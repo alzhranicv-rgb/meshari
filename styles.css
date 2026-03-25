@@ -7977,13 +7977,3 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
     max-width:290px !important;
   }
 }
-@media (min-width: 768px) and (max-width: 1366px){
-  .homePageShell,
-  #homePage{
-    min-height:100vh !important;
-    display:flex !important;
-    flex-direction:column !important;
-    justify-content:center !important;
-    padding:24px 0 !important;
-  }
-}
