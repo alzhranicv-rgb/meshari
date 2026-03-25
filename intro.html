@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>الحنكة - المقدمة</title>
+
+  <link rel="stylesheet" href="styles.css?v=1" />
+  <link rel="stylesheet" href="styles-clean.css?v=1" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="assets/js/supabase.js?v=1"></script>
+</head>
+<body>
+
+  <div class="introPage">
+
+    <div class="introCard">
+
+      <div class="introLogoBox">
+        <div class="introBadge">يلا بينا</div>
+        <h1 class="introTitle">الحنكة</h1>
+        <div class="introTitleLine"></div>
+        <p class="introSubTitle">ابدأ التجهيز وحدد الفريقين والنموذج</p>
+      </div>
+
+      <div class="introForm">
+
+        <div class="introField">
+          <label for="teamANameInput">اسم الفريق الأول</label>
+          <input id="teamANameInput" type="text" placeholder="اكتب اسم الفريق الأول">
+        </div>
+
+        <div class="introField">
+          <label for="teamBNameInput">اسم الفريق الثاني</label>
+          <input id="teamBNameInput" type="text" placeholder="اكتب اسم الفريق الثاني">
+        </div>
+
+        <div class="introField">
+          <label for="introModelSelect">اختيار النموذج</label>
+          <select id="introModelSelect">
+            <option value="">جارٍ تحميل النماذج...</option>
+          </select>
+        </div>
+
+        <div class="introActions">
+          <button id="startGameBtn" onclick="startGameFromIntro()">بدء اللعبة</button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="gameToast" class="gameToast hidden">
+    <div id="gameToastText" class="gameToastText"></div>
+  </div>
+
+  <script src="intro.js?v=1"></script>
+</body>
+</html>

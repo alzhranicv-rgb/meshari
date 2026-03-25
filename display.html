@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>الحنكة</title>
+
+  <link rel="stylesheet" href="styles.css?v=1" />
+  <link rel="stylesheet" href="styles-clean.css?v=1" />
+</head>
+<body>
+
+  <div id="homePage" class="homePageShell">
+
+    <div class="topBoard" id="scoreBoard">
+
+      <div class="teamBox" id="teamABox" onclick="addMainScore('A')">
+        <div class="teamName" id="teamNameA">الفريق الأول</div>
+        <div class="teamScore" id="mainScoreA">0</div>
+      </div>
+
+      <div class="titleBox" id="titleBox">
+        <h1>الحنكة</h1>
+        <div id="modelNameDisplay" class="modelNameDisplay"></div>
+      </div>
+
+      <div class="teamBox" id="teamBBox" onclick="addMainScore('B')">
+        <div class="teamName" id="teamNameB">الفريق الثاني</div>
+        <div class="teamScore" id="mainScoreB">0</div>
+      </div>
+
+    </div>
+
+    <div class="segmentsGrid" id="segmentsGrid">
+
+      <div class="segmentCard" id="segmentWarmup" onclick="openMainSegment('warmup')">
+        <span>التسخين</span>
+        <div class="segmentWinner" id="winnerWarmup"></div>
+      </div>
+
+      <div class="segmentCard" id="segmentTop10" onclick="openMainSegment('top10')">
+        <span>Top 10</span>
+        <div class="segmentWinner" id="winnerTop10"></div>
+      </div>
+
+      <div class="segmentCard" id="segmentAuction" onclick="openMainSegment('auction')">
+        <span>المزاد</span>
+        <div class="segmentWinner" id="winnerAuction"></div>
+      </div>
+
+      <div class="segmentCard" id="segmentWho" onclick="openMainSegment('who')">
+        <span>من هو</span>
+        <div class="segmentWinner" id="winnerWho"></div>
+      </div>
+
+      <div class="segmentCard" id="segmentFinal" onclick="openMainSegment('final')">
+        <span>الفاصلة</span>
+        <div class="segmentWinner" id="winnerFinal"></div>
+      </div>
+
+      <div class="segmentCard" id="segmentArchive" onclick="openMainSegment('archive')">
+        <span>الأرشيف</span>
+        <div class="segmentWinner" id="winnerArchive"></div>
+      </div>
+
+    </div>
+
+    <div class="winnerArea" id="winnerArea">
+      <button class="winnerBtn" onclick="announceWinner()">الفائز</button>
+      <div id="winnerBox"></div>
+    </div>
+
+  </div>
+
+  <div id="segmentArea"></div>
+
+  <div id="winnerOverlay" class="hidden">
+    <div id="winnerOverlayCard">
+      <div id="winnerOverlayTitle">الفائز</div>
+      <div id="winnerOverlayName">—</div>
+      <div id="winnerOverlayBurst">✦ ✦ ✦</div>
+
+      <div class="winnerOverlayActions">
+        <button id="winnerOverlayClose" onclick="closeWinnerOverlay()">إغلاق</button>
+        <button id="winnerOverlayEnd" onclick="endGameAndGoIntro()">إنهاء</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="gameToast" class="gameToast hidden">
+    <div class="gameToastIcon">!</div>
+    <div id="gameToastText" class="gameToastText"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="assets/js/supabase.js?v=1"></script>
+
+  <script src="assets/js/game.js?v=1"></script>
+  <script src="assets/js/warmup.js?v=1"></script>
+  <script src="assets/js/top10.js?v=1"></script>
+  <script src="assets/js/auction.js?v=1"></script>
+  <script src="assets/js/who.js?v=1"></script>
+  <script src="assets/js/final.js?v=1"></script>
+  <script src="assets/js/archive.js?v=1"></script>
+
+</body>
+</html>

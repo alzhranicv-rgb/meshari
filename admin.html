@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الحنكة - لوحة الأسئلة</title>
+  <link rel="stylesheet" href="styles.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="assets/js/supabase.js"></script>
+</head>
+<body>
+
+  <div class="adminPage">
+    <div class="adminTopBar adminTopBarEnhanced">
+      <div class="adminTopBarText">
+        <h1 class="adminTitle">لوحة الأسئلة</h1>
+        <div class="adminTopSubTitle">إدارة النماذج والفقرات والطباعة للمقدم</div>
+      </div>
+    </div>
+
+    <div class="adminMainCard adminMainCardEnhanced">
+
+      <div class="adminModelBar adminModelBarEnhanced">
+
+        <div class="adminField">
+          <label for="modelName">اسم النموذج الجديد</label>
+          <input id="modelName" type="text" placeholder="اكتب اسم النموذج">
+        </div>
+
+        <div class="adminField">
+          <label for="modelsList">النماذج</label>
+          <select id="modelsList">
+            <option value="">جارٍ تحميل النماذج...</option>
+          </select>
+        </div>
+
+        <div class="adminTopActions">
+  <button class="primaryBtn" onclick="createModel()">إنشاء نموذج</button>
+  <button class="secondaryBtn" onclick="openSelectedModel()">فتح النموذج</button>
+  <button class="secondaryBtn" onclick="renameSelectedModel()">تعديل الاسم</button>
+  <button class="deleteBtn" onclick="deleteSelectedModel()">حذف النموذج</button>
+  <button class="adminBtn adminBtnLight" onclick="printPresenterSheet()">طباعة للمقدم</button>
+</div>
+
+      </div>
+
+      <div id="adminTabs" class="adminTabs adminTabsEnhanced hidden">
+        <button onclick="openAdminSegment('warmup')">التسخين</button>
+        <button onclick="openAdminSegment('top10')">Top 10</button>
+        <button onclick="openAdminSegment('auction')">المزاد</button>
+        <button onclick="openAdminSegment('who')">من هو</button>
+        <button onclick="openAdminSegment('final')">الفاصلة</button>
+        <button onclick="openAdminSegment('archive')">الأرشيف</button>
+      </div>
+
+      <div id="adminEditor" class="adminEditor adminEditorEnhanced">
+        <div class="adminEmptyState">افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="gameToast" class="gameToast hidden">
+    <div id="gameToastText" class="gameToastText"></div>
+  </div>
+
+  <div id="printPresenterArea"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

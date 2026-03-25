@@ -1,0 +1,205 @@
+let introModelsLoaded = false
+let gameToastTimer = null
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const introCard = document.querySelector(".introCard")
+  if (introCard) {
+    introCard.classList.add("softEnter")
+  }
+
+  await loadIntroModels()
+  fillSavedIntroValues()
+  bindIntroEnterSubmit()
+})
+
+function showGameToast(message) {
+  const toast = document.getElementById("gameToast")
+  const text = document.getElementById("gameToastText")
+
+  if (!toast || !text) return
+
+  text.innerText = message
+  toast.classList.remove("hidden")
+
+  requestAnimationFrame(() => {
+    toast.classList.add("show")
+  })
+
+  clearTimeout(gameToastTimer)
+  gameToastTimer = setTimeout(() => {
+    toast.classList.remove("show")
+
+    setTimeout(() => {
+      toast.classList.add("hidden")
+    }, 280)
+  }, 3000)
+}
+
+async function loadIntroModels() {
+  const select = document.getElementById("introModelSelect")
+  if (!select) return
+
+  select.innerHTML = `<option value="">جارٍ تحميل النماذج...</option>`
+
+  const { data, error } = await db
+    .from("models")
+    .select("*")
+    .order("id", { ascending: true })
+
+  if (error) {
+    console.log(error)
+    select.innerHTML = `<option value="">تعذر تحميل النماذج</option>`
+    showGameToast("تعذر تحميل النماذج")
+    return
+  }
+
+  const rows = data || []
+  select.innerHTML = `<option value="">اختر النموذج</option>`
+
+  rows.forEach((row) => {
+    const option = document.createElement("option")
+    option.value = row.id
+    option.textContent = row.name || `نموذج ${row.id}`
+    select.appendChild(option)
+  })
+
+  introModelsLoaded = true
+}
+
+function fillSavedIntroValues() {
+  const teamAInput = document.getElementById("teamANameInput")
+  const teamBInput = document.getElementById("teamBNameInput")
+  const modelSelect = document.getElementById("introModelSelect")
+
+  const savedA = localStorage.getItem("teamAName") || ""
+  const savedB = localStorage.getItem("teamBName") || ""
+  const savedModel = localStorage.getItem("game_model") || ""
+
+  if (teamAInput) teamAInput.value = savedA
+  if (teamBInput) teamBInput.value = savedB
+
+  if (modelSelect && savedModel) {
+    const applySavedModel = () => {
+      modelSelect.value = savedModel
+    }
+
+    if (introModelsLoaded) {
+      applySavedModel()
+    } else {
+      setTimeout(applySavedModel, 300)
+    }
+  }
+}
+
+function bindIntroEnterSubmit() {
+  const inputs = [
+    document.getElementById("teamANameInput"),
+    document.getElementById("teamBNameInput"),
+    document.getElementById("introModelSelect")
+  ]
+
+  inputs.forEach((el) => {
+    if (!el) return
+
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault()
+        startGameFromIntro()
+      }
+    })
+  })
+}
+
+function validateIntroForm() {
+  const teamAInput = document.getElementById("teamANameInput")
+  const teamBInput = document.getElementById("teamBNameInput")
+  const modelSelect = document.getElementById("introModelSelect")
+
+  const teamA = (teamAInput?.value || "").trim()
+  const teamB = (teamBInput?.value || "").trim()
+  const model = modelSelect?.value || ""
+
+  if (!teamA) {
+    showIntroFieldError(teamAInput, "اكتب اسم الفريق الأول")
+    return false
+  }
+
+  if (!teamB) {
+    showIntroFieldError(teamBInput, "اكتب اسم الفريق الثاني")
+    return false
+  }
+
+  if (!model) {
+    showIntroFieldError(modelSelect, "اختر النموذج أولاً")
+    return false
+  }
+
+  return true
+}
+
+function showIntroFieldError(field, message) {
+  if (!field) return
+
+  field.focus()
+  field.classList.add("introFieldError")
+
+  setTimeout(() => {
+    field.classList.remove("introFieldError")
+  }, 1200)
+
+  showGameToast(message)
+}
+
+function resetGameStateBeforeStart() {
+  localStorage.removeItem("main_score_a")
+  localStorage.removeItem("main_score_b")
+  localStorage.removeItem("active_segment")
+  localStorage.removeItem("segment_status_v1")
+
+  localStorage.removeItem("warmup_state_v1")
+  localStorage.removeItem("top10_state_v1")
+  localStorage.removeItem("auction_state_v1")
+  localStorage.removeItem("who_state_v1")
+  localStorage.removeItem("final_state_v1")
+  localStorage.removeItem("archive_state_v1")
+}
+
+window.startGameFromIntro = function () {
+  const teamAInput = document.getElementById("teamANameInput")
+  const teamBInput = document.getElementById("teamBNameInput")
+  const modelSelect = document.getElementById("introModelSelect")
+  const startBtn = document.getElementById("startGameBtn")
+  const introCard = document.querySelector(".introCard")
+
+  if (!validateIntroForm()) return
+
+  const teamA = teamAInput.value.trim()
+  const teamB = teamBInput.value.trim()
+  const model = modelSelect.value
+  const modelText = modelSelect.options[modelSelect.selectedIndex]?.text || ""
+
+  resetGameStateBeforeStart()
+
+  localStorage.setItem("teamAName", teamA)
+  localStorage.setItem("teamBName", teamB)
+  localStorage.setItem("game_model", model)
+  localStorage.setItem("game_model_name", modelText)
+
+  localStorage.setItem("main_score_a", 0)
+  localStorage.setItem("main_score_b", 0)
+
+  if (startBtn) {
+    startBtn.disabled = true
+    startBtn.textContent = "جارٍ البدء..."
+  }
+
+  document.body.classList.add("softExit")
+
+  if (introCard) {
+    introCard.classList.add("softExit")
+  }
+
+  setTimeout(() => {
+    window.location.href = "display.html"
+  }, 230)
+}
