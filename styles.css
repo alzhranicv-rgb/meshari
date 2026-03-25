@@ -82,12 +82,12 @@ body::before{
   pointer-events:none;
   z-index:0;
   background:
-    radial-gradient(circle at 10% 14%, rgba(255,196,120,.34) 0 170px, transparent 171px),
-    radial-gradient(circle at 88% 16%, rgba(232,175,103,.28) 0 145px, transparent 146px),
-    radial-gradient(circle at 14% 84%, rgba(255,183,77,.24) 0 180px, transparent 181px),
-    radial-gradient(circle at 86% 82%, rgba(223,150,65,.20) 0 190px, transparent 191px),
-    linear-gradient(120deg, transparent 0 48%, rgba(15,23,42,.012) 48.3%, transparent 49%) 0 0/260px 260px,
-    linear-gradient(120deg, transparent 0 62%, rgba(15,23,42,.009) 62.2%, transparent 63%) 0 0/340px 340px;
+    radial-gradient(circle at 10% 14%, rgba(255,196,120,.28) 0 160px, transparent 161px),
+    radial-gradient(circle at 88% 16%, rgba(232,175,103,.22) 0 135px, transparent 136px),
+    radial-gradient(circle at 14% 84%, rgba(255,183,77,.18) 0 170px, transparent 171px),
+    radial-gradient(circle at 86% 82%, rgba(223,150,65,.16) 0 180px, transparent 181px),
+    linear-gradient(120deg, transparent 0 48%, rgba(15,23,42,.010) 48.3%, transparent 49%) 0 0/260px 260px,
+    linear-gradient(120deg, transparent 0 62%, rgba(15,23,42,.007) 62.2%, transparent 63%) 0 0/340px 340px;
 }
 
 .titleBox h1,
