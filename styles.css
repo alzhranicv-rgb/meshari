@@ -7745,282 +7745,7 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   box-shadow:none !important;
 }
 /* =========================
-   IPAD SIZE FIX - KEEP OLD DESIGN
-========================= */
-
-@media (min-width: 768px) and (max-width: 1366px){
-  .homePageShell,
-  #homePage{
-    width:min(95vw, 1280px) !important;
-    min-height:100vh !important;
-    padding:20px 0 24px !important;
-    justify-content:flex-start !important;
-  }
-
-  .topBoard{
-    grid-template-columns:1fr 180px 1fr !important;
-    gap:16px !important;
-    margin-bottom:20px !important;
-  }
-
-  .titleBox h1{
-    font-size:62px !important;
-  }
-
-  .modelNameDisplay{
-    font-size:24px !important;
-  }
-
-  .teamBox{
-    max-width:100% !important;
-    min-height:102px !important;
-    padding:12px 16px !important;
-  }
-
-  .teamName{
-    min-width:160px !important;
-    font-size:26px !important;
-    padding:10px 14px !important;
-  }
-
-  .teamScore{
-    min-width:72px !important;
-    height:56px !important;
-    font-size:30px !important;
-  }
-
-  .segmentsGrid{
-    grid-template-columns:repeat(3,1fr) !important;
-    gap:16px !important;
-    margin-bottom:20px !important;
-  }
-
-  .segmentCard{
-    min-height:155px !important;
-    padding:18px 16px !important;
-  }
-
-  .segmentCard span{
-    font-size:32px !important;
-  }
-
-  .segmentWinner{
-    font-size:21px !important;
-  }
-
-  .winnerBtn{
-    min-width:220px !important;
-    min-height:58px !important;
-    font-size:24px !important;
-  }
-
-  .segmentControls{
-    width:min(95vw, 1240px) !important;
-    grid-template-columns:150px 1fr 150px !important;
-    gap:12px !important;
-    margin:20px auto 10px !important;
-  }
-
-  .segmentTitle{
-    font-size:40px !important;
-  }
-
-  .backBtn,
-  .endBtn{
-    width:150px !important;
-    min-height:48px !important;
-    font-size:17px !important;
-  }
-
-  .segmentContentWrap{
-    width:min(95vw, 1240px) !important;
-    margin:20px auto 16px !important;
-  }
-
-  .warmupTopBar,
-  .top10HeaderRow,
-  .auctionTopBar,
-  .whoTopBar,
-  .finalTopBar{
-    grid-template-columns:1fr 175px 1fr !important;
-    gap:12px !important;
-  }
-
-  .warmupTeamCard,
-  .top10TeamCard,
-  .auctionTeamCard,
-  .whoTeamCard,
-  .finalTeamCard{
-    min-height:90px !important;
-    padding:10px 12px !important;
-  }
-
-  .warmupTeamName,
-  .top10TeamName,
-  .auctionTeamName,
-  .whoTeamName,
-  .finalTeamName{
-    min-width:150px !important;
-    font-size:24px !important;
-    padding:9px 12px !important;
-  }
-
-  .warmupTeamScore,
-  .top10TeamScore,
-  .auctionTeamScore,
-  .whoTeamScore,
-  .finalTeamScore{
-    min-width:60px !important;
-    height:48px !important;
-    font-size:24px !important;
-  }
-
-  .warmupTimerBox,
-  .top10CenterBox,
-  .auctionTimerBox,
-  .whoTimerBox,
-  .finalCenterBox{
-    min-height:90px !important;
-  }
-
-  .warmupTimerValue,
-  .top10TimerValue,
-  .auctionTimerValue,
-  .whoTimerValue{
-    font-size:38px !important;
-  }
-
-  .finalCenterLabel{
-    font-size:28px !important;
-  }
-
-  .warmupQuestionBox,
-  .top10QuestionBox,
-  .auctionQuestionBox{
-    min-height:82px !important;
-    font-size:23px !important;
-    padding:14px 18px !important;
-  }
-
-  .whoImageStage,
-  .finalImageStage{
-    min-height:290px !important;
-  }
-
-  .warmupGrid{
-    grid-template-columns:repeat(4, minmax(0,1fr)) !important;
-    gap:10px !important;
-  }
-
-  .top10NumbersArea{
-    grid-template-columns:1fr 1fr !important;
-    gap:12px !important;
-  }
-
-  .auctionGrid{
-    grid-template-columns:repeat(4, minmax(0,1fr)) !important;
-    gap:10px !important;
-  }
-
-  .whoGrid{
-    grid-template-columns:repeat(5, minmax(0,1fr)) !important;
-    gap:10px !important;
-  }
-
-  .finalGrid{
-    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
-    gap:12px !important;
-  }
-
-  .warmupCategoryTitle{
-    min-height:54px !important;
-    font-size:20px !important;
-  }
-
-  .warmupNumberBtn,
-  .top10Rect,
-  .auctionBtn,
-  .whoBtn,
-  .finalCard{
-    min-height:60px !important;
-    font-size:26px !important;
-  }
-
-  .warmupControlPanel .btnAnswer,
-  .warmupControlPanel .btnWrong,
-  .warmupControlPanel .btnCorrect,
-  .top10StartBtn,
-  .top10ErrorBtnSingle,
-  .top10ControlPanel .btnAnswer,
-  .top10ControlPanel .roundNavBtn,
-  .auctionControlPanel .btnTimer,
-  .auctionControlPanel .btnWrong,
-  .auctionControlPanel .btnCorrect,
-  .whoControlPanel .btnAnswer,
-  .whoControlPanel .btnWrong,
-  .whoControlPanel .btnCorrect,
-  .archiveCtrlBtn{
-    min-width:145px !important;
-    min-height:48px !important;
-    font-size:17px !important;
-  }
-
-  .archiveMainWrap{
-    grid-template-columns:minmax(0,1fr) 290px !important;
-    gap:22px !important;
-    padding:0 10px !important;
-  }
-
-  .archiveBoard{
-    width:100% !important;
-    max-width:660px !important;
-  }
-
-  .archiveSidePanel{
-    width:290px !important;
-    max-width:290px !important;
-  }
-}
-/* =========================
-   MANGO BACKGROUND VISIBLE
-========================= */
-
-body{
-  position:relative;
-  background:linear-gradient(135deg, var(--bg-main), var(--bg-soft)) !important;
-}
-
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-  background:
-    radial-gradient(circle at 10% 14%, rgba(255,196,120,.34) 0 150px, transparent 151px),
-    radial-gradient(circle at 88% 16%, rgba(232,175,103,.28) 0 130px, transparent 131px),
-    radial-gradient(circle at 14% 84%, rgba(255,183,77,.24) 0 165px, transparent 166px),
-    radial-gradient(circle at 86% 82%, rgba(223,150,65,.22) 0 175px, transparent 176px),
-    linear-gradient(120deg, transparent 0 48%, rgba(15,23,42,.018) 48.3%, transparent 49%) 0 0/260px 260px,
-    linear-gradient(120deg, transparent 0 62%, rgba(15,23,42,.014) 62.2%, transparent 63%) 0 0/340px 340px;
-}
-
-#homePage,
-.homePageShell,
-#segmentArea,
-.segmentContentWrap,
-.topBoard,
-.segmentsGrid,
-.segmentControls{
-  position:relative;
-  z-index:1;
-}
-.segmentContentWrap{
-  background:rgba(255,255,255,.06);
-  border-radius:24px;
-}
-/* =========================
-   IPAD FIT FIX
+   IPAD FINAL SAFE FIX
 ========================= */
 @media (min-width: 768px) and (max-width: 1366px){
   html,
@@ -8028,27 +7753,23 @@ body::before{
     overflow-x:hidden !important;
   }
 
-  /* الصفحة الرئيسية */
   .homePageShell,
   #homePage{
-    width:min(92vw, 1180px) !important;
+    width:min(94vw, 1220px) !important;
     min-height:100vh !important;
     margin:0 auto !important;
-    padding:18px 0 20px !important;
-    display:flex !important;
-    flex-direction:column !important;
-    justify-content:center !important;
+    padding:18px 0 22px !important;
+    justify-content:flex-start !important;
   }
 
   .topBoard{
-    width:100% !important;
-    grid-template-columns:1fr 170px 1fr !important;
+    grid-template-columns:1fr 175px 1fr !important;
     gap:14px !important;
     margin-bottom:18px !important;
   }
 
   .titleBox h1{
-    font-size:56px !important;
+    font-size:58px !important;
   }
 
   .modelNameDisplay{
@@ -8056,38 +7777,35 @@ body::before{
   }
 
   .teamBox{
-    min-height:92px !important;
+    min-height:96px !important;
     padding:10px 14px !important;
   }
 
   .teamName{
-    min-width:140px !important;
+    min-width:145px !important;
     font-size:24px !important;
     padding:9px 12px !important;
   }
 
   .teamScore{
-    min-width:62px !important;
+    min-width:64px !important;
     height:50px !important;
     font-size:26px !important;
   }
 
   .segmentsGrid{
-    width:100% !important;
     grid-template-columns:repeat(3, minmax(0,1fr)) !important;
     gap:14px !important;
     margin-bottom:18px !important;
   }
 
   .segmentCard{
-    min-height:140px !important;
+    min-height:142px !important;
     padding:16px 14px !important;
-    border-radius:24px !important;
   }
 
   .segmentCard span{
-    font-size:28px !important;
-    line-height:1.2 !important;
+    font-size:29px !important;
   }
 
   .segmentWinner{
@@ -8100,12 +7818,11 @@ body::before{
     font-size:22px !important;
   }
 
-  /* هيدر الفقرات */
   .segmentControls{
-    width:min(92vw, 1180px) !important;
-    margin:14px auto 10px !important;
+    width:min(94vw, 1200px) !important;
     grid-template-columns:130px 1fr 130px !important;
     gap:12px !important;
+    margin:16px auto 10px !important;
   }
 
   .segmentTitle{
@@ -8120,20 +7837,19 @@ body::before{
   }
 
   .segmentContentWrap{
-    width:min(92vw, 1180px) !important;
-    margin:14px auto 12px !important;
+    width:min(94vw, 1200px) !important;
+    margin:16px auto 12px !important;
+    background:transparent !important;
+    border-radius:0 !important;
   }
 
-  /* شريط أعلى الفقرات */
   .warmupTopBar,
   .top10HeaderRow,
   .auctionTopBar,
   .whoTopBar,
   .finalTopBar{
-    width:100% !important;
-    grid-template-columns:1fr 150px 1fr !important;
+    grid-template-columns:1fr 155px 1fr !important;
     gap:10px !important;
-    margin-bottom:12px !important;
   }
 
   .warmupTeamCard,
@@ -8150,7 +7866,7 @@ body::before{
   .auctionTeamName,
   .whoTeamName,
   .finalTeamName{
-    min-width:130px !important;
+    min-width:132px !important;
     font-size:22px !important;
     padding:8px 10px !important;
   }
@@ -8184,14 +7900,12 @@ body::before{
     font-size:24px !important;
   }
 
-  /* صناديق السؤال */
   .warmupQuestionBox,
   .top10QuestionBox,
   .auctionQuestionBox{
     min-height:74px !important;
     font-size:21px !important;
     padding:12px 16px !important;
-    margin-bottom:12px !important;
   }
 
   .whoImageStage,
@@ -8199,10 +7913,29 @@ body::before{
     min-height:250px !important;
   }
 
-  /* شبكة التسخين */
   .warmupGrid{
     grid-template-columns:repeat(4, minmax(0,1fr)) !important;
     gap:10px !important;
+  }
+
+  .top10NumbersArea{
+    grid-template-columns:1fr 1fr !important;
+    gap:12px !important;
+  }
+
+  .auctionGrid{
+    grid-template-columns:repeat(4, minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+
+  .whoGrid{
+    grid-template-columns:repeat(5, minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+
+  .finalGrid{
+    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
+    gap:12px !important;
   }
 
   .warmupCategoryTitle{
@@ -8210,56 +7943,15 @@ body::before{
     font-size:18px !important;
   }
 
-  .warmupNumberBtn{
+  .warmupNumberBtn,
+  .top10Rect,
+  .auctionBtn,
+  .whoBtn,
+  .finalCard{
     min-height:54px !important;
     font-size:24px !important;
   }
 
-  /* Top 10 */
-  .top10NumbersArea{
-    grid-template-columns:1fr 1fr !important;
-    gap:12px !important;
-  }
-
-  .top10Rect{
-    min-height:56px !important;
-    font-size:24px !important;
-  }
-
-  /* المزاد */
-  .auctionGrid{
-    grid-template-columns:repeat(4, minmax(0,1fr)) !important;
-    gap:10px !important;
-  }
-
-  .auctionBtn{
-    min-height:56px !important;
-    font-size:24px !important;
-  }
-
-  /* من هو */
-  .whoGrid{
-    grid-template-columns:repeat(5, minmax(0,1fr)) !important;
-    gap:10px !important;
-  }
-
-  .whoBtn{
-    min-height:56px !important;
-    font-size:24px !important;
-  }
-
-  /* الفاصلة */
-  .finalGrid{
-    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
-    gap:12px !important;
-  }
-
-  .finalCard{
-    min-height:56px !important;
-    font-size:24px !important;
-  }
-
-  /* أزرار التحكم */
   .warmupControlPanel .btnAnswer,
   .warmupControlPanel .btnWrong,
   .warmupControlPanel .btnCorrect,
@@ -8279,12 +7971,10 @@ body::before{
     font-size:16px !important;
   }
 
-  /* الأرشيف */
   .archiveMainWrap{
-    width:min(92vw, 1180px) !important;
     grid-template-columns:minmax(0,1fr) 250px !important;
     gap:18px !important;
-    margin:0 auto !important;
+    padding:0 10px !important;
   }
 
   .archiveBoard{
@@ -8295,4 +7985,22 @@ body::before{
     width:250px !important;
     max-width:250px !important;
   }
+}
+
+/* =========================
+   FIX SEGMENT CLICK
+========================= */
+#homePage,
+.homePageShell,
+.topBoard,
+.segmentsGrid,
+.segmentCard,
+.winnerArea{
+  position:relative !important;
+  z-index:2 !important;
+}
+
+body::before{
+  pointer-events:none !important;
+  z-index:0 !important;
 }
