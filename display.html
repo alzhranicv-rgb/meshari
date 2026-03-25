@@ -2,11 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>الحنكة</title>
-
-  <link rel="stylesheet" href="styles.css?v=1" />
-  <link rel="stylesheet" href="styles-clean.css?v=1" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
@@ -87,21 +85,28 @@
     </div>
   </div>
 
+  <div id="gameNotice" class="gameNotice hidden">
+    <div class="gameNoticeCard">
+      <div class="gameNoticeIcon">!</div>
+      <div id="gameNoticeText" class="gameNoticeText"></div>
+      <button class="gameNoticeBtn" onclick="closeGameNotice()">حسنًا</button>
+    </div>
+  </div>
+
   <div id="gameToast" class="gameToast hidden">
     <div class="gameToastIcon">!</div>
     <div id="gameToastText" class="gameToastText"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="assets/js/supabase.js?v=1"></script>
-
-  <script src="assets/js/game.js?v=1"></script>
-  <script src="assets/js/warmup.js?v=1"></script>
-  <script src="assets/js/top10.js?v=1"></script>
-  <script src="assets/js/auction.js?v=1"></script>
-  <script src="assets/js/who.js?v=1"></script>
-  <script src="assets/js/final.js?v=1"></script>
-  <script src="assets/js/archive.js?v=1"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/game.js"></script>
+  <script src="assets/js/warmup.js"></script>
+  <script src="assets/js/top10.js"></script>
+  <script src="assets/js/auction.js"></script>
+  <script src="assets/js/who.js"></script>
+  <script src="assets/js/final.js"></script>
+  <script src="assets/js/archive.js"></script>
 
 </body>
 </html>
