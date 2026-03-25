@@ -7976,3 +7976,41 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
     max-width:290px !important;
   }
 }
+/* =========================
+   MANGO BACKGROUND VISIBLE
+========================= */
+
+body{
+  position:relative;
+  background:linear-gradient(135deg, var(--bg-main), var(--bg-soft)) !important;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(circle at 10% 14%, rgba(255,196,120,.34) 0 150px, transparent 151px),
+    radial-gradient(circle at 88% 16%, rgba(232,175,103,.28) 0 130px, transparent 131px),
+    radial-gradient(circle at 14% 84%, rgba(255,183,77,.24) 0 165px, transparent 166px),
+    radial-gradient(circle at 86% 82%, rgba(223,150,65,.22) 0 175px, transparent 176px),
+    linear-gradient(120deg, transparent 0 48%, rgba(15,23,42,.018) 48.3%, transparent 49%) 0 0/260px 260px,
+    linear-gradient(120deg, transparent 0 62%, rgba(15,23,42,.014) 62.2%, transparent 63%) 0 0/340px 340px;
+}
+
+#homePage,
+.homePageShell,
+#segmentArea,
+.segmentContentWrap,
+.topBoard,
+.segmentsGrid,
+.segmentControls{
+  position:relative;
+  z-index:1;
+}
+.segmentContentWrap{
+  background:rgba(255,255,255,.06);
+  border-radius:24px;
+}
