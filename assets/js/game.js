@@ -150,6 +150,7 @@ function stopWinnerEffects() {
 ========================= */
 
 let sharedGameSounds = null
+let audioUnlocked = false
 
 function initGameSounds() {
   if (sharedGameSounds) return
@@ -169,8 +170,62 @@ function initGameSounds() {
   })
 }
 
+function unlockAudioContext() {
+  if (audioUnlocked) return
+
+  initWinnerSound()
+  initGameSounds()
+
+  const sounds = [
+    winnerSound,
+    ...(sharedGameSounds ? Object.values(sharedGameSounds) : [])
+  ].filter(Boolean)
+
+  sounds.forEach(sound => {
+    try {
+      sound.muted = true
+      const playPromise = sound.play()
+
+      if (playPromise && typeof playPromise.then === "function") {
+        playPromise
+          .then(() => {
+            sound.pause()
+            sound.currentTime = 0
+            sound.muted = false
+          })
+          .catch(() => {
+            sound.muted = false
+          })
+      } else {
+        sound.pause()
+        sound.currentTime = 0
+        sound.muted = false
+      }
+    } catch (e) {
+      sound.muted = false
+    }
+  })
+
+  audioUnlocked = true
+}
+
+function bindAudioUnlock() {
+  const unlockOnce = () => {
+    unlockAudioContext()
+    document.removeEventListener("click", unlockOnce)
+    document.removeEventListener("touchstart", unlockOnce)
+    document.removeEventListener("pointerdown", unlockOnce)
+  }
+
+  document.addEventListener("click", unlockOnce, { passive: true })
+  document.addEventListener("touchstart", unlockOnce, { passive: true })
+  document.addEventListener("pointerdown", unlockOnce, { passive: true })
+}
+
 function playGameSound(type) {
   initGameSounds()
+
+  if (!audioUnlocked) return
 
   const sound = sharedGameSounds?.[type]
   if (!sound) return
@@ -286,6 +341,7 @@ function stopEndButtonWatcher() {
 document.addEventListener("DOMContentLoaded", () => {
   initWinnerSound()
   initGameSounds()
+  bindAudioUnlock()
 
   segmentStatus = loadSegmentStatus()
   updateSegmentCards()
@@ -580,6 +636,8 @@ function updateEndRoundButtonState() {
 function selectTeam(team) {
   selectedTeam = team
 
+  unlockAudioContext()
+
   const a = document.getElementById("teamABox")
   const b = document.getElementById("teamBBox")
 
@@ -591,6 +649,8 @@ function selectTeam(team) {
 }
 
 function correctAnswer() {
+  unlockAudioContext()
+
   if (!selectedTeam) {
     showGameToast("اختر الفريق أولاً")
     return
@@ -620,6 +680,8 @@ function wrongAnswer() {
 }
 
 function startQuestion(points) {
+  unlockAudioContext()
+
   let time = 15
   if (points == 2) time = 25
   if (points == 3) time = 30
@@ -630,16 +692,25 @@ function startQuestion(points) {
   if (!timerBox) return
 
   clearInterval(timer)
+  timer = null
+
+  let lastTickPlayed = null
   timerBox.innerText = time
 
   timer = setInterval(() => {
     time--
     timerBox.innerText = time
 
+    if (time > 0 && time <= 5 && lastTickPlayed !== time) {
+      lastTickPlayed = time
+      playGameSound("tick")
+    }
+
     if (time <= 0) {
       clearInterval(timer)
       timer = null
       timerBox.innerText = 0
+      playGameSound("timeout")
     }
   }, 1000)
 }
