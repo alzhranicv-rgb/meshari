@@ -7984,14 +7984,6 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
     display:flex !important;
     flex-direction:column !important;
     justify-content:center !important;
-    padding:0 !important;
-  }
-
-  .topBoard{
-    margin-bottom:22px !important;
-  }
-
-  .segmentsGrid{
-    margin-bottom:22px !important;
+    padding:24px 0 !important;
   }
 }
