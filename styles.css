@@ -68,11 +68,11 @@ html,body{
   color:var(--text);
   overflow-x:hidden;
   background:
-    radial-gradient(circle at 10% 14%, rgba(240,196,139,.16) 0 90px, transparent 91px),
-    radial-gradient(circle at 88% 18%, rgba(232,175,103,.12) 0 72px, transparent 73px),
-    radial-gradient(circle at 16% 84%, rgba(223,150,65,.08) 0 96px, transparent 97px),
-    radial-gradient(circle at 84% 82%, rgba(240,196,139,.10) 0 104px, transparent 105px),
-    linear-gradient(135deg, #f3f6fa 0%, #eaf0f6 55%, #e5edf5 100%);
+    radial-gradient(circle at 12% 18%, rgba(255,196,120,.18) 0 110px, transparent 111px),
+    radial-gradient(circle at 88% 16%, rgba(255,196,120,.14) 0 95px, transparent 96px),
+    radial-gradient(circle at 15% 85%, rgba(255,183,77,.12) 0 120px, transparent 121px),
+    radial-gradient(circle at 85% 82%, rgba(255,183,77,.14) 0 130px, transparent 131px),
+    linear-gradient(135deg, var(--bg-main), var(--bg-soft));
 }
 
 body::before{
@@ -81,9 +81,8 @@ body::before{
   inset:0;
   pointer-events:none;
   background:
-    linear-gradient(125deg, transparent 0 47%, rgba(15,23,42,.012) 47.3%, transparent 48%) 0 0/320px 320px,
-    linear-gradient(125deg, transparent 0 61%, rgba(15,23,42,.010) 61.2%, transparent 62%) 0 0/420px 420px;
-  opacity:.55;
+    linear-gradient(120deg, transparent 0 48%, rgba(15,23,42,.02) 48.3%, transparent 49%) 0 0/260px 260px,
+    linear-gradient(120deg, transparent 0 62%, rgba(15,23,42,.018) 62.2%, transparent 63%) 0 0/340px 340px;
 }
 
 .titleBox h1,
