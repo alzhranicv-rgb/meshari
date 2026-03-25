@@ -7740,45 +7740,26 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   box-shadow:none !important;
 }
 /* =========================
-   IPAD CLEAN FIT
+   IPAD SIZE FIX - KEEP OLD DESIGN
 ========================= */
 
 @media (min-width: 768px) and (max-width: 1366px){
-  html,
-  body{
-    background:linear-gradient(135deg, var(--bg-main), var(--bg-soft)) !important;
-  }
-
-  body::before,
-  .segmentCard::before,
-  .segmentCard::after,
-  .warmupCategoryTitle::before,
-  .warmupCategoryTitle::after,
-  .warmupNumberBtn::before,
-  .top10Rect::before,
-  .auctionBtn::before,
-  .whoBtn::before,
-  .finalCard::before{
-    display:none !important;
-    content:none !important;
-  }
-
   .homePageShell,
   #homePage{
-    width:min(94vw, 1280px) !important;
-    padding:24px 0 30px !important;
+    width:min(95vw, 1280px) !important;
     min-height:100vh !important;
+    padding:20px 0 24px !important;
     justify-content:flex-start !important;
   }
 
   .topBoard{
     grid-template-columns:1fr 180px 1fr !important;
     gap:16px !important;
-    margin-bottom:24px !important;
+    margin-bottom:20px !important;
   }
 
   .titleBox h1{
-    font-size:60px !important;
+    font-size:62px !important;
   }
 
   .modelNameDisplay{
@@ -7786,14 +7767,14 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   }
 
   .teamBox{
-    min-height:100px !important;
+    max-width:100% !important;
+    min-height:102px !important;
     padding:12px 16px !important;
-    border-radius:20px !important;
   }
 
   .teamName{
     min-width:160px !important;
-    font-size:28px !important;
+    font-size:26px !important;
     padding:10px 14px !important;
   }
 
@@ -7804,40 +7785,35 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   }
 
   .segmentsGrid{
-    grid-template-columns:repeat(3, 1fr) !important;
+    grid-template-columns:repeat(3,1fr) !important;
     gap:16px !important;
+    margin-bottom:20px !important;
   }
 
   .segmentCard{
-    min-height:145px !important;
+    min-height:155px !important;
     padding:18px 16px !important;
-    border-radius:24px !important;
   }
 
   .segmentCard span{
-    font-size:30px !important;
+    font-size:32px !important;
   }
 
   .segmentWinner{
-    font-size:22px !important;
-    min-height:28px !important;
-  }
-
-  .segmentLocked .segmentWinner{
-    font-size:24px !important;
+    font-size:21px !important;
   }
 
   .winnerBtn{
-    min-width:210px !important;
-    min-height:56px !important;
+    min-width:220px !important;
+    min-height:58px !important;
     font-size:24px !important;
   }
 
   .segmentControls{
-    width:min(94vw, 1240px) !important;
+    width:min(95vw, 1240px) !important;
     grid-template-columns:150px 1fr 150px !important;
     gap:12px !important;
-    margin:20px auto 12px !important;
+    margin:20px auto 10px !important;
   }
 
   .segmentTitle{
@@ -7848,11 +7824,11 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   .endBtn{
     width:150px !important;
     min-height:48px !important;
-    font-size:18px !important;
+    font-size:17px !important;
   }
 
   .segmentContentWrap{
-    width:min(94vw, 1240px) !important;
+    width:min(95vw, 1240px) !important;
     margin:20px auto 16px !important;
   }
 
@@ -7861,7 +7837,7 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   .auctionTopBar,
   .whoTopBar,
   .finalTopBar{
-    grid-template-columns:1fr 170px 1fr !important;
+    grid-template-columns:1fr 175px 1fr !important;
     gap:12px !important;
   }
 
@@ -7870,7 +7846,7 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   .auctionTeamCard,
   .whoTeamCard,
   .finalTeamCard{
-    min-height:88px !important;
+    min-height:90px !important;
     padding:10px 12px !important;
   }
 
@@ -7879,7 +7855,7 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   .auctionTeamName,
   .whoTeamName,
   .finalTeamName{
-    min-width:145px !important;
+    min-width:150px !important;
     font-size:24px !important;
     padding:9px 12px !important;
   }
@@ -7899,7 +7875,7 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   .auctionTimerBox,
   .whoTimerBox,
   .finalCenterBox{
-    min-height:88px !important;
+    min-height:90px !important;
   }
 
   .warmupTimerValue,
@@ -7916,18 +7892,18 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   .warmupQuestionBox,
   .top10QuestionBox,
   .auctionQuestionBox{
-    min-height:80px !important;
-    font-size:24px !important;
+    min-height:82px !important;
+    font-size:23px !important;
     padding:14px 18px !important;
   }
 
   .whoImageStage,
   .finalImageStage{
-    min-height:280px !important;
+    min-height:290px !important;
   }
 
   .warmupGrid{
-    grid-template-columns:repeat(4, 1fr) !important;
+    grid-template-columns:repeat(4, minmax(0,1fr)) !important;
     gap:10px !important;
   }
 
@@ -7937,18 +7913,23 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   }
 
   .auctionGrid{
-    grid-template-columns:repeat(4, 1fr) !important;
+    grid-template-columns:repeat(4, minmax(0,1fr)) !important;
     gap:10px !important;
   }
 
   .whoGrid{
-    grid-template-columns:repeat(5, 1fr) !important;
+    grid-template-columns:repeat(5, minmax(0,1fr)) !important;
     gap:10px !important;
   }
 
   .finalGrid{
-    grid-template-columns:repeat(3, 1fr) !important;
+    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
     gap:12px !important;
+  }
+
+  .warmupCategoryTitle{
+    min-height:54px !important;
+    font-size:20px !important;
   }
 
   .warmupNumberBtn,
@@ -7956,14 +7937,8 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   .auctionBtn,
   .whoBtn,
   .finalCard{
-    min-height:58px !important;
+    min-height:60px !important;
     font-size:26px !important;
-    border-radius:14px !important;
-  }
-
-  .warmupCategoryTitle{
-    min-height:52px !important;
-    font-size:20px !important;
   }
 
   .warmupControlPanel .btnAnswer,
@@ -7980,14 +7955,14 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   .whoControlPanel .btnWrong,
   .whoControlPanel .btnCorrect,
   .archiveCtrlBtn{
-    min-width:140px !important;
-    min-height:46px !important;
+    min-width:145px !important;
+    min-height:48px !important;
     font-size:17px !important;
   }
 
   .archiveMainWrap{
-    grid-template-columns:minmax(0,1fr) 300px !important;
-    gap:24px !important;
+    grid-template-columns:minmax(0,1fr) 290px !important;
+    gap:22px !important;
     padding:0 10px !important;
   }
 
@@ -7997,275 +7972,7 @@ input[type="file"][accept=".xlsx,.xls,.csv"]{
   }
 
   .archiveSidePanel{
-    width:300px !important;
-    max-width:300px !important;
-  }
-}
-/* =========================
-   IPAD BIGGER HOME + SEGMENTS
-========================= */
-
-@media (min-width: 768px) and (max-width: 1366px){
-  html,
-  body{
-    overflow-x:hidden !important;
-    overflow-y:auto !important;
-    background:linear-gradient(135deg, var(--bg-main), var(--bg-soft)) !important;
-  }
-
-  body::before,
-  .segmentCard::before,
-  .segmentCard::after,
-  .warmupCategoryTitle::before,
-  .warmupCategoryTitle::after,
-  .warmupNumberBtn::before,
-  .top10Rect::before,
-  .auctionBtn::before,
-  .whoBtn::before,
-  .finalCard::before{
-    display:none !important;
-    content:none !important;
-  }
-
-  .homePageShell,
-  #homePage{
-    width:min(96vw, 1320px) !important;
-    min-height:100vh !important;
-    padding:18px 0 20px !important;
-    justify-content:flex-start !important;
-  }
-
-  .topBoard{
-    grid-template-columns:1fr 210px 1fr !important;
-    gap:18px !important;
-    margin-bottom:20px !important;
-  }
-
-  .titleBox{
-    min-height:110px !important;
-  }
-
-  .titleBox h1{
-    font-size:68px !important;
-  }
-
-  .modelNameDisplay{
-    font-size:28px !important;
-  }
-
-  .teamBox{
-    min-height:112px !important;
-    padding:14px 18px !important;
-    border-radius:22px !important;
-  }
-
-  .teamName{
-    min-width:180px !important;
-    font-size:30px !important;
-    padding:12px 16px !important;
-  }
-
-  .teamScore{
-    min-width:82px !important;
-    height:62px !important;
-    font-size:34px !important;
-  }
-
-  .segmentsGrid{
-    grid-template-columns:repeat(3, 1fr) !important;
-    gap:18px !important;
-    margin-bottom:20px !important;
-  }
-
-  .segmentCard{
-    min-height:175px !important;
-    padding:20px 18px !important;
-    border-radius:28px !important;
-    justify-content:center !important;
-  }
-
-  .segmentCard span{
-    font-size:36px !important;
-    line-height:1.2 !important;
-  }
-
-  .segmentWinner{
-    min-height:34px !important;
-    margin-top:10px !important;
-    font-size:24px !important;
-    line-height:1.4 !important;
-  }
-
-  .winnerArea{
-    margin-top:6px !important;
-    gap:12px !important;
-  }
-
-  .winnerBtn{
-    min-width:240px !important;
-    min-height:62px !important;
-    font-size:26px !important;
-    border-radius:20px !important;
-  }
-
-  #winnerBox{
-    font-size:22px !important;
-  }
-
-  .segmentControls{
-    width:min(95vw, 1280px) !important;
-    grid-template-columns:165px 1fr 165px !important;
-    gap:14px !important;
-    margin:20px auto 12px !important;
-  }
-
-  .segmentTitle{
-    font-size:46px !important;
-  }
-
-  .backBtn,
-  .endBtn{
-    width:165px !important;
-    min-height:54px !important;
-    font-size:19px !important;
-    border-radius:16px !important;
-  }
-
-  .segmentContentWrap{
-    width:min(95vw, 1280px) !important;
-    margin:18px auto 16px !important;
-  }
-
-  .warmupTopBar,
-  .top10HeaderRow,
-  .auctionTopBar,
-  .whoTopBar,
-  .finalTopBar{
-    grid-template-columns:1fr 190px 1fr !important;
-    gap:14px !important;
-  }
-
-  .warmupTeamCard,
-  .top10TeamCard,
-  .auctionTeamCard,
-  .whoTeamCard,
-  .finalTeamCard{
-    min-height:96px !important;
-    padding:12px 14px !important;
-    border-radius:20px !important;
-  }
-
-  .warmupTeamName,
-  .top10TeamName,
-  .auctionTeamName,
-  .whoTeamName,
-  .finalTeamName{
-    min-width:165px !important;
-    font-size:27px !important;
-    padding:10px 14px !important;
-  }
-
-  .warmupTeamScore,
-  .top10TeamScore,
-  .auctionTeamScore,
-  .whoTeamScore,
-  .finalTeamScore{
-    min-width:66px !important;
-    height:52px !important;
-    font-size:27px !important;
-  }
-
-  .warmupTimerBox,
-  .top10CenterBox,
-  .auctionTimerBox,
-  .whoTimerBox,
-  .finalCenterBox{
-    min-height:96px !important;
-    border-radius:20px !important;
-  }
-
-  .warmupTimerValue,
-  .top10TimerValue,
-  .auctionTimerValue,
-  .whoTimerValue{
-    font-size:42px !important;
-  }
-
-  .finalCenterLabel{
-    font-size:30px !important;
-  }
-
-  .warmupQuestionBox,
-  .top10QuestionBox,
-  .auctionQuestionBox{
-    min-height:90px !important;
-    font-size:26px !important;
-    padding:16px 20px !important;
-    border-radius:22px !important;
-  }
-
-  .whoImageStage,
-  .finalImageStage{
-    min-height:320px !important;
-  }
-
-  .warmupGrid{
-    grid-template-columns:repeat(4, 1fr) !important;
-    gap:12px !important;
-  }
-
-  .top10NumbersArea{
-    grid-template-columns:1fr 1fr !important;
-    gap:14px !important;
-  }
-
-  .auctionGrid{
-    grid-template-columns:repeat(4, 1fr) !important;
-    gap:12px !important;
-  }
-
-  .whoGrid{
-    grid-template-columns:repeat(5, 1fr) !important;
-    gap:12px !important;
-  }
-
-  .finalGrid{
-    grid-template-columns:repeat(3, 1fr) !important;
-    gap:14px !important;
-  }
-
-  .warmupCategoryTitle{
-    min-height:58px !important;
-    font-size:22px !important;
-  }
-
-  .warmupNumberBtn,
-  .top10Rect,
-  .auctionBtn,
-  .whoBtn,
-  .finalCard{
-    min-height:66px !important;
-    font-size:30px !important;
-    border-radius:16px !important;
-  }
-
-  .warmupControlPanel .btnAnswer,
-  .warmupControlPanel .btnWrong,
-  .warmupControlPanel .btnCorrect,
-  .top10StartBtn,
-  .top10ErrorBtnSingle,
-  .top10ControlPanel .btnAnswer,
-  .top10ControlPanel .roundNavBtn,
-  .auctionControlPanel .btnTimer,
-  .auctionControlPanel .btnWrong,
-  .auctionControlPanel .btnCorrect,
-  .whoControlPanel .btnAnswer,
-  .whoControlPanel .btnWrong,
-  .whoControlPanel .btnCorrect,
-  .archiveCtrlBtn{
-    min-width:155px !important;
-    min-height:50px !important;
-    font-size:18px !important;
-    border-radius:16px !important;
+    width:290px !important;
+    max-width:290px !important;
   }
 }
