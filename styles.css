@@ -8019,3 +8019,280 @@ body::before{
   background:rgba(255,255,255,.06);
   border-radius:24px;
 }
+/* =========================
+   IPAD FIT FIX
+========================= */
+@media (min-width: 768px) and (max-width: 1366px){
+  html,
+  body{
+    overflow-x:hidden !important;
+  }
+
+  /* الصفحة الرئيسية */
+  .homePageShell,
+  #homePage{
+    width:min(92vw, 1180px) !important;
+    min-height:100vh !important;
+    margin:0 auto !important;
+    padding:18px 0 20px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:center !important;
+  }
+
+  .topBoard{
+    width:100% !important;
+    grid-template-columns:1fr 170px 1fr !important;
+    gap:14px !important;
+    margin-bottom:18px !important;
+  }
+
+  .titleBox h1{
+    font-size:56px !important;
+  }
+
+  .modelNameDisplay{
+    font-size:22px !important;
+  }
+
+  .teamBox{
+    min-height:92px !important;
+    padding:10px 14px !important;
+  }
+
+  .teamName{
+    min-width:140px !important;
+    font-size:24px !important;
+    padding:9px 12px !important;
+  }
+
+  .teamScore{
+    min-width:62px !important;
+    height:50px !important;
+    font-size:26px !important;
+  }
+
+  .segmentsGrid{
+    width:100% !important;
+    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
+    gap:14px !important;
+    margin-bottom:18px !important;
+  }
+
+  .segmentCard{
+    min-height:140px !important;
+    padding:16px 14px !important;
+    border-radius:24px !important;
+  }
+
+  .segmentCard span{
+    font-size:28px !important;
+    line-height:1.2 !important;
+  }
+
+  .segmentWinner{
+    font-size:18px !important;
+  }
+
+  .winnerBtn{
+    min-width:200px !important;
+    min-height:54px !important;
+    font-size:22px !important;
+  }
+
+  /* هيدر الفقرات */
+  .segmentControls{
+    width:min(92vw, 1180px) !important;
+    margin:14px auto 10px !important;
+    grid-template-columns:130px 1fr 130px !important;
+    gap:12px !important;
+  }
+
+  .segmentTitle{
+    font-size:38px !important;
+  }
+
+  .backBtn,
+  .endBtn{
+    width:130px !important;
+    min-height:46px !important;
+    font-size:16px !important;
+  }
+
+  .segmentContentWrap{
+    width:min(92vw, 1180px) !important;
+    margin:14px auto 12px !important;
+  }
+
+  /* شريط أعلى الفقرات */
+  .warmupTopBar,
+  .top10HeaderRow,
+  .auctionTopBar,
+  .whoTopBar,
+  .finalTopBar{
+    width:100% !important;
+    grid-template-columns:1fr 150px 1fr !important;
+    gap:10px !important;
+    margin-bottom:12px !important;
+  }
+
+  .warmupTeamCard,
+  .top10TeamCard,
+  .auctionTeamCard,
+  .whoTeamCard,
+  .finalTeamCard{
+    min-height:84px !important;
+    padding:10px 12px !important;
+  }
+
+  .warmupTeamName,
+  .top10TeamName,
+  .auctionTeamName,
+  .whoTeamName,
+  .finalTeamName{
+    min-width:130px !important;
+    font-size:22px !important;
+    padding:8px 10px !important;
+  }
+
+  .warmupTeamScore,
+  .top10TeamScore,
+  .auctionTeamScore,
+  .whoTeamScore,
+  .finalTeamScore{
+    min-width:56px !important;
+    height:44px !important;
+    font-size:22px !important;
+  }
+
+  .warmupTimerBox,
+  .top10CenterBox,
+  .auctionTimerBox,
+  .whoTimerBox,
+  .finalCenterBox{
+    min-height:84px !important;
+  }
+
+  .warmupTimerValue,
+  .top10TimerValue,
+  .auctionTimerValue,
+  .whoTimerValue{
+    font-size:34px !important;
+  }
+
+  .finalCenterLabel{
+    font-size:24px !important;
+  }
+
+  /* صناديق السؤال */
+  .warmupQuestionBox,
+  .top10QuestionBox,
+  .auctionQuestionBox{
+    min-height:74px !important;
+    font-size:21px !important;
+    padding:12px 16px !important;
+    margin-bottom:12px !important;
+  }
+
+  .whoImageStage,
+  .finalImageStage{
+    min-height:250px !important;
+  }
+
+  /* شبكة التسخين */
+  .warmupGrid{
+    grid-template-columns:repeat(4, minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+
+  .warmupCategoryTitle{
+    min-height:48px !important;
+    font-size:18px !important;
+  }
+
+  .warmupNumberBtn{
+    min-height:54px !important;
+    font-size:24px !important;
+  }
+
+  /* Top 10 */
+  .top10NumbersArea{
+    grid-template-columns:1fr 1fr !important;
+    gap:12px !important;
+  }
+
+  .top10Rect{
+    min-height:56px !important;
+    font-size:24px !important;
+  }
+
+  /* المزاد */
+  .auctionGrid{
+    grid-template-columns:repeat(4, minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+
+  .auctionBtn{
+    min-height:56px !important;
+    font-size:24px !important;
+  }
+
+  /* من هو */
+  .whoGrid{
+    grid-template-columns:repeat(5, minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+
+  .whoBtn{
+    min-height:56px !important;
+    font-size:24px !important;
+  }
+
+  /* الفاصلة */
+  .finalGrid{
+    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
+    gap:12px !important;
+  }
+
+  .finalCard{
+    min-height:56px !important;
+    font-size:24px !important;
+  }
+
+  /* أزرار التحكم */
+  .warmupControlPanel .btnAnswer,
+  .warmupControlPanel .btnWrong,
+  .warmupControlPanel .btnCorrect,
+  .top10StartBtn,
+  .top10ErrorBtnSingle,
+  .top10ControlPanel .btnAnswer,
+  .top10ControlPanel .roundNavBtn,
+  .auctionControlPanel .btnTimer,
+  .auctionControlPanel .btnWrong,
+  .auctionControlPanel .btnCorrect,
+  .whoControlPanel .btnAnswer,
+  .whoControlPanel .btnWrong,
+  .whoControlPanel .btnCorrect,
+  .archiveCtrlBtn{
+    min-width:130px !important;
+    min-height:44px !important;
+    font-size:16px !important;
+  }
+
+  /* الأرشيف */
+  .archiveMainWrap{
+    width:min(92vw, 1180px) !important;
+    grid-template-columns:minmax(0,1fr) 250px !important;
+    gap:18px !important;
+    margin:0 auto !important;
+  }
+
+  .archiveBoard{
+    max-width:620px !important;
+  }
+
+  .archiveSidePanel{
+    width:250px !important;
+    max-width:250px !important;
+  }
+}
