@@ -969,3 +969,87 @@ body::before{
     max-width:310px !important;
   }
 }
+/* إزالة أي طبقة/Glow داخل مربعات الفئات والأرقام */
+.segmentCard,
+.warmupCategoryCard,
+.warmupQuestionBox,
+.top10QuestionBox,
+.auctionQuestionBox,
+.whoImageStage,
+.finalImageStage,
+.archiveModernBigCard,
+.archiveModernInfoCard,
+.archiveModernScoreCard,
+.archiveModernSmallCard,
+.warmupNumberBtn,
+.top10Rect,
+.auctionBtn,
+.whoBtn,
+.finalCard{
+  box-shadow:none !important;
+  filter:none !important;
+}
+
+/* إزالة أي طبقة داخلية أو انعكاس */
+.segmentCard::before,
+.segmentCard::after,
+.warmupCategoryCard::before,
+.warmupCategoryCard::after,
+.warmupQuestionBox::before,
+.warmupQuestionBox::after,
+.top10QuestionBox::before,
+.top10QuestionBox::after,
+.auctionQuestionBox::before,
+.auctionQuestionBox::after,
+.whoImageStage::before,
+.whoImageStage::after,
+.finalImageStage::before,
+.finalImageStage::after,
+.archiveModernBigCard::before,
+.archiveModernBigCard::after,
+.archiveModernInfoCard::before,
+.archiveModernInfoCard::after,
+.archiveModernScoreCard::before,
+.archiveModernScoreCard::after,
+.archiveModernSmallCard::before,
+.archiveModernSmallCard::after,
+.warmupNumberBtn::before,
+.warmupNumberBtn::after,
+.top10Rect::before,
+.top10Rect::after,
+.auctionBtn::before,
+.auctionBtn::after,
+.whoBtn::before,
+.whoBtn::after,
+.finalCard::before,
+.finalCard::after{
+  display:none !important;
+  content:none !important;
+  background:none !important;
+  box-shadow:none !important;
+  filter:none !important;
+}
+
+/* تنظيف خاص للآيباد */
+@media (min-width: 768px) and (max-width: 1366px){
+  .segmentCard,
+  .warmupCategoryCard,
+  .warmupQuestionBox,
+  .top10QuestionBox,
+  .auctionQuestionBox,
+  .whoImageStage,
+  .finalImageStage,
+  .archiveModernBigCard,
+  .archiveModernInfoCard,
+  .archiveModernScoreCard,
+  .archiveModernSmallCard,
+  .warmupNumberBtn,
+  .top10Rect,
+  .auctionBtn,
+  .whoBtn,
+  .finalCard{
+    box-shadow:none !important;
+    filter:none !important;
+    backdrop-filter:none !important;
+  }
+}
