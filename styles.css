@@ -8431,4 +8431,95 @@ body::before{
   .top10ErrorMark{
     font-size:32px !important;
   }
+}/* =========================
+   IPAD WARMUP BIGGER ONLY
+========================= */
+@media (min-width: 768px) and (max-width: 1366px){
+  .warmupTopBar{
+    width:100% !important;
+    grid-template-columns:1fr 180px 1fr !important;
+    gap:12px !important;
+    margin-bottom:14px !important;
+  }
+
+  .warmupTeamCard{
+    min-height:96px !important;
+    padding:12px 14px !important;
+    border-radius:20px !important;
+  }
+
+  .warmupTeamName{
+    min-width:150px !important;
+    font-size:24px !important;
+    padding:10px 14px !important;
+  }
+
+  .warmupTeamScore{
+    min-width:62px !important;
+    height:50px !important;
+    font-size:24px !important;
+  }
+
+  .warmupTimerBox{
+    min-height:96px !important;
+    border-radius:20px !important;
+  }
+
+  .warmupTimerLabel{
+    font-size:18px !important;
+  }
+
+  .warmupTimerValue{
+    font-size:40px !important;
+  }
+
+  .warmupQuestionBox{
+    min-height:88px !important;
+    font-size:24px !important;
+    padding:16px 20px !important;
+    border-radius:22px !important;
+    margin-bottom:14px !important;
+  }
+
+  .warmupControlPanel{
+    gap:12px !important;
+    margin-bottom:16px !important;
+  }
+
+  .warmupControlPanel .btnAnswer,
+  .warmupControlPanel .btnWrong,
+  .warmupControlPanel .btnCorrect{
+    min-width:150px !important;
+    min-height:48px !important;
+    font-size:18px !important;
+    border-radius:16px !important;
+  }
+
+  .warmupGrid{
+    grid-template-columns:repeat(4, minmax(0,1fr)) !important;
+    gap:12px !important;
+    align-items:start !important;
+  }
+
+  .warmupCategoryCard{
+    padding:12px !important;
+    border-radius:22px !important;
+  }
+
+  .warmupCategoryTitle{
+    min-height:58px !important;
+    font-size:21px !important;
+    margin-bottom:12px !important;
+    border-radius:16px !important;
+  }
+
+  .warmupNumbersRow{
+    gap:12px !important;
+  }
+
+  .warmupNumberBtn{
+    min-height:68px !important;
+    font-size:30px !important;
+    border-radius:16px !important;
+  }
 }
