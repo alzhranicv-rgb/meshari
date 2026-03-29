@@ -1,7 +1,8 @@
 let archiveRevealState = {
   1: {},
   2: {},
-  3: {}
+  3: {},
+  4: {}
 }
 
 let archiveRemainingPoints = 0
@@ -18,7 +19,8 @@ let archiveState = {
   errors: {
     1: { A: 0, B: 0 },
     2: { A: 0, B: 0 },
-    3: { A: 0, B: 0 }
+    3: { A: 0, B: 0 },
+    4: { A: 0, B: 0 }
   }
 }
 
@@ -27,7 +29,8 @@ window.archiveState = archiveState
 let archiveRoundCache = {
   1: { box: null, items: [] },
   2: { box: null, items: [] },
-  3: { box: null, items: [] }
+  3: { box: null, items: [] },
+  4: { box: null, items: [] }
 }
 
 window.archiveRevealState = archiveRevealState
@@ -73,6 +76,10 @@ function syncArchiveGlobals() {
     A: archiveState.scores.A,
     B: archiveState.scores.B
   }
+}
+
+function getArchiveItemParentPosition(item) {
+  return Number(item.parent_position || item.column_group || 3)
 }
 
 /* =========================
@@ -145,7 +152,8 @@ function restoreArchiveState(saved) {
 function getArchiveDisplayThemeClass(round) {
   if (round === 1) return "archiveThemeRound1"
   if (round === 2) return "archiveThemeRound2"
-  return "archiveThemeRound3"
+  if (round === 3) return "archiveThemeRound3"
+  return "archiveThemeRound4"
 }
 
 window.renderArchive = async function () {
@@ -154,7 +162,8 @@ window.renderArchive = async function () {
   archiveRevealState = {
     1: {},
     2: {},
-    3: {}
+    3: {},
+    4: {}
   }
   archiveRemainingPoints = 0
   archiveLastTeam = null
@@ -171,7 +180,8 @@ window.renderArchive = async function () {
     errors: {
       1: { A: 0, B: 0 },
       2: { A: 0, B: 0 },
-      3: { A: 0, B: 0 }
+      3: { A: 0, B: 0 },
+      4: { A: 0, B: 0 }
     }
   }
 
@@ -198,6 +208,11 @@ window.renderArchive = async function () {
 
   loadArchiveRoundData(3).then(data => {
     archiveRoundCache[3] = data || { box: null, items: [] }
+    syncArchiveGlobals()
+  })
+
+  loadArchiveRoundData(4).then(data => {
+    archiveRoundCache[4] = data || { box: null, items: [] }
     syncArchiveGlobals()
   })
 }
@@ -438,7 +453,12 @@ function renderArchiveRoundUI() {
 
   const board = document.getElementById("archiveBoardTheme")
   if (board) {
-    board.classList.remove("archiveThemeRound1", "archiveThemeRound2", "archiveThemeRound3")
+    board.classList.remove(
+      "archiveThemeRound1",
+      "archiveThemeRound2",
+      "archiveThemeRound3",
+      "archiveThemeRound4"
+    )
     board.classList.add(getArchiveDisplayThemeClass(round))
   }
 
@@ -464,8 +484,8 @@ function renderArchiveRoundUI() {
     .filter(item => Number(item.position) >= 5)
     .sort((a, b) => Number(a.position) - Number(b.position))
 
-  const leftItems = textItems.filter(item => Number(item.column_group || 4) === 4)
-  const rightItems = textItems.filter(item => Number(item.column_group || 3) === 3)
+  const under3Items = textItems.filter(item => getArchiveItemParentPosition(item) === 3)
+  const under4Items = textItems.filter(item => getArchiveItemParentPosition(item) === 4)
 
   const hasBottomItems = textItems.length > 0
 
@@ -475,11 +495,11 @@ function renderArchiveRoundUI() {
   }
 
   if (leftCol) {
-    leftCol.innerHTML = leftItems.map(item => renderArchiveBottomItem(item, item.position)).join("")
+    leftCol.innerHTML = under4Items.map(item => renderArchiveBottomItem(item, item.position)).join("")
   }
 
   if (rightCol) {
-    rightCol.innerHTML = rightItems.map(item => renderArchiveBottomItem(item, item.position)).join("")
+    rightCol.innerHTML = under3Items.map(item => renderArchiveBottomItem(item, item.position)).join("")
   }
 
   recalcArchiveRemainingPoints(items)
@@ -772,7 +792,7 @@ async function nextArchiveRound() {
     return
   }
 
-  if (archiveState.round >= 3) {
+  if (archiveState.round >= 4) {
     showGameToast("هذه آخر جولة")
     return
   }

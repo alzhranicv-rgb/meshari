@@ -8523,3 +8523,1042 @@ body::before{
     border-radius:16px !important;
   }
 }
+/* =========================
+   PRINT PRESENTER - POLISHED
+========================= */
+
+#printPresenterArea{
+  direction: rtl;
+  font-family:"HanakaText", Arial, sans-serif;
+  background:#fff;
+  color:#111;
+}
+
+.printPresenterWrap{
+  display:block;
+  width:100%;
+  max-width:1100px;
+  margin:0 auto;
+  padding:28px 24px;
+}
+
+.printPresenterHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:18px 22px;
+  border-radius:24px;
+  background:linear-gradient(135deg, #f7eddc, #fff8ee);
+  border:2px solid #e2c9a8;
+  margin-bottom:22px;
+}
+
+.printPresenterTitle{
+  font-family:"HanakaDisplay", "HanakaText", Arial, sans-serif;
+  font-size:42px;
+  font-weight:900;
+  color:#243447;
+  line-height:1.05;
+}
+
+.printPresenterModel{
+  font-size:22px;
+  font-weight:800;
+  color:#8a6a2e;
+}
+
+.printPresenterTeams{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-bottom:22px;
+}
+
+.printPresenterTeamCard{
+  border-radius:22px;
+  padding:18px 20px;
+  background:linear-gradient(180deg, #fffdf8, #f8efe2);
+  border:2px solid #e2c9a8;
+}
+
+.printPresenterTeamName{
+  font-size:28px;
+  font-weight:900;
+  color:#243447;
+  margin-bottom:8px;
+}
+
+.printPresenterTeamScore{
+  font-size:40px;
+  font-weight:900;
+  color:#c77d28;
+}
+
+.printPresenterSection{
+  margin-bottom:20px;
+  border-radius:22px;
+  overflow:hidden;
+  border:2px solid #e2c9a8;
+}
+
+.printPresenterSectionHead{
+  padding:14px 18px;
+  font-size:26px;
+  font-weight:900;
+  color:#fff;
+  background:linear-gradient(135deg, #334155, #1f2937);
+}
+
+.printPresenterSectionBody{
+  padding:18px;
+  background:#fffdfa;
+}
+
+.printPresenterTable{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+
+.printPresenterTable th,
+.printPresenterTable td{
+  border:1px solid #e6d6bf;
+  padding:12px 10px;
+  text-align:center;
+  vertical-align:middle;
+  font-size:18px;
+  word-break:break-word;
+}
+
+.printPresenterTable th{
+  background:#f5e7ce;
+  color:#243447;
+  font-weight:900;
+}
+
+.printPresenterTable td{
+  background:#fff;
+}
+
+.printPresenterBadge{
+  display:inline-block;
+  min-width:90px;
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:16px;
+  font-weight:900;
+  background:#f0c48b;
+  color:#111;
+}
+
+.printPresenterQuestion{
+  font-size:22px;
+  font-weight:800;
+  color:#243447;
+  line-height:1.7;
+}
+
+.printPresenterAnswer{
+  margin-top:12px;
+  padding:14px 16px;
+  border-radius:16px;
+  background:#eef7e9;
+  border:1px solid #b8d9a9;
+  font-size:20px;
+  font-weight:800;
+  color:#1f4d1e;
+}
+
+.printPresenterImage{
+  display:block;
+  width:100%;
+  max-height:320px;
+  object-fit:contain;
+  border-radius:18px;
+  background:#f7f7f7;
+  border:1px solid #ddd;
+  margin-top:12px;
+}
+
+.printPresenterFooter{
+  margin-top:20px;
+  text-align:center;
+  font-size:18px;
+  font-weight:800;
+  color:#6b7280;
+}
+
+/* ألوان مختلفة للعناوين */
+.printPresenterSection.section-warmup .printPresenterSectionHead{
+  background:linear-gradient(135deg, #7c9a1d, #b7d52f);
+  color:#111;
+}
+
+.printPresenterSection.section-top10 .printPresenterSectionHead{
+  background:linear-gradient(135deg, #2f6fa8, #5aa2de);
+}
+
+.printPresenterSection.section-auction .printPresenterSectionHead{
+  background:linear-gradient(135deg, #d38b23, #f0b44f);
+  color:#111;
+}
+
+.printPresenterSection.section-who .printPresenterSectionHead{
+  background:linear-gradient(135deg, #6b55a3, #9077d3);
+}
+
+.printPresenterSection.section-final .printPresenterSectionHead{
+  background:linear-gradient(135deg, #d34b4b, #f06c6c);
+}
+
+.printPresenterSection.section-archive .printPresenterSectionHead{
+  background:linear-gradient(135deg, #243447, #3f546d);
+}
+
+/* طباعة */
+@media print{
+  body *{
+    visibility:hidden !important;
+  }
+
+  #printPresenterArea,
+  #printPresenterArea *{
+    visibility:visible !important;
+  }
+
+  #printPresenterArea{
+    position:absolute;
+    inset:0;
+    width:100%;
+    background:#fff !important;
+    padding:0 !important;
+  }
+
+  .printPresenterWrap{
+    max-width:100%;
+    margin:0;
+    padding:14mm 12mm;
+  }
+
+  .printPresenterSection,
+  .printPresenterHeader,
+  .printPresenterTeamCard{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  .printPresenterTitle{
+    font-size:34px;
+  }
+
+  .printPresenterModel{
+    font-size:18px;
+  }
+
+  .printPresenterTeamName{
+    font-size:22px;
+  }
+
+  .printPresenterTeamScore{
+    font-size:30px;
+  }
+
+  .printPresenterSectionHead{
+    font-size:22px;
+  }
+
+  .printPresenterTable th,
+  .printPresenterTable td{
+    font-size:15px;
+    padding:8px 6px;
+  }
+
+  .printPresenterQuestion{
+    font-size:18px;
+  }
+
+  .printPresenterAnswer{
+    font-size:17px;
+  }
+}
+
+/* =========================
+   ARCHIVE ADMIN MATCH DISPLAY
+========================= */
+.archiveAdminShell{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.archiveAdminRoundsBar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.archiveAdminRoundsBar button{
+  min-width:120px;
+  min-height:46px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(180deg,#edf2f7 0%,#d9e1ea 100%);
+  color:#334155;
+  font-size:17px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:var(--shadow-soft);
+  transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+}
+
+.archiveAdminRoundsBar button:hover{
+  transform:translateY(-1px);
+}
+
+.archiveAdminRoundsBar button.activeArchiveRoundBtn{
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2));
+  color:#111;
+}
+
+.archiveAdminLayout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 300px;
+  gap:20px;
+  align-items:start;
+}
+
+.archiveAdminBoard{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  padding:18px;
+  border-radius:28px;
+  background:linear-gradient(180deg,#fbf7ef 0%, #f2e8d8 100%);
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:var(--shadow-soft);
+}
+
+.archiveAdminSketchTop{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.archiveAdminSketchRow{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:14px;
+  border-radius:18px;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:0 8px 18px rgba(15,23,42,.05);
+}
+
+.archiveAdminText input{
+  width:100%;
+  min-height:46px;
+  border:none;
+  outline:none;
+  border-radius:14px;
+  padding:0 14px;
+  background:#f8fafc;
+  border:1px solid rgba(0,0,0,.08);
+  font-size:17px;
+  font-weight:800;
+  color:#243447;
+}
+
+.archiveAdminLabel{
+  font-size:18px;
+  font-weight:900;
+  color:#475569;
+  text-align:center;
+}
+
+.archiveAdminSketchMiddle{
+  display:grid;
+  grid-template-columns:1fr 230px 1fr;
+  gap:14px;
+  align-items:stretch;
+}
+
+.archiveAdminImageBox,
+.archiveAdminResultCenter{
+  background:#fff;
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:20px;
+  padding:14px;
+  box-shadow:var(--shadow-soft);
+}
+
+.archiveAdminItemTitle{
+  font-size:18px;
+  font-weight:900;
+  color:#243447;
+  margin-bottom:10px;
+}
+
+.archiveAdminPreviewImg{
+  width:100%;
+  height:190px;
+  object-fit:contain;
+  background:#f6f6f6;
+  border-radius:16px;
+  border:1px solid rgba(0,0,0,.08);
+  margin-top:10px;
+}
+
+.archiveAdminResultLabel{
+  font-size:18px;
+  font-weight:900;
+  color:#475569;
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.archiveAdminResultValue input{
+  width:100%;
+  min-height:64px;
+  border:none;
+  outline:none;
+  border-radius:18px;
+  padding:0 14px;
+  background:linear-gradient(180deg,#fff8ea 0%,#f4e2bf 100%);
+  border:1px solid rgba(199,125,40,.25);
+  font-size:28px;
+  font-weight:900;
+  color:#8a5b12;
+  text-align:center;
+}
+
+.archiveAdminBottomGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  align-items:start;
+}
+
+.archiveAdminBottomCol{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.archiveAdminItemEnhanced{
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:18px;
+  padding:12px;
+  background:#fff;
+  box-shadow:var(--shadow-soft);
+}
+
+.archiveAdminItemHead{
+  margin-bottom:10px;
+}
+
+.archiveAdminItemTitle{
+  font-size:16px;
+  font-weight:900;
+  color:#243447;
+}
+
+.archiveAdminFields{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.archiveAdminFields select,
+.archiveAdminFields input,
+.archiveAdminFields textarea{
+  width:100%;
+  border:none;
+  outline:none;
+  border-radius:14px;
+  background:#f8fafc;
+  border:1px solid rgba(0,0,0,.08);
+  color:#243447;
+  font-size:15px;
+  font-weight:700;
+  padding:12px 14px;
+}
+
+.archiveAdminFields textarea{
+  min-height:92px;
+  resize:vertical;
+}
+
+.archiveAdminTools{
+  display:block;
+}
+
+.archiveToolsCard{
+  position:sticky;
+  top:16px;
+  padding:18px;
+  border-radius:24px;
+  background:linear-gradient(180deg,#ffffff 0%,#f8efe2 100%);
+  border:1px solid rgba(226,201,168,.9);
+  box-shadow:var(--shadow-soft);
+}
+
+.archiveToolsCard h3{
+  margin:0 0 14px;
+  font-size:24px;
+  font-weight:900;
+  color:#243447;
+}
+
+.archiveToolsButtons{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.archiveToolsButtons button{
+  width:100%;
+  min-height:48px;
+  border:none;
+  border-radius:16px;
+  font-size:16px;
+  font-weight:900;
+  cursor:pointer;
+  background:linear-gradient(180deg,#edf2f7 0%,#dbe4ee 100%);
+  color:#243447;
+  box-shadow:var(--shadow-soft);
+}
+
+.archiveToolsButtons button:hover{
+  transform:translateY(-1px);
+}
+
+.archiveToolsButtons .adminDeleteBtn{
+  background:linear-gradient(180deg,#f26b6b 0%,#d94b4b 100%);
+  color:#fff;
+}
+
+@media (max-width: 980px){
+  .archiveAdminLayout{
+    grid-template-columns:1fr;
+  }
+
+  .archiveAdminSketchTop,
+  .archiveAdminSketchMiddle,
+  .archiveAdminBottomGrid{
+    grid-template-columns:1fr;
+  }
+
+  .archiveToolsCard{
+    position:static;
+  }
+}
+
+
+/* =========================
+   ARCHIVE DISPLAY TUNING
+========================= */
+
+/* المربعات الكبيرة 3 و 4 */
+.archiveModernMiddle{
+  grid-template-columns: 250px 150px 250px !important;
+  gap: 14px !important;
+  justify-content: center !important;
+}
+
+.archiveModernBigCard{
+  min-height: 250px !important;
+  height: 250px !important;
+  border-radius: 22px !important;
+}
+
+.archiveModernBigCard img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 20px !important;
+}
+
+.archiveModernBigCard span{
+  font-size: 64px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+/* مربع النتيجة */
+.archiveModernScoreCard{
+  min-height: 250px !important;
+  height: 250px !important;
+  border-radius: 22px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 12px !important;
+}
+
+.archiveModernScoreLabel{
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  margin-bottom: 14px !important;
+  line-height: 1.1 !important;
+}
+
+.archiveModernScoreValue{
+  font-size: 44px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+/* البطولة والموسم */
+.archiveModernTop{
+  grid-template-columns: 1fr 1fr !important;
+  gap: 14px !important;
+}
+
+.archiveModernInfoCard{
+  min-height: 86px !important;
+  border-radius: 18px !important;
+  padding: 10px 12px !important;
+}
+
+.archiveModernInfoLabel{
+  font-size: 24px !important;
+  font-weight: 900 !important;
+}
+
+.archiveModernInfoValue{
+  font-size: 34px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+/* المربعات السفلية */
+.archiveBottomGrid{
+  gap: 12px !important;
+  margin-top: 10px !important;
+}
+
+.archiveBottomCol{
+  gap: 10px !important;
+}
+
+.archiveModernSmallCard{
+  min-height: 54px !important;
+  height: 54px !important;
+  border-radius: 14px !important;
+  grid-template-columns: 1fr 48px !important;
+}
+
+.archiveModernSmallMain{
+  padding: 0 10px !important;
+  gap: 8px !important;
+}
+
+.archiveModernSmallNumber{
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.archiveModernSmallText{
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+}
+
+.archiveModernSmallLabel{
+  font-size: 16px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.archiveRequiredLabel{
+  font-size: 18px !important;
+}
+
+.archiveModernSmallEmoji{
+  width: 48px !important;
+  font-size: 21px !important;
+}
+
+
+/* =========================
+   ARCHIVE DISPLAY TUNING
+========================= */
+
+/* البطولة والموسم */
+.archiveModernTop{
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+}
+
+.archiveModernInfoCard{
+  min-height: 78px !important;
+  border-radius: 16px !important;
+  padding: 8px 10px !important;
+}
+
+.archiveModernInfoLabel{
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.archiveModernInfoValue{
+  font-size: 26px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+/* 3 و 4 والنتيجة */
+.archiveModernMiddle{
+  grid-template-columns: 230px 120px 230px !important;
+  gap: 12px !important;
+  justify-content: center !important;
+}
+
+.archiveModernBigCard{
+  min-height: 220px !important;
+  height: 220px !important;
+  border-radius: 20px !important;
+}
+
+.archiveModernBigCard img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 18px !important;
+}
+
+.archiveModernBigCard span{
+  font-size: 54px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.archiveModernScoreCard{
+  min-height: 220px !important;
+  height: 220px !important;
+  border-radius: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 10px !important;
+}
+
+.archiveModernScoreLabel{
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  margin-bottom: 12px !important;
+  line-height: 1.1 !important;
+}
+
+.archiveModernScoreValue{
+  font-size: 34px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+/* المربعات السفلية */
+.archiveBottomGrid{
+  gap: 10px !important;
+  margin-top: 8px !important;
+}
+
+.archiveBottomCol{
+  gap: 8px !important;
+}
+
+.archiveModernSmallCard{
+  min-height: 46px !important;
+  height: 46px !important;
+  border-radius: 12px !important;
+  grid-template-columns: 1fr 42px !important;
+}
+
+.archiveModernSmallMain{
+  padding: 0 8px !important;
+  gap: 6px !important;
+}
+
+.archiveModernSmallNumber{
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.archiveModernSmallText{
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+}
+
+.archiveModernSmallLabel{
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.archiveRequiredLabel{
+  font-size: 15px !important;
+}
+
+.archiveModernSmallEmoji{
+  width: 42px !important;
+  font-size: 18px !important;
+}
+
+/* iPad */
+@media (min-width: 768px) and (max-width: 1366px){
+  .archiveModernInfoLabel{
+    font-size: 18px !important;
+  }
+
+  .archiveModernInfoValue{
+    font-size: 23px !important;
+  }
+
+  .archiveModernMiddle{
+    grid-template-columns: 210px 112px 210px !important;
+    gap: 10px !important;
+  }
+
+  .archiveModernBigCard{
+    min-height: 205px !important;
+    height: 205px !important;
+  }
+
+  .archiveModernScoreCard{
+    min-height: 205px !important;
+    height: 205px !important;
+  }
+
+  .archiveModernBigCard span{
+    font-size: 48px !important;
+  }
+
+  .archiveModernScoreLabel{
+    font-size: 20px !important;
+  }
+
+  .archiveModernScoreValue{
+    font-size: 30px !important;
+  }
+
+  .archiveModernSmallCard{
+    min-height: 42px !important;
+    height: 42px !important;
+  }
+
+  .archiveModernSmallNumber{
+    font-size: 18px !important;
+  }
+
+  .archiveModernSmallText{
+    font-size: 13px !important;
+  }
+
+  .archiveModernSmallLabel{
+    font-size: 12px !important;
+  }
+}
+
+/* =========================
+   ARCHIVE TEXT SIZE BOOST
+========================= */
+
+/* النتيجة */
+.archiveModernScoreValue{
+  font-size: 36px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.archiveThemeRound4 .archiveModernScoreValue{
+  font-size: 36px !important;
+}
+
+/* العناصر تحت الصور */
+.archiveModernSmallNumber{
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.archiveModernSmallText{
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+}
+
+.archiveModernSmallLabel{
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+.archiveRequiredLabel{
+  font-size: 15px !important;
+}
+
+.archiveModernSmallEmoji{
+  font-size: 18px !important;
+}
+
+/* iPad */
+@media (min-width: 768px) and (max-width: 1366px){
+  .archiveModernScoreValue{
+    font-size: 32px !important;
+  }
+
+  .archiveThemeRound4 .archiveModernScoreValue{
+    font-size: 32px !important;
+  }
+
+  .archiveModernSmallNumber{
+    font-size: 18px !important;
+  }
+
+  .archiveModernSmallText{
+    font-size: 13px !important;
+  }
+
+  .archiveModernSmallLabel{
+    font-size: 12px !important;
+  }
+
+  .archiveRequiredLabel{
+    font-size: 14px !important;
+  }
+
+  .archiveModernSmallEmoji{
+    font-size: 17px !important;
+  }
+}
+/* =========================
+   ARCHIVE ROUND 4 - SAME STRUCTURE, NEW COLORS ONLY
+========================= */
+
+/* نفس بنية باقي الجولات، فقط ألوان مختلفة */
+.archiveThemeRound4.archiveModernBoard{
+  --arc-main:#e9a3b2;
+  --arc-dark:#111827;
+  --arc-soft:#fff7fa;
+  --arc-border:#d78a9b;
+  --arc-dark-text:#111;
+  --arc-light-text:#ffffff;
+}
+
+/* لا نغير البنية ولا المقاسات */
+.archiveThemeRound4 .archiveModernInfoCard,
+.archiveThemeRound4 .archiveModernBigCard,
+.archiveThemeRound4 .archiveModernScoreCard,
+.archiveThemeRound4 .archiveModernSmallCard{
+  box-shadow: var(--shadow-soft) !important;
+}
+
+/* العناوين الداكنة */
+.archiveThemeRound4 .archiveModernInfoLabel,
+.archiveThemeRound4 .archiveModernScoreLabel{
+  background:#111827 !important;
+  color:#fff !important;
+}
+
+/* الصناديق الوردية */
+.archiveThemeRound4 .archiveModernInfoValue,
+.archiveThemeRound4 .archiveModernBigCard,
+.archiveThemeRound4 .archiveModernScoreCard{
+  background:#e9a3b2 !important;
+  color:#111 !important;
+}
+
+/* النصوص داخل 3 و4 والنتيجة */
+.archiveThemeRound4 .archiveModernBigCard span,
+.archiveThemeRound4 .archiveModernInfoValue span,
+.archiveThemeRound4 .archiveModernScoreValue{
+  color:#111 !important;
+}
+
+/* العناصر السفلية الداكنة */
+.archiveThemeRound4 .archiveModernSmallCard.archivePromptBall{
+  background:#111827 !important;
+}
+
+.archiveThemeRound4 .archiveModernSmallCard.archivePromptBall .archiveModernSmallNumber,
+.archiveThemeRound4 .archiveModernSmallCard.archivePromptBall .archiveModernSmallText,
+.archiveThemeRound4 .archiveModernSmallCard.archivePromptBall .archiveModernSmallLabel{
+  color:#fff !important;
+}
+
+/* العناصر السفلية الوردية */
+.archiveThemeRound4 .archiveModernSmallCard.archivePromptShoe{
+  background:#e9a3b2 !important;
+}
+
+.archiveThemeRound4 .archiveModernSmallCard.archivePromptShoe .archiveModernSmallNumber,
+.archiveThemeRound4 .archiveModernSmallCard.archivePromptShoe .archiveModernSmallText,
+.archiveThemeRound4 .archiveModernSmallCard.archivePromptShoe .archiveModernSmallLabel{
+  color:#111 !important;
+}
+/* =========================
+   ARCHIVE SCORE BOX - ALL ROUNDS
+========================= */
+.archiveModernScoreCard{
+  min-height: 210px !important;
+  height: 210px !important;
+  border-radius: 22px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.archiveModernScoreLabel{
+  width: 100% !important;
+  min-height: 58px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+.archiveModernScoreValue{
+  flex: 1 !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 38px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  padding: 10px !important;
+  text-align: center !important;
+}
+
+/* iPad */
+@media (min-width: 768px) and (max-width: 1366px){
+  .archiveModernScoreCard{
+    min-height: 190px !important;
+    height: 190px !important;
+  }
+
+  .archiveModernScoreLabel{
+    min-height: 52px !important;
+    font-size: 19px !important;
+  }
+
+  .archiveModernScoreValue{
+    font-size: 32px !important;
+  }
+}

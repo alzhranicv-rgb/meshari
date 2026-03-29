@@ -5,11 +5,7 @@ let currentModelName = ""
 let auctionAdminCount = 8
 let gameToastTimer = null
 
-let archiveAdminRound = 1
-let archiveExtraTextPositions = [5, 6, 7, 8]
-let archivePendingExtraCount = 0
-const ARCHIVE_MAX_TEXT_BOXES = 20
-const ARCHIVE_TEXT_START_POSITION = 5
+
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadModels()
@@ -1502,9 +1498,56 @@ async function saveFinal() {
    Archive
 ========================= */
 
+let archiveAdminRound = 1
+let archivePendingExtraCount = 0
+let archiveExtraTextPositions = []
+let archiveDraftState = {}
+
+const ARCHIVE_TEXT_START_POSITION = 5
+const ARCHIVE_MAX_TEXT_BOXES = 20
+
+function collectArchiveDraftState() {
+  const draft = {}
+
+  for (const position of archiveExtraTextPositions || []) {
+    draft[position] = {
+      parent_position: Number(document.getElementById(`archiveItemParent_${position}`)?.value || 3),
+      label: document.getElementById(`archiveItemLabel_${position}`)?.value || "",
+      prompt_style: document.getElementById(`archiveItemPromptStyle_${position}`)?.value || "shoe",
+      text: document.getElementById(`archiveItemText_${position}`)?.value || ""
+    }
+  }
+
+  const text1 = document.getElementById("archiveItemText_1")
+  const text2 = document.getElementById("archiveItemText_2")
+  const score = document.getElementById("archiveScore")
+
+  draft.__top = {
+    text1: text1 ? text1.value : "",
+    text2: text2 ? text2.value : "",
+    score: score ? score.value : ""
+  }
+
+  archiveDraftState = draft
+}
+
+function getArchiveDraftItem(position, dbItem = {}) {
+  const draftItem = archiveDraftState[position] || {}
+  return {
+    ...dbItem,
+    ...draftItem
+  }
+}
+
+function handleArchiveParentChange() {
+  collectArchiveDraftState()
+  renderArchiveAdminRound(archiveAdminRound)
+}
+
 function renderArchiveAdminItem(position, item = {}) {
-  const columnGroup = Number(item.column_group || 3)
-  const promptStyle = item.prompt_style || "shoe"
+  const mergedItem = getArchiveDraftItem(position, item)
+  const parentPosition = Number(mergedItem.parent_position || mergedItem.column_group || 3)
+  const promptStyle = mergedItem.prompt_style || "shoe"
 
   return `
     <div class="archiveAdminItem archiveAdminItemEnhanced">
@@ -1513,16 +1556,16 @@ function renderArchiveAdminItem(position, item = {}) {
       </div>
 
       <div class="archiveAdminFields">
-        <select id="archiveItemColumn_${position}" onchange="renderArchiveAdminRound(archiveAdminRound)">
-          <option value="3" ${columnGroup === 3 ? "selected" : ""}>أسفل الصورة 3</option>
-          <option value="4" ${columnGroup === 4 ? "selected" : ""}>أسفل الصورة 4</option>
+        <select id="archiveItemParent_${position}" onchange="handleArchiveParentChange()">
+          <option value="3" ${parentPosition === 3 ? "selected" : ""}>تحت الصورة 3</option>
+          <option value="4" ${parentPosition === 4 ? "selected" : ""}>تحت الصورة 4</option>
         </select>
 
         <input
           id="archiveItemLabel_${position}"
           type="text"
           placeholder="عنوان صغير - اختياري"
-          value="${escapeHtml(item.label || "")}"
+          value="${escapeHtml(mergedItem.label || "")}"
         >
 
         <select id="archiveItemPromptStyle_${position}">
@@ -1533,7 +1576,7 @@ function renderArchiveAdminItem(position, item = {}) {
         <textarea
           id="archiveItemText_${position}"
           placeholder="النص"
-        >${escapeHtml(item.text || "")}</textarea>
+        >${escapeHtml(mergedItem.text || "")}</textarea>
       </div>
     </div>
   `
@@ -1542,6 +1585,7 @@ function renderArchiveAdminItem(position, item = {}) {
 async function renderArchiveAdmin() {
   archiveAdminRound = 1
   archivePendingExtraCount = 0
+  archiveDraftState = {}
   await renderArchiveAdminRound(1)
 }
 
@@ -1573,7 +1617,7 @@ async function renderArchiveAdminRound(round) {
   const map = {}
 
   items.forEach(item => {
-    map[item.position] = item
+    map[item.position] = getArchiveDraftItem(item.position, item)
   })
 
   const savedTextPositions = items
@@ -1593,21 +1637,29 @@ async function renderArchiveAdminRound(round) {
     archiveExtraTextPositions.push(p)
   }
 
-  const leftPositions = archiveExtraTextPositions
-  .filter(pos => {
-    const selectedValue = document.getElementById(`archiveItemColumn_${pos}`)?.value
-    const currentGroup = Number(selectedValue || map[pos]?.column_group || 4)
-    return currentGroup === 4
-  })
-  .sort((a, b) => a - b)
+  const under3Positions = archiveExtraTextPositions
+    .filter(pos => {
+      const currentParent = Number(
+        archiveDraftState[pos]?.parent_position ||
+        map[pos]?.parent_position ||
+        map[pos]?.column_group ||
+        3
+      )
+      return currentParent === 3
+    })
+    .sort((a, b) => a - b)
 
-const rightPositions = archiveExtraTextPositions
-  .filter(pos => {
-    const selectedValue = document.getElementById(`archiveItemColumn_${pos}`)?.value
-    const currentGroup = Number(selectedValue || map[pos]?.column_group || 3)
-    return currentGroup === 3
-  })
-  .sort((a, b) => a - b)
+  const under4Positions = archiveExtraTextPositions
+    .filter(pos => {
+      const currentParent = Number(
+        archiveDraftState[pos]?.parent_position ||
+        map[pos]?.parent_position ||
+        map[pos]?.column_group ||
+        3
+      )
+      return currentParent === 4
+    })
+    .sort((a, b) => a - b)
 
   editor().innerHTML = `
     <h2 class="adminSectionTitle">الأرشيف</h2>
@@ -1619,11 +1671,12 @@ const rightPositions = archiveExtraTextPositions
         <button class="${round === 1 ? "activeArchiveRoundBtn" : ""}" onclick="renderArchiveAdminRound(1)">الجولة 1</button>
         <button class="${round === 2 ? "activeArchiveRoundBtn" : ""}" onclick="renderArchiveAdminRound(2)">الجولة 2</button>
         <button class="${round === 3 ? "activeArchiveRoundBtn" : ""}" onclick="renderArchiveAdminRound(3)">الجولة 3</button>
+        <button class="${round === 4 ? "activeArchiveRoundBtn" : ""}" onclick="renderArchiveAdminRound(4)">الجولة 4</button>
       </div>
 
       <div class="archiveAdminLayout">
 
-        <div class="archiveAdminBoard">
+        <div class="archiveAdminBoard ${round === 4 ? "archiveAdminBoardRound4" : ""}">
 
           <div class="archiveAdminSketchTop">
             <div class="archiveAdminSketchRow">
@@ -1632,7 +1685,7 @@ const rightPositions = archiveExtraTextPositions
                   id="archiveItemText_1"
                   type="text"
                   placeholder="قيمة البطولة"
-                  value="${escapeHtml(map[1]?.text || "")}"
+                  value="${escapeHtml(archiveDraftState.__top?.text1 || map[1]?.text || "")}"
                 >
               </div>
               <div class="archiveAdminLabel">البطولة</div>
@@ -1644,7 +1697,7 @@ const rightPositions = archiveExtraTextPositions
                   id="archiveItemText_2"
                   type="text"
                   placeholder="قيمة الموسم"
-                  value="${escapeHtml(map[2]?.text || "")}"
+                  value="${escapeHtml(archiveDraftState.__top?.text2 || map[2]?.text || "")}"
                 >
               </div>
               <div class="archiveAdminLabel">الموسم</div>
@@ -1653,9 +1706,9 @@ const rightPositions = archiveExtraTextPositions
 
           <div class="archiveAdminSketchMiddle">
             <div class="archiveAdminImageBox">
-              <div class="archiveAdminItemTitle">الصورة 3</div>
-              <input id="archiveItemFile_3" type="file" accept="image/*">
-              ${map[3]?.image ? `<img src="${escapeHtml(map[3].image)}" class="archiveAdminPreviewImg">` : ""}
+              <div class="archiveAdminItemTitle">الصورة 4</div>
+              <input id="archiveItemFile_4" type="file" accept="image/*">
+              ${map[4]?.image ? `<img src="${escapeHtml(map[4].image)}" class="archiveAdminPreviewImg">` : ""}
             </div>
 
             <div class="archiveAdminResultCenter">
@@ -1665,25 +1718,27 @@ const rightPositions = archiveExtraTextPositions
                   id="archiveScore"
                   type="text"
                   placeholder="النتيجة"
-                  value="${escapeHtml(box?.score || "")}"
+                  value="${escapeHtml(archiveDraftState.__top?.score || box?.score || "")}"
                 >
               </div>
             </div>
 
             <div class="archiveAdminImageBox">
-              <div class="archiveAdminItemTitle">الصورة 4</div>
-              <input id="archiveItemFile_4" type="file" accept="image/*">
-              ${map[4]?.image ? `<img src="${escapeHtml(map[4].image)}" class="archiveAdminPreviewImg">` : ""}
+              <div class="archiveAdminItemTitle">الصورة 3</div>
+              <input id="archiveItemFile_3" type="file" accept="image/*">
+              ${map[3]?.image ? `<img src="${escapeHtml(map[3].image)}" class="archiveAdminPreviewImg">` : ""}
             </div>
           </div>
 
           <div class="archiveAdminBottomGrid">
             <div class="archiveAdminBottomCol">
-              ${leftPositions.map(pos => renderArchiveAdminItem(pos, map[pos])).join("")}
+              <div class="archiveAdminColumnTitle">تحت الصورة 4</div>
+              ${under4Positions.map(pos => renderArchiveAdminItem(pos, map[pos])).join("")}
             </div>
 
             <div class="archiveAdminBottomCol">
-              ${rightPositions.map(pos => renderArchiveAdminItem(pos, map[pos])).join("")}
+              <div class="archiveAdminColumnTitle">تحت الصورة 3</div>
+              ${under3Positions.map(pos => renderArchiveAdminItem(pos, map[pos])).join("")}
             </div>
           </div>
         </div>
@@ -1708,6 +1763,8 @@ const rightPositions = archiveExtraTextPositions
 }
 
 function addArchiveTextBox() {
+  collectArchiveDraftState()
+
   if (archiveExtraTextPositions.length >= ARCHIVE_MAX_TEXT_BOXES) {
     showGameToast("وصلت للحد الأقصى: 20 مربع")
     return
@@ -1718,9 +1775,16 @@ function addArchiveTextBox() {
 }
 
 function removeArchiveTextBox() {
+  collectArchiveDraftState()
+
   if (archiveExtraTextPositions.length <= 4) {
     showGameToast("الحد الأدنى 4 مربعات")
     return
+  }
+
+  const lastPosition = archiveExtraTextPositions[archiveExtraTextPositions.length - 1]
+  if (lastPosition) {
+    delete archiveDraftState[lastPosition]
   }
 
   archivePendingExtraCount -= 1
@@ -1728,6 +1792,8 @@ function removeArchiveTextBox() {
 }
 
 async function saveArchiveRoundNew() {
+  collectArchiveDraftState()
+
   const round = archiveAdminRound
 
   const scoreValue = (document.getElementById("archiveScore")?.value || "").trim()
@@ -1801,6 +1867,7 @@ async function saveArchiveRoundNew() {
     label: "",
     text: text1,
     image: "",
+    parent_position: null,
     column_group: null,
     prompt_style: null
   })
@@ -1813,6 +1880,7 @@ async function saveArchiveRoundNew() {
     label: "",
     text: text2,
     image: "",
+    parent_position: null,
     column_group: null,
     prompt_style: null
   })
@@ -1833,6 +1901,7 @@ async function saveArchiveRoundNew() {
       label: "",
       text: "",
       image,
+      parent_position: null,
       column_group: null,
       prompt_style: null
     })
@@ -1844,6 +1913,10 @@ async function saveArchiveRoundNew() {
 
     if (!label && !text) continue
 
+    const parentPosition = Number(
+      document.getElementById(`archiveItemParent_${position}`)?.value || 3
+    )
+
     rows.push({
       model: currentModel,
       round,
@@ -1852,7 +1925,8 @@ async function saveArchiveRoundNew() {
       label,
       text,
       image: "",
-      column_group: Number(document.getElementById(`archiveItemColumn_${position}`)?.value || 3),
+      parent_position: parentPosition,
+      column_group: parentPosition,
       prompt_style: (document.getElementById(`archiveItemPromptStyle_${position}`)?.value || "shoe").trim()
     })
   }
@@ -1868,6 +1942,61 @@ async function saveArchiveRoundNew() {
   }
 
   archivePendingExtraCount = 0
+  archiveDraftState = {}
   showGameToast(`تم حفظ الجولة ${round}`)
   await renderArchiveAdminRound(round)
+}
+
+async function deleteArchiveSegment(round = null) {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const deleteOneRound = round !== null && round !== undefined
+  const confirmMessage = deleteOneRound
+    ? `هل تريد حذف الجولة ${round} من الأرشيف؟`
+    : "هل تريد حذف جميع جولات الأرشيف؟"
+
+  const confirmed = window.confirm(confirmMessage)
+  if (!confirmed) return
+
+  try {
+    let deleteBoxesQuery = db.from("archive_boxes").delete().eq("model", currentModel)
+    let deleteItemsQuery = db.from("archive_items").delete().eq("model", currentModel)
+
+    if (deleteOneRound) {
+      deleteBoxesQuery = deleteBoxesQuery.eq("round", round)
+      deleteItemsQuery = deleteItemsQuery.eq("round", round)
+    }
+
+    const { error: itemsError } = await deleteItemsQuery
+    if (itemsError) {
+      console.log(itemsError)
+      showGameToast("تعذر حذف عناصر الأرشيف")
+      return
+    }
+
+    const { error: boxesError } = await deleteBoxesQuery
+    if (boxesError) {
+      console.log(boxesError)
+      showGameToast("تعذر حذف صناديق الأرشيف")
+      return
+    }
+
+    archivePendingExtraCount = 0
+    archiveDraftState = {}
+
+    if (deleteOneRound) {
+      showGameToast(`تم حذف الجولة ${round}`)
+      await renderArchiveAdminRound(round)
+    } else {
+      showGameToast("تم حذف جميع جولات الأرشيف")
+      archiveAdminRound = 1
+      await renderArchiveAdminRound(1)
+    }
+  } catch (err) {
+    console.log(err)
+    showGameToast("حدث خطأ أثناء حذف الأرشيف")
+  }
 }
