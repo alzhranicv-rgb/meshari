@@ -583,336 +583,522 @@ function clearFinalItem(i) {
 
   showGameToast("تم مسح العنصر، اضغط حفظ")
 }
-
-function getPresenterPrintStyles() {
-  return ``
+/* =========================
+  printer
+========================= */
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
 }
 
-async function printPresenterSheet() {
-  if (!currentModel) {
-    showGameToast("افتح نموذجًا أولاً")
-    return
-  }
+window.openPresenterSheet = async function () {
+  try {
+    if (!currentModel) {
+      showGameToast("افتح نموذجًا أولاً")
+      return
+    }
 
-  const printArea = document.getElementById("printPresenterArea")
-  if (!printArea) return
+    const [
+      warmupRes,
+      top10Res,
+      auctionRes,
+      whoRes,
+      archiveBoxesRes,
+      archiveItemsRes,
+      finalMetaRes,
+      finalRound1Res,
+      finalRound2Res,
+      finalRound3Res
+    ] = await Promise.all([
+      db.from("questions")
+        .select("*")
+        .eq("model", Number(currentModel))
+        .eq("segment", "warmup")
+        .order("category", { ascending: true })
+        .order("number", { ascending: true }),
 
-  const [
-    warmupRes,
-    top10Res,
-    auctionRes,
-    whoRes,
-    archiveBoxesRes,
-    archiveItemsRes,
-    finalMetaRes,
-    finalRound1Res,
-    finalRound2Res,
-    finalRound3Res
-  ] = await Promise.all([
-    db.from("warmup_questions").select("*").eq("model", currentModel).order("number", { ascending: true }),
-    db.from("top10_questions").select("*").eq("model", currentModel).order("number", { ascending: true }),
-    db.from("auction_questions").select("*").eq("model", currentModel).order("number", { ascending: true }),
-    db.from("who_questions").select("*").eq("model", currentModel).order("number", { ascending: true }),
-    db.from("archive_boxes").select("*").eq("model", currentModel).order("round", { ascending: true }),
-    db.from("archive_items").select("*").eq("model", currentModel).order("round", { ascending: true }).order("position", { ascending: true }),
-    db.from("final_round_meta").select("*").eq("model", currentModel).order("round", { ascending: true }),
-    db.from("final_round1_items").select("*").eq("model", currentModel).order("number", { ascending: true }),
-    db.from("final_round2_items").select("*").eq("model", currentModel).order("number", { ascending: true }).order("item_order", { ascending: true }),
-    db.from("final_round3_items").select("*").eq("model", currentModel).order("number", { ascending: true }).order("image_order", { ascending: true })
-  ])
+      db.from("top10_questions")
+        .select("*")
+        .eq("model", currentModel)
+        .order("round", { ascending: true })
+        .order("position", { ascending: true }),
 
-  const warmupRows = warmupRes.data || []
-  const top10Rows = top10Res.data || []
-  const auctionRows = auctionRes.data || []
-  const whoRows = whoRes.data || []
-  const archiveBoxes = archiveBoxesRes.data || []
-  const archiveItems = archiveItemsRes.data || []
-  const finalMeta = finalMetaRes.data || []
-  const finalRound1Rows = finalRound1Res.data || []
-  const finalRound2Rows = finalRound2Res.data || []
-  const finalRound3Rows = finalRound3Res.data || []
+      db.from("auction_questions")
+        .select("*")
+        .eq("model", currentModel)
+        .order("number", { ascending: true }),
 
-  const finalMetaMap = {}
-  finalMeta.forEach(row => {
-    finalMetaMap[row.round] = row
-  })
+      db.from("who_images")
+        .select("*")
+        .eq("model", currentModel)
+        .order("number", { ascending: true }),
 
-  const archiveGrouped = {}
-  archiveItems.forEach(item => {
-    if (!archiveGrouped[item.round]) archiveGrouped[item.round] = []
-    archiveGrouped[item.round].push(item)
-  })
+      db.from("archive_boxes")
+        .select("*")
+        .eq("model", currentModel)
+        .order("round", { ascending: true }),
 
-  const finalRound2Grouped = {}
-  finalRound2Rows.forEach(item => {
-    if (!finalRound2Grouped[item.number]) finalRound2Grouped[item.number] = []
-    finalRound2Grouped[item.number].push(item)
-  })
+      db.from("archive_items")
+        .select("*")
+        .eq("model", currentModel)
+        .order("round", { ascending: true })
+        .order("position", { ascending: true }),
 
-  const finalRound3Grouped = {}
-  finalRound3Rows.forEach(item => {
-    if (!finalRound3Grouped[item.number]) finalRound3Grouped[item.number] = []
-    finalRound3Grouped[item.number].push(item)
-  })
+      db.from("final_round_meta")
+        .select("*")
+        .eq("model", currentModel)
+        .order("round", { ascending: true }),
 
-  function text(value) {
-    return escapeHtml(value || "")
-  }
+      db.from("final_round1_items")
+        .select("*")
+        .eq("model", currentModel)
+        .order("number", { ascending: true }),
 
-  function presenterCheckBox(label = "") {
-    return `
-      <div class="presenterCheckItem">
-        <span class="presenterCheckSquare"></span>
-        ${label ? `<span class="presenterCheckLabel">${label}</span>` : ""}
+      db.from("final_round2_items")
+        .select("*")
+        .eq("model", currentModel)
+        .order("number", { ascending: true })
+        .order("item_order", { ascending: true }),
+
+      db.from("final_round3_items")
+        .select("*")
+        .eq("model", currentModel)
+        .order("number", { ascending: true })
+        .order("image_order", { ascending: true })
+    ])
+
+    const warmupRows = warmupRes.data || []
+    const top10Rows = top10Res.data || []
+    const auctionRows = auctionRes.data || []
+    const whoRows = whoRes.data || []
+    const archiveBoxes = archiveBoxesRes.data || []
+    const archiveItems = archiveItemsRes.data || []
+    const finalMeta = finalMetaRes.data || []
+    const finalRound1Rows = finalRound1Res.data || []
+    const finalRound2Rows = finalRound2Res.data || []
+    const finalRound3Rows = finalRound3Res.data || []
+
+    const text = value => escapeHtml(value || "")
+
+    const isImageLike = value =>
+      typeof value === "string" &&
+      /^(https?:\/\/|data:image\/|blob:|\/)/.test(String(value).trim())
+
+    /* =========================
+       Warmup grouping + dedupe
+    ========================= */
+    const groupedWarmup = {}
+    warmupRows.forEach(row => {
+      if (!groupedWarmup[row.category]) {
+        groupedWarmup[row.category] = {
+          title: row.category_name || `فئة ${row.category}`,
+          items: [],
+          seen: new Set()
+        }
+      }
+
+      const key = `${row.number}__${(row.question || "").trim()}__${(row.answer || "").trim()}`
+      if (!groupedWarmup[row.category].seen.has(key)) {
+        groupedWarmup[row.category].seen.add(key)
+        groupedWarmup[row.category].items.push(row)
+      }
+    })
+
+    /* =========================
+       Top10 grouping
+    ========================= */
+    const groupedTop10 = {}
+    top10Rows.forEach(row => {
+      if (!groupedTop10[row.round]) {
+        groupedTop10[row.round] = {
+          question: "",
+          items: []
+        }
+      }
+      if (row.question) groupedTop10[row.round].question = row.question
+      groupedTop10[row.round].items.push(row)
+    })
+
+    /* =========================
+       Archive grouping
+    ========================= */
+    const groupedArchive = {}
+    archiveItems.forEach(item => {
+      if (!groupedArchive[item.round]) groupedArchive[item.round] = []
+      groupedArchive[item.round].push(item)
+    })
+
+    /* =========================
+       Final grouping
+    ========================= */
+    const groupedFinal2 = {}
+    finalRound2Rows.forEach(item => {
+      if (!groupedFinal2[item.number]) groupedFinal2[item.number] = []
+      groupedFinal2[item.number].push(item)
+    })
+
+    const groupedFinal3 = {}
+    finalRound3Rows.forEach(item => {
+      if (!groupedFinal3[item.number]) groupedFinal3[item.number] = []
+      groupedFinal3[item.number].push(item)
+    })
+
+    const finalMetaMap = {}
+    finalMeta.forEach(row => {
+      finalMetaMap[row.round] = row
+    })
+
+    /* =========================
+       Warmup HTML
+    ========================= */
+const warmupHtml = `
+  <div class="presenterSectionCard">
+    <div class="presenterSectionHead">التسخين</div>
+    <div class="presenterSectionBody">
+      
+
+      <div class="presenterWarmupGrid">
+        ${Object.values(groupedWarmup).map(group => `
+          <div class="presenterSubCard presenterWarmupCard">
+            <div class="presenterSubHead">${text(group.title)}</div>
+            <div class="presenterListCompact">
+              ${group.items.map(row => `
+                <div class="presenterRowCompact">
+                  <div class="presenterNumBox">${row.number}</div>
+                  <div class="presenterTextBox">
+                    <div class="presenterQuestionLine">${text(row.question)}</div>
+                    <div class="presenterAnswerLine">الإجابة: ${text(row.answer)}</div>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
       </div>
-    `
-  }
+    </div>
+  </div>
+`
 
-  function presenterQuestionCard(title, body) {
-    return `
-      <div class="presenterBlockCard">
-        <div class="presenterBlockHead">
-          <div class="presenterBlockTitle">${title}</div>
-        </div>
-        <div class="presenterBlockBody">${body}</div>
-      </div>
-    `
-  }
-
-  function buildSimpleQuestions(rows, answerLabel = "الإجابة") {
-    if (!rows.length) return `<div class="presenterEmpty">لا توجد بيانات</div>`
-
-    return rows.map(row => `
-      <div class="presenterQuestionRow">
-        <div class="presenterQuestionNum">${row.number}</div>
-        <div class="presenterQuestionContent">
-          <div class="presenterQuestionText">${text(row.question)}</div>
-          <div class="presenterQuestionAnswer"><strong>${answerLabel}:</strong> ${text(row.answers || row.answer || "")}</div>
+    /* =========================
+       Top10 HTML
+    ========================= */
+    const top10Html = Object.entries(groupedTop10).map(([round, group]) => `
+      <div class="presenterSectionCard">
+        <div class="presenterSectionHead">Top 10 - الجولة ${round}</div>
+        <div class="presenterSectionBody">
+          <div class="presenterQuestionMain">${text(group.question)}</div>
+          <div class="presenterTop10Grid">
+            ${group.items
+              .sort((a, b) => Number(a.position) - Number(b.position))
+              .map(item => `
+                <div class="presenterRowCompact presenterTop10Row">
+                  <div class="presenterNumBox presenterNumBoxLarge">${item.position}</div>
+                  <div class="presenterTextBox presenterTextBig">${text(item.answer)}</div>
+                </div>
+              `).join("")}
+          </div>
         </div>
       </div>
     `).join("")
-  }
 
-  function buildArchiveSection() {
-    return [1, 2, 3, 4].map(round => {
-      const box = archiveBoxes.find(x => Number(x.round) === round)
-      const items = (archiveGrouped[round] || []).sort((a, b) => Number(a.position) - Number(b.position))
-
-      if (!box && !items.length) {
-        return `
-          <div class="presenterSubCard">
-            <div class="presenterSubTitle">الأرشيف - الجولة ${round}</div>
-            <div class="presenterEmpty">لا توجد بيانات</div>
-          </div>
-        `
-      }
-
-      return `
-        <div class="presenterSubCard">
-          <div class="presenterSubTitle">الأرشيف - الجولة ${round}</div>
-
-          <div class="presenterMetaGrid">
-            <div class="presenterMetaItem"><strong>البطولة:</strong> ${text(box?.tournament || items.find(x => Number(x.position) === 1)?.text || "")}</div>
-            <div class="presenterMetaItem"><strong>الموسم:</strong> ${text(box?.season || items.find(x => Number(x.position) === 2)?.text || "")}</div>
-            <div class="presenterMetaItem"><strong>النتيجة:</strong> ${text(box?.score || "")}</div>
-          </div>
-
-          <div class="presenterMiniList">
-            ${items.map(item => `
-              <div class="presenterMiniRow">
-                <div class="presenterMiniNum">${item.position}</div>
-                <div class="presenterMiniText">
-                  ${item.label ? `<span class="presenterTag">${text(item.label)}</span>` : ""}
-                  ${text(item.text || (item.image ? "[صورة]" : ""))}
+    /* =========================
+       Auction HTML
+    ========================= */
+    const auctionHtml = `
+      <div class="presenterSectionCard">
+        <div class="presenterSectionHead">المزاد</div>
+        <div class="presenterSectionBody">
+          <div class="presenterListCompact">
+            ${auctionRows.map(row => `
+              <div class="presenterRowCompact">
+                <div class="presenterNumBox">${row.number}</div>
+                <div class="presenterTextBox">
+                  <div class="presenterQuestionLine">${text(row.question)}</div>
+                  <div class="presenterMetaLine">
+                    <span><strong>الإجابة:</strong> ${text(row.answer)}</span>
+                    <span><strong>الزيادة:</strong> ${text(row.increment || row.value || row.points || "")}</span>
+                  </div>
                 </div>
               </div>
-            `).join("")}
+            `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
           </div>
         </div>
-      `
-    }).join("")
+      </div>
+    `
+
+    /* =========================
+       Who HTML
+    ========================= */
+    const whoHtml = `
+      <div class="presenterSectionCard">
+        <div class="presenterSectionHead">من هو</div>
+        <div class="presenterSectionBody">
+          <div class="presenterWhoGrid">
+            ${whoRows.map(row => `
+              <div class="presenterWhoCard">
+                <div class="presenterWhoNum">${row.number}</div>
+                <div class="presenterWhoAnswer">${text(row.answer)}</div>
+              </div>
+            `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
+          </div>
+        </div>
+      </div>
+    `
+
+    /* =========================
+       Archive HTML
+    ========================= */
+const archiveHtml = [1, 2, 3, 4].map(round => {
+  const box = archiveBoxes.find(x => Number(x.round) === round)
+  const items = (groupedArchive[round] || []).sort((a, b) => Number(a.position) - Number(b.position))
+
+  const itemByPos = {}
+  items.forEach(item => {
+    itemByPos[Number(item.position)] = item
+  })
+
+  const under3Items = items.filter(item => Number(item.parent_position || item.column_group || 3) === 3 && Number(item.position) >= 5)
+  const under4Items = items.filter(item => Number(item.parent_position || item.column_group || 3) === 4 && Number(item.position) >= 5)
+
+  function renderTopInfo(position, fallbackText) {
+    const item = itemByPos[position]
+    if (!item) {
+      return `<div class="presenterArchiveInfoValue">${text(fallbackText || "")}</div>`
+    }
+
+    const raw = item.image || item.text || ""
+    if (isImageLike(raw)) {
+      return `<div class="presenterArchiveInfoValue"><img src="${text(raw)}" alt=""></div>`
+    }
+
+    return `<div class="presenterArchiveInfoValue"><span>${text(item.text || fallbackText || "")}</span></div>`
   }
 
-  function buildFinalSection() {
-    const finalRound1CardsCount = Number(finalMetaMap[1]?.cards_count || 4)
+  function renderBigCard(position) {
+    const item = itemByPos[position]
+    if (!item) {
+      return `<div class="presenterArchiveModernBigCard"><span>${position}</span></div>`
+    }
 
-    const round1Html = `
-      <div class="presenterSubCard">
-        <div class="presenterSubTitle">${text(finalMetaMap[1]?.title || "الجولة الأولى")}</div>
+    const raw = item.image || item.text || ""
+    if (isImageLike(raw)) {
+      return `<div class="presenterArchiveModernBigCard revealed"><img src="${text(raw)}" alt=""></div>`
+    }
 
-        <div class="presenterMetaGrid">
-          <div class="presenterMetaItem"><strong>عدد الأرقام:</strong> ${finalRound1CardsCount}</div>
-          <div class="presenterMetaItem"><strong>الاستخدام:</strong> صورة + إجابة</div>
-          <div class="presenterMetaItem"><strong>المتابعة:</strong> تصفير الأخطاء مع كل رقم جديد</div>
-        </div>
+    return `<div class="presenterArchiveModernBigCard revealed"><span>${text(item.text || position)}</span></div>`
+  }
 
-        <div class="presenterMiniList">
-          ${finalRound1Rows.length ? finalRound1Rows.map(item => `
-            <div class="presenterMiniRow">
-              <div class="presenterMiniNum">${item.number}</div>
-              <div class="presenterMiniText">
-                <strong>الإجابة:</strong> ${text(item.answer)}
+function renderSmallCard(item) {
+  const labelText = (item.label || "").trim()
+  const promptStyle = String(item.prompt_style || "shoe").trim().toLowerCase()
+  const emoji = promptStyle === "ball" ? "⚽️" : "👟"
+  const styleClass = promptStyle === "ball" ? "archivePromptBall" : "archivePromptShoe"
+  const isWanted = labelText === "المطلوب"
+
+  const displayText = (item.text || "").trim()
+  const hasText = displayText.length > 0
+
+  return `
+    <div class="presenterArchiveModernSmallCard ${styleClass} ${isWanted ? "wantedOnlyMark" : ""}">
+      <div class="presenterArchiveModernSmallMain">
+        <div class="presenterArchiveModernSmallNumber">${item.position}</div>
+
+        ${
+          hasText
+            ? `<div class="presenterArchiveModernSmallText">${text(displayText)}</div>`
+            : labelText && !isWanted
+              ? `<div class="presenterArchiveModernSmallLabel">${text(labelText)}</div>`
+              : ``
+        }
+      </div>
+
+      <div class="presenterArchiveModernSmallEmoji">${emoji}</div>
+    </div>
+  `
+}
+
+  return `
+    <div class="presenterSectionCard">
+      <div class="presenterSectionHead">الأرشيف - الجولة ${round}</div>
+      <div class="presenterSectionBody">
+
+        <div class="presenterArchiveBoardWrap">
+          <div class="presenterArchiveBoard presenterArchiveTheme${round}">
+
+            <div class="presenterArchiveModernTop">
+              <div class="presenterArchiveModernInfoCard">
+                <div class="presenterArchiveModernInfoLabel">البطولة</div>
+                ${renderTopInfo(1, box?.tournament || "")}
+              </div>
+
+              <div class="presenterArchiveModernInfoCard">
+                <div class="presenterArchiveModernInfoLabel">الموسم</div>
+                ${renderTopInfo(2, box?.season || "")}
               </div>
             </div>
-          `).join("") : `<div class="presenterEmpty">لا توجد بيانات</div>`}
-        </div>
 
-        <div class="presenterCompletionBox">
-          <div class="presenterCompletionTitle">اكتمال الجولة الأولى</div>
-          <div class="presenterChecksRow">
-            ${Array.from({ length: finalRound1CardsCount }, (_, i) => presenterCheckBox(`رقم ${i + 1}`)).join("")}
-          </div>
-        </div>
-      </div>
-    `
+            <div class="presenterArchiveModernMiddle">
+              ${renderBigCard(4)}
 
-    const round2Html = `
-      <div class="presenterSubCard">
-        <div class="presenterSubTitle">${text(finalMetaMap[2]?.title || "الجولة الثانية")}</div>
-
-        <div class="presenterFinalGrid2">
-          ${[1, 2, 3, 4].map(number => {
-            const rows = finalRound2Grouped[number] || []
-            const isScramble = number === 1 || number === 3
-
-            return `
-              <div class="presenterFinalRoundBox">
-                <div class="presenterFinalRoundHead">
-                  <div class="presenterFinalRoundNum">رقم ${number}</div>
-                  <div class="presenterFinalRoundType">${isScramble ? "مبعثرة" : "مرتبة"}</div>
-                </div>
-
-                <div class="presenterMiniList">
-                  ${rows.length ? rows.map((row, idx) => `
-                    <div class="presenterMiniRow presenterMiniRowTall">
-                      <div class="presenterMiniNum">${idx + 1}</div>
-                      <div class="presenterMiniText">
-                        ${isScramble ? `
-                          <div><strong>الكلمة:</strong> ${text(row.prompt)}</div>
-                          <div><strong>التلميحة:</strong> ${text(row.hint)}</div>
-                          <div><strong>الإجابة:</strong> ${text(row.answer)}</div>
-                        ` : `
-                          <div><strong>الكلمة:</strong> ${text(row.prompt)}</div>
-                        `}
-                      </div>
-                    </div>
-                  `).join("") : `<div class="presenterEmpty">لا توجد بيانات</div>`}
-                </div>
-
-                <div class="presenterCompletionBox">
-                  <div class="presenterCompletionTitle">متابعة الرقم ${number}</div>
-                  <div class="presenterChecksRow">
-                    ${presenterCheckBox("اختيار الفريق")}
-                    ${presenterCheckBox("عرض السؤال")}
-                    ${presenterCheckBox("تسجيل النتيجة")}
-                  </div>
-                </div>
+              <div class="presenterArchiveModernScoreCard">
+                <div class="presenterArchiveModernScoreLabel">النتيجة</div>
+                <div class="presenterArchiveModernScoreValue">${text(box?.score || "-")}</div>
               </div>
-            `
-          }).join("")}
-        </div>
 
-        <div class="presenterCompletionBox presenterCompletionBoxMain">
-          <div class="presenterCompletionTitle">اكتمال الجولة الثانية</div>
-          <div class="presenterChecksRow">
-            ${presenterCheckBox("رقم 1")}
-            ${presenterCheckBox("رقم 2")}
-            ${presenterCheckBox("رقم 3")}
-            ${presenterCheckBox("رقم 4")}
-          </div>
-        </div>
-      </div>
-    `
+              ${renderBigCard(3)}
+            </div>
 
-    const round3Html = `
-      <div class="presenterSubCard">
-        <div class="presenterSubTitle">${text(finalMetaMap[3]?.title || "الجولة الثالثة")}</div>
-
-        <div class="presenterFinalGrid3">
-          ${[1, 2].map(number => {
-            const rows = finalRound3Grouped[number] || []
-
-            return `
-              <div class="presenterFinalRoundBox">
-                <div class="presenterFinalRoundHead">
-                  <div class="presenterFinalRoundNum">رقم ${number}</div>
-                  <div class="presenterFinalRoundType">صور متتابعة</div>
-                </div>
-
-                <div class="presenterMiniList">
-                  ${rows.length ? rows.map((row, idx) => `
-                    <div class="presenterMiniRow">
-                      <div class="presenterMiniNum">${idx + 1}</div>
-                      <div class="presenterMiniText">
-                        <strong>الإجابة:</strong> ${text(row.answer)}
-                      </div>
-                    </div>
-                  `).join("") : `<div class="presenterEmpty">لا توجد بيانات</div>`}
-                </div>
-
-                <div class="presenterCompletionBox">
-                  <div class="presenterCompletionTitle">متابعة الرقم ${number}</div>
-                  <div class="presenterChecksRow">
-                    ${presenterCheckBox("اختيار الفريق")}
-                    ${presenterCheckBox("عرض الصور")}
-                    ${presenterCheckBox("تسجيل النتيجة")}
-                  </div>
-                </div>
+            <div class="presenterArchiveBottomGrid">
+              <div class="presenterArchiveBottomCol">
+                ${under4Items.map(renderSmallCard).join("")}
               </div>
-            `
-          }).join("")}
-        </div>
 
-        <div class="presenterCompletionBox presenterCompletionBoxMain">
-          <div class="presenterCompletionTitle">اكتمال الجولة الثالثة</div>
-          <div class="presenterChecksRow">
-            ${presenterCheckBox("رقم 1")}
-            ${presenterCheckBox("رقم 2")}
+              <div class="presenterArchiveBottomCol">
+                ${under3Items.map(renderSmallCard).join("")}
+              </div>
+            </div>
+
           </div>
         </div>
-      </div>
-    `
 
-    return `
-      <div class="presenterSubCard">
-        <div class="presenterSubTitle">الفاصلة</div>
-        ${round1Html}
-        ${round2Html}
-        ${round3Html}
-      </div>
-    `
-  }
-
-  printArea.innerHTML = `
-    <div class="presenterPrintSheet">
-      <div class="presenterPrintHeader">
-        <div class="presenterPrintTitle">ورقة المقدم</div>
-        <div class="presenterPrintSubTitle">النموذج: ${text(currentModel)}</div>
-      </div>
-
-      <div class="presenterPrintGrid">
-        ${presenterQuestionCard("التسخين", buildSimpleQuestions(warmupRows))}
-        ${presenterQuestionCard("Top 10", buildSimpleQuestions(top10Rows, "الإجابات"))}
-        ${presenterQuestionCard("المزاد", buildSimpleQuestions(auctionRows))}
-        ${presenterQuestionCard("من هو", buildSimpleQuestions(whoRows))}
-        ${presenterQuestionCard("الأرشيف", buildArchiveSection())}
-        ${presenterQuestionCard("الفاصلة", buildFinalSection())}
       </div>
     </div>
   `
+}).join("")
 
-  const originalTitle = document.title
-  const originalBody = document.body.innerHTML
+    /* =========================
+       Final HTML
+    ========================= */
+    const finalHtml = `
+      <div class="presenterSectionCard">
+        <div class="presenterSectionHead">الفاصلة</div>
+        <div class="presenterSectionBody presenterFinalAll">
 
-  document.title = "ورقة المقدم"
-  document.body.innerHTML = printArea.innerHTML
+          <div class="presenterFinalBlock">
+            <div class="presenterFinalTitle">${text(finalMetaMap[1]?.title || "الجولة الأولى")}</div>
+            <div class="presenterFinalHorizontal">
+              ${finalRound1Rows.map(item => `
+                <div class="presenterFinalImageCard">
+                  <div class="presenterFinalImageHead">رقم ${item.number}</div>
+                  <div class="presenterFinalImageBody">
+                    ${
+                      item.image
+                        ? `<img src="${text(item.image)}" alt="">`
+                        : `<div class="presenterFinalNoImage">لا توجد صورة</div>`
+                    }
+                    <div class="presenterAnswerLine">الإجابة: ${text(item.answer)}</div>
+                    ${item.note ? `<div class="presenterHintLine">التوضيح: ${text(item.note)}</div>` : ""}
+                  </div>
+                </div>
+              `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
+            </div>
+          </div>
 
-  setTimeout(() => {
-    window.print()
-    document.body.innerHTML = originalBody
-    document.title = originalTitle
-    location.reload()
-  }, 150)
+          <div class="presenterFinalBlock">
+            <div class="presenterFinalTitle">${text(finalMetaMap[2]?.title || "الجولة الثانية")}</div>
+            <div class="presenterFinalHorizontal">
+              ${[1, 2, 3, 4].map(number => {
+                const rows = groupedFinal2[number] || []
+                const isScramble = number === 1 || number === 3
+
+                return `
+                  <div class="presenterMiniSection finalHorizontalCard">
+                    <div class="presenterMiniSectionHead">رقم ${number}</div>
+                    <div class="presenterMiniSectionBody">
+                      ${rows.map((row, idx) => `
+                        <div class="presenterMiniLine">
+                          <strong>${idx + 1})</strong>
+                          <span>الكلمة: ${text(row.prompt)}</span>
+                          ${isScramble ? `<span>التلميحة: ${text(row.hint)}</span>` : ""}
+                          ${isScramble ? `<span>الإجابة: ${text(row.answer)}</span>` : ""}
+                        </div>
+                      `).join("")}
+                    </div>
+                  </div>
+                `
+              }).join("")}
+            </div>
+          </div>
+
+          <div class="presenterFinalBlock">
+            <div class="presenterFinalTitle">${text(finalMetaMap[3]?.title || "الجولة الثالثة")}</div>
+            <div class="presenterFinalHorizontal">
+              ${[1, 2].map(number => {
+                const rows = groupedFinal3[number] || []
+
+                return `
+                  <div class="presenterFinalImageCard largeFinalCard">
+                    <div class="presenterFinalImageHead">رقم ${number}</div>
+                    <div class="presenterFinalImageBody">
+                      <div class="presenterFinalRound3List">
+                        ${rows.map((row, idx) => `
+                          <div class="presenterFinalRound3Item">
+                            ${
+                              row.image
+                                ? `<img src="${text(row.image)}" alt="">`
+                                : `<div class="presenterFinalNoImage">لا توجد صورة</div>`
+                            }
+                            <div class="presenterAnswerLine">الإجابة: ${text(row.answer)}</div>
+                            ${row.note ? `<div class="presenterHintLine">التوضيح: ${text(row.note)}</div>` : ""}
+                          </div>
+                        `).join("")}
+                      </div>
+                    </div>
+                  </div>
+                `
+              }).join("")}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    `
+
+    const html = `
+      <div class="presenterOverlay" id="presenterOverlay">
+        <div class="presenterPanel">
+          <div class="presenterTopBar">
+            <div class="presenterTopTitle">ورقة المقدم - ${text(currentModel)}</div>
+            <div class="presenterTopActions">
+              <button class="adminBtn" onclick="window.print()">طباعة</button>
+              <button class="adminDeleteBtn" onclick="closePresenterSheet()">إغلاق</button>
+            </div>
+          </div>
+
+          <div class="presenterContent">
+            ${warmupHtml}
+            ${top10Html}
+            ${auctionHtml}
+            ${whoHtml}
+            ${archiveHtml}
+            ${finalHtml}
+          </div>
+        </div>
+      </div>
+    `
+
+    const old = document.getElementById("presenterOverlay")
+    if (old) old.remove()
+
+    document.body.insertAdjacentHTML("beforeend", html)
+  } catch (error) {
+    console.error(error)
+    showGameToast("تعذر فتح ورقة المقدم")
+  }
+}
+
+window.closePresenterSheet = function () {
+  const overlay = document.getElementById("presenterOverlay")
+  if (overlay) overlay.remove()
+}
+
+/* حتى يبقى الزر القديم يعمل */
+window.printPresenterSheet = function () {
+  openPresenterSheet()
 }
 /* =========================
    Warmup
