@@ -160,8 +160,12 @@ function resetGameStateBeforeStart() {
   localStorage.removeItem("top10_state_v1")
   localStorage.removeItem("auction_state_v1")
   localStorage.removeItem("who_state_v1")
-  localStorage.removeItem("final_state_v1")
+  localStorage.removeItem("final_state_v2")
+  localStorage.removeItem("final_state_v3")
   localStorage.removeItem("archive_state_v1")
+
+  localStorage.setItem("main_score_a", 0)
+  localStorage.setItem("main_score_b", 0)
 }
 
 window.startGameFromIntro = function () {

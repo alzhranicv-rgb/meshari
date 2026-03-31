@@ -497,7 +497,12 @@ function endGameAndGoIntro() {
   localStorage.removeItem("top10_state_v1")
   localStorage.removeItem("auction_state_v1")
   localStorage.removeItem("who_state_v1")
-  localStorage.removeItem("final_state_v1")
+  localStorage.removeItem("warmup_state_v1")
+localStorage.removeItem("top10_state_v1")
+localStorage.removeItem("auction_state_v1")
+localStorage.removeItem("who_state_v1")
+localStorage.removeItem("final_state_v2")
+localStorage.removeItem("archive_state_v1")
   localStorage.removeItem("archive_state_v1")
 
   const overlay = document.getElementById("winnerOverlay")

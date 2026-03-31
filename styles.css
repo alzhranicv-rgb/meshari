@@ -2792,285 +2792,6 @@ textarea,
 .whoPointsSelect .whoPointsLabel:last-of-type{
   color:#111827 !important;
 }
-/* =========================================================
-   FINAL - FINAL DESIGN
-========================================================= */
-
-.finalWrap{
-  width:min(1120px,100%);
-  margin:0 auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.finalTopBar{
-  display:grid;
-  grid-template-columns:1fr 180px 1fr;
-  gap:10px;
-  align-items:center;
-}
-
-.finalTeamCard{
-  min-height:82px;
-  padding:10px 12px;
-  background:linear-gradient(180deg, #f8efe2 0%, #f3e6d3 100%);
-  border:2px solid var(--border-soft);
-  border-radius:18px;
-  box-shadow:var(--shadow-soft);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  cursor:pointer;
-  transition:var(--ease);
-}
-
-/* الفريق اليمين */
-.finalTopBar .finalTeamCard:first-of-type{
-  flex-direction:row;
-}
-
-.finalTopBar .finalTeamCard:first-of-type .finalTeamName{
-  order:1;
-}
-.finalTopBar .finalTeamCard:first-of-type .finalTeamScore{
-  order:2;
-}
-
-/* الفريق اليسار */
-.finalTopBar .finalTeamCard:last-of-type{
-  flex-direction:row;
-}
-
-.finalTopBar .finalTeamCard:last-of-type .finalTeamScore{
-  order:1;
-}
-.finalTopBar .finalTeamCard:last-of-type .finalTeamName{
-  order:2;
-}
-
-.finalTeamName{
-  min-width:150px;
-  margin:0;
-  padding:10px 16px;
-  text-align:center;
-  line-height:1.2;
-  background:linear-gradient(180deg, var(--mango-1) 0%, var(--mango-2) 100%);
-  border:1px solid var(--mango-4);
-  border-radius:14px;
-  color:#111111;
-  font-size:24px;
-  font-weight:900;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.18),
-    0 4px 10px rgba(180,120,50,.12);
-}
-
-.finalTeamScore{
-  min-width:64px;
-  height:52px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(180deg, #f2d7a7 0%, #e7c37d 100%);
-  border:1px solid #d4ac63;
-  color:#7a4b12;
-  font-size:28px;
-  font-weight:900;
-  line-height:1;
-  border-radius:0;
-  clip-path:polygon(14% 0, 100% 0, 86% 100%, 0 100%);
-  box-shadow:
-    0 4px 10px rgba(180,140,70,.14),
-    inset 0 1px 0 rgba(255,255,255,.26);
-}
-
-.finalCenterBox{
-  min-height:82px;
-  padding:10px 8px;
-  background:linear-gradient(180deg, #ffffff 0%, #f8efe2 100%);
-  border:2px solid var(--border-soft);
-  border-radius:18px;
-  box-shadow:var(--shadow-soft);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-}
-
-.finalCenterLabel{
-  font-size:28px;
-  font-weight:900;
-  color:var(--text);
-}
-
-.finalImageStage{
-  width:100%;
-  min-height:260px;
-  background:linear-gradient(180deg, #ffffff 0%, #f8efe2 100%);
-  border:2px solid var(--border-soft);
-  border-radius:20px;
-  box-shadow:var(--shadow-soft);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  padding:14px;
-}
-
-.finalImageStage.hidden{
-  display:none !important;
-}
-
-.finalImageFull{
-  width:100%;
-  max-height:420px;
-  object-fit:contain;
-  display:block;
-  border-radius:16px;
-  cursor:pointer;
-}
-
-.finalGrid{
-  display:grid;
-  grid-template-columns:repeat(3, minmax(0,1fr));
-  gap:12px;
-}
-
-.finalCard{
-  min-height:94px;
-  border:none;
-  border-radius:18px;
-  background:linear-gradient(180deg, #566476 0%, #414d5c 100%);
-  border:1px solid rgba(255,255,255,.08);
-  color:#fff;
-  font-size:34px;
-  font-weight:900;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  transition:var(--ease);
-  box-shadow:var(--shadow-card);
-  position:relative;
-  overflow:hidden;
-}
-
-.finalCard::before{
-  content:"";
-  position:absolute;
-  top:-12px;
-  left:-12px;
-  width:74px;
-  height:74px;
-  border-radius:999px;
-  background:rgba(255,255,255,.05);
-}
-
-.finalCard:hover{
-  transform:translateY(-2px);
-  box-shadow:var(--shadow-hover);
-}
-
-.finalCard.used{
-  opacity:.55;
-  cursor:default;
-  transform:none !important;
-  box-shadow:var(--shadow-soft);
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width:992px){
-  .finalTopBar{
-    grid-template-columns:1fr;
-    gap:10px;
-  }
-
-  .finalCenterBox{
-    order:-1;
-  }
-
-  .finalImageStage{
-    min-height:220px;
-  }
-}
-
-@media (max-width:768px){
-  .finalWrap{
-    gap:8px;
-  }
-
-  .finalTeamCard{
-    min-height:76px;
-    padding:8px 10px;
-  }
-
-  .finalTeamName{
-    min-width:118px;
-    font-size:20px;
-    padding:8px 10px;
-  }
-
-  .finalTeamScore{
-    min-width:54px;
-    height:44px;
-    font-size:22px;
-  }
-
-  .finalCenterBox{
-    min-height:76px;
-  }
-
-  .finalCenterLabel{
-    font-size:24px;
-  }
-
-  .finalImageStage{
-    min-height:190px;
-    padding:10px;
-  }
-
-  .finalGrid{
-    grid-template-columns:repeat(2, minmax(0,1fr));
-    gap:10px;
-  }
-
-  .finalCard{
-    min-height:78px;
-    font-size:28px;
-  }
-}
-
-@media (max-width:480px){
-  .finalImageStage{
-    min-height:160px;
-  }
-
-  .finalTeamName{
-    min-width:104px;
-    font-size:18px;
-  }
-
-  .finalTeamScore{
-    min-width:48px;
-    height:40px;
-    font-size:20px;
-  }
-
-  .finalCenterLabel{
-    font-size:22px;
-  }
-
-  .finalCard{
-    min-height:68px;
-    font-size:24px;
-  }
-}
-
 
 /* =========================================================
    INTRO PAGE - FINAL CLEAN
@@ -9560,5 +9281,2743 @@ body::before{
 
   .archiveModernScoreValue{
     font-size: 32px !important;
+  }
+}
+/* =========================
+   FINAL SEGMENT - DISPLAY PAGE
+========================= */
+
+.finalWrapNew{
+  width:min(94vw,1260px);
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  position:relative;
+  z-index:1;
+}
+
+.finalHeaderQuestionRow{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:10px;
+  align-items:center;
+}
+
+.finalMiniTabs{
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+
+.finalMiniTabs button{
+  width:42px;
+  height:36px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(180deg,#edf2f7 0%,#dbe4ee 100%);
+  color:#243447;
+  font-size:17px;
+  font-weight:900;
+  box-shadow:var(--shadow-soft);
+  cursor:pointer;
+}
+
+.finalMiniTabs button.activeFinalRoundTab{
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2)) !important;
+  color:#111 !important;
+}
+
+.finalMiniTabs button.doneFinalRoundTab{
+  box-shadow:0 0 0 2px rgba(0,0,0,.08), var(--shadow-soft);
+}
+
+.finalMiniTitle{
+  min-height:44px;
+  padding:0 16px;
+  border-radius:14px;
+  background:linear-gradient(180deg,#fff9ee 0%,#f5ead6 100%);
+  border:1px solid rgba(226,201,168,.9);
+  color:#243447;
+  font-size:22px;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  box-shadow:var(--shadow-soft);
+}
+
+
+
+.finalRoundCenterCard{
+  border-radius:20px;
+  background:linear-gradient(180deg,#243447 0%,#1f2937 100%);
+  color:#fff;
+  box-shadow:var(--shadow-soft);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:10px;
+}
+
+.finalRoundCenterName{
+  font-size:18px;
+  font-weight:900;
+  opacity:.92;
+}
+
+.finalRoundCenterNum{
+  font-size:30px;
+  font-weight:900;
+  line-height:1;
+}
+
+.finalTeamSide{
+  display:flex;
+}
+
+.finalTeamSideLeft .finalScoreTeamCard{
+  margin-left:auto;
+}
+
+.finalTeamSideRight .finalScoreTeamCard{
+  margin-right:auto;
+}
+
+/* الجولة الأولى */
+.finalTeamsRound1 .finalScoreTeamCard{
+  width:100%;
+  min-height:72px;
+  padding:8px 10px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%);
+  border:2px solid var(--border-soft);
+  box-shadow:var(--shadow-soft);
+  display:grid;
+  grid-template-columns:1fr 48px;
+  grid-template-rows:auto auto;
+  gap:6px 8px;
+  align-items:center;
+}
+
+.finalTeamsRound1 .finalTeamSideRight .finalScoreTeamCard{
+  grid-template-columns:48px 1fr;
+}
+
+.finalTeamsRound1 .finalScoreTeamName{
+  min-height:38px;
+  border-radius:13px;
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2));
+  color:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:0 12px;
+  font-size:19px;
+  font-weight:900;
+}
+
+.finalTeamsRound1 .finalScoreTeamValue{
+  width:48px;
+  height:38px;
+  border-radius:11px;
+  background:linear-gradient(180deg,#f4d89e 0%,#e6bc63 100%);
+  color:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:19px;
+  font-weight:900;
+  box-shadow:var(--shadow-soft);
+}
+
+/* الجولة الثانية والثالثة */
+.finalTeamsRoundOther .finalScoreTeamCard{
+  width:100%;
+  min-height:80px;
+  padding:10px 12px;
+  border-radius:22px;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%);
+  border:2px solid var(--border-soft);
+  box-shadow:var(--shadow-soft);
+  display:grid;
+  grid-template-columns:1fr 56px;
+  grid-template-rows:auto auto;
+  gap:8px 10px;
+  align-items:center;
+}
+
+.finalTeamsRoundOther .finalTeamSideRight .finalScoreTeamCard{
+  grid-template-columns:56px 1fr;
+}
+
+.finalTeamsRoundOther .finalScoreTeamName{
+  min-height:44px;
+  border-radius:15px;
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2));
+  color:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:0 14px;
+  font-size:21px;
+  font-weight:900;
+}
+
+.finalTeamsRoundOther .finalScoreTeamValue{
+  width:56px;
+  height:44px;
+  border-radius:14px;
+  background:linear-gradient(180deg,#f4d89e 0%,#e6bc63 100%);
+  color:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:21px;
+  font-weight:900;
+  box-shadow:var(--shadow-soft);
+}
+
+.finalScoreTeamCard.activeTeam{
+  border:3px solid #111 !important;
+  box-shadow:0 0 0 3px rgba(0,0,0,.10), var(--shadow-soft) !important;
+}
+
+.finalErrorsBox{
+  grid-column:1 / -1;
+  min-height:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.finalErrorsBox .top10ErrorMark{
+  font-size:20px;
+  line-height:1;
+  color:#8b94a3;
+}
+
+.finalErrorsBox .top10ErrorMark.active{
+  color:#d13d3d;
+}
+
+.finalMainStage{
+  min-height:305px;
+  border-radius:22px;
+  padding:14px;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%);
+  border:1px solid rgba(226,201,168,.85);
+  box-shadow:var(--shadow-soft);
+  position:relative;
+  overflow:hidden;
+}
+
+.finalRound1Wrap,
+.finalRound2Wrap,
+.finalRound3Wrap{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.finalRound1Grid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:10px;
+}
+
+.finalRound2Grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+
+.finalRound3Grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.finalRound1Card,
+.finalRound2Card,
+.finalRound3Card{
+  min-height:58px !important;
+  border:none !important;
+  border-radius:16px !important;
+  background:linear-gradient(180deg,#5b6778 0%,#384355 100%) !important;
+  color:#fff !important;
+  font-size:24px !important;
+  font-weight:900 !important;
+  box-shadow:var(--shadow-soft) !important;
+}
+
+.finalRound1Card.used,
+.finalRound2Card.used,
+.finalRound3Card.used{
+  opacity:.24 !important;
+  cursor:not-allowed !important;
+}
+
+.finalRound1ImageStage,
+.finalRound2WordsStage,
+.finalRound3ImageStage{
+  min-height:220px !important;
+  padding:18px !important;
+  border-radius:22px !important;
+  background:#fff !important;
+  border:1px solid rgba(0,0,0,.06) !important;
+  box-shadow:var(--shadow-soft) !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+}
+
+.finalRound1ImageStage img,
+.finalRound3ImageStage img{
+  max-width:100%;
+  max-height:200px;
+  object-fit:contain;
+}
+
+.finalHintStage{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+
+.finalHintText{
+  min-width:min(88%,560px);
+  min-height:50px;
+  padding:10px 18px;
+  border-radius:15px;
+  background:linear-gradient(180deg,#243447 0%,#1f2937 100%) !important;
+  color:#fff !important;
+  font-size:22px !important;
+  font-weight:900 !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  box-shadow:var(--shadow-soft);
+}
+
+.finalWordChipLarge{
+  min-width:min(92%,760px);
+  min-height:100px;
+  padding:20px 28px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#3f4f68 0%,#2d3748 100%) !important;
+  color:#fff !important;
+  font-size:56px !important;
+  font-weight:900 !important;
+  line-height:1.08 !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  box-shadow:var(--shadow-soft);
+}
+
+.finalRound2CounterChip,
+.finalRound3ScoreChip{
+  min-width:96px;
+  min-height:42px;
+  margin:10px auto 0;
+  border-radius:14px;
+  background:linear-gradient(180deg,#f7f3e8 0%,#eadfc7 100%);
+  color:#243447;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:20px;
+  font-weight:900;
+  box-shadow:var(--shadow-soft);
+}
+
+.finalRound2AnswerGrid{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(170px,1fr));
+  gap:10px;
+}
+
+.finalRound2AnswerCard{
+  padding:10px;
+  border-radius:16px;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%);
+  border:1px solid rgba(226,201,168,.85);
+  box-shadow:var(--shadow-soft);
+}
+
+.finalRound2AnswerScrambled{
+  min-height:46px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#3f4f68 0%,#2d3748 100%);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px 12px;
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.finalRound2AnswerCorrect{
+  min-height:46px;
+  border-radius:12px;
+  background:#eef7e9;
+  border:1px solid #b8d9a9;
+  color:#1f4d1e;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px 12px;
+  font-size:18px;
+  font-weight:900;
+}
+
+.finalSequenceWordsWrap{
+  width:100%;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
+}
+
+.finalSequenceWordBtn{
+  min-height:58px !important;
+  padding:12px 22px !important;
+  border:none !important;
+  border-radius:14px !important;
+  background:linear-gradient(180deg,#f7f3e8 0%,#eadfc7 100%) !important;
+  color:#243447 !important;
+  font-size:24px !important;
+  font-weight:900 !important;
+  box-shadow:var(--shadow-soft) !important;
+}
+
+.finalSequenceWordStatic{
+  cursor:default !important;
+}
+
+.finalRound3ImageStageWrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.finalRound3AnswersList{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+}
+
+.finalAnswerChip,
+.finalAnswerBox{
+  min-height:48px;
+  padding:10px 16px;
+  border-radius:16px;
+  background:#eef7e9;
+  border:1px solid #b8d9a9;
+  color:#1f4d1e;
+  font-size:20px;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+.finalAnswerBox{
+  margin-top:12px;
+}
+
+.finalRoundPlaceholder{
+  color:#64748b;
+  font-size:24px;
+  font-weight:800;
+  text-align:center;
+}
+
+.finalControlsBar{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+}
+
+.finalControlsBar .archiveCtrlBtn{
+  min-width:145px !important;
+  min-height:44px !important;
+  border:none !important;
+  border-radius:14px !important;
+  color:#fff !important;
+  font-size:16px !important;
+  font-weight:900 !important;
+  box-shadow:var(--shadow-soft) !important;
+}
+
+.finalControlsBar .archiveCtrlBtn:nth-child(1){
+  background:linear-gradient(180deg,#d7a64a 0%,#b9852a 100%) !important;
+}
+
+.finalControlsBar .archiveCtrlBtn:nth-child(2){
+  background:linear-gradient(180deg,#53c96b 0%,#2e9b47 100%) !important;
+}
+
+.finalControlsBar .archiveCtrlBtn:nth-child(3){
+  background:linear-gradient(180deg,#5b6778 0%,#384355 100%) !important;
+}
+
+.finalControlsBar .archiveCtrlBtn:nth-child(4){
+  background:linear-gradient(180deg,#4a7bd7 0%,#2e5fb8 100%) !important;
+}
+
+/* إلغاء تنسيقات قديمة قد تسبب تعارض */
+.finalTopBar,
+.finalTopBarNoCenter,
+.finalCenterBox,
+.finalCenterLabel,
+.finalTimerValue,
+.finalRoundTitleInline,
+.finalHeaderRow,
+.finalHeaderTitle,
+.finalMiniHeader{
+  display:none !important;
+}
+
+@media (min-width:768px) and (max-width:1366px){
+  .finalScoreBoards{
+    grid-template-columns:1fr 140px 1fr;
+  }
+
+  .finalMiniTitle{
+    min-height:40px;
+    font-size:20px;
+  }
+
+  .finalMiniTabs button{
+    width:38px;
+    height:32px;
+    font-size:15px;
+  }
+
+  .finalRoundCenterName{
+    font-size:16px;
+  }
+
+  .finalRoundCenterNum{
+    font-size:26px;
+  }
+
+  .finalTeamsRound1 .finalScoreTeamCard{
+    min-height:66px;
+    padding:8px;
+  }
+
+  .finalTeamsRound1 .finalScoreTeamName{
+    min-height:34px;
+    font-size:17px;
+  }
+
+  .finalTeamsRound1 .finalScoreTeamValue{
+    width:44px;
+    height:34px;
+    font-size:17px;
+  }
+
+  .finalTeamsRoundOther .finalScoreTeamCard{
+    min-height:72px;
+    padding:8px 10px;
+  }
+
+  .finalTeamsRoundOther .finalScoreTeamName{
+    min-height:38px;
+    font-size:18px;
+  }
+
+  .finalTeamsRoundOther .finalScoreTeamValue{
+    width:48px;
+    height:38px;
+    font-size:18px;
+  }
+
+  .finalRound1Grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+
+  .finalRound1Card,
+  .finalRound2Card,
+  .finalRound3Card{
+    min-height:54px !important;
+    font-size:22px !important;
+  }
+
+  .finalHintText{
+    font-size:20px !important;
+  }
+
+  .finalWordChipLarge{
+    min-height:84px;
+    font-size:42px !important;
+  }
+
+  .finalSequenceWordBtn{
+    min-height:52px !important;
+    font-size:20px !important;
+  }
+
+  .finalControlsBar .archiveCtrlBtn{
+    min-width:134px !important;
+    min-height:42px !important;
+    font-size:15px !important;
+  }
+}
+/* =========================
+   FINAL SEGMENT - FIXED DISPLAY LAYOUT
+========================= */
+
+.finalWrapNew{
+  width:min(94vw,1260px);
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* الشريط العلوي */
+.finalHeaderQuestionRow{
+  display:grid;
+  grid-template-columns: auto 1fr;
+  gap:12px;
+  align-items:center;
+}
+
+.finalMiniTabs{
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+
+.finalMiniTabs button{
+  width:42px;
+  height:36px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(180deg,#edf2f7 0%,#dbe4ee 100%);
+  color:#243447;
+  font-size:17px;
+  font-weight:900;
+  box-shadow:var(--shadow-soft);
+  cursor:pointer;
+}
+
+.finalMiniTabs button.activeFinalRoundTab{
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2)) !important;
+  color:#111 !important;
+}
+
+.finalMiniTabs button.doneFinalRoundTab{
+  box-shadow:0 0 0 2px rgba(0,0,0,.08), var(--shadow-soft);
+}
+
+.finalMiniTitle{
+  min-height:46px;
+  padding:0 16px;
+  border-radius:14px;
+  background:linear-gradient(180deg,#fff9ee 0%,#f5ead6 100%);
+  border:1px solid rgba(226,201,168,.9);
+  color:#243447;
+  font-size:22px;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  box-shadow:var(--shadow-soft);
+}
+
+/* صف الفريقين والجولة */
+.finalScoreBoards{
+  display:grid;
+  grid-template-columns: 1fr 150px 1fr;
+  gap:14px;
+  align-items:stretch;
+}
+
+.finalTeamSide{
+  display:flex;
+}
+
+.finalTeamSideLeft,
+.finalTeamSideRight{
+  width:100%;
+}
+
+.finalTeamSideLeft .finalScoreTeamCard,
+.finalTeamSideRight .finalScoreTeamCard{
+  width:100%;
+}
+
+.finalRoundCenterCard{
+  border-radius:20px;
+  background:linear-gradient(180deg,#243447 0%,#1f2937 100%);
+  color:#fff;
+  box-shadow:var(--shadow-soft);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:10px;
+}
+
+.finalRoundCenterName{
+  font-size:17px;
+  font-weight:900;
+  opacity:.92;
+}
+
+.finalRoundCenterNum{
+  font-size:30px;
+  font-weight:900;
+  line-height:1;
+}
+
+/* الجولة الأولى */
+.finalTeamsRound1 .finalScoreTeamCard{
+  min-height:78px;
+  padding:10px 12px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%);
+  border:2px solid var(--border-soft);
+  box-shadow:var(--shadow-soft);
+  display:grid;
+  align-items:center;
+  gap:8px;
+}
+
+.finalTeamsRound1 .finalTeamSideLeft .finalScoreTeamCard{
+  grid-template-columns:1fr 52px;
+}
+
+.finalTeamsRound1 .finalTeamSideRight .finalScoreTeamCard{
+  grid-template-columns:52px 1fr;
+}
+
+.finalTeamsRound1 .finalScoreTeamName{
+  min-height:42px;
+  border-radius:14px;
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2));
+  color:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:0 12px;
+  font-size:20px;
+  font-weight:900;
+}
+
+.finalTeamsRound1 .finalScoreTeamValue{
+  width:52px;
+  height:42px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#f4d89e 0%,#e6bc63 100%);
+  color:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  font-weight:900;
+  box-shadow:var(--shadow-soft);
+}
+
+.finalTeamsRound1 .finalErrorsBox{
+  grid-column:1 / -1;
+}
+
+/* الجولة الثانية والثالثة */
+.finalTeamsRoundOther .finalScoreTeamCard{
+  min-height:86px;
+  padding:10px 14px;
+  border-radius:22px;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%);
+  border:2px solid var(--border-soft);
+  box-shadow:var(--shadow-soft);
+  display:grid;
+  align-items:center;
+  gap:8px;
+}
+
+.finalTeamsRoundOther .finalTeamSideLeft .finalScoreTeamCard{
+  grid-template-columns:1fr 58px;
+}
+
+.finalTeamsRoundOther .finalTeamSideRight .finalScoreTeamCard{
+  grid-template-columns:58px 1fr;
+}
+
+.finalTeamsRoundOther .finalScoreTeamName{
+  min-height:46px;
+  border-radius:16px;
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2));
+  color:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:0 14px;
+  font-size:22px;
+  font-weight:900;
+}
+
+.finalTeamsRoundOther .finalScoreTeamValue{
+  width:58px;
+  height:46px;
+  border-radius:14px;
+  background:linear-gradient(180deg,#f4d89e 0%,#e6bc63 100%);
+  color:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  font-weight:900;
+  box-shadow:var(--shadow-soft);
+}
+
+.finalTeamsRoundOther .finalErrorsBox{
+  grid-column:1 / -1;
+}
+
+/* الفريق المختار */
+.finalScoreTeamCard.activeTeam{
+  border:3px solid #111 !important;
+  box-shadow:0 0 0 3px rgba(0,0,0,.10), var(--shadow-soft) !important;
+}
+
+/* الأخطاء */
+.finalErrorsBox{
+  min-height:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.finalErrorsBox .top10ErrorMark{
+  font-size:20px;
+  line-height:1;
+  color:#8b94a3;
+}
+
+.finalErrorsBox .top10ErrorMark.active{
+  color:#d13d3d;
+}
+
+/* المسرح */
+.finalMainStage{
+  min-height:305px;
+  border-radius:22px;
+  padding:14px;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%);
+  border:1px solid rgba(226,201,168,.85);
+  box-shadow:var(--shadow-soft);
+}
+
+.finalRound1Wrap,
+.finalRound2Wrap,
+.finalRound3Wrap{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.finalRound1Grid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:10px;
+}
+
+.finalRound2Grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+
+.finalRound3Grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.finalRound1Card,
+.finalRound2Card,
+.finalRound3Card{
+  min-height:58px !important;
+  border:none !important;
+  border-radius:16px !important;
+  background:linear-gradient(180deg,#5b6778 0%,#384355 100%) !important;
+  color:#fff !important;
+  font-size:24px !important;
+  font-weight:900 !important;
+  box-shadow:var(--shadow-soft) !important;
+}
+
+.finalRound1Card.used,
+.finalRound2Card.used,
+.finalRound3Card.used{
+  opacity:.24 !important;
+  cursor:not-allowed !important;
+}
+
+.finalRound1ImageStage,
+.finalRound2WordsStage,
+.finalRound3ImageStage{
+  min-height:220px !important;
+  padding:18px !important;
+  border-radius:22px !important;
+  background:#fff !important;
+  border:1px solid rgba(0,0,0,.06) !important;
+  box-shadow:var(--shadow-soft) !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.finalRound1ImageStage img,
+.finalRound3ImageStage img{
+  max-width:100%;
+  max-height:200px;
+  object-fit:contain;
+}
+
+/* العناصر الإضافية */
+.finalHintStage{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+
+.finalHintText{
+  min-width:min(88%,560px);
+  min-height:50px;
+  padding:10px 18px;
+  border-radius:15px;
+  background:linear-gradient(180deg,#243447 0%,#1f2937 100%) !important;
+  color:#fff !important;
+  font-size:22px !important;
+  font-weight:900 !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  box-shadow:var(--shadow-soft);
+}
+
+.finalWordChipLarge{
+  min-width:min(92%,760px);
+  min-height:100px;
+  padding:20px 28px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#3f4f68 0%,#2d3748 100%) !important;
+  color:#fff !important;
+  font-size:56px !important;
+  font-weight:900 !important;
+  line-height:1.08 !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  box-shadow:var(--shadow-soft);
+}
+
+.finalRound2CounterChip,
+.finalRound3ScoreChip{
+  min-width:96px;
+  min-height:42px;
+  margin:10px auto 0;
+  border-radius:14px;
+  background:linear-gradient(180deg,#f7f3e8 0%,#eadfc7 100%);
+  color:#243447;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:20px;
+  font-weight:900;
+  box-shadow:var(--shadow-soft);
+}
+
+.finalRound2AnswerGrid{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:10px;
+}
+
+.finalRound2AnswerCard{
+  padding:10px;
+  border-radius:16px;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%);
+  border:1px solid rgba(226,201,168,.85);
+  box-shadow:var(--shadow-soft);
+}
+
+.finalRound2AnswerScrambled{
+  min-height:46px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#3f4f68 0%,#2d3748 100%);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px 12px;
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.finalRound2AnswerCorrect{
+  min-height:46px;
+  border-radius:12px;
+  background:#eef7e9;
+  border:1px solid #b8d9a9;
+  color:#1f4d1e;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px 12px;
+  font-size:18px;
+  font-weight:900;
+}
+
+.finalSequenceWordsWrap{
+  width:100%;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
+}
+
+.finalSequenceWordBtn{
+  min-height:58px !important;
+  padding:12px 22px !important;
+  border:none !important;
+  border-radius:14px !important;
+  background:linear-gradient(180deg,#f7f3e8 0%,#eadfc7 100%) !important;
+  color:#243447 !important;
+  font-size:24px !important;
+  font-weight:900 !important;
+  box-shadow:var(--shadow-soft) !important;
+}
+
+.finalSequenceWordStatic{
+  cursor:default !important;
+}
+
+.finalRound3ImageStageWrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.finalRound3AnswersList{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+}
+
+.finalAnswerChip,
+.finalAnswerBox{
+  min-height:48px;
+  padding:10px 16px;
+  border-radius:16px;
+  background:#eef7e9;
+  border:1px solid #b8d9a9;
+  color:#1f4d1e;
+  font-size:20px;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+.finalAnswerBox{
+  margin-top:12px;
+}
+
+.finalRoundPlaceholder{
+  color:#64748b;
+  font-size:24px;
+  font-weight:800;
+  text-align:center;
+}
+
+/* أزرار التحكم */
+.finalControlsBar{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+}
+
+.finalControlsBar .archiveCtrlBtn{
+  min-width:145px !important;
+  min-height:44px !important;
+  border:none !important;
+  border-radius:14px !important;
+  color:#fff !important;
+  font-size:16px !important;
+  font-weight:900 !important;
+  box-shadow:var(--shadow-soft) !important;
+}
+
+.finalControlsBar .archiveCtrlBtn:nth-child(1){
+  background:linear-gradient(180deg,#d7a64a 0%,#b9852a 100%) !important;
+}
+
+.finalControlsBar .archiveCtrlBtn:nth-child(2){
+  background:linear-gradient(180deg,#53c96b 0%,#2e9b47 100%) !important;
+}
+
+.finalControlsBar .archiveCtrlBtn:nth-child(3){
+  background:linear-gradient(180deg,#5b6778 0%,#384355 100%) !important;
+}
+
+.finalControlsBar .archiveCtrlBtn:nth-child(4){
+  background:linear-gradient(180deg,#4a7bd7 0%,#2e5fb8 100%) !important;
+}
+
+/* إلغاء القديم */
+.finalTopBar,
+.finalTopBarNoCenter,
+.finalCenterBox,
+.finalCenterLabel,
+.finalTimerValue,
+.finalRoundTitleInline,
+.finalHeaderRow,
+.finalHeaderTitle,
+.finalMiniHeader{
+  display:none !important;
+}
+
+@media (min-width:768px) and (max-width:1366px){
+  .finalScoreBoards{
+    grid-template-columns:1fr 130px 1fr;
+  }
+
+  .finalMiniTitle{
+    min-height:40px;
+    font-size:20px;
+  }
+
+  .finalMiniTabs button{
+    width:38px;
+    height:32px;
+    font-size:15px;
+  }
+
+  .finalRoundCenterName{
+    font-size:15px;
+  }
+
+  .finalRoundCenterNum{
+    font-size:24px;
+  }
+
+  .finalTeamsRound1 .finalScoreTeamCard{
+    min-height:66px;
+    padding:8px;
+  }
+
+  .finalTeamsRound1 .finalScoreTeamName{
+    min-height:34px;
+    font-size:17px;
+  }
+
+  .finalTeamsRound1 .finalScoreTeamValue{
+    width:44px;
+    height:34px;
+    font-size:17px;
+  }
+
+  .finalTeamsRoundOther .finalScoreTeamCard{
+    min-height:72px;
+    padding:8px 10px;
+  }
+
+  .finalTeamsRoundOther .finalScoreTeamName{
+    min-height:38px;
+    font-size:18px;
+  }
+
+  .finalTeamsRoundOther .finalScoreTeamValue{
+    width:48px;
+    height:38px;
+    font-size:18px;
+  }
+
+  .finalRound1Grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+
+  .finalRound1Card,
+  .finalRound2Card,
+  .finalRound3Card{
+    min-height:54px !important;
+    font-size:22px !important;
+  }
+
+  .finalHintText{
+    font-size:20px !important;
+  }
+
+  .finalWordChipLarge{
+    min-height:84px;
+    font-size:42px !important;
+  }
+
+  .finalSequenceWordBtn{
+    min-height:52px !important;
+    font-size:20px !important;
+  }
+
+  .finalControlsBar .archiveCtrlBtn{
+    min-width:134px !important;
+    min-height:42px !important;
+    font-size:15px !important;
+  }
+}
+/* =========================
+   FINAL - FORCE FIX
+========================= */
+
+.finalWrapNew{
+  width:min(94vw,1260px) !important;
+  margin:0 auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:12px !important;
+}
+
+.finalHeaderQuestionRow{
+  display:grid !important;
+  grid-template-columns:auto 1fr !important;
+  gap:12px !important;
+  align-items:center !important;
+}
+
+.finalMiniTabs{
+  display:flex !important;
+  gap:6px !important;
+  align-items:center !important;
+}
+
+.finalMiniTabs button{
+  width:42px !important;
+  height:36px !important;
+  border:none !important;
+  border-radius:12px !important;
+  background:linear-gradient(180deg,#edf2f7 0%,#dbe4ee 100%) !important;
+  color:#243447 !important;
+  font-size:17px !important;
+  font-weight:900 !important;
+  box-shadow:var(--shadow-soft) !important;
+  cursor:pointer !important;
+}
+
+.finalMiniTabs button.activeFinalRoundTab{
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2)) !important;
+  color:#111 !important;
+}
+
+.finalMiniTitle{
+  min-height:46px !important;
+  padding:0 16px !important;
+  border-radius:14px !important;
+  background:linear-gradient(180deg,#fff9ee 0%,#f5ead6 100%) !important;
+  border:1px solid rgba(226,201,168,.9) !important;
+  color:#243447 !important;
+  font-size:22px !important;
+  font-weight:900 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  box-shadow:var(--shadow-soft) !important;
+}
+
+
+
+.finalRoundCenterCard{
+  border-radius:20px !important;
+  background:linear-gradient(180deg,#243447 0%,#1f2937 100%) !important;
+  color:#fff !important;
+  box-shadow:var(--shadow-soft) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:4px !important;
+  padding:10px !important;
+}
+
+.finalRoundCenterName{
+  font-size:17px !important;
+  font-weight:900 !important;
+}
+
+.finalRoundCenterNum{
+  font-size:30px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+}
+
+.finalTeamSide{
+  display:flex !important;
+  width:100% !important;
+}
+
+.finalScoreTeamCard{
+  width:100% !important;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%) !important;
+  border:2px solid var(--border-soft) !important;
+  box-shadow:var(--shadow-soft) !important;
+}
+
+.finalTeamsRound1 .finalScoreTeamCard{
+  min-height:78px !important;
+  padding:10px 12px !important;
+  border-radius:18px !important;
+  display:grid !important;
+  align-items:center !important;
+  gap:8px !important;
+}
+
+.finalTeamsRound1 .finalTeamSideRight .finalScoreTeamCard{
+  grid-template-columns:1fr 52px !important;
+}
+
+.finalTeamsRound1 .finalTeamSideLeft .finalScoreTeamCard{
+  grid-template-columns:52px 1fr !important;
+}
+
+.finalTeamsRound1 .finalScoreTeamName{
+  min-height:42px !important;
+  border-radius:14px !important;
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2)) !important;
+  color:#111 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  padding:0 12px !important;
+  font-size:20px !important;
+  font-weight:900 !important;
+}
+
+.finalTeamsRound1 .finalScoreTeamValue{
+  width:52px !important;
+  height:42px !important;
+  border-radius:12px !important;
+  background:linear-gradient(180deg,#f4d89e 0%,#e6bc63 100%) !important;
+  color:#111 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:20px !important;
+  font-weight:900 !important;
+}
+
+.finalTeamsRound1 .finalErrorsBox{
+  grid-column:1 / -1 !important;
+}
+
+.finalTeamsRoundOther .finalScoreTeamCard{
+  min-height:86px !important;
+  padding:10px 14px !important;
+  border-radius:22px !important;
+  display:grid !important;
+  align-items:center !important;
+  gap:8px !important;
+}
+
+.finalTeamsRoundOther .finalTeamSideRight .finalScoreTeamCard{
+  grid-template-columns:1fr 58px !important;
+}
+
+.finalTeamsRoundOther .finalTeamSideLeft .finalScoreTeamCard{
+  grid-template-columns:58px 1fr !important;
+}
+
+.finalTeamsRoundOther .finalScoreTeamName{
+  min-height:46px !important;
+  border-radius:16px !important;
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2)) !important;
+  color:#111 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  padding:0 14px !important;
+  font-size:22px !important;
+  font-weight:900 !important;
+}
+
+.finalTeamsRoundOther .finalScoreTeamValue{
+  width:58px !important;
+  height:46px !important;
+  border-radius:14px !important;
+  background:linear-gradient(180deg,#f4d89e 0%,#e6bc63 100%) !important;
+  color:#111 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:22px !important;
+  font-weight:900 !important;
+}
+
+.finalScoreTeamCard.activeTeam{
+  border:3px solid #111 !important;
+  box-shadow:0 0 0 3px rgba(0,0,0,.10), var(--shadow-soft) !important;
+}
+
+.finalErrorsBox{
+  min-height:22px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+}
+
+.finalErrorsBox .top10ErrorMark{
+  font-size:20px !important;
+  color:#8b94a3 !important;
+}
+
+.finalErrorsBox .top10ErrorMark.active{
+  color:#d13d3d !important;
+}
+
+.finalMainStage{
+  min-height:305px !important;
+  border-radius:22px !important;
+  padding:14px !important;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%) !important;
+  border:1px solid rgba(226,201,168,.85) !important;
+  box-shadow:var(--shadow-soft) !important;
+}
+
+.finalRound1Grid{
+  display:grid !important;
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+
+.finalRound2Grid{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+
+.finalRound3Grid{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+
+.finalRound1Card,
+.finalRound2Card,
+.finalRound3Card{
+  min-height:58px !important;
+  border:none !important;
+  border-radius:16px !important;
+  background:linear-gradient(180deg,#5b6778 0%,#384355 100%) !important;
+  color:#fff !important;
+  font-size:24px !important;
+  font-weight:900 !important;
+}
+
+.finalRound1Card.used,
+.finalRound2Card.used,
+.finalRound3Card.used{
+  opacity:.24 !important;
+  cursor:not-allowed !important;
+}
+
+.finalControlsBar{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  justify-content:center !important;
+  gap:10px !important;
+}
+
+.finalControlsBar .archiveCtrlBtn{
+  min-width:145px !important;
+  min-height:44px !important;
+  border:none !important;
+  border-radius:14px !important;
+  color:#fff !important;
+  font-size:16px !important;
+  font-weight:900 !important;
+  box-shadow:var(--shadow-soft) !important;
+}
+
+.finalControlsBar .btnAnswer{
+  background:linear-gradient(180deg,#d7a64a 0%,#b9852a 100%) !important;
+}
+
+.finalControlsBar .btnCorrect{
+  background:linear-gradient(180deg,#53c96b 0%,#2e9b47 100%) !important;
+}
+
+.finalControlsBar .btnWrong,
+.finalControlsBar .btnCounter,
+.finalControlsBar .btnSave{
+  background:linear-gradient(180deg,#5b6778 0%,#384355 100%) !important;
+}
+
+.finalControlsBar .btnNext,
+.finalControlsBar .btnStart{
+  background:linear-gradient(180deg,#4a7bd7 0%,#2e5fb8 100%) !important;
+}
+.finalRound2CounterChip,
+.finalRound3ScoreChip{
+  display:none !important;
+}
+/* تكبير عرض الصور في الفاصلة */
+.finalRound1ImageStage,
+.finalRound3ImageStage{
+  min-height:320px !important;
+  padding:24px !important;
+}
+
+.finalRound1ImageStage img,
+.finalRound3ImageStage img{
+  max-width:100% !important;
+  max-height:300px !important;
+  object-fit:contain !important;
+}
+
+/* تكبير المربع الأوسط شوي ليستوعب النص */
+.finalRoundCenterCard{
+  min-height:90px !important;
+}
+
+.finalRoundCenterName{
+  font-size:16px !important;
+}
+
+.finalRoundCenterNum{
+  font-size:24px !important;
+  line-height:1.1 !important;
+}
+
+@media (min-width:768px) and (max-width:1366px){
+  .finalRound1ImageStage,
+  .finalRound3ImageStage{
+    min-height:280px !important;
+    padding:20px !important;
+  }
+
+  .finalRound1ImageStage img,
+  .finalRound3ImageStage img{
+    max-height:260px !important;
+  }
+
+  .finalRoundCenterNum{
+    font-size:20px !important;
+  }
+}
+.finalRound2AnswerCard{
+  border:none;
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease, outline .15s ease;
+}
+
+.finalRound2AnswerCard.selectedCorrect{
+  outline:3px solid #2e9b47;
+  box-shadow:0 0 0 4px rgba(46,155,71,.14), var(--shadow-soft);
+}
+
+.finalRound2AnswerCard:hover{
+  transform:translateY(-1px);
+}
+/* المربع الأوسط بين النتيجتين */
+.finalRoundCenterName{
+  display:none !important;
+}
+
+.finalRoundCenterCard{
+  min-height:96px !important;
+  gap:0 !important;
+  justify-content:center !important;
+}
+
+.finalRoundCenterNum{
+  font-size:34px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+}
+
+@media (min-width:768px) and (max-width:1366px){
+  .finalRoundCenterCard{
+    min-height:84px !important;
+  }
+
+  .finalRoundCenterNum{
+    font-size:28px !important;
+  }
+}
+/* ألوان أزرار التحكم - الفاصلة */
+.finalControlsBar .archiveCtrlBtn.btnAnswer{
+  background:linear-gradient(180deg,#f0a43a 0%, #d98312 100%) !important; /* برتقالي */
+  color:#fff !important;
+}
+
+.finalControlsBar .archiveCtrlBtn.btnCorrect{
+  background:linear-gradient(180deg,#4fc86a 0%, #249a43 100%) !important; /* أخضر */
+  color:#fff !important;
+}
+
+.finalControlsBar .archiveCtrlBtn.btnWrong{
+  background:linear-gradient(180deg,#eb5b5b 0%, #c92f2f 100%) !important; /* أحمر */
+  color:#fff !important;
+}
+
+.finalControlsBar .archiveCtrlBtn.btnNext{
+  background:linear-gradient(180deg,#344766 0%, #1f2f4a 100%) !important; /* كحلي */
+  color:#fff !important;
+}
+
+.finalControlsBar .archiveCtrlBtn.btnCounter{
+  background:linear-gradient(180deg,#b07be8 0%, #8c52d1 100%) !important; /* موف */
+  color:#fff !important;
+}
+
+.finalControlsBar .archiveCtrlBtn.btnSave{
+  background:linear-gradient(180deg,#4fc86a 0%, #249a43 100%) !important; /* أخضر */
+  color:#fff !important;
+}
+
+.finalControlsBar .archiveCtrlBtn.btnStart{
+  background:linear-gradient(180deg,#344766 0%, #1f2f4a 100%) !important; /* كحلي */
+  color:#fff !important;
+}
+/* =========================
+   FINAL ADMIN - FULL LAYOUT
+========================= */
+
+.finalAdminShell{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.finalAdminTopBar{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.finalAdminRoundsBar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.finalAdminRoundsBar button{
+  min-width:120px;
+  min-height:46px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(180deg,#edf2f7 0%,#dbe4ee 100%);
+  color:#243447;
+  font-size:17px;
+  font-weight:900;
+  box-shadow:var(--shadow-soft);
+  cursor:pointer;
+}
+
+.finalAdminRoundsBar button.activeFinalAdminRound{
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2));
+  color:#111;
+}
+
+.finalAdminTitleCard{
+  padding:16px;
+  border-radius:22px;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%);
+  border:1px solid rgba(226,201,168,.9);
+  box-shadow:var(--shadow-soft);
+}
+
+.finalAdminSubCard{
+  margin-bottom:0;
+}
+
+.finalAdminGrid{
+  display:grid;
+  gap:16px;
+}
+
+.finalAdminGridRound1{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.finalAdminRound2Wrap,
+.finalAdminRound3Wrap{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+
+.finalAdminCard{
+  padding:16px;
+  border-radius:24px;
+  background:linear-gradient(180deg,#fff 0%,#faf4ea 100%);
+  border:1px solid rgba(226,201,168,.85);
+  box-shadow:var(--shadow-soft);
+}
+
+.finalAdminWideCard{
+  padding:18px;
+}
+
+.finalAdminCardHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.finalAdminCardHead h3{
+  margin:0;
+  font-size:22px;
+  font-weight:900;
+  color:#243447;
+}
+
+.finalAdminTypeBadge{
+  min-height:34px;
+  padding:0 12px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#f7f3e8 0%,#eadfc7 100%);
+  color:#243447;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:900;
+}
+
+.finalAdminRowSingle{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.finalAdminPreviewBox{
+  margin-top:12px;
+}
+
+.finalAdminPreviewBox img{
+  width:100%;
+  max-height:200px;
+  object-fit:contain;
+  border-radius:16px;
+  background:#f7f7f7;
+  border:1px solid rgba(0,0,0,.08);
+}
+
+.finalAdminWordRow,
+.finalAdminImageRow{
+  display:grid;
+  gap:12px;
+  align-items:center;
+  padding:12px;
+  border-radius:16px;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:var(--shadow-soft);
+  margin-bottom:10px;
+}
+
+.finalAdminWordRow{
+  grid-template-columns:120px 1fr;
+}
+
+.finalAdminImageRow{
+  grid-template-columns:120px 1fr 130px;
+}
+
+.finalAdminWordIndex{
+  min-height:46px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#f7f3e8 0%,#eadfc7 100%);
+  color:#243447;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:0 10px;
+  font-size:15px;
+  font-weight:900;
+}
+
+.finalAdminWordFields,
+.finalAdminImageFields{
+  display:grid;
+  gap:10px;
+}
+
+.finalAdminWordFields3{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.finalAdminWordFields2{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.finalAdminImageFields{
+  grid-template-columns:1fr 1fr;
+}
+
+.finalAdminImagePreview{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.finalAdminImagePreview img{
+  width:100%;
+  max-width:110px;
+  max-height:90px;
+  object-fit:contain;
+  border-radius:12px;
+  background:#f7f7f7;
+  border:1px solid rgba(0,0,0,.08);
+}
+
+.finalAdminActions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+}
+
+.finalAdminActions button{
+  min-width:150px;
+}
+
+@media (max-width:1100px){
+  .finalAdminGridRound1{
+    grid-template-columns:1fr;
+  }
+
+  .finalAdminWordRow{
+    grid-template-columns:1fr;
+  }
+
+  .finalAdminImageRow{
+    grid-template-columns:1fr;
+  }
+
+  .finalAdminWordFields3,
+  .finalAdminWordFields2,
+  .finalAdminImageFields{
+    grid-template-columns:1fr;
+  }
+
+  .finalAdminImagePreview img{
+    max-width:180px;
+    max-height:120px;
+  }
+
+  .finalAdminRowSingle{
+    grid-template-columns:1fr;
+  }
+}
+/* الجولة الثانية - ترتيب أفقي كامل */
+.finalAdminRound2SingleColumn{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:16px !important;
+}
+
+.finalAdminRound2RowsWrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.finalAdminWordRowInline{
+  grid-template-columns:120px 1fr !important;
+}
+
+.finalAdminRound2Inline{
+  display:grid !important;
+  align-items:center !important;
+  gap:12px !important;
+}
+
+.finalAdminWordFieldsInline3{
+  display:grid !important;
+  grid-template-columns:repeat(3, minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+
+.finalAdminWordFieldsInline1{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:10px !important;
+}
+
+.finalAdminWordFields1{
+  display:grid;
+}
+
+@media (max-width:1100px){
+  .finalAdminWordFieldsInline3{
+    grid-template-columns:1fr !important;
+  }
+
+  .finalAdminWordRowInline{
+    grid-template-columns:1fr !important;
+  }
+}
+/* =========================
+   PRESENTER PRINT SHEET
+========================= */
+
+.presenterPrintSheet{
+  width:100%;
+}
+
+.presenterPrintHeader{
+  text-align:center;
+  margin-bottom:18px;
+  padding:0 0 14px;
+  border-bottom:3px solid #dbc394;
+}
+
+.presenterPrintTitle{
+  font-size:30px;
+  font-weight:900;
+  color:#243447;
+  margin-bottom:6px;
+  letter-spacing:.2px;
+}
+
+.presenterPrintSubTitle{
+  font-size:14px;
+  color:#6b7280;
+  font-weight:700;
+}
+
+.presenterPrintGrid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+
+.presenterBlockCard{
+  border:1px solid #decba8;
+  border-radius:16px;
+  overflow:hidden;
+  background:#fffdf8;
+  break-inside:avoid;
+  page-break-inside:avoid;
+}
+
+.presenterBlockHead{
+  background:linear-gradient(180deg,#f6e5bf 0%,#ecd199 100%);
+  padding:10px 14px;
+  border-bottom:1px solid #decba8;
+}
+
+.presenterBlockTitle{
+  font-size:18px;
+  font-weight:900;
+  color:#243447;
+}
+
+.presenterBlockBody{
+  padding:12px;
+  background:#fffdf9;
+}
+
+.presenterSubCard{
+  border:1px solid #eadcc4;
+  border-radius:14px;
+  padding:12px;
+  background:#fff;
+  margin-bottom:12px;
+  break-inside:avoid;
+  page-break-inside:avoid;
+}
+
+.presenterSubCard:last-child{
+  margin-bottom:0;
+}
+
+.presenterSubTitle{
+  font-size:16px;
+  font-weight:900;
+  color:#243447;
+  margin-bottom:10px;
+  padding-bottom:7px;
+  border-bottom:1px dashed #d7c4a3;
+}
+
+.presenterQuestionRow,
+.presenterMiniRow{
+  display:grid;
+  grid-template-columns:42px 1fr;
+  gap:10px;
+  align-items:start;
+  margin-bottom:8px;
+}
+
+.presenterQuestionRow:last-child,
+.presenterMiniRow:last-child{
+  margin-bottom:0;
+}
+
+.presenterMiniRowTall{
+  align-items:stretch;
+}
+
+.presenterQuestionNum,
+.presenterMiniNum{
+  min-height:34px;
+  border-radius:10px;
+  background:#243447;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+  font-weight:900;
+  padding:4px;
+}
+
+.presenterQuestionContent,
+.presenterMiniText{
+  background:#faf7f2;
+  border:1px solid #eee3d0;
+  border-radius:10px;
+  padding:8px 10px;
+  line-height:1.7;
+  font-size:13px;
+}
+
+.presenterQuestionText{
+  font-weight:800;
+  color:#1f2937;
+  margin-bottom:4px;
+}
+
+.presenterQuestionAnswer{
+  color:#374151;
+}
+
+.presenterMetaGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.presenterMetaItem{
+  background:#faf7f2;
+  border:1px solid #eee3d0;
+  border-radius:10px;
+  padding:8px 10px;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.6;
+}
+
+.presenterMiniList{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.presenterTag{
+  display:inline-block;
+  margin-left:6px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:#f3e3bf;
+  color:#5a4626;
+  font-size:11px;
+  font-weight:900;
+  vertical-align:middle;
+}
+
+.presenterFinalGrid2,
+.presenterFinalGrid3{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.presenterFinalRoundBox{
+  border:1px solid #eee3d0;
+  border-radius:12px;
+  padding:10px;
+  background:#fffdf8;
+  break-inside:avoid;
+  page-break-inside:avoid;
+}
+
+.presenterFinalRoundHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.presenterFinalRoundNum{
+  font-size:14px;
+  font-weight:900;
+  color:#243447;
+}
+
+.presenterFinalRoundType{
+  font-size:11px;
+  font-weight:900;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#f3e3bf;
+  color:#5a4626;
+  white-space:nowrap;
+}
+
+.presenterCompletionBox{
+  margin-top:12px;
+  padding:10px;
+  border:1px dashed #d7c4a3;
+  border-radius:12px;
+  background:#fffcf6;
+}
+
+.presenterCompletionBoxMain{
+  margin-top:14px;
+  background:#fff9ef;
+}
+
+.presenterCompletionTitle{
+  font-size:13px;
+  font-weight:900;
+  color:#243447;
+  margin-bottom:8px;
+}
+
+.presenterChecksRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 16px;
+}
+
+.presenterCheckItem{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  min-height:22px;
+}
+
+.presenterCheckSquare{
+  width:16px;
+  height:16px;
+  border:2px solid #243447;
+  border-radius:4px;
+  display:inline-block;
+  background:#fff;
+  flex:0 0 16px;
+}
+
+.presenterCheckLabel{
+  font-size:12px;
+  font-weight:700;
+  color:#374151;
+}
+
+.presenterEmpty{
+  padding:8px 10px;
+  border-radius:10px;
+  background:#faf7f2;
+  color:#6b7280;
+  font-size:13px;
+  font-weight:700;
+}
+
+@page{
+  size:A4;
+  margin:12mm;
+}
+
+@media print{
+  html, body{
+    margin:0;
+    padding:0;
+    font-family:"Tahoma","Arial",sans-serif;
+    background:#fff !important;
+    color:#1f2937 !important;
+    direction:rtl;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+
+  .presenterBlockCard,
+  .presenterSubCard,
+  .presenterFinalRoundBox,
+  .presenterCompletionBox{
+    break-inside:avoid;
+    page-break-inside:avoid;
+    box-shadow:none !important;
+  }
+}
+.finalNoteBox{
+  margin-top:10px;
+  min-height:42px;
+  padding:10px 14px;
+  border-radius:14px;
+  background:linear-gradient(180deg,#f7f3e8 0%, #eadfc7 100%);
+  color:#243447;
+  font-size:18px;
+  font-weight:800;
+  text-align:center;
+  line-height:1.6;
+  box-shadow:var(--shadow-soft);
+}
+.finalRound1ImageStage{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.finalNoteBoxTop{
+  margin-top:0 !important;
+  margin-bottom:12px !important;
+  order:-1;
+}
+/* الإجابة */
+.finalAnswerBox{
+  margin-top:12px !important;
+  min-width:min(92%, 720px) !important;
+  min-height:52px !important;
+  padding:10px 18px !important;
+  border-radius:16px !important;
+  background:linear-gradient(180deg,#eef7e9 0%, #dff0d3 100%) !important;
+  border:2px solid #b8d9a9 !important;
+  color:#173b16 !important;
+  font-size:28px !important;
+  font-weight:900 !important;
+  line-height:1.35 !important;
+  text-align:center !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-shadow:0 8px 20px rgba(46,155,71,.12), var(--shadow-soft) !important;
+}
+
+/* التلميحة */
+.finalNoteBox,
+.finalNoteBoxTop{
+  margin-top:12px !important;
+  min-width:min(92%, 720px) !important;
+  min-height:52px !important;
+  padding:10px 18px !important;
+  border-radius:16px !important;
+  background:linear-gradient(180deg,#fff4da 0%, #f0ddb1 100%) !important;
+  border:2px solid #d8b96b !important;
+  color:#5a4312 !important;
+  font-size:28px !important;
+  font-weight:900 !important;
+  line-height:1.35 !important;
+  text-align:center !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-shadow:0 8px 20px rgba(184,133,42,.12), var(--shadow-soft) !important;
+}
+
+.finalNoteBoxTop{
+  margin-top:0 !important;
+  margin-bottom:10px !important;
+  order:-1;
+}
+
+@media (min-width:768px) and (max-width:1366px){
+  .finalAnswerBox,
+  .finalNoteBox,
+  .finalNoteBoxTop{
+    font-size:24px !important;
+    min-height:46px !important;
+    padding:9px 14px !important;
+  }
+}
+.finalRound3AnswerCard{
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease, outline .15s ease;
+}
+
+.finalRound3AnswerCard.selectedCorrect{
+  outline:3px solid #2e9b47;
+  border-radius:18px;
+  box-shadow:0 0 0 4px rgba(46,155,71,.14), var(--shadow-soft);
+}
+
+.finalRound3AnswerCard:hover{
+  transform:translateY(-1px);
+}
+/* تحسين تصميم إجابات الجولة الثالثة */
+.finalRound3AnswersList{
+  width:100%;
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:14px !important;
+  align-items:start;
+}
+
+.finalRound3AnswerCard{
+  width:100%;
+  border:none !important;
+  background:linear-gradient(180deg,#fffdf9 0%, #f8efe2 100%) !important;
+  border-radius:20px !important;
+  padding:12px !important;
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease, outline .15s ease;
+  box-shadow:var(--shadow-soft) !important;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.finalRound3AnswerCard .finalAnswerChip{
+  width:100%;
+  min-height:56px;
+  padding:12px 16px;
+  border-radius:16px;
+  background:linear-gradient(180deg,#eef7e9 0%, #dff0d3 100%) !important;
+  border:2px solid #b8d9a9 !important;
+  color:#173b16 !important;
+  font-size:24px !important;
+  font-weight:900 !important;
+  line-height:1.35 !important;
+  text-align:center !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:none !important;
+}
+
+.finalRound3AnswerCard .finalNoteBox{
+  width:100%;
+  min-height:46px;
+  margin-top:0 !important;
+  padding:10px 14px;
+  border-radius:14px;
+  background:linear-gradient(180deg,#fff4da 0%, #f0ddb1 100%) !important;
+  border:2px solid #d8b96b !important;
+  color:#5a4312 !important;
+  font-size:16px !important;
+  font-weight:800 !important;
+  line-height:1.5 !important;
+  text-align:center !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:none !important;
+}
+
+.finalRound3AnswerCard.selectedCorrect{
+  outline:3px solid #2e9b47 !important;
+  box-shadow:0 0 0 4px rgba(46,155,71,.14), var(--shadow-soft) !important;
+  transform:translateY(-2px);
+}
+
+.finalRound3AnswerCard:hover{
+  transform:translateY(-1px);
+}
+
+@media (min-width:768px) and (max-width:1366px){
+  .finalRound3AnswersList{
+    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:12px !important;
+  }
+
+  .finalRound3AnswerCard .finalAnswerChip{
+    min-height:50px;
+    font-size:20px !important;
+    padding:10px 12px;
+  }
+
+  .finalRound3AnswerCard .finalNoteBox{
+    min-height:40px;
+    font-size:14px !important;
+    padding:8px 10px;
+  }
+}
+/* =========================
+   FINAL SCOREBOARD - MATCH WARMUP / TOP10
+========================= */
+
+.finalScoreBoards{
+  display:grid !important;
+  grid-template-columns:1fr 220px 1fr !important;
+  gap:14px !important;
+  align-items:stretch !important;
+}
+
+.finalScorePanel{
+  min-height:106px;
+  padding:16px 18px;
+  border-radius:24px;
+  background:linear-gradient(180deg,#fffdf9 0%,#f8efe2 100%);
+  border:2px solid var(--border-soft);
+  box-shadow:var(--shadow-soft);
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.finalScorePanelLeft{
+  justify-content:space-between;
+}
+
+.finalScorePanelRight{
+  justify-content:space-between;
+}
+
+.finalScoreTeamNameBox{
+  min-width:180px;
+  min-height:48px;
+  padding:0 18px;
+  border-radius:15px;
+  background:linear-gradient(180deg,var(--mango-1),var(--mango-2));
+  color:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:20px;
+  font-weight:900;
+  line-height:1.1;
+}
+
+.finalScoreValueBox{
+  width:56px;
+  height:48px;
+  border-radius:8px;
+  background:linear-gradient(180deg,#f4d89e 0%,#e6bc63 100%);
+  color:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  font-weight:900;
+  box-shadow:var(--shadow-soft);
+  flex:0 0 56px;
+}
+
+.finalScoreErrorsBox{
+  min-width:120px;
+  min-height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+.finalScoreErrorsBox .top10ErrorMark{
+  font-size:20px !important;
+  color:#a29b8d !important;
+}
+
+.finalScoreErrorsBox .top10ErrorMark.active{
+  color:#c83c3c !important;
+}
+
+.finalScorePanel.activeTeam{
+  border:3px solid #111 !important;
+  box-shadow:0 0 0 3px rgba(0,0,0,.10), var(--shadow-soft) !important;
+}
+
+.finalScoreCenterPanel{
+  min-height:106px;
+  border-radius:24px;
+  background:linear-gradient(180deg,#ffffff 0%,#faf7f2 100%);
+  border:2px solid var(--border-soft);
+  box-shadow:var(--shadow-soft);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  padding:10px;
+  text-align:center;
+}
+
+.finalScoreCenterTop{
+  font-size:18px;
+  font-weight:900;
+  color:#243447;
+  line-height:1.1;
+}
+
+.finalScoreCenterValue{
+  font-size:34px;
+  font-weight:900;
+  color:#111;
+  line-height:1;
+}
+
+.finalScoreCenterBottom{
+  font-size:15px;
+  font-weight:800;
+  color:#6b7280;
+  line-height:1.1;
+}
+
+/* الجولة الأولى مثل Top10 أكثر */
+.finalBoardRound1 .finalScoreCenterPanel{
+  background:linear-gradient(180deg,#ffffff 0%,#faf7f2 100%);
+}
+
+.finalBoardRound1 .finalScoreCenterTop{
+  font-size:17px;
+}
+
+.finalBoardRound1 .finalScoreCenterValue{
+  font-size:34px;
+}
+
+.finalBoardRound1 .finalScoreCenterBottom{
+  font-size:14px;
+}
+
+/* الجولة 2 و3 مثل التسخين */
+.finalBoardRoundOther .finalScoreCenterPanel{
+  background:linear-gradient(180deg,#ffffff 0%,#faf7f2 100%);
+}
+
+.finalBoardRoundOther .finalScoreCenterTop{
+  font-size:17px;
+}
+
+.finalBoardRoundOther .finalScoreCenterValue{
+  font-size:32px;
+}
+
+.finalBoardRoundOther .finalScoreCenterBottom{
+  font-size:14px;
+}
+
+@media (min-width:768px) and (max-width:1366px){
+  .finalScoreBoards{
+    grid-template-columns:1fr 180px 1fr !important;
+    gap:10px !important;
+  }
+
+  .finalScorePanel{
+    min-height:88px;
+    padding:12px 14px;
+    gap:10px;
+    border-radius:20px;
+  }
+
+  .finalScoreTeamNameBox{
+    min-width:130px;
+    min-height:40px;
+    padding:0 14px;
+    font-size:17px;
+    border-radius:13px;
+  }
+
+  .finalScoreValueBox{
+    width:48px;
+    height:40px;
+    font-size:20px;
+  }
+
+  .finalScoreErrorsBox{
+    min-width:92px;
+    gap:6px;
+  }
+
+  .finalScoreErrorsBox .top10ErrorMark{
+    font-size:17px !important;
+  }
+
+  .finalScoreCenterPanel{
+    min-height:88px;
+    border-radius:20px;
+    padding:8px;
+  }
+
+  .finalScoreCenterTop{
+    font-size:15px;
+  }
+
+  .finalScoreCenterValue{
+    font-size:27px;
+  }
+
+  .finalScoreCenterBottom{
+    font-size:12px;
+  }
+}
+/* تكبير عناصر لوحة النتائج - الفاصلة */
+.finalScoreTeamNameBox{
+  min-width:200px !important;
+  min-height:54px !important;
+  padding:0 20px !important;
+  font-size:23px !important;
+  border-radius:16px !important;
+}
+
+.finalScoreValueBox{
+  width:64px !important;
+  height:54px !important;
+  font-size:28px !important;
+  flex:0 0 64px !important;
+}
+
+.finalScoreErrorsBox{
+  min-width:138px !important;
+  min-height:32px !important;
+  gap:10px !important;
+}
+
+.finalScoreErrorsBox .top10ErrorMark{
+  font-size:26px !important;
+}
+
+@media (min-width:768px) and (max-width:1366px){
+  .finalScoreTeamNameBox{
+    min-width:150px !important;
+    min-height:44px !important;
+    font-size:19px !important;
+  }
+
+  .finalScoreValueBox{
+    width:52px !important;
+    height:44px !important;
+    font-size:22px !important;
+    flex:0 0 52px !important;
+  }
+
+  .finalScoreErrorsBox{
+    min-width:104px !important;
+    gap:7px !important;
+  }
+
+  .finalScoreErrorsBox .top10ErrorMark{
+    font-size:20px !important;
+  }
+}
+.finalScoreValueBox{
+  width:72px !important;
+  height:58px !important;
+  font-size:32px !important;
+  flex:0 0 72px !important;
+}
+
+.finalScoreErrorsBox{
+  min-width:190px !important;
+  gap:18px !important;
+}
+
+.finalScoreErrorsBox .top10ErrorMark{
+  font-size:40px !important;
+  line-height:1 !important;
+}
+
+@media (min-width:768px) and (max-width:1366px){
+  .finalScoreValueBox{
+    width:58px !important;
+    height:48px !important;
+    font-size:24px !important;
+    flex:0 0 58px !important;
+  }
+
+  .finalScoreErrorsBox{
+    min-width:120px !important;
+    gap:10px !important;
+  }
+
+  .finalScoreErrorsBox .top10ErrorMark{
+    font-size:24px !important;
+  }
+}
+/* تكبير علامات الخطأ في الفاصلة بقوة */
+#finalErrorsA .top10ErrorMark,
+#finalErrorsB .top10ErrorMark,
+.finalScoreErrorsBox .top10ErrorMark,
+.finalErrorsBox .top10ErrorMark{
+  font-size:44px !important;
+  line-height:1 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  transform:scale(1.15) !important;
+}
+
+#finalErrorsA,
+#finalErrorsB,
+.finalScoreErrorsBox,
+.finalErrorsBox{
+  min-width:210px !important;
+  gap:18px !important;
+}
+
+@media (min-width:768px) and (max-width:1366px){
+  #finalErrorsA .top10ErrorMark,
+  #finalErrorsB .top10ErrorMark,
+  .finalScoreErrorsBox .top10ErrorMark,
+  .finalErrorsBox .top10ErrorMark{
+    font-size:32px !important;
+    transform:scale(1.08) !important;
+  }
+
+  #finalErrorsA,
+  #finalErrorsB,
+  .finalScoreErrorsBox,
+  .finalErrorsBox{
+    min-width:150px !important;
+    gap:12px !important;
   }
 }

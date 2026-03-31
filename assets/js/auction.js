@@ -444,12 +444,12 @@ function auctionWrong() {
     return
   }
 
-  if (auctionState.currentBid > 10) {
-    if (auctionState.bidTeam === "A") {
-      auctionState.scoreB += 1
-    } else if (auctionState.bidTeam === "B") {
-      auctionState.scoreA += 1
-    }
+  const otherTeam = auctionState.bidTeam === "A" ? "B" : "A"
+
+  if (otherTeam === "A") {
+    auctionState.scoreA += 1
+  } else if (otherTeam === "B") {
+    auctionState.scoreB += 1
   }
 
   playGameSound("wrong")
