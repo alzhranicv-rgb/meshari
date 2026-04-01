@@ -586,6 +586,12 @@ function clearFinalItem(i) {
 /* =========================
   printer
 ========================= */
+function getArchiveDisplayThemeClass(round) {
+  if (Number(round) === 1) return "archiveThemeRound1"
+  if (Number(round) === 2) return "archiveThemeRound2"
+  if (Number(round) === 3) return "archiveThemeRound3"
+  return "archiveThemeRound4"
+}
 function escapeHtml(value) {
   return String(value || "")
     .replace(/&/g, "&amp;")
@@ -688,9 +694,7 @@ window.openPresenterSheet = async function () {
       typeof value === "string" &&
       /^(https?:\/\/|data:image\/|blob:|\/)/.test(String(value).trim())
 
-    /* =========================
-       Warmup grouping + dedupe
-    ========================= */
+    /* warmup */
     const groupedWarmup = {}
     warmupRows.forEach(row => {
       if (!groupedWarmup[row.category]) {
@@ -708,9 +712,33 @@ window.openPresenterSheet = async function () {
       }
     })
 
-    /* =========================
-       Top10 grouping
-    ========================= */
+    const warmupHtml = `
+      <div class="presenterSectionCard">
+        <div class="presenterSectionHead">التسخين</div>
+        <div class="presenterSectionBody">
+          <div class="presenterWarmupGrid">
+            ${Object.values(groupedWarmup).map(group => `
+              <div class="presenterSubCard presenterWarmupCard">
+                <div class="presenterSubHead">${text(group.title)}</div>
+                <div class="presenterListCompact">
+                  ${group.items.map(row => `
+                    <div class="presenterRowCompact">
+                      <div class="presenterNumBox">${row.number}</div>
+                      <div class="presenterTextBox">
+                        <div class="presenterQuestionLine">${text(row.question)}</div>
+                        <div class="presenterAnswerLine">الإجابة: ${text(row.answer)}</div>
+                      </div>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
+          </div>
+        </div>
+      </div>
+    `
+
+    /* top10 */
     const groupedTop10 = {}
     top10Rows.forEach(row => {
       if (!groupedTop10[row.round]) {
@@ -723,69 +751,6 @@ window.openPresenterSheet = async function () {
       groupedTop10[row.round].items.push(row)
     })
 
-    /* =========================
-       Archive grouping
-    ========================= */
-    const groupedArchive = {}
-    archiveItems.forEach(item => {
-      if (!groupedArchive[item.round]) groupedArchive[item.round] = []
-      groupedArchive[item.round].push(item)
-    })
-
-    /* =========================
-       Final grouping
-    ========================= */
-    const groupedFinal2 = {}
-    finalRound2Rows.forEach(item => {
-      if (!groupedFinal2[item.number]) groupedFinal2[item.number] = []
-      groupedFinal2[item.number].push(item)
-    })
-
-    const groupedFinal3 = {}
-    finalRound3Rows.forEach(item => {
-      if (!groupedFinal3[item.number]) groupedFinal3[item.number] = []
-      groupedFinal3[item.number].push(item)
-    })
-
-    const finalMetaMap = {}
-    finalMeta.forEach(row => {
-      finalMetaMap[row.round] = row
-    })
-
-    /* =========================
-       Warmup HTML
-    ========================= */
-const warmupHtml = `
-  <div class="presenterSectionCard">
-    <div class="presenterSectionHead">التسخين</div>
-    <div class="presenterSectionBody">
-      
-
-      <div class="presenterWarmupGrid">
-        ${Object.values(groupedWarmup).map(group => `
-          <div class="presenterSubCard presenterWarmupCard">
-            <div class="presenterSubHead">${text(group.title)}</div>
-            <div class="presenterListCompact">
-              ${group.items.map(row => `
-                <div class="presenterRowCompact">
-                  <div class="presenterNumBox">${row.number}</div>
-                  <div class="presenterTextBox">
-                    <div class="presenterQuestionLine">${text(row.question)}</div>
-                    <div class="presenterAnswerLine">الإجابة: ${text(row.answer)}</div>
-                  </div>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-        `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
-      </div>
-    </div>
-  </div>
-`
-
-    /* =========================
-       Top10 HTML
-    ========================= */
     const top10Html = Object.entries(groupedTop10).map(([round, group]) => `
       <div class="presenterSectionCard">
         <div class="presenterSectionHead">Top 10 - الجولة ${round}</div>
@@ -805,9 +770,7 @@ const warmupHtml = `
       </div>
     `).join("")
 
-    /* =========================
-       Auction HTML
-    ========================= */
+    /* auction */
     const auctionHtml = `
       <div class="presenterSectionCard">
         <div class="presenterSectionHead">المزاد</div>
@@ -830,9 +793,7 @@ const warmupHtml = `
       </div>
     `
 
-    /* =========================
-       Who HTML
-    ========================= */
+    /* who */
     const whoHtml = `
       <div class="presenterSectionCard">
         <div class="presenterSectionHead">من هو</div>
@@ -849,9 +810,14 @@ const warmupHtml = `
       </div>
     `
 
-    /* =========================
-       Archive HTML
-    ========================= */
+    /* archive */
+    const groupedArchive = {}
+    archiveItems.forEach(item => {
+      const round = Number(item.round || 1)
+      if (!groupedArchive[round]) groupedArchive[round] = []
+      groupedArchive[round].push(item)
+    })
+
 const archiveHtml = [1, 2, 3, 4].map(round => {
   const box = archiveBoxes.find(x => Number(x.round) === round)
   const items = (groupedArchive[round] || []).sort((a, b) => Number(a.position) - Number(b.position))
@@ -861,118 +827,130 @@ const archiveHtml = [1, 2, 3, 4].map(round => {
     itemByPos[Number(item.position)] = item
   })
 
-  const under3Items = items.filter(item => Number(item.parent_position || item.column_group || 3) === 3 && Number(item.position) >= 5)
-  const under4Items = items.filter(item => Number(item.parent_position || item.column_group || 3) === 4 && Number(item.position) >= 5)
+  const under3Items = items.filter(
+    item => Number(item.parent_position || item.column_group || 3) === 3 && Number(item.position) >= 5
+  )
+  const under4Items = items.filter(
+    item => Number(item.parent_position || item.column_group || 3) === 4 && Number(item.position) >= 5
+  )
 
-  function renderTopInfo(position, fallbackText) {
+  function renderPrimaryValue(position, fallbackText = "") {
     const item = itemByPos[position]
     if (!item) {
-      return `<div class="presenterArchiveInfoValue">${text(fallbackText || "")}</div>`
+      return `<span>${text(fallbackText)}</span>`
     }
 
     const raw = item.image || item.text || ""
     if (isImageLike(raw)) {
-      return `<div class="presenterArchiveInfoValue"><img src="${text(raw)}" alt=""></div>`
+      return `<img src="${text(raw)}" alt="">`
     }
 
-    return `<div class="presenterArchiveInfoValue"><span>${text(item.text || fallbackText || "")}</span></div>`
+    return `<span>${text(item.text || fallbackText)}</span>`
   }
 
-  function renderBigCard(position) {
+  function renderBigValue(position) {
     const item = itemByPos[position]
     if (!item) {
-      return `<div class="presenterArchiveModernBigCard"><span>${position}</span></div>`
+      return `<span>${position}</span>`
     }
 
     const raw = item.image || item.text || ""
     if (isImageLike(raw)) {
-      return `<div class="presenterArchiveModernBigCard revealed"><img src="${text(raw)}" alt=""></div>`
+      return `<img src="${text(raw)}" alt="">`
     }
 
-    return `<div class="presenterArchiveModernBigCard revealed"><span>${text(item.text || position)}</span></div>`
+    return `<span>${text(item.text || position)}</span>`
   }
 
-function renderSmallCard(item) {
-  const labelText = (item.label || "").trim()
-  const promptStyle = String(item.prompt_style || "shoe").trim().toLowerCase()
-  const emoji = promptStyle === "ball" ? "⚽️" : "👟"
-  const styleClass = promptStyle === "ball" ? "archivePromptBall" : "archivePromptShoe"
-  const isWanted = labelText === "المطلوب"
+  function renderBottomItem(item) {
+    const labelText = (item.label || "").trim()
+    const promptStyle = String(item.prompt_style || "shoe").trim().toLowerCase()
+    const emoji = promptStyle === "ball" ? "⚽️" : "👟"
+    const styleClass = promptStyle === "ball" ? "archivePromptBall" : "archivePromptShoe"
+    const isWanted = labelText === "المطلوب"
+    const displayText = (item.text || "").trim()
 
-  const displayText = (item.text || "").trim()
-  const hasText = displayText.length > 0
-
-  return `
-    <div class="presenterArchiveModernSmallCard ${styleClass} ${isWanted ? "wantedOnlyMark" : ""}">
-      <div class="presenterArchiveModernSmallMain">
-        <div class="presenterArchiveModernSmallNumber">${item.position}</div>
-
-        ${
-          hasText
-            ? `<div class="presenterArchiveModernSmallText">${text(displayText)}</div>`
-            : labelText && !isWanted
-              ? `<div class="presenterArchiveModernSmallLabel">${text(labelText)}</div>`
-              : ``
-        }
+    return `
+      <div class="archiveModernSmallCard ${styleClass} ${isWanted ? "archiveWantedItem" : ""}">
+        <div class="archiveModernSmallMain">
+          <div class="archiveModernSmallText">${text(displayText || labelText || "")}</div>
+        </div>
+        <div class="archiveModernSmallEmoji">${emoji}</div>
       </div>
-
-      <div class="presenterArchiveModernSmallEmoji">${emoji}</div>
-    </div>
-  `
-}
+    `
+  }
 
   return `
     <div class="presenterSectionCard">
       <div class="presenterSectionHead">الأرشيف - الجولة ${round}</div>
       <div class="presenterSectionBody">
+        <div class="archiveBoard archiveModernBoard ${getArchiveDisplayThemeClass(round)} presenterArchiveLiveClone">
 
-        <div class="presenterArchiveBoardWrap">
-          <div class="presenterArchiveBoard presenterArchiveTheme${round}">
-
-            <div class="presenterArchiveModernTop">
-              <div class="presenterArchiveModernInfoCard">
-                <div class="presenterArchiveModernInfoLabel">البطولة</div>
-                ${renderTopInfo(1, box?.tournament || "")}
-              </div>
-
-              <div class="presenterArchiveModernInfoCard">
-                <div class="presenterArchiveModernInfoLabel">الموسم</div>
-                ${renderTopInfo(2, box?.season || "")}
+          <div class="archiveModernTop">
+            <div class="archiveModernInfoCard">
+              <div class="archiveModernInfoLabel">البطولة</div>
+              <div class="archiveModernInfoValue">
+                ${renderPrimaryValue(1, box?.tournament || "")}
               </div>
             </div>
 
-            <div class="presenterArchiveModernMiddle">
-              ${renderBigCard(4)}
-
-              <div class="presenterArchiveModernScoreCard">
-                <div class="presenterArchiveModernScoreLabel">النتيجة</div>
-                <div class="presenterArchiveModernScoreValue">${text(box?.score || "-")}</div>
-              </div>
-
-              ${renderBigCard(3)}
-            </div>
-
-            <div class="presenterArchiveBottomGrid">
-              <div class="presenterArchiveBottomCol">
-                ${under4Items.map(renderSmallCard).join("")}
-              </div>
-
-              <div class="presenterArchiveBottomCol">
-                ${under3Items.map(renderSmallCard).join("")}
+            <div class="archiveModernInfoCard">
+              <div class="archiveModernInfoLabel">الموسم</div>
+              <div class="archiveModernInfoValue">
+                ${renderPrimaryValue(2, box?.season || "")}
               </div>
             </div>
-
           </div>
-        </div>
 
+          <div class="archiveModernMiddle">
+            <div class="archiveModernBigCard revealed">
+              ${renderBigValue(4)}
+            </div>
+
+            <div class="archiveModernScoreCard">
+              <div class="archiveModernScoreLabel">النتيجة</div>
+              <div class="archiveModernScoreValue">${text(box?.score || "-")}</div>
+            </div>
+
+            <div class="archiveModernBigCard revealed">
+              ${renderBigValue(3)}
+            </div>
+          </div>
+
+          <div class="archiveBottomGrid">
+            <div class="archiveBottomCol">
+              ${under4Items.map(renderBottomItem).join("")}
+            </div>
+
+            <div class="archiveBottomCol">
+              ${under3Items.map(renderBottomItem).join("")}
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   `
 }).join("")
 
-    /* =========================
-       Final HTML
-    ========================= */
+    /* final */
+    const groupedFinal2 = {}
+    finalRound2Rows.forEach(item => {
+      if (!groupedFinal2[item.number]) groupedFinal2[item.number] = []
+      groupedFinal2[item.number].push(item)
+    })
+
+    const groupedFinal3 = {}
+    finalRound3Rows.forEach(item => {
+      if (!groupedFinal3[item.number]) groupedFinal3[item.number] = []
+      groupedFinal3[item.number].push(item)
+    })
+
+    const finalMetaMap = {}
+    finalMeta.forEach(row => {
+      finalMetaMap[row.round] = row
+    })
+
     const finalHtml = `
       <div class="presenterSectionCard">
         <div class="presenterSectionHead">الفاصلة</div>
@@ -1035,7 +1013,7 @@ function renderSmallCard(item) {
                     <div class="presenterFinalImageHead">رقم ${number}</div>
                     <div class="presenterFinalImageBody">
                       <div class="presenterFinalRound3List">
-                        ${rows.map((row, idx) => `
+                        ${rows.map(row => `
                           <div class="presenterFinalRound3Item">
                             ${
                               row.image
@@ -1063,8 +1041,9 @@ function renderSmallCard(item) {
         <div class="presenterPanel">
           <div class="presenterTopBar">
             <div class="presenterTopTitle">ورقة المقدم - ${text(currentModel)}</div>
-            <div class="presenterTopActions">
-              <button class="adminBtn" onclick="window.print()">طباعة</button>
+            <div class="presenterReaderActions">
+              <button class="adminBtn" onclick="copyPresenterReaderLink()">نسخ رابط ورقة المقدم</button>
+              <button class="adminBtn" onclick="savePresenterSheetHtml()">حفظ الصفحة</button>
               <button class="adminDeleteBtn" onclick="closePresenterSheet()">إغلاق</button>
             </div>
           </div>
@@ -1096,10 +1075,163 @@ window.closePresenterSheet = function () {
   if (overlay) overlay.remove()
 }
 
-/* حتى يبقى الزر القديم يعمل */
 window.printPresenterSheet = function () {
   openPresenterSheet()
 }
+
+window.savePresenterSheetHtml = function () {
+  try {
+    const overlay = document.getElementById("presenterOverlay")
+    if (!overlay) {
+      showGameToast("افتح ورقة المقدم أولاً")
+      return
+    }
+
+    const panel = overlay.querySelector(".presenterPanel")
+    if (!panel) {
+      showGameToast("تعذر العثور على الصفحة المعروضة")
+      return
+    }
+
+    const clone = panel.cloneNode(true)
+
+    const actions = clone.querySelector(".presenterReaderActions")
+    if (actions) {
+      actions.innerHTML = `
+        <div style="font-size:13px;font-weight:800;color:#475569">
+          استخدم زر المشاركة ثم احفظ الصفحة
+        </div>
+      `
+    }
+
+    let cssText = ""
+    for (const sheet of Array.from(document.styleSheets)) {
+      try {
+        for (const rule of Array.from(sheet.cssRules || [])) {
+          cssText += rule.cssText + "\n"
+        }
+      } catch (err) {}
+    }
+
+    const html = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ورقة المقدم - ${escapeHtml(currentModel)}</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+      background: #f8fafc;
+      color: #111827;
+      font-family: Tahoma, Arial, sans-serif;
+    }
+
+    body {
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .presenterOverlay {
+      position: static !important;
+      inset: auto !important;
+      background: transparent !important;
+      padding: 0 !important;
+      display: block !important;
+    }
+
+    .presenterPanel {
+      width: 100% !important;
+      height: auto !important;
+      max-height: none !important;
+      margin: 0 auto !important;
+      box-shadow: none !important;
+      border-radius: 18px !important;
+      overflow: visible !important;
+      background: #fff !important;
+    }
+
+    .presenterContent {
+      overflow: visible !important;
+      max-height: none !important;
+    }
+
+    ${cssText}
+  </style>
+</head>
+<body>
+  <div class="presenterOverlay">
+    ${clone.outerHTML}
+  </div>
+</body>
+</html>
+    `
+
+    const newWindow = window.open("", "_blank")
+    if (!newWindow) {
+      showGameToast("اسمح بالنوافذ المنبثقة أولاً")
+      return
+    }
+
+    newWindow.document.open()
+    newWindow.document.write(html)
+    newWindow.document.close()
+
+    showGameToast("تم فتح النسخة المحفوظة في تبويب جديد")
+  } catch (error) {
+    console.error(error)
+    showGameToast("تعذر حفظ الصفحة")
+  }
+}
+
+window.copyPresenterReaderLink = async function () {
+  try {
+    if (!currentModel) {
+      showGameToast("افتح نموذجًا أولاً")
+      return
+    }
+
+    const url = `${window.location.origin}${window.location.pathname}?presenter=1&model=${encodeURIComponent(currentModel)}`
+
+    try {
+      await navigator.clipboard.writeText(url)
+      showGameToast("تم نسخ رابط ورقة المقدم")
+    } catch (err) {
+      prompt("انسخ الرابط:", url)
+    }
+  } catch (error) {
+    console.error(error)
+    showGameToast("تعذر إنشاء الرابط")
+  }
+}
+
+window.addEventListener("load", () => {
+  try {
+    const params = new URLSearchParams(window.location.search)
+    const presenterMode = params.get("presenter")
+    const modelFromUrl = params.get("model")
+
+    if (!presenterMode) return
+
+    if (modelFromUrl) {
+      currentModel = modelFromUrl
+
+      const modelInput = document.querySelector(".adminModelInput")
+      if (modelInput) modelInput.value = modelFromUrl
+    }
+
+    setTimeout(() => {
+      if (typeof openPresenterSheet === "function") {
+        openPresenterSheet()
+      }
+    }, 500)
+  } catch (error) {
+    console.error(error)
+  }
+})
 /* =========================
    Warmup
 ========================= */
