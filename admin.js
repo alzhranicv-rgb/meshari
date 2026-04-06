@@ -1342,6 +1342,47 @@ window.addEventListener("load", () => {
 window.exportPresenterPdf = async function () {
   let cloneWrap = null
 
+  function prepareSectionForA4(section) {
+    section.querySelectorAll(".presenterWarmupGrid, .presenterWhoGrid, .presenterTop10Grid, .presenterFinalHorizontal").forEach(grid => {
+      grid.style.display = "block"
+      grid.style.width = "100%"
+      grid.style.maxWidth = "100%"
+      grid.style.boxSizing = "border-box"
+    })
+
+    section.querySelectorAll(".presenterSubCard, .presenterWhoCard, .presenterRowCompact, .presenterFinalImageCard, .presenterMiniSection").forEach(card => {
+      card.style.width = "100%"
+      card.style.maxWidth = "100%"
+      card.style.marginBottom = "12px"
+      card.style.boxSizing = "border-box"
+    })
+
+    section.querySelectorAll(".archiveBottomGrid").forEach(grid => {
+      grid.style.display = "grid"
+      grid.style.gridTemplateColumns = "1fr 1fr"
+      grid.style.gap = "12px"
+      grid.style.width = "100%"
+      grid.style.maxWidth = "100%"
+      grid.style.boxSizing = "border-box"
+    })
+
+    section.querySelectorAll(".archiveBottomCol").forEach(col => {
+      col.style.display = "flex"
+      col.style.flexDirection = "column"
+      col.style.gap = "12px"
+      col.style.width = "100%"
+      col.style.maxWidth = "100%"
+      col.style.boxSizing = "border-box"
+    })
+
+    section.querySelectorAll("img").forEach(img => {
+      img.style.maxWidth = "100%"
+      img.style.height = "auto"
+      img.style.objectFit = "contain"
+      img.style.display = "block"
+    })
+  }
+
   try {
     const overlay = document.getElementById("presenterOverlay")
     if (!overlay) {
@@ -1368,40 +1409,79 @@ window.exportPresenterPdf = async function () {
       return
     }
 
-    showGameToast("جارٍ تجهيز PDF مرتب...")
+    showGameToast("جارٍ تجهيز PDF بقياس A4...")
+
+    const A4_EXPORT_WIDTH_PX = isIPhoneLikePrintDevice() ? 1040 : 1240
 
     cloneWrap = document.createElement("div")
     cloneWrap.style.position = "fixed"
     cloneWrap.style.left = "-99999px"
     cloneWrap.style.top = "0"
-    cloneWrap.style.width = panel.scrollWidth + "px"
+    cloneWrap.style.width = A4_EXPORT_WIDTH_PX + "px"
     cloneWrap.style.zIndex = "-1"
     cloneWrap.style.pointerEvents = "none"
     cloneWrap.style.opacity = "1"
-    cloneWrap.style.background = "#f8fafc"
-    cloneWrap.style.padding = isIPhoneLikePrintDevice() ? "12px" : "24px"
+    cloneWrap.style.background = "#ffffff"
+    cloneWrap.style.padding = isIPhoneLikePrintDevice() ? "20px" : "28px"
     cloneWrap.style.margin = "0"
     cloneWrap.style.overflow = "visible"
+    cloneWrap.style.boxSizing = "border-box"
 
     const clone = panel.cloneNode(true)
-    clone.style.width = panel.scrollWidth + "px"
-    clone.style.maxWidth = "none"
+    clone.style.width = "100%"
+    clone.style.maxWidth = "100%"
     clone.style.height = "auto"
     clone.style.maxHeight = "none"
     clone.style.overflow = "visible"
     clone.style.transform = "none"
-    clone.style.margin = "0"
+    clone.style.margin = "0 auto"
     clone.style.boxShadow = "none"
     clone.style.borderRadius = "0"
+    clone.style.background = "#ffffff"
+    clone.style.boxSizing = "border-box"
 
     const actions = clone.querySelector(".presenterReaderActions")
     if (actions) actions.remove()
+
+    clone.querySelectorAll(".presenterContent, .presenterSectionBody, .presenterFinalAll").forEach(el => {
+      el.style.overflow = "visible"
+      el.style.maxHeight = "none"
+      el.style.height = "auto"
+      el.style.boxSizing = "border-box"
+      el.style.width = "100%"
+      el.style.maxWidth = "100%"
+    })
+
+    clone.querySelectorAll(".presenterSectionCard, .presenterFinalBlock").forEach(el => {
+      el.style.width = "100%"
+      el.style.maxWidth = "100%"
+      el.style.margin = "0 0 18px 0"
+      el.style.boxSizing = "border-box"
+    })
+
+    clone.querySelectorAll(".presenterWarmupGrid, .presenterWhoGrid, .presenterTop10Grid, .presenterFinalHorizontal").forEach(el => {
+      el.style.width = "100%"
+      el.style.maxWidth = "100%"
+      el.style.boxSizing = "border-box"
+    })
+
+    clone.querySelectorAll(".presenterFinalImageCard, .presenterMiniSection, .presenterSubCard, .presenterWhoCard").forEach(el => {
+      el.style.boxSizing = "border-box"
+      el.style.maxWidth = "100%"
+    })
+
+    clone.querySelectorAll("img").forEach(img => {
+      img.style.maxWidth = "100%"
+      img.style.height = "auto"
+      img.style.objectFit = "contain"
+      img.style.display = "block"
+    })
 
     cloneWrap.appendChild(clone)
     document.body.appendChild(cloneWrap)
 
     await waitForImagesToLoad(clone)
-    await new Promise(resolve => setTimeout(resolve, 400))
+    await new Promise(resolve => setTimeout(resolve, 450))
 
     const sectionNodes = Array.from(clone.querySelectorAll("[data-pdf-section]"))
     if (!sectionNodes.length) {
@@ -1414,7 +1494,7 @@ window.exportPresenterPdf = async function () {
 
     const pageWidth = pdf.internal.pageSize.getWidth()
     const pageHeight = pdf.internal.pageSize.getHeight()
-    const margin = isIPhoneLikePrintDevice() ? 6 : 8
+    const margin = 10
     const usableWidth = pageWidth - margin * 2
     const usableHeight = pageHeight - margin * 2
 
@@ -1423,6 +1503,11 @@ window.exportPresenterPdf = async function () {
     for (let i = 0; i < sectionNodes.length; i++) {
       const section = sectionNodes[i]
 
+      prepareSectionForA4(section)
+
+      section.style.width = "100%"
+      section.style.maxWidth = "100%"
+      section.style.boxSizing = "border-box"
       section.style.pageBreakInside = "avoid"
       section.style.breakInside = "avoid"
       section.style.transform = "none"
@@ -1430,18 +1515,24 @@ window.exportPresenterPdf = async function () {
       section.style.backdropFilter = "none"
       section.style.webkitBackdropFilter = "none"
       section.style.overflow = "visible"
+      section.style.margin = "0"
+      section.style.paddingLeft = "0"
+      section.style.paddingRight = "0"
+
+      const sectionWidth = Math.max(section.offsetWidth, section.scrollWidth)
+      const sectionHeight = Math.max(section.offsetHeight, section.scrollHeight)
 
       const canvas = await html2canvas(section, {
         backgroundColor: "#ffffff",
         useCORS: true,
         allowTaint: false,
-        scale: isIPhoneLikePrintDevice() ? 1.35 : 2,
+        scale: isIPhoneLikePrintDevice() ? 1.5 : 2,
         logging: false,
         imageTimeout: 15000,
         scrollX: 0,
         scrollY: 0,
-        windowWidth: Math.max(section.scrollWidth, section.offsetWidth),
-        windowHeight: Math.max(section.scrollHeight, section.offsetHeight)
+        windowWidth: sectionWidth,
+        windowHeight: sectionHeight
       })
 
       const imgWidthPx = canvas.width
@@ -1520,7 +1611,7 @@ window.exportPresenterPdf = async function () {
     }
 
     pdf.save(`presenter-sheet-${currentModel || "export"}.pdf`)
-    showGameToast("تم حفظ PDF بشكل مرتب")
+    showGameToast("تم حفظ PDF بقياس A4")
   } catch (error) {
     console.error(error)
     showGameToast("تعذر تصدير PDF")
