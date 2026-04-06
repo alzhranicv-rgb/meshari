@@ -586,6 +586,12 @@ function clearFinalItem(i) {
 /* =========================
   printer
 ========================= */
+function getArchiveDisplayThemeClass(round) {
+  if (Number(round) === 1) return "archiveThemeRound1"
+  if (Number(round) === 2) return "archiveThemeRound2"
+  if (Number(round) === 3) return "archiveThemeRound3"
+  return "archiveThemeRound4"
+}
 
 function escapeHtml(value) {
   return String(value || "")
@@ -596,149 +602,234 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;")
 }
 
-function getArchiveDisplayThemeClass(round) {
-  if (Number(round) === 1) return "archiveThemeRound1"
-  if (Number(round) === 2) return "archiveThemeRound2"
-  if (Number(round) === 3) return "archiveThemeRound3"
-  return "archiveThemeRound4"
-}
+function getAllDocumentCssText() {
+  let cssText = ""
 
-window.closePresenterSheet = function () {
-  const overlay = document.getElementById("presenterOverlay")
-  if (overlay) overlay.remove()
-}
-
-window.printPresenterSheet = function () {
-  openPresenterSheet()
-}
-
-window.copyPresenterReaderLink = async function () {
-  try {
-    if (!currentModel) {
-      showGameToast("افتح نموذجًا أولاً")
-      return
-    }
-
-    const url = `${window.location.origin}${window.location.pathname}?presenter=1&model=${encodeURIComponent(currentModel)}`
-
+  for (const sheet of Array.from(document.styleSheets)) {
     try {
-      await navigator.clipboard.writeText(url)
-      showGameToast("تم نسخ رابط ورقة المقدم")
+      for (const rule of Array.from(sheet.cssRules || [])) {
+        cssText += rule.cssText + "\n"
+      }
     } catch (err) {
-      prompt("انسخ الرابط:", url)
+      /* تجاهل ملفات CSS التي يمنع المتصفح قراءتها */
     }
-  } catch (error) {
-    console.error(error)
-    showGameToast("تعذر إنشاء الرابط")
   }
+
+  return cssText
 }
 
-window.savePresenterSheetHtml = function () {
-  try {
-    const overlay = document.getElementById("presenterOverlay")
-    if (!overlay) {
-      showGameToast("افتح ورقة المقدم أولاً")
-      return
-    }
+function buildPresenterPrintHtml(panelNode, modelValue, options = {}) {
+  const {
+    autoPrint = true,
+    closeAfterPrint = true,
+    keepActions = false,
+    savedPageMode = false
+  } = options
 
-    const panel = overlay.querySelector(".presenterPanel")
-    if (!panel) {
-      showGameToast("تعذر العثور على الصفحة المعروضة")
-      return
-    }
+  const clone = panelNode.cloneNode(true)
 
-    const clone = panel.cloneNode(true)
+  const actions = clone.querySelector(".presenterReaderActions")
+  if (actions && !keepActions) {
+    actions.remove()
+  }
 
-    const actions = clone.querySelector(".presenterReaderActions")
-    if (actions) {
-      actions.innerHTML = `
-        <div style="font-size:13px;font-weight:800;color:#475569">
-          استخدم زر المشاركة ثم احفظ الصفحة
-        </div>
-      `
-    }
+  const cssText = getAllDocumentCssText()
 
-    let cssText = ""
-    for (const sheet of Array.from(document.styleSheets)) {
-      try {
-        for (const rule of Array.from(sheet.cssRules || [])) {
-          cssText += rule.cssText + "\n"
-        }
-      } catch (err) {}
-    }
-
-    const html = `
+  return `
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ورقة المقدم - ${escapeHtml(currentModel)}</title>
+  <title>ورقة المقدم - ${escapeHtml(modelValue)}</title>
   <style>
+    ${cssText}
+
     html, body {
-      margin: 0;
-      padding: 0;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100%;
+      min-height: 100%;
       direction: rtl;
-      background: #f8fafc;
-      color: #111827;
-      font-family: Tahoma, Arial, sans-serif;
+      background: #f8fafc !important;
+      color: #111827 !important;
+      font-family: Tahoma, Arial, sans-serif !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
 
     body {
-      padding: 16px;
       box-sizing: border-box;
+      padding: ${savedPageMode ? "16px" : "0"} !important;
+    }
+
+    .printRoot {
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
     }
 
     .presenterOverlay {
       position: static !important;
       inset: auto !important;
+      display: block !important;
       background: transparent !important;
       padding: 0 !important;
-      display: block !important;
+      margin: 0 !important;
+      overflow: visible !important;
     }
 
     .presenterPanel {
       width: 100% !important;
+      max-width: none !important;
       height: auto !important;
       max-height: none !important;
-      margin: 0 auto !important;
-      box-shadow: none !important;
-      border-radius: 18px !important;
+      margin: 0 !important;
+      border-radius: ${savedPageMode ? "18px" : "0"} !important;
+      box-shadow: ${savedPageMode ? "none" : "none"} !important;
       overflow: visible !important;
       background: #fff !important;
+    }
+
+    .presenterTopBar {
+      position: static !important;
+      top: auto !important;
+      z-index: auto !important;
     }
 
     .presenterContent {
       overflow: visible !important;
       max-height: none !important;
+      height: auto !important;
     }
 
-    ${cssText}
+    img {
+      max-width: 100% !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .presenterSectionCard,
+    .presenterSubCard,
+    .presenterWhoCard,
+    .presenterFinalImageCard,
+    .presenterMiniSection,
+    .archiveBoard,
+    .archiveModernBoard,
+    .archiveModernInfoCard,
+    .archiveModernBigCard,
+    .archiveModernScoreCard,
+    .archiveModernSmallCard,
+    .presenterWarmupCard,
+    .presenterTop10Row,
+    .presenterWhoGrid,
+    .presenterFinalBlock,
+    .presenterFinalRound3Item {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    @page {
+      size: A4;
+      margin: 10mm;
+    }
+
+    @media print {
+      html, body {
+        background: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      ${keepActions ? "" : `
+      .presenterReaderActions {
+        display: none !important;
+      }
+      `}
+
+      .printRoot {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .presenterOverlay {
+        background: transparent !important;
+      }
+
+      .presenterPanel {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+
+      .presenterContent {
+        overflow: visible !important;
+        max-height: none !important;
+        height: auto !important;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="presenterOverlay">
-    ${clone.outerHTML}
+  <div class="printRoot">
+    <div class="presenterOverlay">
+      ${clone.outerHTML}
+    </div>
   </div>
-</body>
-</html>
-    `
 
-    const newWindow = window.open("", "_blank")
-    if (!newWindow) {
-      showGameToast("اسمح بالنوافذ المنبثقة أولاً")
-      return
+  <script>
+    function getPanel() {
+      return document.querySelector(".presenterPanel")
     }
 
-    newWindow.document.open()
-    newWindow.document.write(html)
-    newWindow.document.close()
+    window.exportPresenterPdf = function () {
+      ${
+        autoPrint
+          ? `
+      setTimeout(function () {
+        window.focus()
+        window.print()
+      }, 300)
+      `
+          : `
+      const panel = getPanel()
+      if (!panel) return
+      const html = document.documentElement.outerHTML
+      const printWindow = window.open("", "_blank")
+      if (!printWindow) return
+      printWindow.document.open()
+      printWindow.document.write(html)
+      printWindow.document.close()
+      `
+      }
+    }
 
-    showGameToast("تم فتح النسخة في تبويب جديد")
-  } catch (error) {
-    console.error(error)
-    showGameToast("تعذر حفظ الصفحة")
-  }
+    window.addEventListener("load", function () {
+      ${autoPrint ? `
+      setTimeout(function () {
+        window.focus()
+        window.print()
+      }, 700)
+      ` : ""}
+    })
+
+    window.addEventListener("afterprint", function () {
+      ${closeAfterPrint ? `
+      setTimeout(function () {
+        window.close()
+      }, 200)
+      ` : ""}
+    })
+  </script>
+</body>
+</html>
+  `
 }
 
 window.openPresenterSheet = async function () {
@@ -834,6 +925,7 @@ window.openPresenterSheet = async function () {
       typeof value === "string" &&
       /^(https?:\/\/|data:image\/|blob:|\/)/.test(String(value).trim())
 
+    /* warmup */
     const groupedWarmup = {}
     warmupRows.forEach(row => {
       if (!groupedWarmup[row.category]) {
@@ -849,42 +941,6 @@ window.openPresenterSheet = async function () {
         groupedWarmup[row.category].seen.add(key)
         groupedWarmup[row.category].items.push(row)
       }
-    })
-
-    const groupedTop10 = {}
-    top10Rows.forEach(row => {
-      if (!groupedTop10[row.round]) {
-        groupedTop10[row.round] = {
-          question: "",
-          items: []
-        }
-      }
-      if (row.question) groupedTop10[row.round].question = row.question
-      groupedTop10[row.round].items.push(row)
-    })
-
-    const groupedArchive = {}
-    archiveItems.forEach(item => {
-      const round = Number(item.round || 1)
-      if (!groupedArchive[round]) groupedArchive[round] = []
-      groupedArchive[round].push(item)
-    })
-
-    const groupedFinal2 = {}
-    finalRound2Rows.forEach(item => {
-      if (!groupedFinal2[item.number]) groupedFinal2[item.number] = []
-      groupedFinal2[item.number].push(item)
-    })
-
-    const groupedFinal3 = {}
-    finalRound3Rows.forEach(item => {
-      if (!groupedFinal3[item.number]) groupedFinal3[item.number] = []
-      groupedFinal3[item.number].push(item)
-    })
-
-    const finalMetaMap = {}
-    finalMeta.forEach(row => {
-      finalMetaMap[row.round] = row
     })
 
     const warmupHtml = `
@@ -913,6 +969,19 @@ window.openPresenterSheet = async function () {
       </div>
     `
 
+    /* top10 */
+    const groupedTop10 = {}
+    top10Rows.forEach(row => {
+      if (!groupedTop10[row.round]) {
+        groupedTop10[row.round] = {
+          question: "",
+          items: []
+        }
+      }
+      if (row.question) groupedTop10[row.round].question = row.question
+      groupedTop10[row.round].items.push(row)
+    })
+
     const top10Html = Object.entries(groupedTop10).map(([round, group]) => `
       <div class="presenterSectionCard">
         <div class="presenterSectionHead">Top 10 - الجولة ${round}</div>
@@ -932,6 +1001,7 @@ window.openPresenterSheet = async function () {
       </div>
     `).join("")
 
+    /* auction */
     const auctionHtml = `
       <div class="presenterSectionCard">
         <div class="presenterSectionHead">المزاد</div>
@@ -954,6 +1024,7 @@ window.openPresenterSheet = async function () {
       </div>
     `
 
+    /* who */
     const whoHtml = `
       <div class="presenterSectionCard">
         <div class="presenterSectionHead">من هو</div>
@@ -969,6 +1040,14 @@ window.openPresenterSheet = async function () {
         </div>
       </div>
     `
+
+    /* archive */
+    const groupedArchive = {}
+    archiveItems.forEach(item => {
+      const round = Number(item.round || 1)
+      if (!groupedArchive[round]) groupedArchive[round] = []
+      groupedArchive[round].push(item)
+    })
 
     const archiveHtml = [1, 2, 3, 4].map(round => {
       const box = archiveBoxes.find(x => Number(x.round) === round)
@@ -1037,6 +1116,7 @@ window.openPresenterSheet = async function () {
           <div class="presenterSectionHead">الأرشيف - الجولة ${round}</div>
           <div class="presenterSectionBody">
             <div class="archiveBoard archiveModernBoard ${getArchiveDisplayThemeClass(round)} presenterArchiveLiveClone">
+
               <div class="archiveModernTop">
                 <div class="archiveModernInfoCard">
                   <div class="archiveModernInfoLabel">البطولة</div>
@@ -1077,11 +1157,30 @@ window.openPresenterSheet = async function () {
                   ${under3Items.map(renderBottomItem).join("")}
                 </div>
               </div>
+
             </div>
           </div>
         </div>
       `
     }).join("")
+
+    /* final */
+    const groupedFinal2 = {}
+    finalRound2Rows.forEach(item => {
+      if (!groupedFinal2[item.number]) groupedFinal2[item.number] = []
+      groupedFinal2[item.number].push(item)
+    })
+
+    const groupedFinal3 = {}
+    finalRound3Rows.forEach(item => {
+      if (!groupedFinal3[item.number]) groupedFinal3[item.number] = []
+      groupedFinal3[item.number].push(item)
+    })
+
+    const finalMetaMap = {}
+    finalMeta.forEach(row => {
+      finalMetaMap[row.round] = row
+    })
 
     const finalHtml = `
       <div class="presenterSectionCard">
@@ -1174,6 +1273,7 @@ window.openPresenterSheet = async function () {
           <div class="presenterTopBar">
             <div class="presenterTopTitle">ورقة المقدم - ${text(currentModel)}</div>
             <div class="presenterReaderActions">
+              <button class="adminBtn" onclick="exportPresenterPdf()">حفظ PDF</button>
               <button class="adminBtn" onclick="copyPresenterReaderLink()">نسخ رابط ورقة المقدم</button>
               <button class="adminBtn" onclick="savePresenterSheetHtml()">حفظ الصفحة</button>
               <button class="adminDeleteBtn" onclick="closePresenterSheet()">إغلاق</button>
@@ -1202,6 +1302,86 @@ window.openPresenterSheet = async function () {
   }
 }
 
+window.closePresenterSheet = function () {
+  const overlay = document.getElementById("presenterOverlay")
+  if (overlay) overlay.remove()
+}
+
+window.printPresenterSheet = function () {
+  openPresenterSheet()
+}
+
+window.savePresenterSheetHtml = function () {
+  try {
+    const overlay = document.getElementById("presenterOverlay")
+    if (!overlay) {
+      showGameToast("افتح ورقة المقدم أولاً")
+      return
+    }
+
+    const panel = overlay.querySelector(".presenterPanel")
+    if (!panel) {
+      showGameToast("تعذر العثور على الصفحة المعروضة")
+      return
+    }
+
+    const clone = panel.cloneNode(true)
+
+    const actions = clone.querySelector(".presenterReaderActions")
+    if (actions) {
+      actions.innerHTML = `
+        <div class="presenterReaderActions">
+          <button class="adminBtn" onclick="exportPresenterPdf()">حفظ PDF</button>
+          <button class="adminBtn" onclick="window.location.reload()">تحديث الصفحة</button>
+        </div>
+      `
+    }
+
+    const html = buildPresenterPrintHtml(clone, currentModel, {
+      autoPrint: false,
+      closeAfterPrint: false,
+      keepActions: true,
+      savedPageMode: true
+    })
+
+    const newWindow = window.open("", "_blank")
+    if (!newWindow) {
+      showGameToast("اسمح بالنوافذ المنبثقة أولاً")
+      return
+    }
+
+    newWindow.document.open()
+    newWindow.document.write(html)
+    newWindow.document.close()
+
+    showGameToast("تم فتح النسخة المحفوظة في تبويب جديد")
+  } catch (error) {
+    console.error(error)
+    showGameToast("تعذر حفظ الصفحة")
+  }
+}
+
+window.copyPresenterReaderLink = async function () {
+  try {
+    if (!currentModel) {
+      showGameToast("افتح نموذجًا أولاً")
+      return
+    }
+
+    const url = `${window.location.origin}${window.location.pathname}?presenter=1&model=${encodeURIComponent(currentModel)}`
+
+    try {
+      await navigator.clipboard.writeText(url)
+      showGameToast("تم نسخ رابط ورقة المقدم")
+    } catch (err) {
+      prompt("انسخ الرابط:", url)
+    }
+  } catch (error) {
+    console.error(error)
+    showGameToast("تعذر إنشاء الرابط")
+  }
+}
+
 window.addEventListener("load", () => {
   try {
     const params = new URLSearchParams(window.location.search)
@@ -1212,6 +1392,7 @@ window.addEventListener("load", () => {
 
     if (modelFromUrl) {
       currentModel = modelFromUrl
+
       const modelInput = document.querySelector(".adminModelInput")
       if (modelInput) modelInput.value = modelFromUrl
     }
@@ -1225,6 +1406,42 @@ window.addEventListener("load", () => {
     console.error(error)
   }
 })
+
+window.exportPresenterPdf = function () {
+  try {
+    const overlay = document.getElementById("presenterOverlay")
+    if (!overlay) {
+      showGameToast("افتح ورقة المقدم أولاً")
+      return
+    }
+
+    const panel = overlay.querySelector(".presenterPanel")
+    if (!panel) {
+      showGameToast("تعذر العثور على الصفحة المعروضة")
+      return
+    }
+
+    const printHtml = buildPresenterPrintHtml(panel, currentModel, {
+      autoPrint: true,
+      closeAfterPrint: true,
+      keepActions: false,
+      savedPageMode: false
+    })
+
+    const printWindow = window.open("", "_blank")
+    if (!printWindow) {
+      showGameToast("اسمح بالنوافذ المنبثقة أولاً")
+      return
+    }
+
+    printWindow.document.open()
+    printWindow.document.write(printHtml)
+    printWindow.document.close()
+  } catch (error) {
+    console.error(error)
+    showGameToast("تعذر تصدير PDF")
+  }
+}
 /* =========================
    Warmup
 ========================= */
