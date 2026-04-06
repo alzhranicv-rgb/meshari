@@ -14039,3 +14039,67 @@ body::before{
     line-height: 1.45 !important;
   }
 }
+@media print {
+  html, body {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .presenterOverlay,
+  .presenterOverlay * {
+    visibility: visible !important;
+  }
+
+  .presenterOverlay {
+    position: static !important;
+    inset: auto !important;
+    background: #fff !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .presenterPanel {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  .presenterTopBar {
+    display: none !important;
+  }
+
+  .presenterContent {
+    padding: 0 !important;
+    gap: 12px !important;
+    background: #fff !important;
+    overflow: visible !important;
+  }
+
+  .presenterSectionCard {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    box-shadow: none !important;
+  }
+
+  .presenterSectionHead,
+  .presenterSectionBody,
+  .presenterTextBox,
+  .presenterSubCard,
+  .presenterWhoCard,
+  .presenterFinalBlock,
+  .presenterFinalImageCard,
+  .presenterMiniSection {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
