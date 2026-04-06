@@ -611,11 +611,28 @@ function getAllDocumentCssText() {
         cssText += rule.cssText + "\n"
       }
     } catch (err) {
-      /* تجاهل ملفات CSS التي يمنع المتصفح قراءتها */
+      /* تجاهل ملفات CSS المحمية */
     }
   }
 
   return cssText
+}
+
+function waitForImagesToLoad(container) {
+  const images = Array.from(container.querySelectorAll("img"))
+  if (!images.length) return Promise.resolve()
+
+  return Promise.all(
+    images.map(img => {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve()
+
+      return new Promise(resolve => {
+        const done = () => resolve()
+        img.addEventListener("load", done, { once: true })
+        img.addEventListener("error", done, { once: true })
+      })
+    })
+  )
 }
 
 function buildPresenterPrintHtml(panelNode, modelValue, options = {}) {
@@ -687,7 +704,7 @@ function buildPresenterPrintHtml(panelNode, modelValue, options = {}) {
       max-height: none !important;
       margin: 0 !important;
       border-radius: ${savedPageMode ? "18px" : "0"} !important;
-      box-shadow: ${savedPageMode ? "none" : "none"} !important;
+      box-shadow: none !important;
       overflow: visible !important;
       background: #fff !important;
     }
@@ -784,30 +801,11 @@ function buildPresenterPrintHtml(panelNode, modelValue, options = {}) {
   </div>
 
   <script>
-    function getPanel() {
-      return document.querySelector(".presenterPanel")
-    }
-
-    window.exportPresenterPdf = function () {
-      ${
-        autoPrint
-          ? `
+    window.exportPresenterPdfByPrint = function () {
       setTimeout(function () {
         window.focus()
         window.print()
       }, 300)
-      `
-          : `
-      const panel = getPanel()
-      if (!panel) return
-      const html = document.documentElement.outerHTML
-      const printWindow = window.open("", "_blank")
-      if (!printWindow) return
-      printWindow.document.open()
-      printWindow.document.write(html)
-      printWindow.document.close()
-      `
-      }
     }
 
     window.addEventListener("load", function () {
@@ -1274,6 +1272,7 @@ window.openPresenterSheet = async function () {
             <div class="presenterTopTitle">ورقة المقدم - ${text(currentModel)}</div>
             <div class="presenterReaderActions">
               <button class="adminBtn" onclick="exportPresenterPdf()">حفظ PDF</button>
+              <button class="adminBtn" onclick="exportPresenterPdfByPrint()">PDF بالطباعة</button>
               <button class="adminBtn" onclick="copyPresenterReaderLink()">نسخ رابط ورقة المقدم</button>
               <button class="adminBtn" onclick="savePresenterSheetHtml()">حفظ الصفحة</button>
               <button class="adminDeleteBtn" onclick="closePresenterSheet()">إغلاق</button>
@@ -1332,6 +1331,7 @@ window.savePresenterSheetHtml = function () {
       actions.innerHTML = `
         <div class="presenterReaderActions">
           <button class="adminBtn" onclick="exportPresenterPdf()">حفظ PDF</button>
+          <button class="adminBtn" onclick="exportPresenterPdfByPrint()">PDF بالطباعة</button>
           <button class="adminBtn" onclick="window.location.reload()">تحديث الصفحة</button>
         </div>
       `
@@ -1407,7 +1407,7 @@ window.addEventListener("load", () => {
   }
 })
 
-window.exportPresenterPdf = function () {
+window.exportPresenterPdfByPrint = function () {
   try {
     const overlay = document.getElementById("presenterOverlay")
     if (!overlay) {
@@ -1437,6 +1437,157 @@ window.exportPresenterPdf = function () {
     printWindow.document.open()
     printWindow.document.write(printHtml)
     printWindow.document.close()
+  } catch (error) {
+    console.error(error)
+    showGameToast("تعذر تصدير PDF بالطباعة")
+  }
+}
+
+window.exportPresenterPdf = async function () {
+  try {
+    const overlay = document.getElementById("presenterOverlay")
+    if (!overlay) {
+      showGameToast("افتح ورقة المقدم أولاً")
+      return
+    }
+
+    const panel = overlay.querySelector(".presenterPanel")
+    if (!panel) {
+      showGameToast("تعذر العثور على الصفحة المعروضة")
+      return
+    }
+
+    if (typeof html2canvas === "undefined") {
+      showGameToast("مكتبة html2canvas غير محملة")
+      return
+    }
+
+    if (
+      typeof window.jspdf === "undefined" ||
+      typeof window.jspdf.jsPDF === "undefined"
+    ) {
+      showGameToast("مكتبة jsPDF غير محملة")
+      return
+    }
+
+    showGameToast("جارٍ تجهيز PDF...")
+
+    const cloneWrap = document.createElement("div")
+    cloneWrap.style.position = "fixed"
+    cloneWrap.style.left = "-99999px"
+    cloneWrap.style.top = "0"
+    cloneWrap.style.width = panel.scrollWidth + "px"
+    cloneWrap.style.zIndex = "-1"
+    cloneWrap.style.pointerEvents = "none"
+    cloneWrap.style.opacity = "1"
+    cloneWrap.style.background = "#f8fafc"
+    cloneWrap.style.padding = "0"
+    cloneWrap.style.margin = "0"
+    cloneWrap.style.overflow = "visible"
+
+    const clone = panel.cloneNode(true)
+
+    clone.style.width = panel.scrollWidth + "px"
+    clone.style.maxWidth = "none"
+    clone.style.height = "auto"
+    clone.style.maxHeight = "none"
+    clone.style.overflow = "visible"
+    clone.style.transform = "none"
+    clone.style.margin = "0"
+    clone.style.boxShadow = "none"
+
+    const actions = clone.querySelector(".presenterReaderActions")
+    if (actions) actions.remove()
+
+    cloneWrap.appendChild(clone)
+    document.body.appendChild(cloneWrap)
+
+    await waitForImagesToLoad(clone)
+    await new Promise(resolve => setTimeout(resolve, 300))
+
+    const canvas = await html2canvas(clone, {
+      backgroundColor: "#f8fafc",
+      useCORS: true,
+      allowTaint: false,
+      scale: 2,
+      logging: false,
+      imageTimeout: 15000,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: clone.scrollWidth,
+      windowHeight: clone.scrollHeight
+    })
+
+    if (cloneWrap.parentNode) {
+      cloneWrap.parentNode.removeChild(cloneWrap)
+    }
+
+    const { jsPDF } = window.jspdf
+    const pdf = new jsPDF("p", "mm", "a4")
+
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+
+    const margin = 6
+    const usableWidth = pageWidth - margin * 2
+    const usableHeight = pageHeight - margin * 2
+
+    const imgWidthPx = canvas.width
+    const imgHeightPx = canvas.height
+
+    const pxPerMm = imgWidthPx / usableWidth
+    const pageHeightPx = usableHeight * pxPerMm
+
+    let renderedHeightPx = 0
+    let pageIndex = 0
+
+    while (renderedHeightPx < imgHeightPx) {
+      const sliceHeightPx = Math.min(pageHeightPx, imgHeightPx - renderedHeightPx)
+
+      const pageCanvas = document.createElement("canvas")
+      pageCanvas.width = imgWidthPx
+      pageCanvas.height = sliceHeightPx
+
+      const ctx = pageCanvas.getContext("2d")
+      ctx.fillStyle = "#ffffff"
+      ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
+
+      ctx.drawImage(
+        canvas,
+        0,
+        renderedHeightPx,
+        imgWidthPx,
+        sliceHeightPx,
+        0,
+        0,
+        imgWidthPx,
+        sliceHeightPx
+      )
+
+      const pageData = pageCanvas.toDataURL("image/jpeg", 0.98)
+      const pageRenderHeightMm = sliceHeightPx / pxPerMm
+
+      if (pageIndex > 0) {
+        pdf.addPage()
+      }
+
+      pdf.addImage(
+        pageData,
+        "JPEG",
+        margin,
+        margin,
+        usableWidth,
+        pageRenderHeightMm,
+        undefined,
+        "FAST"
+      )
+
+      renderedHeightPx += sliceHeightPx
+      pageIndex += 1
+    }
+
+    pdf.save(`presenter-sheet-${currentModel || "export"}.pdf`)
+    showGameToast("تم حفظ PDF بنجاح")
   } catch (error) {
     console.error(error)
     showGameToast("تعذر تصدير PDF")
