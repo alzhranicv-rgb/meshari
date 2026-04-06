@@ -13929,7 +13929,7 @@ body::before{
   body.presenter-print-mode .presenterArchiveLiveClone,
   body.presenter-print-mode .archiveBoard.archiveModernBoard {
     width: 100% !important;
-    max-width: 680px !important;
+    max-width: 620px !important;
     margin: 0 auto !important;
     gap: 10px !important;
     padding: 10px !important;

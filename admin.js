@@ -1099,7 +1099,7 @@ window.savePresenterSheetHtml = function () {
     if (actions) {
       actions.innerHTML = `
        <div class="presenterReaderActions">
-  <button class="adminBtn" onclick="printPresenterAsPdf()">حفظ PDF</button>
+ <button class="adminBtn" onclick="exportPresenterPdf()">حفظ PDF</button>
   <button class="adminBtn" onclick="copyPresenterReaderLink()">نسخ رابط ورقة المقدم</button>
   <button class="adminBtn" onclick="savePresenterSheetHtml()">حفظ الصفحة</button>
   <button class="adminDeleteBtn" onclick="closePresenterSheet()">إغلاق</button>
@@ -1235,6 +1235,17 @@ window.addEventListener("load", () => {
     console.error(error)
   }
 })
+window.exportPresenterPdf = function () {
+  const overlay = document.getElementById("presenterOverlay")
+  if (!overlay) {
+    showGameToast("افتح ورقة المقدم أولاً")
+    return
+  }
+
+  setTimeout(() => {
+    window.print()
+  }, 200)
+}
 /* =========================
    Warmup
 ========================= */
