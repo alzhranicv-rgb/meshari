@@ -1098,9 +1098,12 @@ window.savePresenterSheetHtml = function () {
     const actions = clone.querySelector(".presenterReaderActions")
     if (actions) {
       actions.innerHTML = `
-        <div style="font-size:13px;font-weight:800;color:#475569">
-          استخدم زر المشاركة ثم احفظ الصفحة
-        </div>
+       <div class="presenterReaderActions">
+  <button class="adminBtn" onclick="printPresenterAsPdf()">حفظ PDF</button>
+  <button class="adminBtn" onclick="copyPresenterReaderLink()">نسخ رابط ورقة المقدم</button>
+  <button class="adminBtn" onclick="savePresenterSheetHtml()">حفظ الصفحة</button>
+  <button class="adminDeleteBtn" onclick="closePresenterSheet()">إغلاق</button>
+</div>
       `
     }
 
@@ -1319,7 +1322,27 @@ async function renderWarmupAdmin() {
 
   editor().innerHTML = html
 }
+window.printPresenterAsPdf = function () {
+  try {
+    const overlay = document.getElementById("presenterOverlay")
+    if (!overlay) {
+      showGameToast("افتح ورقة المقدم أولاً")
+      return
+    }
 
+    document.body.classList.add("presenter-print-mode")
+
+    setTimeout(() => {
+      window.print()
+      setTimeout(() => {
+        document.body.classList.remove("presenter-print-mode")
+      }, 500)
+    }, 150)
+  } catch (error) {
+    console.error(error)
+    showGameToast("تعذر فتح الطباعة")
+  }
+}
 async function saveWarmup() {
   const rows = []
 

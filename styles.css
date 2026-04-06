@@ -13850,3 +13850,192 @@ body::before{
     max-height:720px !important;
   }
 }
+/* =========================
+   Presenter print as-is
+========================= */
+
+@media print {
+  html, body {
+    background: #fff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  body.presenter-print-mode #presenterOverlay,
+  body.presenter-print-mode #presenterOverlay * {
+    visibility: visible !important;
+  }
+
+  body.presenter-print-mode #presenterOverlay {
+    position: static !important;
+    inset: auto !important;
+    background: #fff !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  body.presenter-print-mode .presenterPanel {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  body.presenter-print-mode .presenterTopBar {
+    padding: 10px 14px !important;
+  }
+
+  body.presenter-print-mode .presenterTopTitle {
+    font-size: 18px !important;
+  }
+
+  body.presenter-print-mode .presenterReaderActions,
+  body.presenter-print-mode .presenterTopActions {
+    display: none !important;
+  }
+
+  body.presenter-print-mode .presenterContent {
+    padding: 10px !important;
+    gap: 10px !important;
+    background: #fff !important;
+  }
+
+  body.presenter-print-mode .presenterSectionCard {
+    box-shadow: none !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  body.presenter-print-mode .presenterSectionHead {
+    font-size: 18px !important;
+    padding: 10px 14px !important;
+  }
+
+  body.presenter-print-mode .presenterSectionBody {
+    padding: 10px !important;
+  }
+
+  /* =========================
+     Archive print sizing only
+  ========================= */
+
+  body.presenter-print-mode .presenterArchiveLiveClone,
+  body.presenter-print-mode .archiveBoard.archiveModernBoard {
+    width: 100% !important;
+    max-width: 680px !important;
+    margin: 0 auto !important;
+    gap: 10px !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  body.presenter-print-mode .archiveModernTop {
+    gap: 10px !important;
+  }
+
+  body.presenter-print-mode .archiveModernInfoCard {
+    min-height: 56px !important;
+    grid-template-columns: 105px 1fr !important;
+    border-radius: 16px !important;
+  }
+
+  body.presenter-print-mode .archiveModernInfoLabel {
+    font-size: 15px !important;
+  }
+
+  body.presenter-print-mode .archiveModernInfoValue {
+    font-size: 16px !important;
+    padding: 6px 8px !important;
+  }
+
+  body.presenter-print-mode .archiveModernInfoValue img {
+    max-height: 40px !important;
+  }
+
+  body.presenter-print-mode .archiveModernMiddle {
+    grid-template-columns: 1fr 110px 1fr !important;
+    gap: 10px !important;
+  }
+
+  body.presenter-print-mode .archiveModernBigCard {
+    min-height: 135px !important;
+    border-radius: 18px !important;
+    font-size: 42px !important;
+  }
+
+  body.presenter-print-mode .archiveModernBigCard img {
+    object-fit: contain !important;
+  }
+
+  body.presenter-print-mode .archiveModernScoreCard {
+    min-height: 135px !important;
+    grid-template-rows: 46px 1fr !important;
+    border-radius: 18px !important;
+  }
+
+  body.presenter-print-mode .archiveModernScoreLabel {
+    font-size: 15px !important;
+  }
+
+  body.presenter-print-mode .archiveModernScoreValue {
+    font-size: 24px !important;
+  }
+
+  body.presenter-print-mode .archiveBottomGrid {
+    gap: 10px !important;
+  }
+
+  body.presenter-print-mode .archiveBottomCol {
+    gap: 10px !important;
+  }
+
+  body.presenter-print-mode .archiveModernSmallCard {
+    min-height: 50px !important;
+    grid-template-columns: 1fr 44px !important;
+    border-radius: 14px !important;
+  }
+
+  body.presenter-print-mode .archiveModernSmallMain {
+    padding: 0 10px !important;
+  }
+
+  body.presenter-print-mode .archiveModernSmallText,
+  body.presenter-print-mode .archiveModernSmallLabel {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+
+  body.presenter-print-mode .archiveModernSmallEmoji {
+    font-size: 17px !important;
+  }
+
+  /* =========================
+     Final print keep design
+  ========================= */
+
+  body.presenter-print-mode .presenterFinalHorizontal {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+    gap: 10px !important;
+    padding: 10px !important;
+  }
+
+  body.presenter-print-mode .presenterFinalImageBody img {
+    height: 110px !important;
+  }
+
+  body.presenter-print-mode .largeFinalCard .presenterFinalImageBody img {
+    height: 95px !important;
+  }
+
+  body.presenter-print-mode .presenterMiniLine {
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+  }
+}
