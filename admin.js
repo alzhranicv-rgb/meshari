@@ -635,6 +635,13 @@ function waitForImagesToLoad(container) {
   )
 }
 
+function isIPhoneLikePrintDevice() {
+  const ua = navigator.userAgent || ""
+  const isIOS = /iPhone|iPad|iPod/i.test(ua)
+  const isTouchMac = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1
+  return isIOS || isTouchMac
+}
+
 function buildPresenterPrintHtml(panelNode, modelValue, options = {}) {
   const {
     autoPrint = true,
@@ -799,32 +806,6 @@ function buildPresenterPrintHtml(panelNode, modelValue, options = {}) {
       ${clone.outerHTML}
     </div>
   </div>
-
-  <script>
-    window.exportPresenterPdfByPrint = function () {
-      setTimeout(function () {
-        window.focus()
-        window.print()
-      }, 300)
-    }
-
-    window.addEventListener("load", function () {
-      ${autoPrint ? `
-      setTimeout(function () {
-        window.focus()
-        window.print()
-      }, 700)
-      ` : ""}
-    })
-
-    window.addEventListener("afterprint", function () {
-      ${closeAfterPrint ? `
-      setTimeout(function () {
-        window.close()
-      }, 200)
-      ` : ""}
-    })
-  </script>
 </body>
 </html>
   `
@@ -1269,9 +1250,6 @@ window.openPresenterSheet = async function () {
             <div class="presenterTopTitle">ورقة المقدم - ${text(currentModel)}</div>
             <div class="presenterReaderActions">
               <button class="adminBtn" onclick="exportPresenterPdf()">حفظ PDF</button>
-              <button class="adminBtn" onclick="exportPresenterPdfByPrint()">PDF بالطباعة</button>
-              <button class="adminBtn" onclick="copyPresenterReaderLink()">نسخ رابط ورقة المقدم</button>
-              <button class="adminBtn" onclick="savePresenterSheetHtml()">حفظ الصفحة</button>
               <button class="adminDeleteBtn" onclick="closePresenterSheet()">إغلاق</button>
             </div>
           </div>
@@ -1303,58 +1281,15 @@ window.closePresenterSheet = function () {
   if (overlay) overlay.remove()
 }
 
-window.printPresenterSheet = function () {
-  openPresenterSheet()
-}
+window.printPresenterSheet = async function () {
+  await openPresenterSheet()
 
-window.savePresenterSheetHtml = function () {
-  try {
-    const overlay = document.getElementById("presenterOverlay")
-    if (!overlay) {
-      showGameToast("افتح ورقة المقدم أولاً")
-      return
-    }
-
-    const panel = overlay.querySelector(".presenterPanel")
-    if (!panel) {
-      showGameToast("تعذر العثور على الصفحة المعروضة")
-      return
-    }
-
-    const clone = panel.cloneNode(true)
-
-    const actions = clone.querySelector(".presenterReaderActions")
-    if (actions) {
-      actions.innerHTML = `
-        <div class="presenterReaderActions">
-          <button class="adminBtn" onclick="exportPresenterPdf()">حفظ PDF</button>
-          <button class="adminBtn" onclick="exportPresenterPdfByPrint()">PDF بالطباعة</button>
-          <button class="adminBtn" onclick="window.location.reload()">تحديث الصفحة</button>
-        </div>
-      `
-    }
-
-    const html = buildPresenterPrintHtml(clone, currentModel, {
-      autoPrint: false,
-      closeAfterPrint: false,
-      keepActions: true,
-      savedPageMode: true
-    })
-
-    const newWindow = window.open("", "_blank")
-    if (!newWindow) {
-      showGameToast("اسمح بالنوافذ المنبثقة أولاً")
-      return
-    }
-
-    newWindow.document.open()
-    newWindow.document.write(html)
-    newWindow.document.close()
-
-    showGameToast("تم فتح النسخة المحفوظة في تبويب جديد")
-  } catch (error) {
-    console.error(error)
-    showGameToast("تعذر حفظ الصفحة")
+  if (isIPhoneLikePrintDevice()) {
+    setTimeout(() => {
+      if (typeof exportPresenterPdf === "function") {
+        exportPresenterPdf()
+      }
+    }, 500)
   }
 }
 
@@ -1404,42 +1339,6 @@ window.addEventListener("load", () => {
   }
 })
 
-window.exportPresenterPdfByPrint = function () {
-  try {
-    const overlay = document.getElementById("presenterOverlay")
-    if (!overlay) {
-      showGameToast("افتح ورقة المقدم أولاً")
-      return
-    }
-
-    const panel = overlay.querySelector(".presenterPanel")
-    if (!panel) {
-      showGameToast("تعذر العثور على الصفحة المعروضة")
-      return
-    }
-
-    const printHtml = buildPresenterPrintHtml(panel, currentModel, {
-      autoPrint: true,
-      closeAfterPrint: true,
-      keepActions: false,
-      savedPageMode: false
-    })
-
-    const printWindow = window.open("", "_blank")
-    if (!printWindow) {
-      showGameToast("اسمح بالنوافذ المنبثقة أولاً")
-      return
-    }
-
-    printWindow.document.open()
-    printWindow.document.write(printHtml)
-    printWindow.document.close()
-  } catch (error) {
-    console.error(error)
-    showGameToast("تعذر تصدير PDF بالطباعة")
-  }
-}
-
 window.exportPresenterPdf = async function () {
   let cloneWrap = null
 
@@ -1480,7 +1379,7 @@ window.exportPresenterPdf = async function () {
     cloneWrap.style.pointerEvents = "none"
     cloneWrap.style.opacity = "1"
     cloneWrap.style.background = "#f8fafc"
-    cloneWrap.style.padding = "24px"
+    cloneWrap.style.padding = isIPhoneLikePrintDevice() ? "12px" : "24px"
     cloneWrap.style.margin = "0"
     cloneWrap.style.overflow = "visible"
 
@@ -1515,7 +1414,7 @@ window.exportPresenterPdf = async function () {
 
     const pageWidth = pdf.internal.pageSize.getWidth()
     const pageHeight = pdf.internal.pageSize.getHeight()
-    const margin = 8
+    const margin = isIPhoneLikePrintDevice() ? 6 : 8
     const usableWidth = pageWidth - margin * 2
     const usableHeight = pageHeight - margin * 2
 
@@ -1526,18 +1425,23 @@ window.exportPresenterPdf = async function () {
 
       section.style.pageBreakInside = "avoid"
       section.style.breakInside = "avoid"
+      section.style.transform = "none"
+      section.style.filter = "none"
+      section.style.backdropFilter = "none"
+      section.style.webkitBackdropFilter = "none"
+      section.style.overflow = "visible"
 
       const canvas = await html2canvas(section, {
         backgroundColor: "#ffffff",
         useCORS: true,
         allowTaint: false,
-        scale: 2,
+        scale: isIPhoneLikePrintDevice() ? 1.35 : 2,
         logging: false,
         imageTimeout: 15000,
         scrollX: 0,
         scrollY: 0,
-        windowWidth: section.scrollWidth,
-        windowHeight: section.scrollHeight
+        windowWidth: Math.max(section.scrollWidth, section.offsetWidth),
+        windowHeight: Math.max(section.scrollHeight, section.offsetHeight)
       })
 
       const imgWidthPx = canvas.width
