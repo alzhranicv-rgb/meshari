@@ -942,7 +942,7 @@ window.openPresenterSheet = async function () {
     })
 
     const warmupHtml = `
-      <div class="presenterSectionCard">
+      <div class="presenterSectionCard" data-pdf-section="warmup">
         <div class="presenterSectionHead">التسخين</div>
         <div class="presenterSectionBody">
           <div class="presenterWarmupGrid">
@@ -981,7 +981,7 @@ window.openPresenterSheet = async function () {
     })
 
     const top10Html = Object.entries(groupedTop10).map(([round, group]) => `
-      <div class="presenterSectionCard">
+      <div class="presenterSectionCard" data-pdf-section="top10-round-${round}">
         <div class="presenterSectionHead">Top 10 - الجولة ${round}</div>
         <div class="presenterSectionBody">
           <div class="presenterQuestionMain">${text(group.question)}</div>
@@ -1001,7 +1001,7 @@ window.openPresenterSheet = async function () {
 
     /* auction */
     const auctionHtml = `
-      <div class="presenterSectionCard">
+      <div class="presenterSectionCard" data-pdf-section="auction">
         <div class="presenterSectionHead">المزاد</div>
         <div class="presenterSectionBody">
           <div class="presenterListCompact">
@@ -1024,7 +1024,7 @@ window.openPresenterSheet = async function () {
 
     /* who */
     const whoHtml = `
-      <div class="presenterSectionCard">
+      <div class="presenterSectionCard" data-pdf-section="who">
         <div class="presenterSectionHead">من هو</div>
         <div class="presenterSectionBody">
           <div class="presenterWhoGrid">
@@ -1110,7 +1110,7 @@ window.openPresenterSheet = async function () {
       }
 
       return `
-        <div class="presenterSectionCard">
+        <div class="presenterSectionCard" data-pdf-section="archive-round-${round}">
           <div class="presenterSectionHead">الأرشيف - الجولة ${round}</div>
           <div class="presenterSectionBody">
             <div class="archiveBoard archiveModernBoard ${getArchiveDisplayThemeClass(round)} presenterArchiveLiveClone">
@@ -1181,87 +1181,84 @@ window.openPresenterSheet = async function () {
     })
 
     const finalHtml = `
-      <div class="presenterSectionCard">
-        <div class="presenterSectionHead">الفاصلة</div>
-        <div class="presenterSectionBody presenterFinalAll">
+      <div class="presenterFinalAll">
 
-          <div class="presenterFinalBlock">
-            <div class="presenterFinalTitle">${text(finalMetaMap[1]?.title || "الجولة الأولى")}</div>
-            <div class="presenterFinalHorizontal">
-              ${finalRound1Rows.map(item => `
-                <div class="presenterFinalImageCard">
-                  <div class="presenterFinalImageHead">رقم ${item.number}</div>
-                  <div class="presenterFinalImageBody">
-                    ${
-                      item.image
-                        ? `<img src="${text(item.image)}" alt="">`
-                        : `<div class="presenterFinalNoImage">لا توجد صورة</div>`
-                    }
-                    <div class="presenterAnswerLine">الإجابة: ${text(item.answer)}</div>
-                    ${item.note ? `<div class="presenterHintLine">التوضيح: ${text(item.note)}</div>` : ""}
+        <div class="presenterFinalBlock presenterSectionCard" data-pdf-section="final-round-1">
+          <div class="presenterFinalTitle">${text(finalMetaMap[1]?.title || "الجولة الأولى")}</div>
+          <div class="presenterFinalHorizontal">
+            ${finalRound1Rows.map(item => `
+              <div class="presenterFinalImageCard">
+                <div class="presenterFinalImageHead">رقم ${item.number}</div>
+                <div class="presenterFinalImageBody">
+                  ${
+                    item.image
+                      ? `<img src="${text(item.image)}" alt="">`
+                      : `<div class="presenterFinalNoImage">لا توجد صورة</div>`
+                  }
+                  <div class="presenterAnswerLine">الإجابة: ${text(item.answer)}</div>
+                  ${item.note ? `<div class="presenterHintLine">التوضيح: ${text(item.note)}</div>` : ""}
+                </div>
+              </div>
+            `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
+          </div>
+        </div>
+
+        <div class="presenterFinalBlock presenterSectionCard" data-pdf-section="final-round-2">
+          <div class="presenterFinalTitle">${text(finalMetaMap[2]?.title || "الجولة الثانية")}</div>
+          <div class="presenterFinalHorizontal">
+            ${[1, 2, 3, 4].map(number => {
+              const rows = groupedFinal2[number] || []
+              const isScramble = number === 1 || number === 3
+
+              return `
+                <div class="presenterMiniSection finalHorizontalCard">
+                  <div class="presenterMiniSectionHead">رقم ${number}</div>
+                  <div class="presenterMiniSectionBody">
+                    ${rows.map((row, idx) => `
+                      <div class="presenterMiniLine">
+                        <strong>${idx + 1})</strong>
+                        <span>الكلمة: ${text(row.prompt)}</span>
+                        ${isScramble ? `<span>التلميحة: ${text(row.hint)}</span>` : ""}
+                        ${isScramble ? `<span>الإجابة: ${text(row.answer)}</span>` : ""}
+                      </div>
+                    `).join("")}
                   </div>
                 </div>
-              `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
-            </div>
+              `
+            }).join("")}
           </div>
+        </div>
 
-          <div class="presenterFinalBlock">
-            <div class="presenterFinalTitle">${text(finalMetaMap[2]?.title || "الجولة الثانية")}</div>
-            <div class="presenterFinalHorizontal">
-              ${[1, 2, 3, 4].map(number => {
-                const rows = groupedFinal2[number] || []
-                const isScramble = number === 1 || number === 3
+        <div class="presenterFinalBlock presenterSectionCard" data-pdf-section="final-round-3">
+          <div class="presenterFinalTitle">${text(finalMetaMap[3]?.title || "الجولة الثالثة")}</div>
+          <div class="presenterFinalHorizontal">
+            ${[1, 2].map(number => {
+              const rows = groupedFinal3[number] || []
 
-                return `
-                  <div class="presenterMiniSection finalHorizontalCard">
-                    <div class="presenterMiniSectionHead">رقم ${number}</div>
-                    <div class="presenterMiniSectionBody">
-                      ${rows.map((row, idx) => `
-                        <div class="presenterMiniLine">
-                          <strong>${idx + 1})</strong>
-                          <span>الكلمة: ${text(row.prompt)}</span>
-                          ${isScramble ? `<span>التلميحة: ${text(row.hint)}</span>` : ""}
-                          ${isScramble ? `<span>الإجابة: ${text(row.answer)}</span>` : ""}
+              return `
+                <div class="presenterFinalImageCard largeFinalCard">
+                  <div class="presenterFinalImageHead">رقم ${number}</div>
+                  <div class="presenterFinalImageBody">
+                    <div class="presenterFinalRound3List">
+                      ${rows.map(row => `
+                        <div class="presenterFinalRound3Item">
+                          ${
+                            row.image
+                              ? `<img src="${text(row.image)}" alt="">`
+                              : `<div class="presenterFinalNoImage">لا توجد صورة</div>`
+                          }
+                          <div class="presenterAnswerLine">الإجابة: ${text(row.answer)}</div>
+                          ${row.note ? `<div class="presenterHintLine">التوضيح: ${text(row.note)}</div>` : ""}
                         </div>
                       `).join("")}
                     </div>
                   </div>
-                `
-              }).join("")}
-            </div>
+                </div>
+              `
+            }).join("")}
           </div>
-
-          <div class="presenterFinalBlock">
-            <div class="presenterFinalTitle">${text(finalMetaMap[3]?.title || "الجولة الثالثة")}</div>
-            <div class="presenterFinalHorizontal">
-              ${[1, 2].map(number => {
-                const rows = groupedFinal3[number] || []
-
-                return `
-                  <div class="presenterFinalImageCard largeFinalCard">
-                    <div class="presenterFinalImageHead">رقم ${number}</div>
-                    <div class="presenterFinalImageBody">
-                      <div class="presenterFinalRound3List">
-                        ${rows.map(row => `
-                          <div class="presenterFinalRound3Item">
-                            ${
-                              row.image
-                                ? `<img src="${text(row.image)}" alt="">`
-                                : `<div class="presenterFinalNoImage">لا توجد صورة</div>`
-                            }
-                            <div class="presenterAnswerLine">الإجابة: ${text(row.answer)}</div>
-                            ${row.note ? `<div class="presenterHintLine">التوضيح: ${text(row.note)}</div>` : ""}
-                          </div>
-                        `).join("")}
-                      </div>
-                    </div>
-                  </div>
-                `
-              }).join("")}
-            </div>
-          </div>
-
         </div>
+
       </div>
     `
 
@@ -1444,6 +1441,8 @@ window.exportPresenterPdfByPrint = function () {
 }
 
 window.exportPresenterPdf = async function () {
+  let cloneWrap = null
+
   try {
     const overlay = document.getElementById("presenterOverlay")
     if (!overlay) {
@@ -1470,9 +1469,9 @@ window.exportPresenterPdf = async function () {
       return
     }
 
-    showGameToast("جارٍ تجهيز PDF...")
+    showGameToast("جارٍ تجهيز PDF مرتب...")
 
-    const cloneWrap = document.createElement("div")
+    cloneWrap = document.createElement("div")
     cloneWrap.style.position = "fixed"
     cloneWrap.style.left = "-99999px"
     cloneWrap.style.top = "0"
@@ -1481,12 +1480,11 @@ window.exportPresenterPdf = async function () {
     cloneWrap.style.pointerEvents = "none"
     cloneWrap.style.opacity = "1"
     cloneWrap.style.background = "#f8fafc"
-    cloneWrap.style.padding = "0"
+    cloneWrap.style.padding = "24px"
     cloneWrap.style.margin = "0"
     cloneWrap.style.overflow = "visible"
 
     const clone = panel.cloneNode(true)
-
     clone.style.width = panel.scrollWidth + "px"
     clone.style.maxWidth = "none"
     clone.style.height = "auto"
@@ -1495,6 +1493,7 @@ window.exportPresenterPdf = async function () {
     clone.style.transform = "none"
     clone.style.margin = "0"
     clone.style.boxShadow = "none"
+    clone.style.borderRadius = "0"
 
     const actions = clone.querySelector(".presenterReaderActions")
     if (actions) actions.remove()
@@ -1503,23 +1502,12 @@ window.exportPresenterPdf = async function () {
     document.body.appendChild(cloneWrap)
 
     await waitForImagesToLoad(clone)
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 400))
 
-    const canvas = await html2canvas(clone, {
-      backgroundColor: "#f8fafc",
-      useCORS: true,
-      allowTaint: false,
-      scale: 2,
-      logging: false,
-      imageTimeout: 15000,
-      scrollX: 0,
-      scrollY: 0,
-      windowWidth: clone.scrollWidth,
-      windowHeight: clone.scrollHeight
-    })
-
-    if (cloneWrap.parentNode) {
-      cloneWrap.parentNode.removeChild(cloneWrap)
+    const sectionNodes = Array.from(clone.querySelectorAll("[data-pdf-section]"))
+    if (!sectionNodes.length) {
+      showGameToast("لم يتم العثور على أقسام التصدير")
+      return
     }
 
     const { jsPDF } = window.jspdf
@@ -1527,70 +1515,115 @@ window.exportPresenterPdf = async function () {
 
     const pageWidth = pdf.internal.pageSize.getWidth()
     const pageHeight = pdf.internal.pageSize.getHeight()
-
-    const margin = 6
+    const margin = 8
     const usableWidth = pageWidth - margin * 2
     const usableHeight = pageHeight - margin * 2
 
-    const imgWidthPx = canvas.width
-    const imgHeightPx = canvas.height
+    let addedAnyPage = false
 
-    const pxPerMm = imgWidthPx / usableWidth
-    const pageHeightPx = usableHeight * pxPerMm
+    for (let i = 0; i < sectionNodes.length; i++) {
+      const section = sectionNodes[i]
 
-    let renderedHeightPx = 0
-    let pageIndex = 0
+      section.style.pageBreakInside = "avoid"
+      section.style.breakInside = "avoid"
 
-    while (renderedHeightPx < imgHeightPx) {
-      const sliceHeightPx = Math.min(pageHeightPx, imgHeightPx - renderedHeightPx)
+      const canvas = await html2canvas(section, {
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        allowTaint: false,
+        scale: 2,
+        logging: false,
+        imageTimeout: 15000,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: section.scrollWidth,
+        windowHeight: section.scrollHeight
+      })
 
-      const pageCanvas = document.createElement("canvas")
-      pageCanvas.width = imgWidthPx
-      pageCanvas.height = sliceHeightPx
+      const imgWidthPx = canvas.width
+      const imgHeightPx = canvas.height
+      const pxPerMm = imgWidthPx / usableWidth
+      const sectionHeightMm = imgHeightPx / pxPerMm
 
-      const ctx = pageCanvas.getContext("2d")
-      ctx.fillStyle = "#ffffff"
-      ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
-
-      ctx.drawImage(
-        canvas,
-        0,
-        renderedHeightPx,
-        imgWidthPx,
-        sliceHeightPx,
-        0,
-        0,
-        imgWidthPx,
-        sliceHeightPx
-      )
-
-      const pageData = pageCanvas.toDataURL("image/jpeg", 0.98)
-      const pageRenderHeightMm = sliceHeightPx / pxPerMm
-
-      if (pageIndex > 0) {
+      if (addedAnyPage) {
         pdf.addPage()
       }
 
-      pdf.addImage(
-        pageData,
-        "JPEG",
-        margin,
-        margin,
-        usableWidth,
-        pageRenderHeightMm,
-        undefined,
-        "FAST"
-      )
+      if (sectionHeightMm <= usableHeight) {
+        const imgData = canvas.toDataURL("image/jpeg", 0.98)
+        pdf.addImage(
+          imgData,
+          "JPEG",
+          margin,
+          margin,
+          usableWidth,
+          sectionHeightMm,
+          undefined,
+          "FAST"
+        )
+      } else {
+        const pageHeightPx = usableHeight * pxPerMm
+        let renderedHeightPx = 0
+        let firstSlice = true
 
-      renderedHeightPx += sliceHeightPx
-      pageIndex += 1
+        while (renderedHeightPx < imgHeightPx) {
+          const sliceHeightPx = Math.min(pageHeightPx, imgHeightPx - renderedHeightPx)
+
+          const pageCanvas = document.createElement("canvas")
+          pageCanvas.width = imgWidthPx
+          pageCanvas.height = sliceHeightPx
+
+          const ctx = pageCanvas.getContext("2d")
+          ctx.fillStyle = "#ffffff"
+          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
+
+          ctx.drawImage(
+            canvas,
+            0,
+            renderedHeightPx,
+            imgWidthPx,
+            sliceHeightPx,
+            0,
+            0,
+            imgWidthPx,
+            sliceHeightPx
+          )
+
+          const pageData = pageCanvas.toDataURL("image/jpeg", 0.98)
+          const renderHeightMm = sliceHeightPx / pxPerMm
+
+          if (!firstSlice) {
+            pdf.addPage()
+          }
+
+          pdf.addImage(
+            pageData,
+            "JPEG",
+            margin,
+            margin,
+            usableWidth,
+            renderHeightMm,
+            undefined,
+            "FAST"
+          )
+
+          renderedHeightPx += sliceHeightPx
+          firstSlice = false
+        }
+      }
+
+      addedAnyPage = true
     }
 
     pdf.save(`presenter-sheet-${currentModel || "export"}.pdf`)
-    showGameToast("تم حفظ PDF بنجاح")
+    showGameToast("تم حفظ PDF بشكل مرتب")
   } catch (error) {
     console.error(error)
     showGameToast("تعذر تصدير PDF")
+  } finally {
+    if (cloneWrap && cloneWrap.parentNode) {
+      cloneWrap.parentNode.removeChild(cloneWrap)
+    }
   }
 }
 /* =========================
