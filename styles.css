@@ -14103,3 +14103,104 @@ body::before{
     page-break-inside: avoid;
   }
 }
+/* =========================
+   Final Round 1
+========================= */
+
+.finalRound1Wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  height: 100%;
+}
+
+.finalRound1Grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(80px, 1fr));
+  gap: 14px;
+  width: 100%;
+}
+
+.finalRound1Card {
+  min-height: 76px;
+  border: none;
+  border-radius: 18px;
+  font-size: 28px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.finalRound1Card.used {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.finalRound1FullScreenWrap {
+  width: 100%;
+  height: 100%;
+  min-height: 65vh;
+  display: flex;
+}
+
+.finalRound1ImageStage {
+  width: 100%;
+  min-height: 320px;
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.finalRound1ImageStageFull {
+  width: 100%;
+  height: calc(100vh - 260px);
+  min-height: 65vh;
+  background: #111;
+  border-radius: 28px;
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+.finalRound1ImageInner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.finalRound1ImageStageFull img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* يعرض الصورة كاملة */
+  border-radius: 20px;
+}
+
+.finalRound1NoteOverlay {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  left: 16px;
+  z-index: 3;
+}
+
+.finalAnswerBox {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 3;
+}
+
+.finalRoundPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  border-radius: 20px;
+  font-size: 24px;
+  font-weight: 700;
+}

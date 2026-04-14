@@ -602,6 +602,8 @@ function renderFinalRound1() {
   const controls = document.getElementById("finalControlsBar")
   if (!stage || !controls) return
 
+  const hasActiveImage = !!finalState.round1.currentNumber
+
   let grid = ""
   for (let i = 1; i <= Number(finalState.round1.cardsCount || 4); i++) {
     const opened = finalState.round1.opened.includes(i)
@@ -616,16 +618,20 @@ function renderFinalRound1() {
     `
   }
 
-  const imageBox = finalState.round1.currentNumber
-    ? `<div class="finalRound1ImageStage" id="finalRound1ImageStage"></div>`
-    : `<div class="finalRound1ImageStage finalRoundPlaceholder">اختر رقمًا</div>`
-
-  stage.innerHTML = `
-    <div class="finalRound1Wrap">
-      <div class="finalRound1Grid">${grid}</div>
-      ${imageBox}
-    </div>
-  `
+  if (hasActiveImage) {
+    stage.innerHTML = `
+      <div class="finalRound1FullScreenWrap">
+        <div class="finalRound1ImageStage finalRound1ImageStageFull" id="finalRound1ImageStage"></div>
+      </div>
+    `
+  } else {
+    stage.innerHTML = `
+      <div class="finalRound1Wrap">
+        <div class="finalRound1Grid">${grid}</div>
+        <div class="finalRound1ImageStage finalRoundPlaceholder">اختر رقمًا</div>
+      </div>
+    `
+  }
 
   controls.innerHTML = `
     <button onclick="showFinalRound1Answer()" class="archiveCtrlBtn btnAnswer">إظهار الإجابة</button>
@@ -692,13 +698,25 @@ async function loadFinalRound1Current() {
   let html = ""
 
   if (finalState.round1.currentNote) {
-    html += `<div class="finalNoteBox finalNoteBoxTop">${finalState.round1.currentNote}</div>`
+    html += `
+      <div class="finalNoteBox finalNoteBoxTop finalRound1NoteOverlay">
+        ${finalState.round1.currentNote}
+      </div>
+    `
   }
 
-  if (data?.image) {
-    html += `<img src="${data.image}" alt="">`
+  if (finalState.round1.currentImage) {
+    html += `
+      <div class="finalRound1ImageInner">
+        <img src="${finalState.round1.currentImage}" alt="">
+      </div>
+    `
   } else {
     html += `<div class="finalRoundPlaceholder">لا توجد صورة</div>`
+  }
+
+  if (finalState.round1.answerShown && finalState.round1.currentAnswer) {
+    html += `<div class="finalAnswerBox">${finalState.round1.currentAnswer}</div>`
   }
 
   box.innerHTML = html
@@ -710,33 +728,9 @@ function showFinalRound1Answer() {
     return
   }
 
-  const box = document.getElementById("finalRound1ImageStage")
-  if (!box) return
-
-  if (finalState.round1.currentAnswer && !finalState.round1.answerShown) {
-    box.innerHTML += `<div class="finalAnswerBox">${finalState.round1.currentAnswer}</div>`
+  if (!finalState.round1.answerShown) {
     finalState.round1.answerShown = true
-  }
-
-  playGameSound("answer")
-  saveFinalState()
-
-  setTimeout(() => {
-    finalizeRound1Turn()
-  }, 4000)
-}
-function showFinalRound1Answer() {
-  if (!finalState.round1.pendingScore || !finalState.round1.currentNumber) {
-    showGameToast("اختر رقمًا أولاً")
-    return
-  }
-
-  const box = document.getElementById("finalRound1ImageStage")
-  if (!box) return
-
-  if (finalState.round1.currentAnswer && !finalState.round1.answerShown) {
-    box.innerHTML += `<div class="finalAnswerBox">${finalState.round1.currentAnswer}</div>`
-    finalState.round1.answerShown = true
+    loadFinalRound1Current()
   }
 
   playGameSound("answer")
@@ -788,38 +782,9 @@ function finalRound1Correct() {
     return
   }
 
-  const box = document.getElementById("finalRound1ImageStage")
-  if (box && finalState.round1.currentAnswer && !finalState.round1.answerShown) {
-    box.innerHTML += `<div class="finalAnswerBox">${finalState.round1.currentAnswer}</div>`
+  if (!finalState.round1.answerShown) {
     finalState.round1.answerShown = true
-  }
-
-  finalState.round1.scores[team] += 1
-  playGameSound("correct")
-  renderFinalScores()
-  saveFinalState()
-
-  setTimeout(() => {
-    finalizeRound1Turn()
-  }, 4000)
-}
-function finalRound1Correct() {
-  const team = finalState.round1.activeTeam
-
-  if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
-    showGameToast("اختر رقمًا أولاً")
-    return
-  }
-
-  if (!team) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
-
-  const box = document.getElementById("finalRound1ImageStage")
-  if (box && finalState.round1.currentAnswer && !finalState.round1.answerShown) {
-    box.innerHTML += `<div class="finalAnswerBox">${finalState.round1.currentAnswer}</div>`
-    finalState.round1.answerShown = true
+    loadFinalRound1Current()
   }
 
   finalState.round1.scores[team] += 1
@@ -844,7 +809,6 @@ function finalizeRound1Turn() {
   saveFinalState()
   updateEndRoundButtonState()
 }
-
 /* =========================
    Round 2
 ========================= */
