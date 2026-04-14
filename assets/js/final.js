@@ -617,12 +617,16 @@ function renderFinalRound1() {
   }
 
   if (finalState.round1.currentNumber) {
+    document.body.classList.add("round1-image-mode")
+
     stage.innerHTML = `
-      <div class="finalRound1FullView">
-        <div class="finalRound1ImageStage finalRound1ImageStageFull" id="finalRound1ImageStage"></div>
+      <div class="finalRound1FullscreenOnly">
+        <div class="finalRound1ImageStage" id="finalRound1ImageStage"></div>
       </div>
     `
   } else {
+    document.body.classList.remove("round1-image-mode")
+
     stage.innerHTML = `
       <div class="finalRound1StartView">
         <div class="finalRound1Grid">${grid}</div>
@@ -692,31 +696,22 @@ async function loadFinalRound1Current() {
   const box = document.getElementById("finalRound1ImageStage")
   if (!box) return
 
-  let html = ""
+  box.innerHTML = `
+    ${finalState.round1.currentImage
+      ? `<img class="finalRound1FullscreenImage" src="${finalState.round1.currentImage}" alt="">`
+      : `<div class="finalRoundPlaceholder">لا توجد صورة</div>`
+    }
 
-  if (finalState.round1.currentNote) {
-    html += `
-      <div class="finalNoteBox finalNoteBoxTop finalRound1NoteOverlay">
-        ${finalState.round1.currentNote}
-      </div>
-    `
-  }
+    ${finalState.round1.currentNote
+      ? `<div class="finalRound1TopNote">${finalState.round1.currentNote}</div>`
+      : ""
+    }
 
-  if (finalState.round1.currentImage) {
-    html += `
-      <div class="finalRound1ImageInner">
-        <img src="${finalState.round1.currentImage}" alt="">
-      </div>
-    `
-  } else {
-    html += `<div class="finalRoundPlaceholder">لا توجد صورة</div>`
-  }
-
-  if (finalState.round1.answerShown && finalState.round1.currentAnswer) {
-    html += `<div class="finalAnswerBox">${finalState.round1.currentAnswer}</div>`
-  }
-
-  box.innerHTML = html
+    ${finalState.round1.answerShown && finalState.round1.currentAnswer
+      ? `<div class="finalRound1BottomAnswer">${finalState.round1.currentAnswer}</div>`
+      : ""
+    }
+  `
 }
 
 function showFinalRound1Answer() {
