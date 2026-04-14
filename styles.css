@@ -14188,3 +14188,136 @@ body::before{
   font-weight: 800;
   text-align: center;
 }
+#finalMainStage {
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.finalRound1FullscreenOnly,
+.finalRound1FullView {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.finalRound1ImageStage,
+.finalRound1ImageStageFull {
+  width: min(92vw, 1400px);
+  aspect-ratio: 16 / 9;
+  min-height: 420px;
+  max-height: 78vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  border-radius: 24px;
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.finalRound1ImageFrame {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #111;
+}
+
+.finalRound1BigImage,
+.finalRound1FullscreenImage,
+.finalRound1ImageStage img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  display: block;
+}
+
+.finalRound1TopNote {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  left: 18px;
+  z-index: 5;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.finalRound1BottomAnswer {
+  position: absolute;
+  right: 18px;
+  left: 18px;
+  bottom: 18px;
+  z-index: 5;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* iPad */
+@media (max-width: 1024px) {
+  .finalRound1ImageStage,
+  .finalRound1ImageStageFull {
+    width: min(94vw, 1000px);
+    aspect-ratio: 4 / 3;
+    min-height: 360px;
+    max-height: 72vh;
+    border-radius: 20px;
+  }
+
+  .finalRound1TopNote {
+    font-size: 18px;
+    padding: 12px 14px;
+  }
+
+  .finalRound1BottomAnswer {
+    font-size: 22px;
+    padding: 14px 16px;
+  }
+}
+
+/* جوال */
+@media (max-width: 768px) {
+  .finalRound1ImageStage,
+  .finalRound1ImageStageFull {
+    width: 96vw;
+    aspect-ratio: 4 / 5;
+    min-height: 320px;
+    max-height: 68vh;
+    border-radius: 18px;
+  }
+
+  .finalRound1TopNote {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+
+  .finalRound1BottomAnswer {
+    right: 12px;
+    left: 12px;
+    bottom: 12px;
+    font-size: 20px;
+    padding: 12px 14px;
+  }
+}
