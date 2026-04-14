@@ -602,8 +602,6 @@ function renderFinalRound1() {
   const controls = document.getElementById("finalControlsBar")
   if (!stage || !controls) return
 
-  const hasActiveImage = !!finalState.round1.currentNumber
-
   let grid = ""
   for (let i = 1; i <= Number(finalState.round1.cardsCount || 4); i++) {
     const opened = finalState.round1.opened.includes(i)
@@ -618,17 +616,16 @@ function renderFinalRound1() {
     `
   }
 
-  if (hasActiveImage) {
+  if (finalState.round1.currentNumber) {
     stage.innerHTML = `
-      <div class="finalRound1FullScreenWrap">
+      <div class="finalRound1FullView">
         <div class="finalRound1ImageStage finalRound1ImageStageFull" id="finalRound1ImageStage"></div>
       </div>
     `
   } else {
     stage.innerHTML = `
-      <div class="finalRound1Wrap">
+      <div class="finalRound1StartView">
         <div class="finalRound1Grid">${grid}</div>
-        <div class="finalRound1ImageStage finalRoundPlaceholder">اختر رقمًا</div>
       </div>
     `
   }
