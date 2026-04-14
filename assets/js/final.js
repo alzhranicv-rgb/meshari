@@ -696,22 +696,35 @@ async function loadFinalRound1Current() {
   const box = document.getElementById("finalRound1ImageStage")
   if (!box) return
 
-  box.innerHTML = `
-    ${finalState.round1.currentImage
-      ? `<img class="finalRound1FullscreenImage" src="${finalState.round1.currentImage}" alt="">`
-      : `<div class="finalRoundPlaceholder">لا توجد صورة</div>`
-    }
+  let html = ""
 
-    ${finalState.round1.currentNote
-      ? `<div class="finalRound1TopNote">${finalState.round1.currentNote}</div>`
-      : ""
-    }
+  if (finalState.round1.currentImage) {
+    html += `
+      <div class="finalRound1ImageFrame">
+        <img class="finalRound1BigImage" src="${finalState.round1.currentImage}" alt="">
+      </div>
+    `
+  } else {
+    html += `<div class="finalRoundPlaceholder">لا توجد صورة</div>`
+  }
 
-    ${finalState.round1.answerShown && finalState.round1.currentAnswer
-      ? `<div class="finalRound1BottomAnswer">${finalState.round1.currentAnswer}</div>`
-      : ""
-    }
-  `
+  if (finalState.round1.currentNote) {
+    html += `
+      <div class="finalRound1TopNote">
+        ${finalState.round1.currentNote}
+      </div>
+    `
+  }
+
+  if (finalState.round1.answerShown && finalState.round1.currentAnswer) {
+    html += `
+      <div class="finalRound1BottomAnswer">
+        ${finalState.round1.currentAnswer}
+      </div>
+    `
+  }
+
+  box.innerHTML = html
 }
 
 function showFinalRound1Answer() {
