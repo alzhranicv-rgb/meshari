@@ -14223,11 +14223,7 @@ body::before{
 .finalRound1ImageFrame img {
   width: 100% !important;
   height: 100% !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  display: block !important;
-  object-fit: contain !important;
+  object-fit: cover !important;
   object-position: center center !important;
+  display: block !important;
 }
