@@ -14303,5 +14303,5 @@ body.round1-image-mode #finalMainStage {
   max-height: none !important;
   display: block;
   object-fit: cover !important;
-  object-position: center center !important;
+  object-position: center top !important;
 }
