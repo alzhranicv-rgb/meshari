@@ -14206,3 +14206,28 @@ body::before{
   }
 }
 }
+.finalRound1ImageFrame {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #111;
+}
+
+.finalRound1BigImage,
+.finalRound1FullscreenImage,
+.finalRound1ImageStage img,
+.finalRound1ImageFrame img {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  display: block !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+}
