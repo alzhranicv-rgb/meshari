@@ -79,6 +79,21 @@ function playWinnerEffects() {
   initWinnerSound()
   stopWinnerEffects()
 
+  const winnerBtn = document.querySelector(".winnerBtn")
+  const homeShell = document.querySelector(".homePageShell")
+
+  if (winnerBtn) {
+    winnerBtn.classList.remove("winnerAnnounceFx")
+    void winnerBtn.offsetWidth
+    winnerBtn.classList.add("winnerAnnounceFx")
+  }
+
+  if (homeShell) {
+    homeShell.classList.remove("winnerFlash")
+    void homeShell.offsetWidth
+    homeShell.classList.add("winnerFlash")
+  }
+
   try {
     winnerSound.currentTime = 0
     const playPromise = winnerSound.play()
@@ -533,12 +548,12 @@ function setSegmentWinnerLabel(key) {
   const status = segmentStatus[key] || { locked: false, winner: "" }
 
   if (label) {
-    label.innerText = status.winner ? `الفائز: ${status.winner}` : ""
+    label.innerText = status.winner ? status.winner : ""
   }
 
   if (card) {
-    if (status.locked) card.classList.add("segmentLocked")
-    else card.classList.remove("segmentLocked")
+    if (status.locked) card.classList.add("segmentLocked", "hasWinner")
+    else card.classList.remove("segmentLocked", "hasWinner")
   }
 }
 

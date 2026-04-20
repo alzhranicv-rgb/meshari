@@ -11,54 +11,68 @@
 </head>
 <body>
 
-  <div class="adminPage">
-    <div class="adminTopBar adminTopBarEnhanced">
-      <div class="adminTopBarText">
-        <h1 class="adminTitle">لوحة الأسئلة</h1>
-        <div class="adminTopSubTitle">إدارة النماذج والفقرات والطباعة للمقدم</div>
-      </div>
-    </div>
+  <div class="adminShellNew">
 
-    <div class="adminMainCard adminMainCardEnhanced">
+    <aside class="adminSidebarNew">
+      <div class="adminBrandBox">
+  <div class="adminBrandTitle">الحنكة</div>
+  <div class="adminBrandSub">لوحة إدارة الأسئلة والنماذج</div>
+  <div id="adminBrandCurrentModel" class="adminBrandCurrentModel hidden"></div>
+</div>
 
-      <div class="adminModelBar adminModelBarEnhanced">
+      <div class="adminSideCard">
+        <div class="adminSideCardTitle">إدارة النماذج</div>
 
         <div class="adminField">
           <label for="modelName">اسم النموذج الجديد</label>
-          <input id="modelName" type="text" placeholder="اكتب اسم النموذج">
+          <input
+            id="modelName"
+            class="adminInput"
+            type="text"
+            placeholder="اكتب اسم النموذج"
+          >
         </div>
 
         <div class="adminField">
           <label for="modelsList">النماذج</label>
-          <select id="modelsList">
-            <option value="">جارٍ تحميل النماذج...</option>
+          <select id="modelsList" class="adminSelect">
+            <option value="">اختر النموذج</option>
           </select>
         </div>
 
-        <div class="adminTopActions">
-          <button class="primaryBtn" onclick="createModel()">إنشاء نموذج</button>
-          <button class="secondaryBtn" onclick="openSelectedModel()">فتح النموذج</button>
-          <button class="secondaryBtn" onclick="renameSelectedModel()">تعديل الاسم</button>
-          <button class="deleteBtn" onclick="deleteSelectedModel()">حذف النموذج</button>
-          <button class="adminBtn adminBtnLight" onclick="printPresenterSheet()">طباعة للمقدم</button>
+        <div class="adminSideActions">
+          <button class="adminBtn adminBtnMango" onclick="createModel()">إنشاء نموذج</button>
+          <button class="adminBtn adminBtnDark" onclick="openSelectedModel()">فتح النموذج</button>
+          <button class="adminBtn adminBtnLight" onclick="renameSelectedModel()">تعديل الاسم</button>
+          <button class="adminBtn adminBtnDanger" onclick="deleteSelectedModel()">حذف النموذج</button>
         </div>
-
       </div>
 
-      <div id="adminTabs" class="adminTabs adminTabsEnhanced hidden">
-        <button onclick="openAdminSegment('warmup')">التسخين</button>
-        <button onclick="openAdminSegment('top10')">Top 10</button>
-        <button onclick="openAdminSegment('auction')">المزاد</button>
-        <button onclick="openAdminSegment('who')">من هو</button>
-        <button onclick="openAdminSegment('final')">الفاصلة</button>
-        <button onclick="openAdminSegment('archive')">الأرشيف</button>
+      <div class="adminSideCard presenterSideCard">
+        <div class="adminSideCardTitle">ورقة المقدم</div>
+        <div class="adminSideHint">تصدير مباشر ومنظم بصيغة PDF</div>
+
+        <div class="adminSideActions">
+          <button class="adminBtn adminSaveBtn" onclick="printPresenterSheet()">حفظ PDF</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="adminMainNew">
+      <div id="adminTabs" class="adminTabsNew hidden">
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('warmup')">التسخين</button>
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('top10')">Top 10</button>
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('auction')">المزاد</button>
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('who')">من هو</button>
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('final')">الفاصلة</button>
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('archive')">الأرشيف</button>
       </div>
 
-      <div id="adminEditor" class="adminEditor adminEditorEnhanced">
+      <section id="adminEditor">
         <div class="adminEmptyState">افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها</div>
-      </div>
+      </section>
+    </main>
 
-    </div>
   </div>
 
   <div id="gameToast" class="gameToast hidden">

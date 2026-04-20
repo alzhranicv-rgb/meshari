@@ -38,6 +38,9 @@ window.archiveRoundCache = archiveRoundCache
 
 const ARCHIVE_STORAGE_KEY = "archive_state_v1"
 
+let archiveHistory = []
+const ARCHIVE_HISTORY_LIMIT = 80
+
 /* =========================
    Helpers
 ========================= */
@@ -82,6 +85,98 @@ function getArchiveItemParentPosition(item) {
   return Number(item.parent_position || item.column_group || 3)
 }
 
+function getArchiveRequiredPosition(round) {
+  const items = archiveRoundCache[round]?.items || []
+
+  const requiredItem = items.find(item => {
+    return String(item.label || "").trim() === "المطلوب"
+  })
+
+  return requiredItem ? Number(requiredItem.position) : ""
+}
+
+function updateArchiveRequestedInput() {
+  const requestedInput = document.getElementById("archiveManualInput1")
+  if (!requestedInput) return
+
+  requestedInput.value = getArchiveRequiredPosition(archiveState.round)
+}
+
+/* =========================
+   Undo
+========================= */
+
+function cloneArchiveData(data) {
+  return JSON.parse(JSON.stringify(data))
+}
+
+function createArchiveSnapshot() {
+  return {
+    archiveRevealState: cloneArchiveData(archiveRevealState),
+    archiveRemainingPoints,
+    archiveLastTeam,
+    archiveTurnLocked,
+    archiveTimerStarted,
+    archiveLastTickPlayed,
+    archiveState: cloneArchiveData(archiveState)
+  }
+}
+
+function pushArchiveHistory() {
+  archiveHistory.push(createArchiveSnapshot())
+
+  if (archiveHistory.length > ARCHIVE_HISTORY_LIMIT) {
+    archiveHistory.shift()
+  }
+
+  updateArchiveUndoButtonState()
+}
+
+function restoreArchiveSnapshot(snapshot) {
+  if (!snapshot) return
+
+  clearInterval(archiveTimer)
+  archiveTimer = null
+
+  archiveRevealState = cloneArchiveData(snapshot.archiveRevealState || {
+    1: {},
+    2: {},
+    3: {},
+    4: {}
+  })
+
+  archiveRemainingPoints = Number(snapshot.archiveRemainingPoints || 0)
+  archiveLastTeam = snapshot.archiveLastTeam || null
+  archiveTurnLocked = !!snapshot.archiveTurnLocked
+  archiveTimerStarted = false
+  archiveLastTickPlayed = null
+  archiveState = cloneArchiveData(snapshot.archiveState || archiveState)
+
+  syncArchiveGlobals()
+  renderArchiveRoundUI()
+  setArchiveTimerValue(30)
+  updateArchiveUndoButtonState()
+  saveArchiveState()
+  updateEndRoundButtonState()
+}
+
+function undoArchiveAction() {
+  if (!archiveHistory.length) {
+    showGameToast("لا يوجد خطوة للتراجع")
+    return
+  }
+
+  const snapshot = archiveHistory.pop()
+  restoreArchiveSnapshot(snapshot)
+}
+
+function updateArchiveUndoButtonState() {
+  const btns = document.querySelectorAll(".archiveUndoBtn")
+  btns.forEach(btn => {
+    btn.disabled = archiveHistory.length === 0
+  })
+}
+
 /* =========================
    Persistence
 ========================= */
@@ -96,7 +191,6 @@ function getArchiveState() {
 
 function saveArchiveState() {
   const timerBox = document.getElementById("archiveTimerValue")
-  const requestedInput = document.getElementById("archiveManualInput1")
 
   const state = {
     archiveRevealState,
@@ -105,7 +199,6 @@ function saveArchiveState() {
     archiveTurnLocked,
     archiveTimerStarted,
     archiveState,
-    requestedValue: requestedInput ? requestedInput.value : "",
     timerValue: timerBox ? Number(timerBox.innerText || 0) : 30
   }
 
@@ -132,10 +225,7 @@ function restoreArchiveState(saved) {
   syncArchiveGlobals()
   renderArchiveRoundUI()
 
-  const requestedInput = document.getElementById("archiveManualInput1")
-  if (requestedInput) {
-    requestedInput.value = saved.requestedValue || ""
-  }
+  updateArchiveRequestedInput()
 
   const timerValue = Number(saved.timerValue || 30)
   if (archiveTimerStarted && timerValue > 0) {
@@ -158,6 +248,7 @@ function getArchiveDisplayThemeClass(round) {
 
 window.renderArchive = async function () {
   const saved = getArchiveState()
+  archiveHistory = []
 
   archiveRevealState = {
     1: {},
@@ -311,12 +402,13 @@ function buildArchiveShell() {
           <div class="archiveSideErrors" id="archiveErrorsB"></div>
         </div>
 
-        <div class="archiveControlButtons">
-          <button onclick="addArchiveError()" class="archiveCtrlBtn archiveErrorBtn">خطأ</button>
-          <button onclick="showArchiveAnswer()" class="archiveCtrlBtn archiveAnswerBtn">إظهار الإجابة</button>
-          <button onclick="prevArchiveRound()" class="archiveCtrlBtn archivePrevBtn">الجولة السابقة</button>
-          <button onclick="nextArchiveRound()" class="archiveCtrlBtn archiveNextBtn">الجولة التالية</button>
-        </div>
+       <div class="archiveControlButtons">
+  <button onclick="addArchiveError()" class="archiveCtrlBtn archiveErrorBtn">خطأ</button>
+  <button onclick="showArchiveAnswer()" class="archiveCtrlBtn archiveAnswerBtn">إظهار الإجابة</button>
+  <button onclick="prevArchiveRound()" class="archiveCtrlBtn archivePrevBtn">الجولة السابقة</button>
+  <button onclick="nextArchiveRound()" class="archiveCtrlBtn archiveNextBtn">الجولة التالية</button>
+  <button onclick="undoArchiveAction()" class="archiveCtrlBtn archivePrevBtn archiveUndoBtn">تراجع</button>
+</div>
 
         <div class="archiveInputsInline">
           <div class="archiveInputRow archiveInputHalf">
@@ -326,7 +418,7 @@ function buildArchiveShell() {
 
           <div class="archiveInputRow archiveInputHalf">
             <label class="archiveInputLabel">المطلوب</label>
-            <input id="archiveManualInput1" class="archiveMiniInput archiveMiniInputStrong" type="text" inputmode="numeric" placeholder="رقم">
+            <input id="archiveManualInput1" class="archiveMiniInput archiveMiniInputStrong" type="text" inputmode="numeric" placeholder="رقم" readonly>
           </div>
         </div>
 
@@ -503,6 +595,7 @@ function renderArchiveRoundUI() {
   }
 
   recalcArchiveRemainingPoints(items)
+  updateArchiveRequestedInput()
   updateArchiveScoresUI()
   updateArchiveErrorsUI()
   highlightArchiveTeam()
@@ -515,6 +608,7 @@ function renderArchiveRoundUI() {
 
   syncArchiveGlobals()
   saveArchiveState()
+  updateArchiveUndoButtonState()
   updateEndRoundButtonState()
 }
 
@@ -659,6 +753,8 @@ function toggleArchiveItem(position) {
 
   if (Number(position) >= 5 && hasLabel) return
 
+  pushArchiveHistory()
+
   setArchiveItemRevealed(round, position, true)
   archiveTurnLocked = true
 
@@ -713,6 +809,8 @@ function addArchiveError() {
     return
   }
 
+  pushArchiveHistory()
+
   archiveState.errors[round][team] += 1
   archiveTurnLocked = true
 
@@ -761,6 +859,8 @@ function showArchiveAnswer() {
 
   const hasLabel = !!(item.label || "").trim()
 
+  pushArchiveHistory()
+
   if (hasLabel) {
     const currentRemaining = archiveRemainingPoints
 
@@ -797,6 +897,8 @@ async function nextArchiveRound() {
     return
   }
 
+  pushArchiveHistory()
+
   archiveState.round += 1
   archiveState.activeTeam = null
   archiveLastTeam = null
@@ -819,6 +921,8 @@ async function prevArchiveRound() {
     showGameToast("هذه أول جولة")
     return
   }
+
+  pushArchiveHistory()
 
   archiveState.round -= 1
   archiveState.activeTeam = null

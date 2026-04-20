@@ -335,7 +335,9 @@ function showWhoImageFullscreen(imageUrl) {
   if (!stage || !imageUrl) return
 
   stage.innerHTML = `
-    <img src="${imageUrl}" class="whoImageFull" onclick="hideWhoImage()">
+    <div class="whoImageFrame" onclick="toggleWhoImageOverlay()">
+      <img src="${imageUrl}" class="whoImageFull" alt="">
+    </div>
   `
   stage.classList.remove("hidden")
 }
@@ -511,4 +513,29 @@ function whoWrong() {
   whoQuestionLocked = false
   whoCurrentNumber = null
   saveWhoState()
+}
+function toggleWhoImageOverlay() {
+  const oldOverlay = document.getElementById("whoImageOverlay")
+
+  if (oldOverlay) {
+    oldOverlay.remove()
+    return
+  }
+
+  if (!currentWhoImage) return
+
+  const overlay = document.createElement("div")
+  overlay.id = "whoImageOverlay"
+  overlay.className = "whoImageOverlay"
+  overlay.innerHTML = `
+    <div class="whoImageOverlayInner">
+      <img src="${currentWhoImage}" class="whoImageOverlayImg" alt="">
+    </div>
+  `
+
+  overlay.onclick = function () {
+    overlay.remove()
+  }
+
+  document.body.appendChild(overlay)
 }

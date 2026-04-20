@@ -1,91 +1,105 @@
 let auctionState = {
   usedNumbers: [],
-  currentBid: 0,
-  currentIncrement: 1,
-  bidTeam: null,
   scoreA: 0,
   scoreB: 0,
   currentQuestionNumber: null,
-  questionOpened: false
+  pendingScore: false,
+  answerShown: false,
+  activeTeam: null
 }
 
 window.auctionState = auctionState
 
-let currentAuctionAnswer = null
-let currentAuctionQuestion = null
+let currentAuctionAnswer = ""
+let currentAuctionImage = ""
+let currentAuctionNote = ""
 let auctionMaxNumber = 4
-let auctionTimerStarted = false
-let auctionLastTickPlayed = null
-let auctionQuestionLocked = false
 
 window.auctionMaxNumber = auctionMaxNumber
 
-const AUCTION_STORAGE_KEY = "auction_state_v1"
+let auctionHistory = []
+const AUCTION_HISTORY_LIMIT = 50
+
+let auctionTimerStarted = false
+let auctionLastTickPlayed = null
 
 /* =========================
-   Persistence
+   Undo
 ========================= */
 
-function getAuctionState() {
-  try {
-    return JSON.parse(localStorage.getItem(AUCTION_STORAGE_KEY) || "null")
-  } catch {
-    return null
-  }
+function cloneAuctionData(data) {
+  return JSON.parse(JSON.stringify(data))
 }
 
-function saveAuctionState() {
-  const timerBox = document.getElementById("timer")
-
-  const state = {
-    auctionState,
+function createAuctionSnapshot() {
+  const timerBox = document.getElementById("auctionTimer")
+  return {
+    auctionState: cloneAuctionData(auctionState),
     currentAuctionAnswer,
-    currentAuctionQuestion,
-    auctionMaxNumber,
+    currentAuctionImage,
+    currentAuctionNote,
     auctionTimerStarted,
-    auctionQuestionLocked,
     timerValue: timerBox ? Number(timerBox.innerText || 0) : 0
   }
-
-  localStorage.setItem(AUCTION_STORAGE_KEY, JSON.stringify(state))
-  localStorage.setItem("active_segment", "auction")
 }
 
-function clearAuctionState() {
-  localStorage.removeItem(AUCTION_STORAGE_KEY)
-  localStorage.removeItem("active_segment")
+function pushAuctionHistory() {
+  auctionHistory.push(createAuctionSnapshot())
+
+  if (auctionHistory.length > AUCTION_HISTORY_LIMIT) {
+    auctionHistory.shift()
+  }
+
+  updateAuctionUndoButtonState()
 }
 
-function restoreAuctionState(saved) {
-  if (!saved) return
+function restoreAuctionSnapshot(snapshot) {
+  if (!snapshot) return
 
-  auctionState = saved.auctionState || auctionState
+  clearInterval(timer)
+  timer = null
+
+  auctionState = cloneAuctionData(snapshot.auctionState)
   window.auctionState = auctionState
 
-  currentAuctionAnswer = saved.currentAuctionAnswer || null
-  currentAuctionQuestion = saved.currentAuctionQuestion || null
-  auctionMaxNumber = Number(saved.auctionMaxNumber || 8)
-  window.auctionMaxNumber = auctionMaxNumber
-  auctionTimerStarted = !!saved.auctionTimerStarted
-  auctionQuestionLocked = !!saved.auctionQuestionLocked
-  auctionLastTickPlayed = null
+  currentAuctionAnswer = snapshot.currentAuctionAnswer || ""
+  currentAuctionImage = snapshot.currentAuctionImage || ""
+  currentAuctionNote = snapshot.currentAuctionNote || ""
 
-  const box = document.getElementById("auctionQuestionBox")
-  if (box) {
-    box.innerText = currentAuctionQuestion || "اختر رقم المزاد"
-  }
+  auctionTimerStarted = !!snapshot.auctionTimerStarted
+  auctionLastTickPlayed = null
 
   updateAuctionScoresOnly()
   updateAuctionGridOnly()
-  updateAuctionBidInfo()
-  highlightAuctionBidTeam()
+  highlightAuctionActiveTeam()
+  renderAuctionContent()
+  updateAuctionTurnBox()
+  updateAuctionUndoButtonState()
+  updateEndRoundButtonState()
 
-  const timerValue = Number(saved.timerValue || 0)
+  const timerValue = Number(snapshot.timerValue || 0)
+  const timerBox = document.getElementById("auctionTimer")
   if (auctionTimerStarted && timerValue > 0) {
     resumeAuctionTimer(timerValue)
+  } else if (timerBox) {
+    timerBox.innerText = timerValue || 0
+  }
+}
+
+function undoAuctionAction() {
+  if (!auctionHistory.length) {
+    showGameToast("لا يوجد خطوة للتراجع")
+    return
   }
 
-  updateEndRoundButtonState()
+  const snapshot = auctionHistory.pop()
+  restoreAuctionSnapshot(snapshot)
+}
+
+function updateAuctionUndoButtonState() {
+  const btn = document.getElementById("auctionUndoBtn")
+  if (!btn) return
+  btn.disabled = auctionHistory.length === 0
 }
 
 /* =========================
@@ -93,43 +107,69 @@ function restoreAuctionState(saved) {
 ========================= */
 
 window.renderAuction = async function () {
-  const saved = getAuctionState()
-
   auctionState = {
     usedNumbers: [],
-    currentBid: 0,
-    currentIncrement: 1,
-    bidTeam: null,
     scoreA: 0,
     scoreB: 0,
     currentQuestionNumber: null,
-    questionOpened: false
+    pendingScore: false,
+    answerShown: false,
+    activeTeam: null
   }
 
   window.auctionState = auctionState
   window.currentSegmentScores = { A: 0, B: 0 }
 
-  currentAuctionAnswer = null
-  currentAuctionQuestion = null
+  currentAuctionAnswer = ""
+  currentAuctionImage = ""
+  currentAuctionNote = ""
+
+  auctionHistory = []
   auctionTimerStarted = false
   auctionLastTickPlayed = null
-  auctionQuestionLocked = false
+
+  clearInterval(timer)
+  timer = null
 
   await loadAuctionMaxNumber()
 
   openSegment("المزاد", buildAuctionHTML())
-
-  if (saved) {
-    restoreAuctionState(saved)
-  } else {
-    saveAuctionState()
-    updateEndRoundButtonState()
-  }
+  updateAuctionUndoButtonState()
+  updateAuctionTurnBox()
+  updateEndRoundButtonState()
 }
 
 async function loadAuctionMaxNumber() {
-  auctionMaxNumber = 8
+  const { data, error } = await db
+    .from("segment_settings")
+    .select("item_count")
+    .eq("model", currentModel)
+    .eq("segment", "auction")
+    .maybeSingle()
+
+  if (error) {
+    console.log(error)
+    auctionMaxNumber = 8
+    window.auctionMaxNumber = auctionMaxNumber
+    return
+  }
+
+  auctionMaxNumber = Math.min(
+    Math.max(Number(data?.item_count || 8), 1),
+    8
+  )
+
   window.auctionMaxNumber = auctionMaxNumber
+}
+
+/* =========================
+   Helpers
+========================= */
+
+function getAuctionTurnName() {
+  if (auctionState.activeTeam === "A") return teamAName
+  if (auctionState.activeTeam === "B") return teamBName
+  return "اختر فريق"
 }
 
 /* =========================
@@ -142,49 +182,40 @@ function buildAuctionHTML() {
 
       <div class="auctionTopBar">
 
-        <div class="auctionTeamCard ${auctionState.bidTeam === "A" ? "activeTeam" : ""}" onclick="bid('A')" id="teamABox">
+        <div class="auctionTeamCard ${auctionState.activeTeam === "A" ? "activeTeam" : ""}" onclick="selectAuctionTeam('A')" id="auctionTeamABox">
           <div class="auctionTeamName">${teamAName}</div>
           <div class="auctionTeamScore" id="auctionScoreA">${auctionState.scoreA}</div>
         </div>
 
-        <div class="auctionTimerBox">
+        <div class="auctionMiddleCard">
           <div class="auctionTimerLabel">المؤقت</div>
-          <div class="auctionTimerValue" id="timer">0</div>
+          <div class="auctionTimerValue" id="auctionTimer">0</div>
+          <div class="auctionTurnLabel" id="auctionTurnText">
+            الدور: ${getAuctionTurnName()}
+          </div>
         </div>
 
-        <div class="auctionTeamCard ${auctionState.bidTeam === "B" ? "activeTeam" : ""}" onclick="bid('B')" id="teamBBox">
+        <div class="auctionTeamCard ${auctionState.activeTeam === "B" ? "activeTeam" : ""}" onclick="selectAuctionTeam('B')" id="auctionTeamBBox">
           <div class="auctionTeamName">${teamBName}</div>
           <div class="auctionTeamScore" id="auctionScoreB">${auctionState.scoreB}</div>
         </div>
 
       </div>
 
-      <div class="auctionQuestionBox" id="auctionQuestionBox">
-        ${currentAuctionQuestion || "اختر رقم المزاد"}
+      <div class="auctionQuestionBox auctionQuestionBoxCompact auctionQuestionBoxEmpty" id="auctionQuestionBox">
+        ${buildAuctionContentHTML()}
       </div>
 
       <div class="auctionGrid" id="auctionGrid">
         ${createAuctionGrid()}
       </div>
 
-      <div class="auctionInfoRow">
-        <div class="auctionInfoCard">
-          <div class="auctionInfoLabel">آخر مزايدة</div>
-          <div class="auctionInfoValue" id="bidTeam">
-            ${auctionState.bidTeam === "A" ? teamAName : auctionState.bidTeam === "B" ? teamBName : "لا يوجد"}
-          </div>
-        </div>
-
-        <div class="auctionInfoCard">
-          <div class="auctionInfoLabel">القيمة</div>
-          <div class="auctionInfoValue" id="bidValue">${auctionState.currentBid}</div>
-        </div>
-      </div>
-
       <div class="auctionControlPanel">
-        <button onclick="startAuctionTimer()" class="btnTimer">بدء المؤقت</button>
-        <button onclick="auctionCorrect()" class="btnCorrect">✓ صح</button>
+        <button onclick="startAuctionTimerButton()" class="startBtn">بدء المؤقت</button>
+        <button onclick="showAuctionAnswer()" class="btnAnswer">إظهار الإجابة</button>
+        <button onclick="auctionCorrect()" class="btnCorrect">✓ إجابة صحيحة</button>
         <button onclick="auctionWrong()" class="btnWrong">✕ خطأ</button>
+        <button onclick="undoAuctionAction()" id="auctionUndoBtn" class="undoBtn">تراجع</button>
       </div>
 
     </div>
@@ -195,138 +226,254 @@ function createAuctionGrid() {
   let html = ""
 
   for (let i = 1; i <= auctionMaxNumber; i++) {
-    if (!auctionState.usedNumbers.includes(i)) {
-      html += `<button onclick="openAuction(${i})" class="auctionBtn">${i}</button>`
-    } else {
-      html += `<button class="auctionBtn used" disabled></button>`
-    }
+    const used = auctionState.usedNumbers.includes(i)
+
+    html += `
+      <button
+        onclick="openAuction(${i})"
+        class="auctionBtn ${used ? "used" : ""}"
+        ${used ? "disabled" : ""}
+      >
+        ${used ? "" : i}
+      </button>
+    `
   }
 
   return html
 }
 
+function buildAuctionContentHTML() {
+  if (!auctionState.currentQuestionNumber) {
+    return `<div class="auctionPlaceholder">اختر رقمًا لعرض الصورة</div>`
+  }
+
+  let html = ""
+
+  if (currentAuctionImage) {
+    html += `
+      <div class="auctionImageFrame" onclick="toggleAuctionImageOverlay()">
+        <img class="auctionBigImage" src="${currentAuctionImage}" alt="">
+      </div>
+    `
+  } else {
+    html += `<div class="auctionPlaceholder">لا توجد صورة</div>`
+  }
+
+  if (currentAuctionNote) {
+    html += `
+      <div class="auctionTopNote">
+        ${currentAuctionNote}
+      </div>
+    `
+  }
+
+  if (auctionState.answerShown && currentAuctionAnswer) {
+    html += `
+      <div class="auctionBottomAnswer">
+        ${currentAuctionAnswer}
+      </div>
+    `
+  }
+
+  return html
+}
+
+function updateAuctionTurnBox() {
+  const turnBox = document.getElementById("auctionTurnText")
+  if (turnBox) {
+    turnBox.innerText = "الدور: " + getAuctionTurnName()
+  }
+}
+
+function renderAuctionContent() {
+  const box = document.getElementById("auctionQuestionBox")
+  if (box) {
+    box.innerHTML = buildAuctionContentHTML()
+
+    box.classList.remove("auctionQuestionBoxEmpty", "auctionQuestionBoxFilled")
+
+    if (!auctionState.currentQuestionNumber) {
+      box.classList.add("auctionQuestionBoxEmpty")
+    } else {
+      box.classList.add("auctionQuestionBoxFilled")
+    }
+  }
+
+  updateAuctionTurnBox()
+}
+
 /* =========================
-   Open Question
+   Open Card
 ========================= */
 
-async function openAuction(num) {
-  if (auctionQuestionLocked) {
-    showGameToast("سجل النتيجة أولاً")
+async function openAuction(number) {
+  if (auctionState.pendingScore) {
+    showGameToast("أنهِ الدور الحالي أولاً")
     return
   }
 
-  if (auctionState.usedNumbers.includes(num)) return
+  if (auctionState.usedNumbers.includes(number)) return
 
-  auctionState.usedNumbers.push(num)
-  auctionState.currentBid = 0
-  auctionState.currentIncrement = 1
-  auctionState.bidTeam = null
-  auctionState.currentQuestionNumber = num
-  auctionState.questionOpened = true
+  pushAuctionHistory()
+
+  auctionState.currentQuestionNumber = number
+  auctionState.usedNumbers.push(number)
+  auctionState.pendingScore = true
+  auctionState.answerShown = false
+  auctionState.activeTeam = null
+
+  currentAuctionAnswer = ""
+  currentAuctionImage = ""
+  currentAuctionNote = ""
 
   clearInterval(timer)
   timer = null
-  setAuctionTimerValue(0)
   auctionTimerStarted = false
   auctionLastTickPlayed = null
+  const timerBox = document.getElementById("auctionTimer")
+  if (timerBox) timerBox.innerText = 0
+
+  updateAuctionGridOnly()
+  highlightAuctionActiveTeam()
+  renderAuctionContent()
+  updateAuctionUndoButtonState()
+  updateEndRoundButtonState()
+
+  await loadAuctionCurrent()
+}
+
+async function loadAuctionCurrent() {
+  const number = auctionState.currentQuestionNumber
+  if (!number) return
 
   const { data, error } = await db
     .from("auction_questions")
     .select("*")
     .eq("model", currentModel)
-    .eq("number", num)
+    .eq("number", number)
     .single()
 
   if (error) {
     console.log(error)
-    showGameToast("تعذر تحميل سؤال المزاد")
+    showGameToast("تعذر تحميل بيانات الفقرة")
     return
   }
 
-  if (!data) return
+  currentAuctionAnswer = data?.answer || ""
+  currentAuctionImage = data?.image || ""
+  currentAuctionNote = data?.note || ""
 
-  currentAuctionQuestion = data.question || "لا يوجد نص سؤال"
-  currentAuctionAnswer = data.answer || ""
-  auctionState.currentIncrement = Number(data.increment || 1)
-  auctionQuestionLocked = true
-
-  const box = document.getElementById("auctionQuestionBox")
-  if (box) box.innerText = currentAuctionQuestion
-
-  updateAuctionGridOnly()
-  updateAuctionBidInfo()
-  highlightAuctionBidTeam()
-  saveAuctionState()
-  updateEndRoundButtonState()
+  renderAuctionContent()
 }
 
 /* =========================
-   Bidding
+   Team Select
 ========================= */
 
-function bid(team) {
-  if (!auctionState.questionOpened) {
-    showGameToast("اختر رقم المزاد أولاً")
+function selectAuctionTeam(team) {
+  if (!auctionState.pendingScore || !auctionState.currentQuestionNumber) {
+    showGameToast("اختر رقمًا أولاً")
     return
   }
 
-  if (auctionState.currentQuestionNumber === null) {
-    showGameToast("اختر رقم المزاد أولاً")
-    return
-  }
+  if (auctionState.activeTeam === team) return
 
-  auctionState.currentBid += Number(auctionState.currentIncrement || 1)
-  auctionState.bidTeam = team
+  pushAuctionHistory()
 
-  playGameSound("bid")
-
-  updateAuctionBidInfo()
-  highlightAuctionBidTeam()
-  saveAuctionState()
+  auctionState.activeTeam = team
+  highlightAuctionActiveTeam()
+  renderAuctionContent()
+  updateAuctionUndoButtonState()
 }
 
-function highlightAuctionBidTeam() {
-  const a = document.getElementById("teamABox")
-  const b = document.getElementById("teamBBox")
+function highlightAuctionActiveTeam() {
+  const a = document.getElementById("auctionTeamABox")
+  const b = document.getElementById("auctionTeamBBox")
 
   if (!a || !b) return
 
   a.classList.remove("activeTeam")
   b.classList.remove("activeTeam")
 
-  a.style.border = "2px solid var(--border-soft)"
-  a.style.boxShadow = "var(--shadow-soft)"
-  b.style.border = "2px solid var(--border-soft)"
-  b.style.boxShadow = "var(--shadow-soft)"
-
-  if (auctionState.bidTeam === "A") {
+  if (auctionState.activeTeam === "A") {
     a.classList.add("activeTeam")
-    a.style.border = "3px solid #000"
-    a.style.boxShadow = "0 0 0 4px rgba(0,0,0,.12), var(--shadow-soft)"
   }
 
-  if (auctionState.bidTeam === "B") {
+  if (auctionState.activeTeam === "B") {
     b.classList.add("activeTeam")
-    b.style.border = "3px solid #000"
-    b.style.boxShadow = "0 0 0 4px rgba(0,0,0,.12), var(--shadow-soft)"
-  }
-}
-
-function updateAuctionBidInfo() {
-  const bidValue = document.getElementById("bidValue")
-  const bidTeam = document.getElementById("bidTeam")
-
-  if (bidValue) bidValue.innerText = auctionState.currentBid
-
-  if (bidTeam) {
-    if (auctionState.bidTeam === "A") bidTeam.innerText = teamAName
-    else if (auctionState.bidTeam === "B") bidTeam.innerText = teamBName
-    else bidTeam.innerText = "لا يوجد"
   }
 }
 
 /* =========================
-   Scores / Grid / Timer
+   Timer
+========================= */
+
+function startAuctionTimerButton() {
+  if (!auctionState.pendingScore || auctionState.currentQuestionNumber === null) {
+    showGameToast("اختر رقمًا أولاً")
+    return
+  }
+
+  if (!auctionState.activeTeam) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (auctionTimerStarted) return
+
+  pushAuctionHistory()
+  auctionTimerStarted = true
+  runAuctionTimer(30)
+  updateAuctionUndoButtonState()
+}
+
+function resumeAuctionTimer(seconds) {
+  runAuctionTimer(seconds)
+}
+
+function runAuctionTimer(seconds) {
+  const timerBox = document.getElementById("auctionTimer")
+  if (!timerBox) return
+
+  clearInterval(timer)
+  timer = null
+
+  let time = Number(seconds || 0)
+  auctionLastTickPlayed = null
+  timerBox.innerText = time
+
+  timer = setInterval(() => {
+    time--
+    timerBox.innerText = time
+
+    if (time > 0 && time <= 5 && auctionLastTickPlayed !== time) {
+      auctionLastTickPlayed = time
+      playGameSound("tick")
+    }
+
+    if (time <= 0) {
+      clearInterval(timer)
+      timer = null
+      timerBox.innerText = 0
+      auctionTimerStarted = false
+      auctionLastTickPlayed = null
+      playGameSound("timeout")
+    }
+  }, 1000)
+}
+
+function resetAuctionTimer() {
+  clearInterval(timer)
+  timer = null
+  auctionTimerStarted = false
+  auctionLastTickPlayed = null
+
+  const timerBox = document.getElementById("auctionTimer")
+  if (timerBox) timerBox.innerText = 0
+}
+
+/* =========================
+   Scores / Grid
 ========================= */
 
 function updateAuctionScoresOnly() {
@@ -349,136 +496,132 @@ function updateAuctionGridOnly() {
   }
 }
 
-function setAuctionTimerValue(value) {
-  const timerBox = document.getElementById("timer")
-  if (timerBox) timerBox.innerText = value
-}
-
-function startAuctionTimer() {
-  if (!auctionState.questionOpened || auctionState.currentQuestionNumber === null) {
-    showGameToast("اختر رقم المزاد أولاً")
-    return
-  }
-
-  auctionTimerStarted = true
-  runAuctionTimer(30)
-}
-
-function resumeAuctionTimer(seconds) {
-  auctionTimerStarted = true
-  runAuctionTimer(seconds)
-}
-
-function runAuctionTimer(seconds) {
-  clearInterval(timer)
-  timer = null
-
-  let time = Number(seconds || 0)
-  auctionLastTickPlayed = null
-  setAuctionTimerValue(time)
-  saveAuctionState()
-
-  timer = setInterval(() => {
-    time--
-    setAuctionTimerValue(time)
-
-    if (time > 0 && time <= 5 && auctionLastTickPlayed !== time) {
-      auctionLastTickPlayed = time
-      playGameSound("tick")
-    }
-
-    saveAuctionState()
-
-    if (time <= 0) {
-      clearInterval(timer)
-      timer = null
-      setAuctionTimerValue(0)
-      auctionTimerStarted = false
-      auctionLastTickPlayed = null
-      playGameSound("timeout")
-      saveAuctionState()
-    }
-  }, 1000)
-}
-
 /* =========================
-   Result Buttons
+   Answer / Result Buttons
 ========================= */
 
+function showAuctionAnswer() {
+  if (!auctionState.pendingScore || !auctionState.currentQuestionNumber) {
+    showGameToast("اختر رقمًا أولاً")
+    return
+  }
+
+  pushAuctionHistory()
+
+  if (!auctionState.answerShown) {
+    auctionState.answerShown = true
+    renderAuctionContent()
+  }
+
+  playGameSound("answer")
+  updateAuctionUndoButtonState()
+
+  setTimeout(() => {
+    finalizeAuctionTurn()
+  }, 4000)
+}
+
 function auctionCorrect() {
-  if (!auctionState.questionOpened || auctionState.currentQuestionNumber === null) {
-    showGameToast("اختر رقم المزاد أولاً")
+  const team = auctionState.activeTeam
+
+  if (!auctionState.pendingScore || auctionState.currentQuestionNumber === null) {
+    showGameToast("اختر رقمًا أولاً")
     return
   }
 
-  if (!auctionState.bidTeam) {
-    showGameToast("ابدأ المزايدة أولاً")
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
     return
   }
 
-  let points = 1
+  pushAuctionHistory()
 
-  if (auctionState.currentBid >= 10) {
-    points = Math.floor(auctionState.currentBid / 10)
+  if (!auctionState.answerShown) {
+    auctionState.answerShown = true
+    renderAuctionContent()
   }
 
-  if (auctionState.bidTeam === "A") {
-    auctionState.scoreA += points
-  } else if (auctionState.bidTeam === "B") {
-    auctionState.scoreB += points
+  if (team === "A") {
+    auctionState.scoreA += 1
+  } else if (team === "B") {
+    auctionState.scoreB += 1
   }
 
   playGameSound("correct")
   updateAuctionScoresOnly()
-  finishAuctionRound()
+  updateAuctionUndoButtonState()
+
+  setTimeout(() => {
+    finalizeAuctionTurn()
+  }, 4000)
 }
 
 function auctionWrong() {
-  if (!auctionState.questionOpened || auctionState.currentQuestionNumber === null) {
-    showGameToast("اختر رقم المزاد أولاً")
+  const team = auctionState.activeTeam
+
+  if (!auctionState.pendingScore || auctionState.currentQuestionNumber === null) {
+    showGameToast("اختر رقمًا أولاً")
     return
   }
 
-  if (!auctionState.bidTeam) {
-    showGameToast("ابدأ المزايدة أولاً")
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
     return
   }
 
-  const otherTeam = auctionState.bidTeam === "A" ? "B" : "A"
-
-  if (otherTeam === "A") {
-    auctionState.scoreA += 1
-  } else if (otherTeam === "B") {
-    auctionState.scoreB += 1
-  }
+  pushAuctionHistory()
 
   playGameSound("wrong")
-  updateAuctionScoresOnly()
-  finishAuctionRound()
+  updateAuctionUndoButtonState()
+
+  setTimeout(() => {
+    finalizeAuctionTurn()
+  }, 1500)
 }
 
-function finishAuctionRound() {
-  clearInterval(timer)
-  timer = null
-  setAuctionTimerValue(0)
-  auctionTimerStarted = false
-  auctionLastTickPlayed = null
-  auctionQuestionLocked = false
-
-  auctionState.currentBid = 0
-  auctionState.currentIncrement = 1
-  auctionState.bidTeam = null
+function finalizeAuctionTurn() {
+  auctionState.pendingScore = false
   auctionState.currentQuestionNumber = null
-  auctionState.questionOpened = false
+  auctionState.answerShown = false
+  auctionState.activeTeam = null
 
-  currentAuctionAnswer = null
-  currentAuctionQuestion = null
+  currentAuctionAnswer = ""
+  currentAuctionImage = ""
+  currentAuctionNote = ""
 
-  const box = document.getElementById("auctionQuestionBox")
-  if (box) box.innerText = "اختر رقم المزاد"
-
-  updateAuctionBidInfo()
-  highlightAuctionBidTeam()
-  saveAuctionState()
+  resetAuctionTimer()
+  highlightAuctionActiveTeam()
+  renderAuctionContent()
+  updateAuctionTurnBox()
   updateEndRoundButtonState()
+}
+
+/* =========================
+   Image Overlay
+========================= */
+
+function toggleAuctionImageOverlay() {
+  const oldOverlay = document.getElementById("auctionImageOverlay")
+
+  if (oldOverlay) {
+    oldOverlay.remove()
+    return
+  }
+
+  if (!currentAuctionImage) return
+
+  const overlay = document.createElement("div")
+  overlay.id = "auctionImageOverlay"
+  overlay.className = "auctionImageOverlay"
+  overlay.innerHTML = `
+    <div class="auctionImageOverlayInner">
+      <img src="${currentAuctionImage}" class="auctionImageOverlayImg" alt="">
+    </div>
+  `
+
+  overlay.onclick = function () {
+    overlay.remove()
+  }
+
+  document.body.appendChild(overlay)
 }

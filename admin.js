@@ -5,10 +5,19 @@ let currentModelName = ""
 let auctionAdminCount = 8
 let gameToastTimer = null
 
+let finalAdminRound = 1
+let archiveAdminRound = 1
+let archivePendingExtraCount = 0
+let archiveExtraTextPositions = []
+let archiveDraftState = {}
 
+const ARCHIVE_TEXT_START_POSITION = 5
+const ARCHIVE_MAX_TEXT_BOXES = 20
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadModels()
+  showAdminEmptyState()
+  updateAdminBrandModel()
 })
 
 /* =========================
@@ -62,6 +71,46 @@ function getCurrentModelNameSafe() {
   return currentModelName || `نموذج ${currentModel || ""}`
 }
 
+function setActiveAdminTab(segment) {
+  const wrap = tabs()
+  if (!wrap) return
+
+  wrap.querySelectorAll(".adminTabBtn").forEach(btn => {
+    btn.classList.remove("activeAdminTab")
+  })
+
+  const map = {
+    warmup: 0,
+    top10: 1,
+    auction: 2,
+    who: 3,
+    final: 4,
+    archive: 5
+  }
+
+  const index = map[segment]
+  if (index === undefined) return
+
+  const btn = wrap.querySelectorAll(".adminTabBtn")[index]
+  if (btn) btn.classList.add("activeAdminTab")
+}
+
+function clearActiveAdminTab() {
+  const wrap = tabs()
+  if (!wrap) return
+
+  wrap.querySelectorAll(".adminTabBtn").forEach(btn => {
+    btn.classList.remove("activeAdminTab")
+  })
+}
+
+function showAdminEmptyState(message = "افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها") {
+  const area = editor()
+  if (!area) return
+
+  area.innerHTML = `<div class="adminEmptyState">${message}</div>`
+}
+
 async function uploadImageFile(file, prefix = "file") {
   if (!file) return ""
 
@@ -81,7 +130,22 @@ async function uploadImageFile(file, prefix = "file") {
   const { data } = db.storage.from(BUCKET_NAME).getPublicUrl(fileName)
   return data.publicUrl
 }
+function updateAdminBrandModel() {
+  const brandModel = document.getElementById("adminBrandCurrentModel")
+  if (!brandModel) return
 
+  if (!currentModel) {
+    brandModel.classList.add("hidden")
+    brandModel.innerHTML = ""
+    return
+  }
+
+  brandModel.classList.remove("hidden")
+  brandModel.innerHTML = `
+    <div class="adminBrandCurrentModelLabel">النموذج الحالي</div>
+    <div class="adminBrandCurrentModelName">${escapeHtml(getCurrentModelNameSafe())}</div>
+  `
+}
 /* =========================
    Admin Home / Status
 ========================= */
@@ -103,7 +167,7 @@ async function getAdminCompletionCounts() {
     db.from("top10_questions").select("id", { count: "exact", head: true }).eq("model", currentModel),
     db.from("auction_questions").select("id", { count: "exact", head: true }).eq("model", currentModel),
     db.from("who_images").select("id", { count: "exact", head: true }).eq("model", currentModel),
-    db.from("final_images").select("id", { count: "exact", head: true }).eq("model", currentModel),
+    db.from("final_round1_items").select("id", { count: "exact", head: true }).eq("model", currentModel),
     db.from("archive_boxes").select("id", { count: "exact", head: true }).eq("model", currentModel)
   ])
 
@@ -140,19 +204,14 @@ async function buildSegmentStatusGrid() {
   }
 
   return `
-    <div class="segmentStatusGrid enhancedSegmentStatusGrid">
+    <div class="adminStatusStrip">
       ${Object.keys(labels).map(key => {
         const done = isSegmentDone(key, counts[key] || 0)
 
         return `
-          <div class="segmentStatusCard ${done ? "doneCard" : ""}">
-            <div class="segmentStatusHead">
-              <div class="segmentStatusName">${labels[key]}</div>
-              <div class="segmentStatusBadge ${done ? "done" : ""}">
-                ${done ? "مكتمل" : "غير مكتمل"}
-              </div>
-            </div>
-            <div class="segmentStatusMeta">عدد العناصر: ${counts[key] || 0}</div>
+          <div class="adminStatusStripItem ${done ? "doneCard" : ""}">
+            <span class="adminStatusStripName">${labels[key]}</span>
+            <span class="adminStatusStripCount">${counts[key] || 0}</span>
           </div>
         `
       }).join("")}
@@ -162,21 +221,82 @@ async function buildSegmentStatusGrid() {
 
 async function renderAdminHome() {
   if (!currentModel) {
-    editor().innerHTML = `<div class="adminEmptyState">افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها</div>`
+    clearActiveAdminTab()
+    showAdminEmptyState()
+    updateAdminBrandModel()
     return
   }
 
+  clearActiveAdminTab()
+  updateAdminBrandModel()
+
+  const counts = await getAdminCompletionCounts()
+
+  const segmentCards = [
+    {
+      key: "warmup",
+      title: "التسخين",
+      desc: "أسئلة البداية السريعة",
+      count: counts.warmup || 0
+    },
+    {
+      key: "top10",
+      title: "Top 10",
+      desc: "ثلاث جولات ترتيب",
+      count: counts.top10 || 0
+    },
+    {
+      key: "auction",
+      title: "المزاد",
+      desc: "أسئلة الصور والمزايدة",
+      count: counts.auction || 0
+    },
+    {
+      key: "who",
+      title: "من هو",
+      desc: "تخمين الشخصية",
+      count: counts.who || 0
+    },
+    {
+      key: "final",
+      title: "الفاصلة",
+      desc: "الجولات النهائية",
+      count: counts.final || 0
+    },
+    {
+      key: "archive",
+      title: "الأرشيف",
+      desc: "بطولات وأرشيف",
+      count: counts.archive || 0
+    }
+  ]
+
   editor().innerHTML = `
-    <div class="adminHomeInlineBar">
-      <div class="adminHomeInlineModel">
-        <span class="adminHomeInlineLabel">النموذج الحالي</span>
-        <span class="adminHomeInlineName">${escapeHtml(getCurrentModelNameSafe())}</span>
+    <div class="adminHomeShell">
+      <div class="adminSegmentPickerCompact">
+        ${segmentCards.map(item => {
+          const done = isSegmentDone(item.key, item.count)
+
+          return `
+            <button class="adminSegmentCompactCard ${done ? "doneCard" : ""}" onclick="openAdminSegment('${item.key}')">
+              <div class="adminSegmentCompactTop">
+                <span class="adminSegmentCompactTitle">${item.title}</span>
+                <span class="adminSegmentCompactBadge ${done ? "done" : ""}">
+                  ${done ? "مكتمل" : "غير مكتمل"}
+                </span>
+              </div>
+
+              <div class="adminSegmentCompactDesc">${item.desc}</div>
+
+              <div class="adminSegmentCompactFooter">
+                <span class="adminSegmentCompactMetaLabel">عدد العناصر</span>
+                <span class="adminSegmentCompactMetaValue">${item.count}</span>
+              </div>
+            </button>
+          `
+        }).join("")}
       </div>
-
-      <div class="adminHomeInlineHint">اختر الفقرة من الأعلى</div>
     </div>
-
-    ${await buildSegmentStatusGrid()}
   `
 }
 
@@ -199,6 +319,7 @@ async function loadModels() {
   const list = document.getElementById("modelsList")
   if (!list) return
 
+  const currentValue = currentModel ? String(currentModel) : ""
   list.innerHTML = `<option value="">اختر النموذج</option>`
 
   ;(data || []).forEach(model => {
@@ -207,6 +328,10 @@ async function loadModels() {
     option.textContent = model.name
     list.appendChild(option)
   })
+
+  if (currentValue) {
+    list.value = currentValue
+  }
 }
 
 async function createModel() {
@@ -218,7 +343,11 @@ async function createModel() {
     return
   }
 
-  const { error } = await db.from("models").insert({ name })
+  const { data, error } = await db
+    .from("models")
+    .insert({ name })
+    .select()
+    .single()
 
   if (error) {
     console.log("CREATE MODEL ERROR:", error)
@@ -228,8 +357,22 @@ async function createModel() {
 
   input.value = ""
   await loadModels()
+
+  if (data?.id) {
+    currentModel = data.id
+    currentModelName = data.name || name
+    updateAdminBrandModel()
+
+    const list = document.getElementById("modelsList")
+    if (list) list.value = String(data.id)
+
+    tabs()?.classList.remove("hidden")
+    await renderAdminHome()
+  }
+
   showGameToast("تم إنشاء النموذج")
 }
+
 async function renameSelectedModel() {
   const list = document.getElementById("modelsList")
   const id = Number(list?.value || currentModel || 0)
@@ -244,11 +387,68 @@ async function renameSelectedModel() {
     list?.options?.[list.selectedIndex]?.textContent ||
     ""
 
-  const newName = prompt("اكتب الاسم الجديد للنموذج", currentName)
+  const oldModal = document.getElementById("renameModelModal")
+  if (oldModal) oldModal.remove()
 
-  if (newName === null) return
+  document.body.insertAdjacentHTML("beforeend", `
+    <div class="adminModalOverlay" id="renameModelModal">
+      <div class="adminModalCard">
+        <div class="adminModalTitle">تعديل اسم النموذج</div>
 
-  const name = newName.trim()
+        <div class="adminField">
+          <label for="renameModelInput">الاسم الجديد للنموذج</label>
+          <input
+            id="renameModelInput"
+            class="adminInput"
+            type="text"
+            value="${escapeHtml(currentName)}"
+            placeholder="اكتب الاسم الجديد"
+          >
+        </div>
+
+        <div class="adminModalActions">
+          <button type="button" class="adminBtn adminBtnLight" onclick="closeRenameModelModal()">إلغاء</button>
+          <button type="button" class="adminBtn adminBtnMango" onclick="submitRenameModel(${id})">حفظ التعديل</button>
+        </div>
+      </div>
+    </div>
+  `)
+
+  const modal = document.getElementById("renameModelModal")
+  const input = document.getElementById("renameModelInput")
+
+  if (modal) {
+    modal.addEventListener("click", e => {
+      if (e.target === modal) closeRenameModelModal()
+    })
+  }
+
+  if (input) {
+    input.focus()
+    input.select()
+
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault()
+        submitRenameModel(id)
+      }
+      if (e.key === "Escape") {
+        e.preventDefault()
+        closeRenameModelModal()
+      }
+    })
+  }
+}
+
+function closeRenameModelModal() {
+  const modal = document.getElementById("renameModelModal")
+  if (modal) modal.remove()
+}
+
+async function submitRenameModel(id) {
+  const input = document.getElementById("renameModelInput")
+  const name = (input?.value || "").trim()
+
   if (!name) {
     showGameToast("اسم النموذج فارغ")
     return
@@ -265,7 +465,11 @@ async function renameSelectedModel() {
     return
   }
 
+  currentModel = id
   currentModelName = name
+  updateAdminBrandModel()
+
+  closeRenameModelModal()
   await loadModels()
 
   const modelsList = document.getElementById("modelsList")
@@ -274,7 +478,8 @@ async function renameSelectedModel() {
   await renderAdminHome()
   showGameToast("تم تعديل اسم النموذج")
 }
-function openSelectedModel() {
+
+async function openSelectedModel() {
   const list = document.getElementById("modelsList")
   const id = Number(list?.value || 0)
 
@@ -285,15 +490,16 @@ function openSelectedModel() {
 
   currentModel = id
   currentModelName = list.options[list.selectedIndex]?.textContent || `نموذج ${id}`
+  updateAdminBrandModel()
 
   tabs()?.classList.remove("hidden")
-  renderAdminHome()
+  await renderAdminHome()
   showGameToast(`تم فتح ${currentModelName}`)
 }
 
 async function deleteSelectedModel() {
   const list = document.getElementById("modelsList")
-  const id = Number(list?.value || 0)
+  const id = Number(list?.value || currentModel || 0)
 
   if (!id) {
     showGameToast("اختر النموذج")
@@ -312,11 +518,13 @@ async function deleteSelectedModel() {
   }
 
   if (currentModel === id) {
-    currentModel = null
-    currentModelName = ""
-    tabs()?.classList.add("hidden")
-    editor().innerHTML = `<div class="adminEmptyState">افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها</div>`
-  }
+  currentModel = null
+  currentModelName = ""
+  tabs()?.classList.add("hidden")
+  clearActiveAdminTab()
+  showAdminEmptyState()
+  updateAdminBrandModel()
+}
 
   await loadModels()
   showGameToast("تم حذف النموذج")
@@ -326,18 +534,20 @@ async function deleteSelectedModel() {
    Tabs
 ========================= */
 
-function openAdminSegment(segment) {
+async function openAdminSegment(segment) {
   if (!currentModel) {
     showGameToast("افتح نموذج أولاً")
     return
   }
 
-  if (segment === "warmup") renderWarmupAdmin()
-  if (segment === "top10") renderTop10Admin()
-  if (segment === "auction") renderAuctionAdmin()
-  if (segment === "who") renderWhoAdmin()
-  if (segment === "final") renderFinalAdmin()
-  if (segment === "archive") renderArchiveAdmin()
+  setActiveAdminTab(segment)
+
+  if (segment === "warmup") await renderWarmupAdmin()
+  if (segment === "top10") await renderTop10Admin()
+  if (segment === "auction") await renderAuctionAdmin()
+  if (segment === "who") await renderWhoAdmin()
+  if (segment === "final") await renderFinalAdmin()
+  if (segment === "archive") await renderArchiveAdmin()
 }
 
 /* =========================
@@ -427,88 +637,16 @@ async function deleteWhoSegment() {
 
 async function deleteFinalSegment() {
   if (!currentModel) return
-  const ok = confirm("هل تريد حذف جميع عناصر الفاصلة من قاعدة البيانات؟")
+  const ok = confirm("هل تريد حذف فقرة الفاصلة كاملة؟")
   if (!ok) return
 
-  const { error } = await db
-    .from("final_images")
-    .delete()
-    .eq("model", currentModel)
-
-  if (error) {
-    console.log(error)
-    showGameToast("فشل حذف فقرة الفاصلة")
-    return
-  }
+  await db.from("final_round_meta").delete().eq("model", currentModel)
+  await db.from("final_round1_items").delete().eq("model", currentModel)
+  await db.from("final_round2_items").delete().eq("model", currentModel)
+  await db.from("final_round3_items").delete().eq("model", currentModel)
 
   showGameToast("تم حذف فقرة الفاصلة")
   await renderFinalAdmin()
-}
-
-async function deleteArchiveSegment(round = null) {
-  if (!currentModel) return
-
-  const message = round
-    ? `هل تريد حذف الأرشيف للجولة ${round} من قاعدة البيانات؟`
-    : "هل تريد حذف جميع جولات الأرشيف من قاعدة البيانات؟"
-
-  const ok = confirm(message)
-  if (!ok) return
-
-  if (round) {
-    const { error: boxErr } = await db
-      .from("archive_boxes")
-      .delete()
-      .eq("model", currentModel)
-      .eq("round", round)
-
-    if (boxErr) {
-      console.log(boxErr)
-      showGameToast("فشل حذف صندوق الأرشيف")
-      return
-    }
-
-    const { error: itemsErr } = await db
-      .from("archive_items")
-      .delete()
-      .eq("model", currentModel)
-      .eq("round", round)
-
-    if (itemsErr) {
-      console.log(itemsErr)
-      showGameToast("فشل حذف عناصر الأرشيف")
-      return
-    }
-
-    showGameToast(`تم حذف الأرشيف للجولة ${round}`)
-    await renderArchiveAdminRound(round)
-    return
-  }
-
-  const { error: boxErr } = await db
-    .from("archive_boxes")
-    .delete()
-    .eq("model", currentModel)
-
-  if (boxErr) {
-    console.log(boxErr)
-    showGameToast("فشل حذف صناديق الأرشيف")
-    return
-  }
-
-  const { error: itemsErr } = await db
-    .from("archive_items")
-    .delete()
-    .eq("model", currentModel)
-
-  if (itemsErr) {
-    console.log(itemsErr)
-    showGameToast("فشل حذف عناصر الأرشيف")
-    return
-  }
-
-  showGameToast("تم حذف جميع جولات الأرشيف")
-  await renderArchiveAdmin()
 }
 
 /* =========================
@@ -549,11 +687,11 @@ function clearAuctionQuestion(i) {
 
   const q = document.getElementById(`auction${i}`)
   const a = document.getElementById(`auctionAnswer${i}`)
-  const inc = document.getElementById(`auctionIncrement${i}`)
+  const note = document.getElementById(`auctionNote${i}`)
 
   if (q) q.value = ""
   if (a) a.value = ""
-  if (inc) inc.value = 1
+  if (note) note.value = ""
 
   showGameToast("تم مسح السؤال، اضغط حفظ")
 }
@@ -583,1044 +721,8 @@ function clearFinalItem(i) {
 
   showGameToast("تم مسح العنصر، اضغط حفظ")
 }
-/* =========================
-  printer
-========================= */
-function getArchiveDisplayThemeClass(round) {
-  if (Number(round) === 1) return "archiveThemeRound1"
-  if (Number(round) === 2) return "archiveThemeRound2"
-  if (Number(round) === 3) return "archiveThemeRound3"
-  return "archiveThemeRound4"
-}
 
-function escapeHtml(value) {
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;")
-}
 
-function getAllDocumentCssText() {
-  let cssText = ""
-
-  for (const sheet of Array.from(document.styleSheets)) {
-    try {
-      for (const rule of Array.from(sheet.cssRules || [])) {
-        cssText += rule.cssText + "\n"
-      }
-    } catch (err) {
-      /* تجاهل ملفات CSS المحمية */
-    }
-  }
-
-  return cssText
-}
-
-function waitForImagesToLoad(container) {
-  const images = Array.from(container.querySelectorAll("img"))
-  if (!images.length) return Promise.resolve()
-
-  return Promise.all(
-    images.map(img => {
-      if (img.complete && img.naturalWidth > 0) return Promise.resolve()
-
-      return new Promise(resolve => {
-        const done = () => resolve()
-        img.addEventListener("load", done, { once: true })
-        img.addEventListener("error", done, { once: true })
-      })
-    })
-  )
-}
-
-function isIPhoneLikePrintDevice() {
-  const ua = navigator.userAgent || ""
-  const isIOS = /iPhone|iPad|iPod/i.test(ua)
-  const isTouchMac = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1
-  return isIOS || isTouchMac
-}
-
-function buildPresenterPrintHtml(panelNode, modelValue, options = {}) {
-  const {
-    autoPrint = true,
-    closeAfterPrint = true,
-    keepActions = false,
-    savedPageMode = false
-  } = options
-
-  const clone = panelNode.cloneNode(true)
-
-  const actions = clone.querySelector(".presenterReaderActions")
-  if (actions && !keepActions) {
-    actions.remove()
-  }
-
-  const cssText = getAllDocumentCssText()
-
-  return `
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ورقة المقدم - ${escapeHtml(modelValue)}</title>
-  <style>
-    ${cssText}
-
-    html, body {
-      margin: 0 !important;
-      padding: 0 !important;
-      width: 100%;
-      min-height: 100%;
-      direction: rtl;
-      background: #f8fafc !important;
-      color: #111827 !important;
-      font-family: Tahoma, Arial, sans-serif !important;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
-
-    body {
-      box-sizing: border-box;
-      padding: ${savedPageMode ? "16px" : "0"} !important;
-    }
-
-    .printRoot {
-      width: 100% !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      overflow: visible !important;
-    }
-
-    .presenterOverlay {
-      position: static !important;
-      inset: auto !important;
-      display: block !important;
-      background: transparent !important;
-      padding: 0 !important;
-      margin: 0 !important;
-      overflow: visible !important;
-    }
-
-    .presenterPanel {
-      width: 100% !important;
-      max-width: none !important;
-      height: auto !important;
-      max-height: none !important;
-      margin: 0 !important;
-      border-radius: ${savedPageMode ? "18px" : "0"} !important;
-      box-shadow: none !important;
-      overflow: visible !important;
-      background: #fff !important;
-    }
-
-    .presenterTopBar {
-      position: static !important;
-      top: auto !important;
-      z-index: auto !important;
-    }
-
-    .presenterContent {
-      overflow: visible !important;
-      max-height: none !important;
-      height: auto !important;
-    }
-
-    img {
-      max-width: 100% !important;
-      page-break-inside: avoid !important;
-      break-inside: avoid !important;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
-
-    .presenterSectionCard,
-    .presenterSubCard,
-    .presenterWhoCard,
-    .presenterFinalImageCard,
-    .presenterMiniSection,
-    .archiveBoard,
-    .archiveModernBoard,
-    .archiveModernInfoCard,
-    .archiveModernBigCard,
-    .archiveModernScoreCard,
-    .archiveModernSmallCard,
-    .presenterWarmupCard,
-    .presenterTop10Row,
-    .presenterWhoGrid,
-    .presenterFinalBlock,
-    .presenterFinalRound3Item {
-      page-break-inside: avoid !important;
-      break-inside: avoid !important;
-    }
-
-    @page {
-      size: A4;
-      margin: 10mm;
-    }
-
-    @media print {
-      html, body {
-        background: #ffffff !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-
-      ${keepActions ? "" : `
-      .presenterReaderActions {
-        display: none !important;
-      }
-      `}
-
-      .printRoot {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      .presenterOverlay {
-        background: transparent !important;
-      }
-
-      .presenterPanel {
-        width: 100% !important;
-        max-width: none !important;
-        margin: 0 !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
-      }
-
-      .presenterContent {
-        overflow: visible !important;
-        max-height: none !important;
-        height: auto !important;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="printRoot">
-    <div class="presenterOverlay">
-      ${clone.outerHTML}
-    </div>
-  </div>
-</body>
-</html>
-  `
-}
-
-window.openPresenterSheet = async function () {
-  try {
-    if (!currentModel) {
-      showGameToast("افتح نموذجًا أولاً")
-      return
-    }
-
-    const [
-      warmupRes,
-      top10Res,
-      auctionRes,
-      whoRes,
-      archiveBoxesRes,
-      archiveItemsRes,
-      finalMetaRes,
-      finalRound1Res,
-      finalRound2Res,
-      finalRound3Res
-    ] = await Promise.all([
-      db.from("questions")
-        .select("*")
-        .eq("model", Number(currentModel))
-        .eq("segment", "warmup")
-        .order("category", { ascending: true })
-        .order("number", { ascending: true }),
-
-      db.from("top10_questions")
-        .select("*")
-        .eq("model", currentModel)
-        .order("round", { ascending: true })
-        .order("position", { ascending: true }),
-
-      db.from("auction_questions")
-        .select("*")
-        .eq("model", currentModel)
-        .order("number", { ascending: true }),
-
-      db.from("who_images")
-        .select("*")
-        .eq("model", currentModel)
-        .order("number", { ascending: true }),
-
-      db.from("archive_boxes")
-        .select("*")
-        .eq("model", currentModel)
-        .order("round", { ascending: true }),
-
-      db.from("archive_items")
-        .select("*")
-        .eq("model", currentModel)
-        .order("round", { ascending: true })
-        .order("position", { ascending: true }),
-
-      db.from("final_round_meta")
-        .select("*")
-        .eq("model", currentModel)
-        .order("round", { ascending: true }),
-
-      db.from("final_round1_items")
-        .select("*")
-        .eq("model", currentModel)
-        .order("number", { ascending: true }),
-
-      db.from("final_round2_items")
-        .select("*")
-        .eq("model", currentModel)
-        .order("number", { ascending: true })
-        .order("item_order", { ascending: true }),
-
-      db.from("final_round3_items")
-        .select("*")
-        .eq("model", currentModel)
-        .order("number", { ascending: true })
-        .order("image_order", { ascending: true })
-    ])
-
-    const warmupRows = warmupRes.data || []
-    const top10Rows = top10Res.data || []
-    const auctionRows = auctionRes.data || []
-    const whoRows = whoRes.data || []
-    const archiveBoxes = archiveBoxesRes.data || []
-    const archiveItems = archiveItemsRes.data || []
-    const finalMeta = finalMetaRes.data || []
-    const finalRound1Rows = finalRound1Res.data || []
-    const finalRound2Rows = finalRound2Res.data || []
-    const finalRound3Rows = finalRound3Res.data || []
-
-    const text = value => escapeHtml(value || "")
-
-    const isImageLike = value =>
-      typeof value === "string" &&
-      /^(https?:\/\/|data:image\/|blob:|\/)/.test(String(value).trim())
-
-    /* warmup */
-    const groupedWarmup = {}
-    warmupRows.forEach(row => {
-      if (!groupedWarmup[row.category]) {
-        groupedWarmup[row.category] = {
-          title: row.category_name || `فئة ${row.category}`,
-          items: [],
-          seen: new Set()
-        }
-      }
-
-      const key = `${row.number}__${(row.question || "").trim()}__${(row.answer || "").trim()}`
-      if (!groupedWarmup[row.category].seen.has(key)) {
-        groupedWarmup[row.category].seen.add(key)
-        groupedWarmup[row.category].items.push(row)
-      }
-    })
-
-    const warmupHtml = `
-      <div class="presenterSectionCard" data-pdf-section="warmup">
-        <div class="presenterSectionHead">التسخين</div>
-        <div class="presenterSectionBody">
-          <div class="presenterWarmupGrid">
-            ${Object.values(groupedWarmup).map(group => `
-              <div class="presenterSubCard presenterWarmupCard">
-                <div class="presenterSubHead">${text(group.title)}</div>
-                <div class="presenterListCompact">
-                  ${group.items.map(row => `
-                    <div class="presenterRowCompact">
-                      <div class="presenterNumBox">${row.number}</div>
-                      <div class="presenterTextBox">
-                        <div class="presenterQuestionLine">${text(row.question)}</div>
-                        <div class="presenterAnswerLine">الإجابة: ${text(row.answer)}</div>
-                      </div>
-                    </div>
-                  `).join("")}
-                </div>
-              </div>
-            `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
-          </div>
-        </div>
-      </div>
-    `
-
-    /* top10 */
-    const groupedTop10 = {}
-    top10Rows.forEach(row => {
-      if (!groupedTop10[row.round]) {
-        groupedTop10[row.round] = {
-          question: "",
-          items: []
-        }
-      }
-      if (row.question) groupedTop10[row.round].question = row.question
-      groupedTop10[row.round].items.push(row)
-    })
-
-    const top10Html = Object.entries(groupedTop10).map(([round, group]) => `
-      <div class="presenterSectionCard" data-pdf-section="top10-round-${round}">
-        <div class="presenterSectionHead">Top 10 - الجولة ${round}</div>
-        <div class="presenterSectionBody">
-          <div class="presenterQuestionMain">${text(group.question)}</div>
-          <div class="presenterTop10Grid">
-            ${group.items
-              .sort((a, b) => Number(a.position) - Number(b.position))
-              .map(item => `
-                <div class="presenterRowCompact presenterTop10Row">
-                  <div class="presenterNumBox presenterNumBoxLarge">${item.position}</div>
-                  <div class="presenterTextBox presenterTextBig">${text(item.answer)}</div>
-                </div>
-              `).join("")}
-          </div>
-        </div>
-      </div>
-    `).join("")
-
-    /* auction */
-    const auctionHtml = `
-      <div class="presenterSectionCard" data-pdf-section="auction">
-        <div class="presenterSectionHead">المزاد</div>
-        <div class="presenterSectionBody">
-          <div class="presenterListCompact">
-            ${auctionRows.map(row => `
-              <div class="presenterRowCompact">
-                <div class="presenterNumBox">${row.number}</div>
-                <div class="presenterTextBox">
-                  <div class="presenterQuestionLine">${text(row.question)}</div>
-                  <div class="presenterMetaLine">
-                    <span><strong>الإجابة:</strong> ${text(row.answer)}</span>
-                    <span><strong>الزيادة:</strong> ${text(row.increment || row.value || row.points || "")}</span>
-                  </div>
-                </div>
-              </div>
-            `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
-          </div>
-        </div>
-      </div>
-    `
-
-    /* who */
-    const whoHtml = `
-      <div class="presenterSectionCard" data-pdf-section="who">
-        <div class="presenterSectionHead">من هو</div>
-        <div class="presenterSectionBody">
-          <div class="presenterWhoGrid">
-            ${whoRows.map(row => `
-              <div class="presenterWhoCard">
-                <div class="presenterWhoNum">${row.number}</div>
-                <div class="presenterWhoAnswer">${text(row.answer)}</div>
-              </div>
-            `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
-          </div>
-        </div>
-      </div>
-    `
-
-    /* archive */
-    const groupedArchive = {}
-    archiveItems.forEach(item => {
-      const round = Number(item.round || 1)
-      if (!groupedArchive[round]) groupedArchive[round] = []
-      groupedArchive[round].push(item)
-    })
-
-    const archiveHtml = [1, 2, 3, 4].map(round => {
-      const box = archiveBoxes.find(x => Number(x.round) === round)
-      const items = (groupedArchive[round] || []).sort((a, b) => Number(a.position) - Number(b.position))
-
-      const itemByPos = {}
-      items.forEach(item => {
-        itemByPos[Number(item.position)] = item
-      })
-
-      const under3Items = items.filter(
-        item => Number(item.parent_position || item.column_group || 3) === 3 && Number(item.position) >= 5
-      )
-      const under4Items = items.filter(
-        item => Number(item.parent_position || item.column_group || 3) === 4 && Number(item.position) >= 5
-      )
-
-      function renderPrimaryValue(position, fallbackText = "") {
-        const item = itemByPos[position]
-        if (!item) {
-          return `<span>${text(fallbackText)}</span>`
-        }
-
-        const raw = item.image || item.text || ""
-        if (isImageLike(raw)) {
-          return `<img src="${text(raw)}" alt="">`
-        }
-
-        return `<span>${text(item.text || fallbackText)}</span>`
-      }
-
-      function renderBigValue(position) {
-        const item = itemByPos[position]
-        if (!item) {
-          return `<span>${position}</span>`
-        }
-
-        const raw = item.image || item.text || ""
-        if (isImageLike(raw)) {
-          return `<img src="${text(raw)}" alt="">`
-        }
-
-        return `<span>${text(item.text || position)}</span>`
-      }
-
-      function renderBottomItem(item) {
-        const labelText = (item.label || "").trim()
-        const promptStyle = String(item.prompt_style || "shoe").trim().toLowerCase()
-        const emoji = promptStyle === "ball" ? "⚽️" : "👟"
-        const styleClass = promptStyle === "ball" ? "archivePromptBall" : "archivePromptShoe"
-        const isWanted = labelText === "المطلوب"
-        const displayText = (item.text || "").trim()
-
-        return `
-          <div class="archiveModernSmallCard ${styleClass} ${isWanted ? "archiveWantedItem" : ""}">
-            <div class="archiveModernSmallMain">
-              <div class="archiveModernSmallText">${text(displayText || labelText || "")}</div>
-            </div>
-            <div class="archiveModernSmallEmoji">${emoji}</div>
-          </div>
-        `
-      }
-
-      return `
-        <div class="presenterSectionCard" data-pdf-section="archive-round-${round}">
-          <div class="presenterSectionHead">الأرشيف - الجولة ${round}</div>
-          <div class="presenterSectionBody">
-            <div class="archiveBoard archiveModernBoard ${getArchiveDisplayThemeClass(round)} presenterArchiveLiveClone">
-
-              <div class="archiveModernTop">
-                <div class="archiveModernInfoCard">
-                  <div class="archiveModernInfoLabel">البطولة</div>
-                  <div class="archiveModernInfoValue">
-                    ${renderPrimaryValue(1, box?.tournament || "")}
-                  </div>
-                </div>
-
-                <div class="archiveModernInfoCard">
-                  <div class="archiveModernInfoLabel">الموسم</div>
-                  <div class="archiveModernInfoValue">
-                    ${renderPrimaryValue(2, box?.season || "")}
-                  </div>
-                </div>
-              </div>
-
-              <div class="archiveModernMiddle">
-                <div class="archiveModernBigCard revealed">
-                  ${renderBigValue(4)}
-                </div>
-
-                <div class="archiveModernScoreCard">
-                  <div class="archiveModernScoreLabel">النتيجة</div>
-                  <div class="archiveModernScoreValue">${text(box?.score || "-")}</div>
-                </div>
-
-                <div class="archiveModernBigCard revealed">
-                  ${renderBigValue(3)}
-                </div>
-              </div>
-
-              <div class="archiveBottomGrid">
-                <div class="archiveBottomCol">
-                  ${under4Items.map(renderBottomItem).join("")}
-                </div>
-
-                <div class="archiveBottomCol">
-                  ${under3Items.map(renderBottomItem).join("")}
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      `
-    }).join("")
-
-    /* final */
-    const groupedFinal2 = {}
-    finalRound2Rows.forEach(item => {
-      if (!groupedFinal2[item.number]) groupedFinal2[item.number] = []
-      groupedFinal2[item.number].push(item)
-    })
-
-    const groupedFinal3 = {}
-    finalRound3Rows.forEach(item => {
-      if (!groupedFinal3[item.number]) groupedFinal3[item.number] = []
-      groupedFinal3[item.number].push(item)
-    })
-
-    const finalMetaMap = {}
-    finalMeta.forEach(row => {
-      finalMetaMap[row.round] = row
-    })
-
-    const finalHtml = `
-      <div class="presenterFinalAll">
-
-        <div class="presenterFinalBlock presenterSectionCard" data-pdf-section="final-round-1">
-          <div class="presenterFinalTitle">${text(finalMetaMap[1]?.title || "الجولة الأولى")}</div>
-          <div class="presenterFinalHorizontal">
-            ${finalRound1Rows.map(item => `
-              <div class="presenterFinalImageCard">
-                <div class="presenterFinalImageHead">رقم ${item.number}</div>
-                <div class="presenterFinalImageBody">
-                  ${
-                    item.image
-                      ? `<img src="${text(item.image)}" alt="">`
-                      : `<div class="presenterFinalNoImage">لا توجد صورة</div>`
-                  }
-                  <div class="presenterAnswerLine">الإجابة: ${text(item.answer)}</div>
-                  ${item.note ? `<div class="presenterHintLine">التوضيح: ${text(item.note)}</div>` : ""}
-                </div>
-              </div>
-            `).join("") || `<div class="presenterEmptyBox">لا توجد بيانات</div>`}
-          </div>
-        </div>
-
-        <div class="presenterFinalBlock presenterSectionCard" data-pdf-section="final-round-2">
-          <div class="presenterFinalTitle">${text(finalMetaMap[2]?.title || "الجولة الثانية")}</div>
-          <div class="presenterFinalHorizontal">
-            ${[1, 2, 3, 4].map(number => {
-              const rows = groupedFinal2[number] || []
-              const isScramble = number === 1 || number === 3
-
-              return `
-                <div class="presenterMiniSection finalHorizontalCard">
-                  <div class="presenterMiniSectionHead">رقم ${number}</div>
-                  <div class="presenterMiniSectionBody">
-                    ${rows.map((row, idx) => `
-                      <div class="presenterMiniLine">
-                        <strong>${idx + 1})</strong>
-                        <span>الكلمة: ${text(row.prompt)}</span>
-                        ${isScramble ? `<span>التلميحة: ${text(row.hint)}</span>` : ""}
-                        ${isScramble ? `<span>الإجابة: ${text(row.answer)}</span>` : ""}
-                      </div>
-                    `).join("")}
-                  </div>
-                </div>
-              `
-            }).join("")}
-          </div>
-        </div>
-
-        <div class="presenterFinalBlock presenterSectionCard" data-pdf-section="final-round-3">
-          <div class="presenterFinalTitle">${text(finalMetaMap[3]?.title || "الجولة الثالثة")}</div>
-          <div class="presenterFinalHorizontal">
-            ${[1, 2].map(number => {
-              const rows = groupedFinal3[number] || []
-
-              return `
-                <div class="presenterFinalImageCard largeFinalCard">
-                  <div class="presenterFinalImageHead">رقم ${number}</div>
-                  <div class="presenterFinalImageBody">
-                    <div class="presenterFinalRound3List">
-                      ${rows.map(row => `
-                        <div class="presenterFinalRound3Item">
-                          ${
-                            row.image
-                              ? `<img src="${text(row.image)}" alt="">`
-                              : `<div class="presenterFinalNoImage">لا توجد صورة</div>`
-                          }
-                          <div class="presenterAnswerLine">الإجابة: ${text(row.answer)}</div>
-                          ${row.note ? `<div class="presenterHintLine">التوضيح: ${text(row.note)}</div>` : ""}
-                        </div>
-                      `).join("")}
-                    </div>
-                  </div>
-                </div>
-              `
-            }).join("")}
-          </div>
-        </div>
-
-      </div>
-    `
-
-    const html = `
-      <div class="presenterOverlay" id="presenterOverlay">
-        <div class="presenterPanel">
-          <div class="presenterTopBar">
-            <div class="presenterTopTitle">ورقة المقدم - ${text(currentModel)}</div>
-            <div class="presenterReaderActions">
-              <button class="adminBtn" onclick="exportPresenterPdf()">حفظ PDF</button>
-              <button class="adminDeleteBtn" onclick="closePresenterSheet()">إغلاق</button>
-            </div>
-          </div>
-
-          <div class="presenterContent">
-            ${warmupHtml}
-            ${top10Html}
-            ${auctionHtml}
-            ${whoHtml}
-            ${archiveHtml}
-            ${finalHtml}
-          </div>
-        </div>
-      </div>
-    `
-
-    const old = document.getElementById("presenterOverlay")
-    if (old) old.remove()
-
-    document.body.insertAdjacentHTML("beforeend", html)
-  } catch (error) {
-    console.error(error)
-    showGameToast("تعذر فتح ورقة المقدم")
-  }
-}
-
-window.closePresenterSheet = function () {
-  const overlay = document.getElementById("presenterOverlay")
-  if (overlay) overlay.remove()
-}
-
-window.printPresenterSheet = async function () {
-  await openPresenterSheet()
-
-  if (isIPhoneLikePrintDevice()) {
-    setTimeout(() => {
-      if (typeof exportPresenterPdf === "function") {
-        exportPresenterPdf()
-      }
-    }, 500)
-  }
-}
-
-window.copyPresenterReaderLink = async function () {
-  try {
-    if (!currentModel) {
-      showGameToast("افتح نموذجًا أولاً")
-      return
-    }
-
-    const url = `${window.location.origin}${window.location.pathname}?presenter=1&model=${encodeURIComponent(currentModel)}`
-
-    try {
-      await navigator.clipboard.writeText(url)
-      showGameToast("تم نسخ رابط ورقة المقدم")
-    } catch (err) {
-      prompt("انسخ الرابط:", url)
-    }
-  } catch (error) {
-    console.error(error)
-    showGameToast("تعذر إنشاء الرابط")
-  }
-}
-
-window.addEventListener("load", () => {
-  try {
-    const params = new URLSearchParams(window.location.search)
-    const presenterMode = params.get("presenter")
-    const modelFromUrl = params.get("model")
-
-    if (!presenterMode) return
-
-    if (modelFromUrl) {
-      currentModel = modelFromUrl
-
-      const modelInput = document.querySelector(".adminModelInput")
-      if (modelInput) modelInput.value = modelFromUrl
-    }
-
-    setTimeout(() => {
-      if (typeof openPresenterSheet === "function") {
-        openPresenterSheet()
-      }
-    }, 500)
-  } catch (error) {
-    console.error(error)
-  }
-})
-
-window.exportPresenterPdf = async function () {
-  let cloneWrap = null
-
-  function prepareSectionForA4(section) {
-    section.querySelectorAll(".presenterWarmupGrid, .presenterWhoGrid, .presenterTop10Grid, .presenterFinalHorizontal").forEach(grid => {
-      grid.style.display = "block"
-      grid.style.width = "100%"
-      grid.style.maxWidth = "100%"
-      grid.style.boxSizing = "border-box"
-    })
-
-    section.querySelectorAll(".presenterSubCard, .presenterWhoCard, .presenterRowCompact, .presenterFinalImageCard, .presenterMiniSection").forEach(card => {
-      card.style.width = "100%"
-      card.style.maxWidth = "100%"
-      card.style.marginBottom = "12px"
-      card.style.boxSizing = "border-box"
-    })
-
-    section.querySelectorAll(".archiveBottomGrid").forEach(grid => {
-      grid.style.display = "grid"
-      grid.style.gridTemplateColumns = "1fr 1fr"
-      grid.style.gap = "12px"
-      grid.style.width = "100%"
-      grid.style.maxWidth = "100%"
-      grid.style.boxSizing = "border-box"
-    })
-
-    section.querySelectorAll(".archiveBottomCol").forEach(col => {
-      col.style.display = "flex"
-      col.style.flexDirection = "column"
-      col.style.gap = "12px"
-      col.style.width = "100%"
-      col.style.maxWidth = "100%"
-      col.style.boxSizing = "border-box"
-    })
-
-    section.querySelectorAll("img").forEach(img => {
-      img.style.maxWidth = "100%"
-      img.style.height = "auto"
-      img.style.objectFit = "contain"
-      img.style.display = "block"
-    })
-  }
-
-  try {
-    const overlay = document.getElementById("presenterOverlay")
-    if (!overlay) {
-      showGameToast("افتح ورقة المقدم أولاً")
-      return
-    }
-
-    const panel = overlay.querySelector(".presenterPanel")
-    if (!panel) {
-      showGameToast("تعذر العثور على الصفحة المعروضة")
-      return
-    }
-
-    if (typeof html2canvas === "undefined") {
-      showGameToast("مكتبة html2canvas غير محملة")
-      return
-    }
-
-    if (
-      typeof window.jspdf === "undefined" ||
-      typeof window.jspdf.jsPDF === "undefined"
-    ) {
-      showGameToast("مكتبة jsPDF غير محملة")
-      return
-    }
-
-    showGameToast("جارٍ تجهيز PDF بقياس A4...")
-
-    const A4_EXPORT_WIDTH_PX = isIPhoneLikePrintDevice() ? 1040 : 1240
-
-    cloneWrap = document.createElement("div")
-    cloneWrap.style.position = "fixed"
-    cloneWrap.style.left = "-99999px"
-    cloneWrap.style.top = "0"
-    cloneWrap.style.width = A4_EXPORT_WIDTH_PX + "px"
-    cloneWrap.style.zIndex = "-1"
-    cloneWrap.style.pointerEvents = "none"
-    cloneWrap.style.opacity = "1"
-    cloneWrap.style.background = "#ffffff"
-    cloneWrap.style.padding = isIPhoneLikePrintDevice() ? "20px" : "28px"
-    cloneWrap.style.margin = "0"
-    cloneWrap.style.overflow = "visible"
-    cloneWrap.style.boxSizing = "border-box"
-
-    const clone = panel.cloneNode(true)
-    clone.style.width = "100%"
-    clone.style.maxWidth = "100%"
-    clone.style.height = "auto"
-    clone.style.maxHeight = "none"
-    clone.style.overflow = "visible"
-    clone.style.transform = "none"
-    clone.style.margin = "0 auto"
-    clone.style.boxShadow = "none"
-    clone.style.borderRadius = "0"
-    clone.style.background = "#ffffff"
-    clone.style.boxSizing = "border-box"
-
-    const actions = clone.querySelector(".presenterReaderActions")
-    if (actions) actions.remove()
-
-    clone.querySelectorAll(".presenterContent, .presenterSectionBody, .presenterFinalAll").forEach(el => {
-      el.style.overflow = "visible"
-      el.style.maxHeight = "none"
-      el.style.height = "auto"
-      el.style.boxSizing = "border-box"
-      el.style.width = "100%"
-      el.style.maxWidth = "100%"
-    })
-
-    clone.querySelectorAll(".presenterSectionCard, .presenterFinalBlock").forEach(el => {
-      el.style.width = "100%"
-      el.style.maxWidth = "100%"
-      el.style.margin = "0 0 18px 0"
-      el.style.boxSizing = "border-box"
-    })
-
-    clone.querySelectorAll(".presenterWarmupGrid, .presenterWhoGrid, .presenterTop10Grid, .presenterFinalHorizontal").forEach(el => {
-      el.style.width = "100%"
-      el.style.maxWidth = "100%"
-      el.style.boxSizing = "border-box"
-    })
-
-    clone.querySelectorAll(".presenterFinalImageCard, .presenterMiniSection, .presenterSubCard, .presenterWhoCard").forEach(el => {
-      el.style.boxSizing = "border-box"
-      el.style.maxWidth = "100%"
-    })
-
-    clone.querySelectorAll("img").forEach(img => {
-      img.style.maxWidth = "100%"
-      img.style.height = "auto"
-      img.style.objectFit = "contain"
-      img.style.display = "block"
-    })
-
-    cloneWrap.appendChild(clone)
-    document.body.appendChild(cloneWrap)
-
-    await waitForImagesToLoad(clone)
-    await new Promise(resolve => setTimeout(resolve, 450))
-
-    const sectionNodes = Array.from(clone.querySelectorAll("[data-pdf-section]"))
-    if (!sectionNodes.length) {
-      showGameToast("لم يتم العثور على أقسام التصدير")
-      return
-    }
-
-    const { jsPDF } = window.jspdf
-    const pdf = new jsPDF("p", "mm", "a4")
-
-    const pageWidth = pdf.internal.pageSize.getWidth()
-    const pageHeight = pdf.internal.pageSize.getHeight()
-    const margin = 10
-    const usableWidth = pageWidth - margin * 2
-    const usableHeight = pageHeight - margin * 2
-
-    let addedAnyPage = false
-
-    for (let i = 0; i < sectionNodes.length; i++) {
-      const section = sectionNodes[i]
-
-      prepareSectionForA4(section)
-
-      section.style.width = "100%"
-      section.style.maxWidth = "100%"
-      section.style.boxSizing = "border-box"
-      section.style.pageBreakInside = "avoid"
-      section.style.breakInside = "avoid"
-      section.style.transform = "none"
-      section.style.filter = "none"
-      section.style.backdropFilter = "none"
-      section.style.webkitBackdropFilter = "none"
-      section.style.overflow = "visible"
-      section.style.margin = "0"
-      section.style.paddingLeft = "0"
-      section.style.paddingRight = "0"
-
-      const sectionWidth = Math.max(section.offsetWidth, section.scrollWidth)
-      const sectionHeight = Math.max(section.offsetHeight, section.scrollHeight)
-
-      const canvas = await html2canvas(section, {
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        allowTaint: false,
-        scale: isIPhoneLikePrintDevice() ? 1.5 : 2,
-        logging: false,
-        imageTimeout: 15000,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: sectionWidth,
-        windowHeight: sectionHeight
-      })
-
-      const imgWidthPx = canvas.width
-      const imgHeightPx = canvas.height
-      const pxPerMm = imgWidthPx / usableWidth
-      const sectionHeightMm = imgHeightPx / pxPerMm
-
-      if (addedAnyPage) {
-        pdf.addPage()
-      }
-
-      if (sectionHeightMm <= usableHeight) {
-        const imgData = canvas.toDataURL("image/jpeg", 0.98)
-        pdf.addImage(
-          imgData,
-          "JPEG",
-          margin,
-          margin,
-          usableWidth,
-          sectionHeightMm,
-          undefined,
-          "FAST"
-        )
-      } else {
-        const pageHeightPx = usableHeight * pxPerMm
-        let renderedHeightPx = 0
-        let firstSlice = true
-
-        while (renderedHeightPx < imgHeightPx) {
-          const sliceHeightPx = Math.min(pageHeightPx, imgHeightPx - renderedHeightPx)
-
-          const pageCanvas = document.createElement("canvas")
-          pageCanvas.width = imgWidthPx
-          pageCanvas.height = sliceHeightPx
-
-          const ctx = pageCanvas.getContext("2d")
-          ctx.fillStyle = "#ffffff"
-          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height)
-
-          ctx.drawImage(
-            canvas,
-            0,
-            renderedHeightPx,
-            imgWidthPx,
-            sliceHeightPx,
-            0,
-            0,
-            imgWidthPx,
-            sliceHeightPx
-          )
-
-          const pageData = pageCanvas.toDataURL("image/jpeg", 0.98)
-          const renderHeightMm = sliceHeightPx / pxPerMm
-
-          if (!firstSlice) {
-            pdf.addPage()
-          }
-
-          pdf.addImage(
-            pageData,
-            "JPEG",
-            margin,
-            margin,
-            usableWidth,
-            renderHeightMm,
-            undefined,
-            "FAST"
-          )
-
-          renderedHeightPx += sliceHeightPx
-          firstSlice = false
-        }
-      }
-
-      addedAnyPage = true
-    }
-
-    pdf.save(`presenter-sheet-${currentModel || "export"}.pdf`)
-    showGameToast("تم حفظ PDF بقياس A4")
-  } catch (error) {
-    console.error(error)
-    showGameToast("تعذر تصدير PDF")
-  } finally {
-    if (cloneWrap && cloneWrap.parentNode) {
-      cloneWrap.parentNode.removeChild(cloneWrap)
-    }
-  }
-}
 /* =========================
    Warmup
 ========================= */
@@ -1654,60 +756,105 @@ async function renderWarmupAdmin() {
   })
 
   let html = `
-    <h2 class="adminSectionTitle">التسخين</h2>
-    ${await buildSegmentStatusGrid()}
-    <div class="adminGrid2">
+    <div class="warmupAdminShell">
+      <div class="adminEditorTopBar">
+        <div>
+          <h2 class="adminSectionTitle">التسخين</h2>
+          <div class="adminSectionSubTitle">تحرير أسئلة البداية بشكل مرتب وواضح</div>
+        </div>
+      </div>
+
+      ${await buildSegmentStatusGrid()}
+
+      <div class="warmupAdminGrid">
   `
 
   for (let c = 1; c <= 4; c++) {
     const cat = map[c] || { category_name: "", questions: {} }
 
     html += `
-      <div class="adminCard">
-        <h3>الفئة ${c}</h3>
+      <div class="adminCard warmupCategoryCard">
+        <div class="warmupCategoryHead">
+          <h3>الفئة ${c}</h3>
+        </div>
 
-        <input id="cat${c}" placeholder="اسم الفئة" value="${escapeHtml(cat.category_name || "")}">
+        <div class="adminField">
+          <label>اسم الفئة</label>
+          <input
+            id="cat${c}"
+            placeholder="اسم الفئة"
+            value="${escapeHtml(cat.category_name || "")}"
+          >
+        </div>
 
-        <div class="adminQuestionCard">
+        <div class="adminQuestionCard warmupQuestionCard">
           <div class="adminQuestionCardTop">
             <div class="adminQuestionTitle">سؤال 1</div>
             <button class="adminDeleteBtn" onclick="clearWarmupQuestion(${c},1)">حذف</button>
           </div>
-          <textarea id="q${c}_1" placeholder="سؤال 1">${escapeHtml(cat.questions[1]?.question || "")}</textarea>
-          <input id="a${c}_1" placeholder="إجابة 1" value="${escapeHtml(cat.questions[1]?.answer || "")}">
+
+          <div class="adminField">
+            <label>نص السؤال</label>
+            <textarea id="q${c}_1" placeholder="سؤال 1">${escapeHtml(cat.questions[1]?.question || "")}</textarea>
+          </div>
+
+          <div class="adminField">
+            <label>الإجابة</label>
+            <input id="a${c}_1" placeholder="إجابة 1" value="${escapeHtml(cat.questions[1]?.answer || "")}">
+          </div>
         </div>
 
-        <div class="adminQuestionCard">
+        <div class="adminQuestionCard warmupQuestionCard">
           <div class="adminQuestionCardTop">
             <div class="adminQuestionTitle">سؤال 2</div>
             <button class="adminDeleteBtn" onclick="clearWarmupQuestion(${c},2)">حذف</button>
           </div>
-          <textarea id="q${c}_2" placeholder="سؤال 2">${escapeHtml(cat.questions[2]?.question || "")}</textarea>
-          <input id="a${c}_2" placeholder="إجابة 2" value="${escapeHtml(cat.questions[2]?.answer || "")}">
+
+          <div class="adminField">
+            <label>نص السؤال</label>
+            <textarea id="q${c}_2" placeholder="سؤال 2">${escapeHtml(cat.questions[2]?.question || "")}</textarea>
+          </div>
+
+          <div class="adminField">
+            <label>الإجابة</label>
+            <input id="a${c}_2" placeholder="إجابة 2" value="${escapeHtml(cat.questions[2]?.answer || "")}">
+          </div>
         </div>
 
-        <div class="adminQuestionCard">
+        <div class="adminQuestionCard warmupQuestionCard">
           <div class="adminQuestionCardTop">
             <div class="adminQuestionTitle">سؤال 4</div>
             <button class="adminDeleteBtn" onclick="clearWarmupQuestion(${c},4)">حذف</button>
           </div>
-          <textarea id="q${c}_4" placeholder="سؤال 4">${escapeHtml(cat.questions[4]?.question || "")}</textarea>
-          <input id="a${c}_4" placeholder="إجابة 4" value="${escapeHtml(cat.questions[4]?.answer || "")}">
+
+          <div class="adminField">
+            <label>نص السؤال</label>
+            <textarea id="q${c}_4" placeholder="سؤال 4">${escapeHtml(cat.questions[4]?.question || "")}</textarea>
+          </div>
+
+          <div class="adminField">
+            <label>الإجابة</label>
+            <input id="a${c}_4" placeholder="إجابة 4" value="${escapeHtml(cat.questions[4]?.answer || "")}">
+          </div>
         </div>
       </div>
     `
   }
 
-  html += `</div>
-    <div class="adminActionRow">
-      <button onclick="saveWarmup()">حفظ التسخين</button>
-      <button onclick="deleteWarmupSegment()" class="adminDeleteBtn">حذف الفقرة</button>
-      <button onclick="renderWarmupAdmin()">إعادة تحميل</button>
+  html += `
+      </div>
+
+      <div class="adminActionRow">
+        <button onclick="saveWarmup()" class="adminSaveBtn">حفظ التسخين</button>
+        <button onclick="deleteWarmupSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
+        <button onclick="renderWarmupAdmin()" class="adminReloadBtn">إعادة تحميل</button>
+      </div>
     </div>
   `
 
   editor().innerHTML = html
 }
+
 window.printPresenterAsPdf = function () {
   try {
     const overlay = document.getElementById("presenterOverlay")
@@ -1729,6 +876,7 @@ window.printPresenterAsPdf = function () {
     showGameToast("تعذر فتح الطباعة")
   }
 }
+
 async function saveWarmup() {
   const rows = []
 
@@ -1813,33 +961,54 @@ async function renderTop10Admin() {
   })
 
   let html = `
-    <h2 class="adminSectionTitle">Top 10</h2>
-    ${await buildSegmentStatusGrid()}
-    <div class="adminGrid2">
+    <div class="top10AdminShell">
+      <div class="adminEditorTopBar">
+        <div>
+          <h2 class="adminSectionTitle">Top 10</h2>
+          <div class="adminSectionSubTitle">تحرير جولات الترتيب بشكل واضح ومنظم</div>
+        </div>
+      </div>
+
+      ${await buildSegmentStatusGrid()}
+
+      <div class="top10AdminGrid">
   `
 
   for (let r = 1; r <= 3; r++) {
     const round = map[r] || { question: "", answers: {} }
 
     html += `
-      <div class="adminCard">
-        <div class="adminQuestionCardTop">
+      <div class="adminCard top10RoundCard">
+        <div class="adminQuestionCardTop top10RoundHead">
           <h3>الجولة ${r}</h3>
           <button class="adminDeleteBtn" onclick="clearTop10Round(${r})">حذف الجولة</button>
         </div>
-        <input id="topq${r}" placeholder="السؤال" value="${escapeHtml(round.question || "")}">
-        ${Array.from({ length: 10 }, (_, i) => i + 1).map(i => `
-          <input id="top${r}_${i}" placeholder="إجابة ${i}" value="${escapeHtml(round.answers[i] || "")}">
-        `).join("")}
+
+        <div class="adminField">
+          <label>السؤال الرئيسي</label>
+          <input id="topq${r}" placeholder="السؤال" value="${escapeHtml(round.question || "")}">
+        </div>
+
+        <div class="top10AnswersGrid">
+          ${Array.from({ length: 10 }, (_, i) => i + 1).map(i => `
+            <div class="top10AnswerRow">
+              <div class="top10AnswerNo">${i}</div>
+              <input id="top${r}_${i}" placeholder="إجابة ${i}" value="${escapeHtml(round.answers[i] || "")}">
+            </div>
+          `).join("")}
+        </div>
       </div>
     `
   }
 
-  html += `</div>
-    <div class="adminActionRow">
-      <button onclick="saveTop10()">حفظ Top 10</button>
-      <button onclick="deleteTop10Segment()" class="adminDeleteBtn">حذف الفقرة</button>
-      <button onclick="renderTop10Admin()">إعادة تحميل</button>
+  html += `
+      </div>
+
+      <div class="adminActionRow">
+        <button onclick="saveTop10()" class="adminSaveBtn">حفظ Top 10</button>
+        <button onclick="deleteTop10Segment()" class="adminDeleteAllBtn">حذف الفقرة</button>
+        <button onclick="renderTop10Admin()" class="adminReloadBtn">إعادة تحميل</button>
+      </div>
     </div>
   `
 
@@ -1908,62 +1077,123 @@ async function renderAuctionAdmin() {
 
   if (error) {
     console.log(error)
-    showGameToast("تعذر تحميل المزاد")
+    showGameToast("تعذر تحميل الفقرة")
     return
   }
 
-  const map = {}
-  let maxNumber = 0
+  const { data: settingsData, error: settingsError } = await db
+    .from("segment_settings")
+    .select("item_count")
+    .eq("model", currentModel)
+    .eq("segment", "auction")
+    .maybeSingle()
 
+  if (settingsError) {
+    console.log(settingsError)
+  }
+
+  auctionAdminCount = Math.min(
+    Math.max(Number(settingsData?.item_count || 8), 1),
+    8
+  )
+
+  const map = {}
   ;(data || []).forEach(row => {
     map[row.number] = row
-    if (Number(row.number) > maxNumber) maxNumber = Number(row.number)
   })
 
-  auctionAdminCount = Math.max(maxNumber || 0, 8)
-
   editor().innerHTML = `
-    <h2 class="adminSectionTitle">المزاد</h2>
-    ${await buildSegmentStatusGrid()}
-
-    <div class="adminAuctionTopBar">
-      <div class="adminField adminAuctionCountField">
-        <label for="auctionCountInput">عدد أسئلة المزاد</label>
-        <input id="auctionCountInput" type="number" min="4" value="${auctionAdminCount}">
-      </div>
-
-      <div class="adminAuctionTopActions">
-        <button onclick="applyAuctionCount()">تحديث العدد</button>
-      </div>
-    </div>
-
-    <div class="adminGrid2">
-      ${Array.from({ length: auctionAdminCount }, (_, idx) => idx + 1).map(i => `
-        <div class="adminCard">
-          <div class="adminQuestionCardTop">
-            <h3>السؤال ${i}</h3>
-            <button class="adminDeleteBtn" onclick="clearAuctionQuestion(${i})">حذف</button>
-          </div>
-          <textarea id="auction${i}" placeholder="السؤال">${escapeHtml(map[i]?.question || "")}</textarea>
-          <input id="auctionAnswer${i}" placeholder="الإجابة" value="${escapeHtml(map[i]?.answer || "")}">
-          <input id="auctionIncrement${i}" type="number" min="1" placeholder="الزيادة" value="${Number(map[i]?.increment || 1)}">
+    <div class="auctionAdminShell">
+      <div class="adminEditorTopBar">
+        <div>
+          <h2 class="adminSectionTitle">المزاد</h2>
+          <div class="adminSectionSubTitle">تحرير أسئلة الصور والمزاد بشكل منظم</div>
         </div>
-      `).join("")}
-    </div>
+      </div>
 
-    <div class="adminActionRow">
-      <button onclick="saveAuction()">حفظ المزاد</button>
-      <button onclick="deleteAuctionSegment()" class="adminDeleteBtn">حذف الفقرة</button>
-      <button onclick="renderAuctionAdmin()">إعادة تحميل</button>
+      ${await buildSegmentStatusGrid()}
+
+      <div class="auctionTopCompactRow">
+        <div class="auctionTopCompactBox auctionTopCompactTitleBox">
+          <div class="adminField compactCountField">
+            <label for="auctionCountInput">عدد الأسئلة</label>
+            <div class="compactCountSelectWrap">
+              <select id="auctionCountInput" class="compactCountSelect">
+                <option value="1" ${auctionAdminCount === 1 ? "selected" : ""}>1</option>
+                <option value="2" ${auctionAdminCount === 2 ? "selected" : ""}>2</option>
+                <option value="3" ${auctionAdminCount === 3 ? "selected" : ""}>3</option>
+                <option value="4" ${auctionAdminCount === 4 ? "selected" : ""}>4</option>
+                <option value="5" ${auctionAdminCount === 5 ? "selected" : ""}>5</option>
+                <option value="6" ${auctionAdminCount === 6 ? "selected" : ""}>6</option>
+                <option value="7" ${auctionAdminCount === 7 ? "selected" : ""}>7</option>
+                <option value="8" ${auctionAdminCount === 8 ? "selected" : ""}>8</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="auctionTopCompactBox auctionTopCompactActionBox">
+          <button onclick="applyAuctionCount()" class="adminBtn adminBtnMango compactCountBtn">تحديث العدد</button>
+        </div>
+      </div>
+
+      <div class="auctionAdminGrid">
+        ${Array.from({ length: auctionAdminCount }, (_, idx) => idx + 1).map(i => `
+          <div class="adminCard auctionQuestionCard">
+            <div class="adminQuestionCardTop auctionQuestionHead">
+              <h3>السؤال ${i}</h3>
+              <button class="adminDeleteBtn" onclick="clearAuctionQuestion(${i})">حذف</button>
+            </div>
+
+            <div class="adminField">
+              <label>الصورة</label>
+              <input type="file" id="auctionFile${i}" accept="image/*">
+            </div>
+
+            <div class="adminField">
+              <label>السؤال</label>
+              <textarea id="auction${i}" placeholder="السؤال">${escapeHtml(map[i]?.question || "")}</textarea>
+            </div>
+
+            <div class="adminField">
+              <label>الإجابة</label>
+              <input
+                id="auctionAnswer${i}"
+                placeholder="الإجابة"
+                value="${escapeHtml(map[i]?.answer || "")}"
+              >
+            </div>
+
+            <div class="adminField">
+              <label>ملاحظة اختيارية</label>
+              <input
+                id="auctionNote${i}"
+                placeholder="ملاحظة اختيارية"
+                value="${escapeHtml(map[i]?.note || "")}"
+              >
+            </div>
+
+            <div class="auctionPreviewBox">
+              ${map[i]?.image ? `<img src="${escapeHtml(map[i].image)}" class="previewImg">` : ""}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="adminActionRow">
+        <button onclick="saveAuction()" class="adminSaveBtn">حفظ الفقرة</button>
+        <button onclick="deleteAuctionSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
+        <button onclick="renderAuctionAdmin()" class="adminReloadBtn">إعادة تحميل</button>
+      </div>
     </div>
   `
 }
 
 function applyAuctionCount() {
   const count = Number(document.getElementById("auctionCountInput")?.value || 8)
-  auctionAdminCount = Math.max(count, 4)
+  auctionAdminCount = Math.min(Math.max(count, 1), 8)
   renderAuctionAdminWithCount(auctionAdminCount)
-  showGameToast("تم تحديث عدد أسئلة المزاد")
+  showGameToast("تم تحديث عدد الأسئلة")
 }
 
 async function renderAuctionAdminWithCount(count) {
@@ -1975,7 +1205,7 @@ async function renderAuctionAdminWithCount(count) {
 
   if (error) {
     console.log(error)
-    showGameToast("تعذر تحميل المزاد")
+    showGameToast("تعذر تحميل الفقرة")
     return
   }
 
@@ -1984,46 +1214,140 @@ async function renderAuctionAdminWithCount(count) {
     map[row.number] = row
   })
 
+  auctionAdminCount = Math.min(Math.max(count, 1), 8)
+
   editor().innerHTML = `
-    <h2 class="adminSectionTitle">المزاد</h2>
-    ${await buildSegmentStatusGrid()}
-
-    <div class="adminAuctionTopBar">
-      <div class="adminField adminAuctionCountField">
-        <label for="auctionCountInput">عدد أسئلة المزاد</label>
-        <input id="auctionCountInput" type="number" min="4" value="${count}">
-      </div>
-
-      <div class="adminAuctionTopActions">
-        <button onclick="applyAuctionCount()">تحديث العدد</button>
-      </div>
-    </div>
-
-    <div class="adminGrid2">
-      ${Array.from({ length: count }, (_, idx) => idx + 1).map(i => `
-        <div class="adminCard">
-          <div class="adminQuestionCardTop">
-            <h3>السؤال ${i}</h3>
-            <button class="adminDeleteBtn" onclick="clearAuctionQuestion(${i})">حذف</button>
-          </div>
-          <textarea id="auction${i}" placeholder="السؤال">${escapeHtml(map[i]?.question || "")}</textarea>
-          <input id="auctionAnswer${i}" placeholder="الإجابة" value="${escapeHtml(map[i]?.answer || "")}">
-          <input id="auctionIncrement${i}" type="number" min="1" placeholder="الزيادة" value="${Number(map[i]?.increment || 1)}">
+    <div class="auctionAdminShell">
+      <div class="adminEditorTopBar">
+        <div>
+          <h2 class="adminSectionTitle">المزاد</h2>
+          <div class="adminSectionSubTitle">تحرير أسئلة الصور والمزاد بشكل منظم</div>
         </div>
-      `).join("")}
-    </div>
+      </div>
 
-    <div class="adminActionRow">
-      <button onclick="saveAuction()">حفظ المزاد</button>
-      <button onclick="deleteAuctionSegment()" class="adminDeleteBtn">حذف الفقرة</button>
-      <button onclick="renderAuctionAdmin()">إعادة تحميل</button>
+      ${await buildSegmentStatusGrid()}
+
+      <div class="auctionTopCompactRow">
+        <div class="auctionTopCompactBox auctionTopCompactTitleBox">
+          <div class="adminField compactCountField">
+            <label for="auctionCountInput">عدد الأسئلة</label>
+            <div class="compactCountSelectWrap">
+              <select id="auctionCountInput" class="compactCountSelect">
+                <option value="1" ${auctionAdminCount === 1 ? "selected" : ""}>1</option>
+                <option value="2" ${auctionAdminCount === 2 ? "selected" : ""}>2</option>
+                <option value="3" ${auctionAdminCount === 3 ? "selected" : ""}>3</option>
+                <option value="4" ${auctionAdminCount === 4 ? "selected" : ""}>4</option>
+                <option value="5" ${auctionAdminCount === 5 ? "selected" : ""}>5</option>
+                <option value="6" ${auctionAdminCount === 6 ? "selected" : ""}>6</option>
+                <option value="7" ${auctionAdminCount === 7 ? "selected" : ""}>7</option>
+                <option value="8" ${auctionAdminCount === 8 ? "selected" : ""}>8</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="auctionTopCompactBox auctionTopCompactActionBox">
+          <button onclick="applyAuctionCount()" class="adminBtn adminBtnMango compactCountBtn">تحديث العدد</button>
+        </div>
+      </div>
+
+      <div class="auctionAdminGrid">
+        ${Array.from({ length: auctionAdminCount }, (_, idx) => idx + 1).map(i => `
+          <div class="adminCard auctionQuestionCard">
+            <div class="adminQuestionCardTop auctionQuestionHead">
+              <h3>السؤال ${i}</h3>
+              <button class="adminDeleteBtn" onclick="clearAuctionQuestion(${i})">حذف</button>
+            </div>
+
+            <div class="adminField">
+              <label>الصورة</label>
+              <input type="file" id="auctionFile${i}" accept="image/*">
+            </div>
+
+            <div class="adminField">
+              <label>السؤال</label>
+              <textarea id="auction${i}" placeholder="السؤال">${escapeHtml(map[i]?.question || "")}</textarea>
+            </div>
+
+            <div class="adminField">
+              <label>الإجابة</label>
+              <input
+                id="auctionAnswer${i}"
+                placeholder="الإجابة"
+                value="${escapeHtml(map[i]?.answer || "")}"
+              >
+            </div>
+
+            <div class="adminField">
+              <label>ملاحظة اختيارية</label>
+              <input
+                id="auctionNote${i}"
+                placeholder="ملاحظة اختيارية"
+                value="${escapeHtml(map[i]?.note || "")}"
+              >
+            </div>
+
+            <div class="auctionPreviewBox">
+              ${map[i]?.image ? `<img src="${escapeHtml(map[i].image)}" class="previewImg">` : ""}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="adminActionRow">
+        <button onclick="saveAuction()" class="adminSaveBtn">حفظ الفقرة</button>
+        <button onclick="deleteAuctionSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
+        <button onclick="renderAuctionAdmin()" class="adminReloadBtn">إعادة تحميل</button>
+      </div>
     </div>
   `
 }
 
 async function saveAuction() {
   const count = Number(document.getElementById("auctionCountInput")?.value || auctionAdminCount || 8)
-  const finalCount = Math.max(count, 4)
+  const finalCount = Math.min(Math.max(count, 1), 8)
+
+  const { data: oldRows, error: oldError } = await db
+    .from("auction_questions")
+    .select("number, image")
+    .eq("model", currentModel)
+
+  if (oldError) {
+    console.log(oldError)
+    showGameToast("تعذر قراءة البيانات القديمة")
+    return
+  }
+
+  const oldMap = {}
+  ;(oldRows || []).forEach(row => {
+    oldMap[row.number] = row
+  })
+
+  const rows = []
+
+  for (let i = 1; i <= finalCount; i++) {
+    const file = document.getElementById(`auctionFile${i}`)?.files[0]
+    const question = (document.getElementById(`auction${i}`)?.value || "").trim()
+    const answer = (document.getElementById(`auctionAnswer${i}`)?.value || "").trim()
+    const note = (document.getElementById(`auctionNote${i}`)?.value || "").trim()
+
+    let image = oldMap[i]?.image || ""
+
+    if (file) {
+      image = await uploadImageFile(file, `auction_${i}`)
+    }
+
+    if (!question && !answer && !image && !note) continue
+
+    rows.push({
+      model: currentModel,
+      number: i,
+      question,
+      answer,
+      image,
+      note
+    })
+  }
 
   const { error: delError } = await db
     .from("auction_questions")
@@ -2032,48 +1356,51 @@ async function saveAuction() {
 
   if (delError) {
     console.log(delError)
-    showGameToast("فشل حذف القديم")
+    showGameToast("فشل حذف البيانات القديمة")
     return
   }
 
-  const rows = []
+  if (rows.length) {
+    const { error: insError } = await db
+      .from("auction_questions")
+      .insert(rows)
 
-  for (let i = 1; i <= finalCount; i++) {
-    const question = (document.getElementById(`auction${i}`)?.value || "").trim()
-    const answer = (document.getElementById(`auctionAnswer${i}`)?.value || "").trim()
-    const increment = Number(document.getElementById(`auctionIncrement${i}`)?.value || 1)
-
-    if (!question && !answer) continue
-
-    rows.push({
-      model: currentModel,
-      number: i,
-      question,
-      answer,
-      increment
-    })
+    if (insError) {
+      console.log(insError)
+      showGameToast("فشل حفظ الفقرة")
+      return
+    }
   }
 
-  if (!rows.length) {
-    showGameToast("تم حذف جميع أسئلة المزاد")
-    auctionAdminCount = finalCount
-    await renderAuctionAdmin()
-    return
-  }
+  const { error: settingsError } = await db
+    .from("segment_settings")
+    .upsert(
+      {
+        model: currentModel,
+        segment: "auction",
+        item_count: finalCount
+      },
+      {
+        onConflict: "model,segment"
+      }
+    )
 
-  const { error: insError } = await db.from("auction_questions").insert(rows)
-
-  if (insError) {
-    console.log(insError)
-    showGameToast("فشل حفظ المزاد")
+  if (settingsError) {
+    console.log(settingsError)
+    showGameToast("تم حفظ الفقرة لكن تعذر حفظ عدد الأسئلة")
     return
   }
 
   auctionAdminCount = finalCount
-  showGameToast("تم حفظ المزاد")
+
+  if (!rows.length) {
+    showGameToast("تم حذف جميع الأسئلة")
+  } else {
+    showGameToast("تم حفظ الفقرة")
+  }
+
   await renderAuctionAdmin()
 }
-
 /* =========================
    Who
 ========================= */
@@ -2097,30 +1424,56 @@ async function renderWhoAdmin() {
   })
 
   let html = `
-    <h2 class="adminSectionTitle">من هو</h2>
-    ${await buildSegmentStatusGrid()}
-    <div class="adminGrid2">
+    <div class="whoAdminShell">
+      <div class="adminEditorTopBar">
+        <div>
+          <h2 class="adminSectionTitle">من هو</h2>
+          <div class="adminSectionSubTitle">ارفع الصور واكتب الإجابات بشكل مرتب وسريع</div>
+        </div>
+      </div>
+
+      ${await buildSegmentStatusGrid()}
+
+      <div class="whoAdminGrid">
   `
 
   for (let i = 1; i <= 15; i++) {
     html += `
-      <div class="adminCard">
-        <div class="adminQuestionCardTop">
+      <div class="adminCard whoItemCard">
+        <div class="adminQuestionCardTop whoItemHead">
           <h3>رقم ${i}</h3>
           <button class="adminDeleteBtn" onclick="clearWhoItem(${i})">حذف</button>
         </div>
-        <input type="file" id="who${i}" accept="image/*">
-        <input id="whoAnswer${i}" placeholder="الإجابة" value="${escapeHtml(map[i]?.answer || "")}">
-        ${map[i]?.image ? `<img src="${escapeHtml(map[i].image)}" class="previewImg">` : ""}
+
+        <div class="adminField">
+          <label>الصورة</label>
+          <input type="file" id="who${i}" accept="image/*">
+        </div>
+
+        <div class="adminField">
+          <label>الإجابة</label>
+          <input
+            id="whoAnswer${i}"
+            placeholder="الإجابة"
+            value="${escapeHtml(map[i]?.answer || "")}"
+          >
+        </div>
+
+        <div class="whoPreviewBox">
+          ${map[i]?.image ? `<img src="${escapeHtml(map[i].image)}" class="previewImg">` : ""}
+        </div>
       </div>
     `
   }
 
-  html += `</div>
-    <div class="adminActionRow">
-      <button onclick="saveWho()">حفظ من هو</button>
-      <button onclick="deleteWhoSegment()" class="adminDeleteBtn">حذف الفقرة</button>
-      <button onclick="renderWhoAdmin()">إعادة تحميل</button>
+  html += `
+      </div>
+
+      <div class="adminActionRow">
+        <button onclick="saveWho()" class="adminSaveBtn">حفظ من هو</button>
+        <button onclick="deleteWhoSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
+        <button onclick="renderWhoAdmin()" class="adminReloadBtn">إعادة تحميل</button>
+      </div>
     </div>
   `
 
@@ -2128,6 +1481,22 @@ async function renderWhoAdmin() {
 }
 
 async function saveWho() {
+  const { data: oldRows, error: oldReadError } = await db
+    .from("who_images")
+    .select("*")
+    .eq("model", currentModel)
+
+  if (oldReadError) {
+    console.log(oldReadError)
+    showGameToast("تعذر قراءة بيانات من هو القديمة")
+    return
+  }
+
+  const oldMap = {}
+  ;(oldRows || []).forEach(row => {
+    oldMap[row.number] = row
+  })
+
   const { error: delError } = await db
     .from("who_images")
     .delete()
@@ -2145,11 +1514,7 @@ async function saveWho() {
     const file = document.getElementById(`who${i}`)?.files[0]
     const answer = (document.getElementById(`whoAnswer${i}`)?.value || "").trim()
 
-    let oldImage = ""
-    const existing = await db.from("who_images").select("image").eq("model", currentModel).eq("number", i).maybeSingle()
-    if (existing?.data?.image) oldImage = existing.data.image
-
-    let image = oldImage
+    let image = oldMap[i]?.image || ""
     if (file) image = await uploadImageFile(file, `who_${i}`)
 
     if (!image && !answer) continue
@@ -2184,8 +1549,6 @@ async function saveWho() {
    Final - Admin كامل
 ========================= */
 
-let finalAdminRound = 1
-
 async function renderFinalAdmin() {
   finalAdminRound = 1
   await renderFinalAdminRound(1)
@@ -2207,29 +1570,59 @@ async function renderFinalAdminRound(round) {
     return
   }
 
+  const round1CountBox = round === 1
+  ? `
+    <div class="finalTopCompactBox finalTopCompactCountBox">
+      <div class="adminField compactCountField">
+        <label>عدد الأرقام</label>
+        <div class="compactCountSelectWrap">
+          <select id="finalRound1CardsCount" class="compactCountSelect">
+            <option value="4" ${Number(metaData?.cards_count || 4) === 4 ? "selected" : ""}>4</option>
+            <option value="6" ${Number(metaData?.cards_count || 4) === 6 ? "selected" : ""}>6</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  `
+  : `<div class="finalTopCompactBox finalTopCompactGhost"></div>`
+
   let html = `
-    <div class="finalAdminShell">
-      <h2 class="adminSectionTitle">الفاصلة</h2>
+    <div class="finalAdminShell cleanFinalAdminShell">
+      <div class="adminEditorTopBar">
+        <div>
+          <h2 class="adminSectionTitle">الفاصلة</h2>
+          <div class="adminSectionSubTitle">تحرير الجولات النهائية بشكل مرتب وواضح</div>
+        </div>
+      </div>
+
       ${await buildSegmentStatusGrid()}
 
-      <div class="finalAdminTopBar">
-        <div class="finalAdminRoundsBar">
-          <button class="${round === 1 ? "activeFinalAdminRound" : ""}" onclick="renderFinalAdminRound(1)">الجولة 1</button>
-          <button class="${round === 2 ? "activeFinalAdminRound" : ""}" onclick="renderFinalAdminRound(2)">الجولة 2</button>
-          <button class="${round === 3 ? "activeFinalAdminRound" : ""}" onclick="renderFinalAdminRound(3)">الجولة 3</button>
-        </div>
-
-        <div class="finalAdminTitleCard">
+      <div class="finalTopCompactRow">
+        <div class="finalTopCompactBox finalTopCompactTitleBox">
           <div class="adminField">
             <label>اسم الجولة</label>
-            <input id="finalRoundTitle" value="${escapeHtml(metaData?.title || `الجولة ${round}`)}" placeholder="اسم الجولة">
+            <input
+              id="finalRoundTitle"
+              value="${escapeHtml(metaData?.title || `الجولة ${round}`)}"
+              placeholder="اسم الجولة"
+            >
           </div>
         </div>
+
+        <div class="finalTopCompactBox finalTopCompactTabsBox">
+          <div class="finalAdminRoundsBar cleanRoundsBar">
+            <button class="${round === 1 ? "activeFinalAdminRound" : ""}" onclick="renderFinalAdminRound(1)">الجولة 1</button>
+            <button class="${round === 2 ? "activeFinalAdminRound" : ""}" onclick="renderFinalAdminRound(2)">الجولة 2</button>
+            <button class="${round === 3 ? "activeFinalAdminRound" : ""}" onclick="renderFinalAdminRound(3)">الجولة 3</button>
+          </div>
+        </div>
+
+        ${round1CountBox}
       </div>
   `
 
   if (round === 1) {
-    html += await buildFinalRound1Admin(metaData)
+    html += await buildFinalRound1Admin(metaData, true)
   }
 
   if (round === 2) {
@@ -2242,10 +1635,10 @@ async function renderFinalAdminRound(round) {
 
   html += `
       <div class="finalAdminActions">
-        <button onclick="saveFinalRound(${round})">حفظ الجولة</button>
+        <button onclick="saveFinalRound(${round})" class="adminSaveBtn">حفظ الجولة</button>
         <button onclick="deleteFinalRound(${round})" class="adminDeleteBtn">حذف هذه الجولة</button>
-        <button onclick="deleteFinalSegment()" class="adminDeleteBtn">حذف الفقرة كاملة</button>
-        <button onclick="renderFinalAdminRound(${round})">إعادة تحميل</button>
+        <button onclick="deleteFinalSegment()" class="adminDeleteAllBtn">حذف الفقرة كاملة</button>
+        <button onclick="renderFinalAdminRound(${round})" class="adminReloadBtn">إعادة تحميل</button>
       </div>
     </div>
   `
@@ -2253,11 +1646,62 @@ async function renderFinalAdminRound(round) {
   editor().innerHTML = html
 }
 
+async function saveFinalRound(round) {
+  const title = (document.getElementById("finalRoundTitle")?.value || "").trim() || `الجولة ${round}`
+
+  let cardsCount = null
+  if (round === 1) {
+    cardsCount = Number(document.getElementById("finalRound1CardsCount")?.value || 4)
+  }
+
+  const { error: deleteMetaError } = await db
+    .from("final_round_meta")
+    .delete()
+    .eq("model", currentModel)
+    .eq("round", round)
+
+  if (deleteMetaError) {
+    console.log(deleteMetaError)
+    showGameToast("تعذر حذف بيانات الجولة")
+    return
+  }
+
+  const { error: insertMetaError } = await db
+    .from("final_round_meta")
+    .insert([{
+      model: currentModel,
+      round,
+      title,
+      cards_count: cardsCount
+    }])
+
+  if (insertMetaError) {
+    console.log(insertMetaError)
+    showGameToast("تعذر حفظ اسم الجولة")
+    return
+  }
+
+  if (round === 1) {
+    await saveFinalRound1(cardsCount)
+  }
+
+  if (round === 2) {
+    await saveFinalRound2()
+  }
+
+  if (round === 3) {
+    await saveFinalRound3()
+  }
+
+  showGameToast(`تم حفظ الجولة ${round}`)
+  await renderFinalAdminRound(round)
+}
+
 /* =========================
    Round 1 Admin
 ========================= */
 
-async function buildFinalRound1Admin(metaData) {
+async function buildFinalRound1Admin(metaData, countAlreadyShown = false) {
   const { data, error } = await db
     .from("final_round1_items")
     .select("*")
@@ -2277,30 +1721,35 @@ async function buildFinalRound1Admin(metaData) {
   const cardsCount = Number(metaData?.cards_count || 4)
 
   let html = `
-    <div class="finalAdminTitleCard finalAdminSubCard">
-      <div class="adminField">
-        <label>عدد الأرقام</label>
-        <select id="finalRound1CardsCount">
-          <option value="4" ${cardsCount === 4 ? "selected" : ""}>4</option>
-          <option value="6" ${cardsCount === 6 ? "selected" : ""}>6</option>
-        </select>
+    ${countAlreadyShown ? "" : `
+      <div class="finalAdminHeadOptions">
+        <div class="finalAdminTitleCard finalAdminSubCard">
+          <div class="adminField">
+            <label>عدد الأرقام</label>
+            <select id="finalRound1CardsCount">
+              <option value="4" ${cardsCount === 4 ? "selected" : ""}>4</option>
+              <option value="6" ${cardsCount === 6 ? "selected" : ""}>6</option>
+            </select>
+          </div>
+        </div>
       </div>
-    </div>
+    `}
 
     <div class="finalAdminGrid finalAdminGridRound1">
   `
 
   for (let i = 1; i <= 6; i++) {
-    const dimmed = i > cardsCount ? 'style="opacity:.35;"' : ''
+    const dimmed = i > cardsCount ? 'style="opacity:.38;"' : ''
+    const isTextCard = i <= 3
 
     html += `
-      <div class="finalAdminCard" ${dimmed}>
+      <div class="finalAdminCard finalRound1AdminCard" ${dimmed}>
         <div class="finalAdminCardHead">
           <h3>رقم ${i}</h3>
           <button class="adminDeleteBtn" onclick="clearFinalRound1Item(${i})">حذف</button>
         </div>
 
-        <div class="finalAdminRowSingle">
+        <div class="finalAdminRowSingle finalAdminRound1Fields">
           <div class="adminField">
             <label>الصورة</label>
             <input type="file" id="finalRound1File_${i}" accept="image/*">
@@ -2325,6 +1774,23 @@ async function buildFinalRound1Admin(metaData) {
           </div>
         </div>
 
+        ${
+          isTextCard
+            ? `
+              <div class="finalAdminRowSingle finalAdminRowSingleText">
+                <div class="adminField finalTextCardField">
+                  <label>نص القصاصة</label>
+                  <textarea
+                    id="finalRound1CardText_${i}"
+                    placeholder="اكتب النص الذي سيظهر في القصاصة التاريخية"
+                    rows="4"
+                  >${escapeHtml(map[i]?.card_text || "")}</textarea>
+                </div>
+              </div>
+            `
+            : ""
+        }
+
         <div class="finalAdminPreviewBox">
           ${map[i]?.image ? `<img src="${escapeHtml(map[i].image)}" class="previewImg">` : ""}
         </div>
@@ -2337,15 +1803,50 @@ async function buildFinalRound1Admin(metaData) {
 }
 
 async function saveFinalRound1(cardsCount) {
-  const { data: oldRows } = await db
+  const finalCardsCount = Number(cardsCount || document.getElementById("finalRound1CardsCount")?.value || 4)
+
+  const { data: oldRows, error: oldError } = await db
     .from("final_round1_items")
     .select("*")
     .eq("model", currentModel)
+
+  if (oldError) {
+    console.log(oldError)
+    showGameToast("تعذر قراءة الجولة الأولى القديمة")
+    return
+  }
 
   const oldMap = {}
   ;(oldRows || []).forEach(row => {
     oldMap[row.number] = row
   })
+
+  const rows = []
+
+  for (let i = 1; i <= finalCardsCount; i++) {
+    const file = document.getElementById(`finalRound1File_${i}`)?.files?.[0]
+    const answer = (document.getElementById(`finalRound1Answer_${i}`)?.value || "").trim()
+    const note = (document.getElementById(`finalRound1Note_${i}`)?.value || "").trim()
+    const cardText = i <= 3
+      ? (document.getElementById(`finalRound1CardText_${i}`)?.value || "").trim()
+      : ""
+
+    let image = oldMap[i]?.image || ""
+    if (file) {
+      image = await uploadImageFile(file, `final_r1_${i}`)
+    }
+
+    if (!image && !answer && !note && !cardText) continue
+
+    rows.push({
+      model: currentModel,
+      number: i,
+      image,
+      answer,
+      note,
+      card_text: cardText
+    })
+  }
 
   const { error: delError } = await db
     .from("final_round1_items")
@@ -2358,57 +1859,22 @@ async function saveFinalRound1(cardsCount) {
     return
   }
 
-  const rows = []
-
-  for (let i = 1; i <= cardsCount; i++) {
-    const file = document.getElementById(`finalRound1File_${i}`)?.files?.[0]
-    const answer = (document.getElementById(`finalRound1Answer_${i}`)?.value || "").trim()
-    const note = (document.getElementById(`finalRound1Note_${i}`)?.value || "").trim()
-
-    let image = oldMap[i]?.image || ""
-    if (file) {
-      image = await uploadImageFile(file, `final_r1_${i}`)
-    }
-
-    if (!image && !answer && !note) continue
-
-    rows.push({
-      model: currentModel,
-      number: i,
-      image,
-      answer,
-      note
-    })
-  }
-
-  if (rows.length) {
-    const { error: insError } = await db.from("final_round1_items").insert(rows)
-    if (insError) {
-      console.log(insError)
-      showGameToast("فشل حفظ الجولة الأولى")
-    }
-  }
-}
-
-async function clearFinalRound1Item(number) {
-  const confirmed = window.confirm(`حذف العنصر ${number} من الجولة الأولى؟`)
-  if (!confirmed) return
-
-  const { error } = await db
-    .from("final_round1_items")
-    .delete()
-    .eq("model", currentModel)
-    .eq("number", number)
-
-  if (error) {
-    console.log(error)
-    showGameToast("تعذر حذف العنصر")
+  if (!rows.length) {
+    showGameToast("لا توجد بيانات للحفظ في الجولة الأولى")
     return
   }
 
-  showGameToast(`تم حذف العنصر ${number}`)
-  await renderFinalAdminRound(1)
-} 
+  const { error: insError } = await db
+    .from("final_round1_items")
+    .insert(rows)
+
+  if (insError) {
+    console.log(insError)
+    showGameToast("فشل حفظ الجولة الأولى")
+    return
+  }
+}
+
 /* =========================
    Round 2 Admin
 ========================= */
@@ -2443,7 +1909,7 @@ async function buildFinalRound2Admin() {
       <div class="finalAdminCard finalAdminWideCard">
         <div class="finalAdminCardHead">
           <h3>رقم ${number}</h3>
-          <div class="finalAdminTypeBadge">${isScramble ? "كلمات مبعثرة" : "15 تلميحة او اقل"}</div>
+          <div class="finalAdminTypeBadge">${isScramble ? "كلمات مبعثرة" : "ترتيب / تسلسل"}</div>
         </div>
 
         <div class="finalAdminRound2RowsWrap">
@@ -2568,114 +2034,6 @@ async function buildFinalRound3Admin() {
 
   html += `</div>`
   return html
-}
-
-/* =========================
-   Save Final Round
-========================= */
-
-async function saveFinalRound(round) {
-  const title = (document.getElementById("finalRoundTitle")?.value || "").trim() || `الجولة ${round}`
-
-  let cardsCount = null
-  if (round === 1) {
-    cardsCount = Number(document.getElementById("finalRound1CardsCount")?.value || 4)
-  }
-
-  const { error: deleteMetaError } = await db
-    .from("final_round_meta")
-    .delete()
-    .eq("model", currentModel)
-    .eq("round", round)
-
-  if (deleteMetaError) {
-    console.log(deleteMetaError)
-    showGameToast("تعذر حذف بيانات الجولة")
-    return
-  }
-
-  const { error: insertMetaError } = await db
-    .from("final_round_meta")
-    .insert([{
-      model: currentModel,
-      round,
-      title,
-      cards_count: cardsCount
-    }])
-
-  if (insertMetaError) {
-    console.log(insertMetaError)
-    showGameToast("تعذر حفظ اسم الجولة")
-    return
-  }
-
-  if (round === 1) {
-    await saveFinalRound1(cardsCount)
-  }
-
-  if (round === 2) {
-    await saveFinalRound2()
-  }
-
-  if (round === 3) {
-    await saveFinalRound3()
-  }
-
-  showGameToast(`تم حفظ الجولة ${round}`)
-  await renderFinalAdminRound(round)
-}
-
-async function saveFinalRound1(cardsCount) {
-  const { data: oldRows } = await db
-    .from("final_round1_items")
-    .select("*")
-    .eq("model", currentModel)
-
-  const oldMap = {}
-  ;(oldRows || []).forEach(row => {
-    oldMap[row.number] = row
-  })
-
-  const { error: delError } = await db
-    .from("final_round1_items")
-    .delete()
-    .eq("model", currentModel)
-
-  if (delError) {
-    console.log(delError)
-    showGameToast("تعذر حذف الجولة الأولى القديمة")
-    return
-  }
-
-  const rows = []
-
-  for (let i = 1; i <= cardsCount; i++) {
-    const file = document.getElementById(`finalRound1File_${i}`)?.files?.[0]
-    const answer = (document.getElementById(`finalRound1Answer_${i}`)?.value || "").trim()
-const note = (document.getElementById(`finalRound1Note_${i}`)?.value || "").trim()
-    let image = oldMap[i]?.image || ""
-    if (file) {
-      image = await uploadImageFile(file, `final_r1_${i}`)
-    }
-
-    if (!image && !answer && !note) continue
-
-    rows.push({
-  model: currentModel,
-  number: i,
-  image,
-  answer,
-  note
-})
-  }
-
-  if (rows.length) {
-    const { error: insError } = await db.from("final_round1_items").insert(rows)
-    if (insError) {
-      console.log(insError)
-      showGameToast("فشل حفظ الجولة الأولى")
-    }
-  }
 }
 
 async function saveFinalRound2() {
@@ -2855,14 +2213,6 @@ async function clearFinalRound1Item(number) {
    Archive
 ========================= */
 
-let archiveAdminRound = 1
-let archivePendingExtraCount = 0
-let archiveExtraTextPositions = []
-let archiveDraftState = {}
-
-const ARCHIVE_TEXT_START_POSITION = 5
-const ARCHIVE_MAX_TEXT_BOXES = 20
-
 function collectArchiveDraftState() {
   const draft = {}
 
@@ -2905,34 +2255,49 @@ function renderArchiveAdminItem(position, item = {}) {
   const mergedItem = getArchiveDraftItem(position, item)
   const parentPosition = Number(mergedItem.parent_position || mergedItem.column_group || 3)
   const promptStyle = mergedItem.prompt_style || "shoe"
+  const isRequired = String(mergedItem.label || "").trim() === "المطلوب"
 
   return `
-    <div class="archiveAdminItem archiveAdminItemEnhanced">
+    <div class="archiveAdminItem archiveAdminItemEnhanced ${isRequired ? "archiveAdminItemRequired" : ""}">
       <div class="archiveAdminItemHead">
         <div class="archiveAdminItemTitle">العنصر ${position}</div>
+        ${isRequired ? `<div class="archiveAdminRequiredBadge">المطلوب</div>` : ""}
       </div>
 
       <div class="archiveAdminFields">
-        <select id="archiveItemParent_${position}" onchange="handleArchiveParentChange()">
-          <option value="3" ${parentPosition === 3 ? "selected" : ""}>تحت الصورة 3</option>
-          <option value="4" ${parentPosition === 4 ? "selected" : ""}>تحت الصورة 4</option>
-        </select>
-
         <input
           id="archiveItemLabel_${position}"
           type="text"
-          placeholder="عنوان صغير - اختياري"
+          placeholder="عنوان صغير - مثال: المطلوب"
           value="${escapeHtml(mergedItem.label || "")}"
         >
 
-        <select id="archiveItemPromptStyle_${position}">
-          <option value="ball" ${promptStyle === "ball" ? "selected" : ""}>⚽️ أسود</option>
-          <option value="shoe" ${promptStyle === "shoe" ? "selected" : ""}>👟 أبيض</option>
-        </select>
+        <div class="compactCountSelectWrap">
+          <select
+            id="archiveItemParent_${position}"
+            class="compactCountSelect"
+            onchange="handleArchiveParentChange()"
+          >
+            <option value="3" ${parentPosition === 3 ? "selected" : ""}>تحت الصورة 3</option>
+            <option value="4" ${parentPosition === 4 ? "selected" : ""}>تحت الصورة 4</option>
+          </select>
+        </div>
+
+        <div class="compactCountSelectWrap">
+          <select
+            id="archiveItemPromptStyle_${position}"
+            class="compactCountSelect"
+          >
+            <option value="ball" ${promptStyle === "ball" ? "selected" : ""}>⚽️ الهدف</option>
+            <option value="shoe" ${promptStyle === "shoe" ? "selected" : ""}>👟 الاسيست</option>
+          </select>
+        </div>
+
+        <div></div>
 
         <textarea
           id="archiveItemText_${position}"
-          placeholder="النص"
+          placeholder="النص الذي سيظهر داخل البطاقة"
         >${escapeHtml(mergedItem.text || "")}</textarea>
       </div>
     </div>
@@ -3019,97 +2384,102 @@ async function renderArchiveAdminRound(round) {
     .sort((a, b) => a - b)
 
   editor().innerHTML = `
-    <h2 class="adminSectionTitle">الأرشيف</h2>
-    ${await buildSegmentStatusGrid()}
+    <div class="archiveAdminShell cleanArchiveAdminShell">
+      <div class="adminEditorTopBar">
+        <div>
+          <h2 class="adminSectionTitle">الأرشيف</h2>
+          <div class="adminSectionSubTitle">حرر الجولة بشكل قريب من صفحة العرض حتى تكون القراءة أسهل</div>
+        </div>
+      </div>
 
-    <div class="archiveAdminShell">
+      ${await buildSegmentStatusGrid()}
 
-      <div class="archiveAdminRoundsBar">
+      <div class="archiveAdminRoundsBar cleanRoundsBar">
         <button class="${round === 1 ? "activeArchiveRoundBtn" : ""}" onclick="renderArchiveAdminRound(1)">الجولة 1</button>
         <button class="${round === 2 ? "activeArchiveRoundBtn" : ""}" onclick="renderArchiveAdminRound(2)">الجولة 2</button>
         <button class="${round === 3 ? "activeArchiveRoundBtn" : ""}" onclick="renderArchiveAdminRound(3)">الجولة 3</button>
         <button class="${round === 4 ? "activeArchiveRoundBtn" : ""}" onclick="renderArchiveAdminRound(4)">الجولة 4</button>
       </div>
 
-      <div class="archiveAdminLayout">
+      <div class="archiveAdminLayout cleanArchiveLayout">
 
-        <div class="archiveAdminBoard ${round === 4 ? "archiveAdminBoardRound4" : ""}">
+        <div class="archiveAdminBoard ${round === 4 ? "archiveAdminBoardRound4" : ""} archiveAdminBoardClean">
 
-          <div class="archiveAdminSketchTop">
-            <div class="archiveAdminSketchRow">
+          <div class="archiveAdminSketchTop archiveAdminSketchTopClean">
+            <div class="archiveAdminSketchRow archiveDisplayLikeBox">
+              <div class="archiveAdminLabel">البطولة</div>
               <div class="archiveAdminText">
                 <input
                   id="archiveItemText_1"
                   type="text"
-                  placeholder="قيمة البطولة"
+                  placeholder="مثال: دوري أبطال أوروبا"
                   value="${escapeHtml(archiveDraftState.__top?.text1 || map[1]?.text || "")}"
                 >
               </div>
-              <div class="archiveAdminLabel">البطولة</div>
             </div>
 
-            <div class="archiveAdminSketchRow">
+            <div class="archiveAdminSketchRow archiveDisplayLikeBox">
+              <div class="archiveAdminLabel">الموسم</div>
               <div class="archiveAdminText">
                 <input
                   id="archiveItemText_2"
                   type="text"
-                  placeholder="قيمة الموسم"
+                  placeholder="مثال: 2016 / 2017"
                   value="${escapeHtml(archiveDraftState.__top?.text2 || map[2]?.text || "")}"
                 >
               </div>
-              <div class="archiveAdminLabel">الموسم</div>
             </div>
           </div>
 
-          <div class="archiveAdminSketchMiddle">
-            <div class="archiveAdminImageBox">
+          <div class="archiveAdminSketchMiddle archiveAdminSketchMiddleClean">
+            <div class="archiveAdminImageBox archiveDisplayLikeBox">
               <div class="archiveAdminItemTitle">الصورة 4</div>
               <input id="archiveItemFile_4" type="file" accept="image/*">
               ${map[4]?.image ? `<img src="${escapeHtml(map[4].image)}" class="archiveAdminPreviewImg">` : ""}
             </div>
 
-            <div class="archiveAdminResultCenter">
+            <div class="archiveAdminResultCenter archiveDisplayLikeBox">
               <div class="archiveAdminResultLabel">النتيجة</div>
               <div class="archiveAdminResultValue">
                 <input
                   id="archiveScore"
                   type="text"
-                  placeholder="النتيجة"
+                  placeholder="مثال: 3 - 1"
                   value="${escapeHtml(archiveDraftState.__top?.score || box?.score || "")}"
                 >
               </div>
             </div>
 
-            <div class="archiveAdminImageBox">
+            <div class="archiveAdminImageBox archiveDisplayLikeBox">
               <div class="archiveAdminItemTitle">الصورة 3</div>
               <input id="archiveItemFile_3" type="file" accept="image/*">
               ${map[3]?.image ? `<img src="${escapeHtml(map[3].image)}" class="archiveAdminPreviewImg">` : ""}
             </div>
           </div>
 
-          <div class="archiveAdminBottomGrid">
+          <div class="archiveAdminBottomGrid archiveAdminBottomGridClean">
             <div class="archiveAdminBottomCol">
-              <div class="archiveAdminColumnTitle">تحت الصورة 4</div>
+              <div class="archiveAdminColumnTitle">العناصر تحت الصورة 4</div>
               ${under4Positions.map(pos => renderArchiveAdminItem(pos, map[pos])).join("")}
             </div>
 
             <div class="archiveAdminBottomCol">
-              <div class="archiveAdminColumnTitle">تحت الصورة 3</div>
+              <div class="archiveAdminColumnTitle">العناصر تحت الصورة 3</div>
               ${under3Positions.map(pos => renderArchiveAdminItem(pos, map[pos])).join("")}
             </div>
           </div>
         </div>
 
-        <div class="archiveAdminTools">
+        <div class="archiveAdminTools archiveAdminToolsClean">
           <div class="adminCard archiveToolsCard">
             <h3>أدوات الجولة ${round}</h3>
 
-            <div class="archiveToolsButtons">
-              <button onclick="addArchiveTextBox()">إضافة مربع نص</button>
-              <button onclick="removeArchiveTextBox()">حذف آخر مربع</button>
-              <button onclick="saveArchiveRoundNew()">حفظ الجولة</button>
+            <div class="archiveToolsButtons archiveToolsButtonsClean">
+              <button onclick="saveArchiveRoundNew()" class="adminSaveBtn">حفظ الجولة</button>
+              <button onclick="addArchiveTextBox()" class="adminBtnMango">إضافة مربع نص</button>
+              <button onclick="removeArchiveTextBox()" class="adminBtnLight">حذف آخر مربع</button>
               <button onclick="deleteArchiveSegment(${round})" class="adminDeleteBtn">حذف هذه الجولة</button>
-              <button onclick="deleteArchiveSegment()" class="adminDeleteBtn">حذف جميع الجولات</button>
+              <button onclick="deleteArchiveSegment()" class="adminDeleteAllBtn">حذف جميع الجولات</button>
             </div>
           </div>
         </div>
@@ -3355,5 +2725,746 @@ async function deleteArchiveSegment(round = null) {
   } catch (err) {
     console.log(err)
     showGameToast("حدث خطأ أثناء حذف الأرشيف")
+  }
+}
+
+/* =========================
+   PRESENTER PDF - CLEAN ONLY
+========================= */
+
+function presenterText(value) {
+  return escapeHtml(value || "")
+}
+
+function presenterIsImageLike(value) {
+  return typeof value === "string" &&
+    /^(https?:\/\/|data:image\/|blob:|\/)/.test(String(value).trim())
+}
+
+function waitForPresenterImages(container) {
+  const images = Array.from(container.querySelectorAll("img"))
+  if (!images.length) return Promise.resolve()
+
+  return Promise.all(
+    images.map(img => {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve()
+
+      return new Promise(resolve => {
+        img.onload = () => resolve()
+        img.onerror = () => resolve()
+      })
+    })
+  )
+}
+
+function sanitizeColorsForCanvas(root) {
+  if (!root) return
+
+  root.querySelectorAll("*").forEach(el => {
+    const style = window.getComputedStyle(el)
+
+    const props = [
+      "color",
+      "backgroundColor",
+      "borderTopColor",
+      "borderRightColor",
+      "borderBottomColor",
+      "borderLeftColor",
+      "outlineColor",
+      "textDecorationColor",
+      "caretColor"
+    ]
+
+    props.forEach(prop => {
+      const value = style[prop]
+
+      if (typeof value === "string" && value.includes("color(")) {
+        if (prop === "backgroundColor") {
+          el.style.backgroundColor = "#ffffff"
+        } else if (prop.includes("border")) {
+          el.style[prop] = "#d9e0e0"
+        } else {
+          el.style[prop] = "#243447"
+        }
+      }
+    })
+
+    el.style.filter = "none"
+    el.style.backdropFilter = "none"
+    el.style.webkitBackdropFilter = "none"
+  })
+}
+
+function getArchiveDisplayThemeClass(round) {
+  if (Number(round) === 1) return "archiveThemeRound1"
+  if (Number(round) === 2) return "archiveThemeRound2"
+  if (Number(round) === 3) return "archiveThemeRound3"
+  return "archiveThemeRound4"
+}
+
+function buildPresenterPage(title, bodyHtml, key = "") {
+  return `
+    <section class="presenterPdfPage" data-pdf-page="${presenterText(key || title)}">
+      <div class="presenterPdfPageInner">
+        <div class="presenterPdfPageHead">
+          <div class="presenterPdfPageTitle">${presenterText(title)}</div>
+          <div class="presenterPdfPageModel">${presenterText(getCurrentModelNameSafe())}</div>
+        </div>
+
+        <div class="presenterPdfPageContent">
+          ${bodyHtml}
+        </div>
+      </div>
+    </section>
+  `
+}
+
+async function buildPresenterPagesHtml() {
+  const [
+    warmupRes,
+    top10Res,
+    auctionRes,
+    whoRes,
+    archiveBoxesRes,
+    archiveItemsRes,
+    finalMetaRes,
+    finalRound1Res,
+    finalRound2Res,
+    finalRound3Res
+  ] = await Promise.all([
+    db.from("questions")
+      .select("*")
+      .eq("model", Number(currentModel))
+      .eq("segment", "warmup")
+      .order("category", { ascending: true })
+      .order("number", { ascending: true }),
+
+    db.from("top10_questions")
+      .select("*")
+      .eq("model", currentModel)
+      .order("round", { ascending: true })
+      .order("position", { ascending: true }),
+
+    db.from("auction_questions")
+      .select("*")
+      .eq("model", currentModel)
+      .order("number", { ascending: true }),
+
+    db.from("who_images")
+      .select("*")
+      .eq("model", currentModel)
+      .order("number", { ascending: true }),
+
+    db.from("archive_boxes")
+      .select("*")
+      .eq("model", currentModel)
+      .order("round", { ascending: true }),
+
+    db.from("archive_items")
+      .select("*")
+      .eq("model", currentModel)
+      .order("round", { ascending: true })
+      .order("position", { ascending: true }),
+
+    db.from("final_round_meta")
+      .select("*")
+      .eq("model", currentModel)
+      .order("round", { ascending: true }),
+
+    db.from("final_round1_items")
+      .select("*")
+      .eq("model", currentModel)
+      .order("number", { ascending: true }),
+
+    db.from("final_round2_items")
+      .select("*")
+      .eq("model", currentModel)
+      .order("number", { ascending: true })
+      .order("item_order", { ascending: true }),
+
+    db.from("final_round3_items")
+      .select("*")
+      .eq("model", currentModel)
+      .order("number", { ascending: true })
+      .order("image_order", { ascending: true })
+  ])
+
+  const warmupRows = warmupRes.data || []
+  const top10Rows = top10Res.data || []
+  const auctionRows = auctionRes.data || []
+  const whoRows = whoRes.data || []
+  const archiveBoxes = archiveBoxesRes.data || []
+  const archiveItems = archiveItemsRes.data || []
+  const finalMeta = finalMetaRes.data || []
+  const finalRound1Rows = finalRound1Res.data || []
+  const finalRound2Rows = finalRound2Res.data || []
+  const finalRound3Rows = finalRound3Res.data || []
+
+  const normalizedWarmup = {}
+warmupRows.forEach(row => {
+  const categoryKey = String(row.category ?? "")
+  if (!normalizedWarmup[categoryKey]) {
+    normalizedWarmup[categoryKey] = {
+      title: row.category_name || `الفئة ${row.category}`,
+      items: []
+    }
+  }
+
+  normalizedWarmup[categoryKey].items.push(row)
+})
+
+const warmupHtml = buildPresenterPage(
+  "التسخين",
+  `
+    <div class="presenterWarmupGrid">
+      ${[1, 2, 3, 4].map(category => {
+        const rawGroup = normalizedWarmup[String(category)] || {
+          title: `الفئة ${category}`,
+          items: []
+        }
+
+        const uniqueMap = new Map()
+
+        rawGroup.items.forEach(item => {
+          const uniqueKey = [
+            Number(item.number || 0),
+            String(item.question || "").trim(),
+            String(item.answer || "").trim()
+          ].join("||")
+
+          if (!uniqueMap.has(uniqueKey)) {
+            uniqueMap.set(uniqueKey, item)
+          }
+        })
+
+        const sortedItems = Array.from(uniqueMap.values())
+          .sort((a, b) => Number(a.number) - Number(b.number))
+
+        return `
+          <div class="presenterWarmupCard">
+            <div class="presenterWarmupCardHead">
+              <div class="presenterWarmupCardTitle">${presenterText(rawGroup.title)}</div>
+            </div>
+
+            <div class="presenterWarmupCardBody">
+              ${
+                sortedItems.length
+                  ? sortedItems.map(item => `
+                      <div class="presenterWarmupLine">
+                        <div class="presenterQaBadge">${item.number}</div>
+                        <div class="presenterWarmupLineBody">
+                          <div class="presenterQaQuestion">${presenterText(item.question)}</div>
+                          <div class="presenterQaAnswer">الإجابة: ${presenterText(item.answer)}</div>
+                        </div>
+                      </div>
+                    `).join("")
+                  : `<div class="presenterEmpty">لا توجد أسئلة</div>`
+              }
+            </div>
+          </div>
+        `
+      }).join("")}
+    </div>
+  `,
+  "warmup"
+)
+
+  const groupedTop10 = {}
+  top10Rows.forEach(row => {
+    if (!groupedTop10[row.round]) {
+      groupedTop10[row.round] = { question: "", items: [] }
+    }
+    if (row.question) groupedTop10[row.round].question = row.question
+    groupedTop10[row.round].items.push(row)
+  })
+
+  const top10Html = [1, 2, 3].map(round => {
+    const group = groupedTop10[round] || { question: "", items: [] }
+
+    return buildPresenterPage(
+      `Top 10 - الجولة ${round}`,
+      `
+        <div class="presenterWideQuestionBox">${presenterText(group.question)}</div>
+        <div class="presenterAnswerGrid">
+          ${group.items
+            .sort((a, b) => Number(a.position) - Number(b.position))
+            .map(item => `
+              <div class="presenterAnswerCard">
+                <div class="presenterQaBadge">${item.position}</div>
+                <div class="presenterAnswerOnly">${presenterText(item.answer)}</div>
+              </div>
+            `).join("") || `<div class="presenterEmpty">لا توجد بيانات</div>`}
+        </div>
+      `,
+      `top10-${round}`
+    )
+  }).join("")
+
+  const auctionHtml = buildPresenterPage(
+    "المزاد",
+    `
+      <div class="presenterQaList presenterQaListOne">
+        ${auctionRows.map(item => `
+          <div class="presenterQaCard presenterQaCardFull">
+            <div class="presenterQaBadge">${item.number}</div>
+            <div class="presenterQaQuestion">${presenterText(item.question)}</div>
+            <div class="presenterQaAnswer">الإجابة: ${presenterText(item.answer)}</div>
+            ${item.note ? `<div class="presenterQaNote">ملاحظة: ${presenterText(item.note)}</div>` : ""}
+          </div>
+        `).join("") || `<div class="presenterEmpty">لا توجد بيانات</div>`}
+      </div>
+    `,
+    "auction"
+  )
+
+  const whoHtml = buildPresenterPage(
+  "من هو",
+  `
+    <div class="presenterWhoGrid">
+      ${whoRows.map(item => `
+        <div class="presenterWhoCard">
+          <div class="presenterQaBadge">${item.number}</div>
+          <div class="presenterAnswerOnly">${presenterText(item.answer)}</div>
+        </div>
+      `).join("") || `<div class="presenterEmpty">لا توجد بيانات</div>`}
+    </div>
+  `,
+  "who"
+)
+
+  const groupedArchive = {}
+  archiveItems.forEach(item => {
+    const round = Number(item.round || 1)
+    if (!groupedArchive[round]) groupedArchive[round] = []
+    groupedArchive[round].push(item)
+  })
+
+  const archiveHtml = [1, 2, 3, 4].map(round => {
+  const box = archiveBoxes.find(x => Number(x.round) === round)
+  const items = (groupedArchive[round] || []).sort((a, b) => Number(a.position) - Number(b.position))
+
+  const itemByPos = {}
+  items.forEach(item => {
+    itemByPos[Number(item.position)] = item
+  })
+
+  const under3Items = items.filter(
+    item => Number(item.parent_position || item.column_group || 3) === 3 && Number(item.position) >= 5
+  )
+
+  const under4Items = items.filter(
+    item => Number(item.parent_position || item.column_group || 3) === 4 && Number(item.position) >= 5
+  )
+
+  function renderPrimaryValue(position, fallbackText = "") {
+    const item = itemByPos[position]
+    if (!item) return `<span>${presenterText(fallbackText)}</span>`
+
+    const raw = item.image || item.text || ""
+    if (presenterIsImageLike(raw)) {
+      return `<img src="${presenterText(raw)}" alt="">`
+    }
+
+    return `<span>${presenterText(item.text || fallbackText)}</span>`
+  }
+
+  function renderBigValue(position) {
+    const item = itemByPos[position]
+    if (!item) return `<span>${position}</span>`
+
+    const raw = item.image || item.text || ""
+    if (presenterIsImageLike(raw)) {
+      return `<img src="${presenterText(raw)}" alt="">`
+    }
+
+    return `<span>${presenterText(item.text || position)}</span>`
+  }
+
+  function renderBottomItem(item) {
+    const labelText = (item.label || "").trim()
+    const promptStyle = String(item.prompt_style || "shoe").trim().toLowerCase()
+    const emoji = promptStyle === "ball" ? "⚽️" : "👟"
+    const isWanted = labelText === "المطلوب"
+    const displayText = (item.text || "").trim()
+
+    return `
+      <div class="presenterArchiveHintCard ${isWanted ? "wanted" : ""}">
+        <div class="presenterArchiveHintText">${presenterText(displayText || labelText || "")}</div>
+        <div class="presenterArchiveHintIcon">${emoji}</div>
+      </div>
+    `
+  }
+
+  return buildPresenterPage(
+    `الأرشيف - الجولة ${round}`,
+    `
+      <div class="presenterArchiveBoard">
+        <div class="presenterArchiveTop">
+          <div class="presenterArchiveInfoCard">
+            <div class="presenterArchiveInfoLabel">البطولة</div>
+            <div class="presenterArchiveInfoValue">${renderPrimaryValue(1, box?.tournament || "")}</div>
+          </div>
+
+          <div class="presenterArchiveInfoCard">
+            <div class="presenterArchiveInfoLabel">الموسم</div>
+            <div class="presenterArchiveInfoValue">${renderPrimaryValue(2, box?.season || "")}</div>
+          </div>
+        </div>
+
+        <div class="presenterArchiveMiddle">
+          <div class="presenterArchiveBigCard">
+            ${renderBigValue(4)}
+          </div>
+
+          <div class="presenterArchiveScoreCard">
+            <div class="presenterArchiveScoreLabel">النتيجة</div>
+            <div class="presenterArchiveScoreValue">${presenterText(box?.score || "-")}</div>
+          </div>
+
+          <div class="presenterArchiveBigCard">
+            ${renderBigValue(3)}
+          </div>
+        </div>
+
+        <div class="presenterArchiveBottom">
+          <div class="presenterArchiveColumn">
+            <div class="presenterArchiveColumnTitle">تحت الصورة 4</div>
+            <div class="presenterArchiveHints">
+              ${under4Items.length ? under4Items.map(renderBottomItem).join("") : `<div class="presenterEmpty">لا توجد عناصر</div>`}
+            </div>
+          </div>
+
+          <div class="presenterArchiveColumn">
+            <div class="presenterArchiveColumnTitle">تحت الصورة 3</div>
+            <div class="presenterArchiveHints">
+              ${under3Items.length ? under3Items.map(renderBottomItem).join("") : `<div class="presenterEmpty">لا توجد عناصر</div>`}
+            </div>
+          </div>
+        </div>
+      </div>
+    `,
+    `archive-${round}`
+  )
+}).join("")
+
+  const finalMetaMap = {}
+  finalMeta.forEach(row => {
+    finalMetaMap[row.round] = row
+  })
+
+  const groupedFinal2 = {}
+  finalRound2Rows.forEach(item => {
+    if (!groupedFinal2[item.number]) groupedFinal2[item.number] = []
+    groupedFinal2[item.number].push(item)
+  })
+
+  const groupedFinal3 = {}
+  finalRound3Rows.forEach(item => {
+    if (!groupedFinal3[item.number]) groupedFinal3[item.number] = []
+    groupedFinal3[item.number].push(item)
+  })
+
+  const final1Html = buildPresenterPage(
+    finalMetaMap[1]?.title || "الجولة الأولى",
+    `
+      <div class="presenterFinalCardGrid">
+        ${finalRound1Rows.map(item => `
+          <div class="presenterFinalImageCard">
+            <div class="presenterFinalImageHead">رقم ${item.number}</div>
+            <div class="presenterFinalImageBody">
+              ${item.image ? `<img src="${presenterText(item.image)}" alt="">` : `<div class="presenterNoImage">لا توجد صورة</div>`}
+              <div class="presenterQaAnswer">الإجابة: ${presenterText(item.answer)}</div>
+              ${item.note ? `<div class="presenterQaNote">التوضيح: ${presenterText(item.note)}</div>` : ""}
+            </div>
+          </div>
+        `).join("") || `<div class="presenterEmpty">لا توجد بيانات</div>`}
+      </div>
+    `,
+    "final-1"
+  )
+
+  const final2Html = buildPresenterPage(
+    finalMetaMap[2]?.title || "الجولة الثانية",
+    `
+      <div class="presenterFinalBlocks">
+        ${[1, 2, 3, 4].map(number => {
+          const rows = groupedFinal2[number] || []
+          const isScramble = number === 1 || number === 3
+
+          return `
+            <div class="presenterSectionBlock">
+              <div class="presenterSectionBlockHead">رقم ${number}</div>
+              <div class="presenterMiniList">
+                ${rows.map((row, idx) => `
+                  <div class="presenterMiniLine">
+                    <strong>${idx + 1})</strong>
+                    <span>الكلمة: ${presenterText(row.prompt)}</span>
+                    ${isScramble ? `<span>التلميحة: ${presenterText(row.hint)}</span>` : ""}
+                    ${isScramble ? `<span>الإجابة: ${presenterText(row.answer)}</span>` : ""}
+                  </div>
+                `).join("") || `<div class="presenterEmpty">لا توجد بيانات</div>`}
+              </div>
+            </div>
+          `
+        }).join("")}
+      </div>
+    `,
+    "final-2"
+  )
+
+  const final3Html = buildPresenterPage(
+    finalMetaMap[3]?.title || "الجولة الثالثة",
+    `
+      <div class="presenterFinalCardGrid presenterFinalCardGridTwo">
+        ${[1, 2].map(number => {
+          const rows = groupedFinal3[number] || []
+
+          return `
+            <div class="presenterFinalImageCard">
+              <div class="presenterFinalImageHead">رقم ${number}</div>
+              <div class="presenterFinalImageBody">
+                <div class="presenterFinalRound3List">
+                  ${rows.map(row => `
+                    <div class="presenterFinalRound3Item">
+                      ${row.image ? `<img src="${presenterText(row.image)}" alt="">` : `<div class="presenterNoImage">لا توجد صورة</div>`}
+                      <div class="presenterQaAnswer">الإجابة: ${presenterText(row.answer)}</div>
+                      ${row.note ? `<div class="presenterQaNote">التوضيح: ${presenterText(row.note)}</div>` : ""}
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            </div>
+          `
+        }).join("") || `<div class="presenterEmpty">لا توجد بيانات</div>`}
+      </div>
+    `,
+    "final-3"
+  )
+
+  return [warmupHtml, top10Html, auctionHtml, whoHtml, archiveHtml, final1Html, final2Html, final3Html].join("")
+}
+
+window.openPresenterSheet = function () {
+  showGameToast("الحفظ أصبح PDF مباشر")
+}
+
+window.closePresenterSheet = function () {}
+
+window.printPresenterSheet = async function () {
+  if (!currentModel) {
+    showGameToast("افتح نموذجًا أولاً")
+    return
+  }
+
+  if (typeof html2canvas === "undefined") {
+    showGameToast("html2canvas غير محمل")
+    return
+  }
+
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    showGameToast("jsPDF غير محمل")
+    return
+  }
+
+  let exportRoot = null
+
+  try {
+    const pagesHtml = await buildPresenterPagesHtml()
+
+    exportRoot = document.createElement("div")
+    exportRoot.id = "presenterPdfExportRoot"
+    exportRoot.style.position = "fixed"
+    exportRoot.style.left = "-99999px"
+    exportRoot.style.top = "0"
+    exportRoot.style.width = "1240px"
+    exportRoot.style.background = "#ffffff"
+    exportRoot.style.direction = "rtl"
+    exportRoot.style.zIndex = "-1"
+    exportRoot.innerHTML = `<div class="presenterPdfPages">${pagesHtml}</div>`
+
+    document.body.appendChild(exportRoot)
+    exportRoot.classList.add("presenter-export-safe")
+
+    sanitizeColorsForCanvas(exportRoot)
+
+    await waitForPresenterImages(exportRoot)
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    const pageNodes = Array.from(exportRoot.querySelectorAll("[data-pdf-page]"))
+    if (!pageNodes.length) {
+      throw new Error("لم يتم إنشاء صفحات التصدير")
+    }
+
+    const { jsPDF } = window.jspdf
+    const pdf = new jsPDF("p", "mm", "a4")
+
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+    const margin = 8
+    const usableWidth = pageWidth - margin * 2
+    const usableHeight = pageHeight - margin * 2
+
+    for (let i = 0; i < pageNodes.length; i++) {
+      const node = pageNodes[i]
+
+      const canvas = await html2canvas(node, {
+  backgroundColor: "#ffffff",
+  scale: 2,
+  useCORS: true,
+  allowTaint: true,
+  logging: false,
+  imageTimeout: 0,
+  scrollX: 0,
+  scrollY: 0,
+  width: node.scrollWidth,
+  height: node.scrollHeight,
+  windowWidth: node.scrollWidth,
+  windowHeight: node.scrollHeight,
+  onclone: (clonedDoc) => {
+    injectPresenterSafeStyles(clonedDoc)
+
+    const clonedRoot = clonedDoc.getElementById("presenterPdfExportRoot")
+    if (clonedRoot) {
+      clonedRoot.querySelectorAll("*").forEach(el => {
+        el.style.filter = "none"
+        el.style.backdropFilter = "none"
+        el.style.webkitBackdropFilter = "none"
+        el.style.textShadow = "none"
+        el.style.boxShadow = "none"
+      })
+    }
+  }
+})
+
+
+      const imgData = canvas.toDataURL("image/jpeg", 1.0)
+      const imgWidthPx = canvas.width
+      const imgHeightPx = canvas.height
+      const imgHeightMm = (imgHeightPx * usableWidth) / imgWidthPx
+
+      if (i > 0) pdf.addPage()
+
+      if (imgHeightMm <= usableHeight) {
+        pdf.addImage(imgData, "JPEG", margin, margin, usableWidth, imgHeightMm)
+      } else {
+        const pageCanvasHeightPx = Math.floor((usableHeight * imgWidthPx) / usableWidth)
+        let offsetY = 0
+        let first = true
+
+        while (offsetY < imgHeightPx) {
+          const sliceHeight = Math.min(pageCanvasHeightPx, imgHeightPx - offsetY)
+
+          const sliceCanvas = document.createElement("canvas")
+          sliceCanvas.width = imgWidthPx
+          sliceCanvas.height = sliceHeight
+
+          const ctx = sliceCanvas.getContext("2d")
+          ctx.fillStyle = "#ffffff"
+          ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height)
+
+          ctx.drawImage(
+            canvas,
+            0, offsetY, imgWidthPx, sliceHeight,
+            0, 0, imgWidthPx, sliceHeight
+          )
+
+          const sliceData = sliceCanvas.toDataURL("image/jpeg", 1.0)
+          const sliceHeightMm = (sliceHeight * usableWidth) / imgWidthPx
+
+          if (!first) pdf.addPage()
+          pdf.addImage(sliceData, "JPEG", margin, margin, usableWidth, sliceHeightMm)
+
+          offsetY += sliceHeight
+          first = false
+        }
+      }
+    }
+    function injectPresenterSafeStyles(doc) {
+  const style = doc.createElement("style")
+  style.id = "presenter-export-safe-style"
+  style.textContent = `
+    #presenterPdfExportRoot,
+    #presenterPdfExportRoot *{
+      color: #243447 !important;
+      background-image: none !important;
+      text-shadow: none !important;
+      box-shadow: none !important;
+      filter: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-color: #d9e0e0 !important;
+      outline-color: #d9e0e0 !important;
+      text-decoration-color: #243447 !important;
+      caret-color: #243447 !important;
+    }
+
+    #presenterPdfExportRoot{
+      background: #ffffff !important;
+    }
+
+    #presenterPdfExportRoot .presenterPdfPage,
+    #presenterPdfExportRoot .presenterPdfPageInner,
+    #presenterPdfExportRoot .presenterPdfPageHead,
+    #presenterPdfExportRoot .presenterPdfPageContent,
+    #presenterPdfExportRoot .presenterSectionBlock,
+    #presenterPdfExportRoot .presenterQaCard,
+    #presenterPdfExportRoot .presenterAnswerCard,
+    #presenterPdfExportRoot .presenterFinalImageCard,
+    #presenterPdfExportRoot .presenterWideQuestionBox,
+    #presenterPdfExportRoot .presenterMiniLine,
+    #presenterPdfExportRoot .presenterFinalRound3Item,
+    #presenterPdfExportRoot .presenterNoImage,
+    #presenterPdfExportRoot .archiveBoard,
+    #presenterPdfExportRoot .archiveModernBoard,
+    #presenterPdfExportRoot .archiveModernInfoCard,
+    #presenterPdfExportRoot .archiveModernBigCard,
+    #presenterPdfExportRoot .archiveModernScoreCard,
+    #presenterPdfExportRoot .archiveModernSmallCard,
+    #presenterPdfExportRoot .archiveBottomCol,
+    #presenterPdfExportRoot .archiveBottomGrid{
+      background: #ffffff !important;
+      background-image: none !important;
+    }
+
+    #presenterPdfExportRoot .presenterPdfPageModel,
+    #presenterPdfExportRoot .presenterQaBadge{
+      background: #2f4158 !important;
+      color: #ffffff !important;
+      border-color: #2f4158 !important;
+    }
+
+    #presenterPdfExportRoot .presenterQaAnswer{
+      color: #ff9b51 !important;
+    }
+
+    #presenterPdfExportRoot .archiveWantedItem,
+    #presenterPdfExportRoot .archiveAdminRequiredBadge{
+      background: #ffd7b8 !important;
+      color: #243447 !important;
+      border-color: #ffd7b8 !important;
+    }
+
+    #presenterPdfExportRoot *::before,
+    #presenterPdfExportRoot *::after{
+      color: #243447 !important;
+      background: transparent !important;
+      background-image: none !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+      border-color: #d9e0e0 !important;
+    }
+  `
+  doc.head.appendChild(style)
+}
+
+    pdf.save(`presenter-sheet-${currentModel || "export"}.pdf`)
+    showGameToast("تم حفظ PDF")
+  } catch (error) {
+    console.error("PRESENTER PDF ERROR:", error)
+    showGameToast(`تعذر التصدير: ${error.message || error}`)
+  } finally {
+    if (exportRoot && exportRoot.parentNode) {
+      exportRoot.parentNode.removeChild(exportRoot)
+    }
   }
 }
