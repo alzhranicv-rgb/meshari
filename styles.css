@@ -450,7 +450,7 @@ body::after{
   height:56px;
   padding:0 26px;
   border-radius:18px;
-  background:linear-gradient(180deg, #de923a 0%, #de923a 100%);
+  background:linear-gradient(180deg, #C96A25 0%, #d27431 100%);
   color:#fff;
   font-size:1.08rem;
   font-family:"HanakaText", sans-serif;
@@ -666,6 +666,152 @@ body::after{
   filter:brightness(1.02);
 }
 
+/* =========================
+   WINNER FX - TV SHOW STYLE
+========================= */
+
+.winnerOverlayFx{
+  animation: winnerOverlayPulse 0.9s cubic-bezier(.22,.61,.36,1);
+}
+
+.winnerNameFx{
+  animation: winnerNamePop 0.95s cubic-bezier(.22,.61,.36,1);
+}
+
+.winnerAnnounceFx{
+  animation: winnerBtnGlow 1.35s ease;
+}
+
+.winnerFlash{
+  animation: winnerScreenFlash 1.2s ease;
+}
+
+.winnerConfettiLayer{
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.winnerConfettiLayer::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 50% 10%, rgba(255,215,184,.18), transparent 26%),
+    radial-gradient(circle at 20% 0%, rgba(255,155,81,.10), transparent 18%),
+    radial-gradient(circle at 80% 0%, rgba(47,65,88,.10), transparent 18%);
+}
+
+.winnerConfettiPiece{
+  position:absolute;
+  top:-12%;
+  opacity:.98;
+  animation-name:winnerConfettiFall;
+  animation-timing-function:cubic-bezier(.22,.61,.36,1);
+  animation-fill-mode:forwards;
+  box-shadow:0 8px 18px rgba(0,0,0,.10);
+}
+
+@keyframes winnerConfettiFall{
+  0%{
+    transform:translate3d(0,-24px,0) rotate(0deg) scale(.85);
+    opacity:0;
+  }
+  10%{
+    opacity:1;
+  }
+  100%{
+    transform:translate3d(var(--confetti-drift,0px),110vh,0) rotate(var(--confetti-rotate,40deg)) scale(1);
+    opacity:.98;
+  }
+}
+
+@keyframes winnerOverlayPulse{
+  0%{
+    transform:scale(.92);
+    opacity:0;
+  }
+  55%{
+    transform:scale(1.018);
+    opacity:1;
+  }
+  100%{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+@keyframes winnerNamePop{
+  0%{
+    transform:translateY(26px) scale(.88);
+    opacity:0;
+    letter-spacing:0;
+  }
+  55%{
+    transform:translateY(-4px) scale(1.05);
+    opacity:1;
+    letter-spacing:.6px;
+  }
+  100%{
+    transform:translateY(0) scale(1);
+    opacity:1;
+    letter-spacing:0;
+  }
+}
+
+@keyframes winnerBtnGlow{
+  0%{
+    transform:scale(.96);
+    box-shadow:0 0 0 rgba(255,155,81,0);
+  }
+  45%{
+    transform:scale(1.05);
+    box-shadow:
+      0 0 0 12px rgba(255,155,81,.10),
+      0 0 0 24px rgba(255,215,184,.08);
+  }
+  100%{
+    transform:scale(1);
+    box-shadow:0 0 0 rgba(255,155,81,0);
+  }
+}
+
+@keyframes winnerScreenFlash{
+  0%{
+    filter:brightness(1) saturate(1);
+  }
+  30%{
+    filter:brightness(1.08) saturate(1.06);
+  }
+  100%{
+    filter:brightness(1) saturate(1);
+  }
+}
+/* نسخة أهدأ */
+.winnerNameFx{
+  animation: winnerNamePulseSoft 1.8s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes winnerNamePulseSoft{
+  0%{
+    transform: scale(1);
+  }
+  25%{
+    transform: scale(1.05);
+  }
+  50%{
+    transform: scale(.985);
+  }
+  75%{
+    transform: scale(1.03);
+  }
+  100%{
+    transform: scale(1);
+  }
+}
 /* =========================
    NOTICE
 ========================= */
@@ -1321,6 +1467,57 @@ body::after{
 }
 
 /* =========================
+   SEGMENT LOCKED DESIGN
+========================= */
+
+.segmentLocked{
+  position: relative !important;
+  opacity: .5 !important;
+  filter: grayscale(.18) saturate(.85) !important;
+  pointer-events: none !important;
+  transform: scale(.985) !important;
+  transition:
+    opacity .25s ease,
+    filter .25s ease,
+    transform .25s ease;
+}
+
+.segmentLocked::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255,255,255,.30);
+  z-index: 2;
+}
+
+.segmentLocked::after{
+  content: "منتهية";
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  min-width: 82px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #660000;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "HanakaText", sans-serif;
+  font-size: .95rem;
+  line-height: 1;
+  z-index: 3;
+  box-shadow: 0 10px 20px rgba(47,65,88,.18);
+}
+.segmentLocked .segmentWinner,
+.segmentLocked .winnerName,
+.segmentLocked [id^="segmentWinner"]{
+  font-size: 1.7rem !important;
+  line-height: 1.1 !important;
+}
+/* =========================
    LARGE LAPTOP
 ========================= */
 
@@ -1781,7 +1978,7 @@ body::after{
   border:1px solid rgba(217,224,224,.95);
   background:linear-gradient(180deg, rgba(255,255,255,.99) 0%, rgba(244,247,247,.97) 100%);
   box-shadow:
-    0 12px 28px rgba(39,48,61,.06),
+    0 12px 28px rgba(107, 122, 142, 0.06),
     inset 0 1px 0 rgba(255,255,255,.96);
   padding:20px 16px 18px;
   display:flex;
@@ -2588,6 +2785,36 @@ body::after{
   transform: none;
   box-shadow: 0 8px 18px rgba(255,155,81,.18);
 }
+
+/* تصغير عرض مربعات Top 10 وتكبير الأرقام */
+.top10NumbersArea{
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  gap: 16px !important;
+}
+
+.top10Side{
+  gap: 14px !important;
+}
+
+.top10Rect{
+  width: 100% !important;
+  max-width: 420px !important;
+  min-height: 64px !important;
+  height: 64px !important;
+  margin: 0 auto !important;
+  border-radius: 18px !important;
+  font-size: 1.50rem !important;
+  line-height: 1 !important;
+}
+
+.top10Rect .top10RectInner{
+  font-size: 1.50rem !important;
+  line-height: 1 !important;
+  font-family: "HanakaDisplay", sans-serif !important;
+}
+
 /* =========================
    WHO
 ========================= */
@@ -5151,6 +5378,7 @@ body::after{
     border-radius:14px !important;
   }
 }
+
 /* =========================
    ARCHIVE / الأرشيف
 ========================= */
@@ -5264,7 +5492,7 @@ body::after{
   text-align:center;
   padding:8px 10px;
   font-family:"HanakaText",sans-serif;
-  font-size:1.02rem;
+  font-size:1.50rem;
   font-weight:400;
   line-height:1.2;
 }
@@ -5300,7 +5528,7 @@ body::after{
   background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%);
   color:var(--arc-dark-text);
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.45rem;
+  font-size:1.65rem;
   line-height:1;
 }
 
@@ -5350,7 +5578,7 @@ body::after{
   background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%);
   color:var(--arc-dark-text);
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:3.8rem;
+  font-size:4.8rem;
   line-height:1;
 }
 
@@ -5386,7 +5614,7 @@ body::after{
   justify-content:center;
   text-align:center;
   font-family:"HanakaText",sans-serif;
-  font-size:1.1rem;
+  font-size:1.75rem;
   font-weight:400;
   line-height:1.2;
 }
@@ -5399,7 +5627,7 @@ body::after{
   justify-content:center;
   text-align:center;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2rem;
+  font-size:3rem;
   line-height:1;
 }
 
@@ -5454,7 +5682,7 @@ body::after{
 
 .archiveModernSmallNumber{
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.4rem;
+  font-size:1.80rem;
   line-height:1;
   white-space:nowrap;
 }
@@ -5470,12 +5698,12 @@ body::after{
   color:#8A2E2E;
 }
 
-.archiveModernSmallText{
-  text-align:center;
-  font-family:"HanakaText",sans-serif;
-  font-size:1rem;
-  line-height:1.25;
-  word-break:break-word;
+.archiveModernSmallCard .archiveModernSmallText{
+  text-align:center !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:1.40rem !important;
+  line-height:1.1 !important;
+  word-break:break-word !important;
 }
 
 .archiveModernSmallEmoji{
@@ -5483,7 +5711,7 @@ body::after{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:1.28rem;
+  font-size:1.53rem;
   line-height:1;
 }
 
@@ -5736,7 +5964,7 @@ body::after{
   border-radius:14px;
   text-align:center;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.4rem;
+  font-size:2.4rem;
   line-height:1;
   padding:0 8px;
   box-sizing:border-box;
@@ -6213,7 +6441,7 @@ body::after{
   transform: translateX(150px) !important;
 }
 
-/* لو تبغين فقط الأزرار والمدخلات أكثر لليسار */
+
 .archiveControlButtons,
 .archiveInputsInline,
 .archiveSideRound,
@@ -6295,51 +6523,242 @@ body::after{
   }
 }
 /* =========================
-   FONT FORCE - EXACT HTML
+   ARCHIVE FINAL PATCH
+   - iPad fix
+   - English numbers
+   - Bigger "المطلوب"
 ========================= */
 
-/* كلمة الحنكة */
-#titleBox h1{
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+/* ---------- 1) ENGLISH NUMBERS ---------- */
+.archiveBoard,
+.archiveBoard *,
+.archiveSidePanel,
+.archiveSidePanel *,
+.archiveModernScoreValue,
+.archiveSideTimerValue,
+.archiveSideTeamScore,
+.archiveModernBigCard,
+.archiveModernBigCard::before,
+.archiveModernInfoValue.archiveWhiteHidden::before,
+.archiveModernSmallNumber,
+.archiveMiniInputStrong,
+.archiveCtrlBtn{
+  font-variant-numeric: lining-nums !important;
 }
 
-/* أسماء الفقرات في الصفحة الرئيسية */
-.segmentsGrid .segmentCard > span{
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+/* الأرقام داخل العناصر المعروضة تكون LTR */
+.archiveModernScoreValue,
+.archiveSideTimerValue,
+.archiveSideTeamScore,
+.archiveModernBigCard,
+.archiveModernBigCard::before,
+.archiveModernInfoValue.archiveWhiteHidden::before,
+.archiveModernSmallNumber,
+.archiveMiniInputStrong{
+  direction:ltr !important;
+  unicode-bidi:embed !important;
 }
 
-/* اسم الفقرة داخل كل فقرة */
-.segmentTitle{
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+/* ---------- 2) BIGGER "المطلوب" ---------- */
+/* إذا البطاقة تحمل كلاس archiveWantedItem */
+.archiveModernSmallCard.archiveWantedItem{
+  background:#FF0000 !important;
+  color:#FFFFFF !important;
+  border:2px solid #C40000 !important;
+  box-shadow:
+    0 10px 20px rgba(255,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.10) !important;
 }
 
-/* اسم الفائز على البطاقة */
-.segmentWinner{
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallText,
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallLabel,
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallNumber,
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallEmoji{
+  color:#FFFFFF !important;
 }
 
-/* بقية النصوص */
-body,
-button,
-input,
-textarea,
-select,
-.modelNameDisplay,
-.teamName,
-.teamScore,
-.backBtn,
-.endBtn,
-.winnerBtn,
-.gameNoticeText,
-.gameNoticeBtn,
-#winnerOverlayTitle,
-#winnerOverlayClose,
-#winnerOverlayEnd,
-#winnerOverlayBurst,
-#winnerBox{
-  font-family:"HanakaText",sans-serif !important;
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallText{
+  font-size:2rem !important;
+  line-height:1 !important;
+  font-weight:700 !important;
+  letter-spacing:0 !important;
 }
 
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallMain{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding-inline:8px !important;
+}
+
+/* fallback إذا كان النص نفسه عليه كلاس archiveRequiredLabel */
+.archiveRequiredLabel{
+  color:#FFFFFF !important;
+  font-size:2rem !important;
+  line-height:1 !important;
+  font-weight:700 !important;
+}
+
+/* fallback أوسع لو "المطلوب" داخل النص الرئيسي فقط */
+.archiveModernSmallCard .archiveRequiredLabel,
+.archiveModernSmallCard:has(.archiveRequiredLabel) .archiveModernSmallText{
+  font-size:1.50rem !important;
+  line-height:0.90 !important;
+  font-weight:300 !important;
+}
+
+/* ---------- 3) IPAD SIZE FIX ---------- */
+@media (min-width: 761px) and (max-width: 1100px){
+  .archiveMainWrap{
+    width:100% !important;
+    max-width:980px !important;
+    margin:0 auto !important;
+    padding:0 18px !important;
+    grid-template-columns:minmax(0, 1fr) 250px !important;
+    gap:18px !important;
+    align-items:start !important;
+  }
+
+  .archiveBoardArea{
+    width:100% !important;
+    max-width:none !important;
+    justify-content:center !important;
+  }
+
+  .archiveBoardWrap{
+    width:100% !important;
+    justify-content:center !important;
+  }
+
+  .archiveBoard{
+    width:100% !important;
+    max-width:690px !important;
+    margin:0 !important;
+    gap:10px !important;
+  }
+
+  .archiveModernTop{
+    grid-template-columns:1fr 1fr !important;
+    gap:10px !important;
+  }
+
+  .archiveModernInfoCard{
+    min-height:64px !important;
+    grid-template-columns:120px 1fr !important;
+  }
+
+  .archiveModernInfoLabel{
+    font-size:1.15rem !important;
+  }
+
+  .archiveModernInfoValue{
+    font-size:1.1rem !important;
+  }
+
+  .archiveModernMiddle{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 auto !important;
+    grid-template-columns:minmax(0, 1fr) 118px minmax(0, 1fr) !important;
+    gap:10px !important;
+  }
+
+  .archiveModernBigCard{
+    min-height:150px !important;
+    max-height:150px !important;
+    font-size:3.1rem !important;
+  }
+
+  .archiveModernBigCard.archiveWhiteHidden::before{
+    font-size:3.5rem !important;
+  }
+
+  .archiveModernScoreCard{
+    min-height:150px !important;
+    grid-template-rows:48px 1fr !important;
+  }
+
+  .archiveModernScoreLabel{
+    font-size:1.15rem !important;
+  }
+
+  .archiveModernScoreValue{
+    font-size:2.2rem !important;
+  }
+
+  .archiveBottomGrid{
+    grid-template-columns:1fr 1fr !important;
+    gap:10px !important;
+  }
+
+  .archiveBottomCol{
+    gap:10px !important;
+  }
+
+  .archiveModernSmallCard{
+    min-height:54px !important;
+    height:54px !important;
+    grid-template-columns:1fr 50px !important;
+    border-radius:14px !important;
+  }
+
+  .archiveModernSmallCard .archiveModernSmallText{
+    font-size:1.15rem !important;
+    line-height:1.05 !important;
+  }
+
+  .archiveModernSmallEmoji{
+    font-size:1.2rem !important;
+  }
+
+  .archiveSidePanel{
+    width:100% !important;
+    max-width:250px !important;
+    transform:none !important;
+    margin:0 !important;
+    justify-self:start !important;
+    align-self:start !important;
+    gap:10px !important;
+  }
+
+  .archiveSideRound,
+  .archiveSideTeamCard,
+  .archiveSideTimerBox,
+  .archiveControlButtons,
+  .archiveInputsInline{
+    left:0 !important;
+  }
+
+  .archiveSideRound{
+    min-height:48px !important;
+    font-size:1rem !important;
+  }
+
+  .archiveSideTeamName{
+    font-size:1rem !important;
+  }
+
+  .archiveSideTeamScore{
+    min-width:42px !important;
+    height:34px !important;
+    font-size:1.2rem !important;
+  }
+
+  .archiveSideTimerValue{
+    font-size:2rem !important;
+  }
+
+  .archiveCtrlBtn{
+    min-height:44px !important;
+    font-size:.92rem !important;
+  }
+
+  .archiveMiniInputStrong{
+    height:52px !important;
+    min-height:52px !important;
+    font-size:1.8rem !important;
+  }
+}
 /* =========================
    ADMIN LAYOUT - STEP 1
 ========================= */
@@ -6497,6 +6916,7 @@ body{
     position: static;
   }
 }
+
 /* =========================
    ADMIN TABS + SHARED SECTION UI
 ========================= */
@@ -7851,7 +8271,7 @@ button:hover,
   border-radius:999px;
   background:#990000;
   color:#ffffff;
-  font-size:12px;
+  font-size:120px;
   font-weight:800;
   display:inline-flex;
   align-items:center;
@@ -9532,1104 +9952,50 @@ body{
     padding: 18px !important;
   }
 }
-/* =========================
-   PRESENTER PDF - BETTER LAYOUT
-========================= */
-
-.presenterPdfPages{
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  background: #ffffff;
-  direction: rtl;
-  font-family: "Zain", "Tahoma", "Arial", sans-serif;
-}
-
-.presenterPdfPage{
-  width: 100%;
-  background: #ffffff;
-  border: 1px solid #d9e0e0;
-  border-radius: 30px;
-  overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0,0,0,.05);
-  page-break-inside: avoid;
-  break-inside: avoid;
-}
-
-.presenterPdfPageInner{
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.presenterPdfPageHead{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e3e8e8;
-}
-
-.presenterPdfPageTitle{
-  font-size: 40px;
-  line-height: 1.2;
-  color: #243447;
-  font-weight: 500;
-}
-
-.presenterPdfPageModel{
-  min-height: 44px;
-  padding: 8px 18px;
-  border-radius: 999px;
-  background: #2F4158;
-  color: #ffffff;
-  font-size: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-}
-
-.presenterPdfPageContent{
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.presenterEmpty{
-  min-height: 120px;
-  border: 1px dashed #d9e0e0;
-  background: #f7f9f9;
-  border-radius: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #5f6b7a;
-  font-size: 22px;
-}
-
-/* grids */
-.presenterQaGrid,
-.presenterAnswerGrid,
-.presenterFinalCardGrid{
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.presenterFinalCardGridTwo{
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.presenterQaList,
-.presenterFinalBlocks{
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.presenterQaListOne{
-  gap: 16px;
-}
-
-/* blocks */
-.presenterSectionBlock,
-.presenterAnswerCard,
-.presenterQaCard,
-.presenterFinalImageCard,
-.presenterWideQuestionBox{
-  background: #f7f9f9;
-  border: 1px solid #e3e8e8;
-  border-radius: 24px;
-}
-
-.presenterSectionBlock{
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.presenterSectionBlockHead{
-  font-size: 28px;
-  color: #243447;
-  font-weight: 500;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #e3e8e8;
-}
-
-.presenterWideQuestionBox{
-  padding: 22px 24px;
-  font-size: 30px;
-  color: #243447;
-  line-height: 1.8;
-  background: #fff6ef;
-  border-color: #ffd7b8;
-}
-
-/* question cards */
-.presenterQaCard,
-.presenterAnswerCard{
-  position: relative;
-  padding: 20px;
-  min-height: 145px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 12px;
-}
-
-.presenterQaCardFull{
-  min-height: 165px;
-}
-
-.presenterQaBadge{
-  width: 64px;
-  height: 42px;
-  border-radius: 999px;
-  background: #2f4158;
-  color: #ffffff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 21px;
-  font-weight: 500;
-  margin-bottom: 8px;
-}
-
-.presenterQaQuestion{
-  font-size: 28px;
-  color: #243447;
-  line-height: 1.8;
-}
-
-.presenterQaAnswer,
-.presenterAnswerOnly{
-  font-size: 25px;
-  color: #2f4158;
-  line-height: 1.8;
-}
-
-.presenterQaAnswer{
-  color: #FF9B51;
-}
-
-.presenterQaNote{
-  font-size: 20px;
-  color: #5f6b7a;
-  line-height: 1.9;
-}
-
-/* final */
-.presenterFinalImageCard{
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.presenterFinalImageHead{
-  font-size: 25px;
-  color: #243447;
-  font-weight: 500;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #e3e8e8;
-}
-
-.presenterFinalImageBody{
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.presenterFinalImageBody img,
-.presenterFinalRound3Item img{
-  width: 100%;
-  max-width: 100%;
-  height: 250px;
-  object-fit: contain;
-  display: block;
-  background: #ffffff;
-  border: 1px solid #d9e0e0;
-  border-radius: 20px;
-  padding: 10px;
-}
-
-.presenterFinalRound3List{
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.presenterFinalRound3Item{
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 14px;
-  border: 1px solid #e3e8e8;
-  border-radius: 20px;
-  background: #fcfdfd;
-}
-
-.presenterNoImage{
-  min-height: 180px;
-  border-radius: 18px;
-  border: 1px dashed #d9e0e0;
-  background: #f7f9f9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #5f6b7a;
-  font-size: 20px;
-}
-
-/* round 2 */
-.presenterMiniList{
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.presenterMiniLine{
-  background: #ffffff;
-  border: 1px solid #d9e0e0;
-  border-radius: 18px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 21px;
-  color: #243447;
-  line-height: 1.9;
-}
-
-/* archive export */
-.archiveBoard.presenterArchiveLiveClone{
-  border-radius: 26px;
-  overflow: hidden;
-}
-
-/* responsive inside capture */
-@media (max-width: 1100px){
-  .presenterQaGrid,
-  .presenterAnswerGrid,
-  .presenterFinalCardGrid,
-  .presenterFinalCardGridTwo{
-    grid-template-columns: 1fr;
-  }
-}
-/* =========================
-   PRESENTER PDF - FULL DESIGN
-========================= */
-
-.presenterPdfPages{
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  gap:30px;
-  background:#ffffff;
-  direction:rtl;
-  font-family:"Zain","Tahoma","Arial",sans-serif;
-}
-
-.presenterPdfPage{
-  width:100%;
-  background:#ffffff;
-  border:1px solid #d9e0e0;
-  border-radius:30px;
-  overflow:hidden;
-  box-shadow:0 8px 20px rgba(0,0,0,.05);
-  page-break-inside:avoid;
-  break-inside:avoid;
-}
-
-.presenterPdfPageInner{
-  padding:28px;
-  display:flex;
-  flex-direction:column;
-  gap:24px;
-}
-
-.presenterPdfPageHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
-  padding-bottom:16px;
-  border-bottom:1px solid #e3e8e8;
-}
-
-.presenterPdfPageTitle{
-  font-size:40px;
-  line-height:1.2;
-  color:#243447;
-  font-weight:500;
-}
-
-.presenterPdfPageModel{
-  min-height:44px;
-  padding:8px 18px;
-  border-radius:999px;
-  background:#2F4158;
-  color:#ffffff;
-  font-size:20px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  white-space:nowrap;
-}
-
-.presenterPdfPageContent{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-}
-
-.presenterEmpty{
-  min-height:120px;
-  border:1px dashed #d9e0e0;
-  background:#f7f9f9;
-  border-radius:22px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#5f6b7a;
-  font-size:22px;
-}
 
 /* =========================
-   SHARED CARDS
+   GLOBAL FONT SYSTEM
 ========================= */
 
-.presenterSectionBlock,
-.presenterAnswerCard,
-.presenterQaCard,
-.presenterFinalImageCard,
-.presenterWideQuestionBox,
-.presenterMiniLine,
-.presenterFinalRound3Item{
-  background:#f7f9f9;
-  border:1px solid #e3e8e8;
-  border-radius:24px;
-}
-
-.presenterSectionBlock{
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.presenterSectionBlockHead{
-  font-size:28px;
-  color:#243447;
-  font-weight:500;
-  padding-bottom:12px;
-  border-bottom:1px solid #e3e8e8;
-}
-
-.presenterQaBadge{
-  width:64px;
-  height:42px;
-  border-radius:999px;
-  background:#2F4158;
-  color:#ffffff;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  font-size:21px;
-  font-weight:500;
-  margin-bottom:8px;
-  flex:0 0 auto;
-}
-
-.presenterQaQuestion{
-  font-size:28px;
-  color:#243447;
-  line-height:1.8;
-}
-
-.presenterQaAnswer,
-.presenterAnswerOnly{
-  font-size:25px;
-  color:#2F4158;
-  line-height:1.8;
-}
-
-.presenterQaAnswer{
-  color:#FF9B51;
-}
-
-.presenterQaNote{
-  font-size:20px;
-  color:#5F6B7A;
-  line-height:1.9;
-}
-
-.presenterNoImage{
-  min-height:180px;
-  border-radius:18px;
-  border:1px dashed #d9e0e0;
-  background:#f7f9f9;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#5f6b7a;
-  font-size:20px;
-  text-align:center;
-  padding:18px;
-}
-
-/* =========================
-   WARMUP
-========================= */
-
-.presenterWarmupGrid{
-  display:grid;
-  grid-template-columns:repeat(2, minmax(0, 1fr));
-  gap:18px;
-}
-
-.presenterWarmupCard{
-  background:#f7f9f9;
-  border:1px solid #e3e8e8;
-  border-radius:24px;
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.presenterWarmupCardHead{
-  padding-bottom:12px;
-  border-bottom:1px solid #e3e8e8;
-}
-
-.presenterWarmupCardTitle{
-  font-size:28px;
-  color:#243447;
-  font-weight:500;
-}
-
-.presenterWarmupCardBody{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.presenterWarmupLine{
-  display:flex;
-  align-items:flex-start;
-  gap:14px;
-  background:#ffffff;
-  border:1px solid #d9e0e0;
-  border-radius:20px;
-  padding:16px;
-}
-
-.presenterWarmupLineBody{
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-/* =========================
-   TOP 10
-========================= */
-
-.presenterWideQuestionBox{
-  padding:22px 24px;
-  font-size:30px;
-  color:#243447;
-  line-height:1.8;
-  background:#fff6ef;
-  border-color:#ffd7b8;
-}
-
-.presenterAnswerGrid{
-  display:grid;
-  grid-template-columns:repeat(2, minmax(0, 1fr));
-  gap:18px;
-}
-
-.presenterAnswerCard{
-  padding:20px;
-  min-height:130px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:10px;
-  background:#fcfdfd;
-}
-
-.presenterAnswerOnly{
-  font-size:28px;
-  color:#243447;
-  line-height:1.8;
-}
-
-/* =========================
-   AUCTION
-========================= */
-
-.presenterQaList{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.presenterQaListOne{
-  gap:16px;
-}
-
-.presenterQaCard{
-  position:relative;
-  padding:20px;
-  min-height:150px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:12px;
-  background:#fcfdfd;
-}
-
-.presenterQaCardFull{
-  min-height:170px;
-}
-
-/* =========================
-   WHO
-========================= */
-
-.presenterWhoGrid{
-  display:grid;
-  grid-template-columns:repeat(3, minmax(0, 1fr));
-  gap:18px;
-}
-
-.presenterWhoCard{
-  background:#f7f9f9;
-  border:1px solid #e3e8e8;
-  border-radius:24px;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  min-height:135px;
-  justify-content:center;
-}
-
-/* لو استعملت AnswerGrid الحالية */
-.presenterAnswerGrid .presenterAnswerCard{
-  min-height:135px;
-}
-
-/* =========================
-   FINAL - ROUND 1 + 3
-========================= */
-
-.presenterFinalCardGrid{
-  display:grid;
-  grid-template-columns:repeat(2, minmax(0, 1fr));
-  gap:18px;
-}
-
-.presenterFinalCardGridTwo{
-  grid-template-columns:repeat(2, minmax(0, 1fr));
-}
-
-.presenterFinalImageCard{
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  background:#fcfdfd;
-}
-
-.presenterFinalImageHead{
-  font-size:25px;
-  color:#243447;
-  font-weight:500;
-  padding-bottom:12px;
-  border-bottom:1px solid #e3e8e8;
-}
-
-.presenterFinalImageBody{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.presenterFinalImageBody img,
-.presenterFinalRound3Item img{
-  width:100%;
-  max-width:100%;
-  height:250px;
-  object-fit:contain;
-  display:block;
-  background:#ffffff;
-  border:1px solid #d9e0e0;
-  border-radius:20px;
-  padding:10px;
-}
-
-.presenterFinalRound3List{
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-}
-
-.presenterFinalRound3Item{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  padding:14px;
-  background:#ffffff;
-}
-
-/* =========================
-   FINAL - ROUND 2
-========================= */
-
-.presenterFinalBlocks{
-  display:grid;
-  grid-template-columns:repeat(2, minmax(0, 1fr));
-  gap:18px;
-}
-
-.presenterMiniList{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.presenterMiniLine{
-  background:#ffffff;
-  border:1px solid #d9e0e0;
-  border-radius:18px;
-  padding:14px 16px;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  font-size:21px;
-  color:#243447;
-  line-height:1.9;
-}
-
-/* =========================
-   ARCHIVE
-========================= */
-
-.archiveBoard.presenterArchiveLiveClone{
-  border-radius:26px;
-  overflow:hidden;
-  background:#f7f9f9;
-  border:1px solid #e3e8e8;
-  padding:18px;
-}
-
-.archiveModernTop{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-  margin-bottom:16px;
-}
-
-.archiveModernInfoCard,
-.archiveModernBigCard,
-.archiveModernScoreCard,
-.archiveModernSmallCard{
-  background:#ffffff;
-  border:1px solid #d9e0e0;
-  border-radius:22px;
-  box-shadow:none;
-}
-
-.archiveModernInfoCard{
-  min-height:130px;
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:10px;
-}
-
-.archiveModernInfoLabel{
-  font-size:22px;
-  color:#5f6b7a;
-}
-
-.archiveModernInfoValue{
-  font-size:28px;
-  color:#243447;
-  line-height:1.7;
-}
-
-.archiveModernInfoValue img,
-.archiveModernBigCard img{
-  width:100%;
-  height:170px;
-  object-fit:contain;
-  display:block;
-  background:#ffffff;
-  border-radius:18px;
-}
-
-.archiveModernMiddle{
-  display:grid;
-  grid-template-columns:1fr 260px 1fr;
-  gap:16px;
-  align-items:stretch;
-  margin-bottom:18px;
-}
-
-.archiveModernBigCard{
-  min-height:240px;
-  padding:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:40px;
-  color:#243447;
-}
-
-.archiveModernScoreCard{
-  min-height:240px;
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-  text-align:center;
-  background:#fff6ef;
-  border-color:#ffd7b8;
-}
-
-.archiveModernScoreLabel{
-  font-size:26px;
-  color:#5f6b7a;
-}
-
-.archiveModernScoreValue{
-  font-size:42px;
-  color:#243447;
-  line-height:1.2;
-}
-
-.archiveBottomGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-}
-
-.archiveBottomCol{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.archiveModernSmallCard{
-  min-height:90px;
-  padding:14px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-
-.archiveModernSmallMain{
-  min-width:0;
-  flex:1;
-}
-
-.archiveModernSmallText{
-  font-size:22px;
-  color:#243447;
-  line-height:1.7;
-}
-
-.archiveModernSmallEmoji{
-  font-size:26px;
-  line-height:1;
-}
-
-.archiveWantedItem{
-  background:#fff6ef !important;
-  border-color:#ffd7b8 !important;
-}
-
-/* =========================
-   RESPONSIVE INSIDE EXPORT
-========================= */
-
-@media (max-width:1100px){
-  .presenterWarmupGrid,
-  .presenterAnswerGrid,
-  .presenterFinalCardGrid,
-  .presenterFinalCardGridTwo,
-  .presenterFinalBlocks,
-  .archiveModernTop,
-  .archiveModernMiddle,
-  .archiveBottomGrid{
-    grid-template-columns:1fr;
-  }
-
-  .presenterWhoGrid{
-    grid-template-columns:1fr;
-  }
-}
-/* =========================
-   PRESENTER - WARMUP FIX
-========================= */
-
-.presenterWarmupGrid{
-  display:grid;
-  grid-template-columns:repeat(2, minmax(0, 1fr));
-  gap:18px;
-}
-
-.presenterWarmupCard{
-  background:#f7f9f9;
-  border:1px solid #e3e8e8;
-  border-radius:24px;
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.presenterWarmupCardHead{
-  padding-bottom:12px;
-  border-bottom:1px solid #e3e8e8;
-}
-
-.presenterWarmupCardTitle{
-  font-size:28px;
-  color:#243447;
-  font-weight:500;
-}
-
-.presenterWarmupCardBody{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.presenterWarmupLine{
-  display:flex;
-  align-items:flex-start;
-  gap:14px;
-  background:#ffffff;
-  border:1px solid #d9e0e0;
-  border-radius:20px;
-  padding:16px;
-}
-
-.presenterWarmupLineBody{
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-/* =========================
-   PRESENTER - ARCHIVE REDESIGN
-========================= */
-
-.presenterArchiveBoard{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  background:#f7f9f9;
-  border:1px solid #e3e8e8;
-  border-radius:26px;
-  padding:18px;
-}
-
-.presenterArchiveTop{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-}
-
-.presenterArchiveInfoCard,
-.presenterArchiveBigCard,
-.presenterArchiveScoreCard,
-.presenterArchiveHintCard{
-  background:#ffffff;
-  border:1px solid #d9e0e0;
-  border-radius:22px;
-}
-
-.presenterArchiveInfoCard{
-  min-height:120px;
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:10px;
-}
-
-.presenterArchiveInfoLabel{
-  font-size:22px;
-  color:#5f6b7a;
-}
-
-.presenterArchiveInfoValue{
-  font-size:28px;
-  color:#243447;
-  line-height:1.7;
-}
-
-.presenterArchiveInfoValue img,
-.presenterArchiveBigCard img{
-  width:100%;
-  height:180px;
-  object-fit:contain;
-  display:block;
-  border-radius:16px;
-  background:#ffffff;
-}
-
-.presenterArchiveMiddle{
-  display:grid;
-  grid-template-columns:1fr 260px 1fr;
-  gap:16px;
-  align-items:stretch;
-}
-
-.presenterArchiveBigCard{
-  min-height:240px;
-  padding:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:38px;
-  color:#243447;
-  background:#ffffff;
-}
-
-.presenterArchiveScoreCard{
-  min-height:240px;
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-  text-align:center;
-  background:#fff6ef;
-  border-color:#ffd7b8;
-}
-
-.presenterArchiveScoreLabel{
-  font-size:26px;
-  color:#5f6b7a;
-}
-
-.presenterArchiveScoreValue{
-  font-size:42px;
-  color:#243447;
-  line-height:1.2;
-}
-
-.presenterArchiveBottom{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-}
-
-.presenterArchiveColumn{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.presenterArchiveColumnTitle{
-  background:#ffffff;
-  border:1px solid #d9e0e0;
-  border-radius:18px;
-  padding:12px 16px;
-  font-size:22px;
-  color:#243447;
-  text-align:center;
-}
-
-.presenterArchiveHints{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.presenterArchiveHintCard{
-  min-height:88px;
-  padding:14px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  background:#ffffff;
-  border:1px solid #d9e0e0;
-  border-radius:18px;
-}
-
-.presenterArchiveHintCard.wanted{
-  background:#fff6ef;
-  border-color:#ffd7b8;
-}
-
-.presenterArchiveHintText{
-  font-size:22px;
-  color:#243447;
-  line-height:1.7;
-}
-
-.presenterArchiveHintIcon{
-  font-size:26px;
-  line-height:1;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width:1100px){
-  .presenterWarmupGrid,
-  .presenterArchiveTop,
-  .presenterArchiveMiddle,
-  .presenterArchiveBottom{
-    grid-template-columns:1fr;
-  }
-}
-/* =========================
-   ENGLISH NUMBERS
-========================= */
-
+/* الخط الأساسي للمشروع كله */
+html,
 body,
 button,
 input,
 textarea,
 select,
-.top10Rect,
-.top10ScoreValue,
-.top10MiddleTimer,
+option,
+label,
+span,
+div,
+p,
+small,
+strong,
+table,
+td,
+th{
+  font-family:"HanakaText", sans-serif;
+  font-weight:400;
+}
+
+/* كلمة الحنكة */
+.adminBrandTitle,
+.homeLogoTitle,
+.siteLogo,
+.brandTitle{
+  font-family:"HanakaDisplay", sans-serif !important;
+  font-weight:400 !important;
+}
+
+/* عناوين الفقرات فقط */
+.segmentTitle,
+.adminSectionTitle,
+.adminSideCardTitle,
 .top10MiddleLabel,
-.finalRound3Card,
-.finalRound3ImageStage,
-.finalRound3Item,
-.finalRound1Card,
-.finalRound2Card,
-.finalRound3Card,
-.finalScoreValue,
-.archiveModernScoreValue,
-.archiveAdminResultValue input,
-.adminStatusStripCount,
-.adminSegmentCompactMetaValue{
-  font-variant-numeric: lining-nums;
-  unicode-bidi: plaintext;
+.archiveSideRound,
+.finalRoundTitle,
+.finalMainTitle,
+.presenterPdfPageTitle{
+  font-family:"HanakaDisplay", sans-serif !important;
+  font-weight:400 !important;
 }

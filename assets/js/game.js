@@ -58,7 +58,6 @@ function saveSegmentStatus() {
 }
 
 let segmentStatus = loadSegmentStatus()
-
 /* =========================
    Winner Sound + Effects
 ========================= */
@@ -66,12 +65,14 @@ let segmentStatus = loadSegmentStatus()
 let winnerSound = null
 let winnerConfettiLayer = null
 let winnerConfettiInterval = null
+let winnerFxTimeouts = []
 
 function initWinnerSound() {
   if (!winnerSound) {
     winnerSound = new Audio("sounds/win.mp3")
     winnerSound.preload = "auto"
     winnerSound.loop = true
+    winnerSound.volume = 0.9
   }
 }
 
@@ -81,6 +82,8 @@ function playWinnerEffects() {
 
   const winnerBtn = document.querySelector(".winnerBtn")
   const homeShell = document.querySelector(".homePageShell")
+  const overlay = document.getElementById("winnerOverlay")
+  const nameBox = document.getElementById("winnerOverlayName")
 
   if (winnerBtn) {
     winnerBtn.classList.remove("winnerAnnounceFx")
@@ -94,8 +97,22 @@ function playWinnerEffects() {
     homeShell.classList.add("winnerFlash")
   }
 
+  if (overlay) {
+    overlay.classList.remove("winnerOverlayFx")
+    void overlay.offsetWidth
+    overlay.classList.add("winnerOverlayFx")
+  }
+
+  if (nameBox) {
+    nameBox.classList.remove("winnerNameFx")
+    void nameBox.offsetWidth
+    nameBox.classList.add("winnerNameFx")
+  }
+
   try {
+    winnerSound.pause()
     winnerSound.currentTime = 0
+
     const playPromise = winnerSound.play()
     if (playPromise && typeof playPromise.catch === "function") {
       playPromise.catch(err => {
@@ -107,22 +124,64 @@ function playWinnerEffects() {
   }
 
   launchWinnerConfetti()
+
+  winnerFxTimeouts.push(
+    setTimeout(() => createWinnerConfettiBurst(26), 250),
+    setTimeout(() => createWinnerConfettiBurst(24), 700),
+    setTimeout(() => createWinnerConfettiBurst(20), 1200)
+  )
 }
 
 function createWinnerConfettiBurst(count = 24) {
   if (!winnerConfettiLayer) return
 
+  const colors = [
+    "#FF9B51",
+    "#FFD7B8",
+    "#2F4158",
+    "#FFFFFF",
+    "#EAC17A"
+  ]
+
   for (let i = 0; i < count; i++) {
     const piece = document.createElement("span")
     piece.className = "winnerConfettiPiece"
-    piece.style.left = `${Math.random() * 100}%`
-    piece.style.animationDelay = `${Math.random() * 0.2}s`
-    piece.style.animationDuration = `${2 + Math.random() * 1.2}s`
+
+    const size = 8 + Math.random() * 10
+    const left = Math.random() * 100
+    const delay = Math.random() * 0.18
+    const duration = 2.2 + Math.random() * 1.4
+    const rotate = -40 + Math.random() * 80
+    const drift = -90 + Math.random() * 180
+    const color = colors[Math.floor(Math.random() * colors.length)]
+    const shape = Math.random()
+
+    piece.style.left = `${left}%`
+    piece.style.top = `${-10 - Math.random() * 12}%`
+    piece.style.width = `${size}px`
+    piece.style.height = `${size * (shape > 0.65 ? 1.35 : 1)}px`
+    piece.style.background = color
+    piece.style.animationDelay = `${delay}s`
+    piece.style.animationDuration = `${duration}s`
+    piece.style.setProperty("--confetti-rotate", `${rotate}deg`)
+    piece.style.setProperty("--confetti-drift", `${drift}px`)
+
+    if (shape < 0.33) {
+      piece.style.borderRadius = "50%"
+    } else if (shape < 0.66) {
+      piece.style.borderRadius = "4px"
+    } else {
+      piece.style.borderRadius = "2px"
+      piece.style.transform = "skewX(-12deg)"
+    }
+
     winnerConfettiLayer.appendChild(piece)
 
-    setTimeout(() => {
+    const removeTimeout = setTimeout(() => {
       piece.remove()
-    }, 3800)
+    }, (duration + delay + 1.2) * 1000)
+
+    winnerFxTimeouts.push(removeTimeout)
   }
 }
 
@@ -136,11 +195,11 @@ function launchWinnerConfetti() {
   winnerConfettiLayer.className = "winnerConfettiLayer"
   document.body.appendChild(winnerConfettiLayer)
 
-  createWinnerConfettiBurst(40)
+  createWinnerConfettiBurst(52)
 
   winnerConfettiInterval = setInterval(() => {
-    createWinnerConfettiBurst(18)
-  }, 700)
+    createWinnerConfettiBurst(16)
+  }, 850)
 }
 
 function stopWinnerEffects() {
@@ -154,12 +213,24 @@ function stopWinnerEffects() {
     winnerConfettiInterval = null
   }
 
+  winnerFxTimeouts.forEach(t => clearTimeout(t))
+  winnerFxTimeouts = []
+
   if (winnerConfettiLayer) {
     winnerConfettiLayer.remove()
     winnerConfettiLayer = null
   }
-}
 
+  const winnerBtn = document.querySelector(".winnerBtn")
+  const homeShell = document.querySelector(".homePageShell")
+  const overlay = document.getElementById("winnerOverlay")
+  const nameBox = document.getElementById("winnerOverlayName")
+
+  if (winnerBtn) winnerBtn.classList.remove("winnerAnnounceFx")
+  if (homeShell) homeShell.classList.remove("winnerFlash")
+  if (overlay) overlay.classList.remove("winnerOverlayFx")
+  if (nameBox) nameBox.classList.remove("winnerNameFx")
+}
 /* =========================
    Shared Game Sounds
 ========================= */
