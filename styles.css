@@ -15,7 +15,6 @@
   font-weight:400;
   font-style:normal;
 }
-
 /* =========================
    ROOT
 ========================= */
@@ -51,7 +50,7 @@
 }
 
 /* =========================
-   BASE - EDGE ONLY BACKGROUND SOFT
+   BASE - CLEAN PROJECT GRADIENT
 ========================= */
 
 body{
@@ -63,51 +62,8 @@ body{
   overflow-x:hidden;
   position:relative;
   isolation:isolate;
-  background:linear-gradient(135deg, #ffd7b8 0%, #f4e4d3 22%, #eaefef 58%, #e5ecec 100%);
-}
-
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:-2;
   background:
-    radial-gradient(circle at 12% 14%, rgba(47,65,88,.11) 0 2.6%, transparent 2.9%),
-    radial-gradient(circle at 12% 14%, rgba(47,65,88,.07) 0 6.2%, transparent 6.6%),
-
-    radial-gradient(circle at 86% 16%, rgba(47,65,88,.10) 0 2.4%, transparent 2.7%),
-    radial-gradient(circle at 86% 16%, rgba(47,65,88,.07) 0 5.8%, transparent 6.2%),
-
-    radial-gradient(circle at 18% 84%, rgba(47,65,88,.10) 0 2.5%, transparent 2.8%),
-    radial-gradient(circle at 18% 84%, rgba(47,65,88,.07) 0 5.9%, transparent 6.3%),
-
-    radial-gradient(circle at 84% 82%, rgba(47,65,88,.10) 0 2.6%, transparent 2.9%),
-    radial-gradient(circle at 84% 82%, rgba(47,65,88,.07) 0 6.1%, transparent 6.5%),
-
-    radial-gradient(circle at 6% 8%, rgba(255,155,81,.08) 0 6.6%, transparent 7%),
-    radial-gradient(circle at 94% 10%, rgba(255,155,81,.07) 0 5.8%, transparent 6.2%),
-    radial-gradient(circle at 90% 94%, rgba(255,155,81,.06) 0 6.6%, transparent 7%),
-    radial-gradient(circle at 10% 92%, rgba(255,155,81,.06) 0 5.8%, transparent 6.1%);
-}
-
-body::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:-1;
-  background:
-    linear-gradient(rgba(47,65,88,.11), rgba(47,65,88,.11)) 8% 64% / 90px 2px no-repeat,
-    linear-gradient(rgba(47,65,88,.11), rgba(47,65,88,.11)) 11.8% 59.5% / 2px 60px no-repeat,
-    linear-gradient(rgba(47,65,88,.11), rgba(47,65,88,.11)) 16.2% 59.5% / 2px 60px no-repeat,
-    linear-gradient(rgba(47,65,88,.11), rgba(47,65,88,.11)) 8% 68.8% / 90px 2px no-repeat,
-
-    linear-gradient(rgba(47,65,88,.11), rgba(47,65,88,.11)) 80% 18% / 90px 2px no-repeat,
-    linear-gradient(rgba(47,65,88,.11), rgba(47,65,88,.11)) 83.8% 13.5% / 2px 60px no-repeat,
-    linear-gradient(rgba(47,65,88,.11), rgba(47,65,88,.11)) 88.2% 13.5% / 2px 60px no-repeat,
-    linear-gradient(rgba(47,65,88,.11), rgba(47,65,88,.11)) 80% 22.8% / 90px 2px no-repeat;
-  opacity:.75;
+    linear-gradient(180deg, #fff6ee 0%, #f5eee6 20%, #edf2f1 58%, #e6ecec 100%);
 }
 /* =========================
    HOME PAGE
@@ -3104,7 +3060,7 @@ body::after{
 .whoPointsLabel{
   color:#FFFFFF;
   font-family:"HanakaText", sans-serif;
-  font-size:1.3rem;
+  font-size:1.50rem;
   line-height:1;
 }
 
@@ -3140,7 +3096,7 @@ body::after{
 }
 
 .whoPointBtn.selectedWhoPoint{
-  background:#3A4A56;
+  background:#7f9eb6;
   color:#FFFFFF;
   box-shadow:
     0 10px 18px rgba(37,52,63,.20),
@@ -3337,10 +3293,10 @@ body::after{
 
 #whoTurnInline{
   order: 2 !important;
-  margin-right: 90px !important;
+  margin-right: 10px !important;
   margin-left: 0 !important;
   text-align: right !important;
-  font-size: 1.5rem !important;
+  font-size: 1.80rem !important;
   line-height: 1.2 !important;
 }
 
@@ -3366,7 +3322,7 @@ body::after{
   cursor: zoom-in;
 }
 
-/* تكبير صورة من هو مثل المزاد */
+/* تكبير صورة من هو مثل فتبلة */
 .whoImageOverlay{
   position: fixed;
   inset: 0;
@@ -3406,6 +3362,16 @@ body::after{
   .whoImageOverlayImg{
     border-radius: 16px;
   }
+}
+/* تكبير أرقام منطقة مربعات "من هو" فقط */
+.whoGrid button,
+.whoNumbersGrid button,
+.whoNumbersWrap button,
+[class*="who"] .numberBtn,
+[class*="who"] .whoNumberBtn{
+  font-size: 2rem !important;
+  line-height: 1 !important;
+  font-family: "HanakaDigits","HanakaDisplay","HanakaText",sans-serif !important;
 }
 /* =========================
    AUCTION - FINAL DESIGN
@@ -5378,7 +5344,86 @@ body::after{
     border-radius:14px !important;
   }
 }
+/* =========================
+   FINAL / الفاصلة - FONT FIX
+========================= */
 
+/* النصوص داخل الفاصلة */
+.finalWrap,
+.finalWrap *:not(.finalNumber):not(.finalRoundNumber):not(.finalScoreNumber):not(.finalTimerNumber),
+.finalAdminShell,
+.finalAdminShell *:not(.finalNumber):not(.finalRoundNumber):not(.finalScoreNumber):not(.finalTimerNumber),
+.finalRoundTitle,
+.finalQuestionText,
+.finalAnswerText,
+.finalNoteText,
+.finalTeamName,
+.finalMiddleLabel,
+.finalMiddleTurn,
+.finalControlBtn,
+.finalAdminCard,
+.finalAdminCard input,
+.finalAdminCard textarea,
+.finalAdminCard select{
+  font-family:"HanakaText", sans-serif !important;
+  font-weight:400 !important;
+}
+
+/* الأرقام داخل الفاصلة */
+.finalRound1Card,
+.finalRound2Card,
+.finalRound3Card,
+.finalScoreValue,
+.finalTimer,
+.finalRoundNumber,
+.finalNumber,
+.finalScoreNumber,
+.finalTimerNumber,
+.finalAdminCard h3,
+.finalAdminWordIndex,
+.finalAdminTypeBadge,
+.finalRound1AdminCard h3,
+.finalRound3ImageStage .numberOnly,
+.finalRound3ItemNumber,
+.finalRound2Number,
+.finalRound1Number{
+  font-family:"HanakaDisplay", sans-serif !important;
+  font-weight:400 !important;
+  font-variant-numeric: lining-nums !important;
+  line-height:1 !important;
+}
+
+/* لو الرقم داخل span أو div داخل المربعات */
+.finalRound1Card span,
+.finalRound2Card span,
+.finalRound3Card span,
+.finalScoreValue span,
+.finalTimer span{
+  font-family:"HanakaDisplay", sans-serif !important;
+  font-weight:400 !important;
+}
+
+/* أرقام المربعات تكون أوضح */
+.finalRound1Card,
+.finalRound2Card,
+.finalRound3Card{
+  font-size:2rem !important;
+}
+
+/* أرقام السكور/المؤقت */
+.finalScoreValue,
+.finalTimer{
+  font-size:2.2rem !important;
+}
+/* نصوص أزرار التحكم - الفاصلة فقط */
+.finalWrap button,
+.finalMainBoard button,
+.finalControlsBar button,
+.finalBottomActions button,
+.finalActionRow button{
+  font-family:"HanakaText", sans-serif !important;
+  font-weight:400 !important;
+}
 /* =========================
    ARCHIVE / الأرشيف
 ========================= */
@@ -8870,7 +8915,7 @@ button,
   padding-bottom: 0 !important;
 }
 
-/* أرقام المزاد والفاصلة */
+/* أرقام الفتبلة والفاصلة */
 #auctionCountInput,
 #finalRound1CardsCount,
 .compactCountSelect{

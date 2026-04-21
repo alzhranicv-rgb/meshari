@@ -133,7 +133,7 @@ window.renderAuction = async function () {
 
   await loadAuctionMaxNumber()
 
-  openSegment("المزاد", buildAuctionHTML())
+  openSegment("فتبلة", buildAuctionHTML())
   updateAuctionUndoButtonState()
   updateAuctionTurnBox()
   updateEndRoundButtonState()

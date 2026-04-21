@@ -197,7 +197,7 @@ async function buildSegmentStatusGrid() {
   const labels = {
     warmup: "التسخين",
     top10: "Top 10",
-    auction: "المزاد",
+    auction: "فتبلة",
     who: "من هو",
     final: "الفاصلة",
     archive: "الأرشيف"
@@ -247,8 +247,8 @@ async function renderAdminHome() {
     },
     {
       key: "auction",
-      title: "المزاد",
-      desc: "أسئلة الصور والمزايدة",
+      title: "فتبلة",
+      desc: "أسئلة الصور والفتبلة",
       count: counts.auction || 0
     },
     {
@@ -597,7 +597,7 @@ async function deleteTop10Segment() {
 
 async function deleteAuctionSegment() {
   if (!currentModel) return
-  const ok = confirm("هل تريد حذف جميع أسئلة المزاد من قاعدة البيانات؟")
+  const ok = confirm("هل تريد حذف جميع أسئلة الفتبلة من قاعدة البيانات؟")
   if (!ok) return
 
   const { error } = await db
@@ -607,11 +607,11 @@ async function deleteAuctionSegment() {
 
   if (error) {
     console.log(error)
-    showGameToast("فشل حذف المزاد")
+    showGameToast("فشل حذف الفتبلة")
     return
   }
 
-  showGameToast("تم حذف المزاد")
+  showGameToast("تم حذف الفتبلة")
   await renderAuctionAdmin()
 }
 
@@ -1106,8 +1106,8 @@ async function renderAuctionAdmin() {
     <div class="auctionAdminShell">
       <div class="adminEditorTopBar">
         <div>
-          <h2 class="adminSectionTitle">المزاد</h2>
-          <div class="adminSectionSubTitle">تحرير أسئلة الصور والمزاد بشكل منظم</div>
+          <h2 class="adminSectionTitle">فتبلة</h2>
+          <div class="adminSectionSubTitle">تحرير أسئلة الصور والفتبلة بشكل منظم</div>
         </div>
       </div>
 
@@ -1220,8 +1220,8 @@ async function renderAuctionAdminWithCount(count) {
     <div class="auctionAdminShell">
       <div class="adminEditorTopBar">
         <div>
-          <h2 class="adminSectionTitle">المزاد</h2>
-          <div class="adminSectionSubTitle">تحرير أسئلة الصور والمزاد بشكل منظم</div>
+          <h2 class="adminSectionTitle">فتبلة</h2>
+          <div class="adminSectionSubTitle">تحرير أسئلة الصور والفتبلة بشكل منظم</div>
         </div>
       </div>
 
@@ -3001,7 +3001,7 @@ const warmupHtml = buildPresenterPage(
   }).join("")
 
   const auctionHtml = buildPresenterPage(
-    "المزاد",
+    "فتبلة",
     `
       <div class="presenterQaList presenterQaListOne">
         ${auctionRows.map(item => `

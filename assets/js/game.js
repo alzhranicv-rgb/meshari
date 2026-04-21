@@ -847,7 +847,7 @@ function getCurrentSegmentKey() {
 
   if (text.includes("التسخين")) return "warmup"
   if (text.includes("Top 10")) return "top10"
-  if (text.includes("المزاد")) return "auction"
+  if (text.includes("فتبلة")) return "auction"
   if (text.includes("من هو")) return "who"
   if (text.includes("الفاصلة")) return "final"
   if (text.includes("الأرشيف")) return "archive"
