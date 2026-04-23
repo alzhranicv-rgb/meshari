@@ -456,6 +456,7 @@ function whoCorrect() {
   }
 
   playGameSound("correct")
+  flashScreen("correct")
 
   window.whoState = whoState
   window.currentSegmentScores = {
@@ -498,6 +499,7 @@ function whoWrong() {
   }
 
   playGameSound("wrong")
+  flashScreen("wrong")
 
   window.whoState = whoState
   window.currentSegmentScores = {

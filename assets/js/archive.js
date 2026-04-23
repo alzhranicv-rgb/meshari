@@ -815,6 +815,7 @@ function addArchiveError() {
   archiveTurnLocked = true
 
   playGameSound("wrong")
+  flashScreen("wrong")
 
   updateArchiveErrorsUI()
   resetArchiveTimer()
@@ -875,6 +876,7 @@ function showArchiveAnswer() {
   archiveTurnLocked = true
 
   playGameSound("answer")
+  flashScreen("correct")
 
   recalcArchiveRemainingPoints(items)
   updateArchiveScoresUI()

@@ -7855,7 +7855,7 @@ body::before{
     font-size:28px !important;
   }
 
-  /* المزاد */
+  /* فتبلة */
   .auctionGrid{
     grid-template-columns:repeat(4, minmax(0,1fr)) !important;
     gap:12px !important;
@@ -20708,7 +20708,7 @@ button,
   padding-bottom: 0 !important;
 }
 
-/* أرقام المزاد والفاصلة */
+/* أرقام فتبلة والفاصلة */
 #auctionCountInput,
 #finalRound1CardsCount,
 .compactCountSelect{

@@ -1741,6 +1741,7 @@ async function buildFinalRound1Admin(metaData, countAlreadyShown = false) {
   for (let i = 1; i <= 6; i++) {
     const dimmed = i > cardsCount ? 'style="opacity:.38;"' : ''
     const isTextCard = i <= 3
+    const isQuestionCard = i >= 4 && i <= 6
 
     html += `
       <div class="finalAdminCard finalRound1AdminCard" ${dimmed}>
@@ -1791,6 +1792,45 @@ async function buildFinalRound1Admin(metaData, countAlreadyShown = false) {
             : ""
         }
 
+        ${
+          isQuestionCard
+            ? `
+              <div class="finalAdminRowSingle finalAdminRowSingleText">
+                <div class="adminField finalTextCardField">
+                  <label>جزء السؤال 1</label>
+                  <textarea
+                    id="finalRound1QuestionPart1_${i}"
+                    placeholder="اكتب الجزء الأول"
+                    rows="2"
+                  >${escapeHtml(map[i]?.question_part1 || "")}</textarea>
+                </div>
+              </div>
+
+              <div class="finalAdminRowSingle finalAdminRowSingleText">
+                <div class="adminField finalTextCardField">
+                  <label>جزء السؤال 2</label>
+                  <textarea
+                    id="finalRound1QuestionPart2_${i}"
+                    placeholder="اكتب الجزء الثاني"
+                    rows="2"
+                  >${escapeHtml(map[i]?.question_part2 || "")}</textarea>
+                </div>
+              </div>
+
+              <div class="finalAdminRowSingle finalAdminRowSingleText">
+                <div class="adminField finalTextCardField">
+                  <label>جزء السؤال 3</label>
+                  <textarea
+                    id="finalRound1QuestionPart3_${i}"
+                    placeholder="اكتب الجزء الثالث"
+                    rows="2"
+                  >${escapeHtml(map[i]?.question_part3 || "")}</textarea>
+                </div>
+              </div>
+            `
+            : ""
+        }
+
         <div class="finalAdminPreviewBox">
           ${map[i]?.image ? `<img src="${escapeHtml(map[i].image)}" class="previewImg">` : ""}
         </div>
@@ -1803,7 +1843,9 @@ async function buildFinalRound1Admin(metaData, countAlreadyShown = false) {
 }
 
 async function saveFinalRound1(cardsCount) {
-  const finalCardsCount = Number(cardsCount || document.getElementById("finalRound1CardsCount")?.value || 4)
+  const finalCardsCount = Number(
+    cardsCount || document.getElementById("finalRound1CardsCount")?.value || 4
+  )
 
   const { data: oldRows, error: oldError } = await db
     .from("final_round1_items")
@@ -1827,8 +1869,21 @@ async function saveFinalRound1(cardsCount) {
     const file = document.getElementById(`finalRound1File_${i}`)?.files?.[0]
     const answer = (document.getElementById(`finalRound1Answer_${i}`)?.value || "").trim()
     const note = (document.getElementById(`finalRound1Note_${i}`)?.value || "").trim()
+
     const cardText = i <= 3
       ? (document.getElementById(`finalRound1CardText_${i}`)?.value || "").trim()
+      : ""
+
+    const questionPart1 = i >= 4 && i <= 6
+      ? (document.getElementById(`finalRound1QuestionPart1_${i}`)?.value || "").trim()
+      : ""
+
+    const questionPart2 = i >= 4 && i <= 6
+      ? (document.getElementById(`finalRound1QuestionPart2_${i}`)?.value || "").trim()
+      : ""
+
+    const questionPart3 = i >= 4 && i <= 6
+      ? (document.getElementById(`finalRound1QuestionPart3_${i}`)?.value || "").trim()
       : ""
 
     let image = oldMap[i]?.image || ""
@@ -1836,7 +1891,15 @@ async function saveFinalRound1(cardsCount) {
       image = await uploadImageFile(file, `final_r1_${i}`)
     }
 
-    if (!image && !answer && !note && !cardText) continue
+    if (
+      !image &&
+      !answer &&
+      !note &&
+      !cardText &&
+      !questionPart1 &&
+      !questionPart2 &&
+      !questionPart3
+    ) continue
 
     rows.push({
       model: currentModel,
@@ -1844,7 +1907,10 @@ async function saveFinalRound1(cardsCount) {
       image,
       answer,
       note,
-      card_text: cardText
+      card_text: cardText,
+      question_part1: questionPart1,
+      question_part2: questionPart2,
+      question_part3: questionPart3
     })
   }
 
@@ -1874,7 +1940,6 @@ async function saveFinalRound1(cardsCount) {
     return
   }
 }
-
 /* =========================
    Round 2 Admin
 ========================= */

@@ -492,6 +492,7 @@ function warmupCorrect() {
   }
 
   playGameSound("correct")
+  flashScreen("correct")
 
   lastAnsweredTeam = selectedTeam
   selectedTeam = getNextWarmupTeam()
@@ -521,7 +522,7 @@ function warmupWrong() {
   }
 
   playGameSound("wrong")
-
+  flashScreen("wrong")
   if (selectedTeam) {
     lastAnsweredTeam = selectedTeam
   }

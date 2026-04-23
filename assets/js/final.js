@@ -3,7 +3,7 @@ let finalState = {
 
   round1: {
     title: "الجولة الأولى",
-    cardsCount: 4,
+    cardsCount: 6,
     opened: [],
     activeTeam: null,
     scores: { A: 0, B: 0 },
@@ -12,6 +12,8 @@ let finalState = {
     currentAnswer: "",
     currentImage: "",
     currentNote: "",
+    currentQuestionParts: [],
+    shownQuestionPartsCount: 0,
     answerShown: false,
     pendingScore: false,
     cardTexts: {}
@@ -104,12 +106,21 @@ function clearFinalState() {
 
 function restoreFinalState(saved) {
   if (!saved) return
+
   finalState = saved
   finalState.round2.revealTimer = null
   finalState.round3.sequenceTimer = null
 
   if (!finalState.round1.cardTexts) {
     finalState.round1.cardTexts = {}
+  }
+
+  if (!finalState.round1.currentQuestionParts) {
+    finalState.round1.currentQuestionParts = []
+  }
+
+  if (typeof finalState.round1.shownQuestionPartsCount !== "number") {
+    finalState.round1.shownQuestionPartsCount = 0
   }
 
   window.finalState = finalState
@@ -235,13 +246,43 @@ function getRound2GroupKey(number) {
   return number === 1 || number === 3 ? "scramble" : "sequence"
 }
 
-function shuffleArabicWord(word) {
-  const chars = String(word || "").split("")
-  for (let i = chars.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[chars[i], chars[j]] = [chars[j], chars[i]]
+function shuffleArabicWord(text) {
+  function shuffleWord(word) {
+    const chars = String(word || "").split("")
+    if (chars.length <= 1) return word
+
+    const original = chars.join("")
+    let shuffled = original
+    let attempts = 0
+
+    while (shuffled === original && attempts < 20) {
+      const arr = [...chars]
+
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[arr[i], arr[j]] = [arr[j], arr[i]]
+      }
+
+      shuffled = arr.join("")
+      attempts++
+    }
+
+    if (shuffled === original) {
+      const arr = [...chars]
+      ;[arr[0], arr[1]] = [arr[1], arr[0]]
+      shuffled = arr.join("")
+    }
+
+    return shuffled
   }
-  return chars.join("")
+
+  return String(text || "")
+    .split(/(\s+)/)
+    .map(part => {
+      if (/^\s+$/.test(part)) return part
+      return shuffleWord(part)
+    })
+    .join("")
 }
 
 function getRound1ForcedTeam() {
@@ -267,23 +308,39 @@ function removeArabicDots(text = "") {
     .replace(/ن/g, "ں")
 }
 
-async function loadFinalRound1CardTexts() {
-  const { data, error } = await db
-    .from("final_round1_items")
-    .select("number, card_text")
-    .eq("model", currentModel)
-    .in("number", [1, 2, 3])
+function getFinalRound1ClipStyle(text = "", zoom = false) {
+  const clean = String(text || "").trim()
+  const len = clean.length
 
-  if (error) {
-    console.log(error)
-    return
+  let size = zoom ? "clamp(2.1rem, 2.8vw, 3rem)" : "clamp(1.7rem, 2.2vw, 2.45rem)"
+  let line = zoom ? "1.95" : "1.82"
+
+  if (len > 90) {
+    size = zoom ? "clamp(1.8rem, 2.45vw, 2.55rem)" : "clamp(1.45rem, 1.95vw, 2rem)"
+    line = zoom ? "1.86" : "1.72"
   }
 
-  finalState.round1.cardTexts = {}
+  if (len > 140) {
+    size = zoom ? "clamp(1.55rem, 2.1vw, 2.2rem)" : "clamp(1.22rem, 1.65vw, 1.7rem)"
+    line = zoom ? "1.75" : "1.58"
+  }
 
-  ;(data || []).forEach(row => {
-    finalState.round1.cardTexts[row.number] = row.card_text || ""
-  })
+  if (len > 190) {
+    size = zoom ? "clamp(1.35rem, 1.8vw, 1.9rem)" : "clamp(1.05rem, 1.42vw, 1.45rem)"
+    line = zoom ? "1.62" : "1.46"
+  }
+
+  return `font-family:'MolhimCustom', sans-serif !important;font-size:${size};line-height:${line};text-wrap:balance;`
+}
+
+function setFinalControlsMode(mode) {
+  const controls = document.getElementById("finalControlsBar")
+  if (!controls) return
+
+  controls.classList.remove("finalRound1ControlsBar", "finalRound2ControlsBar", "finalRound3ControlsBar")
+  if (mode === 1) controls.classList.add("finalRound1ControlsBar")
+  if (mode === 2) controls.classList.add("finalRound2ControlsBar")
+  if (mode === 3) controls.classList.add("finalRound3ControlsBar")
 }
 
 function finalizeRound1Turn() {
@@ -292,6 +349,8 @@ function finalizeRound1Turn() {
   finalState.round1.currentAnswer = ""
   finalState.round1.currentImage = ""
   finalState.round1.currentNote = ""
+  finalState.round1.currentQuestionParts = []
+  finalState.round1.shownQuestionPartsCount = 0
   finalState.round1.answerShown = false
   resetFinalTeamSelection()
   renderFinalRound()
@@ -355,6 +414,25 @@ function finalizeRound3Number(nextTeam = null) {
   updateEndRoundButtonState()
 }
 
+async function loadFinalRound1CardTexts() {
+  const { data, error } = await db
+    .from("final_round1_items")
+    .select("number, card_text, question_part1, question_part2, question_part3")
+    .eq("model", currentModel)
+    .in("number", [1, 2, 3, 4, 5, 6])
+
+  if (error) {
+    console.log(error)
+    return
+  }
+
+  finalState.round1.cardTexts = {}
+
+  ;(data || []).forEach(row => {
+    finalState.round1.cardTexts[row.number] = row.card_text || ""
+  })
+}
+
 /* =========================
    Init / Render
 ========================= */
@@ -379,7 +457,7 @@ window.renderFinal = async function () {
     round: 1,
     round1: {
       title: "الجولة الأولى",
-      cardsCount: 4,
+      cardsCount: 6,
       opened: [],
       activeTeam: null,
       scores: { A: 0, B: 0 },
@@ -388,6 +466,8 @@ window.renderFinal = async function () {
       currentAnswer: "",
       currentImage: "",
       currentNote: "",
+      currentQuestionParts: [],
+      shownQuestionPartsCount: 0,
       answerShown: false,
       pendingScore: false,
       cardTexts: {}
@@ -467,7 +547,7 @@ async function loadFinalRoundMeta() {
   ;(data || []).forEach(row => {
     if (row.round === 1) {
       finalState.round1.title = row.title || "الجولة الأولى"
-      finalState.round1.cardsCount = Number(row.cards_count || 4)
+      finalState.round1.cardsCount = Number(row.cards_count || 6)
     }
     if (row.round === 2) {
       finalState.round2.title = row.title || "الجولة الثانية"
@@ -495,7 +575,7 @@ function buildFinalHTML() {
       <div class="finalScoreBoards" id="finalScoreBoards">
 
         <div class="finalScorePanel finalScorePanelLeft" id="finalTeamABox" onclick="selectFinalTeam('A')">
-          <div class="finalScoreTeamNameBox">${teamAName}</div>
+          <div class="finalScoreTeamNameBox finalScoreTeamNameFix">${teamAName}</div>
           <div class="finalScoreErrorsBox" id="finalErrorsA"></div>
           <div class="finalScoreValueBox" id="finalScoreA">0</div>
         </div>
@@ -509,7 +589,7 @@ function buildFinalHTML() {
         <div class="finalScorePanel finalScorePanelRight" id="finalTeamBBox" onclick="selectFinalTeam('B')">
           <div class="finalScoreValueBox" id="finalScoreB">0</div>
           <div class="finalScoreErrorsBox" id="finalErrorsB"></div>
-          <div class="finalScoreTeamNameBox">${teamBName}</div>
+          <div class="finalScoreTeamNameBox finalScoreTeamNameFix">${teamBName}</div>
         </div>
 
       </div>
@@ -562,9 +642,12 @@ function renderFinalRoundTitle() {
   if (titleBox) titleBox.innerText = title
 
   if (boards) {
-    boards.classList.remove("finalBoardRound1", "finalBoardRoundOther")
-    if (finalState.round === 1) boards.classList.add("finalBoardRound1")
-    else boards.classList.add("finalBoardRoundOther")
+    boards.classList.remove("finalBoardRound1", "finalBoardRoundOther", "finalRound1Mode")
+    if (finalState.round === 1) {
+      boards.classList.add("finalBoardRound1", "finalRound1Mode")
+    } else {
+      boards.classList.add("finalBoardRoundOther")
+    }
   }
 
   if (finalState.round === 1) {
@@ -625,16 +708,8 @@ function renderFinalErrors() {
     return
   }
 
-  boxA.innerHTML = renderFinalErrorMarks(finalState.round1.errors.A)
-  boxB.innerHTML = renderFinalErrorMarks(finalState.round1.errors.B)
-}
-
-function renderFinalErrorMarks(count) {
-  let html = ""
-  for (let i = 0; i < 3; i++) {
-    html += `<span class="top10ErrorMark ${i < count ? "active" : ""}">✕</span>`
-  }
-  return html
+  boxA.innerHTML = ""
+  boxB.innerHTML = ""
 }
 
 function renderFinalTeamLayout() {
@@ -650,11 +725,6 @@ function selectFinalTeam(team) {
   if (finalState.round === 1) {
     if (finalState.round1.currentNumber === null) {
       showGameToast("اختر رقمًا أولاً")
-      return
-    }
-    const forcedTeam = getRound1ForcedTeam()
-    if (forcedTeam && team !== forcedTeam) {
-      showGameToast("الدور للفريق الأقل أخطاء")
       return
     }
     finalState.round1.activeTeam = team
@@ -674,7 +744,7 @@ function selectFinalTeam(team) {
 
 function isFinalRoundFinished(round) {
   if (round === 1) {
-    return finalState.round1.opened.length >= Number(finalState.round1.cardsCount || 4)
+    return finalState.round1.opened.length >= Number(finalState.round1.cardsCount || 6)
   }
 
   if (round === 2) {
@@ -714,9 +784,12 @@ function renderFinalRound1() {
   const controls = document.getElementById("finalControlsBar")
   if (!stage || !controls) return
 
+  setFinalControlsMode(1)
+
+  const cardsCount = Number(finalState.round1.cardsCount || 6)
   let cards = []
 
-  for (let i = 1; i <= Number(finalState.round1.cardsCount || 4); i++) {
+  for (let i = 1; i <= cardsCount; i++) {
     const opened = finalState.round1.opened.includes(i)
 
     cards.push(`
@@ -734,8 +807,14 @@ function renderFinalRound1() {
     document.body.classList.add("round1-image-mode")
 
     stage.innerHTML = `
-      <div class="finalRound1FullscreenOnly">
-        <div class="finalRound1ImageStage" id="finalRound1ImageStage"></div>
+      <div class="finalRound1PlayLayout">
+        <div class="finalRound1TopNumbersBar">
+          <div class="finalRound1GridSingleRow">
+            ${cards.join("")}
+          </div>
+        </div>
+
+        <div class="finalRound1ContentShell" id="finalRound1ImageStage"></div>
       </div>
     `
   } else {
@@ -743,13 +822,21 @@ function renderFinalRound1() {
 
     stage.innerHTML = `
       <div class="finalRound1StartView">
-        <div class="finalRound1GridSingleRow">${cards.join("")}</div>
+        <div class="finalRound1GridSingleRow">
+          ${cards.join("")}
+        </div>
       </div>
     `
   }
 
+  const currentNumber = Number(finalState.round1.currentNumber || 0)
+  const isQuestionCard = currentNumber >= 4 && currentNumber <= 6
+
   controls.innerHTML = `
-    <button onclick="showFinalRound1Answer()" class="archiveCtrlBtn btnAnswer">إظهار الإجابة</button>
+    <button onclick="showFinalRound1Question()" class="archiveCtrlBtn btnStart" ${isQuestionCard ? "" : "disabled"}>إظهار السؤال</button>
+    <button onclick="showFinalRound1Answer()" class="archiveCtrlBtn btnAnswer">
+      ${finalState.round1.answerShown ? "إخفاء الإجابة" : "إظهار الإجابة"}
+    </button>
     <button onclick="finalRound1Correct()" class="archiveCtrlBtn btnCorrect">إجابة صحيحة</button>
     <button onclick="finalRound1Wrong()" class="archiveCtrlBtn btnWrong">خطأ</button>
     <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
@@ -777,6 +864,8 @@ async function openFinalRound1Card(number) {
   finalState.round1.currentAnswer = ""
   finalState.round1.currentImage = ""
   finalState.round1.currentNote = ""
+  finalState.round1.currentQuestionParts = []
+  finalState.round1.shownQuestionPartsCount = 0
   finalState.round1.answerShown = false
   finalState.round1.errors.A = 0
   finalState.round1.errors.B = 0
@@ -809,6 +898,11 @@ async function loadFinalRound1Current() {
   finalState.round1.currentAnswer = data?.answer || ""
   finalState.round1.currentImage = data?.image || ""
   finalState.round1.currentNote = data?.note || ""
+  finalState.round1.currentQuestionParts = [
+    data?.question_part1 || "",
+    data?.question_part2 || "",
+    data?.question_part3 || ""
+  ]
 
   if (!finalState.round1.cardTexts) {
     finalState.round1.cardTexts = {}
@@ -818,25 +912,136 @@ async function loadFinalRound1Current() {
   const box = document.getElementById("finalRound1ImageStage")
   if (!box) return
 
-  let html = ""
   const fullCardText = (data?.card_text || "").trim()
-  const isHistoricalTextCard = number <= 3 && !!fullCardText
+  const isHistoricalTextCard = number >= 1 && number <= 3 && !!fullCardText
+  const isQuestionCard = number >= 4 && number <= 6
+
+  let mainContent = ""
+  let noteContent = ""
+  let answerContent = ""
 
   if (isHistoricalTextCard) {
-    html += `
-      <div class="finalRound1HistoricalWrap">
-        <div class="finalRound1ImageZoomTrigger" onclick="toggleFinalRound1Overlay()">
-          <div class="finalRound1HistoricalPaper">
-            <div class="finalRound1HistoricalInner molhimClipFont">
-              ${removeArabicDots(fullCardText)}
+    const clipText = removeArabicDots(fullCardText)
+
+    mainContent = `
+      <div class="finalRound1MainStageCard">
+        <div class="finalRound1HistoricalWrap">
+          <div class="finalRound1ImageZoomTrigger" onclick="toggleFinalRound1Overlay()">
+            <div class="finalRound1HistoricalPaper">
+              <div
+                class="finalRound1HistoricalInner molhimClipFont"
+                style="${getFinalRound1ClipStyle(clipText, false)}"
+              >
+                ${clipText}
+              </div>
             </div>
           </div>
         </div>
       </div>
     `
+  } else if (isQuestionCard) {
+    const visibleParts = (finalState.round1.currentQuestionParts || [])
+      .filter(part => String(part || "").trim() !== "")
+      .slice(0, Number(finalState.round1.shownQuestionPartsCount || 0))
+
+    if (visibleParts.length) {
+      mainContent = `
+        <div class="finalRound1MainStageCard">
+          <div class="finalRound1QuestionStage">
+            ${visibleParts.map(part => `
+              <div class="finalRound1QuestionPart">${part}</div>
+            `).join("")}
+          </div>
+        </div>
+      `
+    } else if (finalState.round1.currentImage) {
+      mainContent = `
+        <div class="finalRound1MainStageCard">
+          <div class="finalRound1ImageFrame">
+            <img class="finalRound1BigImage" src="${finalState.round1.currentImage}" alt="">
+          </div>
+        </div>
+      `
+    } else {
+      mainContent = `
+        <div class="finalRound1MainStageCard">
+          <div class="finalRoundPlaceholder">اضغط إظهار السؤال</div>
+        </div>
+      `
+    }
+  } else if (finalState.round1.currentImage) {
+    mainContent = `
+      <div class="finalRound1MainStageCard">
+        <div class="finalRound1ImageFrame">
+          <img class="finalRound1BigImage" src="${finalState.round1.currentImage}" alt="">
+        </div>
+      </div>
+    `
+  } else {
+    mainContent = `
+      <div class="finalRound1MainStageCard">
+        <div class="finalRoundPlaceholder">لا توجد صورة</div>
+      </div>
+    `
   }
 
-  box.innerHTML = html
+  if (finalState.round1.currentNote) {
+    noteContent = `
+      <div class="finalRound1InfoCard finalRound1NoteBox">
+        ${finalState.round1.currentNote}
+      </div>
+    `
+  }
+
+  if (finalState.round1.answerShown && finalState.round1.currentAnswer) {
+    answerContent = `
+      <div class="finalRound1InfoCard finalRound1AnswerBox">
+        ${finalState.round1.currentAnswer}
+      </div>
+    `
+  }
+
+  box.innerHTML = `
+    <div class="finalRound1StageLayout">
+      ${mainContent}
+
+      ${(noteContent || answerContent) ? `
+        <div class="finalRound1BottomInfoRow">
+          ${noteContent || `<div class="finalRound1InfoCard finalRound1InfoEmpty"></div>`}
+          ${answerContent || `<div class="finalRound1InfoCard finalRound1InfoEmpty"></div>`}
+        </div>
+      ` : ""}
+    </div>
+  `
+}
+
+function showFinalRound1Question() {
+  if (!finalState.round1.pendingScore || !finalState.round1.currentNumber) {
+    showGameToast("اختر رقمًا أولاً")
+    return
+  }
+
+  const number = finalState.round1.currentNumber
+
+  if (number < 4 || number > 6) {
+    showGameToast("إظهار السؤال متاح فقط للأرقام 4 و5 و6")
+    return
+  }
+
+  const parts = (finalState.round1.currentQuestionParts || [])
+    .filter(part => String(part || "").trim() !== "")
+
+  if (!parts.length) {
+    showGameToast("لا توجد أجزاء للسؤال")
+    return
+  }
+
+  if (finalState.round1.shownQuestionPartsCount < parts.length) {
+    finalState.round1.shownQuestionPartsCount += 1
+  }
+
+  loadFinalRound1Current()
+  saveFinalState()
 }
 
 function showFinalRound1Answer() {
@@ -845,47 +1050,24 @@ function showFinalRound1Answer() {
     return
   }
 
-  if (!finalState.round1.answerShown) {
-    finalState.round1.answerShown = true
-    loadFinalRound1Current()
-  }
-
+  finalState.round1.answerShown = !finalState.round1.answerShown
+  loadFinalRound1Current()
+  renderFinalRound1()
   playGameSound("answer")
+  
   saveFinalState()
-
-  setTimeout(() => {
-    finalizeRound1Turn()
-  }, 4000)
 }
 
 function finalRound1Wrong() {
-  const team = finalState.round1.activeTeam
-
   if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
     showGameToast("اختر رقمًا أولاً")
     return
   }
 
-  if (!team) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
-
-  pushFinalHistory()
-
-  if (finalState.round1.errors[team] < 3) {
-    finalState.round1.errors[team] += 1
-  }
-
-  const forcedTeam = getRound1ForcedTeam()
-  if (forcedTeam) {
-    finalState.round1.activeTeam = forcedTeam
-    highlightFinalTeam(forcedTeam)
-  }
+ 
 
   playGameSound("wrong")
-  renderFinalErrors()
-  saveFinalState()
+  flashScreen("wrong")
 }
 
 function finalRound1Correct() {
@@ -910,12 +1092,50 @@ function finalRound1Correct() {
 
   finalState.round1.scores[team] += 1
   playGameSound("correct")
+  flashScreen("correct")
   renderFinalScores()
   saveFinalState()
 
-  setTimeout(() => {
-    finalizeRound1Turn()
-  }, 4000)
+  finalizeRound1Turn()
+}
+
+function toggleFinalRound1Overlay() {
+  const oldOverlay = document.getElementById("finalRound1Overlay")
+
+  if (oldOverlay) {
+    oldOverlay.remove()
+    return
+  }
+
+  const number = finalState.round1.currentNumber
+  if (!number) return
+
+  const text = finalState.round1.cardTexts?.[number] || ""
+  if (!text.trim()) return
+
+  const clipText = removeArabicDots(text)
+
+  const overlay = document.createElement("div")
+  overlay.id = "finalRound1Overlay"
+  overlay.className = "finalRound1Overlay"
+  overlay.innerHTML = `
+    <div class="finalRound1OverlayInner">
+      <div class="finalRound1OverlayPaper">
+        <div
+          class="finalRound1OverlayText molhimClipFont"
+          style="${getFinalRound1ClipStyle(clipText, true)}"
+        >
+          ${clipText}
+        </div>
+      </div>
+    </div>
+  `
+
+  overlay.onclick = function () {
+    overlay.remove()
+  }
+
+  document.body.appendChild(overlay)
 }
 
 /* =========================
@@ -926,6 +1146,8 @@ function renderFinalRound2() {
   const stage = document.getElementById("finalMainStage")
   const controls = document.getElementById("finalControlsBar")
   if (!stage || !controls) return
+
+  setFinalControlsMode(2)
 
   let grid = ""
   for (let i = 1; i <= 4; i++) {
@@ -941,35 +1163,29 @@ function renderFinalRound2() {
     `
   }
 
+  const isScramble = finalState.round2.currentType === "scramble"
+  const isSequence = finalState.round2.currentType === "sequence"
+  const hasCurrent = finalState.round2.pendingScore && finalState.round2.currentNumber !== null
+
   stage.innerHTML = `
     <div class="finalRound2Wrap">
       <div class="finalRound2Grid">${grid}</div>
-      <div class="finalRound2WordsStage" id="finalRound2WordsStage">
+      <div class="finalRound2WordsStage" id="finalRound2WordsStage" data-round2-number="${Number(finalState.round2.currentNumber || 0)}">
         اختر الفريق ثم الرقم
       </div>
     </div>
   `
 
-  if (finalState.round2.currentType === "scramble") {
-    controls.innerHTML = `
-      <button onclick="showFinalRound2Answer()" class="archiveCtrlBtn btnAnswer">إظهار الإجابة</button>
-      <button onclick="finalRound2RecordScore()" class="archiveCtrlBtn btnCorrect">تسجيل النتيجة</button>
-      <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
-      <button onclick="goToFinalRound(3)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>
-    `
-  } else if (finalState.round2.currentType === "sequence") {
-    controls.innerHTML = `
-      <button onclick="finalRound2DecreaseCountdown()" class="archiveCtrlBtn btnStart">${finalState.round2.countdown}</button>
-      <button onclick="finalRound2RecordSequenceScore()" class="archiveCtrlBtn btnCorrect">تسجيل النتيجة</button>
-      <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
-      <button onclick="goToFinalRound(3)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>
-    `
-  } else {
-    controls.innerHTML = `
-      <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
-      <button onclick="goToFinalRound(3)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>
-    `
-  }
+  controls.innerHTML = `
+    <button onclick="showFinalRound2Answer()" class="archiveCtrlBtn btnAnswer" ${hasCurrent ? "" : "disabled"}>إظهار الإجابة</button>
+    <button onclick="finalRound2DecreaseCountdown()" class="archiveCtrlBtn btnStart" ${isSequence ? "" : "disabled"}>
+      ${isSequence ? finalState.round2.countdown : "العداد"}
+    </button>
+    <button onclick="finalRound2RecordScore()" class="archiveCtrlBtn btnCorrect" ${isScramble ? "" : "disabled"}>تسجيل نتيجة المبعثرة</button>
+    <button onclick="finalRound2RecordSequenceScore()" class="archiveCtrlBtn btnCorrect" ${isSequence ? "" : "disabled"}>تسجيل نتيجة التلميح</button>
+    <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
+    <button onclick="goToFinalRound(3)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>
+  `
 
   renderFinalRound2Words(finalState.round2.answerShown)
 }
@@ -1071,6 +1287,8 @@ function renderFinalRound2Words(showAnswers) {
   const box = document.getElementById("finalRound2WordsStage")
   if (!box) return
 
+  box.setAttribute("data-round2-number", String(Number(finalState.round2.currentNumber || 0)))
+
   if (!finalState.round2.currentNumber) {
     box.innerHTML = `<div class="finalRoundPlaceholder">اختر الفريق ثم الرقم</div>`
     return
@@ -1156,6 +1374,7 @@ function showFinalRound2Answer() {
   renderFinalRoundTitle()
   renderFinalRound2Words(true)
   playGameSound("answer")
+  flashScreen("correct")
   saveFinalState()
 }
 
@@ -1298,6 +1517,8 @@ function renderFinalRound3() {
   const controls = document.getElementById("finalControlsBar")
   if (!stage || !controls) return
 
+  setFinalControlsMode(3)
+
   let grid = ""
   for (let i = 1; i <= 2; i++) {
     const opened = finalState.round3.opened.includes(i)
@@ -1414,6 +1635,12 @@ function startFinalRound3Sequence() {
           <img src="${currentFinalRound3Image}" class="finalRound3Image" alt="">
         </div>
       `
+
+      const overlayImg = document.getElementById("finalRound3ImageOverlayImg")
+      if (overlayImg) {
+        overlayImg.src = currentFinalRound3Image
+      }
+
       finalState.round3.shownCount = idx + 1
       idx++
       saveFinalState()
@@ -1423,6 +1650,10 @@ function startFinalRound3Sequence() {
     if (idx === finalState.round3.images.length) {
       currentFinalRound3Image = ""
       stage.innerHTML = `<div class="finalRoundPlaceholder">انتهى عرض الصور</div>`
+
+      const overlay = document.getElementById("finalRound3ImageOverlay")
+      if (overlay) overlay.remove()
+
       finalState.round3.answersAllowed = true
       idx++
       saveFinalState()
@@ -1513,43 +1744,10 @@ function finalRound3RecordScore() {
 
   renderFinalScores()
   playGameSound("correct")
+  flashScreen("correct")
 
   const nextTeam = getOtherTeam(team)
   finalizeRound3Number(nextTeam)
-}
-
-function toggleFinalRound1Overlay() {
-  const oldOverlay = document.getElementById("finalRound1Overlay")
-
-  if (oldOverlay) {
-    oldOverlay.remove()
-    return
-  }
-
-  const number = finalState.round1.currentNumber
-  if (!number) return
-
-  const text = finalState.round1.cardTexts?.[number] || ""
-  if (!text.trim()) return
-
-  const overlay = document.createElement("div")
-  overlay.id = "finalRound1Overlay"
-  overlay.className = "finalRound1Overlay"
-  overlay.innerHTML = `
-    <div class="finalRound1OverlayInner">
-      <div class="finalRound1OverlayPaper">
-        <div class="finalRound1OverlayText molhimClipFont">
-          ${removeArabicDots(text)}
-        </div>
-      </div>
-    </div>
-  `
-
-  overlay.onclick = function () {
-    overlay.remove()
-  }
-
-  document.body.appendChild(overlay)
 }
 
 function toggleFinalRound3ImageOverlay() {
@@ -1567,7 +1765,7 @@ function toggleFinalRound3ImageOverlay() {
   overlay.className = "finalRound3ImageOverlay"
   overlay.innerHTML = `
     <div class="finalRound3ImageOverlayInner">
-      <img src="${currentFinalRound3Image}" class="finalRound3ImageOverlayImg" alt="">
+      <img id="finalRound3ImageOverlayImg" src="${currentFinalRound3Image}" class="finalRound3ImageOverlayImg" alt="">
     </div>
   `
 

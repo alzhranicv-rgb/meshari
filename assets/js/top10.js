@@ -272,41 +272,40 @@ function buildTop10HTML() {
 
         <div class="top10HeaderBar">
 
-          <div class="top10ScoreCard ${top10State.activeTeam === "A" ? "activeTeam" : ""}" id="top10TeamA" onclick="selectTop10Team('A')">
-            <div class="top10ScoreHead">
-              <div class="top10ScoreName">${teamAName}</div>
-              <div class="top10ScoreValue" id="top10ScoreA">${top10State.scores.A}</div>
-            </div>
-            <div class="top10ScoreErrors" id="top10ErrorsA">
-              ${renderTop10Errors("A")}
-            </div>
-          </div>
+  <div class="top10ScoreCard ${top10State.activeTeam === "A" ? "activeTeam" : ""}" id="top10TeamA" onclick="selectTop10Team('A')">
+    <div class="top10ScoreName top10ScoreNameLeft">${teamAName}</div>
 
-          <div class="top10MiddleCard">
-  <div class="top10MiddleLabel" id="top10RoundLabel">الجولة ${top10State.round}</div>
-  <div class="top10MiddleTimer" id="timer">0</div>
-  <div class="top10MiddleTurn" id="top10TurnLabel">
-    الدور: ${
-      top10State.activeTeam === "A"
-        ? teamAName
-        : top10State.activeTeam === "B"
-        ? teamBName
-        : "اختر فريق"
-    }
+    <div class="top10ScoreErrors" id="top10ErrorsA">
+      ${renderTop10Errors("A")}
+    </div>
+
+    <div class="top10ScoreValue top10ScoreValueRight" id="top10ScoreA">${top10State.scores.A}</div>
   </div>
+
+  <div class="top10MiddleCard">
+    <div class="top10MiddleTimer" id="timer">0</div>
+    <div class="top10MiddleTurn" id="top10TurnLabel">
+      الدور: ${
+        top10State.activeTeam === "A"
+          ? teamAName
+          : top10State.activeTeam === "B"
+          ? teamBName
+          : "اختر فريق"
+      }
+    </div>
+  </div>
+
+  <div class="top10ScoreCard ${top10State.activeTeam === "B" ? "activeTeam" : ""}" id="top10TeamB" onclick="selectTop10Team('B')">
+    <div class="top10ScoreValue top10ScoreValueLeft" id="top10ScoreB">${top10State.scores.B}</div>
+
+    <div class="top10ScoreErrors" id="top10ErrorsB">
+      ${renderTop10Errors("B")}
+    </div>
+
+    <div class="top10ScoreName top10ScoreNameRight">${teamBName}</div>
+  </div>
+
 </div>
-
-          <div class="top10ScoreCard ${top10State.activeTeam === "B" ? "activeTeam" : ""}" id="top10TeamB" onclick="selectTop10Team('B')">
-            <div class="top10ScoreHead reverse">
-              <div class="top10ScoreValue" id="top10ScoreB">${top10State.scores.B}</div>
-              <div class="top10ScoreName">${teamBName}</div>
-            </div>
-            <div class="top10ScoreErrors" id="top10ErrorsB">
-              ${renderTop10Errors("B")}
-            </div>
-          </div>
-
-        </div>
 
         <div class="top10QuestionBox" id="top10QuestionBox">
           ${top10State.question[round] || "السؤال يظهر هنا"}
@@ -317,7 +316,7 @@ function buildTop10HTML() {
           <button onclick="showTop10Answer()" class="btnAnswer">إظهار الإجابات</button>
           <button onclick="addTop10Error()" class="top10ErrorBtnSingle">خطأ</button>
           <button onclick="undoTop10Action()" id="top10UndoBtn" class="undoBtn">تراجع</button>
-          <button onclick="prevTop10Round()" class="roundNavBtn">الجولة السابقة</button>
+          <button onclick="switchTop10Turn()" class="roundNavBtn switchTurnBtn">تبديل الدور</button>
           <button onclick="nextTop10Round()" class="roundNavBtn">الجولة التالية</button>
         </div>
 
@@ -648,6 +647,7 @@ function addTop10Error() {
 
   top10State.errors[round][team] += 1
   playGameSound("wrong")
+  flashScreen("wrong")
   window.top10State = top10State
 
   clearInterval(timer)
@@ -833,4 +833,24 @@ function renderCurrentRoundTop10UI() {
   }
 
   updateTop10UndoButtonState()
+}
+function switchTop10Turn() {
+  if (!top10State.activeTeam) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  const otherTeam = getOtherTeam(top10State.activeTeam)
+
+  if (top10State.errors[top10State.round][otherTeam] >= 3) {
+    showGameToast("الفريق الآخر أكمل أخطاءه الثلاث")
+    return
+  }
+
+  pushTop10History()
+
+  top10State.activeTeam = otherTeam
+  highlightTop10TurnTeam()
+  updateTop10TurnLabel()
+  saveTop10State()
 }

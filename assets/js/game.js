@@ -987,3 +987,26 @@ function bumpScore(id) {
   void el.offsetWidth
   el.classList.add("score-bump")
 }
+let screenFlashLayer = null
+
+function ensureScreenFlashLayer() {
+  if (screenFlashLayer && document.body.contains(screenFlashLayer)) return screenFlashLayer
+
+  screenFlashLayer = document.createElement("div")
+  screenFlashLayer.className = "screenFlashLayer"
+  document.body.appendChild(screenFlashLayer)
+  return screenFlashLayer
+}
+
+function flashScreen(type = "correct") {
+  const layer = ensureScreenFlashLayer()
+
+  layer.classList.remove("flashCorrect", "flashWrong")
+  void layer.offsetWidth
+
+  if (type === "wrong") {
+    layer.classList.add("flashWrong")
+  } else {
+    layer.classList.add("flashCorrect")
+  }
+}

@@ -2,6 +2,8 @@ let introModelsLoaded = false
 let gameToastTimer = null
 
 document.addEventListener("DOMContentLoaded", async () => {
+  resetIntroPageState()
+
   const introCard = document.querySelector(".introCard")
   if (introCard) {
     introCard.classList.add("softEnter")
@@ -71,22 +73,18 @@ function fillSavedIntroValues() {
   const teamBInput = document.getElementById("teamBNameInput")
   const modelSelect = document.getElementById("introModelSelect")
 
-  const savedA = localStorage.getItem("teamAName") || ""
-  const savedB = localStorage.getItem("teamBName") || ""
-  const savedModel = localStorage.getItem("game_model") || ""
+  if (teamAInput) teamAInput.value = ""
+  if (teamBInput) teamBInput.value = ""
 
-  if (teamAInput) teamAInput.value = savedA
-  if (teamBInput) teamBInput.value = savedB
-
-  if (modelSelect && savedModel) {
-    const applySavedModel = () => {
-      modelSelect.value = savedModel
+  if (modelSelect) {
+    const resetModel = () => {
+      modelSelect.value = ""
     }
 
     if (introModelsLoaded) {
-      applySavedModel()
+      resetModel()
     } else {
-      setTimeout(applySavedModel, 300)
+      setTimeout(resetModel, 300)
     }
   }
 }
@@ -150,6 +148,27 @@ function showIntroFieldError(field, message) {
   showGameToast(message)
 }
 
+function resetIntroPageState() {
+  localStorage.removeItem("main_score_a")
+  localStorage.removeItem("main_score_b")
+  localStorage.removeItem("active_segment")
+  localStorage.removeItem("segment_status_v1")
+
+  localStorage.removeItem("warmup_state_v1")
+  localStorage.removeItem("top10_state_v1")
+  localStorage.removeItem("auction_state_v1")
+  localStorage.removeItem("auction_state_v2")
+  localStorage.removeItem("who_state_v1")
+  localStorage.removeItem("final_state_v2")
+  localStorage.removeItem("final_state_v3")
+  localStorage.removeItem("archive_state_v1")
+
+  localStorage.removeItem("teamAName")
+  localStorage.removeItem("teamBName")
+  localStorage.removeItem("game_model")
+  localStorage.removeItem("game_model_name")
+}
+
 function resetGameStateBeforeStart() {
   localStorage.removeItem("main_score_a")
   localStorage.removeItem("main_score_b")
@@ -159,10 +178,16 @@ function resetGameStateBeforeStart() {
   localStorage.removeItem("warmup_state_v1")
   localStorage.removeItem("top10_state_v1")
   localStorage.removeItem("auction_state_v1")
+  localStorage.removeItem("auction_state_v2")
   localStorage.removeItem("who_state_v1")
   localStorage.removeItem("final_state_v2")
   localStorage.removeItem("final_state_v3")
   localStorage.removeItem("archive_state_v1")
+
+  localStorage.removeItem("teamAName")
+  localStorage.removeItem("teamBName")
+  localStorage.removeItem("game_model")
+  localStorage.removeItem("game_model_name")
 
   localStorage.setItem("main_score_a", 0)
   localStorage.setItem("main_score_b", 0)
