@@ -6523,7 +6523,7 @@ body{
   background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%);
   color:var(--arc-dark-text);
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:4.8rem;
+  font-size:3.8rem;
   line-height:1;
 }
 
@@ -6572,7 +6572,7 @@ body{
   justify-content:center;
   text-align:center;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:3rem;
+  font-size:2.0rem;
   line-height:1;
 }
 
@@ -6743,7 +6743,7 @@ body{
   border:1px solid rgba(255,155,81,.16);
   color:#C96A25;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.35rem;
+  font-size:2.0rem;
   line-height:1;
 }
 
@@ -6755,7 +6755,7 @@ body{
 }
 
 .archiveSideErrors .errorMark{
-  font-size:1.5rem;
+  font-size:2.0rem;
   line-height:1;
   color:rgba(46,58,77,.24);
 }
@@ -6913,9 +6913,9 @@ body{
   line-height:1;
   padding:0 8px;
   box-sizing:border-box;
-  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  background:linear-gradient(180deg,#7a1630 100%,#7a1630 100%);
   border:1px solid var(--border-soft, #d9e0e0);
-  color:#25343F;
+  color:#FFFFFF;
   box-shadow:
     0 8px 18px rgba(39,48,61,.05),
     inset 0 1px 0 rgba(255,255,255,.94);
@@ -7415,56 +7415,82 @@ body{
 ========================= */
 
 .archiveControlButtons{
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 10px !important;
-  width: 100% !important;
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+  width:100% !important;
 }
 
 /* الصف الأول */
-.archiveAnswerBtn{
-  grid-column: 1 !important;
-  grid-row: 1 !important;
+.archiveErrorBtn{
+  grid-column:1 !important;
+  grid-row:1 !important;
 }
 
-.archiveErrorBtn{
-  grid-column: 2 !important;
-  grid-row: 1 !important;
+.archiveAnswerBtn{
+  grid-column:2 !important;
+  grid-row:1 !important;
 }
 
 /* الصف الثاني */
-.archivePrevBtn:not(.archiveUndoBtn){
-  grid-column: 1 !important;
-  grid-row: 2 !important;
+.archiveUndoBtn,
+#archiveUndoBtn{
+  grid-column:1 !important;
+  grid-row:2 !important;
 }
 
 .archiveNextBtn{
-  grid-column: 2 !important;
-  grid-row: 2 !important;
+  grid-column:2 !important;
+  grid-row:2 !important;
 }
 
-/* الصف الثالث */
-.archiveUndoBtn{
-  grid-column: 1 / -1 !important;
-  grid-row: 3 !important;
-  width: 100% !important;
+/* كل الأزرار نفس المقاس */
+.archiveControlButtons .archiveCtrlBtn,
+.archiveControlButtons button{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  min-height:46px !important;
+  height:46px !important;
+  padding:0 14px !important;
+  border-radius:16px !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.96rem !important;
+  line-height:1.2 !important;
 }
 
-/* كل الأزرار تأخذ عرض الخانة */
-.archiveControlButtons .archiveCtrlBtn{
-  width: 100% !important;
-  min-width: 0 !important;
+/* زر التراجع: نفس المقاس، فقط لون مختلف */
+.archiveUndoBtn,
+#archiveUndoBtn{
+  background:#660000 !important;
+  color:#FFFFFF !important;
+  box-shadow:0 12px 24px rgba(102,0,0,.24) !important;
 }
 
 /* جوال */
-@media (max-width: 760px){
+@media (max-width:760px){
   .archiveControlButtons{
-    grid-template-columns: 1fr 1fr !important;
-    gap: 8px !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
   }
 
-  .archiveUndoBtn{
-    grid-column: 1 / -1 !important;
+  .archiveControlButtons .archiveCtrlBtn,
+  .archiveControlButtons button{
+    min-height:44px !important;
+    height:44px !important;
+    border-radius:14px !important;
+    font-size:.92rem !important;
+  }
+
+  .archiveUndoBtn,
+  #archiveUndoBtn{
+    grid-column:1 !important;
+    grid-row:2 !important;
   }
 }
 /* =========================
@@ -7704,6 +7730,14 @@ body{
     font-size:1.8rem !important;
   }
 }
+/* خط أزرار التحكم - الأرشيف */
+.archiveControlButtons .archiveCtrlBtn,
+.archiveControlButtons button{
+  font-family:"HanakaText", sans-serif !important;
+  font-size:1.02rem !important;
+  line-height:1.1 !important;
+}
+
 /* =========================
    ADMIN LAYOUT - STEP 1
 ========================= */

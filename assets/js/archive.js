@@ -405,9 +405,9 @@ function buildArchiveShell() {
        <div class="archiveControlButtons">
   <button onclick="addArchiveError()" class="archiveCtrlBtn archiveErrorBtn">خطأ</button>
   <button onclick="showArchiveAnswer()" class="archiveCtrlBtn archiveAnswerBtn">إظهار الإجابة</button>
-  <button onclick="prevArchiveRound()" class="archiveCtrlBtn archivePrevBtn">الجولة السابقة</button>
+  <button onclick="undoArchiveAction()" class="archiveCtrlBtn archiveUndoBtn" id="archiveUndoBtn">تراجع</button>
   <button onclick="nextArchiveRound()" class="archiveCtrlBtn archiveNextBtn">الجولة التالية</button>
-  <button onclick="undoArchiveAction()" class="archiveCtrlBtn archivePrevBtn archiveUndoBtn">تراجع</button>
+  
 </div>
 
         <div class="archiveInputsInline">

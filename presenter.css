@@ -1,0 +1,1355 @@
+@font-face{
+  font-family:"HanakaDisplay";
+  src:url("./fonts/dima.ttf") format("truetype");
+  font-weight:400;
+  font-style:normal;
+}
+
+@font-face{
+  font-family:"HanakaText";
+  src:url("./fonts/zain.ttf") format("truetype");
+  font-weight:400;
+  font-style:normal;
+}
+
+:root{
+  --presenter-text:#243447;
+  --presenter-text-soft:#667585;
+  --presenter-accent:#2F4158;
+  --presenter-primary:#FF9B51;
+  --presenter-primary-soft:#FFF2E6;
+  --presenter-border:#D9E0E0;
+  --presenter-border-soft:#E7ECEC;
+  --presenter-shadow:0 10px 22px rgba(39,48,61,.06);
+  --presenter-shadow-soft:0 6px 14px rgba(39,48,61,.05);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html, body{
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:"HanakaText", sans-serif;
+  color:var(--presenter-text);
+  background:linear-gradient(180deg,#fff8f1 0%,#f3f7f7 100%);
+  direction:rtl;
+}
+
+.presenterShell{
+  width:min(1220px, calc(100% - 24px));
+  margin:0 auto;
+  padding:14px 0 28px;
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+.presenterTopBar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  background:linear-gradient(180deg,#fff 0%,#f7faf9 100%);
+  border:1px solid var(--presenter-border);
+  border-radius:22px;
+  padding:14px 16px;
+  box-shadow:var(--presenter-shadow);
+  margin-bottom:14px;
+}
+
+#presenterPageTitle{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.9rem;
+  line-height:1.05;
+  color:var(--presenter-accent);
+}
+
+.presenterTopActions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.presenterTopActions button{
+  border:0;
+  min-width:110px;
+  height:42px;
+  padding:0 16px;
+  border-radius:12px;
+  cursor:pointer;
+  color:#fff;
+  font-family:"HanakaText",sans-serif;
+  font-size:.95rem;
+  box-shadow:0 8px 16px rgba(39,48,61,.08);
+  transition:transform .18s ease, filter .18s ease;
+}
+
+.presenterTopActions button:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.02);
+}
+
+.presenterTopActions button:nth-child(1){
+  background:linear-gradient(180deg,#8A8F98 0%, #6F7782 100%);
+}
+
+.presenterTopActions button:nth-child(2){
+  background:linear-gradient(180deg,#166866 0%, #166866 100%);
+}
+
+.presenterTopActions button:nth-child(3){
+  background:linear-gradient(180deg,#2F4158 0%, #42556D 100%);
+}
+
+/* =========================
+   MAIN WRAP
+========================= */
+
+#presenterContent{
+  display:block;
+}
+
+.presenterPagesWrap{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.presenterEmptyState{
+  background:#fff;
+  border:1px solid var(--presenter-border);
+  border-radius:18px;
+  padding:24px;
+  text-align:center;
+  color:var(--presenter-text-soft);
+}
+
+/* =========================
+   COMMON SECTION
+========================= */
+
+.presenterSection{
+  background:linear-gradient(180deg,#ffffff 0%,#f9fbfb 100%);
+  border:1px solid var(--presenter-border);
+  border-radius:22px;
+  box-shadow:var(--presenter-shadow);
+  overflow:hidden;
+}
+
+.presenterSectionHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  padding:14px 16px 10px;
+  border-bottom:1px solid var(--presenter-border-soft);
+}
+
+.presenterSectionTitle{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.5rem;
+  line-height:1.05;
+  color:var(--presenter-accent);
+}
+
+.presenterSectionCount{
+  min-height:30px;
+  padding:0 12px;
+  border-radius:999px;
+  background:var(--presenter-primary-soft);
+  color:#8A4D1D;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.88rem;
+}
+
+.presenterSectionBody{
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* =========================
+   COMMON BLOCKS
+========================= */
+
+.presenterMiniGrid,
+.presenterSavedInfoGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.presenterBlock{
+  background:#fbfcfc;
+  border:1px solid var(--presenter-border-soft);
+  border-radius:12px;
+  padding:10px 12px;
+}
+
+.presenterBlockTitle{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:.95rem;
+  color:var(--presenter-accent);
+  margin-bottom:6px;
+}
+
+.presenterBlockText{
+  font-size:.92rem;
+  line-height:1.65;
+  color:var(--presenter-text);
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+.presenterImage{
+  width:100%;
+  max-height:180px;
+  object-fit:contain;
+  display:block;
+  margin-top:8px;
+  background:#fff;
+  border:1px solid var(--presenter-border-soft);
+  border-radius:10px;
+}
+
+.presenterSavedInfoGrid:empty{
+  display:none;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.presenterControlsWrap{
+  margin-top:8px;
+  border:1px dashed rgba(47,65,88,.18);
+  border-radius:14px;
+  background:#fcfdfd;
+  padding:10px;
+}
+
+.presenterControlsGrid,
+.presenterUploadRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.presenterNoteBox,
+.presenterUploadBox{
+  background:#fff9f3;
+  border:1px solid rgba(255,155,81,.22);
+  border-radius:14px;
+  padding:10px;
+}
+
+.presenterNoteBoxTitle,
+.presenterUploadTitle{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:.92rem;
+  color:#8A4D1D;
+  margin-bottom:6px;
+}
+
+.presenterTextarea{
+  width:100%;
+  min-height:78px;
+  resize:vertical;
+  border:1px solid var(--presenter-border);
+  border-radius:12px;
+  padding:10px;
+  background:#fff;
+  font-family:"HanakaText",sans-serif;
+  font-size:.94rem;
+  line-height:1.7;
+  color:var(--presenter-text);
+  outline:none;
+}
+
+.presenterTextarea:focus{
+  border-color:#ffb076;
+  box-shadow:0 0 0 4px rgba(255,155,81,.12);
+}
+
+.presenterUploadPreview{
+  margin-top:8px;
+  display:none;
+}
+
+.presenterUploadPreview img{
+  width:100%;
+  max-height:170px;
+  object-fit:contain;
+  display:block;
+  background:#fff;
+  border:1px solid var(--presenter-border-soft);
+  border-radius:10px;
+}
+
+/* =========================
+   WARMUP
+========================= */
+
+.presenterWarmupGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.presenterWarmupCategory{
+  background:#fff;
+  border:1px solid var(--presenter-border-soft);
+  border-radius:18px;
+  padding:12px;
+}
+
+.presenterWarmupCategoryTitle{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.08rem;
+  color:var(--presenter-accent);
+  margin-bottom:10px;
+  text-align:center;
+}
+
+.presenterWarmupQuestionsList{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.presenterWarmupQuestion{
+  border:1px solid var(--presenter-border-soft);
+  border-radius:14px;
+  background:#fcfdfd;
+  padding:10px;
+}
+
+.presenterWarmupQHead{
+  margin-bottom:8px;
+}
+
+.presenterWarmupQNo{
+  display:inline-flex;
+  min-width:76px;
+  height:30px;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  background:#fff2e6;
+  color:#8A4D1D;
+  font-size:.88rem;
+}
+
+/* =========================
+   TOP10
+========================= */
+
+.presenterTop10RoundWrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.presenterTop10AnswersList{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.presenterTop10AnswerRow{
+  display:grid;
+  grid-template-columns:42px 1fr;
+  gap:8px;
+  align-items:center;
+  padding:8px 10px;
+  border:1px solid var(--presenter-border-soft);
+  border-radius:12px;
+  background:#fbfcfc;
+}
+
+.presenterTop10Rank{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  color:var(--presenter-accent);
+  text-align:center;
+}
+
+.presenterTop10AnswerText{
+  line-height:1.35;
+  font-size:.9rem;
+}
+
+/* =========================
+   AUCTION CLEAN
+========================= */
+
+.presenterAuctionGridClean{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.presenterAuctionCardClean{
+  background:#fff;
+  border:1px solid var(--presenter-border-soft);
+  border-radius:18px;
+  padding:12px;
+  box-shadow:0 6px 14px rgba(39,48,61,.05);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.presenterAuctionCardClean .presenterAuctionHead{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  color:#2F4158;
+  font-size:1.02rem;
+  text-align:center;
+  margin-bottom:2px;
+}
+
+/* =========================
+   WHO CLEAN
+========================= */
+
+.presenterWhoGridClean{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:12px;
+}
+
+.presenterWhoCardClean{
+  background:#fff;
+  border:1px solid var(--presenter-border-soft);
+  border-radius:18px;
+  padding:12px;
+  box-shadow:0 6px 14px rgba(39,48,61,.05);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.presenterWhoCardClean .presenterWhoNo{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  color:#2F4158;
+  font-size:1.02rem;
+  text-align:center;
+  margin-bottom:2px;
+}
+
+/* =========================
+   FINAL - COMMON
+========================= */
+
+.presenterFinalCleanCard{
+  background:linear-gradient(180deg,#ffffff 0%,#fbfcfc 100%);
+  border:1px solid #dfe6e7;
+  border-radius:18px;
+  padding:12px;
+  box-shadow:0 6px 14px rgba(39,48,61,.05);
+}
+
+.presenterFinalMiniBlock{
+  border-radius:12px;
+  padding:10px;
+  background:#ffffff;
+}
+
+.presenterFinalMiniBlock .presenterBlockTitle{
+  font-size:.88rem;
+  margin-bottom:4px;
+}
+
+.presenterFinalMiniBlock .presenterBlockText{
+  font-size:.88rem;
+  line-height:1.45;
+}
+
+/* =========================
+   FINAL ROUND 1
+========================= */
+
+.presenterFinalRound1CustomGrid{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:14px;
+  align-items:start;
+}
+
+.presenterFinalOnlyAnswerCard,
+.presenterFinalWideQuestionCard{
+  background:linear-gradient(180deg,#ffffff 0%,#fbfcfc 100%);
+  border:1px solid #dfe6e7;
+  border-radius:18px;
+  padding:12px;
+  box-shadow:0 6px 14px rgba(39,48,61,.05);
+}
+
+.presenterFinalOnlyAnswerCard{
+  min-height:unset;
+}
+
+.presenterFinalWideQuestionCard{
+  grid-column:1 / -1;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.presenterFinalSmallHead{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.05rem;
+  color:#2F4158;
+  margin-bottom:8px;
+}
+
+.presenterFinalTopMedia{
+  background:#fff;
+  border:1px solid #dfe6e7;
+  border-radius:12px;
+  padding:6px;
+}
+
+.presenterFinalTopMedia .presenterImage{
+  width:100%;
+  max-height:130px;
+  margin-top:0;
+  object-fit:contain;
+}
+
+.presenterFinalQuestionAnswerStack{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+/* =========================
+   FINAL ROUND 2
+========================= */
+
+.presenterFinalR2CustomLayout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-areas:
+    "r2n1 r2n3"
+    "r2n2 r2n4";
+  gap:14px;
+  align-items:start;
+}
+
+.presenterFinalR2CustomLayout > :nth-child(1){
+  grid-area:r2n1;
+}
+
+.presenterFinalR2CustomLayout > :nth-child(2){
+  grid-area:r2n2;
+}
+
+.presenterFinalR2CustomLayout > :nth-child(3){
+  grid-area:r2n3;
+}
+
+.presenterFinalR2CustomLayout > :nth-child(4){
+  grid-area:r2n4;
+}
+
+.presenterFinalR2WideCard{
+  background:linear-gradient(180deg,#ffffff 0%,#fbfcfc 100%);
+  border:1px solid #dfe6e7;
+  border-radius:18px;
+  padding:12px;
+  box-shadow:0 6px 14px rgba(39,48,61,.05);
+}
+
+.presenterFinalR2Card{
+  background:linear-gradient(180deg,#ffffff 0%,#fbfcfc 100%);
+  border:1px solid #dfe6e7;
+  border-radius:18px;
+  padding:12px;
+  box-shadow:0 6px 14px rgba(39,48,61,.05);
+}
+
+.presenterFinalR2Head{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.05rem;
+  color:#2F4158;
+  margin-bottom:10px;
+}
+
+.presenterFinalR2HintsAnswersWrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.presenterFinalR2HintsRow,
+.presenterFinalR2AnswersRow{
+  display:grid;
+  grid-template-columns:repeat(6, minmax(0,1fr));
+  gap:8px;
+  align-items:start;
+}
+
+.presenterFinalWordsWrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.presenterFinalWordsWrap .presenterFinalR2WordChip{
+  min-height:38px;
+  padding:7px 12px;
+  border-radius:999px;
+  background:#f4f7fb;
+  border:1px solid #dce5ef;
+  color:#2F4158;
+  font-size:.9rem;
+}
+
+/* =========================
+   FINAL ROUND 3
+========================= */
+
+.presenterFinalR3SingleColumn{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  align-items:start;
+}
+
+.presenterFinalR3Block{
+  background:linear-gradient(180deg,#ffffff 0%,#fbfcfc 100%);
+  border:1px solid #dfe6e7;
+  border-radius:18px;
+  padding:12px;
+  box-shadow:0 6px 14px rgba(39,48,61,.05);
+}
+
+.presenterFinalR3Head{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.05rem;
+  color:#2F4158;
+  margin-bottom:10px;
+}
+
+.presenterFinalR3GroupedWrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.presenterFinalR3ImagesRow,
+.presenterFinalR3AnswersRow{
+  display:grid;
+  grid-template-columns:repeat(5, minmax(0,1fr));
+  gap:8px;
+  align-items:start;
+}
+
+.presenterFinalImageBox,
+.presenterFinalR3TopImage{
+  background:#fff;
+  border:1px solid #dfe6e7;
+  border-radius:12px;
+  padding:6px;
+}
+
+.presenterFinalImageBox .presenterImage,
+.presenterFinalR3TopImage .presenterImage{
+  width:100%;
+  height:88px;
+  max-height:88px;
+  object-fit:contain;
+  margin-top:0;
+}
+
+/* =========================
+   ARCHIVE THEMES
+========================= */
+
+.archiveThemeRound1{
+  --arc-main:#FFB84D;
+  --arc-dark:#25343F;
+  --arc-soft:#FFF5E2;
+  --arc-border:#E9A33A;
+  --arc-dark-text:#2E3A4D;
+  --arc-light-text:#FFFFFF;
+}
+
+.archiveThemeRound2{
+  --arc-main:#FF8A8A;
+  --arc-dark:#25343F;
+  --arc-soft:#FFF0F0;
+  --arc-border:#E16767;
+  --arc-dark-text:#2E3A4D;
+  --arc-light-text:#FFFFFF;
+}
+
+.archiveThemeRound3{
+  --arc-main:#77D99A;
+  --arc-dark:#25343F;
+  --arc-soft:#EEFBEF;
+  --arc-border:#4DBB74;
+  --arc-dark-text:#2E3A4D;
+  --arc-light-text:#FFFFFF;
+}
+
+.archiveThemeRound4{
+  --arc-main:#8ED0E6;
+  --arc-dark:#25343F;
+  --arc-soft:#EFF9FD;
+  --arc-border:#5FB5D3;
+  --arc-dark-text:#2E3A4D;
+  --arc-light-text:#FFFFFF;
+}
+
+/* =========================
+   ARCHIVE A4
+========================= */
+
+.presenterArchiveA4Wrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.presenterArchiveBoardA4{
+  width:100%;
+  max-width:100%;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F8FBFB 100%);
+  border:1px solid var(--arc-border);
+  border-radius:20px;
+  padding:10px;
+  box-shadow:0 8px 18px rgba(39,48,61,.05);
+}
+
+.presenterArchiveTopA4{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.presenterArchiveInfoCard{
+  min-height:54px;
+  border:1px solid var(--arc-border);
+  border-radius:14px;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:96px 1fr;
+  background:var(--arc-soft);
+}
+
+.presenterArchiveInfoLabel{
+  background:var(--arc-dark) !important;
+  color:var(--arc-light-text) !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.86rem;
+  line-height:1.2;
+}
+
+.presenterArchiveInfoValue{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%) !important;
+  color:var(--arc-dark-text) !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:6px 8px;
+  font-size:.86rem;
+  line-height:1.35;
+}
+
+.presenterArchiveMiddleA4{
+  display:grid;
+  grid-template-columns:1fr 92px 1fr;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.presenterArchiveImageCard{
+  min-height:118px;
+  border:1px solid var(--arc-border) !important;
+  border-radius:16px;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%) !important;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.presenterArchiveImageCard img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+.presenterArchiveScoreCard{
+  min-height:118px;
+  border:1px solid var(--arc-border) !important;
+  border-radius:16px;
+  overflow:hidden;
+  display:grid;
+  grid-template-rows:38px 1fr;
+}
+
+.presenterArchiveScoreLabel{
+  background:var(--arc-dark) !important;
+  color:var(--arc-light-text) !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.84rem;
+}
+
+.presenterArchiveScoreValue{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%) !important;
+  color:var(--arc-dark-text) !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.15rem;
+}
+
+.presenterArchiveBottomA4{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.presenterArchiveCol{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.presenterArchiveMiniCard{
+  min-height:38px;
+  border:1px solid var(--arc-border) !important;
+  border-radius:10px;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%) !important;
+  color:var(--arc-dark-text) !important;
+  padding:6px 8px;
+  display:flex;
+  align-items:center;
+}
+
+.presenterArchiveMiniCard.required{
+  background:#FFE9E9 !important;
+  border-color:#E16F6F !important;
+  color:#B40000 !important;
+}
+
+.presenterArchiveMiniText{
+  font-size:.78rem;
+  line-height:1.35;
+  word-break:break-word;
+}
+
+/* =========================
+   PRINT AREA
+========================= */
+
+#printPresenterArea{
+  position:fixed;
+  top:-99999px;
+  left:0;
+  width:210mm;
+  min-height:297mm;
+  opacity:0;
+  pointer-events:none;
+  overflow:hidden;
+  background:#fff;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width:1100px){
+  .presenterFinalR2HintsRow,
+  .presenterFinalR2AnswersRow{
+    grid-template-columns:repeat(3, minmax(0,1fr));
+  }
+
+  .presenterFinalR3ImagesRow,
+  .presenterFinalR3AnswersRow{
+    grid-template-columns:repeat(3, minmax(0,1fr));
+  }
+}
+
+@media (max-width:760px){
+  .presenterShell{
+    width:min(100%, calc(100% - 16px));
+    padding-top:10px;
+  }
+
+  .presenterTopBar{
+    border-radius:16px;
+    padding:12px;
+  }
+
+  #presenterPageTitle{
+    font-size:1.55rem;
+  }
+
+  .presenterTopActions{
+    width:100%;
+  }
+
+  .presenterTopActions button{
+    flex:1;
+    min-width:0;
+  }
+
+  .presenterMiniGrid,
+  .presenterSavedInfoGrid,
+  .presenterControlsGrid,
+  .presenterUploadRow,
+  .presenterWarmupGrid,
+  .presenterTop10AnswersList,
+  .presenterAuctionGridClean,
+  .presenterWhoGridClean,
+  .presenterFinalRound1CustomGrid,
+  .presenterFinalR2CustomLayout,
+  .presenterFinalR3SingleColumn,
+  .presenterArchiveTopA4,
+  .presenterArchiveMiddleA4,
+  .presenterArchiveBottomA4{
+    grid-template-columns:1fr !important;
+  }
+
+  .presenterFinalR2CustomLayout{
+    grid-template-areas:
+      "r2n1"
+      "r2n2"
+      "r2n3"
+      "r2n4" !important;
+  }
+
+  .presenterFinalR2HintsRow,
+  .presenterFinalR2AnswersRow,
+  .presenterFinalR3ImagesRow,
+  .presenterFinalR3AnswersRow{
+    grid-template-columns:1fr 1fr !important;
+  }
+
+  .presenterFinalWideQuestionCard{
+    grid-column:auto !important;
+  }
+}
+
+/* =========================
+   PRINT / PDF
+========================= */
+
+@page{
+  size:A4;
+  margin:10mm;
+}
+
+@media print{
+  html,
+  body{
+    background:#fff !important;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+
+  .no-print,
+  .presenterTopBar,
+  #presenterContent{
+    display:none !important;
+  }
+
+  #printPresenterArea{
+    position:static !important;
+    top:auto !important;
+    left:auto !important;
+    width:100% !important;
+    min-height:auto !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    overflow:visible !important;
+    background:#fff !important;
+    display:block !important;
+  }
+
+  .presenterPagesWrap{
+    gap:0 !important;
+  }
+
+  .presenterPrintPage{
+    display:block !important;
+    width:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+    background:#fff !important;
+    page-break-after:always !important;
+    break-after:page !important;
+    page-break-inside:avoid !important;
+    break-inside:avoid !important;
+    min-height:0 !important;
+  }
+
+  .presenterPrintPage:last-child{
+    page-break-after:auto !important;
+    break-after:auto !important;
+  }
+
+  .presenterSectionHead{
+    padding:0 0 6px 0 !important;
+    margin:0 0 8px 0 !important;
+    border-bottom:2px solid #dbe2e3 !important;
+  }
+
+  .presenterSectionTitle{
+    font-size:1.2rem !important;
+    line-height:1 !important;
+  }
+
+  .presenterSectionCount{
+    min-height:22px !important;
+    padding:0 8px !important;
+    font-size:.75rem !important;
+  }
+
+  .presenterSectionBody{
+    display:block !important;
+    padding:0 !important;
+    gap:8px !important;
+  }
+
+  .presenterBlock,
+  .presenterWarmupCategory,
+  .presenterWarmupQuestion,
+  .presenterAuctionCardClean,
+  .presenterWhoCardClean,
+  .presenterFinalOnlyAnswerCard,
+  .presenterFinalWideQuestionCard,
+  .presenterFinalR2WideCard,
+  .presenterFinalR2Card,
+  .presenterFinalR3Block,
+  .presenterArchiveBoardA4{
+    page-break-inside:avoid !important;
+    break-inside:avoid !important;
+    min-height:0 !important;
+    height:auto !important;
+    overflow:visible !important;
+  }
+
+  .presenterBlock{
+    padding:7px 8px !important;
+    border-radius:10px !important;
+  }
+
+  .presenterBlockTitle{
+    font-size:.78rem !important;
+    margin-bottom:3px !important;
+  }
+
+  .presenterBlockText{
+    font-size:.75rem !important;
+    line-height:1.3 !important;
+  }
+
+  .presenterImage{
+    max-height:82px !important;
+  }
+
+  .presenterControlsWrap,
+  .presenterUploadRow,
+  .presenterTextarea,
+  .presenterExtraImageInput{
+    display:none !important;
+  }
+
+  /* warmup */
+  .presenterWarmupGrid{
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+  }
+
+  /* top10 */
+  .presenterTop10AnswersList{
+    grid-template-columns:1fr 1fr !important;
+    gap:6px !important;
+  }
+
+  .presenterTop10AnswerRow{
+    padding:6px 8px !important;
+  }
+
+  .presenterTop10Rank,
+  .presenterTop10AnswerText{
+    font-size:.78rem !important;
+    line-height:1.3 !important;
+  }
+
+  /* auction */
+  .presenterAuctionGridClean{
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+  }
+
+  .presenterAuctionCardClean{
+    padding:8px !important;
+    border-radius:12px !important;
+    box-shadow:none !important;
+  }
+
+  .presenterAuctionCardClean .presenterAuctionHead{
+    font-size:.9rem !important;
+  }
+
+  /* who */
+  .presenterWhoGridClean{
+    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+
+  .presenterWhoCardClean{
+    padding:8px !important;
+    border-radius:12px !important;
+    box-shadow:none !important;
+  }
+
+  .presenterWhoCardClean .presenterWhoNo{
+    font-size:.9rem !important;
+  }
+
+  /* final round 1 */
+  .presenterFinalRound1CustomGrid{
+    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+
+  .presenterFinalOnlyAnswerCard,
+  .presenterFinalWideQuestionCard{
+    padding:8px !important;
+    border-radius:12px !important;
+    box-shadow:none !important;
+  }
+
+  .presenterFinalTopMedia{
+    padding:4px !important;
+    border-radius:10px !important;
+  }
+
+  .presenterFinalTopMedia .presenterImage{
+    max-height:82px !important;
+  }
+
+  .presenterFinalOnlyAnswerCard .presenterFinalMiniBlock,
+  .presenterFinalWideQuestionCard .presenterFinalMiniBlock{
+    padding:6px !important;
+    border-radius:10px !important;
+  }
+
+  .presenterFinalOnlyAnswerCard .presenterBlockTitle,
+  .presenterFinalWideQuestionCard .presenterBlockTitle{
+    font-size:.75rem !important;
+    margin-bottom:3px !important;
+  }
+
+  .presenterFinalOnlyAnswerCard .presenterBlockText,
+  .presenterFinalWideQuestionCard .presenterBlockText{
+    font-size:.72rem !important;
+    line-height:1.28 !important;
+  }
+
+  /* final round 2 */
+  .presenterFinalR2CustomLayout{
+    grid-template-columns:1fr 1fr !important;
+    grid-template-areas:
+      "r2n1 r2n3"
+      "r2n2 r2n4" !important;
+    gap:8px !important;
+  }
+
+  .presenterFinalR2WideCard,
+  .presenterFinalR2Card{
+    padding:8px !important;
+    border-radius:12px !important;
+    box-shadow:none !important;
+  }
+
+  .presenterFinalR2Head{
+    font-size:.9rem !important;
+    margin-bottom:6px !important;
+  }
+
+  .presenterFinalR2HintsRow,
+  .presenterFinalR2AnswersRow{
+    grid-template-columns:repeat(6, minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+
+  .presenterFinalWordsWrap .presenterFinalR2WordChip{
+    min-height:28px !important;
+    padding:4px 8px !important;
+    font-size:.72rem !important;
+  }
+
+  /* final round 3 */
+  .presenterFinalR3SingleColumn{
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+  }
+
+  .presenterFinalR3Block{
+    padding:8px !important;
+    border-radius:12px !important;
+    box-shadow:none !important;
+  }
+
+  .presenterFinalR3Head{
+    font-size:.9rem !important;
+    margin-bottom:6px !important;
+  }
+
+  .presenterFinalR3ImagesRow,
+  .presenterFinalR3AnswersRow{
+    grid-template-columns:repeat(5, minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+
+  .presenterFinalImageBox,
+  .presenterFinalR3TopImage{
+    padding:4px !important;
+    border-radius:10px !important;
+  }
+
+  .presenterFinalImageBox .presenterImage,
+  .presenterFinalR3TopImage .presenterImage{
+    height:58px !important;
+    max-height:58px !important;
+  }
+
+  /* archive */
+  .presenterArchivePage{
+    page-break-before:always !important;
+    break-before:page !important;
+  }
+
+  .presenterArchiveA4Wrap{
+    gap:8px !important;
+  }
+
+  .presenterArchiveBoardA4{
+    padding:8px !important;
+    border-radius:16px !important;
+    box-shadow:none !important;
+  }
+
+  .presenterArchiveTopA4{
+    gap:6px !important;
+    margin-bottom:6px !important;
+  }
+
+  .presenterArchiveInfoCard{
+    min-height:46px !important;
+    grid-template-columns:82px 1fr !important;
+    border-radius:12px !important;
+  }
+
+  .presenterArchiveInfoLabel{
+    font-size:.78rem !important;
+  }
+
+  .presenterArchiveInfoValue{
+    font-size:.76rem !important;
+    padding:4px 6px !important;
+    line-height:1.25 !important;
+  }
+
+  .presenterArchiveMiddleA4{
+    grid-template-columns:1fr 78px 1fr !important;
+    gap:6px !important;
+    margin-bottom:6px !important;
+  }
+
+  .presenterArchiveImageCard{
+    min-height:96px !important;
+    border-radius:12px !important;
+  }
+
+  .presenterArchiveScoreCard{
+    min-height:96px !important;
+    border-radius:12px !important;
+    grid-template-rows:30px 1fr !important;
+  }
+
+  .presenterArchiveScoreLabel{
+    font-size:.76rem !important;
+  }
+
+  .presenterArchiveScoreValue{
+    font-size:1rem !important;
+  }
+
+  .presenterArchiveBottomA4{
+    gap:6px !important;
+  }
+
+  .presenterArchiveCol{
+    gap:5px !important;
+  }
+
+  .presenterArchiveMiniCard{
+    min-height:30px !important;
+    padding:4px 6px !important;
+    border-radius:8px !important;
+  }
+
+  .presenterArchiveMiniText{
+    font-size:.68rem !important;
+    line-height:1.2 !important;
+  }
+}
+@media print{
+  .pdf-page-force{
+    display:block !important;
+    width:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:#fff !important;
+    box-shadow:none !important;
+    border:0 !important;
+    border-radius:0 !important;
+    page-break-before:always !important;
+    break-before:page !important;
+    page-break-after:always !important;
+    break-after:page !important;
+    page-break-inside:avoid !important;
+    break-inside:avoid !important;
+  }
+
+  .pdf-page-force.pdf-page-first{
+    page-break-before:auto !important;
+    break-before:auto !important;
+  }
+
+  .pdf-page-force.pdf-page-last{
+    page-break-after:auto !important;
+    break-after:auto !important;
+  }
+}
