@@ -325,54 +325,51 @@ function buildWarmupPage(rows, modelId) {
     grouped[row.category].items.push(row)
   })
 
-  const categoriesHtml = Object.values(grouped).map(cat => `
-    <div class="presenterWarmupCategory">
-      <div class="presenterWarmupCategoryTitle">${escapeHtml(cat.category_name)}</div>
+  const categoriesHtml = Object.values(grouped).map(cat => {
+    const noteKey = buildNoteKey(modelId, "warmup", `category_${cat.category}`)
 
-      <div class="presenterWarmupQuestionsList">
-        ${cat.items.map(q => {
-          const noteKey = buildNoteKey(modelId, "warmup", `cat${q.category}_q${q.number}`)
+    const cardsHtml = cat.items.map(q => `
+      <div class="presenterWarmupMiniCard">
+        <div class="presenterWarmupMiniNo">${q.number}</div>
 
-          return `
-            <div class="presenterWarmupQuestion">
-              <div class="presenterWarmupQHead">
-                <span class="presenterWarmupQNo">سؤال ${q.number}</span>
-              </div>
+        <div class="presenterBlock presenterWarmupMiniBlock presenterWarmupQuestionOnlyBlock">
+          <div class="presenterBlockText">${nl2br(q.question || "—")}</div>
+        </div>
 
-              <div class="presenterMiniGrid">
-                <div class="presenterBlock">
-                  <div class="presenterBlockTitle">السؤال</div>
-                  <div class="presenterBlockText">${nl2br(q.question || "—")}</div>
-                </div>
-
-                <div class="presenterBlock">
-                  <div class="presenterBlockTitle">الجواب</div>
-                  <div class="presenterBlockText">${nl2br(q.answer || "—")}</div>
-                </div>
-              </div>
-
-              ${renderSavedInfo(noteKey, {
-                hintTitle: "التلميحة",
-                noteTitle: "التوضيح",
-                showSingleImage: false
-              })}
-
-              ${renderExtraControls(noteKey, {
-                hintTitle: "التلميحة",
-                noteTitle: "التوضيح",
-                showSingleImage: false
-              })}
-            </div>
-          `
-        }).join("")}
+        <div class="presenterBlock presenterWarmupMiniBlock">
+          <div class="presenterBlockTitle">الجواب</div>
+          <div class="presenterBlockText">${nl2br(q.answer || "—")}</div>
+        </div>
       </div>
-    </div>
-  `).join("")
+    `).join("")
+
+    return `
+      <div class="presenterWarmupRowCard">
+        <div class="presenterWarmupRowHead">${escapeHtml(cat.category_name)}</div>
+
+        <div class="presenterWarmupCardsGrid">
+          ${cardsHtml}
+        </div>
+
+        ${renderSavedInfo(noteKey, {
+          hintTitle: "التلميحة",
+          noteTitle: "التوضيح",
+          showSingleImage: false
+        })}
+
+        ${renderExtraControls(noteKey, {
+          hintTitle: "التلميحة",
+          noteTitle: "التوضيح",
+          showSingleImage: false
+        })}
+      </div>
+    `
+  }).join("")
 
   return sectionPage(
     "التسخين",
     `${rows.length} سؤال`,
-    `<div class="presenterWarmupGrid">${categoriesHtml}</div>`,
+    `<div class="presenterWarmupRowWrap">${categoriesHtml}</div>`,
     "presenterWarmupPage"
   )
 }
@@ -397,7 +394,7 @@ function buildTop10Pages(rows, modelId) {
 
     const body = `
       <div class="presenterTop10RoundWrap">
-        <div class="presenterBlock">
+        <div class="presenterBlock presenterTop10QuestionCard">
           <div class="presenterBlockTitle">السؤال</div>
           <div class="presenterBlockText">${nl2br(question || "—")}</div>
         </div>
@@ -442,7 +439,7 @@ function buildAuctionPage(rows, modelId) {
 
     return `
       <div class="presenterAuctionCardClean">
-        <div class="presenterAuctionHead">السؤال ${item.number}</div>
+        <div class="presenterAuctionHead">${item.number}</div>
 
         <div class="presenterBlock">
           <div class="presenterBlockTitle">الإجابة</div>
@@ -482,7 +479,7 @@ function buildWhoPage(rows, modelId) {
 
     return `
       <div class="presenterWhoCardClean">
-        <div class="presenterWhoNo">رقم ${item.number}</div>
+        <div class="presenterWhoNo">${item.number}</div>
 
         <div class="presenterBlock">
           <div class="presenterBlockTitle">الإجابة</div>
@@ -549,7 +546,7 @@ function buildFinalRound1Page(rows, modelId) {
     if (num >= 1 && num <= 3) {
       return `
         <div class="presenterFinalOnlyAnswerCard presenterFinalCleanCard">
-          <div class="presenterFinalSmallHead">رقم ${item.number}</div>
+          <div class="presenterFinalSmallHead">${item.number}</div>
 
           ${item.image ? `
             <div class="presenterFinalTopMedia">
@@ -579,7 +576,7 @@ function buildFinalRound1Page(rows, modelId) {
 
     return `
       <div class="presenterFinalWideQuestionCard presenterFinalCleanCard">
-        <div class="presenterFinalSmallHead">رقم ${item.number}</div>
+        <div class="presenterFinalSmallHead">${item.number}</div>
 
         ${item.image ? `
           <div class="presenterFinalTopMedia">
@@ -633,7 +630,7 @@ function buildFinalRound1Page(rows, modelId) {
    FINAL ROUND 2
 ========================= */
 
-function buildFinalRound2Page(rows, modelId) {
+function buildFinalRound2Page(rows) {
   const grouped = {}
   rows.forEach(row => {
     if (!grouped[row.number]) grouped[row.number] = []
@@ -649,7 +646,7 @@ function buildFinalRound2Page(rows, modelId) {
     if (isHintsAnswersLayout) {
       return `
         <div class="presenterFinalR2WideCard presenterFinalCleanCard">
-          <div class="presenterFinalR2Head">رقم ${number}</div>
+          <div class="presenterFinalR2Head">${number}</div>
 
           <div class="presenterFinalR2HintsAnswersWrap">
             <div class="presenterFinalR2HintsRow">
@@ -676,7 +673,7 @@ function buildFinalRound2Page(rows, modelId) {
 
     return `
       <div class="presenterFinalR2Card presenterFinalCleanCard">
-        <div class="presenterFinalR2Head">رقم ${number}</div>
+        <div class="presenterFinalR2Head">${number}</div>
 
         <div class="presenterFinalWordsWrap">
           ${items.map(row => `
@@ -699,7 +696,7 @@ function buildFinalRound2Page(rows, modelId) {
    FINAL ROUND 3
 ========================= */
 
-function buildFinalRound3Page(rows, modelId) {
+function buildFinalRound3Page(rows) {
   const grouped = {}
   rows.forEach(row => {
     if (!grouped[row.number]) grouped[row.number] = []
@@ -712,7 +709,7 @@ function buildFinalRound3Page(rows, modelId) {
 
     return `
       <div class="presenterFinalR3Block presenterFinalCleanCard">
-        <div class="presenterFinalR3Head">رقم ${number}</div>
+        <div class="presenterFinalR3Head">${number}</div>
 
         <div class="presenterFinalR3GroupedWrap">
           <div class="presenterFinalR3ImagesRow">
@@ -748,11 +745,27 @@ function buildFinalRound3Page(rows, modelId) {
    ARCHIVE
 ========================= */
 
+function clampPresenterText(value, max = 28) {
+  const text = String(value || "").trim()
+  if (!text) return ""
+  if (text.length <= max) return text
+  return text.slice(0, max).trim() + "…"
+}
+
+function clampPresenterTextSoft(value, max = 36) {
+  const text = String(value || "").trim()
+  if (!text) return ""
+  if (text.length <= max) return text
+  return text.slice(0, max).trim() + "…"
+}
+
 function buildArchivePages(boxes, items, modelId) {
   return boxes.map(box => {
     const round = Number(box.round || 1)
     const roundItems = items.filter(x => Number(x.round) === round)
 
+    const pos1 = roundItems.find(x => Number(x.position) === 1)
+    const pos2 = roundItems.find(x => Number(x.position) === 2)
     const image3 = roundItems.find(x => Number(x.position) === 3 && x.item_type === "image")
     const image4 = roundItems.find(x => Number(x.position) === 4 && x.item_type === "image")
 
@@ -771,12 +784,32 @@ function buildArchivePages(boxes, items, modelId) {
     const noteKey = buildNoteKey(modelId, "archive", `round_${round}`)
 
     const renderItem = item => {
-      const isRequired = String(item.label || "").trim() === "المطلوب"
+      const position = Number(item.position || 0)
+      const labelText = String(item.label || "").trim()
+      const text = String(item.text || "").trim()
+      const promptStyle = String(item.prompt_style || "shoe").trim().toLowerCase()
+      const isRequired = labelText === "المطلوب"
+
+      const styleClass = isRequired
+        ? "archivePromptRequired"
+        : (promptStyle === "ball" ? "archivePromptBall" : "archivePromptShoe")
+
+      const emoji = isRequired ? "!" : (promptStyle === "ball" ? "⚽️" : "👟")
+
+      const rawText = isRequired
+        ? (text || labelText || "-")
+        : `${labelText ? `${labelText}: ` : ""}${text || "-"}`
+
+      const screenText = clampPresenterTextSoft(rawText, 34)
+      const printText = clampPresenterText(rawText, 24)
+
       return `
-        <div class="presenterArchiveMiniCard ${isRequired ? "required" : ""}">
-          <div class="presenterArchiveMiniText">
-            ${escapeHtml(item.label || "")}${item.label ? " : " : ""}${escapeHtml(item.text || "")}
+        <div class="presenterArchiveMiniCard ${styleClass}">
+          <div class="presenterArchiveMiniMain">
+            <div class="presenterArchiveMiniNumber">${position}</div>
+            <div class="presenterArchiveMiniText" data-print-text="${escapeHtml(printText)}">${escapeHtml(screenText)}</div>
           </div>
+          <div class="presenterArchiveMiniEmoji">${emoji}</div>
         </div>
       `
     }
@@ -785,39 +818,54 @@ function buildArchivePages(boxes, items, modelId) {
       `الأرشيف - الجولة ${round}`,
       `الجولة ${round}`,
       `
-        <div class="presenterArchiveA4Wrap archiveThemeRound${round}">
-          <div class="presenterArchiveBoardA4">
-            <div class="presenterArchiveTopA4">
-              <div class="presenterArchiveInfoCard">
-                <div class="presenterArchiveInfoLabel">البطولة</div>
-                <div class="presenterArchiveInfoValue">${escapeHtml(box.tournament || "—")}</div>
+        <div class="presenterArchivePdfWrap archiveThemeRound${round}">
+          <div class="presenterArchivePdfBoard">
+
+            <div class="presenterArchivePdfTop">
+              <div class="presenterArchivePdfInfo">
+                <div class="presenterArchivePdfInfoLabel">البطولة</div>
+                <div class="presenterArchivePdfInfoValue">
+                  <span title="${escapeHtml(box.tournament || pos1?.text || "—")}">
+                    ${escapeHtml(clampPresenterTextSoft(box.tournament || pos1?.text || "—", 26))}
+                  </span>
+                </div>
               </div>
 
-              <div class="presenterArchiveInfoCard">
-                <div class="presenterArchiveInfoLabel">الموسم</div>
-                <div class="presenterArchiveInfoValue">${escapeHtml(box.season || "—")}</div>
+              <div class="presenterArchivePdfInfo">
+                <div class="presenterArchivePdfInfoLabel">الموسم</div>
+                <div class="presenterArchivePdfInfoValue">
+                  <span title="${escapeHtml(box.season || pos2?.text || "—")}">
+                    ${escapeHtml(clampPresenterTextSoft(box.season || pos2?.text || "—", 26))}
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div class="presenterArchiveMiddleA4">
-              <div class="presenterArchiveImageCard">
+            <div class="presenterArchivePdfMiddle">
+              <div class="presenterArchivePdfImageBox">
                 ${image4?.image ? `<img src="${escapeHtml(image4.image)}" alt="">` : ""}
               </div>
 
-              <div class="presenterArchiveScoreCard">
-                <div class="presenterArchiveScoreLabel">النتيجة</div>
-                <div class="presenterArchiveScoreValue">${escapeHtml(box.score || "-")}</div>
+              <div class="presenterArchivePdfScoreBox">
+                <div class="presenterArchivePdfScoreLabel">النتيجة</div>
+                <div class="presenterArchivePdfScoreValue">${escapeHtml(box.score || "-")}</div>
               </div>
 
-              <div class="presenterArchiveImageCard">
+              <div class="presenterArchivePdfImageBox">
                 ${image3?.image ? `<img src="${escapeHtml(image3.image)}" alt="">` : ""}
               </div>
             </div>
 
-            <div class="presenterArchiveBottomA4">
-              <div class="presenterArchiveCol">${col4.map(renderItem).join("")}</div>
-              <div class="presenterArchiveCol">${col3.map(renderItem).join("")}</div>
+            <div class="presenterArchivePdfBottom">
+              <div class="presenterArchivePdfCol">
+                ${col4.map(renderItem).join("")}
+              </div>
+
+              <div class="presenterArchivePdfCol">
+                ${col3.map(renderItem).join("")}
+              </div>
             </div>
+
           </div>
 
           ${renderSavedInfo(noteKey, {
@@ -910,17 +958,13 @@ window.savePresenterNotes = function () {
    PRINT
 ========================= */
 
-function buildPrintAreaFromScreen() {
-  const printArea = document.getElementById("printPresenterArea")
-  const content = document.getElementById("presenterContent")
-  if (!printArea || !content) return
+function cleanPrintSection(sectionEl) {
+  const clone = sectionEl.cloneNode(true)
 
-  printArea.innerHTML = content.innerHTML
+  clone.querySelectorAll(".no-print").forEach(el => el.remove())
+  clone.querySelectorAll(".presenterControlsWrap").forEach(el => el.remove())
 
-  printArea.querySelectorAll(".no-print").forEach(el => el.remove())
-  printArea.querySelectorAll(".presenterControlsWrap").forEach(el => el.remove())
-
-  printArea.querySelectorAll(".presenterSavedInfoGrid").forEach(grid => {
+  clone.querySelectorAll(".presenterSavedInfoGrid").forEach(grid => {
     if (!grid.innerHTML.trim()) {
       grid.remove()
       return
@@ -944,20 +988,29 @@ function buildPrintAreaFromScreen() {
     })
   })
 
-  const pages = Array.from(printArea.querySelectorAll(".presenterPrintPage"))
+  return clone
+}
 
-  pages.forEach(page => {
-    page.classList.remove("pdf-page-force", "pdf-page-first", "pdf-page-last")
-    page.classList.add("pdf-page-force")
+function buildPrintAreaFromScreen() {
+  const printArea = document.getElementById("printPresenterArea")
+  const content = document.getElementById("presenterContent")
+  if (!printArea || !content) return
+
+  printArea.innerHTML = ""
+
+  const sections = Array.from(content.querySelectorAll(".presenterPrintPage"))
+
+  sections.forEach(section => {
+    const page = document.createElement("div")
+    page.className = "pdf-sheet"
+
+    const inner = document.createElement("div")
+    inner.className = "pdf-sheet-inner"
+
+    inner.appendChild(cleanPrintSection(section))
+    page.appendChild(inner)
+    printArea.appendChild(page)
   })
-
-  if (pages[0]) {
-    pages[0].classList.add("pdf-page-first")
-  }
-
-  if (pages[pages.length - 1]) {
-    pages[pages.length - 1].classList.add("pdf-page-last")
-  }
 }
 
 window.printPresenterPdf = function () {
@@ -967,7 +1020,7 @@ window.printPresenterPdf = function () {
   requestAnimationFrame(() => {
     setTimeout(() => {
       window.print()
-    }, 350)
+    }, 400)
   })
 }
 
@@ -1025,8 +1078,8 @@ async function renderPresenterPage(keepScroll = false) {
   if (auctionRows.length) html += buildAuctionPage(auctionRows, modelId)
   if (whoRows.length) html += buildWhoPage(whoRows, modelId)
   if (finalR1Rows.length) html += buildFinalRound1Page(finalR1Rows, modelId)
-  if (finalR2Rows.length) html += buildFinalRound2Page(finalR2Rows, modelId)
-  if (finalR3Rows.length) html += buildFinalRound3Page(finalR3Rows, modelId)
+  if (finalR2Rows.length) html += buildFinalRound2Page(finalR2Rows)
+  if (finalR3Rows.length) html += buildFinalRound3Page(finalR3Rows)
   if (archiveData.boxes.length) html += buildArchivePages(archiveData.boxes, archiveData.items, modelId)
 
   html += `</div>`

@@ -13,37 +13,97 @@
 }
 
 :root{
-  --presenter-text:#243447;
-  --presenter-text-soft:#667585;
-  --presenter-accent:#2F4158;
-  --presenter-primary:#FF9B51;
-  --presenter-primary-soft:#FFF2E6;
-  --presenter-border:#D9E0E0;
-  --presenter-border-soft:#E7ECEC;
-  --presenter-shadow:0 10px 22px rgba(39,48,61,.06);
-  --presenter-shadow-soft:0 6px 14px rgba(39,48,61,.05);
+  --bg:#EAEFEF;
+  --bg-soft:#F4F7F7;
+  --card:#FFFFFF;
+  --card-2:#F7F9F9;
+
+  --text:#243447;
+  --text-soft:#5F6B7A;
+  --text-light:#8A93A1;
+
+  --primary:#FF9B51;
+  --primary-dark:#FF9B51;
+  --primary-soft:#FFD7B8;
+
+  --accent:#2F4158;
+  --accent-2:#42556D;
+
+  --success:#FF9B51;
+  --danger:#FF9B51;
+
+  --border:#D9E0E0;
+  --border-soft:#E3E8E8;
+
+  --shadow-sm:0 6px 14px rgba(0,0,0,.05);
+  --shadow-md:0 12px 30px rgba(0,0,0,.08);
+  --shadow-lg:0 20px 50px rgba(0,0,0,.12);
+
+  --container:1280px;
+
+  /* presenter */
+  --presenter-text:var(--text);
+  --presenter-text-soft:var(--text-soft);
+  --presenter-accent:var(--accent);
+  --presenter-primary:var(--primary);
+  --presenter-primary-soft:var(--primary-soft);
+  --presenter-border:var(--border);
+  --presenter-border-soft:var(--border-soft);
+  --presenter-shadow:var(--shadow-md);
+  --presenter-shadow-soft:var(--shadow-sm);
+  --page-bg-1:var(--bg);
+  --page-bg-2:var(--bg-soft);
+
+  /* section colors */
+  --warmup-main:var(--primary);
+  --warmup-soft:#FFF4EA;
+  --warmup-border:#F0C7A6;
+
+  --top10-main:#DCE7EF;
+  --top10-soft:#F4F7FA;
+  --top10-border:#C9D6E2;
+
+  --auction-main:#FFD7B8;
+  --auction-soft:#FFF4EA;
+  --auction-border:#F0C7A6;
+
+  --who-main:#E7EDF3;
+  --who-soft:#F7F9FB;
+  --who-border:#D6DFE8;
+
+  --final-main:#FF9B51;
+  --final-soft:#FFF4EA;
+  --final-border:#F0C7A6;
+
+  --lux-shadow:var(--shadow-md);
+  --lux-soft-shadow:var(--shadow-sm);
 }
 
 *{
   box-sizing:border-box;
 }
 
-html, body{
+html,
+body{
   margin:0;
   padding:0;
 }
 
 body{
-  font-family:"HanakaText", sans-serif;
+  font-family:"HanakaText",sans-serif;
   color:var(--presenter-text);
-  background:linear-gradient(180deg,#fff8f1 0%,#f3f7f7 100%);
+  background:
+    radial-gradient(circle at 92% 8%, rgba(255,155,81,.12) 0, transparent 18%),
+    radial-gradient(circle at 8% 20%, rgba(47,65,88,.08) 0, transparent 20%),
+    radial-gradient(circle at 18% 92%, rgba(255,155,81,.08) 0, transparent 18%),
+    linear-gradient(180deg,var(--bg) 0%,var(--bg-soft) 100%);
   direction:rtl;
 }
 
 .presenterShell{
-  width:min(1220px, calc(100% - 24px));
+  width:min(1240px, calc(100% - 24px));
   margin:0 auto;
-  padding:14px 0 28px;
+  padding:14px 0 34px;
 }
 
 /* =========================
@@ -56,19 +116,22 @@ body{
   justify-content:space-between;
   gap:12px;
   flex-wrap:wrap;
-  background:linear-gradient(180deg,#fff 0%,#f7faf9 100%);
-  border:1px solid var(--presenter-border);
-  border-radius:22px;
+  background:linear-gradient(180deg,rgba(255,255,255,.96) 0%,rgba(249,251,252,.98) 100%);
+  border:1px solid rgba(37,52,63,.08);
+  border-radius:30px;
   padding:14px 16px;
-  box-shadow:var(--presenter-shadow);
+  box-shadow:var(--lux-shadow);
   margin-bottom:14px;
+  backdrop-filter:blur(10px);
 }
 
 #presenterPageTitle{
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.9rem;
+  font-size:2rem;
   line-height:1.05;
   color:var(--presenter-accent);
+  letter-spacing:.2px;
+  text-shadow:0 1px 0 rgba(255,255,255,.55);
 }
 
 .presenterTopActions{
@@ -80,15 +143,16 @@ body{
 
 .presenterTopActions button{
   border:0;
-  min-width:110px;
+  min-width:116px;
   height:42px;
   padding:0 16px;
-  border-radius:12px;
+  border-radius:14px;
   cursor:pointer;
   color:#fff;
   font-family:"HanakaText",sans-serif;
   font-size:.95rem;
-  box-shadow:0 8px 16px rgba(39,48,61,.08);
+  font-weight:700;
+  box-shadow:0 10px 20px rgba(37,52,63,.12);
   transition:transform .18s ease, filter .18s ease;
 }
 
@@ -110,7 +174,7 @@ body{
 }
 
 /* =========================
-   MAIN WRAP
+   MAIN
 ========================= */
 
 #presenterContent{
@@ -127,54 +191,67 @@ body{
   background:#fff;
   border:1px solid var(--presenter-border);
   border-radius:18px;
-  padding:24px;
+  padding:26px;
   text-align:center;
   color:var(--presenter-text-soft);
+  box-shadow:var(--presenter-shadow-soft);
 }
 
 /* =========================
    COMMON SECTION
 ========================= */
 
-.presenterSection{
-  background:linear-gradient(180deg,#ffffff 0%,#f9fbfb 100%);
-  border:1px solid var(--presenter-border);
-  border-radius:22px;
-  box-shadow:var(--presenter-shadow);
+.presenterPrintPage{
+  border-radius:28px;
   overflow:hidden;
+  border:1px solid rgba(37,52,63,.07);
+  box-shadow:var(--lux-shadow);
+  background:#fff;
+  position:relative;
+  margin-bottom:18px;
+}
+
+.presenterPrintPage::before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:6px;
+  background:rgba(37,52,63,.08);
+  pointer-events:none;
 }
 
 .presenterSectionHead{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:10px;
+  gap:12px;
   flex-wrap:wrap;
-  padding:14px 16px 10px;
-  border-bottom:1px solid var(--presenter-border-soft);
+  padding:16px 18px 12px;
+  border-bottom:1px solid rgba(0,0,0,.06);
 }
 
 .presenterSectionTitle{
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.5rem;
+  font-size:1.45rem;
   line-height:1.05;
-  color:var(--presenter-accent);
+  letter-spacing:.2px;
 }
 
 .presenterSectionCount{
-  min-height:30px;
-  padding:0 12px;
+  min-height:36px;
+  padding:0 15px;
   border-radius:999px;
-  background:var(--presenter-primary-soft);
-  color:#8A4D1D;
-  display:flex;
+  display:inline-flex;
   align-items:center;
   justify-content:center;
-  font-size:.88rem;
+  font-size:.86rem;
+  font-weight:800;
+  white-space:nowrap;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28);
 }
 
 .presenterSectionBody{
-  padding:14px;
+  padding:16px;
   display:flex;
   flex-direction:column;
   gap:12px;
@@ -192,21 +269,23 @@ body{
 }
 
 .presenterBlock{
-  background:#fbfcfc;
-  border:1px solid var(--presenter-border-soft);
-  border-radius:12px;
+  background:linear-gradient(180deg,#ffffff 0%,#fcfdfd 100%);
+  border:1px solid rgba(37,52,63,.08);
+  border-radius:16px;
   padding:10px 12px;
+  box-shadow:var(--lux-soft-shadow);
 }
 
 .presenterBlockTitle{
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:.95rem;
+  font-size:.92rem;
   color:var(--presenter-accent);
   margin-bottom:6px;
+  font-weight:800;
 }
 
 .presenterBlockText{
-  font-size:.92rem;
+  font-size:.94rem;
   line-height:1.65;
   color:var(--presenter-text);
   white-space:pre-wrap;
@@ -221,7 +300,8 @@ body{
   margin-top:8px;
   background:#fff;
   border:1px solid var(--presenter-border-soft);
-  border-radius:10px;
+  border-radius:14px;
+  box-shadow:0 8px 18px rgba(37,52,63,.08);
 }
 
 .presenterSavedInfoGrid:empty{
@@ -234,9 +314,9 @@ body{
 
 .presenterControlsWrap{
   margin-top:8px;
-  border:1px dashed rgba(47,65,88,.18);
-  border-radius:14px;
-  background:#fcfdfd;
+  border-radius:20px;
+  background:linear-gradient(180deg,#fffdfa 0%,#fff8f1 100%);
+  border:1px dashed rgba(255,155,81,.26);
   padding:10px;
 }
 
@@ -249,9 +329,9 @@ body{
 
 .presenterNoteBox,
 .presenterUploadBox{
-  background:#fff9f3;
+  background:linear-gradient(180deg,#fffaf4 0%,#fff6ec 100%);
   border:1px solid rgba(255,155,81,.22);
-  border-radius:14px;
+  border-radius:16px;
   padding:10px;
 }
 
@@ -302,59 +382,130 @@ body{
    WARMUP
 ========================= */
 
-.presenterWarmupGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
+.presenterWarmupPage{
+  border-color:var(--warmup-border);
+  background:linear-gradient(180deg,#fff 0%, var(--warmup-soft) 100%);
 }
 
-.presenterWarmupCategory{
-  background:#fff;
-  border:1px solid var(--presenter-border-soft);
-  border-radius:18px;
-  padding:12px;
+.presenterWarmupPage::before{
+  background:linear-gradient(180deg,#E9A33A 0%,#FFB84D 100%);
 }
 
-.presenterWarmupCategoryTitle{
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.08rem;
-  color:var(--presenter-accent);
-  margin-bottom:10px;
-  text-align:center;
+.presenterWarmupPage .presenterSectionHead{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--warmup-main) 18%, white 82%) 0%, var(--warmup-soft) 100%);
 }
 
-.presenterWarmupQuestionsList{
+.presenterWarmupPage .presenterSectionTitle{
+  color:#9a5a00;
+}
+
+.presenterWarmupPage .presenterSectionCount{
+  background:var(--warmup-main);
+  color:#3b2a09;
+}
+
+.presenterWarmupRowWrap{
   display:flex;
   flex-direction:column;
+  gap:12px;
+}
+
+.presenterWarmupRowCard{
+  background:#fff;
+  border:1px solid var(--warmup-border);
+  border-radius:22px;
+  padding:12px;
+  box-shadow:0 8px 18px rgba(233,163,58,.10);
+}
+
+.presenterWarmupRowHead{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  min-height:40px;
+  padding:0 12px;
+  border-radius:12px;
+  background:var(--warmup-main);
+  color:#2f2a20;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.08rem;
+  line-height:1.1;
+  margin-bottom:10px;
+  border:1px solid #f0dbc6;
+  font-weight:800;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3);
+}
+
+.presenterWarmupCardsGrid{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
   gap:10px;
 }
 
-.presenterWarmupQuestion{
-  border:1px solid var(--presenter-border-soft);
+.presenterWarmupMiniCard{
+  background:#fffdf8;
+  border:1px solid #f0d39d;
   border-radius:14px;
-  background:#fcfdfd;
   padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  box-shadow:0 8px 18px rgba(233,163,58,.09);
+  transition:transform .18s ease, box-shadow .18s ease;
 }
 
-.presenterWarmupQHead{
-  margin-bottom:8px;
+.presenterWarmupMiniCard:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 22px rgba(233,163,58,.13);
 }
 
-.presenterWarmupQNo{
-  display:inline-flex;
-  min-width:76px;
-  height:30px;
+.presenterWarmupMiniNo{
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  background:var(--warmup-main);
+  color:#2f2a20;
+  display:flex;
   align-items:center;
   justify-content:center;
-  border-radius:999px;
-  background:#fff2e6;
-  color:#8A4D1D;
-  font-size:.88rem;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1rem;
+}
+
+.presenterWarmupMiniBlock{
+  padding:8px;
+  border-radius:10px;
+}
+
+.presenterWarmupQuestionOnlyBlock .presenterBlockText{
+  margin-top:0;
 }
 
 /* =========================
    TOP10
 ========================= */
+
+.presenterTop10Page{
+  border-color:var(--top10-border);
+  background:linear-gradient(180deg,#fff 0%, var(--top10-soft) 100%);
+}
+
+.presenterTop10Page::before{
+  background:linear-gradient(180deg,#5FB5D3 0%,#8ED0E6 100%);
+}
+
+.presenterTop10Page .presenterSectionHead{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--top10-main) 20%, white 80%) 0%, var(--top10-soft) 100%);
+}
+
+.presenterTop10Page .presenterSectionTitle{
+  color:#1f5f73;
+}
+
+.presenterTop10Page .presenterSectionCount{
+  background:var(--top10-main);
+  color:#173d49;
+}
 
 .presenterTop10RoundWrap{
   display:flex;
@@ -374,15 +525,24 @@ body{
   gap:8px;
   align-items:center;
   padding:8px 10px;
-  border:1px solid var(--presenter-border-soft);
-  border-radius:12px;
-  background:#fbfcfc;
+  border:1px solid #bfe4f1;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 8px 18px rgba(95,181,211,.08);
 }
 
 .presenterTop10Rank{
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  background:rgba(142,208,230,.22);
+  display:flex;
+  align-items:center;
+  justify-content:center;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   color:var(--presenter-accent);
   text-align:center;
+  font-weight:800;
 }
 
 .presenterTop10AnswerText{
@@ -391,8 +551,30 @@ body{
 }
 
 /* =========================
-   AUCTION CLEAN
+   AUCTION
 ========================= */
+
+.presenterAuctionPage{
+  border-color:var(--auction-border);
+  background:linear-gradient(180deg,#fff 0%, var(--auction-soft) 100%);
+}
+
+.presenterAuctionPage::before{
+  background:linear-gradient(180deg,#E16767 0%,#FF8A8A 100%);
+}
+
+.presenterAuctionPage .presenterSectionHead{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--auction-main) 18%, white 82%) 0%, var(--auction-soft) 100%);
+}
+
+.presenterAuctionPage .presenterSectionTitle{
+  color:#a13d3d;
+}
+
+.presenterAuctionPage .presenterSectionCount{
+  background:var(--auction-main);
+  color:#4d2121;
+}
 
 .presenterAuctionGridClean{
   display:grid;
@@ -402,26 +584,57 @@ body{
 
 .presenterAuctionCardClean{
   background:#fff;
-  border:1px solid var(--presenter-border-soft);
-  border-radius:18px;
+  border:1px solid #f0b8b8;
+  border-radius:22px;
   padding:12px;
-  box-shadow:0 6px 14px rgba(39,48,61,.05);
+  box-shadow:0 8px 18px rgba(225,103,103,.10);
   display:flex;
   flex-direction:column;
   gap:10px;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+
+.presenterAuctionCardClean:hover{
+  transform:translateY(-2px);
 }
 
 .presenterAuctionCardClean .presenterAuctionHead{
+  min-height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   color:#2F4158;
-  font-size:1.02rem;
+  font-size:1.1rem;
   text-align:center;
   margin-bottom:2px;
 }
 
 /* =========================
-   WHO CLEAN
+   WHO
 ========================= */
+
+.presenterWhoPage{
+  border-color:var(--who-border);
+  background:linear-gradient(180deg,#fff 0%, var(--who-soft) 100%);
+}
+
+.presenterWhoPage::before{
+  background:linear-gradient(180deg,#8E76E8 0%,#B69CFF 100%);
+}
+
+.presenterWhoPage .presenterSectionHead{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--who-main) 16%, white 84%) 0%, var(--who-soft) 100%);
+}
+
+.presenterWhoPage .presenterSectionTitle{
+  color:#5d46b8;
+}
+
+.presenterWhoPage .presenterSectionCount{
+  background:var(--who-main);
+  color:#2b205e;
+}
 
 .presenterWhoGridClean{
   display:grid;
@@ -431,13 +644,18 @@ body{
 
 .presenterWhoCardClean{
   background:#fff;
-  border:1px solid var(--presenter-border-soft);
-  border-radius:18px;
+  border:1px solid #d5cbff;
+  border-radius:22px;
   padding:12px;
-  box-shadow:0 6px 14px rgba(39,48,61,.05);
+  box-shadow:0 8px 18px rgba(142,118,232,.10);
   display:flex;
   flex-direction:column;
   gap:10px;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+
+.presenterWhoCardClean:hover{
+  transform:translateY(-2px);
 }
 
 .presenterWhoCardClean .presenterWhoNo{
@@ -449,15 +667,47 @@ body{
 }
 
 /* =========================
-   FINAL - COMMON
+   FINAL COMMON
 ========================= */
 
+.presenterFinalR1Page,
+.presenterFinalR2Page,
+.presenterFinalR3Page{
+  border-color:var(--final-border);
+  background:linear-gradient(180deg,#fff 0%, var(--final-soft) 100%);
+}
+
+.presenterFinalR1Page::before,
+.presenterFinalR2Page::before,
+.presenterFinalR3Page::before{
+  background:linear-gradient(180deg,#4DBB74 0%,#77D99A 100%);
+}
+
+.presenterFinalR1Page .presenterSectionHead,
+.presenterFinalR2Page .presenterSectionHead,
+.presenterFinalR3Page .presenterSectionHead{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--final-main) 18%, white 82%) 0%, var(--final-soft) 100%);
+}
+
+.presenterFinalR1Page .presenterSectionTitle,
+.presenterFinalR2Page .presenterSectionTitle,
+.presenterFinalR3Page .presenterSectionTitle{
+  color:#237244;
+}
+
+.presenterFinalR1Page .presenterSectionCount,
+.presenterFinalR2Page .presenterSectionCount,
+.presenterFinalR3Page .presenterSectionCount{
+  background:var(--final-main);
+  color:#113823;
+}
+
 .presenterFinalCleanCard{
-  background:linear-gradient(180deg,#ffffff 0%,#fbfcfc 100%);
-  border:1px solid #dfe6e7;
-  border-radius:18px;
+  background:#fff;
+  border:1px solid #b7e9c8;
+  border-radius:22px;
   padding:12px;
-  box-shadow:0 6px 14px rgba(39,48,61,.05);
+  box-shadow:0 8px 18px rgba(77,187,116,.10);
 }
 
 .presenterFinalMiniBlock{
@@ -476,38 +726,28 @@ body{
   line-height:1.45;
 }
 
-/* =========================
-   FINAL ROUND 1
-========================= */
-
+/* final round 1 */
 .presenterFinalRound1CustomGrid{
   display:grid;
-  grid-template-columns:repeat(3, minmax(0,1fr));
-  gap:14px;
+  grid-template-columns:1fr;
+  gap:12px;
   align-items:start;
 }
 
 .presenterFinalOnlyAnswerCard,
 .presenterFinalWideQuestionCard{
-  background:linear-gradient(180deg,#ffffff 0%,#fbfcfc 100%);
-  border:1px solid #dfe6e7;
-  border-radius:18px;
-  padding:12px;
-  box-shadow:0 6px 14px rgba(39,48,61,.05);
-}
-
-.presenterFinalOnlyAnswerCard{
-  min-height:unset;
-}
-
-.presenterFinalWideQuestionCard{
-  grid-column:1 / -1;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+  border-radius:22px;
 }
 
 .presenterFinalSmallHead{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:38px;
+  height:38px;
+  padding:0 12px;
+  border-radius:999px;
+  background:rgba(119,217,154,.20);
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.05rem;
   color:#2F4158;
@@ -534,53 +774,38 @@ body{
   gap:8px;
 }
 
-/* =========================
-   FINAL ROUND 2
-========================= */
-
+/* final round 2 */
 .presenterFinalR2CustomLayout{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:1fr;
   grid-template-areas:
-    "r2n1 r2n3"
-    "r2n2 r2n4";
-  gap:14px;
+    "r2n1"
+    "r2n2"
+    "r2n3"
+    "r2n4";
+  gap:12px;
   align-items:start;
 }
 
-.presenterFinalR2CustomLayout > :nth-child(1){
-  grid-area:r2n1;
-}
+.presenterFinalR2CustomLayout > :nth-child(1){ grid-area:r2n1; }
+.presenterFinalR2CustomLayout > :nth-child(2){ grid-area:r2n2; }
+.presenterFinalR2CustomLayout > :nth-child(3){ grid-area:r2n3; }
+.presenterFinalR2CustomLayout > :nth-child(4){ grid-area:r2n4; }
 
-.presenterFinalR2CustomLayout > :nth-child(2){
-  grid-area:r2n2;
-}
-
-.presenterFinalR2CustomLayout > :nth-child(3){
-  grid-area:r2n3;
-}
-
-.presenterFinalR2CustomLayout > :nth-child(4){
-  grid-area:r2n4;
-}
-
-.presenterFinalR2WideCard{
-  background:linear-gradient(180deg,#ffffff 0%,#fbfcfc 100%);
-  border:1px solid #dfe6e7;
-  border-radius:18px;
-  padding:12px;
-  box-shadow:0 6px 14px rgba(39,48,61,.05);
-}
-
+.presenterFinalR2WideCard,
 .presenterFinalR2Card{
-  background:linear-gradient(180deg,#ffffff 0%,#fbfcfc 100%);
-  border:1px solid #dfe6e7;
-  border-radius:18px;
-  padding:12px;
-  box-shadow:0 6px 14px rgba(39,48,61,.05);
+  border-radius:22px;
 }
 
 .presenterFinalR2Head{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:38px;
+  height:38px;
+  padding:0 12px;
+  border-radius:999px;
+  background:rgba(119,217,154,.20);
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.05rem;
   color:#2F4158;
@@ -615,28 +840,31 @@ body{
   border:1px solid #dce5ef;
   color:#2F4158;
   font-size:.9rem;
+  box-shadow:0 6px 14px rgba(37,52,63,.06);
+  font-weight:700;
 }
 
-/* =========================
-   FINAL ROUND 3
-========================= */
-
+/* final round 3 */
 .presenterFinalR3SingleColumn{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
+  grid-template-columns:1fr;
+  gap:12px;
   align-items:start;
 }
 
 .presenterFinalR3Block{
-  background:linear-gradient(180deg,#ffffff 0%,#fbfcfc 100%);
-  border:1px solid #dfe6e7;
-  border-radius:18px;
-  padding:12px;
-  box-shadow:0 6px 14px rgba(39,48,61,.05);
+  border-radius:22px;
 }
 
 .presenterFinalR3Head{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:38px;
+  height:38px;
+  padding:0 12px;
+  border-radius:999px;
+  background:rgba(119,217,154,.20);
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.05rem;
   color:#2F4158;
@@ -675,7 +903,7 @@ body{
 }
 
 /* =========================
-   ARCHIVE THEMES
+   ARCHIVE
 ========================= */
 
 .archiveThemeRound1{
@@ -714,151 +942,262 @@ body{
   --arc-light-text:#FFFFFF;
 }
 
-/* =========================
-   ARCHIVE A4
-========================= */
+.presenterArchivePage{
+  border-color:#d9e1e8;
+  background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);
+}
 
-.presenterArchiveA4Wrap{
+.presenterArchivePage::before{
+  background:linear-gradient(180deg,#25343F 0%,#3C5566 100%);
+}
+
+.presenterArchivePage .presenterSectionHead{
+  background:linear-gradient(180deg,#f7f9fb 0%,#eef3f7 100%);
+}
+
+.presenterArchivePage .presenterSectionTitle{
+  color:#25343F;
+}
+
+.presenterArchivePage .presenterSectionCount{
+  background:#25343F;
+  color:#fff;
+}
+
+.presenterArchivePdfWrap{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.presenterArchivePdfBoard{
+  width:100%;
+  max-width:640px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  filter:drop-shadow(0 10px 20px rgba(37,52,63,.08));
+}
+
+.presenterArchivePdfTop{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  align-items:stretch;
+}
+
+.presenterArchivePdfInfo{
+  min-height:58px;
+  height:58px;
+  border:1px solid var(--arc-border);
+  border-radius:18px;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:112px minmax(0,1fr);
+  background:var(--arc-soft);
+  box-shadow:0 10px 22px rgba(39,48,61,.05);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+
+.presenterArchivePdfInfo:hover{
+  transform:translateY(-2px);
+}
+
+.presenterArchivePdfInfoLabel{
+  background:var(--arc-dark);
+  color:var(--arc-light-text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px 10px;
+  font-family:"HanakaText",sans-serif;
+  font-size:1rem;
+  line-height:1.1;
+  white-space:nowrap;
+}
+
+.presenterArchivePdfInfoValue{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%);
+  color:var(--arc-dark-text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px 10px;
+  font-family:"HanakaText",sans-serif;
+  font-size:.92rem;
+  line-height:1.15;
+  min-width:0;
+  overflow:hidden;
+}
+
+.presenterArchivePdfInfoValue span{
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.presenterArchivePdfMiddle{
+  width:100%;
+  max-width:570px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:195px 120px 195px;
+  gap:12px;
+  align-items:stretch;
+  justify-content:center;
+}
+
+.presenterArchivePdfImageBox{
+  min-height:170px;
+  max-height:170px;
+  border:1px solid var(--arc-border);
+  border-radius:22px;
+  overflow:hidden;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+
+.presenterArchivePdfImageBox:hover{
+  transform:translateY(-2px);
+}
+
+.presenterArchivePdfImageBox img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  display:block;
+  padding:8px;
+  background:transparent;
+}
+
+.presenterArchivePdfScoreBox{
+  min-height:170px;
+  border:1px solid var(--arc-border);
+  border-radius:22px;
+  overflow:hidden;
+  display:grid;
+  grid-template-rows:52px 1fr;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+
+.presenterArchivePdfScoreBox:hover{
+  transform:translateY(-2px);
+}
+
+.presenterArchivePdfScoreLabel{
+  background:var(--arc-dark);
+  color:var(--arc-light-text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.02rem;
+}
+
+.presenterArchivePdfScoreValue{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%);
+  color:var(--arc-dark-text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.42rem;
+}
+
+.presenterArchivePdfBottom{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.presenterArchivePdfCol{
   display:flex;
   flex-direction:column;
   gap:10px;
 }
 
-.presenterArchiveBoardA4{
-  width:100%;
-  max-width:100%;
-  background:linear-gradient(180deg,#FFFFFF 0%,#F8FBFB 100%);
-  border:1px solid var(--arc-border);
-  border-radius:20px;
-  padding:10px;
-  box-shadow:0 8px 18px rgba(39,48,61,.05);
-}
-
-.presenterArchiveTopA4{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-bottom:8px;
-}
-
-.presenterArchiveInfoCard{
-  min-height:54px;
-  border:1px solid var(--arc-border);
-  border-radius:14px;
-  overflow:hidden;
-  display:grid;
-  grid-template-columns:96px 1fr;
-  background:var(--arc-soft);
-}
-
-.presenterArchiveInfoLabel{
-  background:var(--arc-dark) !important;
-  color:var(--arc-light-text) !important;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:.86rem;
-  line-height:1.2;
-}
-
-.presenterArchiveInfoValue{
-  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%) !important;
-  color:var(--arc-dark-text) !important;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:6px 8px;
-  font-size:.86rem;
-  line-height:1.35;
-}
-
-.presenterArchiveMiddleA4{
-  display:grid;
-  grid-template-columns:1fr 92px 1fr;
-  gap:8px;
-  margin-bottom:8px;
-}
-
-.presenterArchiveImageCard{
-  min-height:118px;
-  border:1px solid var(--arc-border) !important;
-  border-radius:16px;
-  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%) !important;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.presenterArchiveImageCard img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  display:block;
-}
-
-.presenterArchiveScoreCard{
-  min-height:118px;
-  border:1px solid var(--arc-border) !important;
-  border-radius:16px;
-  overflow:hidden;
-  display:grid;
-  grid-template-rows:38px 1fr;
-}
-
-.presenterArchiveScoreLabel{
-  background:var(--arc-dark) !important;
-  color:var(--arc-light-text) !important;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:.84rem;
-}
-
-.presenterArchiveScoreValue{
-  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%) !important;
-  color:var(--arc-dark-text) !important;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.15rem;
-}
-
-.presenterArchiveBottomA4{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-.presenterArchiveCol{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-
 .presenterArchiveMiniCard{
-  min-height:38px;
-  border:1px solid var(--arc-border) !important;
-  border-radius:10px;
-  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%) !important;
-  color:var(--arc-dark-text) !important;
-  padding:6px 8px;
-  display:flex;
-  align-items:center;
+  min-height:54px;
+  height:54px;
+  border:1px solid var(--arc-border);
+  border-radius:16px;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:1fr 52px;
+  box-shadow:0 8px 16px rgba(39,48,61,.04), inset 0 1px 0 rgba(255,255,255,.22);
+  transition:transform .18s ease, box-shadow .18s ease;
 }
 
-.presenterArchiveMiniCard.required{
-  background:#FFE9E9 !important;
-  border-color:#E16F6F !important;
-  color:#B40000 !important;
+.presenterArchiveMiniCard:hover{
+  transform:translateY(-2px);
+}
+
+.presenterArchiveMiniCard.archivePromptBall{
+  background:var(--arc-dark);
+  color:var(--arc-light-text);
+}
+
+.presenterArchiveMiniCard.archivePromptShoe{
+  background:linear-gradient(180deg, color-mix(in srgb, var(--arc-main) 92%, white 8%) 0%, var(--arc-main) 100%);
+  color:var(--arc-dark-text);
+}
+
+.presenterArchiveMiniCard.archivePromptRequired{
+  background:#FFE9E9;
+  border-color:#E16F6F;
+  color:#B40000;
+}
+
+.presenterArchiveMiniMain{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px;
+  padding:0 10px;
+}
+
+.presenterArchiveMiniNumber{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1rem;
+  line-height:1;
+  white-space:nowrap;
+  flex:0 0 auto;
 }
 
 .presenterArchiveMiniText{
-  font-size:.78rem;
-  line-height:1.35;
+  flex:1;
+  text-align:center;
+  font-family:"HanakaText",sans-serif;
+  font-size:.88rem;
+  line-height:1.1;
   word-break:break-word;
+}
+
+.presenterArchiveMiniEmoji{
+  border-right:1px solid var(--arc-border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.15rem;
+  line-height:1;
+}
+
+.presenterArchiveMiniCard.archivePromptBall .presenterArchiveMiniEmoji{
+  border-right:1px solid rgba(255,255,255,.16);
+}
+
+.presenterArchiveMiniCard.archivePromptRequired .presenterArchiveMiniEmoji{
+  border-right:1px solid #E16F6F;
 }
 
 /* =========================
@@ -866,15 +1205,7 @@ body{
 ========================= */
 
 #printPresenterArea{
-  position:fixed;
-  top:-99999px;
-  left:0;
-  width:210mm;
-  min-height:297mm;
-  opacity:0;
-  pointer-events:none;
-  overflow:hidden;
-  background:#fff;
+  display:none;
 }
 
 /* =========================
@@ -921,25 +1252,17 @@ body{
   .presenterSavedInfoGrid,
   .presenterControlsGrid,
   .presenterUploadRow,
-  .presenterWarmupGrid,
-  .presenterTop10AnswersList,
   .presenterAuctionGridClean,
-  .presenterWhoGridClean,
-  .presenterFinalRound1CustomGrid,
-  .presenterFinalR2CustomLayout,
-  .presenterFinalR3SingleColumn,
-  .presenterArchiveTopA4,
-  .presenterArchiveMiddleA4,
-  .presenterArchiveBottomA4{
+  .presenterWhoGridClean{
     grid-template-columns:1fr !important;
   }
 
-  .presenterFinalR2CustomLayout{
-    grid-template-areas:
-      "r2n1"
-      "r2n2"
-      "r2n3"
-      "r2n4" !important;
+  .presenterWarmupCardsGrid{
+    grid-template-columns:1fr !important;
+  }
+
+  .presenterTop10AnswersList{
+    grid-template-columns:1fr !important;
   }
 
   .presenterFinalR2HintsRow,
@@ -949,13 +1272,15 @@ body{
     grid-template-columns:1fr 1fr !important;
   }
 
-  .presenterFinalWideQuestionCard{
-    grid-column:auto !important;
+  .presenterArchivePdfTop,
+  .presenterArchivePdfMiddle,
+  .presenterArchivePdfBottom{
+    grid-template-columns:1fr !important;
   }
 }
 
 /* =========================
-   PRINT / PDF
+   REAL PDF PAGES
 ========================= */
 
 @page{
@@ -967,8 +1292,8 @@ body{
   html,
   body{
     background:#fff !important;
-    -webkit-print-color-adjust:exact;
-    print-color-adjust:exact;
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
   }
 
   .no-print,
@@ -978,378 +1303,599 @@ body{
   }
 
   #printPresenterArea{
-    position:static !important;
-    top:auto !important;
-    left:auto !important;
-    width:100% !important;
-    min-height:auto !important;
-    opacity:1 !important;
-    pointer-events:auto !important;
-    overflow:visible !important;
-    background:#fff !important;
     display:block !important;
+    position:static !important;
+    width:100% !important;
+    background:#fff !important;
   }
 
-  .presenterPagesWrap{
-    gap:0 !important;
+  .pdf-sheet{
+    width:100% !important;
+    min-height:calc(297mm - 20mm) !important;
+    page-break-after:always !important;
+    break-after:page !important;
+    page-break-inside:avoid !important;
+    break-inside:avoid !important;
+    background:#fff !important;
+    overflow:hidden !important;
   }
 
-  .presenterPrintPage{
+  .pdf-sheet:last-child{
+    page-break-after:auto !important;
+    break-after:auto !important;
+  }
+
+  .pdf-sheet-inner{
+    width:100% !important;
+    height:100% !important;
+  }
+
+  .pdf-sheet .presenterPrintPage{
     display:block !important;
     width:100% !important;
     margin:0 !important;
     padding:0 !important;
     border:0 !important;
-    border-radius:0 !important;
+    border-radius:18px !important;
     box-shadow:none !important;
     background:#fff !important;
-    page-break-after:always !important;
-    break-after:page !important;
-    page-break-inside:avoid !important;
-    break-inside:avoid !important;
-    min-height:0 !important;
-  }
-
-  .presenterPrintPage:last-child{
+    page-break-before:auto !important;
+    break-before:auto !important;
     page-break-after:auto !important;
     break-after:auto !important;
+    overflow:hidden !important;
   }
 
-  .presenterSectionHead{
-    padding:0 0 6px 0 !important;
+  .pdf-sheet .presenterPrintPage::before{
+    width:4px !important;
+  }
+
+  .pdf-sheet .presenterSectionHead{
+    padding:10px 12px 8px !important;
     margin:0 0 8px 0 !important;
-    border-bottom:2px solid #dbe2e3 !important;
+    border-bottom:1px solid rgba(0,0,0,.08) !important;
+    background:transparent !important;
   }
 
-  .presenterSectionTitle{
-    font-size:1.2rem !important;
+  .pdf-sheet .presenterSectionTitle{
+    font-size:1.15rem !important;
     line-height:1 !important;
   }
 
-  .presenterSectionCount{
-    min-height:22px !important;
-    padding:0 8px !important;
-    font-size:.75rem !important;
+  .pdf-sheet .presenterSectionCount{
+    min-height:24px !important;
+    padding:0 10px !important;
+    font-size:.72rem !important;
+    box-shadow:none !important;
   }
 
-  .presenterSectionBody{
-    display:block !important;
+  .pdf-sheet .presenterSectionBody{
     padding:0 !important;
-    gap:8px !important;
+    display:block !important;
   }
 
-  .presenterBlock,
-  .presenterWarmupCategory,
-  .presenterWarmupQuestion,
-  .presenterAuctionCardClean,
-  .presenterWhoCardClean,
-  .presenterFinalOnlyAnswerCard,
-  .presenterFinalWideQuestionCard,
-  .presenterFinalR2WideCard,
-  .presenterFinalR2Card,
-  .presenterFinalR3Block,
-  .presenterArchiveBoardA4{
-    page-break-inside:avoid !important;
-    break-inside:avoid !important;
-    min-height:0 !important;
-    height:auto !important;
-    overflow:visible !important;
-  }
-
-  .presenterBlock{
+  .pdf-sheet .presenterBlock{
     padding:7px 8px !important;
     border-radius:10px !important;
+    box-shadow:none !important;
   }
 
-  .presenterBlockTitle{
+  .pdf-sheet .presenterBlockTitle{
     font-size:.78rem !important;
     margin-bottom:3px !important;
   }
 
-  .presenterBlockText{
-    font-size:.75rem !important;
-    line-height:1.3 !important;
+  .pdf-sheet .presenterBlockText{
+    font-size:.74rem !important;
+    line-height:1.28 !important;
   }
 
-  .presenterImage{
-    max-height:82px !important;
+  .pdf-sheet .presenterImage{
+    max-height:80px !important;
+    box-shadow:none !important;
   }
 
-  .presenterControlsWrap,
-  .presenterUploadRow,
-  .presenterTextarea,
-  .presenterExtraImageInput{
+  .pdf-sheet .presenterControlsWrap,
+  .pdf-sheet .presenterUploadRow,
+  .pdf-sheet .presenterTextarea,
+  .pdf-sheet .presenterExtraImageInput{
     display:none !important;
   }
 
   /* warmup */
-  .presenterWarmupGrid{
-    grid-template-columns:1fr 1fr !important;
+  .pdf-sheet .presenterWarmupRowWrap{
+    display:flex !important;
+    flex-direction:column !important;
     gap:8px !important;
   }
 
-  /* top10 */
-  .presenterTop10AnswersList{
-    grid-template-columns:1fr 1fr !important;
-    gap:6px !important;
-  }
-
-  .presenterTop10AnswerRow{
-    padding:6px 8px !important;
-  }
-
-  .presenterTop10Rank,
-  .presenterTop10AnswerText{
-    font-size:.78rem !important;
-    line-height:1.3 !important;
-  }
-
-  /* auction */
-  .presenterAuctionGridClean{
-    grid-template-columns:1fr 1fr !important;
-    gap:8px !important;
-  }
-
-  .presenterAuctionCardClean{
+  .pdf-sheet .presenterWarmupRowCard{
     padding:8px !important;
     border-radius:12px !important;
     box-shadow:none !important;
   }
 
-  .presenterAuctionCardClean .presenterAuctionHead{
+  .pdf-sheet .presenterWarmupRowHead{
+    min-height:32px !important;
+    padding:0 8px !important;
+    border-radius:10px !important;
+    font-size:.9rem !important;
+    margin-bottom:8px !important;
+  }
+
+  .pdf-sheet .presenterWarmupCardsGrid{
+    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+
+  .pdf-sheet .presenterWarmupMiniCard{
+    padding:8px !important;
+    border-radius:10px !important;
+    box-shadow:none !important;
+    transform:none !important;
+  }
+
+  .pdf-sheet .presenterWarmupMiniNo{
+    width:26px !important;
+    height:26px !important;
+    font-size:.78rem !important;
+  }
+
+  .pdf-sheet .presenterWarmupMiniBlock{
+    padding:6px !important;
+  }
+
+  .pdf-sheet .presenterWarmupMiniBlock .presenterBlockTitle{
+    font-size:.72rem !important;
+    margin-bottom:2px !important;
+  }
+
+  .pdf-sheet .presenterWarmupMiniBlock .presenterBlockText{
+    font-size:.70rem !important;
+    line-height:1.2 !important;
+  }
+
+  /* top10 */
+  .pdf-sheet .presenterTop10AnswersList{
+    grid-template-columns:1fr 1fr !important;
+    gap:6px !important;
+  }
+
+  .pdf-sheet .presenterTop10AnswerRow{
+    padding:6px 8px !important;
+    box-shadow:none !important;
+  }
+
+  /* auction */
+  .pdf-sheet .presenterAuctionGridClean{
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+  }
+
+  .pdf-sheet .presenterAuctionCardClean{
+    padding:8px !important;
+    border-radius:12px !important;
+    box-shadow:none !important;
+    transform:none !important;
+  }
+
+  .pdf-sheet .presenterAuctionCardClean .presenterAuctionHead{
     font-size:.9rem !important;
   }
 
   /* who */
-  .presenterWhoGridClean{
+  .pdf-sheet .presenterWhoGridClean{
     grid-template-columns:repeat(3, minmax(0,1fr)) !important;
     gap:8px !important;
   }
 
-  .presenterWhoCardClean{
+  .pdf-sheet .presenterWhoCardClean{
     padding:8px !important;
     border-radius:12px !important;
     box-shadow:none !important;
+    transform:none !important;
   }
 
-  .presenterWhoCardClean .presenterWhoNo{
+  .pdf-sheet .presenterWhoCardClean .presenterWhoNo{
     font-size:.9rem !important;
   }
 
   /* final round 1 */
-  .presenterFinalRound1CustomGrid{
-    grid-template-columns:repeat(3, minmax(0,1fr)) !important;
-    gap:8px !important;
+  .pdf-sheet .presenterFinalR1Page .presenterSectionBody{
+    padding:0 !important;
   }
 
-  .presenterFinalOnlyAnswerCard,
-  .presenterFinalWideQuestionCard{
-    padding:8px !important;
-    border-radius:12px !important;
-    box-shadow:none !important;
+  .pdf-sheet .presenterFinalRound1CustomGrid{
+    grid-template-columns:1fr !important;
+    gap:6px !important;
   }
 
-  .presenterFinalTopMedia{
-    padding:4px !important;
-    border-radius:10px !important;
-  }
-
-  .presenterFinalTopMedia .presenterImage{
-    max-height:82px !important;
-  }
-
-  .presenterFinalOnlyAnswerCard .presenterFinalMiniBlock,
-  .presenterFinalWideQuestionCard .presenterFinalMiniBlock{
+  .pdf-sheet .presenterFinalOnlyAnswerCard,
+  .pdf-sheet .presenterFinalWideQuestionCard{
     padding:6px !important;
     border-radius:10px !important;
+    box-shadow:none !important;
+    gap:6px !important;
   }
 
-  .presenterFinalOnlyAnswerCard .presenterBlockTitle,
-  .presenterFinalWideQuestionCard .presenterBlockTitle{
-    font-size:.75rem !important;
-    margin-bottom:3px !important;
+  .pdf-sheet .presenterFinalSmallHead{
+    font-size:.82rem !important;
+    margin-bottom:4px !important;
+    line-height:1 !important;
+    min-width:30px !important;
+    height:30px !important;
   }
 
-  .presenterFinalOnlyAnswerCard .presenterBlockText,
-  .presenterFinalWideQuestionCard .presenterBlockText{
-    font-size:.72rem !important;
-    line-height:1.28 !important;
+  .pdf-sheet .presenterFinalTopMedia{
+    padding:3px !important;
+    border-radius:8px !important;
+  }
+
+  .pdf-sheet .presenterFinalTopMedia .presenterImage{
+    max-height:58px !important;
+    margin-top:0 !important;
+  }
+
+  .pdf-sheet .presenterFinalQuestionAnswerStack{
+    gap:5px !important;
+  }
+
+  .pdf-sheet .presenterFinalOnlyAnswerCard .presenterFinalMiniBlock,
+  .pdf-sheet .presenterFinalWideQuestionCard .presenterFinalMiniBlock{
+    padding:5px !important;
+    border-radius:8px !important;
+  }
+
+  .pdf-sheet .presenterFinalOnlyAnswerCard .presenterBlockTitle,
+  .pdf-sheet .presenterFinalWideQuestionCard .presenterBlockTitle{
+    font-size:.68rem !important;
+    margin-bottom:2px !important;
+    line-height:1 !important;
+  }
+
+  .pdf-sheet .presenterFinalOnlyAnswerCard .presenterBlockText,
+  .pdf-sheet .presenterFinalWideQuestionCard .presenterBlockText{
+    font-size:.65rem !important;
+    line-height:1.15 !important;
+  }
+
+  .pdf-sheet .presenterFinalR1Page .presenterSavedInfoGrid{
+    grid-template-columns:1fr 1fr !important;
+    gap:5px !important;
+    margin-top:5px !important;
+  }
+
+  .pdf-sheet .presenterFinalR1Page .presenterSavedInfoGrid .presenterBlock{
+    padding:5px !important;
+    border-radius:8px !important;
+  }
+
+  .pdf-sheet .presenterFinalR1Page .presenterSavedInfoGrid .presenterBlockTitle{
+    font-size:.66rem !important;
+    margin-bottom:2px !important;
+  }
+
+  .pdf-sheet .presenterFinalR1Page .presenterSavedInfoGrid .presenterBlockText{
+    font-size:.63rem !important;
+    line-height:1.12 !important;
   }
 
   /* final round 2 */
-  .presenterFinalR2CustomLayout{
-    grid-template-columns:1fr 1fr !important;
+  .pdf-sheet .presenterFinalR2CustomLayout{
+    grid-template-columns:1fr !important;
     grid-template-areas:
-      "r2n1 r2n3"
-      "r2n2 r2n4" !important;
+      "r2n1"
+      "r2n2"
+      "r2n3"
+      "r2n4" !important;
     gap:8px !important;
   }
 
-  .presenterFinalR2WideCard,
-  .presenterFinalR2Card{
+  .pdf-sheet .presenterFinalR2WideCard,
+  .pdf-sheet .presenterFinalR2Card{
     padding:8px !important;
     border-radius:12px !important;
     box-shadow:none !important;
   }
 
-  .presenterFinalR2Head{
+  .pdf-sheet .presenterFinalR2Head{
     font-size:.9rem !important;
     margin-bottom:6px !important;
+    min-width:30px !important;
+    height:30px !important;
   }
 
-  .presenterFinalR2HintsRow,
-  .presenterFinalR2AnswersRow{
+  .pdf-sheet .presenterFinalR2HintsRow,
+  .pdf-sheet .presenterFinalR2AnswersRow{
     grid-template-columns:repeat(6, minmax(0,1fr)) !important;
     gap:6px !important;
   }
 
-  .presenterFinalWordsWrap .presenterFinalR2WordChip{
+  .pdf-sheet .presenterFinalWordsWrap .presenterFinalR2WordChip{
     min-height:28px !important;
     padding:4px 8px !important;
     font-size:.72rem !important;
+    box-shadow:none !important;
   }
 
   /* final round 3 */
-  .presenterFinalR3SingleColumn{
-    grid-template-columns:1fr 1fr !important;
+  .pdf-sheet .presenterFinalR3SingleColumn{
+    grid-template-columns:1fr !important;
     gap:8px !important;
   }
 
-  .presenterFinalR3Block{
+  .pdf-sheet .presenterFinalR3Block{
     padding:8px !important;
     border-radius:12px !important;
     box-shadow:none !important;
   }
 
-  .presenterFinalR3Head{
+  .pdf-sheet .presenterFinalR3Head{
     font-size:.9rem !important;
     margin-bottom:6px !important;
+    min-width:30px !important;
+    height:30px !important;
   }
 
-  .presenterFinalR3ImagesRow,
-  .presenterFinalR3AnswersRow{
+  .pdf-sheet .presenterFinalR3ImagesRow,
+  .pdf-sheet .presenterFinalR3AnswersRow{
     grid-template-columns:repeat(5, minmax(0,1fr)) !important;
     gap:6px !important;
   }
 
-  .presenterFinalImageBox,
-  .presenterFinalR3TopImage{
+  .pdf-sheet .presenterFinalImageBox,
+  .pdf-sheet .presenterFinalR3TopImage{
     padding:4px !important;
     border-radius:10px !important;
   }
 
-  .presenterFinalImageBox .presenterImage,
-  .presenterFinalR3TopImage .presenterImage{
-    height:58px !important;
-    max-height:58px !important;
+  .pdf-sheet .presenterFinalImageBox .presenterImage,
+  .pdf-sheet .presenterFinalR3TopImage .presenterImage{
+    height:56px !important;
+    max-height:56px !important;
   }
 
   /* archive */
-  .presenterArchivePage{
-    page-break-before:always !important;
-    break-before:page !important;
+  .pdf-sheet .presenterArchivePage .presenterSectionBody{
+    padding:0 !important;
   }
 
-  .presenterArchiveA4Wrap{
+  .pdf-sheet .presenterArchivePdfWrap{
     gap:8px !important;
   }
 
-  .presenterArchiveBoardA4{
-    padding:8px !important;
-    border-radius:16px !important;
-    box-shadow:none !important;
+  .pdf-sheet .presenterArchivePdfBoard{
+    width:100% !important;
+    max-width:620px !important;
+    margin:0 auto !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:8px !important;
+    filter:none !important;
   }
 
-  .presenterArchiveTopA4{
-    gap:6px !important;
-    margin-bottom:6px !important;
+  .pdf-sheet .presenterArchivePdfTop{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+    align-items:stretch !important;
   }
 
-  .presenterArchiveInfoCard{
+  .pdf-sheet .presenterArchivePdfInfo{
     min-height:46px !important;
-    grid-template-columns:82px 1fr !important;
+    height:46px !important;
+    display:grid !important;
+    grid-template-columns:82px minmax(0,1fr) !important;
     border-radius:12px !important;
+    overflow:hidden !important;
+    transform:none !important;
   }
 
-  .presenterArchiveInfoLabel{
-    font-size:.78rem !important;
-  }
-
-  .presenterArchiveInfoValue{
-    font-size:.76rem !important;
+  .pdf-sheet .presenterArchivePdfInfoLabel{
+    font-size:.74rem !important;
     padding:4px 6px !important;
-    line-height:1.25 !important;
+    line-height:1 !important;
+    white-space:nowrap !important;
   }
 
-  .presenterArchiveMiddleA4{
-    grid-template-columns:1fr 78px 1fr !important;
-    gap:6px !important;
-    margin-bottom:6px !important;
+  .pdf-sheet .presenterArchivePdfInfoValue{
+    min-width:0 !important;
+    max-width:100% !important;
+    padding:4px 8px !important;
+    font-size:.66rem !important;
+    line-height:1.05 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    text-align:center !important;
+    overflow:hidden !important;
   }
 
-  .presenterArchiveImageCard{
-    min-height:96px !important;
+  .pdf-sheet .presenterArchivePdfInfoValue span{
+    min-width:0 !important;
+    max-width:100% !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+  }
+
+  .pdf-sheet .presenterArchivePdfMiddle{
+    width:100% !important;
+    max-width:500px !important;
+    margin:0 auto !important;
+    display:grid !important;
+    grid-template-columns:180px 86px 180px !important;
+    gap:8px !important;
+  }
+
+  .pdf-sheet .presenterArchivePdfImageBox{
+    min-height:124px !important;
+    max-height:124px !important;
+    border-radius:16px !important;
+    overflow:hidden !important;
+    transform:none !important;
+  }
+
+  .pdf-sheet .presenterArchivePdfImageBox img{
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+    object-position:center !important;
+    padding:6px !important;
+  }
+
+  .pdf-sheet .presenterArchivePdfScoreBox{
+    min-height:110px !important;
+    max-height:110px !important;
+    height:110px !important;
+    border-radius:14px !important;
+    display:grid !important;
+    grid-template-rows:28px 1fr !important;
+    overflow:hidden !important;
+    align-self:stretch !important;
+    transform:none !important;
+  }
+
+  .pdf-sheet .presenterArchivePdfScoreLabel{
+    font-size:.72rem !important;
+    line-height:1 !important;
+    padding:0 !important;
+  }
+
+  .pdf-sheet .presenterArchivePdfScoreValue{
+    font-size:.9rem !important;
+    line-height:1 !important;
+    padding:0 4px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    text-align:center !important;
+    overflow:hidden !important;
+  }
+
+  .pdf-sheet .presenterArchivePdfBottom{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+  }
+
+  .pdf-sheet .presenterArchivePdfCol{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:8px !important;
+  }
+
+  .pdf-sheet .presenterArchiveMiniCard{
+    min-height:40px !important;
+    height:40px !important;
+    display:grid !important;
+    grid-template-columns:1fr 40px !important;
     border-radius:12px !important;
+    overflow:hidden !important;
+    box-shadow:none !important;
+    transform:none !important;
   }
 
-  .presenterArchiveScoreCard{
-    min-height:96px !important;
-    border-radius:12px !important;
-    grid-template-rows:30px 1fr !important;
-  }
-
-  .presenterArchiveScoreLabel{
-    font-size:.76rem !important;
-  }
-
-  .presenterArchiveScoreValue{
-    font-size:1rem !important;
-  }
-
-  .presenterArchiveBottomA4{
+  .pdf-sheet .presenterArchiveMiniMain{
+    min-width:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
     gap:6px !important;
+    padding:0 8px !important;
   }
 
-  .presenterArchiveCol{
-    gap:5px !important;
+  .pdf-sheet .presenterArchiveMiniNumber{
+    font-size:.82rem !important;
+    flex:0 0 auto !important;
   }
 
-  .presenterArchiveMiniCard{
-    min-height:30px !important;
-    padding:4px 6px !important;
-    border-radius:8px !important;
+  .pdf-sheet .presenterArchiveMiniText{
+    flex:1 !important;
+    text-align:center !important;
+    font-size:0 !important;
+    line-height:1 !important;
+    white-space:normal !important;
+    overflow:hidden !important;
+    word-break:break-word !important;
   }
 
-  .presenterArchiveMiniText{
-    font-size:.68rem !important;
-    line-height:1.2 !important;
+  .pdf-sheet .presenterArchiveMiniText::before{
+    content:attr(data-print-text);
+    font-size:.66rem !important;
+    line-height:1.05 !important;
+  }
+
+  .pdf-sheet .presenterArchiveMiniEmoji{
+    font-size:.9rem !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
   }
 }
-@media print{
-  .pdf-page-force{
-    display:block !important;
-    width:100% !important;
-    margin:0 !important;
-    padding:0 !important;
-    background:#fff !important;
-    box-shadow:none !important;
-    border:0 !important;
-    border-radius:0 !important;
-    page-break-before:always !important;
-    break-before:page !important;
-    page-break-after:always !important;
-    break-after:page !important;
-    page-break-inside:avoid !important;
-    break-inside:avoid !important;
-  }
+.presenterPrintPage::before{
+  background:linear-gradient(180deg,var(--primary) 0%, var(--accent) 100%) !important;
+}
 
-  .pdf-page-force.pdf-page-first{
-    page-break-before:auto !important;
-    break-before:auto !important;
-  }
+.presenterTopBar{
+  background:linear-gradient(180deg,#ffffff 0%, var(--card-2) 100%) !important;
+  border:1px solid var(--border) !important;
+  box-shadow:var(--shadow-md) !important;
+}
 
-  .pdf-page-force.pdf-page-last{
-    page-break-after:auto !important;
-    break-after:auto !important;
-  }
+#presenterPageTitle{
+  color:var(--accent) !important;
+}
+
+.presenterSectionTitle{
+  color:var(--accent) !important;
+}
+
+.presenterSectionCount{
+  background:var(--primary-soft) !important;
+  color:var(--accent) !important;
+}
+
+.presenterBlock{
+  background:linear-gradient(180deg,var(--card) 0%, var(--card-2) 100%) !important;
+  border:1px solid var(--border-soft) !important;
+}
+
+.presenterBlockTitle{
+  color:var(--accent) !important;
+}
+
+.presenterWarmupPage,
+.presenterTop10Page,
+.presenterAuctionPage,
+.presenterWhoPage,
+.presenterFinalR1Page,
+.presenterFinalR2Page,
+.presenterFinalR3Page,
+.presenterArchivePage{
+  background:linear-gradient(180deg,#ffffff 0%, var(--bg-soft) 100%) !important;
+  border-color:var(--border) !important;
+}
+
+.presenterWarmupPage .presenterSectionHead,
+.presenterTop10Page .presenterSectionHead,
+.presenterAuctionPage .presenterSectionHead,
+.presenterWhoPage .presenterSectionHead,
+.presenterFinalR1Page .presenterSectionHead,
+.presenterFinalR2Page .presenterSectionHead,
+.presenterFinalR3Page .presenterSectionHead,
+.presenterArchivePage .presenterSectionHead{
+  background:linear-gradient(180deg,#ffffff 0%, var(--card-2) 100%) !important;
+}
+
+.presenterWarmupPage .presenterSectionCount,
+.presenterTop10Page .presenterSectionCount,
+.presenterAuctionPage .presenterSectionCount,
+.presenterWhoPage .presenterSectionCount,
+.presenterFinalR1Page .presenterSectionCount,
+.presenterFinalR2Page .presenterSectionCount,
+.presenterFinalR3Page .presenterSectionCount,
+.presenterArchivePage .presenterSectionCount{
+  background:var(--primary) !important;
+  color:#fff !important;
 }

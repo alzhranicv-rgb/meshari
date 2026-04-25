@@ -130,6 +130,7 @@ async function uploadImageFile(file, prefix = "file") {
   const { data } = db.storage.from(BUCKET_NAME).getPublicUrl(fileName)
   return data.publicUrl
 }
+
 function updateAdminBrandModel() {
   const brandModel = document.getElementById("adminBrandCurrentModel")
   if (!brandModel) return
@@ -146,6 +147,7 @@ function updateAdminBrandModel() {
     <div class="adminBrandCurrentModelName">${escapeHtml(getCurrentModelNameSafe())}</div>
   `
 }
+
 /* =========================
    Admin Home / Status
 ========================= */
@@ -233,42 +235,12 @@ async function renderAdminHome() {
   const counts = await getAdminCompletionCounts()
 
   const segmentCards = [
-    {
-      key: "warmup",
-      title: "التسخين",
-      desc: "أسئلة البداية السريعة",
-      count: counts.warmup || 0
-    },
-    {
-      key: "top10",
-      title: "Top 10",
-      desc: "ثلاث جولات ترتيب",
-      count: counts.top10 || 0
-    },
-    {
-      key: "auction",
-      title: "فتبلة",
-      desc: "أسئلة الصور والفتبلة",
-      count: counts.auction || 0
-    },
-    {
-      key: "who",
-      title: "من هو",
-      desc: "تخمين الشخصية",
-      count: counts.who || 0
-    },
-    {
-      key: "final",
-      title: "الفاصلة",
-      desc: "الجولات النهائية",
-      count: counts.final || 0
-    },
-    {
-      key: "archive",
-      title: "الأرشيف",
-      desc: "بطولات وأرشيف",
-      count: counts.archive || 0
-    }
+    { key: "warmup", title: "التسخين", desc: "أسئلة البداية السريعة", count: counts.warmup || 0 },
+    { key: "top10", title: "Top 10", desc: "ثلاث جولات ترتيب", count: counts.top10 || 0 },
+    { key: "auction", title: "فتبلة", desc: "أسئلة الصور والفتبلة", count: counts.auction || 0 },
+    { key: "who", title: "من هو", desc: "تخمين الشخصية", count: counts.who || 0 },
+    { key: "final", title: "الفاصلة", desc: "الجولات النهائية", count: counts.final || 0 },
+    { key: "archive", title: "الأرشيف", desc: "بطولات وأرشيف", count: counts.archive || 0 }
   ]
 
   editor().innerHTML = `
@@ -518,13 +490,13 @@ async function deleteSelectedModel() {
   }
 
   if (currentModel === id) {
-  currentModel = null
-  currentModelName = ""
-  tabs()?.classList.add("hidden")
-  clearActiveAdminTab()
-  showAdminEmptyState()
-  updateAdminBrandModel()
-}
+    currentModel = null
+    currentModelName = ""
+    tabs()?.classList.add("hidden")
+    clearActiveAdminTab()
+    showAdminEmptyState()
+    updateAdminBrandModel()
+  }
 
   await loadModels()
   showGameToast("تم حذف النموذج")
@@ -551,181 +523,271 @@ async function openAdminSegment(segment) {
 }
 
 /* =========================
-   Delete Segment بالكامل
-========================= */
-
-async function deleteWarmupSegment() {
-  if (!currentModel) return
-  const ok = confirm("هل تريد حذف جميع أسئلة فقرة التسخين من قاعدة البيانات؟")
-  if (!ok) return
-
-  const { error } = await db
-    .from("questions")
-    .delete()
-    .eq("model", Number(currentModel))
-    .eq("segment", "warmup")
-
-  if (error) {
-    console.log(error)
-    showGameToast("فشل حذف فقرة التسخين")
-    return
-  }
-
-  showGameToast("تم حذف فقرة التسخين")
-  await renderWarmupAdmin()
-}
-
-async function deleteTop10Segment() {
-  if (!currentModel) return
-  const ok = confirm("هل تريد حذف جميع جولات Top 10 من قاعدة البيانات؟")
-  if (!ok) return
-
-  const { error } = await db
-    .from("top10_questions")
-    .delete()
-    .eq("model", currentModel)
-
-  if (error) {
-    console.log(error)
-    showGameToast("فشل حذف Top 10")
-    return
-  }
-
-  showGameToast("تم حذف Top 10")
-  await renderTop10Admin()
-}
-
-async function deleteAuctionSegment() {
-  if (!currentModel) return
-  const ok = confirm("هل تريد حذف جميع أسئلة الفتبلة من قاعدة البيانات؟")
-  if (!ok) return
-
-  const { error } = await db
-    .from("auction_questions")
-    .delete()
-    .eq("model", currentModel)
-
-  if (error) {
-    console.log(error)
-    showGameToast("فشل حذف الفتبلة")
-    return
-  }
-
-  showGameToast("تم حذف الفتبلة")
-  await renderAuctionAdmin()
-}
-
-async function deleteWhoSegment() {
-  if (!currentModel) return
-  const ok = confirm("هل تريد حذف جميع عناصر من هو من قاعدة البيانات؟")
-  if (!ok) return
-
-  const { error } = await db
-    .from("who_images")
-    .delete()
-    .eq("model", currentModel)
-
-  if (error) {
-    console.log(error)
-    showGameToast("فشل حذف فقرة من هو")
-    return
-  }
-
-  showGameToast("تم حذف فقرة من هو")
-  await renderWhoAdmin()
-}
-
-async function deleteFinalSegment() {
-  if (!currentModel) return
-  const ok = confirm("هل تريد حذف فقرة الفاصلة كاملة؟")
-  if (!ok) return
-
-  await db.from("final_round_meta").delete().eq("model", currentModel)
-  await db.from("final_round1_items").delete().eq("model", currentModel)
-  await db.from("final_round2_items").delete().eq("model", currentModel)
-  await db.from("final_round3_items").delete().eq("model", currentModel)
-
-  showGameToast("تم حذف فقرة الفاصلة")
-  await renderFinalAdmin()
-}
-
-/* =========================
    Delete / Clear Helpers
 ========================= */
 
-function clearWarmupQuestion(c, n) {
-  const ok = confirm("هل تريد حذف هذا السؤال من الواجهة؟ ثم احفظ ليتم حذفه نهائيًا.")
-  if (!ok) return
 
-  const q = document.getElementById(`q${c}_${n}`)
-  const a = document.getElementById(`a${c}_${n}`)
-
-  if (q) q.value = ""
-  if (a) a.value = ""
-
-  showGameToast("تم مسح السؤال من النموذج، اضغط حفظ")
-}
-
-function clearTop10Round(r) {
-  const ok = confirm("هل تريد مسح الجولة كاملة؟ ثم احفظ")
-  if (!ok) return
-
-  const q = document.getElementById(`topq${r}`)
-  if (q) q.value = ""
-
-  for (let i = 1; i <= 10; i++) {
-    const ans = document.getElementById(`top${r}_${i}`)
-    if (ans) ans.value = ""
+async function clearTop10Round(r) {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
   }
 
-  showGameToast("تم مسح الجولة، اضغط حفظ")
-}
-
-function clearAuctionQuestion(i) {
-  const ok = confirm("هل تريد حذف هذا السؤال؟ ثم احفظ")
+  const ok = confirm(`هل تريد حذف الجولة ${r} من Top 10 نهائيًا؟`)
   if (!ok) return
 
-  const q = document.getElementById(`auction${i}`)
-  const a = document.getElementById(`auctionAnswer${i}`)
-  const note = document.getElementById(`auctionNote${i}`)
+  try {
+    const { error } = await db
+      .from("top10_questions")
+      .delete()
+      .eq("model", Number(currentModel))
+      .eq("round", Number(r))
 
-  if (q) q.value = ""
-  if (a) a.value = ""
-  if (note) note.value = ""
+    if (error) {
+      console.log(error)
+      showGameToast("تعذر حذف الجولة")
+      return
+    }
 
-  showGameToast("تم مسح السؤال، اضغط حفظ")
+    showGameToast(`تم حذف الجولة ${r}`)
+    await renderTop10Admin()
+  } catch (err) {
+    console.log(err)
+    showGameToast("حدث خطأ أثناء حذف الجولة")
+  }
 }
 
-function clearWhoItem(i) {
-  const ok = confirm("هل تريد حذف هذا العنصر؟ ثم احفظ")
+async function deleteTop10Segment() {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm("هل تريد حذف فقرة Top 10 كاملة نهائيًا؟")
   if (!ok) return
 
-  const a = document.getElementById(`whoAnswer${i}`)
-  const f = document.getElementById(`who${i}`)
+  try {
+    const { error } = await db
+      .from("top10_questions")
+      .delete()
+      .eq("model", Number(currentModel))
 
-  if (a) a.value = ""
-  if (f) f.value = ""
+    if (error) {
+      console.log(error)
+      showGameToast("تعذر حذف فقرة Top 10")
+      return
+    }
 
-  showGameToast("تم مسح العنصر، اضغط حفظ")
+    showGameToast("تم حذف فقرة Top 10")
+    await renderTop10Admin()
+  } catch (err) {
+    console.log(err)
+    showGameToast("حدث خطأ أثناء حذف فقرة Top 10")
+  }
 }
 
-function clearFinalItem(i) {
-  const ok = confirm("هل تريد حذف هذا العنصر؟ ثم احفظ")
+async function clearAuctionQuestion(i) {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm(`هل تريد حذف سؤال فتبلة رقم ${i} نهائيًا؟`)
   if (!ok) return
 
-  const a = document.getElementById(`finalAnswer${i}`)
-  const f = document.getElementById(`final${i}`)
+  try {
+    const { error } = await db
+      .from("auction_questions")
+      .delete()
+      .eq("model", Number(currentModel))
+      .eq("number", Number(i))
 
-  if (a) a.value = ""
-  if (f) f.value = ""
+    if (error) {
+      console.log(error)
+      showGameToast("تعذر حذف السؤال")
+      return
+    }
 
-  showGameToast("تم مسح العنصر، اضغط حفظ")
+    showGameToast(`تم حذف السؤال ${i}`)
+    await renderAuctionAdmin()
+  } catch (err) {
+    console.log(err)
+    showGameToast("حدث خطأ أثناء حذف السؤال")
+  }
 }
 
+async function deleteAuctionSegment() {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm("هل تريد حذف فقرة فتبلة كاملة نهائيًا؟")
+  if (!ok) return
+
+  try {
+    const { error: rowsError } = await db
+      .from("auction_questions")
+      .delete()
+      .eq("model", Number(currentModel))
+
+    if (rowsError) {
+      console.log(rowsError)
+      showGameToast("تعذر حذف الفقرة")
+      return
+    }
+
+    const { error: settingsError } = await db
+      .from("segment_settings")
+      .delete()
+      .eq("model", Number(currentModel))
+      .eq("segment", "auction")
+
+    if (settingsError) {
+      console.log(settingsError)
+    }
+
+    auctionAdminCount = 8
+    showGameToast("تم حذف فقرة فتبلة")
+    await renderAuctionAdmin()
+  } catch (err) {
+    console.log(err)
+    showGameToast("حدث خطأ أثناء حذف الفقرة")
+  }
+}
+
+async function clearWhoItem(i) {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm(`هل تريد حذف العنصر رقم ${i} نهائيًا؟`)
+  if (!ok) return
+
+  try {
+    const { error } = await db
+      .from("who_images")
+      .delete()
+      .eq("model", Number(currentModel))
+      .eq("number", Number(i))
+
+    if (error) {
+      console.log(error)
+      showGameToast("تعذر حذف العنصر")
+      return
+    }
+
+    showGameToast(`تم حذف العنصر ${i}`)
+    await renderWhoAdmin()
+  } catch (err) {
+    console.log(err)
+    showGameToast("حدث خطأ أثناء حذف العنصر")
+  }
+}
+
+async function deleteWhoSegment() {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm("هل تريد حذف فقرة من هو كاملة نهائيًا؟")
+  if (!ok) return
+
+  try {
+    const { error } = await db
+      .from("who_images")
+      .delete()
+      .eq("model", Number(currentModel))
+
+    if (error) {
+      console.log(error)
+      showGameToast("تعذر حذف فقرة من هو")
+      return
+    }
+
+    showGameToast("تم حذف فقرة من هو")
+    await renderWhoAdmin()
+  } catch (err) {
+    console.log(err)
+    showGameToast("حدث خطأ أثناء حذف فقرة من هو")
+  }
+}
 
 /* =========================
    Warmup
 ========================= */
+
+async function clearWarmupQuestionById(id) {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  if (!id) {
+    showGameToast("لم يتم العثور على السؤال لحذفه")
+    return
+  }
+
+  const ok = confirm("هل تريد حذف هذا السؤال نهائيًا؟")
+  if (!ok) return
+
+  try {
+    const { data, error } = await db
+      .from("questions")
+      .delete()
+      .eq("id", Number(id))
+      .select()
+
+    if (error) {
+      console.log("DELETE WARMUP BY ID ERROR:", error)
+      showGameToast("تعذر حذف السؤال")
+      return
+    }
+
+    if (!data || !data.length) {
+      showGameToast("لم يتم العثور على السؤال لحذفه")
+      return
+    }
+
+    showGameToast("تم حذف السؤال")
+    await renderWarmupAdmin()
+  } catch (err) {
+    console.log("DELETE WARMUP BY ID CATCH:", err)
+    showGameToast("حدث خطأ أثناء حذف السؤال")
+  }
+}
+
+async function deleteWarmupSegment() {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm("هل تريد حذف جميع أسئلة فقرة التسخين نهائيًا؟")
+  if (!ok) return
+
+  try {
+    const { error } = await db
+      .from("questions")
+      .delete()
+      .eq("model", Number(currentModel))
+      .eq("segment", "warmup")
+
+    if (error) {
+      console.log("DELETE WARMUP SEGMENT ERROR:", error)
+      showGameToast("تعذر حذف فقرة التسخين")
+      return
+    }
+
+    showGameToast("تم حذف جميع أسئلة التسخين")
+    await renderWarmupAdmin()
+  } catch (err) {
+    console.log("DELETE WARMUP SEGMENT CATCH:", err)
+    showGameToast("حدث خطأ أثناء حذف فقرة التسخين")
+  }
+}
 
 async function renderWarmupAdmin() {
   const { data, error } = await db
@@ -790,7 +852,7 @@ async function renderWarmupAdmin() {
         <div class="adminQuestionCard warmupQuestionCard">
           <div class="adminQuestionCardTop">
             <div class="adminQuestionTitle">سؤال 1</div>
-            <button class="adminDeleteBtn" onclick="clearWarmupQuestion(${c},1)">حذف</button>
+            <button class="adminDeleteBtn" onclick="clearWarmupQuestionById(${cat.questions[1]?.id ?? 'null'})">حذف</button>
           </div>
 
           <div class="adminField">
@@ -807,7 +869,7 @@ async function renderWarmupAdmin() {
         <div class="adminQuestionCard warmupQuestionCard">
           <div class="adminQuestionCardTop">
             <div class="adminQuestionTitle">سؤال 2</div>
-            <button class="adminDeleteBtn" onclick="clearWarmupQuestion(${c},2)">حذف</button>
+            <button class="adminDeleteBtn" onclick="clearWarmupQuestionById(${cat.questions[2]?.id ?? 'null'})">حذف</button>
           </div>
 
           <div class="adminField">
@@ -824,7 +886,7 @@ async function renderWarmupAdmin() {
         <div class="adminQuestionCard warmupQuestionCard">
           <div class="adminQuestionCardTop">
             <div class="adminQuestionTitle">سؤال 4</div>
-            <button class="adminDeleteBtn" onclick="clearWarmupQuestion(${c},4)">حذف</button>
+            <button class="adminDeleteBtn" onclick="clearWarmupQuestionById(${cat.questions[4]?.id ?? 'null'})">حذف</button>
           </div>
 
           <div class="adminField">
@@ -853,28 +915,6 @@ async function renderWarmupAdmin() {
   `
 
   editor().innerHTML = html
-}
-
-window.printPresenterAsPdf = function () {
-  try {
-    const overlay = document.getElementById("presenterOverlay")
-    if (!overlay) {
-      showGameToast("افتح ورقة المقدم أولاً")
-      return
-    }
-
-    document.body.classList.add("presenter-print-mode")
-
-    setTimeout(() => {
-      window.print()
-      setTimeout(() => {
-        document.body.classList.remove("presenter-print-mode")
-      }, 500)
-    }, 150)
-  } catch (error) {
-    console.error(error)
-    showGameToast("تعذر فتح الطباعة")
-  }
 }
 
 async function saveWarmup() {
@@ -919,7 +959,9 @@ async function saveWarmup() {
     return
   }
 
-  const { error: insError } = await db.from("questions").insert(rows)
+  const { error: insError } = await db
+    .from("questions")
+    .insert(rows)
 
   if (insError) {
     console.log(insError)
@@ -1052,7 +1094,11 @@ async function saveTop10() {
     return
   }
 
-  const { error: insError } = await db.from("top10_questions").insert(rows)
+  const { error: insError } = await db
+  .from("top10_questions")
+  .upsert(rows, {
+    onConflict: "model,round,position"
+  })
 
   if (insError) {
     console.log(insError)
@@ -1361,16 +1407,18 @@ async function saveAuction() {
   }
 
   if (rows.length) {
-    const { error: insError } = await db
-      .from("auction_questions")
-      .insert(rows)
+  const { error: insError } = await db
+    .from("auction_questions")
+    .upsert(rows, {
+      onConflict: "model,number"
+    })
 
-    if (insError) {
-      console.log(insError)
-      showGameToast("فشل حفظ الفقرة")
-      return
-    }
+  if (insError) {
+    console.log(insError)
+    showGameToast("فشل حفظ الفقرة")
+    return
   }
+}
 
   const { error: settingsError } = await db
     .from("segment_settings")
@@ -1401,6 +1449,7 @@ async function saveAuction() {
 
   await renderAuctionAdmin()
 }
+
 /* =========================
    Who
 ========================= */
@@ -1533,7 +1582,11 @@ async function saveWho() {
     return
   }
 
-  const { error: insError } = await db.from("who_images").insert(rows)
+  const { error: insError } = await db
+  .from("who_images")
+  .upsert(rows, {
+    onConflict: "model,number"
+  })
 
   if (insError) {
     console.log(insError)
@@ -1571,20 +1624,20 @@ async function renderFinalAdminRound(round) {
   }
 
   const round1CountBox = round === 1
-  ? `
-    <div class="finalTopCompactBox finalTopCompactCountBox">
-      <div class="adminField compactCountField">
-        <label>عدد الأرقام</label>
-        <div class="compactCountSelectWrap">
-          <select id="finalRound1CardsCount" class="compactCountSelect">
-            <option value="4" ${Number(metaData?.cards_count || 4) === 4 ? "selected" : ""}>4</option>
-            <option value="6" ${Number(metaData?.cards_count || 4) === 6 ? "selected" : ""}>6</option>
-          </select>
+    ? `
+      <div class="finalTopCompactBox finalTopCompactCountBox">
+        <div class="adminField compactCountField">
+          <label>عدد الأرقام</label>
+          <div class="compactCountSelectWrap">
+            <select id="finalRound1CardsCount" class="compactCountSelect">
+              <option value="4" ${Number(metaData?.cards_count || 4) === 4 ? "selected" : ""}>4</option>
+              <option value="6" ${Number(metaData?.cards_count || 4) === 6 ? "selected" : ""}>6</option>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
-  `
-  : `<div class="finalTopCompactBox finalTopCompactGhost"></div>`
+    `
+    : `<div class="finalTopCompactBox finalTopCompactGhost"></div>`
 
   let html = `
     <div class="finalAdminShell cleanFinalAdminShell">
@@ -1621,17 +1674,9 @@ async function renderFinalAdminRound(round) {
       </div>
   `
 
-  if (round === 1) {
-    html += await buildFinalRound1Admin(metaData, true)
-  }
-
-  if (round === 2) {
-    html += await buildFinalRound2Admin()
-  }
-
-  if (round === 3) {
-    html += await buildFinalRound3Admin()
-  }
+  if (round === 1) html += await buildFinalRound1Admin(metaData, true)
+  if (round === 2) html += await buildFinalRound2Admin()
+  if (round === 3) html += await buildFinalRound3Admin()
 
   html += `
       <div class="finalAdminActions">
@@ -1654,26 +1699,16 @@ async function saveFinalRound(round) {
     cardsCount = Number(document.getElementById("finalRound1CardsCount")?.value || 4)
   }
 
-  const { error: deleteMetaError } = await db
-    .from("final_round_meta")
-    .delete()
-    .eq("model", currentModel)
-    .eq("round", round)
-
-  if (deleteMetaError) {
-    console.log(deleteMetaError)
-    showGameToast("تعذر حذف بيانات الجولة")
-    return
-  }
-
   const { error: insertMetaError } = await db
     .from("final_round_meta")
-    .insert([{
+    .upsert([{
       model: currentModel,
       round,
       title,
       cards_count: cardsCount
-    }])
+    }], {
+      onConflict: "model,round"
+    })
 
   if (insertMetaError) {
     console.log(insertMetaError)
@@ -1681,17 +1716,9 @@ async function saveFinalRound(round) {
     return
   }
 
-  if (round === 1) {
-    await saveFinalRound1(cardsCount)
-  }
-
-  if (round === 2) {
-    await saveFinalRound2()
-  }
-
-  if (round === 3) {
-    await saveFinalRound3()
-  }
+  if (round === 1) await saveFinalRound1(cardsCount)
+  if (round === 2) await saveFinalRound2()
+  if (round === 3) await saveFinalRound3()
 
   showGameToast(`تم حفظ الجولة ${round}`)
   await renderFinalAdminRound(round)
@@ -1776,59 +1803,55 @@ async function buildFinalRound1Admin(metaData, countAlreadyShown = false) {
         </div>
 
         ${
-          isTextCard
-            ? `
-              <div class="finalAdminRowSingle finalAdminRowSingleText">
-                <div class="adminField finalTextCardField">
-                  <label>نص القصاصة</label>
-                  <textarea
-                    id="finalRound1CardText_${i}"
-                    placeholder="اكتب النص الذي سيظهر في القصاصة التاريخية"
-                    rows="4"
-                  >${escapeHtml(map[i]?.card_text || "")}</textarea>
-                </div>
+          isTextCard ? `
+            <div class="finalAdminRowSingle finalAdminRowSingleText">
+              <div class="adminField finalTextCardField">
+                <label>نص القصاصة</label>
+                <textarea
+                  id="finalRound1CardText_${i}"
+                  placeholder="اكتب النص الذي سيظهر في القصاصة التاريخية"
+                  rows="4"
+                >${escapeHtml(map[i]?.card_text || "")}</textarea>
               </div>
-            `
-            : ""
+            </div>
+          ` : ""
         }
 
         ${
-          isQuestionCard
-            ? `
-              <div class="finalAdminRowSingle finalAdminRowSingleText">
-                <div class="adminField finalTextCardField">
-                  <label>جزء السؤال 1</label>
-                  <textarea
-                    id="finalRound1QuestionPart1_${i}"
-                    placeholder="اكتب الجزء الأول"
-                    rows="2"
-                  >${escapeHtml(map[i]?.question_part1 || "")}</textarea>
-                </div>
+          isQuestionCard ? `
+            <div class="finalAdminRowSingle finalAdminRowSingleText">
+              <div class="adminField finalTextCardField">
+                <label>جزء السؤال 1</label>
+                <textarea
+                  id="finalRound1QuestionPart1_${i}"
+                  placeholder="اكتب الجزء الأول"
+                  rows="2"
+                >${escapeHtml(map[i]?.question_part1 || "")}</textarea>
               </div>
+            </div>
 
-              <div class="finalAdminRowSingle finalAdminRowSingleText">
-                <div class="adminField finalTextCardField">
-                  <label>جزء السؤال 2</label>
-                  <textarea
-                    id="finalRound1QuestionPart2_${i}"
-                    placeholder="اكتب الجزء الثاني"
-                    rows="2"
-                  >${escapeHtml(map[i]?.question_part2 || "")}</textarea>
-                </div>
+            <div class="finalAdminRowSingle finalAdminRowSingleText">
+              <div class="adminField finalTextCardField">
+                <label>جزء السؤال 2</label>
+                <textarea
+                  id="finalRound1QuestionPart2_${i}"
+                  placeholder="اكتب الجزء الثاني"
+                  rows="2"
+                >${escapeHtml(map[i]?.question_part2 || "")}</textarea>
               </div>
+            </div>
 
-              <div class="finalAdminRowSingle finalAdminRowSingleText">
-                <div class="adminField finalTextCardField">
-                  <label>جزء السؤال 3</label>
-                  <textarea
-                    id="finalRound1QuestionPart3_${i}"
-                    placeholder="اكتب الجزء الثالث"
-                    rows="2"
-                  >${escapeHtml(map[i]?.question_part3 || "")}</textarea>
-                </div>
+            <div class="finalAdminRowSingle finalAdminRowSingleText">
+              <div class="adminField finalTextCardField">
+                <label>جزء السؤال 3</label>
+                <textarea
+                  id="finalRound1QuestionPart3_${i}"
+                  placeholder="اكتب الجزء الثالث"
+                  rows="2"
+                >${escapeHtml(map[i]?.question_part3 || "")}</textarea>
               </div>
-            `
-            : ""
+            </div>
+          ` : ""
         }
 
         <div class="finalAdminPreviewBox">
@@ -1891,15 +1914,7 @@ async function saveFinalRound1(cardsCount) {
       image = await uploadImageFile(file, `final_r1_${i}`)
     }
 
-    if (
-      !image &&
-      !answer &&
-      !note &&
-      !cardText &&
-      !questionPart1 &&
-      !questionPart2 &&
-      !questionPart3
-    ) continue
+    if (!image && !answer && !note && !cardText && !questionPart1 && !questionPart2 && !questionPart3) continue
 
     rows.push({
       model: currentModel,
@@ -1914,25 +1929,41 @@ async function saveFinalRound1(cardsCount) {
     })
   }
 
-  const { error: delError } = await db
-    .from("final_round1_items")
-    .delete()
-    .eq("model", currentModel)
+  if (!rows.length) {
+    const { error: clearError } = await db
+      .from("final_round1_items")
+      .delete()
+      .eq("model", currentModel)
 
-  if (delError) {
-    console.log(delError)
-    showGameToast("تعذر حذف الجولة الأولى القديمة")
+    if (clearError) {
+      console.log(clearError)
+      showGameToast("تعذر تفريغ الجولة الأولى")
+      return
+    }
+
+    showGameToast("تم تفريغ الجولة الأولى")
     return
   }
 
-  if (!rows.length) {
-    showGameToast("لا توجد بيانات للحفظ في الجولة الأولى")
+  const keepNumbers = rows.map(row => Number(row.number))
+
+  const { error: cleanupError } = await db
+    .from("final_round1_items")
+    .delete()
+    .eq("model", currentModel)
+    .not("number", "in", `(${keepNumbers.join(",")})`)
+
+  if (cleanupError) {
+    console.log(cleanupError)
+    showGameToast("تعذر تنظيف عناصر الجولة الأولى")
     return
   }
 
   const { error: insError } = await db
     .from("final_round1_items")
-    .insert(rows)
+    .upsert(rows, {
+      onConflict: "model,number"
+    })
 
   if (insError) {
     console.log(insError)
@@ -1940,6 +1971,7 @@ async function saveFinalRound1(cardsCount) {
     return
   }
 }
+
 /* =========================
    Round 2 Admin
 ========================= */
@@ -1962,9 +1994,7 @@ async function buildFinalRound2Admin() {
     grouped[row.number].push(row)
   })
 
-  let html = `
-    <div class="finalAdminRound2Wrap finalAdminRound2SingleColumn">
-  `
+  let html = `<div class="finalAdminRound2Wrap finalAdminRound2SingleColumn">`
 
   for (let number = 1; number <= 4; number++) {
     const isScramble = number === 1 || number === 3
@@ -1974,7 +2004,11 @@ async function buildFinalRound2Admin() {
       <div class="finalAdminCard finalAdminWideCard">
         <div class="finalAdminCardHead">
           <h3>رقم ${number}</h3>
-          <div class="finalAdminTypeBadge">${isScramble ? "كلمات مبعثرة" : "ترتيب / تسلسل"}</div>
+
+          <div class="finalAdminCardHeadActions">
+            <div class="finalAdminTypeBadge">${isScramble ? "كلمات مبعثرة" : "ترتيب / تسلسل"}</div>
+            <button class="adminDeleteBtn" onclick="clearFinalRound2Item(${number})">حذف</button>
+          </div>
         </div>
 
         <div class="finalAdminRound2RowsWrap">
@@ -2036,6 +2070,96 @@ async function buildFinalRound2Admin() {
   return html
 }
 
+async function saveFinalRound2() {
+  const rows = []
+
+  for (let number = 1; number <= 4; number++) {
+    const gameType = number === 1 || number === 3 ? "scramble" : "sequence"
+
+    for (let i = 1; i <= 6; i++) {
+      const prompt = (document.getElementById(`finalRound2Prompt_${number}_${i}`)?.value || "").trim()
+      const hint = gameType === "scramble"
+        ? (document.getElementById(`finalRound2Hint_${number}_${i}`)?.value || "").trim()
+        : ""
+
+      const answer = gameType === "scramble"
+        ? (document.getElementById(`finalRound2Answer_${number}_${i}`)?.value || "").trim()
+        : ""
+
+      if (!prompt && !answer && !hint) continue
+
+      rows.push({
+        model: currentModel,
+        number,
+        game_type: gameType,
+        title: "",
+        item_order: i,
+        prompt,
+        answer,
+        hint
+      })
+    }
+  }
+
+  if (!rows.length) {
+    const { error: clearError } = await db
+      .from("final_round2_items")
+      .delete()
+      .eq("model", currentModel)
+
+    if (clearError) {
+      console.log(clearError)
+      showGameToast("تعذر تفريغ الجولة الثانية")
+      return
+    }
+
+    showGameToast("تم تفريغ الجولة الثانية")
+    return
+  }
+
+  const keepPairs = rows.map(row => `(${Number(row.number)},${Number(row.item_order)})`)
+
+  const { data: existingRows, error: existingError } = await db
+    .from("final_round2_items")
+    .select("number,item_order")
+    .eq("model", currentModel)
+
+  if (existingError) {
+    console.log(existingError)
+    showGameToast("تعذر قراءة الجولة الثانية")
+    return
+  }
+
+  for (const oldRow of existingRows || []) {
+    const pair = `(${Number(oldRow.number)},${Number(oldRow.item_order)})`
+    if (!keepPairs.includes(pair)) {
+      const { error: deleteError } = await db
+        .from("final_round2_items")
+        .delete()
+        .eq("model", currentModel)
+        .eq("number", Number(oldRow.number))
+        .eq("item_order", Number(oldRow.item_order))
+
+      if (deleteError) {
+        console.log(deleteError)
+        showGameToast("تعذر تنظيف عناصر الجولة الثانية")
+        return
+      }
+    }
+  }
+
+  const { error: insError } = await db
+    .from("final_round2_items")
+    .upsert(rows, {
+      onConflict: "model,number,item_order"
+    })
+
+  if (insError) {
+    console.log(insError)
+    showGameToast("فشل حفظ الجولة الثانية")
+  }
+}
+
 /* =========================
    Round 3 Admin
 ========================= */
@@ -2067,6 +2191,7 @@ async function buildFinalRound3Admin() {
       <div class="finalAdminCard finalAdminWideCard">
         <div class="finalAdminCardHead">
           <h3>رقم ${number}</h3>
+          <button class="adminDeleteBtn" onclick="clearFinalRound3Item(${number})">حذف</button>
         </div>
     `
 
@@ -2101,78 +2226,22 @@ async function buildFinalRound3Admin() {
   return html
 }
 
-async function saveFinalRound2() {
-  const { error: delError } = await db
-    .from("final_round2_items")
-    .delete()
-    .eq("model", currentModel)
-
-  if (delError) {
-    console.log(delError)
-    showGameToast("تعذر حذف الجولة الثانية القديمة")
-    return
-  }
-
-  const rows = []
-
-  for (let number = 1; number <= 4; number++) {
-    const gameType = number === 1 || number === 3 ? "scramble" : "sequence"
-
-    for (let i = 1; i <= 6; i++) {
-      const prompt = (document.getElementById(`finalRound2Prompt_${number}_${i}`)?.value || "").trim()
-      const hint = gameType === "scramble"
-        ? (document.getElementById(`finalRound2Hint_${number}_${i}`)?.value || "").trim()
-        : ""
-
-      const answer = gameType === "scramble"
-        ? (document.getElementById(`finalRound2Answer_${number}_${i}`)?.value || "").trim()
-        : ""
-
-      if (!prompt && !answer && !hint) continue
-
-      rows.push({
-        model: currentModel,
-        number,
-        game_type: gameType,
-        title: "",
-        item_order: i,
-        prompt,
-        answer,
-        hint
-      })
-    }
-  }
-
-  if (rows.length) {
-    const { error: insError } = await db.from("final_round2_items").insert(rows)
-    if (insError) {
-      console.log(insError)
-      showGameToast("فشل حفظ الجولة الثانية")
-    }
-  }
-}
-
 async function saveFinalRound3() {
-  const { data: oldRows } = await db
+  const { data: oldRows, error: oldError } = await db
     .from("final_round3_items")
     .select("*")
     .eq("model", currentModel)
+
+  if (oldError) {
+    console.log(oldError)
+    showGameToast("تعذر قراءة الجولة الثالثة القديمة")
+    return
+  }
 
   const oldMap = {}
   ;(oldRows || []).forEach(row => {
     oldMap[`${row.number}_${row.image_order}`] = row
   })
-
-  const { error: delError } = await db
-    .from("final_round3_items")
-    .delete()
-    .eq("model", currentModel)
-
-  if (delError) {
-    console.log(delError)
-    showGameToast("تعذر حذف الجولة الثالثة القديمة")
-    return
-  }
 
   const rows = []
 
@@ -2198,12 +2267,62 @@ async function saveFinalRound3() {
     }
   }
 
-  if (rows.length) {
-    const { error: insError } = await db.from("final_round3_items").insert(rows)
-    if (insError) {
-      console.log(insError)
-      showGameToast("فشل حفظ الجولة الثالثة")
+  if (!rows.length) {
+    const { error: clearError } = await db
+      .from("final_round3_items")
+      .delete()
+      .eq("model", currentModel)
+
+    if (clearError) {
+      console.log(clearError)
+      showGameToast("تعذر تفريغ الجولة الثالثة")
+      return
     }
+
+    showGameToast("تم تفريغ الجولة الثالثة")
+    return
+  }
+
+  const keepPairs = rows.map(row => `(${Number(row.number)},${Number(row.image_order)})`)
+
+  const { data: existingRows, error: existingError } = await db
+    .from("final_round3_items")
+    .select("number,image_order")
+    .eq("model", currentModel)
+
+  if (existingError) {
+    console.log(existingError)
+    showGameToast("تعذر قراءة الجولة الثالثة")
+    return
+  }
+
+  for (const oldRow of existingRows || []) {
+    const pair = `(${Number(oldRow.number)},${Number(oldRow.image_order)})`
+    if (!keepPairs.includes(pair)) {
+      const { error: deleteError } = await db
+        .from("final_round3_items")
+        .delete()
+        .eq("model", currentModel)
+        .eq("number", Number(oldRow.number))
+        .eq("image_order", Number(oldRow.image_order))
+
+      if (deleteError) {
+        console.log(deleteError)
+        showGameToast("تعذر تنظيف عناصر الجولة الثالثة")
+        return
+      }
+    }
+  }
+
+  const { error: insError } = await db
+    .from("final_round3_items")
+    .upsert(rows, {
+      onConflict: "model,number,image_order"
+    })
+
+  if (insError) {
+    console.log(insError)
+    showGameToast("فشل حفظ الجولة الثالثة")
   }
 }
 
@@ -2224,17 +2343,29 @@ async function deleteFinalRound(round) {
   if (metaError) console.log(metaError)
 
   if (round === 1) {
-    const { error } = await db.from("final_round1_items").delete().eq("model", currentModel)
+    const { error } = await db
+      .from("final_round1_items")
+      .delete()
+      .eq("model", currentModel)
+
     if (error) console.log(error)
   }
 
   if (round === 2) {
-    const { error } = await db.from("final_round2_items").delete().eq("model", currentModel)
+    const { error } = await db
+      .from("final_round2_items")
+      .delete()
+      .eq("model", currentModel)
+
     if (error) console.log(error)
   }
 
   if (round === 3) {
-    const { error } = await db.from("final_round3_items").delete().eq("model", currentModel)
+    const { error } = await db
+      .from("final_round3_items")
+      .delete()
+      .eq("model", currentModel)
+
     if (error) console.log(error)
   }
 
@@ -2246,13 +2377,18 @@ async function deleteFinalSegment() {
   const confirmed = window.confirm("هل تريد حذف فقرة الفاصلة كاملة؟")
   if (!confirmed) return
 
-  await db.from("final_round_meta").delete().eq("model", currentModel)
-  await db.from("final_round1_items").delete().eq("model", currentModel)
-  await db.from("final_round2_items").delete().eq("model", currentModel)
-  await db.from("final_round3_items").delete().eq("model", currentModel)
+  try {
+    await db.from("final_round_meta").delete().eq("model", currentModel)
+    await db.from("final_round1_items").delete().eq("model", currentModel)
+    await db.from("final_round2_items").delete().eq("model", currentModel)
+    await db.from("final_round3_items").delete().eq("model", currentModel)
 
-  showGameToast("تم حذف فقرة الفاصلة")
-  await renderFinalAdmin()
+    showGameToast("تم حذف فقرة الفاصلة")
+    await renderFinalAdmin()
+  } catch (err) {
+    console.log(err)
+    showGameToast("تعذر حذف فقرة الفاصلة")
+  }
 }
 
 async function clearFinalRound1Item(number) {
@@ -2263,7 +2399,7 @@ async function clearFinalRound1Item(number) {
     .from("final_round1_items")
     .delete()
     .eq("model", currentModel)
-    .eq("number", number)
+    .eq("number", Number(number))
 
   if (error) {
     console.log(error)
@@ -2274,6 +2410,47 @@ async function clearFinalRound1Item(number) {
   showGameToast(`تم حذف العنصر ${number}`)
   await renderFinalAdminRound(1)
 }
+
+async function clearFinalRound2Item(number) {
+  const confirmed = window.confirm(`حذف الرقم ${number} من الجولة الثانية؟`)
+  if (!confirmed) return
+
+  const { error } = await db
+    .from("final_round2_items")
+    .delete()
+    .eq("model", currentModel)
+    .eq("number", Number(number))
+
+  if (error) {
+    console.log(error)
+    showGameToast("تعذر حذف الرقم")
+    return
+  }
+
+  showGameToast(`تم حذف الرقم ${number}`)
+  await renderFinalAdminRound(2)
+}
+
+async function clearFinalRound3Item(number) {
+  const confirmed = window.confirm(`حذف الرقم ${number} من الجولة الثالثة؟`)
+  if (!confirmed) return
+
+  const { error } = await db
+    .from("final_round3_items")
+    .delete()
+    .eq("model", currentModel)
+    .eq("number", Number(number))
+
+  if (error) {
+    console.log(error)
+    showGameToast("تعذر حذف الرقم")
+    return
+  }
+
+  showGameToast(`تم حذف الرقم ${number}`)
+  await renderFinalAdminRound(3)
+}
+
 /* =========================
    Archive
 ========================= */
@@ -2609,43 +2786,21 @@ async function saveArchiveRoundNew() {
     oldMap[row.position] = row
   })
 
-  const { error: delBoxError } = await db
-    .from("archive_boxes")
-    .delete()
-    .eq("model", currentModel)
-    .eq("round", round)
-
-  if (delBoxError) {
-    console.log(delBoxError)
-    showGameToast("فشل حذف بيانات الجولة")
-    return
-  }
-
   const { error: insBoxError } = await db
     .from("archive_boxes")
-    .insert([{
+    .upsert([{
       model: currentModel,
       round,
       tournament: text1,
       season: text2,
       score: scoreValue
-    }])
+    }], {
+      onConflict: "model,round"
+    })
 
   if (insBoxError) {
     console.log(insBoxError)
     showGameToast("فشل حفظ صندوق الأرشيف")
-    return
-  }
-
-  const { error: delItemsError } = await db
-    .from("archive_items")
-    .delete()
-    .eq("model", currentModel)
-    .eq("round", round)
-
-  if (delItemsError) {
-    console.log(delItemsError)
-    showGameToast("فشل حذف عناصر الجولة")
     return
   }
 
@@ -2723,9 +2878,42 @@ async function saveArchiveRoundNew() {
     })
   }
 
+  const keepPositions = rows.map(row => Number(row.position))
+
+  const { data: existingRows, error: existingError } = await db
+    .from("archive_items")
+    .select("position")
+    .eq("model", currentModel)
+    .eq("round", round)
+
+  if (existingError) {
+    console.log(existingError)
+    showGameToast("تعذر قراءة عناصر الأرشيف الحالية")
+    return
+  }
+
+  for (const oldRow of existingRows || []) {
+    if (!keepPositions.includes(Number(oldRow.position))) {
+      const { error: deleteError } = await db
+        .from("archive_items")
+        .delete()
+        .eq("model", currentModel)
+        .eq("round", round)
+        .eq("position", Number(oldRow.position))
+
+      if (deleteError) {
+        console.log(deleteError)
+        showGameToast("فشل تنظيف عناصر الأرشيف")
+        return
+      }
+    }
+  }
+
   const { error: insItemsError } = await db
     .from("archive_items")
-    .insert(rows)
+    .upsert(rows, {
+      onConflict: "model,round,position"
+    })
 
   if (insItemsError) {
     console.log(insItemsError)
@@ -2739,59 +2927,6 @@ async function saveArchiveRoundNew() {
   await renderArchiveAdminRound(round)
 }
 
-async function deleteArchiveSegment(round = null) {
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const deleteOneRound = round !== null && round !== undefined
-  const confirmMessage = deleteOneRound
-    ? `هل تريد حذف الجولة ${round} من الأرشيف؟`
-    : "هل تريد حذف جميع جولات الأرشيف؟"
-
-  const confirmed = window.confirm(confirmMessage)
-  if (!confirmed) return
-
-  try {
-    let deleteBoxesQuery = db.from("archive_boxes").delete().eq("model", currentModel)
-    let deleteItemsQuery = db.from("archive_items").delete().eq("model", currentModel)
-
-    if (deleteOneRound) {
-      deleteBoxesQuery = deleteBoxesQuery.eq("round", round)
-      deleteItemsQuery = deleteItemsQuery.eq("round", round)
-    }
-
-    const { error: itemsError } = await deleteItemsQuery
-    if (itemsError) {
-      console.log(itemsError)
-      showGameToast("تعذر حذف عناصر الأرشيف")
-      return
-    }
-
-    const { error: boxesError } = await deleteBoxesQuery
-    if (boxesError) {
-      console.log(boxesError)
-      showGameToast("تعذر حذف صناديق الأرشيف")
-      return
-    }
-
-    archivePendingExtraCount = 0
-    archiveDraftState = {}
-
-    if (deleteOneRound) {
-      showGameToast(`تم حذف الجولة ${round}`)
-      await renderArchiveAdminRound(round)
-    } else {
-      showGameToast("تم حذف جميع جولات الأرشيف")
-      archiveAdminRound = 1
-      await renderArchiveAdminRound(1)
-    }
-  } catch (err) {
-    console.log(err)
-    showGameToast("حدث خطأ أثناء حذف الأرشيف")
-  }
-}
 window.openPresenterFromAdmin = function () {
   if (!currentModel) {
     showGameToast("افتح نموذجًا أولاً")

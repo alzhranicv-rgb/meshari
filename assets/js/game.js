@@ -623,8 +623,11 @@ function setSegmentWinnerLabel(key) {
   }
 
   if (card) {
-    if (status.locked) card.classList.add("segmentLocked", "hasWinner")
-    else card.classList.remove("segmentLocked", "hasWinner")
+    if (status.locked) {
+      card.classList.add("segmentLocked", "hasWinner", "segmentDone")
+    } else {
+      card.classList.remove("segmentLocked", "hasWinner", "segmentDone")
+    }
   }
 }
 
