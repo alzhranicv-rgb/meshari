@@ -12,6 +12,11 @@ let archiveTurnLocked = false
 let archiveTimerStarted = false
 let archiveLastTickPlayed = null
 
+let archiveDoubleState = {
+  used: { A: false, B: false },
+  activeTeam: null
+}
+
 let archiveState = {
   round: 1,
   scores: { A: 0, B: 0 },
@@ -103,6 +108,86 @@ function updateArchiveRequestedInput() {
 }
 
 /* =========================
+   Double
+========================= */
+
+function activateArchiveDouble() {
+  const team = archiveState.activeTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (archiveDoubleState.used[team]) {
+    showGameToast("هذا الفريق استخدم الدبل مسبقًا")
+    return
+  }
+
+  if (archiveDoubleState.used.A && archiveDoubleState.used.B) {
+    showGameToast("تم استخدام الدوبيلا من الفريقين")
+    return
+  }
+
+  pushArchiveHistory()
+
+  archiveDoubleState.used[team] = true
+  archiveDoubleState.activeTeam = team
+
+  showGameToast(`تم تفعيل الدوبيلا لفريق ${team === "A" ? teamAName : teamBName}`)
+
+  updateArchiveDoubleButton()
+  saveArchiveState()
+}
+
+function getArchiveScoreMultiplier(team) {
+  return archiveDoubleState.activeTeam === team ? 2 : 1
+}
+
+function clearArchiveActiveDouble(team) {
+  if (archiveDoubleState.activeTeam === team) {
+    archiveDoubleState.activeTeam = null
+  }
+}
+
+function updateArchiveDoubleButton() {
+  const btn = document.getElementById("archiveDoubleBtn")
+  if (!btn) return
+
+  const team = archiveState.activeTeam
+
+  btn.classList.remove("activeDouble")
+
+  if (!team) {
+    btn.disabled = archiveDoubleState.used.A && archiveDoubleState.used.B
+    btn.innerText = "دوبيلا"
+    return
+  }
+
+  if (archiveDoubleState.activeTeam === team) {
+    btn.disabled = true
+    btn.innerText = "الدوبيلا مفعّل"
+    btn.classList.add("activeDouble")
+    return
+  }
+
+  if (archiveDoubleState.used[team]) {
+    btn.disabled = true
+    btn.innerText = "استخدم الدوبيلا"
+    return
+  }
+
+  if (archiveDoubleState.used.A && archiveDoubleState.used.B) {
+    btn.disabled = true
+    btn.innerText = "الدوبيلا مقفل"
+    return
+  }
+
+  btn.disabled = false
+  btn.innerText = "دوبيلا"
+}
+
+/* =========================
    Undo
 ========================= */
 
@@ -118,7 +203,8 @@ function createArchiveSnapshot() {
     archiveTurnLocked,
     archiveTimerStarted,
     archiveLastTickPlayed,
-    archiveState: cloneArchiveData(archiveState)
+    archiveState: cloneArchiveData(archiveState),
+    archiveDoubleState: cloneArchiveData(archiveDoubleState)
   }
 }
 
@@ -151,6 +237,10 @@ function restoreArchiveSnapshot(snapshot) {
   archiveTimerStarted = false
   archiveLastTickPlayed = null
   archiveState = cloneArchiveData(snapshot.archiveState || archiveState)
+  archiveDoubleState = cloneArchiveData(snapshot.archiveDoubleState || {
+    used: { A: false, B: false },
+    activeTeam: null
+  })
 
   syncArchiveGlobals()
   renderArchiveRoundUI()
@@ -198,7 +288,9 @@ function saveArchiveState() {
     archiveLastTeam,
     archiveTurnLocked,
     archiveTimerStarted,
+    archiveLastTickPlayed,
     archiveState,
+    archiveDoubleState,
     timerValue: timerBox ? Number(timerBox.innerText || 0) : 30
   }
 
@@ -220,6 +312,10 @@ function restoreArchiveState(saved) {
   archiveTurnLocked = !!saved.archiveTurnLocked
   archiveTimerStarted = !!saved.archiveTimerStarted
   archiveState = saved.archiveState || archiveState
+  archiveDoubleState = saved.archiveDoubleState || {
+    used: { A: false, B: false },
+    activeTeam: null
+  }
   archiveLastTickPlayed = null
 
   syncArchiveGlobals()
@@ -232,6 +328,7 @@ function restoreArchiveState(saved) {
     resumeArchiveTimer(timerValue)
   }
 
+  updateArchiveDoubleButton()
   updateEndRoundButtonState()
 }
 
@@ -256,11 +353,18 @@ window.renderArchive = async function () {
     3: {},
     4: {}
   }
+
   archiveRemainingPoints = 0
   archiveLastTeam = null
   archiveTurnLocked = false
   archiveTimerStarted = false
   archiveLastTickPlayed = null
+
+  archiveDoubleState = {
+    used: { A: false, B: false },
+    activeTeam: null
+  }
+
   clearInterval(archiveTimer)
   archiveTimer = null
 
@@ -402,13 +506,13 @@ function buildArchiveShell() {
           <div class="archiveSideErrors" id="archiveErrorsB"></div>
         </div>
 
-       <div class="archiveControlButtons">
-  <button onclick="addArchiveError()" class="archiveCtrlBtn archiveErrorBtn">خطأ</button>
-  <button onclick="showArchiveAnswer()" class="archiveCtrlBtn archiveAnswerBtn">إظهار الإجابة</button>
-  <button onclick="undoArchiveAction()" class="archiveCtrlBtn archiveUndoBtn" id="archiveUndoBtn">تراجع</button>
-  <button onclick="nextArchiveRound()" class="archiveCtrlBtn archiveNextBtn">الجولة التالية</button>
-  
-</div>
+        <div class="archiveControlButtons">
+          <button onclick="activateArchiveDouble()" class="archiveCtrlBtn archiveDoubleBtn" id="archiveDoubleBtn">دبل</button>
+          <button onclick="addArchiveError()" class="archiveCtrlBtn archiveErrorBtn">خطأ</button>
+          <button onclick="showArchiveAnswer()" class="archiveCtrlBtn archiveAnswerBtn">إظهار الإجابة</button>
+          <button onclick="undoArchiveAction()" class="archiveCtrlBtn archiveUndoBtn" id="archiveUndoBtn">تراجع</button>
+          <button onclick="nextArchiveRound()" class="archiveCtrlBtn archiveNextBtn">الجولة التالية</button>
+        </div>
 
         <div class="archiveInputsInline">
           <div class="archiveInputRow archiveInputHalf">
@@ -606,6 +710,7 @@ function renderArchiveRoundUI() {
     setArchiveTimerValue(30)
   }
 
+  updateArchiveDoubleButton()
   syncArchiveGlobals()
   saveArchiveState()
   updateArchiveUndoButtonState()
@@ -729,6 +834,8 @@ function highlightArchiveTeam() {
 
   if (archiveState.activeTeam === "A") a.classList.add("activeTeam")
   if (archiveState.activeTeam === "B") b.classList.add("activeTeam")
+
+  updateArchiveDoubleButton()
 }
 
 function toggleArchiveItem(position) {
@@ -811,6 +918,8 @@ function addArchiveError() {
 
   pushArchiveHistory()
 
+  clearArchiveActiveDouble(team)
+
   archiveState.errors[round][team] += 1
   archiveTurnLocked = true
 
@@ -818,6 +927,7 @@ function addArchiveError() {
   flashScreen("wrong")
 
   updateArchiveErrorsUI()
+  updateArchiveDoubleButton()
   resetArchiveTimer()
   advanceArchiveTurn()
   syncArchiveGlobals()
@@ -845,6 +955,7 @@ function showArchiveAnswer() {
   }
 
   const round = archiveState.round
+  const team = archiveState.activeTeam
   const items = archiveRoundCache[round]?.items || []
   const item = items.find(x => Number(x.position) === requested)
 
@@ -864,10 +975,13 @@ function showArchiveAnswer() {
 
   if (hasLabel) {
     const currentRemaining = archiveRemainingPoints
+    const multiplier = getArchiveScoreMultiplier(team)
+    const finalPoints = currentRemaining * multiplier
 
-    if (archiveState.activeTeam === "A") archiveState.scores.A += currentRemaining
-    if (archiveState.activeTeam === "B") archiveState.scores.B += currentRemaining
+    if (team === "A") archiveState.scores.A += finalPoints
+    if (team === "B") archiveState.scores.B += finalPoints
 
+    clearArchiveActiveDouble(team)
     revealAllArchiveRoundItems(round)
   } else {
     setArchiveItemRevealed(round, requested, true)
@@ -880,6 +994,7 @@ function showArchiveAnswer() {
 
   recalcArchiveRemainingPoints(items)
   updateArchiveScoresUI()
+  updateArchiveDoubleButton()
   resetArchiveTimer()
   advanceArchiveTurn()
   syncArchiveGlobals()
@@ -908,6 +1023,7 @@ async function nextArchiveRound() {
   archiveRemainingPoints = 0
   archiveTimerStarted = false
   archiveLastTickPlayed = null
+  archiveDoubleState.activeTeam = null
 
   clearInterval(archiveTimer)
   archiveTimer = null
@@ -933,6 +1049,7 @@ async function prevArchiveRound() {
   archiveRemainingPoints = 0
   archiveTimerStarted = false
   archiveLastTickPlayed = null
+  archiveDoubleState.activeTeam = null
 
   clearInterval(archiveTimer)
   archiveTimer = null

@@ -10,6 +10,11 @@ let warmupQuestionLocked = false
 let currentWarmupQuestionKey = null
 let warmupLastTickPlayed = null
 
+let warmupDoubleState = {
+  used: { A: false, B: false },
+  activeTeam: null
+}
+
 const WARMUP_STORAGE_KEY = "warmup_state_v1"
 
 /* =========================
@@ -36,6 +41,7 @@ function saveWarmupState() {
     warmupManualSelectionDone,
     warmupQuestionLocked,
     currentWarmupQuestionKey,
+    warmupDoubleState,
     selectedTeam,
     currentPoints,
     currentAnswer: window.currentAnswer || "",
@@ -76,6 +82,11 @@ function restoreWarmupUIFromState(saved) {
   warmupManualSelectionDone = !!saved.warmupManualSelectionDone
   warmupQuestionLocked = !!saved.warmupQuestionLocked
   currentWarmupQuestionKey = saved.currentWarmupQuestionKey || null
+  warmupDoubleState = saved.warmupDoubleState || {
+    used: { A: false, B: false },
+    activeTeam: null
+  }
+
   selectedTeam = saved.selectedTeam || null
   currentPoints = Number(saved.currentPoints || 0)
   window.currentAnswer = saved.currentAnswer || ""
@@ -92,6 +103,7 @@ function restoreWarmupUIFromState(saved) {
 
   if (selectedTeam) highlightWarmupSelectedTeam(selectedTeam)
   restoreWarmupButtonStates()
+  updateWarmupDoubleButton()
 
   if (currentWarmupQuestionKey) {
     const [cat, num] = currentWarmupQuestionKey.split("_")
@@ -132,6 +144,11 @@ window.renderWarmup = async function () {
   currentWarmupQuestionKey = null
   warmupLastTickPlayed = null
 
+  warmupDoubleState = {
+    used: { A: false, B: false },
+    activeTeam: null
+  }
+
   const categories = await loadWarmupCategories()
 
   openSegment("التسخين", `
@@ -161,6 +178,7 @@ window.renderWarmup = async function () {
       </div>
 
       <div class="warmupControlPanel">
+        <button onclick="activateWarmupDouble()" class="warmupDoubleBtn" id="warmupDoubleBtn">دبل</button>
         <button onclick="showWarmupAnswer()" class="btnAnswer">إظهار الإجابة</button>
         <button onclick="warmupWrong()" class="btnWrong">✕ خطأ</button>
         <button onclick="warmupCorrect()" class="btnCorrect">✓ صح</button>
@@ -186,6 +204,8 @@ window.renderWarmup = async function () {
   } else {
     saveWarmupState()
   }
+
+  updateWarmupDoubleButton()
 }
 
 async function loadWarmupCategories() {
@@ -227,6 +247,94 @@ function createWarmupCategory(num, name) {
 }
 
 /* =========================
+   Double
+========================= */
+
+function activateWarmupDouble() {
+  const team = selectedTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (warmupQuestionLocked || currentWarmupQuestionKey) {
+    showGameToast("الدوبيلا قبل اختيار السؤال فقط")
+    return
+  }
+
+  if (warmupDoubleState.used[team]) {
+    showGameToast("هذا الفريق استخدم الدوبيلا مسبقًا")
+    return
+  }
+
+  if (warmupDoubleState.used.A && warmupDoubleState.used.B) {
+    showGameToast("تم استخدام الدوبيلا من الفريقين")
+    return
+  }
+
+  warmupDoubleState.used[team] = true
+  warmupDoubleState.activeTeam = team
+
+  showGameToast(`تم تفعيل الدوبيلا  لفريق ${team === "A" ? teamAName : teamBName}`)
+
+  updateWarmupDoubleButton()
+  saveWarmupState()
+}
+
+function getWarmupScoreValue(team) {
+  const base = Number(currentPoints || 0)
+  return warmupDoubleState.activeTeam === team ? base * 2 : base
+}
+
+function clearWarmupActiveDouble() {
+  warmupDoubleState.activeTeam = null
+}
+
+function updateWarmupDoubleButton() {
+  const btn = document.getElementById("warmupDoubleBtn")
+  if (!btn) return
+
+  const team = selectedTeam
+
+  btn.classList.remove("activeDouble")
+
+  if (warmupQuestionLocked || currentWarmupQuestionKey) {
+    btn.disabled = true
+    btn.innerText = "دوبيلا"
+    return
+  }
+
+  if (!team) {
+    btn.disabled = warmupDoubleState.used.A && warmupDoubleState.used.B
+    btn.innerText = "دوبيلا"
+    return
+  }
+
+  if (warmupDoubleState.activeTeam === team) {
+    btn.disabled = true
+    btn.innerText = "الدوبيلا مفعّل"
+    btn.classList.add("activeDouble")
+    return
+  }
+
+  if (warmupDoubleState.used[team]) {
+    btn.disabled = true
+    btn.innerText = " الدوبيلا"
+    return
+  }
+
+  if (warmupDoubleState.used.A && warmupDoubleState.used.B) {
+    btn.disabled = true
+    btn.innerText = "الدوبيلا مقفل"
+    return
+  }
+
+  btn.disabled = false
+  btn.innerText = "دوبيلا "
+}
+
+/* =========================
    Team UI
 ========================= */
 
@@ -257,6 +365,8 @@ function highlightWarmupSelectedTeam(team) {
     b.style.border = "3px solid #000"
     b.style.boxShadow = "0 0 0 4px rgba(0,0,0,.12), var(--shadow-soft)"
   }
+
+  updateWarmupDoubleButton()
 }
 
 function clearWarmupSelectedButton() {
@@ -295,6 +405,7 @@ function selectWarmupTeam(team) {
   selectedTeam = team
   warmupManualSelectionDone = true
   highlightWarmupSelectedTeam(team)
+  updateWarmupDoubleButton()
   saveWarmupState()
 }
 
@@ -383,6 +494,7 @@ async function openWarmupQuestion(category, number) {
   window.currentAnswer = row.answer || ""
   currentPoints = Number(number)
 
+  updateWarmupDoubleButton()
   startWarmupTimer(number)
   saveWarmupState()
 }
@@ -477,19 +589,22 @@ function warmupCorrect() {
     return
   }
 
-  const points = Number(currentPoints || 0)
+  const team = selectedTeam
+  const points = getWarmupScoreValue(team)
 
-  if (selectedTeam === "A") {
+  if (team === "A") {
     warmupScoreA += points
     const box = document.getElementById("roundScoreA")
     if (box) box.innerText = warmupScoreA
   }
 
-  if (selectedTeam === "B") {
+  if (team === "B") {
     warmupScoreB += points
     const box = document.getElementById("roundScoreB")
     if (box) box.innerText = warmupScoreB
   }
+
+  clearWarmupActiveDouble()
 
   playGameSound("correct")
   flashScreen("correct")
@@ -512,6 +627,7 @@ function warmupCorrect() {
   currentWarmupQuestionKey = null
   clearWarmupSelectedButton()
   resetWarmupTimer()
+  updateWarmupDoubleButton()
   saveWarmupState()
 }
 
@@ -521,8 +637,11 @@ function warmupWrong() {
     return
   }
 
+  clearWarmupActiveDouble()
+
   playGameSound("wrong")
   flashScreen("wrong")
+
   if (selectedTeam) {
     lastAnsweredTeam = selectedTeam
   }
@@ -539,5 +658,6 @@ function warmupWrong() {
   currentWarmupQuestionKey = null
   clearWarmupSelectedButton()
   resetWarmupTimer()
+  updateWarmupDoubleButton()
   saveWarmupState()
 }

@@ -1,6 +1,11 @@
 let finalState = {
   round: 1,
 
+  doubleState: {
+    used: { A: false, B: false },
+    activeTeam: null
+  },
+
   round1: {
     title: "الجولة الأولى",
     cardsCount: 6,
@@ -90,6 +95,8 @@ function getFinalState() {
 }
 
 function saveFinalState() {
+  ensureFinalDoubleState()
+
   const safe = JSON.parse(JSON.stringify(finalState))
   safe.round2.revealTimer = null
   safe.round3.sequenceTimer = null
@@ -108,6 +115,9 @@ function restoreFinalState(saved) {
   if (!saved) return
 
   finalState = saved
+
+  ensureFinalDoubleState()
+
   finalState.round2.revealTimer = null
   finalState.round3.sequenceTimer = null
 
@@ -158,6 +168,8 @@ function restoreFinalSnapshot(snapshot) {
   clearFinalIntervals()
 
   finalState = cloneFinalData(snapshot.finalState)
+  ensureFinalDoubleState()
+
   window.finalState = finalState
   currentFinalRound3Image = snapshot.currentFinalRound3Image || ""
 
@@ -187,6 +199,105 @@ function updateFinalUndoButtonState() {
 /* =========================
    Helpers
 ========================= */
+
+function ensureFinalDoubleState() {
+  if (!finalState.doubleState) {
+    finalState.doubleState = {
+      used: { A: false, B: false },
+      activeTeam: null
+    }
+  }
+}
+
+function getFinalCurrentRoundState() {
+  if (finalState.round === 1) return finalState.round1
+  if (finalState.round === 2) return finalState.round2
+  if (finalState.round === 3) return finalState.round3
+  return null
+}
+
+function activateFinalDouble() {
+  ensureFinalDoubleState()
+
+  const roundState = getFinalCurrentRoundState()
+  const team = roundState?.activeTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (roundState.pendingScore || roundState.currentNumber !== null) {
+    showGameToast("الدبل قبل اختيار الرقم فقط")
+    return
+  }
+
+  if (finalState.doubleState.used[team]) {
+    showGameToast("هذا الفريق استخدم الدبل مسبقًا في الفاصلة")
+    return
+  }
+
+  pushFinalHistory()
+
+  finalState.doubleState.used[team] = true
+  finalState.doubleState.activeTeam = team
+
+  showGameToast(`تم تفعيل الدبل لفريق ${team === "A" ? teamAName : teamBName}`)
+
+  updateFinalDoubleButton()
+  saveFinalState()
+}
+
+function getFinalScoreValue(team, base) {
+  ensureFinalDoubleState()
+  const points = Number(base || 0)
+  return finalState.doubleState.activeTeam === team ? points * 2 : points
+}
+
+function clearFinalActiveDouble() {
+  ensureFinalDoubleState()
+  finalState.doubleState.activeTeam = null
+}
+
+function updateFinalDoubleButton() {
+  ensureFinalDoubleState()
+
+  const btn = document.getElementById("finalDoubleBtn")
+  if (!btn) return
+
+  const roundState = getFinalCurrentRoundState()
+  const team = roundState?.activeTeam
+
+  btn.classList.remove("activeDouble")
+
+  if (roundState?.pendingScore || roundState?.currentNumber !== null) {
+    btn.disabled = true
+    btn.innerText = "دوبيلا"
+    return
+  }
+
+  if (!team) {
+    btn.disabled = finalState.doubleState.used.A && finalState.doubleState.used.B
+    btn.innerText = "دوبيلا"
+    return
+  }
+
+  if (finalState.doubleState.activeTeam === team) {
+    btn.disabled = true
+    btn.innerText = "الدوبيلا مفعّل"
+    btn.classList.add("activeDouble")
+    return
+  }
+
+  if (finalState.doubleState.used[team]) {
+    btn.disabled = true
+    btn.innerText = "استخدم الدوبيلا"
+    return
+  }
+
+  btn.disabled = false
+  btn.innerText = "دوبيلا"
+}
 
 function syncFinalGlobals() {
   const totalA =
@@ -227,15 +338,21 @@ function resetFinalTeamSelection() {
   const b = document.getElementById("finalTeamBBox")
   if (a) a.classList.remove("activeTeam")
   if (b) b.classList.remove("activeTeam")
+
+  updateFinalDoubleButton()
 }
 
 function highlightFinalTeam(team) {
   const a = document.getElementById("finalTeamABox")
   const b = document.getElementById("finalTeamBBox")
+
   if (a) a.classList.remove("activeTeam")
   if (b) b.classList.remove("activeTeam")
+
   if (team === "A" && a) a.classList.add("activeTeam")
   if (team === "B" && b) b.classList.add("activeTeam")
+
+  updateFinalDoubleButton()
 }
 
 function getOtherTeam(team) {
@@ -352,6 +469,7 @@ function finalizeRound1Turn() {
   finalState.round1.currentQuestionParts = []
   finalState.round1.shownQuestionPartsCount = 0
   finalState.round1.answerShown = false
+
   resetFinalTeamSelection()
   renderFinalRound()
   saveFinalState()
@@ -455,6 +573,12 @@ window.renderFinal = async function () {
 
   finalState = {
     round: 1,
+
+    doubleState: {
+      used: { A: false, B: false },
+      activeTeam: null
+    },
+
     round1: {
       title: "الجولة الأولى",
       cardsCount: 6,
@@ -472,6 +596,7 @@ window.renderFinal = async function () {
       pendingScore: false,
       cardTexts: {}
     },
+
     round2: {
       title: "الجولة الثانية",
       opened: [],
@@ -498,6 +623,7 @@ window.renderFinal = async function () {
       },
       lastTeamPlayed: null
     },
+
     round3: {
       title: "الجولة الثالثة",
       opened: [],
@@ -602,6 +728,7 @@ function buildFinalHTML() {
 
 function renderFinalRound() {
   clearFinalIntervals()
+  ensureFinalDoubleState()
   renderFinalTabs()
   renderFinalScores()
   renderFinalErrors()
@@ -612,6 +739,7 @@ function renderFinalRound() {
   if (finalState.round === 2) renderFinalRound2()
   if (finalState.round === 3) renderFinalRound3()
 
+  updateFinalDoubleButton()
   syncFinalGlobals()
   saveFinalState()
   updateFinalUndoButtonState()
@@ -722,23 +850,12 @@ function renderFinalTeamLayout() {
 }
 
 function selectFinalTeam(team) {
-  if (finalState.round === 1) {
-    if (finalState.round1.currentNumber === null) {
-      showGameToast("اختر رقمًا أولاً")
-      return
-    }
-    finalState.round1.activeTeam = team
-  }
-
-  if (finalState.round === 2) {
-    finalState.round2.activeTeam = team
-  }
-
-  if (finalState.round === 3) {
-    finalState.round3.activeTeam = team
-  }
+  if (finalState.round === 1) finalState.round1.activeTeam = team
+  if (finalState.round === 2) finalState.round2.activeTeam = team
+  if (finalState.round === 3) finalState.round3.activeTeam = team
 
   highlightFinalTeam(team)
+  updateFinalDoubleButton()
   saveFinalState()
 }
 
@@ -774,7 +891,6 @@ function goToFinalRound(round) {
   renderFinalRound()
   updateEndRoundButtonState()
 }
-
 /* =========================
    Round 1
 ========================= */
@@ -833,6 +949,7 @@ function renderFinalRound1() {
   const isQuestionCard = currentNumber >= 4 && currentNumber <= 6
 
   controls.innerHTML = `
+    <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">دبل</button>
     <button onclick="showFinalRound1Question()" class="archiveCtrlBtn btnStart" ${isQuestionCard ? "" : "disabled"}>إظهار السؤال</button>
     <button onclick="showFinalRound1Answer()" class="archiveCtrlBtn btnAnswer">
       ${finalState.round1.answerShown ? "إخفاء الإجابة" : "إظهار الإجابة"}
@@ -843,6 +960,8 @@ function renderFinalRound1() {
     <button onclick="goToFinalRound(2)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>
   `
 
+  updateFinalDoubleButton()
+
   if (finalState.round1.currentNumber) {
     loadFinalRound1Current()
   }
@@ -851,6 +970,11 @@ function renderFinalRound1() {
 async function openFinalRound1Card(number) {
   if (finalState.round1.pendingScore) {
     showGameToast("أنهِ الدور الحالي أولاً")
+    return
+  }
+
+  if (!finalState.round1.activeTeam) {
+    showGameToast("اختر الفريق أولاً")
     return
   }
 
@@ -869,7 +993,6 @@ async function openFinalRound1Card(number) {
   finalState.round1.answerShown = false
   finalState.round1.errors.A = 0
   finalState.round1.errors.B = 0
-  finalState.round1.activeTeam = null
 
   renderFinalRound1()
   renderFinalErrors()
@@ -1053,8 +1176,6 @@ function showFinalRound1Answer() {
   finalState.round1.answerShown = !finalState.round1.answerShown
   loadFinalRound1Current()
   renderFinalRound1()
-  playGameSound("answer")
-  
   saveFinalState()
 }
 
@@ -1064,10 +1185,12 @@ function finalRound1Wrong() {
     return
   }
 
- 
+  pushFinalHistory()
 
   playGameSound("wrong")
   flashScreen("wrong")
+  updateFinalDoubleButton()
+  saveFinalState()
 }
 
 function finalRound1Correct() {
@@ -1090,7 +1213,9 @@ function finalRound1Correct() {
     loadFinalRound1Current()
   }
 
-  finalState.round1.scores[team] += 1
+  finalState.round1.scores[team] += getFinalScoreValue(team, 1)
+  clearFinalActiveDouble()
+
   playGameSound("correct")
   flashScreen("correct")
   renderFinalScores()
@@ -1177,6 +1302,7 @@ function renderFinalRound2() {
   `
 
   controls.innerHTML = `
+    <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">دبل</button>
     <button onclick="showFinalRound2Answer()" class="archiveCtrlBtn btnAnswer" ${hasCurrent ? "" : "disabled"}>إظهار الإجابة</button>
     <button onclick="finalRound2DecreaseCountdown()" class="archiveCtrlBtn btnStart" ${isSequence ? "" : "disabled"}>
       ${isSequence ? finalState.round2.countdown : "العداد"}
@@ -1187,6 +1313,7 @@ function renderFinalRound2() {
     <button onclick="goToFinalRound(3)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>
   `
 
+  updateFinalDoubleButton()
   renderFinalRound2Words(finalState.round2.answerShown)
 }
 
@@ -1373,7 +1500,7 @@ function showFinalRound2Answer() {
 
   renderFinalRoundTitle()
   renderFinalRound2Words(true)
-  playGameSound("answer")
+  
   flashScreen("correct")
   saveFinalState()
 }
@@ -1436,8 +1563,10 @@ function finalRound2RecordScore() {
   pushFinalHistory()
 
   finalState.round2.correctCount = (finalState.round2.selectedCorrectIndexes || []).length
-  finalState.round2.scores[team] += Number(finalState.round2.correctCount || 0)
+  finalState.round2.scores[team] += getFinalScoreValue(team, finalState.round2.correctCount)
   finalState.round2.lastTeamPlayed = team
+
+  clearFinalActiveDouble()
 
   renderFinalScores()
   playGameSound("correct")
@@ -1500,8 +1629,10 @@ function finalRound2RecordSequenceScore() {
 
   pushFinalHistory()
 
-  finalState.round2.scores[team] += Number(finalState.round2.countdown || 0)
+  finalState.round2.scores[team] += getFinalScoreValue(team, finalState.round2.countdown)
   finalState.round2.lastTeamPlayed = team
+
+  clearFinalActiveDouble()
 
   renderFinalScores()
   playGameSound("correct")
@@ -1545,11 +1676,14 @@ function renderFinalRound3() {
   `
 
   controls.innerHTML = `
+    <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">دبل</button>
     <button onclick="showFinalRound3Answer()" class="archiveCtrlBtn btnAnswer">إظهار الإجابة</button>
     <button onclick="finalRound3RecordScore()" class="archiveCtrlBtn btnCorrect">تسجيل النتيجة</button>
     <button onclick="startFinalRound3Sequence()" class="archiveCtrlBtn btnStart">بدء عرض الصور</button>
     <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
   `
+
+  updateFinalDoubleButton()
 }
 
 async function openFinalRound3Card(number) {
@@ -1719,7 +1853,7 @@ function showFinalRound3Answer() {
       }).join("")}
     </div>
   `
-  playGameSound("answer")
+      
   saveFinalState()
 }
 
@@ -1739,8 +1873,10 @@ function finalRound3RecordScore() {
   pushFinalHistory()
 
   finalState.round3.correctCount = (finalState.round3.selectedCorrectIndexes || []).length
-  finalState.round3.scores[team] += Number(finalState.round3.correctCount || 0)
+  finalState.round3.scores[team] += getFinalScoreValue(team, finalState.round3.correctCount)
   finalState.round3.lastTeamPlayed = team
+
+  clearFinalActiveDouble()
 
   renderFinalScores()
   playGameSound("correct")

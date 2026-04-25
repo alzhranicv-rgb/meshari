@@ -10,6 +10,11 @@ let whoState = {
 
 window.whoState = whoState
 
+let whoDoubleState = {
+  used: { A: false, B: false },
+  activeTeam: null
+}
+
 let currentWhoAnswer = null
 let currentWhoImage = null
 let whoQuestionLocked = false
@@ -36,6 +41,7 @@ function saveWhoState() {
 
   const state = {
     whoState,
+    whoDoubleState,
     currentWhoAnswer,
     currentWhoImage,
     whoQuestionLocked,
@@ -57,6 +63,11 @@ function restoreWhoState(saved) {
   if (!saved) return
 
   whoState = saved.whoState || whoState
+  whoDoubleState = saved.whoDoubleState || {
+    used: { A: false, B: false },
+    activeTeam: null
+  }
+
   window.whoState = whoState
 
   currentWhoAnswer = saved.currentWhoAnswer || null
@@ -75,6 +86,7 @@ function restoreWhoState(saved) {
   highlightWhoPoints()
   highlightWhoTurnTeam()
   updateWhoTurnBox()
+  updateWhoDoubleButton()
 
   const grid = document.querySelector(".whoGrid")
   if (grid) {
@@ -111,6 +123,11 @@ window.renderWho = function () {
     activeTeam: null,
     manualStartDone: false,
     lastAnsweredTeam: null
+  }
+
+  whoDoubleState = {
+    used: { A: false, B: false },
+    activeTeam: null
   }
 
   window.whoState = whoState
@@ -161,6 +178,7 @@ window.renderWho = function () {
         </div>
 
         <div class="whoControlPanel">
+          <button onclick="activateWhoDouble()" class="whoDoubleBtn" id="whoDoubleBtn">دبل</button>
           <button onclick="showWhoAnswer()" class="btnAnswer">إظهار الإجابة</button>
           <button onclick="whoCorrect()" class="btnCorrect">✓ صح</button>
           <button onclick="whoWrong()" class="btnWrong">✕ خطأ</button>
@@ -180,7 +198,101 @@ window.renderWho = function () {
   } else {
     saveWhoState()
   }
+
+  updateWhoDoubleButton()
 }
+
+/* =========================
+   Double
+========================= */
+
+function activateWhoDouble() {
+  const team = whoState.activeTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (whoQuestionLocked || whoCurrentNumber) {
+    showGameToast("الدبويلا قبل اختيار السؤال فقط")
+    return
+  }
+
+  if (whoDoubleState.used[team]) {
+    showGameToast("هذا الفريق استخدم الدوبيلا مسبقًا")
+    return
+  }
+
+  if (whoDoubleState.used.A && whoDoubleState.used.B) {
+    showGameToast("تم استخدام الدوبيلا من الفريقين")
+    return
+  }
+
+  whoDoubleState.used[team] = true
+  whoDoubleState.activeTeam = team
+
+  showGameToast(`تم تفعيل الدوبيلا  لفريق ${team === "A" ? teamAName : teamBName}`)
+
+  updateWhoDoubleButton()
+  saveWhoState()
+}
+
+function getWhoScoreValue(team) {
+  const base = Number(whoState.currentPoints || 0)
+  return whoDoubleState.activeTeam === team ? base * 2 : base
+}
+
+function clearWhoActiveDouble() {
+  whoDoubleState.activeTeam = null
+}
+
+function updateWhoDoubleButton() {
+  const btn = document.getElementById("whoDoubleBtn")
+  if (!btn) return
+
+  const team = whoState.activeTeam
+
+  btn.classList.remove("activeDouble")
+
+  if (whoQuestionLocked || whoCurrentNumber) {
+    btn.disabled = true
+    btn.innerText = "دبل"
+    return
+  }
+
+  if (!team) {
+    btn.disabled = whoDoubleState.used.A && whoDoubleState.used.B
+    btn.innerText = "دوبيلا"
+    return
+  }
+
+  if (whoDoubleState.activeTeam === team) {
+    btn.disabled = true
+    btn.innerText = "الدوبيلا مفعّل"
+    btn.classList.add("activeDouble")
+    return
+  }
+
+  if (whoDoubleState.used[team]) {
+    btn.disabled = true
+    btn.innerText = " الدوبيلا"
+    return
+  }
+
+  if (whoDoubleState.used.A && whoDoubleState.used.B) {
+    btn.disabled = true
+    btn.innerText = "الدوبيلا مقفل"
+    return
+  }
+
+  btn.disabled = false
+  btn.innerText = "دوبيلا"
+}
+
+/* =========================
+   Grid / Points
+========================= */
 
 function createWhoGrid() {
   let html = ""
@@ -197,6 +309,11 @@ function createWhoGrid() {
 }
 
 function setWhoPoints(p) {
+  if (whoQuestionLocked) {
+    showGameToast("لا يمكن تغيير النقاط بعد اختيار السؤال")
+    return
+  }
+
   whoState.currentPoints = p
   highlightWhoPoints()
   saveWhoState()
@@ -235,6 +352,8 @@ function updateWhoTurnBox() {
   if (inline) {
     inline.innerText = "الدور: " + getWhoTurnName()
   }
+
+  updateWhoDoubleButton()
 }
 
 function selectWhoTeam(team) {
@@ -249,6 +368,7 @@ function selectWhoTeam(team) {
 
   highlightWhoTurnTeam()
   updateWhoTurnBox()
+  updateWhoDoubleButton()
   saveWhoState()
 }
 
@@ -263,6 +383,8 @@ function highlightWhoTurnTeam() {
 
   if (whoState.activeTeam === "A") a.classList.add("activeTeam")
   if (whoState.activeTeam === "B") b.classList.add("activeTeam")
+
+  updateWhoDoubleButton()
 }
 
 function switchWhoTurn() {
@@ -274,7 +396,12 @@ function switchWhoTurn() {
 
   highlightWhoTurnTeam()
   updateWhoTurnBox()
+  updateWhoDoubleButton()
 }
+
+/* =========================
+   Question
+========================= */
 
 async function chooseWho(num) {
   if (whoQuestionLocked) {
@@ -299,6 +426,8 @@ async function chooseWho(num) {
   whoQuestionLocked = true
   whoCurrentNumber = num
 
+  updateWhoDoubleButton()
+
   const { data, error } = await db
     .from("who_images")
     .select("*")
@@ -311,6 +440,7 @@ async function chooseWho(num) {
     showGameToast("تعذر تحميل الصورة")
     whoQuestionLocked = false
     whoCurrentNumber = null
+    updateWhoDoubleButton()
     return
   }
 
@@ -375,6 +505,10 @@ function clearWhoStage() {
   currentWhoImage = null
 }
 
+/* =========================
+   Timer
+========================= */
+
 function startWhoTimer() {
   runWhoTimer(30)
 }
@@ -431,6 +565,10 @@ function resetWhoTimer() {
   saveWhoState()
 }
 
+/* =========================
+   Result
+========================= */
+
 function whoCorrect() {
   if (!whoState.activeTeam) {
     showGameToast("اختر الفريق أولاً")
@@ -447,13 +585,18 @@ function whoCorrect() {
     return
   }
 
-  if (whoState.activeTeam === "A") {
-    whoState.scoreA += whoState.currentPoints
+  const team = whoState.activeTeam
+  const points = getWhoScoreValue(team)
+
+  if (team === "A") {
+    whoState.scoreA += points
     document.getElementById("whoScoreA").innerText = whoState.scoreA
   } else {
-    whoState.scoreB += whoState.currentPoints
+    whoState.scoreB += points
     document.getElementById("whoScoreB").innerText = whoState.scoreB
   }
+
+  clearWhoActiveDouble()
 
   playGameSound("correct")
   flashScreen("correct")
@@ -471,6 +614,7 @@ function whoCorrect() {
 
   whoQuestionLocked = false
   whoCurrentNumber = null
+  updateWhoDoubleButton()
   saveWhoState()
 }
 
@@ -490,13 +634,18 @@ function whoWrong() {
     return
   }
 
-  if (whoState.activeTeam === "A") {
-    whoState.scoreA -= whoState.currentPoints
+  const team = whoState.activeTeam
+  const points = getWhoScoreValue(team)
+
+  if (team === "A") {
+    whoState.scoreA -= points
     document.getElementById("whoScoreA").innerText = whoState.scoreA
   } else {
-    whoState.scoreB -= whoState.currentPoints
+    whoState.scoreB -= points
     document.getElementById("whoScoreB").innerText = whoState.scoreB
   }
+
+  clearWhoActiveDouble()
 
   playGameSound("wrong")
   flashScreen("wrong")
@@ -514,8 +663,14 @@ function whoWrong() {
 
   whoQuestionLocked = false
   whoCurrentNumber = null
+  updateWhoDoubleButton()
   saveWhoState()
 }
+
+/* =========================
+   Image Overlay
+========================= */
+
 function toggleWhoImageOverlay() {
   const oldOverlay = document.getElementById("whoImageOverlay")
 

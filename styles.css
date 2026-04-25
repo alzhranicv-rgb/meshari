@@ -3065,6 +3065,80 @@ body{
   line-height:inherit !important;
 }
 /* =========================
+   WARMUP CONTROL PANEL - CLEAN
+========================= */
+
+.warmupControlPanel{
+  display:grid !important;
+  grid-template-columns:repeat(4, minmax(0, 1fr)) !important;
+  gap:12px !important;
+  align-items:stretch !important;
+  width:100% !important;
+}
+
+.warmupControlPanel button{
+  width:100% !important;
+  min-height:52px !important;
+  border-radius:18px !important;
+  white-space:nowrap !important;
+}
+
+.warmupDoubleBtn{
+  border:0;
+  font-family:"HanakaText", sans-serif;
+  font-weight:900;
+  cursor:pointer;
+  color:#fff;
+  background:linear-gradient(180deg, #ffb15f 0%, #ff8a2a 100%);
+  box-shadow:
+    0 10px 20px rgba(255,138,42,.22),
+    inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .18s ease, filter .18s ease, opacity .18s ease;
+}
+
+.warmupDoubleBtn:hover:not(:disabled){
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+.warmupDoubleBtn.activeDouble{
+  background:linear-gradient(180deg, #ffcf75 0%, #ff9b2f 100%);
+  animation:warmupDoublePulse .65s ease-in-out infinite alternate;
+}
+
+.warmupDoubleBtn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none !important;
+}
+
+@keyframes warmupDoublePulse{
+  from{
+    box-shadow:
+      0 0 0 rgba(255,155,47,0),
+      0 10px 20px rgba(255,138,42,.22);
+  }
+  to{
+    box-shadow:
+      0 0 18px rgba(255,155,47,.65),
+      0 12px 24px rgba(255,138,42,.30);
+  }
+}
+
+@media (max-width:900px){
+  .warmupControlPanel{
+    grid-template-columns:repeat(4, minmax(0, 1fr)) !important;
+    gap:8px !important;
+  }
+
+  .warmupControlPanel button{
+    min-height:44px !important;
+    font-size:.85rem !important;
+    padding:8px 6px !important;
+    border-radius:14px !important;
+  }
+}
+/* =========================
    TOP 10 - FINAL DESIGN
 ========================= */
 
@@ -3904,6 +3978,83 @@ body{
   }
 }
 /* =========================
+   TOP10 CONTROL PANEL - ONE ROW
+========================= */
+
+.top10ControlPanel{
+  display:grid !important;
+  grid-template-columns:repeat(7, minmax(0, 1fr)) !important;
+  gap:10px !important;
+  align-items:stretch !important;
+  width:100% !important;
+}
+
+.top10ControlPanel button{
+  width:100% !important;
+  min-width:0 !important;
+  min-height:48px !important;
+  border-radius:16px !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+.top10DoubleBtn{
+  border:0;
+  font-family:"HanakaText", sans-serif;
+  font-weight:900;
+  cursor:pointer;
+  color:#fff;
+  background:linear-gradient(180deg, #ffb15f 0%, #ff8a2a 100%);
+  box-shadow:
+    0 10px 20px rgba(255,138,42,.22),
+    inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .18s ease, filter .18s ease, opacity .18s ease;
+}
+
+.top10DoubleBtn:hover:not(:disabled){
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+.top10DoubleBtn.activeDouble{
+  background:linear-gradient(180deg, #ffcf75 0%, #ff9b2f 100%);
+  animation:top10DoublePulse .65s ease-in-out infinite alternate;
+}
+
+.top10DoubleBtn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none !important;
+}
+
+@keyframes top10DoublePulse{
+  from{
+    box-shadow:
+      0 0 0 rgba(255,155,47,0),
+      0 10px 20px rgba(255,138,42,.22);
+  }
+  to{
+    box-shadow:
+      0 0 18px rgba(255,155,47,.65),
+      0 12px 24px rgba(255,138,42,.30);
+  }
+}
+
+@media (max-width:900px){
+  .top10ControlPanel{
+    grid-template-columns:repeat(7, minmax(0, 1fr)) !important;
+    gap:6px !important;
+  }
+
+  .top10ControlPanel button{
+    min-height:42px !important;
+    font-size:.75rem !important;
+    padding:7px 4px !important;
+    border-radius:12px !important;
+  }
+}
+/* =========================
    WHO
 ========================= */
 
@@ -4431,7 +4582,7 @@ body{
   margin-right: 10px !important;
   margin-left: 0 !important;
   text-align: right !important;
-  font-size: 1.80rem !important;
+  font-size: 1.30rem !important;
   line-height: 1.2 !important;
 }
 
@@ -4507,6 +4658,58 @@ body{
   font-size: 2rem !important;
   line-height: 1 !important;
   font-family: "HanakaDigits","HanakaDisplay","HanakaText",sans-serif !important;
+}
+/* =========================
+   WHO CONTROL BUTTONS ONLY FIX
+========================= */
+
+.whoBottomRow{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:16px !important;
+}
+
+.whoPointsSelect{
+  flex:1 1 auto !important;
+  min-width:0 !important;
+}
+
+.whoControlPanel{
+  flex:0 0 520px !important;
+  display:grid !important;
+  grid-template-columns:repeat(4, minmax(0, 1fr)) !important;
+  gap:10px !important;
+  align-items:stretch !important;
+}
+
+.whoControlPanel button{
+  width:100% !important;
+  min-width:0 !important;
+  height:48px !important;
+  border-radius:16px !important;
+  font-size:.95rem !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+@media (max-width:900px){
+  .whoBottomRow{
+    gap:10px !important;
+  }
+
+  .whoControlPanel{
+    flex:0 0 430px !important;
+    gap:7px !important;
+  }
+
+  .whoControlPanel button{
+    height:42px !important;
+    font-size:.78rem !important;
+    padding:6px 4px !important;
+    border-radius:13px !important;
+  }
 }
 /* =========================
    AUCTION - FINAL DESIGN
@@ -5103,6 +5306,94 @@ body{
   font-family:"HanakaDisplay", sans-serif !important;
   font-size:2.2rem !important;
   line-height:1 !important;
+}
+.auctionControlPanel{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:12px;
+  align-items:stretch;
+}
+
+.auctionControlPanel button{
+  min-height:46px;
+}
+
+.auctionDoubleBtn{
+  border:0;
+  border-radius:16px;
+  font-family:"HanakaText", sans-serif;
+  font-weight:900;
+  cursor:pointer;
+  color:#fff;
+  background:linear-gradient(180deg, #ffb15f 0%, #ff8a2a 100%);
+  box-shadow:
+    0 10px 20px rgba(255,138,42,.22),
+    inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .18s ease, filter .18s ease, opacity .18s ease;
+}
+
+.auctionDoubleBtn:hover:not(:disabled){
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+.auctionDoubleBtn.activeDouble{
+  background:linear-gradient(180deg, #ffcf75 0%, #ff9b2f 100%);
+  animation:auctionDoublePulse .65s ease-in-out infinite alternate;
+}
+
+.auctionDoubleBtn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none !important;
+}
+
+@keyframes auctionDoublePulse{
+  from{
+    box-shadow:
+      0 0 0 rgba(255,155,47,0),
+      0 10px 20px rgba(255,138,42,.22);
+  }
+  to{
+    box-shadow:
+      0 0 18px rgba(255,155,47,.65),
+      0 12px 24px rgba(255,138,42,.30);
+  }
+}
+/* =========================
+   AUCTION CONTROL PANEL - ONE ROW
+========================= */
+
+.auctionControlPanel{
+  display:grid !important;
+  grid-template-columns:repeat(6, minmax(0, 1fr)) !important;
+  gap:12px !important;
+  align-items:stretch !important;
+  width:100% !important;
+  margin-top:18px !important;
+}
+
+.auctionControlPanel button{
+  width:100% !important;
+  min-height:52px !important;
+  border-radius:18px !important;
+  font-size:1rem !important;
+  white-space:nowrap !important;
+}
+
+/* للأيباد والشاشات المتوسطة */
+@media (max-width: 900px){
+  .auctionControlPanel{
+    grid-template-columns:repeat(6, minmax(0, 1fr)) !important;
+    gap:8px !important;
+  }
+
+  .auctionControlPanel button{
+    min-height:46px !important;
+    font-size:.85rem !important;
+    border-radius:14px !important;
+    padding:8px 6px !important;
+  }
 }
 /* =========================
    FINAL / الفاصلة - FULL CSS FIX
@@ -6323,6 +6614,46 @@ body{
 @media (max-width: 760px){
   .finalScoreTeamNameFix{
     font-size: .9rem !important;
+  }
+}
+/* =========================
+   FINAL CONTROL BUTTONS - ONE ROW
+========================= */
+
+.finalControlsBar{
+  display:grid !important;
+  grid-template-columns:repeat(7, minmax(0, 1fr)) !important;
+  gap:10px !important;
+  width:100% !important;
+  align-items:stretch !important;
+}
+
+.finalControlsBar button{
+  width:100% !important;
+  min-width:0 !important;
+  min-height:48px !important;
+  border-radius:16px !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  font-size:.9rem !important;
+}
+
+/* الجولة الثالثة فيها 5 أزرار */
+.finalRound3ControlsBar{
+  grid-template-columns:repeat(5, minmax(0, 1fr)) !important;
+}
+
+@media (max-width:900px){
+  .finalControlsBar{
+    gap:6px !important;
+  }
+
+  .finalControlsBar button{
+    min-height:42px !important;
+    font-size:.72rem !important;
+    padding:7px 4px !important;
+    border-radius:12px !important;
   }
 }
 /* =========================
@@ -7738,7 +8069,43 @@ body{
   font-size:1.02rem !important;
   line-height:1.1 !important;
 }
+.archiveDoubleBtn{
+  background:linear-gradient(180deg, #ffb15f 0%, #ff8a2a 100%) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,138,42,.45) !important;
+  box-shadow:
+    0 10px 20px rgba(255,138,42,.22),
+    inset 0 1px 0 rgba(255,255,255,.35) !important;
+}
 
+.archiveDoubleBtn:hover:not(:disabled){
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+.archiveDoubleBtn.activeDouble{
+  background:linear-gradient(180deg, #ffcf75 0%, #ff9b2f 100%) !important;
+  animation:archiveDoublePulse .65s ease-in-out infinite alternate;
+}
+
+.archiveDoubleBtn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none !important;
+}
+
+@keyframes archiveDoublePulse{
+  from{
+    box-shadow:
+      0 0 0 rgba(255,155,47,0),
+      0 10px 20px rgba(255,138,42,.22);
+  }
+  to{
+    box-shadow:
+      0 0 18px rgba(255,155,47,.65),
+      0 12px 24px rgba(255,138,42,.30);
+  }
+}
 /* =========================
    ADMIN LAYOUT - STEP 1
 ========================= */
@@ -11179,125 +11546,42 @@ th{
   font-family:"HanakaDisplay", sans-serif !important;
   font-weight:400 !important;
 }
-/* =========================
-   SCREEN FLASH FX
-========================= */
+
 
 .screenFlashLayer{
-  position: fixed;
-  inset: 0;
-  z-index: 9998;
-  pointer-events: none;
-  opacity: 0;
-  overflow: hidden;
-}
-
-.screenFlashLayer::before{
-  content: "";
-  position: absolute;
-  inset: -8%;
-  opacity: 0;
-  transform-origin: center center;
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  pointer-events:none;
+  opacity:0;
 }
 
 .screenFlashLayer.flashCorrect{
-  animation: screenFlashWrap .75s ease-out;
-}
-
-.screenFlashLayer.flashCorrect::before{
-  background:
-    radial-gradient(circle at center,
-      rgba(255,255,255,.45) 0%,
-      rgba(120,255,150,.42) 22%,
-      rgba(0,255,90,.38) 48%,
-      rgba(0,220,80,.24) 68%,
-      rgba(0,0,0,0) 86%);
-  animation: screenPulseZoomCorrect .75s ease-out;
+  background:rgba(0,255,80,.62);
+  animation:hardFlashCorrect .48s ease-out;
 }
 
 .screenFlashLayer.flashWrong{
-  animation: screenFlashWrap .75s ease-out;
+  background:rgba(255,0,0,.66);
+  animation:hardFlashWrong .48s ease-out;
 }
 
-.screenFlashLayer.flashWrong::before{
-  background:
-    radial-gradient(circle at center,
-      rgba(255,255,255,.34) 0%,
-      rgba(255,120,120,.40) 22%,
-      rgba(255,0,0,.38) 48%,
-      rgba(220,0,0,.24) 68%,
-      rgba(0,0,0,0) 86%);
-  animation: screenPulseZoomWrong .75s ease-out;
+@keyframes hardFlashCorrect{
+  0%{ opacity:0; }
+  8%{ opacity:1; }
+  18%{ opacity:.18; }
+  30%{ opacity:1; }
+  42%{ opacity:.12; }
+  58%{ opacity:.95; }
+  100%{ opacity:0; }
 }
 
-@keyframes screenFlashWrap{
-  0%   { opacity: 0; }
-  8%   { opacity: 1; }
-  20%  { opacity: .42; }
-  32%  { opacity: 1; }
-  46%  { opacity: .35; }
-  58%  { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-@keyframes screenPulseZoomCorrect{
-  0%{
-    opacity: 0;
-    transform: scale(1.08);
-  }
-  8%{
-    opacity: 1;
-    transform: scale(.94);
-  }
-  20%{
-    opacity: .45;
-    transform: scale(1.03);
-  }
-  32%{
-    opacity: 1;
-    transform: scale(.95);
-  }
-  46%{
-    opacity: .38;
-    transform: scale(1.02);
-  }
-  58%{
-    opacity: 1;
-    transform: scale(.96);
-  }
-  100%{
-    opacity: 0;
-    transform: scale(1.08);
-  }
-}
-
-@keyframes screenPulseZoomWrong{
-  0%{
-    opacity: 0;
-    transform: scale(1.08);
-  }
-  8%{
-    opacity: 1;
-    transform: scale(.94);
-  }
-  20%{
-    opacity: .48;
-    transform: scale(1.03);
-  }
-  32%{
-    opacity: 1;
-    transform: scale(.95);
-  }
-  46%{
-    opacity: .40;
-    transform: scale(1.02);
-  }
-  58%{
-    opacity: 1;
-    transform: scale(.96);
-  }
-  100%{
-    opacity: 0;
-    transform: scale(1.08);
-  }
+@keyframes hardFlashWrong{
+  0%{ opacity:0; }
+  8%{ opacity:1; }
+  18%{ opacity:.20; }
+  30%{ opacity:1; }
+  42%{ opacity:.14; }
+  58%{ opacity:.98; }
+  100%{ opacity:0; }
 }

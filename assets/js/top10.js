@@ -3,29 +3,22 @@ let top10State = {
   scores: { A: 0, B: 0 },
   activeTeam: null,
   lastTeam: null,
-  question: {
-    1: "",
-    2: "",
-    3: ""
-  },
+  question: { 1: "", 2: "", 3: "" },
   errors: {
     1: { A: 0, B: 0 },
     2: { A: 0, B: 0 },
     3: { A: 0, B: 0 }
   },
-  opened: {
-    1: [],
-    2: [],
-    3: []
-  },
-  answers: {
-    1: {},
-    2: {},
-    3: {}
-  }
+  opened: { 1: [], 2: [], 3: [] },
+  answers: { 1: {}, 2: {}, 3: {} }
 }
 
 window.top10State = top10State
+
+let top10DoubleState = {
+  used: { A: false, B: false },
+  activeTeam: null
+}
 
 let currentTop10Answer = null
 let currentTop10Number = null
@@ -35,7 +28,6 @@ let top10AnimatingNumber = null
 
 let top10History = []
 const TOP10_HISTORY_LIMIT = 50
-
 const TOP10_STORAGE_KEY = "top10_state_v1"
 
 /* =========================
@@ -55,6 +47,7 @@ function saveTop10State() {
 
   const state = {
     top10State,
+    top10DoubleState,
     currentTop10Answer,
     currentTop10Number,
     top10TimerStarted,
@@ -75,6 +68,11 @@ function restoreTop10State(saved) {
   if (!saved || !saved.top10State) return
 
   top10State = saved.top10State
+  top10DoubleState = saved.top10DoubleState || {
+    used: { A: false, B: false },
+    activeTeam: null
+  }
+
   window.top10State = top10State
 
   currentTop10Answer = saved.currentTop10Answer || null
@@ -96,6 +94,84 @@ function restoreTop10State(saved) {
   }
 
   updateTop10UndoButtonState()
+  updateTop10DoubleButton()
+}
+
+/* =========================
+   Double
+========================= */
+
+function activateTop10Double() {
+  const team = top10State.activeTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (top10DoubleState.used[team]) {
+    showGameToast("هذا الفريق استخدم الدوبيلا مسبقًا")
+    return
+  }
+
+  if (top10DoubleState.used.A && top10DoubleState.used.B) {
+    showGameToast("تم استخدام الدوبيلا من الفريقين")
+    return
+  }
+
+  pushTop10History()
+
+  top10DoubleState.used[team] = true
+  top10DoubleState.activeTeam = team
+
+  showGameToast(`تم تفعيل الدوبيلا  لفريق ${team === "A" ? teamAName : teamBName}`)
+
+  updateTop10DoubleButton()
+  saveTop10State()
+}
+
+function getTop10ScoreValue(team, num) {
+  return top10DoubleState.activeTeam === team ? num * 2 : num
+}
+
+function clearTop10ActiveDouble() {
+  top10DoubleState.activeTeam = null
+}
+
+function updateTop10DoubleButton() {
+  const btn = document.getElementById("top10DoubleBtn")
+  if (!btn) return
+
+  const team = top10State.activeTeam
+  btn.classList.remove("activeDouble")
+
+  if (!team) {
+    btn.disabled = top10DoubleState.used.A && top10DoubleState.used.B
+    btn.innerText = "دوبيلا"
+    return
+  }
+
+  if (top10DoubleState.activeTeam === team) {
+    btn.disabled = true
+    btn.innerText = "الدوبيلا مفعّل"
+    btn.classList.add("activeDouble")
+    return
+  }
+
+  if (top10DoubleState.used[team]) {
+    btn.disabled = true
+    btn.innerText = " الدوبيلا"
+    return
+  }
+
+  if (top10DoubleState.used.A && top10DoubleState.used.B) {
+    btn.disabled = true
+    btn.innerText = "الدوبيلا مقفل"
+    return
+  }
+
+  btn.disabled = false
+  btn.innerText = "دوبيلا"
 }
 
 /* =========================
@@ -111,6 +187,7 @@ function createTop10Snapshot() {
 
   return {
     top10State: cloneTop10Data(top10State),
+    top10DoubleState: cloneTop10Data(top10DoubleState),
     currentTop10Answer,
     currentTop10Number,
     top10TimerStarted,
@@ -135,6 +212,11 @@ function restoreTop10Snapshot(snapshot) {
   timer = null
 
   top10State = cloneTop10Data(snapshot.top10State)
+  top10DoubleState = cloneTop10Data(snapshot.top10DoubleState || {
+    used: { A: false, B: false },
+    activeTeam: null
+  })
+
   window.top10State = top10State
 
   currentTop10Answer = snapshot.currentTop10Answer || null
@@ -159,6 +241,7 @@ function restoreTop10Snapshot(snapshot) {
   }
 
   updateTop10UndoButtonState()
+  updateTop10DoubleButton()
   saveTop10State()
 }
 
@@ -190,26 +273,19 @@ window.renderTop10 = async function () {
     scores: { A: 0, B: 0 },
     activeTeam: null,
     lastTeam: null,
-    question: {
-      1: "",
-      2: "",
-      3: ""
-    },
+    question: { 1: "", 2: "", 3: "" },
     errors: {
       1: { A: 0, B: 0 },
       2: { A: 0, B: 0 },
       3: { A: 0, B: 0 }
     },
-    opened: {
-      1: [],
-      2: [],
-      3: []
-    },
-    answers: {
-      1: {},
-      2: {},
-      3: {}
-    }
+    opened: { 1: [], 2: [], 3: [] },
+    answers: { 1: {}, 2: {}, 3: {} }
+  }
+
+  top10DoubleState = {
+    used: { A: false, B: false },
+    activeTeam: null
   }
 
   window.top10State = top10State
@@ -234,6 +310,7 @@ window.renderTop10 = async function () {
     highlightTop10TurnTeam()
     updateTop10TurnLabel()
     updateTop10UndoButtonState()
+    updateTop10DoubleButton()
     saveTop10State()
   }
 }
@@ -252,11 +329,8 @@ async function loadTop10RoundQuestion(round) {
     return
   }
 
-  if (data && data.length > 0) {
-    top10State.question[round] = data[0].question || "السؤال يظهر هنا"
-  } else {
-    top10State.question[round] = "السؤال يظهر هنا"
-  }
+  top10State.question[round] =
+    data && data.length > 0 ? data[0].question || "السؤال يظهر هنا" : "السؤال يظهر هنا"
 }
 
 function buildTop10HTML() {
@@ -272,46 +346,39 @@ function buildTop10HTML() {
 
         <div class="top10HeaderBar">
 
-  <div class="top10ScoreCard ${top10State.activeTeam === "A" ? "activeTeam" : ""}" id="top10TeamA" onclick="selectTop10Team('A')">
-    <div class="top10ScoreName top10ScoreNameLeft">${teamAName}</div>
+          <div class="top10ScoreCard ${top10State.activeTeam === "A" ? "activeTeam" : ""}" id="top10TeamA" onclick="selectTop10Team('A')">
+            <div class="top10ScoreName top10ScoreNameLeft">${teamAName}</div>
+            <div class="top10ScoreErrors" id="top10ErrorsA">${renderTop10Errors("A")}</div>
+            <div class="top10ScoreValue top10ScoreValueRight" id="top10ScoreA">${top10State.scores.A}</div>
+          </div>
 
-    <div class="top10ScoreErrors" id="top10ErrorsA">
-      ${renderTop10Errors("A")}
-    </div>
+          <div class="top10MiddleCard">
+            <div class="top10MiddleTimer" id="timer">0</div>
+            <div class="top10MiddleTurn" id="top10TurnLabel">
+              الدور: ${
+                top10State.activeTeam === "A"
+                  ? teamAName
+                  : top10State.activeTeam === "B"
+                  ? teamBName
+                  : "اختر فريق"
+              }
+            </div>
+          </div>
 
-    <div class="top10ScoreValue top10ScoreValueRight" id="top10ScoreA">${top10State.scores.A}</div>
-  </div>
+          <div class="top10ScoreCard ${top10State.activeTeam === "B" ? "activeTeam" : ""}" id="top10TeamB" onclick="selectTop10Team('B')">
+            <div class="top10ScoreValue top10ScoreValueLeft" id="top10ScoreB">${top10State.scores.B}</div>
+            <div class="top10ScoreErrors" id="top10ErrorsB">${renderTop10Errors("B")}</div>
+            <div class="top10ScoreName top10ScoreNameRight">${teamBName}</div>
+          </div>
 
-  <div class="top10MiddleCard">
-    <div class="top10MiddleTimer" id="timer">0</div>
-    <div class="top10MiddleTurn" id="top10TurnLabel">
-      الدور: ${
-        top10State.activeTeam === "A"
-          ? teamAName
-          : top10State.activeTeam === "B"
-          ? teamBName
-          : "اختر فريق"
-      }
-    </div>
-  </div>
-
-  <div class="top10ScoreCard ${top10State.activeTeam === "B" ? "activeTeam" : ""}" id="top10TeamB" onclick="selectTop10Team('B')">
-    <div class="top10ScoreValue top10ScoreValueLeft" id="top10ScoreB">${top10State.scores.B}</div>
-
-    <div class="top10ScoreErrors" id="top10ErrorsB">
-      ${renderTop10Errors("B")}
-    </div>
-
-    <div class="top10ScoreName top10ScoreNameRight">${teamBName}</div>
-  </div>
-
-</div>
+        </div>
 
         <div class="top10QuestionBox" id="top10QuestionBox">
           ${top10State.question[round] || "السؤال يظهر هنا"}
         </div>
 
         <div class="top10ControlPanel">
+          <button onclick="activateTop10Double()" id="top10DoubleBtn" class="top10DoubleBtn">دبل</button>
           <button onclick="startTop10TimerButton()" class="top10StartBtn">بدء المؤقت</button>
           <button onclick="showTop10Answer()" class="btnAnswer">إظهار الإجابات</button>
           <button onclick="addTop10Error()" class="top10ErrorBtnSingle">خطأ</button>
@@ -343,11 +410,7 @@ function renderTop10Rect(num, opened) {
 
   if (isOpened) {
     return `
-      <button
-        class="top10Rect opened${isAnimating ? " top10RevealFx" : ""}"
-        data-num="${num}"
-        disabled
-      >
+      <button class="top10Rect opened${isAnimating ? " top10RevealFx" : ""}" data-num="${num}" disabled>
         <span class="top10RectInner">${top10State.answers[round][num] || num}</span>
       </button>
     `
@@ -403,6 +466,7 @@ function selectTop10Team(team) {
   top10State.activeTeam = team
   highlightTop10TurnTeam()
   updateTop10TurnLabel()
+  updateTop10DoubleButton()
   saveTop10State()
 }
 
@@ -415,13 +479,10 @@ function highlightTop10TurnTeam() {
   a.classList.remove("activeTeam")
   b.classList.remove("activeTeam")
 
-  if (top10State.activeTeam === "A") {
-    a.classList.add("activeTeam")
-  }
+  if (top10State.activeTeam === "A") a.classList.add("activeTeam")
+  if (top10State.activeTeam === "B") b.classList.add("activeTeam")
 
-  if (top10State.activeTeam === "B") {
-    b.classList.add("activeTeam")
-  }
+  updateTop10DoubleButton()
 }
 
 function updateTop10TurnLabel() {
@@ -474,21 +535,22 @@ async function openTop10Number(num) {
   top10State.opened[round].push(num)
   top10State.answers[round][num] = data.answer || ""
 
-  if (top10State.activeTeam === "A") {
-    top10State.scores.A += num
-  } else if (top10State.activeTeam === "B") {
-    top10State.scores.B += num
-  }
+  const team = top10State.activeTeam
+  const points = getTop10ScoreValue(team, num)
+
+  if (team === "A") top10State.scores.A += points
+  if (team === "B") top10State.scores.B += points
+
+  clearTop10ActiveDouble()
 
   playGameSound("correct")
   top10AnimatingNumber = num
+  top10State.lastTeam = team
 
-  top10State.lastTeam = top10State.activeTeam
-
-  const otherTeam = getOtherTeam(top10State.activeTeam)
+  const otherTeam = getOtherTeam(team)
   if (top10State.errors[round][otherTeam] < 3) {
     top10State.activeTeam = otherTeam
-  } else if (top10State.errors[round][top10State.activeTeam] >= 3) {
+  } else if (top10State.errors[round][team] >= 3) {
     top10State.activeTeam = null
   }
 
@@ -500,8 +562,10 @@ async function openTop10Number(num) {
 
   clearInterval(timer)
   timer = null
+
   const timerBox = document.getElementById("timer")
   if (timerBox) timerBox.innerText = 0
+
   top10TimerStarted = false
   top10LastTickPlayed = null
 
@@ -645,15 +709,21 @@ function addTop10Error() {
 
   pushTop10History()
 
+  clearTop10ActiveDouble()
+
   top10State.errors[round][team] += 1
+
   playGameSound("wrong")
   flashScreen("wrong")
+
   window.top10State = top10State
 
   clearInterval(timer)
   timer = null
+
   const timerBox = document.getElementById("timer")
   if (timerBox) timerBox.innerText = 0
+
   top10TimerStarted = false
   top10LastTickPlayed = null
 
@@ -687,6 +757,7 @@ function updateTop10UIOnly() {
 
   highlightTop10TurnTeam()
   updateTop10TurnLabel()
+  updateTop10DoubleButton()
 
   const questionBox = document.getElementById("top10QuestionBox")
   if (questionBox) {
@@ -705,15 +776,11 @@ function updateTop10UIOnly() {
   const leftCol = document.querySelector(".top10LeftSide")
 
   if (rightCol) {
-    rightCol.innerHTML = rightSide
-      .map((num) => renderTop10Rect(num, top10State.opened[round]))
-      .join("")
+    rightCol.innerHTML = rightSide.map((num) => renderTop10Rect(num, top10State.opened[round])).join("")
   }
 
   if (leftCol) {
-    leftCol.innerHTML = leftSide
-      .map((num) => renderTop10Rect(num, top10State.opened[round]))
-      .join("")
+    leftCol.innerHTML = leftSide.map((num) => renderTop10Rect(num, top10State.opened[round])).join("")
   }
 
   updateTop10UndoButtonState()
@@ -747,6 +814,7 @@ async function nextTop10Round() {
     top10TimerStarted = false
     top10LastTickPlayed = null
     top10AnimatingNumber = null
+    top10DoubleState.activeTeam = null
 
     clearInterval(timer)
     timer = null
@@ -776,6 +844,7 @@ async function prevTop10Round() {
     top10TimerStarted = false
     top10LastTickPlayed = null
     top10AnimatingNumber = null
+    top10DoubleState.activeTeam = null
 
     clearInterval(timer)
     timer = null
@@ -808,6 +877,7 @@ function renderCurrentRoundTop10UI() {
   updateTop10Scores()
   highlightTop10TurnTeam()
   updateTop10TurnLabel()
+  updateTop10DoubleButton()
 
   const errorsA = document.getElementById("top10ErrorsA")
   const errorsB = document.getElementById("top10ErrorsB")
@@ -821,19 +891,16 @@ function renderCurrentRoundTop10UI() {
   const leftCol = document.querySelector(".top10LeftSide")
 
   if (rightCol) {
-    rightCol.innerHTML = rightSide
-      .map((num) => renderTop10Rect(num, top10State.opened[round]))
-      .join("")
+    rightCol.innerHTML = rightSide.map((num) => renderTop10Rect(num, top10State.opened[round])).join("")
   }
 
   if (leftCol) {
-    leftCol.innerHTML = leftSide
-      .map((num) => renderTop10Rect(num, top10State.opened[round]))
-      .join("")
+    leftCol.innerHTML = leftSide.map((num) => renderTop10Rect(num, top10State.opened[round])).join("")
   }
 
   updateTop10UndoButtonState()
 }
+
 function switchTop10Turn() {
   if (!top10State.activeTeam) {
     showGameToast("اختر الفريق أولاً")
@@ -852,5 +919,6 @@ function switchTop10Turn() {
   top10State.activeTeam = otherTeam
   highlightTop10TurnTeam()
   updateTop10TurnLabel()
+  updateTop10DoubleButton()
   saveTop10State()
 }
