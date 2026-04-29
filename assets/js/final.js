@@ -227,9 +227,24 @@ function activateFinalDouble() {
     return
   }
 
-  if (roundState.pendingScore || roundState.currentNumber !== null) {
-    showGameToast("الدبل قبل اختيار الرقم فقط")
-    return
+  if (finalState.round === 1) {
+    if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
+      showGameToast("اختر الرقم أولاً")
+      return
+    }
+
+    if (
+      finalState.round1.answerShown ||
+      Number(finalState.round1.shownQuestionPartsCount || 0) > 0
+    ) {
+      showGameToast("الدبل قبل ظهور السؤال فقط")
+      return
+    }
+  } else {
+    if (roundState.pendingScore || roundState.currentNumber !== null) {
+      showGameToast("الدبل قبل اختيار الرقم فقط")
+      return
+    }
   }
 
   if (finalState.doubleState.used[team]) {
@@ -270,33 +285,46 @@ function updateFinalDoubleButton() {
 
   btn.classList.remove("activeDouble")
 
-  if (roundState?.pendingScore || roundState?.currentNumber !== null) {
-    btn.disabled = true
-    btn.innerText = "دوبيلا"
-    return
+  if (finalState.round === 1) {
+    if (
+      !finalState.round1.pendingScore ||
+      finalState.round1.currentNumber === null ||
+      finalState.round1.answerShown ||
+      Number(finalState.round1.shownQuestionPartsCount || 0) > 0
+    ) {
+      btn.disabled = true
+      btn.innerText = "دبل"
+      return
+    }
+  } else {
+    if (roundState?.pendingScore || roundState?.currentNumber !== null) {
+      btn.disabled = true
+      btn.innerText = "دبل"
+      return
+    }
   }
 
   if (!team) {
     btn.disabled = finalState.doubleState.used.A && finalState.doubleState.used.B
-    btn.innerText = "دوبيلا"
+    btn.innerText = "دبل"
     return
   }
 
   if (finalState.doubleState.activeTeam === team) {
     btn.disabled = true
-    btn.innerText = "الدوبيلا مفعّل"
+    btn.innerText = "دبل مفعّل"
     btn.classList.add("activeDouble")
     return
   }
 
   if (finalState.doubleState.used[team]) {
     btn.disabled = true
-    btn.innerText = "استخدم الدوبيلا"
+    btn.innerText = "استخدم الدبل"
     return
   }
 
   btn.disabled = false
-  btn.innerText = "دوبيلا"
+  btn.innerText = "دبل"
 }
 
 function syncFinalGlobals() {
@@ -850,7 +878,15 @@ function renderFinalTeamLayout() {
 }
 
 function selectFinalTeam(team) {
-  if (finalState.round === 1) finalState.round1.activeTeam = team
+  if (finalState.round === 1) {
+    if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
+      showGameToast("اختر الرقم أولاً")
+      return
+    }
+
+    finalState.round1.activeTeam = team
+  }
+
   if (finalState.round === 2) finalState.round2.activeTeam = team
   if (finalState.round === 3) finalState.round3.activeTeam = team
 
@@ -973,11 +1009,6 @@ async function openFinalRound1Card(number) {
     return
   }
 
-  if (!finalState.round1.activeTeam) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
-
   if (finalState.round1.opened.includes(number)) return
 
   pushFinalHistory()
@@ -993,6 +1024,7 @@ async function openFinalRound1Card(number) {
   finalState.round1.answerShown = false
   finalState.round1.errors.A = 0
   finalState.round1.errors.B = 0
+  finalState.round1.activeTeam = null
 
   renderFinalRound1()
   renderFinalErrors()
@@ -1194,14 +1226,14 @@ function finalRound1Wrong() {
 }
 
 function finalRound1Correct() {
-  const team = finalState.round1.activeTeam
+  const answeringTeam = finalState.round1.activeTeam
 
   if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
     showGameToast("اختر رقمًا أولاً")
     return
   }
 
-  if (!team) {
+  if (!answeringTeam) {
     showGameToast("اختر الفريق أولاً")
     return
   }
@@ -1213,8 +1245,17 @@ function finalRound1Correct() {
     loadFinalRound1Current()
   }
 
-  finalState.round1.scores[team] += getFinalScoreValue(team, 1)
-  clearFinalActiveDouble()
+  const doubleTeam = finalState.doubleState?.activeTeam || null
+
+  if (doubleTeam) {
+    if (answeringTeam === doubleTeam) {
+      finalState.round1.scores[doubleTeam] += 2
+    }
+
+    clearFinalActiveDouble()
+  } else {
+    finalState.round1.scores[answeringTeam] += 1
+  }
 
   playGameSound("correct")
   flashScreen("correct")

@@ -178,11 +178,10 @@ window.renderWarmup = async function () {
       </div>
 
       <div class="warmupControlPanel">
-        <button onclick="activateWarmupDouble()" class="warmupDoubleBtn" id="warmupDoubleBtn">دبل</button>
-        <button onclick="showWarmupAnswer()" class="btnAnswer">إظهار الإجابة</button>
-        <button onclick="warmupWrong()" class="btnWrong">✕ خطأ</button>
-        <button onclick="warmupCorrect()" class="btnCorrect">✓ صح</button>
-      </div>
+  <button onclick="activateWarmupDouble()" class="warmupDoubleBtn" id="warmupDoubleBtn">دبل</button>
+  <button onclick="warmupWrong()" class="btnWrong">✕ خطأ</button>
+  <button onclick="warmupCorrect()" class="btnCorrect">✓ صح</button>
+</div>
 
       <div class="warmupGrid">
         ${createWarmupCategory(1, categories[1] || "الفئة 1")}
@@ -578,7 +577,24 @@ function resetWarmupTimer() {
    Actions
 ========================= */
 
+let warmupResultPending = false
+
+function showWarmupAnswerForSeconds(callback) {
+  const box = document.getElementById("questionBox")
+
+  if (box && window.currentAnswer) {
+    box.innerText = window.currentAnswer
+  }
+
+  setTimeout(() => {
+    warmupResultPending = false
+    callback()
+  }, 5000)
+}
+
 function warmupCorrect() {
+  if (warmupResultPending) return
+
   if (!selectedTeam) {
     showGameToast("اختر الفريق أولاً")
     return
@@ -589,75 +605,87 @@ function warmupCorrect() {
     return
   }
 
-  const team = selectedTeam
-  const points = getWarmupScoreValue(team)
-
-  if (team === "A") {
-    warmupScoreA += points
-    const box = document.getElementById("roundScoreA")
-    if (box) box.innerText = warmupScoreA
-  }
-
-  if (team === "B") {
-    warmupScoreB += points
-    const box = document.getElementById("roundScoreB")
-    if (box) box.innerText = warmupScoreB
-  }
-
-  clearWarmupActiveDouble()
+  warmupResultPending = true
+  resetWarmupTimer()
 
   playGameSound("correct")
   flashScreen("correct")
 
-  lastAnsweredTeam = selectedTeam
-  selectedTeam = getNextWarmupTeam()
-  highlightWarmupSelectedTeam(selectedTeam)
+  showWarmupAnswerForSeconds(() => {
+    const team = selectedTeam
+    const points = getWarmupScoreValue(team)
 
-  window.currentSegmentScores = {
-    A: warmupScoreA,
-    B: warmupScoreB
-  }
+    if (team === "A") {
+      warmupScoreA += points
+      const box = document.getElementById("roundScoreA")
+      if (box) box.innerText = warmupScoreA
+    }
 
-  const questionBox = document.getElementById("questionBox")
-  if (questionBox) questionBox.innerText = "اختر رقم السؤال"
+    if (team === "B") {
+      warmupScoreB += points
+      const box = document.getElementById("roundScoreB")
+      if (box) box.innerText = warmupScoreB
+    }
 
-  currentPoints = 0
-  window.currentAnswer = ""
-  warmupQuestionLocked = false
-  currentWarmupQuestionKey = null
-  clearWarmupSelectedButton()
-  resetWarmupTimer()
-  updateWarmupDoubleButton()
-  saveWarmupState()
+    clearWarmupActiveDouble()
+
+    lastAnsweredTeam = selectedTeam
+    selectedTeam = getNextWarmupTeam()
+    highlightWarmupSelectedTeam(selectedTeam)
+
+    window.currentSegmentScores = {
+      A: warmupScoreA,
+      B: warmupScoreB
+    }
+
+    const questionBox = document.getElementById("questionBox")
+    if (questionBox) questionBox.innerText = "اختر رقم السؤال"
+
+    currentPoints = 0
+    window.currentAnswer = ""
+    warmupQuestionLocked = false
+    currentWarmupQuestionKey = null
+    clearWarmupSelectedButton()
+    resetWarmupTimer()
+    updateWarmupDoubleButton()
+    saveWarmupState()
+  })
 }
 
 function warmupWrong() {
+  if (warmupResultPending) return
+
   if (!warmupQuestionLocked) {
     showGameToast("اختر سؤالاً أولاً")
     return
   }
 
-  clearWarmupActiveDouble()
+  warmupResultPending = true
+  resetWarmupTimer()
 
   playGameSound("wrong")
   flashScreen("wrong")
 
-  if (selectedTeam) {
-    lastAnsweredTeam = selectedTeam
-  }
+  showWarmupAnswerForSeconds(() => {
+    clearWarmupActiveDouble()
 
-  selectedTeam = getNextWarmupTeam()
-  highlightWarmupSelectedTeam(selectedTeam)
+    if (selectedTeam) {
+      lastAnsweredTeam = selectedTeam
+    }
 
-  const questionBox = document.getElementById("questionBox")
-  if (questionBox) questionBox.innerText = "اختر رقم السؤال"
+    selectedTeam = getNextWarmupTeam()
+    highlightWarmupSelectedTeam(selectedTeam)
 
-  currentPoints = 0
-  window.currentAnswer = ""
-  warmupQuestionLocked = false
-  currentWarmupQuestionKey = null
-  clearWarmupSelectedButton()
-  resetWarmupTimer()
-  updateWarmupDoubleButton()
-  saveWarmupState()
+    const questionBox = document.getElementById("questionBox")
+    if (questionBox) questionBox.innerText = "اختر رقم السؤال"
+
+    currentPoints = 0
+    window.currentAnswer = ""
+    warmupQuestionLocked = false
+    currentWarmupQuestionKey = null
+    clearWarmupSelectedButton()
+    resetWarmupTimer()
+    updateWarmupDoubleButton()
+    saveWarmupState()
+  })
 }

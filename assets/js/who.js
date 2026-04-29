@@ -179,7 +179,7 @@ window.renderWho = function () {
 
         <div class="whoControlPanel">
           <button onclick="activateWhoDouble()" class="whoDoubleBtn" id="whoDoubleBtn">دبل</button>
-          <button onclick="showWhoAnswer()" class="btnAnswer">إظهار الإجابة</button>
+          <button onclick="showWhoAnswer()" class="btnAnswer"> الإجابة</button>
           <button onclick="whoCorrect()" class="btnCorrect">✓ صح</button>
           <button onclick="whoWrong()" class="btnWrong">✕ خطأ</button>
         </div>

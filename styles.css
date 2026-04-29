@@ -3064,23 +3064,27 @@ body{
   font-size:inherit !important;
   line-height:inherit !important;
 }
+
 /* =========================
    WARMUP CONTROL PANEL - CLEAN
 ========================= */
 
 .warmupControlPanel{
   display:grid !important;
-  grid-template-columns:repeat(4, minmax(0, 1fr)) !important;
-  gap:12px !important;
+  grid-template-columns:repeat(3, minmax(0, 130px)) !important;
+  gap:60px !important;
   align-items:stretch !important;
+  justify-content:center !important;
   width:100% !important;
 }
 
 .warmupControlPanel button{
   width:100% !important;
-  min-height:52px !important;
-  border-radius:18px !important;
+  min-height:42px !important;
+  border-radius:14px !important;
   white-space:nowrap !important;
+  font-size:.86rem !important;
+  padding:8px 10px !important;
 }
 
 .warmupDoubleBtn{
@@ -3089,10 +3093,10 @@ body{
   font-weight:900;
   cursor:pointer;
   color:#fff;
-  background:linear-gradient(180deg, #ffb15f 0%, #ff8a2a 100%);
+  background:linear-gradient(180deg, #8f969e 0%, #5f6872 100%) !important;
   box-shadow:
-    0 10px 20px rgba(255,138,42,.22),
-    inset 0 1px 0 rgba(255,255,255,.35);
+    0 8px 14px rgba(70,78,88,.18),
+    inset 0 1px 0 rgba(255,255,255,.25);
   transition:transform .18s ease, filter .18s ease, opacity .18s ease;
 }
 
@@ -4300,7 +4304,7 @@ body{
     inset 0 1px 0 rgba(255,255,255,.78);
   color:#2F4158;
   font-family:"HanakaText", sans-serif;
-  font-size:clamp(1.35rem,1.9vw,1.9rem);
+  font-size:clamp(2.35rem,1.9vw,1.9rem);
   line-height:1.7;
   display:flex;
   align-items:center;
