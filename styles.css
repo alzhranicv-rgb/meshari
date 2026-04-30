@@ -4716,6 +4716,19 @@ body{
   }
 }
 /* =========================
+   WHO ANSWER TEXT FIX
+========================= */
+
+.whoAnswer{
+  font-family:"HanakaDisplay", "HanakaText", sans-serif !important;
+  font-size:clamp(2rem, 4vw, 4.5rem) !important;
+  line-height:1.25 !important;
+  font-weight:900 !important;
+  color:#1f2a36 !important;
+  text-align:center !important;
+  padding:28px 34px !important;
+}
+/* =========================
    AUCTION - FINAL DESIGN
 ========================= */
 
@@ -5398,6 +5411,19 @@ body{
     border-radius:14px !important;
     padding:8px 6px !important;
   }
+}
+/* =========================
+   AUCTION ANSWER TEXT FIX
+========================= */
+
+.auctionBottomAnswer{
+  font-family:"HanakaDisplay", "HanakaText", sans-serif !important;
+  font-size:clamp(2rem, 3vw, 3.5rem) !important;
+  line-height:1.25 !important;
+  font-weight:900 !important;
+  color:#1f2a36 !important;
+  text-align:center !important;
+  padding:24px 32px !important;
 }
 /* =========================
    FINAL / الفاصلة - FULL CSS FIX
