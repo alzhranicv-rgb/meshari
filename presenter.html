@@ -7,50 +7,32 @@
   <link rel="stylesheet" href="presenter.css" />
 </head>
 <body>
-
+<div class="card" id="presenterModelCard">
+  <div class="label">اختر النموذج</div>
+  <select id="presenterModelSelect" onchange="setPresenterModel()">
+    <option value="">اختر النموذج</option>
+  </select>
+</div>
   <div class="presenterPage">
+
     <div class="presenterHeader">
-      <h1>لوحة المقدم</h1>
-      <select id="presenterSegment">
-        <option value="warmup">التسخين</option>
-        <option value="top10">Top 10</option>
-        <option value="auction">فتبلة</option>
-        <option value="who">من هو</option>
-        <option value="final">الفاصلة</option>
-        <option value="archive">الأرشيف</option>
-      </select>
+      <button class="backBtn hidden" id="presenterBackBtn" onclick="showPresenterHome()">رجوع</button>
+      <h1 id="presenterTitle">لوحة المقدم</h1>
     </div>
 
-    <div class="presenterCard">
-      <label>رقم النموذج</label>
-      <input id="presenterModel" type="number" value="1" />
+    <div id="presenterHome" class="presenterSegments">
+      <button onclick="openPresenterSegment('warmup')">التسخين</button>
+      <button onclick="openPresenterSegment('top10')">Top 10</button>
+      <button onclick="openPresenterSegment('auction')">فتبلة</button>
+      <button onclick="openPresenterSegment('who')">من هو</button>
+      <button onclick="openPresenterSegment('final')">الفاصلة</button>
+      <button onclick="openPresenterSegment('archive')">الأرشيف</button>
     </div>
 
-    <div class="presenterTeams">
-      <button onclick="presenterCommand('selectTeam', { team:'A' })">الفريق A</button>
-      <button onclick="presenterCommand('selectTeam', { team:'B' })">الفريق B</button>
-    </div>
-
-    <div class="presenterActions">
-      <button class="gray" onclick="presenterCommand('double')">دبل</button>
-      <button class="red" onclick="presenterCommand('wrong')">خطأ</button>
-      <button class="green" onclick="presenterCommand('correct')">صح</button>
-    </div>
-
-    <div class="presenterCard">
-      <label>فتح رقم / سؤال</label>
-      <div class="presenterInline">
-        <input id="presenterNumber" type="number" placeholder="رقم" />
-        <button onclick="openPresenterNumber()">فتح</button>
-      </div>
-    </div>
-
-    <div class="presenterActions">
-      <button onclick="presenterCommand('showQuestion')">إظهار السؤال</button>
-      <button onclick="presenterCommand('showAnswer')">إظهار الإجابة</button>
-    </div>
+    <div id="presenterPanel" class="presenterPanel hidden"></div>
 
     <div class="presenterToast" id="presenterToast">تم الإرسال</div>
+
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>

@@ -30,7 +30,7 @@ function handlePresenterCommand(cmd) {
 
   if (segment === "warmup") {
     if (action === "selectTeam") selectWarmupTeam(data.team)
-    if (action === "openNumber") openWarmupQuestion(1, Number(data.number))
+    if (action === "openNumber") openWarmupQuestion(Number(data.category || 1), Number(data.number))
     if (action === "double") activateWarmupDouble()
     if (action === "correct") warmupCorrect()
     if (action === "wrong") warmupWrong()
