@@ -245,12 +245,63 @@ function handlePresenterCommand(cmd) {
   ========================= */
 
   if (segment === "archive") {
-    if (action === "selectTeam") safeRunPresenterAction(() => selectArchiveTeam(data.team))
-    if (action === "openNumber") safeRunPresenterAction(() => toggleArchiveItem(Number(data.number)))
-    if (action === "correct") safeRunPresenterAction(() => showArchiveAnswer())
-    if (action === "wrong") safeRunPresenterAction(() => addArchiveError())
-    if (action === "showAnswer") safeRunPresenterAction(() => showArchiveAnswer())
+    if (action === "selectTeam") {
+      safeRunPresenterAction(() => selectArchiveTeam(data.team))
+    }
+
+    if (action === "openNumber") {
+      safeRunPresenterAction(() => {
+        if (data.round && archiveState.round !== Number(data.round)) {
+          archiveState.round = Number(data.round)
+          archiveState.activeTeam = null
+          archiveLastTeam = null
+          archiveTurnLocked = false
+          archiveRemainingPoints = 0
+          archiveTimerStarted = false
+          archiveLastTickPlayed = null
+
+          clearInterval(archiveTimer)
+          archiveTimer = null
+
+          renderArchiveRoundUI()
+          saveArchiveState()
+        }
+
+        setTimeout(() => {
+          toggleArchiveItem(Number(data.number))
+        }, 150)
+      })
+    }
+
+    if (action === "double") {
+      safeRunPresenterAction(() => activateArchiveDouble())
+    }
+
+    if (action === "startTimer") {
+      safeRunPresenterAction(() => startArchiveTimer())
+    }
+
+    if (action === "showAnswer") {
+      safeRunPresenterAction(() => showArchiveAnswer())
+    }
+
+    if (action === "correct") {
+      safeRunPresenterAction(() => showArchiveAnswer())
+    }
+
+    if (action === "wrong") {
+      safeRunPresenterAction(() => addArchiveError())
+    }
+
+    if (action === "undo") {
+      safeRunPresenterAction(() => undoArchiveAction())
+    }
+
+    if (action === "nextRound") {
+      safeRunPresenterAction(() => nextArchiveRound())
+    }
   }
+
 }
 
 window.addEventListener("load", () => {

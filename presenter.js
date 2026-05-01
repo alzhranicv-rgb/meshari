@@ -640,32 +640,131 @@ async function loadPresenterFinalAnswers(number = null) {
 ========================= */
 
 function renderArchivePresenter() {
-  setTitle("الأرشيف", "الجولات والأرقام")
+  setTitle("الأرشيف", "الجولات والمطلوب")
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-    
     ${presenterTeamControls()}
 
-    <div class="presenterMiniActions">
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
-      <button class="presenterBtn green" onclick="sendCommand('correct')">إظهار الإجابة</button>
-    </div>
-
     <section class="presenterCard">
-      <div class="presenterLabel">فتح رقم</div>
-      <div class="presenterGrid">
-        ${[1,2,3,4,5,6,7,8,9,10].map(n => `
-          <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{number:${n}})">${n}</button>
-        `).join("")}
+      <div class="presenterLabel">الجولة</div>
+      <div class="presenterRoundTabs">
+        <button id="archiveRoundBtn1" onclick="setPresenterArchiveRound(1)">1</button>
+        <button id="archiveRoundBtn2" onclick="setPresenterArchiveRound(2)">2</button>
+        <button id="archiveRoundBtn3" onclick="setPresenterArchiveRound(3)">3</button>
+        <button id="archiveRoundBtn4" onclick="setPresenterArchiveRound(4)">4</button>
       </div>
     </section>
 
+    <div class="presenterActions">
+      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
+      <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
+    </div>
+
+    <div class="presenterMiniActions">
+      <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
+      <button class="presenterBtn dark" onclick="sendCommand('undo')">تراجع</button>
+    </div>
+
+    <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
+      الجولة التالية
+    </button>
+
     <section class="presenterCard">
-      <div class="presenterLabel">ملاحظة</div>
-      <div class="presenterNoteText">الأرشيف يعتمد على الجولة المفتوحة في شاشة العرض.</div>
+      <div class="presenterLabel">فتح رقم</div>
+      <div class="presenterGrid" id="archivePresenterNumbers"></div>
+    </section>
+
+    <section class="presenterCard">
+      <div class="presenterLabel">المطلوب</div>
+      <div class="presenterAnswerText" id="archivePresenterRequired">—</div>
+    </section>
+
+    <section class="presenterCard">
+      <div class="presenterLabel">أسئلة / عناصر الجولة</div>
+      <div class="presenterList" id="archivePresenterItems">—</div>
     </section>
   `
+
+  setPresenterArchiveRound(presenterArchiveRound)
+}
+
+function setPresenterArchiveRound(round) {
+  presenterArchiveRound = Number(round)
+
+  for (let i = 1; i <= 4; i++) {
+    const btn = document.getElementById(`archiveRoundBtn${i}`)
+    if (btn) btn.classList.toggle("active", i === presenterArchiveRound)
+  }
+
+  loadPresenterArchiveItems()
+}
+
+async function loadPresenterArchiveItems() {
+  const listBox = document.getElementById("archivePresenterItems")
+  const requiredBox = document.getElementById("archivePresenterRequired")
+  const numbersBox = document.getElementById("archivePresenterNumbers")
+
+  if (listBox) listBox.innerHTML = "جاري التحميل..."
+  if (requiredBox) requiredBox.innerText = "—"
+
+  const { data, error } = await db
+    .from("archive_items")
+    .select("*")
+    .eq("model", presenterModel)
+    .eq("round", presenterArchiveRound)
+    .order("position", { ascending: true })
+
+  if (error) {
+    console.log(error)
+    if (listBox) listBox.innerHTML = "تعذر تحميل الأرشيف"
+    return
+  }
+
+  const items = data || []
+  const requiredItem = items.find(item => String(item.label || "").trim() === "المطلوب")
+
+  if (requiredBox) {
+    requiredBox.innerText = requiredItem
+      ? `رقم ${requiredItem.position} — ${requiredItem.text || requiredItem.label || "المطلوب"}`
+      : "لا يوجد مطلوب"
+  }
+
+  if (numbersBox) {
+    numbersBox.innerHTML = items.map(item => `
+      <button
+        class="presenterNumberBtn"
+        onclick="openArchivePresenterItem(${Number(item.position)})"
+      >
+        ${item.position}
+      </button>
+    `).join("")
+  }
+
+  if (listBox) {
+    listBox.innerHTML = items.map(item => {
+      const label = item.label ? `<strong>${item.label}</strong><br>` : ""
+      const text = item.text || item.answer || item.title || "-"
+      const imageText = item.image ? `<br>صورة: موجودة` : ""
+
+      return `
+        <div class="presenterListItem">
+          <strong>رقم ${item.position}</strong><br>
+          ${label}
+          ${text}
+          ${imageText}
+        </div>
+      `
+    }).join("")
+  }
+}
+
+function openArchivePresenterItem(number) {
+  sendCommand("openNumber", {
+    number,
+    round: presenterArchiveRound
+  })
 }
 
 /* =========================
