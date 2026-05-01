@@ -67,12 +67,13 @@ function handlePresenterCommand(cmd) {
   }
 
   if (segment === "who") {
-    if (action === "selectTeam") selectWhoTeam(data.team)
-    if (action === "openNumber") chooseWho(Number(data.number))
-    if (action === "correct") whoCorrect()
-    if (action === "wrong") whoWrong()
-    if (action === "showAnswer") showWhoAnswer()
-  }
+  if (action === "selectTeam") selectWhoTeam(data.team)
+  if (action === "setPoints") setWhoPoints(Number(data.points))
+  if (action === "openNumber") chooseWho(Number(data.number))
+  if (action === "correct") whoCorrect()
+  if (action === "wrong") whoWrong()
+  if (action === "showAnswer") showWhoAnswer()
+}
 
   if (segment === "top10") {
     if (action === "selectTeam") selectTop10Team(data.team)

@@ -7,29 +7,56 @@
   <link rel="stylesheet" href="presenter.css" />
 </head>
 <body>
-<div class="card" id="presenterModelCard">
-  <div class="label">اختر النموذج</div>
-  <select id="presenterModelSelect" onchange="setPresenterModel()">
-    <option value="">اختر النموذج</option>
-  </select>
-</div>
+
   <div class="presenterPage">
 
-    <div class="presenterHeader">
-      <button class="backBtn hidden" id="presenterBackBtn" onclick="showPresenterHome()">رجوع</button>
-      <h1 id="presenterTitle">لوحة المقدم</h1>
-    </div>
+    <header class="presenterHeader">
+      <button class="presenterBack hidden" id="presenterBackBtn" onclick="showPresenterHome()">رجوع</button>
 
-    <div id="presenterHome" class="presenterSegments">
-      <button onclick="openPresenterSegment('warmup')">التسخين</button>
-      <button onclick="openPresenterSegment('top10')">Top 10</button>
-      <button onclick="openPresenterSegment('auction')">فتبلة</button>
-      <button onclick="openPresenterSegment('who')">من هو</button>
-      <button onclick="openPresenterSegment('final')">الفاصلة</button>
-      <button onclick="openPresenterSegment('archive')">الأرشيف</button>
-    </div>
+      <div class="presenterHeaderText">
+        <h1 id="presenterTitle">لوحة المقدم</h1>
+        <p id="presenterSubtitle">اختر النموذج ثم الفقرة</p>
+      </div>
+    </header>
 
-    <div id="presenterPanel" class="presenterPanel hidden"></div>
+    <main id="presenterHome" class="presenterHome">
+
+      <section class="presenterCard presenterModelCard">
+        <div class="presenterLabel">النموذج</div>
+        <select id="presenterModelSelect" onchange="setPresenterModel()">
+          <option value="">اختر النموذج</option>
+        </select>
+      </section>
+
+      <section class="presenterSegments">
+        <button onclick="openPresenterSegment('warmup')" class="presenterSegmentBtn">
+          <span>التسخين</span>
+        </button>
+
+        <button onclick="openPresenterSegment('top10')" class="presenterSegmentBtn">
+          <span>Top 10</span>
+        </button>
+
+        <button onclick="openPresenterSegment('auction')" class="presenterSegmentBtn">
+          <span>فتبلة</span>
+        </button>
+
+        <button onclick="openPresenterSegment('who')" class="presenterSegmentBtn">
+          <span>من هو</span>
+        </button>
+
+        <button onclick="openPresenterSegment('final')" class="presenterSegmentBtn">
+          <span>الفاصلة</span>
+        </button>
+
+        <button onclick="openPresenterSegment('archive')" class="presenterSegmentBtn">
+          <span>الأرشيف</span>
+        </button>
+      </section>
+
+    </main>
+
+    <main id="presenterPanel" class="presenterPanel hidden"></main>
 
     <div class="presenterToast" id="presenterToast">تم الإرسال</div>
 
