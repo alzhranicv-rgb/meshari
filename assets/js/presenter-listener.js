@@ -19,6 +19,30 @@ function safeRunPresenterAction(fn) {
   }
 }
 
+function hideDisplayControls() {
+  document.body.classList.add("presenterHideDisplayControls")
+  localStorage.setItem("presenter_hide_controls", "1")
+}
+
+function showDisplayControls() {
+  document.body.classList.remove("presenterHideDisplayControls")
+  localStorage.setItem("presenter_hide_controls", "0")
+}
+
+function toggleDisplayControls() {
+  if (document.body.classList.contains("presenterHideDisplayControls")) {
+    showDisplayControls()
+  } else {
+    hideDisplayControls()
+  }
+}
+
+function restoreDisplayControlsMode() {
+  if (localStorage.getItem("presenter_hide_controls") === "1") {
+    document.body.classList.add("presenterHideDisplayControls")
+  }
+}
+
 function listenPresenterCommands() {
   if (!window.db) {
     console.log("Presenter listener: db not ready")
@@ -57,17 +81,6 @@ function listenPresenterCommands() {
       console.log("Presenter listener status:", status)
     })
 }
-function hideDisplayControls() {
-  document.body.classList.add("presenterHideDisplayControls")
-}
-
-function showDisplayControls() {
-  document.body.classList.remove("presenterHideDisplayControls")
-}
-
-function toggleDisplayControls() {
-  document.body.classList.toggle("presenterHideDisplayControls")
-}
 
 function handlePresenterCommand(cmd) {
   const segment = cmd.segment
@@ -75,20 +88,21 @@ function handlePresenterCommand(cmd) {
   const data = cmd.payload || {}
 
   console.log("Handle:", segment, action, data)
+
   if (action === "toggleDisplayControls") {
-  toggleDisplayControls()
-  return
-}
+    toggleDisplayControls()
+    return
+  }
 
-if (action === "showDisplayControls") {
-  showDisplayControls()
-  return
-}
+  if (action === "hideDisplayControls") {
+    hideDisplayControls()
+    return
+  }
 
-if (action === "hideDisplayControls") {
-  hideDisplayControls()
-  return
-}
+  if (action === "showDisplayControls") {
+    showDisplayControls()
+    return
+  }
 
   if (action === "endSegment") {
     safeRunPresenterAction(() => endCurrentSegment())
@@ -240,5 +254,6 @@ if (action === "hideDisplayControls") {
 }
 
 window.addEventListener("load", () => {
+  restoreDisplayControlsMode()
   setTimeout(listenPresenterCommands, 1500)
 })

@@ -11615,3 +11615,17 @@ th{
   58%{ opacity:.98; }
   100%{ opacity:0; }
 }
+/* =========================
+   PRESENTER MODE - HIDE DISPLAY CONTROLS
+========================= */
+
+body.presenterHideDisplayControls .warmupControlPanel,
+body.presenterHideDisplayControls .top10ControlPanel,
+body.presenterHideDisplayControls .auctionControlPanel,
+body.presenterHideDisplayControls .whoControlPanel,
+body.presenterHideDisplayControls .archiveControlButtons,
+body.presenterHideDisplayControls .finalControlsBar,
+body.presenterHideDisplayControls .segmentControls .backBtn,
+body.presenterHideDisplayControls .segmentControls .endBtn{
+  display:none !important;
+}
