@@ -2,7 +2,13 @@ let presenterChannel = null
 let lastPresenterCommandId = 0
 
 function getDisplayModel() {
-  return Number(window.currentModel || localStorage.getItem("current_model") || localStorage.getItem("selected_model") || 1)
+  return Number(
+    window.currentModel ||
+    localStorage.getItem("game_model") ||
+    localStorage.getItem("current_model") ||
+    localStorage.getItem("selected_model") ||
+    1
+  )
 }
 
 function listenPresenterCommands() {
@@ -31,6 +37,7 @@ function listenPresenterCommands() {
       },
       payload => {
         console.log("Presenter command received:", payload.new)
+
         const cmd = payload.new
         if (!cmd || cmd.id === lastPresenterCommandId) return
 
@@ -50,6 +57,10 @@ function handlePresenterCommand(cmd) {
 
   console.log("Handle:", segment, action, data)
 
+  /* =========================
+     WARMUP
+  ========================= */
+
   if (segment === "warmup") {
     if (action === "selectTeam") selectWarmupTeam(data.team)
     if (action === "openNumber") openWarmupQuestion(Number(data.category || 1), Number(data.number))
@@ -57,6 +68,10 @@ function handlePresenterCommand(cmd) {
     if (action === "correct") warmupCorrect()
     if (action === "wrong") warmupWrong()
   }
+
+  /* =========================
+     AUCTION
+  ========================= */
 
   if (segment === "auction") {
     if (action === "selectTeam") selectAuctionTeam(data.team)
@@ -66,36 +81,74 @@ function handlePresenterCommand(cmd) {
     if (action === "showAnswer") showAuctionAnswer()
   }
 
+  /* =========================
+     WHO
+  ========================= */
+
   if (segment === "who") {
-  if (action === "selectTeam") selectWhoTeam(data.team)
-  if (action === "setPoints") setWhoPoints(Number(data.points))
-  if (action === "openNumber") chooseWho(Number(data.number))
-  if (action === "correct") whoCorrect()
-  if (action === "wrong") whoWrong()
-  if (action === "showAnswer") showWhoAnswer()
-}
+    if (action === "selectTeam") selectWhoTeam(data.team)
+    if (action === "setPoints") setWhoPoints(Number(data.points))
+    if (action === "openNumber") chooseWho(Number(data.number))
+    if (action === "correct") whoCorrect()
+    if (action === "wrong") whoWrong()
+    if (action === "showAnswer") showWhoAnswer()
+  }
+
+  /* =========================
+     TOP 10
+  ========================= */
 
   if (segment === "top10") {
     if (action === "selectTeam") selectTop10Team(data.team)
-    if (action === "openNumber") openTop10Number(Number(data.number))
+
+    if (action === "openNumber") {
+      if (data.round && top10State.round !== Number(data.round)) {
+        top10State.round = Number(data.round)
+        renderCurrentRoundTop10UI()
+        saveTop10State()
+      }
+
+      setTimeout(() => {
+        openTop10Number(Number(data.number))
+      }, 150)
+    }
+
     if (action === "wrong") addTop10Error()
     if (action === "showAnswer") showTop10Answer()
   }
+
+  /* =========================
+     FINAL
+  ========================= */
 
   if (segment === "final") {
     if (action === "selectTeam") selectFinalTeam(data.team)
 
     if (action === "openNumber") {
-      if (finalState.round === 1) openFinalRound1Card(Number(data.number))
-      if (finalState.round === 2) openFinalRound2Card(Number(data.number))
-      if (finalState.round === 3) openFinalRound3Card(Number(data.number))
+      if (data.round && finalState.round !== Number(data.round)) {
+        goToFinalRound(Number(data.round))
+      }
+
+      setTimeout(() => {
+        if (finalState.round === 1) openFinalRound1Card(Number(data.number))
+        if (finalState.round === 2) openFinalRound2Card(Number(data.number))
+        if (finalState.round === 3) openFinalRound3Card(Number(data.number))
+      }, 150)
     }
 
     if (action === "double") activateFinalDouble()
 
     if (action === "correct") {
       if (finalState.round === 1) finalRound1Correct()
-      if (finalState.round === 2) finalRound2RecordScore()
+
+      if (finalState.round === 2) {
+        if (finalState.round2.currentType === "sequence") {
+          finalRound2RecordSequenceScore()
+        } else {
+          finalRound2RecordScore()
+        }
+      }
+
       if (finalState.round === 3) finalRound3RecordScore()
     }
 
@@ -113,6 +166,10 @@ function handlePresenterCommand(cmd) {
       if (finalState.round === 3) showFinalRound3Answer()
     }
   }
+
+  /* =========================
+     ARCHIVE
+  ========================= */
 
   if (segment === "archive") {
     if (action === "selectTeam") selectArchiveTeam(data.team)

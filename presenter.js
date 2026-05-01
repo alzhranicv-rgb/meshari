@@ -2,8 +2,12 @@ let presenterSegment = null
 let presenterModel = Number(
   localStorage.getItem("presenter_model") ||
   localStorage.getItem("current_model") ||
+  localStorage.getItem("game_model") ||
   1
 )
+
+let presenterTeamAName = localStorage.getItem("teamAName") || "الفريق الأول"
+let presenterTeamBName = localStorage.getItem("teamBName") || "الفريق الثاني"
 
 let presenterTop10Round = 1
 let presenterFinalRound = 1
@@ -133,8 +137,12 @@ function openPresenterSegment(segment) {
 function teamControls() {
   return `
     <div class="presenterTeams">
-      <button class="presenterBtn orange" onclick="sendCommand('selectTeam',{team:'A'})">الفريق A</button>
-      <button class="presenterBtn orange" onclick="sendCommand('selectTeam',{team:'B'})">الفريق B</button>
+      <button class="presenterBtn orange" onclick="sendCommand('selectTeam',{team:'A'})">
+        ${presenterTeamAName}
+      </button>
+      <button class="presenterBtn orange" onclick="sendCommand('selectTeam',{team:'B'})">
+        ${presenterTeamBName}
+      </button>
     </div>
   `
 }
@@ -239,7 +247,7 @@ function renderTop10Presenter() {
       <div class="presenterLabel">فتح إجابة</div>
       <div class="presenterGrid">
         ${[1,2,3,4,5,6,7,8,9,10].map(n => `
-          <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{number:${n}})">${n}</button>
+          <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{number:${n}, round:presenterTop10Round})">${n}</button>
         `).join("")}
       </div>
     </section>
@@ -514,7 +522,7 @@ async function loadPresenterFinalAnswers(number = null) {
 
   if (presenterFinalRound === 2) {
     box.innerHTML = `
-      <div class="presenterListItem">الجولة الثانية: يتم التحكم من شاشة العرض حسب نوع الرقم.</div>
+      <div class="presenterListItem">الجولة الثانية: افتح الرقم ثم استخدم أزرار العرض حسب نوع السؤال.</div>
     `
     return
   }
