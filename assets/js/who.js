@@ -179,7 +179,7 @@ window.renderWho = function () {
 
         <div class="whoControlPanel">
           <button onclick="activateWhoDouble()" class="whoDoubleBtn" id="whoDoubleBtn">دبل</button>
-          <button onclick="showWhoAnswer()" class="btnAnswer"> الإجابة</button>
+          
           <button onclick="whoCorrect()" class="btnCorrect">✓ صح</button>
           <button onclick="whoWrong()" class="btnWrong">✕ خطأ</button>
         </div>
@@ -569,6 +569,22 @@ function resetWhoTimer() {
    Result
 ========================= */
 
+function finishWhoAfterAnswerDelay() {
+  resetWhoTimer()
+
+  setTimeout(() => {
+    clearWhoStage()
+    switchWhoTurn()
+    resetWhoPoints()
+
+    whoQuestionLocked = false
+    whoCurrentNumber = null
+
+    updateWhoDoubleButton()
+    saveWhoState()
+  }, 5000)
+}
+
 function whoCorrect() {
   if (!whoState.activeTeam) {
     showGameToast("اختر الفريق أولاً")
@@ -600,6 +616,7 @@ function whoCorrect() {
 
   playGameSound("correct")
   flashScreen("correct")
+  showWhoAnswer()
 
   window.whoState = whoState
   window.currentSegmentScores = {
@@ -607,15 +624,8 @@ function whoCorrect() {
     B: whoState.scoreB
   }
 
-  resetWhoTimer()
-  clearWhoStage()
-  switchWhoTurn()
-  resetWhoPoints()
-
-  whoQuestionLocked = false
-  whoCurrentNumber = null
-  updateWhoDoubleButton()
   saveWhoState()
+  finishWhoAfterAnswerDelay()
 }
 
 function whoWrong() {
@@ -649,6 +659,7 @@ function whoWrong() {
 
   playGameSound("wrong")
   flashScreen("wrong")
+  showWhoAnswer()
 
   window.whoState = whoState
   window.currentSegmentScores = {
@@ -656,15 +667,8 @@ function whoWrong() {
     B: whoState.scoreB
   }
 
-  resetWhoTimer()
-  clearWhoStage()
-  switchWhoTurn()
-  resetWhoPoints()
-
-  whoQuestionLocked = false
-  whoCurrentNumber = null
-  updateWhoDoubleButton()
   saveWhoState()
+  finishWhoAfterAnswerDelay()
 }
 
 /* =========================
