@@ -144,9 +144,8 @@ function setTitle(title, subtitle = "") {
 
 function presenterTopControls() {
   return `
-    <div class="presenterMiniActions">
-      <button class="presenterBtn dark" onclick="showPresenterHome()">رجوع</button>
-      <button class="presenterBtn red" onclick="sendCommand('endSegment')">إنهاء</button>
+    <div class="presenterOneAction">
+      <button class="presenterBtn red" onclick="sendCommand('endSegment')">إنهاء الفقرة</button>
     </div>
   `
 }
@@ -301,16 +300,11 @@ async function openWarmupQuestionPresenter(category, number) {
     row?.answer || "—"
 }
 
-/* =========================
-   TOP 10
-========================= */
-
 function renderTop10Presenter() {
-  setTitle("Top 10", "الجولات والإجابات")
+  setTitle("Top 10", "لوحة التحكم والإجابات")
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-    
     ${presenterTeamControls()}
 
     <section class="presenterCard">
@@ -323,7 +317,7 @@ function renderTop10Presenter() {
     </section>
 
     <section class="presenterCard">
-      <div class="presenterLabel">فتح إجابة</div>
+      <div class="presenterLabel">الأرقام</div>
       <div class="presenterGrid">
         ${[1,2,3,4,5,6,7,8,9,10].map(n => `
           <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{number:${n}, round:presenterTop10Round})">${n}</button>
@@ -331,10 +325,18 @@ function renderTop10Presenter() {
       </div>
     </section>
 
-    <div class="presenterMiniActions">
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
+    <div class="presenterActions">
+      <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
       <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابات</button>
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
     </div>
+
+    <div class="presenterMiniActions">
+      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+      <button class="presenterBtn blue" onclick="sendCommand('switchTurn')">تبديل الدور</button>
+    </div>
+
+    <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
 
     <section class="presenterCard">
       <div class="presenterLabel">الإجابات</div>
@@ -344,66 +346,16 @@ function renderTop10Presenter() {
 
   setPresenterTop10Round(presenterTop10Round)
 }
-
-function setPresenterTop10Round(round) {
-  presenterTop10Round = Number(round)
-
-  for (let i = 1; i <= 3; i++) {
-    const btn = document.getElementById(`top10RoundBtn${i}`)
-    if (btn) btn.classList.toggle("active", i === presenterTop10Round)
-  }
-
-  loadPresenterTop10Answers()
-}
-
-async function loadPresenterTop10Answers() {
-  const box = document.getElementById("top10PresenterAnswers")
-  if (!box) return
-
-  box.innerHTML = "جاري التحميل..."
-
-  const { data, error } = await db
-    .from("top10_questions")
-    .select("position, answer")
-    .eq("model", presenterModel)
-    .eq("round", presenterTop10Round)
-    .order("position", { ascending: true })
-
-  if (error) {
-    console.log(error)
-    box.innerHTML = "تعذر تحميل الإجابات"
-    return
-  }
-
-  box.innerHTML = (data || []).map(item => `
-    <div class="presenterListItem">
-      <strong>${item.position}</strong> - ${item.answer || "-"}
-    </div>
-  `).join("")
-}
-
 /* =========================
    AUCTION
 ========================= */
 
 function renderAuctionPresenter() {
-  setTitle("فتبلة", "الأرقام والإجابة")
+  setTitle("فتبلة", "لوحة التحكم والإجابة")
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-    
     ${presenterTeamControls()}
-
-    <div class="presenterActions">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
-      <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
-      <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
-    </div>
-
-    <div class="presenterMiniActions">
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
-      <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
-    </div>
 
     <section class="presenterCard">
       <div class="presenterLabel">اختر الرقم</div>
@@ -413,6 +365,17 @@ function renderAuctionPresenter() {
         `).join("")}
       </div>
     </section>
+
+    <div class="presenterActions">
+      <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
+      <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
+      <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
+    </div>
+
+    <div class="presenterMiniActions">
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
+      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+    </div>
 
     <section class="presenterCard">
       <div class="presenterLabel">الإجابة</div>

@@ -132,6 +132,7 @@ function handlePresenterCommand(cmd) {
     if (action === "startTimer") safeRunPresenterAction(() => startAuctionTimerButton())
     if (action === "correct") safeRunPresenterAction(() => auctionCorrect())
     if (action === "wrong") safeRunPresenterAction(() => auctionWrong())
+    if (action === "undo") safeRunPresenterAction(() => undoAuctionAction())
     if (action === "showAnswer") safeRunPresenterAction(() => showAuctionAnswer())
   }
 
@@ -170,8 +171,10 @@ function handlePresenterCommand(cmd) {
       })
     }
 
-    if (action === "wrong") safeRunPresenterAction(() => addTop10Error())
-    if (action === "showAnswer") safeRunPresenterAction(() => showTop10Answer())
+    if (action === "startTimer") safeRunPresenterAction(() => startTop10TimerButton())
+if (action === "undo") safeRunPresenterAction(() => undoTop10Action())
+if (action === "switchTurn") safeRunPresenterAction(() => switchTop10Turn())
+if (action === "nextRound") safeRunPresenterAction(() => nextTop10Round())
   }
 
   /* =========================

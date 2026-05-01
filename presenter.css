@@ -355,3 +355,8 @@ select{
   font-weight:900;
   box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
+.presenterOneAction{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
