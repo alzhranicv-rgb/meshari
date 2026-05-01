@@ -14,6 +14,17 @@ let presenterTop10Round = 1
 let presenterFinalRound = 1
 let presenterArchiveRound = 1
 
+function refreshPresenterTeamNames() {
+  presenterTeamAName = localStorage.getItem("teamAName") || "الفريق الأول"
+  presenterTeamBName = localStorage.getItem("teamBName") || "الفريق الثاني"
+
+  const a = document.getElementById("presenterTeamA")
+  const b = document.getElementById("presenterTeamB")
+
+  if (a) a.innerText = presenterTeamAName
+  if (b) b.innerText = presenterTeamBName
+}
+
 /* =========================
    BASIC
 ========================= */
@@ -55,6 +66,13 @@ async function sendCommand(action, payload = {}) {
   }
 
   showToast("تم الإرسال")
+}
+
+async function sendGlobalDisplayControlsToggle() {
+  const oldSegment = presenterSegment
+  presenterSegment = "global"
+  await sendCommand("toggleDisplayControls")
+  presenterSegment = oldSegment
 }
 
 async function loadPresenterModels() {
@@ -113,6 +131,8 @@ function showPresenterHome() {
 }
 
 function openPresenterSegment(segment) {
+  refreshPresenterTeamNames()
+
   if (!presenterModel) {
     showToast("اختر النموذج أولاً")
     return
@@ -151,6 +171,8 @@ function presenterTopControls() {
 }
 
 function presenterTeamControls() {
+  refreshPresenterTeamNames()
+
   return `
     <div class="presenterTeams">
       <button id="presenterTeamA" class="presenterBtn orange" onclick="selectPresenterTeam('A')">
@@ -185,12 +207,6 @@ function resultControls() {
   `
 }
 
-async function sendGlobalDisplayControlsToggle() {
-  const segment = presenterSegment
-  presenterSegment = "global"
-  await sendCommand("toggleDisplayControls")
-  presenterSegment = segment
-}
 /* =========================
    WARMUP
 ========================= */
@@ -202,7 +218,6 @@ async function renderWarmupPresenter() {
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-  
     ${presenterTeamControls()}
     ${resultControls()}
 
@@ -300,6 +315,10 @@ async function openWarmupQuestionPresenter(category, number) {
     row?.answer || "—"
 }
 
+/* =========================
+   TOP 10
+========================= */
+
 function renderTop10Presenter() {
   setTitle("Top 10", "لوحة التحكم والإجابات")
 
@@ -346,6 +365,44 @@ function renderTop10Presenter() {
 
   setPresenterTop10Round(presenterTop10Round)
 }
+
+function setPresenterTop10Round(round) {
+  presenterTop10Round = Number(round)
+
+  for (let i = 1; i <= 3; i++) {
+    const btn = document.getElementById(`top10RoundBtn${i}`)
+    if (btn) btn.classList.toggle("active", i === presenterTop10Round)
+  }
+
+  loadPresenterTop10Answers()
+}
+
+async function loadPresenterTop10Answers() {
+  const box = document.getElementById("top10PresenterAnswers")
+  if (!box) return
+
+  box.innerHTML = "جاري التحميل..."
+
+  const { data, error } = await db
+    .from("top10_questions")
+    .select("position, answer")
+    .eq("model", presenterModel)
+    .eq("round", presenterTop10Round)
+    .order("position", { ascending: true })
+
+  if (error) {
+    console.log(error)
+    box.innerHTML = "تعذر تحميل الإجابات"
+    return
+  }
+
+  box.innerHTML = (data || []).map(item => `
+    <div class="presenterListItem">
+      <strong>${item.position}</strong> - ${item.answer || "-"}
+    </div>
+  `).join("")
+}
+
 /* =========================
    AUCTION
 ========================= */
@@ -418,7 +475,6 @@ function renderWhoPresenter() {
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-    
     ${presenterTeamControls()}
 
     <section class="presenterCard">
@@ -484,7 +540,6 @@ function renderFinalPresenter() {
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-    
     ${presenterTeamControls()}
 
     <section class="presenterCard">
@@ -735,5 +790,6 @@ function openArchivePresenterItem(number) {
 ========================= */
 
 document.addEventListener("DOMContentLoaded", () => {
+  refreshPresenterTeamNames()
   loadPresenterModels()
 })
