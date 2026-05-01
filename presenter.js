@@ -185,19 +185,13 @@ function resultControls() {
     </div>
   `
 }
-function presenterDisplayControlsToggle() {
-  return `
-    <div class="presenterMiniActions">
-      <button class="presenterBtn gray" onclick="sendCommand('toggleDisplayControls')">
-        إخفاء / إظهار تحكم العرض
-      </button>
-      <button class="presenterBtn dark" onclick="sendCommand('showDisplayControls')">
-        إظهار التحكم
-      </button>
-    </div>
-  `
-}
 
+async function sendGlobalDisplayControlsToggle() {
+  const segment = presenterSegment
+  presenterSegment = "global"
+  await sendCommand("toggleDisplayControls")
+  presenterSegment = segment
+}
 /* =========================
    WARMUP
 ========================= */
@@ -209,7 +203,7 @@ async function renderWarmupPresenter() {
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-    ${presenterDisplayControlsToggle()}
+  
     ${presenterTeamControls()}
     ${resultControls()}
 
@@ -316,7 +310,7 @@ function renderTop10Presenter() {
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-    ${presenterDisplayControlsToggle()}
+    
     ${presenterTeamControls()}
 
     <section class="presenterCard">
@@ -397,7 +391,7 @@ function renderAuctionPresenter() {
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-    ${presenterDisplayControlsToggle()}
+    
     ${presenterTeamControls()}
 
     <div class="presenterActions">
@@ -461,7 +455,7 @@ function renderWhoPresenter() {
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-    ${presenterDisplayControlsToggle()}
+    
     ${presenterTeamControls()}
 
     <section class="presenterCard">
@@ -527,7 +521,7 @@ function renderFinalPresenter() {
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-    ${presenterDisplayControlsToggle()}
+    
     ${presenterTeamControls()}
 
     <section class="presenterCard">
@@ -650,7 +644,7 @@ function renderArchivePresenter() {
 
   document.getElementById("presenterPanel").innerHTML = `
     ${presenterTopControls()}
-    ${presenterDisplayControlsToggle()}
+    
     ${presenterTeamControls()}
 
     <div class="presenterMiniActions">
