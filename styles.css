@@ -11616,7 +11616,7 @@ th{
   100%{ opacity:0; }
 }
 /* =========================
-   PRESENTER MODE - HIDE DISPLAY CONTROLS
+   PRESENTER MODE - HIDE SEGMENT CONTROLS ONLY
 ========================= */
 
 body.presenterHideDisplayControls .warmupControlPanel,
@@ -11624,8 +11624,7 @@ body.presenterHideDisplayControls .top10ControlPanel,
 body.presenterHideDisplayControls .auctionControlPanel,
 body.presenterHideDisplayControls .whoControlPanel,
 body.presenterHideDisplayControls .archiveControlButtons,
-body.presenterHideDisplayControls .finalControlsBar,
-body.presenterHideDisplayControls .segmentControls .backBtn,
-body.presenterHideDisplayControls .segmentControls .endBtn{
+body.presenterHideDisplayControls .archiveControlPanel,
+body.presenterHideDisplayControls .finalControlsBar{
   display:none !important;
 }
