@@ -9,6 +9,7 @@ let presenterModel = Number(
 let presenterTeamAName = localStorage.getItem("teamAName") || "الفريق الأول"
 let presenterTeamBName = localStorage.getItem("teamBName") || "الفريق الثاني"
 
+let presenterSelectedTeam = null
 let presenterTop10Round = 1
 let presenterFinalRound = 1
 let presenterArchiveRound = 1
@@ -101,6 +102,7 @@ function setPresenterModel() {
 
 function showPresenterHome() {
   presenterSegment = null
+  presenterSelectedTeam = null
 
   document.getElementById("presenterHome").classList.remove("hidden")
   document.getElementById("presenterPanel").classList.add("hidden")
@@ -117,6 +119,7 @@ function openPresenterSegment(segment) {
   }
 
   presenterSegment = segment
+  presenterSelectedTeam = null
 
   document.getElementById("presenterHome").classList.add("hidden")
   document.getElementById("presenterPanel").classList.remove("hidden")
@@ -130,21 +133,47 @@ function openPresenterSegment(segment) {
   if (segment === "archive") renderArchivePresenter()
 }
 
+function setTitle(title, subtitle = "") {
+  document.getElementById("presenterTitle").innerText = title
+  document.getElementById("presenterSubtitle").innerText = subtitle
+}
+
 /* =========================
    SHARED HTML
 ========================= */
 
-function teamControls() {
+function presenterTopControls() {
+  return `
+    <div class="presenterMiniActions">
+      <button class="presenterBtn dark" onclick="showPresenterHome()">رجوع</button>
+      <button class="presenterBtn red" onclick="sendCommand('endSegment')">إنهاء</button>
+    </div>
+  `
+}
+
+function presenterTeamControls() {
   return `
     <div class="presenterTeams">
-      <button class="presenterBtn orange" onclick="sendCommand('selectTeam',{team:'A'})">
+      <button id="presenterTeamA" class="presenterBtn orange" onclick="selectPresenterTeam('A')">
         ${presenterTeamAName}
       </button>
-      <button class="presenterBtn orange" onclick="sendCommand('selectTeam',{team:'B'})">
+      <button id="presenterTeamB" class="presenterBtn orange" onclick="selectPresenterTeam('B')">
         ${presenterTeamBName}
       </button>
     </div>
   `
+}
+
+function selectPresenterTeam(team) {
+  presenterSelectedTeam = team
+
+  document.getElementById("presenterTeamA")?.classList.remove("selectedPresenterTeam")
+  document.getElementById("presenterTeamB")?.classList.remove("selectedPresenterTeam")
+
+  if (team === "A") document.getElementById("presenterTeamA")?.classList.add("selectedPresenterTeam")
+  if (team === "B") document.getElementById("presenterTeamB")?.classList.add("selectedPresenterTeam")
+
+  sendCommand("selectTeam", { team })
 }
 
 function resultControls() {
@@ -152,35 +181,52 @@ function resultControls() {
     <div class="presenterActions">
       <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
       <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
-      <button class="presenterBtn green" onclick="sendCommand('correct')">صح</button>
+      <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
     </div>
   `
 }
-
-function setTitle(title, subtitle = "") {
-  document.getElementById("presenterTitle").innerText = title
-  document.getElementById("presenterSubtitle").innerText = subtitle
+function presenterDisplayControlsToggle() {
+  return `
+    <div class="presenterMiniActions">
+      <button class="presenterBtn gray" onclick="sendCommand('toggleDisplayControls')">
+        إخفاء / إظهار تحكم العرض
+      </button>
+      <button class="presenterBtn dark" onclick="sendCommand('showDisplayControls')">
+        إظهار التحكم
+      </button>
+    </div>
+  `
 }
 
 /* =========================
    WARMUP
 ========================= */
 
-function renderWarmupPresenter() {
+async function renderWarmupPresenter() {
   setTitle("التسخين", "الفئات والأسئلة")
 
+  const categories = await loadPresenterWarmupCategories()
+
   document.getElementById("presenterPanel").innerHTML = `
-    ${teamControls()}
+    ${presenterTopControls()}
+    ${presenterDisplayControlsToggle()}
+    ${presenterTeamControls()}
     ${resultControls()}
 
     <section class="presenterCard">
-      <div class="presenterLabel">اختر السؤال</div>
+      <div class="presenterLabel">أسئلة التسخين</div>
 
-      <div class="presenterGrid">
+      <div class="presenterWarmupCats">
         ${[1,2,3,4].map(cat => `
-          <button class="presenterNumberBtn" onclick="openWarmupQuestionPresenter(${cat},1)">ف${cat} / 1</button>
-          <button class="presenterNumberBtn" onclick="openWarmupQuestionPresenter(${cat},2)">ف${cat} / 2</button>
-          <button class="presenterNumberBtn" onclick="openWarmupQuestionPresenter(${cat},4)">ف${cat} / 4</button>
+          <div class="presenterWarmupCat">
+            <div class="presenterWarmupCatTitle">${categories[cat] || `الفئة ${cat}`}</div>
+
+            <div class="presenterWarmupNumbers">
+              <button id="pw_${cat}_1" class="presenterNumberBtn" onclick="openWarmupQuestionPresenter(${cat},1)">1</button>
+              <button id="pw_${cat}_2" class="presenterNumberBtn" onclick="openWarmupQuestionPresenter(${cat},2)">2</button>
+              <button id="pw_${cat}_4" class="presenterNumberBtn" onclick="openWarmupQuestionPresenter(${cat},4)">4</button>
+            </div>
+          </div>
         `).join("")}
       </div>
     </section>
@@ -197,8 +243,45 @@ function renderWarmupPresenter() {
   `
 }
 
+async function loadPresenterWarmupCategories() {
+  const { data, error } = await db
+    .from("questions")
+    .select("category, category_name")
+    .eq("model", presenterModel)
+    .eq("segment", "warmup")
+    .order("category", { ascending: true })
+
+  if (error) {
+    console.log(error)
+    return {}
+  }
+
+  const categories = {}
+
+  ;(data || []).forEach(row => {
+    if (row.category) {
+      categories[Number(row.category)] = row.category_name || `الفئة ${row.category}`
+    }
+  })
+
+  return categories
+}
+
 async function openWarmupQuestionPresenter(category, number) {
+  const btn = document.getElementById(`pw_${category}_${number}`)
+
+  if (btn?.classList.contains("usedPresenterNumber")) {
+    showToast("السؤال مستخدم")
+    return
+  }
+
   sendCommand("openNumber", { category, number })
+
+  if (btn) {
+    btn.classList.add("usedPresenterNumber")
+    btn.disabled = true
+    btn.innerText = ""
+  }
 
   const { data, error } = await db
     .from("questions")
@@ -232,7 +315,9 @@ function renderTop10Presenter() {
   setTitle("Top 10", "الجولات والإجابات")
 
   document.getElementById("presenterPanel").innerHTML = `
-    ${teamControls()}
+    ${presenterTopControls()}
+    ${presenterDisplayControlsToggle()}
+    ${presenterTeamControls()}
 
     <section class="presenterCard">
       <div class="presenterLabel">الجولة</div>
@@ -254,7 +339,7 @@ function renderTop10Presenter() {
 
     <div class="presenterMiniActions">
       <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
-      <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الكل</button>
+      <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابات</button>
     </div>
 
     <section class="presenterCard">
@@ -285,7 +370,7 @@ async function loadPresenterTop10Answers() {
 
   const { data, error } = await db
     .from("top10_questions")
-    .select("position, question, answer")
+    .select("position, answer")
     .eq("model", presenterModel)
     .eq("round", presenterTop10Round)
     .order("position", { ascending: true })
@@ -311,8 +396,20 @@ function renderAuctionPresenter() {
   setTitle("فتبلة", "الأرقام والإجابة")
 
   document.getElementById("presenterPanel").innerHTML = `
-    ${teamControls()}
-    ${resultControls()}
+    ${presenterTopControls()}
+    ${presenterDisplayControlsToggle()}
+    ${presenterTeamControls()}
+
+    <div class="presenterActions">
+      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+      <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
+      <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
+    </div>
+
+    <div class="presenterMiniActions">
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
+      <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
+    </div>
 
     <section class="presenterCard">
       <div class="presenterLabel">اختر الرقم</div>
@@ -322,8 +419,6 @@ function renderAuctionPresenter() {
         `).join("")}
       </div>
     </section>
-
-    <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة في العرض</button>
 
     <section class="presenterCard">
       <div class="presenterLabel">الإجابة</div>
@@ -365,7 +460,9 @@ function renderWhoPresenter() {
   setTitle("من هو", "الأرقام والإجابة")
 
   document.getElementById("presenterPanel").innerHTML = `
-    ${teamControls()}
+    ${presenterTopControls()}
+    ${presenterDisplayControlsToggle()}
+    ${presenterTeamControls()}
 
     <section class="presenterCard">
       <div class="presenterLabel">اختر النقاط</div>
@@ -376,7 +473,15 @@ function renderWhoPresenter() {
       </div>
     </section>
 
-    ${resultControls()}
+    <div class="presenterMiniActions">
+      <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
+      <button class="presenterBtn green" onclick="sendCommand('correct')">صح</button>
+    </div>
+
+    <div class="presenterMiniActions">
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
+      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+    </div>
 
     <section class="presenterCard">
       <div class="presenterLabel">اختر الرقم</div>
@@ -386,8 +491,6 @@ function renderWhoPresenter() {
         `).join("")}
       </div>
     </section>
-
-    <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة في العرض</button>
 
     <section class="presenterCard">
       <div class="presenterLabel">الإجابة</div>
@@ -423,8 +526,9 @@ function renderFinalPresenter() {
   setTitle("الفاصلة", "الجولات والتحكم")
 
   document.getElementById("presenterPanel").innerHTML = `
-    ${teamControls()}
-    ${resultControls()}
+    ${presenterTopControls()}
+    ${presenterDisplayControlsToggle()}
+    ${presenterTeamControls()}
 
     <section class="presenterCard">
       <div class="presenterLabel">الجولة</div>
@@ -443,6 +547,16 @@ function renderFinalPresenter() {
     <div class="presenterMiniActions">
       <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">إظهار السؤال</button>
       <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
+    </div>
+
+    <div class="presenterMiniActions">
+      <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
+    </div>
+
+    <div class="presenterMiniActions">
+      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+      <button class="presenterBtn dark" onclick="sendCommand('startSequence')">بدء عرض الصور</button>
     </div>
 
     <section class="presenterCard">
@@ -520,18 +634,11 @@ async function loadPresenterFinalAnswers(number = null) {
     return
   }
 
-  if (presenterFinalRound === 2) {
-    box.innerHTML = `
-      <div class="presenterListItem">الجولة الثانية: افتح الرقم ثم استخدم أزرار العرض حسب نوع السؤال.</div>
-    `
-    return
-  }
-
-  if (presenterFinalRound === 3) {
-    box.innerHTML = `
-      <div class="presenterListItem">الجولة الثالثة: بعد عرض الصور اضغط إظهار الإجابة ثم سجل النتيجة.</div>
-    `
-  }
+  box.innerHTML = `
+    <div class="presenterListItem">
+      تحكم الجولة ${presenterFinalRound} من الأزرار أعلاه.
+    </div>
+  `
 }
 
 /* =========================
@@ -542,21 +649,14 @@ function renderArchivePresenter() {
   setTitle("الأرشيف", "الجولات والأرقام")
 
   document.getElementById("presenterPanel").innerHTML = `
-    ${teamControls()}
+    ${presenterTopControls()}
+    ${presenterDisplayControlsToggle()}
+    ${presenterTeamControls()}
 
     <div class="presenterMiniActions">
       <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
-      <button class="presenterBtn green" onclick="sendCommand('correct')">إظهار المطلوب / صح</button>
+      <button class="presenterBtn green" onclick="sendCommand('correct')">إظهار الإجابة</button>
     </div>
-
-    <section class="presenterCard">
-      <div class="presenterLabel">الجولة</div>
-      <div class="presenterRoundTabs">
-        <button id="archiveRoundBtn1" onclick="setPresenterArchiveRound(1)">1</button>
-        <button id="archiveRoundBtn2" onclick="setPresenterArchiveRound(2)">2</button>
-        <button id="archiveRoundBtn3" onclick="setPresenterArchiveRound(3)">3</button>
-      </div>
-    </section>
 
     <section class="presenterCard">
       <div class="presenterLabel">فتح رقم</div>
@@ -572,17 +672,6 @@ function renderArchivePresenter() {
       <div class="presenterNoteText">الأرشيف يعتمد على الجولة المفتوحة في شاشة العرض.</div>
     </section>
   `
-
-  setPresenterArchiveRound(presenterArchiveRound)
-}
-
-function setPresenterArchiveRound(round) {
-  presenterArchiveRound = Number(round)
-
-  for (let i = 1; i <= 3; i++) {
-    const btn = document.getElementById(`archiveRoundBtn${i}`)
-    if (btn) btn.classList.toggle("active", i === presenterArchiveRound)
-  }
 }
 
 /* =========================
