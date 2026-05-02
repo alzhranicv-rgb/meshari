@@ -104,19 +104,20 @@ function handlePresenterCommand(cmd) {
     return
   }
 
+  if (action === "zoomImage") {
+    safeRunPresenterAction(() => zoomCurrentDisplayImage())
+    return
+  }
+
+  if (action === "closeZoomImage") {
+    safeRunPresenterAction(() => closeCurrentDisplayImageZoom())
+    return
+  }
+
   if (action === "endSegment") {
     safeRunPresenterAction(() => endCurrentSegment())
     return
   }
-  if (action === "zoomImage") {
-  safeRunPresenterAction(() => zoomCurrentDisplayImage())
-  return
-}
-
-if (action === "closeZoomImage") {
-  safeRunPresenterAction(() => closeCurrentDisplayImageZoom())
-  return
-}
 
   /* =========================
      WARMUP
