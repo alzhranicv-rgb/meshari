@@ -2927,17 +2927,3 @@ async function saveArchiveRoundNew() {
   await renderArchiveAdminRound(round)
 }
 
-window.openPresenterFromAdmin = function () {
-  if (!currentModel) {
-    showGameToast("افتح نموذجًا أولاً")
-    return
-  }
-
-  const payload = {
-    id: Number(currentModel || 0),
-    name: currentModelName || getCurrentModelNameSafe() || `نموذج ${currentModel}`
-  }
-
-  localStorage.setItem("presenter_admin_model", JSON.stringify(payload))
-  window.open("presenter.html", "_blank")
-}
