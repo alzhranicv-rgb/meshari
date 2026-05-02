@@ -599,3 +599,60 @@ body{
     font-size:.86rem;
   }
 }
+.presenterImageZoomModal{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:rgba(20,28,38,.72);
+  backdrop-filter:blur(7px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.presenterImageZoomCard{
+  width:min(900px,100%);
+  max-height:92vh;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.presenterImageZoomImg{
+  max-width:100%;
+  max-height:90vh;
+  object-fit:contain;
+  border-radius:24px;
+  background:#fff;
+  box-shadow:0 24px 60px rgba(0,0,0,.28);
+}
+
+.presenterImageZoomClose{
+  position:absolute;
+  top:-14px;
+  left:-14px;
+  width:46px;
+  height:46px;
+  border:0;
+  border-radius:16px;
+  background:#2F4158;
+  color:#fff;
+  font-size:1.5rem;
+  z-index:2;
+}
+
+@media (max-width:760px){
+  .presenterImageZoomImg{
+    border-radius:18px;
+  }
+
+  .presenterImageZoomClose{
+    top:8px;
+    left:8px;
+  }
+}
+.presenterImageZoomModal.hidden{
+  display:none !important;
+}

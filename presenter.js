@@ -454,7 +454,7 @@ async function openAuctionPresenter(number) {
 
   const { data, error } = await db
     .from("auction_questions")
-    .select("answer, note, image")
+    .select("*")
     .eq("model", presenterModel)
     .eq("number", Number(number))
     .single()
@@ -465,17 +465,15 @@ async function openAuctionPresenter(number) {
     return
   }
 
+  const imageUrl = data?.image || data?.image_url || data?.question_image || ""
+
   document.getElementById("auctionPresenterAnswer").innerText = data?.answer || "—"
   document.getElementById("auctionPresenterNote").innerText = data?.note || "—"
 
   const imgBtn = document.getElementById("auctionPresenterImageBtn")
   if (imgBtn) {
-    if (data?.image) {
-      imgBtn.classList.remove("hidden")
-      imgBtn.onclick = () => openPresenterImageZoom(data.image)
-    } else {
-      imgBtn.classList.add("hidden")
-    }
+    imgBtn.classList.toggle("hidden", !imageUrl)
+    imgBtn.onclick = () => openPresenterImageZoom(imageUrl)
   }
 }
 
@@ -501,7 +499,7 @@ function renderWhoPresenter() {
 
     <div class="presenterMiniActions">
       <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
-      <button class="presenterBtn green" onclick="sendCommand('correct')">صح</button>
+      <button class="presenterBtn green" onclick="presenterCorrect()">صح</button>
     </div>
 
     <div class="presenterMiniActions">
@@ -533,7 +531,7 @@ async function openWhoPresenter(number) {
 
   const { data, error } = await db
     .from("who_images")
-    .select("answer, image")
+    .select("*")
     .eq("model", presenterModel)
     .eq("number", Number(number))
     .single()
@@ -544,16 +542,14 @@ async function openWhoPresenter(number) {
     return
   }
 
+  const imageUrl = data?.image || data?.image_url || data?.url || ""
+
   document.getElementById("whoPresenterAnswer").innerText = data?.answer || "—"
 
   const imgBtn = document.getElementById("whoPresenterImageBtn")
   if (imgBtn) {
-    if (data?.image) {
-      imgBtn.classList.remove("hidden")
-      imgBtn.onclick = () => openPresenterImageZoom(data.image)
-    } else {
-      imgBtn.classList.add("hidden")
-    }
+    imgBtn.classList.toggle("hidden", !imageUrl)
+    imgBtn.onclick = () => openPresenterImageZoom(imageUrl)
   }
 }
 
