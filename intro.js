@@ -232,3 +232,36 @@ window.startGameFromIntro = function () {
     window.location.href = "display.html"
   }, 230)
 }
+function getPresenterIntroUrl() {
+  return `${window.location.origin}${window.location.pathname.replace("intro.html", "")}presenter.html`
+}
+
+function openPresenterIntroModal() {
+  const modal = document.getElementById("presenterIntroModal")
+  const qr = document.getElementById("presenterIntroQr")
+  const linkBox = document.getElementById("presenterIntroLink")
+
+  const url = getPresenterIntroUrl()
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=${encodeURIComponent(url)}`
+
+  if (qr) qr.src = qrUrl
+  if (linkBox) linkBox.innerText = url
+  if (modal) modal.classList.remove("hidden")
+}
+
+function closePresenterIntroModal() {
+  document.getElementById("presenterIntroModal")?.classList.add("hidden")
+}
+
+async function copyPresenterIntroLink() {
+  const url = getPresenterIntroUrl()
+
+  try {
+    await navigator.clipboard.writeText(url)
+    if (typeof showGameToast === "function") {
+      showGameToast("تم نسخ رابط المقدم")
+    }
+  } catch (e) {
+    console.log(e)
+  }
+}

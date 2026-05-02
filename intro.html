@@ -1,10 +1,12 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>الحنكة - المقدمة</title>
 
-<link rel="stylesheet" href="styles.css" />
-<link rel="stylesheet" href="assets/css/segments/intro.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="assets/css/segments/intro.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
@@ -12,11 +14,10 @@
 <body>
 
   <div class="introPage">
-
     <div class="introCard">
 
       <div class="introLogoBox">
-        <div class="introBadge"> يلا بينا </div>
+        <div class="introBadge">يلا بينا</div>
         <h1 class="introTitle">الحنكة</h1>
         <div class="introTitleLine"></div>
         <p class="introSubTitle">ابدأ التجهيز وحدد الفريقين والنموذج</p>
@@ -41,17 +42,52 @@
           </select>
         </div>
 
-        <div class="introActions">
+        <div class="introActions introActionsRow">
           <button id="startGameBtn" onclick="startGameFromIntro()">بدء اللعبة</button>
+
+          <button
+            type="button"
+            class="introPresenterEyeBtn"
+            onclick="openPresenterIntroModal()"
+            aria-label="عرض QR صفحة المقدم"
+          >
+            👁
+          </button>
         </div>
 
       </div>
 
     </div>
+  </div>
 
+  <div id="presenterIntroModal" class="introPresenterModal hidden">
+    <div class="introPresenterModalCard">
+      <button
+        type="button"
+        class="introPresenterModalClose"
+        onclick="closePresenterIntroModal()"
+        aria-label="إغلاق"
+      >
+        ×
+      </button>
+
+      <div class="introPresenterModalTitle">صفحة المقدم</div>
+      <div class="introPresenterModalText">امسح QR من الآيفون لفتح لوحة المقدم</div>
+
+      <div class="introPresenterQrBox">
+        <img id="presenterIntroQr" alt="QR صفحة المقدم">
+      </div>
+
+      <div id="presenterIntroLink" class="introPresenterLink"></div>
+
+      <button type="button" class="introPresenterCopyBtn" onclick="copyPresenterIntroLink()">
+        نسخ الرابط
+      </button>
+    </div>
   </div>
 
   <div id="gameToast" class="gameToast hidden">
+    <div class="gameToastIcon">!</div>
     <div id="gameToastText" class="gameToastText"></div>
   </div>
 
