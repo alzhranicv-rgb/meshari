@@ -1,0 +1,1038 @@
+/* =========================
+   ARCHIVE / الأرشيف
+========================= */
+
+.archiveMainWrap{
+  width:100%;
+  max-width:100%;
+  margin:0 auto;
+  padding:0 24px;
+  display:grid;
+  grid-template-columns:620px 280px;
+  gap:28px;
+  justify-content:center;
+  align-items:start;
+  direction:ltr;
+}
+
+.archiveBoardArea{
+  width:620px;
+  display:flex;
+  justify-content:center;
+}
+
+.archiveBoardWrap{
+  width:100%;
+  display:flex;
+  justify-content:center;
+}
+
+.archiveBoard{
+  width:620px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  direction:rtl;
+}
+
+.archiveSidePanel{
+  width:100%;
+  max-width:280px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  direction:rtl;
+  transform:translateX(150px);
+}
+
+/* =========================
+   THEMES
+========================= */
+
+.archiveThemeRound1.archiveModernBoard{
+  --arc-main:#FFB84D;
+  --arc-dark:#25343F;
+  --arc-soft:#FFF5E2;
+  --arc-border:#E9A33A;
+  --arc-dark-text:#2E3A4D;
+  --arc-light-text:#FFFFFF;
+}
+
+.archiveThemeRound2.archiveModernBoard{
+  --arc-main:#FF8A8A;
+  --arc-dark:#25343F;
+  --arc-soft:#FFF0F0;
+  --arc-border:#E16767;
+  --arc-dark-text:#2E3A4D;
+  --arc-light-text:#FFFFFF;
+}
+
+.archiveThemeRound3.archiveModernBoard{
+  --arc-main:#77D99A;
+  --arc-dark:#25343F;
+  --arc-soft:#EEFBEF;
+  --arc-border:#4DBB74;
+  --arc-dark-text:#2E3A4D;
+  --arc-light-text:#FFFFFF;
+}
+
+.archiveThemeRound4.archiveModernBoard{
+  --arc-main:#8ED0E6;
+  --arc-dark:#25343F;
+  --arc-soft:#EFF9FD;
+  --arc-border:#5FB5D3;
+  --arc-dark-text:#2E3A4D;
+  --arc-light-text:#FFFFFF;
+}
+
+/* =========================
+   BOARD TOP
+========================= */
+
+.archiveModernTop{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.archiveModernInfoCard{
+  min-height:60px;
+  border:1px solid var(--arc-border);
+  border-radius:18px;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:128px 1fr;
+  background:var(--arc-soft);
+  box-shadow:
+    0 10px 22px rgba(39,48,61,.05),
+    inset 0 1px 0 rgba(255,255,255,.35);
+}
+
+.archiveModernInfoLabel{
+  background:var(--arc-dark);
+  color:var(--arc-light-text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px 10px;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.5rem;
+  line-height:1.2;
+}
+
+.archiveModernInfoValue{
+  position:relative;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--arc-main) 92%,white 8%) 0%,var(--arc-main) 100%);
+  color:var(--arc-dark-text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px 10px;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.28rem;
+  line-height:1.2;
+  overflow:hidden;
+}
+
+.archiveModernInfoValue span{
+  position:relative;
+  z-index:2;
+}
+
+.archiveModernInfoValue.archiveWhiteHidden::before{
+  content:attr(data-number);
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--arc-main) 92%,white 8%) 0%,var(--arc-main) 100%);
+  color:var(--arc-dark-text);
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.65rem;
+  line-height:1;
+}
+
+/* =========================
+   BOARD MIDDLE
+========================= */
+
+.archiveModernMiddle{
+  width:100%;
+  max-width:560px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:195px 128px 195px;
+  gap:10px;
+  align-items:stretch;
+  justify-content:center;
+}
+
+.archiveModernBigCard{
+  min-height:175px;
+  max-height:175px;
+  padding:0;
+  border:1px solid var(--arc-border);
+  border-radius:22px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--arc-main) 92%,white 8%) 0%,var(--arc-main) 100%);
+  color:var(--arc-dark-text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:3.8rem;
+  line-height:1;
+  position:relative;
+  overflow:hidden;
+  box-shadow:
+    0 10px 22px rgba(39,48,61,.05),
+    inset 0 1px 0 rgba(255,255,255,.28);
+}
+
+.archiveModernBigCard.archiveWhiteHidden::before{
+  content:attr(data-number);
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--arc-main) 92%,white 8%) 0%,var(--arc-main) 100%);
+  color:var(--arc-dark-text);
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:3.8rem;
+  line-height:1;
+}
+
+.archiveModernBigCard.revealed::before{
+  display:none;
+}
+
+.archiveModernBigCard img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  display:block;
+  background:rgba(255,255,255,.08);
+}
+
+.archiveModernScoreCard{
+  min-height:175px;
+  border:1px solid var(--arc-border);
+  border-radius:22px;
+  overflow:hidden;
+  display:grid;
+  grid-template-rows:58px 1fr;
+  box-shadow:
+    0 10px 22px rgba(39,48,61,.05),
+    inset 0 1px 0 rgba(255,255,255,.28);
+}
+
+.archiveModernScoreLabel{
+  background:var(--arc-dark);
+  color:var(--arc-light-text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.75rem;
+  line-height:1.2;
+}
+
+.archiveModernScoreValue{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--arc-main) 92%,white 8%) 0%,var(--arc-main) 100%);
+  color:var(--arc-dark-text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2rem;
+  line-height:1;
+}
+
+/* =========================
+   BOARD BOTTOM
+========================= */
+
+.archiveBottomGrid{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.archiveBottomCol{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.archiveModernSmallCard{
+  min-height:56px;
+  height:56px;
+  border:1px solid var(--arc-border);
+  border-radius:16px;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:1fr 54px;
+  box-shadow:
+    0 8px 16px rgba(39,48,61,.04),
+    inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+.archiveModernSmallCard.archivePromptBall{
+  background:var(--arc-dark);
+  color:var(--arc-light-text);
+}
+
+.archiveModernSmallCard.archivePromptShoe{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--arc-main) 92%,white 8%) 0%,var(--arc-main) 100%);
+  color:var(--arc-dark-text);
+}
+
+.archiveModernSmallMain{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:0 10px;
+}
+
+.archiveModernSmallNumber{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.8rem;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.archiveModernSmallLabel{
+  font-family:"HanakaText",sans-serif;
+  font-size:.95rem;
+  line-height:1.2;
+  white-space:nowrap;
+}
+
+.archiveModernSmallCard .archiveModernSmallText{
+  text-align:center !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:1.4rem !important;
+  line-height:1.1 !important;
+  word-break:break-word !important;
+}
+
+.archiveModernSmallEmoji{
+  border-right:1px solid var(--arc-border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.53rem;
+  line-height:1;
+}
+
+/* =========================
+   WANTED / المطلوب
+========================= */
+
+.archiveModernSmallCard.archiveWantedItem,
+.archiveModernSmallCard:has(.archiveRequiredLabel){
+  background:#FF0000 !important;
+  color:#FFFFFF !important;
+  border:2px solid #C40000 !important;
+  box-shadow:
+    0 10px 20px rgba(255,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallText,
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallLabel,
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallNumber,
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallEmoji,
+.archiveModernSmallCard:has(.archiveRequiredLabel) .archiveModernSmallText,
+.archiveModernSmallCard:has(.archiveRequiredLabel) .archiveModernSmallLabel,
+.archiveModernSmallCard:has(.archiveRequiredLabel) .archiveModernSmallNumber,
+.archiveModernSmallCard:has(.archiveRequiredLabel) .archiveModernSmallEmoji,
+.archiveRequiredLabel{
+  color:#FFFFFF !important;
+}
+
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallText,
+.archiveModernSmallCard:has(.archiveRequiredLabel) .archiveModernSmallText,
+.archiveRequiredLabel{
+  font-size:1.5rem !important;
+  line-height:1 !important;
+  font-weight:700 !important;
+}
+
+.archiveModernSmallCard.archiveWantedItem .archiveModernSmallMain{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding-inline:8px !important;
+}
+
+.archiveModernSmallCard:has(.archiveRequiredLabel) .archiveModernSmallEmoji{
+  border-right:2px solid rgba(255,255,255,.22) !important;
+}
+
+/* =========================
+   SIDE PANEL
+========================= */
+
+.archiveSideRound{
+  min-height:52px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  border:1px solid var(--border-soft,#d9e0e0);
+  box-shadow:
+    0 10px 22px rgba(39,48,61,.05),
+    inset 0 1px 0 rgba(255,255,255,.92);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#2F4158;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.2rem;
+  line-height:1.2;
+}
+
+.archiveSideTeamCard{
+  padding:10px 12px;
+  border-radius:18px;
+  border:1px solid var(--border-soft,#d9e0e0);
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  box-shadow:
+    0 12px 24px rgba(255,155,81,.16),
+    inset 0 1px 0 rgba(255,255,255,.22);
+  cursor:pointer;
+  transition:transform .16s ease, box-shadow .16s ease;
+}
+
+.archiveSideTeamCard:hover{
+  transform:translateY(-2px);
+}
+
+.archiveSideTeamCard.activeTeam{
+  border-color:#D66F28 !important;
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.18),
+    0 16px 26px rgba(255,155,81,.22),
+    inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+
+.archiveSideTeamRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.archiveSideTeamName{
+  flex:1;
+  text-align:center;
+  color:#2E3A4D;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.34rem;
+  line-height:1.2;
+}
+
+.archiveSideTeamScore{
+  flex:0 0 auto;
+  min-width:48px;
+  height:38px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FFF4EC 100%);
+  border:1px solid rgba(255,155,81,.16);
+  color:#C96A25;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.52rem;
+  line-height:1;
+}
+
+.archiveSideErrors{
+  margin-top:8px;
+  display:flex;
+  justify-content:center;
+  gap:10px;
+}
+
+.archiveSideErrors .errorMark{
+  font-size:2rem;
+  line-height:1;
+  color:rgba(46,58,77,.24);
+}
+
+.archiveSideErrors .errorMark.active{
+  color:#FF0000;
+}
+
+.archiveSideTimerBox{
+  min-height:118px;
+  border-radius:20px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  border:1px solid var(--border-soft,#d9e0e0);
+  box-shadow:
+    0 10px 22px rgba(39,48,61,.05),
+    inset 0 1px 0 rgba(255,255,255,.92);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:10px 12px;
+}
+
+.archiveSideTimerLabel{
+  color:#6A7886;
+  font-family:"HanakaText",sans-serif;
+  font-size:.92rem;
+  line-height:1.2;
+}
+
+.archiveSideTimerValue{
+  margin-top:3px;
+  color:#25343F;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2.4rem;
+  line-height:1;
+}
+
+.archiveTimerBtn{
+  margin-top:8px;
+  width:100%;
+  min-height:44px;
+  background:#FF9B51;
+  color:#FFFFFF;
+  box-shadow:0 12px 24px rgba(255,155,81,.24);
+}
+
+/* =========================
+   CONTROL BUTTONS
+========================= */
+
+.archiveControlButtons{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+  width:100% !important;
+}
+
+.archiveControlButtons .archiveCtrlBtn,
+.archiveControlButtons button,
+.archiveCtrlBtn{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  min-height:46px !important;
+  height:46px !important;
+  padding:0 14px !important;
+  border:0;
+  border-radius:16px !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  cursor:pointer;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:1.02rem !important;
+  line-height:1.1 !important;
+  transition:transform .18s ease, box-shadow .18s ease, filter .18s ease, opacity .18s ease;
+}
+
+.archiveCtrlBtn:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.03);
+}
+
+.archiveCtrlBtn:disabled{
+  opacity:.58;
+  cursor:not-allowed;
+  transform:none !important;
+  filter:none;
+}
+
+.archiveErrorBtn{
+  grid-column:1 !important;
+  grid-row:1 !important;
+  background:#FF0000;
+  color:#FFFFFF;
+  box-shadow:0 12px 24px rgba(255,0,0,.22);
+}
+
+.archiveAnswerBtn{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  background:#009900;
+  color:#FFFFFF;
+  box-shadow:0 12px 24px rgba(0,153,0,.22);
+}
+
+.archiveUndoBtn,
+#archiveUndoBtn{
+  grid-column:1 !important;
+  grid-row:2 !important;
+  background:#660000 !important;
+  color:#FFFFFF !important;
+  box-shadow:0 12px 24px rgba(102,0,0,.24) !important;
+}
+
+.archiveNextBtn{
+  grid-column:2 !important;
+  grid-row:2 !important;
+  background:#D6C1A6;
+  color:#FFFFFF;
+  box-shadow:0 12px 24px rgba(102,0,0,.24);
+}
+
+.archivePrevBtn{
+  background:#D6C1A6;
+  color:#FFFFFF;
+  box-shadow:0 12px 24px rgba(102,0,0,.24);
+}
+
+.archiveDoubleBtn{
+  background:linear-gradient(180deg,#ffb15f 0%,#ff8a2a 100%) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,138,42,.45) !important;
+  box-shadow:
+    0 10px 20px rgba(255,138,42,.22),
+    inset 0 1px 0 rgba(255,255,255,.35) !important;
+}
+
+.archiveDoubleBtn:hover:not(:disabled){
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+.archiveDoubleBtn.activeDouble{
+  background:linear-gradient(180deg,#ffcf75 0%,#ff9b2f 100%) !important;
+  animation:archiveDoublePulse .65s ease-in-out infinite alternate;
+}
+
+.archiveDoubleBtn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none !important;
+}
+
+@keyframes archiveDoublePulse{
+  from{
+    box-shadow:
+      0 0 0 rgba(255,155,47,0),
+      0 10px 20px rgba(255,138,42,.22);
+  }
+  to{
+    box-shadow:
+      0 0 18px rgba(255,155,47,.65),
+      0 12px 24px rgba(255,138,42,.30);
+  }
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.archiveInputsInline{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.archiveInputRow{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.archiveInputLabel{
+  text-align:center;
+  color:#5F6D7B;
+  font-family:"HanakaText",sans-serif;
+  font-size:.84rem;
+  line-height:1.2;
+}
+
+.archiveMiniInput,
+.archiveMiniInputStrong{
+  font-family:"HanakaText",sans-serif;
+}
+
+.archiveMiniInputStrong{
+  width:100%;
+  height:58px;
+  min-height:58px;
+  border-radius:14px;
+  text-align:center;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2.4rem;
+  line-height:1;
+  padding:0 8px;
+  background:#7a1630;
+  border:1px solid var(--border-soft,#d9e0e0);
+  color:#FFFFFF;
+  box-shadow:
+    0 8px 18px rgba(39,48,61,.05),
+    inset 0 1px 0 rgba(255,255,255,.94);
+}
+
+.archiveMiniInputStrong::placeholder{
+  color:#9AA6B2;
+}
+
+/* =========================
+   NUMBERS
+========================= */
+
+.archiveBoard,
+.archiveBoard *,
+.archiveSidePanel,
+.archiveSidePanel *,
+.archiveModernScoreValue,
+.archiveSideTimerValue,
+.archiveSideTeamScore,
+.archiveModernBigCard,
+.archiveModernBigCard::before,
+.archiveModernInfoValue.archiveWhiteHidden::before,
+.archiveModernSmallNumber,
+.archiveMiniInputStrong,
+.archiveCtrlBtn{
+  font-variant-numeric:lining-nums !important;
+}
+
+.archiveModernScoreValue,
+.archiveSideTimerValue,
+.archiveSideTeamScore,
+.archiveModernBigCard,
+.archiveModernBigCard::before,
+.archiveModernInfoValue.archiveWhiteHidden::before,
+.archiveModernSmallNumber,
+.archiveMiniInputStrong{
+  direction:ltr !important;
+  unicode-bidi:embed !important;
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (min-width:761px) and (max-width:1100px){
+  .archiveMainWrap{
+    width:100% !important;
+    max-width:980px !important;
+    margin:0 auto !important;
+    padding:0 18px !important;
+    grid-template-columns:minmax(0,1fr) 250px !important;
+    gap:18px !important;
+    align-items:start !important;
+  }
+
+  .archiveBoardArea{
+    width:100% !important;
+    max-width:none !important;
+    justify-content:center !important;
+  }
+
+  .archiveBoardWrap{
+    width:100% !important;
+    justify-content:center !important;
+  }
+
+  .archiveBoard{
+    width:100% !important;
+    max-width:690px !important;
+    margin:0 !important;
+    gap:10px !important;
+  }
+
+  .archiveSidePanel{
+    width:100% !important;
+    max-width:250px !important;
+    transform:none !important;
+    margin:0 !important;
+    justify-self:start !important;
+    align-self:start !important;
+    gap:10px !important;
+  }
+
+  .archiveModernTop{
+    grid-template-columns:1fr 1fr !important;
+    gap:10px !important;
+  }
+
+  .archiveModernInfoCard{
+    min-height:64px !important;
+    grid-template-columns:120px 1fr !important;
+  }
+
+  .archiveModernInfoLabel{
+    font-size:1.15rem !important;
+  }
+
+  .archiveModernInfoValue{
+    font-size:1.1rem !important;
+  }
+
+  .archiveModernMiddle{
+    width:100% !important;
+    max-width:none !important;
+    grid-template-columns:minmax(0,1fr) 118px minmax(0,1fr) !important;
+    gap:10px !important;
+  }
+
+  .archiveModernBigCard{
+    min-height:150px !important;
+    max-height:150px !important;
+    font-size:3.1rem !important;
+  }
+
+  .archiveModernBigCard.archiveWhiteHidden::before{
+    font-size:3.5rem !important;
+  }
+
+  .archiveModernScoreCard{
+    min-height:150px !important;
+    grid-template-rows:48px 1fr !important;
+  }
+
+  .archiveModernScoreLabel{
+    font-size:1.15rem !important;
+  }
+
+  .archiveModernScoreValue{
+    font-size:2.2rem !important;
+  }
+
+  .archiveModernSmallCard{
+    min-height:54px !important;
+    height:54px !important;
+    grid-template-columns:1fr 50px !important;
+    border-radius:14px !important;
+  }
+
+  .archiveModernSmallCard .archiveModernSmallText{
+    font-size:1.15rem !important;
+    line-height:1.05 !important;
+  }
+
+  .archiveModernSmallEmoji{
+    font-size:1.2rem !important;
+  }
+
+  .archiveSideRound{
+    min-height:48px !important;
+    font-size:1rem !important;
+  }
+
+  .archiveSideTeamName{
+    font-size:1rem !important;
+  }
+
+  .archiveSideTeamScore{
+    min-width:42px !important;
+    height:34px !important;
+    font-size:1.2rem !important;
+  }
+
+  .archiveSideTimerValue{
+    font-size:2rem !important;
+  }
+
+  .archiveCtrlBtn{
+    min-height:44px !important;
+    font-size:.92rem !important;
+  }
+
+  .archiveMiniInputStrong{
+    height:52px !important;
+    min-height:52px !important;
+    font-size:1.8rem !important;
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width:760px){
+  .archiveMainWrap{
+    padding:0;
+    grid-template-columns:1fr !important;
+    gap:18px;
+  }
+
+  .archiveBoardArea,
+  .archiveBoard{
+    width:100% !important;
+    max-width:620px !important;
+    margin:0 !important;
+  }
+
+  .archiveSidePanel{
+    width:100% !important;
+    max-width:620px !important;
+    margin:0 auto !important;
+    transform:none !important;
+    gap:10px;
+  }
+
+  .archiveBoard{
+    gap:8px;
+  }
+
+  .archiveModernTop{
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .archiveModernInfoCard{
+    min-height:52px;
+    border-radius:14px;
+    grid-template-columns:108px 1fr;
+  }
+
+  .archiveModernInfoLabel{
+    font-size:.92rem;
+  }
+
+  .archiveModernInfoValue{
+    font-size:1.05rem;
+  }
+
+  .archiveModernInfoValue.archiveWhiteHidden::before{
+    font-size:1.15rem;
+  }
+
+  .archiveModernMiddle{
+    max-width:none;
+    grid-template-columns:1fr 90px 1fr;
+    gap:8px;
+  }
+
+  .archiveModernBigCard{
+    min-height:118px;
+    max-height:118px;
+    border-radius:16px;
+    font-size:2.4rem;
+  }
+
+  .archiveModernBigCard.archiveWhiteHidden::before{
+    font-size:2.4rem;
+  }
+
+  .archiveModernScoreCard{
+    min-height:118px;
+    border-radius:16px;
+    grid-template-rows:42px 1fr;
+  }
+
+  .archiveModernScoreLabel{
+    font-size:.92rem;
+  }
+
+  .archiveModernScoreValue{
+    font-size:1.4rem;
+  }
+
+  .archiveBottomGrid{
+    gap:8px;
+  }
+
+  .archiveBottomCol{
+    gap:8px;
+  }
+
+  .archiveModernSmallCard{
+    min-height:48px;
+    height:48px;
+    border-radius:12px;
+    grid-template-columns:1fr 42px;
+  }
+
+  .archiveModernSmallNumber{
+    font-size:1.05rem;
+  }
+
+  .archiveModernSmallLabel{
+    font-size:.76rem;
+  }
+
+  .archiveModernSmallCard .archiveModernSmallText{
+    font-size:.82rem !important;
+  }
+
+  .archiveModernSmallEmoji{
+    font-size:1rem;
+  }
+
+  .archiveSideRound{
+    min-height:46px;
+    border-radius:14px;
+    font-size:1rem;
+  }
+
+  .archiveSideTeamCard{
+    padding:8px 10px;
+    border-radius:14px;
+  }
+
+  .archiveSideTeamName{
+    font-size:1.08rem !important;
+  }
+
+  .archiveSideTeamScore{
+    min-width:42px;
+    height:34px;
+    font-size:1.24rem !important;
+  }
+
+  .archiveSideErrors .errorMark{
+    font-size:1.18rem;
+  }
+
+  .archiveSideTimerBox{
+    min-height:102px;
+    border-radius:16px;
+  }
+
+  .archiveSideTimerLabel{
+    font-size:.84rem;
+  }
+
+  .archiveSideTimerValue{
+    font-size:2rem;
+  }
+
+  .archiveControlButtons{
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+  }
+
+  .archiveControlButtons .archiveCtrlBtn,
+  .archiveControlButtons button{
+    min-height:44px !important;
+    height:44px !important;
+    border-radius:14px !important;
+    font-size:.92rem !important;
+  }
+
+  .archiveInputsInline{
+    gap:8px;
+  }
+
+  .archiveMiniInputStrong{
+    height:50px;
+    min-height:50px;
+    border-radius:12px;
+    font-size:1.2rem;
+  }
+}

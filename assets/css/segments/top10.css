@@ -1,0 +1,703 @@
+/* =========================
+   TOP 10
+========================= */
+
+.top10Wrap{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  padding:8px 0 18px;
+  overflow:hidden;
+}
+
+.top10MainBoard{
+  position:relative;
+  width:min(100%,1280px);
+  margin:0 auto;
+  overflow:hidden;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  border:1px solid rgba(217,224,224,.95);
+  border-radius:34px;
+  box-shadow:
+    0 20px 40px rgba(39,48,61,.08),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.top10MainBoard::before{
+  content:"";
+  position:absolute;
+  width:220px;
+  height:220px;
+  top:-90px;
+  right:-80px;
+  border-radius:50%;
+  background:rgba(255,155,81,.08);
+}
+
+.top10MainBoard::after{
+  content:"";
+  position:absolute;
+  width:150px;
+  height:150px;
+  bottom:-70px;
+  left:-40px;
+  border-radius:28px;
+  transform:rotate(24deg);
+  background:rgba(47,65,88,.04);
+}
+
+/* =========================
+   HEADER / SCOREBOARD
+========================= */
+
+.top10HeaderBar{
+  position:relative;
+  z-index:2;
+  display:grid !important;
+  grid-template-columns:1fr 240px 1fr !important;
+  gap:16px !important;
+  align-items:stretch !important;
+  width:100%;
+}
+
+.top10ScoreCard,
+.top10MiddleCard{
+  position:relative !important;
+  overflow:hidden !important;
+  min-width:0;
+  max-width:100%;
+  min-height:108px !important;
+  height:108px !important;
+  border-radius:28px;
+  border:1px solid rgba(255,155,81,.36);
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  box-shadow:
+    0 14px 30px rgba(255,155,81,.18),
+    inset 0 1px 0 rgba(255,255,255,.28);
+}
+
+.top10ScoreCard::before,
+.top10MiddleCard::before{
+  content:"";
+  position:absolute;
+  width:120px;
+  height:120px;
+  top:-55px;
+  right:-20px;
+  border-radius:50%;
+  background:rgba(255,255,255,.16);
+}
+
+.top10ScoreCard::after,
+.top10MiddleCard::after{
+  content:"";
+  position:absolute;
+  width:76px;
+  height:76px;
+  bottom:-24px;
+  left:-14px;
+  border-radius:22px;
+  transform:rotate(24deg);
+  background:rgba(140,77,21,.08);
+}
+
+.top10ScoreCard{
+  padding:0 20px !important;
+  display:grid !important;
+  align-items:center !important;
+  cursor:pointer;
+}
+
+.top10ScoreCard.activeTeam{
+  border-color:#D66F28 !important;
+  box-shadow:
+    0 0 0 5px rgba(255,155,81,.18),
+    0 18px 34px rgba(255,155,81,.22),
+    inset 0 1px 0 rgba(255,255,255,.30) !important;
+}
+
+#top10TeamA{
+  grid-template-columns:minmax(0,1fr) 64px !important;
+}
+
+#top10TeamB{
+  grid-template-columns:64px minmax(0,1fr) !important;
+}
+
+.top10ScoreName{
+  min-width:0 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  font-family:"HanakaText", sans-serif !important;
+  font-size:1.95rem !important;
+  line-height:1.05 !important;
+  color:#1F2F46 !important;
+  align-self:center !important;
+  z-index:3 !important;
+}
+
+.top10ScoreNameLeft{
+  text-align:left !important;
+  justify-self:start !important;
+  padding-left:6px !important;
+}
+
+.top10ScoreNameRight{
+  text-align:right !important;
+  justify-self:end !important;
+  padding-right:6px !important;
+}
+
+.top10ScoreValue{
+  width:64px !important;
+  min-width:64px !important;
+  height:46px !important;
+  border-radius:14px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FFF4EC 100%);
+  border:2px solid rgba(255,155,81,.14);
+  box-shadow:
+    inset 0 2px 8px rgba(255,255,255,.98),
+    0 4px 10px rgba(255,155,81,.10);
+  color:#C96A25;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.7rem !important;
+  line-height:1 !important;
+  z-index:3 !important;
+}
+
+.top10ScoreValueRight{
+  justify-self:end !important;
+}
+
+.top10ScoreValueLeft{
+  justify-self:start !important;
+}
+
+.top10ScoreErrors,
+#top10ErrorsA,
+#top10ErrorsB{
+  position:absolute !important;
+  top:50% !important;
+  left:50% !important;
+  transform:translate(-50%,-50%) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+  min-width:120px !important;
+  margin:0 !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+}
+
+.top10ScoreErrors .errorMark{
+  font-size:3rem !important;
+  line-height:1 !important;
+  color:rgba(46,58,77,.24) !important;
+}
+
+.top10ScoreErrors .errorMark.active{
+  color:#FF0000 !important;
+}
+
+.top10ScoreHead,
+.top10ScoreHead.reverse,
+.top10ScoreRow,
+.top10ScoreRow.reverse{
+  display:contents !important;
+}
+
+/* =========================
+   MIDDLE CARD
+========================= */
+
+.top10MiddleCard{
+  padding:10px 14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  text-align:center;
+}
+
+.top10MiddleTimer{
+  position:relative;
+  z-index:2;
+  color:#2E3A4D;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2.4rem;
+  line-height:1;
+}
+
+.top10MiddleTurn{
+  position:relative;
+  z-index:2;
+  color:#7A4A22;
+  font-family:"HanakaText", sans-serif;
+  font-size:1rem;
+  line-height:1.2;
+  text-wrap:balance;
+}
+
+/* =========================
+   QUESTION
+========================= */
+
+.top10QuestionBox{
+  position:relative;
+  z-index:2;
+  min-height:100px;
+  border-radius:24px;
+  border:1px solid rgba(217,224,224,.95);
+  background:linear-gradient(180deg, rgba(255,255,255,.99) 0%, rgba(244,247,247,.97) 100%);
+  box-shadow:
+    0 12px 26px rgba(39,48,61,.05),
+    inset 0 1px 0 rgba(255,255,255,.96);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:1px 2px;
+  color:#2F4158;
+  font-family:"HanakaText", sans-serif;
+  font-size:clamp(1.75rem,1.7vw,1.7rem);
+  line-height:2.65;
+  overflow:hidden;
+}
+
+.top10QuestionBox::before{
+  content:"";
+  position:absolute;
+  width:140px;
+  height:140px;
+  top:-54px;
+  right:-34px;
+  border-radius:50%;
+  background:rgba(255,155,81,.10);
+}
+
+.top10QuestionBox::after{
+  content:"";
+  position:absolute;
+  width:76px;
+  height:76px;
+  bottom:-20px;
+  left:-10px;
+  border-radius:18px;
+  transform:rotate(22deg);
+  background:rgba(47,65,88,.05);
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.top10ControlPanel{
+  display:grid !important;
+  grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+  gap:10px !important;
+  align-items:stretch !important;
+  width:100% !important;
+}
+
+.top10ControlPanel button{
+  width:100% !important;
+  min-width:0 !important;
+  min-height:48px !important;
+  height:54px;
+  padding:0 10px;
+  border:0;
+  border-radius:16px !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  font-family:"HanakaText", sans-serif;
+  font-size:.98rem;
+  line-height:1.1;
+  cursor:pointer;
+  transition:transform .16s ease, filter .16s ease, box-shadow .16s ease;
+}
+
+.top10ControlPanel button:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.03);
+}
+
+.top10StartBtn{
+  background:#28D7E5;
+  color:#16313A;
+  box-shadow:0 12px 24px rgba(40,215,229,.20);
+}
+
+.btnAnswer{
+  background:#0AA000;
+  color:#FFFFFF;
+  box-shadow:0 12px 24px rgba(10,160,0,.20);
+}
+
+.top10ErrorBtnSingle{
+  background:#FF5A66;
+  color:#FFFFFF;
+  box-shadow:0 12px 24px rgba(255,90,102,.20);
+}
+
+.undoBtn{
+  background:#3D0614;
+  color:#FFFFFF;
+  box-shadow:0 12px 24px rgba(61,6,20,.22);
+}
+
+.switchTurnBtn{
+  background:#2F6BFF !important;
+  color:#FFFFFF !important;
+  box-shadow:0 12px 24px rgba(47,107,255,.22) !important;
+}
+
+.roundNavBtn{
+  background:#E4D9C7;
+  color:#2F4158;
+  box-shadow:0 12px 24px rgba(228,217,199,.22);
+}
+
+.top10DoubleBtn{
+  border:0;
+  font-family:"HanakaText", sans-serif;
+  font-weight:900;
+  cursor:pointer;
+  color:#fff;
+  background:linear-gradient(180deg,#ffb15f 0%,#ff8a2a 100%);
+  box-shadow:
+    0 10px 20px rgba(255,138,42,.22),
+    inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .18s ease, filter .18s ease, opacity .18s ease;
+}
+
+.top10DoubleBtn:hover:not(:disabled){
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+.top10DoubleBtn.activeDouble{
+  background:linear-gradient(180deg,#ffcf75 0%,#ff9b2f 100%);
+  animation:top10DoublePulse .65s ease-in-out infinite alternate;
+}
+
+.top10DoubleBtn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none !important;
+}
+
+@keyframes top10DoublePulse{
+  from{
+    box-shadow:
+      0 0 0 rgba(255,155,47,0),
+      0 10px 20px rgba(255,138,42,.22);
+  }
+  to{
+    box-shadow:
+      0 0 18px rgba(255,155,47,.65),
+      0 12px 24px rgba(255,138,42,.30);
+  }
+}
+
+/* =========================
+   NUMBERS
+========================= */
+
+.top10NumbersShell{
+  background:linear-gradient(180deg, rgba(255,255,255,.86) 0%, rgba(244,247,247,.92) 100%);
+  border:1px solid rgba(217,224,224,.75);
+  border-radius:26px;
+  padding:14px;
+}
+
+.top10NumbersArea{
+  width:100%;
+  max-width:1160px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.top10Side{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.top10Rect{
+  position:relative;
+  width:100% !important;
+  max-width:420px !important;
+  min-height:64px !important;
+  height:64px !important;
+  margin:0 auto !important;
+  border:0;
+  border-radius:18px;
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
+  color:#FFFFFF;
+  border:1px solid rgba(47,65,88,.18);
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.5rem;
+  line-height:1;
+  cursor:pointer;
+  box-shadow:
+    0 10px 20px rgba(36,52,71,.16),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    background .25s ease,
+    color .25s ease,
+    border-color .25s ease;
+  overflow:hidden;
+}
+
+.top10Rect::before{
+  content:"";
+  position:absolute;
+  width:48px;
+  height:48px;
+  top:-14px;
+  right:-8px;
+  border-radius:50%;
+  background:rgba(255,255,255,.08);
+}
+
+.top10Rect::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  box-shadow:inset 0 -8px 16px rgba(0,0,0,.16);
+  pointer-events:none;
+}
+
+.top10Rect:hover:not(.opened){
+  transform:translateY(-2px);
+  box-shadow:0 14px 24px rgba(36,52,71,.20);
+}
+
+.top10Rect.opened{
+  background:linear-gradient(180deg,#a4b2c4 0%,#a4b2c4 100%);
+  color:#243447;
+  border:1px solid #0b1829;
+  box-shadow:0 8px 18px rgba(255,155,81,.18);
+  cursor:default;
+}
+
+.top10Rect.opened:hover{
+  transform:none;
+}
+
+.top10RectInner{
+  display:block;
+  font-size:1.5rem;
+  line-height:1.4;
+  font-family:"HanakaDisplay", sans-serif;
+  transition:opacity .25s ease, transform .25s ease;
+}
+
+.top10Rect.opened .top10RectInner{
+  color:#243447;
+  font-weight:700;
+}
+
+.top10Rect.top10RevealFx{
+  animation:top10RevealPop .42s ease;
+}
+
+.top10Rect.top10RevealFx .top10RectInner{
+  animation:top10RevealInner .42s ease;
+}
+
+@keyframes top10RevealPop{
+  0%{
+    transform:scale(.88);
+    opacity:.25;
+    filter:brightness(1.15);
+  }
+  60%{
+    transform:scale(1.06);
+    opacity:1;
+    filter:brightness(1.05);
+  }
+  100%{
+    transform:scale(1);
+    opacity:1;
+    filter:brightness(1);
+  }
+}
+
+@keyframes top10RevealInner{
+  0%{
+    transform:translateY(10px);
+    opacity:0;
+  }
+  100%{
+    transform:translateY(0);
+    opacity:1;
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width:1100px){
+  .top10HeaderBar{
+    grid-template-columns:1fr !important;
+  }
+
+  .top10ScoreCard{
+    min-height:92px !important;
+    height:92px !important;
+    padding:0 16px !important;
+  }
+
+  #top10TeamA{
+    grid-template-columns:minmax(0,1fr) 58px !important;
+  }
+
+  #top10TeamB{
+    grid-template-columns:58px minmax(0,1fr) !important;
+  }
+
+  .top10ScoreName{
+    font-size:1.2rem !important;
+  }
+
+  .top10ScoreErrors,
+  #top10ErrorsA,
+  #top10ErrorsB{
+    min-width:94px !important;
+    gap:8px !important;
+  }
+
+  .top10ScoreErrors .errorMark{
+    font-size:1.45rem !important;
+  }
+
+  .top10ScoreValue{
+    width:58px !important;
+    min-width:58px !important;
+    height:42px !important;
+    font-size:1.3rem !important;
+  }
+
+  .top10QuestionBox{
+    font-size:1.45rem;
+  }
+
+  .top10ControlPanel{
+    grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+
+  .top10ControlPanel button{
+    min-height:42px !important;
+    font-size:.75rem !important;
+    padding:7px 4px !important;
+    border-radius:12px !important;
+  }
+
+  .top10NumbersArea{
+    gap:12px;
+  }
+
+  .top10Rect,
+  .top10RectInner{
+    font-size:1.4rem !important;
+  }
+}
+
+@media (max-width:760px){
+  .top10MainBoard{
+    padding:14px;
+    border-radius:24px;
+  }
+
+  .top10ScoreCard{
+    min-height:82px !important;
+    height:82px !important;
+    padding:0 12px !important;
+    border-radius:20px !important;
+  }
+
+  #top10TeamA{
+    grid-template-columns:minmax(0,1fr) 50px !important;
+  }
+
+  #top10TeamB{
+    grid-template-columns:50px minmax(0,1fr) !important;
+  }
+
+  .top10ScoreName{
+    font-size:1rem !important;
+  }
+
+  .top10ScoreErrors,
+  #top10ErrorsA,
+  #top10ErrorsB{
+    min-width:76px !important;
+    gap:6px !important;
+  }
+
+  .top10ScoreErrors .errorMark{
+    font-size:1.1rem !important;
+  }
+
+  .top10ScoreValue{
+    width:50px !important;
+    min-width:50px !important;
+    height:38px !important;
+    border-radius:14px !important;
+    font-size:1.1rem !important;
+  }
+
+  .top10MiddleCard{
+    min-height:82px;
+    height:82px;
+    border-radius:20px;
+  }
+
+  .top10MiddleTimer{
+    font-size:1.8rem;
+  }
+
+  .top10MiddleTurn{
+    font-size:.9rem;
+  }
+
+  .top10QuestionBox{
+    min-height:92px;
+    padding:14px 16px;
+    font-size:1.05rem;
+  }
+
+  .top10ControlPanel{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  .top10Rect{
+    min-height:56px !important;
+    height:56px !important;
+    font-size:1.25rem !important;
+  }
+
+  .top10RectInner{
+    font-size:1.25rem !important;
+  }
+}

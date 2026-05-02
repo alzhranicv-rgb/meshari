@@ -1,0 +1,387 @@
+/* =========================
+   INTRO PAGE
+========================= */
+
+.introPage{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:30px 18px;
+  background:
+    radial-gradient(circle at top right, rgba(255,155,81,.14), transparent 22%),
+    radial-gradient(circle at 18% 85%, rgba(47,65,88,.07), transparent 22%),
+    linear-gradient(180deg,#F4F7F7 0%,#EAEFEF 100%);
+  position:relative;
+  overflow:hidden;
+}
+
+.introPage::before{
+  content:"";
+  position:absolute;
+  width:340px;
+  height:340px;
+  top:-140px;
+  right:-100px;
+  border-radius:50%;
+  background:rgba(255,155,81,.10);
+  filter:blur(8px);
+}
+
+.introPage::after{
+  content:"";
+  position:absolute;
+  width:260px;
+  height:260px;
+  bottom:-120px;
+  left:-90px;
+  border-radius:42px;
+  transform:rotate(24deg);
+  background:rgba(47,65,88,.05);
+  filter:blur(4px);
+}
+
+/* =========================
+   CARD
+========================= */
+
+.introCard{
+  width:min(820px,100%);
+  padding:40px 34px 34px;
+  border-radius:38px;
+  background:linear-gradient(180deg,rgba(255,255,255,.98) 0%,rgba(244,247,247,.98) 100%);
+  border:1px solid #D9E0E0;
+  box-shadow:
+    0 24px 60px rgba(39,48,61,.10),
+    0 10px 24px rgba(255,155,81,.08),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  position:relative;
+  overflow:hidden;
+  backdrop-filter:blur(4px);
+}
+
+.introCard::before{
+  content:"";
+  position:absolute;
+  width:250px;
+  height:250px;
+  top:-110px;
+  right:-85px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,155,81,.16) 0%, rgba(255,155,81,.04) 58%, transparent 72%);
+}
+
+.introCard::after{
+  content:"";
+  position:absolute;
+  width:180px;
+  height:180px;
+  bottom:-82px;
+  left:-58px;
+  border-radius:34px;
+  transform:rotate(26deg);
+  background:linear-gradient(180deg, rgba(47,65,88,.06), rgba(47,65,88,.02));
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.introLogoBox{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  margin-bottom:30px;
+}
+
+.introBadge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:38px;
+  padding:7px 20px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  color:#7A4A22;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.02rem;
+  line-height:1.2;
+  box-shadow:
+    0 10px 18px rgba(255,155,81,.18),
+    inset 0 1px 0 rgba(255,255,255,.4);
+  margin-bottom:18px;
+}
+
+.introTitle{
+  margin:0;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(3.6rem,6vw,6.2rem);
+  font-weight:400;
+  line-height:.92;
+  color:#2F4158;
+  text-shadow:
+    0 2px 0 rgba(255,255,255,.96),
+    0 6px 14px rgba(255,155,81,.16),
+    0 14px 28px rgba(47,65,88,.10);
+}
+
+.introTitleLine{
+  width:138px;
+  height:6px;
+  margin:16px auto 14px;
+  border-radius:999px;
+  background:linear-gradient(90deg,rgba(255,155,81,0),#FF9B51,rgba(255,155,81,0));
+  box-shadow:0 6px 12px rgba(255,155,81,.14);
+}
+
+.introSubTitle{
+  margin:0;
+  color:#7A6950;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.18rem;
+  line-height:1.8;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.introForm{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  padding:24px;
+  border-radius:28px;
+  background:rgba(255,255,255,.38);
+  border:1px solid rgba(217,224,224,.72);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45);
+}
+
+.introField{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+
+.introField label{
+  color:#2F4158;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.15rem;
+  line-height:1.3;
+  padding-inline:6px;
+}
+
+.introField input,
+.introField select{
+  width:100%;
+  height:66px;
+  border-radius:20px;
+  border:1px solid #D9E0E0;
+  background:linear-gradient(180deg,rgba(255,255,255,.98) 0%,rgba(246,249,249,.96) 100%);
+  box-shadow:
+    inset 0 1px 3px rgba(255,255,255,.95),
+    0 8px 18px rgba(39,48,61,.05);
+  outline:none;
+  padding:0 20px;
+  color:#243447;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.1rem;
+  transition:.18s ease;
+}
+
+.introField input::placeholder{
+  color:#A09C94;
+}
+
+.introField input:focus,
+.introField select:focus{
+  border-color:rgba(255,155,81,.88);
+  background:linear-gradient(180deg,#FFFFFF 0%,#FFF7F1 100%);
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.12),
+    0 12px 20px rgba(39,48,61,.07);
+  transform:translateY(-1px);
+}
+
+.introField select{
+  height:68px;
+  border-radius:22px;
+  padding:0 22px;
+  font-size:1.12rem;
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  cursor:pointer;
+}
+
+.introField:has(select){
+  position:relative;
+}
+
+.introField:has(select)::after{
+  content:"⌄";
+  position:absolute;
+  left:22px;
+  bottom:20px;
+  color:#C96A25;
+  font-size:1.4rem;
+  pointer-events:none;
+}
+
+/* =========================
+   ACTION
+========================= */
+
+.introActions{
+  display:flex;
+  justify-content:center;
+  padding-top:16px;
+}
+
+#startGameBtn{
+  min-width:320px;
+  height:68px;
+  border:0;
+  border-radius:24px;
+  padding:0 34px;
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  color:#FFFFFF;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.28rem;
+  box-shadow:
+    0 18px 34px rgba(255,155,81,.26),
+    inset 0 1px 0 rgba(255,255,255,.22);
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+#startGameBtn:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 24px 40px rgba(255,155,81,.30),
+    inset 0 1px 0 rgba(255,255,255,.28);
+  filter:brightness(1.02);
+}
+
+#startGameBtn:active{
+  transform:translateY(0);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width:1100px){
+  .introCard{
+    width:min(740px,100%);
+    padding:34px 26px 28px;
+    border-radius:30px;
+  }
+
+  .introTitle{
+    font-size:clamp(3.1rem,8vw,5rem);
+  }
+
+  .introForm{
+    padding:20px;
+    border-radius:24px;
+  }
+
+  .introField input,
+  .introField select{
+    height:60px;
+  }
+
+  .introField select{
+    height:62px;
+  }
+
+  .introField:has(select)::after{
+    bottom:18px;
+  }
+
+  #startGameBtn{
+    min-width:240px;
+    height:60px;
+  }
+}
+
+@media (max-width:760px){
+  .introPage{
+    padding:18px 12px;
+  }
+
+  .introCard{
+    width:100%;
+    border-radius:24px;
+    padding:26px 18px 22px;
+  }
+
+  .introLogoBox{
+    margin-bottom:22px;
+  }
+
+  .introBadge{
+    min-height:32px;
+    padding:5px 14px;
+    font-size:.95rem;
+    margin-bottom:14px;
+  }
+
+  .introTitle{
+    font-size:3rem;
+  }
+
+  .introTitleLine{
+    width:96px;
+    height:4px;
+    margin:12px auto;
+  }
+
+  .introSubTitle{
+    font-size:1rem;
+    line-height:1.7;
+  }
+
+  .introForm{
+    gap:14px;
+    padding:16px;
+    border-radius:20px;
+  }
+
+  .introField label{
+    font-size:1rem;
+  }
+
+  .introField input,
+  .introField select{
+    height:56px;
+    border-radius:16px;
+    font-size:1rem;
+    padding:0 14px;
+  }
+
+  .introField select{
+    height:58px;
+  }
+
+  .introField:has(select)::after{
+    left:16px;
+    bottom:17px;
+    font-size:1.2rem;
+  }
+
+  .introActions{
+    padding-top:6px;
+  }
+
+  #startGameBtn{
+    width:100%;
+    min-width:0;
+    height:56px;
+    border-radius:18px;
+    font-size:1.1rem;
+  }
+}

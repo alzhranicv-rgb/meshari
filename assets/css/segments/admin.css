@@ -1,0 +1,1835 @@
+/* =========================
+   ADMIN / CLEAN BASE
+========================= */
+
+:root{
+  --admin-bg:#EAEFEF;
+  --admin-card:#FFFFFF;
+  --admin-card-soft:#F8FBFB;
+  --admin-border:#D9E0E0;
+  --admin-border-soft:#E3E8E8;
+
+  --admin-text:#243447;
+  --admin-text-soft:#5F6B7A;
+  --admin-text-light:#8A93A1;
+
+  --admin-dark:#2F4158;
+  --admin-dark-2:#243447;
+  --admin-mango:#FF9B51;
+  --admin-mango-2:#F0A35F;
+  --admin-green:#18794E;
+  --admin-red:#D92D20;
+  --admin-maroon:#7A1630;
+
+  --admin-radius-xl:28px;
+  --admin-radius-lg:24px;
+  --admin-radius-md:18px;
+
+  --admin-shadow:0 8px 22px rgba(0,0,0,.05);
+  --admin-shadow-lg:0 12px 30px rgba(0,0,0,.08);
+}
+
+/* =========================
+   PAGE
+========================= */
+
+html,
+body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+  background:var(--admin-bg);
+  color:var(--admin-text);
+  direction:rtl;
+}
+
+.adminShellNew,
+.adminShellNew *{
+  box-sizing:border-box;
+  font-family:"Zain","Tahoma","Arial",sans-serif !important;
+}
+
+.adminShellNew{
+  width:100%;
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:320px minmax(0,1fr);
+  gap:22px;
+  padding:20px;
+  align-items:start;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.adminSidebarNew{
+  position:sticky;
+  top:20px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  align-items:stretch;
+}
+
+.adminBrandBox,
+.adminSideCard{
+  width:100%;
+  margin:0;
+  padding:22px;
+  border-radius:var(--admin-radius-xl);
+  border:1px solid var(--admin-border);
+  box-shadow:var(--admin-shadow);
+}
+
+.adminBrandBox{
+  background:#F4F7F7;
+  text-align:center;
+}
+
+.adminSideCard{
+  background:var(--admin-card-soft);
+}
+
+.adminBrandTitle{
+  margin:0 0 6px;
+  color:var(--admin-text);
+  font-size:34px;
+  font-weight:500;
+  line-height:1.2;
+}
+
+.adminBrandSub{
+  margin:0 0 12px;
+  color:var(--admin-text-soft);
+  font-size:15px;
+  font-weight:400;
+  line-height:1.8;
+}
+
+.adminBrandCurrentModel{
+  margin-top:10px;
+  padding-top:12px;
+  border-top:1px solid #DFE5E5;
+}
+
+.adminBrandCurrentModelLabel{
+  margin-bottom:6px;
+  color:var(--admin-text-light);
+  font-size:14px;
+  font-weight:400;
+}
+
+.adminBrandCurrentModelName{
+  color:var(--admin-text);
+  font-size:24px;
+  font-weight:500;
+  line-height:1.35;
+  word-break:break-word;
+}
+
+.adminSideCardTitle{
+  margin:0 0 10px;
+  color:var(--admin-text);
+  text-align:center;
+  font-size:22px;
+  font-weight:500;
+  line-height:1.3;
+}
+
+.adminSideHint{
+  margin:0 0 16px;
+  color:var(--admin-text-soft);
+  text-align:center;
+  font-size:14px;
+  font-weight:400;
+  line-height:1.9;
+}
+
+.adminSideCard .adminField{
+  margin-bottom:12px;
+}
+
+.adminSideCard .adminField:last-of-type{
+  margin-bottom:0;
+}
+
+.adminSideActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:12px;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.adminMainNew{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+#adminTabs,
+#adminEditor{
+  background:var(--admin-card);
+  border:1px solid var(--admin-border);
+  border-radius:var(--admin-radius-xl);
+  box-shadow:var(--admin-shadow-lg);
+}
+
+#adminTabs{
+  padding:14px;
+}
+
+#adminEditor{
+  min-height:420px;
+  padding:22px;
+}
+
+.hidden{
+  display:none !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width:1200px){
+  .adminShellNew{
+    grid-template-columns:280px minmax(0,1fr);
+  }
+}
+
+@media (max-width:980px){
+  .adminShellNew{
+    grid-template-columns:1fr;
+  }
+
+  .adminSidebarNew{
+    position:static;
+  }
+}
+
+@media (max-width:640px){
+  .adminShellNew{
+    padding:12px;
+  }
+
+  .adminSideActions{
+    grid-template-columns:1fr;
+  }
+
+  .adminBrandBox,
+  .adminSideCard,
+  #adminEditor,
+  #adminTabs{
+    border-radius:22px;
+  }
+}
+/* =========================
+   ADMIN TABS
+========================= */
+
+.adminTabsNew{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:12px;
+}
+
+.adminTabBtn{
+  min-height:58px;
+  border:0;
+  border-radius:18px;
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
+  color:#FFFFFF;
+  padding:12px 14px;
+  font-size:17px;
+  font-weight:400;
+  cursor:pointer;
+  box-shadow:0 8px 18px rgba(15,23,42,.08);
+  transition:transform .18s ease, opacity .18s ease, box-shadow .18s ease;
+}
+
+.adminTabBtn:hover{
+  transform:translateY(-1px);
+  opacity:.96;
+}
+
+.adminTabBtn.activeAdminTab{
+  background:linear-gradient(180deg,#F0A35F 0%,#FF9B51 100%);
+  color:#FFFFFF;
+  box-shadow:0 10px 20px rgba(255,155,81,.24);
+}
+
+/* =========================
+   FIELDS
+========================= */
+
+.adminField{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.adminField label{
+  color:#344054;
+  font-size:15px;
+  font-weight:500;
+  line-height:1.5;
+}
+
+.adminInput,
+.adminSelect,
+.adminField input,
+.adminField select,
+.adminField textarea,
+.adminCard input,
+.adminCard select,
+.adminCard textarea,
+.finalAdminCard input,
+.finalAdminCard select,
+.finalAdminCard textarea,
+.archiveAdminItem input,
+.archiveAdminItem select,
+.archiveAdminItem textarea{
+  width:100%;
+  min-height:54px;
+  border:1px solid var(--admin-border);
+  border-radius:18px;
+  background:#FFFFFF;
+  color:var(--admin-text);
+  padding:12px 16px;
+  font-size:18px;
+  font-weight:500;
+  line-height:1.5;
+  outline:none;
+  box-shadow:none;
+  transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+textarea,
+.adminField textarea,
+.adminCard textarea,
+.finalAdminCard textarea,
+.archiveAdminItem textarea{
+  min-height:120px;
+  resize:vertical;
+  line-height:1.7;
+  padding-top:14px;
+  padding-bottom:14px;
+}
+
+.adminInput::placeholder,
+.adminField input::placeholder,
+.adminField textarea::placeholder,
+.adminCard input::placeholder,
+.adminCard textarea::placeholder,
+.finalAdminCard input::placeholder,
+.finalAdminCard textarea::placeholder,
+.archiveAdminItem input::placeholder,
+.archiveAdminItem textarea::placeholder{
+  color:var(--admin-text-light);
+}
+
+.adminInput:focus,
+.adminSelect:focus,
+.adminField input:focus,
+.adminField select:focus,
+.adminField textarea:focus,
+.adminCard input:focus,
+.adminCard select:focus,
+.adminCard textarea:focus,
+.finalAdminCard input:focus,
+.finalAdminCard select:focus,
+.finalAdminCard textarea:focus,
+.archiveAdminItem input:focus,
+.archiveAdminItem select:focus,
+.archiveAdminItem textarea:focus{
+  border-color:var(--admin-mango);
+  background:#FFFDF9;
+  box-shadow:0 0 0 4px rgba(255,155,81,.12);
+}
+
+/* SELECT */
+.adminSelect,
+.compactCountSelect{
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  -moz-appearance:none !important;
+  cursor:pointer;
+  padding-left:48px !important;
+  padding-right:16px !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #667085 50%),
+    linear-gradient(135deg, #667085 50%, transparent 50%);
+  background-position:
+    18px calc(50% - 3px),
+    28px calc(50% - 3px);
+  background-size:8px 8px, 8px 8px;
+  background-repeat:no-repeat;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button,
+.adminBtn,
+.adminSaveBtn,
+.adminReloadBtn,
+.adminDeleteBtn,
+.adminDeleteAllBtn,
+.compactCountBtn{
+  border:0;
+  outline:none;
+  min-height:52px;
+  border-radius:18px;
+  padding:12px 18px;
+  font-size:17px;
+  font-weight:400;
+  line-height:1.2;
+  cursor:pointer;
+  white-space:nowrap;
+  box-shadow:0 8px 18px rgba(15,23,42,.08);
+  transition:transform .18s ease, opacity .18s ease, box-shadow .18s ease;
+}
+
+button:hover,
+.adminBtn:hover,
+.adminSaveBtn:hover,
+.adminReloadBtn:hover,
+.adminDeleteBtn:hover,
+.adminDeleteAllBtn:hover,
+.compactCountBtn:hover{
+  transform:translateY(-1px);
+}
+
+.adminBtn,
+.adminBtnDark{
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
+  color:#FFFFFF;
+}
+
+.adminBtnMango{
+  background:linear-gradient(180deg,#F0A35F 0%,#FF9B51 100%);
+  color:#FFFFFF;
+}
+
+.adminBtnLight{
+  background:linear-gradient(180deg,#F2E6D2 0%,#EAD8BE 100%);
+  color:var(--admin-text);
+}
+
+.adminSaveBtn{
+  background:linear-gradient(180deg,#27A164 0%,#18794E 100%);
+  color:#FFFFFF;
+}
+
+.adminReloadBtn{
+  background:linear-gradient(180deg,#3B82F6 0%,#2563EB 100%);
+  color:#FFFFFF;
+}
+
+.adminDeleteBtn{
+  background:linear-gradient(180deg,#EF4444 0%,#D92D20 100%);
+  color:#FFFFFF;
+}
+
+.adminDeleteAllBtn,
+.adminBtnDanger{
+  background:linear-gradient(180deg,#8B2946 0%,#7A1630 100%);
+  color:#FFFFFF;
+}
+
+.adminSideActions .adminBtn,
+.adminSideActions .adminSaveBtn,
+.adminSideActions .adminReloadBtn,
+.adminSideActions .adminDeleteBtn,
+.adminSideActions .adminDeleteAllBtn,
+.adminSideActions button{
+  width:100%;
+  min-height:52px;
+  height:52px;
+  padding:10px 14px;
+}
+
+/* =========================
+   COMPACT COUNT
+========================= */
+
+.compactCountField{
+  gap:8px;
+}
+
+.compactCountSelectWrap{
+  position:relative;
+  width:100%;
+}
+
+.compactCountSelect{
+  width:100% !important;
+  min-height:58px !important;
+  height:58px !important;
+  border:1px solid var(--admin-border) !important;
+  border-radius:18px !important;
+  background-color:#FFFFFF !important;
+  color:var(--admin-text) !important;
+  font-size:18px !important;
+  font-weight:500 !important;
+  text-align:center !important;
+  box-shadow:none !important;
+}
+
+.compactCountSelectWrap::after{
+  content:"";
+  position:absolute;
+  left:18px;
+  top:50%;
+  width:10px;
+  height:10px;
+  border-left:3px solid #667085;
+  border-bottom:3px solid #667085;
+  transform:translateY(-65%) rotate(-45deg);
+  pointer-events:none;
+}
+
+.compactCountBtn{
+  width:100%;
+  min-height:58px !important;
+  height:58px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width:1100px){
+  .adminTabsNew{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+
+@media (max-width:720px){
+  .adminTabsNew{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .adminTabBtn{
+    min-height:54px;
+    font-size:15px;
+  }
+
+  button,
+  .adminBtn,
+  .adminSaveBtn,
+  .adminReloadBtn,
+  .adminDeleteBtn,
+  .adminDeleteAllBtn,
+  .compactCountBtn{
+    min-height:48px;
+    font-size:15px;
+  }
+}
+/* =========================
+   ADMIN HOME
+========================= */
+
+.adminHomeShell{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.adminHomeTopLineSingleRow{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(260px,.8fr) minmax(260px,.9fr);
+  gap:16px;
+  align-items:stretch;
+}
+
+.adminHomeHeroCard,
+.adminHomeModelMini,
+.adminHomeMiniHintCard{
+  background:var(--admin-card);
+  border:1px solid var(--admin-border);
+  border-radius:var(--admin-radius-lg);
+  box-shadow:var(--admin-shadow);
+  padding:22px;
+  min-height:150px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.adminHomeHeroTitle{
+  margin:0 0 10px;
+  color:var(--admin-text);
+  font-size:32px;
+  font-weight:500;
+  line-height:1.25;
+}
+
+.adminHomeHeroText,
+.adminHomeMiniHintText{
+  color:var(--admin-text-soft);
+  font-size:16px;
+  font-weight:400;
+  line-height:1.9;
+}
+
+.adminHomeModelMiniLabel,
+.adminHomeMiniHintTitle{
+  margin-bottom:8px;
+  color:var(--admin-text-soft);
+  font-size:16px;
+  font-weight:400;
+}
+
+.adminHomeModelMiniName{
+  color:var(--admin-text);
+  font-size:30px;
+  font-weight:500;
+  line-height:1.35;
+}
+
+/* =========================
+   SEGMENT CARDS
+========================= */
+
+.adminSegmentPickerCompact{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:18px;
+}
+
+.adminSegmentCompactCard{
+  background:var(--admin-card);
+  border:1px solid var(--admin-border);
+  border-radius:24px;
+  box-shadow:var(--admin-shadow);
+  padding:20px;
+  text-align:right;
+  cursor:pointer;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  overflow:hidden;
+}
+
+.adminSegmentCompactCard:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--admin-shadow-lg);
+}
+
+.adminSegmentCompactCard.doneCard{
+  background:#EEF8F0;
+  border-color:#CDE8D1;
+}
+
+.adminSegmentCompactTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.adminSegmentCompactTitle{
+  color:var(--admin-text);
+  font-size:24px;
+  font-weight:500;
+  line-height:1.25;
+}
+
+.adminSegmentCompactBadge{
+  min-height:34px;
+  padding:4px 10px;
+  border-radius:999px;
+  background:#FDECEC;
+  color:#C24141;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+  font-weight:500;
+  line-height:1;
+}
+
+.adminSegmentCompactBadge.done{
+  background:#DFF5E4;
+  color:#18794E;
+}
+
+.adminSegmentCompactDesc{
+  margin-bottom:10px;
+  color:var(--admin-text-soft);
+  font-size:15px;
+  font-weight:400;
+  line-height:1.8;
+}
+
+.adminSegmentCompactFooter{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px solid var(--admin-border-soft);
+}
+
+.adminSegmentCompactMetaLabel{
+  color:var(--admin-text-soft);
+  font-size:14px;
+  font-weight:500;
+}
+
+.adminSegmentCompactMetaValue{
+  min-width:42px;
+  height:34px;
+  padding:0 10px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
+  color:#FFFFFF;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:500;
+}
+
+.adminSegmentCompactCard.doneCard .adminSegmentCompactMetaValue{
+  background:linear-gradient(180deg,#27A164 0%,#18794E 100%);
+}
+
+/* =========================
+   STATUS STRIP
+========================= */
+
+.adminStatusStrip{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:12px;
+}
+
+.adminStatusStripItem{
+  min-height:82px;
+  padding:14px 12px;
+  background:var(--admin-card);
+  border:1px solid var(--admin-border);
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:8px;
+  text-align:center;
+  overflow:hidden;
+}
+
+.adminStatusStripItem.doneCard{
+  background:#EEF8F0;
+  border-color:#CDE8D1;
+}
+
+.adminStatusStripName{
+  color:var(--admin-text);
+  font-size:18px;
+  font-weight:500;
+}
+
+.adminStatusStripCount{
+  color:var(--admin-text-soft);
+  font-size:15px;
+  font-weight:400;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.adminEmptyState{
+  min-height:280px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px;
+  border:2px dashed var(--admin-border);
+  border-radius:22px;
+  background:var(--admin-card-soft);
+  color:var(--admin-text-soft);
+  font-size:18px;
+  font-weight:500;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width:1180px){
+  .adminHomeTopLineSingleRow{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .adminHomeHeroCard{
+    grid-column:1 / -1;
+  }
+}
+
+@media (max-width:1100px){
+  .adminSegmentPickerCompact{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .adminStatusStrip{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+
+@media (max-width:760px){
+  .adminHomeTopLineSingleRow,
+  .adminSegmentPickerCompact{
+    grid-template-columns:1fr;
+  }
+
+  .adminHomeHeroCard,
+  .adminHomeModelMini,
+  .adminHomeMiniHintCard{
+    min-height:auto;
+  }
+
+  .adminHomeHeroTitle{
+    font-size:26px;
+  }
+
+  .adminHomeModelMiniName{
+    font-size:24px;
+  }
+}
+
+@media (max-width:720px){
+  .adminStatusStrip{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+/* =========================
+   SHARED EDITOR SECTIONS
+========================= */
+
+.adminSectionShell,
+.cleanSectionShell,
+.finalAdminShell,
+.archiveAdminShell,
+.warmupAdminShell,
+.top10AdminShell,
+.auctionAdminShell,
+.whoAdminShell{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.adminEditorTopBar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.adminSectionTitle{
+  margin:0;
+  color:var(--admin-text);
+  font-size:34px;
+  font-weight:500;
+  line-height:1.2;
+}
+
+.adminSectionSubTitle{
+  margin-top:6px;
+  color:var(--admin-text-soft);
+  font-size:15px;
+  font-weight:400;
+  line-height:1.8;
+}
+
+.adminGrid2,
+.warmupAdminGrid,
+.top10AdminGrid,
+.auctionAdminGrid,
+.whoAdminGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+
+.adminCard,
+.finalAdminCard,
+.archiveToolsCard,
+.finalTopCompactBox,
+.finalAdminTitleCard{
+  background:var(--admin-card);
+  border:1px solid var(--admin-border);
+  border-radius:24px;
+  box-shadow:var(--admin-shadow);
+  padding:18px;
+  overflow:hidden;
+}
+
+.adminCard h3,
+.finalAdminCard h3,
+.archiveToolsCard h3{
+  margin:0;
+  color:var(--admin-text);
+  font-size:28px;
+  font-weight:500;
+  line-height:1.25;
+}
+
+.adminQuestionCard,
+.presenterSectionBlock,
+.finalAdminImageRow,
+.finalAdminWordRow{
+  background:var(--admin-card-soft);
+  border:1px solid var(--admin-border-soft);
+  border-radius:20px;
+  padding:14px;
+  overflow:hidden;
+}
+
+.adminQuestionCardTop,
+.finalAdminCardHead,
+.archiveAdminItemHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+  flex-wrap:wrap;
+}
+
+.adminQuestionTitle{
+  color:var(--admin-text);
+  font-size:22px;
+  font-weight:500;
+  line-height:1.25;
+}
+
+.adminActionRow,
+.finalAdminActions,
+.archiveToolsButtons,
+.archiveToolsButtonsClean{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.previewImg,
+.archiveAdminPreviewImg{
+  width:100%;
+  max-width:100%;
+  max-height:240px;
+  object-fit:contain;
+  display:block;
+  border-radius:18px;
+  border:1px solid var(--admin-border);
+  background:#FFFFFF;
+  padding:8px;
+}
+
+/* =========================
+   WARMUP / TOP10 / AUCTION / WHO
+========================= */
+
+.warmupCategoryCard,
+.top10RoundCard,
+.auctionQuestionCard,
+.whoItemCard{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-width:0;
+}
+
+.warmupCategoryHead,
+.top10RoundHead,
+.auctionQuestionHead,
+.whoItemHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:2px;
+}
+
+.warmupCategoryHead h3,
+.top10RoundHead h3,
+.auctionQuestionHead h3,
+.whoItemHead h3{
+  margin:0;
+  color:var(--admin-text);
+  font-size:22px;
+  font-weight:500;
+  line-height:1.25;
+}
+
+.warmupQuestionCard{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.top10AnswersGrid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+.top10AnswerRow{
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr);
+  gap:10px;
+  align-items:center;
+}
+
+.top10AnswerNo{
+  min-height:50px;
+  border-radius:16px;
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
+  color:#FFFFFF;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  font-weight:500;
+  line-height:1.2;
+}
+
+.auctionTopCompactRow{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 320px !important;
+  gap:16px !important;
+  align-items:stretch !important;
+  margin-bottom:6px !important;
+}
+
+.auctionTopCompactBox{
+  min-height:126px;
+  border-radius:24px !important;
+  padding:18px !important;
+  display:flex;
+  align-items:center;
+  background:var(--admin-card);
+  border:1px solid var(--admin-border);
+  box-shadow:var(--admin-shadow);
+}
+
+.auctionTopCompactTitleBox{
+  justify-content:center;
+}
+
+.auctionTopCompactTitleBox .adminField{
+  width:100%;
+  max-width:100%;
+  justify-content:center;
+  gap:10px;
+}
+
+.auctionTopCompactActionBox{
+  justify-content:center;
+  align-items:center !important;
+}
+
+.auctionTopCompactActionBox .compactCountBtn{
+  width:100% !important;
+  max-width:210px;
+}
+
+.auctionQuestionCard{
+  border-radius:24px !important;
+  padding:18px !important;
+}
+
+.auctionQuestionHead{
+  margin-bottom:8px !important;
+}
+
+.auctionQuestionHead .adminDeleteBtn{
+  min-height:40px !important;
+  height:40px !important;
+  padding:0 14px !important;
+  border-radius:14px !important;
+  font-size:14px !important;
+}
+
+.auctionPreviewBox,
+.whoPreviewBox{
+  min-height:120px;
+  border:1px dashed #D6DEE6;
+  border-radius:18px;
+  background:#FAFBFC;
+  padding:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.auctionPreviewBox:empty,
+.whoPreviewBox:empty{
+  padding:0;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width:1100px){
+  .adminGrid2,
+  .warmupAdminGrid,
+  .top10AdminGrid,
+  .auctionAdminGrid,
+  .whoAdminGrid{
+    grid-template-columns:1fr;
+  }
+
+  .auctionTopCompactRow{
+    grid-template-columns:1fr 280px !important;
+  }
+}
+
+@media (max-width:820px){
+  .auctionTopCompactRow{
+    grid-template-columns:1fr !important;
+  }
+
+  .auctionTopCompactActionBox .compactCountBtn{
+    max-width:100%;
+  }
+}
+
+@media (max-width:720px){
+  .adminSectionTitle{
+    font-size:28px;
+  }
+
+  .adminCard h3,
+  .finalAdminCard h3{
+    font-size:22px;
+  }
+
+  .top10AnswerRow{
+    grid-template-columns:56px minmax(0,1fr);
+  }
+
+  .top10AnswerNo{
+    min-height:46px;
+    font-size:16px;
+  }
+
+  .warmupCategoryHead h3,
+  .top10RoundHead h3,
+  .auctionQuestionHead h3,
+  .whoItemHead h3{
+    font-size:20px;
+  }
+}
+/* =========================
+   FINAL ADMIN
+========================= */
+
+.cleanFinalAdminShell,
+.finalAdminShell{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.finalTopCompactRow{
+  display:grid;
+  grid-template-columns:minmax(260px,1fr) minmax(320px,1.2fr) minmax(180px,220px);
+  gap:14px;
+  align-items:end;
+}
+
+.finalTopCompactBox{
+  background:var(--admin-card);
+  border:1px solid var(--admin-border);
+  border-radius:22px;
+  box-shadow:var(--admin-shadow);
+  padding:16px;
+  min-width:0;
+}
+
+.finalTopCompactGhost{
+  visibility:hidden;
+}
+
+.finalAdminRoundsBar,
+.archiveAdminRoundsBar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.finalAdminRoundsBar button,
+.archiveAdminRoundsBar button{
+  min-height:48px;
+  padding:10px 16px;
+  border-radius:16px;
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
+  color:#FFFFFF;
+  font-size:16px;
+}
+
+.finalAdminRoundsBar button.activeFinalAdminRound,
+.archiveAdminRoundsBar button.activeArchiveRoundBtn{
+  background:linear-gradient(180deg,#F0A35F 0%,#FF9B51 100%);
+  box-shadow:0 10px 20px rgba(255,155,81,.24);
+}
+
+/* =========================
+   FINAL ROUND 1
+========================= */
+
+.finalAdminGridRound1{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:22px !important;
+  align-items:start !important;
+}
+
+.finalRound1AdminCard{
+  grid-column:1 / -1 !important;
+  width:100% !important;
+  background:linear-gradient(180deg,#FCFEFF 0%,#F3F8FF 100%) !important;
+  border:2px solid #C9D9EB !important;
+  border-radius:24px !important;
+  padding:20px !important;
+  box-shadow:var(--admin-shadow) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:18px !important;
+}
+
+.finalRound1AdminCard .finalAdminCardHead{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:12px !important;
+  padding-bottom:10px !important;
+  border-bottom:1px solid #E7EEF6 !important;
+  margin:0 !important;
+}
+
+.finalRound1AdminCard .finalAdminCardHead h3{
+  margin:0 !important;
+  color:#1D5685 !important;
+  font-size:24px !important;
+  font-weight:500 !important;
+}
+
+.finalRound1AdminCard .adminDeleteBtn{
+  min-width:88px !important;
+  min-height:44px !important;
+  height:44px !important;
+  border-radius:16px !important;
+  font-size:14px !important;
+}
+
+.finalAdminRound1Fields{
+  display:grid !important;
+  grid-template-columns:.75fr 1.2fr 1.2fr !important;
+  gap:16px !important;
+  align-items:start !important;
+}
+
+.finalAdminRound1Fields .adminField{
+  min-width:0 !important;
+}
+
+.finalAdminRound1Fields .adminField label{
+  display:block !important;
+  margin-bottom:8px !important;
+  text-align:center !important;
+  color:#2A3F59 !important;
+  font-size:15px !important;
+}
+
+.finalAdminRound1Fields input,
+.finalAdminRound1Fields textarea,
+.finalAdminRound1Fields select{
+  width:100% !important;
+  box-sizing:border-box !important;
+  border:2px solid #DCE6F2 !important;
+  border-radius:18px !important;
+  background:#FFFFFF !important;
+  margin:0 !important;
+}
+
+.finalAdminRound1Fields .adminField:nth-child(1) input{
+  min-height:70px !important;
+  padding:14px 12px !important;
+  font-size:18px !important;
+  text-align:center !important;
+}
+
+.finalAdminRound1Fields .adminField:nth-child(2) input,
+.finalAdminRound1Fields .adminField:nth-child(3) input{
+  min-height:72px !important;
+  padding:16px 18px !important;
+  font-size:22px !important;
+  line-height:1.5 !important;
+  text-align:center !important;
+}
+
+.finalAdminRowSingleText{
+  display:block !important;
+  margin:0 !important;
+}
+
+.finalAdminRowSingleText + .finalAdminRowSingleText{
+  margin-top:10px !important;
+}
+
+.finalTextCardField,
+.finalQuestionPartBox,
+.finalQuestionPartField,
+.finalQuestionPartWrap{
+  width:100% !important;
+  background:#EEF6FF !important;
+  border:2px dashed #BFD6ED !important;
+  border-radius:22px !important;
+  padding:18px !important;
+  box-sizing:border-box !important;
+}
+
+.finalQuestionPartBox,
+.finalQuestionPartField,
+.finalQuestionPartWrap{
+  background:#F7FBFF !important;
+  border-color:#CFE0F2 !important;
+  margin-top:10px !important;
+}
+
+.finalTextCardField label,
+.finalQuestionPartBox label,
+.finalQuestionPartField label,
+.finalQuestionPartWrap label{
+  display:block !important;
+  margin-bottom:10px !important;
+  color:#294766 !important;
+  font-size:17px !important;
+  text-align:right !important;
+}
+
+.finalTextCardField input,
+.finalTextCardField textarea,
+.finalQuestionPartBox input,
+.finalQuestionPartBox textarea,
+.finalQuestionPartField input,
+.finalQuestionPartField textarea,
+.finalQuestionPartWrap input,
+.finalQuestionPartWrap textarea{
+  width:100% !important;
+  box-sizing:border-box !important;
+  border:2px solid #D7E3F1 !important;
+  border-radius:20px !important;
+  background:#FFFFFF !important;
+  padding:18px 20px !important;
+  font-size:22px !important;
+  line-height:1.8 !important;
+  text-align:center !important;
+  margin:0 !important;
+}
+
+.finalTextCardField textarea{
+  min-height:190px !important;
+  resize:vertical !important;
+}
+
+.finalAdminPreviewBox{
+  margin-top:4px !important;
+}
+
+.finalAdminPreviewBox .previewImg{
+  width:100% !important;
+  max-height:200px !important;
+  object-fit:cover !important;
+  border-radius:18px !important;
+  border:2px solid #E7EDF5 !important;
+}
+
+.finalAdminHeadOptions{
+  margin-bottom:18px !important;
+}
+
+.finalAdminHeadOptions .finalAdminTitleCard{
+  max-width:260px !important;
+}
+
+/* =========================
+   FINAL ROUND 2
+========================= */
+
+.finalAdminRound2Wrap,
+.finalAdminRound3Wrap{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.finalAdminWideCard{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.finalAdminTypeBadge{
+  min-height:36px;
+  padding:6px 12px;
+  border-radius:999px;
+  background:#EDF2F7;
+  color:#334155;
+  font-size:14px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.finalAdminRound2RowsWrap{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.finalAdminWordRow{
+  display:grid;
+  grid-template-columns:120px minmax(0,1fr);
+  gap:12px;
+  align-items:start;
+}
+
+.finalAdminWordIndex{
+  min-height:52px;
+  border-radius:16px;
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
+  color:#FFFFFF;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  padding:10px;
+  text-align:center;
+}
+
+.finalAdminWordFields{
+  display:grid;
+  gap:12px;
+}
+
+.finalAdminWordFields3{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.finalAdminWordFields1{
+  grid-template-columns:1fr;
+}
+
+/* =========================
+   FINAL ROUND 3
+========================= */
+
+.finalAdminImageRow{
+  display:grid;
+  grid-template-columns:120px minmax(0,1fr) 180px;
+  gap:12px;
+  align-items:start;
+}
+
+.finalAdminImageFields{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width:1100px){
+  .finalTopCompactRow,
+  .finalAdminRound1Fields,
+  .finalAdminWordFields3,
+  .finalAdminImageRow,
+  .finalAdminImageFields{
+    grid-template-columns:1fr !important;
+  }
+
+  .finalAdminRound1Fields .adminField:nth-child(2) input,
+  .finalAdminRound1Fields .adminField:nth-child(3) input,
+  .finalTextCardField input,
+  .finalTextCardField textarea,
+  .finalQuestionPartBox input,
+  .finalQuestionPartBox textarea,
+  .finalQuestionPartField input,
+  .finalQuestionPartField textarea,
+  .finalQuestionPartWrap input,
+  .finalQuestionPartWrap textarea{
+    font-size:18px !important;
+  }
+
+  .finalTextCardField textarea{
+    min-height:150px !important;
+  }
+}
+
+@media (max-width:720px){
+  .finalAdminWordRow{
+    grid-template-columns:1fr;
+  }
+}
+/* =========================
+   ARCHIVE ADMIN
+========================= */
+
+.cleanArchiveAdminShell,
+.archiveAdminShell{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.cleanArchiveLayout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 240px;
+  gap:18px;
+  align-items:start;
+}
+
+.archiveAdminBoardClean{
+  background:var(--admin-card);
+  border:1px solid var(--admin-border);
+  border-radius:26px;
+  box-shadow:var(--admin-shadow);
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.archiveAdminSketchTopClean{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.archiveAdminSketchMiddleClean{
+  display:grid;
+  grid-template-columns:1fr 240px 1fr;
+  gap:14px;
+  align-items:stretch;
+}
+
+.archiveDisplayLikeBox{
+  background:var(--admin-card-soft);
+  border:1px solid var(--admin-border-soft);
+  border-radius:20px;
+  padding:14px;
+  min-width:0;
+}
+
+.archiveAdminSketchRow.archiveDisplayLikeBox{
+  min-height:118px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.archiveAdminImageBox{
+  min-height:300px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.archiveAdminPreviewImg{
+  width:100%;
+  height:200px;
+  object-fit:contain;
+  display:block;
+  border-radius:16px;
+  border:1px solid var(--admin-border);
+  background:#FFFFFF;
+  padding:8px;
+}
+
+.archiveAdminResultCenter{
+  min-height:300px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  gap:16px;
+}
+
+.archiveAdminResultLabel{
+  color:var(--admin-text);
+  font-size:28px;
+  font-weight:500;
+}
+
+.archiveAdminResultValue,
+.archiveAdminText{
+  width:100%;
+}
+
+.archiveAdminResultValue input{
+  width:100%;
+  min-height:64px !important;
+  height:64px !important;
+  border:2px solid #EDD3A4 !important;
+  border-radius:18px !important;
+  background:#FFFAF2 !important;
+  color:var(--admin-text) !important;
+  padding:0 16px !important;
+  text-align:center;
+  font-size:24px !important;
+  font-weight:500 !important;
+  line-height:1.2 !important;
+}
+
+.archiveAdminSketchRow .archiveAdminText input{
+  width:100%;
+  min-height:58px;
+  border:1px solid var(--admin-border);
+  border-radius:16px;
+  background:#FFFFFF;
+  padding:12px 16px;
+  color:var(--admin-text);
+  font-size:18px;
+  font-weight:500;
+  text-align:right;
+}
+
+.archiveAdminLabel,
+.archiveAdminItemTitle,
+.archiveAdminColumnTitle{
+  color:#344054;
+  font-size:18px;
+  font-weight:500;
+}
+
+.archiveAdminBottomGridClean{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  align-items:start;
+}
+
+.archiveAdminBottomCol{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  min-width:0;
+}
+
+.archiveAdminColumnTitle{
+  background:#F8FAFC;
+  border:1px solid #E2E8F0;
+  border-radius:16px;
+  padding:12px 14px;
+  text-align:center;
+}
+
+.archiveAdminItem{
+  background:var(--admin-card-soft);
+  border:1px solid var(--admin-border-soft);
+  border-radius:20px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-width:0;
+  overflow:hidden;
+}
+
+.archiveAdminItemRequired{
+  border-color:#CC0000 !important;
+  background:#F4CCCC !important;
+}
+
+.archiveAdminItemTitle{
+  color:var(--admin-text);
+  font-size:17px;
+}
+
+.archiveAdminRequiredBadge{
+  min-height:30px;
+  padding:4px 10px;
+  border-radius:999px;
+  background:#660000;
+  color:#FFFFFF;
+  font-size:13px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.archiveAdminFields{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  align-items:start;
+}
+
+.archiveAdminFields textarea{
+  grid-column:1 / -1;
+  min-height:110px;
+}
+
+.archiveAdminToolsClean{
+  position:sticky;
+  top:20px;
+}
+
+.archiveToolsCard{
+  background:var(--admin-card);
+  border:1px solid var(--admin-border);
+  border-radius:22px;
+  box-shadow:var(--admin-shadow);
+  padding:16px;
+}
+
+.archiveToolsCard h3{
+  margin:0 0 14px;
+  color:var(--admin-text);
+  text-align:center;
+  font-size:22px;
+  font-weight:500;
+}
+
+.archiveToolsButtonsClean{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.archiveToolsButtonsClean button{
+  width:100%;
+  min-height:46px;
+  padding:10px 14px;
+  border-radius:14px;
+  font-size:16px;
+}
+
+/* archive select polish */
+.archiveAdminItem .compactCountSelectWrap{
+  width:100%;
+}
+
+.archiveAdminItem .compactCountSelect{
+  min-height:54px !important;
+  height:54px !important;
+  border-radius:16px !important;
+  font-size:16px !important;
+  padding-right:16px !important;
+  padding-left:46px !important;
+  text-align:right !important;
+}
+
+.archiveAdminItem .compactCountSelectWrap::after{
+  left:16px !important;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.adminModalOverlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:rgba(15,23,42,.28);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.adminModalCard{
+  width:min(520px,100%);
+  background:#FFFFFF;
+  border:1px solid var(--admin-border);
+  border-radius:26px;
+  box-shadow:0 20px 50px rgba(15,23,42,.18);
+  padding:22px;
+}
+
+.adminModalTitle{
+  margin-bottom:18px;
+  color:var(--admin-text);
+  text-align:center;
+  font-size:28px;
+  font-weight:500;
+}
+
+.adminModalActions{
+  display:flex;
+  gap:12px;
+  margin-top:18px;
+}
+
+.adminModalActions button{
+  flex:1;
+  min-height:56px;
+  border-radius:18px;
+  font-size:17px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width:1200px){
+  .cleanArchiveLayout{
+    grid-template-columns:1fr;
+  }
+
+  .archiveAdminToolsClean{
+    position:static;
+  }
+}
+
+@media (max-width:980px){
+  .archiveAdminSketchTopClean,
+  .archiveAdminSketchMiddleClean,
+  .archiveAdminBottomGridClean,
+  .archiveAdminFields{
+    grid-template-columns:1fr;
+  }
+
+  .archiveAdminFields textarea{
+    grid-column:auto;
+  }
+
+  .archiveAdminImageBox,
+  .archiveAdminResultCenter{
+    min-height:auto;
+  }
+
+  .archiveAdminPreviewImg{
+    height:220px;
+  }
+}
+
+@media (max-width:640px){
+  .adminModalActions{
+    flex-direction:column;
+  }
+}
