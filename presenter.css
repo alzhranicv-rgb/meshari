@@ -2,37 +2,67 @@
    PRESENTER PAGE - NEW DESIGN
 ========================= */
 
+@font-face{
+  font-family:"HanakaDisplay";
+  src:url("./fonts/dima.ttf") format("truetype");
+  font-weight:400;
+  font-style:normal;
+}
+
+@font-face{
+  font-family:"HanakaText";
+  src:url("./fonts/zain.ttf") format("truetype");
+  font-weight:400;
+  font-style:normal;
+}
+
 :root{
-  --presenter-bg:#EAEFEF;
-  --presenter-card:#FFFFFF;
-  --presenter-soft:#F4F7F7;
-  --presenter-text:#243447;
-  --presenter-muted:#5F6B7A;
-  --presenter-mango:#FF9B51;
-  --presenter-mango-soft:#FFD7B8;
-  --presenter-dark:#2F4158;
-  --presenter-border:#D9E0E0;
-  --presenter-shadow:0 12px 30px rgba(0,0,0,.08);
+  --p-bg:#EAEFEF;
+  --p-card:#FFFFFF;
+  --p-card2:#F4F7F7;
+  --p-text:#243447;
+  --p-soft:#5F6B7A;
+  --p-primary:#FF9B51;
+  --p-primary2:#FFC08E;
+  --p-dark:#25343F;
+  --p-border:#D9E0E0;
+  --p-green:#009900;
+  --p-green-soft:#8EE88E;
+  --p-red:#FF6666;
+  --p-blue:#2F6BFF;
+  --p-cyan:#00FFFF;
+  --p-brown:#3B0808;
+  --p-nav:#D6C1A6;
 }
 
+*{
+  box-sizing:border-box;
+}
+
+html,
 body{
-  background:
-    radial-gradient(circle at top right, rgba(255,155,81,.14), transparent 24%),
-    linear-gradient(180deg,#FFF6EE 0%,#EAEFEF 100%);
-}
-
-.presenterPage,
-.presenterShell{
-  width:min(980px, calc(100% - 24px));
-  min-height:100vh;
-  margin:0 auto;
-  padding:16px 0 24px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
+  margin:0;
+  min-height:100%;
   direction:rtl;
   font-family:"HanakaText", sans-serif;
-  color:var(--presenter-text);
+  background:
+    radial-gradient(circle at top right, rgba(255,155,81,.14), transparent 24%),
+    linear-gradient(180deg,#FFF6EE 0%,#EDF2F1 56%,#E6ECEC 100%);
+  color:var(--p-text);
+}
+
+.hidden{
+  display:none !important;
+}
+
+.presenterPage{
+  width:min(100% - 20px, 620px);
+  min-height:100vh;
+  margin:0 auto;
+  padding:12px 0 18px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
 /* =========================
@@ -41,244 +71,422 @@ body{
 
 .presenterHeader{
   position:sticky;
-  top:10px;
-  z-index:50;
-  background:rgba(255,255,255,.88);
-  backdrop-filter:blur(10px);
-  border:1px solid var(--presenter-border);
-  border-radius:24px;
-  box-shadow:var(--presenter-shadow);
-  padding:14px;
+  top:0;
+  z-index:30;
+  min-height:72px;
   display:grid;
-  grid-template-columns:52px minmax(0,1fr);
-  gap:12px;
+  grid-template-columns:82px 1fr 82px;
+  gap:8px;
   align-items:center;
-}
-
-#presenterBackBtn{
-  width:52px;
-  height:52px;
-  border:0;
-  border-radius:18px;
-  background:var(--presenter-dark);
-  color:#fff;
-  font-size:1rem;
-  cursor:pointer;
+  padding:10px;
+  border-radius:0 0 24px 24px;
+  background:rgba(234,239,239,.88);
+  backdrop-filter:blur(10px);
 }
 
 .presenterHeaderText{
   min-width:0;
+  text-align:center;
 }
 
-#presenterTitle{
+.presenterHeaderText h1{
   margin:0;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(2rem,5vw,3rem);
+  font-size:2rem;
   line-height:1.05;
-  color:var(--presenter-dark);
+  color:#2F4158;
 }
 
-#presenterSubtitle{
-  margin-top:4px;
-  color:var(--presenter-muted);
-  font-size:1rem;
-  line-height:1.5;
+.presenterHeaderText p{
+  margin:4px 0 0;
+  color:var(--p-soft);
+  font-size:.92rem;
+  line-height:1.35;
+}
+
+.presenterBack,
+.presenterEnd{
+  height:46px;
+  border:0;
+  border-radius:16px;
+  color:#fff;
+  font-family:"HanakaText",sans-serif;
+  font-size:.92rem;
+  cursor:pointer;
+  box-shadow:0 10px 20px rgba(0,0,0,.08);
+}
+
+.presenterBack{
+  background:#2F4158;
+}
+
+.presenterEnd{
+  background:#7A1630;
 }
 
 /* =========================
-   HOME
+   SETUP
 ========================= */
 
-#presenterHome{
+.presenterHome,
+.presenterPanel{
   display:flex;
   flex-direction:column;
-  gap:14px;
+  gap:12px;
 }
 
-.presenterModelCard{
-  background:var(--presenter-card);
-  border:1px solid var(--presenter-border);
-  border-radius:24px;
-  box-shadow:var(--presenter-shadow);
+.presenterSetupCard,
+.presenterCard,
+.presenterModelHero{
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  border:1px solid var(--p-border);
+  border-radius:26px;
+  box-shadow:0 12px 28px rgba(39,48,61,.07);
   padding:16px;
+  overflow:hidden;
+  position:relative;
+}
+
+.presenterSetupCard::before,
+.presenterCard::before,
+.presenterModelHero::before{
+  content:"";
+  position:absolute;
+  width:120px;
+  height:120px;
+  top:-54px;
+  right:-38px;
+  border-radius:50%;
+  background:rgba(255,155,81,.09);
+}
+
+.presenterSetupTitle{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2.35rem;
+  color:#2F4158;
+  line-height:1.1;
+  margin-bottom:14px;
+}
+
+.presenterSetupGrid{
   display:grid;
+  grid-template-columns:1fr 1fr;
   gap:10px;
 }
 
-.presenterModelCard label,
-.presenterLabel{
-  color:var(--presenter-muted);
-  font-size:.95rem;
-  line-height:1.4;
+.presenterField{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin-bottom:12px;
 }
 
+.presenterField label,
+.presenterLabel{
+  color:#2F4158;
+  font-size:1rem;
+  line-height:1.3;
+}
+
+.presenterField input,
+.presenterField select,
 #presenterModelSelect{
   width:100%;
   height:56px;
-  border:1px solid var(--presenter-border);
   border-radius:18px;
+  border:1px solid var(--p-border);
   background:#fff;
-  color:var(--presenter-text);
+  color:var(--p-text);
   padding:0 14px;
+  font-family:"HanakaText",sans-serif;
   font-size:1rem;
   outline:none;
 }
 
-.presenterSegmentsGrid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+.presenterField input:focus,
+.presenterField select:focus,
+#presenterModelSelect:focus{
+  border-color:var(--p-primary);
+  box-shadow:0 0 0 4px rgba(255,155,81,.12);
+}
+
+.presenterStartBtn{
+  position:relative;
+  z-index:1;
+  width:100%;
+  height:58px;
+  border:0;
+  border-radius:20px;
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  color:#fff;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.1rem;
+  cursor:pointer;
+  box-shadow:0 16px 30px rgba(255,155,81,.24);
+}
+
+/* =========================
+   HOME SEGMENTS
+========================= */
+
+.presenterGameHome{
+  display:flex;
+  flex-direction:column;
   gap:12px;
 }
 
-.presenterSegmentCard{
-  min-height:120px;
-  border:1px solid var(--presenter-border);
-  border-radius:24px;
-  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
-  box-shadow:var(--presenter-shadow);
-  padding:16px;
+.presenterModelHero{
+  min-height:92px;
   display:flex;
+  flex-direction:column;
   align-items:center;
   justify-content:center;
   text-align:center;
-  color:var(--presenter-dark);
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2rem;
-  line-height:1.1;
-  cursor:pointer;
+}
+
+.presenterModelHeroLabel{
   position:relative;
-  overflow:hidden;
+  z-index:1;
+  color:#7A6950;
+  font-size:.95rem;
+  margin-bottom:6px;
 }
 
-.presenterSegmentCard::before{
-  content:"";
-  position:absolute;
-  width:90px;
-  height:90px;
-  top:-30px;
-  right:-22px;
-  border-radius:50%;
-  background:rgba(255,155,81,.12);
+.presenterModelHeroName{
+  position:relative;
+  z-index:1;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  color:#2F4158;
+  font-size:2.25rem;
+  line-height:1.1;
 }
 
-/* =========================
-   PANEL
-========================= */
-
-#presenterPanel{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.presenterCard{
-  background:var(--presenter-card);
-  border:1px solid var(--presenter-border);
-  border-radius:24px;
-  box-shadow:var(--presenter-shadow);
-  padding:16px;
-  display:flex;
-  flex-direction:column;
+.presenterSegments{
+  display:grid;
+  grid-template-columns:1fr 1fr;
   gap:12px;
 }
 
-.presenterCard.compact{
-  padding:12px;
+.presenterSegmentBtn{
+  position:relative;
+  min-height:118px;
+  border:1px solid var(--p-border);
+  border-radius:24px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F3F7F7 100%);
+  box-shadow:0 10px 24px rgba(39,48,61,.06);
+  overflow:hidden;
+  cursor:pointer;
+}
+
+.presenterSegmentBtn::before{
+  content:"";
+  position:absolute;
+  width:92px;
+  height:92px;
+  top:-34px;
+  left:-20px;
+  border-radius:50%;
+  background:rgba(255,155,81,.10);
+}
+
+.presenterSegmentBtn::after{
+  content:"";
+  position:absolute;
+  width:70px;
+  height:70px;
+  bottom:-28px;
+  right:-14px;
+  border-radius:18px;
+  transform:rotate(24deg);
+  background:rgba(47,65,88,.05);
+}
+
+.presenterSegmentBtn span{
+  position:relative;
+  z-index:1;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2rem;
+  color:#2F4158;
+  line-height:1.1;
+}
+
+.presenterGlobalToggleBtn{
+  min-height:58px;
+  border:0;
+  border-radius:20px;
+  background:linear-gradient(180deg,#2F4158 0%,#25343F 100%);
+  color:#fff;
+  font-family:"HanakaText",sans-serif;
+  font-size:1rem;
+  cursor:pointer;
+  box-shadow:0 12px 24px rgba(47,65,88,.18);
+}
+
+.presenterGlobalToggleBtn.isHiddenMode{
+  background:linear-gradient(180deg,#FFB15F 0%,#FF8A2A 100%);
+  color:#fff;
 }
 
 /* =========================
-   BUTTONS
+   SHARED COMPONENTS
 ========================= */
+
+.presenterOneAction{
+  display:none;
+}
+
+.presenterTeams{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
 
 .presenterBtn,
 .presenterNumberBtn,
 .presenterRoundTabs button{
   border:0;
   min-height:52px;
-  border-radius:18px;
-  padding:10px 14px;
+  border-radius:17px;
+  padding:0 12px;
   font-family:"HanakaText",sans-serif;
   font-size:1rem;
-  line-height:1.2;
+  line-height:1.15;
   cursor:pointer;
-  color:#fff;
-  background:var(--presenter-dark);
-  box-shadow:0 8px 18px rgba(47,65,88,.12);
+  box-shadow:
+    0 10px 20px rgba(0,0,0,.10),
+    inset 0 1px 0 rgba(255,255,255,.14);
+  transition:.16s ease;
+}
+
+.presenterBtn:active,
+.presenterNumberBtn:active,
+.presenterRoundTabs button:active{
+  transform:scale(.98);
 }
 
 .presenterBtn.orange{
   background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
-  color:#243447;
+  color:#2E3A4D;
 }
 
-.presenterBtn.green{
-  background:#009900;
-}
-
-.presenterBtn.red{
-  background:#FF5A5A;
+.presenterBtn.dark{
+  background:#25343F;
+  color:#fff;
 }
 
 .presenterBtn.gray{
   background:#6F7A88;
+  color:#fff;
+}
+
+.presenterBtn.red{
+  background:#FF6666;
+  color:#fff;
+}
+
+.presenterBtn.green{
+  background:#8EE88E;
+  color:#17351C;
 }
 
 .presenterBtn.blue{
   background:#2F6BFF;
+  color:#fff;
 }
 
-.presenterBtn.dark{
-  background:var(--presenter-dark);
-}
-
-.presenterBtn.selectedPresenterTeam,
 .selectedPresenterTeam{
-  outline:4px solid rgba(255,155,81,.25);
-  box-shadow:0 0 0 2px var(--presenter-mango), 0 10px 20px rgba(255,155,81,.18);
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.22),
+    0 12px 24px rgba(255,155,81,.20) !important;
+  filter:brightness(1.04);
 }
 
-.usedPresenterNumber{
-  opacity:.45;
-  color:transparent !important;
-  pointer-events:none;
-}
-
-/* =========================
-   ACTION GROUPS
-========================= */
-
-.presenterOneAction,
-.presenterTeams,
 .presenterActions,
-.presenterMiniActions{
+.presenterMiniActions,
+.presenterControlRow{
   display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+
+.presenterMiniActions{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.presenterActions .presenterBtn,
+.presenterMiniActions .presenterBtn{
+  width:100%;
+  min-width:0;
+}
+
+.presenterCard{
+  display:flex;
+  flex-direction:column;
   gap:10px;
 }
 
-.presenterOneAction{
-  grid-template-columns:1fr;
+.presenterLabel{
+  position:relative;
+  z-index:1;
+  text-align:right;
+  color:#5F6B7A;
 }
 
-.presenterTeams{
-  grid-template-columns:1fr 1fr;
+.presenterQuestionText,
+.presenterAnswerText,
+.presenterNoteText,
+.presenterList{
+  position:relative;
+  z-index:1;
+  width:100%;
+  border-radius:20px;
+  border:1px solid var(--p-border);
+  background:#fff;
+  color:#243447;
+  padding:14px;
+  text-align:center;
+  line-height:1.65;
+  font-size:1.05rem;
+  min-height:70px;
 }
 
-.presenterActions{
-  grid-template-columns:repeat(3,minmax(0,1fr));
+.presenterAnswerText{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.55rem;
+  line-height:1.35;
 }
 
-.presenterMiniActions{
-  grid-template-columns:1fr 1fr;
+.presenterNoteText{
+  background:#4B5563;
+  color:#fff;
 }
 
-/* =========================
-   GRIDS
-========================= */
+.presenterList{
+  max-height:300px;
+  overflow:auto;
+  text-align:right;
+}
+
+.presenterListItem{
+  background:#F7F9F9;
+  border:1px solid #E3E8E8;
+  border-radius:16px;
+  padding:12px;
+  margin-bottom:8px;
+  line-height:1.6;
+}
 
 .presenterGrid{
+  position:relative;
+  z-index:1;
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:10px;
+  gap:8px;
 }
 
 .presenterGrid.four{
@@ -290,369 +498,248 @@ body{
 }
 
 .presenterNumberBtn{
-  min-height:58px;
+  min-height:54px;
   background:#25343F;
-  color:#FFFFFF;
+  color:#fff;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.55rem;
 }
 
-/* =========================
-   ROUND TABS
-========================= */
+.presenterNumberBtn.usedPresenterNumber,
+.presenterNumberBtn.presenterOpened{
+  background:#3A4A56;
+  color:transparent;
+}
 
 .presenterRoundTabs{
+  position:relative;
+  z-index:1;
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:10px;
+  gap:8px;
+}
+
+.presenterRoundTabs button{
+  background:#25343F;
+  color:#fff;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.25rem;
 }
 
 .presenterRoundTabs button.active{
-  background:var(--presenter-mango);
-  color:#243447;
+  background:#FF9B51;
+  color:#2E3A4D;
 }
 
 /* =========================
-   TEXT / ANSWERS
-========================= */
-
-.presenterQuestionText,
-.presenterAnswerText,
-.presenterNoteText{
-  width:100%;
-  min-height:90px;
-  border-radius:20px;
-  background:var(--presenter-soft);
-  border:1px solid var(--presenter-border);
-  color:var(--presenter-text);
-  padding:16px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  line-height:1.7;
-  font-size:1.25rem;
-}
-
-.presenterAnswerText{
-  background:#FFF4EC;
-  border-color:rgba(255,155,81,.32);
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.7rem;
-  line-height:1.35;
-}
-
-.presenterNoteText{
-  background:#EEF2F6;
-  color:#42556D;
-  font-size:1.05rem;
-}
-
-.presenterList{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.presenterListItem{
-  background:var(--presenter-soft);
-  border:1px solid var(--presenter-border);
-  border-radius:18px;
-  padding:12px 14px;
-  line-height:1.7;
-  color:var(--presenter-text);
-  font-size:1rem;
-}
-
-/* =========================
-   WARMUP CATEGORIES
+   WARMUP
 ========================= */
 
 .presenterWarmupCats{
+  position:relative;
+  z-index:1;
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
 }
 
 .presenterWarmupCat{
-  background:var(--presenter-soft);
-  border:1px solid var(--presenter-border);
+  border:1px solid var(--p-border);
   border-radius:20px;
-  padding:12px;
+  background:#fff;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
 }
 
 .presenterWarmupCatTitle{
-  min-height:42px;
+  min-height:44px;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
-  color:var(--presenter-dark);
+  color:#2F4158;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.25rem;
-  line-height:1.2;
-  margin-bottom:10px;
+  font-size:1.35rem;
+  line-height:1.15;
 }
 
 .presenterWarmupNumbers{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
 }
 
 /* =========================
-   IMAGE PREVIEW IN PRESENTER
+   WHO IMAGE PREVIEW
 ========================= */
 
-.presenterImagePreview,
-.presenterAnswerImage,
-.presenterListItem img{
+.presenterImagePreviewBox{
   width:100%;
-  max-height:240px;
-  object-fit:contain;
-  border-radius:18px;
+  border-radius:20px;
+  border:1px solid var(--p-border);
   background:#fff;
-  border:1px solid var(--presenter-border);
-  padding:8px;
+  padding:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.presenterImagePreviewBox img{
+  max-width:100%;
+  max-height:220px;
+  object-fit:contain;
+  border-radius:16px;
+  display:block;
 }
 
 /* =========================
    TOAST
 ========================= */
 
-#presenterToast{
+.presenterToast{
   position:fixed;
-  right:50%;
-  bottom:20px;
-  transform:translateX(50%) translateY(20px);
+  top:14px;
+  left:50%;
+  transform:translateX(-50%) translateY(-20px);
   z-index:9999;
   min-width:220px;
-  max-width:calc(100% - 28px);
-  padding:12px 18px;
-  border-radius:999px;
-  background:var(--presenter-dark);
+  max-width:calc(100% - 24px);
+  padding:12px 16px;
+  border-radius:18px;
+  background:#2F4158;
   color:#fff;
   text-align:center;
+  font-size:1rem;
   opacity:0;
   pointer-events:none;
-  transition:.22s ease;
+  transition:.25s ease;
   box-shadow:0 14px 30px rgba(0,0,0,.18);
 }
 
-#presenterToast.show{
+.presenterToast.show{
   opacity:1;
-  transform:translateX(50%) translateY(0);
+  transform:translateX(-50%) translateY(0);
 }
 
 /* =========================
-   IPHONE
+   DISPLAY IMAGE ZOOM BUTTON CARD
 ========================= */
 
-@media (max-width:760px){
-  .presenterPage,
-  .presenterShell{
-    width:calc(100% - 18px);
-    padding:10px 0 18px;
-    gap:10px;
+.presenterZoomDisplayBtn{
+  background:#2F6BFF !important;
+  color:#fff !important;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width:430px){
+  .presenterPage{
+    width:calc(100% - 14px);
+    padding-top:8px;
   }
 
   .presenterHeader{
-    top:8px;
-    border-radius:20px;
-    padding:10px;
-    grid-template-columns:46px minmax(0,1fr);
+    grid-template-columns:70px 1fr 70px;
+    padding:8px;
   }
 
-  #presenterBackBtn{
-    width:46px;
-    height:46px;
-    border-radius:15px;
+  .presenterHeaderText h1{
+    font-size:1.65rem;
   }
 
-  #presenterTitle{
-    font-size:2rem;
+  .presenterHeaderText p{
+    font-size:.8rem;
   }
 
-  #presenterSubtitle{
-    font-size:.9rem;
+  .presenterBack,
+  .presenterEnd{
+    height:42px;
+    border-radius:14px;
+    font-size:.82rem;
   }
 
-  .presenterCard,
-  .presenterModelCard{
-    border-radius:20px;
-    padding:12px;
-    gap:10px;
-  }
-
-  .presenterSegmentsGrid{
+  .presenterSetupGrid{
     grid-template-columns:1fr;
-    gap:10px;
+    gap:0;
   }
 
-  .presenterSegmentCard{
-    min-height:92px;
-    border-radius:20px;
-    font-size:1.7rem;
+  .presenterSegments{
+    grid-template-columns:1fr 1fr;
+    gap:9px;
   }
 
-  .presenterTeams,
-  .presenterActions,
-  .presenterMiniActions{
+  .presenterSegmentBtn{
+    min-height:104px;
+    border-radius:22px;
+  }
+
+  .presenterSegmentBtn span{
+    font-size:1.65rem;
+  }
+
+  .presenterTeams{
+    gap:8px;
+  }
+
+  .presenterBtn,
+  .presenterNumberBtn,
+  .presenterRoundTabs button{
+    min-height:48px;
+    border-radius:15px;
+    font-size:.92rem;
+    padding:0 8px;
+  }
+
+  .presenterNumberBtn{
+    font-size:1.35rem;
+  }
+
+  .presenterGrid{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:7px;
+  }
+
+  .presenterGrid.four{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+
+  .presenterWarmupCats{
     grid-template-columns:1fr 1fr;
     gap:8px;
   }
 
-  .presenterActions{
-    grid-template-columns:repeat(3,minmax(0,1fr));
+  .presenterWarmupCat{
+    padding:8px;
+    border-radius:18px;
   }
 
-  .presenterBtn{
-    min-height:48px;
-    border-radius:15px;
-    font-size:.9rem;
-    padding:8px 8px;
+  .presenterWarmupCatTitle{
+    font-size:1.12rem;
+    min-height:38px;
   }
 
-  .presenterGrid,
-  .presenterGrid.four{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:8px;
-  }
-
-  .presenterGrid.two{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
-  .presenterNumberBtn{
-    min-height:52px;
-    border-radius:16px;
-    font-size:1.35rem;
-  }
-
-  .presenterRoundTabs{
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:8px;
-  }
-
-  .presenterRoundTabs button{
-    min-height:48px;
-    border-radius:15px;
+  .presenterWarmupNumbers{
+    gap:6px;
   }
 
   .presenterQuestionText,
   .presenterAnswerText,
-  .presenterNoteText{
-    min-height:76px;
-    border-radius:18px;
+  .presenterNoteText,
+  .presenterList{
+    min-height:58px;
     padding:12px;
-    font-size:1.05rem;
-    line-height:1.65;
+    font-size:.98rem;
   }
 
   .presenterAnswerText{
-    font-size:1.45rem;
-    line-height:1.35;
+    font-size:1.32rem;
   }
 
-  .presenterListItem{
-    border-radius:16px;
-    padding:10px 12px;
-    font-size:.95rem;
-    line-height:1.65;
+  .presenterList{
+    max-height:250px;
   }
-
-  .presenterWarmupCats{
-    grid-template-columns:1fr;
-  }
-
-  .presenterWarmupCatTitle{
-    font-size:1.15rem;
-  }
-
-  .presenterWarmupNumbers{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-
-  .presenterImagePreview,
-  .presenterAnswerImage,
-  .presenterListItem img{
-    max-height:190px;
-    border-radius:16px;
-  }
-}
-
-/* =========================
-   SMALL IPHONE
-========================= */
-
-@media (max-width:390px){
-  .presenterActions{
-    grid-template-columns:1fr;
-  }
-
-  .presenterGrid,
-  .presenterGrid.four{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
-  .presenterBtn{
-    font-size:.86rem;
-  }
-}
-.presenterImageZoomModal{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  background:rgba(20,28,38,.72);
-  backdrop-filter:blur(7px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:18px;
-}
-
-.presenterImageZoomCard{
-  width:min(900px,100%);
-  max-height:92vh;
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.presenterImageZoomImg{
-  max-width:100%;
-  max-height:90vh;
-  object-fit:contain;
-  border-radius:24px;
-  background:#fff;
-  box-shadow:0 24px 60px rgba(0,0,0,.28);
-}
-
-.presenterImageZoomClose{
-  position:absolute;
-  top:-14px;
-  left:-14px;
-  width:46px;
-  height:46px;
-  border:0;
-  border-radius:16px;
-  background:#2F4158;
-  color:#fff;
-  font-size:1.5rem;
-  z-index:2;
-}
-
-@media (max-width:760px){
-  .presenterImageZoomImg{
-    border-radius:18px;
-  }
-
-  .presenterImageZoomClose{
-    top:8px;
-    left:8px;
-  }
-}
-.presenterImageZoomModal.hidden{
-  display:none !important;
 }

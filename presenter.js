@@ -13,17 +13,7 @@ let presenterSelectedTeam = null
 let presenterTop10Round = 1
 let presenterFinalRound = 1
 let presenterArchiveRound = 1
-
-function refreshPresenterTeamNames() {
-  presenterTeamAName = localStorage.getItem("teamAName") || "الفريق الأول"
-  presenterTeamBName = localStorage.getItem("teamBName") || "الفريق الثاني"
-
-  const a = document.getElementById("presenterTeamA")
-  const b = document.getElementById("presenterTeamB")
-
-  if (a) a.innerText = presenterTeamAName
-  if (b) b.innerText = presenterTeamBName
-}
+let presenterControlsHidden = localStorage.getItem("presenter_hide_controls") === "1"
 
 /* =========================
    BASIC
@@ -39,6 +29,17 @@ function showToast(text = "تم الإرسال") {
   setTimeout(() => {
     toast.classList.remove("show")
   }, 1100)
+}
+
+function refreshPresenterTeamNames() {
+  presenterTeamAName = localStorage.getItem("teamAName") || "الفريق الأول"
+  presenterTeamBName = localStorage.getItem("teamBName") || "الفريق الثاني"
+
+  const a = document.getElementById("presenterTeamA")
+  const b = document.getElementById("presenterTeamB")
+
+  if (a) a.innerText = presenterTeamAName
+  if (b) b.innerText = presenterTeamBName
 }
 
 async function sendCommand(action, payload = {}) {
@@ -68,10 +69,10 @@ async function sendCommand(action, payload = {}) {
   showToast("تم الإرسال")
 }
 
-async function sendGlobalDisplayControlsToggle() {
+async function sendGlobalCommand(action, payload = {}) {
   const oldSegment = presenterSegment
   presenterSegment = "global"
-  await sendCommand("toggleDisplayControls")
+  await sendCommand(action, payload)
   presenterSegment = oldSegment
 }
 
@@ -100,9 +101,13 @@ async function loadPresenterModels() {
     `
   })
 
-  if (presenterModel) {
-    select.value = String(presenterModel)
-  }
+  if (presenterModel) select.value = String(presenterModel)
+}
+
+function getPresenterModelName() {
+  const select = document.getElementById("presenterModelSelect")
+  const selected = select?.options?.[select.selectedIndex]
+  return selected?.textContent?.trim() || `النموذج ${presenterModel}`
 }
 
 function setPresenterModel() {
@@ -114,20 +119,115 @@ function setPresenterModel() {
   }
 
   presenterModel = Number(value)
+
   localStorage.setItem("presenter_model", value)
+  localStorage.setItem("current_model", value)
+  localStorage.setItem("game_model", value)
+
+  const modelNameBox = document.getElementById("presenterCurrentModelName")
+  if (modelNameBox) modelNameBox.innerText = getPresenterModelName()
+
   showToast("تم اختيار النموذج")
 }
+
+function applyPresenterHomeState() {
+  const teamAInput = document.getElementById("presenterTeamAInput")
+  const teamBInput = document.getElementById("presenterTeamBInput")
+  const modelNameBox = document.getElementById("presenterCurrentModelName")
+  const setupCard = document.querySelector(".presenterSetupCard")
+  const gameHome = document.getElementById("presenterGameHome")
+
+  if (teamAInput) teamAInput.value = localStorage.getItem("teamAName") || ""
+  if (teamBInput) teamBInput.value = localStorage.getItem("teamBName") || ""
+
+  if (modelNameBox) modelNameBox.innerText = getPresenterModelName()
+
+  if (presenterModel && localStorage.getItem("presenter_ready") === "1") {
+    setupCard?.classList.add("hidden")
+    gameHome?.classList.remove("hidden")
+  }
+
+  updatePresenterControlsToggleUI()
+}
+
+function startPresenterSetup() {
+  const teamA = document.getElementById("presenterTeamAInput")?.value.trim() || "الفريق الأول"
+  const teamB = document.getElementById("presenterTeamBInput")?.value.trim() || "الفريق الثاني"
+
+  if (!presenterModel) {
+    showToast("اختر النموذج أولاً")
+    return
+  }
+
+  localStorage.setItem("teamAName", teamA)
+  localStorage.setItem("teamBName", teamB)
+  localStorage.setItem("presenter_ready", "1")
+  localStorage.setItem("current_model", String(presenterModel))
+  localStorage.setItem("game_model", String(presenterModel))
+
+  refreshPresenterTeamNames()
+
+  document.querySelector(".presenterSetupCard")?.classList.add("hidden")
+  document.getElementById("presenterGameHome")?.classList.remove("hidden")
+
+  const modelNameBox = document.getElementById("presenterCurrentModelName")
+  if (modelNameBox) modelNameBox.innerText = getPresenterModelName()
+
+  showToast("تم تجهيز لوحة المقدم")
+}
+
+async function togglePresenterDisplayControlsBtn() {
+  presenterControlsHidden = !presenterControlsHidden
+  localStorage.setItem("presenter_hide_controls", presenterControlsHidden ? "1" : "0")
+
+  await sendGlobalCommand("toggleDisplayControls")
+  updatePresenterControlsToggleUI()
+}
+
+function updatePresenterControlsToggleUI() {
+  const btn = document.getElementById("presenterGlobalToggleBtn")
+  if (!btn) return
+
+  btn.classList.toggle("isHiddenMode", presenterControlsHidden)
+
+  btn.innerText = presenterControlsHidden
+    ? "إظهار أزرار التحكم في العرض"
+    : "إخفاء أزرار التحكم في العرض"
+}
+
+function setTitle(title, subtitle = "") {
+  document.getElementById("presenterTitle").innerText = title
+  document.getElementById("presenterSubtitle").innerText = subtitle
+}
+
+/* =========================
+   PAGE NAVIGATION
+========================= */
 
 function showPresenterHome() {
   presenterSegment = null
   presenterSelectedTeam = null
 
-  document.getElementById("presenterHome").classList.remove("hidden")
-  document.getElementById("presenterPanel").classList.add("hidden")
-  document.getElementById("presenterBackBtn").classList.add("hidden")
+  document.getElementById("presenterHome")?.classList.remove("hidden")
+  document.getElementById("presenterPanel")?.classList.add("hidden")
+  document.getElementById("presenterBackBtn")?.classList.add("hidden")
+  document.getElementById("presenterEndBtn")?.classList.add("hidden")
 
-  document.getElementById("presenterTitle").innerText = "لوحة المقدم"
-  document.getElementById("presenterSubtitle").innerText = "اختر النموذج ثم الفقرة"
+  setTitle("لوحة المقدم", "اختر الفقرة")
+  applyPresenterHomeState()
+}
+
+function getPresenterSegmentTitle(segment) {
+  const titles = {
+    warmup: "التسخين",
+    top10: "Top 10",
+    auction: "فتبلة",
+    who: "من هو",
+    final: "الفاصلة",
+    archive: "الأرشيف"
+  }
+
+  return titles[segment] || "لوحة المقدم"
 }
 
 function openPresenterSegment(segment) {
@@ -138,12 +238,20 @@ function openPresenterSegment(segment) {
     return
   }
 
+  if (localStorage.getItem("presenter_ready") !== "1") {
+    showToast("اضغط بدء لوحة المقدم أولاً")
+    return
+  }
+
   presenterSegment = segment
   presenterSelectedTeam = null
 
-  document.getElementById("presenterHome").classList.add("hidden")
-  document.getElementById("presenterPanel").classList.remove("hidden")
-  document.getElementById("presenterBackBtn").classList.remove("hidden")
+  document.getElementById("presenterHome")?.classList.add("hidden")
+  document.getElementById("presenterPanel")?.classList.remove("hidden")
+  document.getElementById("presenterBackBtn")?.classList.remove("hidden")
+  document.getElementById("presenterEndBtn")?.classList.remove("hidden")
+
+  setTitle(getPresenterSegmentTitle(segment), "اختر الفريق ثم تحكم بالفقرة")
 
   if (segment === "warmup") renderWarmupPresenter()
   if (segment === "top10") renderTop10Presenter()
@@ -153,22 +261,18 @@ function openPresenterSegment(segment) {
   if (segment === "archive") renderArchivePresenter()
 }
 
-function setTitle(title, subtitle = "") {
-  document.getElementById("presenterTitle").innerText = title
-  document.getElementById("presenterSubtitle").innerText = subtitle
+async function presenterEndSegment() {
+  if (!presenterSegment) {
+    showToast("اختر الفقرة")
+    return
+  }
+
+  await sendCommand("endSegment")
 }
 
 /* =========================
-   SHARED HTML
+   SHARED CONTROLS
 ========================= */
-
-function presenterTopControls() {
-  return `
-    <div class="presenterOneAction">
-      <button class="presenterBtn red" onclick="sendCommand('endSegment')">إنهاء الفقرة</button>
-    </div>
-  `
-}
 
 function presenterTeamControls() {
   refreshPresenterTeamNames()
@@ -200,11 +304,30 @@ function selectPresenterTeam(team) {
 function resultControls() {
   return `
     <div class="presenterActions">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+      <button class="presenterBtn green" onclick="presenterCorrect()">صح</button>
       <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
-      <button class="presenterBtn green" onclick="presenterCorrect()">إجابة صحيحة</button>
+      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
     </div>
   `
+}
+
+function presenterCorrect() {
+  sendCommand("closeZoomImage")
+
+  setTimeout(() => {
+    sendCommand("correct")
+  }, 120)
+}
+
+function zoomDisplayImage() {
+  sendCommand("zoomImage")
+}
+
+function markPresenterNumberUsed(btn) {
+  if (!btn) return
+  btn.classList.add("usedPresenterNumber", "presenterOpened")
+  btn.disabled = true
+  btn.innerText = ""
 }
 
 /* =========================
@@ -212,17 +335,16 @@ function resultControls() {
 ========================= */
 
 async function renderWarmupPresenter() {
-  setTitle("التسخين", "الفئات والأسئلة")
+  setTitle("التسخين", "اختر الفريق ثم السؤال")
 
   const categories = await loadPresenterWarmupCategories()
 
   document.getElementById("presenterPanel").innerHTML = `
-    ${presenterTopControls()}
     ${presenterTeamControls()}
     ${resultControls()}
 
     <section class="presenterCard">
-      <div class="presenterLabel">أسئلة التسخين</div>
+      <div class="presenterLabel">الفئات والأسئلة</div>
 
       <div class="presenterWarmupCats">
         ${[1,2,3,4].map(cat => `
@@ -239,12 +361,10 @@ async function renderWarmupPresenter() {
       </div>
     </section>
 
-    <section class="presenterCard">
+    <section class="presenterCard presenterCompactQa">
       <div class="presenterLabel">السؤال</div>
       <div class="presenterQuestionText" id="warmupPresenterQuestion">اختر سؤال</div>
-    </section>
 
-    <section class="presenterCard">
       <div class="presenterLabel">الإجابة</div>
       <div class="presenterAnswerText" id="warmupPresenterAnswer">—</div>
     </section>
@@ -267,9 +387,7 @@ async function loadPresenterWarmupCategories() {
   const categories = {}
 
   ;(data || []).forEach(row => {
-    if (row.category) {
-      categories[Number(row.category)] = row.category_name || `الفئة ${row.category}`
-    }
+    if (row.category) categories[Number(row.category)] = row.category_name || `الفئة ${row.category}`
   })
 
   return categories
@@ -283,13 +401,13 @@ async function openWarmupQuestionPresenter(category, number) {
     return
   }
 
-  sendCommand("openNumber", { category, number })
-
-  if (btn) {
-    btn.classList.add("usedPresenterNumber")
-    btn.disabled = true
-    btn.innerText = ""
+  if (!presenterSelectedTeam) {
+    showToast("اختر الفريق أولاً")
+    return
   }
+
+  await sendCommand("openNumber", { category, number })
+  markPresenterNumberUsed(btn)
 
   const { data, error } = await db
     .from("questions")
@@ -308,11 +426,8 @@ async function openWarmupQuestionPresenter(category, number) {
 
   const row = data?.[0]
 
-  document.getElementById("warmupPresenterQuestion").innerText =
-    row?.question || "لا يوجد سؤال"
-
-  document.getElementById("warmupPresenterAnswer").innerText =
-    row?.answer || "—"
+  document.getElementById("warmupPresenterQuestion").innerText = row?.question || "لا يوجد سؤال"
+  document.getElementById("warmupPresenterAnswer").innerText = row?.answer || "—"
 }
 
 /* =========================
@@ -320,10 +435,9 @@ async function openWarmupQuestionPresenter(category, number) {
 ========================= */
 
 function renderTop10Presenter() {
-  setTitle("Top 10", "لوحة التحكم والإجابات")
+  setTitle("Top 10", "اختر الفريق والجولة")
 
   document.getElementById("presenterPanel").innerHTML = `
-    ${presenterTopControls()}
     ${presenterTeamControls()}
 
     <section class="presenterCard">
@@ -335,18 +449,9 @@ function renderTop10Presenter() {
       </div>
     </section>
 
-    <section class="presenterCard">
-      <div class="presenterLabel">الأرقام</div>
-      <div class="presenterGrid">
-        ${[1,2,3,4,5,6,7,8,9,10].map(n => `
-          <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{number:${n}, round:presenterTop10Round})">${n}</button>
-        `).join("")}
-      </div>
-    </section>
-
     <div class="presenterActions">
       <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
-      <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابات</button>
+      <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابات</button>
       <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
     </div>
 
@@ -358,8 +463,8 @@ function renderTop10Presenter() {
     <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
 
     <section class="presenterCard">
-      <div class="presenterLabel">الإجابات</div>
-      <div class="presenterList" id="top10PresenterAnswers">—</div>
+      <div class="presenterLabel">الأرقام والإجابات</div>
+      <div class="presenterGrid" id="top10PresenterNumbers"></div>
     </section>
   `
 
@@ -378,7 +483,7 @@ function setPresenterTop10Round(round) {
 }
 
 async function loadPresenterTop10Answers() {
-  const box = document.getElementById("top10PresenterAnswers")
+  const box = document.getElementById("top10PresenterNumbers")
   if (!box) return
 
   box.innerHTML = "جاري التحميل..."
@@ -397,10 +502,25 @@ async function loadPresenterTop10Answers() {
   }
 
   box.innerHTML = (data || []).map(item => `
-    <div class="presenterListItem">
-      <strong>${item.position}</strong> - ${item.answer || "-"}
-    </div>
+    <button
+      id="ptop10_${presenterTop10Round}_${item.position}"
+      class="presenterNumberBtn"
+      onclick="openTop10PresenterNumber(${Number(item.position)})"
+      title="${item.answer || "-"}"
+    >
+      ${item.position}
+    </button>
   `).join("")
+}
+
+function openTop10PresenterNumber(number) {
+  if (!presenterSelectedTeam) {
+    showToast("اختر الفريق أولاً")
+    return
+  }
+
+  sendCommand("openNumber", { number, round: presenterTop10Round })
+  markPresenterNumberUsed(document.getElementById(`ptop10_${presenterTop10Round}_${number}`))
 }
 
 /* =========================
@@ -408,36 +528,33 @@ async function loadPresenterTop10Answers() {
 ========================= */
 
 function renderAuctionPresenter() {
-  setTitle("فتبلة", "لوحة التحكم والإجابة")
+  setTitle("فتبلة", "اختر الفريق ثم الرقم")
 
   document.getElementById("presenterPanel").innerHTML = `
-    ${presenterTopControls()}
     ${presenterTeamControls()}
 
     <section class="presenterCard">
       <div class="presenterLabel">اختر الرقم</div>
       <div class="presenterGrid four">
         ${[1,2,3,4,5,6,7,8].map(n => `
-          <button class="presenterNumberBtn" onclick="openAuctionPresenter(${n})">${n}</button>
+          <button id="pauction_${n}" class="presenterNumberBtn" onclick="openAuctionPresenter(${n})">${n}</button>
         `).join("")}
       </div>
     </section>
 
     <div class="presenterActions">
       <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
-      <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
-      <button class="presenterBtn green" onclick="presenterCorrect()">إجابة صحيحة</button>
+      <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
+      <button class="presenterBtn blue" onclick="zoomDisplayImage()">تكبير الصورة</button>
     </div>
 
-    <div class="presenterMiniActions">
+    <div class="presenterActions">
+      <button class="presenterBtn green" onclick="presenterCorrect()">صح</button>
       <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
       <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
     </div>
 
     <section class="presenterCard">
-    <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
-  تكبير الصورة في العرض
-</button>
       <div class="presenterLabel">الإجابة</div>
       <div class="presenterAnswerText" id="auctionPresenterAnswer">—</div>
     </section>
@@ -450,7 +567,13 @@ function renderAuctionPresenter() {
 }
 
 async function openAuctionPresenter(number) {
+  if (!presenterSelectedTeam) {
+    showToast("اختر الفريق أولاً")
+    return
+  }
+
   sendCommand("openNumber", { number })
+  markPresenterNumberUsed(document.getElementById(`pauction_${number}`))
 
   const { data, error } = await db
     .from("auction_questions")
@@ -465,16 +588,8 @@ async function openAuctionPresenter(number) {
     return
   }
 
-  const imageUrl = data?.image || data?.image_url || data?.question_image || ""
-
   document.getElementById("auctionPresenterAnswer").innerText = data?.answer || "—"
   document.getElementById("auctionPresenterNote").innerText = data?.note || "—"
-
-  const imgBtn = document.getElementById("auctionPresenterImageBtn")
-  if (imgBtn) {
-    imgBtn.classList.toggle("hidden", !imageUrl)
-    imgBtn.onclick = () => openPresenterImageZoom(imageUrl)
-  }
 }
 
 /* =========================
@@ -482,52 +597,67 @@ async function openAuctionPresenter(number) {
 ========================= */
 
 function renderWhoPresenter() {
-  setTitle("من هو", "الأرقام والإجابة")
+  setTitle("من هو", "اختر الفريق والنقاط ثم الرقم")
 
   document.getElementById("presenterPanel").innerHTML = `
-    ${presenterTopControls()}
     ${presenterTeamControls()}
 
     <section class="presenterCard">
       <div class="presenterLabel">اختر النقاط</div>
       <div class="presenterGrid">
         ${[1,2,3,4,5].map(n => `
-          <button class="presenterNumberBtn" onclick="sendCommand('setPoints',{points:${n}})">${n}</button>
+          <button id="pwhoPoint_${n}" class="presenterNumberBtn" onclick="setWhoPresenterPoints(${n})">${n}</button>
         `).join("")}
       </div>
     </section>
 
-    <div class="presenterMiniActions">
+    <div class="presenterActions">
       <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
       <button class="presenterBtn green" onclick="presenterCorrect()">صح</button>
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
     </div>
 
     <div class="presenterMiniActions">
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
       <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+      <button class="presenterBtn blue" onclick="zoomDisplayImage()">تكبير الصورة</button>
     </div>
 
     <section class="presenterCard">
       <div class="presenterLabel">اختر الرقم</div>
       <div class="presenterGrid">
         ${Array.from({ length:15 }, (_,i) => i + 1).map(n => `
-          <button class="presenterNumberBtn" onclick="openWhoPresenter(${n})">${n}</button>
+          <button id="pwho_${n}" class="presenterNumberBtn" onclick="openWhoPresenter(${n})">${n}</button>
         `).join("")}
       </div>
     </section>
 
+    <section id="whoPresenterImageBox" class="presenterImagePreviewBox hidden"></section>
+
     <section class="presenterCard">
-    <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
-  تكبير الصورة في العرض
-</button>
       <div class="presenterLabel">الإجابة</div>
       <div class="presenterAnswerText" id="whoPresenterAnswer">—</div>
     </section>
   `
 }
 
+function setWhoPresenterPoints(points) {
+  sendCommand("setPoints", { points })
+
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById(`pwhoPoint_${i}`)?.classList.remove("active")
+  }
+
+  document.getElementById(`pwhoPoint_${points}`)?.classList.add("active")
+}
+
 async function openWhoPresenter(number) {
+  if (!presenterSelectedTeam) {
+    showToast("اختر الفريق أولاً")
+    return
+  }
+
   sendCommand("openNumber", { number })
+  markPresenterNumberUsed(document.getElementById(`pwho_${number}`))
 
   const { data, error } = await db
     .from("who_images")
@@ -546,10 +676,15 @@ async function openWhoPresenter(number) {
 
   document.getElementById("whoPresenterAnswer").innerText = data?.answer || "—"
 
-  const imgBtn = document.getElementById("whoPresenterImageBtn")
-  if (imgBtn) {
-    imgBtn.classList.toggle("hidden", !imageUrl)
-    imgBtn.onclick = () => openPresenterImageZoom(imageUrl)
+  const imgBox = document.getElementById("whoPresenterImageBox")
+  if (imgBox) {
+    if (imageUrl) {
+      imgBox.classList.remove("hidden")
+      imgBox.innerHTML = `<img src="${imageUrl}" alt="">`
+    } else {
+      imgBox.classList.add("hidden")
+      imgBox.innerHTML = ""
+    }
   }
 }
 
@@ -558,10 +693,9 @@ async function openWhoPresenter(number) {
 ========================= */
 
 function renderFinalPresenter() {
-  setTitle("الفاصلة", "الجولات والتحكم")
+  setTitle("الفاصلة", "اختر الجولة والرقم")
 
   document.getElementById("presenterPanel").innerHTML = `
-    ${presenterTopControls()}
     ${presenterTeamControls()}
 
     <section class="presenterCard">
@@ -578,23 +712,10 @@ function renderFinalPresenter() {
       <div class="presenterGrid" id="finalPresenterNumbers"></div>
     </section>
 
-    <div class="presenterMiniActions">
-      <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">إظهار السؤال</button>
-      <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
-    </div>
-
-    <div class="presenterMiniActions">
-      <button class="presenterBtn green" onclick="presenterCorrect()">إجابة صحيحة</button>
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
-    </div>
-
-    <div class="presenterMiniActions">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
-      <button class="presenterBtn dark" onclick="sendCommand('startSequence')">بدء عرض الصور</button>
-    </div>
+    <div id="finalPresenterControls"></div>
 
     <section class="presenterCard">
-      <div class="presenterLabel">الإجابات / المعلومات</div>
+      <div class="presenterLabel">معلومات الرقم المختار</div>
       <div class="presenterList" id="finalPresenterAnswers">—</div>
     </section>
   `
@@ -611,7 +732,58 @@ function setPresenterFinalRound(round) {
   }
 
   renderFinalPresenterNumbers()
+  renderFinalPresenterControls()
   loadPresenterFinalAnswers()
+}
+
+function renderFinalPresenterControls() {
+  const box = document.getElementById("finalPresenterControls")
+  if (!box) return
+
+  if (presenterFinalRound === 1) {
+    box.innerHTML = `
+      <div class="presenterActions">
+        <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">إظهار السؤال</button>
+        <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
+        <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+      </div>
+      <div class="presenterActions">
+        <button class="presenterBtn green" onclick="presenterCorrect()">صح</button>
+        <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
+        <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+      </div>
+    `
+    return
+  }
+
+  if (presenterFinalRound === 2) {
+    box.innerHTML = `
+      <div class="presenterActions">
+        <button class="presenterBtn blue" onclick="sendCommand('showHint')">إظهار التلميحة</button>
+        <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
+        <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+      </div>
+      <div class="presenterActions">
+        <button class="presenterBtn green" onclick="presenterCorrect()">صح</button>
+        <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
+        <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+      </div>
+    `
+    return
+  }
+
+  box.innerHTML = `
+    <div class="presenterActions">
+      <button class="presenterBtn dark" onclick="sendCommand('startSequence')">بدء الصور</button>
+      <button class="presenterBtn blue" onclick="zoomDisplayImage()">تكبير الصورة</button>
+      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+    </div>
+    <div class="presenterActions">
+      <button class="presenterBtn green" onclick="presenterCorrect()">صح</button>
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
+      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+    </div>
+  `
 }
 
 function renderFinalPresenterNumbers() {
@@ -625,12 +797,18 @@ function renderFinalPresenterNumbers() {
   box.className = presenterFinalRound === 3 ? "presenterGrid two" : "presenterGrid"
 
   box.innerHTML = nums.map(n => `
-    <button class="presenterNumberBtn" onclick="openFinalPresenter(${n})">${n}</button>
+    <button id="pfinal_${presenterFinalRound}_${n}" class="presenterNumberBtn" onclick="openFinalPresenter(${n})">${n}</button>
   `).join("")
 }
 
 async function openFinalPresenter(number) {
+  if (!presenterSelectedTeam) {
+    showToast("اختر الفريق أولاً")
+    return
+  }
+
   sendCommand("openNumber", { number, round: presenterFinalRound })
+  markPresenterNumberUsed(document.getElementById(`pfinal_${presenterFinalRound}_${number}`))
   loadPresenterFinalAnswers(number)
 }
 
@@ -643,7 +821,7 @@ async function loadPresenterFinalAnswers(number = null) {
   if (presenterFinalRound === 1) {
     let query = db
       .from("final_round1_items")
-      .select("number, answer, note, card_text, question_part1, question_part2, question_part3")
+      .select("*")
       .eq("model", presenterModel)
       .order("number", { ascending: true })
 
@@ -659,8 +837,8 @@ async function loadPresenterFinalAnswers(number = null) {
 
     box.innerHTML = (data || []).map(item => `
       <div class="presenterListItem">
-        <strong>${item.number}</strong><br>
-        السؤال: ${[item.question_part1, item.question_part2, item.question_part3].filter(Boolean).join(" / ") || item.card_text || "-"}<br>
+        <strong>رقم ${item.number}</strong><br>
+        ${Number(item.number) <= 3 ? "" : `السؤال: ${[item.question_part1, item.question_part2, item.question_part3].filter(Boolean).join(" / ") || item.card_text || "-"}<br>`}
         الإجابة: ${item.answer || "-"}<br>
         ${item.note ? `ملاحظة: ${item.note}` : ""}
       </div>
@@ -668,9 +846,18 @@ async function loadPresenterFinalAnswers(number = null) {
     return
   }
 
+  if (presenterFinalRound === 2) {
+    box.innerHTML = `
+      <div class="presenterListItem">
+        الجولة الثانية: استخدم أزرار التحكم حسب الرقم المختار.
+      </div>
+    `
+    return
+  }
+
   box.innerHTML = `
     <div class="presenterListItem">
-      تحكم الجولة ${presenterFinalRound} من الأزرار أعلاه.
+      الجولة الثالثة: تظهر الصور في العرض، ويمكن تكبير صورة العرض من زر التكبير.
     </div>
   `
 }
@@ -680,10 +867,9 @@ async function loadPresenterFinalAnswers(number = null) {
 ========================= */
 
 function renderArchivePresenter() {
-  setTitle("الأرشيف", "الجولات والمطلوب")
+  setTitle("الأرشيف", "اختر الفريق والجولة")
 
   document.getElementById("presenterPanel").innerHTML = `
-    ${presenterTopControls()}
     ${presenterTeamControls()}
 
     <section class="presenterCard">
@@ -702,14 +888,11 @@ function renderArchivePresenter() {
       <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
     </div>
 
-    <div class="presenterMiniActions">
+    <div class="presenterActions">
       <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
-      <button class="presenterBtn dark" onclick="sendCommand('undo')">تراجع</button>
+      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+      <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
     </div>
-
-    <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
-      الجولة التالية
-    </button>
 
     <section class="presenterCard">
       <div class="presenterLabel">فتح رقم</div>
@@ -722,7 +905,7 @@ function renderArchivePresenter() {
     </section>
 
     <section class="presenterCard">
-      <div class="presenterLabel">أسئلة / عناصر الجولة</div>
+      <div class="presenterLabel">عناصر الجولة</div>
       <div class="presenterList" id="archivePresenterItems">—</div>
     </section>
   `
@@ -774,6 +957,7 @@ async function loadPresenterArchiveItems() {
   if (numbersBox) {
     numbersBox.innerHTML = items.map(item => `
       <button
+        id="parchive_${presenterArchiveRound}_${Number(item.position)}"
         class="presenterNumberBtn"
         onclick="openArchivePresenterItem(${Number(item.position)})"
       >
@@ -801,55 +985,26 @@ async function loadPresenterArchiveItems() {
 }
 
 function openArchivePresenterItem(number) {
+  if (!presenterSelectedTeam) {
+    showToast("اختر الفريق أولاً")
+    return
+  }
+
   sendCommand("openNumber", {
     number,
     round: presenterArchiveRound
   })
-}
-let presenterZoomImageUrl = ""
 
-function openPresenterImageZoom(imageUrl = "") {
-  if (!imageUrl) {
-    showToast("لا توجد صورة")
-    return
-  }
-
-  presenterZoomImageUrl = imageUrl
-
-  let modal = document.getElementById("presenterImageZoomModal")
-  if (!modal) {
-    modal = document.createElement("div")
-    modal.id = "presenterImageZoomModal"
-    modal.className = "presenterImageZoomModal hidden"
-    modal.innerHTML = `
-      <div class="presenterImageZoomCard">
-        <button class="presenterImageZoomClose" onclick="closePresenterImageZoom()">×</button>
-        <img id="presenterImageZoomImg" class="presenterImageZoomImg" alt="">
-      </div>
-    `
-    document.body.appendChild(modal)
-  }
-
-  document.getElementById("presenterImageZoomImg").src = imageUrl
-  modal.classList.remove("hidden")
+  markPresenterNumberUsed(document.getElementById(`parchive_${presenterArchiveRound}_${number}`))
 }
 
-function closePresenterImageZoom() {
-  document.getElementById("presenterImageZoomModal")?.classList.add("hidden")
-}
-
-function presenterCorrect() {
-  sendCommand("closeZoomImage")
-
-  setTimeout(() => {
-    sendCommand("correct")
-  }, 120)
-}
 /* =========================
    INIT
 ========================= */
 
 document.addEventListener("DOMContentLoaded", () => {
   refreshPresenterTeamNames()
-  loadPresenterModels()
+  loadPresenterModels().then(() => {
+    applyPresenterHomeState()
+  })
 })
