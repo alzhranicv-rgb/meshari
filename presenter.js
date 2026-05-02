@@ -202,7 +202,7 @@ function resultControls() {
     <div class="presenterActions">
       <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
       <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
-      <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
+      <button class="presenterBtn green" onclick="presenterCorrect()">إجابة صحيحة</button>
     </div>
   `
 }
@@ -426,7 +426,7 @@ function renderAuctionPresenter() {
     <div class="presenterActions">
       <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
       <button class="presenterBtn dark" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
-      <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
+      <button class="presenterBtn green" onclick="presenterCorrect()">إجابة صحيحة</button>
     </div>
 
     <div class="presenterMiniActions">
@@ -435,6 +435,9 @@ function renderAuctionPresenter() {
     </div>
 
     <section class="presenterCard">
+    <button id="auctionPresenterImageBtn" class="presenterBtn blue hidden">
+  تكبير الصورة
+</button>
       <div class="presenterLabel">الإجابة</div>
       <div class="presenterAnswerText" id="auctionPresenterAnswer">—</div>
     </section>
@@ -451,7 +454,7 @@ async function openAuctionPresenter(number) {
 
   const { data, error } = await db
     .from("auction_questions")
-    .select("answer, note")
+    .select("answer, note, image")
     .eq("model", presenterModel)
     .eq("number", Number(number))
     .single()
@@ -464,6 +467,16 @@ async function openAuctionPresenter(number) {
 
   document.getElementById("auctionPresenterAnswer").innerText = data?.answer || "—"
   document.getElementById("auctionPresenterNote").innerText = data?.note || "—"
+
+  const imgBtn = document.getElementById("auctionPresenterImageBtn")
+  if (imgBtn) {
+    if (data?.image) {
+      imgBtn.classList.remove("hidden")
+      imgBtn.onclick = () => openPresenterImageZoom(data.image)
+    } else {
+      imgBtn.classList.add("hidden")
+    }
+  }
 }
 
 /* =========================
@@ -506,6 +519,9 @@ function renderWhoPresenter() {
     </section>
 
     <section class="presenterCard">
+    <button id="whoPresenterImageBtn" class="presenterBtn blue hidden">
+  تكبير الصورة
+</button>
       <div class="presenterLabel">الإجابة</div>
       <div class="presenterAnswerText" id="whoPresenterAnswer">—</div>
     </section>
@@ -517,7 +533,7 @@ async function openWhoPresenter(number) {
 
   const { data, error } = await db
     .from("who_images")
-    .select("answer")
+    .select("answer, image")
     .eq("model", presenterModel)
     .eq("number", Number(number))
     .single()
@@ -529,6 +545,16 @@ async function openWhoPresenter(number) {
   }
 
   document.getElementById("whoPresenterAnswer").innerText = data?.answer || "—"
+
+  const imgBtn = document.getElementById("whoPresenterImageBtn")
+  if (imgBtn) {
+    if (data?.image) {
+      imgBtn.classList.remove("hidden")
+      imgBtn.onclick = () => openPresenterImageZoom(data.image)
+    } else {
+      imgBtn.classList.add("hidden")
+    }
+  }
 }
 
 /* =========================
@@ -562,7 +588,7 @@ function renderFinalPresenter() {
     </div>
 
     <div class="presenterMiniActions">
-      <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
+      <button class="presenterBtn green" onclick="presenterCorrect()">إجابة صحيحة</button>
       <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
     </div>
 
@@ -784,7 +810,42 @@ function openArchivePresenterItem(number) {
     round: presenterArchiveRound
   })
 }
+let presenterZoomImageUrl = ""
 
+function openPresenterImageZoom(imageUrl = "") {
+  if (!imageUrl) {
+    showToast("لا توجد صورة")
+    return
+  }
+
+  presenterZoomImageUrl = imageUrl
+
+  let modal = document.getElementById("presenterImageZoomModal")
+  if (!modal) {
+    modal = document.createElement("div")
+    modal.id = "presenterImageZoomModal"
+    modal.className = "presenterImageZoomModal hidden"
+    modal.innerHTML = `
+      <div class="presenterImageZoomCard">
+        <button class="presenterImageZoomClose" onclick="closePresenterImageZoom()">×</button>
+        <img id="presenterImageZoomImg" class="presenterImageZoomImg" alt="">
+      </div>
+    `
+    document.body.appendChild(modal)
+  }
+
+  document.getElementById("presenterImageZoomImg").src = imageUrl
+  modal.classList.remove("hidden")
+}
+
+function closePresenterImageZoom() {
+  document.getElementById("presenterImageZoomModal")?.classList.add("hidden")
+}
+
+function presenterCorrect() {
+  closePresenterImageZoom()
+  sendCommand("correct")
+}
 /* =========================
    INIT
 ========================= */
