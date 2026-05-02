@@ -1069,3 +1069,35 @@ body.presenterHideDisplayControls .finalControlsBar{
     max-width:none;
   }
 }
+.displayImageZoomOverlay{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  background:rgba(20,28,38,.76);
+  backdrop-filter:blur(7px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+
+.displayImageZoomOverlay.hidden{
+  display:none !important;
+}
+
+.displayImageZoomInner{
+  width:min(1200px,100%);
+  max-height:92vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.displayImageZoomImg{
+  max-width:100%;
+  max-height:90vh;
+  object-fit:contain;
+  border-radius:24px;
+  background:#fff;
+  box-shadow:0 24px 60px rgba(0,0,0,.3);
+}

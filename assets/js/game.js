@@ -1013,3 +1013,38 @@ function flashScreen(type = "correct") {
     layer.classList.add("flashCorrect")
   }
 }
+function zoomCurrentDisplayImage() {
+  const img =
+    document.querySelector(".auctionBigImage") ||
+    document.querySelector(".whoImageFull") ||
+    document.querySelector(".finalRound1BigImage") ||
+    document.querySelector(".finalRound3Image") ||
+    document.querySelector(".archiveModernBigCard.revealed img")
+
+  if (!img || !img.src) {
+    showGameToast("لا توجد صورة للتكبير")
+    return
+  }
+
+  let overlay = document.getElementById("displayImageZoomOverlay")
+
+  if (!overlay) {
+    overlay = document.createElement("div")
+    overlay.id = "displayImageZoomOverlay"
+    overlay.className = "displayImageZoomOverlay"
+    overlay.onclick = closeCurrentDisplayImageZoom
+    overlay.innerHTML = `
+      <div class="displayImageZoomInner">
+        <img id="displayImageZoomImg" class="displayImageZoomImg" alt="">
+      </div>
+    `
+    document.body.appendChild(overlay)
+  }
+
+  document.getElementById("displayImageZoomImg").src = img.src
+  overlay.classList.remove("hidden")
+}
+
+function closeCurrentDisplayImageZoom() {
+  document.getElementById("displayImageZoomOverlay")?.classList.add("hidden")
+}

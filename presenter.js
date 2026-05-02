@@ -435,8 +435,8 @@ function renderAuctionPresenter() {
     </div>
 
     <section class="presenterCard">
-    <button id="auctionPresenterImageBtn" class="presenterBtn blue hidden">
-  تكبير الصورة
+    <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
+  تكبير الصورة في العرض
 </button>
       <div class="presenterLabel">الإجابة</div>
       <div class="presenterAnswerText" id="auctionPresenterAnswer">—</div>
@@ -517,8 +517,8 @@ function renderWhoPresenter() {
     </section>
 
     <section class="presenterCard">
-    <button id="whoPresenterImageBtn" class="presenterBtn blue hidden">
-  تكبير الصورة
+    <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
+  تكبير الصورة في العرض
 </button>
       <div class="presenterLabel">الإجابة</div>
       <div class="presenterAnswerText" id="whoPresenterAnswer">—</div>
@@ -839,8 +839,11 @@ function closePresenterImageZoom() {
 }
 
 function presenterCorrect() {
-  closePresenterImageZoom()
-  sendCommand("correct")
+  sendCommand("closeZoomImage")
+
+  setTimeout(() => {
+    sendCommand("correct")
+  }, 120)
 }
 /* =========================
    INIT
