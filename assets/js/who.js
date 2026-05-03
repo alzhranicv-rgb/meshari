@@ -92,9 +92,12 @@ function restoreWhoState(saved) {
   updateWhoDoubleButton()
 
   const grid = document.querySelector(".whoGrid")
-  if (grid) {
-    grid.innerHTML = createWhoGrid()
-  }
+if (grid) {
+  grid.innerHTML = createWhoGrid()
+}
+
+updateWhoCompensationButton()
+
 
   if (currentWhoImage) {
     showWhoImageFullscreen(currentWhoImage)
@@ -302,12 +305,23 @@ function updateWhoDoubleButton() {
 function createWhoGrid() {
   let html = ""
 
+  const used = (whoState.usedNumbers || []).map(Number)
+  const lock15 = !used.includes(15) && used.length < 14
+  const waitCompensation = !used.includes(15) && used.length === 14 && !whoCompensationMode
+
   for (let i = 1; i <= 15; i++) {
-    if (!whoState.usedNumbers.includes(i)) {
-      html += `<button onclick="chooseWho(${i})" class="whoBtn">${i}</button>`
-    } else {
-      html += `<button class="whoBtn used"></button>`
-    }
+    const isUsed = used.includes(i)
+    const isLocked15 = i === 15 && (lock15 || waitCompensation)
+
+    html += `
+      <button
+        onclick="${isLocked15 ? "" : `chooseWho(${i})`}"
+        class="whoBtn ${isUsed ? "used" : ""} ${isLocked15 ? "whoBtnLocked15" : ""}"
+        ${(isUsed || isLocked15) ? "disabled" : ""}
+      >
+        ${isUsed ? "" : i}
+      </button>
+    `
   }
 
   return html
@@ -422,11 +436,18 @@ function switchWhoTurn() {
 
 
 function canUseWhoCompensation() {
+  const used = (whoState.usedNumbers || []).map(Number)
+  const remaining = []
+
+  for (let i = 1; i <= 15; i++) {
+    if (!used.includes(i)) remaining.push(i)
+  }
+
   return (
     !whoQuestionLocked &&
     !whoCurrentNumber &&
-    !whoState.usedNumbers.includes(15) &&
-    whoState.usedNumbers.length === 14
+    remaining.length === 1 &&
+    remaining[0] === 15
   )
 }
 
@@ -448,12 +469,24 @@ async function startWhoCompensation() {
 
   whoCompensationMode = true
   whoState.currentPoints = 5
-  highlightWhoPoints()
 
-  await chooseWho(15)
+  whoState.activeTeam = null
+  selectedTeam = null
+
+  highlightWhoPoints()
+  highlightWhoTurnTeam()
+  updateWhoTurnBox()
+  updateWhoDoubleButton()
+
+  const grid = document.querySelector(".whoGrid")
+  if (grid) {
+    grid.innerHTML = createWhoGrid()
+  }
 
   updateWhoCompensationButton()
   saveWhoState()
+
+  showGameToast("تم تفعيل التعويض، افتح رقم 15")
 }
 /* =========================
    Question
@@ -509,12 +542,13 @@ openWhoImageOverlay()
 startWhoTimer()
 }
 
-  const grid = document.querySelector(".whoGrid")
-  if (grid) {
-    grid.innerHTML = createWhoGrid()
-  }
+const grid = document.querySelector(".whoGrid")
+if (grid) {
+  grid.innerHTML = createWhoGrid()
+}
 
-  saveWhoState()
+updateWhoCompensationButton()
+saveWhoState()
 }
 
 function showWhoImageFullscreen(imageUrl) {
@@ -658,8 +692,9 @@ function finishWhoAfterAnswerDelay() {
     whoCurrentNumber = null
 
     updateWhoDoubleButton()
+    updateWhoCompensationButton()
     saveWhoState()
-  }, 5000)
+  }, 10000)
 }
 
 function whoCorrect() {
@@ -669,7 +704,7 @@ function whoCorrect() {
   }
 
   if (whoCompensationMode && !whoState.activeTeam) {
-    showGameToast("اختر الفريق الذي يأخذ التعويض")
+    showGameToast("اختر الفريق الذي يأخذ التعويض ثم اضغط صح")
     return
   }
 

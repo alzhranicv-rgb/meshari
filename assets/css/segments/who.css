@@ -858,7 +858,7 @@ body.presenterHideDisplayControls .whoPointsSelect{
 }
 /* يخلي الإجابة مستطيل بجانب الصورة */
 .whoResultView{
-  grid-template-columns:1.2fr .8fr !important;
+  grid-template-columns:1.2fr .6fr !important;
   align-items:center !important;
 }
 
@@ -930,4 +930,9 @@ body.presenterHideDisplayControls .whoPointsSelect{
     font-size:.68rem !important;
     border-radius:12px !important;
   }
+}
+.whoBtnLocked15{
+  opacity:.35 !important;
+  cursor:not-allowed !important;
+  filter:grayscale(.4) !important;
 }

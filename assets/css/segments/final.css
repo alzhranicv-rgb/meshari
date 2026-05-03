@@ -1595,3 +1595,261 @@
   margin-left:auto !important;
   margin-right:auto !important;
 }
+/* نخلي الاثنين نفس العرض بالضبط */
+.finalRound1MainStageCard,
+.finalRound1AnswerBox{
+  width:100% !important;
+  max-width:780px !important; /* نفس العرض */
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* توسيطهم داخل الصفحة */
+.finalRound1StageLayout{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+}
+
+/* ترتيب المسافة بينهم */
+.finalRound1BottomInfoRow{
+  width:100% !important;
+  max-width:780px !important;
+  margin:10px auto 0 !important;
+  display:flex !important;
+  justify-content:center !important;
+}
+.finalRound1AnswerBox{
+  max-width:700px !important;
+}
+/* حركة ظهور الإجابة */
+.finalRound1AnswerBox{
+  animation:finalAnswerPop .45s ease both !important;
+}
+
+@keyframes finalAnswerPop{
+  0%{
+    opacity:0;
+    transform:translateY(10px) scale(.96);
+  }
+  65%{
+    opacity:1;
+    transform:translateY(0) scale(1.02);
+  }
+  100%{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+/* تصغير وتنسيق مربع السؤال والإجابة */
+.finalRound1MainStageCard{
+  max-width:760px !important;
+  min-height:185px !important;
+  padding:12px !important;
+  border-radius:22px !important;
+}
+
+.finalRound1TextCard{
+  min-height:150px !important;
+  padding:22px 28px !important;
+  border-radius:22px !important;
+}
+
+.finalRound1TextCardInner{
+  font-size:clamp(1.45rem,2.25vw,2.55rem) !important;
+  line-height:1.55 !important;
+}
+
+.finalRound1BottomInfoRow{
+  max-width:760px !important;
+  margin:8px auto 0 !important;
+}
+
+.finalRound1AnswerBox{
+  max-width:700px !important;
+  min-height:76px !important;
+  padding:14px 28px !important;
+  border-radius:22px !important;
+  font-size:clamp(1.45rem,2.25vw,2.55rem) !important;
+  line-height:1.28 !important;
+}
+
+/* تقليل المسافة العامة في الجولة الأولى */
+.finalRound1StageLayout{
+  gap:8px !important;
+}
+
+.finalRound1PlayLayout{
+  gap:10px !important;
+}
+/* تنسيق نص التكبير داخل المربع */
+.finalRound1OverlayPaper{
+  width:min(92vw, 850px) !important;
+  min-height:260px !important;
+  max-height:82vh !important;
+  padding:28px 36px !important;
+  border-radius:28px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.finalRound1OverlayText{
+  width:100% !important;
+  max-width:100% !important;
+
+  font-family:"MolhimCustom","HanakaText",sans-serif !important;
+  font-size:clamp(1.7rem, 3vw, 3.2rem) !important;
+  line-height:1.65 !important;
+
+  text-align:center !important;
+  white-space:normal !important;
+  word-break:break-word !important;
+  text-wrap:balance !important;
+  overflow-wrap:anywhere !important;
+}
+.finalRound1AnswerMolhimFont{
+  font-family:"MolhimCustom","HanakaText",sans-serif !important;
+}
+
+.finalRound1AnswerProjectFont{
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+}
+/* =========================
+   FINAL ROUND 2 - PRO STYLE (1 & 3)
+========================= */
+
+.finalRound2WordsStage[data-round2-number="1"],
+.finalRound2WordsStage[data-round2-number="3"]{
+  min-height:280px !important;
+  padding:26px 24px !important;
+  border-radius:30px !important;
+
+  background:
+    radial-gradient(circle at top, rgba(255,155,81,.08), transparent 70%),
+    linear-gradient(180deg,#ffffff 0%,#f6f8fa 100%) !important;
+
+  border:1px solid rgba(255,155,81,.25) !important;
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,.06),
+    inset 0 1px 0 rgba(255,255,255,.9) !important;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+.finalRound2WordsStage[data-round2-number="1"] .finalHintStage,
+.finalRound2WordsStage[data-round2-number="3"] .finalHintStage{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:18px !important;
+}
+
+/* =========================
+   HINT (التلميح)
+========================= */
+
+.finalRound2WordsStage[data-round2-number="1"] .finalHintText,
+.finalRound2WordsStage[data-round2-number="3"] .finalHintText{
+
+  width:min(100%, 640px) !important;
+  min-height:64px !important;
+
+  padding:14px 26px !important;
+  border-radius:22px !important;
+
+  background:linear-gradient(180deg,#FFF9F3 0%,#FFE8D2 100%) !important;
+  border:2px solid rgba(255,155,81,.35) !important;
+
+  box-shadow:
+    0 14px 28px rgba(255,155,81,.12),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+
+  color:#2F4158 !important;
+  font-family:"HanakaText",sans-serif !important;
+
+  font-size:1.35rem !important;
+  line-height:1.6 !important;
+  text-align:center !important;
+
+  letter-spacing:.2px;
+}
+
+/* =========================
+   WORD (الكلمة)
+========================= */
+
+.finalRound2WordsStage[data-round2-number="1"] .finalWordChipLarge,
+.finalRound2WordsStage[data-round2-number="3"] .finalWordChipLarge{
+
+  width:min(100%, 560px) !important;
+  min-height:88px !important;
+
+  padding:18px 30px !important;
+  border-radius:26px !important;
+
+  background:
+    linear-gradient(180deg,#2F4158 0%,#1F2D3A 100%) !important;
+
+  color:#ffffff !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:2.3rem !important;
+  line-height:1.3 !important;
+  text-align:center !important;
+
+  letter-spacing:.5px;
+
+  box-shadow:
+    0 20px 36px rgba(31,45,58,.28),
+    inset 0 2px 0 rgba(255,255,255,.08) !important;
+
+  transition:.2s ease;
+}
+
+/* تأثير بسيط عند الظهور */
+.finalRound2WordsStage[data-round2-number="1"] .finalWordChipLarge,
+.finalRound2WordsStage[data-round2-number="3"] .finalWordChipLarge{
+  animation:wordPop .35s ease;
+}
+
+@keyframes wordPop{
+  0%{ transform:scale(.9); opacity:0 }
+  100%{ transform:scale(1); opacity:1 }
+}
+/* تحسين مربع تلميحة الجولة الثانية 1 و 3 */
+.finalRound2WordsStage[data-round2-number="1"] .finalHintText,
+.finalRound2WordsStage[data-round2-number="3"] .finalHintText{
+  width:min(100%, 600px) !important;
+  min-height:58px !important;
+  padding:12px 24px !important;
+  border-radius:20px !important;
+
+  background:
+    radial-gradient(circle at top right, rgba(255,155,81,.18), transparent 45%),
+    linear-gradient(180deg,#FFF8F1 0%,#FFE4CA 100%) !important;
+
+  border:2px solid rgba(255,155,81,.42) !important;
+  box-shadow:
+    0 10px 22px rgba(255,155,81,.14),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+
+  color:#2F4158 !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:2.18rem !important;
+  line-height:1.55 !important;
+  font-weight:400 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+
+  text-wrap:balance !important;
+  word-break:break-word !important;
+}

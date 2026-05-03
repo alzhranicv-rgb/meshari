@@ -1,218 +1,158 @@
 /* =========================
-   INTRO PAGE
+   INTRO PAGE - NEW CLEAN DESIGN
 ========================= */
 
 .introPage{
-  min-height:100vh;
+  min-height:100dvh;
+  width:100%;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:30px 18px;
+  padding:20px;
   background:
-    radial-gradient(circle at top right, rgba(255,155,81,.14), transparent 22%),
-    radial-gradient(circle at 18% 85%, rgba(47,65,88,.07), transparent 22%),
+    radial-gradient(circle at 85% 12%, rgba(255,155,81,.18), transparent 26%),
+    radial-gradient(circle at 12% 88%, rgba(47,65,88,.08), transparent 28%),
     linear-gradient(180deg,#F4F7F7 0%,#EAEFEF 100%);
-  position:relative;
   overflow:hidden;
 }
 
-.introPage::before{
-  content:"";
-  position:absolute;
-  width:340px;
-  height:340px;
-  top:-140px;
-  right:-100px;
-  border-radius:50%;
-  background:rgba(255,155,81,.10);
-  filter:blur(8px);
-}
-
-.introPage::after{
-  content:"";
-  position:absolute;
-  width:260px;
-  height:260px;
-  bottom:-120px;
-  left:-90px;
-  border-radius:42px;
-  transform:rotate(24deg);
-  background:rgba(47,65,88,.05);
-  filter:blur(4px);
-}
-
-/* =========================
-   CARD
-========================= */
-
 .introCard{
-  width:min(820px,100%);
-  padding:40px 34px 34px;
-  border-radius:38px;
-  background:linear-gradient(180deg,rgba(255,255,255,.98) 0%,rgba(244,247,247,.98) 100%);
-  border:1px solid #D9E0E0;
+  width:min(100%,680px);
+  border-radius:34px;
+  padding:28px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F7FAFA 100%);
+  border:1px solid rgba(217,224,224,.95);
   box-shadow:
-    0 24px 60px rgba(39,48,61,.10),
-    0 10px 24px rgba(255,155,81,.08),
+    0 24px 60px rgba(39,48,61,.12),
     inset 0 1px 0 rgba(255,255,255,.95);
   position:relative;
   overflow:hidden;
-  backdrop-filter:blur(4px);
 }
 
 .introCard::before{
   content:"";
   position:absolute;
-  width:250px;
-  height:250px;
-  top:-110px;
-  right:-85px;
+  width:210px;
+  height:210px;
+  top:-90px;
+  right:-70px;
   border-radius:50%;
-  background:radial-gradient(circle, rgba(255,155,81,.16) 0%, rgba(255,155,81,.04) 58%, transparent 72%);
+  background:rgba(255,155,81,.12);
 }
 
 .introCard::after{
   content:"";
   position:absolute;
-  width:180px;
-  height:180px;
-  bottom:-82px;
-  left:-58px;
-  border-radius:34px;
-  transform:rotate(26deg);
-  background:linear-gradient(180deg, rgba(47,65,88,.06), rgba(47,65,88,.02));
+  width:130px;
+  height:130px;
+  bottom:-55px;
+  left:-35px;
+  border-radius:30px;
+  transform:rotate(24deg);
+  background:rgba(47,65,88,.05);
 }
 
-/* =========================
-   HEADER
-========================= */
-
-.introLogoBox{
+.introLogoBox,
+.introForm{
   position:relative;
   z-index:2;
+}
+
+.introLogoBox{
   text-align:center;
-  margin-bottom:30px;
+  margin-bottom:22px;
 }
 
 .introBadge{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:38px;
-  padding:7px 20px;
+  width:max-content;
+  margin:0 auto 10px;
+  min-height:34px;
+  padding:7px 18px;
   border-radius:999px;
   background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
   color:#7A4A22;
   font-family:"HanakaText",sans-serif;
-  font-size:1.02rem;
-  line-height:1.2;
-  box-shadow:
-    0 10px 18px rgba(255,155,81,.18),
-    inset 0 1px 0 rgba(255,255,255,.4);
-  margin-bottom:18px;
+  font-size:.95rem;
+  box-shadow:0 10px 18px rgba(255,155,81,.18);
 }
 
 .introTitle{
   margin:0;
+  color:#243447;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(3.6rem,6vw,6.2rem);
+  font-size:clamp(3.6rem,6vw,5.6rem);
+  line-height:.95;
   font-weight:400;
-  line-height:.92;
-  color:#2F4158;
-  text-shadow:
-    0 2px 0 rgba(255,255,255,.96),
-    0 6px 14px rgba(255,155,81,.16),
-    0 14px 28px rgba(47,65,88,.10);
+  text-shadow:0 8px 20px rgba(47,65,88,.10);
 }
 
 .introTitleLine{
-  width:138px;
-  height:6px;
-  margin:16px auto 14px;
+  width:120px;
+  height:5px;
+  margin:13px auto 10px;
   border-radius:999px;
-  background:linear-gradient(90deg,rgba(255,155,81,0),#FF9B51,rgba(255,155,81,0));
-  box-shadow:0 6px 12px rgba(255,155,81,.14);
+  background:linear-gradient(90deg,transparent,#FF9B51,transparent);
 }
 
 .introSubTitle{
   margin:0;
-  color:#7A6950;
+  color:#5E6A76;
   font-family:"HanakaText",sans-serif;
-  font-size:1.18rem;
-  line-height:1.8;
+  font-size:1.05rem;
+  line-height:1.6;
 }
 
-/* =========================
-   FORM
-========================= */
-
 .introForm{
-  position:relative;
-  z-index:2;
   display:flex;
   flex-direction:column;
-  gap:20px;
-  padding:24px;
-  border-radius:28px;
-  background:rgba(255,255,255,.38);
-  border:1px solid rgba(217,224,224,.72);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.45);
+  gap:13px;
+  padding:16px;
+  border-radius:26px;
+  background:rgba(255,255,255,.55);
+  border:1px solid rgba(217,224,224,.8);
 }
 
 .introField{
   display:flex;
   flex-direction:column;
-  gap:9px;
+  gap:7px;
 }
 
 .introField label{
+  padding-inline:6px;
   color:#2F4158;
   font-family:"HanakaText",sans-serif;
-  font-size:1.15rem;
-  line-height:1.3;
-  padding-inline:6px;
+  font-size:.98rem;
 }
 
 .introField input,
 .introField select{
   width:100%;
-  height:66px;
-  border-radius:20px;
-  border:1px solid #D9E0E0;
-  background:linear-gradient(180deg,rgba(255,255,255,.98) 0%,rgba(246,249,249,.96) 100%);
-  box-shadow:
-    inset 0 1px 3px rgba(255,255,255,.95),
-    0 8px 18px rgba(39,48,61,.05);
+  height:56px;
+  border-radius:18px;
+  border:1px solid rgba(217,224,224,.95);
   outline:none;
-  padding:0 20px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F6F9F9 100%);
   color:#243447;
   font-family:"HanakaText",sans-serif;
-  font-size:1.1rem;
-  transition:.18s ease;
-}
-
-.introField input::placeholder{
-  color:#A09C94;
+  font-size:1rem;
+  padding:0 18px;
+  box-shadow:
+    inset 0 1px 3px rgba(255,255,255,.95),
+    0 8px 18px rgba(39,48,61,.04);
 }
 
 .introField input:focus,
 .introField select:focus{
-  border-color:rgba(255,155,81,.88);
-  background:linear-gradient(180deg,#FFFFFF 0%,#FFF7F1 100%);
+  border-color:rgba(255,155,81,.85);
   box-shadow:
     0 0 0 4px rgba(255,155,81,.12),
-    0 12px 20px rgba(39,48,61,.07);
-  transform:translateY(-1px);
+    0 10px 20px rgba(39,48,61,.06);
 }
 
 .introField select{
-  height:68px;
-  border-radius:22px;
-  padding:0 22px;
-  font-size:1.12rem;
   appearance:none;
   -webkit-appearance:none;
-  -moz-appearance:none;
   cursor:pointer;
 }
 
@@ -223,205 +163,61 @@
 .introField:has(select)::after{
   content:"⌄";
   position:absolute;
-  left:22px;
-  bottom:20px;
+  left:18px;
+  bottom:14px;
   color:#C96A25;
-  font-size:1.4rem;
+  font-size:1.45rem;
   pointer-events:none;
 }
 
-/* =========================
-   ACTION
-========================= */
-
-.introActions{
-  display:flex;
-  justify-content:center;
-  padding-top:16px;
+.introActionsRow{
+  display:grid !important;
+  grid-template-columns:1fr 58px;
+  gap:10px;
+  align-items:center;
+  margin-top:4px;
 }
 
 #startGameBtn{
-  min-width:320px;
-  height:68px;
+  width:100%;
+  height:58px;
   border:0;
-  border-radius:24px;
-  padding:0 34px;
+  border-radius:20px;
   background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
   color:#FFFFFF;
   font-family:"HanakaText",sans-serif;
-  font-size:1.28rem;
-  box-shadow:
-    0 18px 34px rgba(255,155,81,.26),
-    inset 0 1px 0 rgba(255,255,255,.22);
+  font-size:1.12rem;
   cursor:pointer;
-  transition:.18s ease;
-}
-
-#startGameBtn:hover{
-  transform:translateY(-2px);
   box-shadow:
-    0 24px 40px rgba(255,155,81,.30),
-    inset 0 1px 0 rgba(255,255,255,.28);
-  filter:brightness(1.02);
-}
-
-#startGameBtn:active{
-  transform:translateY(0);
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width:1100px){
-  .introCard{
-    width:min(740px,100%);
-    padding:34px 26px 28px;
-    border-radius:30px;
-  }
-
-  .introTitle{
-    font-size:clamp(3.1rem,8vw,5rem);
-  }
-
-  .introForm{
-    padding:20px;
-    border-radius:24px;
-  }
-
-  .introField input,
-  .introField select{
-    height:60px;
-  }
-
-  .introField select{
-    height:62px;
-  }
-
-  .introField:has(select)::after{
-    bottom:18px;
-  }
-
-  #startGameBtn{
-    min-width:240px;
-    height:60px;
-  }
-}
-
-@media (max-width:760px){
-  .introPage{
-    padding:18px 12px;
-  }
-
-  .introCard{
-    width:100%;
-    border-radius:24px;
-    padding:26px 18px 22px;
-  }
-
-  .introLogoBox{
-    margin-bottom:22px;
-  }
-
-  .introBadge{
-    min-height:32px;
-    padding:5px 14px;
-    font-size:.95rem;
-    margin-bottom:14px;
-  }
-
-  .introTitle{
-    font-size:3rem;
-  }
-
-  .introTitleLine{
-    width:96px;
-    height:4px;
-    margin:12px auto;
-  }
-
-  .introSubTitle{
-    font-size:1rem;
-    line-height:1.7;
-  }
-
-  .introForm{
-    gap:14px;
-    padding:16px;
-    border-radius:20px;
-  }
-
-  .introField label{
-    font-size:1rem;
-  }
-
-  .introField input,
-  .introField select{
-    height:56px;
-    border-radius:16px;
-    font-size:1rem;
-    padding:0 14px;
-  }
-
-  .introField select{
-    height:58px;
-  }
-
-  .introField:has(select)::after{
-    left:16px;
-    bottom:17px;
-    font-size:1.2rem;
-  }
-
-  .introActions{
-    padding-top:6px;
-  }
-
-  #startGameBtn{
-    width:100%;
-    min-width:0;
-    height:56px;
-    border-radius:18px;
-    font-size:1.1rem;
-  }
-}
-/* =========================
-   INTRO PRESENTER LINK
-========================= */
-
-.introActionsRow{
-  display:grid !important;
-  grid-template-columns:minmax(0, 1fr) 68px;
-  gap:12px;
-  align-items:center;
+    0 16px 30px rgba(255,155,81,.24),
+    inset 0 1px 0 rgba(255,255,255,.25);
 }
 
 .introPresenterEyeBtn{
-  width:68px;
-  height:68px;
+  width:58px;
+  height:58px;
   border:0;
-  border-radius:22px;
+  border-radius:20px;
   background:linear-gradient(180deg,#FFFFFF 0%,#FFF4EC 100%);
   border:1px solid rgba(255,155,81,.34);
   color:#2F4158;
-  font-size:1.55rem;
+  font-size:1.35rem;
   cursor:pointer;
-  box-shadow:
-    0 14px 26px rgba(255,155,81,.16),
-    inset 0 1px 0 rgba(255,255,255,.9);
-  transition:.18s ease;
+  box-shadow:0 12px 24px rgba(255,155,81,.14);
 }
 
+#startGameBtn:hover,
 .introPresenterEyeBtn:hover{
   transform:translateY(-2px);
-  filter:brightness(1.02);
+  filter:brightness(1.03);
 }
 
+/* Modal */
 .introPresenterModal{
   position:fixed;
   inset:0;
   z-index:9999;
-  background:rgba(20,28,38,.52);
+  background:rgba(20,28,38,.55);
   backdrop-filter:blur(7px);
   display:flex;
   align-items:center;
@@ -429,11 +225,15 @@
   padding:18px;
 }
 
+.introPresenterModal.hidden{
+  display:none !important;
+}
+
 .introPresenterModalCard{
-  width:min(430px,100%);
+  width:min(100%,420px);
+  border-radius:28px;
   background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
   border:1px solid #D9E0E0;
-  border-radius:30px;
   box-shadow:0 24px 60px rgba(39,48,61,.18);
   padding:26px 20px 20px;
   text-align:center;
@@ -444,19 +244,19 @@
   position:absolute;
   top:14px;
   left:14px;
-  width:42px;
-  height:42px;
+  width:40px;
+  height:40px;
   border:0;
   border-radius:14px;
   background:#2F4158;
-  color:#FFFFFF;
-  font-size:1.4rem;
+  color:#fff;
+  font-size:1.35rem;
   cursor:pointer;
 }
 
 .introPresenterModalTitle{
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2.3rem;
+  font-size:2.2rem;
   color:#2F4158;
   line-height:1.1;
   margin-bottom:8px;
@@ -465,76 +265,435 @@
 .introPresenterModalText{
   color:#5F6B7A;
   font-size:1rem;
-  line-height:1.7;
-  margin-bottom:16px;
+  line-height:1.6;
+  margin-bottom:14px;
 }
 
 .introPresenterQrBox{
-  width:230px;
-  height:230px;
+  width:220px;
+  height:220px;
   margin:0 auto 14px;
   padding:12px;
   border-radius:24px;
-  background:#FFFFFF;
+  background:#fff;
   border:1px solid #D9E0E0;
   box-shadow:0 12px 26px rgba(39,48,61,.08);
-  display:flex;
-  align-items:center;
-  justify-content:center;
 }
 
 .introPresenterQrBox img{
   width:100%;
   height:100%;
   object-fit:contain;
-  display:block;
 }
 
 .introPresenterLink{
   direction:ltr;
-  unicode-bidi:embed;
-  background:#FFFFFF;
+  background:#fff;
   border:1px solid #D9E0E0;
   border-radius:16px;
   padding:12px;
   color:#2F4158;
-  font-size:.88rem;
-  line-height:1.5;
+  font-size:.86rem;
   word-break:break-all;
   margin-bottom:12px;
 }
 
 .introPresenterCopyBtn{
   width:100%;
-  height:54px;
+  height:52px;
   border:0;
   border-radius:18px;
   background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
-  color:#FFFFFF;
+  color:#fff;
   font-family:"HanakaText",sans-serif;
-  font-size:1.05rem;
+  font-size:1rem;
   cursor:pointer;
 }
 
+/* Responsive */
 @media (max-width:760px){
-  .introActionsRow{
-    grid-template-columns:1fr 58px;
-    gap:10px;
+  .introPage{
+    padding:12px;
   }
 
+  .introCard{
+    padding:20px 14px 16px;
+    border-radius:24px;
+  }
+
+  .introLogoBox{
+    margin-bottom:16px;
+  }
+
+  .introTitle{
+    font-size:3rem;
+  }
+
+  .introForm{
+    padding:13px;
+    border-radius:20px;
+  }
+
+  .introField input,
+  .introField select{
+    height:52px;
+    border-radius:16px;
+  }
+
+  #startGameBtn,
   .introPresenterEyeBtn{
-    width:58px;
-    height:56px;
+    height:54px;
     border-radius:18px;
-    font-size:1.35rem;
   }
 
-  .introPresenterQrBox{
-    width:210px;
-    height:210px;
+  .introActionsRow{
+    grid-template-columns:1fr 54px;
+  }
+}
+.softEnter{
+  animation:introEnter .45s ease both;
+}
+
+.softExit{
+  animation:introExit .23s ease both;
+}
+
+@keyframes introEnter{
+  from{
+    opacity:0;
+    transform:translateY(14px) scale(.97);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@keyframes introExit{
+  to{
+    opacity:0;
+    transform:translateY(10px) scale(.98);
+  }
+}
+
+.introFieldError{
+  border-color:#FF3B3B !important;
+  box-shadow:
+    0 0 0 4px rgba(255,59,59,.13),
+    0 10px 20px rgba(255,59,59,.12) !important;
+  animation:introErrorShake .28s ease both;
+}
+
+@keyframes introErrorShake{
+  0%,100%{ transform:translateX(0); }
+  25%{ transform:translateX(5px); }
+  50%{ transform:translateX(-5px); }
+  75%{ transform:translateX(3px); }
+}
+
+
+
+#teamANameInput::placeholder,
+#teamBNameInput::placeholder{
+  color:#9AA3AA !important;
+}
+.introFieldsGroup{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.introTeamField,
+.introModelField{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  padding:0 !important;
+}
+
+.introTeamField input{
+  height:56px !important;
+  border-radius:20px !important;
+}
+/* إصلاح تمدد حقول أسماء الفرق */
+.introForm,
+.introFieldsGroup,
+.introField{
+  width:100% !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+}
+
+#teamANameInput,
+#teamBNameInput{
+  width:100% !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+  display:block !important;
+  margin:0 !important;
+}
+.hasIcon{
+  position:relative;
+}
+
+.fieldIcon{
+  position:absolute;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:1.2rem;
+  opacity:.6;
+}
+
+.hasIcon input{
+  padding-left:42px !important;
+}
+#teamANameInput,
+#teamBNameInput{
+  transition:.2s ease;
+}
+
+#teamANameInput:focus,
+#teamBNameInput:focus{
+  transform:translateY(-2px) scale(1.01);
+}
+#startGameBtn{
+  position:relative;
+  overflow:hidden;
+}
+
+#startGameBtn::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.35),transparent);
+  opacity:0;
+  transition:.3s;
+}
+
+#startGameBtn:hover::after{
+  opacity:1;
+  transform:translateX(100%);
+}
+
+#startGameBtn:active{
+  transform:scale(.97);
+}.introTitle{
+  animation:titleEnter .6s ease both;
+}
+
+@keyframes titleEnter{
+  from{
+    opacity:0;
+    transform:translateY(20px) scale(.9);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}.introCard{
+  position:relative;
+  overflow:hidden;
+}
+
+.introCard::before{
+  animation:cardGlow 6s linear infinite;
+}
+
+@keyframes cardGlow{
+  0%{ transform:translateX(-20px); }
+  50%{ transform:translateX(20px); }
+  100%{ transform:translateX(-20px); }
+}
+/* =========================
+   INTRO ULTRA POLISH
+========================= */
+
+.introPage{
+  background-size:140% 140% !important;
+  animation:introBgMove 10s ease-in-out infinite alternate;
+}
+
+@keyframes introBgMove{
+  from{ background-position:0% 0%; }
+  to{ background-position:100% 100%; }
+}
+
+.introCard{
+  animation:introCardFloat 5s ease-in-out infinite;
+}
+
+@keyframes introCardFloat{
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-6px); }
+}
+
+.introTitle{
+  background:linear-gradient(180deg,#2F4158 0%,#1E2C3A 55%,#FF9B51 130%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent !important;
+}
+
+.introTitleLine{
+  animation:introLineGlow 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes introLineGlow{
+  from{
+    width:110px;
+    box-shadow:0 0 8px rgba(255,155,81,.18);
+  }
+  to{
+    width:150px;
+    box-shadow:0 0 20px rgba(255,155,81,.45);
+  }
+}
+
+.introField input,
+.introField select{
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.introField input:focus,
+.introField select:focus{
+  transform:translateY(-2px);
+}
+
+#startGameBtn{
+  position:relative;
+  overflow:hidden;
+}
+
+#startGameBtn::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.45),transparent);
+  transform:translateX(-120%);
+  transition:.45s ease;
+}
+
+#startGameBtn:hover::before{
+  transform:translateX(120%);
+}
+
+.introPresenterEyeBtn{
+  position:relative;
+  overflow:hidden;
+}
+
+.introPresenterEyeBtn::after{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border-radius:16px;
+  border:1px solid rgba(255,155,81,.25);
+  opacity:.7;
+}
+
+@media (max-width:760px){
+  .introCard{
+    animation:none;
+  }
+}
+/* تصغير كلمة الحنكة */
+.introTitle{
+  font-size:clamp(3rem, 4.6vw, 4.6rem) !important;
+}
+
+/* ترتيب حقول أسماء الفرق والنموذج */
+.introField{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  padding:0 !important;
+  overflow:visible !important;
+}
+
+#teamANameInput,
+#teamBNameInput,
+#introModelSelect{
+  width:100% !important;
+  max-width:100% !important;
+  height:54px !important;
+  box-sizing:border-box !important;
+  border-radius:18px !important;
+  border:1.5px solid rgba(217,224,224,.95) !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F8FBFB 100%) !important;
+  box-shadow:
+    0 7px 16px rgba(39,48,61,.05),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+  color:#243447 !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:1rem !important;
+  padding:0 18px !important;
+}
+
+#teamANameInput:focus,
+#teamBNameInput:focus,
+#introModelSelect:focus{
+  border-color:#FF9B51 !important;
+  background:#FFFFFF !important;
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.12),
+    0 10px 20px rgba(39,48,61,.07) !important;
+}
+
+/* اختيار النموذج */
+.introModelField label{
+  margin-bottom:2px !important;
+  font-size:.95rem !important;
+  color:#2F4158 !important;
+}
+
+#introModelSelect{
+  cursor:pointer !important;
+  padding-left:44px !important;
+}
+
+.introModelField::after{
+  left:18px !important;
+  bottom:14px !important;
+  color:#FF9B51 !important;
+}
+
+/* آيفون */
+@media (max-width:760px){
+  .introTitle{
+    font-size:2.55rem !important;
   }
 
-  .introPresenterModalTitle{
-    font-size:2rem;
+  #teamANameInput,
+  #teamBNameInput,
+  #introModelSelect{
+    height:52px !important;
+    border-radius:16px !important;
   }
+}
+/* تمدد مناسب عند الكتابة بدون خروج عن الكرت */
+#teamANameInput,
+#teamBNameInput{
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease,
+    height .18s ease !important;
+  transform-origin:center !important;
+}
+
+#teamANameInput:focus,
+#teamBNameInput:focus{
+  height:58px !important;
+  transform:scale(1.015) !important;
+  max-width:98% !important;
+  margin:0 auto !important;
+}
+
+/* يمنع الخروج من حدود الفورم */
+.introTeamField{
+  display:flex !important;
+  justify-content:center !important;
+  overflow:visible !important;
 }

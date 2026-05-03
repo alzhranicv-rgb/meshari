@@ -950,3 +950,213 @@ body{
   background:#2f4158;
   color:#fff;
 }
+/* =========================
+   PRESENTER FINAL POLISH
+========================= */
+
+.presenterPage{
+  width:min(100% - 18px, 760px) !important;
+  gap:14px !important;
+}
+
+.presenterHeader{
+  grid-template-columns:86px 1fr 86px !important;
+  border-radius:0 0 26px 26px !important;
+  background:rgba(244,247,247,.92) !important;
+  box-shadow:0 10px 28px rgba(39,48,61,.08) !important;
+}
+
+.presenterHeaderText h1{
+  font-size:2.15rem !important;
+}
+
+.presenterHeaderText p{
+  font-size:.95rem !important;
+}
+
+/* الكروت */
+.presenterSetupCard,
+.presenterCard,
+.presenterHomeTopCard{
+  border-radius:28px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%) !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  box-shadow:
+    0 16px 34px rgba(39,48,61,.08),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+
+/* صفحة البداية */
+.presenterHomeTopCard{
+  padding:14px !important;
+}
+
+.presenterHomeTitleBox{
+  background:
+    radial-gradient(circle at top right, rgba(255,255,255,.18), transparent 45%),
+    linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%) !important;
+  color:#2E3A4D !important;
+  border-radius:22px !important;
+  text-align:center !important;
+}
+
+.presenterHomeKicker{
+  opacity:.8 !important;
+}
+
+.presenterHomeModelName{
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.75rem !important;
+  font-weight:400 !important;
+}
+
+/* زر إخفاء / إظهار التحكم */
+.presenterGlobalToggleBtn{
+  color:#fff !important;
+  border-radius:999px !important;
+  height:50px !important;
+  min-height:50px !important;
+  font-size:.95rem !important;
+  box-shadow:none !important;
+}
+
+.presenterGlobalToggleBtn.presenterHideControlsMode{
+  background:linear-gradient(180deg,#FF5A66 0%,#D62828 100%) !important;
+}
+
+.presenterGlobalToggleBtn.presenterShowControlsMode{
+  background:linear-gradient(180deg,#22C55E 0%,#16A34A 100%) !important;
+}
+
+/* أزرار الفقرات */
+.presenterSegments{
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+
+.presenterSegmentBtn{
+  min-height:106px !important;
+  border-radius:24px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%) !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  box-shadow:0 12px 26px rgba(39,48,61,.06) !important;
+}
+
+.presenterSegmentBtn span{
+  font-size:1.85rem !important;
+}
+
+/* أزرار الفرق */
+.presenterTeams{
+  gap:10px !important;
+}
+
+.presenterTeams .presenterBtn{
+  min-height:64px !important;
+  border-radius:22px !important;
+  font-size:1.25rem !important;
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%) !important;
+  color:#2E3A4D !important;
+}
+
+/* أزرار التحكم */
+.presenterActions{
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+
+.presenterBtn{
+  min-height:50px !important;
+  border-radius:16px !important;
+  font-size:.95rem !important;
+  box-shadow:0 10px 20px rgba(47,65,88,.12) !important;
+}
+
+.presenterBtn.green{
+  background:#16A34A !important;
+  color:#fff !important;
+}
+
+.presenterBtn.red{
+  background:#D62828 !important;
+  color:#fff !important;
+}
+
+.presenterBtn.gray{
+  background:#6F7A88 !important;
+  color:#fff !important;
+}
+
+.presenterBtn.dark{
+  background:#25343F !important;
+  color:#fff !important;
+}
+
+.presenterBtn.blue{
+  background:#2F6BFF !important;
+  color:#fff !important;
+}
+
+/* أرقام الأسئلة نفس طابع العرض */
+.presenterNumberBtn{
+  min-height:56px !important;
+  border-radius:18px !important;
+  background:#25343F !important;
+  color:#FFFFFF !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.65rem !important;
+  box-shadow:
+    0 9px 16px rgba(37,52,63,.20),
+    inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+.presenterNumberBtn.usedPresenterNumber,
+.presenterNumberBtn.presenterOpened{
+  background:#3A4A56 !important;
+  color:transparent !important;
+  opacity:1 !important;
+}
+
+/* مربعات النص */
+.presenterQuestionText,
+.presenterAnswerText,
+.presenterNoteText,
+.presenterList{
+  border-radius:20px !important;
+  background:#FFFFFF !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+
+.presenterAnswerText{
+  font-size:1.65rem !important;
+  color:#2F4158 !important;
+}
+
+/* الهواتف */
+@media (max-width:430px){
+  .presenterPage{
+    width:calc(100% - 12px) !important;
+  }
+
+  .presenterSegments{
+    gap:9px !important;
+  }
+
+  .presenterSegmentBtn{
+    min-height:96px !important;
+  }
+
+  .presenterSegmentBtn span{
+    font-size:1.55rem !important;
+  }
+
+  .presenterActions{
+    gap:7px !important;
+  }
+
+  .presenterBtn{
+    font-size:.82rem !important;
+    min-height:46px !important;
+  }
+}

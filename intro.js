@@ -233,7 +233,7 @@ window.startGameFromIntro = function () {
   }, 230)
 }
 function getPresenterIntroUrl() {
-  return `${window.location.origin}${window.location.pathname.replace("intro.html", "")}presenter.html`
+  return new URL("presenter.html", window.location.href).href
 }
 
 function openPresenterIntroModal() {

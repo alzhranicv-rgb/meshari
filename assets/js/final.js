@@ -1135,9 +1135,9 @@ async function loadFinalRound1Current() {
 
   if (finalState.round1.answerShown && finalState.round1.currentAnswer) {
     answerContent = `
-      <div class="finalRound1InfoCard finalRound1AnswerBox">
-        ${finalState.round1.currentAnswer}
-      </div>
+      <div class="finalRound1InfoCard finalRound1AnswerBox ${number >= 4 && number <= 6 ? "finalRound1AnswerProjectFont" : "finalRound1AnswerMolhimFont"}">
+  ${finalState.round1.currentAnswer}
+</div>
     `
   }
 

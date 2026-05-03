@@ -1026,6 +1026,7 @@ function flashScreen(type = "correct") {
     layer.classList.add("flashCorrect")
   }
 }
+
 function zoomCurrentDisplayImage() {
   const img =
     document.querySelector(".auctionBigImage") ||
@@ -1061,12 +1062,14 @@ function zoomCurrentDisplayImage() {
 function closeCurrentDisplayImageZoom() {
   document.getElementById("displayImageZoomOverlay")?.classList.add("hidden")
 }
+
 function updateDisplayControlsEyeButton(isHidden) {
   const btn = document.getElementById("displayControlsEyeBtn")
   if (!btn) return
 
-  btn.innerText = isHidden ? "◉" : "👁️"
-  btn.classList.toggle("hiddenMode", isHidden)
+  btn.innerText = isHidden ? "إظهار التحكم" : "إخفاء التحكم"
+  btn.classList.toggle("showControlsMode", isHidden)
+  btn.classList.toggle("hideControlsMode", !isHidden)
   btn.title = isHidden ? "إظهار أزرار التحكم" : "إخفاء أزرار التحكم"
 }
 

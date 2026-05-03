@@ -25,37 +25,47 @@
 
       <div class="introForm">
 
-        <div class="introField">
-          
-          <input id="teamANameInput" type="text" placeholder="اكتب اسم الفريق الأول">
-        </div>
+  <div class="introFieldsGroup">
+    <div class="introField introTeamField">
+      <input
+        id="teamANameInput"
+        type="text"
+        placeholder="اكتب اسم الفريق الأول"
+        autocomplete="off"
+      >
+    </div>
 
-        <div class="introField">
-          
-          <input id="teamBNameInput" type="text" placeholder="اكتب اسم الفريق الثاني">
-        </div>
+    <div class="introField introTeamField">
+      <input
+        id="teamBNameInput"
+        type="text"
+        placeholder="اكتب اسم الفريق الثاني"
+        autocomplete="off"
+      >
+    </div>
+  </div>
 
-        <div class="introField">
-          <label for="introModelSelect">اختيار النموذج</label>
-          <select id="introModelSelect">
-            <option value="">جارٍ تحميل النماذج...</option>
-          </select>
-        </div>
+  <div class="introField introModelField">
+    <label for="introModelSelect">اختيار النموذج</label>
+    <select id="introModelSelect">
+      <option value="">جارٍ تحميل النماذج...</option>
+    </select>
+  </div>
 
-        <div class="introActions introActionsRow">
-          <button id="startGameBtn" onclick="startGameFromIntro()">بدء اللعبة</button>
+  <div class="introActions introActionsRow">
+    <button id="startGameBtn" onclick="startGameFromIntro()">بدء اللعبة</button>
 
-          <button
-            type="button"
-            class="introPresenterEyeBtn"
-            onclick="openPresenterIntroModal()"
-            aria-label="عرض QR صفحة المقدم"
-          >
-            👁
-          </button>
-        </div>
+    <button
+      type="button"
+      class="introPresenterEyeBtn"
+      onclick="openPresenterIntroModal()"
+      aria-label="عرض QR صفحة المقدم"
+    >
+      👁
+    </button>
+  </div>
 
-      </div>
+</div>
 
     </div>
   </div>

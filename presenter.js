@@ -363,11 +363,12 @@ function updatePresenterControlsToggleUI() {
   const btn = document.getElementById("presenterGlobalToggleBtn")
   if (!btn) return
 
-  btn.classList.toggle("isHiddenMode", presenterControlsHidden)
+  btn.classList.toggle("presenterShowControlsMode", presenterControlsHidden)
+  btn.classList.toggle("presenterHideControlsMode", !presenterControlsHidden)
 
   btn.innerText = presenterControlsHidden
-    ? "👁️ إظهار أزرار التحكم"
-    : "🚫👁️ إخفاء أزرار التحكم"
+    ? "إظهار أزرار التحكم"
+    : "إخفاء أزرار التحكم"
 }
 
 function setTitle(title, subtitle = "") {
@@ -783,15 +784,10 @@ function renderTop10Presenter() {
 
     <div class="presenterActions">
       <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
-      <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
       <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابات</button>
-    </div>
-
-    <div class="presenterActions">
-      <button class="presenterBtn red" onclick="presenterWrong()">خطأ</button>
-      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
-      <button class="presenterBtn blue" onclick="sendCommand('switchTurn')">تبديل الدور</button>
-    </div>
+<button class="presenterBtn red" onclick="presenterWrong()">خطأ</button>
+<button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+<button class="presenterBtn blue" onclick="sendCommand('switchTurn')">تبديل الدور</button>
 
     <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
 
@@ -926,25 +922,15 @@ async function renderAuctionPresenter() {
     </section>
 
     <div class="presenterActions">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
-      <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
-      <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
-    </div>
+  <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+  <button class="presenterBtn green" onclick="presenterCorrect()">إجابة صحيحة</button>
+  <button class="presenterBtn red" onclick="presenterWrong()">خطأ</button>
+</div>
 
-    <div class="presenterActions">
-      <button class="presenterBtn green" onclick="presenterCorrect()">إجابة صحيحة</button>
-      <button class="presenterBtn red" onclick="presenterWrong()">خطأ</button>
-      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
-    </div>
-
-    <button class="presenterBtn blue" onclick="zoomDisplayImage()">تكبير صورة العرض</button>
-
-    <section id="auctionPresenterImageBox" class="presenterImagePreviewBox hidden"></section>
-
-    <section class="presenterCard">
-      <div class="presenterLabel">الإجابة</div>
-      <div class="presenterAnswerText" id="auctionPresenterAnswer">—</div>
-    </section>
+<div class="presenterActions">
+  <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+  <button class="presenterBtn blue" onclick="zoomDisplayImage()">تكبير الصورة</button>
+</div>
 
     <section class="presenterCard">
       <div class="presenterLabel">ملاحظة</div>
@@ -1026,10 +1012,14 @@ function renderWhoPresenter() {
     </section>
 
     <div class="presenterActions">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
-      <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
-      <button class="presenterBtn blue" onclick="zoomDisplayImage()">تكبير صورة العرض</button>
-    </div>
+  <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+  <button class="presenterBtn green" onclick="presenterCorrect()">صح</button>
+  <button class="presenterBtn red" onclick="presenterWrong()">خطأ</button>
+</div>
+
+<div class="presenterActions">
+  <button class="presenterBtn blue" onclick="zoomDisplayImage()">تكبير الصورة</button>
+</div>
 
     <div class="presenterActions">
       <button class="presenterBtn green" onclick="presenterCorrect()">صح</button>
@@ -1197,20 +1187,18 @@ function renderFinalPresenterControls() {
 
   if (presenterFinalRound === 1) {
     box.innerHTML = `
-      <div class="presenterActions">
-        <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
-        <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">إظهار السؤال</button>
-        <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار / إخفاء الإجابة</button>
-      </div>
+  <div class="presenterActions">
+    <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+    <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">إظهار السؤال</button>
+    <button class="presenterBtn green" onclick="presenterCorrect()">إجابة صحيحة</button>
+  </div>
 
-      <div class="presenterActions">
-        <button class="presenterBtn green" onclick="presenterCorrect()">إجابة صحيحة</button>
-        <button class="presenterBtn red" onclick="presenterWrong()">خطأ</button>
-        <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
-      </div>
-
-      <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
-    `
+  <div class="presenterActions">
+    <button class="presenterBtn red" onclick="presenterWrong()">خطأ</button>
+    <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+    <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
+  </div>
+`
     return
   }
 

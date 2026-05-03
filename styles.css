@@ -1217,3 +1217,37 @@ body.presenterHideDisplayControls .finalControlsBar{
   animation:none !important;
   filter:none !important;
 }
+#displayControlsEyeBtn{
+  min-width:132px !important;
+  height:46px !important;
+  padding:0 18px !important;
+  border:0 !important;
+  border-radius:999px !important;
+
+  color:#fff !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.9rem !important;
+  line-height:1 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  cursor:pointer !important;
+  transition:transform .16s ease, filter .16s ease, box-shadow .16s ease !important;
+}
+
+#displayControlsEyeBtn:hover{
+  transform:translateY(-2px) !important;
+  filter:brightness(1.05) !important;
+}
+
+#displayControlsEyeBtn.hideControlsMode{
+  background:linear-gradient(180deg,#FF5A66 0%,#D62828 100%) !important;
+  box-shadow:0 10px 22px rgba(214,40,40,.24) !important;
+}
+
+#displayControlsEyeBtn.showControlsMode{
+  background:linear-gradient(180deg,#22C55E 0%,#16A34A 100%) !important;
+  box-shadow:0 10px 22px rgba(22,163,74,.24) !important;
+}
