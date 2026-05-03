@@ -6,8 +6,8 @@
   width:100%;
   display:flex;
   flex-direction:column;
-  gap:22px;
-  padding:8px 0 18px;
+  gap:14px;
+  padding:10px 0 8px;
 }
 
 /* =========================
@@ -16,38 +16,38 @@
 
 .warmupTopBar{
   display:grid;
-  grid-template-columns:1fr 220px 1fr;
-  gap:18px;
+  grid-template-columns:1fr 190px 1fr;
+  gap:14px;
   align-items:center;
 }
 
 .warmupTeamCard,
 .warmupTimerBox{
   position:relative;
-  min-height:108px;
-  height:108px;
-  border-radius:28px;
+  min-height:92px;
+  height:92px;
+  border-radius:24px;
   overflow:hidden;
   border:1px solid rgba(255,155,81,.36);
   background:linear-gradient(180deg, #FFC08E 0%, #FF9B51 100%);
   box-shadow:
-    0 14px 30px rgba(255,155,81,.18),
+    0 12px 24px rgba(255,155,81,.16),
     inset 0 1px 0 rgba(255,255,255,.28);
 }
 
 .warmupTeamCard{
-  padding:14px 18px;
+  padding:10px 16px;
   cursor:pointer;
   display:flex;
   align-items:center;
-  gap:14px;
+  gap:12px;
   transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 
 .warmupTeamCard:hover{
   transform:translateY(-2px);
   box-shadow:
-    0 18px 34px rgba(255,155,81,.22),
+    0 16px 30px rgba(255,155,81,.20),
     inset 0 1px 0 rgba(255,255,255,.34);
   border-color:rgba(255,155,81,.56);
 }
@@ -56,40 +56,30 @@
 .warmupTimerBox::before{
   content:"";
   position:absolute;
-  width:120px;
-  height:120px;
-  top:-55px;
+  width:110px;
+  height:110px;
+  top:-52px;
   border-radius:50%;
   background:rgba(255,255,255,.16);
 }
 
-.warmupTeamCard::before{
-  right:-20px;
-}
-
-.warmupTimerBox::before{
-  left:-20px;
-}
+.warmupTeamCard::before{ right:-20px; }
+.warmupTimerBox::before{ left:-20px; }
 
 .warmupTeamCard::after{
   content:"";
   position:absolute;
-  width:76px;
-  height:76px;
+  width:70px;
+  height:70px;
   bottom:-24px;
   left:-14px;
-  border-radius:22px;
+  border-radius:20px;
   transform:rotate(24deg);
   background:rgba(140,77,21,.08);
 }
 
-#warmupTeamABox{
-  flex-direction:row;
-}
-
-#warmupTeamBBox{
-  flex-direction:row-reverse;
-}
+#warmupTeamABox{ flex-direction:row; }
+#warmupTeamBBox{ flex-direction:row-reverse; }
 
 .warmupTeamName{
   position:relative;
@@ -97,25 +87,20 @@
   flex:1;
   color:#2E3A4D;
   font-family:"HanakaText", sans-serif;
-  font-size:clamp(1.7rem, 2.4vw, 2.3rem);
+  font-size:clamp(1.35rem, 2vw, 2rem);
   line-height:1.1;
 }
 
-#warmupTeamABox .warmupTeamName{
-  text-align:right;
-}
-
-#warmupTeamBBox .warmupTeamName{
-  text-align:left;
-}
+#warmupTeamABox .warmupTeamName{ text-align:right; }
+#warmupTeamBBox .warmupTeamName{ text-align:left; }
 
 .warmupTeamScore{
   position:relative;
   z-index:2;
   flex-shrink:0;
-  width:78px;
-  height:56px;
-  border-radius:18px;
+  width:68px;
+  height:50px;
+  border-radius:16px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -126,7 +111,7 @@
     0 5px 12px rgba(255,155,81,.10);
   color:#C96A25;
   font-family:"HanakaDisplay", "HanakaText", sans-serif;
-  font-size:clamp(2rem, 2.8vw, 2.9rem);
+  font-size:clamp(1.8rem, 2.4vw, 2.5rem);
   line-height:1;
 }
 
@@ -134,7 +119,7 @@
   border-color:#D66F28 !important;
   box-shadow:
     0 0 0 5px rgba(255,155,81,.18),
-    0 18px 34px rgba(255,155,81,.22),
+    0 16px 30px rgba(255,155,81,.20),
     inset 0 1px 0 rgba(255,255,255,.30) !important;
 }
 
@@ -143,7 +128,7 @@
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:6px;
+  gap:4px;
 }
 
 .warmupTimerLabel{
@@ -151,7 +136,7 @@
   z-index:1;
   color:#7A4A22;
   font-family:"HanakaText", sans-serif;
-  font-size:1rem;
+  font-size:.92rem;
   line-height:1.2;
 }
 
@@ -160,7 +145,7 @@
   z-index:1;
   color:#2E3A4D;
   font-family:"HanakaDisplay", "HanakaText", sans-serif;
-  font-size:clamp(2.5rem, 3.8vw, 3.8rem);
+  font-size:clamp(2.2rem, 3.2vw, 3.2rem);
   line-height:1;
 }
 
@@ -169,22 +154,22 @@
 ========================= */
 
 .warmupQuestionBox{
-  min-height:60px;
-  border-radius:22px;
+  min-height:54px;
+  border-radius:20px;
   border:1px solid rgba(217,224,224,.95);
   background:linear-gradient(180deg, rgba(255,255,255,.99) 0%, rgba(244,247,247,.97) 100%);
   box-shadow:
-    0 14px 30px rgba(39,48,61,.06),
+    0 10px 24px rgba(39,48,61,.05),
     inset 0 1px 0 rgba(255,255,255,.96);
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
-  padding:12px 24px;
+  padding:10px 20px;
   color:#2F4158;
   font-family:"HanakaText", sans-serif;
-  font-size:clamp(1.35rem, 2vw, 1.95rem);
-  line-height:1.6;
+  font-size:clamp(1.2rem, 1.7vw, 1.65rem);
+  line-height:1.45;
   position:relative;
   overflow:hidden;
 }
@@ -192,9 +177,9 @@
 .warmupQuestionBox::before{
   content:"";
   position:absolute;
-  width:180px;
-  height:180px;
-  top:-70px;
+  width:160px;
+  height:160px;
+  top:-68px;
   right:-40px;
   border-radius:50%;
   background:rgba(255,155,81,.10);
@@ -203,11 +188,11 @@
 .warmupQuestionBox::after{
   content:"";
   position:absolute;
-  width:90px;
-  height:90px;
+  width:80px;
+  height:80px;
   bottom:-30px;
   left:-12px;
-  border-radius:22px;
+  border-radius:20px;
   transform:rotate(30deg);
   background:rgba(47,65,88,.05);
 }
@@ -218,63 +203,51 @@
 
 .warmupControlPanel{
   display:grid !important;
-  grid-template-columns:repeat(3, minmax(0, 130px)) !important;
-  gap:60px !important;
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+  gap:10px !important;
   align-items:stretch !important;
-  justify-content:center !important;
   width:100% !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
 }
+
+.warmupControlPanel::-webkit-scrollbar{ display:none; }
 
 .warmupControlPanel button{
   width:100% !important;
-  min-height:42px !important;
-  border-radius:14px !important;
+  min-width:0 !important;
+  height:54px !important;
+  min-height:54px !important;
+  padding:0 10px !important;
+  border:0 !important;
+  border-radius:16px !important;
   white-space:nowrap !important;
-  font-family:"HanakaText", sans-serif;
-  font-size:.86rem !important;
-  padding:8px 10px !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  font-family:"HanakaText", sans-serif !important;
+  font-size:.98rem !important;
+  font-weight:400 !important;
+  line-height:1.1 !important;
+  cursor:pointer;
+  box-shadow:0 12px 24px rgba(47,65,88,.12) !important;
 }
 
 .warmupDoubleBtn{
-  border:0;
-  font-family:"HanakaText", sans-serif;
-  font-weight:900;
-  cursor:pointer;
-  color:#fff;
-  background:linear-gradient(180deg, #8f969e 0%, #5f6872 100%) !important;
-  box-shadow:
-    0 8px 14px rgba(70,78,88,.18),
-    inset 0 1px 0 rgba(255,255,255,.25);
-  transition:transform .18s ease, filter .18s ease, opacity .18s ease;
-}
-
-.warmupDoubleBtn:hover:not(:disabled){
-  transform:translateY(-2px);
-  filter:brightness(1.05);
+  color:#fff !important;
+  background:linear-gradient(180deg, #06264a 0%, #07305f 100%) !important;
 }
 
 .warmupDoubleBtn.activeDouble{
-  background:linear-gradient(180deg, #ffcf75 0%, #ff9b2f 100%);
-  animation:warmupDoublePulse .65s ease-in-out infinite alternate;
+  background:linear-gradient(180deg, #ffcf75 0%, #ff9b2f 100%) !important;
 }
 
-.warmupDoubleBtn:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-  transform:none !important;
-}
-
-@keyframes warmupDoublePulse{
-  from{
-    box-shadow:
-      0 0 0 rgba(255,155,47,0),
-      0 10px 20px rgba(255,138,42,.22);
-  }
-  to{
-    box-shadow:
-      0 0 18px rgba(255,155,47,.65),
-      0 12px 24px rgba(255,138,42,.30);
-  }
+.warmupDoubleBtn:disabled,
+.warmupControlPanel button:disabled{
+  opacity:.55 !important;
+  cursor:not-allowed !important;
 }
 
 /* =========================
@@ -284,31 +257,32 @@
 .warmupGrid{
   display:grid;
   grid-template-columns:repeat(4, minmax(0, 1fr));
-  gap:18px;
+  gap:14px;
   align-items:stretch;
+  margin-top:22px;
 }
 
 .warmupCategoryCard{
   position:relative;
-  min-height:255px;
-  border-radius:28px;
-  border:1px solid rgba(217,224,224,.95);
+  min-height:218px;
+  border-radius:24px;
+  border:0.50px solid rgba(34, 35, 35, 0.95);
   background:linear-gradient(180deg, rgba(255,255,255,.99) 0%, rgba(244,247,247,.97) 100%);
   box-shadow:
-    0 12px 28px rgba(107, 122, 142, 0.06),
+    0 10px 22px rgba(107,122,142,.05),
     inset 0 1px 0 rgba(255,255,255,.96);
-  padding:20px 16px 18px;
+  padding:16px 14px 14px;
   display:flex;
   flex-direction:column;
-  gap:18px;
+  gap:12px;
   overflow:hidden;
 }
 
 .warmupCategoryCard::before{
   content:"";
   position:absolute;
-  width:135px;
-  height:135px;
+  width:125px;
+  height:125px;
   top:-48px;
   right:-30px;
   border-radius:50%;
@@ -318,11 +292,11 @@
 .warmupCategoryCard::after{
   content:"";
   position:absolute;
-  width:86px;
-  height:86px;
+  width:78px;
+  height:78px;
   bottom:-28px;
   left:-10px;
-  border-radius:20px;
+  border-radius:18px;
   transform:rotate(24deg);
   background:rgba(47,65,88,.05);
 }
@@ -330,16 +304,16 @@
 .warmupCategoryTitle{
   position:relative;
   z-index:2;
-  min-height:82px;
+  min-height:66px;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
   color:#2F4158;
   font-family:"HanakaDisplay", "HanakaText", sans-serif;
-  font-size:clamp(1.8rem, 2.4vw, 2.5rem);
-  line-height:1.25;
-  padding:4px 6px;
+  font-size:clamp(1.45rem, 2vw, 2.1rem);
+  line-height:1.18;
+  padding:2px 4px;
 }
 
 .warmupNumbersRow{
@@ -347,7 +321,7 @@
   z-index:2;
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:9px;
   margin-top:auto;
 }
 
@@ -359,32 +333,30 @@
 .warmupGrid button,
 .warmupNumbersGrid button{
   font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:2rem !important;
+  font-size:1.75rem !important;
   line-height:1 !important;
 }
 
 .warmupNumberBtn{
   position:relative;
   width:100%;
-  height:68px;
+  height:56px;
   border:0;
-  border-radius:20px;
+  border-radius:18px;
   background:#25343F !important;
   color:#FFFFFF !important;
-  font-family:"HanakaDisplay", "HanakaText", sans-serif;
   cursor:pointer;
   box-shadow:
-    0 10px 18px rgba(37,52,63,.22),
+    0 9px 16px rgba(37,52,63,.20),
     inset 0 1px 0 rgba(255,255,255,.08) !important;
-  transition:transform .16s ease, box-shadow .16s ease, filter .16s ease;
   overflow:hidden;
 }
 
 .warmupNumberBtn::before{
   content:"";
   position:absolute;
-  width:58px;
-  height:58px;
+  width:52px;
+  height:52px;
   top:-18px;
   right:-10px;
   border-radius:50%;
@@ -395,21 +367,9 @@
   content:"";
   position:absolute;
   inset:0;
-  border-radius:20px;
-  box-shadow:inset 0 -8px 16px rgba(0,0,0,.16) !important;
+  border-radius:18px;
+  box-shadow:inset 0 -7px 14px rgba(0,0,0,.16) !important;
   pointer-events:none;
-}
-
-.warmupNumberBtn:hover{
-  transform:translateY(-3px) scale(1.02);
-  box-shadow:
-    0 16px 28px rgba(37,52,63,.28),
-    inset 0 1px 0 rgba(255,255,255,.12) !important;
-  filter:brightness(1.05) !important;
-}
-
-.warmupNumberBtn:active{
-  transform:translateY(0) scale(.99);
 }
 
 .warmupNumberBtn:disabled,
@@ -417,142 +377,138 @@
   background:#3A4A56 !important;
   color:transparent !important;
   cursor:default !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.10),
-    0 4px 10px rgba(37,52,63,.14) !important;
   opacity:1 !important;
 }
 
-.warmupNumberBtn:disabled::before,
-.warmupNumberBtn.warmupUsedBtn::before{
-  background:rgba(255,255,255,.08) !important;
-}
-
-.warmupNumberBtn:disabled::after,
-.warmupNumberBtn.warmupUsedBtn::after{
-  box-shadow:inset 0 -6px 12px rgba(0,0,0,.12) !important;
-}
-
 /* =========================
-   RESPONSIVE
+   IPAD
 ========================= */
 
-@media (max-width:1100px){
-  .warmupTopBar{
-    grid-template-columns:1fr;
-    gap:14px;
-  }
-
-  .warmupTimerBox{
-    order:-1;
-    min-height:92px;
-    height:92px;
-  }
-
-  .warmupTeamCard{
-    min-height:90px;
-    height:90px;
-  }
-
-  .warmupGrid{
-    grid-template-columns:repeat(2, minmax(0, 1fr));
-  }
-
-  .warmupCategoryCard{
-    min-height:230px;
-  }
-}
-
-@media (max-width:900px){
-  .warmupControlPanel{
-    grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
-    gap:8px !important;
-  }
-
-  .warmupControlPanel button{
-    min-height:44px !important;
-    font-size:.85rem !important;
-    padding:8px 6px !important;
-    border-radius:14px !important;
-  }
-}
-
-@media (max-width:760px){
+@media (min-width:768px) and (max-width:1180px){
   .warmupWrap{
-    gap:16px;
-    padding-bottom:12px;
+    gap:10px;
+    padding:34px 0 4px;
   }
 
-  .warmupTeamCard{
-    min-height:82px;
-    height:82px;
-    border-radius:20px;
-    padding:10px 12px;
-  }
-
-  .warmupTeamName{
-    font-size:1.15rem;
-  }
-
-  .warmupTeamScore{
-    width:64px;
-    height:46px;
-    font-size:1.9rem;
-  }
-
-  .warmupTimerBox{
-    min-height:84px;
-    height:84px;
-    border-radius:22px;
-  }
-
-  .warmupTimerValue{
-    font-size:2.5rem;
-  }
-
-  .warmupQuestionBox{
-    min-height:110px;
-    border-radius:22px;
-    padding:18px 16px;
-    font-size:1.2rem;
-  }
-
-  .warmupControlPanel{
-    grid-template-columns:1fr !important;
-    gap:10px !important;
-  }
-
-  .warmupControlPanel button{
-    width:100%;
-    min-width:0;
-    height:52px;
-    border-radius:16px;
-    font-size:1rem !important;
-  }
-
-  .warmupGrid{
-    grid-template-columns:1fr;
-    gap:14px;
-  }
-
-  .warmupCategoryCard{
-    min-height:200px;
-    border-radius:22px;
-    gap:14px;
-  }
-
-  .warmupCategoryTitle{
-    min-height:60px;
-    font-size:1.4rem;
-  }
-
-  .warmupNumbersRow{
+  .warmupTopBar{
+    grid-template-columns:1fr 160px 1fr;
     gap:10px;
   }
 
+  .warmupTeamCard,
+  .warmupTimerBox{
+    min-height:72px;
+    height:72px;
+    border-radius:20px;
+  }
+
+  .warmupTeamCard{ padding:8px 12px; }
+  .warmupTeamName{ font-size:1.2rem; }
+
+  .warmupTeamScore{
+    width:56px;
+    height:40px;
+    border-radius:14px;
+    font-size:1.7rem;
+  }
+
+  .warmupTimerLabel{ font-size:.78rem; }
+  .warmupTimerValue{ font-size:2.1rem; }
+
+  .warmupQuestionBox{
+    min-height:46px;
+    padding:8px 16px;
+    border-radius:18px;
+    font-size:1.05rem;
+    line-height:1.35;
+  }
+
+.warmupControlPanel{
+  grid-template-columns:repeat(6, 118px) !important;
+  justify-content:center !important;
+  gap:6px !important;
+}
+
+.warmupControlPanel button{
+  height:42px !important;
+  min-height:42px !important;
+  font-size:.72rem !important;
+  padding:0 4px !important;
+  border-radius:12px !important;
+}
+
+  .warmupGrid{
+    gap:10px;
+    margin-top:18px;
+  }
+
+  .warmupCategoryCard{
+    min-height:178px;
+    border-radius:20px;
+    padding:12px 10px;
+    gap:9px;
+  }
+
+  .warmupCategoryTitle{
+    min-height:50px;
+    font-size:1.25rem;
+    line-height:1.12;
+  }
+
+  .warmupNumbersRow{ gap:7px; }
+
   .warmupNumberBtn{
-    height:58px;
-    border-radius:16px;
-    font-size:1.7rem !important;
+    height:42px;
+    border-radius:14px;
+    font-size:1.35rem !important;
+  }
+}
+/* WARMUP 3 CONTROLS - SAME TOP10 BUTTON SIZE */
+.warmupControlPanel{
+  display:grid !important;
+  grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+  gap:10px !important;
+  align-items:stretch !important;
+  justify-content:center !important;
+  width:calc((100% - 30px) / 2) !important;
+  margin:0 auto !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.warmupControlPanel button{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  height:54px !important;
+  min-height:54px !important;
+  padding:0 10px !important;
+  border:0 !important;
+  border-radius:16px !important;
+  font-family:"HanakaText", sans-serif !important;
+  font-size:.98rem !important;
+  font-weight:400 !important;
+  line-height:1.1 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .warmupControlPanel{
+    width:calc((100% - 18px) / 2) !important;
+    grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+    gap:6px !important;
+  }
+
+  .warmupControlPanel button{
+    height:42px !important;
+    min-height:42px !important;
+    font-size:.72rem !important;
+    padding:0 4px !important;
+    border-radius:12px !important;
   }
 }

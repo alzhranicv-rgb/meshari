@@ -620,3 +620,291 @@
     border-radius:16px;
   }
 }
+/* =========================
+   AUCTION FINAL SIZE
+   نفس مقاس التسخين + أزرار التسخين
+========================= */
+
+.auctionWrap{
+  width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:14px !important;
+  padding:10px 0 8px !important;
+}
+
+.auctionTopBar{
+  grid-template-columns:1fr 190px 1fr !important;
+  gap:14px !important;
+}
+
+.auctionTeamCard,
+.auctionMiddleCard{
+  min-height:92px !important;
+  height:92px !important;
+  border-radius:24px !important;
+}
+
+.auctionTeamCard{
+  padding:10px 16px !important;
+}
+
+.auctionTeamName{
+  font-size:clamp(1.35rem, 2vw, 2rem) !important;
+}
+
+.auctionTeamScore{
+  width:68px !important;
+  height:50px !important;
+  border-radius:16px !important;
+  font-size:clamp(1.8rem, 2.4vw, 2.5rem) !important;
+}
+
+/* الصورة بدون خلفية */
+.auctionQuestionBox{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.auctionQuestionBox::before,
+.auctionQuestionBox::after{
+  display:none !important;
+  content:none !important;
+}
+
+.auctionImageFrame{
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  padding:0 !important;
+}
+
+.auctionBigImage{
+  border-radius:18px !important;
+  background:transparent !important;
+}
+
+/* أزرار التحكم مثل التسخين */
+.auctionControlPanel{
+  display:grid !important;
+  grid-template-columns:repeat(4, minmax(0,1fr)) !important;
+  gap:10px !important;
+  width:100% !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.auctionControlPanel button{
+  width:100% !important;
+  min-width:0 !important;
+  height:54px !important;
+  min-height:54px !important;
+  padding:0 10px !important;
+  border:0 !important;
+  border-radius:16px !important;
+  font-family:"HanakaText", sans-serif !important;
+  font-size:.98rem !important;
+  font-weight:400 !important;
+  line-height:1.1 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .auctionWrap{
+    gap:10px !important;
+    padding:34px 0 4px !important;
+  }
+
+  .auctionTopBar{
+    grid-template-columns:1fr 160px 1fr !important;
+    gap:10px !important;
+  }
+
+  .auctionTeamCard,
+  .auctionMiddleCard{
+    min-height:72px !important;
+    height:72px !important;
+    border-radius:20px !important;
+  }
+
+  .auctionTeamName{
+    font-size:1.2rem !important;
+  }
+
+  .auctionTeamScore{
+    width:56px !important;
+    height:40px !important;
+    border-radius:14px !important;
+    font-size:1.7rem !important;
+  }
+
+  .auctionQuestionBox.auctionQuestionBoxEmpty{
+    min-height:46px !important;
+    padding:8px 16px !important;
+  }
+
+  .auctionQuestionBox.auctionQuestionBoxFilled{
+    min-height:250px !important;
+    padding:8px !important;
+  }
+
+  .auctionBigImage{
+    max-height:240px !important;
+  }
+
+  .auctionControlPanel{
+    grid-template-columns:repeat(4, minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+
+  .auctionControlPanel button{
+    height:42px !important;
+    min-height:42px !important;
+    border-radius:12px !important;
+    font-size:.72rem !important;
+    padding:0 4px !important;
+  }
+}
+
+/* iPhone */
+@media (max-width:760px){
+  .auctionControlPanel{
+    grid-template-columns:repeat(2, minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+
+  .auctionTopBar{
+    grid-template-columns:1fr !important;
+  }
+}
+/* =========================
+   AUCTION ANSWER BOX - PREMIUM
+========================= */
+
+.auctionBottomAnswer{
+  width:min(100%, 680px) !important;
+  min-height:82px !important;
+  margin:0 auto !important;
+  padding:16px 30px !important;
+  border-radius:26px !important;
+
+  background:
+    radial-gradient(circle at top right, rgba(255,155,81,.22), transparent 42%),
+    linear-gradient(180deg,#FFFFFF 0%,#FFF7EF 100%) !important;
+
+  border:2px solid rgba(255,155,81,.42) !important;
+  box-shadow:
+    0 18px 34px rgba(47,65,88,.12),
+    0 10px 22px rgba(255,155,81,.14),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+
+  color:#2F4158 !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.9rem, 3vw, 3.2rem) !important;
+  line-height:1.18 !important;
+  font-weight:400 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  position:relative !important;
+  overflow:hidden !important;
+}
+
+.auctionBottomAnswer::before{
+  
+  position:absolute;
+  top:8px;
+  right:18px;
+  font-family:"HanakaText",sans-serif;
+  font-size:.78rem;
+  color:#C96A25;
+  opacity:.85;
+}
+
+@media (min-width:768px) and (max-width:1180px){
+  .auctionBottomAnswer{
+    width:min(100%, 560px) !important;
+    min-height:64px !important;
+    padding:12px 22px !important;
+    border-radius:20px !important;
+    font-size:clamp(1.45rem, 2.4vw, 2.25rem) !important;
+  }
+}
+
+@media (max-width:760px){
+  .auctionBottomAnswer{
+    width:100% !important;
+    min-height:62px !important;
+    padding:12px 16px !important;
+    border-radius:18px !important;
+    font-size:1.45rem !important;
+  }
+}
+
+
+/* تلميح متوهج بدون لمبة */
+.auctionTopNote{
+  order:-1 !important;
+  width:min(100%, 720px) !important;
+  min-height:58px !important;
+  margin:0 auto 12px !important;
+  padding:12px 30px !important;
+  border-radius:22px !important;
+
+  background:
+    radial-gradient(circle at top right, rgba(255,155,81,.26), transparent 45%),
+    linear-gradient(180deg,#FFF8F1 0%,#FFE2C5 100%) !important;
+
+  border:2px solid rgba(255,155,81,.55) !important;
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.10),
+    0 0 28px rgba(255,155,81,.38),
+    0 14px 28px rgba(255,155,81,.18),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+
+  color:#2F4158 !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:1.95rem !important;
+  line-height:1.45 !important;
+  text-align:center !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  animation:auctionNoteGlow 1.5s ease-in-out infinite alternate !important;
+}
+
+.auctionTopNote::before{
+  content:none !important;
+  display:none !important;
+}
+
+@keyframes auctionNoteGlow{
+  from{
+    box-shadow:
+      0 0 0 3px rgba(255,155,81,.08),
+      0 0 18px rgba(255,155,81,.25),
+      0 12px 24px rgba(255,155,81,.14),
+      inset 0 1px 0 rgba(255,255,255,.95);
+  }
+  to{
+    box-shadow:
+      0 0 0 6px rgba(255,155,81,.16),
+      0 0 36px rgba(255,155,81,.48),
+      0 16px 34px rgba(255,155,81,.24),
+      inset 0 1px 0 rgba(255,255,255,.95);
+  }
+}
+.auctionTopNote{
+  width:min(100%, 480px) !important;
+}

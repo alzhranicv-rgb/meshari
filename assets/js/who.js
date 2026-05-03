@@ -21,6 +21,7 @@ let whoQuestionLocked = false
 let whoCurrentNumber = null
 let whoLastTickPlayed = null
 let whoTimerStarted = false
+let whoCompensationMode = false
 
 const WHO_STORAGE_KEY = "who_state_v1"
 
@@ -40,15 +41,16 @@ function saveWhoState() {
   const timerBox = document.getElementById("timer")
 
   const state = {
-    whoState,
-    whoDoubleState,
-    currentWhoAnswer,
-    currentWhoImage,
-    whoQuestionLocked,
-    whoCurrentNumber,
-    whoTimerStarted,
-    timerValue: timerBox ? Number(timerBox.innerText || 0) : 0
-  }
+  whoState,
+  whoDoubleState,
+  currentWhoAnswer,
+  currentWhoImage,
+  whoQuestionLocked,
+  whoCurrentNumber,
+  whoTimerStarted,
+  whoCompensationMode,
+  timerValue: timerBox ? Number(timerBox.innerText || 0) : 0
+}
 
   localStorage.setItem(WHO_STORAGE_KEY, JSON.stringify(state))
   localStorage.setItem("active_segment", "who")
@@ -75,6 +77,7 @@ function restoreWhoState(saved) {
   whoQuestionLocked = !!saved.whoQuestionLocked
   whoCurrentNumber = saved.whoCurrentNumber || null
   whoTimerStarted = !!saved.whoTimerStarted
+  whoCompensationMode = !!saved.whoCompensationMode
   whoLastTickPlayed = null
 
   const scoreABox = document.getElementById("whoScoreA")
@@ -140,6 +143,7 @@ window.renderWho = function () {
   whoCurrentNumber = null
   whoLastTickPlayed = null
   whoTimerStarted = false
+  whoCompensationMode = false
 
   openSegment("من هو", `
     <div class="whoWrap">
@@ -178,11 +182,11 @@ window.renderWho = function () {
         </div>
 
         <div class="whoControlPanel">
-          <button onclick="activateWhoDouble()" class="whoDoubleBtn" id="whoDoubleBtn">دبل</button>
-          
-          <button onclick="whoCorrect()" class="btnCorrect">✓ صح</button>
-          <button onclick="whoWrong()" class="btnWrong">✕ خطأ</button>
-        </div>
+  <button onclick="activateWhoDouble()" class="whoDoubleBtn" id="whoDoubleBtn">دبل</button>
+  <button onclick="startWhoCompensation()" class="whoCompensationBtn" id="whoCompensationBtn" disabled>التعويض</button>
+  <button onclick="whoCorrect()" class="btnCorrect">✓ صح</button>
+  <button onclick="whoWrong()" class="btnWrong">✕ خطأ</button>
+</div>
 
       </div>
 
@@ -200,6 +204,7 @@ window.renderWho = function () {
   }
 
   updateWhoDoubleButton()
+updateWhoCompensationButton()
 }
 
 /* =========================
@@ -309,6 +314,11 @@ function createWhoGrid() {
 }
 
 function setWhoPoints(p) {
+  if (whoCompensationMode) {
+    showGameToast("في التعويض النقاط ثابتة 5")
+    return
+  }
+
   if (whoQuestionLocked) {
     showGameToast("لا يمكن تغيير النقاط بعد اختيار السؤال")
     return
@@ -357,6 +367,17 @@ function updateWhoTurnBox() {
 }
 
 function selectWhoTeam(team) {
+  if (whoCompensationMode && whoQuestionLocked) {
+    whoState.activeTeam = team
+    selectedTeam = team
+
+    highlightWhoTurnTeam()
+    updateWhoTurnBox()
+    updateWhoDoubleButton()
+    saveWhoState()
+    return
+  }
+
   if (whoState.manualStartDone) {
     showGameToast("بعد البداية الأولى ينتقل الدور تلقائيًا")
     return
@@ -399,6 +420,41 @@ function switchWhoTurn() {
   updateWhoDoubleButton()
 }
 
+
+function canUseWhoCompensation() {
+  return (
+    !whoQuestionLocked &&
+    !whoCurrentNumber &&
+    !whoState.usedNumbers.includes(15) &&
+    whoState.usedNumbers.length === 14
+  )
+}
+
+function updateWhoCompensationButton() {
+  const btn = document.getElementById("whoCompensationBtn")
+  if (!btn) return
+
+  const active = canUseWhoCompensation()
+
+  btn.disabled = !active
+  btn.classList.toggle("activeCompensation", active)
+}
+
+async function startWhoCompensation() {
+  if (!canUseWhoCompensation()) {
+    showGameToast("التعويض يتفعل فقط إذا بقي الرقم 15")
+    return
+  }
+
+  whoCompensationMode = true
+  whoState.currentPoints = 5
+  highlightWhoPoints()
+
+  await chooseWho(15)
+
+  updateWhoCompensationButton()
+  saveWhoState()
+}
 /* =========================
    Question
 ========================= */
@@ -409,15 +465,15 @@ async function chooseWho(num) {
     return
   }
 
-  if (!whoState.activeTeam) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
+  if (!whoState.activeTeam && !whoCompensationMode) {
+  showGameToast("اختر الفريق أولاً")
+  return
+}
 
-  if (whoState.currentPoints === 0) {
-    showGameToast("اختر النقاط أولاً")
-    return
-  }
+  if (whoState.currentPoints === 0 && !whoCompensationMode) {
+  showGameToast("اختر النقاط أولاً")
+  return
+}
 
   if (whoState.usedNumbers.includes(num)) return
 
@@ -444,13 +500,14 @@ async function chooseWho(num) {
     return
   }
 
-  if (data) {
-    currentWhoAnswer = data.answer || ""
-    currentWhoImage = data.image || ""
+if (data) {
+  currentWhoAnswer = data.answer || ""
+  currentWhoImage = data.image || ""
 
-    showWhoImageFullscreen(currentWhoImage)
-    startWhoTimer()
-  }
+  showWhoImageFullscreen(currentWhoImage)
+openWhoImageOverlay()
+startWhoTimer()
+}
 
   const grid = document.querySelector(".whoGrid")
   if (grid) {
@@ -486,10 +543,25 @@ function showWhoAnswer() {
     return
   }
 
+  const oldOverlay = document.getElementById("whoImageOverlay")
+  if (oldOverlay) oldOverlay.remove()
+
   const stage = document.getElementById("whoImageStage")
   if (!stage) return
 
-  stage.innerHTML = `<div class="whoAnswer">${currentWhoAnswer}</div>`
+  stage.innerHTML = `
+    <div class="whoResultView">
+      <div class="whoResultImageBox">
+        <img src="${currentWhoImage || ""}" class="whoResultImage" alt="">
+      </div>
+
+      <div class="whoResultAnswerBox">
+        <div class="whoResultAnswerLabel">الإجابة</div>
+        <div class="whoResultAnswerText">${currentWhoAnswer}</div>
+      </div>
+    </div>
+  `
+
   stage.classList.remove("hidden")
   saveWhoState()
 }
@@ -528,11 +600,16 @@ function runWhoTimer(startValue) {
 
   let time = Number(startValue || 0)
   timerBox.innerText = time
+  const overlayTimer = document.getElementById("whoOverlayTimer")
+if (overlayTimer) overlayTimer.innerText = time
+  
   saveWhoState()
 
   timer = setInterval(() => {
     time--
     timerBox.innerText = time
+    const overlayTimer = document.getElementById("whoOverlayTimer")
+if (overlayTimer) overlayTimer.innerText = time
 
     if (time > 0 && time <= 5 && whoLastTickPlayed !== time) {
       whoLastTickPlayed = time
@@ -586,23 +663,23 @@ function finishWhoAfterAnswerDelay() {
 }
 
 function whoCorrect() {
-  if (!whoState.activeTeam) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
-
   if (!whoQuestionLocked) {
     showGameToast("اختر رقمًا أولاً")
     return
   }
 
-  if (whoState.currentPoints === 0) {
-    showGameToast("اختر النقاط أولاً")
+  if (whoCompensationMode && !whoState.activeTeam) {
+    showGameToast("اختر الفريق الذي يأخذ التعويض")
+    return
+  }
+
+  if (!whoState.activeTeam) {
+    showGameToast("اختر الفريق أولاً")
     return
   }
 
   const team = whoState.activeTeam
-  const points = getWhoScoreValue(team)
+  const points = whoCompensationMode ? 5 : getWhoScoreValue(team)
 
   if (team === "A") {
     whoState.scoreA += points
@@ -623,6 +700,8 @@ function whoCorrect() {
     A: whoState.scoreA,
     B: whoState.scoreB
   }
+  whoCompensationMode = false
+updateWhoCompensationButton()
 
   saveWhoState()
   finishWhoAfterAnswerDelay()
@@ -675,20 +754,20 @@ function whoWrong() {
    Image Overlay
 ========================= */
 
-function toggleWhoImageOverlay() {
+function openWhoImageOverlay() {
   const oldOverlay = document.getElementById("whoImageOverlay")
-
-  if (oldOverlay) {
-    oldOverlay.remove()
-    return
-  }
+  if (oldOverlay) oldOverlay.remove()
 
   if (!currentWhoImage) return
+
+  const timerBox = document.getElementById("timer")
+  const time = timerBox ? timerBox.innerText : "0"
 
   const overlay = document.createElement("div")
   overlay.id = "whoImageOverlay"
   overlay.className = "whoImageOverlay"
   overlay.innerHTML = `
+    <div class="whoImageOverlayTimer" id="whoOverlayTimer">${time}</div>
     <div class="whoImageOverlayInner">
       <img src="${currentWhoImage}" class="whoImageOverlayImg" alt="">
     </div>
@@ -699,4 +778,15 @@ function toggleWhoImageOverlay() {
   }
 
   document.body.appendChild(overlay)
+}
+
+function toggleWhoImageOverlay() {
+  const oldOverlay = document.getElementById("whoImageOverlay")
+
+  if (oldOverlay) {
+    oldOverlay.remove()
+    return
+  }
+
+  openWhoImageOverlay()
 }

@@ -987,9 +987,7 @@ function renderFinalRound1() {
   controls.innerHTML = `
     <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">دبل</button>
     <button onclick="showFinalRound1Question()" class="archiveCtrlBtn btnStart" ${isQuestionCard ? "" : "disabled"}>إظهار السؤال</button>
-    <button onclick="showFinalRound1Answer()" class="archiveCtrlBtn btnAnswer">
-      ${finalState.round1.answerShown ? "إخفاء الإجابة" : "إظهار الإجابة"}
-    </button>
+    
     <button onclick="finalRound1Correct()" class="archiveCtrlBtn btnCorrect">إجابة صحيحة</button>
     <button onclick="finalRound1Wrong()" class="archiveCtrlBtn btnWrong">خطأ</button>
     <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
@@ -1079,21 +1077,14 @@ async function loadFinalRound1Current() {
     const clipText = removeArabicDots(fullCardText)
 
     mainContent = `
-      <div class="finalRound1MainStageCard">
-        <div class="finalRound1HistoricalWrap">
-          <div class="finalRound1ImageZoomTrigger" onclick="toggleFinalRound1Overlay()">
-            <div class="finalRound1HistoricalPaper">
-              <div
-                class="finalRound1HistoricalInner molhimClipFont"
-                style="${getFinalRound1ClipStyle(clipText, false)}"
-              >
-                ${clipText}
-              </div>
-            </div>
-          </div>
-        </div>
+  <div class="finalRound1MainStageCard">
+    <div class="finalRound1TextCard" onclick="toggleFinalRound1Overlay()">
+      <div class="finalRound1TextCardInner">
+        ${clipText}
       </div>
-    `
+    </div>
+  </div>
+`
   } else if (isQuestionCard) {
     const visibleParts = (finalState.round1.currentQuestionParts || [])
       .filter(part => String(part || "").trim() !== "")
@@ -1140,13 +1131,7 @@ async function loadFinalRound1Current() {
     `
   }
 
-  if (finalState.round1.currentNote) {
-    noteContent = `
-      <div class="finalRound1InfoCard finalRound1NoteBox">
-        ${finalState.round1.currentNote}
-      </div>
-    `
-  }
+  
 
   if (finalState.round1.answerShown && finalState.round1.currentAnswer) {
     answerContent = `
@@ -1245,6 +1230,7 @@ function finalRound1Correct() {
     loadFinalRound1Current()
   }
 
+
   const doubleTeam = finalState.doubleState?.activeTeam || null
 
   if (doubleTeam) {
@@ -1260,9 +1246,11 @@ function finalRound1Correct() {
   playGameSound("correct")
   flashScreen("correct")
   renderFinalScores()
-  saveFinalState()
+saveFinalState()
 
+setTimeout(() => {
   finalizeRound1Turn()
+}, 20000)
 }
 
 function toggleFinalRound1Overlay() {

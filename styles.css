@@ -1101,3 +1101,119 @@ body.presenterHideDisplayControls .finalControlsBar{
   background:#fff;
   box-shadow:0 24px 60px rgba(0,0,0,.3);
 }
+
+
+.displayControlsEyeBtn.hiddenMode{
+  background:#2f4158;
+  color:#fff;
+}
+
+.presenterHideDisplayControls .warmupControlPanel,
+.presenterHideDisplayControls .top10ControlPanel,
+.presenterHideDisplayControls .auctionControlPanel,
+.presenterHideDisplayControls .whoControlPanel,
+.presenterHideDisplayControls .finalControlsBar,
+.presenterHideDisplayControls .archiveControlButtons,
+.presenterHideDisplayControls .archiveSideTimerBox button{
+  display:none !important;
+}
+
+.winnerArea{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:18px !important;
+  flex-wrap:wrap !important;
+}
+
+.winnerArea .displayControlsEyeBtn{
+  position:static !important;
+  width:72px !important;
+  height:58px !important;
+  border:0 !important;
+  border-radius:999px !important;
+  background:linear-gradient(135deg,#fff,#fff1df) !important;
+  color:#2f4158 !important;
+  font-size:1.45rem !important;
+  font-weight:900 !important;
+  box-shadow:
+    0 12px 26px rgba(47,65,88,.16),
+    inset 0 0 0 2px rgba(255,155,81,.32) !important;
+  cursor:pointer !important;
+  transition:.2s ease !important;
+}
+
+.winnerArea .displayControlsEyeBtn::after{
+  content:"";
+  display:block;
+  width:34px;
+  height:4px;
+  margin:3px auto 0;
+  border-radius:999px;
+  background:#ff9b51;
+  opacity:.9;
+}
+
+.winnerArea .displayControlsEyeBtn:hover{
+  transform:translateY(-2px) !important;
+  box-shadow:
+    0 16px 32px rgba(47,65,88,.22),
+    0 0 0 6px rgba(255,155,81,.12),
+    inset 0 0 0 2px rgba(255,155,81,.45) !important;
+}
+
+.winnerArea .displayControlsEyeBtn:active{
+  transform:scale(.95) !important;
+}
+
+.winnerArea .displayControlsEyeBtn.hiddenMode{
+  background:linear-gradient(135deg,#2f4158,#182331) !important;
+  color:#fff !important;
+  box-shadow:
+    0 14px 32px rgba(24,35,49,.34),
+    inset 0 0 0 2px rgba(255,255,255,.16) !important;
+}
+
+.winnerArea .displayControlsEyeBtn.hiddenMode::after{
+  background:#fff;
+  transform:rotate(-18deg);
+}
+
+/* نزول صفحة الفقرة كاملة من الأعلى */
+#segmentArea{
+  padding-top:20px !important;
+}
+
+/* نزول عنوان الفقرة وأزرار رجوع/إنهاء */
+.segmentControls{
+  margin-top:8px !important;
+  margin-bottom:20px !important;
+}
+/* إزالة التغبيش والطبقة من زر الرجوع والإنهاء */
+.backBtn,
+.endBtn{
+  position:relative !important;
+  overflow:hidden !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  animation:none !important;
+  filter:none !important;
+}
+
+.backBtn::before,
+.backBtn::after,
+.endBtn::before,
+.endBtn::after{
+  content:none !important;
+  display:none !important;
+  opacity:0 !important;
+  background:none !important;
+  animation:none !important;
+}
+
+/* منع الوميض */
+.backBtn *,
+.endBtn *{
+  animation:none !important;
+  filter:none !important;
+}

@@ -594,3 +594,340 @@
     border-radius:16px;
   }
 }
+/* =========================
+   WHO FINAL ADJUSTMENTS
+========================= */
+
+.whoWrap{
+  width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:14px !important;
+  padding:10px 0 8px !important;
+}
+
+.whoTopBar{
+  grid-template-columns:1fr 190px 1fr !important;
+  gap:14px !important;
+}
+
+.whoTeamCard,
+.whoTimerBox{
+  min-height:92px !important;
+  height:92px !important;
+  border-radius:24px !important;
+}
+
+.whoTeamCard{
+  padding:10px 16px !important;
+}
+
+.whoTeamName{
+  font-size:clamp(1.35rem, 2vw, 2rem) !important;
+}
+
+.whoTeamScore{
+  width:68px !important;
+  height:50px !important;
+  border-radius:16px !important;
+  font-size:clamp(1.8rem, 2.4vw, 2.5rem) !important;
+}
+
+/* بوكس الصورة */
+.whoImageStage{
+  min-height:300px !important;
+  border-radius:24px !important;
+  padding:14px !important;
+}
+
+/* النقاط */
+.whoBottomRow{
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.whoPointsSelect{
+  flex:1 1 auto !important;
+  min-height:70px !important;
+  border-radius:22px !important;
+  background:linear-gradient(180deg,#FFB15F 0%,#FF8A2A 100%) !important;
+  justify-content:center !important;
+  gap:10px !important;
+  padding:10px 14px !important;
+}
+
+.whoPointsLabel,
+#whoTurnInline{
+  color:#FFFFFF !important;
+  font-size:1.08rem !important;
+}
+
+.whoPointBtn{
+  min-width:54px !important;
+  height:44px !important;
+  border-radius:14px !important;
+  background:#25343F !important;
+  color:#FFFFFF !important;
+  font-size:1.25rem !important;
+}
+
+.whoPointBtn.selectedWhoPoint{
+  background:#FFFFFF !important;
+  color:#C96A25 !important;
+  box-shadow:0 8px 16px rgba(255,255,255,.18) !important;
+}
+
+/* أزرار التحكم */
+.whoControlPanel{
+  flex:0 0 430px !important;
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+
+.whoControlPanel button{
+  width:100% !important;
+  min-width:0 !important;
+  height:54px !important;
+  min-height:54px !important;
+  padding:0 10px !important;
+  border:0 !important;
+  border-radius:16px !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.98rem !important;
+  font-weight:400 !important;
+}
+
+/* إذا أزرار التحكم مخفية، النقاط تتوسط */
+body.presenterHideDisplayControls .whoBottomRow{
+  justify-content:center !important;
+}
+
+body.presenterHideDisplayControls .whoPointsSelect{
+  flex:0 1 760px !important;
+  margin:0 auto !important;
+}
+
+/* نتيجة الصورة + الإجابة */
+.whoResultView{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  align-items:stretch;
+  position:relative;
+  z-index:2;
+}
+
+.whoResultImageBox,
+.whoResultAnswerBox{
+  min-height:260px;
+  border-radius:26px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  border:1px solid rgba(217,224,224,.95);
+  box-shadow:
+    0 14px 30px rgba(39,48,61,.08),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.whoResultImage{
+  max-width:100%;
+  max-height:250px;
+  object-fit:contain;
+  display:block;
+}
+
+.whoResultAnswerBox{
+  flex-direction:column;
+  gap:12px;
+  background:
+    radial-gradient(circle at top right, rgba(255,155,81,.22), transparent 45%),
+    linear-gradient(180deg,#FFF8F1 0%,#FFE2C5 100%);
+  border:2px solid rgba(255,155,81,.46);
+}
+
+.whoResultAnswerLabel{
+  color:#C96A25;
+  font-size:1rem;
+}
+
+.whoResultAnswerText{
+  color:#2F4158;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(2rem, 4vw, 4rem);
+  line-height:1.15;
+  text-align:center;
+  padding:0 20px;
+}
+
+/* مؤقت التكبير */
+.whoImageOverlayTimer{
+  position:fixed;
+  top:24px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:5002;
+  min-width:90px;
+  height:58px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  color:#2E3A4D;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2.2rem;
+  box-shadow:0 16px 34px rgba(0,0,0,.24);
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .whoWrap{
+    gap:10px !important;
+    padding:34px 0 4px !important;
+  }
+
+  .whoTopBar{
+    grid-template-columns:1fr 160px 1fr !important;
+    gap:10px !important;
+  }
+
+  .whoTeamCard,
+  .whoTimerBox{
+    min-height:72px !important;
+    height:72px !important;
+    border-radius:20px !important;
+  }
+
+  .whoTeamName{
+    font-size:1.2rem !important;
+  }
+
+  .whoTeamScore{
+    width:56px !important;
+    height:40px !important;
+    font-size:1.7rem !important;
+  }
+
+  .whoImageStage{
+    min-height:235px !important;
+    padding:10px !important;
+  }
+
+  .whoPointsSelect{
+    min-height:58px !important;
+  }
+
+  .whoControlPanel{
+    flex:0 0 360px !important;
+    gap:6px !important;
+  }
+
+  .whoControlPanel button{
+    height:42px !important;
+    min-height:42px !important;
+    border-radius:12px !important;
+    font-size:.72rem !important;
+    padding:0 4px !important;
+  }
+}
+
+/* iPhone */
+@media (max-width:760px){
+  .whoTopBar{
+    grid-template-columns:1fr !important;
+  }
+
+  .whoBottomRow{
+    flex-direction:column !important;
+  }
+
+  .whoControlPanel{
+    flex:unset !important;
+    width:100% !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  .whoResultView{
+    grid-template-columns:1fr;
+  }
+}
+/* يخلي الإجابة مستطيل بجانب الصورة */
+.whoResultView{
+  grid-template-columns:1.2fr .8fr !important;
+  align-items:center !important;
+}
+
+.whoResultImageBox{
+  min-height:260px !important;
+}
+
+.whoResultAnswerBox{
+  min-height:78px !important;
+  height:auto !important;
+  align-self:center !important;
+  padding:16px 34px !important;
+}
+.whoCompensationBtn{
+  background:linear-gradient(180deg,#FFD36E 0%,#FF9B2F 100%) !important;
+  color:#2F4158 !important;
+  box-shadow:0 12px 24px rgba(255,155,47,.22) !important;
+}
+
+.whoCompensationBtn:disabled{
+  opacity:.45 !important;
+  cursor:not-allowed !important;
+}
+
+.whoCompensationBtn.activeCompensation{
+  opacity:1 !important;
+  animation:whoCompensationGlow 1s ease-in-out infinite alternate;
+}
+
+@keyframes whoCompensationGlow{
+  from{
+    box-shadow:0 0 0 rgba(255,155,47,0), 0 10px 20px rgba(255,155,47,.20);
+  }
+  to{
+    box-shadow:0 0 22px rgba(255,155,47,.65), 0 14px 28px rgba(255,155,47,.32);
+  }
+}
+/* WHO CONTROL BUTTONS - ONE ROW */
+.whoControlPanel{
+  flex:0 0 560px !important;
+  display:grid !important;
+  grid-template-columns:repeat(4, minmax(0,1fr)) !important;
+  gap:10px !important;
+  align-items:stretch !important;
+}
+
+.whoControlPanel button{
+  width:100% !important;
+  min-width:0 !important;
+  height:54px !important;
+  min-height:54px !important;
+  border-radius:16px !important;
+  font-size:.9rem !important;
+  padding:0 8px !important;
+  white-space:nowrap !important;
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .whoControlPanel{
+    flex:0 0 430px !important;
+    grid-template-columns:repeat(4, minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+
+  .whoControlPanel button{
+    height:42px !important;
+    min-height:42px !important;
+    font-size:.68rem !important;
+    border-radius:12px !important;
+  }
+}

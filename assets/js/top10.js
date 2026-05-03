@@ -29,7 +29,7 @@ let top10AnimatingNumber = null
 let top10History = []
 const TOP10_HISTORY_LIMIT = 50
 const TOP10_STORAGE_KEY = "top10_state_v1"
-
+const TOP10_TIMER_SECONDS = 35
 /* =========================
    Persistence
 ========================= */
@@ -95,6 +95,7 @@ function restoreTop10State(saved) {
 
   updateTop10UndoButtonState()
   updateTop10DoubleButton()
+  
 }
 
 /* =========================
@@ -313,8 +314,17 @@ window.renderTop10 = async function () {
     updateTop10DoubleButton()
     saveTop10State()
   }
+  
 }
+function autoStartTop10Timer() {
+  if (!top10State.activeTeam) return
 
+  clearInterval(timer)
+  timer = null
+
+  top10TimerStarted = true
+  runTop10Timer(TOP10_TIMER_SECONDS)
+}
 async function loadTop10RoundQuestion(round) {
   const { data, error } = await db
     .from("top10_questions")
@@ -379,7 +389,7 @@ function buildTop10HTML() {
 
         <div class="top10ControlPanel">
           <button onclick="activateTop10Double()" id="top10DoubleBtn" class="top10DoubleBtn">دبل</button>
-          <button onclick="startTop10TimerButton()" class="top10StartBtn">بدء المؤقت</button>
+          
           <button onclick="showTop10Answer()" class="btnAnswer">إظهار الإجابات</button>
           <button onclick="addTop10Error()" class="top10ErrorBtnSingle">خطأ</button>
           <button onclick="undoTop10Action()" id="top10UndoBtn" class="undoBtn">تراجع</button>
@@ -464,6 +474,7 @@ function selectTop10Team(team) {
   pushTop10History()
 
   top10State.activeTeam = team
+  autoStartTop10Timer()
   highlightTop10TurnTeam()
   updateTop10TurnLabel()
   updateTop10DoubleButton()
@@ -505,6 +516,7 @@ async function openTop10Number(num) {
     showGameToast("اختر الفريق أولاً")
     return
   }
+  
 
   if (top10State.opened[round].includes(num)) return
 
@@ -560,14 +572,17 @@ async function openTop10Number(num) {
     B: top10State.scores.B
   }
 
-  clearInterval(timer)
-  timer = null
+  if (top10State.activeTeam) {
+    autoStartTop10Timer()
+  } else {
+    clearInterval(timer)
+    timer = null
+    top10TimerStarted = false
+    top10LastTickPlayed = null
 
-  const timerBox = document.getElementById("timer")
-  if (timerBox) timerBox.innerText = 0
-
-  top10TimerStarted = false
-  top10LastTickPlayed = null
+    const timerBox = document.getElementById("timer")
+    if (timerBox) timerBox.innerText = 0
+  }
 
   updateTop10UIOnly()
   saveTop10State()
@@ -575,6 +590,7 @@ async function openTop10Number(num) {
   setTimeout(() => {
     top10AnimatingNumber = null
     updateTop10UIOnly()
+    saveTop10State()
   }, 1400)
 }
 
@@ -716,32 +732,32 @@ function addTop10Error() {
   playGameSound("wrong")
   flashScreen("wrong")
 
-  window.top10State = top10State
-
-  clearInterval(timer)
-  timer = null
-
-  const timerBox = document.getElementById("timer")
-  if (timerBox) timerBox.innerText = 0
-
-  top10TimerStarted = false
-  top10LastTickPlayed = null
-
   const otherTeam = getOtherTeam(team)
 
   if (top10State.errors[round][team] >= 3) {
-    if (top10State.errors[round][otherTeam] < 3) {
-      top10State.activeTeam = otherTeam
-    } else {
-      top10State.activeTeam = null
-    }
+    top10State.activeTeam =
+      top10State.errors[round][otherTeam] < 3 ? otherTeam : null
   } else {
-    if (top10State.errors[round][otherTeam] < 3) {
-      top10State.activeTeam = otherTeam
-    }
+    top10State.activeTeam =
+      top10State.errors[round][otherTeam] < 3 ? otherTeam : team
   }
 
+  window.top10State = top10State
+
   updateTop10UIOnly()
+
+  if (top10State.activeTeam) {
+    autoStartTop10Timer()
+  } else {
+    clearInterval(timer)
+    timer = null
+    top10TimerStarted = false
+    top10LastTickPlayed = null
+
+    const timerBox = document.getElementById("timer")
+    if (timerBox) timerBox.innerText = 0
+  }
+
   saveTop10State()
 }
 
@@ -917,6 +933,7 @@ function switchTop10Turn() {
   pushTop10History()
 
   top10State.activeTeam = otherTeam
+  autoStartTop10Timer()
   highlightTop10TurnTeam()
   updateTop10TurnLabel()
   updateTop10DoubleButton()

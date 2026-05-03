@@ -825,6 +825,19 @@ function endCurrentSegment() {
 
   const winner = getWinnerFromSegmentScores()
 
+  if (winner === teamAName) {
+    scoreA++
+    localStorage.setItem("main_score_a", scoreA)
+  }
+
+  if (winner === teamBName) {
+    scoreB++
+    localStorage.setItem("main_score_b", scoreB)
+  }
+
+  updateMainScoreBoard()
+  updateLeadingTeamStyle()
+
   if (!segmentStatus[key]) {
     segmentStatus[key] = { locked: false, winner: "" }
   }
@@ -1048,3 +1061,27 @@ function zoomCurrentDisplayImage() {
 function closeCurrentDisplayImageZoom() {
   document.getElementById("displayImageZoomOverlay")?.classList.add("hidden")
 }
+function updateDisplayControlsEyeButton(isHidden) {
+  const btn = document.getElementById("displayControlsEyeBtn")
+  if (!btn) return
+
+  btn.innerText = isHidden ? "◉" : "👁️"
+  btn.classList.toggle("hiddenMode", isHidden)
+  btn.title = isHidden ? "إظهار أزرار التحكم" : "إخفاء أزرار التحكم"
+}
+
+function toggleDisplayControlsFromScreen() {
+  const isHidden = document.body.classList.toggle("presenterHideDisplayControls")
+  localStorage.setItem("presenter_hide_controls", isHidden ? "1" : "0")
+  updateDisplayControlsEyeButton(isHidden)
+}
+
+function restoreDisplayControlsEye() {
+  const isHidden = localStorage.getItem("presenter_hide_controls") === "1"
+  document.body.classList.toggle("presenterHideDisplayControls", isHidden)
+  updateDisplayControlsEyeButton(isHidden)
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(restoreDisplayControlsEye, 300)
+})

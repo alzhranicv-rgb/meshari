@@ -1116,3 +1116,482 @@
     border-radius:16px;
   }
 }
+/* FINAL POLISH */
+
+.finalRound1TextCard{
+  width:min(100%, 850px) !important;
+  min-height:180px !important;
+  padding:28px 34px !important;
+  border-radius:26px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FFF7EF 100%) !important;
+  border:2px solid rgba(255,155,81,.42) !important;
+  box-shadow:0 18px 34px rgba(47,65,88,.12), inset 0 1px 0 rgba(255,255,255,.95) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.finalRound1TextCardInner{
+  color:#2F4158 !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:clamp(1.8rem,2.6vw,3rem) !important;
+  line-height:1.65 !important;
+  text-align:center !important;
+  text-wrap:balance !important;
+}
+
+.finalRound1NoteBox,
+.finalHintText{
+  background:
+    radial-gradient(circle at top right, rgba(255,155,81,.26), transparent 45%),
+    linear-gradient(180deg,#FFF8F1 0%,#FFE2C5 100%) !important;
+  border:2px solid rgba(255,155,81,.55) !important;
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.10),
+    0 0 28px rgba(255,155,81,.35),
+    0 14px 28px rgba(255,155,81,.18) !important;
+  color:#2F4158 !important;
+  font-size:1.35rem !important;
+}
+
+.finalRound1AnswerBox{
+  width:min(100%,680px) !important;
+  min-height:82px !important;
+  margin:0 auto !important;
+  border-radius:26px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FFF7EF 100%) !important;
+  border:2px solid rgba(255,155,81,.42) !important;
+  color:#2F4158 !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.9rem,3vw,3.2rem) !important;
+  line-height:1.18 !important;
+}
+
+.finalRound1Card,
+.finalRound2Card,
+.finalRound3Card{
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%) !important;
+  border-radius:18px !important;
+  box-shadow:0 10px 20px rgba(36,52,71,.16), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+.finalRound1Card.used,
+.finalRound2Card.used,
+.finalRound3Card.used{
+  background:#a4b2c4 !important;
+  color:transparent !important;
+}
+
+.finalWordChipLarge,
+.finalSequenceWordBtn{
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%) !important;
+  color:#FFFFFF !important;
+  border-radius:20px !important;
+}
+
+.finalControlsBar{
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+}
+/* =========================
+   FINAL NUMBERS = WARMUP STYLE
+========================= */
+
+.finalRound1Card,
+.finalRound2Card,
+.finalRound3Card{
+  position:relative !important;
+  height:56px !important;
+  min-height:56px !important;
+  border:0 !important;
+  border-radius:18px !important;
+  background:#25343F !important;
+  color:#FFFFFF !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.75rem !important;
+  line-height:1 !important;
+  cursor:pointer !important;
+  box-shadow:
+    0 9px 16px rgba(37,52,63,.20),
+    inset 0 1px 0 rgba(255,255,255,.08) !important;
+  overflow:hidden !important;
+}
+
+.finalRound1Card::before,
+.finalRound2Card::before,
+.finalRound3Card::before{
+  content:"";
+  position:absolute;
+  width:52px;
+  height:52px;
+  top:-18px;
+  right:-10px;
+  border-radius:50%;
+  background:rgba(255,255,255,.08);
+}
+
+.finalRound1Card::after,
+.finalRound2Card::after,
+.finalRound3Card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  box-shadow:inset 0 -7px 14px rgba(0,0,0,.16);
+  pointer-events:none;
+}
+
+.finalRound1Card.used,
+.finalRound2Card.used,
+.finalRound3Card.used{
+  background:#3A4A56 !important;
+  color:transparent !important;
+  cursor:default !important;
+  opacity:1 !important;
+}
+
+/* =========================
+   ROUND 1 TEXT CARD OLD FONT + ZOOM
+========================= */
+
+.finalRound1TextCard{
+  cursor:zoom-in !important;
+}
+
+.finalRound1TextCardInner{
+  font-family:"MolhimCustom","HanakaText",sans-serif !important;
+  font-weight:400 !important;
+  color:#2F4158 !important;
+  font-size:clamp(1.8rem,2.7vw,3.1rem) !important;
+  line-height:1.75 !important;
+}
+
+/* =========================
+   ROUND 1 NOTE + ANSWER LAYOUT
+========================= */
+
+.finalRound1BottomInfoRow{
+  width:min(100%, 900px) !important;
+  margin:0 auto !important;
+  grid-template-columns:1fr !important;
+  gap:12px !important;
+}
+
+.finalRound1NoteBox{
+  width:min(100%, 560px) !important;
+  min-height:58px !important;
+  margin:0 auto !important;
+  padding:12px 30px !important;
+  border-radius:22px !important;
+  background:
+    radial-gradient(circle at top right, rgba(255,155,81,.26), transparent 45%),
+    linear-gradient(180deg,#FFF8F1 0%,#FFE2C5 100%) !important;
+  border:2px solid rgba(255,155,81,.55) !important;
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.10),
+    0 0 28px rgba(255,155,81,.38),
+    0 14px 28px rgba(255,155,81,.18) !important;
+  color:#2F4158 !important;
+  font-size:1.35rem !important;
+  line-height:1.45 !important;
+}
+
+.finalRound1AnswerBox{
+  width:min(100%, 620px) !important;
+  min-height:74px !important;
+  margin:0 auto !important;
+  padding:14px 34px !important;
+  border-radius:22px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FFF7EF 100%) !important;
+  border:2px solid rgba(255,155,81,.42) !important;
+  color:#2F4158 !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.7rem,2.8vw,3rem) !important;
+  line-height:1.15 !important;
+}
+
+/* =========================
+   FINAL CONTROLS CLEAN ONE ROW
+========================= */
+
+.finalRound1ControlsBar,
+.finalRound2ControlsBar,
+.finalRound3ControlsBar{
+  width:100% !important;
+  display:grid !important;
+  gap:10px !important;
+  margin:0 auto !important;
+}
+
+.finalRound1ControlsBar{
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+}
+
+.finalRound2ControlsBar{
+  grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+}
+
+.finalRound3ControlsBar{
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+}
+
+.finalControlsBar button{
+  height:54px !important;
+  min-height:54px !important;
+  border-radius:16px !important;
+  font-size:.88rem !important;
+  padding:0 8px !important;
+}
+/* تكبير نص الجولة الأولى بدون قصاصة */
+.finalRound1OverlayPaper{
+  width:min(100%, 920px) !important;
+  min-height:360px !important;
+  aspect-ratio:auto !important;
+  padding:34px 42px !important;
+  border-radius:30px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FFF7EF 100%) !important;
+  border:2px solid rgba(255,155,81,.42) !important;
+  box-shadow:0 24px 60px rgba(0,0,0,.28) !important;
+}
+
+.finalRound1OverlayText{
+  font-family:"MolhimCustom","HanakaText",sans-serif !important;
+  color:#2F4158 !important;
+  font-size:clamp(2rem,3.2vw,3.5rem) !important;
+  line-height:1.75 !important;
+}
+
+/* أرقام الفاصلة نفس خط أرقام التسخين */
+.finalRound1Card,
+.finalRound2Card,
+.finalRound3Card{
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-weight:400 !important;
+}
+.finalWrapNew .finalRound1Card,
+.finalWrapNew .finalRound2Card,
+.finalWrapNew .finalRound3Card{
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-weight:400 !important;
+  font-size:1.75rem !important;
+  line-height:1 !important;
+}
+
+.finalWrapNew .finalRound1Card *,
+.finalWrapNew .finalRound2Card *,
+.finalWrapNew .finalRound3Card *{
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+}
+/* ترتيب التلميحة والإجابة في الجولة الأولى */
+.finalRound1BottomInfoRow{
+  width:100% !important;
+  max-width:760px !important;
+  margin:4px auto 0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  gap:12px !important;
+}
+
+.finalRound1NoteBox{
+  width:100% !important;
+  max-width:560px !important;
+  min-height:54px !important;
+  order:1 !important;
+}
+
+.finalRound1AnswerBox{
+  width:100% !important;
+  max-width:640px !important;
+  min-height:72px !important;
+  order:2 !important;
+}
+
+.finalRound1InfoEmpty{
+  display:none !important;
+}
+/* التلميحة جنب مربع السؤال بشكل صغير */
+.finalRound1StageLayout{
+  display:grid !important;
+  grid-template-columns:1fr 260px !important;
+  gap:14px !important;
+  align-items:start !important;
+}
+
+.finalRound1MainStageCard{
+  grid-column:1 !important;
+}
+
+.finalRound1BottomInfoRow{
+  grid-column:2 !important;
+  max-width:260px !important;
+  width:260px !important;
+  margin:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:10px !important;
+}
+
+.finalRound1NoteBox{
+  width:100% !important;
+  max-width:260px !important;
+  min-height:70px !important;
+  padding:10px 14px !important;
+  border-radius:18px !important;
+  font-size:1rem !important;
+  line-height:1.45 !important;
+}
+
+.finalRound1AnswerBox{
+  width:100% !important;
+  max-width:260px !important;
+  min-height:70px !important;
+  padding:12px 14px !important;
+  border-radius:18px !important;
+  font-size:1.25rem !important;
+}
+
+.finalRound1InfoEmpty{
+  display:none !important;
+}
+
+@media (max-width:900px){
+  .finalRound1StageLayout{
+    grid-template-columns:1fr !important;
+  }
+
+  .finalRound1BottomInfoRow{
+    grid-column:1 !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+}
+/* حذف التلميحة بالكامل */
+.finalRound1NoteBox{
+  display:none !important;
+}
+
+/* لو فيه صف كان يحتوي التلميحة */
+.finalRound1BottomInfoRow{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+}
+
+/* خلي الإجابة تتوسط لحالها */
+.finalRound1AnswerBox{
+  width:min(100%, 700px) !important;
+  margin:0 auto !important;
+}
+/* ترتيب صندوق الجولة الأولى والإجابة بعد حذف التلميحة */
+.finalRound1StageLayout{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  gap:14px !important;
+}
+
+.finalRound1MainStageCard{
+  width:100% !important;
+  max-width:920px !important;
+  min-height:250px !important;
+  margin:0 auto !important;
+  padding:18px !important;
+}
+
+.finalRound1BottomInfoRow{
+  width:100% !important;
+  max-width:720px !important;
+  margin:0 auto !important;
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+}
+
+.finalRound1AnswerBox{
+  width:100% !important;
+  min-height:78px !important;
+  padding:16px 34px !important;
+  border-radius:24px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FFF7EF 100%) !important;
+  border:2px solid rgba(255,155,81,.42) !important;
+  box-shadow:
+    0 16px 32px rgba(47,65,88,.12),
+    0 8px 18px rgba(255,155,81,.14),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+  color:#2F4158 !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.8rem,2.8vw,3.1rem) !important;
+  line-height:1.18 !important;
+  text-align:center !important;
+}
+
+.finalRound1InfoEmpty,
+.finalRound1NoteBox{
+  display:none !important;
+}
+/* إجابة الجولة الأولى بعرض واسع ومستطيل */
+.finalRound1BottomInfoRow{
+  width:100% !important;
+  max-width:920px !important;
+}
+
+.finalRound1AnswerBox{
+  width:100% !important;
+  max-width:920px !important;
+  min-height:64px !important;
+  height:auto !important;
+  padding:12px 28px !important;
+  border-radius:22px !important;
+}
+/* إجابة أرقام 1-2-3 بخط Molhim الطبيعي مع النقاط */
+.finalRound1AnswerBox{
+  font-family:"MolhimCustom","HanakaText",sans-serif !important;
+  font-weight:400 !important;
+}
+/* إجابة مرنة + وسط المربع */
+.finalRound1AnswerBox{
+  min-height:110px !important;
+  height:auto !important;
+  max-height:none !important;
+
+  padding:22px 36px !important;
+  line-height:1.45 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+
+  white-space:normal !important;
+  word-break:break-word !important;
+  text-wrap:balance !important;
+}
+
+/* توسيط صندوق الإجابة نفسه */
+.finalRound1BottomInfoRow{
+  width:100% !important;
+  max-width:920px !important;
+  margin:0 auto !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+/* توسيط مربع السؤال والإجابة فقط في الجولة الأولى */
+.finalRound1MainStageCard,
+.finalRound1AnswerBox{
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+.finalRound1StageLayout{
+  align-items:center !important;
+}
+
+.finalRound1BottomInfoRow{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}

@@ -366,8 +366,8 @@ function updatePresenterControlsToggleUI() {
   btn.classList.toggle("isHiddenMode", presenterControlsHidden)
 
   btn.innerText = presenterControlsHidden
-    ? "إظهار أزرار التحكم في العرض"
-    : "إخفاء أزرار التحكم في العرض"
+    ? "👁️ إظهار أزرار التحكم"
+    : "🚫👁️ إخفاء أزرار التحكم"
 }
 
 function setTitle(title, subtitle = "") {

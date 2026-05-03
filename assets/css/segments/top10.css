@@ -6,8 +6,8 @@
   width:100%;
   display:flex;
   flex-direction:column;
-  gap:18px;
-  padding:8px 0 18px;
+  gap:12px;
+  padding:3px 0 8px;
   overflow:hidden;
 }
 
@@ -18,14 +18,14 @@
   overflow:hidden;
   background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
   border:1px solid rgba(217,224,224,.95);
-  border-radius:34px;
+  border-radius:30px;
   box-shadow:
-    0 20px 40px rgba(39,48,61,.08),
+    0 16px 34px rgba(39,48,61,.07),
     inset 0 1px 0 rgba(255,255,255,.95);
-  padding:18px;
+  padding:14px;
   display:flex;
   flex-direction:column;
-  gap:16px;
+  gap:12px;
 }
 
 .top10MainBoard::before{
@@ -235,16 +235,16 @@
   z-index:2;
   color:#2E3A4D;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2.4rem;
+  font-size:3.4rem;
   line-height:1;
 }
 
 .top10MiddleTurn{
   position:relative;
   z-index:2;
-  color:#7A4A22;
+  color:#010101;
   font-family:"HanakaText", sans-serif;
-  font-size:1rem;
+  font-size:1.50rem;
   line-height:1.2;
   text-wrap:balance;
 }
@@ -304,28 +304,31 @@
 
 .top10ControlPanel{
   display:grid !important;
-  grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
   gap:10px !important;
   align-items:stretch !important;
   width:100% !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
 }
 
 .top10ControlPanel button{
   width:100% !important;
   min-width:0 !important;
-  min-height:48px !important;
-  height:54px;
-  padding:0 10px;
-  border:0;
+  height:54px !important;
+  min-height:54px !important;
+  padding:0 10px !important;
+  border:0 !important;
   border-radius:16px !important;
   white-space:nowrap !important;
   overflow:hidden !important;
   text-overflow:ellipsis !important;
-  font-family:"HanakaText", sans-serif;
-  font-size:.98rem;
-  line-height:1.1;
+  font-family:"HanakaText", sans-serif !important;
+  font-size:.98rem !important;
+  font-weight:400 !important;
+  line-height:1.1 !important;
   cursor:pointer;
-  transition:transform .16s ease, filter .16s ease, box-shadow .16s ease;
 }
 
 .top10ControlPanel button:hover{
@@ -602,14 +605,15 @@
   }
 
   .top10ControlPanel{
-    grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
     gap:6px !important;
   }
 
   .top10ControlPanel button{
+    height:42px !important;
     min-height:42px !important;
-    font-size:.75rem !important;
-    padding:7px 4px !important;
+    font-size:.72rem !important;
+    padding:0 4px !important;
     border-radius:12px !important;
   }
 
@@ -699,5 +703,101 @@
 
   .top10RectInner{
     font-size:1.25rem !important;
+  }
+}
+/* =========================
+   TOP10 FINAL SIZE = WARMUP PAGE + WARMUP BUTTONS
+========================= */
+
+.top10Wrap{
+  width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:14px !important;
+  padding:10px 0 8px !important;
+  overflow:hidden !important;
+}
+
+.top10MainBoard{
+  width:96% !important;
+  max-width:1180px !important;
+  margin:0 auto !important;
+}
+
+/* أزرار التحكم نفس مقاس التسخين */
+.top10ControlPanel{
+  display:grid !important;
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+  gap:10px !important;
+  align-items:stretch !important;
+  width:100% !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.top10ControlPanel button{
+  width:100% !important;
+  min-width:0 !important;
+  height:54px !important;
+  min-height:54px !important;
+  padding:0 10px !important;
+  border:0 !important;
+  border-radius:16px !important;
+  font-family:"HanakaText", sans-serif !important;
+  font-size:.98rem !important;
+  font-weight:400 !important;
+  line-height:1.1 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .top10Wrap{
+    gap:10px !important;
+    padding:34px 0 4px !important;
+  }
+
+  @media (min-width:768px) and (max-width:1180px){
+  .top10MainBoard{
+    width:94% !important;
+    max-width:940px !important;
+  }
+}
+
+  .top10ControlPanel{
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+
+  .top10ControlPanel button{
+    height:42px !important;
+    min-height:42px !important;
+    border-radius:12px !important;
+    font-size:.72rem !important;
+    padding:0 4px !important;
+  }
+}
+
+/* iPhone */
+@media (max-width:760px){
+  .top10Wrap{
+    padding:10px 0 8px !important;
+  }
+
+  @media (max-width:760px){
+  .top10MainBoard{
+    width:100% !important;
+    max-width:100% !important;
+  }
+}
+
+  .top10ControlPanel{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
   }
 }

@@ -52,10 +52,20 @@
 
       <section id="presenterGameHome" class="presenterGameHome hidden">
 
-        <div class="presenterModelHero">
-          <div class="presenterModelHeroLabel">النموذج الحالي</div>
-          <div id="presenterCurrentModelName" class="presenterModelHeroName">—</div>
-        </div>
+        <section class="presenterHomeTopCard">
+          <div class="presenterHomeTitleBox">
+            <div class="presenterHomeKicker">لوحة المقدم</div>
+            <div id="presenterCurrentModelName" class="presenterHomeModelName">—</div>
+          </div>
+
+          <button
+            id="presenterGlobalToggleBtn"
+            class="presenterGlobalToggleBtn"
+            onclick="togglePresenterDisplayControlsBtn()"
+          >
+            👁️ إخفاء أزرار التحكم
+          </button>
+        </section>
 
         <section class="presenterSegments">
           <button onclick="openPresenterSegment('warmup')" class="presenterSegmentBtn">
@@ -82,14 +92,6 @@
             <span>الأرشيف</span>
           </button>
         </section>
-
-        <button
-          id="presenterGlobalToggleBtn"
-          class="presenterGlobalToggleBtn"
-          onclick="togglePresenterDisplayControlsBtn()"
-        >
-          إخفاء أزرار التحكم في العرض
-        </button>
 
       </section>
 
