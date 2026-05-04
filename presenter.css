@@ -1,39 +1,6 @@
 /* =========================
-   PRESENTER PAGE - NEW DESIGN
+   PRESENTER CLEAN DESIGN
 ========================= */
-
-@font-face{
-  font-family:"HanakaDisplay";
-  src:url("./fonts/dima.ttf") format("truetype");
-  font-weight:400;
-  font-style:normal;
-}
-
-@font-face{
-  font-family:"HanakaText";
-  src:url("./fonts/zain.ttf") format("truetype");
-  font-weight:400;
-  font-style:normal;
-}
-
-:root{
-  --p-bg:#EAEFEF;
-  --p-card:#FFFFFF;
-  --p-card2:#F4F7F7;
-  --p-text:#243447;
-  --p-soft:#5F6B7A;
-  --p-primary:#FF9B51;
-  --p-primary2:#FFC08E;
-  --p-dark:#25343F;
-  --p-border:#D9E0E0;
-  --p-green:#009900;
-  --p-green-soft:#8EE88E;
-  --p-red:#FF6666;
-  --p-blue:#2F6BFF;
-  --p-cyan:#00FFFF;
-  --p-brown:#3B0808;
-  --p-nav:#D6C1A6;
-}
 
 *{
   box-sizing:border-box;
@@ -44,11 +11,11 @@ body{
   margin:0;
   min-height:100%;
   direction:rtl;
-  font-family:"HanakaText", sans-serif;
+  font-family:Arial, sans-serif;
   background:
-    radial-gradient(circle at top right, rgba(255,155,81,.14), transparent 24%),
-    linear-gradient(180deg,#FFF6EE 0%,#EDF2F1 56%,#E6ECEC 100%);
-  color:var(--p-text);
+    radial-gradient(circle at 85% 0%, rgba(255,155,81,.28), transparent 28%),
+    linear-gradient(180deg,#fff6ee 0%,#eaf0ef 100%);
+  color:#243447;
 }
 
 .hidden{
@@ -56,77 +23,67 @@ body{
 }
 
 .presenterPage{
-  width:min(100% - 20px, 620px);
+  width:min(100% - 18px, 680px);
   min-height:100vh;
   margin:0 auto;
-  padding:12px 0 18px;
+  padding:10px 0 18px;
   display:flex;
   flex-direction:column;
   gap:12px;
 }
 
-/* =========================
-   HEADER
-========================= */
-
 .presenterHeader{
   position:sticky;
   top:0;
-  z-index:30;
-  min-height:72px;
+  z-index:20;
   display:grid;
-  grid-template-columns:82px 1fr 82px;
+  grid-template-columns:76px 1fr 76px;
   gap:8px;
   align-items:center;
   padding:10px;
   border-radius:0 0 24px 24px;
-  background:rgba(234,239,239,.88);
-  backdrop-filter:blur(10px);
+  background:rgba(255,246,238,.92);
+  backdrop-filter:blur(12px);
+  box-shadow:0 10px 30px rgba(47,65,88,.10);
 }
 
 .presenterHeaderText{
-  min-width:0;
   text-align:center;
+  min-width:0;
 }
 
 .presenterHeaderText h1{
   margin:0;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2rem;
-  line-height:1.05;
-  color:#2F4158;
+  font-size:1.85rem;
+  line-height:1.1;
+  color:#2f4158;
 }
 
 .presenterHeaderText p{
   margin:4px 0 0;
-  color:var(--p-soft);
-  font-size:.92rem;
-  line-height:1.35;
+  font-size:.86rem;
+  color:#677383;
 }
 
 .presenterBack,
 .presenterEnd{
-  height:46px;
+  height:44px;
   border:0;
-  border-radius:16px;
+  border-radius:15px;
   color:#fff;
-  font-family:"HanakaText",sans-serif;
-  font-size:.92rem;
+  font-size:.9rem;
+  font-weight:800;
   cursor:pointer;
-  box-shadow:0 10px 20px rgba(0,0,0,.08);
+  box-shadow:0 10px 22px rgba(47,65,88,.14);
 }
 
 .presenterBack{
-  background:#2F4158;
+  background:#2f4158;
 }
 
 .presenterEnd{
-  background:#7A1630;
+  background:#7a1630;
 }
-
-/* =========================
-   SETUP
-========================= */
 
 .presenterHome,
 .presenterPanel{
@@ -134,138 +91,6 @@ body{
   flex-direction:column;
   gap:12px;
 }
-
-.presenterSetupCard,
-.presenterCard,
-.presenterModelHero{
-  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
-  border:1px solid var(--p-border);
-  border-radius:26px;
-  box-shadow:0 12px 28px rgba(39,48,61,.07);
-  padding:16px;
-  overflow:hidden;
-  position:relative;
-}
-
-.presenterSetupCard::before,
-.presenterCard::before,
-.presenterModelHero::before{
-  content:"";
-  position:absolute;
-  width:120px;
-  height:120px;
-  top:-54px;
-  right:-38px;
-  border-radius:50%;
-  background:rgba(255,155,81,.09);
-}
-
-.presenterSetupTitle{
-  position:relative;
-  z-index:1;
-  text-align:center;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2.35rem;
-  color:#2F4158;
-  line-height:1.1;
-  margin-bottom:14px;
-}
-
-.presenterSetupGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.presenterField{
-  position:relative;
-  z-index:1;
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-  margin-bottom:12px;
-}
-
-.presenterField label,
-.presenterLabel{
-  color:#2F4158;
-  font-size:1rem;
-  line-height:1.3;
-}
-
-.presenterField input,
-.presenterField select,
-#presenterModelSelect{
-  width:100%;
-  height:56px;
-  border-radius:18px;
-  border:1px solid var(--p-border);
-  background:#fff;
-  color:var(--p-text);
-  padding:0 14px;
-  font-family:"HanakaText",sans-serif;
-  font-size:1rem;
-  outline:none;
-}
-
-.presenterField input:focus,
-.presenterField select:focus,
-#presenterModelSelect:focus{
-  border-color:var(--p-primary);
-  box-shadow:0 0 0 4px rgba(255,155,81,.12);
-}
-
-.presenterStartBtn{
-  position:relative;
-  z-index:1;
-  width:100%;
-  height:58px;
-  border:0;
-  border-radius:20px;
-  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
-  color:#fff;
-  font-family:"HanakaText",sans-serif;
-  font-size:1.1rem;
-  cursor:pointer;
-  box-shadow:0 16px 30px rgba(255,155,81,.24);
-}
-
-/* =========================
-   HOME SEGMENTS
-========================= */
-
-.presenterGameHome{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.presenterModelHero{
-  min-height:92px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-}
-
-.presenterModelHeroLabel{
-  position:relative;
-  z-index:1;
-  color:#7A6950;
-  font-size:.95rem;
-  margin-bottom:6px;
-}
-
-.presenterModelHeroName{
-  position:relative;
-  z-index:1;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  color:#2F4158;
-  font-size:2.25rem;
-  line-height:1.1;
-}
-
 .presenterSegments{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -273,71 +98,72 @@ body{
 }
 
 .presenterSegmentBtn{
-  position:relative;
-  min-height:118px;
-  border:1px solid var(--p-border);
+  min-height:110px;
+  border:0;
   border-radius:24px;
-  background:linear-gradient(180deg,#FFFFFF 0%,#F3F7F7 100%);
-  box-shadow:0 10px 24px rgba(39,48,61,.06);
+  background:linear-gradient(180deg,#fff 0%,#f6f8f8 100%);
+  box-shadow:0 14px 30px rgba(47,65,88,.10);
+  font-size:1.5rem;
+  font-weight:900;
+  color:#2f4158;
+}
+.presenterSetupCard,
+.presenterCard{
+  position:relative;
   overflow:hidden;
-  cursor:pointer;
+  background:linear-gradient(180deg,#ffffff 0%,#f6f8f8 100%);
+  border:1px solid rgba(47,65,88,.12);
+  border-radius:26px;
+  padding:16px;
+  box-shadow:0 14px 34px rgba(47,65,88,.10);
 }
 
-.presenterSegmentBtn::before{
+.presenterSetupCard::before,
+.presenterCard::before{
   content:"";
   position:absolute;
-  width:92px;
-  height:92px;
-  top:-34px;
-  left:-20px;
+  width:120px;
+  height:120px;
+  top:-52px;
+  right:-38px;
   border-radius:50%;
-  background:rgba(255,155,81,.10);
+  background:rgba(255,155,81,.13);
 }
 
-.presenterSegmentBtn::after{
-  content:"";
-  position:absolute;
-  width:70px;
-  height:70px;
-  bottom:-28px;
-  right:-14px;
-  border-radius:18px;
-  transform:rotate(24deg);
-  background:rgba(47,65,88,.05);
-}
-
-.presenterSegmentBtn span{
+.presenterSetupTitle{
   position:relative;
   z-index:1;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  text-align:center;
   font-size:2rem;
-  color:#2F4158;
-  line-height:1.1;
+  font-weight:900;
+  color:#2f4158;
+  margin-bottom:14px;
 }
 
-.presenterGlobalToggleBtn{
-  min-height:58px;
-  border:0;
+.presenterLabel{
+  position:relative;
+  z-index:1;
+  color:#5f6b7a;
+  font-size:.98rem;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.presenterAnswerText{
+  position:relative;
+  z-index:1;
+  min-height:64px;
   border-radius:20px;
-  background:linear-gradient(180deg,#2F4158 0%,#25343F 100%);
-  color:#fff;
-  font-family:"HanakaText",sans-serif;
-  font-size:1rem;
-  cursor:pointer;
-  box-shadow:0 12px 24px rgba(47,65,88,.18);
-}
-
-.presenterGlobalToggleBtn.isHiddenMode{
-  background:linear-gradient(180deg,#FFB15F 0%,#FF8A2A 100%);
-  color:#fff;
-}
-
-/* =========================
-   SHARED COMPONENTS
-========================= */
-
-.presenterOneAction{
-  display:none;
+  border:1px solid rgba(47,65,88,.12);
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:14px;
+  font-size:1.05rem;
+  font-weight:900;
+  color:#2f4158;
 }
 
 .presenterTeams{
@@ -346,139 +172,79 @@ body{
   gap:10px;
 }
 
-.presenterBtn,
-.presenterNumberBtn,
-.presenterRoundTabs button{
-  border:0;
-  min-height:52px;
-  border-radius:17px;
-  padding:0 12px;
-  font-family:"HanakaText",sans-serif;
-  font-size:1rem;
-  line-height:1.15;
-  cursor:pointer;
-  box-shadow:
-    0 10px 20px rgba(0,0,0,.10),
-    inset 0 1px 0 rgba(255,255,255,.14);
-  transition:.16s ease;
-}
-
-.presenterBtn:active,
-.presenterNumberBtn:active,
-.presenterRoundTabs button:active{
-  transform:scale(.98);
-}
-
-.presenterBtn.orange{
-  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
-  color:#2E3A4D;
-}
-
-.presenterBtn.dark{
-  background:#25343F;
-  color:#fff;
-}
-
-.presenterBtn.gray{
-  background:#6F7A88;
-  color:#fff;
-}
-
-.presenterBtn.red{
-  background:#FF6666;
-  color:#fff;
-}
-
-.presenterBtn.green{
-  background:#8EE88E;
-  color:#17351C;
-}
-
-.presenterBtn.blue{
-  background:#2F6BFF;
-  color:#fff;
-}
-
-.selectedPresenterTeam{
-  box-shadow:
-    0 0 0 4px rgba(255,155,81,.22),
-    0 12px 24px rgba(255,155,81,.20) !important;
-  filter:brightness(1.04);
-}
-
-.presenterActions,
-.presenterMiniActions,
-.presenterControlRow{
+.presenterActions{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:8px;
 }
 
-.presenterMiniActions{
-  grid-template-columns:repeat(2,minmax(0,1fr));
+.presenterBtn,
+.presenterNumberBtn,
+.presenterRoundTabs button,
+.presenterStartBtn{
+  border:0;
+  min-height:52px;
+  border-radius:17px;
+  padding:0 10px;
+  font-size:1rem;
+  font-weight:900;
+  cursor:pointer;
+  transition:.15s ease;
+  box-shadow:
+    0 10px 20px rgba(0,0,0,.10),
+    inset 0 1px 0 rgba(255,255,255,.22);
 }
 
-.presenterActions .presenterBtn,
-.presenterMiniActions .presenterBtn{
-  width:100%;
-  min-width:0;
+.presenterBtn:active,
+.presenterNumberBtn:active,
+.presenterRoundTabs button:active,
+.presenterStartBtn:active{
+  transform:scale(.97);
 }
 
-.presenterCard{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+.presenterBtn.orange{
+  background:linear-gradient(180deg,#ffc08e 0%,#ff9b51 100%);
+  color:#263445;
 }
 
-.presenterLabel{
-  position:relative;
-  z-index:1;
-  text-align:right;
-  color:#5F6B7A;
+.presenterBtn.green{
+  background:#8ee88e;
+  color:#17351c;
 }
 
-.presenterQuestionText,
-.presenterAnswerText,
-.presenterNoteText,
-.presenterList{
-  position:relative;
-  z-index:1;
-  width:100%;
-  border-radius:20px;
-  border:1px solid var(--p-border);
-  background:#fff;
-  color:#243447;
-  padding:14px;
-  text-align:center;
-  line-height:1.65;
-  font-size:1.05rem;
-  min-height:70px;
-}
-
-.presenterAnswerText{
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.55rem;
-  line-height:1.35;
-}
-
-.presenterNoteText{
-  background:#4B5563;
+.presenterBtn.red{
+  background:#ff6666;
   color:#fff;
 }
 
-.presenterList{
-  max-height:300px;
-  overflow:auto;
-  text-align:right;
+.presenterBtn.gray{
+  background:#6f7a88;
+  color:#fff;
 }
 
-.presenterListItem{
-  background:#F7F9F9;
-  border:1px solid #E3E8E8;
-  border-radius:16px;
-  padding:12px;
-  margin-bottom:8px;
-  line-height:1.6;
+.presenterBtn.blue{
+  background:#2f6bff;
+  color:#fff;
+}
+
+.presenterBtn.dark{
+  background:#25343f;
+  color:#fff;
+}
+
+.presenterStartBtn{
+  width:100%;
+  margin-top:12px;
+  background:linear-gradient(180deg,#ffc08e 0%,#ff9b51 100%);
+  color:#fff;
+  min-height:58px;
+}
+
+.selectedPresenterTeam{
+  outline:4px solid rgba(255,155,81,.35);
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.18),
+    0 14px 28px rgba(255,155,81,.22) !important;
 }
 
 .presenterGrid{
@@ -498,42 +264,28 @@ body{
 }
 
 .presenterNumberBtn{
-  min-height:54px;
-  background:#25343F;
+  background:#25343f;
   color:#fff;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.55rem;
-}
-
-.presenterNumberBtn.usedPresenterNumber,
-.presenterNumberBtn.presenterOpened{
-  background:#3A4A56;
-  color:transparent;
+  font-size:1.35rem;
 }
 
 .presenterRoundTabs{
   position:relative;
   z-index:1;
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(3,minmax(0,1fr));
   gap:8px;
 }
 
 .presenterRoundTabs button{
-  background:#25343F;
+  background:#25343f;
   color:#fff;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.25rem;
 }
 
 .presenterRoundTabs button.active{
-  background:#FF9B51;
-  color:#2E3A4D;
+  background:#ff9b51;
+  color:#263445;
 }
-
-/* =========================
-   WARMUP
-========================= */
 
 .presenterWarmupCats{
   position:relative;
@@ -544,9 +296,9 @@ body{
 }
 
 .presenterWarmupCat{
-  border:1px solid var(--p-border);
-  border-radius:20px;
   background:#fff;
+  border:1px solid rgba(47,65,88,.12);
+  border-radius:20px;
   padding:10px;
   display:flex;
   flex-direction:column;
@@ -554,15 +306,14 @@ body{
 }
 
 .presenterWarmupCatTitle{
-  min-height:44px;
+  min-height:38px;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
-  color:#2F4158;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.35rem;
-  line-height:1.15;
+  color:#2f4158;
+  font-size:1.05rem;
+  font-weight:900;
 }
 
 .presenterWarmupNumbers{
@@ -571,50 +322,23 @@ body{
   gap:7px;
 }
 
-/* =========================
-   WHO IMAGE PREVIEW
-========================= */
-
-.presenterImagePreviewBox{
-  width:100%;
-  border-radius:20px;
-  border:1px solid var(--p-border);
-  background:#fff;
-  padding:10px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.presenterImagePreviewBox img{
-  max-width:100%;
-  max-height:220px;
-  object-fit:contain;
-  border-radius:16px;
-  display:block;
-}
-
-/* =========================
-   TOAST
-========================= */
-
 .presenterToast{
   position:fixed;
-  top:14px;
+  top:16px;
   left:50%;
-  transform:translateX(-50%) translateY(-20px);
+  transform:translateX(-50%) translateY(-18px);
   z-index:9999;
-  min-width:220px;
+  min-width:210px;
   max-width:calc(100% - 24px);
   padding:12px 16px;
   border-radius:18px;
-  background:#2F4158;
+  background:#2f4158;
   color:#fff;
   text-align:center;
-  font-size:1rem;
+  font-weight:900;
   opacity:0;
   pointer-events:none;
-  transition:.25s ease;
+  transition:.22s ease;
   box-shadow:0 14px 30px rgba(0,0,0,.18);
 }
 
@@ -623,66 +347,40 @@ body{
   transform:translateX(-50%) translateY(0);
 }
 
-/* =========================
-   DISPLAY IMAGE ZOOM BUTTON CARD
-========================= */
-
-.presenterZoomDisplayBtn{
-  background:#2F6BFF !important;
-  color:#fff !important;
-}
-
-/* =========================
-   MOBILE
-========================= */
-
 @media (max-width:430px){
   .presenterPage{
-    width:calc(100% - 14px);
-    padding-top:8px;
+    width:calc(100% - 12px);
+    padding-top:6px;
   }
 
   .presenterHeader{
-    grid-template-columns:70px 1fr 70px;
+    grid-template-columns:64px 1fr 64px;
     padding:8px;
   }
 
   .presenterHeaderText h1{
-    font-size:1.65rem;
+    font-size:1.45rem;
   }
 
   .presenterHeaderText p{
-    font-size:.8rem;
+    font-size:.75rem;
   }
 
   .presenterBack,
   .presenterEnd{
-    height:42px;
-    border-radius:14px;
-    font-size:.82rem;
+    height:40px;
+    border-radius:13px;
+    font-size:.8rem;
   }
 
-  .presenterSetupGrid{
-    grid-template-columns:1fr;
-    gap:0;
-  }
-
-  .presenterSegments{
-    grid-template-columns:1fr 1fr;
-    gap:9px;
-  }
-
-  .presenterSegmentBtn{
-    min-height:104px;
+  .presenterSetupCard,
+  .presenterCard{
     border-radius:22px;
+    padding:13px;
   }
 
-  .presenterSegmentBtn span{
+  .presenterSetupTitle{
     font-size:1.65rem;
-  }
-
-  .presenterTeams{
-    gap:8px;
   }
 
   .presenterBtn,
@@ -690,21 +388,21 @@ body{
   .presenterRoundTabs button{
     min-height:48px;
     border-radius:15px;
-    font-size:.92rem;
-    padding:0 8px;
+    font-size:.88rem;
   }
 
   .presenterNumberBtn{
-    font-size:1.35rem;
+    font-size:1.2rem;
+  }
+
+  .presenterActions{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:7px;
   }
 
   .presenterGrid{
     grid-template-columns:repeat(5,minmax(0,1fr));
     gap:7px;
-  }
-
-  .presenterGrid.four{
-    grid-template-columns:repeat(4,minmax(0,1fr));
   }
 
   .presenterWarmupCats{
@@ -714,449 +412,9 @@ body{
 
   .presenterWarmupCat{
     padding:8px;
-    border-radius:18px;
   }
 
   .presenterWarmupCatTitle{
-    font-size:1.12rem;
-    min-height:38px;
-  }
-
-  .presenterWarmupNumbers{
-    gap:6px;
-  }
-
-  .presenterQuestionText,
-  .presenterAnswerText,
-  .presenterNoteText,
-  .presenterList{
-    min-height:58px;
-    padding:12px;
-    font-size:.98rem;
-  }
-
-  .presenterAnswerText{
-    font-size:1.32rem;
-  }
-
-  .presenterList{
-    max-height:250px;
-  }
-}
-.presenterTop10Answers{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-}
-
-.presenterTop10AnswerBtn{
-  width:100%;
-  min-height:58px;
-  border:0;
-  border-radius:18px;
-  background:#25343F;
-  color:#FFFFFF;
-  display:grid;
-  grid-template-columns:54px minmax(0,1fr);
-  gap:10px;
-  align-items:center;
-  padding:8px 12px;
-  text-align:right;
-  font-family:"HanakaText",sans-serif;
-  box-shadow:
-    0 10px 18px rgba(37,52,63,.18),
-    inset 0 1px 0 rgba(255,255,255,.08);
-}
-
-.presenterTop10AnswerBtn.opened{
-  background:#A4B2C4;
-  color:#243447;
-  box-shadow:0 8px 18px rgba(47,65,88,.12);
-}
-
-.presenterTop10AnswerNo{
-  width:44px;
-  height:42px;
-  border-radius:14px;
-  background:rgba(255,255,255,.12);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.45rem;
-}
-
-.presenterTop10AnswerBtn.opened .presenterTop10AnswerNo{
-  background:#FFFFFF;
-  color:#243447;
-}
-
-.presenterTop10AnswerText{
-  font-size:1.05rem;
-  line-height:1.45;
-  overflow:hidden;
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-}
-
-@media (max-width:760px){
-  .presenterTop10AnswerBtn{
-    min-height:54px;
-    grid-template-columns:48px minmax(0,1fr);
-    border-radius:16px;
-    padding:7px 10px;
-  }
-
-  .presenterTop10AnswerNo{
-    width:38px;
-    height:38px;
-    font-size:1.25rem;
-  }
-
-  .presenterTop10AnswerText{
-    font-size:.98rem;
-  }
-}
-.presenterArchiveItems{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-}
-
-.presenterArchiveItemBtn{
-  width:100%;
-  min-height:62px;
-  border:0;
-  border-radius:18px;
-  background:#25343F;
-  color:#fff;
-  display:grid;
-  grid-template-columns:54px minmax(0,1fr);
-  gap:10px;
-  align-items:center;
-  padding:10px 12px;
-  text-align:right;
-}
-
-.presenterArchiveItemBtn.opened{
-  background:#A4B2C4;
-  color:#243447;
-}
-
-.presenterArchiveItemBtn.required{
-  background:#660000;
-}
-
-.presenterArchiveItemBtn.hasLabel:not(.required){
-  background:#D6C1A6;
-  color:#243447;
-}
-
-.presenterArchiveItemNo{
-  width:42px;
-  height:42px;
-  border-radius:14px;
-  background:rgba(255,255,255,.16);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.35rem;
-}
-
-.presenterArchiveItemText{
-  display:flex;
-  flex-direction:column;
-  gap:3px;
-  min-width:0;
-}
-
-.presenterArchiveItemText strong{
-  font-size:1rem;
-  line-height:1.2;
-}
-
-.presenterArchiveItemText em{
-  font-style:normal;
-  font-size:.92rem;
-  line-height:1.35;
-  opacity:.9;
-}
-
-.presenterArchiveImageTag{
-  margin-top:4px;
-  font-size:.8rem;
-  opacity:.8;
-}
-.presenterHomeTopCard{
-  background:#fff7ed;
-  border:2px solid rgba(255,155,81,.35);
-  border-radius:24px;
-  padding:16px;
-  box-shadow:0 14px 34px rgba(47,65,88,.12);
-  display:grid;
-  gap:14px;
-}
-
-.presenterHomeTitleBox{
-  background:linear-gradient(135deg,#2f4158,#1f2d3b);
-  color:white;
-  border-radius:20px;
-  padding:16px;
-}
-
-.presenterHomeKicker{
-  font-size:.9rem;
-  opacity:.75;
-}
-
-.presenterHomeModelName{
-  margin-top:6px;
-  font-size:1.35rem;
-  font-weight:900;
-}
-
-.presenterHomeModelSelect label{
-  display:block;
-  margin-bottom:8px;
-  font-weight:800;
-  color:#2f4158;
-}
-
-.presenterHomeModelSelect select{
-  width:100%;
-  height:52px;
-  border-radius:16px;
-  border:2px solid rgba(47,65,88,.16);
-  padding:0 14px;
-  font-size:1rem;
-  font-weight:800;
-}
-
-.presenterGlobalToggleBtn{
-  width:100%;
-  min-height:56px;
-  border:0;
-  border-radius:20px;
-  background:#fff7ed;
-  color:#2f4158;
-  font-size:1rem;
-  font-weight:900;
-  box-shadow:0 10px 24px rgba(47,65,88,.10);
-}
-
-.presenterGlobalToggleBtn.isHiddenMode{
-  background:#2f4158;
-  color:#fff;
-}
-/* =========================
-   PRESENTER FINAL POLISH
-========================= */
-
-.presenterPage{
-  width:min(100% - 18px, 760px) !important;
-  gap:14px !important;
-}
-
-.presenterHeader{
-  grid-template-columns:86px 1fr 86px !important;
-  border-radius:0 0 26px 26px !important;
-  background:rgba(244,247,247,.92) !important;
-  box-shadow:0 10px 28px rgba(39,48,61,.08) !important;
-}
-
-.presenterHeaderText h1{
-  font-size:2.15rem !important;
-}
-
-.presenterHeaderText p{
-  font-size:.95rem !important;
-}
-
-/* الكروت */
-.presenterSetupCard,
-.presenterCard,
-.presenterHomeTopCard{
-  border-radius:28px !important;
-  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%) !important;
-  border:1px solid rgba(217,224,224,.95) !important;
-  box-shadow:
-    0 16px 34px rgba(39,48,61,.08),
-    inset 0 1px 0 rgba(255,255,255,.95) !important;
-}
-
-/* صفحة البداية */
-.presenterHomeTopCard{
-  padding:14px !important;
-}
-
-.presenterHomeTitleBox{
-  background:
-    radial-gradient(circle at top right, rgba(255,255,255,.18), transparent 45%),
-    linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%) !important;
-  color:#2E3A4D !important;
-  border-radius:22px !important;
-  text-align:center !important;
-}
-
-.presenterHomeKicker{
-  opacity:.8 !important;
-}
-
-.presenterHomeModelName{
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:1.75rem !important;
-  font-weight:400 !important;
-}
-
-/* زر إخفاء / إظهار التحكم */
-.presenterGlobalToggleBtn{
-  color:#fff !important;
-  border-radius:999px !important;
-  height:50px !important;
-  min-height:50px !important;
-  font-size:.95rem !important;
-  box-shadow:none !important;
-}
-
-.presenterGlobalToggleBtn.presenterHideControlsMode{
-  background:linear-gradient(180deg,#FF5A66 0%,#D62828 100%) !important;
-}
-
-.presenterGlobalToggleBtn.presenterShowControlsMode{
-  background:linear-gradient(180deg,#22C55E 0%,#16A34A 100%) !important;
-}
-
-/* أزرار الفقرات */
-.presenterSegments{
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  gap:12px !important;
-}
-
-.presenterSegmentBtn{
-  min-height:106px !important;
-  border-radius:24px !important;
-  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%) !important;
-  border:1px solid rgba(217,224,224,.95) !important;
-  box-shadow:0 12px 26px rgba(39,48,61,.06) !important;
-}
-
-.presenterSegmentBtn span{
-  font-size:1.85rem !important;
-}
-
-/* أزرار الفرق */
-.presenterTeams{
-  gap:10px !important;
-}
-
-.presenterTeams .presenterBtn{
-  min-height:64px !important;
-  border-radius:22px !important;
-  font-size:1.25rem !important;
-  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%) !important;
-  color:#2E3A4D !important;
-}
-
-/* أزرار التحكم */
-.presenterActions{
-  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-  gap:10px !important;
-}
-
-.presenterBtn{
-  min-height:50px !important;
-  border-radius:16px !important;
-  font-size:.95rem !important;
-  box-shadow:0 10px 20px rgba(47,65,88,.12) !important;
-}
-
-.presenterBtn.green{
-  background:#16A34A !important;
-  color:#fff !important;
-}
-
-.presenterBtn.red{
-  background:#D62828 !important;
-  color:#fff !important;
-}
-
-.presenterBtn.gray{
-  background:#6F7A88 !important;
-  color:#fff !important;
-}
-
-.presenterBtn.dark{
-  background:#25343F !important;
-  color:#fff !important;
-}
-
-.presenterBtn.blue{
-  background:#2F6BFF !important;
-  color:#fff !important;
-}
-
-/* أرقام الأسئلة نفس طابع العرض */
-.presenterNumberBtn{
-  min-height:56px !important;
-  border-radius:18px !important;
-  background:#25343F !important;
-  color:#FFFFFF !important;
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:1.65rem !important;
-  box-shadow:
-    0 9px 16px rgba(37,52,63,.20),
-    inset 0 1px 0 rgba(255,255,255,.08) !important;
-}
-
-.presenterNumberBtn.usedPresenterNumber,
-.presenterNumberBtn.presenterOpened{
-  background:#3A4A56 !important;
-  color:transparent !important;
-  opacity:1 !important;
-}
-
-/* مربعات النص */
-.presenterQuestionText,
-.presenterAnswerText,
-.presenterNoteText,
-.presenterList{
-  border-radius:20px !important;
-  background:#FFFFFF !important;
-  border:1px solid rgba(217,224,224,.95) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.95) !important;
-}
-
-.presenterAnswerText{
-  font-size:1.65rem !important;
-  color:#2F4158 !important;
-}
-
-/* الهواتف */
-@media (max-width:430px){
-  .presenterPage{
-    width:calc(100% - 12px) !important;
-  }
-
-  .presenterSegments{
-    gap:9px !important;
-  }
-
-  .presenterSegmentBtn{
-    min-height:96px !important;
-  }
-
-  .presenterSegmentBtn span{
-    font-size:1.55rem !important;
-  }
-
-  .presenterActions{
-    gap:7px !important;
-  }
-
-  .presenterBtn{
-    font-size:.82rem !important;
-    min-height:46px !important;
+    font-size:.92rem;
   }
 }

@@ -13,86 +13,82 @@
   <div class="presenterPage">
 
     <header class="presenterHeader">
-      <button class="presenterBack hidden" id="presenterBackBtn" onclick="showPresenterHome()">رجوع</button>
+      <button
+        class="presenterBack hidden"
+        id="presenterBackBtn"
+        onclick="presenterGoHome()"
+      >
+        رجوع
+      </button>
 
       <div class="presenterHeaderText">
         <h1 id="presenterTitle">لوحة المقدم</h1>
-        <p id="presenterSubtitle">اختر النموذج وجهّز الفريقين</p>
+        <p id="presenterSubtitle">اختر الفقرة وتحكم بالعرض</p>
       </div>
 
-      <button class="presenterEnd hidden" id="presenterEndBtn" onclick="presenterEndSegment()">إنهاء</button>
+      <button
+        class="presenterEnd hidden"
+        id="presenterEndBtn"
+        onclick="sendCommand('endSegment')"
+      >
+        إنهاء
+      </button>
     </header>
 
     <main id="presenterHome" class="presenterHome">
 
       <section class="presenterSetupCard">
-        <div class="presenterSetupTitle">تجهيز اللعبة</div>
+        <div class="presenterSetupTitle">لوحة المقدم</div>
 
-        <div class="presenterField">
-          <label for="presenterModelSelect">اختيار النموذج</label>
-          <select id="presenterModelSelect" onchange="setPresenterModel()">
-            <option value="">اختر النموذج</option>
-          </select>
-        </div>
-
-        <div class="presenterSetupGrid">
-          <div class="presenterField">
-            <label for="presenterTeamAInput">اسم الفريق الأول</label>
-            <input id="presenterTeamAInput" type="text" placeholder="الفريق الأول">
-          </div>
-
-          <div class="presenterField">
-            <label for="presenterTeamBInput">اسم الفريق الثاني</label>
-            <input id="presenterTeamBInput" type="text" placeholder="الفريق الثاني">
+        <div class="presenterCard">
+          <div class="presenterLabel">الحالة</div>
+          <div class="presenterAnswerText" id="presenterConnectionStatus">
+            متصل بالعرض ✅
           </div>
         </div>
 
-        <button class="presenterStartBtn" onclick="startPresenterSetup()">بدء لوحة المقدم</button>
+        <div class="presenterTeams">
+          <button class="presenterBtn orange" id="presenterHomeTeamA">
+            الفريق الأول
+          </button>
+
+          <button class="presenterBtn orange" id="presenterHomeTeamB">
+            الفريق الثاني
+          </button>
+        </div>
+
+        <button
+          class="presenterStartBtn"
+          onclick="sendCommand('toggleDisplayControls')"
+        >
+          إظهار / إخفاء تحكم العرض
+        </button>
       </section>
 
-      <section id="presenterGameHome" class="presenterGameHome hidden">
+      <section class="presenterSegments">
+        <button onclick="openPresenterSegment('warmup')" class="presenterSegmentBtn">
+          <span>التسخين</span>
+        </button>
 
-        <section class="presenterHomeTopCard">
-          <div class="presenterHomeTitleBox">
-            <div class="presenterHomeKicker">لوحة المقدم</div>
-            <div id="presenterCurrentModelName" class="presenterHomeModelName">—</div>
-          </div>
+        <button onclick="openPresenterSegment('top10')" class="presenterSegmentBtn">
+          <span>Top 10</span>
+        </button>
 
-          <button
-            id="presenterGlobalToggleBtn"
-            class="presenterGlobalToggleBtn"
-            onclick="togglePresenterDisplayControlsBtn()"
-          >
-            👁️ إخفاء أزرار التحكم
-          </button>
-        </section>
+        <button onclick="openPresenterSegment('auction')" class="presenterSegmentBtn">
+          <span>فتبلة</span>
+        </button>
 
-        <section class="presenterSegments">
-          <button onclick="openPresenterSegment('warmup')" class="presenterSegmentBtn">
-            <span>التسخين</span>
-          </button>
+        <button onclick="openPresenterSegment('who')" class="presenterSegmentBtn">
+          <span>من هو</span>
+        </button>
 
-          <button onclick="openPresenterSegment('top10')" class="presenterSegmentBtn">
-            <span>Top 10</span>
-          </button>
+        <button onclick="openPresenterSegment('final')" class="presenterSegmentBtn">
+          <span>الفاصلة</span>
+        </button>
 
-          <button onclick="openPresenterSegment('auction')" class="presenterSegmentBtn">
-            <span>فتبلة</span>
-          </button>
-
-          <button onclick="openPresenterSegment('who')" class="presenterSegmentBtn">
-            <span>من هو</span>
-          </button>
-
-          <button onclick="openPresenterSegment('final')" class="presenterSegmentBtn">
-            <span>الفاصلة</span>
-          </button>
-
-          <button onclick="openPresenterSegment('archive')" class="presenterSegmentBtn">
-            <span>الأرشيف</span>
-          </button>
-        </section>
-
+        <button onclick="openPresenterSegment('archive')" class="presenterSegmentBtn">
+          <span>الأرشيف</span>
+        </button>
       </section>
 
     </main>

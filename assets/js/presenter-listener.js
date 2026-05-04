@@ -89,263 +89,127 @@ function handlePresenterCommand(cmd) {
 
   console.log("Handle:", segment, action, data)
 
-  if (action === "toggleDisplayControls") {
-    toggleDisplayControls()
-    return
-  }
-
-  if (action === "hideDisplayControls") {
-    hideDisplayControls()
-    return
-  }
-
-  if (action === "showDisplayControls") {
-    showDisplayControls()
-    return
-  }
-
-  if (action === "zoomImage") {
-    safeRunPresenterAction(() => zoomCurrentDisplayImage())
-    return
-  }
-
-  if (action === "closeZoomImage") {
-    safeRunPresenterAction(() => closeCurrentDisplayImageZoom())
-    return
-  }
-
-  if (action === "endSegment") {
-    safeRunPresenterAction(() => endCurrentSegment())
-    return
-  }
-
-  /* =========================
-     WARMUP
-  ========================= */
+  if (action === "toggleDisplayControls") return safeRunPresenterAction(toggleDisplayControls)
+  if (action === "hideDisplayControls") return safeRunPresenterAction(hideDisplayControls)
+  if (action === "showDisplayControls") return safeRunPresenterAction(showDisplayControls)
+  if (action === "zoomImage") return safeRunPresenterAction(() => zoomCurrentDisplayImage())
+  if (action === "closeZoomImage") return safeRunPresenterAction(() => closeCurrentDisplayImageZoom())
+  if (action === "endSegment") return safeRunPresenterAction(() => endCurrentSegment())
+  if (action === "goHome") return safeRunPresenterAction(() => goHome())
 
   if (segment === "warmup") {
-    if (action === "selectTeam") safeRunPresenterAction(() => selectWarmupTeam(data.team))
-    if (action === "openNumber") safeRunPresenterAction(() => openWarmupQuestion(Number(data.category || 1), Number(data.number)))
-    if (action === "double") safeRunPresenterAction(() => activateWarmupDouble())
-    if (action === "correct") safeRunPresenterAction(() => warmupCorrect())
-    if (action === "wrong") safeRunPresenterAction(() => warmupWrong())
-  }
-
-  /* =========================
-     AUCTION
-  ========================= */
+  if (action === "selectTeam") return safeRunPresenterAction(() => selectWarmupTeam(data.team))
+  if (action === "openNumber") return safeRunPresenterAction(() => openWarmupQuestion(Number(data.category), Number(data.number)))
+  if (action === "double") return safeRunPresenterAction(() => activateWarmupDouble())
+  if (action === "correct") return safeRunPresenterAction(() => warmupCorrect())
+  if (action === "wrong") return safeRunPresenterAction(() => warmupWrong())
+}
 
   if (segment === "auction") {
-    if (action === "selectTeam") safeRunPresenterAction(() => selectAuctionTeam(data.team))
-    if (action === "openNumber") safeRunPresenterAction(() => openAuction(Number(data.number)))
-    if (action === "double") safeRunPresenterAction(() => activateAuctionDouble())
-    if (action === "startTimer") safeRunPresenterAction(() => startAuctionTimerButton())
-    if (action === "correct") safeRunPresenterAction(() => auctionCorrect())
-    if (action === "wrong") safeRunPresenterAction(() => auctionWrong())
-    if (action === "undo") safeRunPresenterAction(() => undoAuctionAction())
-    if (action === "showAnswer") safeRunPresenterAction(() => showAuctionAnswer())
-  }
-
-  /* =========================
-     WHO
-  ========================= */
+  if (action === "selectTeam") return safeRunPresenterAction(() => selectAuctionTeam(data.team))
+  if (action === "openNumber") return safeRunPresenterAction(() => openAuction(Number(data.number)))
+  if (action === "double") return safeRunPresenterAction(() => activateAuctionDouble())
+  if (action === "correct") return safeRunPresenterAction(() => auctionCorrect())
+  if (action === "wrong") return safeRunPresenterAction(() => auctionWrong())
+  if (action === "undo") return safeRunPresenterAction(() => undoAuctionAction())
+  if (action === "zoomImage") return safeRunPresenterAction(() => zoomCurrentDisplayImage())
+}
 
   if (segment === "who") {
-    if (action === "selectTeam") safeRunPresenterAction(() => selectWhoTeam(data.team))
-    if (action === "setPoints") safeRunPresenterAction(() => setWhoPoints(Number(data.points)))
-    if (action === "openNumber") safeRunPresenterAction(() => chooseWho(Number(data.number)))
-    if (action === "double") safeRunPresenterAction(() => activateWhoDouble())
-    if (action === "correct") safeRunPresenterAction(() => whoCorrect())
-    if (action === "wrong") safeRunPresenterAction(() => whoWrong())
-    if (action === "showAnswer") safeRunPresenterAction(() => showWhoAnswer())
-  }
-
-  /* =========================
-     TOP 10
-  ========================= */
+  if (action === "selectTeam") return safeRunPresenterAction(() => selectWhoTeam(data.team))
+  if (action === "setPoints") return safeRunPresenterAction(() => setWhoPoints(Number(data.points)))
+  if (action === "openNumber") return safeRunPresenterAction(() => chooseWho(Number(data.number)))
+  if (action === "double") return safeRunPresenterAction(() => activateWhoDouble())
+  if (action === "compensation") return safeRunPresenterAction(() => startWhoCompensation())
+  if (action === "correct") return safeRunPresenterAction(() => whoCorrect())
+  if (action === "wrong") return safeRunPresenterAction(() => whoWrong())
+}
 
   if (segment === "top10") {
-    if (action === "selectTeam") safeRunPresenterAction(() => selectTop10Team(data.team))
+  if (action === "selectTeam") return safeRunPresenterAction(() => selectTop10Team(data.team))
+  if (action === "openNumber") return safeRunPresenterAction(() => openTop10Number(Number(data.number)))
+  if (action === "double") return safeRunPresenterAction(() => activateTop10Double())
+  if (action === "showAnswer") return safeRunPresenterAction(() => showTop10Answer())
+  if (action === "wrong") return safeRunPresenterAction(() => addTop10Error())
+  if (action === "undo") return safeRunPresenterAction(() => undoTop10Action())
+  if (action === "switchTurn") return safeRunPresenterAction(() => switchTop10Turn())
+  if (action === "nextRound") return safeRunPresenterAction(() => nextTop10Round())
+}
+
+  if (segment === "final") {
+    if (action === "selectTeam") return safeRunPresenterAction(() => selectFinalTeam(data.team))
+
+    if (action === "setRound") {
+  return safeRunPresenterAction(() => {
+    const round = Number(data.round || 1)
+    if (round !== finalState.round) goToFinalRound(round)
+  })
+}
 
     if (action === "openNumber") {
-      safeRunPresenterAction(() => {
-        if (data.round && top10State.round !== Number(data.round)) {
-          top10State.round = Number(data.round)
-          renderCurrentRoundTop10UI()
-          saveTop10State()
+      return safeRunPresenterAction(() => {
+        const round = Number(data.round || finalState.round || 1)
+
+        if (round !== finalState.round) {
+          goToFinalRound(round)
         }
 
         setTimeout(() => {
-          openTop10Number(Number(data.number))
-        }, 150)
+          if (round === 1) openFinalRound1Card(Number(data.number))
+          if (round === 2) openFinalRound2Card(Number(data.number))
+          if (round === 3) openFinalRound3Card(Number(data.number))
+        }, 120)
       })
     }
 
-    if (action === "startTimer") safeRunPresenterAction(() => startTop10TimerButton())
-if (action === "undo") safeRunPresenterAction(() => undoTop10Action())
-if (action === "switchTurn") safeRunPresenterAction(() => switchTop10Turn())
-if (action === "nextRound") safeRunPresenterAction(() => nextTop10Round())
-if (action === "double") safeRunPresenterAction(() => activateTop10Double())
-if (action === "showAnswer") safeRunPresenterAction(() => showTop10Answer())
-if (action === "wrong") safeRunPresenterAction(() => addTop10Error())
-  }
-
-  /* =========================
-     FINAL
-  ========================= */
-
-if (segment === "final") {
-  if (action === "selectTeam") {
-    safeRunPresenterAction(() => selectFinalTeam(data.team))
-    return
-  }
-
-  if (action === "openNumber") {
-    safeRunPresenterAction(() => {
-      if (data.round && data.round !== finalState.round) {
-        goToFinalRound(Number(data.round))
-      }
-
-      if (Number(data.round) === 1) openFinalRound1Card(Number(data.number))
-      if (Number(data.round) === 2) openFinalRound2Card(Number(data.number))
-      if (Number(data.round) === 3) openFinalRound3Card(Number(data.number))
-    })
-    return
-  }
-
-  if (action === "double") {
-    safeRunPresenterAction(() => activateFinalDouble())
-    return
-  }
-
-  if (action === "showQuestion") {
-    safeRunPresenterAction(() => showFinalRound1Question())
-    return
-  }
-
-  if (action === "showAnswer") {
-    safeRunPresenterAction(() => {
-      if (finalState.round === 1) showFinalRound1Answer()
-      if (finalState.round === 2) showFinalRound2Answer()
-      if (finalState.round === 3) showFinalRound3Answer()
-    })
-    return
-  }
-
-  if (action === "correct") {
-    safeRunPresenterAction(() => {
-      if (finalState.round === 1) finalRound1Correct()
-    })
-    return
-  }
-
-  if (action === "wrong") {
-    safeRunPresenterAction(() => {
-      if (finalState.round === 1) finalRound1Wrong()
-    })
-    return
-  }
-
-  if (action === "decreaseCountdown") {
-    safeRunPresenterAction(() => finalRound2DecreaseCountdown())
-    return
-  }
-
-  if (action === "recordScrambleScore") {
-    safeRunPresenterAction(() => finalRound2RecordScore())
-    return
-  }
-
-  if (action === "recordSequenceScore") {
-    safeRunPresenterAction(() => finalRound2RecordSequenceScore())
-    return
-  }
-
-  if (action === "startSequence") {
-    safeRunPresenterAction(() => startFinalRound3Sequence())
-    return
-  }
-
-  if (action === "recordRound3Score") {
-    safeRunPresenterAction(() => finalRound3RecordScore())
-    return
-  }
-
-  if (action === "undo") {
-    safeRunPresenterAction(() => undoFinalAction())
-    return
-  }
-
-  if (action === "nextRound") {
-    safeRunPresenterAction(() => goToFinalRound(Number(finalState.round) + 1))
-    return
-  }
-}
-  /* =========================
-     ARCHIVE
-  ========================= */
-
-  if (segment === "archive") {
-    if (action === "selectTeam") {
-      safeRunPresenterAction(() => selectArchiveTeam(data.team))
-      return
-    }
-
-    if (action === "setRound") {
-      safeRunPresenterAction(() => {
-        if (Number(data.round) !== archiveState.round) {
-          archiveState.round = Number(data.round)
-          archiveState.activeTeam = null
-          renderArchiveRoundUI()
-        }
-      })
-      return
-    }
-
-    if (action === "openNumber") {
-      safeRunPresenterAction(() => {
-        if (Number(data.round) !== archiveState.round) {
-          archiveState.round = Number(data.round)
-          archiveState.activeTeam = null
-          renderArchiveRoundUI()
-        }
-
-        toggleArchiveItem(Number(data.number))
-      })
-      return
-    }
-
-    if (action === "double") {
-      safeRunPresenterAction(() => activateArchiveDouble())
-      return
-    }
-
-    if (action === "startTimer") {
-      safeRunPresenterAction(() => startArchiveTimer())
-      return
-    }
+    if (action === "double") return safeRunPresenterAction(() => activateFinalDouble())
+    if (action === "showQuestion") return safeRunPresenterAction(() => showFinalRound1Question())
 
     if (action === "showAnswer") {
-      safeRunPresenterAction(() => showArchiveAnswer())
-      return
+      return safeRunPresenterAction(() => {
+        if (finalState.round === 1) showFinalRound1Answer()
+        if (finalState.round === 2) showFinalRound2Answer()
+        if (finalState.round === 3) showFinalRound3Answer()
+      })
+    }
+
+    if (action === "correct") {
+      return safeRunPresenterAction(() => {
+        if (finalState.round === 1) finalRound1Correct()
+      })
     }
 
     if (action === "wrong") {
-      safeRunPresenterAction(() => addArchiveError())
-      return
+      return safeRunPresenterAction(() => {
+        if (finalState.round === 1) finalRound1Wrong()
+      })
     }
 
-    if (action === "undo") {
-      safeRunPresenterAction(() => undoArchiveAction())
-      return
-    }
-
-    if (action === "nextRound") {
-      safeRunPresenterAction(() => nextArchiveRound())
-      return
-    }
+    if (action === "decreaseCountdown") return safeRunPresenterAction(() => finalRound2DecreaseCountdown())
+    if (action === "recordScrambleScore") return safeRunPresenterAction(() => finalRound2RecordScore())
+    if (action === "recordSequenceScore") return safeRunPresenterAction(() => finalRound2RecordSequenceScore())
+    if (action === "startSequence") return safeRunPresenterAction(() => startFinalRound3Sequence())
+    if (action === "recordRound3Score") return safeRunPresenterAction(() => finalRound3RecordScore())
+    if (action === "undo") return safeRunPresenterAction(() => undoFinalAction())
+    if (action === "nextRound") return safeRunPresenterAction(() => goToFinalRound(Number(finalState.round) + 1))
   }
+
+  if (segment === "archive") {
+  if (action === "selectTeam") return safeRunPresenterAction(() => selectArchiveTeam(data.team))
+
+  if (action === "openNumber") {
+    return safeRunPresenterAction(() => toggleArchiveItem(Number(data.number)))
+  }
+
+  if (action === "double") return safeRunPresenterAction(() => activateArchiveDouble())
+  if (action === "startTimer") return safeRunPresenterAction(() => startArchiveTimer())
+  if (action === "showAnswer") return safeRunPresenterAction(() => showArchiveAnswer())
+  if (action === "wrong") return safeRunPresenterAction(() => addArchiveError())
+  if (action === "undo") return safeRunPresenterAction(() => undoArchiveAction())
+  if (action === "nextRound") return safeRunPresenterAction(() => nextArchiveRound())
 }
+}
+
 
 window.addEventListener("load", () => {
   restoreDisplayControlsMode()
