@@ -27,12 +27,14 @@ async function loadPresenterSession() {
     .from("game_sessions")
     .select("*")
     .eq("id", GAME_SESSION_ID)
-    .single()
+    .maybeSingle()
 
   if (error) {
     console.log(error)
     return null
   }
+
+  if (!data) return null
 
   presenterSession = data
   return data
@@ -171,4 +173,40 @@ function renderBasicScreen(title) {
       </div>
     </div>
   `
+}
+function startPresenterSetup() {
+  showToast("صفحة المقدم مرتبطة بالعرض")
+}
+
+function showPresenterHome() {
+  presenterSegment = null
+  updatePresenterUI()
+}
+
+function presenterEndSegment() {
+  showToast("الإنهاء يتم من صفحة العرض الآن")
+}
+
+function setPresenterModel() {
+  showToast("النموذج يقرأ من العرض")
+}
+
+function togglePresenterDisplayControlsBtn() {
+  showToast("بنربط زر التحكم لاحقًا")
+}
+
+function openPresenterSegment(segment) {
+  showToast("افتح الفقرة من صفحة العرض")
+}
+
+function showToast(text = "تم") {
+  const toast = document.getElementById("presenterToast")
+  if (!toast) return
+
+  toast.innerText = text
+  toast.classList.add("show")
+
+  setTimeout(() => {
+    toast.classList.remove("show")
+  }, 1200)
 }
