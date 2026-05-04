@@ -52,12 +52,48 @@ function loadSegmentStatus() {
 function saveSegmentStatus() {
   try {
     localStorage.setItem(SEGMENT_STATUS_KEY, JSON.stringify(segmentStatus))
+    syncDisplayStateToSession()
   } catch (e) {
     console.log("segment status save error:", e)
   }
 }
 
 let segmentStatus = loadSegmentStatus()
+const GAME_SESSION_ID = "main_game"
+
+function getSafeJson(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "null")
+  } catch {
+    return null
+  }
+}
+
+async function syncDisplayStateToSession() {
+  try {
+    const state = {
+      segmentStatus: getSafeJson("segment_status_v1"),
+      warmup: getSafeJson("warmup_state_v1"),
+      top10: getSafeJson("top10_state_v1"),
+      auction: getSafeJson("auction_state_v2"),
+      who: getSafeJson("who_state_v1"),
+      final: getSafeJson("final_state_v3"),
+      archive: getSafeJson("archive_state_v1")
+    }
+
+    await db.from("game_sessions").upsert({
+      id: GAME_SESSION_ID,
+      model: Number(localStorage.getItem("game_model") || currentModel || 1),
+      team_a: localStorage.getItem("teamAName") || teamAName,
+      team_b: localStorage.getItem("teamBName") || teamBName,
+      active_segment: localStorage.getItem("active_segment") || null,
+      state,
+      updated_at: new Date().toISOString()
+    })
+  } catch (e) {
+    console.log("sync session error:", e)
+  }
+}
 /* =========================
    Winner Sound + Effects
 ========================= */
@@ -432,7 +468,7 @@ document.addEventListener("DOMContentLoaded", () => {
   segmentStatus = loadSegmentStatus()
   updateSegmentCards()
 
-  localStorage.removeItem("active_segment")
+  
 
   renderMainHome(true)
 })
@@ -593,7 +629,7 @@ localStorage.removeItem("archive_state_v1")
 
   const overlay = document.getElementById("winnerOverlay")
   if (overlay) overlay.classList.add("hidden")
-
+   syncDisplayStateToSession()
   window.location.href = "intro.html"
 }
 
@@ -639,6 +675,8 @@ function openSegmentPage(segmentKey) {
   if (segmentStatus[segmentKey]?.locked) return
 
   homeRefreshLocked = true
+  localStorage.setItem("active_segment", segmentKey)
+  syncDisplayStateToSession()
 
   const homeScreen = getFirstElement(["homeScreen", "homePage"])
   const segmentScreen = getFirstElement(["segmentScreen"])
@@ -678,14 +716,17 @@ function openSegment(title, content) {
     </div>
   `
 
-  updateEndRoundButtonState()
-  startEndButtonWatcher()
+  syncDisplayStateToSession()
+updateEndRoundButtonState()
+startEndButtonWatcher()
 }
 
 function goHome() {
   clearInterval(timer)
   timer = null
   window.currentSegmentScores = null
+  localStorage.removeItem("active_segment")
+syncDisplayStateToSession()
   homeRefreshLocked = false
 
   stopEndButtonWatcher()
