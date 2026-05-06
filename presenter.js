@@ -28,10 +28,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     .eq("id", savedSessionId)
     .maybeSingle()
 
-  if (error || !data) {
-    showPresenterJoin()
-    return
-  }
+if (error || !data) {
+  localStorage.removeItem("presenter_session_id")
+  localStorage.removeItem("presenter_join_code")
+  showPresenterJoin()
+  return
+}
 
   if (data.status === "ended") {
     renderPresenterEnded()
