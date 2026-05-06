@@ -275,15 +275,11 @@ function renderPresenterHome() {
 
 if (title) title.innerText = "لوحة المقدم"
 
-const modelName =
-  presenterLiveState?.currentModelName ||
-  presenterLiveState?.modelName ||
-  presenterLiveState?.mainScores?.modelName ||
-  ""
+const modelName = presenterLiveState?.currentModelName || ""
 
 if (subtitle) {
   subtitle.innerHTML = presenterSessionId
-    ? `<span class="presenterOnlineDot">✅</span><span class="presenterModelName">${modelName || "نموذج اللعبة"}</span>`
+    ? `<span class="presenterOnlineDot">✅</span><span class="presenterModelName">${modelName || "بدون اسم نموذج"}</span>`
     : `<span class="presenterOfflineDot">❌</span><span class="presenterModelName">غير متصل</span>`
 }
 
