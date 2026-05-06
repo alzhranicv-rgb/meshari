@@ -74,12 +74,15 @@ async function syncDisplayStateToSession() {
     const sessionId = localStorage.getItem("game_session_id")
     if (!sessionId) return
 
-const state = {
-  mainScores: {
-    A: Number(localStorage.getItem("main_score_a") || scoreA || 0),
-    B: Number(localStorage.getItem("main_score_b") || scoreB || 0)
-  },
-  currentModelName: localStorage.getItem("game_model_name") || currentModelName || "",
+    currentModelName = localStorage.getItem("game_model_name") || currentModelName || ""
+    window.currentModelName = currentModelName
+
+    const state = {
+      mainScores: {
+        A: Number(localStorage.getItem("main_score_a") || scoreA || 0),
+        B: Number(localStorage.getItem("main_score_b") || scoreB || 0)
+      },
+      currentModelName: localStorage.getItem("game_model_name") || currentModelName || "",
   displayControlsHidden: localStorage.getItem("presenter_hide_controls") === "1",
   segmentStatus: getSafeJson("segment_status_v1"),
   warmup: getSafeJson("warmup_state_v1"),
