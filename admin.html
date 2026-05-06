@@ -13,7 +13,29 @@
 </head>
 <body>
 
-  <div class="adminShellNew">
+  <div id="adminPinScreen" class="adminPinScreen">
+    <div class="adminPinCard">
+      <div class="adminPinLogo">لوحة الأسئلة</div>
+<div class="adminPinTitle">الحنكة</div>
+<div class="adminPinSub">أدخل الرقم السري للمتابعة</div>
+
+      <input
+  id="adminPinInput"
+  class="adminPinInput"
+  type="tel"
+  inputmode="numeric"
+  pattern="[0-9]*"
+  maxlength="6"
+  autocomplete="one-time-code"
+  placeholder="••••"
+/>
+
+      <button class="adminPinBtn" onclick="checkAdminPinFromInput()">دخول</button>
+      <div id="adminPinError" class="adminPinError"></div>
+    </div>
+  </div>
+
+  <div class="adminShellNew hidden" id="adminShellNew">
 
     <aside class="adminSidebarNew">
       <div class="adminBrandBox">
@@ -23,8 +45,6 @@
       </div>
 
       <div class="adminSideCard">
-        
-
         <div class="adminField">
           <label for="modelName">اسم النموذج الجديد</label>
           <input id="modelName" class="adminInput" type="text" placeholder="اكتب اسم النموذج">
@@ -42,6 +62,7 @@
           <button class="adminBtn adminBtnDark" onclick="openSelectedModel()">فتح النموذج</button>
           <button class="adminBtn adminBtnLight" onclick="renameSelectedModel()">تعديل الاسم</button>
           <button class="adminBtn adminBtnDanger" onclick="deleteSelectedModel()">حذف النموذج</button>
+          <button class="adminBtn adminLogoutBtn" onclick="logoutAdminPin()">خروج </button>
         </div>
       </div>
     </aside>
@@ -71,6 +92,57 @@
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <script>
+    const ADMIN_PIN = "9900"
+
+    function unlockAdminPanel() {
+      document.getElementById("adminPinScreen")?.classList.add("hidden")
+      document.getElementById("adminShellNew")?.classList.remove("hidden")
+    }
+
+    function checkAdminPinFromInput() {
+      const input = document.getElementById("adminPinInput")
+      const error = document.getElementById("adminPinError")
+      const pin = (input?.value || "").trim()
+
+      if (pin === ADMIN_PIN) {
+        localStorage.setItem("admin_pin_ok", "1")
+        unlockAdminPanel()
+        return true
+      }
+
+      if (error) error.innerText = "الرقم السري غير صحيح"
+
+      if (input) {
+        input.value = ""
+        input.focus()
+      }
+
+      return false
+    }
+
+    function logoutAdminPin() {
+      localStorage.removeItem("admin_pin_ok")
+      location.reload()
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("admin_pin_ok") === "1") {
+        unlockAdminPanel()
+        return
+      }
+
+      const input = document.getElementById("adminPinInput")
+      if (input) {
+        input.focus()
+        input.addEventListener("keydown", e => {
+          if (e.key === "Enter") checkAdminPinFromInput()
+        })
+      }
+    })
+  </script>
+
   <script src="admin.js"></script>
 </body>
 </html>

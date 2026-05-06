@@ -2040,3 +2040,186 @@ button:hover,
     gap:8px !important;
   }
 }
+
+/* =========================
+   ADMIN PIN PAGE - INTRO STYLE
+========================= */
+
+.adminPinScreen{
+  min-height:100dvh;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  box-sizing:border-box;
+  background:
+    radial-gradient(circle at 85% 12%, rgba(255,155,81,.18), transparent 26%),
+    radial-gradient(circle at 12% 88%, rgba(47,65,88,.08), transparent 28%),
+    linear-gradient(180deg,#F4F7F7 0%,#EAEFEF 100%);
+  overflow:hidden;
+}
+
+.adminPinCard{
+  width:min(100%,520px);
+  border-radius:34px;
+  padding:28px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F7FAFA 100%);
+  border:1px solid rgba(217,224,224,.95);
+  box-shadow:
+    0 24px 60px rgba(39,48,61,.12),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  position:relative;
+  overflow:hidden;
+  text-align:center;
+}
+
+.adminPinCard::before{
+  content:"";
+  position:absolute;
+  width:210px;
+  height:210px;
+  top:-90px;
+  right:-70px;
+  border-radius:50%;
+  background:rgba(255,155,81,.12);
+}
+
+.adminPinCard::after{
+  content:"";
+  position:absolute;
+  width:130px;
+  height:130px;
+  bottom:-55px;
+  left:-35px;
+  border-radius:30px;
+  transform:rotate(24deg);
+  background:rgba(47,65,88,.05);
+}
+
+.adminPinLogo,
+.adminPinTitle,
+.adminPinSub,
+.adminPinInput,
+.adminPinBtn,
+.adminPinError{
+  position:relative;
+  z-index:2;
+}
+
+.adminPinLogo{
+  width:max-content;
+  margin:0 auto 10px;
+  min-height:34px;
+  padding:7px 18px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  color:#7A4A22;
+  font-family:"HanakaText",sans-serif;
+  font-size:.95rem;
+  box-shadow:0 10px 18px rgba(255,155,81,.18);
+}
+
+.adminPinTitle{
+  margin:0;
+  color:#243447;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(3.2rem,7vw,5rem);
+  line-height:.95;
+  font-weight:400;
+  text-shadow:0 8px 20px rgba(47,65,88,.10);
+}
+
+.adminPinTitle::after{
+  content:"";
+  display:block;
+  width:120px;
+  height:5px;
+  margin:13px auto 10px;
+  border-radius:999px;
+  background:linear-gradient(90deg,transparent,#FF9B51,transparent);
+}
+
+.adminPinSub{
+  margin:0 0 16px;
+  color:#5E6A76;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.05rem;
+  line-height:1.6;
+}
+
+.adminPinInput{
+  width:100%;
+  height:58px;
+  border-radius:20px;
+  border:1px solid rgba(217,224,224,.95);
+  outline:none;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F6F9F9 100%);
+  color:#243447;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.45rem;
+  text-align:center;
+  letter-spacing:8px;
+  padding:0 18px;
+  box-sizing:border-box;
+  box-shadow:
+    inset 0 1px 3px rgba(255,255,255,.95),
+    0 8px 18px rgba(39,48,61,.04);
+}
+
+.adminPinInput:focus{
+  border-color:rgba(255,155,81,.85);
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.12),
+    0 10px 20px rgba(39,48,61,.06);
+}
+
+.adminPinBtn{
+  width:100%;
+  height:58px;
+  margin-top:12px;
+  border:0;
+  border-radius:20px;
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  color:#FFFFFF;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.12rem;
+  cursor:pointer;
+  box-shadow:
+    0 16px 30px rgba(255,155,81,.24),
+    inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+.adminPinBtn:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.03);
+}
+
+.adminPinError{
+  min-height:22px;
+  margin-top:12px;
+  color:#A93F3F;
+  font-size:.92rem;
+}
+
+/* iPhone */
+@media (max-width:760px){
+  .adminPinScreen{
+    padding:12px;
+  }
+
+  .adminPinCard{
+    padding:20px 14px 16px;
+    border-radius:24px;
+  }
+
+  .adminPinTitle{
+    font-size:3rem;
+  }
+
+  .adminPinInput,
+  .adminPinBtn{
+    height:54px;
+    border-radius:18px;
+  }
+}

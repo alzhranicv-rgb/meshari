@@ -273,8 +273,19 @@ function renderPresenterHome() {
 
   
 
-  if (title) title.innerText = "لوحة المقدم"
-  if (subtitle) subtitle.innerText = presenterSessionId ? "متصل بالعرض ✅" : "غير متصل"
+if (title) title.innerText = "لوحة المقدم"
+
+const modelName =
+  presenterLiveState?.currentModelName ||
+  presenterLiveState?.modelName ||
+  presenterLiveState?.mainScores?.modelName ||
+  ""
+
+if (subtitle) {
+  subtitle.innerHTML = presenterSessionId
+    ? `<span class="presenterOnlineDot">✅</span><span class="presenterModelName">${modelName || "نموذج اللعبة"}</span>`
+    : `<span class="presenterOfflineDot">❌</span><span class="presenterModelName">غير متصل</span>`
+}
 
   const panel = document.getElementById("presenterPanel")
   if (panel) panel.dataset.segment = ""
@@ -301,7 +312,7 @@ function openPresenterSegmentFromSync(segment) {
   const subtitle = document.getElementById("presenterSegmentSubtitle")
 
   if (title) title.innerText = getPresenterSegmentName(segment)
-  if (subtitle) subtitle.innerText = "تحكم مباشر بالعرض"
+  
 
   const panel = document.getElementById("presenterPanel")
   const currentRendered = panel?.dataset.segment

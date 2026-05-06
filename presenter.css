@@ -247,42 +247,66 @@
 /* صفحة الفقرة */
 
 .presenterSegmentTopBoard{
+  width:100% !important;
   display:grid !important;
-  grid-template-columns:62px 1fr 62px !important;
+  grid-template-columns:64px minmax(0,1fr) 64px !important;
   gap:8px !important;
   align-items:center !important;
-  margin-top:6px !important;
+  margin:6px 0 8px !important;
+  padding:0 !important;
+  box-sizing:border-box !important;
 }
 
 .presenterSegmentTitleBox{
-  min-height:78px !important;
-  padding:6px 6px 2px !important;
-  border-radius:24px !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:76px !important;
+  padding:8px 6px 6px !important;
+  border-radius:22px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-sizing:border-box !important;
 }
 
 .presenterSegmentTitleBox h1{
-  font-size:2.05rem !important;
-  line-height:1 !important;
+  width:100% !important;
   margin:0 !important;
+  color:#243447 !important;
+  font-size:clamp(1.65rem, 7vw, 2.25rem) !important;
+  line-height:1 !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
 }
 
 .presenterSegmentTitleBox .modelNameDisplay{
-  font-size:.78rem !important;
+  width:100% !important;
   margin-top:4px !important;
-  min-height:14px !important;
+  font-size:.78rem !important;
+  line-height:1.2 !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
 }
 
 .presenterBackBtn,
 .presenterEndBtn{
-  width:62px !important;
+  width:64px !important;
+  height:44px !important;
   min-width:0 !important;
-  height:42px !important;
+  padding:0 !important;
   border:0 !important;
-  border-radius:14px !important;
+  border-radius:15px !important;
   color:#fff !important;
   font-size:.82rem !important;
-  padding:0 !important;
-  box-shadow:0 8px 16px rgba(47,65,88,.13) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-sizing:border-box !important;
 }
 
 .presenterBackBtn{
@@ -292,12 +316,35 @@
 .presenterEndBtn{
   background:#660000 !important;
 }
+.presenterSegmentTitleBox{
+  width:100% !important;
+  min-width:0 !important;
+  min-height:82px !important;
+  padding:10px 12px !important;
+  border-radius:24px !important;
 
-.presenterPanel{
-  width:100%;
-  margin-top:6px;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  overflow:hidden !important;
+  box-sizing:border-box !important;
 }
 
+.presenterSegmentTitleBox h1{
+  margin:0 !important;
+  width:100% !important;
+
+  color:#243447 !important;
+  font-size:clamp(1.7rem, 6vw, 2.5rem) !important;
+  line-height:1.1 !important;
+  text-align:center !important;
+
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:unset !important;
+  word-break:break-word !important;
+}
 /* التوست */
 
 #presenterToast{
@@ -354,7 +401,17 @@
   text-align:center !important;
   white-space:normal !important;
 }
+#presenterSubtitle{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+}
 
+.presenterModelName{
+  font-size:.95rem;
+  color:#2F4158;
+}
 /* تحسينات صغيرة للآيفون الصغير */
 
 @media (max-width:380px){
