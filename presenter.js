@@ -623,6 +623,13 @@ function openWarmupPresenterQuestion(category, number) {
 
   presenterWarmupSelected = { category, number }
 
+  const btn = event?.currentTarget
+  if (btn) {
+    btn.disabled = true
+    btn.classList.add("presenterOpened", "selectedPresenterTeam")
+    btn.innerText = ""
+  }
+
   showPresenterWarmupPreview(category, number)
   sendCommand("openNumber", { category, number })
 }
