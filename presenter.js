@@ -15,6 +15,13 @@ let lastPresenterToastTime = 0
 let presenterSyncTimer = null
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const urlParams = new URLSearchParams(window.location.search)
+
+  if (urlParams.get("join") === "1") {
+    localStorage.removeItem("presenter_session_id")
+    localStorage.removeItem("presenter_join_code")
+  }
+
   const savedSessionId = localStorage.getItem("presenter_session_id")
 
   if (!savedSessionId) {
@@ -28,12 +35,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     .eq("id", savedSessionId)
     .maybeSingle()
 
-if (error || !data) {
-  localStorage.removeItem("presenter_session_id")
-  localStorage.removeItem("presenter_join_code")
-  showPresenterJoin()
-  return
-}
+  if (error || !data) {
+    localStorage.removeItem("presenter_session_id")
+    localStorage.removeItem("presenter_join_code")
+    showPresenterJoin()
+    return
+  }
 
   if (data.status === "ended") {
     renderPresenterEnded()
@@ -43,7 +50,6 @@ if (error || !data) {
   applyPresenterSessionData(data)
   subscribeToGameSession(data.id)
 })
-
 /* =========================
    PAGE MODE
 ========================= */

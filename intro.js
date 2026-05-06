@@ -258,7 +258,7 @@ openPresenterIntroModal()
   
 }
 function getPresenterIntroUrl() {
-  return new URL("presenter.html", window.location.href).href
+  return new URL("presenter.html?join=1", window.location.href).href
 }
 
 function openPresenterIntroModal() {
