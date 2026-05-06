@@ -1607,40 +1607,63 @@
 }
 
 
-.presenterSegmentTopBoard{
+.presenterCleanHeader{
+  width:100% !important;
   display:grid !important;
-  grid-template-columns:74px 1fr 74px !important;
+  grid-template-columns:76px minmax(0,1fr) 76px !important;
   gap:8px !important;
   align-items:center !important;
-  margin-top:8px !important;
+  margin:8px 0 10px !important;
+  padding:0 !important;
+  box-sizing:border-box !important;
+  direction:rtl !important;
 }
 
-.presenterSegmentTitleBox{
-  min-height:92px !important;
-  padding:4px 4px 0 !important;
-}
-
-.presenterSegmentTitleBox h1{
-  font-size:2.45rem !important;
-  line-height:.95 !important;
-}
-
-.presenterBackBtn,
-.presenterEndBtn{
-  width:74px !important;
+.presenterCleanHeaderTitle{
   min-width:0 !important;
-  height:44px !important;
+  height:82px !important;
+  border-radius:24px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F7FAFA 100%) !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  box-shadow:0 12px 26px rgba(47,65,88,.08) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  overflow:hidden !important;
+}
+
+.presenterCleanHeaderTitle h1{
+  margin:0 !important;
+  padding:0 8px !important;
+  width:100% !important;
+  color:#243447 !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.8rem, 7vw, 2.6rem) !important;
+  line-height:1.05 !important;
+  text-align:center !important;
+  white-space:normal !important;
+  word-break:normal !important;
+}
+
+.presenterCleanHeaderBtn{
+  width:76px !important;
+  height:46px !important;
   border:0 !important;
-  border-radius:15px !important;
+  border-radius:16px !important;
   color:#fff !important;
+  font-family:"HanakaText",sans-serif !important;
   font-size:.92rem !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:0 !important;
   box-shadow:0 8px 18px rgba(47,65,88,.13) !important;
 }
 
-.presenterBackBtn{
+.presenterCleanBackBtn{
   background:#166866 !important;
 }
 
-.presenterEndBtn{
+.presenterCleanEndBtn{
   background:#660000 !important;
 }

@@ -113,29 +113,29 @@
 
   <div id="presenterSegmentPage" class="homePageShell presenterSegmentPage hidden">
 
-    <div class="presenterSegmentTopBoard">
+<div class="presenterCleanHeader">
 
-      <button
-        class="displayControlsEyeBtn presenterBackBtn"
-        id="presenterBackBtn"
-        onclick="presenterGoHome()"
-      >
-        رجوع
-      </button>
+  <button
+    class="presenterCleanHeaderBtn presenterCleanBackBtn"
+    id="presenterBackBtn"
+    onclick="presenterGoHome()"
+  >
+    رجوع
+  </button>
 
-      <div class="titleBox presenterSegmentTitleBox">
-  <h1 id="presenterSegmentTitle">الفقرة</h1>
+  <div class="presenterCleanHeaderTitle">
+    <h1 id="presenterSegmentTitle">الفقرة</h1>
+  </div>
+
+  <button
+    class="presenterCleanHeaderBtn presenterCleanEndBtn"
+    id="presenterEndBtn"
+    onclick="sendCommand('endSegment')"
+  >
+    إنهاء
+  </button>
+
 </div>
-
-      <button
-        class="displayControlsEyeBtn presenterEndBtn"
-        id="presenterEndBtn"
-        onclick="sendCommand('endSegment')"
-      >
-        إنهاء
-      </button>
-
-    </div>
 
     <div id="presenterPanel" class="presenterPanel"></div>
 
