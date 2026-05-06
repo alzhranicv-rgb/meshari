@@ -310,7 +310,14 @@ if (currentRendered === segment) {
   if (segment === "final") {
     presenterFinalRound = getPresenterFinalRound()
     renderPresenterFinalRoundContent()
+    return
   }
+
+  if (segment === "top10") {
+    renderTop10()
+    return
+  }
+
   return
 }
 
