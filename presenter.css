@@ -589,7 +589,58 @@
 .presenterAnswerBody{
   background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
 }
+/* =========================
+   FIX PRESENTER TOP HEADER
+========================= */
 
+.presenterSegmentTopBoard{
+  display:grid !important;
+  grid-template-columns:72px minmax(0,1fr) 72px !important;
+  align-items:center !important;
+  gap:10px !important;
+  width:100% !important;
+  padding:10px 12px !important;
+  border-radius:30px !important;
+  box-sizing:border-box !important;
+}
+
+.presenterSegmentTitleBox{
+  width:100% !important;
+  min-width:0 !important;
+  min-height:72px !important;
+  height:72px !important;
+  padding:8px 10px !important;
+  border-radius:22px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+}
+
+.presenterSegmentTitleBox h1{
+  margin:0 !important;
+  width:100% !important;
+
+  font-size:1.7rem !important;
+  line-height:1.05 !important;
+
+  text-align:center !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+.presenterBackBtn,
+.presenterEndBtn{
+  width:72px !important;
+  height:46px !important;
+  min-width:72px !important;
+  border-radius:16px !important;
+  font-size:.95rem !important;
+}
 /* =========================
    PRESENTER WARMUP
 ========================= */
