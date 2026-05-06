@@ -191,9 +191,12 @@ function resetGameStateBeforeStart() {
 
   localStorage.setItem("main_score_a", 0)
   localStorage.setItem("main_score_b", 0)
+  localStorage.removeItem("game_session_id")
+  localStorage.removeItem("game_join_code")
+  
 }
 
-window.startGameFromIntro = function () {
+window.startGameFromIntro = async function () {
   const teamAInput = document.getElementById("teamANameInput")
   const teamBInput = document.getElementById("teamBNameInput")
   const modelSelect = document.getElementById("introModelSelect")
@@ -213,6 +216,36 @@ window.startGameFromIntro = function () {
   localStorage.setItem("teamBName", teamB)
   localStorage.setItem("game_model", model)
   localStorage.setItem("game_model_name", modelText)
+  const gameSessionId = "game_" + Date.now()
+const joinCode = String(Math.floor(1000 + Math.random() * 9000))
+
+localStorage.setItem("game_session_id", gameSessionId)
+localStorage.setItem("game_join_code", joinCode)
+
+const { error } = await db.from("game_sessions").upsert({
+  id: gameSessionId,
+  join_code: joinCode,
+  status: "active",
+  model: Number(model),
+  team_a: teamA,
+  team_b: teamB,
+  active_segment: null,
+  state: {},
+  updated_at: new Date().toISOString()
+})
+
+if (error) {
+  console.log(error)
+  showGameToast("تعذر إنشاء جلسة المقدم")
+  if (startBtn) {
+    startBtn.disabled = false
+    startBtn.textContent = "ابدأ اللعبة"
+  }
+  return
+}
+
+localStorage.setItem("presenter_join_code_temp", joinCode)
+openPresenterIntroModal()
 
   localStorage.setItem("main_score_a", 0)
   localStorage.setItem("main_score_b", 0)
@@ -222,15 +255,7 @@ window.startGameFromIntro = function () {
     startBtn.textContent = "جارٍ البدء..."
   }
 
-  document.body.classList.add("softExit")
-
-  if (introCard) {
-    introCard.classList.add("softExit")
-  }
-
-  setTimeout(() => {
-    window.location.href = "display.html"
-  }, 230)
+  
 }
 function getPresenterIntroUrl() {
   return new URL("presenter.html", window.location.href).href
@@ -240,12 +265,15 @@ function openPresenterIntroModal() {
   const modal = document.getElementById("presenterIntroModal")
   const qr = document.getElementById("presenterIntroQr")
   const linkBox = document.getElementById("presenterIntroLink")
+  const codeBox = document.getElementById("presenterIntroCode")
 
+  const joinCode = localStorage.getItem("game_join_code") || ""
   const url = getPresenterIntroUrl()
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=${encodeURIComponent(url)}`
 
   if (qr) qr.src = qrUrl
   if (linkBox) linkBox.innerText = url
+  if (codeBox) codeBox.innerText = joinCode
   if (modal) modal.classList.remove("hidden")
 }
 
@@ -264,4 +292,7 @@ async function copyPresenterIntroLink() {
   } catch (e) {
     console.log(e)
   }
+}
+function goToDisplayFromIntro() {
+  window.location.href = "display.html"
 }

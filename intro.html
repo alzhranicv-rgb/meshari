@@ -20,79 +20,83 @@
         <div class="introBadge">يلا بينا</div>
         <h1 class="introTitle">الحنكة</h1>
         <div class="introTitleLine"></div>
-        <p class="introSubTitle">ابدأ التجهيز وحدد الفريقين والنموذج</p>
+        <p class="introSubTitle">حدد الفريقين والنموذج</p>
       </div>
 
       <div class="introForm">
 
-  <div class="introFieldsGroup">
-    <div class="introField introTeamField">
-      <input
-        id="teamANameInput"
-        type="text"
-        placeholder="اكتب اسم الفريق الأول"
-        autocomplete="off"
-      >
-    </div>
+        <div class="introFieldsGroup">
+          <div class="introField introTeamField">
+            <input
+              id="teamANameInput"
+              type="text"
+              placeholder="اسم الفريق الأول"
+              autocomplete="off"
+            >
+          </div>
 
-    <div class="introField introTeamField">
-      <input
-        id="teamBNameInput"
-        type="text"
-        placeholder="اكتب اسم الفريق الثاني"
-        autocomplete="off"
-      >
-    </div>
-  </div>
+          <div class="introField introTeamField">
+            <input
+              id="teamBNameInput"
+              type="text"
+              placeholder="اسم الفريق الثاني"
+              autocomplete="off"
+            >
+          </div>
+        </div>
 
-  <div class="introField introModelField">
-    <label for="introModelSelect">اختيار النموذج</label>
-    <select id="introModelSelect">
-      <option value="">جارٍ تحميل النماذج...</option>
-    </select>
-  </div>
+        <div class="introField introModelField">
+          <label for="introModelSelect">النموذج</label>
+          <select id="introModelSelect">
+            <option value="">جارٍ تحميل النماذج...</option>
+          </select>
+        </div>
 
-  <div class="introActions introActionsRow">
-    <button id="startGameBtn" onclick="startGameFromIntro()">بدء اللعبة</button>
-
-    <button
-      type="button"
-      class="introPresenterEyeBtn"
-      onclick="openPresenterIntroModal()"
-      aria-label="عرض QR صفحة المقدم"
-    >
-      👁
-    </button>
-  </div>
-
+        <div class="introActions introActionsRow introActionsSingle">
+  <button id="startGameBtn" onclick="startGameFromIntro()">بدء اللعبة</button>
 </div>
+
+      </div>
 
     </div>
   </div>
 
   <div id="presenterIntroModal" class="introPresenterModal hidden">
     <div class="introPresenterModalCard">
+
       <button
-        type="button"
-        class="introPresenterModalClose"
-        onclick="closePresenterIntroModal()"
-        aria-label="إغلاق"
-      >
-        ×
-      </button>
+  type="button"
+  class="introPresenterModalClose"
+  onclick="goToDisplayFromIntro()"
+  aria-label="إغلاق"
+>
+  ×
+</button>
 
       <div class="introPresenterModalTitle">صفحة المقدم</div>
-      <div class="introPresenterModalText">امسح QR من الآيفون لفتح لوحة المقدم</div>
+      <div class="introPresenterModalText">امسح QR أو استخدم الكود للدخول</div>
 
       <div class="introPresenterQrBox">
         <img id="presenterIntroQr" alt="QR صفحة المقدم">
       </div>
 
+      <div class="presenterIntroCodeBox">
+        <div class="presenterIntroCodeLabel">كود المقدم</div>
+        <div id="presenterIntroCode" class="presenterIntroCodeValue">----</div>
+      </div>
+
       <div id="presenterIntroLink" class="introPresenterLink"></div>
 
-      <button type="button" class="introPresenterCopyBtn" onclick="copyPresenterIntroLink()">
-        نسخ الرابط
-      </button>
+      <div class="introPresenterModalActions">
+        <button type="button" class="introPresenterCopyBtn" onclick="copyPresenterIntroLink()">
+          نسخ الرابط
+        </button>
+
+        <button type="button" class="introPresenterCopyBtn" onclick="goToDisplayFromIntro()">
+          بدء اللعبة
+        </button>
+      </div>
+
     </div>
   </div>
 

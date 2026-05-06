@@ -1,84 +1,320 @@
 /* =========================
-   PRESENTER - FINAL VERSION
+   PRESENTER - SESSION VERSION
 ========================= */
-
-const GAME_SESSION_ID = "main_game"
 
 let presenterModel = 1
 let presenterSegment = null
 let presenterTeamAName = "الفريق الأول"
 let presenterTeamBName = "الفريق الثاني"
 let presenterSelectedTeam = null
+let presenterSessionId = null
+let presenterChannel = null
+let presenterFinalRound = 1
+let presenterLiveState = null
+let lastPresenterToastTime = 0
+let presenterSyncTimer = null
 
-/* =========================
-   INIT
-========================= */
+document.addEventListener("DOMContentLoaded", async () => {
+  const savedSessionId = localStorage.getItem("presenter_session_id")
 
-document.addEventListener("DOMContentLoaded", () => {
-  startPresenterSessionWatcher()
+  if (!savedSessionId) {
+    showPresenterJoin()
+    return
+  }
+
+  const { data, error } = await db
+    .from("game_sessions")
+    .select("*")
+    .eq("id", savedSessionId)
+    .maybeSingle()
+
+  if (error || !data) {
+    showPresenterJoin()
+    return
+  }
+
+  if (data.status === "ended") {
+    renderPresenterEnded()
+    return
+  }
+
+  applyPresenterSessionData(data)
+  subscribeToGameSession(data.id)
 })
 
 /* =========================
-   WATCH DISPLAY SESSION
+   PAGE MODE
 ========================= */
 
-async function loadPresenterSession() {
-  const { data } = await db
+function showPresenterJoin() {
+  document.getElementById("presenterJoin")?.classList.remove("hidden")
+  document.getElementById("presenterHome")?.classList.add("hidden")
+  document.getElementById("presenterSegmentPage")?.classList.add("hidden")
+}
+
+function showPresenterHomePage() {
+  document.getElementById("presenterJoin")?.classList.add("hidden")
+  document.getElementById("presenterHome")?.classList.remove("hidden")
+  document.getElementById("presenterSegmentPage")?.classList.add("hidden")
+}
+
+function showPresenterSegmentPage() {
+  document.getElementById("presenterJoin")?.classList.add("hidden")
+  document.getElementById("presenterHome")?.classList.add("hidden")
+  document.getElementById("presenterSegmentPage")?.classList.remove("hidden")
+}
+
+function getPresenterSegmentName(segment) {
+  const names = {
+    warmup: "التسخين",
+    top10: "Top 10",
+    auction: "فتبلة",
+    who: "من هو",
+    final: "الفاصلة",
+    archive: "الأرشيف"
+  }
+
+  return names[segment] || "لوحة المقدم"
+}
+
+/* =========================
+   JOIN SESSION
+========================= */
+
+async function joinGameSession() {
+  const input = document.getElementById("joinCodeInput")
+  const status = document.getElementById("presenterJoinStatus")
+  const code = (input?.value || "").trim()
+
+  if (code.length !== 4) {
+    if (status) status.innerText = "اكتب كود من 4 أرقام"
+    return
+  }
+
+  const { data, error } = await db
     .from("game_sessions")
     .select("*")
-    .eq("id", GAME_SESSION_ID)
-    .maybeSingle()
+    .eq("join_code", code)
+    .eq("status", "active")
+    .single()
 
-  if (!data) return null
+  if (error || !data) {
+    if (status) status.innerText = "الكود غير صحيح أو اللعبة منتهية"
+    return
+  }
 
+  localStorage.setItem("presenter_session_id", data.id)
+  localStorage.setItem("presenter_join_code", code)
+
+  applyPresenterSessionData(data)
+  subscribeToGameSession(data.id)
+
+  showToast("تم الدخول للجلسة")
+}
+
+/* =========================
+   SESSION WATCHER
+========================= */
+
+function applyPresenterSessionData(data) {
+  if (!data) return
+
+  if (data.status === "ended") {
+    renderPresenterEnded()
+    return
+  }
+
+  presenterSessionId = data.id
   presenterModel = Number(data.model || 1)
   presenterTeamAName = data.team_a || "الفريق الأول"
   presenterTeamBName = data.team_b || "الفريق الثاني"
   presenterSegment = data.active_segment || null
+  presenterLiveState = data.state || {}
 
-  updatePresenterUI()
+  const toast = presenterLiveState?.toast
+  if (toast?.text && toast?.time && toast.time !== lastPresenterToastTime) {
+    lastPresenterToastTime = toast.time
+    showToast(toast.text)
+  }
+
+  if (!presenterSegment) {
+    renderPresenterHome()
+    return
+  }
+
+  openPresenterSegmentFromSync(presenterSegment)
 }
 
-function startPresenterSessionWatcher() {
-  setInterval(loadPresenterSession, 700)
+function subscribeToGameSession(sessionId) {
+  presenterSessionId = sessionId
+
+  if (presenterChannel) {
+    db.removeChannel(presenterChannel)
+  }
+
+  if (presenterSyncTimer) {
+    clearInterval(presenterSyncTimer)
+    presenterSyncTimer = null
+  }
+
+  presenterChannel = db.channel("game_session_" + sessionId)
+
+  presenterChannel
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "game_sessions",
+        filter: `id=eq.${sessionId}`
+      },
+      payload => {
+        applyPresenterSessionData(payload.new)
+      }
+    )
+    .subscribe()
+
+  
+  presenterSyncTimer = setInterval(async () => {
+    const { data } = await db
+      .from("game_sessions")
+      .select("*")
+      .eq("id", sessionId)
+      .maybeSingle()
+
+    if (data) applyPresenterSessionData(data)
+  }, 5000)
+}
+
+function renderPresenterEnded() {
+  showPresenterJoin()
+
+  const status = document.getElementById("presenterJoinStatus")
+  if (status) status.innerText = "انتهت اللعبة أو لا توجد جلسة نشطة"
 }
 
 /* =========================
-   SEND COMMAND
+   SEND COMMAND - FAST
 ========================= */
 
 async function sendCommand(action, payload = {}) {
+  const sessionId = localStorage.getItem("presenter_session_id")
+
+  if (!sessionId) {
+    showToast("ادخل كود الجلسة أولاً")
+    return false
+  }
+
   const { error } = await db.from("presenter_commands").insert({
+    session_id: sessionId,
     model: presenterModel,
     segment: presenterSegment || "global",
     action,
-    payload
+    payload,
+    created_at: new Date().toISOString()
   })
 
   if (error) {
     console.log(error)
-    showToast("فشل الإرسال")
-    return
+    showToast("تعذر تنفيذ الأمر")
+    return false
   }
 
-  showToast("تم الإرسال")
+  return true
 }
+
+/* =========================
+   HOME / NAV
+========================= */
+
+function getPresenterTotalScores() {
+  const s = presenterLiveState || {}
+
+  if (s.final) {
+    const f = s.final
+    return {
+      A:
+        Number(f.round1?.scores?.A || 0) +
+        Number(f.round2?.scores?.A || 0) +
+        Number(f.round3?.scores?.A || 0),
+      B:
+        Number(f.round1?.scores?.B || 0) +
+        Number(f.round2?.scores?.B || 0) +
+        Number(f.round3?.scores?.B || 0)
+    }
+  }
+
+  if (s.archive?.archiveState?.scores) return s.archive.archiveState.scores
+  if (s.top10?.top10State?.scores) return s.top10.top10State.scores
+  if (s.who?.whoState) return { A: s.who.whoState.scoreA || 0, B: s.who.whoState.scoreB || 0 }
+  if (s.auction?.auctionState) return { A: s.auction.auctionState.scoreA || 0, B: s.auction.auctionState.scoreB || 0 }
+  if (s.warmup) return { A: s.warmup.warmupScoreA || 0, B: s.warmup.warmupScoreB || 0 }
+
+  return { A: 0, B: 0 }
+}
+
+function renderPresenterHome() {
+  showPresenterHomePage()
+
+  const scores = getPresenterTotalScores()
+
+  const teamA = document.getElementById("presenterHomeTeamA")
+  const teamB = document.getElementById("presenterHomeTeamB")
+  const scoreA = document.getElementById("presenterHomeScoreA")
+  const scoreB = document.getElementById("presenterHomeScoreB")
+  const status = document.getElementById("presenterConnectionStatus")
+  const title = document.getElementById("presenterTitle")
+  const subtitle = document.getElementById("presenterSubtitle")
+
+  if (teamA) teamA.innerText = presenterTeamAName
+  if (teamB) teamB.innerText = presenterTeamBName
+  if (scoreA) scoreA.innerText = scores.A
+  if (scoreB) scoreB.innerText = scores.B
+
+  
+
+  if (title) title.innerText = "لوحة المقدم"
+  if (subtitle) subtitle.innerText = presenterSessionId ? "متصل بالعرض ✅" : "غير متصل"
+
+  const panel = document.getElementById("presenterPanel")
+  if (panel) panel.dataset.segment = ""
+}
+
 function presenterGoHome() {
   sendCommand("goHome")
-
   presenterSegment = null
   renderPresenterHome()
 }
-/* =========================
-   UI
-========================= */
+
 function openPresenterSegment(segment) {
   presenterSegment = segment
+  presenterSelectedTeam = null
 
-  document.getElementById("presenterHome")?.classList.add("hidden")
-  document.getElementById("presenterPanel")?.classList.remove("hidden")
-  document.getElementById("presenterBackBtn")?.classList.remove("hidden")
-  document.getElementById("presenterEndBtn")?.classList.remove("hidden")
+  sendCommand("openSegment", { segment })
+  openPresenterSegmentFromSync(segment)
+}
+
+function openPresenterSegmentFromSync(segment) {
+  showPresenterSegmentPage()
+
+  const title = document.getElementById("presenterSegmentTitle")
+  const subtitle = document.getElementById("presenterSegmentSubtitle")
+
+  if (title) title.innerText = getPresenterSegmentName(segment)
+  if (subtitle) subtitle.innerText = "تحكم مباشر بالعرض"
+
+  const panel = document.getElementById("presenterPanel")
+  const currentRendered = panel?.dataset.segment
+
+if (currentRendered === segment) {
+  if (segment === "final") {
+    presenterFinalRound = getPresenterFinalRound()
+    renderPresenterFinalRoundContent()
+  }
+  return
+}
+
+  if (panel) panel.dataset.segment = segment
 
   if (segment === "warmup") renderWarmup()
   if (segment === "top10") renderTop10()
@@ -88,145 +324,392 @@ function openPresenterSegment(segment) {
   if (segment === "archive") renderArchive()
 }
 
-function updatePresenterUI() {
-  if (!presenterSegment) {
-    renderPresenterHome()
-    return
+/* =========================
+   SHARED UI
+========================= */
+
+function getPresenterActiveTeamFromState() {
+  if (presenterSegment === "warmup") {
+    return presenterLiveState?.warmup?.selectedTeam || null
   }
 
-  document.getElementById("presenterHome")?.classList.add("hidden")
-  document.getElementById("presenterPanel")?.classList.remove("hidden")
-  document.getElementById("presenterBackBtn")?.classList.remove("hidden")
-  document.getElementById("presenterEndBtn")?.classList.remove("hidden")
+  if (presenterSegment === "top10") {
+    return presenterLiveState?.top10?.top10State?.activeTeam || null
+  }
 
-  if (presenterSegment === "warmup") renderWarmup()
-  if (presenterSegment === "top10") renderTop10()
-  if (presenterSegment === "auction") renderAuction()
-  if (presenterSegment === "who") renderWho()
-  if (presenterSegment === "final") renderFinal()
-  if (presenterSegment === "archive") renderArchive()
-}
+  if (presenterSegment === "auction") {
+    return presenterLiveState?.auction?.auctionState?.activeTeam || null
+  }
 
-function renderPresenterHome() {
-  document.getElementById("presenterHome")?.classList.remove("hidden")
-  document.getElementById("presenterPanel")?.classList.add("hidden")
-  document.getElementById("presenterBackBtn")?.classList.add("hidden")
-  document.getElementById("presenterEndBtn")?.classList.add("hidden")
+  if (presenterSegment === "who") {
+    return presenterLiveState?.who?.whoState?.activeTeam || null
+  }
 
-  const status = document.getElementById("presenterConnectionStatus")
-  const teamA = document.getElementById("presenterHomeTeamA")
-  const teamB = document.getElementById("presenterHomeTeamB")
+  if (presenterSegment === "final") {
+    const round = presenterLiveState?.final?.round || presenterFinalRound || 1
 
-  if (status) status.innerText = "متصل بالعرض ✅ افتح فقرة من شاشة العرض"
-  if (teamA) teamA.innerText = presenterTeamAName
-  if (teamB) teamB.innerText = presenterTeamBName
-}
+    if (round === 1) return presenterLiveState?.final?.round1?.activeTeam || null
+    if (round === 2) return presenterLiveState?.final?.round2?.activeTeam || null
+    if (round === 3) return presenterLiveState?.final?.round3?.activeTeam || null
+  }
 
-function renderHome() {
-  document.getElementById("presenterHome")?.classList.remove("hidden")
-  document.getElementById("presenterPanel")?.classList.add("hidden")
+  if (presenterSegment === "archive") {
+    return presenterLiveState?.archive?.archiveState?.activeTeam || null
+  }
 
-  const box = document.querySelector(".presenterSetupCard")
-  if (!box) return
-
-  box.innerHTML = `
-    <div class="presenterSetupTitle">لوحة المقدم</div>
-
-    <div class="presenterCard">
-      <div class="presenterLabel">الحالة</div>
-      <div class="presenterAnswerText">متصل بالعرض ✅</div>
-    </div>
-
-    <div class="presenterTeams">
-      <button class="presenterBtn orange">${presenterTeamAName}</button>
-      <button class="presenterBtn orange">${presenterTeamBName}</button>
-    </div>
-
-    <button class="presenterStartBtn" onclick="sendCommand('toggleDisplayControls')">
-      إظهار / إخفاء التحكم
-    </button>
-  `
+  return presenterSelectedTeam
 }
 
 function teamButtons() {
+  const activeTeam = getPresenterActiveTeamFromState() || presenterSelectedTeam
+
   return `
     <div class="presenterTeams">
-      <button class="presenterBtn orange" onclick="selectTeam('A')" id="teamA">${presenterTeamAName}</button>
-      <button class="presenterBtn orange" onclick="selectTeam('B')" id="teamB">${presenterTeamBName}</button>
+      <button
+        class="presenterBtn orange ${activeTeam === "A" ? "selectedPresenterTeam" : ""}"
+        onclick="selectTeam('A')"
+        id="teamA"
+      >
+        ${presenterTeamAName}
+      </button>
+
+      <button
+        class="presenterBtn orange ${activeTeam === "B" ? "selectedPresenterTeam" : ""}"
+        onclick="selectTeam('B')"
+        id="teamB"
+      >
+        ${presenterTeamBName}
+      </button>
     </div>
   `
 }
 
 function selectTeam(team) {
+  if (team !== "A" && team !== "B") return
+
   presenterSelectedTeam = team
+
+  document.getElementById("teamA")?.classList.toggle("selectedPresenterTeam", team === "A")
+  document.getElementById("teamB")?.classList.toggle("selectedPresenterTeam", team === "B")
+
   sendCommand("selectTeam", { team })
 
-  document.getElementById("teamA")?.classList.remove("selectedPresenterTeam")
-  document.getElementById("teamB")?.classList.remove("selectedPresenterTeam")
-
-  document.getElementById(`team${team}`)?.classList.add("selectedPresenterTeam")
+  if (presenterSegment === "final") {
+    renderPresenterFinalRoundContent()
+  }
 }
 
-function actions() {
-  return `
-    <div class="presenterActions">
-      <button class="presenterBtn green" onclick="sendCommand('correct')">صح</button>
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
-      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
-    </div>
-  `
+/* =========================
+   TOAST
+========================= */
+
+let presenterToastTimer = null
+let presenterToastHideTimer = null
+
+function showToast(text) {
+  const t = document.getElementById("presenterToast")
+  const textBox = document.getElementById("presenterToastText")
+  if (!t) return
+
+  clearTimeout(presenterToastTimer)
+  clearTimeout(presenterToastHideTimer)
+
+  if (textBox) textBox.innerText = text
+  else t.innerText = text
+
+  t.classList.remove("hidden")
+  t.classList.add("show")
+
+  presenterToastTimer = setTimeout(() => {
+    t.classList.remove("show")
+
+    presenterToastHideTimer = setTimeout(() => {
+      t.classList.add("hidden")
+    }, 120)
+  }, 1250)
 }
 
+
+
+let presenterDisplayControlsHidden = false
+
+function updateDisplayControlsEyeButton(isHidden) {
+  const btn = document.getElementById("displayControlsEyeBtn")
+  if (!btn) return
+
+  btn.innerText = isHidden ? "إظهار التحكم" : "إخفاء التحكم"
+  btn.classList.toggle("showControlsMode", isHidden)
+  btn.classList.toggle("hideControlsMode", !isHidden)
+  btn.title = isHidden ? "إظهار أزرار التحكم" : "إخفاء أزرار التحكم"
+}
+
+function togglePresenterDisplayControls() {
+  presenterDisplayControlsHidden = !presenterDisplayControlsHidden
+  updateDisplayControlsEyeButton(presenterDisplayControlsHidden)
+  sendCommand("toggleDisplayControls")
+}
 /* =========================
    WARMUP
 ========================= */
 
-function renderWarmup() {
-  document.getElementById("presenterPanel").innerHTML = `
+let presenterWarmupRows = []
+let presenterWarmupSelected = null
+
+function getPresenterWarmupState() {
+  return presenterLiveState?.warmup || {}
+}
+
+function getPresenterWarmupUsed() {
+  return getPresenterWarmupState()?.usedQuestions || {}
+}
+
+function getPresenterWarmupActiveTeam() {
+  return getPresenterWarmupState()?.selectedTeam || presenterSelectedTeam || null
+}
+
+function getPresenterWarmupLocked() {
+  return !!getPresenterWarmupState()?.warmupQuestionLocked
+}
+
+function getPresenterWarmupCurrentKey() {
+  return getPresenterWarmupState()?.currentWarmupQuestionKey || null
+}
+
+async function renderWarmup() {
+  const panel = document.getElementById("presenterPanel")
+  if (!panel) return
+
+  const { data } = await db
+    .from("questions")
+    .select("category, category_name, number, question, answer")
+    .eq("model", presenterModel)
+    .eq("segment", "warmup")
+    .order("category", { ascending: true })
+    .order("number", { ascending: true })
+
+  presenterWarmupRows = data || []
+
+  const warmupState = getPresenterWarmupState()
+  const used = getPresenterWarmupUsed()
+  const locked = getPresenterWarmupLocked()
+  const currentKey = getPresenterWarmupCurrentKey()
+
+  panel.innerHTML = `
     ${teamButtons()}
 
     <div class="presenterActions">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دوبيلا</button>
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">✕ خطأ</button>
-      <button class="presenterBtn green" onclick="sendCommand('correct')">✓ صح</button>
+      <button
+        class="presenterBtn gray"
+        onclick="sendCommand('double')"
+        ${locked || currentKey ? "disabled" : ""}
+      >
+        دوبيلا
+      </button>
+
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">
+        ✕ خطأ
+      </button>
+
+      <button class="presenterBtn green" onclick="sendCommand('correct')">
+        ✓ صح
+      </button>
     </div>
 
     <section class="presenterCard">
       <div class="presenterLabel">الفئات والأسئلة</div>
 
       <div class="presenterWarmupCats">
-        ${[1,2,3,4].map(cat => `
-          <div class="presenterWarmupCat">
-            <div class="presenterWarmupCatTitle">الفئة ${cat}</div>
+        ${[1, 2, 3, 4].map(cat => {
+          const catRows = presenterWarmupRows.filter(r => Number(r.category) === cat)
+          const catName = catRows[0]?.category_name || `الفئة ${cat}`
 
-            <div class="presenterWarmupNumbers">
-              <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{category:${cat},number:1})">1</button>
-              <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{category:${cat},number:2})">2</button>
-              <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{category:${cat},number:4})">4</button>
+          return `
+            <div class="presenterWarmupCat">
+              <div class="presenterWarmupCatTitle">${catName}</div>
+
+              <div class="presenterWarmupNumbers">
+                ${[1, 2, 4].map(num => {
+                  const key = `${cat}_${num}`
+                  const isUsed = !!used[key]
+                  const isCurrent = currentKey === key
+                  const isSelected =
+                    presenterWarmupSelected &&
+                    Number(presenterWarmupSelected.category) === Number(cat) &&
+                    Number(presenterWarmupSelected.number) === Number(num)
+
+                  return `
+                    <button
+                      class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent || isSelected ? "selectedPresenterTeam" : ""}"
+                      ${isUsed || locked ? "disabled" : ""}
+                      onclick="openWarmupPresenterQuestion(${cat}, ${num})"
+                    >
+                      ${isUsed ? "" : num}
+                    </button>
+                  `
+                }).join("")}
+              </div>
             </div>
-          </div>
-        `).join("")}
+          `
+        }).join("")}
       </div>
     </section>
+
+    <section class="presenterCard presenterWarmupPreviewCard">
+      
+
+      <div class="presenterLabel">السؤال</div>
+      <div id="presenterWarmupQuestionText" class="presenterQuestionBody">
+        اختر رقم السؤال
+      </div>
+
+      <div class="presenterLabel">الإجابة</div>
+      <div id="presenterWarmupAnswerText" class="presenterAnswerBody">
+        —
+      </div>
+
+    
+    </section>
   `
+
+if (currentKey) {
+  const [cat, num] = currentKey.split("_")
+  showPresenterWarmupPreview(Number(cat), Number(num))
+} else {
+  presenterWarmupSelected = null
+}
 }
 
-function openWarmup(cat, num) {
-  sendCommand("openNumber", { category: cat, number: num })
+function openWarmupPresenterQuestion(category, number) {
+  const warmupState = getPresenterWarmupState()
+  const used = getPresenterWarmupUsed()
+  const key = `${category}_${number}`
+
+  if (warmupState.warmupQuestionLocked) {
+    showToast("سجل النتيجة أولاً")
+    return
+  }
+
+  if (used[key]) {
+    showToast("السؤال مستخدم")
+    return
+  }
+
+  if (!getPresenterWarmupActiveTeam()) {
+    showToast("اختر الفريق أولاً")
+    return
+  }
+
+  presenterWarmupSelected = { category, number }
+
+  showPresenterWarmupPreview(category, number)
+  sendCommand("openNumber", { category, number })
 }
 
+function showPresenterWarmupPreview(category, number) {
+  const item = presenterWarmupRows.find(row => {
+    return Number(row.category) === Number(category) &&
+           Number(row.number) === Number(number)
+  })
+
+  const questionBox = document.getElementById("presenterWarmupQuestionText")
+  const answerBox = document.getElementById("presenterWarmupAnswerText")
+
+  if (questionBox) questionBox.innerText = item?.question || "لا يوجد سؤال"
+  if (answerBox) answerBox.innerText = item?.answer || "لا توجد إجابة"
+}
 /* =========================
-   TOP10
+   TOP 10
 ========================= */
 
-function renderTop10() {
-  document.getElementById("presenterPanel").innerHTML = `
+let presenterTop10Rows = []
+let presenterTop10OpenedBy = JSON.parse(localStorage.getItem("presenter_top10_opened_by") || "{}")
+
+function savePresenterTop10OpenedBy() {
+  localStorage.setItem("presenter_top10_opened_by", JSON.stringify(presenterTop10OpenedBy))
+}
+
+function getPresenterTop10State() {
+  return presenterLiveState?.top10?.top10State || {
+    round: 1,
+    activeTeam: null,
+    opened: { 1: [], 2: [], 3: [] },
+    answers: { 1: {}, 2: {}, 3: {} },
+    question: { 1: "", 2: "", 3: "" },
+    errors: {
+      1: { A: 0, B: 0 },
+      2: { A: 0, B: 0 },
+      3: { A: 0, B: 0 }
+    }
+  }
+}
+
+function getPresenterTop10Round() {
+  return Number(getPresenterTop10State()?.round || 1)
+}
+
+function getTop10OpenedTeamName(round, num) {
+  const team = presenterTop10OpenedBy[`${round}_${num}`]
+
+  if (team === "A") return presenterTeamAName
+  if (team === "B") return presenterTeamBName
+
+  return ""
+}
+
+async function renderTop10() {
+  const panel = document.getElementById("presenterPanel")
+  if (!panel) return
+
+  const top10 = getPresenterTop10State()
+  const round = getPresenterTop10Round()
+  const opened = top10.opened?.[round] || []
+  const question = top10.question?.[round] || "السؤال يظهر هنا"
+  const errorsA = Number(top10.errors?.[round]?.A || 0)
+  const errorsB = Number(top10.errors?.[round]?.B || 0)
+
+  const { data } = await db
+    .from("top10_questions")
+    .select("round, position, question, answer")
+    .eq("model", presenterModel)
+    .eq("round", round)
+    .order("position", { ascending: true })
+
+  presenterTop10Rows = data || []
+
+  panel.innerHTML = `
     ${teamButtons()}
+
+    <section class="presenterCard">
+      <div class="presenterLabel">الجولة</div>
+      <div class="presenterRoundTabs">
+        <button class="${round === 1 ? "active" : ""}" onclick="setPresenterTop10Round(1)">1</button>
+        <button class="${round === 2 ? "active" : ""}" onclick="setPresenterTop10Round(2)">2</button>
+        <button class="${round === 3 ? "active" : ""}" onclick="setPresenterTop10Round(3)">3</button>
+      </div>
+    </section>
+
+    <section class="presenterCard">
+      <div class="presenterLabel">السؤال</div>
+      <div class="presenterQuestionBody">${question}</div>
+
+      <div class="presenterLabel">أخطاء الفرق</div>
+      <div class="presenterTop10Errors">
+        <div class="presenterTop10ErrorBox">
+          <span>${presenterTeamAName}</span>
+          <strong>${errorsA} / 3</strong>
+        </div>
+
+        <div class="presenterTop10ErrorBox">
+          <span>${presenterTeamBName}</span>
+          <strong>${errorsB} / 3</strong>
+        </div>
+      </div>
+    </section>
 
     <div class="presenterActions">
       <button class="presenterBtn gray" onclick="sendCommand('double')">دوبيلا</button>
       <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابات</button>
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ الفريق</button>
     </div>
 
     <div class="presenterActions">
@@ -236,98 +719,497 @@ function renderTop10() {
     </div>
 
     <section class="presenterCard">
-      <div class="presenterLabel">الأرقام</div>
-      <div class="presenterGrid">
-        ${Array.from({ length: 10 }, (_, i) => i + 1).map(n => `
-          <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{number:${n}})">${n}</button>
-        `).join("")}
+      <div class="presenterLabel">الإجابات</div>
+
+      <div class="presenterTop10Answers">
+        ${Array.from({ length: 10 }, (_, i) => i + 1).map(num => {
+          const item = presenterTop10Rows.find(r => Number(r.position) === num)
+          const isOpened = opened.includes(num)
+          const openedName = getTop10OpenedTeamName(round, num)
+
+          return `
+            <button
+              class="presenterTop10AnswerBtn ${isOpened ? "opened" : ""}"
+              ${isOpened ? "disabled" : ""}
+              onclick="openTop10PresenterNumber(${num}, event)"
+            >
+              <span class="presenterTop10AnswerNo">${num}</span>
+
+              <span class="presenterTop10AnswerText">
+                ${item?.answer || "-"}
+              </span>
+
+              <span class="presenterTop10OpenedBy">
+                ${isOpened ? (openedName || "تم الفتح") : ""}
+              </span>
+            </button>
+          `
+        }).join("")}
       </div>
     </section>
   `
 }
 
+function setPresenterTop10Round(round) {
+  sendCommand("setRound", { round })
+}
+
+function openTop10PresenterNumber(number, event) {
+  const top10 = getPresenterTop10State()
+  const round = getPresenterTop10Round()
+  const opened = top10.opened?.[round] || []
+  const activeTeam = top10.activeTeam || presenterSelectedTeam
+
+  if (!activeTeam) {
+    showToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (opened.includes(number)) {
+    showToast("الإجابة مفتوحة")
+    return
+  }
+
+  const teamName = activeTeam === "A" ? presenterTeamAName : presenterTeamBName
+
+  presenterTop10OpenedBy[`${round}_${number}`] = activeTeam
+  savePresenterTop10OpenedBy()
+
+  const btn = event?.currentTarget
+
+  if (btn) {
+    btn.classList.add("opened")
+    btn.classList.add("top10RevealFx")
+    btn.disabled = true
+
+    const openedByBox = btn.querySelector(".presenterTop10OpenedBy")
+    if (openedByBox) openedByBox.innerText = teamName
+
+    setTimeout(() => {
+      btn.classList.remove("top10RevealFx")
+    }, 350)
+  }
+
+  sendCommand("openNumber", {
+    number,
+    round,
+    team: activeTeam
+  })
+}
 /* =========================
    AUCTION
 ========================= */
 
-function renderAuction() {
-  document.getElementById("presenterPanel").innerHTML = `
+let presenterAuctionRows = []
+
+function getPresenterAuctionState() {
+  return presenterLiveState?.auction || {}
+}
+
+function getPresenterAuctionData() {
+  return getPresenterAuctionState()?.auctionState || {
+    usedNumbers: [],
+    scoreA: 0,
+    scoreB: 0,
+    currentQuestionNumber: null,
+    pendingScore: false,
+    answerShown: false,
+    activeTeam: null
+  }
+}
+
+function getPresenterAuctionMaxNumber() {
+  return Number(getPresenterAuctionState()?.auctionMaxNumber || 8)
+}
+
+async function renderAuction() {
+  const panel = document.getElementById("presenterPanel")
+  if (!panel) return
+
+  const auction = getPresenterAuctionData()
+  const maxNumber = getPresenterAuctionMaxNumber()
+  const used = auction.usedNumbers || []
+  const currentNumber = Number(auction.currentQuestionNumber || 0)
+  const pendingScore = !!auction.pendingScore
+
+  const { data } = await db
+    .from("auction_questions")
+    .select("number, answer, note, image")
+    .eq("model", presenterModel)
+    .order("number", { ascending: true })
+
+  presenterAuctionRows = data || []
+
+  panel.innerHTML = `
     ${teamButtons()}
 
     <div class="presenterActions">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دوبيلا</button>
-      <button class="presenterBtn green" onclick="sendCommand('correct')">✓ إجابة صحيحة</button>
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">✕ خطأ</button>
+      <button
+        class="presenterBtn gray"
+        onclick="sendCommand('double')"
+        ${currentNumber || pendingScore ? "disabled" : ""}
+      >
+        دوبيلا
+      </button>
+
+      <button class="presenterBtn green" onclick="sendCommand('correct')">
+        ✓ إجابة صحيحة
+      </button>
+
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">
+        ✕ خطأ
+      </button>
     </div>
 
     <div class="presenterActions">
-  <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
-  <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">تكبير الصورة</button>
-</div>
+      <button class="presenterBtn gray" onclick="sendCommand('undo')">
+        تراجع
+      </button>
+
+      <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
+        تكبير الصورة
+      </button>
+    </div>
 
     <section class="presenterCard">
       <div class="presenterLabel">الأرقام</div>
+
       <div class="presenterGrid four">
-        ${Array.from({ length: 8 }, (_, i) => i + 1).map(n => `
-          <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{number:${n}})">${n}</button>
-        `).join("")}
+        ${Array.from({ length: maxNumber }, (_, i) => i + 1).map(num => {
+          const isUsed = used.includes(num)
+          const isCurrent = currentNumber === num
+
+          return `
+            <button
+              class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
+              ${isUsed || pendingScore ? "disabled" : ""}
+              onclick="openAuctionPresenterNumber(${num})"
+            >
+              ${isUsed ? "" : num}
+            </button>
+          `
+        }).join("")}
       </div>
     </section>
+
+    <section class="presenterCard presenterAuctionPreviewCard">
+  <div class="presenterLabel">الإجابة</div>
+  <div id="presenterAuctionAnswerText" class="presenterAnswerBody">
+    —
+  </div>
+
+  <div class="presenterLabel">الملاحظة</div>
+  <div id="presenterAuctionNoteText" class="presenterQuestionBody">
+    —
+  </div>
+
+  <div class="presenterLabel">الصورة</div>
+  <div id="presenterAuctionImageBox" class="presenterImagePreviewBox hidden"></div>
+</section>
   `
+
+  if (currentNumber) {
+    showPresenterAuctionPreview(currentNumber)
+  }
 }
 
+function openAuctionPresenterNumber(number) {
+  const auction = getPresenterAuctionData()
+  const used = auction.usedNumbers || []
+
+  if (auction.pendingScore) {
+    showToast("أنهِ الدور الحالي أولاً")
+    return
+  }
+
+  if (used.includes(number)) {
+    showToast("الرقم مستخدم")
+    return
+  }
+
+  showPresenterAuctionPreview(number)
+  sendCommand("openNumber", { number })
+}
+
+function showPresenterAuctionPreview(number) {
+  const item = presenterAuctionRows.find(row => Number(row.number) === Number(number))
+
+  const answerBox = document.getElementById("presenterAuctionAnswerText")
+  const noteBox = document.getElementById("presenterAuctionNoteText")
+  const imageBox = document.getElementById("presenterAuctionImageBox")
+
+  if (answerBox) answerBox.innerText = item?.answer || "لا توجد إجابة"
+  if (noteBox) noteBox.innerText = item?.note || "لا توجد ملاحظة"
+
+  if (imageBox) {
+    if (item?.image) {
+      imageBox.classList.remove("hidden")
+      imageBox.innerHTML = `<img src="${item.image}" alt="">`
+    } else {
+      imageBox.classList.add("hidden")
+      imageBox.innerHTML = ""
+    }
+  }
+}
 /* =========================
    WHO
 ========================= */
 
-function renderWho() {
-  document.getElementById("presenterPanel").innerHTML = `
+let presenterWhoRows = []
+
+function getPresenterWhoStateRoot() {
+  return presenterLiveState?.who || {}
+}
+
+function getPresenterWhoState() {
+  return getPresenterWhoStateRoot()?.whoState || {
+    usedNumbers: [],
+    scoreA: 0,
+    scoreB: 0,
+    currentPoints: 0,
+    activeTeam: null,
+    manualStartDone: false,
+    lastAnsweredTeam: null
+  }
+}
+
+function getPresenterWhoLocked() {
+  return !!getPresenterWhoStateRoot()?.whoQuestionLocked
+}
+
+function getPresenterWhoCurrentNumber() {
+  return Number(getPresenterWhoStateRoot()?.whoCurrentNumber || 0)
+}
+
+function getPresenterWhoCompensationMode() {
+  return !!getPresenterWhoStateRoot()?.whoCompensationMode
+}
+
+function canPresenterWhoCompensation() {
+  const who = getPresenterWhoState()
+  const used = (who.usedNumbers || []).map(Number)
+  const remaining = []
+
+  for (let i = 1; i <= 15; i++) {
+    if (!used.includes(i)) remaining.push(i)
+  }
+
+  return (
+    !getPresenterWhoLocked() &&
+    !getPresenterWhoCurrentNumber() &&
+    remaining.length === 1 &&
+    remaining[0] === 15
+  )
+}
+
+async function renderWho() {
+  const panel = document.getElementById("presenterPanel")
+  if (!panel) return
+
+  const who = getPresenterWhoState()
+  const used = (who.usedNumbers || []).map(Number)
+  const currentNumber = getPresenterWhoCurrentNumber()
+  const locked = getPresenterWhoLocked()
+  const currentPoints = Number(who.currentPoints || 0)
+  const compensationMode = getPresenterWhoCompensationMode()
+
+  const lock15 = !used.includes(15) && used.length < 14
+  const waitCompensation = !used.includes(15) && used.length === 14 && !compensationMode
+
+  const { data } = await db
+    .from("who_images")
+    .select("number, answer, image")
+    .eq("model", presenterModel)
+    .order("number", { ascending: true })
+
+  presenterWhoRows = data || []
+
+  panel.innerHTML = `
     ${teamButtons()}
 
     <section class="presenterCard">
-      <div class="presenterLabel">اختر النقاط</div>
+      <div class="presenterLabel">النقاط</div>
+
       <div class="presenterGrid">
         ${[1,2,3,4,5].map(p => `
-          <button class="presenterNumberBtn" onclick="sendCommand('setPoints',{points:${p}})">${p}</button>
+          <button
+            class="presenterNumberBtn ${currentPoints === p ? "selectedPresenterTeam" : ""}"
+            ${locked || compensationMode ? "disabled" : ""}
+            onclick="sendCommand('setPoints',{points:${p}})"
+          >
+            ${p}
+          </button>
         `).join("")}
       </div>
     </section>
 
     <div class="presenterActions">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دوبيلا</button>
-      <button class="presenterBtn gray" onclick="sendCommand('compensation')">التعويض</button>
-      <button class="presenterBtn green" onclick="sendCommand('correct')">✓ صح</button>
-    </div>
+      <button
+        class="presenterBtn gray"
+        onclick="sendCommand('double')"
+        ${locked || currentNumber ? "disabled" : ""}
+      >
+        دوبيلا
+      </button>
 
-    <div class="presenterActions">
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">✕ خطأ</button>
+      <button
+        class="presenterBtn gray"
+        onclick="sendCommand('compensation')"
+        ${canPresenterWhoCompensation() ? "" : "disabled"}
+      >
+        التعويض
+      </button>
+
+      <button class="presenterBtn green" onclick="sendCommand('correct')">
+        ✓ صح
+      </button>
+
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">
+        ✕ خطأ
+      </button>
     </div>
 
     <section class="presenterCard">
       <div class="presenterLabel">الأرقام</div>
+
       <div class="presenterGrid">
-        ${Array.from({ length: 15 }, (_, i) => i + 1).map(n => `
-          <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{number:${n}})">${n}</button>
-        `).join("")}
+        ${Array.from({ length: 15 }, (_, i) => i + 1).map(num => {
+          const isUsed = used.includes(num)
+          const isCurrent = currentNumber === num
+          const isLocked15 = num === 15 && (lock15 || waitCompensation)
+
+          return `
+            <button
+              class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
+              ${(isUsed || locked || isLocked15) ? "disabled" : ""}
+              onclick="openWhoPresenterNumber(${num})"
+            >
+              ${isUsed ? "" : num}
+            </button>
+          `
+        }).join("")}
       </div>
     </section>
+
+    <section class="presenterCard presenterWhoPreviewCard">
+  <div class="presenterLabel">الإجابة</div>
+  <div id="presenterWhoAnswerText" class="presenterAnswerBody">
+    —
+  </div>
+
+  <div class="presenterLabel">الصورة</div>
+  <div id="presenterWhoImageBox" class="presenterImagePreviewBox hidden"></div>
+</section>
   `
+
+  if (currentNumber) {
+    showPresenterWhoPreview(currentNumber)
+  }
 }
 
+function openWhoPresenterNumber(number) {
+  const who = getPresenterWhoState()
+  const used = (who.usedNumbers || []).map(Number)
+
+  if (getPresenterWhoLocked()) {
+    showToast("سجل النتيجة أولاً")
+    return
+  }
+
+  if (used.includes(number)) {
+    showToast("الرقم مستخدم")
+    return
+  }
+
+  if (!(who.activeTeam || presenterSelectedTeam) && !getPresenterWhoCompensationMode()) {
+    showToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (Number(who.currentPoints || 0) === 0 && !getPresenterWhoCompensationMode()) {
+    showToast("اختر النقاط أولاً")
+    return
+  }
+
+  showPresenterWhoPreview(number)
+  sendCommand("openNumber", { number })
+}
+
+function showPresenterWhoPreview(number) {
+  const item = presenterWhoRows.find(row => Number(row.number) === Number(number))
+
+  const answerBox = document.getElementById("presenterWhoAnswerText")
+  const imageBox = document.getElementById("presenterWhoImageBox")
+
+  if (answerBox) answerBox.innerText = item?.answer || "لا توجد إجابة"
+
+  if (imageBox) {
+    if (item?.image) {
+      imageBox.classList.remove("hidden")
+      imageBox.innerHTML = `<img src="${item.image}" alt="">`
+    } else {
+      imageBox.classList.add("hidden")
+      imageBox.innerHTML = ""
+    }
+  }
+}
 /* =========================
    FINAL
 ========================= */
 
-function renderFinal() {
-  document.getElementById("presenterPanel").innerHTML = `
+let presenterFinalRound1Rows = []
+let presenterFinalRound2Rows = []
+let presenterFinalRound3Rows = []
+
+let presenterFinalSelected = { round: 1, number: null }
+
+let presenterFinalPreviewCache = {
+  1: "",
+  2: "",
+  3: ""
+}
+
+function getPresenterFinalState() {
+  return presenterLiveState?.final || { round: 1 }
+}
+
+function getPresenterFinalRound() {
+  return Number(getPresenterFinalState()?.round || presenterFinalRound || 1)
+}
+
+function getPresenterFinalRoundState(round = getPresenterFinalRound()) {
+  const state = getPresenterFinalState()
+
+  if (round === 1) return state.round1 || {}
+  if (round === 2) return state.round2 || {}
+  if (round === 3) return state.round3 || {}
+
+  return {}
+}
+
+function clearPresenterFinalPreview(round = presenterFinalRound) {
+  presenterFinalPreviewCache[round] = ""
+  presenterFinalSelected = { round, number: null }
+
+  const previewBox = document.getElementById("presenterFinalPreview")
+  if (previewBox) previewBox.innerHTML = "اختر رقمًا"
+}
+
+async function renderFinal() {
+  const panel = document.getElementById("presenterPanel")
+  if (!panel) return
+
+  presenterFinalRound = getPresenterFinalRound()
+
+  panel.innerHTML = `
     ${teamButtons()}
 
     <section class="presenterCard">
       <div class="presenterLabel">الجولة</div>
       <div class="presenterRoundTabs">
-        <button onclick="setPresenterFinalRound(1)">1</button>
-        <button onclick="setPresenterFinalRound(2)">2</button>
-        <button onclick="setPresenterFinalRound(3)">3</button>
+        <button class="${presenterFinalRound === 1 ? "active" : ""}" onclick="setPresenterFinalRound(1)">1</button>
+        <button class="${presenterFinalRound === 2 ? "active" : ""}" onclick="setPresenterFinalRound(2)">2</button>
+        <button class="${presenterFinalRound === 3 ? "active" : ""}" onclick="setPresenterFinalRound(3)">3</button>
       </div>
     </section>
 
@@ -336,58 +1218,125 @@ function renderFinal() {
       <div class="presenterGrid" id="presenterFinalNumbers"></div>
     </section>
 
+    <section class="presenterCard">
+      <div class="presenterLabel">المحتوى / الإجابات</div>
+      <div id="presenterFinalPreview" class="presenterQuestionBody">
+        ${presenterFinalPreviewCache[presenterFinalRound] || "اختر رقمًا"}
+      </div>
+    </section>
+
     <div id="presenterFinalControls"></div>
   `
 
-  setPresenterFinalRound(presenterFinalRound || 1)
+  await renderPresenterFinalRoundContent()
 }
 
-function setPresenterFinalRound(round) {
+async function setPresenterFinalRound(round) {
   presenterFinalRound = Number(round)
-  sendCommand("setRound", { round: presenterFinalRound })
+  presenterFinalSelected = { round: presenterFinalRound, number: null }
 
+  sendCommand("setRound", { round: presenterFinalRound })
+  await renderPresenterFinalRoundContent()
+}
+
+async function renderPresenterFinalRoundContent() {
   const numbersBox = document.getElementById("presenterFinalNumbers")
   const controlsBox = document.getElementById("presenterFinalControls")
-  if (!numbersBox || !controlsBox) return
+  const previewBox = document.getElementById("presenterFinalPreview")
+
+  if (!numbersBox || !controlsBox || !previewBox) return
+
+  const round = Number(presenterFinalRound || 1)
+  const state = getPresenterFinalRoundState(round)
 
   let nums = [1, 2, 3, 4, 5, 6]
-  if (presenterFinalRound === 2) nums = [1, 2, 3, 4]
-  if (presenterFinalRound === 3) nums = [1, 2]
+  if (round === 2) nums = [1, 2, 3, 4]
+  if (round === 3) nums = [1, 2]
 
-  numbersBox.innerHTML = nums.map(n => `
-    <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{round:${presenterFinalRound},number:${n}})">
-      ${n}
-    </button>
-  `).join("")
+  const selectedNumber =
+    Number(state.currentNumber || 0) ||
+    (presenterFinalSelected?.round === round ? Number(presenterFinalSelected.number || 0) : 0)
 
-  if (presenterFinalRound === 1) {
+  numbersBox.innerHTML = nums.map(n => {
+    const opened = (state.opened || []).includes(n)
+    const current = selectedNumber === n
+
+    return `
+      <button
+        class="presenterNumberBtn ${opened ? "presenterOpened" : ""} ${current ? "selectedPresenterTeam" : ""}"
+        ${opened || state.pendingScore ? "disabled" : ""}
+        onclick="openPresenterFinalNumber(${round}, ${n})"
+      >
+        ${opened ? "" : n}
+      </button>
+    `
+  }).join("")
+
+  if (selectedNumber) {
+    if (round === 1) await renderPresenterFinalRound1Preview()
+    if (round === 2) await renderPresenterFinalRound2Preview()
+    if (round === 3) await renderPresenterFinalRound3Preview()
+  } else {
+    previewBox.innerHTML = presenterFinalPreviewCache[round] || "اختر رقمًا"
+  }
+
+  controlsBox.dataset.round = String(round)
+
+  if (round === 1) {
     controlsBox.innerHTML = `
       <div class="presenterActions">
         <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
         <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">إظهار السؤال</button>
-        <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
+        <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">تكبير</button>
       </div>
 
       <div class="presenterActions">
+        <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
         <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
         <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
-        <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
       </div>
+
+      <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
     `
     return
   }
 
-  if (presenterFinalRound === 2) {
+  if (round === 2) {
+    const finalCurrentNumber = Number(
+      state.currentNumber ||
+      (
+        presenterFinalSelected?.round === 2
+          ? presenterFinalSelected.number
+          : 0
+      )
+    )
+
+    const isScrambleNumber = finalCurrentNumber === 1 || finalCurrentNumber === 3
+    const isSequenceNumber = finalCurrentNumber === 2 || finalCurrentNumber === 4
+
     controlsBox.innerHTML = `
-      <div class="presenterActions">
+      <div class="presenterActions finalTwoActions">
         <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
-        <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
         <button class="presenterBtn dark" onclick="sendCommand('decreaseCountdown')">العداد</button>
       </div>
 
       <div class="presenterActions">
-        <button class="presenterBtn green" onclick="sendCommand('recordScrambleScore')">تسجيل نتيجة المبعثرة</button>
-        <button class="presenterBtn green" onclick="sendCommand('recordSequenceScore')">تسجيل نتيجة التلميح</button>
+<button
+  class="presenterBtn green"
+  onclick="clearPresenterFinalPreview(2); sendCommand('recordScrambleScore')"
+  ${(!finalCurrentNumber || isSequenceNumber) ? "disabled" : ""}
+>
+  تسجيل المبعثرة
+</button>
+
+<button
+  class="presenterBtn green"
+  onclick="clearPresenterFinalPreview(2); sendCommand('recordSequenceScore')"
+  ${(!finalCurrentNumber || isScrambleNumber) ? "disabled" : ""}
+>
+  تسجيل التلميح
+</button>
+
         <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
       </div>
 
@@ -404,20 +1353,335 @@ function setPresenterFinalRound(round) {
     </div>
 
     <div class="presenterActions">
-      <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابة</button>
-      <button class="presenterBtn green" onclick="sendCommand('recordRound3Score')">تسجيل النتيجة</button>
+      <button
+  class="presenterBtn green"
+  onclick="clearPresenterFinalPreview(3); sendCommand('recordRound3Score')"
+  ${!Number(state.currentNumber || 0) ? "disabled" : ""}
+>
+  تسجيل النتيجة
+</button>
+
       <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
     </div>
   `
 }
 
+function openPresenterFinalNumber(round, number) {
+  const state = getPresenterFinalRoundState(round)
+
+  if (state.pendingScore) {
+    showToast("أنهِ الرقم الحالي أولاً")
+    return
+  }
+
+  if ((state.opened || []).includes(number)) {
+    showToast("الرقم مستخدم")
+    return
+  }
+
+  if (round === 2 || round === 3) {
+    const activeTeam =
+      state.activeTeam ||
+      presenterSelectedTeam ||
+      getPresenterActiveTeamFromState()
+
+    if (!activeTeam) {
+      showToast("اختر الفريق أولاً")
+      return
+    }
+  }
+
+  presenterFinalSelected = { round, number }
+
+  if (round === 1) renderPresenterFinalRound1Preview()
+  if (round === 2) renderPresenterFinalRound2Preview()
+  if (round === 3) renderPresenterFinalRound3Preview()
+
+  sendCommand("openNumber", { round, number })
+}
+/* ===== Round 1 preview ===== */
+
+async function renderPresenterFinalRound1Preview() {
+  const previewBox = document.getElementById("presenterFinalPreview")
+  const state = getPresenterFinalRoundState(1)
+  if (!previewBox) return
+  if (state.answerShown) {
+  presenterFinalPreviewCache[1] = ""
+  presenterFinalSelected = { round: 1, number: null }
+  previewBox.innerHTML = "اختر رقمًا"
+  return
+}
+
+  const current = Number(state.currentNumber || (
+    presenterFinalSelected?.round === 1 ? presenterFinalSelected.number : 0
+  ))
+
+  if (!current) {
+    previewBox.innerHTML = presenterFinalPreviewCache[1] || "اختر رقمًا"
+    return
+  }
+
+  const { data } = await db
+    .from("final_round1_items")
+    .select("*")
+    .eq("model", presenterModel)
+    .eq("number", current)
+    .single()
+
+  const parts = [
+    data?.question_part1 || "",
+    data?.question_part2 || "",
+    data?.question_part3 || ""
+  ].filter(Boolean)
+
+  if (current >= 1 && current <= 3) {
+    presenterFinalPreviewCache[1] = `
+      <div><strong>الرقم:</strong> ${current}</div>
+      ${data?.answer ? `<div><strong>الإجابة:</strong><br>${data.answer}</div>` : ""}
+      ${data?.note ? `<div><strong>ملاحظة:</strong><br>${data.note}</div>` : ""}
+    `
+  } else {
+    presenterFinalPreviewCache[1] = `
+      <div><strong>الرقم:</strong> ${current}</div>
+      ${parts.length ? `<div><strong>السؤال:</strong><br>${parts.join("<br>")}</div>` : ""}
+      ${data?.answer ? `<div><strong>الإجابة:</strong><br>${data.answer}</div>` : ""}
+      ${data?.note ? `<div><strong>ملاحظة:</strong><br>${data.note}</div>` : ""}
+    `
+  }
+
+  const freshBox = document.getElementById("presenterFinalPreview")
+  if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[1]
+}
+
+/* ===== Round 2 preview ===== */
+
+async function renderPresenterFinalRound2Preview() {
+  const previewBox = document.getElementById("presenterFinalPreview")
+  const state = getPresenterFinalRoundState(2)
+  if (!previewBox) return
+
+  const current = Number(state.currentNumber || (
+    presenterFinalSelected?.round === 2 ? presenterFinalSelected.number : 0
+  ))
+
+  if (!state.pendingScore && presenterFinalSelected?.round === 2) {
+    presenterFinalPreviewCache[2] = ""
+    presenterFinalSelected = { round: 2, number: null }
+    previewBox.innerHTML = "اختر رقمًا"
+    return
+  }
+
+  if (!current) {
+    previewBox.innerHTML = presenterFinalPreviewCache[2] || "اختر رقمًا"
+    return
+  }
+
+  const { data } = await db
+    .from("final_round2_items")
+    .select("*")
+    .eq("model", presenterModel)
+    .eq("number", current)
+    .order("item_order", { ascending: true })
+
+  const rows = data || []
+  const isScramble = current === 1 || current === 3
+
+  if (isScramble) {
+    const selected = state.selectedCorrectIndexes || []
+
+    presenterFinalPreviewCache[2] = `
+      <div class="presenterFinalRound2SimpleGrid">
+        ${rows.map((r, idx) => `
+          <button
+            class="presenterFinalRound2SimpleCard ${selected.includes(idx) ? "selectedCorrect" : ""}"
+            type="button"
+            onclick="sendCommand('toggleRound2Correct',{index:${idx}})"
+          >
+            ${r.answer || r.prompt || "-"}
+          </button>
+        `).join("")}
+      </div>
+    `
+  } else {
+    const hidden = state.hiddenSequence || []
+
+    presenterFinalPreviewCache[2] = `
+      <div class="presenterAnswerBody">
+        العداد: ${state.countdown ?? 15}
+      </div>
+
+      <div class="finalRound2WordsStage presenterFinalRound2PreviewStage">
+        <div class="finalSequenceWordsWrap">
+          ${rows.map((r, idx) => {
+            if (hidden.includes(idx)) return ""
+
+            return `
+              <button
+                class="finalSequenceWordBtn"
+                type="button"
+                onclick="sendCommand('hideRound2SequenceWord',{index:${idx}})"
+              >
+                ${r.prompt || r.answer || "-"}
+              </button>
+            `
+          }).join("")}
+        </div>
+      </div>
+    `
+  }
+
+  const freshBox = document.getElementById("presenterFinalPreview")
+  if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[2]
+}
+
+/* ===== Round 3 preview ===== */
+
+async function renderPresenterFinalRound3Preview() {
+  const previewBox = document.getElementById("presenterFinalPreview")
+  const state = getPresenterFinalRoundState(3)
+  if (!previewBox) return
+
+  const current = Number(state.currentNumber || (
+    presenterFinalSelected?.round === 3 ? presenterFinalSelected.number : 0
+  ))
+
+  if (!state.pendingScore && presenterFinalSelected?.round === 3) {
+    presenterFinalPreviewCache[3] = ""
+    presenterFinalSelected = { round: 3, number: null }
+    previewBox.innerHTML = "اختر رقمًا"
+    return
+  }
+
+  if (!current) {
+    previewBox.innerHTML = presenterFinalPreviewCache[3] || "اختر رقمًا"
+    return
+  }
+
+  const { data } = await db
+    .from("final_round3_items")
+    .select("*")
+    .eq("model", presenterModel)
+    .eq("number", current)
+    .order("image_order", { ascending: true })
+
+  const rows = data || []
+  const selected = state.selectedCorrectIndexes || []
+  const shownCount = Number(state.shownCount || 0)
+  const currentImageIndex = Math.max(0, Math.min(shownCount - 1, rows.length - 1))
+  const currentImage = rows[currentImageIndex]?.image || ""
+
+  presenterFinalPreviewCache[3] = `
+    <div class="presenterFinalRound3Preview">
+      <div class="finalRound3AnswersList">
+        ${rows.map((r, idx) => `
+          <button
+            class="finalRound3AnswerCard ${selected.includes(idx) ? "selectedCorrect" : ""}"
+            type="button"
+            onclick="sendCommand('toggleRound3Correct',{index:${idx}})"
+          >
+            ${r.answer || "-"}
+          </button>
+        `).join("")}
+      </div>
+
+      <div class="presenterFinalRound3ImageStage">
+        ${
+          currentImage
+            ? `
+              <div class="presenterImagePreviewBox">
+                <img src="${currentImage}" alt="">
+              </div>
+            `
+            : `<div class="presenterAnswerBody">لم تبدأ الصور بعد</div>`
+        }
+      </div>
+    </div>
+  `
+
+  const freshBox = document.getElementById("presenterFinalPreview")
+  if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[3]
+}
 /* =========================
    ARCHIVE
 ========================= */
 
-function renderArchive() {
-  document.getElementById("presenterPanel").innerHTML = `
+let presenterArchiveRows = []
+let presenterArchiveBox = null
+
+function getPresenterArchiveRoot() {
+  return presenterLiveState?.archive || {}
+}
+
+function getPresenterArchiveState() {
+  return getPresenterArchiveRoot()?.archiveState || {
+    round: 1,
+    scores: { A: 0, B: 0 },
+    activeTeam: null,
+    errors: {}
+  }
+}
+
+function getPresenterArchiveRound() {
+  return Number(getPresenterArchiveState()?.round || 1)
+}
+
+function getPresenterArchiveReveal() {
+  return getPresenterArchiveRoot()?.archiveRevealState || {}
+}
+
+function getPresenterArchiveRoundReveal(round = getPresenterArchiveRound()) {
+  return getPresenterArchiveReveal()?.[round] || {}
+}
+
+function getPresenterArchiveRemainingPoints() {
+  return Number(getPresenterArchiveRoot()?.archiveRemainingPoints || 0)
+}
+
+async function loadPresenterArchiveRound(round) {
+  const { data: boxData } = await db
+    .from("archive_boxes")
+    .select("*")
+    .eq("model", presenterModel)
+    .eq("round", round)
+    .limit(1)
+
+  const { data: itemsData } = await db
+    .from("archive_items")
+    .select("*")
+    .eq("model", presenterModel)
+    .eq("round", round)
+    .order("position", { ascending: true })
+
+  presenterArchiveBox = boxData?.[0] || null
+  presenterArchiveRows = itemsData || []
+}
+
+async function renderArchive() {
+  const panel = document.getElementById("presenterPanel")
+  if (!panel) return
+
+  const round = getPresenterArchiveRound()
+  const reveal = getPresenterArchiveRoundReveal(round)
+  const remainingPoints = getPresenterArchiveRemainingPoints()
+
+  await loadPresenterArchiveRound(round)
+
+  const requiredItems = presenterArchiveRows
+    .filter(item => String(item.label || "").trim() === "المطلوب")
+    .sort((a, b) => Number(a.position) - Number(b.position))
+
+  panel.innerHTML = `
     ${teamButtons()}
+
+    <section class="presenterCard">
+      <div class="presenterLabel">الجولات</div>
+      <div class="presenterRoundTabs">
+        <button class="${round === 1 ? "active" : ""}" onclick="sendCommand('setRound',{round:1})">1</button>
+        <button class="${round === 2 ? "active" : ""}" onclick="sendCommand('setRound',{round:2})">2</button>
+        <button class="${round === 3 ? "active" : ""}" onclick="sendCommand('setRound',{round:3})">3</button>
+        <button class="${round === 4 ? "active" : ""}" onclick="sendCommand('setRound',{round:4})">4</button>
+      </div>
+    </section>
 
     <div class="presenterActions">
       <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
@@ -431,27 +1695,35 @@ function renderArchive() {
       <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
     </div>
 
-    <section class="presenterCard">
-      <div class="presenterLabel">العناصر</div>
-      <div class="presenterGrid">
-        ${Array.from({ length: 12 }, (_, i) => i + 1).map(n => `
-          <button class="presenterNumberBtn" onclick="sendCommand('openNumber',{number:${n}})">${n}</button>
-        `).join("")}
+    <section class="presenterCard presenterArchiveSimpleCard">
+      <div class="presenterLabel">النقاط الباقية</div>
+
+      <div class="presenterArchiveSimpleScore">
+        <strong>${remainingPoints}</strong>
+      </div>
+
+      <div class="presenterLabel">المطلوب</div>
+
+      <div class="presenterArchiveRequiredList">
+        ${
+          requiredItems.length
+            ? requiredItems.map(item => {
+                const position = Number(item.position)
+                const opened = !!reveal[position]
+
+                return `
+                  <button
+                    class="presenterArchiveRequiredItem ${opened ? "opened" : ""}"
+                    onclick="sendCommand('showAnswer')"
+                    ${opened ? "disabled" : ""}
+                  >
+                    ${item.text || "المطلوب"}
+                  </button>
+                `
+              }).join("")
+            : `<div class="presenterArchiveEmpty">لا يوجد مطلوب</div>`
+        }
       </div>
     </section>
   `
-}
-
-/* =========================
-   HELPERS
-========================= */
-
-function showToast(text) {
-  const t = document.getElementById("presenterToast")
-  if (!t) return
-
-  t.innerText = text
-  t.classList.add("show")
-
-  setTimeout(()=>t.classList.remove("show"),1000)
 }

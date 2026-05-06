@@ -908,3 +908,20 @@
 .auctionTopNote{
   width:min(100%, 480px) !important;
 }
+.auctionImageOverlay.auctionWrongFlash::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(255, 0, 0, .35);
+  pointer-events:none;
+  animation:auctionWrongFlash .65s ease;
+  z-index:50;
+}
+
+@keyframes auctionWrongFlash{
+  0%{opacity:0}
+  18%{opacity:1}
+  38%{opacity:.15}
+  58%{opacity:1}
+  100%{opacity:0}
+}

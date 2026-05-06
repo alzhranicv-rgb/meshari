@@ -296,6 +296,10 @@ function saveArchiveState() {
 
   localStorage.setItem(ARCHIVE_STORAGE_KEY, JSON.stringify(state))
   localStorage.setItem("active_segment", "archive")
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
 }
 
 function clearArchiveState() {

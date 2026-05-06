@@ -65,10 +65,10 @@ function saveAuctionState() {
     A: auctionState.scoreA,
     B: auctionState.scoreB
   }
-}
 
-function clearAuctionState() {
-  localStorage.removeItem(AUCTION_STORAGE_KEY)
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
 }
 
 function restoreAuctionState(saved) {
@@ -110,21 +110,58 @@ function restoreAuctionState(saved) {
    Double
 ========================= */
 
+let auctionDoublePickMode = false
+
+function selectAuctionTeam(team) {
+  if (auctionDoublePickMode) {
+    if (auctionState.currentQuestionNumber || auctionState.pendingScore) {
+      showGameToast("الدوبيلا قبل اختيار الرقم فقط")
+      auctionDoublePickMode = false
+      updateAuctionDoubleButton()
+      return
+    }
+
+    if (auctionDoubleState.used[team]) {
+      showGameToast("هذا الفريق استخدم الدوبيلا مسبقًا")
+      return
+    }
+
+    pushAuctionHistory()
+
+    auctionState.activeTeam = team
+    auctionDoubleState.used[team] = true
+    auctionDoubleState.activeTeam = team
+    auctionDoublePickMode = false
+
+    showGameToast(`تم تفعيل الدوبيلا لفريق ${team === "A" ? teamAName : teamBName}`)
+
+    highlightAuctionActiveTeam()
+    renderAuctionContent()
+    updateAuctionDoubleButton()
+    updateAuctionUndoButtonState()
+    saveAuctionState()
+    return
+  }
+
+  if (!auctionState.currentQuestionNumber || !auctionState.pendingScore) {
+    showGameToast("اختر الرقم أولاً")
+    return
+  }
+
+  pushAuctionHistory()
+
+  auctionState.activeTeam = auctionState.activeTeam === team ? null : team
+
+  highlightAuctionActiveTeam()
+  renderAuctionContent()
+  updateAuctionDoubleButton()
+  updateAuctionUndoButtonState()
+  saveAuctionState()
+}
+
 function activateAuctionDouble() {
-  const team = auctionState.activeTeam
-
-  if (!team) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
-
   if (auctionState.currentQuestionNumber || auctionState.pendingScore) {
-    showGameToast("الدوبيلا  قبل اختيار السؤال فقط")
-    return
-  }
-
-  if (auctionDoubleState.used[team]) {
-    showGameToast("هذا الفريق استخدم الدوبيلا مسبقًا")
+    showGameToast("الدوبيلا قبل اختيار الرقم فقط")
     return
   }
 
@@ -133,15 +170,9 @@ function activateAuctionDouble() {
     return
   }
 
-  pushAuctionHistory()
-
-  auctionDoubleState.used[team] = true
-  auctionDoubleState.activeTeam = team
-
-  showGameToast(`تم تفعيل الدوبيلا  لفريق ${team === "A" ? teamAName : teamBName}`)
-
+  auctionDoublePickMode = true
+  showGameToast("اختر الفريق لتفعيل الدوبيلا")
   updateAuctionDoubleButton()
-  saveAuctionState()
 }
 
 function getAuctionScoreValue(team) {
@@ -162,28 +193,16 @@ function updateAuctionDoubleButton() {
 
   btn.classList.remove("activeDouble")
 
-  if (auctionState.currentQuestionNumber || auctionState.pendingScore) {
-    btn.disabled = true
-    btn.innerText = "دوبيلا"
-    return
-  }
-
-  if (!team) {
-    btn.disabled = auctionDoubleState.used.A && auctionDoubleState.used.B
-    btn.innerText = "دوبيلا"
-    return
-  }
-
-  if (auctionDoubleState.activeTeam === team) {
-    btn.disabled = true
-    btn.innerText = "الدوبيلا مفعّل"
+  if (auctionDoublePickMode) {
+    btn.disabled = false
+    btn.innerText = "اختر الفريق"
     btn.classList.add("activeDouble")
     return
   }
 
-  if (auctionDoubleState.used[team]) {
+  if (auctionState.currentQuestionNumber || auctionState.pendingScore) {
     btn.disabled = true
-    btn.innerText = "استخدم الدوبيلا"
+    btn.innerText = "دوبيلا"
     return
   }
 
@@ -193,10 +212,16 @@ function updateAuctionDoubleButton() {
     return
   }
 
-  btn.disabled = false
-  btn.innerText = "دوبيلا "
-}
+  if (team && auctionDoubleState.activeTeam === team) {
+    btn.disabled = true
+    btn.innerText = "الدوبيلا مفعّل"
+    btn.classList.add("activeDouble")
+    return
+  }
 
+  btn.disabled = false
+  btn.innerText = "دوبيلا"
+}
 /* =========================
    Undo
 ========================= */
@@ -509,6 +534,7 @@ function renderAuctionContent() {
   updateAuctionDoubleButton()
 }
 
+
 /* =========================
    Open Card
 ========================= */
@@ -573,23 +599,6 @@ async function loadAuctionCurrent() {
   saveAuctionState()
 }
 
-/* =========================
-   Team Select
-========================= */
-
-function selectAuctionTeam(team) {
-  if (auctionState.activeTeam === team) return
-
-  pushAuctionHistory()
-
-  auctionState.activeTeam = team
-  highlightAuctionActiveTeam()
-  renderAuctionContent()
-  updateAuctionDoubleButton()
-  updateAuctionUndoButtonState()
-  saveAuctionState()
-}
-
 function highlightAuctionActiveTeam() {
   const a = document.getElementById("auctionTeamABox")
   const b = document.getElementById("auctionTeamBBox")
@@ -610,14 +619,12 @@ function highlightAuctionActiveTeam() {
   updateAuctionDoubleButton()
 }
 
-
 function resetAuctionTimer() {
   clearInterval(timer)
   timer = null
   auctionTimerStarted = false
   auctionLastTickPlayed = null
 }
-
 /* =========================
    Scores / Grid
 ========================= */
@@ -647,6 +654,9 @@ function updateAuctionGridOnly() {
 ========================= */
 
 function auctionCorrect() {
+  const oldOverlay = document.getElementById("auctionImageOverlay")
+  if (oldOverlay) oldOverlay.remove()
+
   const team = auctionState.activeTeam
 
   if (!auctionState.pendingScore || auctionState.currentQuestionNumber === null) {
@@ -706,11 +716,19 @@ function auctionWrong() {
 
   pushAuctionHistory()
 
-
   auctionDoubleState.activeTeam = null
 
   playGameSound("wrong")
-  flashScreen("wrong")
+
+  const overlay = document.getElementById("auctionImageOverlay")
+  if (overlay) {
+    overlay.classList.remove("auctionWrongFlash")
+    void overlay.offsetWidth
+    overlay.classList.add("auctionWrongFlash")
+  } else {
+    flashScreen("wrong")
+  }
+
   updateAuctionDoubleButton()
   saveAuctionState()
 }

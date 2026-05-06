@@ -1,420 +1,1552 @@
 /* =========================
-   PRESENTER CLEAN DESIGN
+   PRESENTER PAGE - IPHONE HOME
 ========================= */
 
-*{
+.presenterJoinShell,
+#presenterHome,
+.presenterSegmentPage{
+  width:min(430px, calc(100% - 22px)) !important;
+  min-height:100svh !important;
+  padding:14px 0 18px !important;
+  gap:14px !important;
+}
+
+/* دخول المقدم */
+
+.presenterJoinShell{
+  justify-content:flex-start !important;
+}
+
+.presenterTopBoard{
+  grid-template-columns:1fr !important;
+  margin-top:18px !important;
+}
+
+.presenterJoinTitleBox{
+  min-height:130px !important;
+}
+
+.presenterJoinTitleBox h1{
+  font-size:4.2rem !important;
+}
+
+.presenterJoinTitleBox .modelNameDisplay{
+  font-size:1.45rem !important;
+  margin-top:6px !important;
+}
+
+.presenterJoinCard{
+  position:relative;
+  width:100%;
+  margin:18px auto 0;
+  padding:22px 18px 18px;
+  border-radius:30px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F3F7F7 100%);
+  border:1px solid var(--border);
+  box-shadow:
+    0 14px 34px rgba(47,65,88,.10),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  overflow:hidden;
   box-sizing:border-box;
 }
 
-html,
-body{
-  margin:0;
-  min-height:100%;
-  direction:rtl;
-  font-family:Arial, sans-serif;
-  background:
-    radial-gradient(circle at 85% 0%, rgba(255,155,81,.28), transparent 28%),
-    linear-gradient(180deg,#fff6ee 0%,#eaf0ef 100%);
-  color:#243447;
+.presenterJoinCard::before{
+  content:"";
+  position:absolute;
+  width:150px;
+  height:150px;
+  top:-62px;
+  left:-42px;
+  border-radius:50%;
+  background:rgba(255,155,81,.13);
+}
+
+.presenterJoinCard::after{
+  content:"";
+  position:absolute;
+  width:95px;
+  height:95px;
+  bottom:-42px;
+  right:-24px;
+  border-radius:24px;
+  transform:rotate(28deg);
+  background:rgba(47,65,88,.05);
+}
+
+.presenterJoinLabel{
+  position:relative;
+  z-index:2;
+  color:#7A6950;
+  font-size:1.1rem;
+  text-align:center;
+  margin-bottom:12px;
+}
+
+.presenterJoinInput{
+  position:relative;
+  z-index:2;
+  width:100%;
+  height:70px;
+  border:2px solid rgba(255,155,81,.26);
+  border-radius:22px;
+  outline:none;
+  background:linear-gradient(180deg,#FFF8F1 0%,#FFF1E3 100%);
+  color:#2F4158;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2.6rem;
+  text-align:center;
+  letter-spacing:10px;
+  box-shadow:
+    inset 0 2px 8px rgba(255,255,255,.95),
+    0 8px 18px rgba(255,155,81,.10);
+  box-sizing:border-box;
+}
+
+.presenterJoinInput::placeholder{
+  color:rgba(47,65,88,.28);
+}
+
+.presenterJoinBtn{
+  position:relative;
+  z-index:2;
+  width:100% !important;
+  margin-top:14px;
+  height:58px !important;
+  min-width:0 !important;
+  border-radius:20px !important;
+  font-size:1.15rem !important;
+}
+
+.presenterJoinStatus{
+  position:relative;
+  z-index:2;
+  margin-top:14px;
+  min-height:22px;
+  text-align:center;
+  color:var(--text-soft);
+  font-size:.95rem;
+  line-height:1.5;
+}
+
+/* صفحة الهوم */
+
+#presenterScoreBoard{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  grid-template-areas:
+    "title title"
+    "teamA teamB" !important;
+  gap:10px !important;
+  margin-top:8px !important;
+}
+
+#presenterTitleBox{
+  grid-area:title !important;
+  min-height:118px !important;
+  padding:6px 8px 0 !important;
+}
+
+#presenterTitle{
+  font-size:3.3rem !important;
+  line-height:.92 !important;
+}
+
+#presenterSubtitle{
+  font-size:1.05rem !important;
+  margin-top:6px !important;
+  min-height:20px !important;
+}
+
+#presenterHomeTeamABox{
+  grid-area:teamA !important;
+}
+
+#presenterHomeTeamBBox{
+  grid-area:teamB !important;
+}
+
+#presenterHomeTeamABox,
+#presenterHomeTeamBBox{
+  width:100% !important;
+  max-width:none !important;
+  min-height:70px !important;
+  height:70px !important;
+  border-radius:20px !important;
+  padding:8px 9px !important;
+  gap:8px !important;
+  box-sizing:border-box !important;
+}
+
+#presenterHomeTeamABox{
+  flex-direction:row !important;
+}
+
+#presenterHomeTeamBBox{
+  flex-direction:row-reverse !important;
+}
+
+#presenterHomeTeamA,
+#presenterHomeTeamB{
+  font-size:1rem !important;
+  line-height:1.1 !important;
+  max-height:40px !important;
+  overflow:hidden !important;
+}
+
+#presenterHomeTeamA{
+  text-align:right !important;
+}
+
+#presenterHomeTeamB{
+  text-align:left !important;
+}
+
+#presenterHomeScoreA,
+#presenterHomeScoreB{
+  width:46px !important;
+  height:40px !important;
+  border-radius:13px !important;
+  font-size:1.65rem !important;
+}
+
+/* كروت الفقرات */
+
+#presenterSegmentsGrid{
+  display:grid !important;
+  grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+  gap:11px !important;
+  margin-top:14px !important;
+}
+
+#presenterSegmentsGrid .segmentCard{
+  height:118px !important;
+  min-height:118px !important;
+  border-radius:24px !important;
+  padding:12px !important;
+}
+
+#presenterSegmentsGrid .segmentCard span{
+  font-size:2rem !important;
+  line-height:1.05 !important;
+}
+
+/* زر إخفاء التحكم */
+
+#presenterHome > #displayControlsEyeBtn{
+  position:sticky !important;
+  bottom:12px !important;
+  z-index:50 !important;
+  width:100% !important;
+  min-width:0 !important;
+  height:54px !important;
+  margin-top:auto !important;
+  border-radius:18px !important;
+  font-size:1rem !important;
+}
+
+/* صفحة الفقرة */
+
+.presenterSegmentTopBoard{
+  display:grid !important;
+  grid-template-columns:74px 1fr 74px !important;
+  gap:8px !important;
+  align-items:center !important;
+  margin-top:8px !important;
+}
+
+.presenterSegmentTitleBox{
+  min-height:92px !important;
+  padding:4px 4px 0 !important;
+}
+
+.presenterSegmentTitleBox h1{
+  font-size:2.45rem !important;
+  line-height:.95 !important;
+}
+
+.presenterSegmentTitleBox .modelNameDisplay{
+  font-size:.9rem !important;
+  margin-top:4px !important;
+  min-height:16px !important;
+}
+
+.presenterBackBtn,
+.presenterEndBtn{
+  width:74px !important;
+  min-width:0 !important;
+  height:44px !important;
+  border:0 !important;
+  border-radius:15px !important;
+  color:#fff !important;
+  font-size:.92rem !important;
+  box-shadow:0 8px 18px rgba(47,65,88,.13) !important;
+}
+
+.presenterBackBtn{
+  background:#166866 !important;
+}
+
+.presenterEndBtn{
+  background:#660000 !important;
+}
+
+.presenterPanel{
+  width:100%;
+  margin-top:8px;
+}
+
+/* التوست */
+
+#presenterToast{
+  position:fixed;
+  top:16px;
+  left:50%;
+  transform:translateX(-50%) translateY(-14px);
+  z-index:3300;
+  width:min(88vw, 360px);
+  min-width:0;
+  background:linear-gradient(180deg,#C95757 0%,#A93F3F 100%);
+  color:#fff;
+  border-radius:18px;
+  border:2px solid #8C2F2F;
+  box-shadow:0 14px 26px rgba(88,24,24,.22);
+  padding:10px 12px;
+  display:none;
+  align-items:center;
+  gap:10px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .12s ease, transform .12s ease;
+}
+
+#presenterToast.show{
+  display:flex !important;
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+#presenterToast.show{
+  display:flex !important;
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+#presenterToast .gameToastIcon{
+  width:34px;
+  height:34px;
+  min-width:34px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#772323;
+  color:#fff;
+  font-size:.95rem;
+  font-weight:900;
+}
+
+#presenterToast .gameToastText,
+#presenterToastText{
+  flex:1;
+  color:#fff;
+  font-size:.92rem;
+  line-height:1.45;
+  text-align:center;
 }
 
 .hidden{
   display:none !important;
 }
 
-.presenterPage{
-  width:min(100% - 18px, 680px);
-  min-height:100vh;
-  margin:0 auto;
-  padding:10px 0 18px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
+/* تحسينات صغيرة للآيفون الصغير */
 
-.presenterHeader{
-  position:sticky;
-  top:0;
-  z-index:20;
-  display:grid;
-  grid-template-columns:76px 1fr 76px;
-  gap:8px;
-  align-items:center;
-  padding:10px;
-  border-radius:0 0 24px 24px;
-  background:rgba(255,246,238,.92);
-  backdrop-filter:blur(12px);
-  box-shadow:0 10px 30px rgba(47,65,88,.10);
-}
+@media (max-width:380px){
+  .presenterJoinShell,
+  #presenterHome,
+  .presenterSegmentPage{
+    width:calc(100% - 18px) !important;
+  }
 
-.presenterHeaderText{
-  text-align:center;
-  min-width:0;
-}
+  #presenterTitle{
+    font-size:2.9rem !important;
+  }
 
-.presenterHeaderText h1{
-  margin:0;
-  font-size:1.85rem;
-  line-height:1.1;
-  color:#2f4158;
-}
+  #presenterSegmentsGrid .segmentCard{
+    height:108px !important;
+    min-height:108px !important;
+  }
 
-.presenterHeaderText p{
-  margin:4px 0 0;
-  font-size:.86rem;
-  color:#677383;
-}
+  #presenterSegmentsGrid .segmentCard span{
+    font-size:1.75rem !important;
+  }
 
-.presenterBack,
-.presenterEnd{
-  height:44px;
-  border:0;
-  border-radius:15px;
-  color:#fff;
-  font-size:.9rem;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 10px 22px rgba(47,65,88,.14);
+  #presenterHomeTeamA,
+  #presenterHomeTeamB{
+    font-size:.88rem !important;
+  }
 }
+/* =========================
+   PRESENTER SHARED BASICS
+========================= */
 
-.presenterBack{
-  background:#2f4158;
-}
-
-.presenterEnd{
-  background:#7a1630;
-}
-
-.presenterHome,
 .presenterPanel{
+  width:100%;
   display:flex;
   flex-direction:column;
-  gap:12px;
-}
-.presenterSegments{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.presenterSegmentBtn{
-  min-height:110px;
-  border:0;
-  border-radius:24px;
-  background:linear-gradient(180deg,#fff 0%,#f6f8f8 100%);
-  box-shadow:0 14px 30px rgba(47,65,88,.10);
-  font-size:1.5rem;
-  font-weight:900;
-  color:#2f4158;
-}
-.presenterSetupCard,
-.presenterCard{
-  position:relative;
-  overflow:hidden;
-  background:linear-gradient(180deg,#ffffff 0%,#f6f8f8 100%);
-  border:1px solid rgba(47,65,88,.12);
-  border-radius:26px;
-  padding:16px;
-  box-shadow:0 14px 34px rgba(47,65,88,.10);
-}
-
-.presenterSetupCard::before,
-.presenterCard::before{
-  content:"";
-  position:absolute;
-  width:120px;
-  height:120px;
-  top:-52px;
-  right:-38px;
-  border-radius:50%;
-  background:rgba(255,155,81,.13);
-}
-
-.presenterSetupTitle{
-  position:relative;
-  z-index:1;
-  text-align:center;
-  font-size:2rem;
-  font-weight:900;
-  color:#2f4158;
-  margin-bottom:14px;
-}
-
-.presenterLabel{
-  position:relative;
-  z-index:1;
-  color:#5f6b7a;
-  font-size:.98rem;
-  font-weight:800;
-  margin-bottom:8px;
-}
-
-.presenterAnswerText{
-  position:relative;
-  z-index:1;
-  min-height:64px;
-  border-radius:20px;
-  border:1px solid rgba(47,65,88,.12);
-  background:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:14px;
-  font-size:1.05rem;
-  font-weight:900;
-  color:#2f4158;
+  gap:10px;
 }
 
 .presenterTeams{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:repeat(2, minmax(0,1fr));
   gap:10px;
+  width:100%;
+}
+
+.presenterTeams .presenterBtn.orange{
+  position:relative;
+  height:64px;
+  border:1px solid rgba(255,155,81,.38);
+  border-radius:20px;
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  color:#2E3A4D;
+  font-size:1rem;
+  line-height:1.1;
+  box-shadow:
+    0 10px 22px rgba(255,155,81,.18),
+    inset 0 1px 0 rgba(255,255,255,.34);
+  overflow:hidden;
+}
+
+.presenterTeams .presenterBtn.orange::before{
+  content:"";
+  position:absolute;
+  width:80px;
+  height:80px;
+  top:-42px;
+  right:-22px;
+  border-radius:50%;
+  background:rgba(255,255,255,.15);
+}
+
+.presenterTeams .presenterBtn.orange.selectedPresenterTeam{
+  border-color:#D66F28 !important;
+  box-shadow:
+    0 0 0 5px rgba(255,155,81,.20),
+    0 14px 26px rgba(255,155,81,.22),
+    inset 0 1px 0 rgba(255,255,255,.35) !important;
 }
 
 .presenterActions{
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:9px;
+  width:100%;
 }
 
-.presenterBtn,
-.presenterNumberBtn,
-.presenterRoundTabs button,
-.presenterStartBtn{
+.presenterBtn{
+  min-width:0;
+  height:48px;
   border:0;
-  min-height:52px;
-  border-radius:17px;
-  padding:0 10px;
-  font-size:1rem;
-  font-weight:900;
+  border-radius:15px;
+  padding:0 8px;
+  font-family:"HanakaText",sans-serif;
+  font-size:.92rem;
+  line-height:1.1;
   cursor:pointer;
-  transition:.15s ease;
-  box-shadow:
-    0 10px 20px rgba(0,0,0,.10),
-    inset 0 1px 0 rgba(255,255,255,.22);
-}
-
-.presenterBtn:active,
-.presenterNumberBtn:active,
-.presenterRoundTabs button:active,
-.presenterStartBtn:active{
-  transform:scale(.97);
-}
-
-.presenterBtn.orange{
-  background:linear-gradient(180deg,#ffc08e 0%,#ff9b51 100%);
-  color:#263445;
-}
-
-.presenterBtn.green{
-  background:#8ee88e;
-  color:#17351c;
-}
-
-.presenterBtn.red{
-  background:#ff6666;
-  color:#fff;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  box-shadow:0 10px 20px rgba(47,65,88,.13);
 }
 
 .presenterBtn.gray{
-  background:#6f7a88;
+  background:linear-gradient(180deg,#06264a 0%,#07305f 100%);
   color:#fff;
 }
 
-.presenterBtn.blue{
-  background:#2f6bff;
+.presenterBtn.red{
+  background:var(--ctrl-wrong);
   color:#fff;
 }
 
-.presenterBtn.dark{
-  background:#25343f;
-  color:#fff;
+.presenterBtn.green{
+  background:var(--ctrl-correct);
+  color:#17351C;
 }
 
-.presenterStartBtn{
+.presenterBtn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.presenterCard{
+  position:relative;
   width:100%;
-  margin-top:12px;
-  background:linear-gradient(180deg,#ffc08e 0%,#ff9b51 100%);
-  color:#fff;
-  min-height:58px;
-}
-
-.selectedPresenterTeam{
-  outline:4px solid rgba(255,155,81,.35);
+  padding:14px 12px;
+  border-radius:24px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F3F7F7 100%);
+  border:1px solid var(--border);
   box-shadow:
-    0 0 0 4px rgba(255,155,81,.18),
-    0 14px 28px rgba(255,155,81,.22) !important;
+    0 10px 24px rgba(47,65,88,.07),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  box-sizing:border-box;
+  overflow:hidden;
 }
 
-.presenterGrid{
+.presenterCard::before{
+  content:"";
+  position:absolute;
+  width:130px;
+  height:130px;
+  top:-54px;
+  right:-34px;
+  border-radius:50%;
+  background:rgba(255,155,81,.10);
+}
+
+.presenterLabel{
   position:relative;
-  z-index:1;
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:8px;
+  z-index:2;
+  color:#7A6950;
+  font-size:.9rem;
+  text-align:center;
+  margin:4px 0 10px;
 }
 
-.presenterGrid.four{
-  grid-template-columns:repeat(4,minmax(0,1fr));
-}
-
-.presenterGrid.two{
-  grid-template-columns:repeat(2,minmax(0,1fr));
-}
-
-.presenterNumberBtn{
-  background:#25343f;
-  color:#fff;
-  font-size:1.35rem;
-}
-
-.presenterRoundTabs{
+.presenterQuestionBody,
+.presenterAnswerBody{
   position:relative;
-  z-index:1;
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
+  z-index:2;
+  min-height:44px;
+  padding:10px 12px;
+  border-radius:17px;
+  background:linear-gradient(180deg,#FFF8F1 0%,#FFF1E3 100%);
+  border:1px solid rgba(255,155,81,.22);
+  color:#2F4158;
+  font-size:1rem;
+  line-height:1.55;
+  text-align:center;
+  box-sizing:border-box;
+  margin-bottom:10px;
 }
 
-.presenterRoundTabs button{
-  background:#25343f;
-  color:#fff;
+.presenterAnswerBody{
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
 }
 
-.presenterRoundTabs button.active{
-  background:#ff9b51;
-  color:#263445;
-}
+/* =========================
+   PRESENTER WARMUP
+========================= */
 
 .presenterWarmupCats{
   position:relative;
-  z-index:1;
+  z-index:2;
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:9px;
 }
 
 .presenterWarmupCat{
-  background:#fff;
-  border:1px solid rgba(47,65,88,.12);
-  border-radius:20px;
-  padding:10px;
+  min-height:145px;
+  padding:10px 8px;
+  border-radius:21px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  border:.5px solid rgba(34,35,35,.35);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95);
+  box-sizing:border-box;
   display:flex;
   flex-direction:column;
   gap:8px;
 }
 
 .presenterWarmupCatTitle{
-  min-height:38px;
+  min-height:42px;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
-  color:#2f4158;
-  font-size:1.05rem;
-  font-weight:900;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.18rem;
+  line-height:1.1;
+  color:#2F4158;
 }
 
 .presenterWarmupNumbers{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
+  display:flex;
+  flex-direction:column;
   gap:7px;
+  margin-top:auto;
 }
 
-.presenterToast{
-  position:fixed;
-  top:16px;
-  left:50%;
-  transform:translateX(-50%) translateY(-18px);
-  z-index:9999;
-  min-width:210px;
-  max-width:calc(100% - 24px);
-  padding:12px 16px;
-  border-radius:18px;
-  background:#2f4158;
+.presenterNumberBtn{
+  width:100%;
+  height:40px;
+  border:0;
+  border-radius:15px;
+  background:#25343F;
   color:#fff;
-  text-align:center;
-  font-weight:900;
-  opacity:0;
-  pointer-events:none;
-  transition:.22s ease;
-  box-shadow:0 14px 30px rgba(0,0,0,.18);
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.35rem;
+  box-shadow:
+    0 8px 14px rgba(37,52,63,.18),
+    inset 0 1px 0 rgba(255,255,255,.08);
 }
 
-.presenterToast.show{
+.presenterNumberBtn.presenterOpened{
+  background:#3A4A56;
+  color:transparent;
   opacity:1;
-  transform:translateX(-50%) translateY(0);
 }
 
-@media (max-width:430px){
-  .presenterPage{
-    width:calc(100% - 12px);
-    padding-top:6px;
-  }
+.presenterNumberBtn.selectedPresenterTeam{
+  background:linear-gradient(180deg,#ffcf75 0%,#ff9b2f 100%);
+  color:#2F4158;
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.18),
+    0 8px 16px rgba(255,155,81,.18);
+}
 
-  .presenterHeader{
-    grid-template-columns:64px 1fr 64px;
-    padding:8px;
-  }
+/* =========================
+   SMALL IPHONE
+========================= */
 
-  .presenterHeaderText h1{
-    font-size:1.45rem;
-  }
-
-  .presenterHeaderText p{
-    font-size:.75rem;
-  }
-
-  .presenterBack,
-  .presenterEnd{
-    height:40px;
-    border-radius:13px;
-    font-size:.8rem;
-  }
-
-  .presenterSetupCard,
-  .presenterCard{
-    border-radius:22px;
-    padding:13px;
-  }
-
-  .presenterSetupTitle{
-    font-size:1.65rem;
-  }
-
-  .presenterBtn,
-  .presenterNumberBtn,
-  .presenterRoundTabs button{
-    min-height:48px;
-    border-radius:15px;
+@media (max-width:380px){
+  .presenterTeams .presenterBtn.orange{
+    height:58px;
     font-size:.88rem;
   }
 
-  .presenterNumberBtn{
-    font-size:1.2rem;
-  }
-
-  .presenterActions{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:7px;
-  }
-
-  .presenterGrid{
-    grid-template-columns:repeat(5,minmax(0,1fr));
-    gap:7px;
+  .presenterBtn{
+    height:44px;
+    font-size:.8rem;
   }
 
   .presenterWarmupCats{
-    grid-template-columns:1fr 1fr;
-    gap:8px;
+    gap:7px;
   }
 
   .presenterWarmupCat{
-    padding:8px;
+    min-height:136px;
+    padding:9px 7px;
   }
 
   .presenterWarmupCatTitle{
-    font-size:.92rem;
+    font-size:1.05rem;
+  }
+
+  .presenterNumberBtn{
+    height:37px;
+    font-size:1.25rem;
+  }
+}/* =========================
+   WARMUP PREVIEW CLEAN
+========================= */
+
+.presenterWarmupPreviewCard{
+  padding:16px 13px 18px !important;
+  border-radius:26px !important;
+}
+
+.presenterBigQuestionBody{
+  min-height:96px !important;
+  padding:16px 14px !important;
+  border-radius:20px !important;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(255,155,81,.16), transparent 42%),
+    linear-gradient(180deg,#FFF8F1 0%,#FFF1E3 100%) !important;
+  border:1px solid rgba(255,155,81,.32) !important;
+  color:#2F4158 !important;
+  font-size:1.12rem !important;
+  line-height:1.75 !important;
+  text-align:center !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.presenterBigAnswerBody{
+  min-height:70px !important;
+  padding:14px 13px !important;
+  border-radius:19px !important;
+  font-size:1.02rem !important;
+  line-height:1.65 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+@media (max-width:380px){
+  .presenterBigQuestionBody{
+    min-height:88px !important;
+    font-size:1.02rem !important;
+    line-height:1.65 !important;
+  }
+
+  .presenterBigAnswerBody{
+    min-height:62px !important;
+    font-size:.95rem !important;
   }
 }
+/* =========================
+   PRESENTER TOP 10 FINAL
+========================= */
+
+.presenterRoundTabs{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+}
+
+.presenterRoundTabs button{
+  height:44px;
+  border:0;
+  border-radius:15px;
+  background:#25343F;
+  color:#fff;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.35rem;
+  box-shadow:
+    0 8px 14px rgba(37,52,63,.18),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.presenterRoundTabs button.active{
+  background:linear-gradient(180deg,#ffcf75 0%,#ff9b2f 100%);
+  color:#2F4158;
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.18),
+    0 8px 16px rgba(255,155,81,.18);
+}
+
+.presenterBtn.blue{
+  background:linear-gradient(180deg,#2F4158 0%,#182331 100%);
+  color:#fff;
+}
+
+/* السؤال */
+.presenterCard .presenterQuestionBody{
+  min-height:82px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.08rem;
+  line-height:1.7;
+}
+
+/* الأخطاء */
+.presenterTop10Errors{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+.presenterTop10ErrorBox{
+  min-width:0;
+  min-height:62px;
+  border:0;
+  border-radius:18px;
+  padding:8px 6px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,90,102,.14), transparent 44%),
+    linear-gradient(180deg,#FFF8F1 0%,#FFF1E3 100%);
+  border:1px solid rgba(255,90,102,.24);
+  box-shadow:
+    0 8px 16px rgba(255,90,102,.10),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+}
+
+.presenterTop10ErrorBox span{
+  max-width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  color:#7A6950;
+  font-size:.78rem;
+  line-height:1;
+}
+
+.presenterTop10ErrorBox strong{
+  min-width:52px;
+  height:28px;
+  border-radius:999px;
+  background:#FF5A66;
+  color:#fff;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.15rem;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* الإجابات */
+.presenterTop10Answers{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.presenterTop10AnswerBtn{
+  position:relative !important;
+  width:100%;
+  height:50px !important;
+  min-height:50px !important;
+  border:0 !important;
+  border-radius:18px !important;
+  padding:6px 7px !important;
+
+  display:grid !important;
+  grid-template-columns:42px minmax(0,1fr) 120px !important;
+  gap:7px !important;
+  align-items:center !important;
+
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%) !important;
+  color:#fff !important;
+  border:1px solid rgba(47,65,88,.18) !important;
+
+  box-shadow:
+    0 10px 20px rgba(36,52,71,.16),
+    inset 0 1px 0 rgba(255,255,255,.08) !important;
+
+  overflow:hidden !important;
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    background .25s ease,
+    color .25s ease,
+    border-color .25s ease !important;
+}
+
+.presenterTop10AnswerBtn::before{
+  content:"";
+  position:absolute;
+  width:48px;
+  height:48px;
+  top:-14px;
+  right:-8px;
+  border-radius:50%;
+  background:rgba(255,255,255,.08);
+}
+
+.presenterTop10AnswerBtn::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  box-shadow:inset 0 -8px 16px rgba(0,0,0,.16);
+  pointer-events:none;
+}
+
+.presenterTop10AnswerBtn:hover:not(.opened){
+  transform:translateY(-2px);
+  box-shadow:0 14px 24px rgba(36,52,71,.20) !important;
+}
+
+.presenterTop10AnswerNo{
+  position:relative;
+  z-index:2;
+  width:34px !important;
+  height:34px !important;
+  border-radius:12px !important;
+  background:rgba(255,255,255,.12) !important;
+  color:#fff !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.15rem !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.presenterTop10AnswerText{
+  position:relative;
+  z-index:2;
+  min-width:0 !important;
+  color:#fff !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.05rem !important;
+  line-height:1.35 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+.presenterTop10OpenedBy{
+  position:relative;
+  z-index:2;
+  min-width:0;
+  height:30px;
+  padding:0 10px;
+  border-radius:999px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  font-size:.74rem;
+  font-family:"HanakaText",sans-serif;
+
+  background:transparent;
+  color:transparent;
+
+  transition:.25s ease;
+}
+
+/* المفتوح */
+.presenterTop10AnswerBtn.opened{
+  background:linear-gradient(180deg,#a4b2c4 0%,#93A3B7 100%) !important;
+  color:#243447 !important;
+  border:1px solid #0b1829 !important;
+  box-shadow:0 8px 18px rgba(255,155,81,.18) !important;
+  cursor:default !important;
+  opacity:1 !important;
+  filter:none !important;
+}
+
+.presenterTop10AnswerBtn.opened:hover{
+  transform:none !important;
+}
+
+.presenterTop10AnswerBtn.opened .presenterTop10AnswerNo{
+  background:#243447 !important;
+  color:#fff !important;
+}
+
+.presenterTop10AnswerBtn.opened .presenterTop10AnswerText{
+  color:#243447 !important;
+  font-weight:700 !important;
+}
+
+.presenterTop10AnswerBtn.opened .presenterTop10OpenedBy{
+  background:linear-gradient(180deg,#FFCF75 0%,#FF9B2F 100%);
+  color:#243447;
+  box-shadow:0 4px 10px rgba(255,155,47,.22);
+}
+
+/* تأثير الفتح مرة واحدة */
+.presenterTop10AnswerBtn.top10RevealFx{
+  animation:top10RevealPop .32s ease !important;
+}
+
+.presenterTop10AnswerBtn.top10RevealFx .presenterTop10AnswerText,
+.presenterTop10AnswerBtn.top10RevealFx .presenterTop10AnswerNo,
+.presenterTop10AnswerBtn.top10RevealFx .presenterTop10OpenedBy{
+  animation:top10RevealInner .32s ease !important;
+}
+
+@media (max-width:380px){
+  .presenterRoundTabs button{
+    height:40px;
+    font-size:1.2rem;
+  }
+
+  .presenterTop10AnswerBtn{
+    grid-template-columns:36px minmax(0,1fr) 92px !important;
+    height:48px !important;
+    min-height:48px !important;
+  }
+
+  .presenterTop10AnswerNo{
+    width:30px !important;
+    height:30px !important;
+    font-size:1rem !important;
+  }
+
+  .presenterTop10AnswerText{
+    font-size:.9rem !important;
+  }
+
+  .presenterTop10OpenedBy{
+    height:27px;
+    font-size:.66rem;
+    padding:0 7px;
+  }
+}
+/* =========================
+   PRESENTER WHO FINAL
+========================= */
+
+.presenterGrid{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+}
+
+/* أرقام من هو + اختيار النقاط */
+.presenterGrid .presenterNumberBtn{
+  width:100%;
+  height:46px;
+  border:0;
+  border-radius:16px;
+  background:#25343F;
+  color:#FFFFFF;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.35rem;
+  box-shadow:
+    0 8px 14px rgba(37,52,63,.18),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  overflow:hidden;
+  position:relative;
+}
+
+.presenterGrid .presenterNumberBtn::before{
+  content:"";
+  position:absolute;
+  width:42px;
+  height:42px;
+  top:-15px;
+  right:-8px;
+  border-radius:50%;
+  background:rgba(255,255,255,.08);
+}
+
+.presenterGrid .presenterNumberBtn.selectedPresenterTeam{
+  background:linear-gradient(180deg,#FFCF75 0%,#FF9B2F 100%);
+  color:#243447;
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.18),
+    0 8px 16px rgba(255,155,81,.18);
+}
+
+.presenterGrid .presenterNumberBtn.presenterOpened,
+.presenterGrid .presenterNumberBtn:disabled.presenterOpened{
+  background:linear-gradient(180deg,#a4b2c4 0%,#93A3B7 100%);
+  color:transparent;
+  opacity:1;
+  box-shadow:inset 0 2px 8px rgba(47,65,88,.12);
+}
+
+/* من هو: أزرار التحكم 4 أزرار */
+.presenterActions:has(button:nth-child(4)){
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+
+.presenterActions:has(button:nth-child(4)) .presenterBtn{
+  font-size:.82rem;
+  padding:0 5px;
+}
+
+/* كرت المعاينة */
+#presenterWhoAnswerText{
+  min-height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.05rem;
+  line-height:1.6;
+}
+
+.presenterImagePreviewBox{
+  position:relative;
+  z-index:2;
+  width:100%;
+  height:190px;
+  border-radius:22px;
+  overflow:hidden;
+  background:linear-gradient(180deg,#FFF8F1 0%,#FFF1E3 100%);
+  border:1px solid rgba(255,155,81,.28);
+  box-shadow:
+    0 10px 20px rgba(255,155,81,.10),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.presenterImagePreviewBox img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+/* ترتيب حالة السؤال */
+.presenterCard .presenterAnswerBody:first-of-type{
+  font-size:.95rem;
+  color:#7A6950;
+}
+
+/* iPhone صغير */
+@media (max-width:380px){
+  .presenterGrid{
+    gap:7px;
+  }
+
+  .presenterGrid .presenterNumberBtn{
+    height:42px;
+    border-radius:14px;
+    font-size:1.2rem;
+  }
+
+  .presenterActions:has(button:nth-child(4)) .presenterBtn{
+    font-size:.72rem;
+  }
+
+  .presenterImagePreviewBox{
+    height:165px;
+    border-radius:19px;
+  }
+}
+.presenterWhoPreviewCard{
+  padding:16px 13px 18px !important;
+  border-radius:26px !important;
+}
+
+.presenterWhoPreviewCard #presenterWhoAnswerText{
+  min-height:74px !important;
+  border-radius:20px !important;
+  font-size:1.12rem !important;
+  line-height:1.7 !important;
+}
+/* =========================
+   PRESENTER AUCTION FINAL
+========================= */
+
+.presenterGrid.four{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+
+.presenterGrid.four .presenterNumberBtn{
+  height:48px;
+  border-radius:16px;
+  font-size:1.35rem;
+}
+
+#presenterAuctionAnswerText{
+  min-height:62px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.08rem;
+  line-height:1.6;
+}
+
+#presenterAuctionNoteText{
+  min-height:74px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:20px;
+  font-size:1rem;
+  line-height:1.7;
+}
+
+#presenterAuctionImageBox{
+  height:190px;
+}
+
+/* أزرار فتبلة */
+.presenterActions .presenterBtn.blue{
+  background:linear-gradient(180deg,#2F4158 0%,#182331 100%);
+  color:#fff;
+}
+
+/* iPhone صغير */
+@media (max-width:380px){
+  .presenterGrid.four{
+    gap:7px;
+  }
+
+  .presenterGrid.four .presenterNumberBtn{
+    height:42px;
+    border-radius:14px;
+    font-size:1.2rem;
+  }
+
+  #presenterAuctionImageBox{
+    height:165px;
+  }
+}
+.presenterAuctionPreviewCard{
+  padding:16px 13px 18px !important;
+  border-radius:26px !important;
+}
+/* =========================
+   PRESENTER FINAL FINAL
+========================= */
+
+#presenterFinalNumbers.presenterGrid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+#presenterFinalControls{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+
+#presenterFinalControls > .presenterBtn{
+  width:100%;
+  height:50px;
+}
+
+.presenterBtn.dark{
+  background:linear-gradient(180deg,#3D0614 0%,#21030A 100%);
+  color:#fff;
+}
+
+#presenterFinalPreview{
+  min-height:90px;
+  border-radius:20px;
+  padding:14px 12px;
+  font-size:1rem;
+  line-height:1.7;
+  display:block;
+  text-align:center;
+}
+
+#presenterFinalPreview strong{
+  color:#C96A25;
+}
+
+/* إخفاء حالة الجولة */
+#presenterPanel .presenterCard:has(.presenterLabel:first-child){
+  overflow:hidden;
+}
+
+/* الجولة الثانية */
+.presenterFinalRound2PreviewStage{
+  position:relative;
+  z-index:2;
+}
+
+.finalRound2AnswerGrid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+
+.finalRound2AnswerCard{
+  width:100%;
+  min-height:58px;
+  border:0;
+  border-radius:18px;
+  padding:10px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  border:1px solid rgba(217,224,224,.95);
+  box-shadow:
+    0 8px 16px rgba(47,65,88,.07),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  color:#2F4158;
+}
+
+.finalRound2AnswerCard.selectedCorrect{
+  background:linear-gradient(180deg,#FFCF75 0%,#FF9B2F 100%);
+  color:#243447;
+  border-color:rgba(255,155,47,.45);
+}
+
+.finalRound2AnswerScrambled{
+  font-size:1.05rem;
+  line-height:1.35;
+  color:#2F4158;
+}
+
+.finalRound2AnswerCorrect{
+  margin-top:5px;
+  font-size:.85rem;
+  line-height:1.3;
+  color:#7A6950;
+}
+
+.finalSequenceWordsWrap{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+.finalSequenceWordBtn{
+  min-height:46px;
+  border:0;
+  border-radius:16px;
+  padding:8px;
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
+  color:#fff;
+  font-size:.95rem;
+  line-height:1.3;
+  box-shadow:
+    0 8px 16px rgba(36,52,71,.15),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+/* الجولة الثالثة */
+.presenterFinalRound3Preview{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.finalRound3AnswersList{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+
+.finalRound3AnswerCard{
+  border:0;
+  border-radius:18px;
+  padding:9px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  border:1px solid rgba(217,224,224,.95);
+  box-shadow:
+    0 8px 16px rgba(47,65,88,.07),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.finalRound3AnswerCard.selectedCorrect{
+  background:linear-gradient(180deg,#FFCF75 0%,#FF9B2F 100%);
+}
+
+.finalAnswerChip{
+  min-height:34px;
+  border-radius:14px;
+  background:#2F4158;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:4px 8px;
+  font-size:.95rem;
+}
+
+.finalNoteBox{
+  margin-top:6px;
+  padding:7px 8px;
+  border-radius:13px;
+  background:rgba(255,255,255,.55);
+  color:#7A6950;
+  font-size:.8rem;
+  line-height:1.4;
+}
+
+.presenterFinalRound3ImageStage .presenterImagePreviewBox{
+  height:180px;
+}
+
+/* تحسين أزرار الفاصلة */
+#presenterFinalControls .presenterActions{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+#presenterFinalControls .presenterActions:has(button:nth-child(2)):not(:has(button:nth-child(3))){
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+/* iPhone صغير */
+@media (max-width:380px){
+  #presenterFinalPreview{
+    font-size:.92rem;
+    min-height:78px;
+  }
+
+  .finalSequenceWordsWrap{
+    grid-template-columns:1fr;
+  }
+
+  .presenterFinalRound3ImageStage .presenterImagePreviewBox{
+    height:155px;
+  }
+
+  #presenterFinalControls .presenterBtn{
+    font-size:.72rem;
+  }
+}
+/* =========================
+   FINAL ROUND 2 SIMPLE ANSWERS
+========================= */
+
+.presenterFinalRound2SimpleGrid{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+
+.presenterFinalRound2SimpleCard{
+  width:100%;
+  min-height:52px;
+  border:0;
+  border-radius:17px;
+  padding:10px 12px;
+
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
+  color:#fff;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.05rem;
+  line-height:1.35;
+  text-align:center;
+
+  box-shadow:
+    0 8px 16px rgba(36,52,71,.15),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.presenterFinalRound2SimpleCard.selectedCorrect{
+  background:linear-gradient(180deg,#8EE88E 0%,#22C55E 100%) !important;
+  color:#17351C !important;
+  box-shadow:
+    0 0 0 4px rgba(34,197,94,.18),
+    0 8px 16px rgba(34,197,94,.20) !important;
+}
+.finalTwoActions{
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+}
+/* =========================
+   FINAL ROUND 3 ANSWERS GRID
+========================= */
+
+.finalRound3AnswersList{
+  display:grid !important;
+  grid-template-columns:repeat(2, minmax(0,1fr)) !important;
+  gap:8px !important;
+}
+
+.finalRound3AnswerCard{
+  min-height:58px !important;
+  padding:8px !important;
+}
+
+.finalAnswerChip{
+  min-height:38px !important;
+  font-size:.88rem !important;
+  line-height:1.25 !important;
+  text-align:center !important;
+}
+
+.finalNoteBox{
+  font-size:.72rem !important;
+  line-height:1.35 !important;
+  max-height:48px !important;
+  overflow:auto !important;
+}
+
+@media (max-width:380px){
+  .finalRound3AnswersList{
+    grid-template-columns:repeat(2, minmax(0,1fr)) !important;
+    gap:7px !important;
+  }
+
+  .finalAnswerChip{
+    font-size:.8rem !important;
+  }
+}
+/* FINAL ROUND 3 - ANSWER IN ONE BOX */
+
+.finalRound3AnswerCard{
+  min-height:52px !important;
+  padding:8px 10px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.finalAnswerChip{
+  width:100% !important;
+  min-height:0 !important;
+  background:transparent !important;
+  color:#2F4158 !important;
+  padding:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  font-size:.95rem !important;
+  line-height:1.35 !important;
+}
+
+.finalRound3AnswerCard.selectedCorrect .finalAnswerChip{
+  color:#17351C !important;
+}
+
+.finalNoteBox{
+  display:none !important;
+}
+/* =========================
+   PRESENTER ARCHIVE SIMPLE FINAL
+========================= */
+
+.presenterRoundTabs:has(button:nth-child(4)){
+  grid-template-columns:repeat(4,1fr) !important;
+}
+
+.presenterArchiveSimpleCard{
+  padding:16px 13px 18px !important;
+  border-radius:26px !important;
+}
+
+.presenterArchiveSimpleScore{
+  position:relative;
+  z-index:2;
+  min-height:78px;
+  border-radius:22px;
+  background:linear-gradient(180deg,#FFCF75 0%,#FF9B2F 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:14px;
+  box-shadow:0 10px 20px rgba(255,155,47,.16);
+}
+
+.presenterArchiveSimpleScore strong{
+  color:#243447;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2.45rem;
+  line-height:1;
+}
+
+.presenterArchiveRequiredList{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+
+.presenterArchiveRequiredItem{
+  min-height:58px;
+  border:0;
+  border-radius:18px;
+  padding:10px 12px;
+  background:linear-gradient(180deg,#FF5A66 0%,#D62828 100%);
+  color:#fff;
+  font-size:1.02rem;
+  line-height:1.4;
+  text-align:center;
+  box-shadow:0 10px 20px rgba(214,40,40,.18);
+}
+
+.presenterArchiveRequiredItem.opened{
+  opacity:.45;
+  filter:grayscale(.2);
+}
+
+.presenterArchiveEmpty{
+  min-height:54px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  color:#7A6950;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+

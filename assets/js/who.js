@@ -41,24 +41,23 @@ function saveWhoState() {
   const timerBox = document.getElementById("timer")
 
   const state = {
-  whoState,
-  whoDoubleState,
-  currentWhoAnswer,
-  currentWhoImage,
-  whoQuestionLocked,
-  whoCurrentNumber,
-  whoTimerStarted,
-  whoCompensationMode,
-  timerValue: timerBox ? Number(timerBox.innerText || 0) : 0
-}
+    whoState,
+    whoDoubleState,
+    currentWhoAnswer,
+    currentWhoImage,
+    whoQuestionLocked,
+    whoCurrentNumber,
+    whoTimerStarted,
+    whoCompensationMode,
+    timerValue: timerBox ? Number(timerBox.innerText || 0) : 0
+  }
 
   localStorage.setItem(WHO_STORAGE_KEY, JSON.stringify(state))
   localStorage.setItem("active_segment", "who")
-}
 
-function clearWhoState() {
-  localStorage.removeItem(WHO_STORAGE_KEY)
-  localStorage.removeItem("active_segment")
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
 }
 
 function restoreWhoState(saved) {

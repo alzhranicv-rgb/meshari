@@ -51,11 +51,10 @@ function saveWarmupState() {
 
   localStorage.setItem(WARMUP_STORAGE_KEY, JSON.stringify(state))
   localStorage.setItem("active_segment", "warmup")
-}
 
-function clearWarmupState() {
-  localStorage.removeItem(WARMUP_STORAGE_KEY)
-  localStorage.removeItem("active_segment")
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
 }
 
 function restoreWarmupButtonStates() {

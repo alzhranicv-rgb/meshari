@@ -57,6 +57,10 @@ function saveTop10State() {
 
   localStorage.setItem(TOP10_STORAGE_KEY, JSON.stringify(state))
   localStorage.setItem("active_segment", "top10")
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
 }
 
 function clearTop10State() {

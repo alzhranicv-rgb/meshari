@@ -3,101 +3,149 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة المقدم</title>
+  <title>الحنكة - لوحة المقدم</title>
 
   <link rel="stylesheet" href="styles.css" />
+
+  <link rel="stylesheet" href="assets/css/segments/warmup.css" />
+  <link rel="stylesheet" href="assets/css/segments/top10.css" />
+  <link rel="stylesheet" href="assets/css/segments/auction.css" />
+  <link rel="stylesheet" href="assets/css/segments/who.css" />
+  <link rel="stylesheet" href="assets/css/segments/final.css" />
+  <link rel="stylesheet" href="assets/css/segments/archive.css" />
+
   <link rel="stylesheet" href="presenter.css" />
 </head>
 <body>
 
-  <div class="presenterPage">
+  <div id="presenterJoin" class="homePageShell presenterJoinShell">
+    <div class="topBoard presenterTopBoard">
+      <div class="titleBox presenterJoinTitleBox">
+        <h1>الحنكة</h1>
+        <div class="modelNameDisplay">لوحة المقدم</div>
+      </div>
+    </div>
 
-    <header class="presenterHeader">
+    <div class="presenterJoinCard">
+      <div class="presenterJoinLabel">كود الجلسة</div>
+
+      <input
+  id="joinCodeInput"
+  class="presenterJoinInput"
+  type="tel"
+  inputmode="numeric"
+  pattern="[0-9]*"
+  maxlength="4"
+  autocomplete="one-time-code"
+  placeholder="0000"
+/>
+
+      <button class="winnerBtn presenterJoinBtn" onclick="joinGameSession()">
+        دخول
+      </button>
+
+      <div id="presenterJoinStatus" class="presenterJoinStatus">
+        أدخل الكود الظاهر في شاشة الانترو
+      </div>
+    </div>
+  </div>
+
+  <div id="presenterHome" class="homePageShell hidden">
+
+    <div class="topBoard" id="presenterScoreBoard">
+
+      <div class="teamBox" id="presenterHomeTeamABox">
+        <div class="teamName" id="presenterHomeTeamA">الفريق الأول</div>
+        <div class="teamScore" id="presenterHomeScoreA">0</div>
+      </div>
+
+      <div class="titleBox" id="presenterTitleBox">
+        <h1 id="presenterTitle">لوحة المقدم</h1>
+        <div id="presenterSubtitle" class="modelNameDisplay">اختر الفقرة وتحكم بالعرض</div>
+      </div>
+
+      <div class="teamBox" id="presenterHomeTeamBBox">
+        <div class="teamName" id="presenterHomeTeamB">الفريق الثاني</div>
+        <div class="teamScore" id="presenterHomeScoreB">0</div>
+      </div>
+
+    </div>
+
+    
+
+    <div class="segmentsGrid" id="presenterSegmentsGrid">
+
+      <div class="segmentCard" onclick="openPresenterSegment('warmup')">
+        <span>التسخين</span>
+      </div>
+
+      <div class="segmentCard" onclick="openPresenterSegment('top10')">
+        <span>Top 10</span>
+      </div>
+
+      <div class="segmentCard" onclick="openPresenterSegment('auction')">
+        <span>فتبلة</span>
+      </div>
+
+      <div class="segmentCard" onclick="openPresenterSegment('who')">
+        <span>من هو</span>
+      </div>
+
+      <div class="segmentCard" onclick="openPresenterSegment('final')">
+        <span>الفاصلة</span>
+      </div>
+
+      <div class="segmentCard" onclick="openPresenterSegment('archive')">
+        <span>الأرشيف</span>
+      </div>
+
+    </div>
+
+    <button
+  id="displayControlsEyeBtn"
+  class="presenterDisplayControlsBtn hideControlsMode"
+  onclick="togglePresenterDisplayControls()"
+>
+  إخفاء التحكم
+</button>
+
+  </div>
+
+  <div id="presenterSegmentPage" class="homePageShell presenterSegmentPage hidden">
+
+    <div class="topBoard presenterSegmentTopBoard">
+
       <button
-        class="presenterBack hidden"
+        class="displayControlsEyeBtn presenterBackBtn"
         id="presenterBackBtn"
         onclick="presenterGoHome()"
       >
         رجوع
       </button>
 
-      <div class="presenterHeaderText">
-        <h1 id="presenterTitle">لوحة المقدم</h1>
-        <p id="presenterSubtitle">اختر الفقرة وتحكم بالعرض</p>
+      <div class="titleBox presenterSegmentTitleBox">
+        <h1 id="presenterSegmentTitle">الفقرة</h1>
+        <div id="presenterSegmentSubtitle" class="modelNameDisplay">تحكم مباشر بالعرض</div>
       </div>
 
       <button
-        class="presenterEnd hidden"
+        class="displayControlsEyeBtn presenterEndBtn"
         id="presenterEndBtn"
         onclick="sendCommand('endSegment')"
       >
         إنهاء
       </button>
-    </header>
 
-    <main id="presenterHome" class="presenterHome">
+    </div>
 
-      <section class="presenterSetupCard">
-        <div class="presenterSetupTitle">لوحة المقدم</div>
-
-        <div class="presenterCard">
-          <div class="presenterLabel">الحالة</div>
-          <div class="presenterAnswerText" id="presenterConnectionStatus">
-            متصل بالعرض ✅
-          </div>
-        </div>
-
-        <div class="presenterTeams">
-          <button class="presenterBtn orange" id="presenterHomeTeamA">
-            الفريق الأول
-          </button>
-
-          <button class="presenterBtn orange" id="presenterHomeTeamB">
-            الفريق الثاني
-          </button>
-        </div>
-
-        <button
-          class="presenterStartBtn"
-          onclick="sendCommand('toggleDisplayControls')"
-        >
-          إظهار / إخفاء تحكم العرض
-        </button>
-      </section>
-
-      <section class="presenterSegments">
-        <button onclick="openPresenterSegment('warmup')" class="presenterSegmentBtn">
-          <span>التسخين</span>
-        </button>
-
-        <button onclick="openPresenterSegment('top10')" class="presenterSegmentBtn">
-          <span>Top 10</span>
-        </button>
-
-        <button onclick="openPresenterSegment('auction')" class="presenterSegmentBtn">
-          <span>فتبلة</span>
-        </button>
-
-        <button onclick="openPresenterSegment('who')" class="presenterSegmentBtn">
-          <span>من هو</span>
-        </button>
-
-        <button onclick="openPresenterSegment('final')" class="presenterSegmentBtn">
-          <span>الفاصلة</span>
-        </button>
-
-        <button onclick="openPresenterSegment('archive')" class="presenterSegmentBtn">
-          <span>الأرشيف</span>
-        </button>
-      </section>
-
-    </main>
-
-    <main id="presenterPanel" class="presenterPanel hidden"></main>
-
-    <div class="presenterToast" id="presenterToast">تم الإرسال</div>
+    <div id="presenterPanel" class="presenterPanel"></div>
 
   </div>
+
+  <div class="gameToast presenterToast hidden" id="presenterToast">
+  <div class="gameToastIcon">!</div>
+  <div class="gameToastText" id="presenterToastText"></div>
+</div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>

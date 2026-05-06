@@ -59,7 +59,7 @@ function saveSegmentStatus() {
 }
 
 let segmentStatus = loadSegmentStatus()
-const GAME_SESSION_ID = "main_game"
+const GAME_SESSION_ID = localStorage.getItem("game_session_id")
 
 function getSafeJson(key) {
   try {
@@ -71,18 +71,29 @@ function getSafeJson(key) {
 
 async function syncDisplayStateToSession() {
   try {
+    const sessionId = localStorage.getItem("game_session_id")
+    if (!sessionId) return
+
     const state = {
+      mainScores: {
+        A: Number(localStorage.getItem("main_score_a") || scoreA || 0),
+        B: Number(localStorage.getItem("main_score_b") || scoreB || 0)
+      },
+      displayControlsHidden: localStorage.getItem("presenter_hide_controls") === "1",
       segmentStatus: getSafeJson("segment_status_v1"),
       warmup: getSafeJson("warmup_state_v1"),
       top10: getSafeJson("top10_state_v1"),
       auction: getSafeJson("auction_state_v2"),
       who: getSafeJson("who_state_v1"),
       final: getSafeJson("final_state_v3"),
-      archive: getSafeJson("archive_state_v1")
+      archive: getSafeJson("archive_state_v1"),
+      toast: window.lastDisplayToast || null
     }
 
     await db.from("game_sessions").upsert({
-      id: GAME_SESSION_ID,
+      id: sessionId,
+      join_code: localStorage.getItem("game_join_code"),
+      status: "active",
       model: Number(localStorage.getItem("game_model") || currentModel || 1),
       team_a: localStorage.getItem("teamAName") || teamAName,
       team_b: localStorage.getItem("teamBName") || teamBName,
@@ -94,6 +105,7 @@ async function syncDisplayStateToSession() {
     console.log("sync session error:", e)
   }
 }
+
 /* =========================
    Winner Sound + Effects
 ========================= */
@@ -397,7 +409,10 @@ function removeClassIfFound(ids, className) {
 function updateModelNameDisplay() {
   const box = document.getElementById("modelNameDisplay")
   if (!box) return
+
   box.innerText = currentModelName ? currentModelName : ""
+  box.onclick = showJoinCodePopup
+  box.style.cursor = "pointer"
 }
 
 function getSegmentWinnerLabelIds(key) {
@@ -543,6 +558,7 @@ function increaseMainScore(team) {
 
   if (team === "A") bumpScore("mainScoreA")
   if (team === "B") bumpScore("mainScoreB")
+    syncDisplayStateToSession()
 }
 
 function addMainScore(team) {
@@ -605,8 +621,19 @@ function closeWinnerOverlay() {
   stopWinnerEffects()
 }
 
-function endGameAndGoIntro() {
+async function endGameAndGoIntro() {
   stopWinnerEffects()
+
+  const sessionId = localStorage.getItem("game_session_id")
+
+  if (sessionId) {
+    await db.from("game_sessions").update({
+      status: "ended",
+      active_segment: null,
+      ended_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }).eq("id", sessionId)
+  }
 
   localStorage.removeItem("main_score_a")
   localStorage.removeItem("main_score_b")
@@ -618,18 +645,18 @@ function endGameAndGoIntro() {
   localStorage.removeItem("warmup_state_v1")
   localStorage.removeItem("top10_state_v1")
   localStorage.removeItem("auction_state_v1")
+  localStorage.removeItem("auction_state_v2")
   localStorage.removeItem("who_state_v1")
-  localStorage.removeItem("warmup_state_v1")
-localStorage.removeItem("top10_state_v1")
-localStorage.removeItem("auction_state_v1")
-localStorage.removeItem("who_state_v1")
-localStorage.removeItem("final_state_v2")
-localStorage.removeItem("archive_state_v1")
+  localStorage.removeItem("final_state_v2")
+  localStorage.removeItem("final_state_v3")
   localStorage.removeItem("archive_state_v1")
+
+  localStorage.removeItem("game_session_id")
+  localStorage.removeItem("game_join_code")
 
   const overlay = document.getElementById("winnerOverlay")
   if (overlay) overlay.classList.add("hidden")
-   syncDisplayStateToSession()
+
   window.location.href = "intro.html"
 }
 
@@ -725,9 +752,11 @@ function goHome() {
   clearInterval(timer)
   timer = null
   window.currentSegmentScores = null
+
   localStorage.removeItem("active_segment")
-syncDisplayStateToSession()
   homeRefreshLocked = false
+
+  syncDisplayStateToSession()
 
   stopEndButtonWatcher()
 
@@ -735,6 +764,7 @@ syncDisplayStateToSession()
 
   playSoftExit(content, () => {
     renderMainHome(true)
+    syncDisplayStateToSession()
   })
 }
 
@@ -878,6 +908,7 @@ function endCurrentSegment() {
 
   updateMainScoreBoard()
   updateLeadingTeamStyle()
+  syncDisplayStateToSession()
 
   if (!segmentStatus[key]) {
     segmentStatus[key] = { locked: false, winner: "" }
@@ -887,13 +918,14 @@ function endCurrentSegment() {
   segmentStatus[key].winner = winner
 
   saveSegmentStatus()
-  updateSegmentCards()
+updateSegmentCards()
 
-  clearInterval(timer)
-  timer = null
-  localStorage.removeItem("active_segment")
+clearInterval(timer)
+timer = null
+localStorage.removeItem("active_segment")
 
-  goHome()
+syncDisplayStateToSession()
+goHome()
 }
 
 function getCurrentSegmentKey() {
@@ -940,7 +972,7 @@ function canEndSegment(segmentKey) {
 
   if (segmentKey === "final") {
     if (!window.finalOpenedNumbers) return false
-    return window.finalOpenedNumbers.length >= 6
+    return window.finalOpenedNumbers.length >= 12
   }
 
   if (segmentKey === "archive") {
@@ -949,12 +981,14 @@ function canEndSegment(segmentKey) {
     const round1Items = window.archiveRoundCache?.[1]?.items || []
     const round2Items = window.archiveRoundCache?.[2]?.items || []
     const round3Items = window.archiveRoundCache?.[3]?.items || []
+    const round4Items = window.archiveRoundCache?.[4]?.items || []
 
     const r1 = round1Items.length > 0 && round1Items.every(item => window.archiveRevealState?.[1]?.[item.position])
     const r2 = round2Items.length > 0 && round2Items.every(item => window.archiveRevealState?.[2]?.[item.position])
     const r3 = round3Items.length > 0 && round3Items.every(item => window.archiveRevealState?.[3]?.[item.position])
+    const r4 = round4Items.length > 0 && round4Items.every(item => window.archiveRevealState?.[4]?.[item.position])
 
-    return r1 && r2 && r3
+    return r1 && r2 && r3 && r4
   }
 
   return false
@@ -1010,6 +1044,15 @@ function getWinnerFromSegmentScores() {
 let gameToastTimer = null
 
 function showGameToast(message) {
+  window.lastDisplayToast = {
+    text: message,
+    time: Date.now()
+  }
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
+
   const toast = document.getElementById("gameToast")
   const text = document.getElementById("gameToastText")
 
@@ -1031,7 +1074,6 @@ function showGameToast(message) {
     }, 280)
   }, 3000)
 }
-
 /* =========================
    Score bump helper
 ========================= */
@@ -1129,3 +1171,61 @@ function restoreDisplayControlsEye() {
 document.addEventListener("DOMContentLoaded", () => {
   setTimeout(restoreDisplayControlsEye, 300)
 })
+
+let joinCodePopTimer = null
+
+function showJoinCodePopup() {
+  const code = localStorage.getItem("game_join_code") || ""
+
+  if (!code) {
+    showGameToast("لا يوجد كود جلسة")
+    return
+  }
+
+  let box = document.getElementById("joinCodePopup")
+
+  if (!box) {
+    box = document.createElement("div")
+    box.id = "joinCodePopup"
+    box.className = "joinCodePopup"
+    document.getElementById("modelNameDisplay")?.appendChild(box)
+  }
+
+  const isHidden = localStorage.getItem("presenter_hide_controls") === "1"
+
+  box.innerHTML = `
+    <div class="joinCodePopupLabel">كود المقدم</div>
+    <div class="joinCodePopupNumber">${code}</div>
+
+    <button
+      id="displayControlsEyeBtn"
+      class="${isHidden ? "showControlsMode" : "hideControlsMode"}"
+      type="button"
+    >
+      ${isHidden ? "إظهار التحكم" : "إخفاء التحكم"}
+    </button>
+  `
+
+  const ctrlBtn = box.querySelector("#displayControlsEyeBtn")
+  if (ctrlBtn) {
+    ctrlBtn.onclick = function (e) {
+      e.preventDefault()
+      e.stopPropagation()
+      toggleDisplayControlsFromScreen()
+      return false
+    }
+  }
+
+  box.onclick = function (e) {
+    e.stopPropagation()
+  }
+
+  box.classList.remove("hidden")
+  box.classList.add("show")
+
+  clearTimeout(joinCodePopTimer)
+  joinCodePopTimer = setTimeout(() => {
+    box.classList.remove("show")
+    setTimeout(() => box.classList.add("hidden"), 250)
+  }, 10000)
+}
