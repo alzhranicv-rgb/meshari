@@ -16,8 +16,10 @@ let presenterSyncTimer = null
 
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search)
+  const openedFromQr = urlParams.get("join") === "1"
+  const alreadyJoined = localStorage.getItem("presenter_session_id")
 
-  if (urlParams.get("join") === "1") {
+  if (openedFromQr && !alreadyJoined) {
     localStorage.removeItem("presenter_session_id")
     localStorage.removeItem("presenter_join_code")
   }
