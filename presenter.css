@@ -1667,3 +1667,73 @@
 .presenterCleanEndBtn{
   background:#660000 !important;
 }
+/* =========================
+   PRESENTER IPHONE FIT FIX
+========================= */
+
+@media (max-width:760px){
+  .presenterJoinShell,
+  #presenterHome,
+  .presenterSegmentPage{
+    width:calc(100% - 18px) !important;
+    min-height:100svh !important;
+    padding:10px 0 12px !important;
+    gap:10px !important;
+    overflow-x:hidden !important;
+  }
+
+  #presenterScoreBoard{
+    margin-top:2px !important;
+    gap:8px !important;
+  }
+
+  #presenterTitleBox{
+    min-height:94px !important;
+  }
+
+  #presenterTitle{
+    font-size:2.75rem !important;
+  }
+
+  #presenterHomeTeamABox,
+  #presenterHomeTeamBBox{
+    height:62px !important;
+    min-height:62px !important;
+  }
+
+  #presenterSegmentsGrid{
+    gap:9px !important;
+    margin-top:8px !important;
+  }
+
+  #presenterSegmentsGrid .segmentCard{
+    height:96px !important;
+    min-height:96px !important;
+    border-radius:20px !important;
+  }
+
+  #presenterSegmentsGrid .segmentCard span{
+    font-size:1.55rem !important;
+  }
+
+  .presenterPanel{
+    gap:8px !important;
+    margin-top:4px !important;
+  }
+
+  .presenterCard{
+    padding:11px 10px !important;
+    border-radius:20px !important;
+  }
+
+  .presenterBtn{
+    height:44px !important;
+    border-radius:13px !important;
+    font-size:.82rem !important;
+  }
+
+  .presenterTeams .presenterBtn.orange{
+    height:54px !important;
+    border-radius:17px !important;
+  }
+}
