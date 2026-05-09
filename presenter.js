@@ -13,16 +13,17 @@ let presenterFinalRound = 1
 let presenterLiveState = null
 let lastPresenterToastTime = 0
 let presenterSyncTimer = null
+let presenterGoingHome = false
 
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search)
   const openedFromQr = urlParams.get("join") === "1"
   const alreadyJoined = localStorage.getItem("presenter_session_id")
 
-  if (openedFromQr && !alreadyJoined) {
-    localStorage.removeItem("presenter_session_id")
-    localStorage.removeItem("presenter_join_code")
-  }
+if (openedFromQr) {
+  localStorage.removeItem("presenter_session_id")
+  localStorage.removeItem("presenter_join_code")
+}
 
   const savedSessionId = localStorage.getItem("presenter_session_id")
 
@@ -115,11 +116,19 @@ async function joinGameSession() {
 
   localStorage.setItem("presenter_session_id", data.id)
   localStorage.setItem("presenter_join_code", code)
+  window.history.replaceState({}, "", "presenter.html")
 
-  applyPresenterSessionData(data)
-  subscribeToGameSession(data.id)
+presenterSessionId = data.id
+presenterModel = Number(data.model || 1)
+presenterTeamAName = data.team_a || "الفريق الأول"
+presenterTeamBName = data.team_b || "الفريق الثاني"
+presenterSegment = null
+presenterLiveState = data.state || {}
 
-  showToast("تم الدخول للجلسة")
+renderPresenterHome()
+subscribeToGameSession(data.id)
+
+showToast("تم الدخول للجلسة")
 }
 
 /* =========================
@@ -140,6 +149,14 @@ function applyPresenterSessionData(data) {
   presenterTeamBName = data.team_b || "الفريق الثاني"
   presenterSegment = data.active_segment || null
   presenterLiveState = data.state || {}
+  if (presenterGoingHome) {
+  if (!data.active_segment) {
+    presenterGoingHome = false
+  }
+
+  renderPresenterHome()
+  return
+}
 
   const toast = presenterLiveState?.toast
   if (toast?.text && toast?.time && toast.time !== lastPresenterToastTime) {
@@ -308,9 +325,16 @@ if (subtitle) {
 }
 
 function presenterGoHome() {
-  sendCommand("goHome")
+  presenterGoingHome = true
   presenterSegment = null
+  presenterSelectedTeam = null
+
   renderPresenterHome()
+  sendCommand("goHome")
+
+  setTimeout(() => {
+    presenterGoingHome = false
+  }, 1800)
 }
 
 function openPresenterSegment(segment) {
@@ -321,21 +345,39 @@ function openPresenterSegment(segment) {
   openPresenterSegmentFromSync(segment)
 }
 
-function openPresenterSegmentFromSync(segment) {
+async function openPresenterSegmentFromSync(segment) {
   showPresenterSegmentPage()
 
   const title = document.getElementById("presenterSegmentTitle")
+  const panel = document.getElementById("presenterPanel")
+
   if (title) title.innerText = getPresenterSegmentName(segment)
 
-  const panel = document.getElementById("presenterPanel")
-  if (panel) panel.dataset.segment = segment
+  if (panel) {
+    panel.dataset.segment = segment
+    panel.innerHTML = `<section class="presenterCard"><div class="presenterLabel">جارٍ التحميل...</div></section>`
+  }
 
-  if (segment === "warmup") return renderWarmup()
-  if (segment === "top10") return renderTop10()
-  if (segment === "auction") return renderAuction()
-  if (segment === "who") return renderWho()
-  if (segment === "final") return renderFinal()
-  if (segment === "archive") return renderArchive()
+  try {
+    if (segment === "warmup") return await renderWarmup()
+    if (segment === "top10") return await renderTop10()
+    if (segment === "auction") return await renderAuction()
+    if (segment === "who") return await renderWho()
+    if (segment === "final") return await renderFinal()
+    if (segment === "archive") return await renderArchive()
+
+    renderPresenterHome()
+  } catch (e) {
+    console.log("Presenter render error:", e)
+    if (panel) {
+      panel.innerHTML = `
+        <section class="presenterCard">
+          <div class="presenterLabel">حدث خطأ في تحميل الفقرة</div>
+          <button class="presenterBtn gray" onclick="presenterGoHome()">رجوع للرئيسية</button>
+        </section>
+      `
+    }
+  }
 }
 
 /* =========================
