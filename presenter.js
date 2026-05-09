@@ -142,6 +142,13 @@ showToast("تم الدخول للجلسة")
 
 function applyPresenterSessionData(data) {
   if (!data) return
+  if (
+  presenterSessionId === data.id &&
+  JSON.stringify(presenterLiveState) === JSON.stringify(data.state) &&
+  presenterSegment === (data.active_segment || null)
+) {
+  return
+}
 
   if (data.status === "ended") {
     renderPresenterEnded()
@@ -213,22 +220,41 @@ function subscribeToGameSession(sessionId) {
     .subscribe()
 
   
-  presenterSyncTimer = setInterval(async () => {
-    const { data } = await db
-      .from("game_sessions")
-      .select("*")
-      .eq("id", sessionId)
-      .maybeSingle()
+presenterSyncTimer = setInterval(async () => {
+  if (document.hidden) return
 
-    if (data) applyPresenterSessionData(data)
-  }, 5000)
+  const { data } = await db
+    .from("game_sessions")
+    .select("*")
+    .eq("id", sessionId)
+    .maybeSingle()
+
+  if (!data) return
+
+  const newSegment = data.active_segment || null
+  const currentSegment = presenterSegment || null
+
+  if (newSegment !== currentSegment) {
+    applyPresenterSessionData(data)
+  }
+}, 15000)
 }
 
 function renderPresenterEnded() {
+  localStorage.removeItem("presenter_session_id")
+  localStorage.removeItem("presenter_join_code")
+
+  presenterSessionId = null
+  presenterSegment = null
+  presenterLiveState = null
+
   showPresenterJoin()
 
   const status = document.getElementById("presenterJoinStatus")
-  if (status) status.innerText = "انتهت اللعبة أو لا توجد جلسة نشطة"
+
+  if (status) {
+    status.innerText = "انتهت اللعبة — أدخل كود جديد"
+  }
 }
 
 /* =========================
@@ -310,7 +336,6 @@ function renderPresenterHome() {
   const teamB = document.getElementById("presenterHomeTeamB")
   const scoreA = document.getElementById("presenterHomeScoreA")
   const scoreB = document.getElementById("presenterHomeScoreB")
-  const status = document.getElementById("presenterConnectionStatus")
   const title = document.getElementById("presenterTitle")
   const subtitle = document.getElementById("presenterSubtitle")
 
@@ -319,33 +344,72 @@ function renderPresenterHome() {
   if (scoreA) scoreA.innerText = scores.A
   if (scoreB) scoreB.innerText = scores.B
 
-  
+  if (title) title.innerText = "لوحة المقدم"
 
-if (title) title.innerText = "لوحة المقدم"
+  const modelName = presenterLiveState?.currentModelName || ""
 
-const modelName = presenterLiveState?.currentModelName || ""
-
-if (subtitle) {
-  subtitle.innerHTML = presenterSessionId
-    ? `<span class="presenterOnlineDot">✅</span><span class="presenterModelName">${modelName || "بدون اسم نموذج"}</span>`
-    : `<span class="presenterOfflineDot">❌</span><span class="presenterModelName">غير متصل</span>`
-}
+  if (subtitle) {
+    subtitle.innerHTML = presenterSessionId
+      ? `<span class="presenterOnlineDot">✅</span><span class="presenterModelName">${modelName || "بدون اسم نموذج"}</span>`
+      : `<span class="presenterOfflineDot">❌</span><span class="presenterModelName">غير متصل</span>`
+  }
 
   const panel = document.getElementById("presenterPanel")
+
   if (panel) panel.dataset.segment = ""
+
+  updatePresenterLockedSegments()
+}
+function updatePresenterLockedSegments() {
+  const locked = presenterLiveState?.segmentStatus || {}
+
+  const map = {
+    warmup: 0,
+    top10: 1,
+    auction: 2,
+    who: 3,
+    final: 4,
+    archive: 5
+  }
+
+  const cards = document.querySelectorAll("#presenterSegmentsGrid .segmentCard")
+
+  Object.keys(map).forEach(key => {
+    const card = cards[map[key]]
+
+    if (!card) return
+
+    const isLocked = !!locked?.[key]?.locked
+
+    card.classList.toggle("presenterLockedSegment", isLocked)
+  })
 }
 
-function presenterGoHome() {
+async function presenterGoHome() {
   presenterGoingHome = true
+
   presenterSegment = null
   presenterSelectedTeam = null
 
   renderPresenterHome()
-  sendCommand("goHome")
+
+  const sessionId = localStorage.getItem("presenter_session_id")
+
+  if (sessionId) {
+    await db
+      .from("game_sessions")
+      .update({
+        active_segment: null,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", sessionId)
+  }
+
+  await sendCommand("goHome")
 
   setTimeout(() => {
     presenterGoingHome = false
-  }, 1800)
+  }, 500)
 }
 
 function openPresenterSegment(segment) {
@@ -357,34 +421,56 @@ function openPresenterSegment(segment) {
 }
 
 async function openPresenterSegmentFromSync(segment) {
+  const panel = document.getElementById("presenterPanel")
+  const currentRendered = panel?.dataset.segment
+
+  if (currentRendered === segment) {
+    return
+  }
+
   showPresenterSegmentPage()
 
   const title = document.getElementById("presenterSegmentTitle")
-  const panel = document.getElementById("presenterPanel")
 
-  if (title) title.innerText = getPresenterSegmentName(segment)
+  if (title) {
+    title.innerText = getPresenterSegmentName(segment)
+  }
 
   if (panel) {
     panel.dataset.segment = segment
-    panel.innerHTML = `<section class="presenterCard"><div class="presenterLabel">جارٍ التحميل...</div></section>`
+
+    panel.innerHTML = `
+      <section class="presenterCard">
+        <div class="presenterLabel">جارٍ التحميل...</div>
+      </section>
+    `
   }
 
   try {
-    if (segment === "warmup") return await renderWarmup()
-    if (segment === "top10") return await renderTop10()
-    if (segment === "auction") return await renderAuction()
-    if (segment === "who") return await renderWho()
-    if (segment === "final") return await renderFinal()
-    if (segment === "archive") return await renderArchive()
+    if (segment === "warmup") await renderWarmup()
+    else if (segment === "top10") await renderTop10()
+    else if (segment === "auction") await renderAuction()
+    else if (segment === "who") await renderWho()
+    else if (segment === "final") await renderFinal()
+    else if (segment === "archive") await renderArchive()
+    else renderPresenterHome()
 
-    renderPresenterHome()
   } catch (e) {
     console.log("Presenter render error:", e)
+
     if (panel) {
       panel.innerHTML = `
         <section class="presenterCard">
-          <div class="presenterLabel">حدث خطأ في تحميل الفقرة</div>
-          <button class="presenterBtn gray" onclick="presenterGoHome()">رجوع للرئيسية</button>
+          <div class="presenterLabel">
+            حدث خطأ في تحميل الفقرة
+          </div>
+
+          <button
+            class="presenterBtn gray"
+            onclick="presenterGoHome()"
+          >
+            رجوع للرئيسية
+          </button>
         </section>
       `
     }

@@ -1737,3 +1737,21 @@
     border-radius:17px !important;
   }
 }
+.presenterLockedSegment{
+  opacity:.38 !important;
+  filter:grayscale(.5);
+  position:relative;
+}
+
+.presenterLockedSegment::after{
+  content:"منتهية";
+  position:absolute;
+  bottom:10px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#7D1D1D;
+  color:#fff;
+  padding:4px 12px;
+  border-radius:999px;
+  font-size:.75rem;
+}
