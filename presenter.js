@@ -237,7 +237,7 @@ presenterSyncTimer = setInterval(async () => {
   if (newSegment !== currentSegment) {
     applyPresenterSessionData(data)
   }
-}, 15000)
+}, 30000)
 }
 
 function renderPresenterEnded() {
@@ -404,12 +404,14 @@ async function presenterGoHome() {
   }, 500)
 }
 
-function openPresenterSegment(segment) {
-  presenterSegment = segment
+async function openPresenterSegment(segment) {
   presenterSelectedTeam = null
 
-  sendCommand("openSegment", { segment })
-  openPresenterSegmentFromSync(segment)
+  const sent = await sendCommand("openSegment", { segment })
+  if (!sent) return
+
+  presenterSegment = segment
+  await openPresenterSegmentFromSync(segment)
 }
 
 async function openPresenterSegmentFromSync(segment) {
