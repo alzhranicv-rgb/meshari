@@ -14,6 +14,7 @@ let presenterLiveState = null
 let lastPresenterToastTime = 0
 let presenterSyncTimer = null
 let presenterGoingHome = false
+let presenterJustJoined = false
 
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search)
@@ -125,8 +126,12 @@ presenterTeamBName = data.team_b || "الفريق الثاني"
 presenterSegment = null
 presenterLiveState = data.state || {}
 
+presenterJustJoined = true
+
 renderPresenterHome()
 subscribeToGameSession(data.id)
+
+
 
 showToast("تم الدخول للجلسة")
 }
@@ -149,6 +154,12 @@ function applyPresenterSessionData(data) {
   presenterTeamBName = data.team_b || "الفريق الثاني"
   presenterSegment = data.active_segment || null
   presenterLiveState = data.state || {}
+  if (presenterJustJoined) {
+  presenterJustJoined = false
+  presenterSegment = null
+  renderPresenterHome()
+  return
+}
   if (presenterGoingHome) {
   if (!data.active_segment) {
     presenterGoingHome = false
