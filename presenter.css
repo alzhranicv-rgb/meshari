@@ -1739,8 +1739,8 @@
 }
 .presenterLockedSegment{
   opacity:.38 !important;
-  filter:grayscale(.5);
-  position:relative;
+  filter:grayscale(.5) !important;
+  position:relative !important;
 }
 
 .presenterLockedSegment::after{

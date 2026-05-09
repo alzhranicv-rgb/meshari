@@ -142,13 +142,16 @@ showToast("تم الدخول للجلسة")
 
 function applyPresenterSessionData(data) {
   if (!data) return
+
   if (
-  presenterSessionId === data.id &&
-  JSON.stringify(presenterLiveState) === JSON.stringify(data.state) &&
-  presenterSegment === (data.active_segment || null)
-) {
-  return
-}
+    presenterSessionId === data.id &&
+    JSON.stringify(presenterLiveState) === JSON.stringify(data.state) &&
+    presenterSegment === (data.active_segment || null)
+  ) {
+    updatePresenterHomeScoresOnly()
+    updatePresenterLockedSegments()
+    return
+  }
 
   if (data.status === "ended") {
     renderPresenterEnded()
@@ -161,20 +164,25 @@ function applyPresenterSessionData(data) {
   presenterTeamBName = data.team_b || "الفريق الثاني"
   presenterSegment = data.active_segment || null
   presenterLiveState = data.state || {}
+
+  updatePresenterHomeScoresOnly()
+  updatePresenterLockedSegments()
+
   if (presenterJustJoined) {
-  presenterJustJoined = false
-  presenterSegment = null
-  renderPresenterHome()
-  return
-}
-  if (presenterGoingHome) {
-  if (!data.active_segment) {
-    presenterGoingHome = false
+    presenterJustJoined = false
+    presenterSegment = null
+    renderPresenterHome()
+    return
   }
 
-  renderPresenterHome()
-  return
-}
+  if (presenterGoingHome) {
+    if (!data.active_segment) {
+      presenterGoingHome = false
+    }
+
+    renderPresenterHome()
+    return
+  }
 
   const toast = presenterLiveState?.toast
   if (toast?.text && toast?.time && toast.time !== lastPresenterToastTime) {
@@ -219,25 +227,33 @@ function subscribeToGameSession(sessionId) {
     )
     .subscribe()
 
-  
-presenterSyncTimer = setInterval(async () => {
-  if (document.hidden) return
+  presenterSyncTimer = setInterval(async () => {
+    if (document.hidden) return
 
-  const { data } = await db
-    .from("game_sessions")
-    .select("*")
-    .eq("id", sessionId)
-    .maybeSingle()
+    const { data } = await db
+      .from("game_sessions")
+      .select("*")
+      .eq("id", sessionId)
+      .maybeSingle()
 
-  if (!data) return
+    if (!data) return
 
-  const newSegment = data.active_segment || null
-  const currentSegment = presenterSegment || null
+    const oldScores = JSON.stringify(presenterLiveState?.mainScores || {})
+    const newScores = JSON.stringify(data.state?.mainScores || {})
+    const oldLocked = JSON.stringify(presenterLiveState?.segmentStatus || {})
+    const newLocked = JSON.stringify(data.state?.segmentStatus || {})
 
-  if (newSegment !== currentSegment) {
-    applyPresenterSessionData(data)
-  }
-}, 30000)
+    const newSegment = data.active_segment || null
+    const currentSegment = presenterSegment || null
+
+    if (
+      newSegment !== currentSegment ||
+      oldScores !== newScores ||
+      oldLocked !== newLocked
+    ) {
+      applyPresenterSessionData(data)
+    }
+  }, 30000)
 }
 
 function renderPresenterEnded() {
@@ -256,7 +272,6 @@ function renderPresenterEnded() {
     status.innerText = "انتهت اللعبة — أدخل كود جديد"
   }
 }
-
 /* =========================
    SEND COMMAND - FAST
 ========================= */
@@ -296,25 +311,12 @@ async function sendCommand(action, payload = {}) {
 function getPresenterTotalScores() {
   const s = presenterLiveState || {}
 
-  if (s.final) {
-    const f = s.final
+  if (s.mainScores) {
     return {
-      A:
-        Number(f.round1?.scores?.A || 0) +
-        Number(f.round2?.scores?.A || 0) +
-        Number(f.round3?.scores?.A || 0),
-      B:
-        Number(f.round1?.scores?.B || 0) +
-        Number(f.round2?.scores?.B || 0) +
-        Number(f.round3?.scores?.B || 0)
+      A: Number(s.mainScores.A || 0),
+      B: Number(s.mainScores.B || 0)
     }
   }
-
-  if (s.archive?.archiveState?.scores) return s.archive.archiveState.scores
-  if (s.top10?.top10State?.scores) return s.top10.top10State.scores
-  if (s.who?.whoState) return { A: s.who.whoState.scoreA || 0, B: s.who.whoState.scoreB || 0 }
-  if (s.auction?.auctionState) return { A: s.auction.auctionState.scoreA || 0, B: s.auction.auctionState.scoreB || 0 }
-  if (s.warmup) return { A: s.warmup.warmupScoreA || 0, B: s.warmup.warmupScoreB || 0 }
 
   return { A: 0, B: 0 }
 }
@@ -351,6 +353,15 @@ function renderPresenterHome() {
   if (panel) panel.dataset.segment = ""
 
   updatePresenterLockedSegments()
+}
+function updatePresenterHomeScoresOnly() {
+  const scores = getPresenterTotalScores()
+
+  const scoreA = document.getElementById("presenterHomeScoreA")
+  const scoreB = document.getElementById("presenterHomeScoreB")
+
+  if (scoreA) scoreA.innerText = scores.A
+  if (scoreB) scoreB.innerText = scores.B
 }
 function updatePresenterLockedSegments() {
   const locked = presenterLiveState?.segmentStatus || {}
@@ -405,6 +416,13 @@ async function presenterGoHome() {
 }
 
 async function openPresenterSegment(segment) {
+  const locked = !!presenterLiveState?.segmentStatus?.[segment]?.locked
+
+  if (locked) {
+    showToast("هذه الفقرة منتهية")
+    return
+  }
+
   presenterSelectedTeam = null
 
   const sent = await sendCommand("openSegment", { segment })
