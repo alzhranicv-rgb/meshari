@@ -284,15 +284,7 @@ async function sendCommand(action, payload = {}) {
     return false
   }
 
-  setTimeout(async () => {
-    const { data } = await db
-      .from("game_sessions")
-      .select("*")
-      .eq("id", sessionId)
-      .maybeSingle()
 
-    if (data) applyPresenterSessionData(data)
-  }, 250)
 
   return true
 }
