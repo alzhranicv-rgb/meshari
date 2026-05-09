@@ -230,6 +230,16 @@ async function sendCommand(action, payload = {}) {
     return false
   }
 
+  setTimeout(async () => {
+    const { data } = await db
+      .from("game_sessions")
+      .select("*")
+      .eq("id", sessionId)
+      .maybeSingle()
+
+    if (data) applyPresenterSessionData(data)
+  }, 250)
+
   return true
 }
 
@@ -315,37 +325,17 @@ function openPresenterSegmentFromSync(segment) {
   showPresenterSegmentPage()
 
   const title = document.getElementById("presenterSegmentTitle")
-  const subtitle = document.getElementById("presenterSegmentSubtitle")
-
   if (title) title.innerText = getPresenterSegmentName(segment)
-  
 
   const panel = document.getElementById("presenterPanel")
-  const currentRendered = panel?.dataset.segment
-
-if (currentRendered === segment) {
-  if (segment === "final") {
-    presenterFinalRound = getPresenterFinalRound()
-    renderPresenterFinalRoundContent()
-    return
-  }
-
-  if (segment === "top10") {
-    renderTop10()
-    return
-  }
-
-  return
-}
-
   if (panel) panel.dataset.segment = segment
 
-  if (segment === "warmup") renderWarmup()
-  if (segment === "top10") renderTop10()
-  if (segment === "auction") renderAuction()
-  if (segment === "who") renderWho()
-  if (segment === "final") renderFinal()
-  if (segment === "archive") renderArchive()
+  if (segment === "warmup") return renderWarmup()
+  if (segment === "top10") return renderTop10()
+  if (segment === "auction") return renderAuction()
+  if (segment === "who") return renderWho()
+  if (segment === "final") return renderFinal()
+  if (segment === "archive") return renderArchive()
 }
 
 /* =========================
