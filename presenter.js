@@ -198,7 +198,7 @@ function applyPresenterSessionData(data) {
   openPresenterSegmentFromSync(presenterSegment)
 }
 
-function subscribeToGameSession(sessionId) {
+  function subscribeToGameSession(sessionId) {
   presenterSessionId = sessionId
 
   if (presenterChannel) {
@@ -212,20 +212,30 @@ function subscribeToGameSession(sessionId) {
 
   presenterChannel = db.channel("game_session_" + sessionId)
 
-  presenterChannel
-    .on(
-      "postgres_changes",
-      {
-        event: "UPDATE",
-        schema: "public",
-        table: "game_sessions",
-        filter: `id=eq.${sessionId}`
-      },
-      payload => {
-        applyPresenterSessionData(payload.new)
-      }
-    )
-    .subscribe()
+presenterChannel
+  .on(
+    "broadcast",
+    { event: "session_state" },
+    payload => {
+      const data = payload?.payload
+      if (!data) return
+
+      applyPresenterSessionData(data)
+    }
+  )
+  .on(
+    "postgres_changes",
+    {
+      event: "UPDATE",
+      schema: "public",
+      table: "game_sessions",
+      filter: `id=eq.${sessionId}`
+    },
+    payload => {
+      applyPresenterSessionData(payload.new)
+    }
+  )
+  .subscribe()
 
   presenterSyncTimer = setInterval(async () => {
     if (document.hidden) return

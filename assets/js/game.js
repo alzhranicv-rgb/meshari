@@ -83,18 +83,18 @@ async function syncDisplayStateToSession() {
         B: Number(localStorage.getItem("main_score_b") || scoreB || 0)
       },
       currentModelName: localStorage.getItem("game_model_name") || currentModelName || "",
-  displayControlsHidden: localStorage.getItem("presenter_hide_controls") === "1",
-  segmentStatus: getSafeJson("segment_status_v1"),
-  warmup: getSafeJson("warmup_state_v1"),
-  top10: getSafeJson("top10_state_v1"),
-  auction: getSafeJson("auction_state_v2"),
-  who: getSafeJson("who_state_v1"),
-  final: getSafeJson("final_state_v3"),
-  archive: getSafeJson("archive_state_v1"),
-  toast: window.lastDisplayToast || null
-}
+      displayControlsHidden: localStorage.getItem("presenter_hide_controls") === "1",
+      segmentStatus: getSafeJson("segment_status_v1"),
+      warmup: getSafeJson("warmup_state_v1"),
+      top10: getSafeJson("top10_state_v1"),
+      auction: getSafeJson("auction_state_v2"),
+      who: getSafeJson("who_state_v1"),
+      final: getSafeJson("final_state_v3"),
+      archive: getSafeJson("archive_state_v1"),
+      toast: window.lastDisplayToast || null
+    }
 
-    await db.from("game_sessions").upsert({
+    const sessionData = {
       id: sessionId,
       join_code: localStorage.getItem("game_join_code"),
       status: "active",
@@ -104,7 +104,22 @@ async function syncDisplayStateToSession() {
       active_segment: localStorage.getItem("active_segment") || null,
       state,
       updated_at: new Date().toISOString()
-    })
+    }
+
+    try {
+      if (presenterCommandChannel) {
+        presenterCommandChannel.send({
+          type: "broadcast",
+          event: "session_state",
+          payload: sessionData
+        })
+      }
+    } catch (e) {
+      console.log("Display session broadcast error:", e)
+    }
+
+    await db.from("game_sessions").upsert(sessionData)
+
   } catch (e) {
     console.log("sync session error:", e)
   }
