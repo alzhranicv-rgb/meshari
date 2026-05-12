@@ -265,31 +265,30 @@ function handleTop10PresenterAction(action, data) {
 ========================= */
 
 function handleAuctionPresenterAction(action, data) {
-  showGameToast("وصل أمر فتبلة: " + action)
-
   if (action === "selectTeam") {
     if (!isValidPresenterTeam(data.team)) return
     return safeRunPresenterAction(() => selectAuctionTeam(data.team))
   }
 
-  if (action === "openNumber") return safeRunPresenterAction(() => openAuction(Number(data.number)))
-  if (action === "double") return safeRunPresenterAction(() => activateAuctionDouble())
+  if (action === "openNumber") {
+    return safeRunPresenterAction(() => openAuction(Number(data.number)))
+  }
+
+  if (action === "double") {
+    return safeRunPresenterAction(() => activateAuctionDouble())
+  }
 
   if (action === "correct") {
-    return safeRunPresenterAction(() => {
-      showGameToast("تنفيذ صح فتبلة")
-      auctionCorrect()
-    })
+    return safeRunPresenterAction(() => auctionCorrect())
   }
 
   if (action === "wrong") {
-    return safeRunPresenterAction(() => {
-      showGameToast("تنفيذ خطأ فتبلة")
-      auctionWrong()
-    })
+    return safeRunPresenterAction(() => auctionWrong())
   }
 
-  if (action === "undo") return safeRunPresenterAction(() => undoAuctionAction())
+  if (action === "undo") {
+    return safeRunPresenterAction(() => undoAuctionAction())
+  }
 }
 
 /* =========================

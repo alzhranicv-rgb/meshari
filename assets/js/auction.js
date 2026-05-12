@@ -675,26 +675,31 @@ function closeAuctionZoomOverlays() {
 
 function flashAuctionZoomOverlayWrong() {
   const auctionOverlay = document.getElementById("auctionImageOverlay")
-  const auctionImg = auctionOverlay?.querySelector("img")
-
   const displayOverlay = document.getElementById("displayImageZoomOverlay")
   const displayImg = document.getElementById("displayImageZoomImg")
 
-  let target = null
-
-  if (auctionOverlay && !auctionOverlay.classList.contains("hidden")) {
-    target = auctionImg || auctionOverlay
-  } else if (displayOverlay && !displayOverlay.classList.contains("hidden")) {
-    target = displayImg || displayOverlay
+  if (auctionOverlay) {
+    auctionOverlay.classList.remove("auctionZoomWrongFlash", "auctionZoomOverlayFlash")
+    void auctionOverlay.offsetWidth
+    auctionOverlay.classList.add("auctionZoomOverlayFlash")
+    return true
   }
 
-  if (!target) return false
+  if (displayOverlay && !displayOverlay.classList.contains("hidden")) {
+    displayOverlay.classList.remove("auctionZoomWrongFlash", "auctionZoomOverlayFlash")
+    void displayOverlay.offsetWidth
+    displayOverlay.classList.add("auctionZoomOverlayFlash")
 
-  target.classList.remove("auctionZoomWrongFlash")
-  void target.offsetWidth
-  target.classList.add("auctionZoomWrongFlash")
+    if (displayImg) {
+      displayImg.classList.remove("auctionZoomImageShake")
+      void displayImg.offsetWidth
+      displayImg.classList.add("auctionZoomImageShake")
+    }
 
-  return true
+    return true
+  }
+
+  return false
 }
 
 function auctionCorrect() {
