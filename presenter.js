@@ -1238,7 +1238,7 @@ async function renderAuction() {
 
   const auction = getPresenterAuctionData()
   const maxNumber = getPresenterAuctionMaxNumber()
-  const used = auction.usedNumbers || []
+  const used = (auction.usedNumbers || []).map(Number)
   const currentNumber = Number(auction.currentQuestionNumber || 0)
   const pendingScore = !!auction.pendingScore
 
@@ -1250,89 +1250,89 @@ async function renderAuction() {
 
   presenterAuctionRows = data || []
 
-panel.innerHTML = `
-  ${teamButtons()}
+  panel.innerHTML = `
+    ${teamButtons()}
 
-  <div class="presenterActions">
-    <button
-      class="presenterBtn gray"
-      onclick="sendCommand('double')"
-      ${currentNumber || pendingScore ? "disabled" : ""}
-    >
-      دوبيلا
-    </button>
+    <div class="presenterActions">
+      <button
+        class="presenterBtn gray"
+        onclick="sendCommand('double')"
+        ${currentNumber || pendingScore ? "disabled" : ""}
+      >
+        دوبيلا
+      </button>
 
-    <button class="presenterBtn green" onclick="sendCommand('correct')">
-      ✓ إجابة صحيحة
-    </button>
+      <button class="presenterBtn green" onclick="sendCommand('correct')">
+        ✓ إجابة صحيحة
+      </button>
 
-    <button class="presenterBtn red" onclick="sendCommand('wrong')">
-      ✕ خطأ
-    </button>
-  </div>
-
-  <div class="presenterActions">
-    <button class="presenterBtn gray" onclick="sendCommand('undo')">
-      تراجع
-    </button>
-
-    <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
-      تكبير الصورة
-    </button>
-  </div>
-
-  <section class="presenterCard">
-    <div class="presenterLabel">الأرقام</div>
-
-    <div class="presenterGrid four">
-      ${Array.from({ length: maxNumber }, (_, i) => i + 1).map(num => {
-        const isUsed = used.includes(num)
-        const isCurrent = currentNumber === num
-
-        return `
-          <button
-            class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
-            ${isUsed || pendingScore ? "disabled" : ""}
-            onclick="openAuctionPresenterNumber(${num})"
-          >
-            ${isUsed ? "" : num}
-          </button>
-        `
-      }).join("")}
-    </div>
-  </section>
-
-  <section class="presenterCard presenterAuctionPreviewCard">
-    <div class="presenterLabel">الإجابة</div>
-    <div id="presenterAuctionAnswerText" class="presenterAnswerBody">
-      —
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">
+        ✕ خطأ
+      </button>
     </div>
 
-    <div class="presenterLabel">الملاحظة</div>
-    <div id="presenterAuctionNoteText" class="presenterQuestionBody">
-      —
+    <div class="presenterActions">
+      <button class="presenterBtn gray" onclick="sendCommand('undo')">
+        تراجع
+      </button>
+
+      <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
+        تكبير الصورة
+      </button>
     </div>
 
-    <div class="presenterLabel">الصورة</div>
-    <div id="presenterAuctionImageBox" class="presenterImagePreviewBox hidden"></div>
-  </section>
-`
+    <section class="presenterCard">
+      <div class="presenterLabel">الأرقام</div>
+
+      <div class="presenterGrid four" id="presenterAuctionGrid">
+        ${Array.from({ length: maxNumber }, (_, i) => i + 1).map(num => {
+          const isUsed = used.includes(num)
+          const isCurrent = currentNumber === num
+
+          return `
+            <button
+              class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
+              ${isUsed || pendingScore ? "disabled" : ""}
+              onclick="openAuctionPresenterNumber(${num})"
+            >
+              ${isUsed ? "" : num}
+            </button>
+          `
+        }).join("")}
+      </div>
+    </section>
+
+    <section class="presenterCard presenterAuctionPreviewCard">
+      <div class="presenterLabel">الإجابة</div>
+      <div id="presenterAuctionAnswerText" class="presenterAnswerBody">
+        —
+      </div>
+
+      <div class="presenterLabel">الملاحظة</div>
+      <div id="presenterAuctionNoteText" class="presenterQuestionBody">
+        —
+      </div>
+
+      <div class="presenterLabel">الصورة</div>
+      <div id="presenterAuctionImageBox" class="presenterImagePreviewBox hidden"></div>
+    </section>
+  `
 
   if (currentNumber) {
-    showPresenterAuctionPreview(currentNumber)
+    refreshPresenterAuctionFromState()
   }
 }
 
 function openAuctionPresenterNumber(number) {
   const auction = getPresenterAuctionData()
-  const used = auction.usedNumbers || []
+  const used = (auction.usedNumbers || []).map(Number)
 
   if (auction.pendingScore) {
     showToast("أنهِ الدور الحالي أولاً")
     return
   }
 
-  if (used.includes(number)) {
+  if (used.includes(Number(number))) {
     showToast("الرقم مستخدم")
     return
   }
@@ -1341,11 +1341,33 @@ function openAuctionPresenterNumber(number) {
   sendCommand("openNumber", { number })
 }
 
+function showPresenterAuctionPreview(number) {
+  const item = presenterAuctionRows.find(row => Number(row.number) === Number(number))
+
+  const answerBox = document.getElementById("presenterAuctionAnswerText")
+  const noteBox = document.getElementById("presenterAuctionNoteText")
+  const imageBox = document.getElementById("presenterAuctionImageBox")
+
+  if (answerBox) answerBox.innerText = item?.answer || "لا توجد إجابة"
+  if (noteBox) noteBox.innerText = item?.note || "لا توجد ملاحظة"
+
+  if (imageBox) {
+    if (item?.image) {
+      imageBox.classList.remove("hidden")
+      imageBox.innerHTML = `<img src="${item.image}" alt="">`
+    } else {
+      imageBox.classList.add("hidden")
+      imageBox.innerHTML = ""
+    }
+  }
+}
+
 function refreshPresenterAuctionFromState() {
   if (presenterSegment !== "auction") return
 
   const auctionRoot = getPresenterAuctionState()
   const auction = getPresenterAuctionData()
+
   const maxNumber = getPresenterAuctionMaxNumber()
   const used = (auction.usedNumbers || []).map(Number)
   const currentNumber = Number(auction.currentQuestionNumber || 0)
@@ -1362,7 +1384,8 @@ function refreshPresenterAuctionFromState() {
     activeTeam === "B"
   )
 
-  const grid = document.querySelector(".presenterGrid.four")
+  const grid = document.getElementById("presenterAuctionGrid")
+
   if (grid) {
     grid.innerHTML = Array.from({ length: maxNumber }, (_, i) => i + 1).map(num => {
       const isUsed = used.includes(num)
