@@ -940,6 +940,7 @@ function refreshPresenterWarmupFromState() {
 ========================= */
 
 let presenterTop10Rows = []
+let presenterTop10LoadedRound = null
 let presenterTop10OpenedBy = JSON.parse(localStorage.getItem("presenter_top10_opened_by") || "{}")
 
 function savePresenterTop10OpenedBy() {
@@ -993,18 +994,17 @@ async function renderTop10() {
     .order("position", { ascending: true })
 
   presenterTop10Rows = data || []
+  presenterTop10LoadedRound = round
 
   panel.innerHTML = `
     ${teamButtons()}
 
-    <section class="presenterCard">
-      <div class="presenterLabel">الجولة</div>
-      <div class="presenterRoundTabs">
-        <button class="${round === 1 ? "active" : ""}" onclick="setPresenterTop10Round(1)">1</button>
-        <button class="${round === 2 ? "active" : ""}" onclick="setPresenterTop10Round(2)">2</button>
-        <button class="${round === 3 ? "active" : ""}" onclick="setPresenterTop10Round(3)">3</button>
-      </div>
-    </section>
+    <section class="presenterCard presenterTop10RoundInfo">
+  <div class="presenterLabel">الجولة الحالية</div>
+  <div id="presenterTop10RoundText" class="presenterTop10RoundText">
+    الجولة ${round}
+  </div>
+</section>
 
     <section class="presenterCard">
       <div class="presenterLabel">السؤال</div>
@@ -1068,11 +1068,28 @@ async function renderTop10() {
   `
 }
 
-function refreshPresenterTop10FromState() {
+async function loadPresenterTop10RoundRows(round) {
+  const { data } = await db
+    .from("top10_questions")
+    .select("round, position, question, answer")
+    .eq("model", presenterModel)
+    .eq("round", round)
+    .order("position", { ascending: true })
+
+  presenterTop10Rows = data || []
+  presenterTop10LoadedRound = round
+}
+
+async function refreshPresenterTop10FromState() {
   if (presenterSegment !== "top10") return
 
   const top10 = getPresenterTop10State()
   const round = getPresenterTop10Round()
+
+  if (presenterTop10LoadedRound !== round) {
+    await loadPresenterTop10RoundRows(round)
+  }
+
   const opened = top10.opened?.[round] || []
   const question = top10.question?.[round] || "السؤال يظهر هنا"
   const errorsA = Number(top10.errors?.[round]?.A || 0)
@@ -1089,10 +1106,10 @@ function refreshPresenterTop10FromState() {
     activeTeam === "B"
   )
 
-  document.querySelectorAll(".presenterRoundTabs button").forEach(btn => {
-    const value = Number(btn.innerText.trim())
-    btn.classList.toggle("active", value === round)
-  })
+  const roundText = document.getElementById("presenterTop10RoundText")
+if (roundText) {
+  roundText.innerText = `الجولة ${round}`
+}
 
   const questionBox = document.querySelector(".presenterQuestionBody")
   if (questionBox) {
@@ -1112,7 +1129,8 @@ function refreshPresenterTop10FromState() {
     if (!num) return
 
     const isOpened = opened.includes(num)
-    const answer = top10.answers?.[round]?.[num] || textBox?.innerText || "-"
+    const row = presenterTop10Rows.find(r => Number(r.position) === num)
+    const answer = top10.answers?.[round]?.[num] || row?.answer || "-"
 
     btn.classList.toggle("opened", isOpened)
     btn.disabled = isOpened
