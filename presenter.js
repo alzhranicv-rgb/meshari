@@ -495,6 +495,10 @@ async function openPresenterSegmentFromSync(segment) {
     refreshPresenterWarmupFromState()
   }
 
+  if (segment === "top10") {
+    refreshPresenterTop10FromState()
+  }
+
   return
 }
 
@@ -1055,8 +1059,69 @@ async function renderTop10() {
   `
 }
 
+function refreshPresenterTop10FromState() {
+  if (presenterSegment !== "top10") return
+
+  const top10 = getPresenterTop10State()
+  const round = getPresenterTop10Round()
+  const opened = top10.opened?.[round] || []
+  const question = top10.question?.[round] || "السؤال يظهر هنا"
+  const errorsA = Number(top10.errors?.[round]?.A || 0)
+  const errorsB = Number(top10.errors?.[round]?.B || 0)
+  const activeTeam = top10.activeTeam || presenterSelectedTeam || null
+
+  document.getElementById("teamA")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "A"
+  )
+
+  document.getElementById("teamB")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "B"
+  )
+
+  document.querySelectorAll(".presenterRoundTabs button").forEach(btn => {
+    const value = Number(btn.innerText.trim())
+    btn.classList.toggle("active", value === round)
+  })
+
+  const questionBox = document.querySelector(".presenterQuestionBody")
+  if (questionBox) {
+    questionBox.innerText = question
+  }
+
+  const errorBoxes = document.querySelectorAll(".presenterTop10ErrorBox strong")
+  if (errorBoxes[0]) errorBoxes[0].innerText = `${errorsA} / 3`
+  if (errorBoxes[1]) errorBoxes[1].innerText = `${errorsB} / 3`
+
+  document.querySelectorAll(".presenterTop10AnswerBtn").forEach(btn => {
+    const noBox = btn.querySelector(".presenterTop10AnswerNo")
+    const textBox = btn.querySelector(".presenterTop10AnswerText")
+    const openedByBox = btn.querySelector(".presenterTop10OpenedBy")
+
+    const num = Number(noBox?.innerText || 0)
+    if (!num) return
+
+    const isOpened = opened.includes(num)
+    const answer = top10.answers?.[round]?.[num] || textBox?.innerText || "-"
+
+    btn.classList.toggle("opened", isOpened)
+    btn.disabled = isOpened
+
+    if (textBox) {
+      textBox.innerText = answer
+    }
+
+    if (openedByBox) {
+      openedByBox.innerText = isOpened
+        ? (getTop10OpenedTeamName(round, num) || "تم الفتح")
+        : ""
+    }
+  })
+}
+
 function setPresenterTop10Round(round) {
-  sendCommand("setRound", { round })
+  sendCommand("setRound", { round: Number(round) })
 }
 
 function openTop10PresenterNumber(number, event) {
