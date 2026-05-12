@@ -157,6 +157,10 @@ if (
     refreshPresenterWarmupFromState()
   }
 
+  if (presenterSegment === "top10") {
+    refreshPresenterTop10FromState()
+  }
+
   return
 }
 
@@ -207,6 +211,11 @@ openPresenterSegmentFromSync(presenterSegment)
 if (presenterSegment === "warmup") {
   refreshPresenterWarmupFromState()
 }
+
+if (presenterSegment === "top10") {
+  refreshPresenterTop10FromState()
+}
+
 }
 
   function subscribeToGameSession(sessionId) {
