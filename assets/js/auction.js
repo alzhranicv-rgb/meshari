@@ -652,10 +652,31 @@ function updateAuctionGridOnly() {
 /* =========================
    Answer / Result Buttons
 ========================= */
+function closeAuctionZoomOverlays() {
+  const auctionOverlay = document.getElementById("auctionImageOverlay")
+  if (auctionOverlay) auctionOverlay.remove()
+
+  const displayOverlay = document.getElementById("displayImageZoomOverlay")
+  if (displayOverlay) displayOverlay.classList.add("hidden")
+}
+function flashAuctionZoomOverlayWrong() {
+  const auctionOverlay = document.getElementById("auctionImageOverlay")
+  const displayOverlay = document.getElementById("displayImageZoomOverlay")
+
+  const target = auctionOverlay || displayOverlay
+
+  if (target) {
+    target.classList.remove("auctionWrongFlash")
+    void target.offsetWidth
+    target.classList.add("auctionWrongFlash")
+    return true
+  }
+
+  return false
+}
 
 function auctionCorrect() {
-  const oldOverlay = document.getElementById("auctionImageOverlay")
-  if (oldOverlay) oldOverlay.remove()
+  closeAuctionZoomOverlays()
 
   const team = auctionState.activeTeam
 
@@ -720,14 +741,11 @@ function auctionWrong() {
 
   playGameSound("wrong")
 
-  const overlay = document.getElementById("auctionImageOverlay")
-  if (overlay) {
-    overlay.classList.remove("auctionWrongFlash")
-    void overlay.offsetWidth
-    overlay.classList.add("auctionWrongFlash")
-  } else {
-    flashScreen("wrong")
-  }
+  const flashedOverlay = flashAuctionZoomOverlayWrong()
+
+if (!flashedOverlay) {
+  flashScreen("wrong")
+}
 
   updateAuctionDoubleButton()
   saveAuctionState()

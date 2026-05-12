@@ -161,6 +161,10 @@ if (
     refreshPresenterTop10FromState()
   }
 
+  if (presenterSegment === "auction") {
+    refreshPresenterAuctionFromState()
+  }
+
   return
 }
 
@@ -214,6 +218,10 @@ if (presenterSegment === "warmup") {
 
 if (presenterSegment === "top10") {
   refreshPresenterTop10FromState()
+}
+
+if (presenterSegment === "auction") {
+  refreshPresenterAuctionFromState()
 }
 
 }
@@ -506,6 +514,10 @@ async function openPresenterSegmentFromSync(segment) {
 
   if (segment === "top10") {
     refreshPresenterTop10FromState()
+  }
+
+  if (segment === "auction") {
+    refreshPresenterAuctionFromState()
   }
 
   return
@@ -1334,24 +1346,93 @@ function openAuctionPresenterNumber(number) {
   sendCommand("openNumber", { number })
 }
 
-function showPresenterAuctionPreview(number) {
-  const item = presenterAuctionRows.find(row => Number(row.number) === Number(number))
+function refreshPresenterAuctionFromState() {
+  if (presenterSegment !== "auction") return
+
+  const auctionRoot = getPresenterAuctionState()
+  const auction = getPresenterAuctionData()
+  const maxNumber = getPresenterAuctionMaxNumber()
+  const used = (auction.usedNumbers || []).map(Number)
+  const currentNumber = Number(auction.currentQuestionNumber || 0)
+  const pendingScore = !!auction.pendingScore
+  const activeTeam = auction.activeTeam || presenterSelectedTeam || null
+
+  document.getElementById("teamA")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "A"
+  )
+
+  document.getElementById("teamB")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "B"
+  )
+
+  const grid = document.querySelector(".presenterGrid.four")
+  if (grid) {
+    grid.innerHTML = Array.from({ length: maxNumber }, (_, i) => i + 1).map(num => {
+      const isUsed = used.includes(num)
+      const isCurrent = currentNumber === num
+
+      return `
+        <button
+          class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
+          ${isUsed || pendingScore ? "disabled" : ""}
+          onclick="openAuctionPresenterNumber(${num})"
+        >
+          ${isUsed ? "" : num}
+        </button>
+      `
+    }).join("")
+  }
 
   const answerBox = document.getElementById("presenterAuctionAnswerText")
   const noteBox = document.getElementById("presenterAuctionNoteText")
   const imageBox = document.getElementById("presenterAuctionImageBox")
 
-  if (answerBox) answerBox.innerText = item?.answer || "لا توجد إجابة"
-  if (noteBox) noteBox.innerText = item?.note || "لا توجد ملاحظة"
+  const answer =
+    auctionRoot.currentAuctionAnswer ||
+    auctionRoot.answer ||
+    ""
 
-  if (imageBox) {
-    if (item?.image) {
-      imageBox.classList.remove("hidden")
-      imageBox.innerHTML = `<img src="${item.image}" alt="">`
-    } else {
+  const note =
+    auctionRoot.currentAuctionNote ||
+    auctionRoot.note ||
+    ""
+
+  const image =
+    auctionRoot.currentAuctionImage ||
+    auctionRoot.image ||
+    ""
+
+  if (currentNumber) {
+    if (answerBox) answerBox.innerText = answer || "لا توجد إجابة"
+    if (noteBox) noteBox.innerText = note || "لا توجد ملاحظة"
+
+    if (imageBox) {
+      if (image) {
+        imageBox.classList.remove("hidden")
+        imageBox.innerHTML = `<img src="${image}" alt="">`
+      } else {
+        imageBox.classList.add("hidden")
+        imageBox.innerHTML = ""
+      }
+    }
+  } else {
+    if (answerBox) answerBox.innerText = "—"
+    if (noteBox) noteBox.innerText = "—"
+
+    if (imageBox) {
       imageBox.classList.add("hidden")
       imageBox.innerHTML = ""
     }
+  }
+
+  const doubleBtn = document.querySelector(
+    `.presenterActions .presenterBtn.gray[onclick="sendCommand('double')"]`
+  )
+
+  if (doubleBtn) {
+    doubleBtn.disabled = !!currentNumber || !!pendingScore
   }
 }
 /* =========================
