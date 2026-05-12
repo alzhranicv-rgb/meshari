@@ -975,6 +975,18 @@ function getTop10OpenedTeamName(round, num) {
   return ""
 }
 
+async function loadPresenterTop10RoundRows(round) {
+  const { data } = await db
+    .from("top10_questions")
+    .select("round, position, question, answer")
+    .eq("model", presenterModel)
+    .eq("round", round)
+    .order("position", { ascending: true })
+
+  presenterTop10Rows = data || []
+  presenterTop10LoadedRound = round
+}
+
 async function renderTop10() {
   const panel = document.getElementById("presenterPanel")
   if (!panel) return
@@ -986,60 +998,71 @@ async function renderTop10() {
   const errorsA = Number(top10.errors?.[round]?.A || 0)
   const errorsB = Number(top10.errors?.[round]?.B || 0)
 
-  const { data } = await db
-    .from("top10_questions")
-    .select("round, position, question, answer")
-    .eq("model", presenterModel)
-    .eq("round", round)
-    .order("position", { ascending: true })
-
-  presenterTop10Rows = data || []
-  presenterTop10LoadedRound = round
+  await loadPresenterTop10RoundRows(round)
 
   panel.innerHTML = `
     ${teamButtons()}
 
-    <section class="presenterCard presenterTop10RoundInfo">
-  <div class="presenterLabel">الجولة الحالية</div>
-  <div id="presenterTop10RoundText" class="presenterTop10RoundText">
-    الجولة ${round}
-  </div>
-</section>
+    <section class="presenterTop10CompactHead">
+      <div class="presenterTop10RoundBadge" id="presenterTop10RoundText">
+        الجولة ${round}
+      </div>
 
-    <section class="presenterCard">
-      <div class="presenterLabel">السؤال</div>
-      <div class="presenterQuestionBody">${question}</div>
+      <div class="presenterTop10QuestionMini">
+        <div class="presenterLabel">السؤال</div>
+        <div id="presenterTop10QuestionText" class="presenterTop10QuestionText">
+          ${question}
+        </div>
+      </div>
 
-      <div class="presenterLabel">أخطاء الفرق</div>
-      <div class="presenterTop10Errors">
-        <div class="presenterTop10ErrorBox">
+      <div class="presenterTop10ErrorsMini">
+        <div class="presenterTop10ErrorMiniBox">
           <span>${presenterTeamAName}</span>
-          <strong>${errorsA} / 3</strong>
+          <strong id="presenterTop10ErrorsA">${errorsA} / 3</strong>
         </div>
 
-        <div class="presenterTop10ErrorBox">
+        <div class="presenterTop10ErrorMiniBox">
           <span>${presenterTeamBName}</span>
-          <strong>${errorsB} / 3</strong>
+          <strong id="presenterTop10ErrorsB">${errorsB} / 3</strong>
         </div>
       </div>
     </section>
 
-    <div class="presenterActions">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دوبيلا</button>
-      <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابات</button>
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ الفريق</button>
-    </div>
+    <section class="presenterTop10ControlCard">
+      <div class="presenterTop10ControlGrid">
+        <button class="presenterBtn gray" onclick="sendCommand('double')">
+          دوبيلا
+        </button>
 
-    <div class="presenterActions">
-      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
-      <button class="presenterBtn blue" onclick="sendCommand('switchTurn')">تبديل الدور</button>
-      <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
-    </div>
+        <button class="presenterBtn green" onclick="sendCommand('showAnswer')">
+          إظهار الإجابات
+        </button>
 
-    <section class="presenterCard">
-      <div class="presenterLabel">الإجابات</div>
+        <button class="presenterBtn red" onclick="sendCommand('wrong')">
+          خطأ الفريق
+        </button>
 
-      <div class="presenterTop10Answers">
+        <button class="presenterBtn gray" onclick="sendCommand('undo')">
+          تراجع
+        </button>
+
+        <button class="presenterBtn blue" onclick="sendCommand('switchTurn')">
+          تبديل الدور
+        </button>
+
+        <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
+          الجولة التالية
+        </button>
+      </div>
+    </section>
+
+    <section class="presenterTop10AnswersCard">
+      <div class="presenterTop10AnswersHeader">
+        <div class="presenterLabel">الإجابات</div>
+        <div class="presenterTop10Hint">اضغط على الإجابة لفتحها في العرض</div>
+      </div>
+
+      <div class="presenterTop10AnswersGrid">
         ${Array.from({ length: 10 }, (_, i) => i + 1).map(num => {
           const item = presenterTop10Rows.find(r => Number(r.position) === num)
           const isOpened = opened.includes(num)
@@ -1130,12 +1153,12 @@ async function refreshPresenterTop10FromState() {
     }
 
     if (openedByBox) {
-  const openedTeamName = getTop10OpenedTeamName(round, num)
+      const openedTeamName = getTop10OpenedTeamName(round, num)
 
-  openedByBox.innerText = isOpened
-    ? (openedTeamName || "تم الفتح")
-    : ""
-}
+      openedByBox.innerText = isOpened
+        ? (openedTeamName || "تم الفتح")
+        : ""
+    }
   })
 }
 
@@ -1161,7 +1184,6 @@ function openTop10PresenterNumber(number, event) {
 
   const teamName = activeTeam === "A" ? presenterTeamAName : presenterTeamBName
 
-  // حفظ اسم الفريق في صفحة المقدم فقط
   presenterTop10OpenedBy[`${round}_${number}`] = activeTeam
   savePresenterTop10OpenedBy()
 
