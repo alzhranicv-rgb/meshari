@@ -480,8 +480,12 @@ async function openPresenterSegmentFromSync(segment) {
   const currentRendered = panel?.dataset.segment
 
   if (currentRendered === segment) {
-    return
+  if (segment === "warmup") {
+    refreshPresenterWarmupFromState()
   }
+
+  return
+}
 
   showPresenterSegmentPage()
 
@@ -749,7 +753,7 @@ async function renderWarmup() {
                     <button
                       class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent || isSelected ? "selectedPresenterTeam" : ""}"
                       ${isUsed || locked ? "disabled" : ""}
-                      onclick="openWarmupPresenterQuestion(${cat}, ${num}, event)"
+                     onclick="openWarmupPresenterQuestion(${cat}, ${num}, event)"
                     >
                       ${isUsed ? "" : num}
                     </button>
@@ -832,6 +836,81 @@ function showPresenterWarmupPreview(category, number) {
   if (questionBox) questionBox.innerText = item?.question || "لا يوجد سؤال"
   if (answerBox) answerBox.innerText = item?.answer || "لا توجد إجابة"
 }
+function refreshPresenterWarmupFromState() {
+  if (presenterSegment !== "warmup") return
+
+  const warmupState = getPresenterWarmupState()
+  const used = getPresenterWarmupUsed()
+  const locked = getPresenterWarmupLocked()
+  const currentKey = getPresenterWarmupCurrentKey()
+  const activeTeam = getPresenterWarmupActiveTeam()
+
+  document.getElementById("teamA")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "A"
+  )
+
+  document.getElementById("teamB")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "B"
+  )
+
+  document.querySelectorAll(".presenterWarmupNumbers .presenterNumberBtn").forEach(btn => {
+    btn.classList.remove("presenterOpened", "selectedPresenterTeam")
+    btn.disabled = false
+
+    const onclick = btn.getAttribute("onclick") || ""
+    const match = onclick.match(/openWarmupPresenterQuestion\((\d+),\s*(\d+)/)
+
+    if (!match) return
+
+    const cat = Number(match[1])
+    const num = Number(match[2])
+    const key = `${cat}_${num}`
+
+    const isUsed = !!used[key]
+    const isCurrent = currentKey === key
+
+    if (isUsed) {
+      btn.classList.add("presenterOpened")
+      btn.disabled = true
+      btn.innerText = ""
+    } else {
+      btn.innerText = String(num)
+    }
+
+    if (isCurrent) {
+      btn.classList.add("selectedPresenterTeam")
+      btn.disabled = true
+    }
+
+    if (locked && !isCurrent) {
+      btn.disabled = true
+    }
+  })
+
+  if (currentKey) {
+    const [cat, num] = currentKey.split("_")
+    showPresenterWarmupPreview(Number(cat), Number(num))
+  } else {
+    const questionBox = document.getElementById("presenterWarmupQuestionText")
+    const answerBox = document.getElementById("presenterWarmupAnswerText")
+
+    if (questionBox) questionBox.innerText = "اختر رقم السؤال"
+    if (answerBox) answerBox.innerText = "—"
+
+    presenterWarmupSelected = null
+  }
+
+  const doubleBtn = document.querySelector(
+    `.presenterActions .presenterBtn.gray[onclick="sendCommand('double')"]`
+  )
+
+  if (doubleBtn) {
+    doubleBtn.disabled = !!locked || !!currentKey
+  }
+}
+
 /* =========================
    TOP 10
 ========================= */
