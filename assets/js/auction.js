@@ -676,30 +676,42 @@ function closeAuctionZoomOverlays() {
 function flashAuctionZoomOverlayWrong() {
   const auctionOverlay = document.getElementById("auctionImageOverlay")
   const displayOverlay = document.getElementById("displayImageZoomOverlay")
-  const displayImg = document.getElementById("displayImageZoomImg")
 
-  if (auctionOverlay) {
-    auctionOverlay.classList.remove("auctionZoomWrongFlash", "auctionZoomOverlayFlash")
-    void auctionOverlay.offsetWidth
-    auctionOverlay.classList.add("auctionZoomOverlayFlash")
-    return true
+  const auctionVisible = auctionOverlay && !auctionOverlay.classList.contains("hidden")
+  const displayVisible = displayOverlay && !displayOverlay.classList.contains("hidden")
+
+  if (!auctionVisible && !displayVisible) {
+    return false
   }
 
-  if (displayOverlay && !displayOverlay.classList.contains("hidden")) {
-    displayOverlay.classList.remove("auctionZoomWrongFlash", "auctionZoomOverlayFlash")
-    void displayOverlay.offsetWidth
-    displayOverlay.classList.add("auctionZoomOverlayFlash")
+  let flashLayer = document.getElementById("auctionZoomFlashLayer")
 
-    if (displayImg) {
-      displayImg.classList.remove("auctionZoomImageShake")
-      void displayImg.offsetWidth
-      displayImg.classList.add("auctionZoomImageShake")
-    }
-
-    return true
+  if (!flashLayer) {
+    flashLayer = document.createElement("div")
+    flashLayer.id = "auctionZoomFlashLayer"
+    flashLayer.className = "auctionZoomFlashLayer"
+    document.body.appendChild(flashLayer)
   }
 
-  return false
+  flashLayer.classList.remove("auctionZoomFlashRun")
+  void flashLayer.offsetWidth
+  flashLayer.classList.add("auctionZoomFlashRun")
+
+  const img =
+    document.querySelector("#auctionImageOverlay img") ||
+    document.getElementById("displayImageZoomImg")
+
+  if (img) {
+    img.classList.remove("auctionZoomImageShake")
+    void img.offsetWidth
+    img.classList.add("auctionZoomImageShake")
+  }
+
+  setTimeout(() => {
+    flashLayer.classList.remove("auctionZoomFlashRun")
+  }, 800)
+
+  return true
 }
 
 function auctionCorrect() {

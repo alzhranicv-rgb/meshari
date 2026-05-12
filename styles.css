@@ -1360,59 +1360,72 @@ body.presenterHideDisplayControls .finalControlsBar{
   position:relative !important;
   z-index:20 !important;
 }
-.auctionZoomOverlayFlash{
-  animation: auctionZoomOverlayFlash .75s ease-in-out;
+.auctionZoomFlashLayer{
+  position:fixed;
+  inset:0;
+  z-index:999999999;
+  pointer-events:none;
+  opacity:0;
 }
 
-@keyframes auctionZoomOverlayFlash{
+.auctionZoomFlashLayer.auctionZoomFlashRun{
+  animation:auctionZoomFlashRun .75s ease-in-out;
+}
+
+@keyframes auctionZoomFlashRun{
   0%{
-    background: rgba(0,0,0,.72);
+    opacity:0;
+    background:rgba(255,0,0,0);
   }
 
   18%{
-    background: rgba(255,0,0,.46);
+    opacity:1;
+    background:rgba(255,0,0,.38);
   }
 
   42%{
-    background: rgba(0,0,0,.72);
+    opacity:.25;
+    background:rgba(255,0,0,.12);
   }
 
   68%{
-    background: rgba(255,0,0,.38);
+    opacity:1;
+    background:rgba(255,0,0,.32);
   }
 
   100%{
-    background: rgba(0,0,0,.72);
+    opacity:0;
+    background:rgba(255,0,0,0);
   }
 }
 
 .auctionZoomImageShake{
-  animation: auctionZoomImageShake .75s ease-in-out;
+  animation:auctionZoomImageShake .75s ease-in-out;
 }
 
 @keyframes auctionZoomImageShake{
   0%{
-    transform: scale(1);
-    filter: none;
+    transform:scale(1);
+    filter:none;
   }
 
   18%{
-    transform: scale(.985);
-    filter: saturate(1.45) contrast(1.15) brightness(.9);
+    transform:scale(.985);
+    filter:saturate(1.5) contrast(1.18) brightness(.9);
   }
 
   42%{
-    transform: scale(1.012);
-    filter: saturate(1.2) contrast(1.08);
+    transform:scale(1.012);
+    filter:saturate(1.2) contrast(1.08);
   }
 
   68%{
-    transform: scale(.99);
-    filter: saturate(1.5) contrast(1.16) brightness(.9);
+    transform:scale(.99);
+    filter:saturate(1.5) contrast(1.18) brightness(.9);
   }
 
   100%{
-    transform: scale(1);
-    filter: none;
+    transform:scale(1);
+    filter:none;
   }
 }
