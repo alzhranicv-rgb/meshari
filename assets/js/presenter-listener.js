@@ -26,6 +26,10 @@ function hideDisplayControls() {
   if (typeof updateDisplayControlsEyeButton === "function") {
     updateDisplayControlsEyeButton(true)
   }
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
 }
 
 function showDisplayControls() {
@@ -34,6 +38,10 @@ function showDisplayControls() {
 
   if (typeof updateDisplayControlsEyeButton === "function") {
     updateDisplayControlsEyeButton(false)
+  }
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
   }
 }
 
@@ -170,7 +178,7 @@ function handlePresenterCommand(cmd) {
   if (action === "hideDisplayControls") return safeRunPresenterAction(hideDisplayControls)
   if (action === "showDisplayControls") return safeRunPresenterAction(showDisplayControls)
     
-    if (action === "toggleDisplayControls") {
+  if (action === "toggleDisplayControls") {
   return safeRunPresenterAction(() => {
     if (document.body.classList.contains("presenterHideDisplayControls")) {
       showDisplayControls()
@@ -205,7 +213,16 @@ function handlePresenterCommand(cmd) {
     })
   }
 
-  if (action === "closeZoomImage") return safeRunPresenterAction(() => closeCurrentDisplayImageZoom())
+  if (action === "closeZoomImage") {
+  return safeRunPresenterAction(() => {
+    closeCurrentDisplayImageZoom()
+
+    document.getElementById("auctionImageOverlay")?.remove()
+    document.getElementById("whoImageOverlay")?.remove()
+    document.getElementById("finalRound1Overlay")?.remove()
+    document.getElementById("finalRound3ImageOverlay")?.remove()
+  })
+}
   if (action === "endSegment") return safeRunPresenterAction(() => endCurrentSegment())
   if (action === "goHome") return safeRunPresenterAction(() => goHome())
 

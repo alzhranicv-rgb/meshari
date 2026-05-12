@@ -124,14 +124,18 @@ presenterModel = Number(data.model || 1)
 presenterTeamAName = data.team_a || "الفريق الأول"
 presenterTeamBName = data.team_b || "الفريق الثاني"
 presenterSegment = null
-presenterLiveState = data.state || {}
+presenterLiveState = {
+  ...(data.state || {}),
+  presenterStarted: true,
+  presenterStartedAt: new Date().toISOString()
+}
 
 presenterJustJoined = true
 
+await markPresenterStartedSession(data.id)
+
 renderPresenterHome()
 subscribeToGameSession(data.id)
-
-
 
 showToast("تم الدخول للجلسة")
 }
@@ -249,6 +253,39 @@ if (presenterSegment === "final") {
   refreshPresenterFinalFromState()
 }
 
+}
+
+async function markPresenterStartedSession(sessionId) {
+  if (!sessionId || !window.db) return
+
+  const { data, error } = await db
+    .from("game_sessions")
+    .select("state")
+    .eq("id", sessionId)
+    .maybeSingle()
+
+  if (error || !data) {
+    console.log("mark presenter started read error:", error)
+    return
+  }
+
+  const nextState = {
+    ...(data.state || {}),
+    presenterStarted: true,
+    presenterStartedAt: new Date().toISOString()
+  }
+
+  const { error: updateError } = await db
+    .from("game_sessions")
+    .update({
+      state: nextState,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", sessionId)
+
+  if (updateError) {
+    console.log("mark presenter started update error:", updateError)
+  }
 }
 
   function subscribeToGameSession(sessionId) {
