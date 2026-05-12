@@ -165,6 +165,10 @@ if (
     refreshPresenterAuctionFromState()
   }
 
+if (presenterSegment === "who") {
+  refreshPresenterWhoFromState()
+}
+
   return
 }
 
@@ -222,6 +226,10 @@ if (presenterSegment === "top10") {
 
 if (presenterSegment === "auction") {
   refreshPresenterAuctionFromState()
+}
+
+if (presenterSegment === "who") {
+  refreshPresenterWhoFromState()
 }
 
 }
@@ -507,7 +515,7 @@ async function openPresenterSegmentFromSync(segment) {
   const panel = document.getElementById("presenterPanel")
   const currentRendered = panel?.dataset.segment
 
-  if (currentRendered === segment) {
+if (currentRendered === segment) {
   if (segment === "warmup") {
     refreshPresenterWarmupFromState()
   }
@@ -1653,6 +1661,121 @@ function showPresenterWhoPreview(number) {
       imageBox.classList.add("hidden")
       imageBox.innerHTML = ""
     }
+  }
+}
+
+function refreshPresenterWhoFromState() {
+  if (presenterSegment !== "who") return
+
+  const whoRoot = getPresenterWhoStateRoot()
+  const who = getPresenterWhoState()
+
+  const used = (who.usedNumbers || []).map(Number)
+  const currentNumber = getPresenterWhoCurrentNumber()
+  const locked = getPresenterWhoLocked()
+  const currentPoints = Number(who.currentPoints || 0)
+  const compensationMode = getPresenterWhoCompensationMode()
+  const activeTeam = who.activeTeam || presenterSelectedTeam || null
+
+  document.getElementById("teamA")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "A"
+  )
+
+  document.getElementById("teamB")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "B"
+  )
+
+  document.querySelectorAll(".presenterGrid .presenterNumberBtn").forEach(btn => {
+    const onclick = btn.getAttribute("onclick") || ""
+    const pointsMatch = onclick.match(/setPoints.*points:(\d+)/)
+    const numberMatch = onclick.match(/openWhoPresenterNumber\((\d+)\)/)
+
+    if (pointsMatch) {
+      const p = Number(pointsMatch[1])
+
+      btn.classList.toggle("selectedPresenterTeam", currentPoints === p)
+      btn.disabled = !!locked || !!compensationMode
+
+      return
+    }
+
+    if (numberMatch) {
+      const num = Number(numberMatch[1])
+      const isUsed = used.includes(num)
+      const isCurrent = currentNumber === num
+
+      const lock15 = !used.includes(15) && used.length < 14
+      const waitCompensation = !used.includes(15) && used.length === 14 && !compensationMode
+      const isLocked15 = num === 15 && (lock15 || waitCompensation)
+
+      btn.classList.remove("presenterOpened", "selectedPresenterTeam")
+
+      if (isUsed) {
+        btn.classList.add("presenterOpened")
+        btn.disabled = true
+        btn.innerText = ""
+      } else {
+        btn.innerText = String(num)
+        btn.disabled = !!locked || !!isLocked15
+      }
+
+      if (isCurrent) {
+        btn.classList.add("selectedPresenterTeam")
+        btn.disabled = true
+      }
+    }
+  })
+
+  const answerBox = document.getElementById("presenterWhoAnswerText")
+  const imageBox = document.getElementById("presenterWhoImageBox")
+
+  const answer =
+    whoRoot.currentWhoAnswer ||
+    whoRoot.answer ||
+    ""
+
+  const image =
+    whoRoot.currentWhoImage ||
+    whoRoot.image ||
+    ""
+
+  if (currentNumber) {
+    if (answerBox) answerBox.innerText = answer || "لا توجد إجابة"
+
+    if (imageBox) {
+      if (image) {
+        imageBox.classList.remove("hidden")
+        imageBox.innerHTML = `<img src="${image}" alt="">`
+      } else {
+        imageBox.classList.add("hidden")
+        imageBox.innerHTML = ""
+      }
+    }
+  } else {
+    if (answerBox) answerBox.innerText = "—"
+
+    if (imageBox) {
+      imageBox.classList.add("hidden")
+      imageBox.innerHTML = ""
+    }
+  }
+
+  const doubleBtn = document.querySelector(
+    `.presenterActions .presenterBtn.gray[onclick="sendCommand('double')"]`
+  )
+
+  if (doubleBtn) {
+    doubleBtn.disabled = !!locked || !!currentNumber
+  }
+
+  const compensationBtn = document.querySelector(
+    `.presenterActions .presenterBtn.gray[onclick="sendCommand('compensation')"]`
+  )
+
+  if (compensationBtn) {
+    compensationBtn.disabled = !canPresenterWhoCompensation()
   }
 }
 /* =========================
