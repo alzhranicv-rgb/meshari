@@ -173,6 +173,10 @@ if (
     refreshPresenterArchiveFromState()
   }
 
+  if (presenterSegment === "final") {
+    refreshPresenterFinalFromState()
+  }
+
   return
 }
 
@@ -239,6 +243,10 @@ if (presenterSegment === "who") {
 
 if (presenterSegment === "archive") {
   refreshPresenterArchiveFromState()
+}
+
+if (presenterSegment === "final") {
+  refreshPresenterFinalFromState()
 }
 
 }
@@ -543,6 +551,10 @@ if (currentRendered === segment) {
 
   if (segment === "archive") {
     refreshPresenterArchiveFromState()
+  }
+
+  if (segment === "final") {
+    refreshPresenterFinalFromState()
   }
 
   return
@@ -1795,6 +1807,7 @@ function refreshPresenterWhoFromState() {
     compensationBtn.disabled = !canPresenterWhoCompensation()
   }
 }
+
 /* =========================
    FINAL
 ========================= */
@@ -1940,6 +1953,8 @@ async function renderPresenterFinalRoundContent() {
 
       <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
     `
+
+    refreshPresenterFinalControlsOnly(1)
     return
   }
 
@@ -1959,31 +1974,35 @@ async function renderPresenterFinalRoundContent() {
     controlsBox.innerHTML = `
       <div class="presenterActions finalTwoActions">
         <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
-        <button class="presenterBtn dark" onclick="sendCommand('decreaseCountdown')">العداد</button>
+        <button class="presenterBtn dark" onclick="sendCommand('decreaseCountdown')">
+          ${isSequenceNumber ? `العداد ${state.countdown ?? 15}` : "العداد"}
+        </button>
       </div>
 
       <div class="presenterActions">
-<button
-  class="presenterBtn green"
-  onclick="clearPresenterFinalPreview(2); sendCommand('recordScrambleScore')"
-  ${(!finalCurrentNumber || isSequenceNumber) ? "disabled" : ""}
->
-  تسجيل المبعثرة
-</button>
+        <button
+          class="presenterBtn green"
+          onclick="clearPresenterFinalPreview(2); sendCommand('recordScrambleScore')"
+          ${(!finalCurrentNumber || isSequenceNumber) ? "disabled" : ""}
+        >
+          تسجيل المبعثرة
+        </button>
 
-<button
-  class="presenterBtn green"
-  onclick="clearPresenterFinalPreview(2); sendCommand('recordSequenceScore')"
-  ${(!finalCurrentNumber || isScrambleNumber) ? "disabled" : ""}
->
-  تسجيل التلميح
-</button>
+        <button
+          class="presenterBtn green"
+          onclick="clearPresenterFinalPreview(2); sendCommand('recordSequenceScore')"
+          ${(!finalCurrentNumber || isScrambleNumber) ? "disabled" : ""}
+        >
+          تسجيل التلميح
+        </button>
 
         <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
       </div>
 
       <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
     `
+
+    refreshPresenterFinalControlsOnly(2)
     return
   }
 
@@ -1996,16 +2015,187 @@ async function renderPresenterFinalRoundContent() {
 
     <div class="presenterActions">
       <button
-  class="presenterBtn green"
-  onclick="clearPresenterFinalPreview(3); sendCommand('recordRound3Score')"
-  ${!Number(state.currentNumber || 0) ? "disabled" : ""}
->
-  تسجيل النتيجة
-</button>
+        class="presenterBtn green"
+        onclick="clearPresenterFinalPreview(3); sendCommand('recordRound3Score')"
+        ${!Number(state.currentNumber || 0) ? "disabled" : ""}
+      >
+        تسجيل النتيجة
+      </button>
 
       <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
     </div>
   `
+
+  refreshPresenterFinalControlsOnly(3)
+}
+
+async function refreshPresenterFinalFromState() {
+  if (presenterSegment !== "final") return
+
+  const round = getPresenterFinalRound()
+  presenterFinalRound = round
+
+  const activeTeam = getPresenterActiveTeamFromState() || presenterSelectedTeam || null
+
+  document.getElementById("teamA")?.classList.toggle("selectedPresenterTeam", activeTeam === "A")
+  document.getElementById("teamB")?.classList.toggle("selectedPresenterTeam", activeTeam === "B")
+
+  document.querySelectorAll(".presenterRoundTabs button").forEach(btn => {
+    const value = Number(btn.innerText.trim())
+    btn.classList.toggle("active", value === round)
+  })
+
+  const controlsBox = document.getElementById("presenterFinalControls")
+  const currentControlsRound = Number(controlsBox?.dataset.round || 0)
+
+  if (currentControlsRound !== round) {
+    presenterFinalSelected = { round, number: null }
+    await renderPresenterFinalRoundContent()
+    return
+  }
+
+  await refreshPresenterFinalNumbersOnly(round)
+  await refreshPresenterFinalPreviewOnly(round)
+  refreshPresenterFinalControlsOnly(round)
+}
+
+async function refreshPresenterFinalNumbersOnly(round) {
+  const numbersBox = document.getElementById("presenterFinalNumbers")
+  if (!numbersBox) return
+
+  const state = getPresenterFinalRoundState(round)
+
+  let nums = [1, 2, 3, 4, 5, 6]
+  if (round === 2) nums = [1, 2, 3, 4]
+  if (round === 3) nums = [1, 2]
+
+  const selectedNumber =
+    Number(state.currentNumber || 0) ||
+    (
+      presenterFinalSelected?.round === round
+        ? Number(presenterFinalSelected.number || 0)
+        : 0
+    )
+
+  numbersBox.innerHTML = nums.map(n => {
+    const opened = (state.opened || []).includes(n)
+    const current = selectedNumber === n
+    const pendingScore = !!state.pendingScore
+
+    return `
+      <button
+        class="presenterNumberBtn ${opened ? "presenterOpened" : ""} ${current ? "selectedPresenterTeam" : ""}"
+        ${opened || pendingScore ? "disabled" : ""}
+        onclick="openPresenterFinalNumber(${round}, ${n})"
+      >
+        ${opened ? "" : n}
+      </button>
+    `
+  }).join("")
+}
+
+async function refreshPresenterFinalPreviewOnly(round) {
+  const previewBox = document.getElementById("presenterFinalPreview")
+  if (!previewBox) return
+
+  const state = getPresenterFinalRoundState(round)
+
+  const currentNumber =
+    Number(state.currentNumber || 0) ||
+    (
+      presenterFinalSelected?.round === round
+        ? Number(presenterFinalSelected.number || 0)
+        : 0
+    )
+
+  if (!currentNumber) {
+    presenterFinalPreviewCache[round] = ""
+    presenterFinalSelected = { round, number: null }
+    previewBox.innerHTML = "اختر رقمًا"
+    return
+  }
+
+  if (round === 1) await renderPresenterFinalRound1Preview()
+  if (round === 2) await renderPresenterFinalRound2Preview()
+  if (round === 3) await renderPresenterFinalRound3Preview()
+}
+
+function refreshPresenterFinalControlsOnly(round) {
+  const controlsBox = document.getElementById("presenterFinalControls")
+  if (!controlsBox) return
+
+  const state = getPresenterFinalRoundState(round)
+  const allButtons = [...controlsBox.querySelectorAll(".presenterBtn")]
+
+  if (round === 1) {
+    const currentNumber = Number(state.currentNumber || 0)
+    const isQuestionCard = currentNumber >= 4 && currentNumber <= 6
+
+    const showQuestionBtn = allButtons.find(btn =>
+      (btn.getAttribute("onclick") || "").includes("showQuestion")
+    )
+
+    const correctBtn = allButtons.find(btn =>
+      (btn.getAttribute("onclick") || "").includes("correct")
+    )
+
+    const wrongBtn = allButtons.find(btn =>
+      (btn.getAttribute("onclick") || "").includes("wrong")
+    )
+
+    if (showQuestionBtn) showQuestionBtn.disabled = !isQuestionCard
+    if (correctBtn) correctBtn.disabled = !state.pendingScore
+    if (wrongBtn) wrongBtn.disabled = !state.pendingScore
+
+    return
+  }
+
+  if (round === 2) {
+    const currentNumber = Number(state.currentNumber || 0)
+    const isScrambleNumber = currentNumber === 1 || currentNumber === 3
+    const isSequenceNumber = currentNumber === 2 || currentNumber === 4
+
+    const countdownBtn = allButtons.find(btn =>
+      (btn.getAttribute("onclick") || "").includes("decreaseCountdown")
+    )
+
+    const scrambleBtn = allButtons.find(btn =>
+      (btn.getAttribute("onclick") || "").includes("recordScrambleScore")
+    )
+
+    const sequenceBtn = allButtons.find(btn =>
+      (btn.getAttribute("onclick") || "").includes("recordSequenceScore")
+    )
+
+    if (countdownBtn) {
+      countdownBtn.disabled = !isSequenceNumber
+      countdownBtn.innerText = isSequenceNumber
+        ? `العداد ${state.countdown ?? 15}`
+        : "العداد"
+    }
+
+    if (scrambleBtn) {
+      scrambleBtn.disabled = !currentNumber || isSequenceNumber
+    }
+
+    if (sequenceBtn) {
+      sequenceBtn.disabled = !currentNumber || isScrambleNumber
+    }
+
+    return
+  }
+
+  if (round === 3) {
+    const currentNumber = Number(state.currentNumber || 0)
+
+    const recordBtn = allButtons.find(btn =>
+      (btn.getAttribute("onclick") || "").includes("recordRound3Score")
+    )
+
+    if (recordBtn) {
+      recordBtn.disabled = !currentNumber
+    }
+  }
 }
 
 function openPresenterFinalNumber(round, number) {
@@ -2041,22 +2231,19 @@ function openPresenterFinalNumber(round, number) {
 
   sendCommand("openNumber", { round, number })
 }
+
 /* ===== Round 1 preview ===== */
 
 async function renderPresenterFinalRound1Preview() {
   const previewBox = document.getElementById("presenterFinalPreview")
-  const state = getPresenterFinalRoundState(1)
   if (!previewBox) return
-  if (state.answerShown) {
-  presenterFinalPreviewCache[1] = ""
-  presenterFinalSelected = { round: 1, number: null }
-  previewBox.innerHTML = "اختر رقمًا"
-  return
-}
 
-  const current = Number(state.currentNumber || (
-    presenterFinalSelected?.round === 1 ? presenterFinalSelected.number : 0
-  ))
+  const state = getPresenterFinalRoundState(1)
+
+  const current = Number(
+    state.currentNumber ||
+    (presenterFinalSelected?.round === 1 ? presenterFinalSelected.number : 0)
+  )
 
   if (!current) {
     previewBox.innerHTML = presenterFinalPreviewCache[1] || "اختر رقمًا"
@@ -2099,14 +2286,16 @@ async function renderPresenterFinalRound1Preview() {
 
 async function renderPresenterFinalRound2Preview() {
   const previewBox = document.getElementById("presenterFinalPreview")
-  const state = getPresenterFinalRoundState(2)
   if (!previewBox) return
 
-  const current = Number(state.currentNumber || (
-    presenterFinalSelected?.round === 2 ? presenterFinalSelected.number : 0
-  ))
+  const state = getPresenterFinalRoundState(2)
 
-  if (!state.pendingScore && presenterFinalSelected?.round === 2) {
+  const current = Number(
+    state.currentNumber ||
+    (presenterFinalSelected?.round === 2 ? presenterFinalSelected.number : 0)
+  )
+
+  if (!state.pendingScore && !state.currentNumber && presenterFinalSelected?.round === 2) {
     presenterFinalPreviewCache[2] = ""
     presenterFinalSelected = { round: 2, number: null }
     previewBox.innerHTML = "اختر رقمًا"
@@ -2180,14 +2369,16 @@ async function renderPresenterFinalRound2Preview() {
 
 async function renderPresenterFinalRound3Preview() {
   const previewBox = document.getElementById("presenterFinalPreview")
-  const state = getPresenterFinalRoundState(3)
   if (!previewBox) return
 
-  const current = Number(state.currentNumber || (
-    presenterFinalSelected?.round === 3 ? presenterFinalSelected.number : 0
-  ))
+  const state = getPresenterFinalRoundState(3)
 
-  if (!state.pendingScore && presenterFinalSelected?.round === 3) {
+  const current = Number(
+    state.currentNumber ||
+    (presenterFinalSelected?.round === 3 ? presenterFinalSelected.number : 0)
+  )
+
+  if (!state.pendingScore && !state.currentNumber && presenterFinalSelected?.round === 3) {
     presenterFinalPreviewCache[3] = ""
     presenterFinalSelected = { round: 3, number: null }
     previewBox.innerHTML = "اختر رقمًا"
@@ -2243,6 +2434,7 @@ async function renderPresenterFinalRound3Preview() {
   const freshBox = document.getElementById("presenterFinalPreview")
   if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[3]
 }
+
 /* =========================
    ARCHIVE
 ========================= */
