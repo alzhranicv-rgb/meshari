@@ -143,15 +143,22 @@ showToast("تم الدخول للجلسة")
 function applyPresenterSessionData(data) {
   if (!data) return
 
-  if (
-    presenterSessionId === data.id &&
-    JSON.stringify(presenterLiveState) === JSON.stringify(data.state) &&
-    presenterSegment === (data.active_segment || null)
-  ) {
-    updatePresenterHomeScoresOnly()
-    updatePresenterLockedSegments()
-    return
+if (
+  presenterSessionId === data.id &&
+  JSON.stringify(presenterLiveState) === JSON.stringify(data.state) &&
+  presenterSegment === (data.active_segment || null)
+) {
+  presenterLiveState = data.state || presenterLiveState || {}
+
+  updatePresenterHomeScoresOnly()
+  updatePresenterLockedSegments()
+
+  if (presenterSegment === "warmup") {
+    refreshPresenterWarmupFromState()
   }
+
+  return
+}
 
   if (data.status === "ended") {
     renderPresenterEnded()
@@ -191,11 +198,15 @@ function applyPresenterSessionData(data) {
   }
 
   if (!presenterSegment) {
-    renderPresenterHome()
-    return
-  }
+  renderPresenterHome()
+  return
+}
 
-  openPresenterSegmentFromSync(presenterSegment)
+openPresenterSegmentFromSync(presenterSegment)
+
+if (presenterSegment === "warmup") {
+  refreshPresenterWarmupFromState()
+}
 }
 
   function subscribeToGameSession(sessionId) {
