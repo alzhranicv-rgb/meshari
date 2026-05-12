@@ -1000,95 +1000,74 @@ async function renderTop10() {
 
   await loadPresenterTop10RoundRows(round)
 
-  panel.innerHTML = `
-    ${teamButtons()}
+panel.innerHTML = `
+  ${teamButtons()}
 
-    <section class="presenterTop10CompactHead">
-      <div class="presenterTop10RoundBadge" id="presenterTop10RoundText">
-        الجولة ${round}
-      </div>
+  <section class="presenterTop10MiniHeader">
+    <div class="presenterTop10RoundBadge" id="presenterTop10RoundText">
+      الجولة ${round}
+    </div>
 
-      <div class="presenterTop10QuestionMini">
-        <div class="presenterLabel">السؤال</div>
-        <div id="presenterTop10QuestionText" class="presenterTop10QuestionText">
-          ${question}
-        </div>
-      </div>
+    <div class="presenterTop10QuestionBox">
+      <span>السؤال</span>
+      <strong id="presenterTop10QuestionText">${question}</strong>
+    </div>
+  </section>
 
-      <div class="presenterTop10ErrorsMini">
-        <div class="presenterTop10ErrorMiniBox">
-          <span>${presenterTeamAName}</span>
-          <strong id="presenterTop10ErrorsA">${errorsA} / 3</strong>
-        </div>
+  <section class="presenterTop10ErrorsBar">
+    <div class="presenterTop10ErrorPill">
+      <span>${presenterTeamAName}</span>
+      <strong id="presenterTop10ErrorsA">${errorsA} / 3</strong>
+    </div>
 
-        <div class="presenterTop10ErrorMiniBox">
-          <span>${presenterTeamBName}</span>
-          <strong id="presenterTop10ErrorsB">${errorsB} / 3</strong>
-        </div>
-      </div>
-    </section>
+    <div class="presenterTop10ErrorPill">
+      <span>${presenterTeamBName}</span>
+      <strong id="presenterTop10ErrorsB">${errorsB} / 3</strong>
+    </div>
+  </section>
 
-    <section class="presenterTop10ControlCard">
-      <div class="presenterTop10ControlGrid">
-        <button class="presenterBtn gray" onclick="sendCommand('double')">
-          دوبيلا
-        </button>
+  <section class="presenterTop10ControlCard">
+    <div class="presenterTop10ControlGrid">
+      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ الفريق</button>
+      <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابات</button>
+      <button class="presenterBtn gray" onclick="sendCommand('double')">دوبيلا</button>
 
-        <button class="presenterBtn green" onclick="sendCommand('showAnswer')">
-          إظهار الإجابات
-        </button>
+      <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
+      <button class="presenterBtn blue" onclick="sendCommand('switchTurn')">تبديل الدور</button>
+      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+    </div>
+  </section>
 
-        <button class="presenterBtn red" onclick="sendCommand('wrong')">
-          خطأ الفريق
-        </button>
+  <section class="presenterTop10AnswersCard">
+    <div class="presenterTop10AnswersTitle">الإجابات</div>
 
-        <button class="presenterBtn gray" onclick="sendCommand('undo')">
-          تراجع
-        </button>
+    <div class="presenterTop10AnswersGrid">
+      ${Array.from({ length: 10 }, (_, i) => i + 1).map(num => {
+        const item = presenterTop10Rows.find(r => Number(r.position) === num)
+        const isOpened = opened.includes(num)
+        const openedName = getTop10OpenedTeamName(round, num)
 
-        <button class="presenterBtn blue" onclick="sendCommand('switchTurn')">
-          تبديل الدور
-        </button>
+        return `
+          <button
+            class="presenterTop10AnswerBtn ${isOpened ? "opened" : ""}"
+            ${isOpened ? "disabled" : ""}
+            onclick="openTop10PresenterNumber(${num}, event)"
+          >
+            <span class="presenterTop10AnswerNo">${num}</span>
 
-        <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
-          الجولة التالية
-        </button>
-      </div>
-    </section>
+            <span class="presenterTop10AnswerText">
+              ${item?.answer || "-"}
+            </span>
 
-    <section class="presenterTop10AnswersCard">
-      <div class="presenterTop10AnswersHeader">
-        <div class="presenterLabel">الإجابات</div>
-        <div class="presenterTop10Hint">اضغط على الإجابة لفتحها في العرض</div>
-      </div>
-
-      <div class="presenterTop10AnswersGrid">
-        ${Array.from({ length: 10 }, (_, i) => i + 1).map(num => {
-          const item = presenterTop10Rows.find(r => Number(r.position) === num)
-          const isOpened = opened.includes(num)
-          const openedName = getTop10OpenedTeamName(round, num)
-
-          return `
-            <button
-              class="presenterTop10AnswerBtn ${isOpened ? "opened" : ""}"
-              ${isOpened ? "disabled" : ""}
-              onclick="openTop10PresenterNumber(${num}, event)"
-            >
-              <span class="presenterTop10AnswerNo">${num}</span>
-
-              <span class="presenterTop10AnswerText">
-                ${item?.answer || "-"}
-              </span>
-
-              <span class="presenterTop10OpenedBy">
-                ${isOpened ? (openedName || "تم الفتح") : ""}
-              </span>
-            </button>
-          `
-        }).join("")}
-      </div>
-    </section>
-  `
+            <span class="presenterTop10OpenedBy">
+              ${isOpened ? (openedName || "تم الفتح") : ""}
+            </span>
+          </button>
+        `
+      }).join("")}
+    </div>
+  </section>
+`
 }
 
 async function refreshPresenterTop10FromState() {
