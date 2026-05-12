@@ -284,22 +284,49 @@ async function sendCommand(action, payload = {}) {
     return false
   }
 
-  const { error } = await db.from("presenter_commands").insert({
+  const clientCommandId = `${Date.now()}_${Math.random().toString(36).slice(2)}`
+
+  const commandPayload = {
+    ...payload,
+    __client_command_id: clientCommandId
+  }
+
+  const command = {
     session_id: sessionId,
     model: presenterModel,
     segment: presenterSegment || "global",
     action,
-    payload,
+    payload: commandPayload,
     created_at: new Date().toISOString()
-  })
-
-  if (error) {
-    console.log(error)
-    showToast("تعذر تنفيذ الأمر")
-    return false
   }
 
+  let broadcastSent = false
 
+  try {
+    if (presenterChannel) {
+      await presenterChannel.send({
+        type: "broadcast",
+        event: "presenter_command",
+        payload: command
+      })
+
+      broadcastSent = true
+    }
+  } catch (error) {
+    console.log("Presenter broadcast error:", error)
+  }
+
+  db.from("presenter_commands")
+    .insert(command)
+    .then(({ error }) => {
+      if (error) {
+        console.log("Presenter command database error:", error)
+
+        if (!broadcastSent) {
+          showToast("تعذر تنفيذ الأمر")
+        }
+      }
+    })
 
   return true
 }
@@ -396,19 +423,22 @@ async function presenterGoHome() {
 
   renderPresenterHome()
 
+  sendCommand("goHome")
+
   const sessionId = localStorage.getItem("presenter_session_id")
 
   if (sessionId) {
-    await db
+    db
       .from("game_sessions")
       .update({
         active_segment: null,
         updated_at: new Date().toISOString()
       })
       .eq("id", sessionId)
+      .then(({ error }) => {
+        if (error) console.log("Go home update error:", error)
+      })
   }
-
-  await sendCommand("goHome")
 
   setTimeout(() => {
     presenterGoingHome = false
@@ -424,12 +454,15 @@ async function openPresenterSegment(segment) {
   }
 
   presenterSelectedTeam = null
+  presenterSegment = segment
+
+  openPresenterSegmentFromSync(segment)
 
   const sent = await sendCommand("openSegment", { segment })
-  if (!sent) return
 
-  presenterSegment = segment
-  await openPresenterSegmentFromSync(segment)
+  if (!sent) {
+    showToast("تعذر فتح الفقرة في العرض")
+  }
 }
 
 async function openPresenterSegmentFromSync(segment) {
@@ -706,7 +739,7 @@ async function renderWarmup() {
                     <button
                       class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent || isSelected ? "selectedPresenterTeam" : ""}"
                       ${isUsed || locked ? "disabled" : ""}
-                      onclick="openWarmupPresenterQuestion(${cat}, ${num})"
+                      onclick="openWarmupPresenterQuestion(${cat}, ${num}, event)"
                     >
                       ${isUsed ? "" : num}
                     </button>
@@ -744,7 +777,7 @@ if (currentKey) {
 }
 }
 
-function openWarmupPresenterQuestion(category, number) {
+function openWarmupPresenterQuestion(category, number, event) {
   const warmupState = getPresenterWarmupState()
   const used = getPresenterWarmupUsed()
   const key = `${category}_${number}`

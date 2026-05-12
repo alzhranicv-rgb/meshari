@@ -1,6 +1,7 @@
 
 let presenterCommandChannel = null
 let lastPresenterCommandId = 0
+let handledPresenterCommandKeys = new Set()
 
 function getDisplaySessionId() {
   return localStorage.getItem("game_session_id") || ""
@@ -50,21 +51,38 @@ function restoreDisplayControlsMode() {
 ========================= */
 
 function listenPresenterCommands() {
-  if (!window.db) return
+  if (!window.db) {
+    console.log("Presenter listener: db not ready")
+    setTimeout(listenPresenterCommands, 300)
+    return
+  }
 
   const sessionId = getDisplaySessionId()
+
   if (!sessionId) {
     console.log("Presenter listener: no session id")
+    setTimeout(listenPresenterCommands, 500)
     return
   }
 
   if (presenterCommandChannel) {
     db.removeChannel(presenterCommandChannel)
+    presenterCommandChannel = null
   }
 
-  presenterCommandChannel = db.channel("presenter_commands_session_" + sessionId)
+  presenterCommandChannel = db.channel("game_session_" + sessionId)
 
   presenterCommandChannel
+    .on(
+      "broadcast",
+      { event: "presenter_command" },
+      payload => {
+        const cmd = payload?.payload
+        if (!cmd) return
+
+        handlePresenterCommandOnce(cmd, "broadcast")
+      }
+    )
     .on(
       "postgres_changes",
       {
@@ -75,10 +93,9 @@ function listenPresenterCommands() {
       },
       payload => {
         const cmd = payload.new
-        if (!cmd || cmd.id === lastPresenterCommandId) return
+        if (!cmd) return
 
-        lastPresenterCommandId = cmd.id
-        handlePresenterCommand(cmd)
+        handlePresenterCommandOnce(cmd, "database")
       }
     )
     .subscribe(status => {
@@ -93,11 +110,56 @@ function isValidPresenterTeam(team) {
 /* =========================
    HANDLE COMMANDS
 ========================= */
+function getPresenterCommandKey(cmd) {
+  const payload = cmd?.payload || {}
+
+  if (payload.__client_command_id) {
+    return "client_" + payload.__client_command_id
+  }
+
+  if (cmd.id) {
+    return "db_" + cmd.id
+  }
+
+  return [
+    cmd.session_id || "",
+    cmd.segment || "",
+    cmd.action || "",
+    JSON.stringify(cmd.payload || {}),
+    cmd.created_at || ""
+  ].join("_")
+}
+
+function handlePresenterCommandOnce(cmd, source = "unknown") {
+  const key = getPresenterCommandKey(cmd)
+
+  if (handledPresenterCommandKeys.has(key)) {
+    return
+  }
+
+  handledPresenterCommandKeys.add(key)
+
+  if (handledPresenterCommandKeys.size > 80) {
+    handledPresenterCommandKeys = new Set(
+      Array.from(handledPresenterCommandKeys).slice(-40)
+    )
+  }
+
+  if (cmd.id) {
+    lastPresenterCommandId = cmd.id
+  }
+
+  console.log("Presenter command source:", source)
+
+  handlePresenterCommand(cmd)
+}
 
 function handlePresenterCommand(cmd) {
   const segment = cmd.segment
   const action = cmd.action
-  const data = cmd.payload || {}
+  const data = { ...(cmd.payload || {}) }
+
+  delete data.__client_command_id
 
   console.log("Handle presenter command:", segment, action, data)
 
@@ -343,5 +405,5 @@ function handleArchivePresenterAction(action, data) {
 
 window.addEventListener("load", () => {
   restoreDisplayControlsMode()
-  setTimeout(listenPresenterCommands, 1500)
+  listenPresenterCommands()
 })
