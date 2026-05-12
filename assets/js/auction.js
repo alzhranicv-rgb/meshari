@@ -657,22 +657,44 @@ function closeAuctionZoomOverlays() {
   if (auctionOverlay) auctionOverlay.remove()
 
   const displayOverlay = document.getElementById("displayImageZoomOverlay")
-  if (displayOverlay) displayOverlay.classList.add("hidden")
-}
-function flashAuctionZoomOverlayWrong() {
-  const auctionOverlay = document.getElementById("auctionImageOverlay")
-  const displayOverlay = document.getElementById("displayImageZoomOverlay")
+  if (displayOverlay) {
+    displayOverlay.classList.add("hidden")
+    displayOverlay.classList.remove("auctionWrongFlash", "auctionZoomWrongFlash")
 
-  const target = auctionOverlay || displayOverlay
-
-  if (target) {
-    target.classList.remove("auctionWrongFlash")
-    void target.offsetWidth
-    target.classList.add("auctionWrongFlash")
-    return true
+    const img = document.getElementById("displayImageZoomImg")
+    if (img) {
+      img.classList.remove("auctionWrongFlash", "auctionZoomWrongFlash")
+      img.removeAttribute("src")
+    }
   }
 
-  return false
+  if (typeof closeCurrentDisplayImageZoom === "function") {
+    closeCurrentDisplayImageZoom()
+  }
+}
+
+function flashAuctionZoomOverlayWrong() {
+  const auctionOverlay = document.getElementById("auctionImageOverlay")
+  const auctionImg = auctionOverlay?.querySelector("img")
+
+  const displayOverlay = document.getElementById("displayImageZoomOverlay")
+  const displayImg = document.getElementById("displayImageZoomImg")
+
+  let target = null
+
+  if (auctionOverlay && !auctionOverlay.classList.contains("hidden")) {
+    target = auctionImg || auctionOverlay
+  } else if (displayOverlay && !displayOverlay.classList.contains("hidden")) {
+    target = displayImg || displayOverlay
+  }
+
+  if (!target) return false
+
+  target.classList.remove("auctionZoomWrongFlash")
+  void target.offsetWidth
+  target.classList.add("auctionZoomWrongFlash")
+
+  return true
 }
 
 function auctionCorrect() {
