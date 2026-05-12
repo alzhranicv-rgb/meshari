@@ -1003,45 +1003,50 @@ async function renderTop10() {
 panel.innerHTML = `
   ${teamButtons()}
 
-  <section class="presenterTop10MiniHeader">
-    <div class="presenterTop10RoundBadge" id="presenterTop10RoundText">
-      الجولة ${round}
+  <section class="presenterCard presenterTop10StatusCard">
+    <div class="presenterTop10StatusTop">
+      <div class="presenterTop10RoundMini">
+        <span>الجولة</span>
+        <strong id="presenterTop10RoundText">${round}</strong>
+      </div>
+
+      <div class="presenterTop10ErrorsMini">
+        <div class="presenterTop10ErrorMiniBox">
+          <span>${presenterTeamAName}</span>
+          <strong id="presenterTop10ErrorsA">${errorsA} / 3</strong>
+        </div>
+
+        <div class="presenterTop10ErrorMiniBox">
+          <span>${presenterTeamBName}</span>
+          <strong id="presenterTop10ErrorsB">${errorsB} / 3</strong>
+        </div>
+      </div>
     </div>
 
-    <div class="presenterTop10QuestionBox">
-      <span>السؤال</span>
-      <strong id="presenterTop10QuestionText">${question}</strong>
-    </div>
-  </section>
-
-  <section class="presenterTop10ErrorsBar">
-    <div class="presenterTop10ErrorPill">
-      <span>${presenterTeamAName}</span>
-      <strong id="presenterTop10ErrorsA">${errorsA} / 3</strong>
-    </div>
-
-    <div class="presenterTop10ErrorPill">
-      <span>${presenterTeamBName}</span>
-      <strong id="presenterTop10ErrorsB">${errorsB} / 3</strong>
-    </div>
-  </section>
-
-  <section class="presenterTop10ControlCard">
-    <div class="presenterTop10ControlGrid">
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ الفريق</button>
-      <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابات</button>
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دوبيلا</button>
-
-      <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
-      <button class="presenterBtn blue" onclick="sendCommand('switchTurn')">تبديل الدور</button>
-      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+    <div class="presenterTop10QuestionClear">
+      <div class="presenterLabel">السؤال</div>
+      <div id="presenterTop10QuestionText" class="presenterTop10QuestionText">
+        ${question}
+      </div>
     </div>
   </section>
 
-  <section class="presenterTop10AnswersCard">
-    <div class="presenterTop10AnswersTitle">الإجابات</div>
+  <div class="presenterActions">
+    <button class="presenterBtn gray" onclick="sendCommand('double')">دوبيلا</button>
+    <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابات</button>
+    <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ الفريق</button>
+  </div>
 
-    <div class="presenterTop10AnswersGrid">
+  <div class="presenterActions">
+    <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+    <button class="presenterBtn blue" onclick="sendCommand('switchTurn')">تبديل الدور</button>
+    <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
+  </div>
+
+  <section class="presenterCard">
+    <div class="presenterLabel">الإجابات</div>
+
+    <div class="presenterTop10Answers">
       ${Array.from({ length: 10 }, (_, i) => i + 1).map(num => {
         const item = presenterTop10Rows.find(r => Number(r.position) === num)
         const isOpened = opened.includes(num)
