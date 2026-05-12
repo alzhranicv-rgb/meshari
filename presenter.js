@@ -1253,73 +1253,68 @@ async function renderAuction() {
 panel.innerHTML = `
   ${teamButtons()}
 
-  <section class="presenterTop10CompactHead">
-    <div class="presenterTop10RoundBadge" id="presenterTop10RoundText">
-      الجولة ${round}
-    </div>
+  <div class="presenterActions">
+    <button
+      class="presenterBtn gray"
+      onclick="sendCommand('double')"
+      ${currentNumber || pendingScore ? "disabled" : ""}
+    >
+      دوبيلا
+    </button>
 
-    <div class="presenterTop10QuestionMini">
-      <div class="presenterLabel">السؤال</div>
-      <div id="presenterTop10QuestionText" class="presenterTop10QuestionText">
-        ${question}
-      </div>
-    </div>
+    <button class="presenterBtn green" onclick="sendCommand('correct')">
+      ✓ إجابة صحيحة
+    </button>
 
-    <div class="presenterTop10ErrorsMini">
-      <div class="presenterTop10ErrorMiniBox">
-        <span>${presenterTeamAName}</span>
-        <strong id="presenterTop10ErrorsA">${errorsA} / 3</strong>
-      </div>
+    <button class="presenterBtn red" onclick="sendCommand('wrong')">
+      ✕ خطأ
+    </button>
+  </div>
 
-      <div class="presenterTop10ErrorMiniBox">
-        <span>${presenterTeamBName}</span>
-        <strong id="presenterTop10ErrorsB">${errorsB} / 3</strong>
-      </div>
-    </div>
-  </section>
+  <div class="presenterActions">
+    <button class="presenterBtn gray" onclick="sendCommand('undo')">
+      تراجع
+    </button>
 
-  <section class="presenterTop10ControlCard">
-    <div class="presenterTop10ControlGrid">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دوبيلا</button>
-      <button class="presenterBtn green" onclick="sendCommand('showAnswer')">إظهار الإجابات</button>
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ الفريق</button>
-      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
-      <button class="presenterBtn blue" onclick="sendCommand('switchTurn')">تبديل الدور</button>
-      <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
-    </div>
-  </section>
+    <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
+      تكبير الصورة
+    </button>
+  </div>
 
-  <section class="presenterTop10AnswersCard">
-    <div class="presenterTop10AnswersHeader">
-      <div class="presenterLabel">الإجابات</div>
-      <div class="presenterTop10Hint">اضغط على الإجابة لفتحها في العرض</div>
-    </div>
+  <section class="presenterCard">
+    <div class="presenterLabel">الأرقام</div>
 
-    <div class="presenterTop10AnswersGrid">
-      ${Array.from({ length: 10 }, (_, i) => i + 1).map(num => {
-        const item = presenterTop10Rows.find(r => Number(r.position) === num)
-        const isOpened = opened.includes(num)
-        const openedName = getTop10OpenedTeamName(round, num)
+    <div class="presenterGrid four">
+      ${Array.from({ length: maxNumber }, (_, i) => i + 1).map(num => {
+        const isUsed = used.includes(num)
+        const isCurrent = currentNumber === num
 
         return `
           <button
-            class="presenterTop10AnswerBtn ${isOpened ? "opened" : ""}"
-            ${isOpened ? "disabled" : ""}
-            onclick="openTop10PresenterNumber(${num}, event)"
+            class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
+            ${isUsed || pendingScore ? "disabled" : ""}
+            onclick="openAuctionPresenterNumber(${num})"
           >
-            <span class="presenterTop10AnswerNo">${num}</span>
-
-            <span class="presenterTop10AnswerText">
-              ${item?.answer || "-"}
-            </span>
-
-            <span class="presenterTop10OpenedBy">
-              ${isOpened ? (openedName || "تم الفتح") : ""}
-            </span>
+            ${isUsed ? "" : num}
           </button>
         `
       }).join("")}
     </div>
+  </section>
+
+  <section class="presenterCard presenterAuctionPreviewCard">
+    <div class="presenterLabel">الإجابة</div>
+    <div id="presenterAuctionAnswerText" class="presenterAnswerBody">
+      —
+    </div>
+
+    <div class="presenterLabel">الملاحظة</div>
+    <div id="presenterAuctionNoteText" class="presenterQuestionBody">
+      —
+    </div>
+
+    <div class="presenterLabel">الصورة</div>
+    <div id="presenterAuctionImageBox" class="presenterImagePreviewBox hidden"></div>
   </section>
 `
 
