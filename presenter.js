@@ -165,12 +165,17 @@ if (
     refreshPresenterAuctionFromState()
   }
 
-if (presenterSegment === "who") {
-  refreshPresenterWhoFromState()
-}
+  if (presenterSegment === "who") {
+    refreshPresenterWhoFromState()
+  }
+
+  if (presenterSegment === "archive") {
+    refreshPresenterArchiveFromState()
+  }
 
   return
 }
+
 
   if (data.status === "ended") {
     renderPresenterEnded()
@@ -230,6 +235,10 @@ if (presenterSegment === "auction") {
 
 if (presenterSegment === "who") {
   refreshPresenterWhoFromState()
+}
+
+if (presenterSegment === "archive") {
+  refreshPresenterArchiveFromState()
 }
 
 }
@@ -526,6 +535,14 @@ if (currentRendered === segment) {
 
   if (segment === "auction") {
     refreshPresenterAuctionFromState()
+  }
+
+  if (segment === "who") {
+    refreshPresenterWhoFromState()
+  }
+
+  if (segment === "archive") {
+    refreshPresenterArchiveFromState()
   }
 
   return
@@ -2232,6 +2249,8 @@ async function renderPresenterFinalRound3Preview() {
 
 let presenterArchiveRows = []
 let presenterArchiveBox = null
+let presenterArchiveLoadedRound = null
+
 
 function getPresenterArchiveRoot() {
   return presenterLiveState?.archive || {}
@@ -2279,6 +2298,7 @@ async function loadPresenterArchiveRound(round) {
 
   presenterArchiveBox = boxData?.[0] || null
   presenterArchiveRows = itemsData || []
+  presenterArchiveLoadedRound = round
 }
 
 async function renderArchive() {
@@ -2351,4 +2371,72 @@ async function renderArchive() {
       </div>
     </section>
   `
+}
+
+async function refreshPresenterArchiveFromState() {
+  if (presenterSegment !== "archive") return
+
+  const archive = getPresenterArchiveState()
+  const round = getPresenterArchiveRound()
+
+  if (presenterArchiveLoadedRound !== round) {
+    await loadPresenterArchiveRound(round)
+  }
+
+  const reveal = getPresenterArchiveRoundReveal(round)
+  const remainingPoints = getPresenterArchiveRemainingPoints()
+  const activeTeam = archive.activeTeam || presenterSelectedTeam || null
+
+  document.getElementById("teamA")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "A"
+  )
+
+  document.getElementById("teamB")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "B"
+  )
+
+  document.querySelectorAll(".presenterRoundTabs button").forEach(btn => {
+    const value = Number(btn.innerText.trim())
+    btn.classList.toggle("active", value === round)
+  })
+
+  const scoreBox = document.querySelector(".presenterArchiveSimpleScore strong")
+  if (scoreBox) {
+    scoreBox.innerText = remainingPoints
+  }
+
+  const requiredItems = presenterArchiveRows
+    .filter(item => String(item.label || "").trim() === "المطلوب")
+    .sort((a, b) => Number(a.position) - Number(b.position))
+
+  const list = document.querySelector(".presenterArchiveRequiredList")
+
+  if (list) {
+    list.innerHTML = requiredItems.length
+      ? requiredItems.map(item => {
+          const position = Number(item.position)
+          const opened = !!reveal[position]
+
+          return `
+            <button
+              class="presenterArchiveRequiredItem ${opened ? "opened" : ""}"
+              onclick="sendCommand('showAnswer')"
+              ${opened ? "disabled" : ""}
+            >
+              ${item.text || "المطلوب"}
+            </button>
+          `
+        }).join("")
+      : `<div class="presenterArchiveEmpty">لا يوجد مطلوب</div>`
+  }
+
+  const doubleBtn = document.querySelector(
+    `.presenterActions .presenterBtn.gray[onclick="sendCommand('double')"]`
+  )
+
+  if (doubleBtn) {
+    doubleBtn.disabled = !activeTeam
+  }
 }
