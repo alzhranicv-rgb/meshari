@@ -676,8 +676,6 @@ function flashAuctionZoomOverlayWrong() {
 }
 
 function auctionCorrect() {
-  closeAuctionZoomOverlays()
-
   const team = auctionState.activeTeam
 
   if (!auctionState.pendingScore || auctionState.currentQuestionNumber === null) {
@@ -689,6 +687,8 @@ function auctionCorrect() {
     showGameToast("اختر الفريق أولاً لتسجيل النقطة")
     return
   }
+
+  closeAuctionZoomOverlays()
 
   pushAuctionHistory()
 
@@ -743,9 +743,9 @@ function auctionWrong() {
 
   const flashedOverlay = flashAuctionZoomOverlayWrong()
 
-if (!flashedOverlay) {
-  flashScreen("wrong")
-}
+  if (!flashedOverlay) {
+    flashScreen("wrong")
+  }
 
   updateAuctionDoubleButton()
   saveAuctionState()
