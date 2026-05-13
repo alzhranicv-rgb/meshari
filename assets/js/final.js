@@ -115,6 +115,14 @@ function restoreFinalState(saved) {
 
   finalState = saved
 
+if (!finalState.round1) {
+  finalState.round1 = {}
+}
+
+if (!finalState.round1.cardsCount || Number(finalState.round1.cardsCount) < 6) {
+  finalState.round1.cardsCount = 6
+}
+
   ensureFinalDoubleState()
 
   finalState.round2.revealTimer = null

@@ -84,7 +84,7 @@ async function syncDisplayStateToSession() {
       },
       currentModelName: localStorage.getItem("game_model_name") || currentModelName || "",
       displayControlsHidden: localStorage.getItem("presenter_hide_controls") === "1",
-      segmentStatus: getSafeJson("segment_status_v1"),
+      segmentStatus: getSafeJson("segment_status_v1") || defaultSegmentStatus(),
       warmup: getSafeJson("warmup_state_v1"),
       top10: getSafeJson("top10_state_v1"),
       auction: getSafeJson("auction_state_v2"),
@@ -971,17 +971,23 @@ function canEndSegment(segmentKey) {
 
   if (segmentKey === "top10") {
     if (!window.top10State) return false
-    return (
-      window.top10State.round === 3 &&
-      window.top10State.opened[1].length === 10 &&
-      window.top10State.opened[2].length === 10 &&
-      window.top10State.opened[3].length === 10
+
+    const maxRound = Math.min(
+      Math.max(Number(window.top10MaxRound || 3), 1),
+      4
     )
+
+    for (let r = 1; r <= maxRound; r++) {
+      const opened = window.top10State.opened?.[r] || []
+      if (opened.length < 10) return false
+    }
+
+    return Number(window.top10State.round || 1) >= maxRound
   }
 
   if (segmentKey === "auction") {
     if (!window.auctionState) return false
-    return window.auctionState.usedNumbers.length >= (window.auctionMaxNumber || 4)
+    return window.auctionState.usedNumbers.length >= Number(window.auctionMaxNumber || 4)
   }
 
   if (segmentKey === "who") {
@@ -990,24 +996,45 @@ function canEndSegment(segmentKey) {
   }
 
   if (segmentKey === "final") {
-    if (!window.finalOpenedNumbers) return false
-    return window.finalOpenedNumbers.length >= 12
+    if (!window.finalState) return false
+
+    const r1Count = Number(window.finalState.round1?.cardsCount || 6)
+
+    const r1Done =
+      (window.finalState.round1?.opened || []).length >= r1Count
+
+    const r2Done =
+      (window.finalState.round2?.opened || []).length >= 4 &&
+      (window.finalState.round2?.scoredNumbers || []).length >= 4
+
+    const r3Done =
+      (window.finalState.round3?.opened || []).length >= 2 &&
+      (window.finalState.round3?.scoredNumbers || []).length >= 2
+
+    return r1Done && r2Done && r3Done
   }
 
   if (segmentKey === "archive") {
     if (!window.archiveState) return false
 
-    const round1Items = window.archiveRoundCache?.[1]?.items || []
-    const round2Items = window.archiveRoundCache?.[2]?.items || []
-    const round3Items = window.archiveRoundCache?.[3]?.items || []
-    const round4Items = window.archiveRoundCache?.[4]?.items || []
+    const maxRound = Math.min(
+      Math.max(Number(window.archiveMaxRound || 4), 1),
+      4
+    )
 
-    const r1 = round1Items.length > 0 && round1Items.every(item => window.archiveRevealState?.[1]?.[item.position])
-    const r2 = round2Items.length > 0 && round2Items.every(item => window.archiveRevealState?.[2]?.[item.position])
-    const r3 = round3Items.length > 0 && round3Items.every(item => window.archiveRevealState?.[3]?.[item.position])
-    const r4 = round4Items.length > 0 && round4Items.every(item => window.archiveRevealState?.[4]?.[item.position])
+    for (let r = 1; r <= maxRound; r++) {
+      const items = window.archiveRoundCache?.[r]?.items || []
 
-    return r1 && r2 && r3 && r4
+      if (!items.length) return false
+
+      const finished = items.every(item => {
+        return !!window.archiveRevealState?.[r]?.[item.position]
+      })
+
+      if (!finished) return false
+    }
+
+    return Number(window.archiveState.round || 1) >= maxRound
   }
 
   return false

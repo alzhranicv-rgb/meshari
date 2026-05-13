@@ -1033,17 +1033,22 @@ function savePresenterTop10OpenedBy() {
   localStorage.setItem("presenter_top10_opened_by", JSON.stringify(presenterTop10OpenedBy))
 }
 
+function getPresenterTop10MaxRound() {
+  return Number(presenterLiveState?.top10?.top10MaxRound || 3)
+}
+
 function getPresenterTop10State() {
   return presenterLiveState?.top10?.top10State || {
     round: 1,
     activeTeam: null,
-    opened: { 1: [], 2: [], 3: [] },
-    answers: { 1: {}, 2: {}, 3: {} },
-    question: { 1: "", 2: "", 3: "" },
+    opened: { 1: [], 2: [], 3: [], 4: [] },
+    answers: { 1: {}, 2: {}, 3: {}, 4: {} },
+    question: { 1: "", 2: "", 3: "", 4: "" },
     errors: {
       1: { A: 0, B: 0 },
       2: { A: 0, B: 0 },
-      3: { A: 0, B: 0 }
+      3: { A: 0, B: 0 },
+      4: { A: 0, B: 0 }
     }
   }
 }
@@ -1088,6 +1093,20 @@ async function renderTop10() {
 
 panel.innerHTML = `
   ${teamButtons()}
+
+  <section class="presenterCard">
+    <div class="presenterLabel">الجولات</div>
+    <div class="presenterRoundTabs">
+      ${Array.from({ length: getPresenterTop10MaxRound() }, (_, i) => i + 1).map(r => `
+        <button
+          class="${round === r ? "active" : ""}"
+          onclick="setPresenterTop10Round(${r})"
+        >
+          ${r}
+        </button>
+      `).join("")}
+    </div>
+  </section>
 
   <section class="presenterCard presenterTop10StatusCard">
     <div class="presenterTop10StatusTop">
@@ -1187,10 +1206,15 @@ async function refreshPresenterTop10FromState() {
     activeTeam === "B"
   )
 
+  document.querySelectorAll(".presenterRoundTabs button").forEach(btn => {
+  const value = Number(btn.innerText.trim())
+  btn.classList.toggle("active", value === round)
+})
+
   const roundText = document.getElementById("presenterTop10RoundText")
-  if (roundText) {
-    roundText.innerText = `الجولة ${round}`
-  }
+if (roundText) {
+  roundText.innerText = round
+}
 
   const questionBox = document.getElementById("presenterTop10QuestionText")
   if (questionBox) {
@@ -1233,7 +1257,10 @@ async function refreshPresenterTop10FromState() {
 }
 
 function setPresenterTop10Round(round) {
-  sendCommand("setRound", { round: Number(round) })
+  const maxRound = getPresenterTop10MaxRound()
+  const safeRound = Math.min(Math.max(Number(round || 1), 1), maxRound)
+
+  sendCommand("setRound", { round: safeRound })
 }
 
 function openTop10PresenterNumber(number, event) {
@@ -2493,6 +2520,9 @@ function getPresenterArchiveState() {
     errors: {}
   }
 }
+function getPresenterArchiveMaxRound() {
+  return Number(getPresenterArchiveRoot()?.archiveMaxRound || 4)
+}
 
 function getPresenterArchiveRound() {
   return Number(getPresenterArchiveState()?.round || 1)
@@ -2548,14 +2578,18 @@ async function renderArchive() {
     ${teamButtons()}
 
     <section class="presenterCard">
-      <div class="presenterLabel">الجولات</div>
-      <div class="presenterRoundTabs">
-        <button class="${round === 1 ? "active" : ""}" onclick="sendCommand('setRound',{round:1})">1</button>
-        <button class="${round === 2 ? "active" : ""}" onclick="sendCommand('setRound',{round:2})">2</button>
-        <button class="${round === 3 ? "active" : ""}" onclick="sendCommand('setRound',{round:3})">3</button>
-        <button class="${round === 4 ? "active" : ""}" onclick="sendCommand('setRound',{round:4})">4</button>
-      </div>
-    </section>
+  <div class="presenterLabel">الجولات</div>
+  <div class="presenterRoundTabs">
+    ${Array.from({ length: getPresenterArchiveMaxRound() }, (_, i) => i + 1).map(r => `
+      <button
+        class="${round === r ? "active" : ""}"
+        onclick="setPresenterArchiveRound(${r})"
+      >
+        ${r}
+      </button>
+    `).join("")}
+  </div>
+</section>
 
     <div class="presenterActions">
       <button class="presenterBtn dark" onclick="sendCommand('startTimer')">بدء المؤقت</button>
@@ -2668,4 +2702,10 @@ async function refreshPresenterArchiveFromState() {
   if (doubleBtn) {
     doubleBtn.disabled = !activeTeam
   }
+}
+function setPresenterArchiveRound(round) {
+  const maxRound = getPresenterArchiveMaxRound()
+  const safeRound = Math.min(Math.max(Number(round || 1), 1), maxRound)
+
+  sendCommand("setRound", { round: safeRound })
 }

@@ -11,88 +11,200 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
 </head>
+
 <body>
 
+  <!-- =========================
+       PIN SCREEN
+  ========================== -->
   <div id="adminPinScreen" class="adminPinScreen">
     <div class="adminPinCard">
-      <div class="adminPinLogo">لوحة الأسئلة</div>
-<div class="adminPinTitle">الحنكة</div>
-<div class="adminPinSub">أدخل الرقم السري للمتابعة</div>
 
-      <input
-  id="adminPinInput"
-  class="adminPinInput"
-  type="tel"
-  inputmode="numeric"
-  pattern="[0-9]*"
-  maxlength="6"
-  autocomplete="one-time-code"
-  placeholder="••••"
-/>
+      <div class="adminPinHeader">
+        <div class="adminPinLogo">لوحة الأسئلة</div>
+        <div class="adminPinTitle">الحنكة</div>
+        <div class="adminPinSub">أدخل الرقم السري للمتابعة</div>
+      </div>
 
-      <button class="adminPinBtn" onclick="checkAdminPinFromInput()">دخول</button>
-      <div id="adminPinError" class="adminPinError"></div>
+      <div class="adminPinForm">
+        <input
+          id="adminPinInput"
+          class="adminPinInput"
+          type="tel"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="6"
+          autocomplete="one-time-code"
+          placeholder="••••"
+        />
+
+        <button
+          type="button"
+          class="adminPinBtn"
+          onclick="checkAdminPinFromInput()"
+        >
+          دخول
+        </button>
+
+        <div id="adminPinError" class="adminPinError"></div>
+      </div>
+
     </div>
   </div>
 
+
+  <!-- =========================
+       ADMIN APP
+  ========================== -->
   <div class="adminShellNew hidden" id="adminShellNew">
 
-    <aside class="adminSidebarNew">
-      <div class="adminBrandBox">
-        <div class="adminBrandTitle">الحنكة</div>
-        <div class="adminBrandSub">لوحة إدارة الأسئلة والنماذج</div>
-        <div id="adminBrandCurrentModel" class="adminBrandCurrentModel hidden"></div>
+    <!-- =========================
+         TOP BAR
+    ========================== -->
+    <header class="adminTopHeader">
+
+      <div class="adminTopBrand">
+        <div class="adminTopLogo">الحنكة</div>
+        <div class="adminTopSub">لوحة إدارة الأسئلة والنماذج</div>
       </div>
 
-      <div class="adminSideCard">
-        <div class="adminField">
-          <label for="modelName">اسم النموذج الجديد</label>
-          <input id="modelName" class="adminInput" type="text" placeholder="اكتب اسم النموذج">
+      <div id="adminCurrentModelPill" class="adminCurrentModelPill">
+        <span class="adminCurrentModelLabel">النموذج الحالي</span>
+        <strong id="adminBrandCurrentModel">لم يتم اختيار نموذج</strong>
+      </div>
+
+      <div class="adminModelControls">
+
+        <div class="adminModelField">
+          <label for="modelName">نموذج جديد</label>
+          <input
+            id="modelName"
+            class="adminInput"
+            type="text"
+            placeholder="اسم النموذج"
+          >
         </div>
 
-        <div class="adminField">
+        <div class="adminModelField">
           <label for="modelsList">النماذج</label>
           <select id="modelsList" class="adminSelect">
             <option value="">اختر النموذج</option>
           </select>
         </div>
 
-        <div class="adminSideActions">
-          <button class="adminBtn adminBtnMango" onclick="createModel()">إنشاء نموذج</button>
-          <button class="adminBtn adminBtnDark" onclick="openSelectedModel()">فتح النموذج</button>
-          <button class="adminBtn adminBtnLight" onclick="renameSelectedModel()">تعديل الاسم</button>
-          <button class="adminBtn adminBtnDanger" onclick="deleteSelectedModel()">حذف النموذج</button>
-          <button class="adminBtn adminLogoutBtn" onclick="logoutAdminPin()">خروج </button>
+        <div class="adminModelActions">
+          <button
+            type="button"
+            class="adminBtn adminBtnMango"
+            onclick="createModel()"
+          >
+            إنشاء
+          </button>
+
+          <button
+            type="button"
+            class="adminBtn adminBtnDark"
+            onclick="openSelectedModel()"
+          >
+            فتح
+          </button>
+
+          <button
+            type="button"
+            class="adminBtn adminBtnLight"
+            onclick="renameSelectedModel()"
+          >
+            تعديل
+          </button>
+
+          <button
+            type="button"
+            class="adminBtn adminBtnDanger"
+            onclick="deleteSelectedModel()"
+          >
+            حذف
+          </button>
+
+          <button
+            type="button"
+            class="adminBtn adminLogoutBtn"
+            onclick="logoutAdminPin()"
+          >
+            خروج
+          </button>
         </div>
-      </div>
-    </aside>
 
+      </div>
+
+    </header>
+
+
+    <!-- =========================
+         MAIN AREA
+    ========================== -->
     <main class="adminMainNew">
-      <div id="adminTabs" class="adminTabsNew hidden">
-        <button type="button" class="adminTabBtn" onclick="openAdminSegment('warmup')">التسخين</button>
-        <button type="button" class="adminTabBtn" onclick="openAdminSegment('top10')">Top 10</button>
-        <button type="button" class="adminTabBtn" onclick="openAdminSegment('auction')">فتبلة</button>
-        <button type="button" class="adminTabBtn" onclick="openAdminSegment('who')">من هو</button>
-        <button type="button" class="adminTabBtn" onclick="openAdminSegment('final')">الفاصلة</button>
-        <button type="button" class="adminTabBtn" onclick="openAdminSegment('archive')">الأرشيف</button>
-      </div>
 
-      <section id="adminEditor">
-        <div class="adminEmptyState">افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها</div>
+      <nav id="adminTabs" class="adminTabsNew hidden">
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('warmup')">
+          التسخين
+        </button>
+
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('top10')">
+          Top 10
+        </button>
+
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('auction')">
+          فتبلة
+        </button>
+
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('who')">
+          من هو
+        </button>
+
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('final')">
+          الفاصلة
+        </button>
+
+        <button type="button" class="adminTabBtn" onclick="openAdminSegment('archive')">
+          الأرشيف
+        </button>
+      </nav>
+
+      <section id="adminEditor" class="adminEditor">
+        <div class="adminEmptyState">
+          افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها
+        </div>
       </section>
+
     </main>
 
   </div>
 
+
+  <!-- =========================
+       TOAST
+  ========================== -->
   <div id="gameToast" class="gameToast hidden">
     <div id="gameToastText" class="gameToastText"></div>
   </div>
 
+
+  <!-- =========================
+       PRINT / PDF AREA
+  ========================== -->
   <div id="printPresenterArea"></div>
 
+
+  <!-- =========================
+       LIBRARIES
+  ========================== -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
+
+  <!-- =========================
+       ADMIN PIN
+  ========================== -->
   <script>
     const ADMIN_PIN = "9900"
 
@@ -112,7 +224,9 @@
         return true
       }
 
-      if (error) error.innerText = "الرقم السري غير صحيح"
+      if (error) {
+        error.innerText = "الرقم السري غير صحيح"
+      }
 
       if (input) {
         input.value = ""
@@ -134,15 +248,24 @@
       }
 
       const input = document.getElementById("adminPinInput")
+
       if (input) {
         input.focus()
+
         input.addEventListener("keydown", e => {
-          if (e.key === "Enter") checkAdminPinFromInput()
+          if (e.key === "Enter") {
+            checkAdminPinFromInput()
+          }
         })
       }
     })
   </script>
 
+
+  <!-- =========================
+       ADMIN JS
+  ========================== -->
   <script src="admin.js"></script>
+
 </body>
 </html>

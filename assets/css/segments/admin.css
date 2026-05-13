@@ -1,192 +1,74 @@
 /* =========================
-   ADMIN / CLEAN BASE
+   ADMIN PANEL - ALHANAKAH THEME
+   احذف القديم كامل واستبدله بهذا
+========================= */
+
+/* =========================
+   FALLBACK VARIABLES
 ========================= */
 
 :root{
-  --admin-bg:#EAEFEF;
-  --admin-card:#FFFFFF;
-  --admin-card-soft:#F8FBFB;
-  --admin-border:#D9E0E0;
-  --admin-border-soft:#E3E8E8;
+  --admin-bg:var(--bg,#EAEFEF);
+  --admin-bg-soft:var(--bg-soft,#F4F7F7);
+  --admin-card:var(--card,#FFFFFF);
+  --admin-card-2:var(--card-2,#F7F9F9);
 
-  --admin-text:#243447;
-  --admin-text-soft:#5F6B7A;
-  --admin-text-light:#8A93A1;
+  --admin-text:var(--text,#243447);
+  --admin-text-soft:var(--text-soft,#5F6B7A);
+  --admin-text-light:var(--text-light,#8A93A1);
 
-  --admin-dark:#2F4158;
-  --admin-dark-2:#243447;
-  --admin-mango:#FF9B51;
-  --admin-mango-2:#F0A35F;
+  --admin-primary:var(--primary,#FF9B51);
+  --admin-primary-soft:var(--primary-soft,#FFD7B8);
+
+  --admin-accent:var(--accent,#2F4158);
+  --admin-accent-2:var(--accent-2,#42556D);
+
+  --admin-border:var(--border,#D9E0E0);
+  --admin-border-soft:var(--border-soft,#E3E8E8);
+
+  --admin-red:#C95757;
+  --admin-red-dark:#A93F3F;
   --admin-green:#18794E;
-  --admin-red:#D92D20;
-  --admin-maroon:#7A1630;
+  --admin-blue:#2F4158;
 
-  --admin-radius-xl:28px;
+  --admin-radius-xl:30px;
   --admin-radius-lg:24px;
   --admin-radius-md:18px;
 
-  --admin-shadow:0 8px 22px rgba(0,0,0,.05);
-  --admin-shadow-lg:0 12px 30px rgba(0,0,0,.08);
+  --admin-shadow-sm:var(--shadow-sm,0 6px 14px rgba(0,0,0,.05));
+  --admin-shadow-md:var(--shadow-md,0 12px 30px rgba(0,0,0,.08));
+  --admin-shadow-lg:var(--shadow-lg,0 20px 50px rgba(0,0,0,.12));
 }
 
 /* =========================
-   PAGE
+   BASE
 ========================= */
 
 html,
 body{
   margin:0;
-  padding:0;
-  min-height:100%;
-  background:var(--admin-bg);
-  color:var(--admin-text);
+  min-height:100vh;
   direction:rtl;
+  color:var(--admin-text);
+  overflow-x:hidden;
+}
+
+body{
+  background:
+    radial-gradient(circle at 88% 8%, rgba(255,155,81,.18), transparent 24%),
+    radial-gradient(circle at 12% 90%, rgba(47,65,88,.08), transparent 28%),
+    linear-gradient(180deg,#fff6ee 0%,#f5eee6 18%,#edf2f1 58%,#e6ecec 100%);
 }
 
 .adminShellNew,
-.adminShellNew *{
+.adminShellNew *,
+.adminPinScreen,
+.adminPinScreen *,
+.adminModalOverlay,
+.adminModalOverlay *{
   box-sizing:border-box;
-  font-family:"Zain","Tahoma","Arial",sans-serif !important;
-}
-
-.adminShellNew{
-  width:100%;
-  min-height:100vh;
-  display:grid;
-  grid-template-columns:320px minmax(0,1fr);
-  gap:22px;
-  padding:20px;
-  align-items:start;
-}
-
-/* =========================
-   SIDEBAR
-========================= */
-
-.adminSidebarNew{
-  position:sticky;
-  top:20px;
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-  align-items:stretch;
-}
-
-.adminBrandBox,
-.adminSideCard{
-  width:100%;
-  margin:0;
-  padding:22px;
-  border-radius:var(--admin-radius-xl);
-  border:1px solid var(--admin-border);
-  box-shadow:var(--admin-shadow);
-}
-
-.adminBrandBox{
-  background:#F4F7F7;
-  text-align:center;
-}
-
-.adminSideCard{
-  background:var(--admin-card-soft);
-}
-
-.adminBrandTitle{
-  margin:0 0 6px;
-  color:var(--admin-text);
-  font-size:34px;
-  font-weight:500;
-  line-height:1.2;
-}
-
-.adminBrandSub{
-  margin:0 0 12px;
-  color:var(--admin-text-soft);
-  font-size:15px;
+  font-family:"HanakaText","Zain","Tahoma","Arial",sans-serif !important;
   font-weight:400;
-  line-height:1.8;
-}
-
-.adminBrandCurrentModel{
-  margin-top:10px;
-  padding-top:12px;
-  border-top:1px solid #DFE5E5;
-}
-
-.adminBrandCurrentModelLabel{
-  margin-bottom:6px;
-  color:var(--admin-text-light);
-  font-size:14px;
-  font-weight:400;
-}
-
-.adminBrandCurrentModelName{
-  color:var(--admin-text);
-  font-size:24px;
-  font-weight:500;
-  line-height:1.35;
-  word-break:break-word;
-}
-
-.adminSideCardTitle{
-  margin:0 0 10px;
-  color:var(--admin-text);
-  text-align:center;
-  font-size:22px;
-  font-weight:500;
-  line-height:1.3;
-}
-
-.adminSideHint{
-  margin:0 0 16px;
-  color:var(--admin-text-soft);
-  text-align:center;
-  font-size:14px;
-  font-weight:400;
-  line-height:1.9;
-}
-
-.adminSideCard .adminField{
-  margin-bottom:12px;
-}
-
-.adminSideCard .adminField:last-of-type{
-  margin-bottom:0;
-}
-
-.adminSideActions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:12px;
-}
-
-/* =========================
-   MAIN
-========================= */
-
-.adminMainNew{
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-
-#adminTabs,
-#adminEditor{
-  background:var(--admin-card);
-  border:1px solid var(--admin-border);
-  border-radius:var(--admin-radius-xl);
-  box-shadow:var(--admin-shadow-lg);
-}
-
-#adminTabs{
-  padding:14px;
-}
-
-#adminEditor{
-  min-height:420px;
-  padding:22px;
 }
 
 .hidden{
@@ -194,74 +76,368 @@ body{
 }
 
 /* =========================
-   RESPONSIVE
+   PIN SCREEN
 ========================= */
 
-@media (max-width:1200px){
-  .adminShellNew{
-    grid-template-columns:280px minmax(0,1fr);
-  }
+.adminPinScreen{
+  position:fixed;
+  inset:0;
+  z-index:5000;
+  min-height:100dvh;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at 85% 12%, rgba(255,155,81,.20), transparent 26%),
+    radial-gradient(circle at 12% 88%, rgba(47,65,88,.08), transparent 28%),
+    linear-gradient(180deg,#F4F7F7 0%,#EAEFEF 100%);
+  overflow:hidden;
 }
 
-@media (max-width:980px){
-  .adminShellNew{
-    grid-template-columns:1fr;
-  }
-
-  .adminSidebarNew{
-    position:static;
-  }
+.adminPinCard{
+  width:min(100%,520px);
+  position:relative;
+  overflow:hidden;
+  text-align:center;
+  border-radius:34px;
+  padding:30px 28px 24px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F7FAFA 100%);
+  border:1px solid rgba(217,224,224,.95);
+  box-shadow:
+    0 24px 60px rgba(39,48,61,.12),
+    inset 0 1px 0 rgba(255,255,255,.95);
 }
 
-@media (max-width:640px){
-  .adminShellNew{
-    padding:12px;
-  }
-
-  .adminSideActions{
-    grid-template-columns:1fr;
-  }
-
-  .adminBrandBox,
-  .adminSideCard,
-  #adminEditor,
-  #adminTabs{
-    border-radius:22px;
-  }
+.adminPinCard::before{
+  content:"";
+  position:absolute;
+  width:210px;
+  height:210px;
+  top:-90px;
+  right:-70px;
+  border-radius:50%;
+  background:rgba(255,155,81,.13);
 }
+
+.adminPinCard::after{
+  content:"";
+  position:absolute;
+  width:130px;
+  height:130px;
+  bottom:-55px;
+  left:-35px;
+  border-radius:30px;
+  transform:rotate(24deg);
+  background:rgba(47,65,88,.06);
+}
+
+.adminPinHeader,
+.adminPinForm{
+  position:relative;
+  z-index:2;
+}
+
+.adminPinHeader{
+  display:grid;
+  gap:8px;
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.adminPinLogo{
+  width:max-content;
+  margin:0 auto 4px;
+  min-height:34px;
+  padding:7px 18px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  color:#7A4A22;
+  font-size:.95rem;
+  box-shadow:0 10px 18px rgba(255,155,81,.18);
+}
+
+.adminPinTitle{
+  margin:0;
+  color:var(--admin-accent);
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(3.2rem,7vw,5rem);
+  line-height:.95;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.95),
+    0 8px 20px rgba(47,65,88,.10);
+}
+
+.adminPinTitle::after{
+  content:"";
+  display:block;
+  width:120px;
+  height:5px;
+  margin:13px auto 6px;
+  border-radius:999px;
+  background:linear-gradient(90deg,transparent,#FF9B51,transparent);
+}
+
+.adminPinSub{
+  color:var(--admin-text-soft);
+  font-size:1.05rem;
+  line-height:1.6;
+}
+
+.adminPinForm{
+  display:grid;
+  gap:12px;
+}
+
+.adminPinInput{
+  width:100%;
+  height:58px;
+  border-radius:20px;
+  border:1px solid rgba(217,224,224,.95);
+  outline:none;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F6F9F9 100%);
+  color:var(--admin-text);
+  font-size:1.45rem;
+  text-align:center;
+  letter-spacing:8px;
+  padding:0 18px;
+  box-shadow:
+    inset 0 1px 3px rgba(255,255,255,.95),
+    0 8px 18px rgba(39,48,61,.04);
+}
+
+.adminPinInput:focus{
+  border-color:rgba(255,155,81,.85);
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.12),
+    0 10px 20px rgba(39,48,61,.06);
+}
+
+.adminPinBtn{
+  width:100%;
+  height:58px;
+  border:0;
+  border-radius:20px;
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  color:#FFFFFF;
+  font-size:1.12rem;
+  cursor:pointer;
+  box-shadow:
+    0 16px 30px rgba(255,155,81,.24),
+    inset 0 1px 0 rgba(255,255,255,.25);
+  transition:.18s ease;
+}
+
+.adminPinBtn:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.03);
+}
+
+.adminPinError{
+  min-height:22px;
+  color:#A93F3F;
+  font-size:.95rem;
+  line-height:1.5;
+}
+
 /* =========================
-   ADMIN TABS
+   APP LAYOUT
+========================= */
+
+.adminShellNew{
+  width:min(1440px,calc(100% - 28px));
+  margin:0 auto;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  padding:16px 0 24px;
+}
+
+/* =========================
+   TOP HEADER
+========================= */
+
+.adminTopHeader{
+  position:sticky;
+  top:12px;
+  z-index:1000;
+  display:grid;
+  grid-template-columns:190px 240px minmax(0,1fr);
+  gap:12px;
+  align-items:stretch;
+  padding:12px;
+  border-radius:28px;
+  background:rgba(255,255,255,.82);
+  border:1px solid rgba(217,224,224,.92);
+  box-shadow:var(--admin-shadow-md);
+  backdrop-filter:blur(12px);
+}
+
+.adminTopBrand,
+.adminCurrentModelPill,
+.adminModelControls{
+  border-radius:22px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F7F9F9 100%);
+  border:1px solid var(--admin-border-soft);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+.adminTopBrand{
+  min-height:86px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:10px;
+  overflow:hidden;
+}
+
+.adminTopLogo{
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  color:var(--admin-accent);
+  font-size:2.6rem;
+  line-height:.9;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.95),
+    0 8px 18px rgba(47,65,88,.10);
+}
+
+.adminTopSub{
+  margin-top:8px;
+  color:var(--admin-text-soft);
+  font-size:.82rem;
+  line-height:1.4;
+}
+
+.adminCurrentModelPill{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:6px;
+  padding:14px 16px;
+}
+
+.adminCurrentModelPill.hasModel{
+  border-color:rgba(255,155,81,.42);
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255,155,81,.16), transparent 38%),
+    linear-gradient(180deg,#FFFFFF 0%,#FFF8F0 100%);
+}
+
+.adminCurrentModelLabel{
+  color:var(--admin-text-light);
+  font-size:.82rem;
+  line-height:1.2;
+}
+
+.adminCurrentModelPill strong{
+  min-width:0;
+  color:var(--admin-text);
+  font-size:1.15rem;
+  line-height:1.35;
+  word-break:break-word;
+}
+
+.adminModelControls{
+  display:grid;
+  grid-template-columns:minmax(160px,1fr) minmax(190px,1fr) auto;
+  gap:10px;
+  align-items:end;
+  padding:12px;
+  min-width:0;
+}
+
+.adminModelField{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.adminModelField label{
+  color:var(--admin-text-soft);
+  font-size:.82rem;
+  padding:0 6px;
+}
+
+.adminModelActions{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(72px,1fr));
+  gap:8px;
+  align-items:end;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.adminMainNew{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-width:0;
+}
+
+#adminTabs,
+#adminEditor{
+  background:rgba(255,255,255,.86);
+  border:1px solid rgba(217,224,224,.92);
+  border-radius:28px;
+  box-shadow:var(--admin-shadow-md);
+  backdrop-filter:blur(10px);
+}
+
+#adminTabs{
+  padding:12px;
+}
+
+#adminEditor{
+  min-height:520px;
+  padding:20px;
+}
+
+.adminEditor{
+  width:100%;
+}
+
+/* =========================
+   TABS
 ========================= */
 
 .adminTabsNew{
   display:grid;
   grid-template-columns:repeat(6,minmax(0,1fr));
-  gap:12px;
+  gap:10px;
 }
 
 .adminTabBtn{
-  min-height:58px;
+  min-height:56px;
   border:0;
   border-radius:18px;
-  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
-  color:#FFFFFF;
-  padding:12px 14px;
-  font-size:17px;
-  font-weight:400;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  color:var(--admin-accent);
+  border:1px solid rgba(217,224,224,.95);
+  padding:10px 14px;
+  font-size:1rem;
   cursor:pointer;
-  box-shadow:0 8px 18px rgba(15,23,42,.08);
-  transition:transform .18s ease, opacity .18s ease, box-shadow .18s ease;
+  box-shadow:var(--admin-shadow-sm);
+  transition:.18s ease;
 }
 
 .adminTabBtn:hover{
-  transform:translateY(-1px);
-  opacity:.96;
+  transform:translateY(-2px);
+  border-color:rgba(255,155,81,.42);
 }
 
 .adminTabBtn.activeAdminTab{
-  background:linear-gradient(180deg,#F0A35F 0%,#FF9B51 100%);
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
   color:#FFFFFF;
-  box-shadow:0 10px 20px rgba(255,155,81,.24);
+  border-color:rgba(255,155,81,.58);
+  box-shadow:0 14px 26px rgba(255,155,81,.22);
 }
 
 /* =========================
@@ -272,13 +448,14 @@ body{
   display:flex;
   flex-direction:column;
   gap:8px;
+  min-width:0;
 }
 
-.adminField label{
-  color:#344054;
-  font-size:15px;
-  font-weight:500;
-  line-height:1.5;
+.adminField label,
+.adminModelField label{
+  color:var(--admin-text-soft);
+  font-size:.92rem;
+  line-height:1.4;
 }
 
 .adminInput,
@@ -296,18 +473,25 @@ body{
 .archiveAdminItem select,
 .archiveAdminItem textarea{
   width:100%;
-  min-height:54px;
-  border:1px solid var(--admin-border);
+  min-height:52px;
+  border:1px solid rgba(217,224,224,.95);
   border-radius:18px;
-  background:#FFFFFF;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FBFDFD 100%);
   color:var(--admin-text);
-  padding:12px 16px;
-  font-size:18px;
-  font-weight:500;
+  padding:12px 15px;
+  font-size:1rem;
   line-height:1.5;
   outline:none;
-  box-shadow:none;
-  transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+  transition:.18s ease;
+}
+
+.adminModelField input,
+.adminModelField select{
+  min-height:48px;
+  height:48px;
+  border-radius:16px;
+  font-size:.95rem;
 }
 
 textarea,
@@ -315,11 +499,9 @@ textarea,
 .adminCard textarea,
 .finalAdminCard textarea,
 .archiveAdminItem textarea{
-  min-height:120px;
+  min-height:118px;
   resize:vertical;
-  line-height:1.7;
-  padding-top:14px;
-  padding-bottom:14px;
+  line-height:1.75;
 }
 
 .adminInput::placeholder,
@@ -348,30 +530,71 @@ textarea,
 .archiveAdminItem input:focus,
 .archiveAdminItem select:focus,
 .archiveAdminItem textarea:focus{
-  border-color:var(--admin-mango);
+  border-color:rgba(255,155,81,.92);
   background:#FFFDF9;
-  box-shadow:0 0 0 4px rgba(255,155,81,.12);
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.12),
+    inset 0 1px 0 rgba(255,255,255,.95);
 }
 
 /* SELECT */
+
 .adminSelect,
-.compactCountSelect{
+.compactCountSelect,
+.adminField select{
   appearance:none !important;
   -webkit-appearance:none !important;
-  -moz-appearance:none !important;
   cursor:pointer;
-  padding-left:48px !important;
-  padding-right:16px !important;
+  padding-left:46px !important;
   background-image:
     linear-gradient(45deg, transparent 50%, #667085 50%),
     linear-gradient(135deg, #667085 50%, transparent 50%);
   background-position:
     18px calc(50% - 3px),
     28px calc(50% - 3px);
-  background-size:8px 8px, 8px 8px;
+  background-size:8px 8px,8px 8px;
   background-repeat:no-repeat;
-  text-overflow:ellipsis;
-  white-space:nowrap;
+}
+
+.compactCountSelectWrap{
+  position:relative;
+  width:100%;
+}
+
+.compactCountSelect{
+  min-height:52px !important;
+  height:52px !important;
+  text-align:center;
+}
+
+.compactCountSelectWrap::after{
+  content:"";
+  position:absolute;
+  left:17px;
+  top:50%;
+  width:9px;
+  height:9px;
+  border-left:3px solid #667085;
+  border-bottom:3px solid #667085;
+  transform:translateY(-65%) rotate(-45deg);
+  pointer-events:none;
+}
+
+/* FILE INPUT */
+
+input[type="file"]{
+  padding:10px !important;
+  cursor:pointer;
+}
+
+input[type="file"]::file-selector-button{
+  border:0;
+  border-radius:14px;
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
+  color:#FFFFFF;
+  padding:9px 13px;
+  margin-left:10px;
+  cursor:pointer;
 }
 
 /* =========================
@@ -387,16 +610,15 @@ button,
 .compactCountBtn{
   border:0;
   outline:none;
-  min-height:52px;
+  min-height:50px;
   border-radius:18px;
-  padding:12px 18px;
-  font-size:17px;
-  font-weight:400;
+  padding:10px 16px;
+  font-size:1rem;
   line-height:1.2;
   cursor:pointer;
   white-space:nowrap;
-  box-shadow:0 8px 18px rgba(15,23,42,.08);
-  transition:transform .18s ease, opacity .18s ease, box-shadow .18s ease;
+  box-shadow:var(--admin-shadow-sm);
+  transition:.18s ease;
 }
 
 button:hover,
@@ -406,7 +628,19 @@ button:hover,
 .adminDeleteBtn:hover,
 .adminDeleteAllBtn:hover,
 .compactCountBtn:hover{
-  transform:translateY(-1px);
+  transform:translateY(-2px);
+  filter:brightness(1.02);
+}
+
+button:active{
+  transform:scale(.97);
+}
+
+button:disabled{
+  opacity:.38;
+  cursor:not-allowed;
+  transform:none !important;
+  box-shadow:none !important;
 }
 
 .adminBtn,
@@ -415,424 +649,81 @@ button:hover,
   color:#FFFFFF;
 }
 
-.adminBtnMango{
-  background:linear-gradient(180deg,#F0A35F 0%,#FF9B51 100%);
+.adminBtnMango,
+.compactCountBtn{
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
   color:#FFFFFF;
 }
 
 .adminBtnLight{
-  background:linear-gradient(180deg,#F2E6D2 0%,#EAD8BE 100%);
-  color:var(--admin-text);
+  background:linear-gradient(180deg,#FFFFFF 0%,#EEF2F2 100%);
+  color:var(--admin-accent);
+  border:1px solid var(--admin-border);
 }
 
 .adminSaveBtn{
-  background:linear-gradient(180deg,#27A164 0%,#18794E 100%);
+  background:linear-gradient(180deg,#2FA66B 0%,#18794E 100%);
   color:#FFFFFF;
 }
 
 .adminReloadBtn{
-  background:linear-gradient(180deg,#3B82F6 0%,#2563EB 100%);
+  background:linear-gradient(180deg,#42556D 0%,#2F4158 100%);
   color:#FFFFFF;
 }
 
-.adminDeleteBtn{
-  background:linear-gradient(180deg,#EF4444 0%,#D92D20 100%);
-  color:#FFFFFF;
-}
-
+.adminDeleteBtn,
 .adminDeleteAllBtn,
 .adminBtnDanger{
-  background:linear-gradient(180deg,#8B2946 0%,#7A1630 100%);
+  background:linear-gradient(180deg,#C95757 0%,#A93F3F 100%);
   color:#FFFFFF;
 }
 
-.adminSideActions .adminBtn,
-.adminSideActions .adminSaveBtn,
-.adminSideActions .adminReloadBtn,
-.adminSideActions .adminDeleteBtn,
-.adminSideActions .adminDeleteAllBtn,
-.adminSideActions button{
-  width:100%;
-  min-height:52px;
-  height:52px;
-  padding:10px 14px;
+.adminLogoutBtn{
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  color:#A93F3F;
+  border:1px solid rgba(201,87,87,.28);
 }
 
-/* =========================
-   COMPACT COUNT
-========================= */
-
-.compactCountField{
-  gap:8px;
-}
-
-.compactCountSelectWrap{
-  position:relative;
-  width:100%;
-}
-
-.compactCountSelect{
-  width:100% !important;
-  min-height:58px !important;
-  height:58px !important;
-  border:1px solid var(--admin-border) !important;
-  border-radius:18px !important;
-  background-color:#FFFFFF !important;
-  color:var(--admin-text) !important;
-  font-size:18px !important;
-  font-weight:500 !important;
-  text-align:center !important;
-  box-shadow:none !important;
-}
-
-.compactCountSelectWrap::after{
-  content:"";
-  position:absolute;
-  left:18px;
-  top:50%;
-  width:10px;
-  height:10px;
-  border-left:3px solid #667085;
-  border-bottom:3px solid #667085;
-  transform:translateY(-65%) rotate(-45deg);
-  pointer-events:none;
-}
-
-.compactCountBtn{
-  width:100%;
-  min-height:58px !important;
-  height:58px !important;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width:1100px){
-  .adminTabsNew{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-}
-
-@media (max-width:720px){
-  .adminTabsNew{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
-  .adminTabBtn{
-    min-height:54px;
-    font-size:15px;
-  }
-
-  button,
-  .adminBtn,
-  .adminSaveBtn,
-  .adminReloadBtn,
-  .adminDeleteBtn,
-  .adminDeleteAllBtn,
-  .compactCountBtn{
-    min-height:48px;
-    font-size:15px;
-  }
-}
-/* =========================
-   ADMIN HOME
-========================= */
-
-.adminHomeShell{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-
-.adminHomeTopLineSingleRow{
-  display:grid;
-  grid-template-columns:minmax(0,1.35fr) minmax(260px,.8fr) minmax(260px,.9fr);
-  gap:16px;
-  align-items:stretch;
-}
-
-.adminHomeHeroCard,
-.adminHomeModelMini,
-.adminHomeMiniHintCard{
-  background:var(--admin-card);
-  border:1px solid var(--admin-border);
-  border-radius:var(--admin-radius-lg);
-  box-shadow:var(--admin-shadow);
-  padding:22px;
-  min-height:150px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-}
-
-.adminHomeHeroTitle{
-  margin:0 0 10px;
-  color:var(--admin-text);
-  font-size:32px;
-  font-weight:500;
-  line-height:1.25;
-}
-
-.adminHomeHeroText,
-.adminHomeMiniHintText{
-  color:var(--admin-text-soft);
-  font-size:16px;
-  font-weight:400;
-  line-height:1.9;
-}
-
-.adminHomeModelMiniLabel,
-.adminHomeMiniHintTitle{
-  margin-bottom:8px;
-  color:var(--admin-text-soft);
-  font-size:16px;
-  font-weight:400;
-}
-
-.adminHomeModelMiniName{
-  color:var(--admin-text);
-  font-size:30px;
-  font-weight:500;
-  line-height:1.35;
-}
-
-/* =========================
-   SEGMENT CARDS
-========================= */
-
-.adminSegmentPickerCompact{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:18px;
-}
-
-.adminSegmentCompactCard{
-  background:var(--admin-card);
-  border:1px solid var(--admin-border);
-  border-radius:24px;
-  box-shadow:var(--admin-shadow);
-  padding:20px;
-  text-align:right;
+.adminSmallDangerBtn,
+.adminDeleteMiniBtn{
+  height:36px;
+  min-height:36px;
+  min-width:56px;
+  padding:0 12px;
+  border:0;
+  border-radius:13px;
+  background:linear-gradient(180deg,#C95757 0%,#A93F3F 100%);
+  color:#FFFFFF;
+  font-size:.82rem;
   cursor:pointer;
-  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-  overflow:hidden;
+  box-shadow:0 8px 16px rgba(169,63,63,.16);
 }
 
-.adminSegmentCompactCard:hover{
-  transform:translateY(-2px);
-  box-shadow:var(--admin-shadow-lg);
-}
-
-.adminSegmentCompactCard.doneCard{
-  background:#EEF8F0;
-  border-color:#CDE8D1;
-}
-
-.adminSegmentCompactTop{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:12px;
-}
-
-.adminSegmentCompactTitle{
-  color:var(--admin-text);
-  font-size:24px;
-  font-weight:500;
-  line-height:1.25;
-}
-
-.adminSegmentCompactBadge{
-  min-height:34px;
-  padding:4px 10px;
-  border-radius:999px;
-  background:#FDECEC;
-  color:#C24141;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  font-size:13px;
-  font-weight:500;
-  line-height:1;
-}
-
-.adminSegmentCompactBadge.done{
-  background:#DFF5E4;
-  color:#18794E;
-}
-
-.adminSegmentCompactDesc{
-  margin-bottom:10px;
-  color:var(--admin-text-soft);
-  font-size:15px;
-  font-weight:400;
-  line-height:1.8;
-}
-
-.adminSegmentCompactFooter{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-top:14px;
-  padding-top:12px;
-  border-top:1px solid var(--admin-border-soft);
-}
-
-.adminSegmentCompactMetaLabel{
-  color:var(--admin-text-soft);
-  font-size:14px;
-  font-weight:500;
-}
-
-.adminSegmentCompactMetaValue{
-  min-width:42px;
-  height:34px;
-  padding:0 10px;
-  border-radius:999px;
-  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
-  color:#FFFFFF;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  font-size:14px;
-  font-weight:500;
-}
-
-.adminSegmentCompactCard.doneCard .adminSegmentCompactMetaValue{
-  background:linear-gradient(180deg,#27A164 0%,#18794E 100%);
+.adminSavingBtn{
+  opacity:.65 !important;
+  pointer-events:none !important;
+  cursor:wait !important;
+  filter:grayscale(.12);
 }
 
 /* =========================
-   STATUS STRIP
+   SHARED CARDS / HEADERS
 ========================= */
 
-.adminStatusStrip{
-  display:grid;
-  grid-template-columns:repeat(6,minmax(0,1fr));
-  gap:12px;
-}
-
-.adminStatusStripItem{
-  min-height:82px;
-  padding:14px 12px;
-  background:var(--admin-card);
-  border:1px solid var(--admin-border);
-  border-radius:18px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:8px;
-  text-align:center;
-  overflow:hidden;
-}
-
-.adminStatusStripItem.doneCard{
-  background:#EEF8F0;
-  border-color:#CDE8D1;
-}
-
-.adminStatusStripName{
-  color:var(--admin-text);
-  font-size:18px;
-  font-weight:500;
-}
-
-.adminStatusStripCount{
-  color:var(--admin-text-soft);
-  font-size:15px;
-  font-weight:400;
-}
-
-/* =========================
-   EMPTY STATE
-========================= */
-
-.adminEmptyState{
-  min-height:280px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:30px;
-  border:2px dashed var(--admin-border);
-  border-radius:22px;
-  background:var(--admin-card-soft);
-  color:var(--admin-text-soft);
-  font-size:18px;
-  font-weight:500;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width:1180px){
-  .adminHomeTopLineSingleRow{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .adminHomeHeroCard{
-    grid-column:1 / -1;
-  }
-}
-
-@media (max-width:1100px){
-  .adminSegmentPickerCompact{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
-  .adminStatusStrip{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-}
-
-@media (max-width:760px){
-  .adminHomeTopLineSingleRow,
-  .adminSegmentPickerCompact{
-    grid-template-columns:1fr;
-  }
-
-  .adminHomeHeroCard,
-  .adminHomeModelMini,
-  .adminHomeMiniHintCard{
-    min-height:auto;
-  }
-
-  .adminHomeHeroTitle{
-    font-size:26px;
-  }
-
-  .adminHomeModelMiniName{
-    font-size:24px;
-  }
-}
-
-@media (max-width:720px){
-  .adminStatusStrip{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-}
-/* =========================
-   SHARED EDITOR SECTIONS
-========================= */
-
-.adminSectionShell,
-.cleanSectionShell,
-.finalAdminShell,
-.archiveAdminShell,
+.adminHomeShell,
 .warmupAdminShell,
 .top10AdminShell,
 .auctionAdminShell,
-.whoAdminShell{
+.whoAdminShell,
+.finalAdminShell,
+.archiveAdminShell{
   display:flex;
   flex-direction:column;
-  gap:20px;
+  gap:18px;
 }
 
-.adminEditorTopBar{
+.adminEditorTopBar,
+.compactAdminEditorTopBar{
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -842,544 +733,661 @@ button:hover,
 
 .adminSectionTitle{
   margin:0;
-  color:var(--admin-text);
-  font-size:34px;
-  font-weight:500;
-  line-height:1.2;
+  color:var(--admin-accent);
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(2.2rem,4vw,3.6rem);
+  line-height:.95;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.95),
+    0 8px 18px rgba(47,65,88,.08);
 }
 
 .adminSectionSubTitle{
-  margin-top:6px;
+  margin-top:8px;
   color:var(--admin-text-soft);
-  font-size:15px;
-  font-weight:400;
-  line-height:1.8;
-}
-
-.adminGrid2,
-.warmupAdminGrid,
-.top10AdminGrid,
-.auctionAdminGrid,
-.whoAdminGrid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:18px;
+  font-size:1rem;
+  line-height:1.7;
 }
 
 .adminCard,
 .finalAdminCard,
 .archiveToolsCard,
 .finalTopCompactBox,
-.finalAdminTitleCard{
-  background:var(--admin-card);
-  border:1px solid var(--admin-border);
-  border-radius:24px;
-  box-shadow:var(--admin-shadow);
-  padding:18px;
+.finalAdminTitleCard,
+.adminCollapseCard{
+  position:relative;
   overflow:hidden;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F7F9F9 100%);
+  border:1px solid var(--admin-border);
+  border-radius:26px;
+  box-shadow:var(--admin-shadow-sm);
+  padding:18px;
+}
+
+.adminCard::before,
+.finalAdminCard::before{
+  content:"";
+  position:absolute;
+  width:110px;
+  height:110px;
+  top:-56px;
+  left:-34px;
+  border-radius:50%;
+  background:rgba(255,155,81,.08);
+  pointer-events:none;
 }
 
 .adminCard h3,
 .finalAdminCard h3,
 .archiveToolsCard h3{
   margin:0;
-  color:var(--admin-text);
-  font-size:28px;
-  font-weight:500;
-  line-height:1.25;
-}
-
-.adminQuestionCard,
-.presenterSectionBlock,
-.finalAdminImageRow,
-.finalAdminWordRow{
-  background:var(--admin-card-soft);
-  border:1px solid var(--admin-border-soft);
-  border-radius:20px;
-  padding:14px;
-  overflow:hidden;
-}
-
-.adminQuestionCardTop,
-.finalAdminCardHead,
-.archiveAdminItemHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:12px;
-  flex-wrap:wrap;
-}
-
-.adminQuestionTitle{
-  color:var(--admin-text);
-  font-size:22px;
-  font-weight:500;
+  color:var(--admin-accent);
+  font-size:1.45rem;
   line-height:1.25;
 }
 
 .adminActionRow,
 .finalAdminActions,
-.archiveToolsButtons,
-.archiveToolsButtonsClean{
+.adminMiniActions{
   display:flex;
   flex-wrap:wrap;
+  gap:10px;
+}
+
+.adminActionRow{
+  position:sticky;
+  bottom:12px;
+  z-index:40;
+  padding:12px;
+  border-radius:22px;
+  background:rgba(255,255,255,.86);
+  border:1px solid rgba(217,224,224,.88);
+  box-shadow:0 14px 28px rgba(39,48,61,.10);
+  backdrop-filter:blur(10px);
+}
+
+.adminActionRow button{
+  flex:1;
+  min-width:140px;
+}
+
+/* =========================
+   STATUS STRIP
+========================= */
+
+.adminStatusStrip{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:10px;
+}
+
+.adminStatusStripItem{
+  min-height:70px;
+  padding:12px;
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  text-align:center;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  border:1px solid var(--admin-border);
+  box-shadow:var(--admin-shadow-sm);
+}
+
+.adminStatusStripItem.doneCard{
+  background:linear-gradient(180deg,#F0FFF5 0%,#E4F8EA 100%);
+  border-color:#CDE8D1;
+}
+
+.adminStatusStripName{
+  color:var(--admin-text);
+  font-size:.95rem;
+}
+
+.adminStatusStripCount{
+  min-width:34px;
+  height:26px;
+  padding:0 9px;
+  border-radius:999px;
+  background:var(--admin-accent);
+  color:#FFFFFF;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.82rem;
+}
+
+.doneCard .adminStatusStripCount{
+  background:var(--admin-green);
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.adminEmptyState{
+  min-height:360px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:34px;
+  border:2px dashed var(--admin-border);
+  border-radius:26px;
+  background:
+    radial-gradient(circle at 50% 24%, rgba(255,155,81,.12), transparent 30%),
+    linear-gradient(180deg,#FFFFFF 0%,#F7F9F9 100%);
+  color:var(--admin-text-soft);
+  font-size:1.15rem;
+  line-height:1.8;
+}
+
+/* =========================
+   HOME
+========================= */
+
+.adminHomeTopActions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.adminSegmentPickerCompact{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+
+.adminSegmentCompactCard{
+  min-height:152px;
+  position:relative;
+  overflow:hidden;
+  border:1px solid var(--admin-border);
+  border-radius:28px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  box-shadow:var(--admin-shadow-sm);
+  padding:18px;
+  text-align:right;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.adminSegmentCompactCard:hover{
+  transform:translateY(-3px);
+  border-color:rgba(255,155,81,.42);
+  box-shadow:var(--admin-shadow-md);
+}
+
+.adminSegmentCompactCard::before{
+  content:"";
+  position:absolute;
+  width:128px;
+  height:128px;
+  top:-48px;
+  left:-30px;
+  border-radius:50%;
+  background:rgba(255,155,81,.10);
+}
+
+.adminSegmentCompactCard::after{
+  content:"";
+  position:absolute;
+  width:90px;
+  height:90px;
+  bottom:-38px;
+  right:-18px;
+  border-radius:22px;
+  transform:rotate(28deg);
+  background:rgba(47,65,88,.05);
+}
+
+.adminSegmentCompactCard.doneCard{
+  background:linear-gradient(180deg,#F0FFF5 0%,#EAF8EF 100%);
+  border-color:#CDE8D1;
+}
+
+.adminSegmentCompactTop,
+.adminSegmentCompactDesc,
+.adminSegmentCompactFooter{
+  position:relative;
+  z-index:2;
+}
+
+.adminSegmentCompactTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.adminSegmentCompactTitle{
+  color:var(--admin-accent);
+  font-size:1.45rem;
+}
+
+.adminSegmentCompactBadge{
+  min-height:30px;
+  padding:4px 10px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#FDECEC;
+  color:#A93F3F;
+  font-size:.78rem;
+}
+
+.adminSegmentCompactBadge.done{
+  background:#DFF5E4;
+  color:#18794E;
+}
+
+.adminSegmentCompactDesc{
+  color:var(--admin-text-soft);
+  font-size:.95rem;
+  line-height:1.7;
+}
+
+.adminSegmentCompactFooter{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:16px;
+  padding-top:12px;
+  border-top:1px solid var(--admin-border-soft);
+}
+
+.adminSegmentCompactMetaLabel{
+  color:var(--admin-text-soft);
+  font-size:.86rem;
+}
+
+.adminSegmentCompactMetaValue{
+  min-width:42px;
+  height:34px;
+  padding:0 10px;
+  border-radius:999px;
+  background:var(--admin-accent);
+  color:#FFFFFF;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* =========================
+   COMPACT NAV TABS
+========================= */
+
+.warmupCategoryTabs,
+.top10RoundTabs,
+.auctionNumberTabs,
+.whoNumberTabs,
+.finalAdminRoundsBar,
+.archiveAdminRoundsBar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.warmupCategoryTab,
+.top10RoundTab,
+.auctionNumberTab,
+.whoNumberTab,
+.finalAdminRoundsBar button,
+.archiveAdminRoundsBar button{
+  min-height:46px;
+  border-radius:16px;
+  padding:9px 14px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
+  color:var(--admin-accent);
+  border:1px solid var(--admin-border);
+  box-shadow:var(--admin-shadow-sm);
+}
+
+.activeWarmupCategoryTab,
+.activeTop10RoundTab,
+.activeAuctionNumberTab,
+.activeWhoNumberTab,
+.finalAdminRoundsBar button.activeFinalAdminRound,
+.archiveAdminRoundsBar button.activeArchiveRoundBtn{
+  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%) !important;
+  color:#FFFFFF !important;
+  border-color:rgba(255,155,81,.55) !important;
+  box-shadow:0 12px 24px rgba(255,155,81,.20) !important;
+}
+
+.auctionNumberTab,
+.whoNumberTab{
+  min-width:48px;
+  padding:0 12px;
+}
+
+/* =========================
+   WARMUP
+========================= */
+
+.compactWarmupAdminShell{
+  gap:16px;
+}
+
+.warmupSingleCategoryCard{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.warmupSingleCategoryHead,
+.top10SingleRoundHead,
+.auctionSingleQuestionHead,
+.whoSingleHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
   gap:12px;
+  flex-wrap:wrap;
+  position:relative;
+  z-index:2;
+}
+
+.warmupSingleCategorySub,
+.top10SingleRoundSub,
+.auctionSingleQuestionSub,
+.whoSingleSub{
+  margin-top:5px;
+  color:var(--admin-text-soft);
+  font-size:.92rem;
+}
+
+.warmupCategoryBadge{
+  min-height:34px;
+  padding:5px 12px;
+  border-radius:999px;
+  background:rgba(255,155,81,.14);
+  color:#B76626;
+  font-size:.85rem;
+}
+
+.warmupQuestionsCompactGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+
+.adminQuestionCard,
+.warmupQuestionCardCompact{
+  background:linear-gradient(180deg,#FFFFFF 0%,#FBFDFD 100%);
+  border:1px solid var(--admin-border-soft);
+  border-radius:22px;
+  padding:14px;
+  overflow:hidden;
+}
+
+.adminQuestionCardTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.adminQuestionTitle{
+  color:var(--admin-accent);
+  font-size:1.1rem;
+}
+
+.warmupQuestionFieldsCompact{
+  display:grid;
+  gap:12px;
+}
+
+.warmupQuestionCardCompact textarea{
+  min-height:150px;
+}
+
+/* =========================
+   TOP 10
+========================= */
+
+.top10ControlPanel,
+.auctionControlPanel,
+.archiveAdminControlBar{
+  display:grid;
+  grid-template-columns:280px minmax(0,1fr);
+  gap:12px;
+  align-items:stretch;
+}
+
+.top10RoundCountBox,
+.auctionCountBox,
+.archiveRoundsControl{
+  border-radius:24px;
+  padding:14px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F7F9F9 100%);
+  border:1px solid var(--admin-border);
+  box-shadow:var(--admin-shadow-sm);
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+.top10RoundTabs,
+.auctionNumberTabs{
+  align-content:center;
+  border-radius:24px;
+  padding:14px;
+  background:rgba(255,255,255,.70);
+  border:1px solid var(--admin-border);
+}
+
+.top10SingleRoundCard{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.top10AnswersCompactGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.top10AnswerCompactRow,
+.top10AnswerRow{
+  display:grid;
+  grid-template-columns:52px minmax(0,1fr) 58px;
+  gap:8px;
+  align-items:center;
+  padding:8px;
+  border-radius:18px;
+  background:rgba(244,247,247,.76);
+  border:1px solid var(--admin-border-soft);
+}
+
+.top10AnswerNo{
+  height:48px;
+  border-radius:15px;
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
+  color:#FFFFFF;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1rem;
+}
+
+/* =========================
+   AUCTION / WHO
+========================= */
+
+.auctionSingleQuestionCard,
+.whoSingleCard{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.auctionSingleLayout,
+.whoSingleLayout{
+  display:grid;
+  grid-template-columns:minmax(260px,.85fr) minmax(0,1.15fr);
+  gap:16px;
+  align-items:start;
+}
+
+.auctionImagePanel,
+.whoImagePanel,
+.auctionFieldsPanel,
+.whoAnswerPanel{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  min-width:0;
+}
+
+.auctionPreviewBox,
+.whoPreviewBox,
+.archiveImagePreviewBox,
+.finalAdminImagePreview{
+  border:1px dashed #D7DEDE;
+  border-radius:22px;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,155,81,.08), transparent 36%),
+    #FAFCFC;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.auctionPreviewLarge,
+.whoPreviewLarge{
+  min-height:330px;
+  padding:10px;
 }
 
 .previewImg,
 .archiveAdminPreviewImg{
   width:100%;
   max-width:100%;
-  max-height:240px;
+  max-height:320px;
   object-fit:contain;
   display:block;
   border-radius:18px;
-  border:1px solid var(--admin-border);
   background:#FFFFFF;
-  padding:8px;
+  padding:6px;
 }
 
-/* =========================
-   WARMUP / TOP10 / AUCTION / WHO
-========================= */
-
-.warmupCategoryCard,
-.top10RoundCard,
-.auctionQuestionCard,
-.whoItemCard{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  min-width:0;
+.emptyImageHint,
+.archiveNoImage{
+  color:var(--admin-text-light);
+  font-size:1rem;
+  text-align:center;
 }
 
-.warmupCategoryHead,
-.top10RoundHead,
-.auctionQuestionHead,
-.whoItemHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:2px;
-}
-
-.warmupCategoryHead h3,
-.top10RoundHead h3,
-.auctionQuestionHead h3,
-.whoItemHead h3{
-  margin:0;
-  color:var(--admin-text);
-  font-size:22px;
-  font-weight:500;
-  line-height:1.25;
-}
-
-.warmupQuestionCard{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.top10AnswersGrid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:12px;
-}
-
-.top10AnswerRow{
-  display:grid;
-  grid-template-columns:64px minmax(0,1fr);
-  gap:10px;
-  align-items:center;
-}
-
-.top10AnswerNo{
-  min-height:50px;
-  border-radius:16px;
-  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
-  color:#FFFFFF;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-  font-weight:500;
-  line-height:1.2;
-}
-
-.auctionTopCompactRow{
-  display:grid !important;
-  grid-template-columns:minmax(0,1fr) 320px !important;
-  gap:16px !important;
-  align-items:stretch !important;
-  margin-bottom:6px !important;
-}
-
-.auctionTopCompactBox{
-  min-height:126px;
-  border-radius:24px !important;
-  padding:18px !important;
-  display:flex;
-  align-items:center;
-  background:var(--admin-card);
+.whoNumberTabs{
+  padding:14px;
+  border-radius:24px;
+  background:rgba(255,255,255,.72);
   border:1px solid var(--admin-border);
-  box-shadow:var(--admin-shadow);
 }
 
-.auctionTopCompactTitleBox{
-  justify-content:center;
-}
-
-.auctionTopCompactTitleBox .adminField{
-  width:100%;
-  max-width:100%;
-  justify-content:center;
-  gap:10px;
-}
-
-.auctionTopCompactActionBox{
-  justify-content:center;
-  align-items:center !important;
-}
-
-.auctionTopCompactActionBox .compactCountBtn{
-  width:100% !important;
-  max-width:210px;
-}
-
-.auctionQuestionCard{
-  border-radius:24px !important;
-  padding:18px !important;
-}
-
-.auctionQuestionHead{
-  margin-bottom:8px !important;
-}
-
-.auctionQuestionHead .adminDeleteBtn{
-  min-height:40px !important;
-  height:40px !important;
-  padding:0 14px !important;
-  border-radius:14px !important;
-  font-size:14px !important;
-}
-
-.auctionPreviewBox,
-.whoPreviewBox{
-  min-height:120px;
-  border:1px dashed #D6DEE6;
+.whoSmallHint{
+  padding:14px;
   border-radius:18px;
-  background:#FAFBFC;
-  padding:8px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.auctionPreviewBox:empty,
-.whoPreviewBox:empty{
-  padding:0;
+  background:#FFF8F0;
+  border:1px solid rgba(255,155,81,.20);
+  color:#8A5A31;
+  font-size:.95rem;
+  line-height:1.7;
 }
 
 /* =========================
-   RESPONSIVE
+   FINAL
 ========================= */
-
-@media (max-width:1100px){
-  .adminGrid2,
-  .warmupAdminGrid,
-  .top10AdminGrid,
-  .auctionAdminGrid,
-  .whoAdminGrid{
-    grid-template-columns:1fr;
-  }
-
-  .auctionTopCompactRow{
-    grid-template-columns:1fr 280px !important;
-  }
-}
-
-@media (max-width:820px){
-  .auctionTopCompactRow{
-    grid-template-columns:1fr !important;
-  }
-
-  .auctionTopCompactActionBox .compactCountBtn{
-    max-width:100%;
-  }
-}
-
-@media (max-width:720px){
-  .adminSectionTitle{
-    font-size:28px;
-  }
-
-  .adminCard h3,
-  .finalAdminCard h3{
-    font-size:22px;
-  }
-
-  .top10AnswerRow{
-    grid-template-columns:56px minmax(0,1fr);
-  }
-
-  .top10AnswerNo{
-    min-height:46px;
-    font-size:16px;
-  }
-
-  .warmupCategoryHead h3,
-  .top10RoundHead h3,
-  .auctionQuestionHead h3,
-  .whoItemHead h3{
-    font-size:20px;
-  }
-}
-/* =========================
-   FINAL ADMIN
-========================= */
-
-.cleanFinalAdminShell,
-.finalAdminShell{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-}
 
 .finalTopCompactRow{
   display:grid;
-  grid-template-columns:minmax(260px,1fr) minmax(320px,1.2fr) minmax(180px,220px);
-  gap:14px;
-  align-items:end;
+  grid-template-columns:minmax(220px,.9fr) minmax(280px,1.25fr) minmax(150px,210px);
+  gap:12px;
+  align-items:stretch;
 }
 
 .finalTopCompactBox{
-  background:var(--admin-card);
-  border:1px solid var(--admin-border);
-  border-radius:22px;
-  box-shadow:var(--admin-shadow);
-  padding:16px;
-  min-width:0;
+  display:flex;
+  align-items:center;
+}
+
+.finalTopCompactBox .adminField{
+  width:100%;
 }
 
 .finalTopCompactGhost{
   visibility:hidden;
 }
 
-.finalAdminRoundsBar,
-.archiveAdminRoundsBar{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-
-.finalAdminRoundsBar button,
-.archiveAdminRoundsBar button{
-  min-height:48px;
-  padding:10px 16px;
-  border-radius:16px;
-  background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
-  color:#FFFFFF;
-  font-size:16px;
-}
-
-.finalAdminRoundsBar button.activeFinalAdminRound,
-.archiveAdminRoundsBar button.activeArchiveRoundBtn{
-  background:linear-gradient(180deg,#F0A35F 0%,#FF9B51 100%);
-  box-shadow:0 10px 20px rgba(255,155,81,.24);
-}
-
-/* =========================
-   FINAL ROUND 1
-========================= */
-
 .finalAdminGridRound1{
-  display:grid !important;
-  grid-template-columns:1fr !important;
-  gap:22px !important;
-  align-items:start !important;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
 }
 
 .finalRound1AdminCard{
-  grid-column:1 / -1 !important;
-  width:100% !important;
-  background:linear-gradient(180deg,#FCFEFF 0%,#F3F8FF 100%) !important;
-  border:2px solid #C9D9EB !important;
-  border-radius:24px !important;
-  padding:20px !important;
-  box-shadow:var(--admin-shadow) !important;
-  display:flex !important;
-  flex-direction:column !important;
-  gap:18px !important;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
 }
 
-.finalRound1AdminCard .finalAdminCardHead{
-  display:flex !important;
-  align-items:center !important;
-  justify-content:space-between !important;
-  gap:12px !important;
-  padding-bottom:10px !important;
-  border-bottom:1px solid #E7EEF6 !important;
-  margin:0 !important;
+.finalAdminCardHead{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--admin-border-soft);
 }
 
-.finalRound1AdminCard .finalAdminCardHead h3{
-  margin:0 !important;
-  color:#1D5685 !important;
-  font-size:24px !important;
-  font-weight:500 !important;
-}
-
-.finalRound1AdminCard .adminDeleteBtn{
-  min-width:88px !important;
-  min-height:44px !important;
-  height:44px !important;
-  border-radius:16px !important;
-  font-size:14px !important;
+.finalAdminCardHeadActions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
 }
 
 .finalAdminRound1Fields{
-  display:grid !important;
-  grid-template-columns:.75fr 1.2fr 1.2fr !important;
-  gap:16px !important;
-  align-items:start !important;
+  display:grid;
+  grid-template-columns:.75fr 1fr 1fr;
+  gap:12px;
 }
 
-.finalAdminRound1Fields .adminField{
-  min-width:0 !important;
-}
-
-.finalAdminRound1Fields .adminField label{
-  display:block !important;
-  margin-bottom:8px !important;
-  text-align:center !important;
-  color:#2A3F59 !important;
-  font-size:15px !important;
-}
-
-.finalAdminRound1Fields input,
-.finalAdminRound1Fields textarea,
-.finalAdminRound1Fields select{
-  width:100% !important;
-  box-sizing:border-box !important;
-  border:2px solid #DCE6F2 !important;
-  border-radius:18px !important;
-  background:#FFFFFF !important;
-  margin:0 !important;
-}
-
-.finalAdminRound1Fields .adminField:nth-child(1) input{
-  min-height:70px !important;
-  padding:14px 12px !important;
-  font-size:18px !important;
-  text-align:center !important;
-}
-
-.finalAdminRound1Fields .adminField:nth-child(2) input,
-.finalAdminRound1Fields .adminField:nth-child(3) input{
-  min-height:72px !important;
-  padding:16px 18px !important;
-  font-size:22px !important;
-  line-height:1.5 !important;
-  text-align:center !important;
-}
-
-.finalAdminRowSingleText{
-  display:block !important;
-  margin:0 !important;
-}
-
-.finalAdminRowSingleText + .finalAdminRowSingleText{
-  margin-top:10px !important;
-}
-
-.finalTextCardField,
-.finalQuestionPartBox,
-.finalQuestionPartField,
-.finalQuestionPartWrap{
-  width:100% !important;
-  background:#EEF6FF !important;
-  border:2px dashed #BFD6ED !important;
-  border-radius:22px !important;
-  padding:18px !important;
-  box-sizing:border-box !important;
-}
-
-.finalQuestionPartBox,
-.finalQuestionPartField,
-.finalQuestionPartWrap{
-  background:#F7FBFF !important;
-  border-color:#CFE0F2 !important;
-  margin-top:10px !important;
-}
-
-.finalTextCardField label,
-.finalQuestionPartBox label,
-.finalQuestionPartField label,
-.finalQuestionPartWrap label{
-  display:block !important;
-  margin-bottom:10px !important;
-  color:#294766 !important;
-  font-size:17px !important;
-  text-align:right !important;
-}
-
-.finalTextCardField input,
-.finalTextCardField textarea,
-.finalQuestionPartBox input,
-.finalQuestionPartBox textarea,
-.finalQuestionPartField input,
-.finalQuestionPartField textarea,
-.finalQuestionPartWrap input,
-.finalQuestionPartWrap textarea{
-  width:100% !important;
-  box-sizing:border-box !important;
-  border:2px solid #D7E3F1 !important;
-  border-radius:20px !important;
-  background:#FFFFFF !important;
-  padding:18px 20px !important;
-  font-size:22px !important;
-  line-height:1.8 !important;
-  text-align:center !important;
-  margin:0 !important;
+.finalTextCardField{
+  padding:14px;
+  border-radius:22px;
+  background:#FFF8F0;
+  border:1px dashed rgba(255,155,81,.36);
 }
 
 .finalTextCardField textarea{
-  min-height:190px !important;
-  resize:vertical !important;
-}
-
-.finalAdminPreviewBox{
-  margin-top:4px !important;
+  min-height:140px;
+  font-size:1.08rem;
 }
 
 .finalAdminPreviewBox .previewImg{
-  width:100% !important;
-  max-height:200px !important;
-  object-fit:cover !important;
-  border-radius:18px !important;
-  border:2px solid #E7EDF5 !important;
+  max-height:220px;
 }
-
-.finalAdminHeadOptions{
-  margin-bottom:18px !important;
-}
-
-.finalAdminHeadOptions .finalAdminTitleCard{
-  max-width:260px !important;
-}
-
-/* =========================
-   FINAL ROUND 2
-========================= */
 
 .finalAdminRound2Wrap,
-.finalAdminRound3Wrap{
+.finalAdminRound3Wrap,
+.finalAdminRound2RowsWrap{
   display:flex;
   flex-direction:column;
-  gap:18px;
+  gap:12px;
 }
 
 .finalAdminWideCard{
@@ -1389,46 +1397,47 @@ button:hover,
 }
 
 .finalAdminTypeBadge{
-  min-height:36px;
+  min-height:34px;
   padding:6px 12px;
   border-radius:999px;
-  background:#EDF2F7;
-  color:#334155;
-  font-size:14px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
+  background:#FFF3E8;
+  color:#B76626;
+  border:1px solid rgba(255,155,81,.24);
+  font-size:.85rem;
 }
 
-.finalAdminRound2RowsWrap{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.finalAdminWordRow{
+.finalAdminWordRow,
+.finalAdminImageRow{
   display:grid;
-  grid-template-columns:120px minmax(0,1fr);
-  gap:12px;
+  grid-template-columns:110px minmax(0,1fr);
+  gap:10px;
   align-items:start;
+  border-radius:20px;
+  padding:12px;
+  background:rgba(244,247,247,.72);
+  border:1px solid var(--admin-border-soft);
+}
+
+.finalAdminImageRow{
+  grid-template-columns:110px minmax(0,1fr) 170px;
 }
 
 .finalAdminWordIndex{
-  min-height:52px;
+  min-height:50px;
   border-radius:16px;
   background:linear-gradient(180deg,#2F4158 0%,#243447 100%);
   color:#FFFFFF;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:16px;
-  padding:10px;
   text-align:center;
+  padding:8px;
 }
 
-.finalAdminWordFields{
+.finalAdminWordFields,
+.finalAdminImageFields{
   display:grid;
-  gap:12px;
+  gap:10px;
 }
 
 .finalAdminWordFields3{
@@ -1439,323 +1448,229 @@ button:hover,
   grid-template-columns:1fr;
 }
 
-/* =========================
-   FINAL ROUND 3
-========================= */
-
-.finalAdminImageRow{
-  display:grid;
-  grid-template-columns:120px minmax(0,1fr) 180px;
-  gap:12px;
-  align-items:start;
-}
-
 .finalAdminImageFields{
-  display:grid;
   grid-template-columns:1fr 1fr;
-  gap:12px;
 }
 
 /* =========================
-   RESPONSIVE
+   ARCHIVE
 ========================= */
 
-@media (max-width:1100px){
-  .finalTopCompactRow,
-  .finalAdminRound1Fields,
-  .finalAdminWordFields3,
-  .finalAdminImageRow,
-  .finalAdminImageFields{
-    grid-template-columns:1fr !important;
-  }
-
-  .finalAdminRound1Fields .adminField:nth-child(2) input,
-  .finalAdminRound1Fields .adminField:nth-child(3) input,
-  .finalTextCardField input,
-  .finalTextCardField textarea,
-  .finalQuestionPartBox input,
-  .finalQuestionPartBox textarea,
-  .finalQuestionPartField input,
-  .finalQuestionPartField textarea,
-  .finalQuestionPartWrap input,
-  .finalQuestionPartWrap textarea{
-    font-size:18px !important;
-  }
-
-  .finalTextCardField textarea{
-    min-height:150px !important;
-  }
-}
-
-@media (max-width:720px){
-  .finalAdminWordRow{
-    grid-template-columns:1fr;
-  }
-}
-/* =========================
-   ARCHIVE ADMIN
-========================= */
-
-.cleanArchiveAdminShell,
-.archiveAdminShell{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-}
-
-.cleanArchiveLayout{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 240px;
-  gap:18px;
-  align-items:start;
-}
-
-.archiveAdminBoardClean{
-  background:var(--admin-card);
-  border:1px solid var(--admin-border);
-  border-radius:26px;
-  box-shadow:var(--admin-shadow);
-  padding:18px;
-  display:flex;
-  flex-direction:column;
+.archiveAdminCleanV2{
   gap:16px;
 }
 
-.archiveAdminSketchTopClean{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
+.archiveAdminTopBar{
+  align-items:flex-start;
 }
 
-.archiveAdminSketchMiddleClean{
-  display:grid;
-  grid-template-columns:1fr 240px 1fr;
-  gap:14px;
-  align-items:stretch;
+.archiveTopActions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
 }
 
-.archiveDisplayLikeBox{
-  background:var(--admin-card-soft);
-  border:1px solid var(--admin-border-soft);
-  border-radius:20px;
+.archiveTopActions button{
+  min-height:42px;
+  border-radius:15px;
+  font-size:.92rem;
+  padding:8px 12px;
+}
+
+.archiveRoundsControl label{
+  color:var(--admin-text-soft);
+  font-size:.9rem;
+}
+
+.archiveRoundsInline{
+  display:grid;
+  grid-template-columns:1fr 110px;
+  gap:8px;
+}
+
+.archiveAdminRoundsBar{
+  align-content:center;
+  border-radius:24px;
   padding:14px;
-  min-width:0;
+  background:rgba(255,255,255,.72);
+  border:1px solid var(--admin-border);
 }
 
-.archiveAdminSketchRow.archiveDisplayLikeBox{
-  min-height:118px;
+.archiveAdminBoardV2{
   display:flex;
   flex-direction:column;
+  gap:14px;
+  padding:16px;
+  border-radius:28px;
+}
+
+.archiveMainInfoCard,
+.archiveImageCard,
+.archiveTextGroup{
+  border-radius:24px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F7F9F9 100%);
+  border:1px solid var(--admin-border);
+  box-shadow:var(--admin-shadow-sm);
+  padding:16px;
+}
+
+.archiveMainInfoHead,
+.archiveImageCardHead,
+.archiveAdminColumnTitle{
+  display:flex;
+  align-items:center;
   justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.archiveMainInfoHead h3,
+.archiveImageCardHead h3{
+  margin:0;
+  color:var(--admin-accent);
+  font-size:1.2rem;
+}
+
+.archiveMainInfoHead span,
+.archiveAdminColumnTitle small{
+  color:var(--admin-text-soft);
+  font-size:.86rem;
+}
+
+.archiveMainInfoGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr 180px;
+  gap:12px;
+}
+
+.archiveImagesRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.archiveImageCard{
+  display:flex;
+  flex-direction:column;
   gap:10px;
 }
 
-.archiveAdminImageBox{
-  min-height:300px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
+.archiveImagePreviewBox{
+  min-height:260px;
+  padding:10px;
 }
 
 .archiveAdminPreviewImg{
-  width:100%;
-  height:200px;
-  object-fit:contain;
-  display:block;
-  border-radius:16px;
-  border:1px solid var(--admin-border);
-  background:#FFFFFF;
-  padding:8px;
+  height:240px;
+  max-height:240px;
 }
 
-.archiveAdminResultCenter{
-  min-height:300px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  gap:16px;
-}
-
-.archiveAdminResultLabel{
-  color:var(--admin-text);
-  font-size:28px;
-  font-weight:500;
-}
-
-.archiveAdminResultValue,
-.archiveAdminText{
-  width:100%;
-}
-
-.archiveAdminResultValue input{
-  width:100%;
-  min-height:64px !important;
-  height:64px !important;
-  border:2px solid #EDD3A4 !important;
-  border-radius:18px !important;
-  background:#FFFAF2 !important;
-  color:var(--admin-text) !important;
-  padding:0 16px !important;
-  text-align:center;
-  font-size:24px !important;
-  font-weight:500 !important;
-  line-height:1.2 !important;
-}
-
-.archiveAdminSketchRow .archiveAdminText input{
-  width:100%;
-  min-height:58px;
-  border:1px solid var(--admin-border);
-  border-radius:16px;
-  background:#FFFFFF;
-  padding:12px 16px;
-  color:var(--admin-text);
-  font-size:18px;
-  font-weight:500;
-  text-align:right;
-}
-
-.archiveAdminLabel,
-.archiveAdminItemTitle,
-.archiveAdminColumnTitle{
-  color:#344054;
-  font-size:18px;
-  font-weight:500;
-}
-
-.archiveAdminBottomGridClean{
+.archiveTextGroupsGrid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:14px;
+  gap:12px;
   align-items:start;
+}
+
+.archiveAdminColumnTitle{
+  margin:0 0 12px;
+  padding:12px;
+  border-radius:18px;
+  background:#FFF8F0;
+  border:1px solid rgba(255,155,81,.20);
+  color:var(--admin-accent);
+}
+
+.archiveAdminColumnTitle span{
+  color:var(--admin-accent);
 }
 
 .archiveAdminBottomCol{
   display:flex;
   flex-direction:column;
-  gap:12px;
-  min-width:0;
-}
-
-.archiveAdminColumnTitle{
-  background:#F8FAFC;
-  border:1px solid #E2E8F0;
-  border-radius:16px;
-  padding:12px 14px;
-  text-align:center;
-}
-
-.archiveAdminItem{
-  background:var(--admin-card-soft);
-  border:1px solid var(--admin-border-soft);
-  border-radius:20px;
-  padding:16px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  min-width:0;
-  overflow:hidden;
-}
-
-.archiveAdminItemRequired{
-  border-color:#CC0000 !important;
-  background:#F4CCCC !important;
-}
-
-.archiveAdminItemTitle{
-  color:var(--admin-text);
-  font-size:17px;
-}
-
-.archiveAdminRequiredBadge{
-  min-height:30px;
-  padding:4px 10px;
-  border-radius:999px;
-  background:#660000;
-  color:#FFFFFF;
-  font-size:13px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.archiveAdminFields{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  align-items:start;
-}
-
-.archiveAdminFields textarea{
-  grid-column:1 / -1;
-  min-height:110px;
-}
-
-.archiveAdminToolsClean{
-  position:sticky;
-  top:20px;
-}
-
-.archiveToolsCard{
-  background:var(--admin-card);
-  border:1px solid var(--admin-border);
-  border-radius:22px;
-  box-shadow:var(--admin-shadow);
-  padding:16px;
-}
-
-.archiveToolsCard h3{
-  margin:0 0 14px;
-  color:var(--admin-text);
-  text-align:center;
-  font-size:22px;
-  font-weight:500;
-}
-
-.archiveToolsButtonsClean{
-  display:flex;
-  flex-direction:column;
   gap:10px;
 }
 
-.archiveToolsButtonsClean button{
-  width:100%;
-  min-height:46px;
-  padding:10px 14px;
-  border-radius:14px;
-  font-size:16px;
+.archiveAdminItemCompact{
+  background:linear-gradient(180deg,#FFFFFF 0%,#FBFDFD 100%);
+  border:1px solid var(--admin-border-soft);
+  border-radius:22px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
-/* archive select polish */
-.archiveAdminItem .compactCountSelectWrap{
-  width:100%;
+.archiveAdminItemRequired{
+  border-color:rgba(201,87,87,.38) !important;
+  background:linear-gradient(180deg,#FFF8F8 0%,#FDECEC 100%) !important;
 }
 
-.archiveAdminItem .compactCountSelect{
-  min-height:54px !important;
-  height:54px !important;
-  border-radius:16px !important;
-  font-size:16px !important;
-  padding-right:16px !important;
-  padding-left:46px !important;
-  text-align:right !important;
+.archiveAdminItemHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
 }
 
-.archiveAdminItem .compactCountSelectWrap::after{
-  left:16px !important;
+.archiveAdminItemTitle{
+  color:var(--admin-accent);
+  font-size:1rem;
+}
+
+.archiveAdminItemMeta{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:5px;
+}
+
+.archiveAdminItemMeta span{
+  min-height:24px;
+  padding:3px 8px;
+  border-radius:999px;
+  background:#F4F7F7;
+  color:var(--admin-text-soft);
+  font-size:.76rem;
+}
+
+.archiveAdminItemActions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.archiveAdminRequiredBadge{
+  min-height:28px;
+  padding:4px 9px;
+  border-radius:999px;
+  background:#A93F3F;
+  color:#FFFFFF;
+  font-size:.75rem;
+}
+
+.archiveAdminFieldsCompact{
+  display:grid;
+  grid-template-columns:1fr 160px 140px;
+  gap:8px;
+}
+
+.archiveAdminFieldsCompact textarea{
+  grid-column:1 / -1;
+  min-height:94px;
 }
 
 /* =========================
-   MODAL
+   MODALS / CHECK
 ========================= */
 
 .adminModalOverlay{
   position:fixed;
   inset:0;
-  z-index:9999;
-  background:rgba(15,23,42,.28);
+  z-index:4200;
+  background:rgba(23,31,43,.42);
+  backdrop-filter:blur(4px);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -1763,463 +1678,1723 @@ button:hover,
 }
 
 .adminModalCard{
-  width:min(520px,100%);
+  width:min(560px,100%);
+  max-height:86vh;
+  overflow:auto;
   background:#FFFFFF;
-  border:1px solid var(--admin-border);
-  border-radius:26px;
-  box-shadow:0 20px 50px rgba(15,23,42,.18);
-  padding:22px;
+  border:2px solid var(--admin-border);
+  border-radius:28px;
+  box-shadow:var(--admin-shadow-lg);
+  padding:24px;
+}
+
+.modelCheckModalCard{
+  width:min(92vw,760px);
 }
 
 .adminModalTitle{
-  margin-bottom:18px;
-  color:var(--admin-text);
+  margin:0 0 16px;
+  color:var(--admin-accent);
   text-align:center;
-  font-size:28px;
-  font-weight:500;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:2.2rem;
+  line-height:1;
 }
 
 .adminModalActions{
   display:flex;
-  gap:12px;
+  gap:10px;
   margin-top:18px;
 }
 
 .adminModalActions button{
   flex:1;
-  min-height:56px;
+}
+
+.modelCheckSummary{
+  padding:14px 16px;
   border-radius:18px;
-  font-size:17px;
+  margin:12px 0 18px;
+  text-align:center;
+}
+
+.modelCheckSummary.ready{
+  background:#E8F8EE;
+  color:#168044;
+}
+
+.modelCheckSummary.notReady{
+  background:#FFF1E6;
+  color:#B65316;
+}
+
+.modelCheckList{
+  display:grid;
+  gap:10px;
+}
+
+.modelCheckItem{
+  border-radius:18px;
+  padding:14px;
+  border:1px solid rgba(0,0,0,.08);
+  background:#FFFFFF;
+}
+
+.modelCheckItem.ok{
+  border-color:rgba(22,128,68,.22);
+  background:#FBFFFC;
+}
+
+.modelCheckItem.bad{
+  border-color:rgba(182,83,22,.22);
+  background:#FFFAF6;
+}
+
+.modelCheckItemHead{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.modelCheckIcon{
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  background:#F1F1F1;
+}
+
+.modelCheckItem.ok .modelCheckIcon{
+  background:#DFF5E8;
+  color:#168044;
+}
+
+.modelCheckItem.bad .modelCheckIcon{
+  background:#FFE1CF;
+  color:#B65316;
+}
+
+.modelCheckDetails{
+  margin-top:10px;
+  display:grid;
+  gap:6px;
+  color:#555;
+  font-size:.88rem;
+  line-height:1.7;
+}
+
+/* =========================
+   TOAST - PROJECT STYLE RED
+========================= */
+
+.gameToast{
+  position:fixed;
+  top:22px;
+  left:50%;
+  transform:translateX(-50%) translateY(-12px);
+  z-index:4300;
+  min-width:340px;
+  max-width:min(520px,calc(100% - 28px));
+  background:linear-gradient(180deg,#C95757 0%,#A93F3F 100%);
+  color:#FFFFFF;
+  border-radius:22px;
+  border:2px solid #8C2F2F;
+  box-shadow:0 18px 34px rgba(88,24,24,.26);
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s ease;
+}
+
+.gameToast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+.gameToastText{
+  flex:1;
+  color:#FFFFFF;
+  font-size:1.08rem;
+  line-height:1.6;
+  text-align:center;
 }
 
 /* =========================
    RESPONSIVE
 ========================= */
 
-@media (max-width:1200px){
-  .cleanArchiveLayout{
-    grid-template-columns:1fr;
+@media (max-width:1250px){
+  .adminTopHeader{
+    grid-template-columns:170px 1fr;
   }
 
-  .archiveAdminToolsClean{
-    position:static;
+  .adminModelControls{
+    grid-column:1 / -1;
+  }
+
+  .adminSegmentPickerCompact{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .adminStatusStrip{
+    grid-template-columns:repeat(3,minmax(0,1fr));
   }
 }
 
-@media (max-width:980px){
-  .archiveAdminSketchTopClean,
-  .archiveAdminSketchMiddleClean,
-  .archiveAdminBottomGridClean,
-  .archiveAdminFields{
+@media (max-width:1050px){
+  .adminModelControls,
+  .top10ControlPanel,
+  .auctionControlPanel,
+  .archiveAdminControlBar,
+  .finalTopCompactRow,
+  .auctionSingleLayout,
+  .whoSingleLayout,
+  .archiveMainInfoGrid,
+  .archiveImagesRow,
+  .archiveTextGroupsGrid{
     grid-template-columns:1fr;
   }
 
-  .archiveAdminFields textarea{
+  .adminModelActions{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+  }
+
+  .warmupQuestionsCompactGrid,
+  .top10AnswersCompactGrid{
+    grid-template-columns:1fr;
+  }
+
+  .finalAdminRound1Fields,
+  .finalAdminWordFields3,
+  .finalAdminImageRow,
+  .finalAdminImageFields{
+    grid-template-columns:1fr;
+  }
+
+  .finalAdminImagePreview{
+    min-height:180px;
+  }
+}
+
+@media (max-width:760px){
+  .adminShellNew{
+    width:min(100% - 18px,1440px);
+    padding-top:10px;
+  }
+
+  .adminTopHeader{
+    position:static;
+    grid-template-columns:1fr;
+    border-radius:24px;
+  }
+
+  .adminTopBrand{
+    min-height:76px;
+  }
+
+  .adminTopLogo{
+    font-size:2.4rem;
+  }
+
+  .adminModelActions{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .adminTabsNew{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .adminTabBtn{
+    min-height:50px;
+    font-size:.92rem;
+  }
+
+  #adminEditor{
+    padding:14px;
+    border-radius:24px;
+  }
+
+  .adminSectionTitle{
+    font-size:2.35rem;
+  }
+
+  .adminStatusStrip{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .adminSegmentPickerCompact{
+    grid-template-columns:1fr;
+  }
+
+  .adminActionRow{
+    position:static;
+  }
+
+  .adminActionRow button{
+    min-width:100%;
+  }
+
+  .archiveTopActions button{
+    flex:1;
+    min-width:calc(50% - 8px);
+  }
+
+  .archiveAdminFieldsCompact{
+    grid-template-columns:1fr;
+  }
+
+  .archiveAdminFieldsCompact textarea{
     grid-column:auto;
   }
 
-  .archiveAdminImageBox,
-  .archiveAdminResultCenter{
-    min-height:auto;
-  }
-
-  .archiveAdminPreviewImg{
-    height:220px;
-  }
-}
-
-@media (max-width:640px){
   .adminModalActions{
     flex-direction:column;
   }
-}
-/* =========================
-   ADMIN TOP BAR - PROFESSIONAL FINAL
-========================= */
 
-.adminShellNew{
-  min-height:100vh !important;
-  display:flex !important;
-  flex-direction:column !important;
-  gap:16px !important;
-  padding:18px !important;
-  background:#EAEFEF !important;
+  .gameToast{
+    top:14px;
+    min-width:auto;
+    width:calc(100% - 28px);
+  }
 }
 
-/* الشريط العلوي */
-.adminSidebarNew{
-  position:static !important;
+@media (max-width:520px){
+  .adminModelActions{
+    grid-template-columns:1fr;
+  }
+
+  .adminTabsNew{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .adminStatusStrip{
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+
+  .adminStatusStripItem{
+    min-height:62px;
+    padding:10px 8px;
+  }
+
+  .warmupCategoryTabs,
+  .top10RoundTabs,
+  .auctionNumberTabs,
+  .whoNumberTabs,
+  .finalAdminRoundsBar,
+  .archiveAdminRoundsBar{
+    gap:6px;
+  }
+
+  .warmupCategoryTab,
+  .top10RoundTab,
+  .auctionNumberTab,
+  .whoNumberTab,
+  .finalAdminRoundsBar button,
+  .archiveAdminRoundsBar button{
+    min-height:42px;
+    font-size:.86rem;
+    padding:8px 10px;
+  }
+
+  .adminPinCard{
+    padding:22px 16px 18px;
+    border-radius:26px;
+  }
+
+  .adminPinTitle{
+    font-size:3rem;
+  }
+}
+/* =====================================================
+   ADMIN CLEAN FINAL ADDITIONS
+   ضع هذا الكود آخر ملف CSS فقط
+===================================================== */
+
+
+/* =====================================================
+   1) شريط الفقرات الرئيسي
+===================================================== */
+
+#adminTabs{
+  display:block !important;
+  width:100% !important;
+  padding:14px !important;
+  margin:0 !important;
+  background:rgba(255,255,255,.74) !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  border-radius:28px !important;
+  box-shadow:0 10px 24px rgba(39,48,61,.06) !important;
+  overflow:visible !important;
+}
+
+#adminTabs.hidden{
+  display:none !important;
+}
+
+#adminTabs .adminTabsUnified{
   width:100% !important;
   display:grid !important;
-  grid-template-columns:190px minmax(0, 1fr) !important;
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
   gap:14px !important;
   align-items:stretch !important;
 }
 
-/* بطاقة الحنكة */
-.adminBrandBox{
-  min-height:92px !important;
-  padding:14px 16px !important;
-  border-radius:24px !important;
+#adminTabs .adminTabBtnUnified{
+  width:100% !important;
+  min-width:0 !important;
+  height:74px !important;
+  min-height:74px !important;
+  padding:12px 16px !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  border-radius:22px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:12px !important;
+
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%) !important;
+  color:#243447 !important;
+  box-shadow:
+    0 8px 18px rgba(39,48,61,.05),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+
+  cursor:pointer !important;
+  overflow:hidden !important;
+}
+
+#adminTabs .adminTabBtnUnified.doneCard:not(.activeAdminTab){
+  background:linear-gradient(180deg,#F0FBF4 0%,#E5F6EA 100%) !important;
+  border-color:#CDE8D1 !important;
+}
+
+#adminTabs .adminTabBtnUnified.activeAdminTab{
+  background:linear-gradient(180deg,#FFB978 0%,#FF8A2A 100%) !important;
+  border:2px solid #D96B16 !important;
+  color:#FFFFFF !important;
+  transform:translateY(-2px) !important;
+  box-shadow:
+    0 14px 28px rgba(255,138,42,.34),
+    0 0 0 4px rgba(255,155,81,.16),
+    inset 0 1px 0 rgba(255,255,255,.38) !important;
+}
+
+#adminTabs .adminTabBtnUnified .adminTabBtnLabel{
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  display:block !important;
+
+  color:inherit !important;
+  font-size:20px !important;
+  font-weight:900 !important;
+  line-height:1.2 !important;
+  text-align:center !important;
+
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+
+#adminTabs .adminTabBtnUnified .adminTabBtnCount{
+  width:42px !important;
+  height:42px !important;
+  min-width:42px !important;
+  min-height:42px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border-radius:999px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex-shrink:0 !important;
+
+  background:#2F8F67 !important;
+  color:#FFFFFF !important;
+  font-size:17px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+}
+
+#adminTabs .adminTabBtnUnified.activeAdminTab .adminTabBtnCount{
+  background:#FFFFFF !important;
+  color:#D96B16 !important;
+}
+
+
+/* =====================================================
+   2) كروت البداية
+===================================================== */
+
+.adminHomeShell{
   display:flex !important;
   flex-direction:column !important;
-  justify-content:center !important;
-  align-items:center !important;
-  text-align:center !important;
-  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%) !important;
-  border:1px solid #D9E0E0 !important;
-  box-shadow:0 8px 20px rgba(0,0,0,.05) !important;
-}
-
-.adminBrandTitle{
-  font-size:30px !important;
-  line-height:1.05 !important;
-  margin:0 0 4px !important;
-  color:#243447 !important;
-}
-
-.adminBrandSub{
-  font-size:13px !important;
-  line-height:1.35 !important;
-  margin:0 !important;
-  color:#5F6B7A !important;
-}
-
-.adminBrandCurrentModel{
-  margin-top:6px !important;
-  padding-top:6px !important;
+  gap:20px !important;
   width:100% !important;
 }
 
-.adminBrandCurrentModelLabel{
-  font-size:12px !important;
+.adminHomeTopActions{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:12px !important;
+  flex-wrap:wrap !important;
+  margin:0 0 4px !important;
 }
 
-.adminBrandCurrentModelName{
-  font-size:16px !important;
-  line-height:1.25 !important;
-}
-
-/* بطاقة إدارة النماذج */
-.adminSidebarNew .adminSideCard{
-  min-height:92px !important;
-  padding:14px !important;
-  border-radius:24px !important;
-  background:linear-gradient(180deg,#FFFFFF 0%,#F7F9F9 100%) !important;
-  border:1px solid #D9E0E0 !important;
-  box-shadow:0 8px 20px rgba(0,0,0,.05) !important;
-
+.adminSegmentPickerCompact{
   display:grid !important;
-  grid-template-columns:150px minmax(180px, 1fr) minmax(180px, 1fr) repeat(4, minmax(105px, 130px)) !important;
-  gap:10px !important;
-  align-items:end !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:18px !important;
+  width:100% !important;
+  opacity:1 !important;
+  visibility:visible !important;
 }
 
-/* عنوان إدارة النماذج */
-.adminSidebarNew .adminSideCardTitle{
-  grid-column:1 !important;
-  grid-row:1 !important;
-  align-self:center !important;
-  margin:0 !important;
-  font-size:24px !important;
-  line-height:1.2 !important;
+.adminSegmentCompactCard{
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:space-between !important;
+  min-height:172px !important;
+  height:auto !important;
+  padding:22px !important;
+  border-radius:28px !important;
+
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%) !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  box-shadow:
+    0 10px 24px rgba(39,48,61,.06),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+
   color:#243447 !important;
-  text-align:center !important;
+  text-align:right !important;
+  cursor:pointer !important;
+  overflow:hidden !important;
 }
 
-/* الحقول */
-.adminSidebarNew .adminField{
+.adminSegmentCompactCard.doneCard{
+  background:linear-gradient(180deg,#F0FBF4 0%,#E5F6EA 100%) !important;
+  border-color:#CDE8D1 !important;
+}
+
+.adminSegmentCompactTitle{
+  font-size:28px !important;
+  font-weight:900 !important;
+  color:#243447 !important;
+}
+
+.adminSegmentCompactDesc{
+  font-size:17px !important;
+  color:#5F6B7A !important;
+  line-height:1.7 !important;
+}
+
+.adminSegmentCompactFooter{
+  margin-top:18px !important;
+  padding-top:14px !important;
+}
+
+.adminSegmentCompactMetaValue{
+  width:44px !important;
+  height:38px !important;
+  min-width:44px !important;
+  border-radius:999px !important;
+  font-size:17px !important;
+  font-weight:900 !important;
+}
+
+
+/* =====================================================
+   3) هيدر الفقرة + مستطيل التبويبات الداخلي
+===================================================== */
+
+.adminEditorTopBarWithTabs,
+.compactAdminEditorTopBar.adminEditorTopBarWithTabs{
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:16px !important;
+  flex-wrap:nowrap !important;
+  width:100% !important;
+  direction:rtl !important;
+}
+
+.adminEditorTopBarWithTabs > div:first-child,
+.compactAdminEditorTopBar.adminEditorTopBarWithTabs > div:first-child{
+  flex:0 0 auto !important;
+  width:auto !important;
+  min-width:150px !important;
+  max-width:230px !important;
+}
+
+.adminEditorTopBarWithTabs .adminSectionTitle{
+  margin:0 !important;
+  line-height:1.1 !important;
+  white-space:nowrap !important;
+  text-align:right !important;
+}
+
+.adminInlineTabsBox{
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  width:auto !important;
+  max-width:none !important;
+  margin:0 !important;
+
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:end !important;
+  justify-content:flex-start !important;
+  gap:10px !important;
+  flex-wrap:wrap !important;
+
+  direction:rtl !important;
+  padding:12px !important;
+  border-radius:24px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%) !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  box-shadow:
+    0 8px 18px rgba(39,48,61,.05),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+
+
+/* =====================================================
+   4) صندوق العدد / اسم الجولة داخل المستطيل
+===================================================== */
+
+.adminInlineTabsBox .adminInlineTitleBox,
+.adminInlineTabsBox .adminInlineCountBox,
+.adminInlineTabsBox .top10RoundCountBox,
+.adminInlineTabsBox .auctionCountBox,
+.adminInlineTabsBox .archiveRoundsControl,
+.adminInlineTabsBox .finalTopCompactCountBox{
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.adminInlineTabsBox .adminInlineTitleBox{
+  flex:0 0 310px !important;
+  width:310px !important;
+  min-width:310px !important;
+  max-width:310px !important;
+}
+
+.adminInlineTabsBox .adminInlineCountBox,
+.adminInlineTabsBox .top10RoundCountBox,
+.adminInlineTabsBox .auctionCountBox,
+.adminInlineTabsBox .archiveRoundsControl{
+  flex:0 0 250px !important;
+  width:250px !important;
+  min-width:250px !important;
+  max-width:250px !important;
+}
+
+.adminInlineTabsBox .finalTopCompactCountBox{
+  flex:0 0 150px !important;
+  width:150px !important;
+  min-width:150px !important;
+  max-width:150px !important;
+}
+
+.adminInlineTabsBox .adminField{
   margin:0 !important;
   gap:5px !important;
-  min-width:0 !important;
 }
 
-.adminSidebarNew .adminField label{
-  font-size:13px !important;
+.adminInlineTabsBox label{
+  font-size:12px !important;
   line-height:1.2 !important;
   color:#5F6B7A !important;
   padding:0 6px !important;
   text-align:right !important;
 }
 
-.adminSidebarNew .adminField input,
-.adminSidebarNew .adminField select{
-  height:48px !important;
-  min-height:48px !important;
-  border-radius:16px !important;
-  padding:0 14px !important;
-  font-size:16px !important;
+.adminInlineTabsBox input,
+.adminInlineTabsBox select{
+  height:44px !important;
+  min-height:44px !important;
+  border-radius:15px !important;
   background:#FFFFFF !important;
-  border:1px solid #D9E0E0 !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.9) !important;
+  font-size:15px !important;
+  font-weight:800 !important;
 }
 
-/* الأزرار داخل نفس الصف */
-.adminSideActions{
-  display:contents !important;
+.adminInlineTabsBox .compactCountBtn{
+  height:44px !important;
+  min-height:44px !important;
+  border-radius:15px !important;
+  padding:0 12px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
 }
 
-.adminSideActions .adminBtn,
-.adminSideActions button{
-  height:48px !important;
-  min-height:48px !important;
+.adminInlineTabsBox .archiveRoundsInline,
+.adminInlineTabsBox .top10RoundCountBox,
+.adminInlineTabsBox .auctionCountBox{
+  display:grid !important;
+  grid-template-columns:1fr 96px !important;
+  gap:8px !important;
+  align-items:end !important;
+}
+
+
+/* =====================================================
+   5) التبويبات الداخلية العامة
+===================================================== */
+
+.adminInlineTabsBox .adminInlineSectionTabs,
+.adminInlineTabsBox .warmupCategoryTabs,
+.adminInlineTabsBox .top10RoundTabs,
+.adminInlineTabsBox .auctionNumberTabs,
+.adminInlineTabsBox .whoNumberTabs,
+.adminInlineTabsBox .finalAdminRoundsBar,
+.adminInlineTabsBox .archiveAdminRoundsBar{
+  flex:1 1 auto !important;
+  width:auto !important;
+  min-width:220px !important;
+  max-width:none !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.adminInlineTabsBox button,
+.adminInlineTabsBox .adminInlineSectionTabs button,
+.adminInlineTabsBox .warmupCategoryTab,
+.adminInlineTabsBox .top10RoundTab,
+.adminInlineTabsBox .auctionNumberTab,
+.adminInlineTabsBox .whoNumberTab,
+.adminInlineTabsBox .finalAdminRoundsBar button,
+.adminInlineTabsBox .archiveAdminRoundsBar button{
+  position:relative !important;
+  overflow:hidden !important;
+
+  min-width:86px !important;
+  height:44px !important;
+  min-height:44px !important;
+  padding:0 14px !important;
+
+  border-radius:15px !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:#FFFFFF !important;
+  color:#243447 !important;
+
+  font-size:15px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+
+  box-shadow:0 5px 12px rgba(39,48,61,.04) !important;
+  cursor:pointer !important;
+}
+
+.adminInlineTabsBox .auctionNumberTab,
+.adminInlineTabsBox .whoNumberTab{
+  width:44px !important;
+  min-width:44px !important;
+  padding:0 !important;
+  font-size:17px !important;
+}
+
+.adminInlineTabsBox .warmupCategoryTab,
+.adminInlineTabsBox .top10RoundTab{
+  min-width:112px !important;
+}
+
+
+/* =====================================================
+   6) التبويب الداخلي المحدد
+===================================================== */
+
+.adminInlineTabsBox button.innerTabActive,
+.adminInlineTabsBox .activeWarmupCategoryTab,
+.adminInlineTabsBox .activeTop10RoundTab,
+.adminInlineTabsBox .activeAuctionNumberTab,
+.adminInlineTabsBox .activeWhoNumberTab,
+.adminInlineTabsBox .activeFinalAdminRound,
+.adminInlineTabsBox .activeArchiveRoundBtn{
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%) !important;
+  color:#FFFFFF !important;
+  border:2px solid #FF9B51 !important;
+  transform:translateY(-2px) !important;
+  box-shadow:
+    0 10px 22px rgba(47,65,88,.26),
+    0 0 0 4px rgba(255,155,81,.18),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+.adminInlineTabsBox button.innerTabActive::after,
+.adminInlineTabsBox .activeWarmupCategoryTab::after,
+.adminInlineTabsBox .activeTop10RoundTab::after,
+.adminInlineTabsBox .activeAuctionNumberTab::after,
+.adminInlineTabsBox .activeWhoNumberTab::after,
+.adminInlineTabsBox .activeFinalAdminRound::after,
+.adminInlineTabsBox .activeArchiveRoundBtn::after{
+  content:"" !important;
+  position:absolute !important;
+  right:10px !important;
+  left:10px !important;
+  bottom:5px !important;
+  height:3px !important;
+  border-radius:999px !important;
+  background:#FF9B51 !important;
+}
+
+
+/* =====================================================
+   7) التبويب المكتمل أخضر
+===================================================== */
+
+.adminInlineTabsBox .innerTabDone,
+.adminInlineTabsBox .auctionNumberDone,
+.adminInlineTabsBox .warmupCategoryDone,
+.adminInlineTabsBox .top10RoundDone,
+.adminInlineTabsBox .whoNumberDone,
+.adminInlineTabsBox .finalRoundDone,
+.adminInlineTabsBox .archiveRoundDone{
+  background:linear-gradient(180deg,#E8F8EE 0%,#D8F1E2 100%) !important;
+  color:#18794E !important;
+  border:2px solid #9ED9B6 !important;
+  box-shadow:
+    0 6px 14px rgba(24,121,78,.12),
+    inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+
+.adminInlineTabsBox .innerTabDone.innerTabActive,
+.adminInlineTabsBox .auctionNumberActiveDone,
+.adminInlineTabsBox .warmupCategoryActiveDone,
+.adminInlineTabsBox .top10RoundActiveDone,
+.adminInlineTabsBox .whoNumberActiveDone,
+.adminInlineTabsBox .finalRoundActiveDone,
+.adminInlineTabsBox .archiveRoundActiveDone,
+.adminInlineTabsBox .auctionNumberDone.innerTabActive,
+.adminInlineTabsBox .whoNumberDone.innerTabActive,
+.adminInlineTabsBox .finalRoundDone.innerTabActive,
+.adminInlineTabsBox .archiveRoundDone.innerTabActive{
+  background:linear-gradient(180deg,#27A164 0%,#18794E 100%) !important;
+  color:#FFFFFF !important;
+  border:2px solid #FF9B51 !important;
+  transform:translateY(-2px) !important;
+  box-shadow:
+    0 12px 24px rgba(24,121,78,.30),
+    0 0 0 4px rgba(255,155,81,.18),
+    inset 0 1px 0 rgba(255,255,255,.20) !important;
+}
+
+.adminInlineTabsBox .innerTabDone.innerTabActive::after,
+.adminInlineTabsBox .auctionNumberActiveDone::after,
+.adminInlineTabsBox .warmupCategoryActiveDone::after,
+.adminInlineTabsBox .top10RoundActiveDone::after,
+.adminInlineTabsBox .whoNumberActiveDone::after,
+.adminInlineTabsBox .finalRoundActiveDone::after,
+.adminInlineTabsBox .archiveRoundActiveDone::after,
+.adminInlineTabsBox .auctionNumberDone.innerTabActive::after,
+.adminInlineTabsBox .whoNumberDone.innerTabActive::after,
+.adminInlineTabsBox .finalRoundDone.innerTabActive::after,
+.adminInlineTabsBox .archiveRoundDone.innerTabActive::after{
+  content:"" !important;
+  position:absolute !important;
+  right:10px !important;
+  left:10px !important;
+  bottom:5px !important;
+  height:3px !important;
+  border-radius:999px !important;
+  background:#FF9B51 !important;
+}
+
+
+/* =====================================================
+   8) ترتيب خاص بالفاصلة
+===================================================== */
+
+.adminInlineTabsBox .adminInlineTitleBox{
+  order:1 !important;
+}
+
+.adminInlineTabsBox .finalTopCompactCountBox{
+  order:2 !important;
+}
+
+.adminInlineTabsBox .finalAdminRoundsBar{
+  order:3 !important;
+  flex:1 1 auto !important;
+  min-width:290px !important;
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  gap:8px !important;
+}
+
+.adminInlineTabsBox .finalAdminRoundsBar button{
+  flex:1 1 0 !important;
+  min-width:95px !important;
+}
+
+.finalTopCompactRow:empty,
+.finalTopCompactRow .finalTopCompactTabsBox:empty,
+.finalTopCompactRow .finalTopCompactCountBox:empty{
+  display:none !important;
+}
+
+
+/* =====================================================
+   9) ترتيب خاص بالأرشيف
+   يعمل فقط إذا استخدمت archiveTopBarInline و archiveInlineTabsBox
+===================================================== */
+
+.archiveTopBarInline{
+  display:grid !important;
+  grid-template-columns:260px 1fr !important;
+  align-items:start !important;
+  gap:14px !important;
+}
+
+.archiveTopBarInline > div:first-child{
+  min-width:240px !important;
+}
+
+.archiveInlineTabsBox{
+  min-width:0 !important;
+
+  display:grid !important;
+  grid-template-columns:220px 1fr !important;
+  grid-template-areas:
+    "count tabs"
+    "actions actions" !important;
+
+  align-items:center !important;
+  gap:10px !important;
+
+  padding:12px !important;
+  border-radius:24px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F5F7F7 100%) !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  box-shadow:0 8px 18px rgba(39,48,61,.05) !important;
+}
+
+.archiveInlineTabsBox .archiveRoundsControl{
+  grid-area:count !important;
   width:100% !important;
   min-width:0 !important;
-  padding:0 10px !important;
-  border-radius:16px !important;
-  font-size:14px !important;
-  line-height:1.15 !important;
   margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.archiveInlineTabsBox .archiveRoundsControl > label{
+  display:block !important;
+  margin:0 6px 5px !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+  color:#5F6B7A !important;
+}
+
+.archiveInlineTabsBox .archiveRoundsInline{
+  display:grid !important;
+  grid-template-columns:1fr 82px !important;
+  gap:8px !important;
+  align-items:center !important;
+}
+
+.archiveInlineTabsBox .archiveAdminRoundsBar{
+  grid-area:tabs !important;
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:8px !important;
+
+  width:100% !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.archiveInlineTabsBox .archiveAdminRoundsBar button{
+  height:42px !important;
+  min-height:42px !important;
+  border-radius:14px !important;
+  font-size:14px !important;
+  font-weight:900 !important;
+}
+
+.archiveTopBarInline .archiveTopActions{
+  grid-area:actions !important;
+
+  width:100% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:8px !important;
+  flex-wrap:wrap !important;
+
+  margin:2px 0 0 !important;
+  padding-top:10px !important;
+  border-top:1px solid rgba(217,224,224,.75) !important;
+}
+
+.archiveTopActions button{
+  height:40px !important;
+  min-height:40px !important;
+  border-radius:14px !important;
+  padding:0 15px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
   white-space:nowrap !important;
 }
 
-/* المحرر */
-.adminMainNew{
-  width:100% !important;
+.archiveAdminControlBar.archiveControlBarMoved{
+  display:none !important;
 }
 
-#adminEditor{
-  width:100% !important;
-  min-height:430px !important;
-  border-radius:28px !important;
-  padding:22px !important;
+
+/* =====================================================
+   10) إخفاء الفراغات القديمة بعد النقل
+===================================================== */
+
+.top10ControlPanel:empty,
+.auctionControlPanel:empty,
+.whoNumberTabs:empty,
+.warmupCategoryTabs:empty,
+.finalAdminRoundsBar:empty,
+.archiveAdminRoundsBar:empty{
+  display:none !important;
 }
 
-.adminEmptyState{
-  min-height:330px !important;
-  border-radius:24px !important;
-}
 
-/* التابات */
-#adminTabs{
-  border-radius:24px !important;
-}
+/* =====================================================
+   11) Responsive
+===================================================== */
 
-/* آيباد */
-@media (max-width:1200px){
-  .adminSidebarNew{
+@media (max-width:1100px){
+  #adminTabs .adminTabsUnified{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+
+  .adminSegmentPickerCompact{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  .adminEditorTopBarWithTabs,
+  .compactAdminEditorTopBar.adminEditorTopBarWithTabs{
+    flex-wrap:wrap !important;
+    align-items:flex-start !important;
+  }
+
+  .adminInlineTabsBox{
+    width:100% !important;
+    min-width:0 !important;
+    flex-wrap:wrap !important;
+  }
+
+  .adminInlineTabsBox .adminInlineTitleBox{
+    flex:1 1 300px !important;
+    width:auto !important;
+    min-width:220px !important;
+    max-width:none !important;
+  }
+
+  .adminInlineTabsBox .adminInlineCountBox,
+  .adminInlineTabsBox .top10RoundCountBox,
+  .adminInlineTabsBox .auctionCountBox,
+  .adminInlineTabsBox .archiveRoundsControl,
+  .adminInlineTabsBox .finalTopCompactCountBox{
+    flex:1 1 220px !important;
+    width:auto !important;
+    min-width:180px !important;
+    max-width:none !important;
+  }
+
+  .adminInlineTabsBox .finalAdminRoundsBar{
+    flex:1 1 100% !important;
+    width:100% !important;
+    min-width:0 !important;
+  }
+
+  .archiveTopBarInline{
     grid-template-columns:1fr !important;
   }
 
-  .adminBrandBox{
-    min-height:78px !important;
+  .archiveInlineTabsBox{
+    grid-template-columns:1fr !important;
+    grid-template-areas:
+      "count"
+      "tabs"
+      "actions" !important;
   }
 
-  .adminSidebarNew .adminSideCard{
-    grid-template-columns:130px minmax(0,1fr) minmax(0,1fr) repeat(4, minmax(90px,1fr)) !important;
-  }
-
-  .adminSidebarNew .adminSideCardTitle{
-    font-size:21px !important;
-  }
-
-  .adminSideActions .adminBtn,
-  .adminSideActions button{
-    font-size:13px !important;
+  .archiveInlineTabsBox .archiveAdminRoundsBar{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
   }
 }
 
-/* جوال */
-@media (max-width:760px){
-  .adminShellNew{
-    padding:12px !important;
+@media (max-width:720px){
+  #adminTabs .adminTabsUnified{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:10px !important;
   }
 
-  .adminSidebarNew .adminSideCard{
-    grid-template-columns:1fr 1fr !important;
+  #adminTabs .adminTabBtnUnified{
+    height:66px !important;
+    min-height:66px !important;
+    padding:10px 12px !important;
   }
 
-  .adminSidebarNew .adminSideCardTitle{
-    grid-column:1 / -1 !important;
+  #adminTabs .adminTabBtnUnified .adminTabBtnLabel{
+    font-size:17px !important;
   }
 
-  .adminSideActions{
+  #adminTabs .adminTabBtnUnified .adminTabBtnCount{
+    width:36px !important;
+    height:36px !important;
+    min-width:36px !important;
+    min-height:36px !important;
+    font-size:15px !important;
+  }
+
+  .adminSegmentPickerCompact{
+    grid-template-columns:1fr !important;
+  }
+
+  .adminSegmentCompactCard{
+    min-height:150px !important;
+  }
+
+  .adminEditorTopBarWithTabs,
+  .compactAdminEditorTopBar.adminEditorTopBarWithTabs{
+    flex-direction:column !important;
+    align-items:stretch !important;
+  }
+
+  .adminEditorTopBarWithTabs > div:first-child,
+  .compactAdminEditorTopBar.adminEditorTopBarWithTabs > div:first-child{
+    min-width:0 !important;
+    max-width:none !important;
+    width:100% !important;
+  }
+
+  .adminInlineTabsBox{
+    width:100% !important;
+    min-width:0 !important;
+    padding:10px !important;
+  }
+
+  .adminInlineTabsBox .adminInlineTitleBox,
+  .adminInlineTabsBox .adminInlineCountBox,
+  .adminInlineTabsBox .top10RoundCountBox,
+  .adminInlineTabsBox .auctionCountBox,
+  .adminInlineTabsBox .archiveRoundsControl,
+  .adminInlineTabsBox .finalTopCompactCountBox{
+    flex:1 1 100% !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+  }
+
+  .adminInlineTabsBox .adminInlineSectionTabs,
+  .adminInlineTabsBox .warmupCategoryTabs,
+  .adminInlineTabsBox .top10RoundTabs,
+  .adminInlineTabsBox .auctionNumberTabs,
+  .adminInlineTabsBox .whoNumberTabs,
+  .adminInlineTabsBox .finalAdminRoundsBar,
+  .adminInlineTabsBox .archiveAdminRoundsBar{
+    width:100% !important;
     display:grid !important;
-    grid-column:1 / -1 !important;
-    grid-template-columns:1fr 1fr !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
     gap:8px !important;
   }
+
+  .adminInlineTabsBox button,
+  .adminInlineTabsBox .adminInlineSectionTabs button,
+  .adminInlineTabsBox .warmupCategoryTab,
+  .adminInlineTabsBox .top10RoundTab,
+  .adminInlineTabsBox .auctionNumberTab,
+  .adminInlineTabsBox .whoNumberTab{
+    width:100% !important;
+    min-width:0 !important;
+    height:42px !important;
+    min-height:42px !important;
+    padding:0 8px !important;
+    font-size:14px !important;
+  }
+}
+/* =========================
+   DONE INNER TABS FINAL FIX
+========================= */
+
+.adminInlineTabsBox button.innerTabDone,
+.adminInlineTabsBox button.auctionNumberDone,
+.adminInlineTabsBox button.whoNumberDone,
+.adminInlineTabsBox button.top10RoundDone,
+.adminInlineTabsBox button.warmupCategoryDone,
+.adminInlineTabsBox button.finalRoundDone,
+.archiveInlineTabsBox button.archiveRoundDone{
+  background:linear-gradient(180deg,#E8F8EE 0%,#D8F1E2 100%) !important;
+  color:#18794E !important;
+  border:2px solid #9ED9B6 !important;
+  box-shadow:
+    0 6px 14px rgba(24,121,78,.12),
+    inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+
+.adminInlineTabsBox button.innerTabActive.innerTabDone,
+.adminInlineTabsBox button.auctionNumberActiveDone,
+.adminInlineTabsBox button.whoNumberActiveDone,
+.adminInlineTabsBox button.top10RoundActiveDone,
+.adminInlineTabsBox button.warmupCategoryActiveDone,
+.adminInlineTabsBox button.finalRoundActiveDone,
+.archiveInlineTabsBox button.archiveRoundActiveDone,
+.archiveInlineTabsBox button.archiveRoundDone.innerTabActive{
+  background:linear-gradient(180deg,#27A164 0%,#18794E 100%) !important;
+  color:#FFFFFF !important;
+  border:2px solid #FF9B51 !important;
+  transform:translateY(-2px) !important;
+  box-shadow:
+    0 12px 24px rgba(24,121,78,.30),
+    0 0 0 4px rgba(255,155,81,.18),
+    inset 0 1px 0 rgba(255,255,255,.20) !important;
+}
+
+.adminInlineTabsBox button.innerTabActive.innerTabDone::after,
+.adminInlineTabsBox button.auctionNumberActiveDone::after,
+.adminInlineTabsBox button.whoNumberActiveDone::after,
+.adminInlineTabsBox button.top10RoundActiveDone::after,
+.adminInlineTabsBox button.warmupCategoryActiveDone::after,
+.adminInlineTabsBox button.finalRoundActiveDone::after,
+.archiveInlineTabsBox button.archiveRoundActiveDone::after,
+.archiveInlineTabsBox button.archiveRoundDone.innerTabActive::after{
+  content:"" !important;
+  position:absolute !important;
+  right:10px !important;
+  left:10px !important;
+  bottom:5px !important;
+  height:3px !important;
+  border-radius:999px !important;
+  background:#FF9B51 !important;
+}
+
+
+/* =========================
+   ARCHIVE ORDER FIX
+========================= */
+
+.archiveTopBarInline{
+  display:grid !important;
+  grid-template-columns:260px 1fr !important;
+  align-items:start !important;
+  gap:14px !important;
+  width:100% !important;
+}
+
+.archiveTopBarInline > div:first-child{
+  min-width:240px !important;
+}
+
+.archiveInlineTabsBox{
+  min-width:0 !important;
+  width:100% !important;
+
+  display:grid !important;
+  grid-template-columns:220px 1fr !important;
+  grid-template-areas:
+    "count tabs"
+    "actions actions" !important;
+
+  align-items:center !important;
+  gap:10px !important;
+
+  padding:12px !important;
+  border-radius:24px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F5F7F7 100%) !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  box-shadow:0 8px 18px rgba(39,48,61,.05) !important;
+}
+
+.archiveInlineTabsBox .archiveRoundsControl{
+  grid-area:count !important;
+  width:100% !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.archiveInlineTabsBox .archiveRoundsControl > label{
+  display:block !important;
+  margin:0 6px 5px !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+  color:#5F6B7A !important;
+}
+
+.archiveInlineTabsBox .archiveRoundsInline{
+  display:grid !important;
+  grid-template-columns:1fr 82px !important;
+  gap:8px !important;
+  align-items:center !important;
+}
+
+.archiveInlineTabsBox .archiveRoundsInline select,
+.archiveInlineTabsBox .archiveRoundsInline .compactCountBtn{
+  height:42px !important;
+  min-height:42px !important;
+  border-radius:14px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+}
+
+.archiveInlineTabsBox .archiveAdminRoundsBar{
+  grid-area:tabs !important;
+  width:100% !important;
+  min-width:0 !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:8px !important;
+
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.archiveInlineTabsBox .archiveAdminRoundsBar button{
+  position:relative !important;
+  overflow:hidden !important;
+
+  height:42px !important;
+  min-height:42px !important;
+  border-radius:14px !important;
+
+  border:1px solid rgba(217,224,224,.95) !important;
+  background:#FFFFFF !important;
+  color:#243447 !important;
+
+  font-size:14px !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.archiveInlineTabsBox .archiveAdminRoundsBar button.innerTabActive{
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%) !important;
+  color:#FFFFFF !important;
+  border:2px solid #FF9B51 !important;
+  transform:translateY(-2px) !important;
+}
+
+.archiveInlineTabsBox .archiveAdminRoundsBar button.innerTabActive::after{
+  content:"" !important;
+  position:absolute !important;
+  right:10px !important;
+  left:10px !important;
+  bottom:5px !important;
+  height:3px !important;
+  border-radius:999px !important;
+  background:#FF9B51 !important;
+}
+
+.archiveTopBarInline .archiveTopActions{
+  grid-area:actions !important;
+
+  width:100% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:8px !important;
+  flex-wrap:wrap !important;
+
+  margin:2px 0 0 !important;
+  padding-top:10px !important;
+  border-top:1px solid rgba(217,224,224,.75) !important;
+}
+
+.archiveTopActions button{
+  height:40px !important;
+  min-height:40px !important;
+  border-radius:14px !important;
+  padding:0 15px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+}
+
+.archiveAdminControlBar.archiveControlBarMoved{
+  display:none !important;
+}
+
+@media (max-width:1100px){
+  .archiveTopBarInline{
+    grid-template-columns:1fr !important;
+  }
+
+  .archiveInlineTabsBox{
+    grid-template-columns:1fr !important;
+    grid-template-areas:
+      "count"
+      "tabs"
+      "actions" !important;
+  }
+
+  .archiveInlineTabsBox .archiveAdminRoundsBar{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+/* =========================
+   FINAL + ARCHIVE CLEAN RESET
+   ضع هذا آخر ملف CSS
+========================= */
+
+/* إلغاء أي إخفاء قديم */
+.finalTopCompactRow,
+.archiveAdminControlBar{
+  display:grid !important;
+  visibility:visible !important;
+  opacity:1 !important;
 }
 
 /* =========================
-   ADMIN PIN PAGE - INTRO STYLE
+   الفاصلة - ترتيب نظيف
 ========================= */
 
-.adminPinScreen{
-  min-height:100dvh;
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  box-sizing:border-box;
-  background:
-    radial-gradient(circle at 85% 12%, rgba(255,155,81,.18), transparent 26%),
-    radial-gradient(circle at 12% 88%, rgba(47,65,88,.08), transparent 28%),
-    linear-gradient(180deg,#F4F7F7 0%,#EAEFEF 100%);
-  overflow:hidden;
+.finalTopCompactRow{
+  grid-template-columns:1.3fr 1.4fr auto !important;
+  gap:14px !important;
+  align-items:end !important;
+
+  width:100% !important;
+  margin:0 0 18px !important;
+  padding:14px !important;
+
+  border-radius:24px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F5F7F7 100%) !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  box-shadow:0 8px 18px rgba(39,48,61,.05) !important;
 }
 
-.adminPinCard{
-  width:min(100%,520px);
-  border-radius:34px;
-  padding:28px;
-  background:linear-gradient(180deg,#FFFFFF 0%,#F7FAFA 100%);
-  border:1px solid rgba(217,224,224,.95);
+.finalTopCompactBox{
+  width:100% !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.finalTopCompactTitleBox .adminField,
+.finalTopCompactCountBox .adminField{
+  margin:0 !important;
+  gap:5px !important;
+}
+
+.finalTopCompactRow label{
+  font-size:12px !important;
+  font-weight:900 !important;
+  color:#5F6B7A !important;
+  padding:0 6px !important;
+}
+
+.finalTopCompactRow input,
+.finalTopCompactRow select{
+  height:44px !important;
+  min-height:44px !important;
+  border-radius:15px !important;
+  background:#FFFFFF !important;
+  font-size:15px !important;
+  font-weight:800 !important;
+}
+
+.finalAdminRoundsBar{
+  width:100% !important;
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:8px !important;
+
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.finalAdminRoundsBar button{
+  position:relative !important;
+  overflow:hidden !important;
+
+  height:44px !important;
+  min-height:44px !important;
+  border-radius:15px !important;
+
+  border:1px solid rgba(217,224,224,.95) !important;
+  background:#FFFFFF !important;
+  color:#243447 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  font-size:15px !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+}
+
+.finalAdminRoundsBar button.activeFinalAdminRound{
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%) !important;
+  color:#FFFFFF !important;
+  border:2px solid #FF9B51 !important;
+  transform:translateY(-2px) !important;
   box-shadow:
-    0 24px 60px rgba(39,48,61,.12),
-    inset 0 1px 0 rgba(255,255,255,.95);
-  position:relative;
-  overflow:hidden;
-  text-align:center;
+    0 10px 22px rgba(47,65,88,.24),
+    0 0 0 4px rgba(255,155,81,.16) !important;
 }
 
-.adminPinCard::before{
-  content:"";
-  position:absolute;
-  width:210px;
-  height:210px;
-  top:-90px;
-  right:-70px;
-  border-radius:50%;
-  background:rgba(255,155,81,.12);
+.finalAdminRoundsBar button.activeFinalAdminRound::after{
+  content:"" !important;
+  position:absolute !important;
+  right:12px !important;
+  left:12px !important;
+  bottom:5px !important;
+  height:3px !important;
+  border-radius:999px !important;
+  background:#FF9B51 !important;
 }
 
-.adminPinCard::after{
-  content:"";
-  position:absolute;
-  width:130px;
-  height:130px;
-  bottom:-55px;
-  left:-35px;
-  border-radius:30px;
-  transform:rotate(24deg);
-  background:rgba(47,65,88,.05);
+/* الفاصلة: المكتمل أخضر */
+.finalAdminRoundsBar button.finalRoundDone{
+  background:linear-gradient(180deg,#E8F8EE 0%,#D8F1E2 100%) !important;
+  color:#18794E !important;
+  border:2px solid #9ED9B6 !important;
 }
 
-.adminPinLogo,
-.adminPinTitle,
-.adminPinSub,
-.adminPinInput,
-.adminPinBtn,
-.adminPinError{
-  position:relative;
-  z-index:2;
+.finalAdminRoundsBar button.finalRoundActiveDone,
+.finalAdminRoundsBar button.finalRoundDone.activeFinalAdminRound{
+  background:linear-gradient(180deg,#27A164 0%,#18794E 100%) !important;
+  color:#FFFFFF !important;
+  border:2px solid #FF9B51 !important;
 }
 
-.adminPinLogo{
-  width:max-content;
-  margin:0 auto 10px;
-  min-height:34px;
-  padding:7px 18px;
-  border-radius:999px;
-  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
-  color:#7A4A22;
-  font-family:"HanakaText",sans-serif;
-  font-size:.95rem;
-  box-shadow:0 10px 18px rgba(255,155,81,.18);
+/* =========================
+   الأرشيف - ترتيب نظيف
+========================= */
+
+.archiveAdminTopBar{
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:14px !important;
+  flex-wrap:wrap !important;
 }
 
-.adminPinTitle{
-  margin:0;
-  color:#243447;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(3.2rem,7vw,5rem);
-  line-height:.95;
-  font-weight:400;
-  text-shadow:0 8px 20px rgba(47,65,88,.10);
+.archiveTopActions{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:8px !important;
+  flex-wrap:wrap !important;
+
+  padding:10px !important;
+  border-radius:20px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F5F7F7 100%) !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  box-shadow:0 8px 18px rgba(39,48,61,.05) !important;
 }
 
-.adminPinTitle::after{
-  content:"";
-  display:block;
-  width:120px;
-  height:5px;
-  margin:13px auto 10px;
-  border-radius:999px;
-  background:linear-gradient(90deg,transparent,#FF9B51,transparent);
+.archiveTopActions button{
+  height:40px !important;
+  min-height:40px !important;
+  border-radius:14px !important;
+  padding:0 14px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
 }
 
-.adminPinSub{
-  margin:0 0 16px;
-  color:#5E6A76;
-  font-family:"HanakaText",sans-serif;
-  font-size:1.05rem;
-  line-height:1.6;
+.archiveAdminControlBar,
+.archiveAdminControlBar.archiveControlBarMoved{
+  display:grid !important;
+  grid-template-columns:220px 1fr !important;
+  gap:12px !important;
+  align-items:end !important;
+
+  width:100% !important;
+  margin:0 0 18px !important;
+  padding:14px !important;
+
+  border-radius:24px !important;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F5F7F7 100%) !important;
+  border:1px solid rgba(217,224,224,.95) !important;
+  box-shadow:0 8px 18px rgba(39,48,61,.05) !important;
 }
 
-.adminPinInput{
-  width:100%;
-  height:58px;
-  border-radius:20px;
-  border:1px solid rgba(217,224,224,.95);
-  outline:none;
-  background:linear-gradient(180deg,#FFFFFF 0%,#F6F9F9 100%);
-  color:#243447;
-  font-family:"HanakaText",sans-serif;
-  font-size:1.45rem;
-  text-align:center;
-  letter-spacing:8px;
-  padding:0 18px;
-  box-sizing:border-box;
+.archiveRoundsControl{
+  width:100% !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.archiveRoundsControl > label{
+  display:block !important;
+  margin:0 6px 5px !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+  color:#5F6B7A !important;
+}
+
+.archiveRoundsInline{
+  display:grid !important;
+  grid-template-columns:1fr 82px !important;
+  gap:8px !important;
+  align-items:center !important;
+}
+
+.archiveRoundsInline select,
+.archiveRoundsInline .compactCountBtn{
+  height:42px !important;
+  min-height:42px !important;
+  border-radius:14px !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+}
+
+.archiveAdminRoundsBar{
+  width:100% !important;
+  min-width:0 !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:8px !important;
+
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.archiveAdminRoundsBar button{
+  position:relative !important;
+  overflow:hidden !important;
+
+  height:42px !important;
+  min-height:42px !important;
+  border-radius:14px !important;
+
+  border:1px solid rgba(217,224,224,.95) !important;
+  background:#FFFFFF !important;
+  color:#243447 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  font-size:14px !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+}
+
+.archiveAdminRoundsBar button.activeArchiveRoundBtn{
+  background:linear-gradient(180deg,#2F4158 0%,#243447 100%) !important;
+  color:#FFFFFF !important;
+  border:2px solid #FF9B51 !important;
+  transform:translateY(-2px) !important;
   box-shadow:
-    inset 0 1px 3px rgba(255,255,255,.95),
-    0 8px 18px rgba(39,48,61,.04);
+    0 10px 22px rgba(47,65,88,.24),
+    0 0 0 4px rgba(255,155,81,.16) !important;
 }
 
-.adminPinInput:focus{
-  border-color:rgba(255,155,81,.85);
-  box-shadow:
-    0 0 0 4px rgba(255,155,81,.12),
-    0 10px 20px rgba(39,48,61,.06);
+.archiveAdminRoundsBar button.activeArchiveRoundBtn::after{
+  content:"" !important;
+  position:absolute !important;
+  right:12px !important;
+  left:12px !important;
+  bottom:5px !important;
+  height:3px !important;
+  border-radius:999px !important;
+  background:#FF9B51 !important;
 }
 
-.adminPinBtn{
-  width:100%;
-  height:58px;
-  margin-top:12px;
-  border:0;
-  border-radius:20px;
-  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
-  color:#FFFFFF;
-  font-family:"HanakaText",sans-serif;
-  font-size:1.12rem;
-  cursor:pointer;
-  box-shadow:
-    0 16px 30px rgba(255,155,81,.24),
-    inset 0 1px 0 rgba(255,255,255,.25);
+/* الأرشيف: المكتمل أخضر */
+.archiveAdminRoundsBar button.archiveRoundDone{
+  background:linear-gradient(180deg,#E8F8EE 0%,#D8F1E2 100%) !important;
+  color:#18794E !important;
+  border:2px solid #9ED9B6 !important;
 }
 
-.adminPinBtn:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.03);
+.archiveAdminRoundsBar button.archiveRoundActiveDone,
+.archiveAdminRoundsBar button.archiveRoundDone.activeArchiveRoundBtn{
+  background:linear-gradient(180deg,#27A164 0%,#18794E 100%) !important;
+  color:#FFFFFF !important;
+  border:2px solid #FF9B51 !important;
 }
 
-.adminPinError{
-  min-height:22px;
-  margin-top:12px;
-  color:#A93F3F;
-  font-size:.92rem;
-}
+/* =========================
+   Responsive
+========================= */
 
-/* iPhone */
-@media (max-width:760px){
-  .adminPinScreen{
-    padding:12px;
+@media (max-width:1100px){
+  .finalTopCompactRow{
+    grid-template-columns:1fr !important;
   }
 
-  .adminPinCard{
-    padding:20px 14px 16px;
-    border-radius:24px;
+  .archiveAdminControlBar,
+  .archiveAdminControlBar.archiveControlBarMoved{
+    grid-template-columns:1fr !important;
   }
 
-  .adminPinTitle{
-    font-size:3rem;
+  .archiveAdminRoundsBar{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
+@media (max-width:640px){
+  .finalAdminRoundsBar,
+  .archiveAdminRoundsBar{
+    grid-template-columns:1fr !important;
   }
 
-  .adminPinInput,
-  .adminPinBtn{
-    height:54px;
-    border-radius:18px;
+  .archiveTopActions{
+    width:100% !important;
+  }
+
+  .archiveTopActions button{
+    flex:1 1 auto !important;
   }
 }

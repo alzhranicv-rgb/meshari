@@ -414,13 +414,13 @@ function handleArchivePresenterAction(action, data) {
 }
   if (action === "openNumber") return safeRunPresenterAction(() => toggleArchiveItem(Number(data.number)))
 
-  if (action === "setRound") {
-    return safeRunPresenterAction(() => {
-      archiveState.round = Number(data.round || 1)
-      renderArchiveRoundUI()
-      saveArchiveState()
-    })
-  }
+ if (action === "setRound") {
+  return safeRunPresenterAction(() => {
+    archiveState.round = Number(data.round || 1)
+    renderArchiveRoundUI()
+    saveArchiveState()
+  })
+}
 
   if (action === "double") return safeRunPresenterAction(() => activateArchiveDouble())
   if (action === "startTimer") return safeRunPresenterAction(() => startArchiveTimer())
