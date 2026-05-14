@@ -58,8 +58,9 @@ window.archiveRoundCache = archiveRoundCache
 const ARCHIVE_STORAGE_KEY = "archive_state_v1"
 
 let archiveHistory = []
-let archiveMaxRound = 4
-window.archiveMaxRound = archiveMaxRound
+
+window.archiveMaxRound = Number(window.archiveMaxRound || localStorage.getItem("archive_max_round") || 4)
+var archiveMaxRound = window.archiveMaxRound
 
 const ARCHIVE_HISTORY_LIMIT = 80
 
@@ -68,22 +69,31 @@ const ARCHIVE_HISTORY_LIMIT = 80
 ========================= */
 
 async function loadArchiveMaxRound() {
+  if (!currentModel) {
+    archiveMaxRound = 4
+    window.archiveMaxRound = archiveMaxRound
+    localStorage.setItem("archive_max_round", String(archiveMaxRound))
+    return archiveMaxRound
+  }
+
   const { data, error } = await db
     .from("segment_settings")
     .select("item_count")
-    .eq("model", currentModel)
+    .eq("model", Number(currentModel))
     .eq("segment", "archive")
     .maybeSingle()
 
   if (error) {
     console.log(error)
     archiveMaxRound = 4
-    window.archiveMaxRound = archiveMaxRound
-    return
+  } else {
+    archiveMaxRound = Math.min(Math.max(Number(data?.item_count || 4), 1), 4)
   }
 
-  archiveMaxRound = Math.min(Math.max(Number(data?.item_count || 4), 1), 4)
   window.archiveMaxRound = archiveMaxRound
+  localStorage.setItem("archive_max_round", String(archiveMaxRound))
+
+  return archiveMaxRound
 }
 
 function getArchiveRoundReveal(round) {
@@ -111,7 +121,9 @@ function isArchiveRoundFinished(round) {
   const items = archiveRoundCache[round]?.items || []
   if (!items.length) return false
 
-  return items.every(item => isArchiveItemRevealed(round, item.position))
+  return items.every(item => {
+    return isArchiveItemRevealed(round, item.position)
+  })
 }
 
 function syncArchiveGlobals() {
@@ -123,6 +135,16 @@ function syncArchiveGlobals() {
   window.currentSegmentScores = {
     A: archiveState.scores.A,
     B: archiveState.scores.B
+  }
+}
+
+function updateArchiveEndState() {
+  if (typeof updateArchiveNavButtons === "function") {
+    updateArchiveNavButtons()
+  }
+
+  if (typeof window.updateEndRoundButtonState === "function") {
+    window.updateEndRoundButtonState()
   }
 }
 
@@ -227,8 +249,13 @@ function clearArchiveState() {
 function restoreArchiveState(saved) {
   if (!saved) return
 
-  archiveMaxRound = Math.min(Math.max(Number(window.archiveMaxRound || archiveMaxRound || 4), 1), 4)
-window.archiveMaxRound = archiveMaxRound
+  archiveMaxRound = Math.min(
+    Math.max(Number(window.archiveMaxRound || localStorage.getItem("archive_max_round") || saved.archiveMaxRound || archiveMaxRound || 4), 1),
+    4
+  )
+
+  window.archiveMaxRound = archiveMaxRound
+  localStorage.setItem("archive_max_round", String(archiveMaxRound))
 
   archiveRevealState = saved.archiveRevealState || createDefaultArchiveRevealState()
   archiveRemainingPoints = Number(saved.archiveRemainingPoints || 0)
@@ -237,7 +264,10 @@ window.archiveMaxRound = archiveMaxRound
   archiveTimerStarted = !!saved.archiveTimerStarted
   archiveState = saved.archiveState || archiveState
 
-  archiveState.round = Math.min(Math.max(Number(archiveState.round || 1), 1), archiveMaxRound)
+  archiveState.round = Math.min(
+    Math.max(Number(archiveState.round || 1), 1),
+    archiveMaxRound
+  )
 
   if (!archiveState.errors) {
     archiveState.errors = createDefaultArchiveErrors()
@@ -270,7 +300,7 @@ window.archiveMaxRound = archiveMaxRound
 
   updateArchiveDoubleButton()
   updateArchiveUndoButtonState()
-  updateEndRoundButtonState()
+  updateArchiveEndState()
 }
 
 /* =========================
@@ -278,9 +308,9 @@ window.archiveMaxRound = archiveMaxRound
 ========================= */
 
 window.renderArchive = async function () {
-  const saved = getArchiveState()
-
   await loadArchiveMaxRound()
+
+  const saved = getArchiveState()
 
   archiveHistory = []
   archiveRevealState = createDefaultArchiveRevealState()
@@ -310,7 +340,10 @@ window.renderArchive = async function () {
   window.archiveState = archiveState
   window.currentSegmentScores = { A: 0, B: 0 }
 
-  archiveRoundCache[1] = await loadArchiveRoundData(1) || { box: null, items: [] }
+  for (let r = 1; r <= archiveMaxRound; r++) {
+    archiveRoundCache[r] = await loadArchiveRoundData(r) || { box: null, items: [] }
+  }
+
   syncArchiveGlobals()
 
   openSegment("الأرشيف - الجولة 1", buildArchiveShell())
@@ -320,14 +353,7 @@ window.renderArchive = async function () {
   } else {
     renderArchiveRoundUI()
     saveArchiveState()
-    updateEndRoundButtonState()
-  }
-
-  for (let r = 2; r <= archiveMaxRound; r++) {
-    loadArchiveRoundData(r).then(data => {
-      archiveRoundCache[r] = data || { box: null, items: [] }
-      syncArchiveGlobals()
-    })
+    updateArchiveEndState()
   }
 }
 
@@ -729,7 +755,7 @@ function restoreArchiveSnapshot(snapshot) {
   setArchiveTimerValue(30)
   updateArchiveUndoButtonState()
   saveArchiveState()
-  updateEndRoundButtonState()
+  updateArchiveEndState()
 }
 
 function undoArchiveAction() {
@@ -834,7 +860,7 @@ function renderArchiveRoundUI() {
   syncArchiveGlobals()
   saveArchiveState()
   updateArchiveUndoButtonState()
-  updateEndRoundButtonState()
+  updateArchiveEndState()
 }
 
 function renderArchivePrimaryBox(position, item) {
@@ -984,7 +1010,7 @@ function toggleArchiveItem(position) {
   syncArchiveGlobals()
   renderArchiveRoundUI()
   saveArchiveState()
-  updateEndRoundButtonState()
+  updateArchiveEndState()
 }
 
 function addArchiveError() {
@@ -1023,7 +1049,7 @@ function addArchiveError() {
   syncArchiveGlobals()
   renderArchiveRoundUI()
   saveArchiveState()
-  updateEndRoundButtonState()
+  updateArchiveEndState()
 }
 
 function showArchiveAnswer() {
@@ -1090,7 +1116,7 @@ function showArchiveAnswer() {
   syncArchiveGlobals()
   renderArchiveRoundUI()
   saveArchiveState()
-  updateEndRoundButtonState()
+  updateArchiveEndState()
 }
 
 /* =========================
@@ -1135,7 +1161,7 @@ async function setArchiveRound(round) {
   syncArchiveGlobals()
   renderArchiveRoundUI()
   saveArchiveState()
-  updateEndRoundButtonState()
+  updateArchiveEndState()
 }
 
 async function nextArchiveRound() {
@@ -1162,17 +1188,21 @@ async function prevArchiveRound() {
 }
 
 /* =========================
-   End Round Button Fallback
+   Navigation Buttons
 ========================= */
 
-function updateEndRoundButtonState() {
+function updateArchiveNavButtons() {
+  const currentRound = Number(archiveState.round || 1)
+
   const nextBtns = document.querySelectorAll(".archiveNextBtn")
   nextBtns.forEach(btn => {
-    btn.disabled = archiveState.round >= archiveMaxRound
+    btn.disabled =
+      currentRound >= archiveMaxRound ||
+      !isArchiveRoundFinished(currentRound)
   })
 
   const prevBtns = document.querySelectorAll(".archivePrevBtn")
   prevBtns.forEach(btn => {
-    btn.disabled = archiveState.round <= 1
+    btn.disabled = currentRound <= 1
   })
 }

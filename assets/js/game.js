@@ -16,6 +16,9 @@ window.currentModel = currentModel
 
 let currentModelName = localStorage.getItem("game_model_name") || ""
 window.currentModelName = currentModelName
+window.top10MaxRound = Number(localStorage.getItem("top10_max_round") || 3)
+window.auctionMaxNumber = Number(localStorage.getItem("auction_max_number") || 8)
+window.archiveMaxRound = Number(localStorage.getItem("archive_max_round") || 4)
 
 const SEGMENT_STATUS_KEY = "segment_status_v1"
 
@@ -397,6 +400,54 @@ function playGameSound(type) {
     console.log(`sound error [${type}]`, e)
   }
 }
+/* =========================
+   Segment Counts From Admin
+========================= */
+
+async function getDisplaySegmentCount(segment, fallback = 3, max = 4) {
+  if (!currentModel) return fallback
+
+  const { data, error } = await db
+    .from("segment_settings")
+    .select("item_count")
+    .eq("model", Number(currentModel))
+    .eq("segment", segment)
+    .maybeSingle()
+
+  if (error) {
+    console.log("GET DISPLAY SEGMENT COUNT ERROR:", error)
+    return fallback
+  }
+
+  return Math.min(Math.max(Number(data?.item_count || fallback), 1), max)
+}
+
+async function loadDisplaySegmentCounts() {
+  window.top10MaxRound = await getDisplaySegmentCount("top10", 3, 4)
+  window.auctionMaxNumber = await getDisplaySegmentCount("auction", 8, 8)
+  window.archiveMaxRound = await getDisplaySegmentCount("archive", 4, 4)
+
+  localStorage.setItem("top10_max_round", String(window.top10MaxRound))
+  localStorage.setItem("auction_max_number", String(window.auctionMaxNumber))
+  localStorage.setItem("archive_max_round", String(window.archiveMaxRound))
+}
+
+async function loadDisplayCountForSegment(segmentKey) {
+  if (segmentKey === "top10") {
+    window.top10MaxRound = await getDisplaySegmentCount("top10", 3, 4)
+    localStorage.setItem("top10_max_round", String(window.top10MaxRound))
+  }
+
+  if (segmentKey === "auction") {
+    window.auctionMaxNumber = await getDisplaySegmentCount("auction", 8, 8)
+    localStorage.setItem("auction_max_number", String(window.auctionMaxNumber))
+  }
+
+  if (segmentKey === "archive") {
+    window.archiveMaxRound = await getDisplaySegmentCount("archive", 4, 4)
+    localStorage.setItem("archive_max_round", String(window.archiveMaxRound))
+  }
+}
 
 /* =========================
    Helpers
@@ -494,15 +545,15 @@ function stopEndButtonWatcher() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   initWinnerSound()
   initGameSounds()
   bindAudioUnlock()
 
+  await loadDisplaySegmentCounts()
+
   segmentStatus = loadSegmentStatus()
   updateSegmentCards()
-
-  
 
   renderMainHome(true)
 })
@@ -717,8 +768,10 @@ function setSegmentWinnerLabel(key) {
    Open Segment
 ========================= */
 
-function openSegmentPage(segmentKey) {
+async function openSegmentPage(segmentKey) {
   if (segmentStatus[segmentKey]?.locked) return
+
+  await loadDisplayCountForSegment(segmentKey)
 
   homeRefreshLocked = true
   localStorage.setItem("active_segment", segmentKey)
@@ -937,21 +990,22 @@ function endCurrentSegment() {
   segmentStatus[key].winner = winner
 
   saveSegmentStatus()
-updateSegmentCards()
+  updateSegmentCards()
 
-clearInterval(timer)
-timer = null
-localStorage.removeItem("active_segment")
+  clearInterval(timer)
+  timer = null
 
-syncDisplayStateToSession()
-goHome()
+  localStorage.removeItem("active_segment")
+  syncDisplayStateToSession()
+
+  goHome()
 }
 
 function getCurrentSegmentKey() {
   const title = document.querySelector(".segmentTitle")
   if (!title) return null
 
-  const text = title.innerText
+  const text = title.innerText || ""
 
   if (text.includes("التسخين")) return "warmup"
   if (text.includes("Top 10")) return "top10"
@@ -960,7 +1014,14 @@ function getCurrentSegmentKey() {
   if (text.includes("الفاصلة")) return "final"
   if (text.includes("الأرشيف")) return "archive"
 
-  return null
+  return localStorage.getItem("active_segment") || null
+}
+
+function getSafeSegmentNumber(value, fallback, max) {
+  return Math.min(
+    Math.max(Number(value || fallback), 1),
+    max
+  )
 }
 
 function canEndSegment(segmentKey) {
@@ -972,8 +1033,9 @@ function canEndSegment(segmentKey) {
   if (segmentKey === "top10") {
     if (!window.top10State) return false
 
-    const maxRound = Math.min(
-      Math.max(Number(window.top10MaxRound || 3), 1),
+    const maxRound = getSafeSegmentNumber(
+      window.top10MaxRound || localStorage.getItem("top10_max_round"),
+      3,
       4
     )
 
@@ -987,12 +1049,19 @@ function canEndSegment(segmentKey) {
 
   if (segmentKey === "auction") {
     if (!window.auctionState) return false
-    return window.auctionState.usedNumbers.length >= Number(window.auctionMaxNumber || 4)
+
+    const maxNumber = getSafeSegmentNumber(
+      window.auctionMaxNumber || localStorage.getItem("auction_max_number"),
+      8,
+      8
+    )
+
+    return (window.auctionState.usedNumbers || []).length >= maxNumber
   }
 
   if (segmentKey === "who") {
     if (!window.whoState) return false
-    return window.whoState.usedNumbers.length >= 15
+    return (window.whoState.usedNumbers || []).length >= 15
   }
 
   if (segmentKey === "final") {
@@ -1017,13 +1086,15 @@ function canEndSegment(segmentKey) {
   if (segmentKey === "archive") {
     if (!window.archiveState) return false
 
-    const maxRound = Math.min(
-      Math.max(Number(window.archiveMaxRound || 4), 1),
+    const maxRound = getSafeSegmentNumber(
+      window.archiveMaxRound || localStorage.getItem("archive_max_round"),
+      4,
       4
     )
 
     for (let r = 1; r <= maxRound; r++) {
-      const items = window.archiveRoundCache?.[r]?.items || []
+      const roundCache = window.archiveRoundCache?.[r]
+      const items = roundCache?.items || []
 
       if (!items.length) return false
 
@@ -1039,7 +1110,6 @@ function canEndSegment(segmentKey) {
 
   return false
 }
-
 /* =========================
    Leading Team Style
 ========================= */

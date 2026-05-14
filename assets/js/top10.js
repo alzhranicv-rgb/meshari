@@ -1,4 +1,4 @@
-let top10MaxRound = 3
+let top10MaxRound = Number(window.top10MaxRound || localStorage.getItem("top10_max_round") || 3)
 window.top10MaxRound = top10MaxRound
 
 let top10State = {
@@ -47,6 +47,20 @@ function getTop10State() {
   }
 }
 
+function syncTop10Globals() {
+  top10MaxRound = Math.min(Math.max(Number(top10MaxRound || 3), 1), 4)
+
+  window.top10MaxRound = top10MaxRound
+  window.top10State = top10State
+
+  localStorage.setItem("top10_max_round", String(top10MaxRound))
+
+  window.currentSegmentScores = {
+    A: Number(top10State.scores?.A || 0),
+    B: Number(top10State.scores?.B || 0)
+  }
+}
+
 function createEmptyTop10State(maxRound = top10MaxRound) {
   const safeMax = Math.min(Math.max(Number(maxRound || 3), 1), 4)
 
@@ -76,7 +90,6 @@ function createEmptyTop10State(maxRound = top10MaxRound) {
 
 function ensureTop10RoundState() {
   top10MaxRound = Math.min(Math.max(Number(top10MaxRound || 3), 1), 4)
-  window.top10MaxRound = top10MaxRound
 
   if (!top10State.question) top10State.question = {}
   if (!top10State.errors) top10State.errors = {}
@@ -109,15 +122,12 @@ function ensureTop10RoundState() {
     }
   }
 
-  if (Number(top10State.round || 1) > top10MaxRound) {
-    top10State.round = top10MaxRound
-  }
+  top10State.round = Math.min(
+    Math.max(Number(top10State.round || 1), 1),
+    top10MaxRound
+  )
 
-  if (Number(top10State.round || 1) < 1) {
-    top10State.round = 1
-  }
-
-  window.top10State = top10State
+  syncTop10Globals()
 }
 
 function saveTop10State() {
@@ -137,7 +147,10 @@ function saveTop10State() {
   }
 
   localStorage.setItem(TOP10_STORAGE_KEY, JSON.stringify(state))
+  localStorage.setItem("top10_max_round", String(top10MaxRound))
   localStorage.setItem("active_segment", "top10")
+
+  syncTop10Globals()
 
   if (typeof syncDisplayStateToSession === "function") {
     syncDisplayStateToSession()
@@ -146,24 +159,74 @@ function saveTop10State() {
 
 function clearTop10State() {
   localStorage.removeItem(TOP10_STORAGE_KEY)
+  localStorage.removeItem("top10_max_round")
   localStorage.removeItem("active_segment")
 }
 
 function restoreTop10State(saved) {
   if (!saved || !saved.top10State) return
 
-  top10MaxRound = Math.min(Math.max(Number(window.top10MaxRound || top10MaxRound || 3), 1), 4)
-window.top10MaxRound = top10MaxRound
+  top10MaxRound = Math.min(
+    Math.max(
+      Number(
+        window.top10MaxRound ||
+        localStorage.getItem("top10_max_round") ||
+        saved.top10MaxRound ||
+        top10MaxRound ||
+        3
+      ),
+      1
+    ),
+    4
+  )
+
+  window.top10MaxRound = top10MaxRound
+  localStorage.setItem("top10_max_round", String(top10MaxRound))
+
+  const loadedQuestions = top10State?.question ? { ...top10State.question } : {}
 
   top10State = saved.top10State
-  ensureTop10RoundState()
+
+  if (!top10State.question) top10State.question = {}
+  if (!top10State.errors) top10State.errors = {}
+  if (!top10State.opened) top10State.opened = {}
+  if (!top10State.answers) top10State.answers = {}
+
+  for (let r = 1; r <= top10MaxRound; r++) {
+    if (!top10State.question[r]) {
+      top10State.question[r] = loadedQuestions[r] || "السؤال يظهر هنا"
+    }
+
+    if (!top10State.errors[r]) {
+      top10State.errors[r] = { A: 0, B: 0 }
+    }
+
+    if (typeof top10State.errors[r].A !== "number") {
+      top10State.errors[r].A = 0
+    }
+
+    if (typeof top10State.errors[r].B !== "number") {
+      top10State.errors[r].B = 0
+    }
+
+    if (!Array.isArray(top10State.opened[r])) {
+      top10State.opened[r] = []
+    }
+
+    if (!top10State.answers[r]) {
+      top10State.answers[r] = {}
+    }
+  }
+
+  top10State.round = Math.min(
+    Math.max(Number(top10State.round || 1), 1),
+    top10MaxRound
+  )
 
   top10DoubleState = saved.top10DoubleState || {
     used: { A: false, B: false },
     activeTeam: null
   }
-
-  window.top10State = top10State
 
   currentTop10Answer = saved.currentTop10Answer || null
   currentTop10Number = saved.currentTop10Number || null
@@ -171,6 +234,7 @@ window.top10MaxRound = top10MaxRound
   top10AnimatingNumber = null
   top10History = Array.isArray(saved.top10History) ? saved.top10History : []
 
+  syncTop10Globals()
   renderCurrentRoundTop10UI()
 
   const timerValue = Number(saved.timerValue || 0)
@@ -182,13 +246,13 @@ window.top10MaxRound = top10MaxRound
     if (timerBox) timerBox.innerText = timerValue || 0
   }
 
-  window.currentSegmentScores = {
-    A: top10State.scores.A,
-    B: top10State.scores.B
-  }
-
   updateTop10UndoButtonState()
   updateTop10DoubleButton()
+  saveTop10State()
+
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
+  }
 }
 
 /* =========================
@@ -307,8 +371,10 @@ function restoreTop10Snapshot(snapshot) {
   clearInterval(timer)
   timer = null
 
-  top10MaxRound = Math.min(Math.max(Number(snapshot.top10MaxRound || top10MaxRound || 3), 1), 4)
-  window.top10MaxRound = top10MaxRound
+  top10MaxRound = Math.min(
+    Math.max(Number(snapshot.top10MaxRound || top10MaxRound || 3), 1),
+    4
+  )
 
   top10State = cloneTop10Data(snapshot.top10State)
   ensureTop10RoundState()
@@ -318,14 +384,13 @@ function restoreTop10Snapshot(snapshot) {
     activeTeam: null
   })
 
-  window.top10State = top10State
-
   currentTop10Answer = snapshot.currentTop10Answer || null
   currentTop10Number = snapshot.currentTop10Number || null
   top10TimerStarted = !!snapshot.top10TimerStarted
   top10LastTickPlayed = null
   top10AnimatingNumber = null
 
+  syncTop10Globals()
   renderCurrentRoundTop10UI()
 
   const timerValue = Number(snapshot.timerValue || 0)
@@ -337,14 +402,13 @@ function restoreTop10Snapshot(snapshot) {
     if (timerBox) timerBox.innerText = timerValue || 0
   }
 
-  window.currentSegmentScores = {
-    A: top10State.scores.A,
-    B: top10State.scores.B
-  }
-
   updateTop10UndoButtonState()
   updateTop10DoubleButton()
   saveTop10State()
+
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
+  }
 }
 
 function undoTop10Action() {
@@ -369,22 +433,31 @@ function updateTop10UndoButtonState() {
 ========================= */
 
 async function loadTop10MaxRound() {
+  if (!currentModel) {
+    top10MaxRound = 3
+    window.top10MaxRound = top10MaxRound
+    localStorage.setItem("top10_max_round", String(top10MaxRound))
+    return top10MaxRound
+  }
+
   const { data, error } = await db
     .from("segment_settings")
     .select("item_count")
-    .eq("model", currentModel)
+    .eq("model", Number(currentModel))
     .eq("segment", "top10")
     .maybeSingle()
 
   if (error) {
     console.log(error)
     top10MaxRound = 3
-    window.top10MaxRound = top10MaxRound
-    return
+  } else {
+    top10MaxRound = Math.min(Math.max(Number(data?.item_count || 3), 1), 4)
   }
 
-  top10MaxRound = Math.min(Math.max(Number(data?.item_count || 3), 1), 4)
   window.top10MaxRound = top10MaxRound
+  localStorage.setItem("top10_max_round", String(top10MaxRound))
+
+  return top10MaxRound
 }
 
 /* =========================
@@ -392,9 +465,9 @@ async function loadTop10MaxRound() {
 ========================= */
 
 window.renderTop10 = async function () {
-  const saved = getTop10State()
-
   await loadTop10MaxRound()
+
+  const saved = getTop10State()
 
   top10State = createEmptyTop10State(top10MaxRound)
   ensureTop10RoundState()
@@ -404,8 +477,7 @@ window.renderTop10 = async function () {
     activeTeam: null
   }
 
-  window.top10State = top10State
-  window.currentSegmentScores = { A: 0, B: 0 }
+  syncTop10Globals()
 
   currentTop10Answer = null
   currentTop10Number = null
@@ -428,6 +500,10 @@ window.renderTop10 = async function () {
     updateTop10UndoButtonState()
     updateTop10DoubleButton()
     saveTop10State()
+  }
+
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
   }
 }
 
@@ -456,7 +532,9 @@ async function loadTop10RoundQuestion(round) {
   }
 
   top10State.question[round] =
-    data && data.length > 0 ? data[0].question || "السؤال يظهر هنا" : "السؤال يظهر هنا"
+    data && data.length > 0
+      ? data[0].question || "السؤال يظهر هنا"
+      : "السؤال يظهر هنا"
 }
 
 function buildTop10HTML() {
@@ -694,11 +772,7 @@ async function openTop10Number(num) {
     top10State.activeTeam = null
   }
 
-  window.top10State = top10State
-  window.currentSegmentScores = {
-    A: top10State.scores.A,
-    B: top10State.scores.B
-  }
+  syncTop10Globals()
 
   if (top10State.activeTeam) {
     autoStartTop10Timer()
@@ -715,10 +789,18 @@ async function openTop10Number(num) {
   updateTop10UIOnly()
   saveTop10State()
 
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
+  }
+
   setTimeout(() => {
     top10AnimatingNumber = null
     updateTop10UIOnly()
     saveTop10State()
+
+    if (typeof updateEndRoundButtonState === "function") {
+      updateEndRoundButtonState()
+    }
   }, 1400)
 }
 
@@ -766,10 +848,14 @@ async function revealAllTop10Answers() {
   })
 
   top10AnimatingNumber = null
-  window.top10State = top10State
 
+  syncTop10Globals()
   updateTop10UIOnly()
   saveTop10State()
+
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
+  }
 }
 
 function addTop10Error() {
@@ -809,8 +895,7 @@ function addTop10Error() {
       top10State.errors[round][otherTeam] < 3 ? otherTeam : team
   }
 
-  window.top10State = top10State
-
+  syncTop10Globals()
   updateTop10UIOnly()
 
   if (top10State.activeTeam) {
@@ -826,6 +911,10 @@ function addTop10Error() {
   }
 
   saveTop10State()
+
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
+  }
 }
 
 /* =========================
@@ -900,10 +989,7 @@ function updateTop10Scores() {
   if (a) a.innerText = top10State.scores.A
   if (b) b.innerText = top10State.scores.B
 
-  window.currentSegmentScores = {
-    A: top10State.scores.A,
-    B: top10State.scores.B
-  }
+  syncTop10Globals()
 }
 
 function updateTop10UIOnly() {
@@ -1051,9 +1137,13 @@ async function nextTop10Round() {
 
     await loadTop10RoundQuestion(top10State.round)
 
-    window.top10State = top10State
+    syncTop10Globals()
     renderCurrentRoundTop10UI()
     saveTop10State()
+
+    if (typeof updateEndRoundButtonState === "function") {
+      updateEndRoundButtonState()
+    }
   })
 }
 
@@ -1083,9 +1173,13 @@ async function prevTop10Round() {
 
     await loadTop10RoundQuestion(top10State.round)
 
-    window.top10State = top10State
+    syncTop10Globals()
     renderCurrentRoundTop10UI()
     saveTop10State()
+
+    if (typeof updateEndRoundButtonState === "function") {
+      updateEndRoundButtonState()
+    }
   })
 }
 

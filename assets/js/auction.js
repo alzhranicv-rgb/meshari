@@ -1,3 +1,7 @@
+/* =========================
+   Auction - Display
+========================= */
+
 let auctionState = {
   usedNumbers: [],
   scoreA: 0,
@@ -18,15 +22,21 @@ let auctionDoubleState = {
 let currentAuctionAnswer = ""
 let currentAuctionImage = ""
 let currentAuctionNote = ""
-let auctionMaxNumber = 4
 
-window.auctionMaxNumber = auctionMaxNumber
+window.auctionMaxNumber = Number(
+  window.auctionMaxNumber ||
+  localStorage.getItem("auction_max_number") ||
+  8
+)
+
+var auctionMaxNumber = window.auctionMaxNumber
 
 let auctionHistory = []
 const AUCTION_HISTORY_LIMIT = 50
 
 let auctionTimerStarted = false
 let auctionLastTickPlayed = null
+let auctionDoublePickMode = false
 
 const AUCTION_STORAGE_KEY = "auction_state_v2"
 
@@ -42,8 +52,21 @@ function getAuctionState() {
   }
 }
 
+function syncAuctionGlobals() {
+  window.auctionState = auctionState
+  window.auctionMaxNumber = auctionMaxNumber
+  localStorage.setItem("auction_max_number", String(auctionMaxNumber))
+
+  window.currentSegmentScores = {
+    A: Number(auctionState.scoreA || 0),
+    B: Number(auctionState.scoreB || 0)
+  }
+}
+
 function saveAuctionState() {
   const timerBox = document.getElementById("auctionTimer")
+
+  auctionMaxNumber = Math.min(Math.max(Number(auctionMaxNumber || 8), 1), 8)
 
   const safe = {
     auctionState: JSON.parse(JSON.stringify(auctionState)),
@@ -58,13 +81,9 @@ function saveAuctionState() {
 
   localStorage.setItem(AUCTION_STORAGE_KEY, JSON.stringify(safe))
   localStorage.setItem("active_segment", "auction")
+  localStorage.setItem("auction_max_number", String(auctionMaxNumber))
 
-  window.auctionState = auctionState
-  window.auctionMaxNumber = auctionMaxNumber
-  window.currentSegmentScores = {
-    A: auctionState.scoreA,
-    B: auctionState.scoreB
-  }
+  syncAuctionGlobals()
 
   if (typeof syncDisplayStateToSession === "function") {
     syncDisplayStateToSession()
@@ -73,6 +92,23 @@ function saveAuctionState() {
 
 function restoreAuctionState(saved) {
   if (!saved) return
+
+  auctionMaxNumber = Math.min(
+    Math.max(
+      Number(
+        window.auctionMaxNumber ||
+        localStorage.getItem("auction_max_number") ||
+        saved.auctionMaxNumber ||
+        auctionMaxNumber ||
+        8
+      ),
+      1
+    ),
+    8
+  )
+
+  window.auctionMaxNumber = auctionMaxNumber
+  localStorage.setItem("auction_max_number", String(auctionMaxNumber))
 
   auctionState = saved.auctionState || {
     usedNumbers: [],
@@ -84,33 +120,75 @@ function restoreAuctionState(saved) {
     activeTeam: null
   }
 
+  if (!Array.isArray(auctionState.usedNumbers)) {
+    auctionState.usedNumbers = []
+  }
+
+  auctionState.usedNumbers = auctionState.usedNumbers
+    .map(n => Number(n))
+    .filter(n => n >= 1 && n <= auctionMaxNumber)
+
+  auctionState.scoreA = Number(auctionState.scoreA || 0)
+  auctionState.scoreB = Number(auctionState.scoreB || 0)
+
   auctionDoubleState = saved.auctionDoubleState || {
     used: { A: false, B: false },
     activeTeam: null
   }
 
-  window.auctionState = auctionState
+  if (!auctionDoubleState.used) {
+    auctionDoubleState.used = { A: false, B: false }
+  }
 
   currentAuctionAnswer = saved.currentAuctionAnswer || ""
   currentAuctionImage = saved.currentAuctionImage || ""
   currentAuctionNote = saved.currentAuctionNote || ""
-  auctionMaxNumber = Number(saved.auctionMaxNumber || 4)
-  window.auctionMaxNumber = auctionMaxNumber
 
   auctionTimerStarted = !!saved.auctionTimerStarted
   auctionLastTickPlayed = null
+  auctionDoublePickMode = false
 
-  window.currentSegmentScores = {
-    A: auctionState.scoreA,
-    B: auctionState.scoreB
+  syncAuctionGlobals()
+}
+
+/* =========================
+   Settings
+========================= */
+
+async function loadAuctionMaxNumber() {
+  if (!currentModel) {
+    auctionMaxNumber = 8
+    window.auctionMaxNumber = auctionMaxNumber
+    localStorage.setItem("auction_max_number", String(auctionMaxNumber))
+    return auctionMaxNumber
   }
+
+  const { data, error } = await db
+    .from("segment_settings")
+    .select("item_count")
+    .eq("model", Number(currentModel))
+    .eq("segment", "auction")
+    .maybeSingle()
+
+  if (error) {
+    console.log(error)
+    auctionMaxNumber = 8
+  } else {
+    auctionMaxNumber = Math.min(
+      Math.max(Number(data?.item_count || 8), 1),
+      8
+    )
+  }
+
+  window.auctionMaxNumber = auctionMaxNumber
+  localStorage.setItem("auction_max_number", String(auctionMaxNumber))
+
+  return auctionMaxNumber
 }
 
 /* =========================
    Double
 ========================= */
-
-let auctionDoublePickMode = false
 
 function selectAuctionTeam(team) {
   if (auctionDoublePickMode) {
@@ -222,6 +300,7 @@ function updateAuctionDoubleButton() {
   btn.disabled = false
   btn.innerText = "دوبيلا"
 }
+
 /* =========================
    Undo
 ========================= */
@@ -232,12 +311,14 @@ function cloneAuctionData(data) {
 
 function createAuctionSnapshot() {
   const timerBox = document.getElementById("auctionTimer")
+
   return {
     auctionState: cloneAuctionData(auctionState),
     auctionDoubleState: cloneAuctionData(auctionDoubleState),
     currentAuctionAnswer,
     currentAuctionImage,
     currentAuctionNote,
+    auctionMaxNumber,
     auctionTimerStarted,
     timerValue: timerBox ? Number(timerBox.innerText || 0) : 0
   }
@@ -265,7 +346,10 @@ function restoreAuctionSnapshot(snapshot) {
     activeTeam: null
   })
 
-  window.auctionState = auctionState
+  auctionMaxNumber = Math.min(
+    Math.max(Number(snapshot.auctionMaxNumber || auctionMaxNumber || 8), 1),
+    8
+  )
 
   currentAuctionAnswer = snapshot.currentAuctionAnswer || ""
   currentAuctionImage = snapshot.currentAuctionImage || ""
@@ -273,6 +357,9 @@ function restoreAuctionSnapshot(snapshot) {
 
   auctionTimerStarted = !!snapshot.auctionTimerStarted
   auctionLastTickPlayed = null
+  auctionDoublePickMode = false
+
+  syncAuctionGlobals()
 
   updateAuctionScoresOnly()
   updateAuctionGridOnly()
@@ -282,9 +369,10 @@ function restoreAuctionSnapshot(snapshot) {
   updateAuctionAnswerButton()
   updateAuctionDoubleButton()
   updateAuctionUndoButtonState()
-  updateEndRoundButtonState()
 
-
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
+  }
 
   saveAuctionState()
 }
@@ -302,6 +390,7 @@ function undoAuctionAction() {
 function updateAuctionUndoButtonState() {
   const btn = document.getElementById("auctionUndoBtn")
   if (!btn) return
+
   btn.disabled = auctionHistory.length === 0
 }
 
@@ -313,6 +402,7 @@ window.renderAuction = async function () {
   auctionHistory = []
   auctionTimerStarted = false
   auctionLastTickPlayed = null
+  auctionDoublePickMode = false
 
   clearInterval(timer)
   timer = null
@@ -339,12 +429,11 @@ window.renderAuction = async function () {
       activeTeam: null
     }
 
-    window.auctionState = auctionState
-    window.currentSegmentScores = { A: 0, B: 0 }
-
     currentAuctionAnswer = ""
     currentAuctionImage = ""
     currentAuctionNote = ""
+
+    syncAuctionGlobals()
   }
 
   openSegment("فتبلة", buildAuctionHTML())
@@ -357,34 +446,12 @@ window.renderAuction = async function () {
   updateAuctionAnswerButton()
   updateAuctionDoubleButton()
   updateAuctionUndoButtonState()
-  updateEndRoundButtonState()
 
-
-
-  saveAuctionState()
-}
-
-async function loadAuctionMaxNumber() {
-  const { data, error } = await db
-    .from("segment_settings")
-    .select("item_count")
-    .eq("model", currentModel)
-    .eq("segment", "auction")
-    .maybeSingle()
-
-  if (error) {
-    console.log(error)
-    auctionMaxNumber = 8
-    window.auctionMaxNumber = auctionMaxNumber
-    return
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
   }
 
-  auctionMaxNumber = Math.min(
-    Math.max(Number(data?.item_count || 8), 1),
-    8
-  )
-
-  window.auctionMaxNumber = auctionMaxNumber
+  saveAuctionState()
 }
 
 /* =========================
@@ -399,6 +466,24 @@ function getAuctionTurnName() {
 
 function updateAuctionAnswerButton() {}
 
+function resetAuctionTimer() {
+  clearInterval(timer)
+  timer = null
+  auctionTimerStarted = false
+  auctionLastTickPlayed = null
+}
+
+function isAuctionFinished() {
+  const maxNumber = Math.min(
+    Math.max(Number(window.auctionMaxNumber || auctionMaxNumber || 8), 1),
+    8
+  )
+
+  return (window.auctionState?.usedNumbers || []).length >= maxNumber &&
+    !window.auctionState?.pendingScore &&
+    !window.auctionState?.currentQuestionNumber
+}
+
 /* =========================
    HTML
 ========================= */
@@ -409,18 +494,26 @@ function buildAuctionHTML() {
 
       <div class="auctionTopBar">
 
-        <div class="auctionTeamCard ${auctionState.activeTeam === "A" ? "activeTeam" : ""}" onclick="selectAuctionTeam('A')" id="auctionTeamABox">
+        <div
+          class="auctionTeamCard ${auctionState.activeTeam === "A" ? "activeTeam" : ""}"
+          onclick="selectAuctionTeam('A')"
+          id="auctionTeamABox"
+        >
           <div class="auctionTeamName">${teamAName}</div>
           <div class="auctionTeamScore" id="auctionScoreA">${auctionState.scoreA}</div>
         </div>
 
         <div class="auctionMiddleCard">
-  <div class="auctionTurnLabel" id="auctionTurnText">
-    ${auctionState.activeTeam ? ` ${getAuctionTurnName()}` : "بدون فريق"}
-  </div>
-</div>
+          <div class="auctionTurnLabel" id="auctionTurnText">
+            ${auctionState.activeTeam ? getAuctionTurnName() : "بدون فريق"}
+          </div>
+        </div>
 
-        <div class="auctionTeamCard ${auctionState.activeTeam === "B" ? "activeTeam" : ""}" onclick="selectAuctionTeam('B')" id="auctionTeamBBox">
+        <div
+          class="auctionTeamCard ${auctionState.activeTeam === "B" ? "activeTeam" : ""}"
+          onclick="selectAuctionTeam('B')"
+          id="auctionTeamBBox"
+        >
           <div class="auctionTeamName">${teamBName}</div>
           <div class="auctionTeamScore" id="auctionScoreB">${auctionState.scoreB}</div>
         </div>
@@ -436,11 +529,7 @@ function buildAuctionHTML() {
       </div>
 
       <div class="auctionControlPanel">
-        <button onclick="activateAuctionDouble()" id="auctionDoubleBtn" class="auctionDoubleBtn">دبل</button>
-        
-
-        
-
+        <button onclick="activateAuctionDouble()" id="auctionDoubleBtn" class="auctionDoubleBtn">دوبيلا</button>
         <button onclick="auctionCorrect()" class="btnCorrect">✓ إجابة صحيحة</button>
         <button onclick="auctionWrong()" class="btnWrong">✕ خطأ</button>
         <button onclick="undoAuctionAction()" id="auctionUndoBtn" class="undoBtn">تراجع</button>
@@ -453,7 +542,9 @@ function buildAuctionHTML() {
 function createAuctionGrid() {
   let html = ""
 
-  for (let i = 1; i <= auctionMaxNumber; i++) {
+  const maxNumber = Math.min(Math.max(Number(auctionMaxNumber || 8), 1), 8)
+
+  for (let i = 1; i <= maxNumber; i++) {
     const used = auctionState.usedNumbers.includes(i)
 
     html += `
@@ -508,15 +599,16 @@ function buildAuctionContentHTML() {
 
 function updateAuctionTurnBox() {
   const turnBox = document.getElementById("auctionTurnText")
-  if (turnBox) {
-    turnBox.innerText = auctionState.activeTeam
-      ? " " + getAuctionTurnName()
-      : "بدون فريق"
-  }
+  if (!turnBox) return
+
+  turnBox.innerText = auctionState.activeTeam
+    ? getAuctionTurnName()
+    : "بدون فريق"
 }
 
 function renderAuctionContent() {
   const box = document.getElementById("auctionQuestionBox")
+
   if (box) {
     box.innerHTML = buildAuctionContentHTML()
 
@@ -533,7 +625,6 @@ function renderAuctionContent() {
   updateAuctionAnswerButton()
   updateAuctionDoubleButton()
 }
-
 
 /* =========================
    Open Card
@@ -558,17 +649,18 @@ async function openAuction(number) {
   currentAuctionImage = ""
   currentAuctionNote = ""
 
-  clearInterval(timer)
-  timer = null
-  auctionTimerStarted = false
-  auctionLastTickPlayed = null
+  resetAuctionTimer()
 
   updateAuctionGridOnly()
   highlightAuctionActiveTeam()
   renderAuctionContent()
   updateAuctionDoubleButton()
   updateAuctionUndoButtonState()
-  updateEndRoundButtonState()
+
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
+  }
+
   saveAuctionState()
 
   await loadAuctionCurrent()
@@ -608,23 +700,12 @@ function highlightAuctionActiveTeam() {
   a.classList.remove("activeTeam")
   b.classList.remove("activeTeam")
 
-  if (auctionState.activeTeam === "A") {
-    a.classList.add("activeTeam")
-  }
-
-  if (auctionState.activeTeam === "B") {
-    b.classList.add("activeTeam")
-  }
+  if (auctionState.activeTeam === "A") a.classList.add("activeTeam")
+  if (auctionState.activeTeam === "B") b.classList.add("activeTeam")
 
   updateAuctionDoubleButton()
 }
 
-function resetAuctionTimer() {
-  clearInterval(timer)
-  timer = null
-  auctionTimerStarted = false
-  auctionLastTickPlayed = null
-}
 /* =========================
    Scores / Grid
 ========================= */
@@ -652,6 +733,7 @@ function updateAuctionGridOnly() {
 /* =========================
    Answer / Result Buttons
 ========================= */
+
 function closeAuctionZoomOverlays() {
   const auctionOverlay = document.getElementById("auctionImageOverlay")
   if (auctionOverlay) auctionOverlay.remove()
@@ -739,7 +821,8 @@ function auctionCorrect() {
   if (team === "A") auctionState.scoreA += points
   if (team === "B") auctionState.scoreB += points
 
-  auctionDoubleState.activeTeam = null
+  clearAuctionActiveDouble(team)
+  auctionDoublePickMode = false
 
   renderAuctionContent()
   playGameSound("correct")
@@ -751,20 +834,7 @@ function auctionCorrect() {
   saveAuctionState()
 
   setTimeout(() => {
-    auctionState.currentQuestionNumber = null
-    auctionState.answerShown = false
-    auctionState.activeTeam = null
-
-    currentAuctionAnswer = ""
-    currentAuctionImage = ""
-    currentAuctionNote = ""
-
-    highlightAuctionActiveTeam()
-    renderAuctionContent()
-    updateAuctionTurnBox()
-    updateAuctionDoubleButton()
-    updateEndRoundButtonState()
-    saveAuctionState()
+    finalizeAuctionTurn()
   }, 10000)
 }
 
@@ -777,6 +847,7 @@ function auctionWrong() {
   pushAuctionHistory()
 
   auctionDoubleState.activeTeam = null
+  auctionDoublePickMode = false
 
   playGameSound("wrong")
 
@@ -805,10 +876,13 @@ function finalizeAuctionTurn() {
   renderAuctionContent()
   updateAuctionTurnBox()
   updateAuctionDoubleButton()
-  updateEndRoundButtonState()
+
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
+  }
+
   saveAuctionState()
 }
-
 
 /* =========================
    Image Overlay

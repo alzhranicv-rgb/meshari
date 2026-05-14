@@ -886,72 +886,6 @@ th{
   100%{ opacity:0; }
 }
 
-/* =========================
-   GLOBAL CONTROL BUTTON COLORS
-   فقط داخل شاشة العرض
-========================= */
-
-.warmupControlPanel .startBtn,
-.top10ControlPanel .top10StartBtn,
-.top10ControlPanel .startBtn,
-.auctionControlPanel .startBtn,
-.whoControlPanel .startBtn,
-.finalControlsBar .startBtn,
-.archiveControlButtons .startBtn,
-.archiveTimerBtn{
-  background:var(--ctrl-start) !important;
-  color:#0F2B33 !important;
-}
-
-.warmupControlPanel .btnAnswer,
-.top10ControlPanel .btnAnswer,
-.auctionControlPanel .btnAnswer,
-.whoControlPanel .btnAnswer,
-.finalControlsBar .btnAnswer,
-.archiveControlButtons .archiveAnswerBtn{
-  background:var(--ctrl-answer) !important;
-  color:#FFFFFF !important;
-}
-
-.warmupControlPanel .btnCorrect,
-.top10ControlPanel .btnCorrect,
-.auctionControlPanel .btnCorrect,
-.whoControlPanel .btnCorrect,
-.finalControlsBar .btnCorrect{
-  background:var(--ctrl-correct) !important;
-  color:#17351C !important;
-}
-
-.warmupControlPanel .btnWrong,
-.top10ControlPanel .btnWrong,
-.top10ControlPanel .top10ErrorBtnSingle,
-.auctionControlPanel .btnWrong,
-.whoControlPanel .btnWrong,
-.finalControlsBar .btnWrong,
-.archiveControlButtons .archiveErrorBtn{
-  background:var(--ctrl-wrong) !important;
-  color:#FFFFFF !important;
-}
-
-.warmupControlPanel .undoBtn,
-.top10ControlPanel .undoBtn,
-.auctionControlPanel .undoBtn,
-.whoControlPanel .undoBtn,
-.finalControlsBar .undoBtn,
-.archiveControlButtons .archiveUndoBtn{
-  background:var(--ctrl-undo) !important;
-  color:#FFFFFF !important;
-}
-
-.top10ControlPanel .roundNavBtn,
-.auctionControlPanel .roundNavBtn,
-.whoControlPanel .roundNavBtn,
-.finalControlsBar .roundNavBtn,
-.archiveControlButtons .archiveNextBtn,
-.archiveControlButtons .archivePrevBtn{
-  background:var(--ctrl-nav) !important;
-  color:#2F4158 !important;
-}
 
 /* =========================
    PRESENTER MODE
@@ -1428,4 +1362,427 @@ body.presenterHideDisplayControls .finalControlsBar{
     transform:scale(1);
     filter:none;
   }
+}
+
+/* =========================
+   FINAL UNIFIED CONTROL BUTTON COLORS
+   ضع هذا آخر ملف CSS بالكامل
+========================= */
+
+:root{
+  --ctrl-back-end:#0A7C6E;
+  --ctrl-nav:#202940;
+  --ctrl-undo:#7F2020;
+  --ctrl-wrong:#DB1A1A;
+  --ctrl-correct:#237227;
+  --ctrl-double:#450693;
+  --ctrl-disabled:#D8DFDF;
+  --ctrl-disabled-text:#8A969B;
+}
+
+/* =========================
+   الأساس لكل أزرار التحكم
+========================= */
+
+.segmentControls button,
+.warmupControlPanel button,
+.top10ControlPanel button,
+.auctionControlPanel button,
+.whoControlPanel button,
+.finalControlsBar button,
+.archiveControlButtons button,
+.archiveSideTimerBox button,
+.presenterControls button,
+.presenterControlPanel button,
+.presenterTopControls button{
+  border:0 !important;
+  color:#FFFFFF !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-weight:400 !important;
+  box-shadow:
+    0 10px 22px rgba(32,41,64,.22),
+    inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+
+/* =========================
+   رجوع + إنهاء
+   اللون: 0A7C6E
+========================= */
+
+.backBtn,
+.endBtn,
+.segmentControls .backBtn,
+.segmentControls .endBtn,
+.presenterBackBtn,
+.presenterEndBtn,
+button[onclick="goHome()"],
+button[onclick="endCurrentSegment()"]{
+  background:var(--ctrl-back-end) !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(10,124,110,.28),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* =========================
+   انتقال الجولات / التالي / السابق / تبديل الدور
+   اللون: 202940
+========================= */
+
+.roundNavBtn,
+.switchTurnBtn,
+.nextRoundBtn,
+.prevRoundBtn,
+.archiveNextBtn,
+.archivePrevBtn,
+.finalNextBtn,
+.finalPrevBtn,
+.presenterNextBtn,
+.presenterPrevBtn,
+button[onclick*="next"],
+button[onclick*="prev"],
+button[onclick*="Next"],
+button[onclick*="Prev"],
+button[onclick*="switchTop10Turn"],
+.top10ControlPanel .roundNavBtn,
+.auctionControlPanel .roundNavBtn,
+.whoControlPanel .roundNavBtn,
+.finalControlsBar .roundNavBtn,
+.archiveControlButtons .archiveNextBtn,
+.archiveControlButtons .archivePrevBtn{
+  background:var(--ctrl-nav) !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(32,41,64,.30),
+    inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+
+/* =========================
+   تراجع
+   اللون: 7F2020
+========================= */
+
+.undoBtn,
+.archiveUndoBtn,
+.presenterUndoBtn,
+button[onclick*="undo"],
+button[onclick*="Undo"],
+.warmupControlPanel .undoBtn,
+.top10ControlPanel .undoBtn,
+.auctionControlPanel .undoBtn,
+.whoControlPanel .undoBtn,
+.finalControlsBar .undoBtn,
+.archiveControlButtons .archiveUndoBtn{
+  background:var(--ctrl-undo) !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(127,32,32,.28),
+    inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+
+/* =========================
+   الخطأ
+   اللون: DB1A1A
+========================= */
+
+.btnWrong,
+.wrongBtn,
+.errorBtn,
+.top10ErrorBtnSingle,
+.archiveErrorBtn,
+.presenterWrongBtn,
+button[onclick*="Wrong"],
+button[onclick*="wrong"],
+button[onclick*="Error"],
+button[onclick*="error"],
+button[onclick*="addTop10Error"],
+button[onclick*="addArchiveError"],
+.warmupControlPanel .btnWrong,
+.top10ControlPanel .btnWrong,
+.top10ControlPanel .top10ErrorBtnSingle,
+.auctionControlPanel .btnWrong,
+.whoControlPanel .btnWrong,
+.finalControlsBar .btnWrong,
+.archiveControlButtons .archiveErrorBtn{
+  background:var(--ctrl-wrong) !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(219,26,26,.30),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* =========================
+   الصح
+   اللون: 237227
+========================= */
+
+.btnCorrect,
+.correctBtn,
+.archiveCorrectBtn,
+.presenterCorrectBtn,
+button[onclick*="Correct"],
+button[onclick*="correct"],
+button[onclick*="auctionCorrect"],
+.warmupControlPanel .btnCorrect,
+.top10ControlPanel .btnCorrect,
+.auctionControlPanel .btnCorrect,
+.whoControlPanel .btnCorrect,
+.finalControlsBar .btnCorrect{
+  background:var(--ctrl-correct) !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(35,114,39,.30),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* =========================
+   الدبل / الدوبيلا
+   اللون: 450693
+========================= */
+
+.top10DoubleBtn,
+.auctionDoubleBtn,
+.archiveDoubleBtn,
+.doubleBtn,
+.presenterDoubleBtn,
+button[onclick*="Double"],
+button[onclick*="double"],
+button[onclick*="activateTop10Double"],
+button[onclick*="activateAuctionDouble"],
+button[onclick*="activateArchiveDouble"],
+.top10ControlPanel .top10DoubleBtn,
+.auctionControlPanel .auctionDoubleBtn,
+.archiveControlButtons .archiveDoubleBtn{
+  background:var(--ctrl-double) !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(69,6,147,.32),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+.top10DoubleBtn.activeDouble,
+.auctionDoubleBtn.activeDouble,
+.archiveDoubleBtn.activeDouble,
+.doubleBtn.activeDouble,
+button.activeDouble{
+  background:var(--ctrl-double) !important;
+  color:#FFFFFF !important;
+  box-shadow:
+    0 0 0 4px rgba(69,6,147,.18),
+    0 12px 26px rgba(69,6,147,.34),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* =========================
+   إظهار الإجابة
+   حالياً نفس لون انتقال الجولات
+========================= */
+
+.btnAnswer,
+.answerBtn,
+.archiveAnswerBtn,
+.presenterAnswerBtn,
+button[onclick*="Answer"],
+button[onclick*="answer"],
+button[onclick*="showTop10Answer"],
+button[onclick*="showArchiveAnswer"],
+.warmupControlPanel .btnAnswer,
+.top10ControlPanel .btnAnswer,
+.auctionControlPanel .btnAnswer,
+.whoControlPanel .btnAnswer,
+.finalControlsBar .btnAnswer,
+.archiveControlButtons .archiveAnswerBtn{
+  background:var(--ctrl-nav) !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(32,41,64,.30),
+    inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+
+/* =========================
+   المؤقت / بداية السؤال
+   نفس لون رجوع وإنهاء
+========================= */
+
+.startBtn,
+.top10StartBtn,
+.archiveTimerBtn,
+.timerBtn,
+.presenterTimerBtn,
+button[onclick*="Timer"],
+button[onclick*="timer"],
+button[onclick*="startQuestion"],
+button[onclick*="startArchiveTimer"]{
+  background:var(--ctrl-back-end) !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(10,124,110,.28),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* =========================
+   Hover / Active
+========================= */
+
+.segmentControls button:hover,
+.warmupControlPanel button:hover,
+.top10ControlPanel button:hover,
+.auctionControlPanel button:hover,
+.whoControlPanel button:hover,
+.finalControlsBar button:hover,
+.archiveControlButtons button:hover,
+.archiveSideTimerBox button:hover{
+  filter:brightness(1.05) !important;
+  transform:translateY(-2px) !important;
+}
+
+.segmentControls button:active,
+.warmupControlPanel button:active,
+.top10ControlPanel button:active,
+.auctionControlPanel button:active,
+.whoControlPanel button:active,
+.finalControlsBar button:active,
+.archiveControlButtons button:active,
+.archiveSideTimerBox button:active{
+  transform:scale(.96) !important;
+}
+
+/* =========================
+   المعطل
+========================= */
+
+button:disabled,
+button.disabledEndBtn,
+.endBtn:disabled,
+.endBtn.disabledEndBtn,
+.segmentControls .endBtn:disabled,
+.warmupControlPanel button:disabled,
+.top10ControlPanel button:disabled,
+.auctionControlPanel button:disabled,
+.whoControlPanel button:disabled,
+.finalControlsBar button:disabled,
+.archiveControlButtons button:disabled,
+.archiveSideTimerBox button:disabled{
+  background:var(--ctrl-disabled) !important;
+  color:var(--ctrl-disabled-text) !important;
+  border:0 !important;
+  box-shadow:none !important;
+  opacity:.78 !important;
+  cursor:not-allowed !important;
+  transform:none !important;
+  filter:none !important;
+}
+/* =========================
+   EXTRA CONTROL COLORS FIX
+   ضعها آخر ملف CSS بالكامل
+========================= */
+
+:root{
+  --ctrl-answer-green:#06923E;
+  --ctrl-timer-comp:#64E2B7;
+}
+
+/* إظهار الإجابات */
+.btnAnswer,
+.answerBtn,
+.archiveAnswerBtn,
+.presenterAnswerBtn,
+button[onclick*="showTop10Answer"],
+button[onclick*="showArchiveAnswer"],
+button[onclick*="showAnswer"],
+button[onclick*="showFinalAnswer"],
+.warmupControlPanel .btnAnswer,
+.top10ControlPanel .btnAnswer,
+.auctionControlPanel .btnAnswer,
+.whoControlPanel .btnAnswer,
+.finalControlsBar .btnAnswer,
+.archiveControlButtons .archiveAnswerBtn{
+  background:#06923E !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(6,146,62,.30),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* تسجيل نتيجة المبعثرة + تسجيل نتيجة التلميح */
+.scrambleScoreBtn,
+.hintScoreBtn,
+.finalScrambleScoreBtn,
+.finalHintScoreBtn,
+button[onclick*="scoreScramble"],
+button[onclick*="scoreHint"],
+button[onclick*="addScrambleScore"],
+button[onclick*="addHintScore"],
+button[onclick*="finalRound2Score"],
+button[onclick*="scoreFinalRound2"],
+.finalControlsBar .scrambleScoreBtn,
+.finalControlsBar .hintScoreBtn{
+  background:#06923E !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(6,146,62,.30),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* التعويض */
+.compensationBtn,
+.compensateBtn,
+.replaceBtn,
+.substituteBtn,
+button[onclick*="compensation"],
+button[onclick*="Compensation"],
+button[onclick*="compensate"],
+button[onclick*="Compensate"],
+button[onclick*="replace"],
+button[onclick*="Replace"],
+button[onclick*="substitute"],
+button[onclick*="Substitute"]{
+  background:#64E2B7 !important;
+  color:#12362D !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(100,226,183,.30),
+    inset 0 1px 0 rgba(255,255,255,.35) !important;
+}
+
+/* العداد / المؤقت */
+.startBtn,
+.top10StartBtn,
+.archiveTimerBtn,
+.timerBtn,
+.presenterTimerBtn,
+button[onclick*="Timer"],
+button[onclick*="timer"],
+button[onclick*="startQuestion"],
+button[onclick*="startArchiveTimer"],
+button[onclick*="startTop10Timer"],
+button[onclick*="startWarmupTimer"],
+button[onclick*="startFinalTimer"]{
+  background:#64E2B7 !important;
+  color:#12362D !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(100,226,183,.30),
+    inset 0 1px 0 rgba(255,255,255,.35) !important;
+}
+
+/* الحالة النشطة أو الهوفر لنفس الأزرار */
+.btnAnswer:hover,
+.scrambleScoreBtn:hover,
+.hintScoreBtn:hover,
+.compensationBtn:hover,
+.compensateBtn:hover,
+.timerBtn:hover,
+.archiveTimerBtn:hover{
+  filter:brightness(1.05) !important;
 }

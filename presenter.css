@@ -1893,3 +1893,296 @@
     min-height:48px;
   }
 }
+/* =========================
+   PRESENTER CONTROL BUTTON COLORS
+   توحيد أزرار لوحة المقدم مع العرض
+   ضعها آخر ملف CSS
+========================= */
+
+/* زر الرجوع / الرئيسية */
+.presenterHomeBtn,
+.presenterBackBtn,
+.presenterGoHomeBtn,
+.presenterHeaderBtn,
+.presenterTopBtn,
+.presenterControlBtn.home,
+.presenterControlBtn.back,
+.presenterRoundHomeBtn,
+.presenterExitBtn{
+  background:#0A7C6E !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(10,124,110,.26),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* انتقال الجولات / التالي / السابق / فتح فقرة */
+.presenterNextBtn,
+.presenterPrevBtn,
+.presenterNavBtn,
+.presenterRoundBtn,
+.presenterSegmentBtn,
+.presenterOpenBtn,
+.presenterControlBtn.next,
+.presenterControlBtn.prev,
+.presenterControlBtn.nav,
+.presenterControlBtn.open,
+.presenterCommandBtn.next,
+.presenterCommandBtn.prev,
+.presenterCommandBtn.open{
+  background:#202940 !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(32,41,64,.26),
+    inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+
+/* تراجع */
+.presenterUndoBtn,
+.presenterControlBtn.undo,
+.presenterCommandBtn.undo,
+.presenterResetBtn{
+  background:#7F2020 !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(127,32,32,.25),
+    inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+
+/* خطأ */
+.presenterWrongBtn,
+.presenterErrorBtn,
+.presenterControlBtn.wrong,
+.presenterControlBtn.error,
+.presenterCommandBtn.wrong,
+.presenterCommandBtn.error{
+  background:#DB1A1A !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(219,26,26,.26),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* صح */
+.presenterCorrectBtn,
+.presenterSuccessBtn,
+.presenterControlBtn.correct,
+.presenterCommandBtn.correct{
+  background:#237227 !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(35,114,39,.25),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* دبل / دوبيلا */
+.presenterDoubleBtn,
+.presenterControlBtn.double,
+.presenterCommandBtn.double{
+  background:#450693 !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(69,6,147,.28),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* الدبل إذا كان مفعّل */
+.presenterDoubleBtn.activeDouble,
+.presenterControlBtn.double.activeDouble,
+.presenterCommandBtn.double.activeDouble{
+  background:#450693 !important;
+  color:#FFFFFF !important;
+  box-shadow:
+    0 0 0 4px rgba(69,6,147,.18),
+    0 12px 26px rgba(69,6,147,.32) !important;
+}
+
+/* إظهار الإجابات / تسجيل نتيجة المبعثرة / تسجيل نتيجة التلميح */
+.presenterAnswerBtn,
+.presenterShowAnswerBtn,
+.presenterRevealBtn,
+.presenterScoreBtn,
+.presenterHintScoreBtn,
+.presenterScrambleScoreBtn,
+.presenterControlBtn.answer,
+.presenterControlBtn.reveal,
+.presenterControlBtn.score,
+.presenterControlBtn.hint,
+.presenterControlBtn.scramble,
+.presenterCommandBtn.answer,
+.presenterCommandBtn.reveal,
+.presenterCommandBtn.score,
+.presenterCommandBtn.hint,
+.presenterCommandBtn.scramble{
+  background:#06923E !important;
+  color:#FFFFFF !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(6,146,62,.26),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* التعويض / العداد / المؤقت */
+.presenterTimerBtn,
+.presenterStartTimerBtn,
+.presenterCompensateBtn,
+.presenterBonusBtn,
+.presenterControlBtn.timer,
+.presenterControlBtn.start,
+.presenterControlBtn.compensate,
+.presenterControlBtn.bonus,
+.presenterCommandBtn.timer,
+.presenterCommandBtn.start,
+.presenterCommandBtn.compensate,
+.presenterCommandBtn.bonus{
+  background:#64E2B7 !important;
+  color:#12382F !important;
+  border:0 !important;
+  box-shadow:
+    0 10px 22px rgba(100,226,183,.28),
+    inset 0 1px 0 rgba(255,255,255,.28) !important;
+}
+
+/* شكل موحد لكل أزرار المقدم */
+.presenterControlBtn,
+.presenterCommandBtn,
+.presenterHomeBtn,
+.presenterBackBtn,
+.presenterGoHomeBtn,
+.presenterNextBtn,
+.presenterPrevBtn,
+.presenterNavBtn,
+.presenterRoundBtn,
+.presenterSegmentBtn,
+.presenterOpenBtn,
+.presenterUndoBtn,
+.presenterWrongBtn,
+.presenterErrorBtn,
+.presenterCorrectBtn,
+.presenterDoubleBtn,
+.presenterAnswerBtn,
+.presenterShowAnswerBtn,
+.presenterRevealBtn,
+.presenterTimerBtn,
+.presenterStartTimerBtn,
+.presenterScoreBtn,
+.presenterHintScoreBtn,
+.presenterScrambleScoreBtn,
+.presenterCompensateBtn,
+.presenterBonusBtn,
+.presenterResetBtn{
+  min-height:44px !important;
+  border-radius:15px !important;
+  padding:0 16px !important;
+  font-weight:900 !important;
+  transition:
+    transform .16s ease,
+    filter .16s ease,
+    box-shadow .16s ease !important;
+}
+
+/* hover */
+.presenterControlBtn:hover,
+.presenterCommandBtn:hover,
+.presenterHomeBtn:hover,
+.presenterBackBtn:hover,
+.presenterGoHomeBtn:hover,
+.presenterNextBtn:hover,
+.presenterPrevBtn:hover,
+.presenterNavBtn:hover,
+.presenterRoundBtn:hover,
+.presenterSegmentBtn:hover,
+.presenterOpenBtn:hover,
+.presenterUndoBtn:hover,
+.presenterWrongBtn:hover,
+.presenterErrorBtn:hover,
+.presenterCorrectBtn:hover,
+.presenterDoubleBtn:hover,
+.presenterAnswerBtn:hover,
+.presenterShowAnswerBtn:hover,
+.presenterRevealBtn:hover,
+.presenterTimerBtn:hover,
+.presenterStartTimerBtn:hover,
+.presenterScoreBtn:hover,
+.presenterHintScoreBtn:hover,
+.presenterScrambleScoreBtn:hover,
+.presenterCompensateBtn:hover,
+.presenterBonusBtn:hover,
+.presenterResetBtn:hover{
+  transform:translateY(-2px) !important;
+  filter:brightness(1.04) !important;
+}
+
+/* active */
+.presenterControlBtn:active,
+.presenterCommandBtn:active,
+.presenterHomeBtn:active,
+.presenterBackBtn:active,
+.presenterGoHomeBtn:active,
+.presenterNextBtn:active,
+.presenterPrevBtn:active,
+.presenterNavBtn:active,
+.presenterRoundBtn:active,
+.presenterSegmentBtn:active,
+.presenterOpenBtn:active,
+.presenterUndoBtn:active,
+.presenterWrongBtn:active,
+.presenterErrorBtn:active,
+.presenterCorrectBtn:active,
+.presenterDoubleBtn:active,
+.presenterAnswerBtn:active,
+.presenterShowAnswerBtn:active,
+.presenterRevealBtn:active,
+.presenterTimerBtn:active,
+.presenterStartTimerBtn:active,
+.presenterScoreBtn:active,
+.presenterHintScoreBtn:active,
+.presenterScrambleScoreBtn:active,
+.presenterCompensateBtn:active,
+.presenterBonusBtn:active,
+.presenterResetBtn:active{
+  transform:scale(.96) !important;
+}
+
+/* المعطل */
+.presenterControlBtn:disabled,
+.presenterCommandBtn:disabled,
+.presenterHomeBtn:disabled,
+.presenterBackBtn:disabled,
+.presenterGoHomeBtn:disabled,
+.presenterNextBtn:disabled,
+.presenterPrevBtn:disabled,
+.presenterNavBtn:disabled,
+.presenterRoundBtn:disabled,
+.presenterSegmentBtn:disabled,
+.presenterOpenBtn:disabled,
+.presenterUndoBtn:disabled,
+.presenterWrongBtn:disabled,
+.presenterErrorBtn:disabled,
+.presenterCorrectBtn:disabled,
+.presenterDoubleBtn:disabled,
+.presenterAnswerBtn:disabled,
+.presenterShowAnswerBtn:disabled,
+.presenterRevealBtn:disabled,
+.presenterTimerBtn:disabled,
+.presenterStartTimerBtn:disabled,
+.presenterScoreBtn:disabled,
+.presenterHintScoreBtn:disabled,
+.presenterScrambleScoreBtn:disabled,
+.presenterCompensateBtn:disabled,
+.presenterBonusBtn:disabled,
+.presenterResetBtn:disabled{
+  background:#D8DFDF !important;
+  color:#8A969B !important;
+  box-shadow:none !important;
+  opacity:.78 !important;
+  cursor:not-allowed !important;
+  transform:none !important;
+  filter:none !important;
+}
