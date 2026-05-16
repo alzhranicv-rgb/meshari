@@ -1064,24 +1064,32 @@ function canEndSegment(segmentKey) {
     return (window.whoState.usedNumbers || []).length >= 15
   }
 
-  if (segmentKey === "final") {
-    if (!window.finalState) return false
+if (segmentKey === "final") {
+  if (!window.finalState) return false
 
-    const r1Count = Number(window.finalState.round1?.cardsCount || 6)
+  const r1Count = Number(window.finalState.round1?.cardsCount || 6)
 
-    const r1Done =
-      (window.finalState.round1?.opened || []).length >= r1Count
+  const r1Done =
+    (window.finalState.round1?.opened || []).length >= r1Count
 
-    const r2Done =
-      (window.finalState.round2?.opened || []).length >= 4 &&
-      (window.finalState.round2?.scoredNumbers || []).length >= 4
+  const r2Done =
+    (window.finalState.round2?.opened || []).length >= 4 &&
+    (window.finalState.round2?.scoredNumbers || []).length >= 4
 
-    const r3Done =
+  let r3Done = false
+
+  if (window.finalState.round3?.mode === "team_media") {
+    r3Done =
+      (window.finalState.round3?.teamMedia?.usedNumbers || []).length >= 4 &&
+      (window.finalState.round3?.scoredNumbers || []).length >= 4
+  } else {
+    r3Done =
       (window.finalState.round3?.opened || []).length >= 2 &&
       (window.finalState.round3?.scoredNumbers || []).length >= 2
-
-    return r1Done && r2Done && r3Done
   }
+
+  return r1Done && r2Done && r3Done
+}
 
   if (segmentKey === "archive") {
     if (!window.archiveState) return false

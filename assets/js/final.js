@@ -1,86 +1,114 @@
-let finalState = {
-  round: 1,
+/* =========================
+   FINAL - CLEAN VERSION
+========================= */
 
-  doubleState: {
-    used: { A: false, B: false },
-    activeTeam: null
-  },
-
-  round1: {
-    title: "الجولة الأولى",
-    cardsCount: 6,
-    opened: [],
-    activeTeam: null,
-    scores: { A: 0, B: 0 },
-    errors: { A: 0, B: 0 },
-    currentNumber: null,
-    currentAnswer: "",
-    currentImage: "",
-    currentNote: "",
-    currentQuestionParts: [],
-    shownQuestionPartsCount: 0,
-    answerShown: false,
-    pendingScore: false,
-    cardTexts: {}
-  },
-
-  round2: {
-    title: "الجولة الثانية",
-    opened: [],
-    scoredNumbers: [],
-    activeTeam: null,
-    scores: { A: 0, B: 0 },
-    currentNumber: null,
-    currentType: null,
-    revealTimer: null,
-    allWords: [],
-    answers: [],
-    hints: [],
-    scrambledWords: [],
-    currentRevealIndex: -1,
-    hiddenSequence: [],
-    selectedCorrectIndexes: [],
-    answerShown: false,
-    correctCount: 0,
-    countdown: 15,
-    pendingScore: false,
-    assignedTeams: {
-      scramble: {},
-      sequence: {}
-    },
-    lastTeamPlayed: null
-  },
-
-  round3: {
-    title: "الجولة الثالثة",
-    opened: [],
-    scoredNumbers: [],
-    activeTeam: null,
-    scores: { A: 0, B: 0 },
-    currentNumber: null,
-    images: [],
-    answers: [],
-    notes: [],
-    sequenceTimer: null,
-    shownCount: 0,
-    correctCount: 0,
-    pendingScore: false,
-    answersAllowed: false,
-    assignedTeams: {},
-    lastTeamPlayed: null,
-    selectedCorrectIndexes: []
-  }
-}
+let finalState = createDefaultFinalState()
 
 window.finalState = finalState
 window.finalOpenedNumbers = []
 
 const FINAL_STORAGE_KEY = "final_state_v3"
+const FINAL_HISTORY_LIMIT = 60
 
 let currentFinalRound3Image = ""
-
 let finalHistory = []
-const FINAL_HISTORY_LIMIT = 60
+
+/* =========================
+   Default State
+========================= */
+
+function createDefaultFinalState() {
+  return {
+    round: 1,
+
+    doubleState: {
+      used: { A: false, B: false },
+      activeTeam: null
+    },
+
+    round1: {
+      title: "الجولة الأولى",
+      cardsCount: 6,
+      opened: [],
+      activeTeam: null,
+      scores: { A: 0, B: 0 },
+      errors: { A: 0, B: 0 },
+      currentNumber: null,
+      currentAnswer: "",
+      currentImage: "",
+      currentNote: "",
+      currentQuestionParts: [],
+      shownQuestionPartsCount: 0,
+      answerShown: false,
+      pendingScore: false,
+      cardTexts: {}
+    },
+
+    round2: {
+      title: "الجولة الثانية",
+      opened: [],
+      scoredNumbers: [],
+      activeTeam: null,
+      scores: { A: 0, B: 0 },
+      currentNumber: null,
+      currentType: null,
+      revealTimer: null,
+      allWords: [],
+      answers: [],
+      hints: [],
+      scrambledWords: [],
+      currentRevealIndex: -1,
+      hiddenSequence: [],
+      selectedCorrectIndexes: [],
+      answerShown: false,
+      correctCount: 0,
+      countdown: 15,
+      pendingScore: false,
+      assignedTeams: {
+        scramble: {},
+        sequence: {}
+      },
+      lastTeamPlayed: null
+    },
+
+    round3: {
+      title: "الجولة الثالثة",
+      mode: "classic",
+
+      opened: [],
+      scoredNumbers: [],
+      activeTeam: null,
+      scores: { A: 0, B: 0 },
+      currentNumber: null,
+
+      images: [],
+      answers: [],
+      notes: [],
+      sequenceTimer: null,
+      shownCount: 0,
+      correctCount: 0,
+      pendingScore: false,
+      answersAllowed: false,
+      assignedTeams: {},
+      lastTeamPlayed: null,
+      selectedCorrectIndexes: [],
+
+      teamMedia: {
+        usedNumbers: [],
+        teamNumbers: { A: [], B: [] },
+        currentNumber: null,
+        currentTeam: null,
+        currentMediaType: "",
+        currentMedia: "",
+        currentQuestion: "",
+        currentAnswer: "",
+        questionShown: false,
+        answerShown: false,
+        videoPlayed: false
+      }
+    }
+  }
+}
 
 /* =========================
    Persistence
@@ -95,14 +123,16 @@ function getFinalState() {
 }
 
 function saveFinalState() {
-  ensureFinalDoubleState()
+  ensureFinalStateShape()
 
   const safe = JSON.parse(JSON.stringify(finalState))
-  safe.round2.revealTimer = null
-  safe.round3.sequenceTimer = null
+
+  if (safe.round2) safe.round2.revealTimer = null
+  if (safe.round3) safe.round3.sequenceTimer = null
 
   localStorage.setItem(FINAL_STORAGE_KEY, JSON.stringify(safe))
   localStorage.setItem("active_segment", "final")
+
   syncFinalGlobals()
 
   if (typeof syncDisplayStateToSession === "function") {
@@ -114,34 +144,156 @@ function restoreFinalState(saved) {
   if (!saved) return
 
   finalState = saved
-
-if (!finalState.round1) {
-  finalState.round1 = {}
-}
-
-if (!finalState.round1.cardsCount || Number(finalState.round1.cardsCount) < 6) {
-  finalState.round1.cardsCount = 6
-}
-
-  ensureFinalDoubleState()
+  ensureFinalStateShape()
 
   finalState.round2.revealTimer = null
   finalState.round3.sequenceTimer = null
 
-  if (!finalState.round1.cardTexts) {
-    finalState.round1.cardTexts = {}
-  }
-
-  if (!finalState.round1.currentQuestionParts) {
-    finalState.round1.currentQuestionParts = []
-  }
-
-  if (typeof finalState.round1.shownQuestionPartsCount !== "number") {
-    finalState.round1.shownQuestionPartsCount = 0
-  }
-
   window.finalState = finalState
   syncFinalGlobals()
+}
+
+/* =========================
+   Ensure State
+========================= */
+
+function ensureFinalStateShape() {
+  if (!finalState) finalState = createDefaultFinalState()
+
+  if (!finalState.round1) finalState.round1 = createDefaultFinalState().round1
+  if (!finalState.round2) finalState.round2 = createDefaultFinalState().round2
+  if (!finalState.round3) finalState.round3 = createDefaultFinalState().round3
+
+  ensureFinalDoubleState()
+  ensureFinalRound1State()
+  ensureFinalRound2State()
+  ensureFinalRound3State()
+}
+
+function ensureFinalDoubleState() {
+  if (!finalState.doubleState) {
+    finalState.doubleState = {
+      used: { A: false, B: false },
+      activeTeam: null
+    }
+  }
+
+  if (!finalState.doubleState.used) {
+    finalState.doubleState.used = { A: false, B: false }
+  }
+
+  finalState.doubleState.used.A = !!finalState.doubleState.used.A
+  finalState.doubleState.used.B = !!finalState.doubleState.used.B
+}
+
+function ensureFinalRound1State() {
+  const r = finalState.round1
+  const d = createDefaultFinalState().round1
+
+  r.title = r.title || d.title
+  r.cardsCount = Number(r.cardsCount || 6)
+  if (r.cardsCount < 6) r.cardsCount = 6
+
+  if (!Array.isArray(r.opened)) r.opened = []
+  if (!r.scores) r.scores = { A: 0, B: 0 }
+  if (!r.errors) r.errors = { A: 0, B: 0 }
+  if (!Array.isArray(r.currentQuestionParts)) r.currentQuestionParts = []
+  if (!r.cardTexts) r.cardTexts = {}
+
+  r.scores.A = Number(r.scores.A || 0)
+  r.scores.B = Number(r.scores.B || 0)
+  r.errors.A = Number(r.errors.A || 0)
+  r.errors.B = Number(r.errors.B || 0)
+  r.shownQuestionPartsCount = Number(r.shownQuestionPartsCount || 0)
+  r.answerShown = !!r.answerShown
+  r.pendingScore = !!r.pendingScore
+}
+
+function ensureFinalRound2State() {
+  const r = finalState.round2
+  const d = createDefaultFinalState().round2
+
+  r.title = r.title || d.title
+
+  if (!Array.isArray(r.opened)) r.opened = []
+  if (!Array.isArray(r.scoredNumbers)) r.scoredNumbers = []
+  if (!r.scores) r.scores = { A: 0, B: 0 }
+  if (!Array.isArray(r.allWords)) r.allWords = []
+  if (!Array.isArray(r.answers)) r.answers = []
+  if (!Array.isArray(r.hints)) r.hints = []
+  if (!Array.isArray(r.scrambledWords)) r.scrambledWords = []
+  if (!Array.isArray(r.hiddenSequence)) r.hiddenSequence = []
+  if (!Array.isArray(r.selectedCorrectIndexes)) r.selectedCorrectIndexes = []
+
+  if (!r.assignedTeams) {
+    r.assignedTeams = { scramble: {}, sequence: {} }
+  }
+
+  if (!r.assignedTeams.scramble) r.assignedTeams.scramble = {}
+  if (!r.assignedTeams.sequence) r.assignedTeams.sequence = {}
+
+  r.scores.A = Number(r.scores.A || 0)
+  r.scores.B = Number(r.scores.B || 0)
+  r.correctCount = Number(r.correctCount || 0)
+  r.countdown = Number(r.countdown ?? 15)
+  r.pendingScore = !!r.pendingScore
+  r.answerShown = !!r.answerShown
+}
+
+function ensureFinalRound3State() {
+  const r = finalState.round3
+  const d = createDefaultFinalState().round3
+
+  r.title = r.title || d.title
+  r.mode = r.mode === "team_media" ? "team_media" : "classic"
+
+  if (!Array.isArray(r.opened)) r.opened = []
+  if (!Array.isArray(r.scoredNumbers)) r.scoredNumbers = []
+  if (!r.scores) r.scores = { A: 0, B: 0 }
+
+  if (!Array.isArray(r.images)) r.images = []
+  if (!Array.isArray(r.answers)) r.answers = []
+  if (!Array.isArray(r.notes)) r.notes = []
+  if (!Array.isArray(r.selectedCorrectIndexes)) r.selectedCorrectIndexes = []
+  if (!r.assignedTeams) r.assignedTeams = {}
+
+  r.scores.A = Number(r.scores.A || 0)
+  r.scores.B = Number(r.scores.B || 0)
+  r.correctCount = Number(r.correctCount || 0)
+  r.shownCount = Number(r.shownCount || 0)
+  r.pendingScore = !!r.pendingScore
+  r.answersAllowed = !!r.answersAllowed
+
+  if (!r.teamMedia) {
+    r.teamMedia = {
+      usedNumbers: [],
+      teamNumbers: { A: [], B: [] },
+      currentNumber: null,
+      currentTeam: null,
+      currentMediaType: "",
+      currentMedia: "",
+      currentQuestion: "",
+      currentAnswer: "",
+      questionShown: false,
+      answerShown: false,
+      videoPlayed: false
+    }
+  }
+
+  const m = r.teamMedia
+
+  if (!Array.isArray(m.usedNumbers)) m.usedNumbers = []
+  if (!m.teamNumbers) m.teamNumbers = { A: [], B: [] }
+  if (!Array.isArray(m.teamNumbers.A)) m.teamNumbers.A = []
+  if (!Array.isArray(m.teamNumbers.B)) m.teamNumbers.B = []
+
+  m.currentMediaType = String(m.currentMediaType || "")
+  m.currentMedia = String(m.currentMedia || "")
+  m.currentQuestion = String(m.currentQuestion || "")
+  m.currentAnswer = String(m.currentAnswer || "")
+  m.questionShown = !!m.questionShown
+  m.answerShown = !!m.answerShown
+  m.videoPlayed = !!m.videoPlayed
 }
 
 /* =========================
@@ -175,10 +327,10 @@ function restoreFinalSnapshot(snapshot) {
   clearFinalIntervals()
 
   finalState = cloneFinalData(snapshot.finalState)
-  ensureFinalDoubleState()
-
-  window.finalState = finalState
   currentFinalRound3Image = snapshot.currentFinalRound3Image || ""
+
+  ensureFinalStateShape()
+  window.finalState = finalState
 
   renderFinalRound()
   updateEndRoundButtonState()
@@ -207,21 +359,180 @@ function updateFinalUndoButtonState() {
    Helpers
 ========================= */
 
-function ensureFinalDoubleState() {
-  if (!finalState.doubleState) {
-    finalState.doubleState = {
-      used: { A: false, B: false },
-      activeTeam: null
-    }
-  }
-}
-
 function getFinalCurrentRoundState() {
   if (finalState.round === 1) return finalState.round1
   if (finalState.round === 2) return finalState.round2
   if (finalState.round === 3) return finalState.round3
   return null
 }
+
+function getOtherTeam(team) {
+  return team === "A" ? "B" : "A"
+}
+
+function getRound2GroupKey(number) {
+  return number === 1 || number === 3 ? "scramble" : "sequence"
+}
+
+function clearFinalIntervals() {
+  if (finalState.round2?.revealTimer) {
+    clearInterval(finalState.round2.revealTimer)
+    finalState.round2.revealTimer = null
+  }
+
+  if (finalState.round3?.sequenceTimer) {
+    clearInterval(finalState.round3.sequenceTimer)
+    finalState.round3.sequenceTimer = null
+  }
+}
+
+function syncFinalGlobals() {
+  const totalA =
+    Number(finalState.round1?.scores?.A || 0) +
+    Number(finalState.round2?.scores?.A || 0) +
+    Number(finalState.round3?.scores?.A || 0)
+
+  const totalB =
+    Number(finalState.round1?.scores?.B || 0) +
+    Number(finalState.round2?.scores?.B || 0) +
+    Number(finalState.round3?.scores?.B || 0)
+
+  window.currentSegmentScores = { A: totalA, B: totalB }
+
+  window.finalOpenedNumbers = [
+    ...(finalState.round1?.opened || []).map(x => `r1-${x}`),
+    ...(finalState.round2?.opened || []).map(x => `r2-${x}`),
+    ...(finalState.round3?.opened || []).map(x => `r3-${x}`)
+  ]
+
+  window.finalState = finalState
+}
+
+function setFinalControlsMode(mode) {
+  const controls = document.getElementById("finalControlsBar")
+  if (!controls) return
+
+  controls.classList.remove(
+    "finalRound1ControlsBar",
+    "finalRound2ControlsBar",
+    "finalRound3ControlsBar"
+  )
+
+  if (mode === 1) controls.classList.add("finalRound1ControlsBar")
+  if (mode === 2) controls.classList.add("finalRound2ControlsBar")
+  if (mode === 3) controls.classList.add("finalRound3ControlsBar")
+}
+
+function resetFinalTeamSelection() {
+  finalState.round1.activeTeam = null
+  finalState.round2.activeTeam = null
+  finalState.round3.activeTeam = null
+
+  const a = document.getElementById("finalTeamABox")
+  const b = document.getElementById("finalTeamBBox")
+
+  if (a) a.classList.remove("activeTeam")
+  if (b) b.classList.remove("activeTeam")
+
+  updateFinalDoubleButton()
+}
+
+function highlightFinalTeam(team) {
+  const a = document.getElementById("finalTeamABox")
+  const b = document.getElementById("finalTeamBBox")
+
+  if (a) a.classList.remove("activeTeam")
+  if (b) b.classList.remove("activeTeam")
+
+  if (team === "A" && a) a.classList.add("activeTeam")
+  if (team === "B" && b) b.classList.add("activeTeam")
+
+  updateFinalDoubleButton()
+}
+
+function shuffleArabicWord(text) {
+  function shuffleWord(word) {
+    const chars = String(word || "").split("")
+    if (chars.length <= 1) return word
+
+    const original = chars.join("")
+    let shuffled = original
+    let attempts = 0
+
+    while (shuffled === original && attempts < 20) {
+      const arr = [...chars]
+
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[arr[i], arr[j]] = [arr[j], arr[i]]
+      }
+
+      shuffled = arr.join("")
+      attempts++
+    }
+
+    if (shuffled === original && chars.length > 1) {
+      const arr = [...chars]
+      ;[arr[0], arr[1]] = [arr[1], arr[0]]
+      shuffled = arr.join("")
+    }
+
+    return shuffled
+  }
+
+  return String(text || "")
+    .split(/(\s+)/)
+    .map(part => {
+      if (/^\s+$/.test(part)) return part
+      return shuffleWord(part)
+    })
+    .join("")
+}
+
+function removeArabicDots(text = "") {
+  return String(text)
+    .replace(/ي/g, "ى")
+    .replace(/[بتث]/g, "ٮ")
+    .replace(/[جخ]/g, "ح")
+    .replace(/ذ/g, "د")
+    .replace(/ز/g, "ر")
+    .replace(/ش/g, "س")
+    .replace(/ض/g, "ص")
+    .replace(/ظ/g, "ط")
+    .replace(/غ/g, "ع")
+    .replace(/ف/g, "ڡ")
+    .replace(/ق/g, "ٯ")
+    .replace(/ن/g, "ں")
+}
+
+function getFinalRound1ClipStyle(text = "", zoom = false) {
+  const clean = String(text || "").trim()
+  const len = clean.length
+
+  let size = zoom ? "clamp(2.1rem, 2.8vw, 3rem)" : "clamp(1.7rem, 2.2vw, 2.45rem)"
+  let line = zoom ? "1.95" : "1.82"
+
+  if (len > 90) {
+    size = zoom ? "clamp(1.8rem, 2.45vw, 2.55rem)" : "clamp(1.45rem, 1.95vw, 2rem)"
+    line = zoom ? "1.86" : "1.72"
+  }
+
+  if (len > 140) {
+    size = zoom ? "clamp(1.55rem, 2.1vw, 2.2rem)" : "clamp(1.22rem, 1.65vw, 1.7rem)"
+    line = zoom ? "1.75" : "1.58"
+  }
+
+  if (len > 190) {
+    size = zoom ? "clamp(1.35rem, 1.8vw, 1.9rem)" : "clamp(1.05rem, 1.42vw, 1.45rem)"
+    line = zoom ? "1.62" : "1.46"
+  }
+
+  return `font-family:'MolhimCustom', sans-serif !important;font-size:${size};line-height:${line};text-wrap:balance;`
+}
+
+/* =========================
+   Double
+========================= */
 
 function activateFinalDouble() {
   ensureFinalDoubleState()
@@ -272,6 +583,7 @@ function activateFinalDouble() {
 
 function getFinalScoreValue(team, base) {
   ensureFinalDoubleState()
+
   const points = Number(base || 0)
   return finalState.doubleState.activeTeam === team ? points * 2 : points
 }
@@ -334,260 +646,6 @@ function updateFinalDoubleButton() {
   btn.innerText = "دبل"
 }
 
-function syncFinalGlobals() {
-  const totalA =
-    Number(finalState.round1.scores.A || 0) +
-    Number(finalState.round2.scores.A || 0) +
-    Number(finalState.round3.scores.A || 0)
-
-  const totalB =
-    Number(finalState.round1.scores.B || 0) +
-    Number(finalState.round2.scores.B || 0) +
-    Number(finalState.round3.scores.B || 0)
-
-  window.currentSegmentScores = { A: totalA, B: totalB }
-
-  window.finalOpenedNumbers = [
-    ...finalState.round1.opened.map(x => `r1-${x}`),
-    ...finalState.round2.opened.map(x => `r2-${x}`),
-    ...finalState.round3.opened.map(x => `r3-${x}`)
-  ]
-
-  window.finalState = finalState
-}
-
-function clearFinalIntervals() {
-  clearInterval(finalState.round2.revealTimer)
-  finalState.round2.revealTimer = null
-
-  clearInterval(finalState.round3.sequenceTimer)
-  finalState.round3.sequenceTimer = null
-}
-
-function resetFinalTeamSelection() {
-  finalState.round1.activeTeam = null
-  finalState.round2.activeTeam = null
-  finalState.round3.activeTeam = null
-
-  const a = document.getElementById("finalTeamABox")
-  const b = document.getElementById("finalTeamBBox")
-  if (a) a.classList.remove("activeTeam")
-  if (b) b.classList.remove("activeTeam")
-
-  updateFinalDoubleButton()
-}
-
-function highlightFinalTeam(team) {
-  const a = document.getElementById("finalTeamABox")
-  const b = document.getElementById("finalTeamBBox")
-
-  if (a) a.classList.remove("activeTeam")
-  if (b) b.classList.remove("activeTeam")
-
-  if (team === "A" && a) a.classList.add("activeTeam")
-  if (team === "B" && b) b.classList.add("activeTeam")
-
-  updateFinalDoubleButton()
-}
-
-function getOtherTeam(team) {
-  return team === "A" ? "B" : "A"
-}
-
-function getRound2GroupKey(number) {
-  return number === 1 || number === 3 ? "scramble" : "sequence"
-}
-
-function shuffleArabicWord(text) {
-  function shuffleWord(word) {
-    const chars = String(word || "").split("")
-    if (chars.length <= 1) return word
-
-    const original = chars.join("")
-    let shuffled = original
-    let attempts = 0
-
-    while (shuffled === original && attempts < 20) {
-      const arr = [...chars]
-
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[arr[i], arr[j]] = [arr[j], arr[i]]
-      }
-
-      shuffled = arr.join("")
-      attempts++
-    }
-
-    if (shuffled === original) {
-      const arr = [...chars]
-      ;[arr[0], arr[1]] = [arr[1], arr[0]]
-      shuffled = arr.join("")
-    }
-
-    return shuffled
-  }
-
-  return String(text || "")
-    .split(/(\s+)/)
-    .map(part => {
-      if (/^\s+$/.test(part)) return part
-      return shuffleWord(part)
-    })
-    .join("")
-}
-
-function getRound1ForcedTeam() {
-  const e = finalState.round1.errors
-  if (e.A >= 3 && e.B < 3) return "B"
-  if (e.B >= 3 && e.A < 3) return "A"
-  return null
-}
-
-function removeArabicDots(text = "") {
-  return String(text)
-    .replace(/ي/g, "ى")
-    .replace(/[بتث]/g, "ٮ")
-    .replace(/[جخ]/g, "ح")
-    .replace(/ذ/g, "د")
-    .replace(/ز/g, "ر")
-    .replace(/ش/g, "س")
-    .replace(/ض/g, "ص")
-    .replace(/ظ/g, "ط")
-    .replace(/غ/g, "ع")
-    .replace(/ف/g, "ڡ")
-    .replace(/ق/g, "ٯ")
-    .replace(/ن/g, "ں")
-}
-
-function getFinalRound1ClipStyle(text = "", zoom = false) {
-  const clean = String(text || "").trim()
-  const len = clean.length
-
-  let size = zoom ? "clamp(2.1rem, 2.8vw, 3rem)" : "clamp(1.7rem, 2.2vw, 2.45rem)"
-  let line = zoom ? "1.95" : "1.82"
-
-  if (len > 90) {
-    size = zoom ? "clamp(1.8rem, 2.45vw, 2.55rem)" : "clamp(1.45rem, 1.95vw, 2rem)"
-    line = zoom ? "1.86" : "1.72"
-  }
-
-  if (len > 140) {
-    size = zoom ? "clamp(1.55rem, 2.1vw, 2.2rem)" : "clamp(1.22rem, 1.65vw, 1.7rem)"
-    line = zoom ? "1.75" : "1.58"
-  }
-
-  if (len > 190) {
-    size = zoom ? "clamp(1.35rem, 1.8vw, 1.9rem)" : "clamp(1.05rem, 1.42vw, 1.45rem)"
-    line = zoom ? "1.62" : "1.46"
-  }
-
-  return `font-family:'MolhimCustom', sans-serif !important;font-size:${size};line-height:${line};text-wrap:balance;`
-}
-
-function setFinalControlsMode(mode) {
-  const controls = document.getElementById("finalControlsBar")
-  if (!controls) return
-
-  controls.classList.remove("finalRound1ControlsBar", "finalRound2ControlsBar", "finalRound3ControlsBar")
-  if (mode === 1) controls.classList.add("finalRound1ControlsBar")
-  if (mode === 2) controls.classList.add("finalRound2ControlsBar")
-  if (mode === 3) controls.classList.add("finalRound3ControlsBar")
-}
-
-function finalizeRound1Turn() {
-  finalState.round1.pendingScore = false
-  finalState.round1.currentNumber = null
-  finalState.round1.currentAnswer = ""
-  finalState.round1.currentImage = ""
-  finalState.round1.currentNote = ""
-  finalState.round1.currentQuestionParts = []
-  finalState.round1.shownQuestionPartsCount = 0
-  finalState.round1.answerShown = false
-
-  finalState.round1.activeTeam = null
-
-  resetFinalTeamSelection()
-  renderFinalRound()
-  saveFinalState()
-  updateEndRoundButtonState()
-}
-
-function finalizeRound2Number() {
-  if (finalState.round2.currentNumber !== null) {
-    if (!finalState.round2.scoredNumbers.includes(finalState.round2.currentNumber)) {
-      finalState.round2.scoredNumbers.push(finalState.round2.currentNumber)
-    }
-  }
-
-  finalState.round2.pendingScore = false
-  finalState.round2.currentNumber = null
-  finalState.round2.currentType = null
-  finalState.round2.allWords = []
-  finalState.round2.answers = []
-  finalState.round2.hints = []
-  finalState.round2.scrambledWords = []
-  finalState.round2.currentRevealIndex = -1
-  finalState.round2.answerShown = false
-  finalState.round2.correctCount = 0
-  finalState.round2.countdown = 15
-  finalState.round2.hiddenSequence = []
-
-  resetFinalTeamSelection()
-  renderFinalRound()
-  saveFinalState()
-  updateEndRoundButtonState()
-}
-
-function finalizeRound3Number(nextTeam = null) {
-  if (finalState.round3.currentNumber !== null) {
-    if (!finalState.round3.scoredNumbers.includes(finalState.round3.currentNumber)) {
-      finalState.round3.scoredNumbers.push(finalState.round3.currentNumber)
-    }
-  }
-
-  finalState.round3.pendingScore = false
-  finalState.round3.currentNumber = null
-  finalState.round3.images = []
-  finalState.round3.answers = []
-  finalState.round3.notes = []
-  finalState.round3.shownCount = 0
-  finalState.round3.correctCount = 0
-  finalState.round3.answersAllowed = false
-  finalState.round3.selectedCorrectIndexes = []
-  currentFinalRound3Image = ""
-
-  resetFinalTeamSelection()
-  renderFinalRound()
-
-  if (nextTeam) {
-    finalState.round3.activeTeam = nextTeam
-    highlightFinalTeam(nextTeam)
-  }
-
-  saveFinalState()
-  updateEndRoundButtonState()
-}
-
-async function loadFinalRound1CardTexts() {
-  const { data, error } = await db
-    .from("final_round1_items")
-    .select("number, card_text, question_part1, question_part2, question_part3")
-    .eq("model", currentModel)
-    .in("number", [1, 2, 3, 4, 5, 6])
-
-  if (error) {
-    console.log(error)
-    return
-  }
-
-  finalState.round1.cardTexts = {}
-
-  ;(data || []).forEach(row => {
-    finalState.round1.cardTexts[row.number] = row.card_text || ""
-  })
-}
-
 /* =========================
    Init / Render
 ========================= */
@@ -596,94 +654,15 @@ window.renderFinal = async function () {
   const saved = getFinalState()
   finalHistory = []
 
+  clearFinalIntervals()
+
   if (saved) {
     restoreFinalState(saved)
-    await loadFinalRoundMeta()
-    await loadFinalRound1CardTexts()
-    openSegment("الفاصلة", buildFinalHTML())
-    renderFinalRound()
-    saveFinalState()
-    updateEndRoundButtonState()
-    updateFinalUndoButtonState()
-    return
+  } else {
+    finalState = createDefaultFinalState()
+    window.finalState = finalState
+    syncFinalGlobals()
   }
-
-  finalState = {
-    round: 1,
-
-    doubleState: {
-      used: { A: false, B: false },
-      activeTeam: null
-    },
-
-    round1: {
-      title: "الجولة الأولى",
-      cardsCount: 6,
-      opened: [],
-      activeTeam: null,
-      scores: { A: 0, B: 0 },
-      errors: { A: 0, B: 0 },
-      currentNumber: null,
-      currentAnswer: "",
-      currentImage: "",
-      currentNote: "",
-      currentQuestionParts: [],
-      shownQuestionPartsCount: 0,
-      answerShown: false,
-      pendingScore: false,
-      cardTexts: {}
-    },
-
-    round2: {
-      title: "الجولة الثانية",
-      opened: [],
-      scoredNumbers: [],
-      activeTeam: null,
-      scores: { A: 0, B: 0 },
-      currentNumber: null,
-      currentType: null,
-      revealTimer: null,
-      allWords: [],
-      answers: [],
-      hints: [],
-      scrambledWords: [],
-      currentRevealIndex: -1,
-      hiddenSequence: [],
-      selectedCorrectIndexes: [],
-      answerShown: false,
-      correctCount: 0,
-      countdown: 15,
-      pendingScore: false,
-      assignedTeams: {
-        scramble: {},
-        sequence: {}
-      },
-      lastTeamPlayed: null
-    },
-
-    round3: {
-      title: "الجولة الثالثة",
-      opened: [],
-      scoredNumbers: [],
-      activeTeam: null,
-      scores: { A: 0, B: 0 },
-      currentNumber: null,
-      images: [],
-      answers: [],
-      notes: [],
-      sequenceTimer: null,
-      shownCount: 0,
-      correctCount: 0,
-      pendingScore: false,
-      answersAllowed: false,
-      assignedTeams: {},
-      lastTeamPlayed: null,
-      selectedCorrectIndexes: []
-    }
-  }
-
-  window.finalState = finalState
-  syncFinalGlobals()
 
   await loadFinalRoundMeta()
   await loadFinalRound1CardTexts()
@@ -699,7 +678,7 @@ async function loadFinalRoundMeta() {
   const { data, error } = await db
     .from("final_round_meta")
     .select("*")
-    .eq("model", currentModel)
+    .eq("model", Number(currentModel))
     .order("round", { ascending: true })
 
   if (error) {
@@ -712,12 +691,44 @@ async function loadFinalRoundMeta() {
       finalState.round1.title = row.title || "الجولة الأولى"
       finalState.round1.cardsCount = Number(row.cards_count || 6)
     }
+
     if (row.round === 2) {
       finalState.round2.title = row.title || "الجولة الثانية"
     }
+
     if (row.round === 3) {
       finalState.round3.title = row.title || "الجولة الثالثة"
+
+      const mode =
+        row.mode ||
+        row.round3_mode ||
+        row.display_mode ||
+        row.type ||
+        "classic"
+
+      finalState.round3.mode = mode === "team_media" ? "team_media" : "classic"
     }
+  })
+
+  ensureFinalStateShape()
+}
+
+async function loadFinalRound1CardTexts() {
+  const { data, error } = await db
+    .from("final_round1_items")
+    .select("number, card_text, question_part1, question_part2, question_part3")
+    .eq("model", Number(currentModel))
+    .in("number", [1, 2, 3, 4, 5, 6])
+
+  if (error) {
+    console.log(error)
+    return
+  }
+
+  finalState.round1.cardTexts = {}
+
+  ;(data || []).forEach(row => {
+    finalState.round1.cardTexts[row.number] = row.card_text || ""
   })
 }
 
@@ -765,7 +776,8 @@ function buildFinalHTML() {
 
 function renderFinalRound() {
   clearFinalIntervals()
-  ensureFinalDoubleState()
+  ensureFinalStateShape()
+
   renderFinalTabs()
   renderFinalScores()
   renderFinalErrors()
@@ -786,7 +798,9 @@ function renderFinalTabs() {
   for (const n of [1, 2, 3]) {
     const btn = document.getElementById(`finalRoundTab${n}`)
     if (!btn) continue
+
     btn.classList.remove("activeFinalRoundTab", "doneFinalRoundTab")
+
     if (finalState.round === n) btn.classList.add("activeFinalRoundTab")
     if (isFinalRoundFinished(n)) btn.classList.add("doneFinalRoundTab")
   }
@@ -808,6 +822,7 @@ function renderFinalRoundTitle() {
 
   if (boards) {
     boards.classList.remove("finalBoardRound1", "finalBoardRoundOther", "finalRound1Mode")
+
     if (finalState.round === 1) {
       boards.classList.add("finalBoardRound1", "finalRound1Mode")
     } else {
@@ -818,7 +833,11 @@ function renderFinalRoundTitle() {
   if (finalState.round === 1) {
     if (centerTop) centerTop.innerText = "الجولة 1"
     if (centerNum) centerNum.innerText = "0"
-    if (centerBottom) centerBottom.innerText = finalState.round1.activeTeam ? "الدور: فريق مختار" : "الدور: اختر فريق"
+    if (centerBottom) {
+      centerBottom.innerText = finalState.round1.activeTeam
+        ? "الدور: فريق مختار"
+        : "الدور: اختر فريق"
+    }
     return
   }
 
@@ -836,7 +855,16 @@ function renderFinalRoundTitle() {
   }
 
   if (finalState.round === 3) {
+    if (finalState.round3.mode === "team_media") {
+      const used = finalState.round3.teamMedia.usedNumbers.length
+      if (centerTop) centerTop.innerText = "المفتوح"
+      if (centerNum) centerNum.innerText = `${used} / 4`
+      if (centerBottom) centerBottom.innerText = "الجولة 3"
+      return
+    }
+
     const totalImages = finalState.round3.images.length || 5
+
     if (centerTop) centerTop.innerText = "الصح"
     if (centerNum) centerNum.innerText = `${finalState.round3.correctCount} / ${totalImages}`
     if (centerBottom) centerBottom.innerText = "الجولة 3"
@@ -848,14 +876,14 @@ function renderFinalScores() {
   const b = document.getElementById("finalScoreB")
 
   const totalA =
-    finalState.round1.scores.A +
-    finalState.round2.scores.A +
-    finalState.round3.scores.A
+    Number(finalState.round1.scores.A || 0) +
+    Number(finalState.round2.scores.A || 0) +
+    Number(finalState.round3.scores.A || 0)
 
   const totalB =
-    finalState.round1.scores.B +
-    finalState.round2.scores.B +
-    finalState.round3.scores.B
+    Number(finalState.round1.scores.B || 0) +
+    Number(finalState.round2.scores.B || 0) +
+    Number(finalState.round3.scores.B || 0)
 
   if (a) a.innerText = totalA
   if (b) b.innerText = totalB
@@ -867,12 +895,6 @@ function renderFinalErrors() {
 
   if (!boxA || !boxB) return
 
-  if (finalState.round !== 1) {
-    boxA.innerHTML = ""
-    boxB.innerHTML = ""
-    return
-  }
-
   boxA.innerHTML = ""
   boxB.innerHTML = ""
 }
@@ -882,6 +904,7 @@ function renderFinalTeamLayout() {
   if (!wrap) return
 
   wrap.classList.remove("finalTeamsRound1", "finalTeamsRoundOther")
+
   if (finalState.round === 1) wrap.classList.add("finalTeamsRound1")
   else wrap.classList.add("finalTeamsRoundOther")
 }
@@ -908,7 +931,9 @@ function selectFinalTeam(team) {
   }
 
   const current = getFinalCurrentRoundState()
+
   highlightFinalTeam(current?.activeTeam || null)
+  renderFinalRoundTitle()
   updateFinalDoubleButton()
   saveFinalState()
 }
@@ -924,6 +949,11 @@ function isFinalRoundFinished(round) {
   }
 
   if (round === 3) {
+    if (finalState.round3.mode === "team_media") {
+      return finalState.round3.teamMedia.usedNumbers.length >= 4 &&
+        finalState.round3.scoredNumbers.length >= 4
+    }
+
     return finalState.round3.opened.length >= 2 &&
       finalState.round3.scoredNumbers.length >= 2
   }
@@ -940,11 +970,14 @@ function goToFinalRound(round) {
   }
 
   pushFinalHistory()
+
   finalState.round = round
   resetFinalTeamSelection()
+
   renderFinalRound()
   updateEndRoundButtonState()
 }
+
 /* =========================
    Round 1
 ========================= */
@@ -1005,7 +1038,6 @@ function renderFinalRound1() {
   controls.innerHTML = `
     <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">دبل</button>
     <button onclick="showFinalRound1Question()" class="archiveCtrlBtn btnStart" ${isQuestionCard ? "" : "disabled"}>إظهار السؤال</button>
-    
     <button onclick="finalRound1Correct()" class="archiveCtrlBtn btnCorrect">إجابة صحيحة</button>
     <button onclick="finalRound1Wrong()" class="archiveCtrlBtn btnWrong">خطأ</button>
     <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
@@ -1040,7 +1072,6 @@ async function openFinalRound1Card(number) {
   finalState.round1.answerShown = false
   finalState.round1.errors.A = 0
   finalState.round1.errors.B = 0
-  
 
   renderFinalRound1()
   renderFinalErrors()
@@ -1057,8 +1088,8 @@ async function loadFinalRound1Current() {
   const { data, error } = await db
     .from("final_round1_items")
     .select("*")
-    .eq("model", currentModel)
-    .eq("number", number)
+    .eq("model", Number(currentModel))
+    .eq("number", Number(number))
     .single()
 
   if (error) {
@@ -1075,34 +1106,36 @@ async function loadFinalRound1Current() {
     data?.question_part3 || ""
   ]
 
-  if (!finalState.round1.cardTexts) {
-    finalState.round1.cardTexts = {}
-  }
   finalState.round1.cardTexts[number] = data?.card_text || ""
 
+  renderFinalRound1Content(data || {})
+  saveFinalState()
+}
+
+function renderFinalRound1Content(data) {
   const box = document.getElementById("finalRound1ImageStage")
   if (!box) return
 
-  const fullCardText = (data?.card_text || "").trim()
+  const number = Number(finalState.round1.currentNumber || 0)
+  const fullCardText = (data?.card_text || finalState.round1.cardTexts?.[number] || "").trim()
   const isHistoricalTextCard = number >= 1 && number <= 3 && !!fullCardText
   const isQuestionCard = number >= 4 && number <= 6
 
   let mainContent = ""
-  let noteContent = ""
   let answerContent = ""
 
   if (isHistoricalTextCard) {
     const clipText = removeArabicDots(fullCardText)
 
     mainContent = `
-  <div class="finalRound1MainStageCard">
-    <div class="finalRound1TextCard" onclick="toggleFinalRound1Overlay()">
-      <div class="finalRound1TextCardInner">
-        ${clipText}
+      <div class="finalRound1MainStageCard">
+        <div class="finalRound1TextCard" onclick="toggleFinalRound1Overlay()">
+          <div class="finalRound1TextCardInner">
+            ${clipText}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-`
+    `
   } else if (isQuestionCard) {
     const visibleParts = (finalState.round1.currentQuestionParts || [])
       .filter(part => String(part || "").trim() !== "")
@@ -1149,13 +1182,11 @@ async function loadFinalRound1Current() {
     `
   }
 
-  
-
   if (finalState.round1.answerShown && finalState.round1.currentAnswer) {
     answerContent = `
       <div class="finalRound1InfoCard finalRound1AnswerBox ${number >= 4 && number <= 6 ? "finalRound1AnswerProjectFont" : "finalRound1AnswerMolhimFont"}">
-  ${finalState.round1.currentAnswer}
-</div>
+        ${finalState.round1.currentAnswer}
+      </div>
     `
   }
 
@@ -1163,10 +1194,10 @@ async function loadFinalRound1Current() {
     <div class="finalRound1StageLayout">
       ${mainContent}
 
-      ${(noteContent || answerContent) ? `
+      ${answerContent ? `
         <div class="finalRound1BottomInfoRow">
-          ${noteContent || `<div class="finalRound1InfoCard finalRound1InfoEmpty"></div>`}
-          ${answerContent || `<div class="finalRound1InfoCard finalRound1InfoEmpty"></div>`}
+          <div class="finalRound1InfoCard finalRound1InfoEmpty"></div>
+          ${answerContent}
         </div>
       ` : ""}
     </div>
@@ -1179,7 +1210,7 @@ function showFinalRound1Question() {
     return
   }
 
-  const number = finalState.round1.currentNumber
+  const number = Number(finalState.round1.currentNumber)
 
   if (number < 4 || number > 6) {
     showGameToast("إظهار السؤال متاح فقط للأرقام 4 و5 و6")
@@ -1193,6 +1224,8 @@ function showFinalRound1Question() {
     showGameToast("لا توجد أجزاء للسؤال")
     return
   }
+
+  pushFinalHistory()
 
   if (finalState.round1.shownQuestionPartsCount < parts.length) {
     finalState.round1.shownQuestionPartsCount += 1
@@ -1208,9 +1241,10 @@ function showFinalRound1Answer() {
     return
   }
 
+  pushFinalHistory()
+
   finalState.round1.answerShown = !finalState.round1.answerShown
   loadFinalRound1Current()
-  renderFinalRound1()
   saveFinalState()
 }
 
@@ -1222,8 +1256,10 @@ function finalRound1Wrong() {
 
   pushFinalHistory()
 
+  clearFinalActiveDouble()
   playGameSound("wrong")
   flashScreen("wrong")
+
   updateFinalDoubleButton()
   saveFinalState()
 }
@@ -1251,27 +1287,35 @@ function finalRound1Correct() {
     loadFinalRound1Current()
   }
 
+  finalState.round1.scores[answeringTeam] += getFinalScoreValue(answeringTeam, 1)
 
-  const doubleTeam = finalState.doubleState?.activeTeam || null
-
-  if (doubleTeam) {
-    if (answeringTeam === doubleTeam) {
-      finalState.round1.scores[doubleTeam] += 2
-    }
-
-    clearFinalActiveDouble()
-  } else {
-    finalState.round1.scores[answeringTeam] += 1
-  }
+  clearFinalActiveDouble()
 
   playGameSound("correct")
   flashScreen("correct")
   renderFinalScores()
-saveFinalState()
+  saveFinalState()
 
-setTimeout(() => {
-  finalizeRound1Turn()
-}, 7000)
+  setTimeout(() => {
+    finalizeRound1Turn()
+  }, 7000)
+}
+
+function finalizeRound1Turn() {
+  finalState.round1.pendingScore = false
+  finalState.round1.currentNumber = null
+  finalState.round1.currentAnswer = ""
+  finalState.round1.currentImage = ""
+  finalState.round1.currentNote = ""
+  finalState.round1.currentQuestionParts = []
+  finalState.round1.shownQuestionPartsCount = 0
+  finalState.round1.answerShown = false
+  finalState.round1.activeTeam = null
+
+  resetFinalTeamSelection()
+  renderFinalRound()
+  saveFinalState()
+  updateEndRoundButtonState()
 }
 
 function toggleFinalRound1Overlay() {
@@ -1325,8 +1369,10 @@ function renderFinalRound2() {
   setFinalControlsMode(2)
 
   let grid = ""
+
   for (let i = 1; i <= 4; i++) {
     const opened = finalState.round2.opened.includes(i)
+
     grid += `
       <button
         class="finalRound2Card ${opened ? "used" : ""}"
@@ -1340,7 +1386,6 @@ function renderFinalRound2() {
 
   const isScramble = finalState.round2.currentType === "scramble"
   const isSequence = finalState.round2.currentType === "sequence"
-  const hasCurrent = finalState.round2.pendingScore && finalState.round2.currentNumber !== null
 
   stage.innerHTML = `
     <div class="finalRound2Wrap">
@@ -1353,12 +1398,19 @@ function renderFinalRound2() {
 
   controls.innerHTML = `
     <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">دبل</button>
-    
+
     <button onclick="finalRound2DecreaseCountdown()" class="archiveCtrlBtn btnStart" ${isSequence ? "" : "disabled"}>
       ${isSequence ? finalState.round2.countdown : "العداد"}
     </button>
-    <button onclick="finalRound2RecordScore()" class="archiveCtrlBtn btnCorrect" ${isScramble ? "" : "disabled"}>تسجيل نتيجة المبعثرة</button>
-    <button onclick="finalRound2RecordSequenceScore()" class="archiveCtrlBtn btnCorrect" ${isSequence ? "" : "disabled"}>تسجيل نتيجة التلميح</button>
+
+    <button onclick="finalRound2RecordScore()" class="archiveCtrlBtn btnCorrect" ${isScramble ? "" : "disabled"}>
+      تسجيل نتيجة المبعثرة
+    </button>
+
+    <button onclick="finalRound2RecordSequenceScore()" class="archiveCtrlBtn btnCorrect" ${isSequence ? "" : "disabled"}>
+      تسجيل نتيجة التلميح
+    </button>
+
     <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
     <button onclick="goToFinalRound(3)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>
   `
@@ -1374,6 +1426,7 @@ async function openFinalRound2Card(number) {
   }
 
   const team = finalState.round2.activeTeam
+
   if (!team) {
     showGameToast("اختر الفريق أولاً")
     return
@@ -1413,8 +1466,8 @@ async function openFinalRound2Card(number) {
   const { data, error } = await db
     .from("final_round2_items")
     .select("*")
-    .eq("model", currentModel)
-    .eq("number", number)
+    .eq("model", Number(currentModel))
+    .eq("number", Number(number))
     .order("item_order", { ascending: true })
 
   if (error) {
@@ -1423,6 +1476,7 @@ async function openFinalRound2Card(number) {
   }
 
   const items = data || []
+
   finalState.round2.allWords = items.map(x => x.prompt || "")
   finalState.round2.answers = items.map(x => x.answer || x.prompt || "")
   finalState.round2.hints = items.map(x => x.hint || "")
@@ -1443,8 +1497,10 @@ async function openFinalRound2Card(number) {
 
 function startFinalRound2ScrambleReveal() {
   clearInterval(finalState.round2.revealTimer)
+
   finalState.round2.currentRevealIndex = -1
   finalState.round2.answerShown = false
+
   renderFinalRound2Words(false)
 
   let idx = 0
@@ -1455,6 +1511,7 @@ function startFinalRound2ScrambleReveal() {
       finalState.round2.revealTimer = null
 
       finalState.round2.answerShown = true
+
       renderFinalRoundTitle()
       renderFinalRound2Words(true)
       flashScreen("correct")
@@ -1485,7 +1542,8 @@ function renderFinalRound2Words(showAnswers) {
       box.innerHTML = `
         <div class="finalRound2AnswerGrid">
           ${finalState.round2.scrambledWords.map((word, idx) => {
-            const selected = (finalState.round2.selectedCorrectIndexes || []).includes(idx)
+            const selected = finalState.round2.selectedCorrectIndexes.includes(idx)
+
             return `
               <button
                 class="finalRound2AnswerCard ${selected ? "selectedCorrect" : ""}"
@@ -1502,6 +1560,7 @@ function renderFinalRound2Words(showAnswers) {
     }
 
     const idx = finalState.round2.currentRevealIndex
+
     if (idx < 0 || !finalState.round2.scrambledWords[idx]) {
       box.innerHTML = `<div class="finalRoundPlaceholder">انتظر ظهور الكلمات</div>`
       return
@@ -1547,23 +1606,6 @@ function renderFinalRound2Words(showAnswers) {
   `
 }
 
-function showFinalRound2Answer() {
-  if (!finalState.round2.pendingScore || finalState.round2.currentNumber === null) {
-    showGameToast("اختر الفريق ثم الرقم أولاً")
-    return
-  }
-
-  finalState.round2.answerShown = true
-  clearInterval(finalState.round2.revealTimer)
-  finalState.round2.revealTimer = null
-
-  renderFinalRoundTitle()
-  renderFinalRound2Words(true)
-  
-  flashScreen("correct")
-  saveFinalState()
-}
-
 function toggleFinalRound2CorrectSelection(index) {
   if (finalState.round2.currentType !== "scramble") return
   if (!finalState.round2.answerShown) return
@@ -1571,14 +1613,12 @@ function toggleFinalRound2CorrectSelection(index) {
 
   pushFinalHistory()
 
-  const arr = finalState.round2.selectedCorrectIndexes || []
+  const arr = finalState.round2.selectedCorrectIndexes
   const exists = arr.includes(index)
 
-  if (exists) {
-    finalState.round2.selectedCorrectIndexes = arr.filter(x => x !== index)
-  } else {
-    finalState.round2.selectedCorrectIndexes = [...arr, index]
-  }
+  finalState.round2.selectedCorrectIndexes = exists
+    ? arr.filter(x => x !== index)
+    : [...arr, index]
 
   finalState.round2.correctCount = finalState.round2.selectedCorrectIndexes.length
 
@@ -1594,14 +1634,12 @@ function finalRound2ToggleCorrectFromPresenter(index) {
 
   pushFinalHistory()
 
-  const arr = finalState.round2.selectedCorrectIndexes || []
+  const arr = finalState.round2.selectedCorrectIndexes
   const exists = arr.includes(index)
 
-  if (exists) {
-    finalState.round2.selectedCorrectIndexes = arr.filter(x => x !== index)
-  } else {
-    finalState.round2.selectedCorrectIndexes = [...arr, index]
-  }
+  finalState.round2.selectedCorrectIndexes = exists
+    ? arr.filter(x => x !== index)
+    : [...arr, index]
 
   finalState.round2.correctCount = finalState.round2.selectedCorrectIndexes.length
 
@@ -1612,51 +1650,6 @@ function finalRound2ToggleCorrectFromPresenter(index) {
   }
 
   saveFinalState()
-}
-
-function finalRound2AddCorrect() {
-  if (!finalState.round2.pendingScore || finalState.round2.currentNumber === null) {
-    showGameToast("اختر الفريق ثم الرقم أولاً")
-    return
-  }
-
-  if (finalState.round2.currentType === "scramble") {
-    showGameToast("حدد الصحيح بالضغط على البطاقات")
-    return
-  }
-
-  showGameToast("هذا الزر غير مستخدم هنا")
-}
-
-function finalRound2RecordScore() {
-  const team = finalState.round2.activeTeam
-
-  if (!finalState.round2.pendingScore || finalState.round2.currentNumber === null) {
-    showGameToast("اختر الفريق ثم الرقم أولاً")
-    return
-  }
-
-  if (finalState.round2.currentType !== "scramble") {
-    showGameToast("هذا الزر خاص بالرقمين 1 و 3")
-    return
-  }
-
-  if (!team) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
-
-  pushFinalHistory()
-
-  finalState.round2.correctCount = (finalState.round2.selectedCorrectIndexes || []).length
-  finalState.round2.scores[team] += getFinalScoreValue(team, finalState.round2.correctCount)
-  finalState.round2.lastTeamPlayed = team
-
-  clearFinalActiveDouble()
-
-  renderFinalScores()
-  playGameSound("correct")
-  finalizeRound2Number()
 }
 
 function hideFinalRound2SequenceWord(index) {
@@ -1704,6 +1697,37 @@ function finalRound2DecreaseCountdown() {
   saveFinalState()
 }
 
+function finalRound2RecordScore() {
+  const team = finalState.round2.activeTeam
+
+  if (!finalState.round2.pendingScore || finalState.round2.currentNumber === null) {
+    showGameToast("اختر الفريق ثم الرقم أولاً")
+    return
+  }
+
+  if (finalState.round2.currentType !== "scramble") {
+    showGameToast("هذا الزر خاص بالرقمين 1 و 3")
+    return
+  }
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  pushFinalHistory()
+
+  finalState.round2.correctCount = finalState.round2.selectedCorrectIndexes.length
+  finalState.round2.scores[team] += getFinalScoreValue(team, finalState.round2.correctCount)
+  finalState.round2.lastTeamPlayed = team
+
+  clearFinalActiveDouble()
+
+  renderFinalScores()
+  playGameSound("correct")
+  finalizeRound2Number()
+}
+
 function finalRound2RecordSequenceScore() {
   const team = finalState.round2.activeTeam
 
@@ -1734,11 +1758,56 @@ function finalRound2RecordSequenceScore() {
   finalizeRound2Number()
 }
 
+function finalizeRound2Number() {
+  if (finalState.round2.currentNumber !== null) {
+    if (!finalState.round2.scoredNumbers.includes(finalState.round2.currentNumber)) {
+      finalState.round2.scoredNumbers.push(finalState.round2.currentNumber)
+    }
+  }
+
+  clearInterval(finalState.round2.revealTimer)
+
+  finalState.round2.revealTimer = null
+  finalState.round2.pendingScore = false
+  finalState.round2.currentNumber = null
+  finalState.round2.currentType = null
+  finalState.round2.allWords = []
+  finalState.round2.answers = []
+  finalState.round2.hints = []
+  finalState.round2.scrambledWords = []
+  finalState.round2.currentRevealIndex = -1
+  finalState.round2.answerShown = false
+  finalState.round2.correctCount = 0
+  finalState.round2.countdown = 15
+  finalState.round2.hiddenSequence = []
+  finalState.round2.selectedCorrectIndexes = []
+
+  resetFinalTeamSelection()
+  renderFinalRound()
+  saveFinalState()
+  updateEndRoundButtonState()
+}
+
 /* =========================
-   Round 3
+   Round 3 Switch
 ========================= */
 
 function renderFinalRound3() {
+  ensureFinalRound3State()
+
+  if (finalState.round3.mode === "team_media") {
+    renderFinalRound3TeamMedia()
+    return
+  }
+
+  renderFinalRound3Classic()
+}
+
+/* =========================
+   Round 3 - Classic
+========================= */
+
+function renderFinalRound3Classic() {
   const stage = document.getElementById("finalMainStage")
   const controls = document.getElementById("finalControlsBar")
   if (!stage || !controls) return
@@ -1746,8 +1815,10 @@ function renderFinalRound3() {
   setFinalControlsMode(3)
 
   let grid = ""
+
   for (let i = 1; i <= 2; i++) {
     const opened = finalState.round3.opened.includes(i)
+
     grid += `
       <button
         class="finalRound3Card ${opened ? "used" : ""}"
@@ -1762,6 +1833,7 @@ function renderFinalRound3() {
   stage.innerHTML = `
     <div class="finalRound3Wrap">
       <div class="finalRound3Grid">${grid}</div>
+
       <div class="finalRound3ImageStageWrap">
         <div class="finalRound3ImageStage" id="finalRound3ImageStage">
           اختر الفريق ثم الرقم
@@ -1772,7 +1844,6 @@ function renderFinalRound3() {
 
   controls.innerHTML = `
     <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">دبل</button>
-    
     <button onclick="finalRound3RecordScore()" class="archiveCtrlBtn btnCorrect">تسجيل النتيجة</button>
     <button onclick="startFinalRound3Sequence()" class="archiveCtrlBtn btnStart">بدء عرض الصور</button>
     <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
@@ -1788,12 +1859,14 @@ async function openFinalRound3Card(number) {
   }
 
   const team = finalState.round3.activeTeam
+
   if (!team) {
     showGameToast("اختر الفريق أولاً")
     return
   }
 
   if (finalState.round3.opened.includes(number)) return
+
   if (Object.values(finalState.round3.assignedTeams).includes(team)) {
     showGameToast("كل فريق له رقم واحد فقط")
     return
@@ -1802,8 +1875,8 @@ async function openFinalRound3Card(number) {
   pushFinalHistory()
 
   clearInterval(finalState.round3.sequenceTimer)
-  finalState.round3.sequenceTimer = null
 
+  finalState.round3.sequenceTimer = null
   finalState.round3.currentNumber = number
   finalState.round3.opened.push(number)
   finalState.round3.pendingScore = true
@@ -1816,8 +1889,8 @@ async function openFinalRound3Card(number) {
   const { data, error } = await db
     .from("final_round3_items")
     .select("*")
-    .eq("model", currentModel)
-    .eq("number", number)
+    .eq("model", Number(currentModel))
+    .eq("number", Number(number))
     .order("image_order", { ascending: true })
 
   if (error) {
@@ -1826,6 +1899,7 @@ async function openFinalRound3Card(number) {
   }
 
   const rows = data || []
+
   finalState.round3.images = rows.map(x => x.image || "")
   finalState.round3.answers = rows.map(x => x.answer || "")
   finalState.round3.notes = rows.map(x => x.note || "")
@@ -1866,9 +1940,7 @@ function startFinalRound3Sequence() {
       `
 
       const overlayImg = document.getElementById("finalRound3ImageOverlayImg")
-if (overlayImg) {
-  overlayImg.src = currentFinalRound3Image
-}
+      if (overlayImg) overlayImg.src = currentFinalRound3Image
 
       finalState.round3.shownCount = idx + 1
       idx++
@@ -1876,52 +1948,22 @@ if (overlayImg) {
       return
     }
 
-    if (idx === finalState.round3.images.length) {
-  currentFinalRound3Image = ""
+    currentFinalRound3Image = ""
 
-  const overlay = document.getElementById("finalRound3ImageOverlay")
-  if (overlay) overlay.remove()
+    const overlay = document.getElementById("finalRound3ImageOverlay")
+    if (overlay) overlay.remove()
 
-  finalState.round3.answersAllowed = true
-  idx++
-
-  showFinalRound3Answer()
-  saveFinalState()
-  return
-}
+    finalState.round3.answersAllowed = true
 
     clearInterval(finalState.round3.sequenceTimer)
     finalState.round3.sequenceTimer = null
+
+    showFinalRound3Answer()
+    saveFinalState()
   }
 
   showImage()
   finalState.round3.sequenceTimer = setInterval(showImage, 10000)
-}
-
-function toggleFinalRound3CorrectSelection(index) {
-  if (!finalState.round3.pendingScore) return
-  if (index < 0) return
-
-  pushFinalHistory()
-
-  const arr = finalState.round3.selectedCorrectIndexes || []
-  const exists = arr.includes(index)
-
-  if (exists) {
-    finalState.round3.selectedCorrectIndexes = arr.filter(x => x !== index)
-  } else {
-    finalState.round3.selectedCorrectIndexes = [...arr, index]
-  }
-
-  finalState.round3.correctCount = finalState.round3.selectedCorrectIndexes.length
-
-  renderFinalRoundTitle()
-
-  if (finalState.round3.answersAllowed) {
-    showFinalRound3Answer()
-  }
-
-  saveFinalState()
 }
 
 function showFinalRound3Answer() {
@@ -1942,18 +1984,46 @@ function showFinalRound3Answer() {
 
   stage.innerHTML = `
     <div class="finalRound3AnswersList">
-      ${finalState.round3.answers.map((x, idx) => {
-        const selected = (finalState.round3.selectedCorrectIndexes || []).includes(idx)
+      ${finalState.round3.answers.map((answer, idx) => {
+        const selected = finalState.round3.selectedCorrectIndexes.includes(idx)
+
         return `
-          <button class="finalRound3AnswerCard ${selected ? "selectedCorrect" : ""}" onclick="toggleFinalRound3CorrectSelection(${idx})">
-            <div class="finalAnswerChip">${x}</div>
+          <button
+            class="finalRound3AnswerCard ${selected ? "selectedCorrect" : ""}"
+            onclick="toggleFinalRound3CorrectSelection(${idx})"
+          >
+            <div class="finalAnswerChip">${answer}</div>
             ${finalState.round3.notes[idx] ? `<div class="finalNoteBox">${finalState.round3.notes[idx]}</div>` : ""}
           </button>
         `
       }).join("")}
     </div>
   `
-      
+
+  saveFinalState()
+}
+
+function toggleFinalRound3CorrectSelection(index) {
+  if (!finalState.round3.pendingScore) return
+  if (index < 0) return
+
+  pushFinalHistory()
+
+  const arr = finalState.round3.selectedCorrectIndexes
+  const exists = arr.includes(index)
+
+  finalState.round3.selectedCorrectIndexes = exists
+    ? arr.filter(x => x !== index)
+    : [...arr, index]
+
+  finalState.round3.correctCount = finalState.round3.selectedCorrectIndexes.length
+
+  renderFinalRoundTitle()
+
+  if (finalState.round3.answersAllowed) {
+    showFinalRound3Answer()
+  }
+
   saveFinalState()
 }
 
@@ -1972,7 +2042,7 @@ function finalRound3RecordScore() {
 
   pushFinalHistory()
 
-  finalState.round3.correctCount = (finalState.round3.selectedCorrectIndexes || []).length
+  finalState.round3.correctCount = finalState.round3.selectedCorrectIndexes.length
   finalState.round3.scores[team] += getFinalScoreValue(team, finalState.round3.correctCount)
   finalState.round3.lastTeamPlayed = team
 
@@ -1982,8 +2052,40 @@ function finalRound3RecordScore() {
   playGameSound("correct")
   flashScreen("correct")
 
-  const nextTeam = getOtherTeam(team)
-  finalizeRound3Number(nextTeam)
+  finalizeRound3Number(getOtherTeam(team))
+}
+
+function finalizeRound3Number(nextTeam = null) {
+  if (finalState.round3.currentNumber !== null) {
+    if (!finalState.round3.scoredNumbers.includes(finalState.round3.currentNumber)) {
+      finalState.round3.scoredNumbers.push(finalState.round3.currentNumber)
+    }
+  }
+
+  clearInterval(finalState.round3.sequenceTimer)
+
+  finalState.round3.sequenceTimer = null
+  finalState.round3.pendingScore = false
+  finalState.round3.currentNumber = null
+  finalState.round3.images = []
+  finalState.round3.answers = []
+  finalState.round3.notes = []
+  finalState.round3.shownCount = 0
+  finalState.round3.correctCount = 0
+  finalState.round3.answersAllowed = false
+  finalState.round3.selectedCorrectIndexes = []
+  currentFinalRound3Image = ""
+
+  resetFinalTeamSelection()
+  renderFinalRound()
+
+  if (nextTeam) {
+    finalState.round3.activeTeam = nextTeam
+    highlightFinalTeam(nextTeam)
+  }
+
+  saveFinalState()
+  updateEndRoundButtonState()
 }
 
 function toggleFinalRound3ImageOverlay() {
@@ -2010,4 +2112,482 @@ function toggleFinalRound3ImageOverlay() {
   }
 
   document.body.appendChild(overlay)
+}
+/* =========================
+   Round 3 - Team Media
+========================= */
+
+async function loadFinalRound3TeamMediaItem(number) {
+  const { data, error } = await db
+    .from("final_round3_items")
+    .select("*")
+    .eq("model", Number(currentModel))
+    .eq("number", Number(number))
+    .eq("image_order", 1)
+    .maybeSingle()
+
+  if (error) {
+    console.log("LOAD FINAL ROUND 3 TEAM MEDIA ERROR:", error)
+    showGameToast("تعذر تحميل بيانات الرقم")
+    return null
+  }
+
+  return data || null
+}
+
+function renderFinalRound3TeamMedia() {
+  const stage = document.getElementById("finalMainStage")
+  const controls = document.getElementById("finalControlsBar")
+  if (!stage || !controls) return
+
+  setFinalControlsMode(3)
+  ensureFinalRound3State()
+
+  const state = finalState.round3.teamMedia
+  const used = state.usedNumbers || []
+
+  let grid = ""
+
+  for (let i = 1; i <= 4; i++) {
+    const opened = used.includes(i)
+
+    grid += `
+      <button
+        class="finalRound3Card ${opened ? "used" : ""}"
+        ${opened ? "disabled" : ""}
+        onclick="openFinalRound3TeamMediaCard(${i})"
+      >
+        ${opened ? "" : i}
+      </button>
+    `
+  }
+
+  stage.innerHTML = `
+    <div class="finalRound3Wrap finalRound3TeamMediaWrap">
+
+      <div class="finalRound3Grid">${grid}</div>
+
+      <div class="finalRound3ImageStageWrap">
+        <div class="finalRound3ImageStage finalRound3TeamMediaStage" id="finalRound3TeamMediaStage">
+          ${buildFinalRound3TeamMediaContent()}
+        </div>
+      </div>
+
+    </div>
+  `
+
+  const hasCurrent = !!state.currentNumber
+  const canShowQuestion = hasCurrent && !!state.currentQuestion
+  const isVideo = hasCurrent && state.currentMediaType === "video" && !!state.currentMedia
+
+  controls.innerHTML = `
+    <button
+      onclick="showFinalRound3TeamMediaQuestion()"
+      class="archiveCtrlBtn btnAnswer"
+      ${canShowQuestion ? "" : "disabled"}
+    >
+      إظهار السؤال
+    </button>
+
+    <button
+      onclick="playFinalRound3TeamMediaVideo()"
+      class="archiveCtrlBtn btnStart"
+      ${isVideo ? "" : "disabled"}
+    >
+      تشغيل
+    </button>
+
+    <button
+      onclick="restartFinalRound3TeamMediaVideo()"
+      class="archiveCtrlBtn btnStart"
+      ${isVideo ? "" : "disabled"}
+    >
+      إعادة تشغيل
+    </button>
+
+    <button onclick="finalRound3TeamMediaCorrect()" class="archiveCtrlBtn btnCorrect">
+      إجابة صحيحة
+    </button>
+
+    <button onclick="finalRound3TeamMediaWrong()" class="archiveCtrlBtn btnWrong">
+      خطأ
+    </button>
+
+    <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">
+      تراجع
+    </button>
+  `
+
+  renderFinalRoundTitle()
+  renderFinalScores()
+  updateFinalUndoButtonState()
+  updateFinalDoubleButton()
+  updateEndRoundButtonState()
+  saveFinalState()
+}
+
+function buildFinalRound3TeamMediaContent() {
+  const state = finalState.round3.teamMedia
+
+  if (!state.currentNumber) {
+    return `<div class="finalRoundPlaceholder">اختر الفريق ثم الرقم</div>`
+  }
+
+  let mediaHTML = ""
+
+  if (state.currentMediaType === "video" && state.currentMedia) {
+    mediaHTML = `
+      <div class="finalRound3ImageFrame finalRound3VideoFrame finalRound3VideoFrameSmall">
+        <video
+          id="finalRound3TeamMediaInlineVideo"
+          src="${state.currentMedia}"
+          class="finalRound3Image finalRound3Video finalRound3VideoSmall"
+          playsinline
+          preload="metadata"
+          onclick="openFinalRound3TeamMediaOverlay('video')"
+        ></video>
+      </div>
+    `
+  } else if (state.currentMedia) {
+    mediaHTML = `
+      <div class="finalRound3ImageFrame" onclick="openFinalRound3TeamMediaOverlay('image')">
+        <img src="${state.currentMedia}" class="finalRound3Image" alt="">
+      </div>
+    `
+  } else {
+    mediaHTML = `<div class="finalRoundPlaceholder">لا توجد صورة أو فيديو</div>`
+  }
+
+  return `
+    <div class="finalRound3TeamMediaContent">
+      ${mediaHTML}
+
+      ${
+        state.questionShown && state.currentQuestion
+          ? `<div class="finalRound3QuestionBox">${state.currentQuestion}</div>`
+          : ""
+      }
+
+      ${
+        state.answerShown && state.currentAnswer
+          ? `<div class="finalRound3TeamMediaAnswer">${state.currentAnswer}</div>`
+          : ""
+      }
+    </div>
+  `
+}
+
+async function openFinalRound3TeamMediaCard(number) {
+  ensureFinalRound3State()
+
+  const state = finalState.round3.teamMedia
+  const team = finalState.round3.activeTeam
+
+  if (state.currentNumber) {
+    showGameToast("أغلق الرقم الحالي أولاً")
+    return
+  }
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (state.teamNumbers[team].length >= 2) {
+    showGameToast("هذا الفريق أخذ رقمين")
+    return
+  }
+
+  if (state.usedNumbers.includes(number)) return
+
+  const item = await loadFinalRound3TeamMediaItem(number)
+
+  if (!item) {
+    showGameToast("لا توجد بيانات لهذا الرقم")
+    return
+  }
+
+  pushFinalHistory()
+
+  const video = String(item.video || "").trim()
+  const image = String(item.image || "").trim()
+
+  state.currentNumber = number
+  state.currentTeam = team
+  state.currentQuestion = item.question || item.note || ""
+  state.currentAnswer = item.answer || ""
+  state.answerShown = false
+  state.questionShown = false
+  state.videoPlayed = false
+
+  if (video) {
+    state.currentMediaType = "video"
+    state.currentMedia = video
+  } else {
+    state.currentMediaType = "image"
+    state.currentMedia = image
+  }
+
+  state.usedNumbers.push(number)
+  state.teamNumbers[team].push(number)
+
+  finalState.round3.currentNumber = number
+  finalState.round3.pendingScore = true
+
+  if (!finalState.round3.opened.includes(number)) {
+    finalState.round3.opened.push(number)
+  }
+
+  playGameSound("open")
+  renderFinalRound3TeamMedia()
+}
+
+function showFinalRound3TeamMediaQuestion() {
+  const state = finalState.round3.teamMedia
+
+  if (!state.currentNumber) {
+    showGameToast("افتح رقم أولاً")
+    return
+  }
+
+  if (!state.currentQuestion) {
+    showGameToast("لا يوجد سؤال لهذا الرقم")
+    return
+  }
+
+  pushFinalHistory()
+
+  state.questionShown = true
+
+  playGameSound("answer")
+  renderFinalRound3TeamMedia()
+}
+
+function finalRound3TeamMediaCorrect() {
+  const state = finalState.round3.teamMedia
+  const team = state.currentTeam
+  const number = state.currentNumber
+
+  if (!number) {
+    showGameToast("افتح رقم أولاً")
+    return
+  }
+
+  if (!team) {
+    showGameToast("لا يوجد فريق محدد")
+    return
+  }
+
+  if (finalState.round3.scoredNumbers.includes(number)) {
+    showGameToast("تم تسجيل هذا الرقم مسبقاً")
+    return
+  }
+
+  pushFinalHistory()
+
+  state.answerShown = true
+
+  finalState.round3.scores[team] += getFinalScoreValue(team, 1)
+  finalState.round3.scoredNumbers.push(number)
+
+  clearFinalActiveDouble()
+
+  playGameSound("correct")
+  flashScreen("correct")
+  closeFinalRound3TeamMediaOverlay()
+
+  renderFinalScores()
+  renderFinalRound3TeamMedia()
+
+  setTimeout(() => {
+    resetFinalRound3TeamMediaCurrent()
+  }, 5000)
+}
+
+function finalRound3TeamMediaWrong() {
+  const state = finalState.round3.teamMedia
+  const number = state.currentNumber
+
+  if (!number) {
+    showGameToast("افتح رقم أولاً")
+    return
+  }
+
+  pushFinalHistory()
+
+  state.answerShown = true
+
+  if (!finalState.round3.scoredNumbers.includes(number)) {
+    finalState.round3.scoredNumbers.push(number)
+  }
+
+  playGameSound("wrong")
+  flashScreen("wrong")
+  closeFinalRound3TeamMediaOverlay()
+
+  renderFinalRound3TeamMedia()
+
+  setTimeout(() => {
+    resetFinalRound3TeamMediaCurrent()
+  }, 5000)
+}
+
+function resetFinalRound3TeamMediaCurrent() {
+  const state = finalState.round3.teamMedia
+
+  state.currentNumber = null
+  state.currentTeam = null
+  state.currentMediaType = ""
+  state.currentMedia = ""
+  state.currentQuestion = ""
+  state.currentAnswer = ""
+  state.answerShown = false
+  state.questionShown = false
+  state.videoPlayed = false
+
+  finalState.round3.currentNumber = null
+  finalState.round3.pendingScore = false
+  finalState.round3.activeTeam = null
+
+  resetFinalTeamSelection()
+  renderFinalRound3TeamMedia()
+  updateEndRoundButtonState()
+}
+
+function openFinalRound3TeamMediaOverlay(type) {
+  const state = finalState.round3.teamMedia
+
+  if (!state.currentMedia) return
+
+  let overlay = document.getElementById("finalRound3TeamMediaOverlay")
+
+  if (!overlay) {
+    overlay = document.createElement("div")
+    overlay.id = "finalRound3TeamMediaOverlay"
+    overlay.className = "finalRound3TeamMediaOverlay"
+    document.body.appendChild(overlay)
+  }
+
+  overlay.onclick = function () {
+    closeFinalRound3TeamMediaOverlay()
+  }
+
+  if (type === "video") {
+    overlay.innerHTML = `
+      <button class="finalRound3TeamMediaCloseBtn" onclick="event.stopPropagation(); closeFinalRound3TeamMediaOverlay()">
+        ×
+      </button>
+
+      <div class="finalRound3TeamMediaOverlayInner" onclick="event.stopPropagation()">
+        <video
+          id="finalRound3TeamMediaOverlayVideo"
+          src="${state.currentMedia}"
+          playsinline
+          preload="metadata"
+        ></video>
+      </div>
+    `
+  } else {
+    overlay.innerHTML = `
+      <button class="finalRound3TeamMediaCloseBtn" onclick="event.stopPropagation(); closeFinalRound3TeamMediaOverlay()">
+        ×
+      </button>
+
+      <div class="finalRound3TeamMediaOverlayInner" onclick="event.stopPropagation()">
+        <img src="${state.currentMedia}" alt="">
+      </div>
+    `
+  }
+
+  overlay.classList.remove("hidden")
+}
+
+function closeFinalRound3TeamMediaOverlay() {
+  const overlay = document.getElementById("finalRound3TeamMediaOverlay")
+  if (!overlay) return
+
+  const overlayVideo = document.getElementById("finalRound3TeamMediaOverlayVideo")
+  if (overlayVideo) {
+    overlayVideo.pause()
+    overlayVideo.currentTime = 0
+  }
+
+  const inlineVideo = document.getElementById("finalRound3TeamMediaInlineVideo")
+  if (inlineVideo) {
+    inlineVideo.pause()
+  }
+
+  overlay.classList.add("hidden")
+  overlay.innerHTML = ""
+}
+
+function getFinalRound3ActiveVideo() {
+  return (
+    document.getElementById("finalRound3TeamMediaOverlayVideo") ||
+    document.getElementById("finalRound3TeamMediaInlineVideo")
+  )
+}
+
+function playFinalRound3TeamMediaVideo() {
+  const state = finalState.round3.teamMedia
+
+  if (!state.currentNumber || state.currentMediaType !== "video") {
+    showGameToast("لا يوجد فيديو")
+    return
+  }
+
+  if (state.videoPlayed) {
+    showGameToast("الفيديو اشتغل مرة واحدة، اضغط إعادة تشغيل")
+    return
+  }
+
+  openFinalRound3TeamMediaOverlay("video")
+
+  setTimeout(() => {
+    const video = document.getElementById("finalRound3TeamMediaOverlayVideo")
+    if (!video) return
+
+    state.videoPlayed = true
+
+    video.controls = false
+    video.currentTime = 0
+
+    video.onended = function () {
+      closeFinalRound3TeamMediaOverlay()
+      saveFinalState()
+    }
+
+    video.play()
+    saveFinalState()
+  }, 50)
+}
+
+function restartFinalRound3TeamMediaVideo() {
+  const state = finalState.round3.teamMedia
+
+  if (!state.currentNumber || state.currentMediaType !== "video") {
+    showGameToast("لا يوجد فيديو")
+    return
+  }
+
+  openFinalRound3TeamMediaOverlay("video")
+
+  setTimeout(() => {
+    const video = document.getElementById("finalRound3TeamMediaOverlayVideo")
+    if (!video) return
+
+    video.pause()
+    video.currentTime = 0
+    video.controls = false
+
+    state.videoPlayed = true
+
+    video.onended = function () {
+      closeFinalRound3TeamMediaOverlay()
+      saveFinalState()
+    }
+
+    video.play()
+    saveFinalState()
+  }, 50)
 }

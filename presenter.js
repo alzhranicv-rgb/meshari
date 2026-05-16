@@ -1871,7 +1871,6 @@ function refreshPresenterWhoFromState() {
     compensationBtn.disabled = !canPresenterWhoCompensation()
   }
 }
-
 /* =========================
    FINAL
 ========================= */
@@ -1904,6 +1903,29 @@ function getPresenterFinalRoundState(round = getPresenterFinalRound()) {
   if (round === 3) return state.round3 || {}
 
   return {}
+}
+
+function isPresenterFinalRound3TeamMedia() {
+  const state = getPresenterFinalRoundState(3)
+  return state?.mode === "team_media"
+}
+
+function getPresenterFinalRound3TeamMediaState() {
+  const state = getPresenterFinalRoundState(3)
+
+  return state.teamMedia || {
+    usedNumbers: [],
+    teamNumbers: { A: [], B: [] },
+    currentNumber: null,
+    currentTeam: null,
+    currentMediaType: "",
+    currentMedia: "",
+    currentQuestion: "",
+    currentAnswer: "",
+    questionShown: false,
+    answerShown: false,
+    videoPlayed: false
+  }
 }
 
 function clearPresenterFinalPreview(round = presenterFinalRound) {
@@ -1968,22 +1990,31 @@ async function renderPresenterFinalRoundContent() {
   const round = Number(presenterFinalRound || 1)
   const state = getPresenterFinalRoundState(round)
 
+  const isTeamMedia = round === 3 && isPresenterFinalRound3TeamMedia()
+  const teamMediaState = getPresenterFinalRound3TeamMediaState()
+
   let nums = [1, 2, 3, 4, 5, 6]
   if (round === 2) nums = [1, 2, 3, 4]
-  if (round === 3) nums = [1, 2]
+  if (round === 3) nums = isTeamMedia ? [1, 2, 3, 4] : [1, 2]
+
+  const openedNumbers = isTeamMedia
+    ? (teamMediaState.usedNumbers || [])
+    : (state.opened || [])
 
   const selectedNumber =
-    Number(state.currentNumber || 0) ||
+    Number(isTeamMedia ? teamMediaState.currentNumber : state.currentNumber || 0) ||
     (presenterFinalSelected?.round === round ? Number(presenterFinalSelected.number || 0) : 0)
 
+  const pendingScore = !!state.pendingScore || !!teamMediaState.currentNumber
+
   numbersBox.innerHTML = nums.map(n => {
-    const opened = (state.opened || []).includes(n)
+    const opened = openedNumbers.includes(n)
     const current = selectedNumber === n
 
     return `
       <button
         class="presenterNumberBtn ${opened ? "presenterOpened" : ""} ${current ? "selectedPresenterTeam" : ""}"
-        ${opened || state.pendingScore ? "disabled" : ""}
+        ${opened || pendingScore ? "disabled" : ""}
         onclick="openPresenterFinalNumber(${round}, ${n})"
       >
         ${opened ? "" : n}
@@ -2070,6 +2101,62 @@ async function renderPresenterFinalRoundContent() {
     return
   }
 
+  if (isTeamMedia) {
+    const hasCurrent = !!teamMediaState.currentNumber
+    const isVideo = teamMediaState.currentMediaType === "video"
+
+    controlsBox.innerHTML = `
+      <div class="presenterActions">
+        <button
+          class="presenterBtn blue"
+          onclick="sendCommand('showQuestion')"
+          ${hasCurrent && teamMediaState.currentQuestion ? "" : "disabled"}
+        >
+          إظهار السؤال
+        </button>
+
+        <button
+          class="presenterBtn dark"
+          onclick="sendCommand('playTeamMediaVideo')"
+          ${hasCurrent && isVideo ? "" : "disabled"}
+        >
+          تشغيل الفيديو
+        </button>
+
+        <button
+          class="presenterBtn blue"
+          onclick="sendCommand('restartTeamMediaVideo')"
+          ${hasCurrent && isVideo ? "" : "disabled"}
+        >
+          إعادة تشغيل
+        </button>
+      </div>
+
+      <div class="presenterActions">
+        <button
+          class="presenterBtn green"
+          onclick="clearPresenterFinalPreview(3); sendCommand('correct')"
+          ${hasCurrent ? "" : "disabled"}
+        >
+          إجابة صحيحة
+        </button>
+
+        <button
+          class="presenterBtn red"
+          onclick="clearPresenterFinalPreview(3); sendCommand('wrong')"
+          ${hasCurrent ? "" : "disabled"}
+        >
+          خطأ
+        </button>
+
+        <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+      </div>
+    `
+
+    refreshPresenterFinalControlsOnly(3)
+    return
+  }
+
   controlsBox.innerHTML = `
     <div class="presenterActions">
       <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
@@ -2128,23 +2215,30 @@ async function refreshPresenterFinalNumbersOnly(round) {
   if (!numbersBox) return
 
   const state = getPresenterFinalRoundState(round)
+  const isTeamMedia = round === 3 && isPresenterFinalRound3TeamMedia()
+  const teamMediaState = getPresenterFinalRound3TeamMediaState()
 
   let nums = [1, 2, 3, 4, 5, 6]
   if (round === 2) nums = [1, 2, 3, 4]
-  if (round === 3) nums = [1, 2]
+  if (round === 3) nums = isTeamMedia ? [1, 2, 3, 4] : [1, 2]
+
+  const openedNumbers = isTeamMedia
+    ? (teamMediaState.usedNumbers || [])
+    : (state.opened || [])
 
   const selectedNumber =
-    Number(state.currentNumber || 0) ||
+    Number(isTeamMedia ? teamMediaState.currentNumber : state.currentNumber || 0) ||
     (
       presenterFinalSelected?.round === round
         ? Number(presenterFinalSelected.number || 0)
         : 0
     )
 
+  const pendingScore = !!state.pendingScore || !!teamMediaState.currentNumber
+
   numbersBox.innerHTML = nums.map(n => {
-    const opened = (state.opened || []).includes(n)
+    const opened = openedNumbers.includes(n)
     const current = selectedNumber === n
-    const pendingScore = !!state.pendingScore
 
     return `
       <button
@@ -2163,9 +2257,11 @@ async function refreshPresenterFinalPreviewOnly(round) {
   if (!previewBox) return
 
   const state = getPresenterFinalRoundState(round)
+  const isTeamMedia = round === 3 && isPresenterFinalRound3TeamMedia()
+  const teamMediaState = getPresenterFinalRound3TeamMediaState()
 
   const currentNumber =
-    Number(state.currentNumber || 0) ||
+    Number(isTeamMedia ? teamMediaState.currentNumber : state.currentNumber || 0) ||
     (
       presenterFinalSelected?.round === round
         ? Number(presenterFinalSelected.number || 0)
@@ -2250,6 +2346,36 @@ function refreshPresenterFinalControlsOnly(round) {
   }
 
   if (round === 3) {
+    const isTeamMedia = isPresenterFinalRound3TeamMedia()
+    const teamMediaState = getPresenterFinalRound3TeamMediaState()
+
+    if (isTeamMedia) {
+      const hasCurrent = !!teamMediaState.currentNumber
+      const isVideo = teamMediaState.currentMediaType === "video"
+
+      allButtons.forEach(btn => {
+        const onclick = btn.getAttribute("onclick") || ""
+
+        if (onclick.includes("showQuestion")) {
+          btn.disabled = !(hasCurrent && teamMediaState.currentQuestion)
+        }
+
+        if (onclick.includes("playTeamMediaVideo")) {
+          btn.disabled = !(hasCurrent && isVideo)
+        }
+
+        if (onclick.includes("restartTeamMediaVideo")) {
+          btn.disabled = !(hasCurrent && isVideo)
+        }
+
+        if (onclick.includes("correct") || onclick.includes("wrong")) {
+          btn.disabled = !hasCurrent
+        }
+      })
+
+      return
+    }
+
     const currentNumber = Number(state.currentNumber || 0)
 
     const recordBtn = allButtons.find(btn =>
@@ -2264,13 +2390,19 @@ function refreshPresenterFinalControlsOnly(round) {
 
 function openPresenterFinalNumber(round, number) {
   const state = getPresenterFinalRoundState(round)
+  const isTeamMedia = round === 3 && isPresenterFinalRound3TeamMedia()
+  const teamMediaState = getPresenterFinalRound3TeamMediaState()
 
-  if (state.pendingScore) {
+  const openedNumbers = isTeamMedia
+    ? (teamMediaState.usedNumbers || [])
+    : (state.opened || [])
+
+  if (state.pendingScore || teamMediaState.currentNumber) {
     showToast("أنهِ الرقم الحالي أولاً")
     return
   }
 
-  if ((state.opened || []).includes(number)) {
+  if (openedNumbers.includes(number)) {
     showToast("الرقم مستخدم")
     return
   }
@@ -2436,13 +2568,17 @@ async function renderPresenterFinalRound3Preview() {
   if (!previewBox) return
 
   const state = getPresenterFinalRoundState(3)
+  const isTeamMedia = isPresenterFinalRound3TeamMedia()
+  const teamMediaState = getPresenterFinalRound3TeamMediaState()
 
   const current = Number(
-    state.currentNumber ||
-    (presenterFinalSelected?.round === 3 ? presenterFinalSelected.number : 0)
+    isTeamMedia
+      ? teamMediaState.currentNumber
+      : state.currentNumber ||
+        (presenterFinalSelected?.round === 3 ? presenterFinalSelected.number : 0)
   )
 
-  if (!state.pendingScore && !state.currentNumber && presenterFinalSelected?.round === 3) {
+  if (!state.pendingScore && !state.currentNumber && !teamMediaState.currentNumber && presenterFinalSelected?.round === 3) {
     presenterFinalPreviewCache[3] = ""
     presenterFinalSelected = { round: 3, number: null }
     previewBox.innerHTML = "اختر رقمًا"
@@ -2451,6 +2587,75 @@ async function renderPresenterFinalRound3Preview() {
 
   if (!current) {
     previewBox.innerHTML = presenterFinalPreviewCache[3] || "اختر رقمًا"
+    return
+  }
+
+  if (isTeamMedia) {
+    const { data } = await db
+      .from("final_round3_items")
+      .select("*")
+      .eq("model", presenterModel)
+      .eq("number", current)
+      .eq("image_order", 1)
+      .maybeSingle()
+
+    const mediaType =
+      teamMediaState.currentMediaType ||
+      (data?.video ? "video" : data?.image ? "image" : "")
+
+    const media =
+      teamMediaState.currentMedia ||
+      data?.video ||
+      data?.image ||
+      ""
+
+    const question =
+      teamMediaState.currentQuestion ||
+      data?.question ||
+      data?.note ||
+      ""
+
+    const answer =
+      teamMediaState.currentAnswer ||
+      data?.answer ||
+      ""
+
+    presenterFinalPreviewCache[3] = `
+      <div class="presenterFinalTeamMediaPreview">
+        <div><strong>الرقم:</strong> ${current}</div>
+
+        ${
+          media
+            ? mediaType === "video"
+              ? `
+                <div class="presenterImagePreviewBox presenterVideoPreviewBox">
+                  <video src="${media}" muted playsinline preload="metadata"></video>
+                </div>
+              `
+              : `
+                <div class="presenterImagePreviewBox">
+                  <img src="${media}" alt="">
+                </div>
+              `
+            : `<div class="presenterAnswerBody">لا توجد صورة أو فيديو</div>`
+        }
+
+        ${
+          question
+            ? `<div><strong>السؤال:</strong><br>${question}</div>`
+            : `<div><strong>السؤال:</strong><br>لا يوجد سؤال</div>`
+        }
+
+        ${
+          answer
+            ? `<div><strong>الإجابة:</strong><br>${answer}</div>`
+            : `<div><strong>الإجابة:</strong><br>لا توجد إجابة</div>`
+        }
+      </div>
+    `
+
+    const freshBox = document.getElementById("presenterFinalPreview")
+    if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[3]
     return
   }
 
@@ -2498,7 +2703,6 @@ async function renderPresenterFinalRound3Preview() {
   const freshBox = document.getElementById("presenterFinalPreview")
   if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[3]
 }
-
 /* =========================
    ARCHIVE
 ========================= */

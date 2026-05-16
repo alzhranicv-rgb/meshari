@@ -2573,7 +2573,9 @@ function getAuctionDraftItem(number) {
       answer: "",
       note: "",
       image: "",
-      file: null
+      video: "",
+      file: null,
+      videoFile: null
     }
   }
 
@@ -2590,6 +2592,8 @@ function collectAuctionCurrentDraft() {
 
   const file = document.getElementById(`auctionFile${n}`)?.files?.[0] || null
   if (file) item.file = file
+  const videoFile = document.getElementById(`auctionVideo${n}`)?.files?.[0] || null
+  if (videoFile) item.videoFile = videoFile
 }
 
 function switchAuctionAdminNumber(number) {
@@ -2652,7 +2656,10 @@ async function renderAuctionAdmin() {
     item.answer = row.answer || ""
     item.note = row.note || ""
     item.image = row.image || ""
+    item.video = row.video || ""
+
     item.file = null
+    item.videoFile = null
   })
 
   if (auctionAdminActiveNumber > auctionAdminCount) {
@@ -2673,8 +2680,11 @@ function isAuctionDraftComplete(number) {
   const question = String(item.question || "").trim()
   const answer = String(item.answer || "").trim()
   const image = String(item.image || "").trim()
+  const video = String(item.video || "").trim()
+  const file = item.file
+  const videoFile = item.videoFile
 
-  return question && answer && image
+  return !!(question && answer && (image || video || file || videoFile))
 }
 
 async function renderAuctionAdminFromDraft() {
@@ -2755,14 +2765,17 @@ async function renderAuctionAdminFromDraft() {
             <div class="adminField">
               <label>الصورة</label>
               <input type="file" id="auctionFile${n}" accept="image/*">
+<input type="file" id="auctionVideo${n}" accept="video/*">
             </div>
 
             <div class="auctionPreviewBox auctionPreviewLarge">
               ${
-                item.image
-                  ? `<img src="${escapeHtml(item.image)}" class="previewImg">`
-                  : `<div class="emptyImageHint">لا توجد صورة حالياً</div>`
-              }
+  item.video
+    ? `<video src="${escapeHtml(item.video)}" class="previewImg" controls></video>`
+    : item.image
+      ? `<img src="${escapeHtml(item.image)}" class="previewImg">`
+      : `<div class="emptyImageHint">لا توجد صورة أو فيديو حالياً</div>`
+}
             </div>
           </div>
 
@@ -2873,12 +2886,17 @@ async function saveAuction() {
     setAdminSaving(true, "جارٍ حفظ فتبلة...")
     showGameToast("جارٍ حفظ فتبلة...")
 
-    const count = Number(document.getElementById("auctionCountInput")?.value || auctionAdminCount || 8)
+    const count = Number(
+      document.getElementById("auctionCountInput")?.value ||
+      auctionAdminCount ||
+      8
+    )
+
     const finalCount = Math.min(Math.max(count, 1), 8)
 
     const { data: oldRows, error: oldError } = await db
       .from("auction_questions")
-      .select("number, image")
+      .select("number, image, video")
       .eq("model", Number(currentModel))
 
     if (oldError) {
@@ -2888,6 +2906,7 @@ async function saveAuction() {
     }
 
     const oldMap = {}
+
     ;(oldRows || []).forEach(row => {
       oldMap[Number(row.number)] = row
     })
@@ -2903,6 +2922,7 @@ async function saveAuction() {
       const note = String(item.note || "").trim()
 
       let image = oldMap[i]?.image || item.image || ""
+      let video = oldMap[i]?.video || item.video || ""
 
       if (item.file) {
         image = await uploadImageFile(item.file, `auction_${i}`)
@@ -2910,7 +2930,13 @@ async function saveAuction() {
         item.image = image
       }
 
-      if (!question && !answer && !image && !note) continue
+      if (item.videoFile) {
+        video = await uploadImageFile(item.videoFile, `auction_video_${i}`)
+        item.videoFile = null
+        item.video = video
+      }
+
+      if (!question && !answer && !image && !video && !note) continue
 
       rows.push({
         model: Number(currentModel),
@@ -2918,6 +2944,7 @@ async function saveAuction() {
         question,
         answer,
         image,
+        video,
         note
       })
 
@@ -3315,6 +3342,7 @@ async function renderFinalAdmin() {
   finalAdminRound = 1
   await renderFinalAdminRound(1)
 }
+
 async function getFinalAdminDoneMap() {
   const doneMap = {
     1: false,
@@ -3341,6 +3369,7 @@ async function getFinalAdminDoneMap() {
     metaMap[Number(row.round)] = row
   })
 
+  /* الجولة الأولى */
   const r1CardsCount = Number(metaMap[1]?.cards_count || 6)
 
   const r1Map = {}
@@ -3385,6 +3414,7 @@ async function getFinalAdminDoneMap() {
 
   doneMap[1] = round1Done
 
+  /* الجولة الثانية */
   const r2Map = {}
   ;(r2Res.data || []).forEach(row => {
     r2Map[`${Number(row.number)}_${Number(row.item_order)}`] = row
@@ -3422,7 +3452,42 @@ async function getFinalAdminDoneMap() {
 
   doneMap[2] = round2Done
 
+  /* الجولة الثالثة */
+  const round3Mode = metaMap[3]?.round3_mode || "classic"
+
+  if (round3Mode === "team_media") {
+    const r3Map = {}
+
+    ;(r3Res.data || []).forEach(row => {
+      r3Map[Number(row.number)] = row
+    })
+
+    let round3Done = true
+
+    for (let number = 1; number <= 4; number++) {
+      const row = r3Map[number]
+
+      if (!row) {
+        round3Done = false
+        break
+      }
+
+      const image = String(row.image || "").trim()
+      const video = String(row.video || "").trim()
+      const answer = String(row.answer || "").trim()
+
+      if ((!image && !video) || !answer) {
+        round3Done = false
+        break
+      }
+    }
+
+    doneMap[3] = round3Done
+    return doneMap
+  }
+
   const r3Map = {}
+
   ;(r3Res.data || []).forEach(row => {
     r3Map[`${Number(row.number)}_${Number(row.image_order)}`] = row
   })
@@ -3473,16 +3538,35 @@ async function renderFinalAdminRound(round) {
 
   const doneMap = await getFinalAdminDoneMap()
   const round1CardsCount = Number(metaData?.cards_count || 6)
+  const round3Mode = metaData?.round3_mode || "classic"
 
   const round1CountBox = round === 1
     ? `
       <div class="finalTopCompactBox finalTopCompactCountBox">
         <div class="adminField compactCountField">
-          
           <div class="compactCountSelectWrap">
             <select id="finalRound1CardsCount" class="compactCountSelect">
               <option value="4" ${round1CardsCount === 4 ? "selected" : ""}>4</option>
               <option value="6" ${round1CardsCount === 6 ? "selected" : ""}>6</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    `
+    : ""
+
+  const round3ModeBox = round === 3
+    ? `
+      <div class="finalTopCompactBox finalTopCompactCountBox">
+        <div class="adminField compactCountField">
+          <div class="compactCountSelectWrap">
+            <select id="finalRound3Mode" class="compactCountSelect" onchange="handleFinalRound3ModeChange()">
+              <option value="classic" ${round3Mode === "classic" ? "selected" : ""}>
+                اشرح الصورة
+              </option>
+              <option value="team_media" ${round3Mode === "team_media" ? "selected" : ""}>
+                التركيز
+              </option>
             </select>
           </div>
         </div>
@@ -3503,7 +3587,6 @@ async function renderFinalAdminRound(round) {
       <div class="finalTopCompactRow">
         <div class="finalTopCompactBox finalTopCompactTitleBox">
           <div class="adminField">
-            
             <input
               id="finalRoundTitle"
               value="${escapeHtml(metaData?.title || `الجولة ${round}`)}"
@@ -3535,12 +3618,13 @@ async function renderFinalAdminRound(round) {
         </div>
 
         ${round1CountBox}
+        ${round3ModeBox}
       </div>
   `
 
   if (round === 1) html += await buildFinalRound1Admin(metaData, true)
   if (round === 2) html += await buildFinalRound2Admin()
-  if (round === 3) html += await buildFinalRound3Admin()
+  if (round === 3) html += await buildFinalRound3Admin(round3Mode)
 
   html += `
       <div class="finalAdminActions">
@@ -3553,10 +3637,24 @@ async function renderFinalAdminRound(round) {
   `
 
   editor().innerHTML = html
-
   arrangeAdminInnerTabs()
+}
 
-  
+async function handleFinalRound3ModeChange() {
+  const select = document.getElementById("finalRound3Mode")
+  const mode = select?.value || "classic"
+
+  const area = editor()
+  if (!area) return
+
+  const oldWrap =
+    area.querySelector(".finalAdminRound3Wrap") ||
+    area.querySelector(".finalAdminRound3TeamMediaWrap")
+
+  if (!oldWrap) return
+
+  const newHtml = await buildFinalRound3Admin(mode)
+  oldWrap.outerHTML = newHtml
 }
 
 async function saveFinalRound(round) {
@@ -3582,15 +3680,26 @@ async function saveFinalRound(round) {
       )
     }
 
+    const round3Mode =
+      round === 3
+        ? (document.getElementById("finalRound3Mode")?.value || "classic")
+        : null
+
+    const metaPayload = {
+      model: Number(currentModel),
+      round: Number(round),
+      title,
+      cards_count: cardsCount
+    }
+
+    if (round === 3) {
+      metaPayload.round3_mode = round3Mode
+    }
+
     const { error: insertMetaError } = await db
       .from("final_round_meta")
       .upsert(
-        [{
-          model: Number(currentModel),
-          round: Number(round),
-          title,
-          cards_count: cardsCount
-        }],
+        [metaPayload],
         {
           onConflict: "model,round"
         }
@@ -3606,7 +3715,7 @@ async function saveFinalRound(round) {
 
     if (round === 1) saved = await saveFinalRound1(cardsCount, true)
     if (round === 2) saved = await saveFinalRound2(true)
-    if (round === 3) saved = await saveFinalRound3(true)
+    if (round === 3) saved = await saveFinalRound3(round3Mode, true)
 
     if (!saved) return false
 
@@ -4165,16 +4274,15 @@ async function saveFinalRound2(skipSavingLock = false) {
     }
   }
 }
-
 /* =========================
    Round 3 Admin
 ========================= */
 
-async function buildFinalRound3Admin() {
+async function buildFinalRound3Admin(mode = "classic") {
   const { data, error } = await db
     .from("final_round3_items")
     .select("*")
-    .eq("model", currentModel)
+    .eq("model", Number(currentModel))
     .order("number", { ascending: true })
     .order("image_order", { ascending: true })
 
@@ -4183,9 +4291,24 @@ async function buildFinalRound3Admin() {
     return `<div class="adminCard">تعذر تحميل الجولة الثالثة</div>`
   }
 
+  if (mode === "team_media") {
+    return buildFinalRound3TeamMediaAdmin(data || [])
+  }
+
+  return buildFinalRound3ClassicAdmin(data || [])
+}
+
+/* =========================
+   Round 3 Classic Admin
+========================= */
+
+function buildFinalRound3ClassicAdmin(data = []) {
   const grouped = { 1: [], 2: [] }
+
   ;(data || []).forEach(row => {
-    grouped[row.number].push(row)
+    const number = Number(row.number || 1)
+    if (!grouped[number]) grouped[number] = []
+    grouped[number].push(row)
   })
 
   let html = `<div class="finalAdminRound3Wrap">`
@@ -4232,7 +4355,99 @@ async function buildFinalRound3Admin() {
   return html
 }
 
-async function saveFinalRound3(skipSavingLock = false) {
+/* =========================
+   Round 3 Team Media Admin
+========================= */
+
+function buildFinalRound3TeamMediaAdmin(data = []) {
+  const map = {}
+
+  ;(data || []).forEach(row => {
+    map[Number(row.number)] = row
+  })
+
+  let html = `
+    <div class="finalAdminRound3TeamMediaWrap">
+      <div class="adminCard finalRound3ModeNote">
+        <div class="adminCleanSectionText">
+          <h3>الجولة الثالثة الجديدة</h3>
+          <p>4 أرقام، كل فريق له رقمين. لكل رقم صورة أو فيديو + سؤال + إجابة.</p>
+        </div>
+      </div>
+
+      <div class="finalAdminGrid finalAdminGridRound1">
+  `
+
+  for (let number = 1; number <= 4; number++) {
+    const row = map[number] || {}
+    const teamName = number <= 2 ? "الفريق الأول" : "الفريق الثاني"
+
+    html += `
+      <div class="finalAdminCard finalRound1AdminCard">
+        <div class="finalAdminCardHead">
+          <h3>رقم ${number}</h3>
+          <div class="finalAdminTypeBadge">${teamName}</div>
+          <button class="adminDeleteBtn" onclick="clearFinalRound3Item(${number})">حذف</button>
+        </div>
+
+        <div class="finalAdminRowSingle finalAdminRound1Fields">
+          <div class="adminField">
+            <label>الصورة</label>
+            <input type="file" id="finalRound3TeamImage_${number}" accept="image/*">
+          </div>
+
+          <div class="adminField">
+            <label>الفيديو</label>
+            <input type="file" id="finalRound3TeamVideo_${number}" accept="video/*">
+          </div>
+
+          <div class="adminField">
+            <label>الإجابة</label>
+            <input
+              id="finalRound3TeamAnswer_${number}"
+              placeholder="الإجابة"
+              value="${escapeHtml(row.answer || "")}"
+            >
+          </div>
+        </div>
+
+        <div class="finalAdminRowSingle finalAdminRowSingleText">
+          <div class="adminField finalTextCardField">
+            <label>السؤال</label>
+            <textarea
+              id="finalRound3TeamQuestion_${number}"
+              placeholder="اكتب السؤال الذي يظهر في العرض عند الضغط على زر إظهار السؤال"
+              rows="3"
+            >${escapeHtml(row.question || "")}</textarea>
+          </div>
+        </div>
+
+        <div class="finalAdminPreviewBox">
+          ${
+            row.video
+              ? `<video src="${escapeHtml(row.video)}" class="previewImg" controls></video>`
+              : row.image
+                ? `<img src="${escapeHtml(row.image)}" class="previewImg">`
+                : `<div class="emptyImageHint">لا توجد صورة أو فيديو</div>`
+          }
+        </div>
+      </div>
+    `
+  }
+
+  html += `
+      </div>
+    </div>
+  `
+
+  return html
+}
+
+/* =========================
+   Save Round 3
+========================= */
+
+async function saveFinalRound3(mode = "classic", skipSavingLock = false) {
   if (!skipSavingLock && isAdminSaving()) return false
 
   if (!currentModel) {
@@ -4247,6 +4462,29 @@ async function saveFinalRound3(skipSavingLock = false) {
 
     showGameToast("جارٍ حفظ الجولة الثالثة...")
 
+    if (mode === "team_media") {
+      return await saveFinalRound3TeamMedia(true)
+    }
+
+    return await saveFinalRound3Classic(true)
+
+  } catch (err) {
+    console.log("SAVE FINAL ROUND 3 ERROR:", err)
+    showGameToast("توقف حفظ الجولة الثالثة بسبب خطأ")
+    return false
+  } finally {
+    if (!skipSavingLock) {
+      setAdminSaving(false)
+    }
+  }
+}
+
+/* =========================
+   Save Round 3 Classic
+========================= */
+
+async function saveFinalRound3Classic(skipSavingLock = false) {
+  try {
     const { data: oldRows, error: oldError } = await db
       .from("final_round3_items")
       .select("*")
@@ -4259,6 +4497,7 @@ async function saveFinalRound3(skipSavingLock = false) {
     }
 
     const oldMap = {}
+
     ;(oldRows || []).forEach(row => {
       oldMap[`${Number(row.number)}_${Number(row.image_order)}`] = row
     })
@@ -4269,7 +4508,9 @@ async function saveFinalRound3(skipSavingLock = false) {
       for (let i = 1; i <= 5; i++) {
         const fileInput = document.getElementById(`finalRound3File_${number}_${i}`)
         const file = fileInput?.files?.[0] || null
-        const answer = (document.getElementById(`finalRound3Answer_${number}_${i}`)?.value || "").trim()
+
+        const answer =
+          (document.getElementById(`finalRound3Answer_${number}_${i}`)?.value || "").trim()
 
         let image = oldMap[`${number}_${i}`]?.image || ""
 
@@ -4289,14 +4530,16 @@ async function saveFinalRound3(skipSavingLock = false) {
           number: Number(number),
           image_order: Number(i),
           image,
+          video: "",
+          question: "",
           answer
         })
       }
     }
 
-    
     if (!rows.length) {
       const ok = confirm("الجولة الثالثة فارغة، هل تريد حذف بياناتها؟")
+
       if (!ok) {
         showGameToast("تم إلغاء الحفظ")
         return false
@@ -4364,17 +4607,152 @@ async function saveFinalRound3(skipSavingLock = false) {
     showGameToast("تم حفظ الجولة الثالثة")
     return true
 
-    } catch (err) {
-    console.log("SAVE FINAL ROUND 3 ERROR:", err)
+  } catch (err) {
+    console.log("SAVE FINAL ROUND 3 CLASSIC ERROR:", err)
     showGameToast("توقف حفظ الجولة الثالثة بسبب خطأ")
     return false
-  } finally {
-    if (!skipSavingLock) {
-      setAdminSaving(false)
-    }
   }
 }
 
+/* =========================
+   Save Round 3 Team Media
+========================= */
+
+async function saveFinalRound3TeamMedia(skipSavingLock = false) {
+  try {
+    const { data: oldRows, error: oldError } = await db
+      .from("final_round3_items")
+      .select("*")
+      .eq("model", Number(currentModel))
+
+    if (oldError) {
+      console.log(oldError)
+      showGameToast("تعذر قراءة الجولة الثالثة القديمة")
+      return false
+    }
+
+    const oldMap = {}
+
+    ;(oldRows || []).forEach(row => {
+      oldMap[Number(row.number)] = row
+    })
+
+    const rows = []
+
+    for (let number = 1; number <= 4; number++) {
+      const imageFile =
+        document.getElementById(`finalRound3TeamImage_${number}`)?.files?.[0] || null
+
+      const videoFile =
+        document.getElementById(`finalRound3TeamVideo_${number}`)?.files?.[0] || null
+
+      const question =
+        (document.getElementById(`finalRound3TeamQuestion_${number}`)?.value || "").trim()
+
+      const answer =
+        (document.getElementById(`finalRound3TeamAnswer_${number}`)?.value || "").trim()
+
+      let image = oldMap[number]?.image || ""
+      let video = oldMap[number]?.video || ""
+
+      if (imageFile) {
+        image = await uploadImageFile(imageFile, `final_r3_team_img_${number}`)
+        video = ""
+      }
+
+      if (videoFile) {
+        video = await uploadImageFile(videoFile, `final_r3_team_video_${number}`)
+        image = ""
+      }
+
+      if (!image && !video && !question && !answer) continue
+
+      rows.push({
+        model: Number(currentModel),
+        number: Number(number),
+        image_order: 1,
+        image,
+        video,
+        question,
+        answer
+      })
+    }
+
+    if (!rows.length) {
+      const ok = confirm("الجولة الثالثة الجديدة فارغة، هل تريد حذف بياناتها؟")
+
+      if (!ok) {
+        showGameToast("تم إلغاء الحفظ")
+        return false
+      }
+
+      const { error: clearError } = await db
+        .from("final_round3_items")
+        .delete()
+        .eq("model", Number(currentModel))
+
+      if (clearError) {
+        console.log(clearError)
+        showGameToast("تعذر تفريغ الجولة الثالثة")
+        return false
+      }
+
+      showGameToast("تم تفريغ الجولة الثالثة")
+      return true
+    }
+
+    const keepNumbers = rows.map(row => Number(row.number))
+
+    const { data: existingRows, error: existingError } = await db
+      .from("final_round3_items")
+      .select("number")
+      .eq("model", Number(currentModel))
+
+    if (existingError) {
+      console.log(existingError)
+      showGameToast("تعذر قراءة الجولة الثالثة الحالية")
+      return false
+    }
+
+    for (const oldRow of existingRows || []) {
+      const oldNumber = Number(oldRow.number)
+
+      if (!keepNumbers.includes(oldNumber)) {
+        const { error: deleteError } = await db
+          .from("final_round3_items")
+          .delete()
+          .eq("model", Number(currentModel))
+          .eq("number", oldNumber)
+
+        if (deleteError) {
+          console.log(deleteError)
+          showGameToast("تعذر تنظيف الجولة الثالثة")
+          return false
+        }
+      }
+    }
+
+    const { error: saveError } = await db
+      .from("final_round3_items")
+      .upsert(rows, {
+        onConflict: "model,number,image_order"
+      })
+
+    if (saveError) {
+      console.log(saveError)
+      showGameToast("فشل حفظ الجولة الثالثة الجديدة")
+      return false
+    }
+
+    showGameToast("تم حفظ الجولة الثالثة الجديدة")
+    return true
+
+  } catch (err) {
+    console.log("SAVE FINAL ROUND 3 TEAM MEDIA ERROR:", err)
+    showGameToast("توقف حفظ الجولة الثالثة الجديدة بسبب خطأ")
+    return false
+  }
+}
 /* =========================
    Delete Final
 ========================= */

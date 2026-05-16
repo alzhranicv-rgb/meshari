@@ -925,3 +925,132 @@
   58%{opacity:1}
   100%{opacity:0}
 }
+.auctionVideoFrame{
+  cursor:default !important;
+}
+
+.auctionBigVideo{
+  width:100% !important;
+  height:100% !important;
+  max-height:100% !important;
+  object-fit:contain !important;
+  background:#000 !important;
+  border-radius:inherit !important;
+}
+/* =========================
+   AUCTION VIDEO SMALL + FULLSCREEN
+========================= */
+
+.auctionVideoSmallFrame{
+  position:relative !important;
+  width:min(520px, 100%) !important;
+  height:300px !important;
+  margin:0 auto !important;
+  cursor:pointer !important;
+  background:#000 !important;
+  border-radius:24px !important;
+  overflow:hidden !important;
+}
+
+.auctionVideoSmall{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  background:#000 !important;
+  border-radius:24px !important;
+  pointer-events:auto !important;
+}
+
+.auctionVideoPlayOverlay{
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%, -50%) !important;
+  width:86px !important;
+  height:86px !important;
+  border:0 !important;
+  border-radius:50% !important;
+  background:rgba(10,124,110,.92) !important;
+  color:#fff !important;
+  font-size:2.3rem !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  cursor:pointer !important;
+  box-shadow:0 18px 40px rgba(0,0,0,.28) !important;
+  z-index:5 !important;
+}
+
+.auctionVideoPlayOverlay:hover{
+  transform:translate(-50%, -50%) scale(1.06) !important;
+  filter:brightness(1.08) !important;
+}
+
+.auctionVideoFullscreenOverlay{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:999999 !important;
+  background:rgba(0,0,0,.88) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:24px !important;
+}
+
+.auctionVideoFullscreenInner{
+  position:relative !important;
+  width:min(1280px, 96vw) !important;
+  height:min(720px, 88vh) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.auctionFullscreenVideo{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  background:#000 !important;
+  border-radius:24px !important;
+  box-shadow:0 28px 70px rgba(0,0,0,.45) !important;
+}
+
+.auctionVideoFullscreenClose{
+  position:absolute !important;
+  top:-18px !important;
+  left:-18px !important;
+  z-index:10 !important;
+  width:54px !important;
+  height:54px !important;
+  border:0 !important;
+  border-radius:50% !important;
+  background:#DB1A1A !important;
+  color:#fff !important;
+  font-size:2rem !important;
+  line-height:1 !important;
+  cursor:pointer !important;
+  box-shadow:0 12px 26px rgba(219,26,26,.35) !important;
+}
+
+@media (max-width:760px){
+  .auctionVideoSmallFrame{
+    height:220px !important;
+    border-radius:18px !important;
+  }
+
+  .auctionVideoPlayOverlay{
+    width:68px !important;
+    height:68px !important;
+    font-size:1.8rem !important;
+  }
+
+  .auctionVideoFullscreenInner{
+    width:96vw !important;
+    height:70vh !important;
+  }
+
+  .auctionVideoFullscreenClose{
+    top:-12px !important;
+    left:-8px !important;
+  }
+}

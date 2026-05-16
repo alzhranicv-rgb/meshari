@@ -1853,3 +1853,431 @@
   text-wrap:balance !important;
   word-break:break-word !important;
 }
+/* =========================
+   FINAL ROUND 3 - TEAM MEDIA MODE
+   ضعها آخر ملف CSS
+========================= */
+
+.finalRound3TeamMediaWrap{
+  gap:18px !important;
+}
+
+.finalRound3TeamMediaStats{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:14px;
+  margin-bottom:10px;
+}
+
+.finalRound3TeamMediaTeam{
+  min-height:64px;
+  border-radius:20px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#F3F7F7 100%);
+  border:2px solid rgba(217,224,224,.95);
+  box-shadow:0 10px 22px rgba(47,65,88,.08);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 18px;
+  color:#2F4158;
+}
+
+.finalRound3TeamMediaTeam strong{
+  font-size:1.25rem;
+  color:#2F4158;
+}
+
+.finalRound3TeamMediaTeam span{
+  min-width:70px;
+  height:38px;
+  border-radius:999px;
+  background:#202940;
+  color:#FFFFFF;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.05rem;
+}
+
+.finalRound3TeamMediaTeam.activeTeam{
+  border-color:#FF9B51;
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.16),
+    0 12px 24px rgba(255,155,81,.18);
+}
+
+.finalRound3TeamMediaStage{
+  min-height:420px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.finalRound3TeamMediaContent{
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+}
+
+.finalRound3VideoFrame,
+.finalRound3ImageFrame{
+  width:min(820px, 100%);
+  height:min(430px, 56vh);
+  border-radius:28px;
+  overflow:hidden;
+  background:#101827;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 18px 42px rgba(0,0,0,.18);
+  cursor:pointer;
+}
+
+.finalRound3Video,
+.finalRound3Image{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+.finalRound3Video{
+  background:#000;
+}
+
+.finalRound3TeamMediaAnswer{
+  width:min(820px, 100%);
+  min-height:72px;
+  border-radius:22px;
+  background:#06923E;
+  color:#FFFFFF;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:14px 20px;
+  font-size:clamp(1.5rem, 2.5vw, 2.4rem);
+  line-height:1.35;
+  box-shadow:0 12px 28px rgba(6,146,62,.24);
+}
+
+/* =========================
+   FINAL ROUND 3 TEAM MEDIA OVERLAY
+========================= */
+
+.finalRound3TeamMediaOverlay{
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  background:rgba(8,13,22,.88);
+  backdrop-filter:blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+
+.finalRound3TeamMediaOverlay.hidden{
+  display:none !important;
+}
+
+.finalRound3TeamMediaOverlayInner{
+  width:min(1280px, 100%);
+  max-height:92vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.finalRound3TeamMediaOverlayInner img,
+.finalRound3TeamMediaOverlayInner video{
+  max-width:100%;
+  max-height:90vh;
+  object-fit:contain;
+  border-radius:24px;
+  background:#000;
+  box-shadow:0 26px 70px rgba(0,0,0,.45);
+}
+
+/* أزرار الجولة الثالثة الجديدة */
+.finalControlsBar .finalDoubleBtn,
+.finalControlsBar .doubleBtn{
+  background:#450693 !important;
+  color:#FFFFFF !important;
+}
+
+.finalControlsBar .btnAnswer{
+  background:#06923E !important;
+  color:#FFFFFF !important;
+}
+
+.finalControlsBar .btnCorrect{
+  background:#237227 !important;
+  color:#FFFFFF !important;
+}
+
+.finalControlsBar .btnWrong{
+  background:#DB1A1A !important;
+  color:#FFFFFF !important;
+}
+
+.finalControlsBar .undoBtn{
+  background:#7F2020 !important;
+  color:#FFFFFF !important;
+}
+
+/* للجوال والآيباد */
+@media (max-width:900px){
+  .finalRound3TeamMediaStats{
+    grid-template-columns:1fr;
+  }
+
+  .finalRound3VideoFrame,
+  .finalRound3ImageFrame{
+    height:360px;
+    border-radius:22px;
+  }
+
+  .finalRound3TeamMediaStage{
+    min-height:360px;
+  }
+}
+
+@media (max-width:600px){
+  .finalRound3VideoFrame,
+  .finalRound3ImageFrame{
+    height:280px;
+  }
+
+  .finalRound3TeamMediaTeam{
+    min-height:56px;
+    padding:0 12px;
+  }
+
+  .finalRound3TeamMediaTeam strong{
+    font-size:1rem;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    font-size:1.35rem;
+    border-radius:18px;
+  }
+}
+/* =========================
+   FINAL ROUND 3 TEAM MEDIA VIDEO OVERLAY
+========================= */
+
+.finalRound3TeamMediaOverlay{
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  background:rgba(12,18,28,.82);
+  backdrop-filter:blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+
+.finalRound3TeamMediaOverlay.hidden{
+  display:none !important;
+}
+
+.finalRound3TeamMediaOverlayInner{
+  width:min(1180px, 96vw);
+  height:min(680px, 86vh);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+}
+
+.finalRound3TeamMediaOverlayInner video,
+.finalRound3TeamMediaOverlayInner img{
+  max-width:100%;
+  max-height:calc(86vh - 90px);
+  object-fit:contain;
+  border-radius:24px;
+  background:#000;
+  box-shadow:0 26px 70px rgba(0,0,0,.45);
+}
+
+.finalRound3TeamMediaCloseBtn{
+  position:fixed;
+  top:22px;
+  left:24px;
+  z-index:1000000;
+  width:54px;
+  height:54px;
+  border:0;
+  border-radius:50%;
+  background:#DB1A1A;
+  color:#fff;
+  font-size:2.2rem;
+  line-height:1;
+  cursor:pointer;
+  box-shadow:0 14px 34px rgba(219,26,26,.32);
+}
+
+.finalRound3VideoControls{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.finalRound3VideoControls button{
+  min-width:150px;
+  height:50px;
+  border:0;
+  border-radius:16px;
+  background:#0A7C6E;
+  color:#fff;
+  font-family:"HanakaText", sans-serif;
+  font-size:1rem;
+  cursor:pointer;
+  box-shadow:0 10px 22px rgba(10,124,110,.25);
+}
+
+.finalRound3VideoControls button:nth-child(2){
+  background:#64E2B7;
+  color:#14352F;
+}
+/* تصغير مربع الفيديو داخل العرض */
+.finalRound3VideoFrameSmall{
+  width:min(520px, 72vw) !important;
+  height:min(300px, 38vh) !important;
+  margin:auto !important;
+}
+
+.finalRound3VideoSmall{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  border-radius:22px !important;
+  background:#000 !important;
+  cursor:pointer !important;
+}
+
+/* ضبط محتوى Team Media */
+.finalRound3TeamMediaContent{
+  width:100% !important;
+  height:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:18px !important;
+}
+
+/* مربع الإجابة بعد الصح أو الخطأ */
+.finalRound3TeamMediaAnswer{
+  min-width:min(560px, 86vw) !important;
+  max-width:min(760px, 90vw) !important;
+  padding:18px 24px !important;
+  border-radius:22px !important;
+  background:#FFFFFF !important;
+  color:#202940 !important;
+  font-size:clamp(1.5rem, 2.4vw, 2.5rem) !important;
+  line-height:1.5 !important;
+  text-align:center !important;
+  box-shadow:0 16px 34px rgba(0,0,0,.12) !important;
+}
+/* =========================
+   FINAL ROUND 3 VIDEO SMALLER BOX
+   ضعها آخر ملف CSS
+========================= */
+
+.finalRound3TeamMediaStage{
+  width:100% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:0 !important;
+}
+
+.finalRound3TeamMediaContent{
+  width:100% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex-direction:column !important;
+  gap:14px !important;
+}
+
+/* تصغير مربع الفيديو */
+.finalRound3VideoFrame,
+.finalRound3VideoFrameSmall,
+.finalRound3TeamMediaContent .finalRound3ImageFrame{
+  width:min(620px, 72vw) !important;
+  max-width:620px !important;
+  height:auto !important;
+  margin:0 auto !important;
+  border-radius:22px !important;
+  overflow:hidden !important;
+}
+
+/* تصغير الفيديو داخل المربع */
+.finalRound3Video,
+.finalRound3VideoSmall,
+.finalRound3TeamMediaContent .finalRound3Image{
+  width:100% !important;
+  height:auto !important;
+  max-height:360px !important;
+  object-fit:contain !important;
+  display:block !important;
+  border-radius:22px !important;
+}
+
+/* الأزرار في الوسط صف واحد */
+.finalControlsBar,
+.finalRound3ControlsBar{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex-wrap:nowrap !important;
+  gap:14px !important;
+  width:100% !important;
+  margin:18px auto 0 !important;
+}
+
+.finalControlsBar .archiveCtrlBtn,
+.finalRound3ControlsBar .archiveCtrlBtn,
+.finalControlsBar button,
+.finalRound3ControlsBar button{
+  min-width:150px !important;
+  height:48px !important;
+  white-space:nowrap !important;
+}
+/* =========================
+   FINAL ROUND 3 TEAM MEDIA QUESTION
+========================= */
+
+.finalRound3QuestionBox{
+  width:min(760px, 90%) !important;
+  margin:14px auto 0 !important;
+  padding:16px 22px !important;
+  border-radius:22px !important;
+  background:#FFFFFF !important;
+  color:#202940 !important;
+  border:2px solid rgba(32,41,64,.16) !important;
+  box-shadow:0 12px 28px rgba(32,41,64,.14) !important;
+  text-align:center !important;
+  font-size:clamp(1.25rem, 2vw, 2rem) !important;
+  line-height:1.7 !important;
+}
+
+.finalRound3TeamMediaContent{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+}

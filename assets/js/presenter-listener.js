@@ -188,30 +188,44 @@ function handlePresenterCommand(cmd) {
   })
 }
 
-  if (action === "zoomImage") {
-    return safeRunPresenterAction(() => {
-      if (
-        segment === "final" &&
-        window.finalState?.round === 3 &&
-        Number(window.finalState?.round3?.currentNumber || 0)
-      ) {
-        toggleFinalRound3ImageOverlay()
-        return
-      }
+ if (action === "zoomImage") {
+  return safeRunPresenterAction(() => {
+    if (
+      segment === "final" &&
+      window.finalState?.round === 3 &&
+      window.finalState?.round3?.mode === "team_media" &&
+      window.finalState?.round3?.teamMedia?.currentMedia
+    ) {
+      const type = window.finalState.round3.teamMedia.currentMediaType === "video"
+        ? "video"
+        : "image"
 
-      if (
-        segment === "final" &&
-        window.finalState?.round === 1 &&
-        Number(window.finalState?.round1?.currentNumber || 0) >= 1 &&
-        Number(window.finalState?.round1?.currentNumber || 0) <= 3
-      ) {
-        toggleFinalRound1Overlay()
-        return
-      }
+      openFinalRound3TeamMediaOverlay(type)
+      return
+    }
 
-      zoomCurrentDisplayImage()
-    })
-  }
+    if (
+      segment === "final" &&
+      window.finalState?.round === 3 &&
+      Number(window.finalState?.round3?.currentNumber || 0)
+    ) {
+      toggleFinalRound3ImageOverlay()
+      return
+    }
+
+    if (
+      segment === "final" &&
+      window.finalState?.round === 1 &&
+      Number(window.finalState?.round1?.currentNumber || 0) >= 1 &&
+      Number(window.finalState?.round1?.currentNumber || 0) <= 3
+    ) {
+      toggleFinalRound1Overlay()
+      return
+    }
+
+    zoomCurrentDisplayImage()
+  })
+}
 
   if (action === "closeZoomImage") {
   return safeRunPresenterAction(() => {
@@ -352,57 +366,226 @@ function handleFinalPresenterAction(action, data) {
       }
 
       setTimeout(() => {
-        if (round === 1) openFinalRound1Card(Number(data.number))
-        if (round === 2) openFinalRound2Card(Number(data.number))
-        if (round === 3) openFinalRound3Card(Number(data.number))
+        if (round === 1) {
+          openFinalRound1Card(Number(data.number))
+          return
+        }
+
+        if (round === 2) {
+          openFinalRound2Card(Number(data.number))
+          return
+        }
+
+        if (round === 3) {
+          if (finalState.round3?.mode === "team_media") {
+            openFinalRound3TeamMediaCard(Number(data.number))
+          } else {
+            openFinalRound3Card(Number(data.number))
+          }
+        }
       }, 120)
     })
   }
 
-  if (action === "double") return safeRunPresenterAction(() => activateFinalDouble())
-  if (action === "showQuestion") return safeRunPresenterAction(() => showFinalRound1Question())
+  if (action === "double") {
+    return safeRunPresenterAction(() => activateFinalDouble())
+  }
+
+  if (action === "showQuestion") {
+    return safeRunPresenterAction(() => {
+      if (finalState.round === 1) {
+        showFinalRound1Question()
+        return
+      }
+
+      if (
+        finalState.round === 3 &&
+        finalState.round3?.mode === "team_media"
+      ) {
+        showFinalRound3TeamMediaQuestion()
+      }
+    })
+  }
 
   if (action === "showAnswer") {
     return safeRunPresenterAction(() => {
-      if (finalState.round === 1) showFinalRound1Answer()
-      if (finalState.round === 2) showFinalRound2Answer()
-      if (finalState.round === 3) showFinalRound3Answer()
+      if (finalState.round === 1) {
+        showFinalRound1Answer()
+        return
+      }
+
+      if (finalState.round === 2 && typeof showFinalRound2Answer === "function") {
+        showFinalRound2Answer()
+        return
+      }
+
+      if (finalState.round === 3) {
+        if (finalState.round3?.mode === "team_media") {
+          const state = finalState.round3.teamMedia
+
+          if (!state.currentNumber) {
+            showGameToast("افتح رقم أولاً")
+            return
+          }
+
+          pushFinalHistory()
+          state.answerShown = true
+          renderFinalRound3TeamMedia()
+          saveFinalState()
+        } else {
+          showFinalRound3Answer()
+        }
+      }
     })
   }
 
   if (action === "correct") {
     return safeRunPresenterAction(() => {
-      if (finalState.round === 1) finalRound1Correct()
+      if (finalState.round === 1) {
+        finalRound1Correct()
+        return
+      }
+
+      if (
+        finalState.round === 3 &&
+        finalState.round3?.mode === "team_media"
+      ) {
+        finalRound3TeamMediaCorrect()
+      }
     })
   }
 
   if (action === "wrong") {
     return safeRunPresenterAction(() => {
-      if (finalState.round === 1) finalRound1Wrong()
+      if (finalState.round === 1) {
+        finalRound1Wrong()
+        return
+      }
+
+      if (
+        finalState.round === 3 &&
+        finalState.round3?.mode === "team_media"
+      ) {
+        finalRound3TeamMediaWrong()
+      }
     })
   }
 
   if (action === "toggleRound2Correct") {
-    return safeRunPresenterAction(() => finalRound2ToggleCorrectFromPresenter(Number(data.index)))
+    return safeRunPresenterAction(() => {
+      finalRound2ToggleCorrectFromPresenter(Number(data.index))
+    })
   }
 
   if (action === "hideRound2SequenceWord") {
-    return safeRunPresenterAction(() => hideFinalRound2SequenceWord(Number(data.index)))
+    return safeRunPresenterAction(() => {
+      hideFinalRound2SequenceWord(Number(data.index))
+    })
   }
 
   if (action === "toggleRound3Correct") {
-    return safeRunPresenterAction(() => toggleFinalRound3CorrectSelection(Number(data.index)))
+    return safeRunPresenterAction(() => {
+      if (
+        finalState.round3?.mode === "team_media"
+      ) {
+        return
+      }
+
+      toggleFinalRound3CorrectSelection(Number(data.index))
+    })
   }
 
-  if (action === "decreaseCountdown") return safeRunPresenterAction(() => finalRound2DecreaseCountdown())
-  if (action === "recordScrambleScore") return safeRunPresenterAction(() => finalRound2RecordScore())
-  if (action === "recordSequenceScore") return safeRunPresenterAction(() => finalRound2RecordSequenceScore())
-  if (action === "startSequence") return safeRunPresenterAction(() => startFinalRound3Sequence())
-  if (action === "recordRound3Score") return safeRunPresenterAction(() => finalRound3RecordScore())
-  if (action === "undo") return safeRunPresenterAction(() => undoFinalAction())
-  if (action === "nextRound") return safeRunPresenterAction(() => goToFinalRound(Number(finalState.round) + 1))
-}
+  if (action === "decreaseCountdown") {
+    return safeRunPresenterAction(() => finalRound2DecreaseCountdown())
+  }
 
+  if (action === "recordScrambleScore") {
+    return safeRunPresenterAction(() => finalRound2RecordScore())
+  }
+
+  if (action === "recordSequenceScore") {
+    return safeRunPresenterAction(() => finalRound2RecordSequenceScore())
+  }
+
+  if (action === "startSequence") {
+    return safeRunPresenterAction(() => {
+      if (
+        finalState.round3?.mode === "team_media" &&
+        finalState.round3?.teamMedia?.currentMediaType === "video"
+      ) {
+        openFinalRound3TeamMediaOverlay("video")
+
+        setTimeout(() => {
+          playFinalRound3TeamMediaVideo()
+        }, 120)
+
+        return
+      }
+
+      startFinalRound3Sequence()
+    })
+  }
+
+  if (action === "restartTeamMediaVideo") {
+    return safeRunPresenterAction(() => {
+      if (
+        finalState.round !== 3 ||
+        finalState.round3?.mode !== "team_media" ||
+        finalState.round3?.teamMedia?.currentMediaType !== "video"
+      ) {
+        return
+      }
+
+      openFinalRound3TeamMediaOverlay("video")
+
+      setTimeout(() => {
+        restartFinalRound3TeamMediaVideo()
+
+        setTimeout(() => {
+          playFinalRound3TeamMediaVideo()
+        }, 80)
+      }, 120)
+    })
+  }
+
+  if (action === "playTeamMediaVideo") {
+    return safeRunPresenterAction(() => {
+      if (
+        finalState.round !== 3 ||
+        finalState.round3?.mode !== "team_media" ||
+        finalState.round3?.teamMedia?.currentMediaType !== "video"
+      ) {
+        return
+      }
+
+      openFinalRound3TeamMediaOverlay("video")
+
+      setTimeout(() => {
+        playFinalRound3TeamMediaVideo()
+      }, 120)
+    })
+  }
+
+  if (action === "recordRound3Score") {
+    return safeRunPresenterAction(() => {
+      if (finalState.round3?.mode === "team_media") {
+        finalRound3TeamMediaCorrect()
+      } else {
+        finalRound3RecordScore()
+      }
+    })
+  }
+
+  if (action === "undo") {
+    return safeRunPresenterAction(() => undoFinalAction())
+  }
+
+  if (action === "nextRound") {
+    return safeRunPresenterAction(() => {
+      goToFinalRound(Number(finalState.round) + 1)
+    })
+  }
+}
 /* =========================
    ARCHIVE
 ========================= */

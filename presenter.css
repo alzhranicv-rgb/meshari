@@ -2186,3 +2186,160 @@
   transform:none !important;
   filter:none !important;
 }
+/* =========================
+   Presenter Final Round 3
+========================= */
+
+.presenterFinalRound3Preview{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  width:100%;
+}
+
+.presenterFinalRound3Preview > div{
+  font-size:1rem;
+  line-height:1.7;
+}
+
+.presenterFinalRound3ImageStage{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin-top:8px;
+}
+
+.presenterFinalRound3ImageStage .presenterImagePreviewBox{
+  width:100%;
+  max-width:520px;
+  min-height:220px;
+  border-radius:22px;
+  overflow:hidden;
+  background:#f4f4f4;
+  border:1px solid rgba(0,0,0,.08);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.presenterFinalRound3ImageStage img,
+.presenterFinalRound3ImageStage video{
+  width:100%;
+  height:100%;
+  max-height:320px;
+  object-fit:contain;
+  display:block;
+  background:#111;
+}
+
+.presenterFinalRound2SimpleGrid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:10px;
+  width:100%;
+}
+
+.presenterFinalRound2SimpleCard{
+  border:0;
+  border-radius:16px;
+  padding:14px 12px;
+  font-size:1rem;
+  font-weight:800;
+  background:#f3f3f3;
+  color:#222;
+  cursor:pointer;
+}
+
+.presenterFinalRound2SimpleCard.selectedCorrect,
+.finalRound3AnswerCard.selectedCorrect{
+  background:#dff7df !important;
+  color:#137333 !important;
+  box-shadow:0 0 0 2px rgba(19,115,51,.22) inset;
+}
+
+#presenterFinalControls{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+#presenterFinalControls .presenterActions{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+#presenterFinalControls .presenterBtn{
+  min-width:120px;
+}
+
+@media (max-width:600px){
+  .presenterFinalRound2SimpleGrid{
+    grid-template-columns:1fr;
+  }
+
+  .presenterFinalRound3ImageStage .presenterImagePreviewBox{
+    max-width:100%;
+    min-height:180px;
+  }
+
+  .presenterFinalRound3ImageStage img,
+  .presenterFinalRound3ImageStage video{
+    max-height:240px;
+  }
+
+  #presenterFinalControls .presenterBtn{
+    min-width:105px;
+    flex:1;
+  }
+}
+.presenterFinalTeamMediaPreview{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  text-align:right;
+}
+
+.presenterFinalTeamMediaPreview strong{
+  font-weight:900;
+}
+
+.presenterVideoPreviewBox video{
+  width:100%;
+  max-height:220px;
+  object-fit:contain;
+  border-radius:18px;
+  display:block;
+  background:#111;
+}
+
+.presenterFinalRound3Preview{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.presenterFinalRound3ImageStage{
+  width:100%;
+}
+
+.presenterFinalRound2SimpleGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterFinalRound2SimpleCard{
+  border:0;
+  border-radius:16px;
+  padding:14px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.presenterFinalRound2SimpleCard.selectedCorrect{
+  outline:3px solid rgba(20,180,90,.55);
+}
