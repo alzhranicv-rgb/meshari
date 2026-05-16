@@ -162,7 +162,32 @@ async function uploadImageFile(file, prefix = "file") {
   const { data } = db.storage.from(BUCKET_NAME).getPublicUrl(fileName)
   return data.publicUrl
 }
+async function uploadVideoFile(file, pathPrefix = "video") {
+  if (!file) return ""
 
+  const ext = (file.name.split(".").pop() || "mp4").toLowerCase()
+  const fileName = `${pathPrefix}_${Date.now()}.${ext}`
+  const filePath = `uploads/${fileName}`
+
+  const { error } = await db.storage
+    .from("images")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: true,
+      contentType: file.type || "video/mp4"
+    })
+
+  if (error) {
+    console.log("UPLOAD VIDEO ERROR:", error)
+    return ""
+  }
+
+  const { data } = db.storage
+    .from("images")
+    .getPublicUrl(filePath)
+
+  return data?.publicUrl || ""
+}
 function updateAdminBrandModel() {
   const brandModel = document.getElementById("adminBrandCurrentModel")
   const pill = document.getElementById("adminCurrentModelPill")
