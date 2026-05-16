@@ -3629,3 +3629,24 @@ button:disabled{
     grid-template-columns:1fr;
   }
 }
+.adminPinShake{
+  animation:adminPinShake .35s ease;
+}
+
+@keyframes adminPinShake{
+  0%,100%{
+    transform:translateX(0);
+  }
+
+  25%{
+    transform:translateX(8px);
+  }
+
+  50%{
+    transform:translateX(-8px);
+  }
+
+  75%{
+    transform:translateX(5px);
+  }
+}

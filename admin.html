@@ -205,66 +205,72 @@
   <!-- =========================
        ADMIN PIN
   ========================== -->
-  <script>
-    const ADMIN_PIN = "9900"
+ <script>
+  const ADMIN_PIN = "9900"
 
-    function unlockAdminPanel() {
-      document.getElementById("adminPinScreen")?.classList.add("hidden")
-      document.getElementById("adminShellNew")?.classList.remove("hidden")
+  function unlockAdminPanel() {
+    document.getElementById("adminPinScreen")?.classList.add("hidden")
+    document.getElementById("adminShellNew")?.classList.remove("hidden")
+  }
+
+  async function checkAdminPinFromInput() {
+    const input = document.getElementById("adminPinInput")
+    const error = document.getElementById("adminPinError")
+    const pin = (input?.value || "").trim()
+
+    if (pin === ADMIN_PIN) {
+      localStorage.setItem("admin_pin_ok", "1")
+      unlockAdminPanel()
+
+      if (typeof initAdminPanel === "function") {
+        await initAdminPanel()
+      }
+
+      return true
     }
 
-    function checkAdminPinFromInput() {
-      const input = document.getElementById("adminPinInput")
-      const error = document.getElementById("adminPinError")
-      const pin = (input?.value || "").trim()
-
-      if (pin === ADMIN_PIN) {
-        localStorage.setItem("admin_pin_ok", "1")
-        unlockAdminPanel()
-        return true
-      }
-
-      if (error) {
-        error.innerText = "الرقم السري غير صحيح"
-      }
-
-      if (input) {
-        input.value = ""
-        input.focus()
-      }
-
-      return false
+    if (error) {
+      error.innerText = "الرقم السري غير صحيح"
     }
 
-    function logoutAdminPin() {
-      localStorage.removeItem("admin_pin_ok")
-      location.reload()
+    if (input) {
+      input.value = ""
+      input.focus()
+      input.classList.remove("adminPinShake")
+      void input.offsetWidth
+      input.classList.add("adminPinShake")
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("admin_pin_ok") === "1") {
-        unlockAdminPanel()
-        return
-      }
+    return false
+  }
 
-      const input = document.getElementById("adminPinInput")
+  function logoutAdminPin() {
+    localStorage.removeItem("admin_pin_ok")
+    location.reload()
+  }
 
-      if (input) {
-        input.focus()
+  document.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("admin_pin_ok") === "1") {
+      unlockAdminPanel()
+      return
+    }
 
-        input.addEventListener("keydown", e => {
-          if (e.key === "Enter") {
-            checkAdminPinFromInput()
-          }
-        })
-      }
-    })
-  </script>
+    const input = document.getElementById("adminPinInput")
+
+    if (input) {
+      input.focus()
+
+      input.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          checkAdminPinFromInput()
+        }
+      })
+    }
+  })
+</script>
 
 
-  <!-- =========================
-       ADMIN JS
-  ========================== -->
+ 
   <script src="admin.js"></script>
 
 </body>

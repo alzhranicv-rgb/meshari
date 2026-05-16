@@ -20,12 +20,19 @@ const ARCHIVE_TEXT_START_POSITION = 5
 const ARCHIVE_MAX_TEXT_BOXES = 20
 
 document.addEventListener("DOMContentLoaded", async () => {
+  if (localStorage.getItem("admin_pin_ok") !== "1") {
+    return
+  }
+
+  await initAdminPanel()
+})
+
+async function initAdminPanel() {
   await loadModels()
   showAdminEmptyState()
   updateAdminBrandModel()
   await renderAdminTabsUnified()
-})
-
+}
 /* =========================
    Toast
 ========================= */
@@ -4686,7 +4693,7 @@ async function saveFinalRound3TeamMedia(skipSavingLock = false) {
       }
 
       if (videoFile) {
-        video = await uploadImageFile(videoFile, `final_r3_team_video_${number}`)
+        video = await uploadVideoFile(videoFile, `final_r3_team_video_${number}`)
         image = ""
       }
 
