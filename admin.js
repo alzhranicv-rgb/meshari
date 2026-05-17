@@ -155,7 +155,7 @@ function makeSafeFileExt(file, fallback = "bin") {
 
   if (nameExt) return nameExt
 
-  const type = String(file?.type || "")
+  const type = String(file?.type || "").toLowerCase()
 
   if (type.includes("jpeg")) return "jpg"
   if (type.includes("png")) return "png"
@@ -175,8 +175,32 @@ function makeUploadPath(prefix = "file", ext = "bin") {
   return `${cleanPrefix}_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
 }
 
+function getFileSizeMB(file) {
+  return Number((file.size / 1024 / 1024).toFixed(2))
+}
+
+function getVideoContentType(file, ext) {
+  const type = String(file?.type || "").trim()
+
+  if (type) return type
+
+  if (ext === "mov") return "video/quicktime"
+  if (ext === "webm") return "video/webm"
+  if (ext === "m4v") return "video/x-m4v"
+
+  return "video/mp4"
+}
+
 async function uploadImageFile(file, prefix = "file") {
   if (!file) return ""
+
+  const maxImageSizeMB = 15
+  const sizeMB = getFileSizeMB(file)
+
+  if (sizeMB > maxImageSizeMB) {
+    showGameToast(`حجم الصورة كبير: ${sizeMB}MB`)
+    return ""
+  }
 
   const ext = makeSafeFileExt(file, "png")
   const fileName = makeUploadPath(prefix, ext)
@@ -190,9 +214,16 @@ async function uploadImageFile(file, prefix = "file") {
     })
 
   if (uploadError) {
-    console.log("UPLOAD IMAGE ERROR:", uploadError)
-    showGameToast("فشل رفع الصورة، لم يتم الحفظ")
-    throw uploadError
+    console.log("UPLOAD IMAGE ERROR FULL:", uploadError)
+
+    const msg =
+      uploadError.message ||
+      uploadError.error ||
+      uploadError.statusCode ||
+      "خطأ غير معروف"
+
+    showGameToast(`فشل رفع الصورة: ${msg}`)
+    return ""
   }
 
   const { data } = db.storage
@@ -205,28 +236,57 @@ async function uploadImageFile(file, prefix = "file") {
 async function uploadVideoFile(file, prefix = "video") {
   if (!file) return ""
 
+  const maxVideoSizeMB = 80
+  const sizeMB = getFileSizeMB(file)
+
+  console.log("VIDEO FILE INFO:", {
+    name: file.name,
+    type: file.type,
+    sizeMB
+  })
+
+  if (sizeMB > maxVideoSizeMB) {
+    showGameToast(`حجم الفيديو كبير: ${sizeMB}MB`)
+    return ""
+  }
+
   const ext = makeSafeFileExt(file, "mp4")
   const fileName = makeUploadPath(prefix, ext)
+  const contentType = getVideoContentType(file, ext)
 
   const { error: uploadError } = await db.storage
     .from(BUCKET_NAME)
     .upload(fileName, file, {
       upsert: true,
       cacheControl: "31536000",
-      contentType: file.type || "video/mp4"
+      contentType
     })
 
   if (uploadError) {
-    console.log("UPLOAD VIDEO ERROR:", uploadError)
-    showGameToast("فشل رفع الفيديو، لم يتم الحفظ")
-    throw uploadError
+    console.log("UPLOAD VIDEO ERROR FULL:", uploadError)
+
+    const msg =
+      uploadError.message ||
+      uploadError.error ||
+      uploadError.statusCode ||
+      "خطأ غير معروف"
+
+    showGameToast(`فشل رفع الفيديو: ${msg}`)
+    return ""
   }
 
   const { data } = db.storage
     .from(BUCKET_NAME)
     .getPublicUrl(fileName)
 
-  return data?.publicUrl || ""
+  const publicUrl = data?.publicUrl || ""
+
+  if (!publicUrl) {
+    showGameToast("تم رفع الفيديو لكن تعذر جلب الرابط")
+    return ""
+  }
+
+  return publicUrl
 }
 
 function updateAdminBrandModel() {
@@ -4545,141 +4605,6 @@ async function saveFinalRound3(mode = "classic", skipSavingLock = false) {
 }
 
 /* =========================
-   Save Round 3 Classic
-========================= */
-
-async function saveFinalRound3Classic(skipSavingLock = false) {
-  try {
-    const { data: oldRows, error: oldError } = await db
-      .from("final_round3_items")
-      .select("*")
-      .eq("model", Number(currentModel))
-
-    if (oldError) {
-      console.log(oldError)
-      showGameToast("تعذر قراءة الجولة الثالثة القديمة")
-      return false
-    }
-
-    const oldMap = {}
-
-    ;(oldRows || []).forEach(row => {
-      oldMap[`${Number(row.number)}_${Number(row.image_order)}`] = row
-    })
-
-    const rows = []
-
-    for (let number = 1; number <= 2; number++) {
-      for (let i = 1; i <= 5; i++) {
-        const fileInput = document.getElementById(`finalRound3File_${number}_${i}`)
-        const file = fileInput?.files?.[0] || null
-
-        const answer =
-          (document.getElementById(`finalRound3Answer_${number}_${i}`)?.value || "").trim()
-
-        let image = oldMap[`${number}_${i}`]?.image || ""
-
-        if (file) {
-          image = await uploadImageFile(file, `final_r3_${number}_${i}`)
-
-          if (!image) {
-            showGameToast(`فشل رفع صورة رقم ${i} في الرقم ${number}`)
-            return false
-          }
-        }
-
-        if (!image && !answer) continue
-
-        rows.push({
-          model: Number(currentModel),
-          number: Number(number),
-          image_order: Number(i),
-          image,
-          video: "",
-          question: "",
-          answer
-        })
-      }
-    }
-
-    if (!rows.length) {
-      const ok = confirm("الجولة الثالثة فارغة، هل تريد حذف بياناتها؟")
-
-      if (!ok) {
-        showGameToast("تم إلغاء الحفظ")
-        return false
-      }
-
-      const { error: clearError } = await db
-        .from("final_round3_items")
-        .delete()
-        .eq("model", Number(currentModel))
-
-      if (clearError) {
-        console.log(clearError)
-        showGameToast("تعذر تفريغ الجولة الثالثة")
-        return false
-      }
-
-      showGameToast("تم تفريغ الجولة الثالثة")
-      return true
-    }
-
-    const keepKeys = rows.map(row => `${Number(row.number)}_${Number(row.image_order)}`)
-
-    const { data: existingRows, error: existingError } = await db
-      .from("final_round3_items")
-      .select("number,image_order")
-      .eq("model", Number(currentModel))
-
-    if (existingError) {
-      console.log(existingError)
-      showGameToast("تعذر قراءة الجولة الثالثة الحالية")
-      return false
-    }
-
-    for (const oldRow of existingRows || []) {
-      const key = `${Number(oldRow.number)}_${Number(oldRow.image_order)}`
-
-      if (!keepKeys.includes(key)) {
-        const { error: deleteError } = await db
-          .from("final_round3_items")
-          .delete()
-          .eq("model", Number(currentModel))
-          .eq("number", Number(oldRow.number))
-          .eq("image_order", Number(oldRow.image_order))
-
-        if (deleteError) {
-          console.log(deleteError)
-          showGameToast("تعذر تنظيف عناصر الجولة الثالثة")
-          return false
-        }
-      }
-    }
-
-    const { error: saveError } = await db
-      .from("final_round3_items")
-      .upsert(rows, {
-        onConflict: "model,number,image_order"
-      })
-
-    if (saveError) {
-      console.log(saveError)
-      showGameToast("فشل حفظ الجولة الثالثة")
-      return false
-    }
-
-    showGameToast("تم حفظ الجولة الثالثة")
-    return true
-
-  } catch (err) {
-    console.log("SAVE FINAL ROUND 3 CLASSIC ERROR:", err)
-    showGameToast("توقف حفظ الجولة الثالثة بسبب خطأ")
-    return false
-  }
-}
-
-/* =========================
    Save Round 3 Team Media
 ========================= */
 
@@ -4721,12 +4646,28 @@ async function saveFinalRound3TeamMedia(skipSavingLock = false) {
       let video = oldMap[number]?.video || ""
 
       if (imageFile) {
+        showGameToast(`جارٍ رفع صورة رقم ${number}...`)
+
         image = await uploadImageFile(imageFile, `final_r3_team_img_${number}`)
+
+        if (!image) {
+          showGameToast(`تعذر رفع صورة رقم ${number}`)
+          return false
+        }
+
         video = ""
       }
 
       if (videoFile) {
+        showGameToast(`جارٍ رفع فيديو رقم ${number}...`)
+
         video = await uploadVideoFile(videoFile, `final_r3_team_video_${number}`)
+
+        if (!video) {
+          showGameToast(`تعذر رفع فيديو رقم ${number}`)
+          return false
+        }
+
         image = ""
       }
 
@@ -4814,10 +4755,18 @@ async function saveFinalRound3TeamMedia(skipSavingLock = false) {
 
   } catch (err) {
     console.log("SAVE FINAL ROUND 3 TEAM MEDIA ERROR:", err)
-    showGameToast("توقف حفظ الجولة الثالثة الجديدة بسبب خطأ")
+
+    const msg =
+      err?.message ||
+      err?.error ||
+      err?.statusCode ||
+      "خطأ غير معروف"
+
+    showGameToast(`توقف حفظ الجولة الثالثة: ${msg}`)
     return false
   }
 }
+
 /* =========================
    Delete Final
 ========================= */
