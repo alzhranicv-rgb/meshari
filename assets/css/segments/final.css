@@ -2298,3 +2298,30 @@
   object-fit: contain;
   background: #000;
 }
+.finalRound3TeamMediaOverlayVideo{
+  width:min(92vw, 1300px) !important;
+  height:min(78vh, 760px) !important;
+  max-width:92vw !important;
+  max-height:78vh !important;
+  object-fit:contain !important;
+  background:#000 !important;
+  border-radius:24px !important;
+  display:block !important;
+}
+
+.finalRound3TeamMediaOverlayInner video{
+  object-fit:contain !important;
+  background:#000 !important;
+}
+
+.finalRound3Video,
+.finalRound3VideoSmall{
+  object-fit:contain !important;
+  background:#000 !important;
+}
+
+.finalRound3VideoFrame,
+.finalRound3VideoFrameSmall{
+  background:#000 !important;
+  overflow:hidden !important;
+}

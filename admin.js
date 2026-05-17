@@ -236,21 +236,23 @@ async function uploadImageFile(file, prefix = "file") {
 async function uploadVideoFile(file, prefix = "video") {
   if (!file) return ""
 
-  const MAX_VIDEO_SIZE_MB = 45
-  const maxSize = MAX_VIDEO_SIZE_MB * 1024 * 1024
+  const maxSizeMB = 45
+  const fileSizeMB = file.size / (1024 * 1024)
 
-  if (file.size > maxSize) {
-    const sizeMb = (file.size / 1024 / 1024).toFixed(1)
-
-    showGameToast(
-      `حجم الفيديو ${sizeMb}MB كبير جدًا. صغّر الفيديو لأقل من ${MAX_VIDEO_SIZE_MB}MB`
-    )
-
-    throw new Error(`Video too large: ${sizeMb}MB`)
+  if (fileSizeMB > maxSizeMB) {
+    showGameToast(`حجم الفيديو ${fileSizeMB.toFixed(1)}MB أكبر من المسموح ${maxSizeMB}MB`)
+    throw new Error("VIDEO_FILE_TOO_LARGE")
   }
 
   const ext = makeSafeFileExt(file, "mp4")
   const fileName = makeUploadPath(prefix, ext)
+
+  console.log("VIDEO FILE INFO:", {
+    name: file.name,
+    sizeMB: fileSizeMB.toFixed(2),
+    type: file.type,
+    fileName
+  })
 
   const { error: uploadError } = await db.storage
     .from(BUCKET_NAME)
@@ -262,13 +264,7 @@ async function uploadVideoFile(file, prefix = "video") {
 
   if (uploadError) {
     console.log("UPLOAD VIDEO ERROR FULL:", uploadError)
-
-    showGameToast(
-      uploadError.message?.includes("maximum allowed size")
-        ? "الفيديو أكبر من الحد المسموح في Supabase"
-        : "فشل رفع الفيديو، لم يتم الحفظ"
-    )
-
+    showGameToast("فشل رفع الفيديو، غالبًا الحجم أكبر من حد Supabase")
     throw uploadError
   }
 

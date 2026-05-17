@@ -2244,6 +2244,8 @@ function buildFinalRound3TeamMediaContent() {
           class="finalRound3Image finalRound3Video finalRound3VideoSmall"
           playsinline
           preload="metadata"
+          controlslist="nodownload noplaybackrate"
+          disablepictureinpicture
           onclick="openFinalRound3TeamMediaOverlay('video')"
         ></video>
       </div>
@@ -2482,8 +2484,11 @@ function openFinalRound3TeamMediaOverlay(type) {
         <video
           id="finalRound3TeamMediaOverlayVideo"
           src="${state.currentMedia}"
+          class="finalRound3TeamMediaOverlayVideo"
           playsinline
-          preload="metadata"
+          preload="auto"
+          controlslist="nodownload noplaybackrate"
+          disablepictureinpicture
         ></video>
       </div>
     `
@@ -2557,9 +2562,17 @@ function playFinalRound3TeamMediaVideo() {
       saveFinalState()
     }
 
-    video.play()
+    const playPromise = video.play()
+
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(err => {
+        console.log("VIDEO PLAY ERROR:", err)
+        showGameToast("اضغط تشغيل مرة أخرى")
+      })
+    }
+
     saveFinalState()
-  }, 50)
+  }, 80)
 }
 
 function restartFinalRound3TeamMediaVideo() {
@@ -2587,7 +2600,15 @@ function restartFinalRound3TeamMediaVideo() {
       saveFinalState()
     }
 
-    video.play()
+    const playPromise = video.play()
+
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(err => {
+        console.log("VIDEO RESTART ERROR:", err)
+        showGameToast("اضغط إعادة تشغيل مرة أخرى")
+      })
+    }
+
     saveFinalState()
-  }, 50)
+  }, 80)
 }
