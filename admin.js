@@ -142,51 +142,93 @@ function showAdminEmptyState(message = "افتح نموذجًا ثم اختر ا
   area.innerHTML = `<div class="adminEmptyState">${message}</div>`
 }
 
+/* =========================
+   Upload Helpers
+========================= */
+
+function makeSafeFileExt(file, fallback = "bin") {
+  const nameExt = String(file?.name || "")
+    .split(".")
+    .pop()
+    ?.toLowerCase()
+    ?.replace(/[^a-z0-9]/g, "")
+
+  if (nameExt) return nameExt
+
+  const type = String(file?.type || "")
+
+  if (type.includes("jpeg")) return "jpg"
+  if (type.includes("png")) return "png"
+  if (type.includes("webp")) return "webp"
+  if (type.includes("gif")) return "gif"
+  if (type.includes("mp4")) return "mp4"
+  if (type.includes("quicktime")) return "mov"
+  if (type.includes("webm")) return "webm"
+
+  return fallback
+}
+
+function makeUploadPath(prefix = "file", ext = "bin") {
+  const cleanPrefix = String(prefix || "file")
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+
+  return `${cleanPrefix}_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
+}
+
 async function uploadImageFile(file, prefix = "file") {
   if (!file) return ""
 
-  const ext = file.name.split(".").pop() || "png"
-  const fileName = `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
+  const ext = makeSafeFileExt(file, "png")
+  const fileName = makeUploadPath(prefix, ext)
 
   const { error: uploadError } = await db.storage
     .from(BUCKET_NAME)
-    .upload(fileName, file, { upsert: true })
+    .upload(fileName, file, {
+      upsert: true,
+      cacheControl: "31536000",
+      contentType: file.type || `image/${ext}`
+    })
 
   if (uploadError) {
-    console.log("UPLOAD ERROR:", uploadError)
+    console.log("UPLOAD IMAGE ERROR:", uploadError)
     showGameToast("فشل رفع الصورة، لم يتم الحفظ")
     throw uploadError
   }
 
-  const { data } = db.storage.from(BUCKET_NAME).getPublicUrl(fileName)
-  return data.publicUrl
-}
-async function uploadVideoFile(file, pathPrefix = "video") {
-  if (!file) return ""
-
-  const ext = (file.name.split(".").pop() || "mp4").toLowerCase()
-  const fileName = `${pathPrefix}_${Date.now()}.${ext}`
-  const filePath = `uploads/${fileName}`
-
-  const { error } = await db.storage
-    .from("images")
-    .upload(filePath, file, {
-      cacheControl: "3600",
-      upsert: true,
-      contentType: file.type || "video/mp4"
-    })
-
-  if (error) {
-    console.log("UPLOAD VIDEO ERROR:", error)
-    return ""
-  }
-
   const { data } = db.storage
-    .from("images")
-    .getPublicUrl(filePath)
+    .from(BUCKET_NAME)
+    .getPublicUrl(fileName)
 
   return data?.publicUrl || ""
 }
+
+async function uploadVideoFile(file, prefix = "video") {
+  if (!file) return ""
+
+  const ext = makeSafeFileExt(file, "mp4")
+  const fileName = makeUploadPath(prefix, ext)
+
+  const { error: uploadError } = await db.storage
+    .from(BUCKET_NAME)
+    .upload(fileName, file, {
+      upsert: true,
+      cacheControl: "31536000",
+      contentType: file.type || "video/mp4"
+    })
+
+  if (uploadError) {
+    console.log("UPLOAD VIDEO ERROR:", uploadError)
+    showGameToast("فشل رفع الفيديو، لم يتم الحفظ")
+    throw uploadError
+  }
+
+  const { data } = db.storage
+    .from(BUCKET_NAME)
+    .getPublicUrl(fileName)
+
+  return data?.publicUrl || ""
+}
+
 function updateAdminBrandModel() {
   const brandModel = document.getElementById("adminBrandCurrentModel")
   const pill = document.getElementById("adminCurrentModelPill")
@@ -213,7 +255,6 @@ document.addEventListener("click", e => {
     menu.classList.add("hidden")
   }
 })
-
 /* =========================
    Saving Lock
 ========================= */
