@@ -236,57 +236,47 @@ async function uploadImageFile(file, prefix = "file") {
 async function uploadVideoFile(file, prefix = "video") {
   if (!file) return ""
 
-  const maxVideoSizeMB = 80
-  const sizeMB = getFileSizeMB(file)
+  const MAX_VIDEO_SIZE_MB = 45
+  const maxSize = MAX_VIDEO_SIZE_MB * 1024 * 1024
 
-  console.log("VIDEO FILE INFO:", {
-    name: file.name,
-    type: file.type,
-    sizeMB
-  })
+  if (file.size > maxSize) {
+    const sizeMb = (file.size / 1024 / 1024).toFixed(1)
 
-  if (sizeMB > maxVideoSizeMB) {
-    showGameToast(`حجم الفيديو كبير: ${sizeMB}MB`)
-    return ""
+    showGameToast(
+      `حجم الفيديو ${sizeMb}MB كبير جدًا. صغّر الفيديو لأقل من ${MAX_VIDEO_SIZE_MB}MB`
+    )
+
+    throw new Error(`Video too large: ${sizeMb}MB`)
   }
 
   const ext = makeSafeFileExt(file, "mp4")
   const fileName = makeUploadPath(prefix, ext)
-  const contentType = getVideoContentType(file, ext)
 
   const { error: uploadError } = await db.storage
     .from(BUCKET_NAME)
     .upload(fileName, file, {
       upsert: true,
       cacheControl: "31536000",
-      contentType
+      contentType: file.type || "video/mp4"
     })
 
   if (uploadError) {
     console.log("UPLOAD VIDEO ERROR FULL:", uploadError)
 
-    const msg =
-      uploadError.message ||
-      uploadError.error ||
-      uploadError.statusCode ||
-      "خطأ غير معروف"
+    showGameToast(
+      uploadError.message?.includes("maximum allowed size")
+        ? "الفيديو أكبر من الحد المسموح في Supabase"
+        : "فشل رفع الفيديو، لم يتم الحفظ"
+    )
 
-    showGameToast(`فشل رفع الفيديو: ${msg}`)
-    return ""
+    throw uploadError
   }
 
   const { data } = db.storage
     .from(BUCKET_NAME)
     .getPublicUrl(fileName)
 
-  const publicUrl = data?.publicUrl || ""
-
-  if (!publicUrl) {
-    showGameToast("تم رفع الفيديو لكن تعذر جلب الرابط")
-    return ""
-  }
-
-  return publicUrl
+  return data?.publicUrl || ""
 }
 
 function updateAdminBrandModel() {
