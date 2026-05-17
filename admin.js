@@ -19,14 +19,6 @@ let currentAdminSegment = ""
 const ARCHIVE_TEXT_START_POSITION = 5
 const ARCHIVE_MAX_TEXT_BOXES = 20
 
-document.addEventListener("DOMContentLoaded", async () => {
-  if (localStorage.getItem("admin_pin_ok") !== "1") {
-    return
-  }
-
-  await initAdminPanel()
-})
-
 async function initAdminPanel() {
   await loadModels()
   showAdminEmptyState()
