@@ -194,55 +194,51 @@ function playWinnerEffects() {
   }
 
   launchWinnerConfetti()
-
-  winnerFxTimeouts.push(
-    setTimeout(() => createWinnerConfettiBurst(26), 250),
-    setTimeout(() => createWinnerConfettiBurst(24), 700),
-    setTimeout(() => createWinnerConfettiBurst(20), 1200)
-  )
 }
 
-function createWinnerConfettiBurst(count = 24) {
+function createWinnerConfettiBurst(count = 50) {
   if (!winnerConfettiLayer) return
 
   const colors = [
-    "#FF9B51",
-    "#FFD7B8",
-    "#2F4158",
-    "#FFFFFF",
-    "#EAC17A"
+    "#FF9B51", // برتقالي المشروع
+    "#FFC08E", // برتقالي فاتح
+    "#2F4158", // كحلي المشروع
+    "#25343F", // كحلي غامق
+    "#FFFFFF", // أبيض
+    "#EAC17A", // ذهبي هادي
+    "#67E8F9"  // سماوي خفيف
   ]
 
   for (let i = 0; i < count; i++) {
     const piece = document.createElement("span")
     piece.className = "winnerConfettiPiece"
 
-    const size = 8 + Math.random() * 10
+    const size = 7 + Math.random() * 12
     const left = Math.random() * 100
-    const delay = Math.random() * 0.18
-    const duration = 2.2 + Math.random() * 1.4
-    const rotate = -40 + Math.random() * 80
-    const drift = -90 + Math.random() * 180
+    const delay = Math.random() * 0.22
+    const duration = 2.6 + Math.random() * 1.9
+    const drift = -170 + Math.random() * 340
+    const rotate = 240 + Math.random() * 760
     const color = colors[Math.floor(Math.random() * colors.length)]
     const shape = Math.random()
 
     piece.style.left = `${left}%`
-    piece.style.top = `${-10 - Math.random() * 12}%`
+    piece.style.top = `-44px`
     piece.style.width = `${size}px`
-    piece.style.height = `${size * (shape > 0.65 ? 1.35 : 1)}px`
+    piece.style.height = `${size * (shape > 0.62 ? 1.45 : 1)}px`
     piece.style.background = color
     piece.style.animationDelay = `${delay}s`
     piece.style.animationDuration = `${duration}s`
-    piece.style.setProperty("--confetti-rotate", `${rotate}deg`)
     piece.style.setProperty("--confetti-drift", `${drift}px`)
+    piece.style.setProperty("--confetti-rotate", `${rotate}deg`)
 
-    if (shape < 0.33) {
+    if (shape < 0.30) {
       piece.style.borderRadius = "50%"
-    } else if (shape < 0.66) {
-      piece.style.borderRadius = "4px"
+    } else if (shape < 0.68) {
+      piece.style.borderRadius = "5px"
     } else {
       piece.style.borderRadius = "2px"
-      piece.style.transform = "skewX(-12deg)"
+      piece.style.transform = "skewX(-10deg)"
     }
 
     winnerConfettiLayer.appendChild(piece)
@@ -265,11 +261,16 @@ function launchWinnerConfetti() {
   winnerConfettiLayer.className = "winnerConfettiLayer"
   document.body.appendChild(winnerConfettiLayer)
 
-  createWinnerConfettiBurst(52)
+  createWinnerConfettiBurst(55)
+
+  winnerFxTimeouts.push(
+    setTimeout(() => createWinnerConfettiBurst(35), 280),
+    setTimeout(() => createWinnerConfettiBurst(28), 620)
+  )
 
   winnerConfettiInterval = setInterval(() => {
-    createWinnerConfettiBurst(16)
-  }, 850)
+    createWinnerConfettiBurst(10)
+  }, 900)
 }
 
 function stopWinnerEffects() {
@@ -1183,20 +1184,24 @@ function showGameToast(message) {
   if (!toast || !text) return
 
   text.innerText = message
+
   toast.classList.remove("hidden")
+  toast.classList.remove("show")
 
   requestAnimationFrame(() => {
     toast.classList.add("show")
   })
 
   clearTimeout(gameToastTimer)
+
   gameToastTimer = setTimeout(() => {
     toast.classList.remove("show")
 
     setTimeout(() => {
       toast.classList.add("hidden")
+      text.innerText = ""
     }, 280)
-  }, 3000)
+  }, 5000)
 }
 /* =========================
    Score bump helper
@@ -1291,46 +1296,49 @@ function restoreDisplayControlsEye() {
   document.body.classList.toggle("presenterHideDisplayControls", isHidden)
   updateDisplayControlsEyeButton(isHidden)
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(restoreDisplayControlsEye, 300)
-})
-
 let joinCodePopTimer = null
-
 function showJoinCodePopup() {
   const code = localStorage.getItem("game_join_code") || ""
+  const modelName = localStorage.getItem("game_model_name") || currentModelName || "النموذج الحالي"
 
   if (!code) {
     showGameToast("لا يوجد كود جلسة")
     return
   }
 
-  let box = document.getElementById("joinCodePopup")
-
-  if (!box) {
-    box = document.createElement("div")
-    box.id = "joinCodePopup"
-    box.className = "joinCodePopup"
-    document.getElementById("modelNameDisplay")?.appendChild(box)
-  }
+  const box = document.getElementById("homeModelPopupArea")
+  if (!box) return
 
   const isHidden = localStorage.getItem("presenter_hide_controls") === "1"
 
   box.innerHTML = `
-    <div class="joinCodePopupLabel">كود المقدم</div>
-    <div class="joinCodePopupNumber">${code}</div>
+    <div class="homeModelClassicBox">
 
-    <button
-      id="displayControlsEyeBtn"
-      class="${isHidden ? "showControlsMode" : "hideControlsMode"}"
-      type="button"
-    >
-      ${isHidden ? "إظهار التحكم" : "إخفاء التحكم"}
-    </button>
+      <button class="homeModelClassicClose" onclick="hideJoinCodePopup()">×</button>
+
+      <div class="homeModelClassicHeader">
+        <div class="homeModelClassicLabel">النموذج الحالي</div>
+        <div class="homeModelClassicName">${modelName}</div>
+      </div>
+
+      <div class="homeModelClassicBody">
+        <div class="homeModelClassicCodeLabel">كود المقدم</div>
+        <div class="homeModelClassicCode">${code}</div>
+      </div>
+
+      <button
+        id="displayControlsEyeBtn"
+        class="homeModelClassicControl ${isHidden ? "showControlsMode" : "hideControlsMode"}"
+        type="button"
+      >
+        ${isHidden ? "إظهار أزرار التحكم" : "إخفاء أزرار التحكم"}
+      </button>
+
+    </div>
   `
 
   const ctrlBtn = box.querySelector("#displayControlsEyeBtn")
+
   if (ctrlBtn) {
     ctrlBtn.onclick = function (e) {
       e.preventDefault()
@@ -1340,16 +1348,25 @@ function showJoinCodePopup() {
     }
   }
 
-  box.onclick = function (e) {
-    e.stopPropagation()
-  }
-
   box.classList.remove("hidden")
+  box.classList.remove("show")
+  void box.offsetWidth
   box.classList.add("show")
 
   clearTimeout(joinCodePopTimer)
   joinCodePopTimer = setTimeout(() => {
-    box.classList.remove("show")
-    setTimeout(() => box.classList.add("hidden"), 250)
+    hideJoinCodePopup()
   }, 10000)
+}
+
+function hideJoinCodePopup() {
+  const box = document.getElementById("homeModelPopupArea")
+  if (!box) return
+
+  box.classList.remove("show")
+
+  setTimeout(() => {
+    box.classList.add("hidden")
+    box.innerHTML = ""
+  }, 240)
 }

@@ -552,16 +552,29 @@ function buildTop10HTML() {
 
         <div class="top10HeaderBar">
 
-          <div class="top10ScoreCard ${top10State.activeTeam === "A" ? "activeTeam" : ""}" id="top10TeamA" onclick="selectTop10Team('A')">
-            <div class="top10ScoreName top10ScoreNameLeft">${teamAName}</div>
-            <div class="top10ScoreErrors" id="top10ErrorsA">${renderTop10Errors("A")}</div>
-            <div class="top10ScoreValue top10ScoreValueRight" id="top10ScoreA">${top10State.scores.A}</div>
+          <div
+            class="top10ScoreCard ${top10State.activeTeam === "A" ? "activeTeam" : ""}"
+            id="top10TeamA"
+            onclick="selectTop10Team('A')"
+          >
+            <div class="top10ScoreName top10ScoreNameLeft">
+              ${teamAName}
+            </div>
+
+            <div class="top10ScoreErrors" id="top10ErrorsA">
+              ${renderTop10Errors("A")}
+            </div>
+
+            <div class="top10ScoreValue top10ScoreValueRight" id="top10ScoreA">
+              ${top10State.scores.A}
+            </div>
           </div>
 
           <div class="top10MiddleCard">
             <div class="top10MiddleTimer" id="timer">0</div>
+
             <div class="top10MiddleTurn" id="top10TurnLabel">
-              الدور: ${
+              ${
                 top10State.activeTeam === "A"
                   ? teamAName
                   : top10State.activeTeam === "B"
@@ -571,10 +584,22 @@ function buildTop10HTML() {
             </div>
           </div>
 
-          <div class="top10ScoreCard ${top10State.activeTeam === "B" ? "activeTeam" : ""}" id="top10TeamB" onclick="selectTop10Team('B')">
-            <div class="top10ScoreValue top10ScoreValueLeft" id="top10ScoreB">${top10State.scores.B}</div>
-            <div class="top10ScoreErrors" id="top10ErrorsB">${renderTop10Errors("B")}</div>
-            <div class="top10ScoreName top10ScoreNameRight">${teamBName}</div>
+          <div
+            class="top10ScoreCard ${top10State.activeTeam === "B" ? "activeTeam" : ""}"
+            id="top10TeamB"
+            onclick="selectTop10Team('B')"
+          >
+            <div class="top10ScoreValue top10ScoreValueLeft" id="top10ScoreB">
+              ${top10State.scores.B}
+            </div>
+
+            <div class="top10ScoreErrors" id="top10ErrorsB">
+              ${renderTop10Errors("B")}
+            </div>
+
+            <div class="top10ScoreName top10ScoreNameRight">
+              ${teamBName}
+            </div>
           </div>
 
         </div>
@@ -584,16 +609,38 @@ function buildTop10HTML() {
         </div>
 
         <div class="top10ControlPanel">
-          <button onclick="activateTop10Double()" id="top10DoubleBtn" class="top10DoubleBtn">دبل</button>
-          <button onclick="showTop10Answer()" class="btnAnswer">إظهار الإجابات</button>
-          <button onclick="addTop10Error()" class="top10ErrorBtnSingle">خطأ</button>
-          <button onclick="undoTop10Action()" id="top10UndoBtn" class="undoBtn">تراجع</button>
-          <button onclick="switchTop10Turn()" class="roundNavBtn switchTurnBtn">تبديل الدور</button>
-          <button onclick="nextTop10Round()" class="roundNavBtn">الجولة التالية</button>
+          <button
+            onclick="activateTop10Double()"
+            id="top10DoubleBtn"
+            class="top10DoubleBtn"
+          >
+            دوبيلا
+          </button>
+
+          <button onclick="showTop10Answer()" class="btnAnswer">
+            إظهار الإجابات
+          </button>
+
+          <button onclick="addTop10Error()" class="top10ErrorBtnSingle">
+            خطأ
+          </button>
+
+          <button onclick="undoTop10Action()" id="top10UndoBtn" class="undoBtn">
+            تراجع
+          </button>
+
+          <button onclick="switchTop10Turn()" class="roundNavBtn switchTurnBtn">
+            تبديل الدور
+          </button>
+
+          <button onclick="nextTop10Round()" class="roundNavBtn">
+            الجولة التالية
+          </button>
         </div>
 
         <div class="top10NumbersShell">
           <div class="top10NumbersArea">
+
             <div class="top10Side top10RightSide">
               ${rightSide.map(num => renderTop10Rect(num, opened)).join("")}
             </div>
@@ -601,6 +648,7 @@ function buildTop10HTML() {
             <div class="top10Side top10LeftSide">
               ${leftSide.map(num => renderTop10Rect(num, opened)).join("")}
             </div>
+
           </div>
         </div>
 
@@ -613,17 +661,26 @@ function renderTop10Rect(num, opened) {
   const round = top10State.round
   const isOpened = opened.includes(num)
   const isAnimating = top10AnimatingNumber === num
+  const answer = top10State.answers?.[round]?.[num] || num
 
   if (isOpened) {
     return `
-      <button class="top10Rect opened${isAnimating ? " top10RevealFx" : ""}" data-num="${num}" disabled>
-        <span class="top10RectInner">${top10State.answers?.[round]?.[num] || num}</span>
+      <button
+        class="top10Rect opened${isAnimating ? " top10RevealFx" : ""}"
+        data-num="${num}"
+        disabled
+      >
+        <span class="top10RectInner">${answer}</span>
       </button>
     `
   }
 
   return `
-    <button onclick="openTop10Number(${num})" data-num="${num}" class="top10Rect">
+    <button
+      onclick="openTop10Number(${num})"
+      data-num="${num}"
+      class="top10Rect"
+    >
       <span class="top10RectInner">${num}</span>
     </button>
   `
@@ -705,12 +762,11 @@ function updateTop10TurnLabel() {
   if (!label) return
 
   label.innerText =
-    "الدور: " +
-    (top10State.activeTeam === "A"
+    top10State.activeTeam === "A"
       ? teamAName
       : top10State.activeTeam === "B"
       ? teamBName
-      : "اختر فريق")
+      : "اختر فريق"
 }
 
 async function openTop10Number(num) {

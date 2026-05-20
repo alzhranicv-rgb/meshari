@@ -153,24 +153,35 @@ window.renderWarmup = async function () {
   openSegment("التسخين", `
     <div class="warmupWrap">
 
-      <div class="warmupTopBar">
+      <div class="warmupScoreBoard">
 
-        <div class="warmupTeamCard" onclick="selectWarmupTeam('A')" id="warmupTeamABox">
-          <div class="warmupTeamName">${teamAName}</div>
-          <div class="warmupTeamScore" id="roundScoreA">${warmupScoreA}</div>
-        </div>
+  <div class="warmupTeamCard warmupScoreTeamCard" onclick="selectWarmupTeam('A')" id="warmupTeamABox">
+    <div class="warmupTeamMeta">
+      <div class="warmupTeamName">${teamAName}</div>
+    </div>
 
-        <div class="warmupTimerBox">
-          <div class="warmupTimerLabel">المؤقت</div>
-          <div class="warmupTimerValue" id="timer">0</div>
-        </div>
+    <div class="warmupTeamScoreWrap">
+      <div class="warmupTeamScore" id="roundScoreA">${warmupScoreA}</div>
+    </div>
+  </div>
 
-        <div class="warmupTeamCard" onclick="selectWarmupTeam('B')" id="warmupTeamBBox">
-          <div class="warmupTeamName">${teamBName}</div>
-          <div class="warmupTeamScore" id="roundScoreB">${warmupScoreB}</div>
-        </div>
+  <div class="warmupTimerBox warmupScoreTimerBox">
+    
+    <div class="warmupTimerValue" id="timer">0</div>
+  </div>
 
-      </div>
+  <div class="warmupTeamCard warmupScoreTeamCard" onclick="selectWarmupTeam('B')" id="warmupTeamBBox">
+    <div class="warmupTeamMeta">
+      <div class="warmupTeamName">${teamBName}</div>
+    </div>
+
+    <div class="warmupTeamScoreWrap">
+      <div class="warmupTeamScore" id="roundScoreB">${warmupScoreB}</div>
+    </div>
+  </div>
+
+</div>
+
 
       <div id="questionBox" class="warmupQuestionBox">
         اختر رقم السؤال
@@ -342,26 +353,20 @@ function highlightWarmupSelectedTeam(team) {
 
   if (a) {
     a.classList.remove("activeTeam")
-    a.style.border = "2px solid var(--border-soft)"
-    a.style.boxShadow = "var(--shadow-soft)"
+    a.removeAttribute("style")
   }
 
   if (b) {
     b.classList.remove("activeTeam")
-    b.style.border = "2px solid var(--border-soft)"
-    b.style.boxShadow = "var(--shadow-soft)"
+    b.removeAttribute("style")
   }
 
   if (team === "A" && a) {
     a.classList.add("activeTeam")
-    a.style.border = "3px solid #000"
-    a.style.boxShadow = "0 0 0 4px rgba(0,0,0,.12), var(--shadow-soft)"
   }
 
   if (team === "B" && b) {
     b.classList.add("activeTeam")
-    b.style.border = "3px solid #000"
-    b.style.boxShadow = "0 0 0 4px rgba(0,0,0,.12), var(--shadow-soft)"
   }
 
   updateWarmupDoubleButton()
@@ -369,8 +374,8 @@ function highlightWarmupSelectedTeam(team) {
 
 function clearWarmupSelectedButton() {
   if (!currentWarmupButton) return
-  currentWarmupButton.style.outline = "none"
-  currentWarmupButton.style.outlineOffset = "0"
+
+  currentWarmupButton.classList.remove("currentNumber")
   currentWarmupButton = null
 }
 
@@ -379,8 +384,7 @@ function highlightWarmupSelectedButton(button) {
   if (!button) return
 
   currentWarmupButton = button
-  button.style.outline = "3px solid #000"
-  button.style.outlineOffset = "0"
+  button.classList.add("currentNumber")
 }
 
 function getNextWarmupTeam() {

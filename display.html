@@ -3,86 +3,111 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>الحنكة</title>
 
-  <link rel="stylesheet" href="styles.css" />
-
+  <!-- ملفات الفقرات أولاً -->
   <link rel="stylesheet" href="assets/css/segments/warmup.css" />
   <link rel="stylesheet" href="assets/css/segments/top10.css" />
   <link rel="stylesheet" href="assets/css/segments/auction.css" />
   <link rel="stylesheet" href="assets/css/segments/who.css" />
   <link rel="stylesheet" href="assets/css/segments/final.css" />
   <link rel="stylesheet" href="assets/css/segments/archive.css" />
+
+  <!-- ملف التصميم الرئيسي أخيراً -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
 
-  <div id="homePage" class="homePageShell">
+  <div id="homePage" class="homePageShell homeShowPage">
 
-    <div class="topBoard" id="scoreBoard">
+    <div class="homeHero">
 
-      <div class="teamBox" id="teamABox" onclick="addMainScore('A')">
-        <div class="teamName" id="teamNameA">الفريق الأول</div>
-        <div class="teamScore" id="mainScoreA">0</div>
+      <div class="homeTeamCard homeTeamA" id="teamABox" onclick="addMainScore('A')">
+        <div class="homeTeamText">
+          <div class="teamName homeTeamName" id="teamNameA">الفريق الأول</div>
+        </div>
+
+        <div class="teamScore homeTeamScore" id="mainScoreA">0</div>
       </div>
 
-      <div class="titleBox" id="titleBox">
+      <div class="titleBox homeTitleBox" id="titleBox">
+        <div class="homeTitleGlow"></div>
         <h1>الحنكة</h1>
-        <div id="modelNameDisplay" class="modelNameDisplay"></div>
+        <div id="modelNameDisplay" class="modelNameDisplay homeModelName"></div>
       </div>
 
-      <div class="teamBox" id="teamBBox" onclick="addMainScore('B')">
-        <div class="teamName" id="teamNameB">الفريق الثاني</div>
-        <div class="teamScore" id="mainScoreB">0</div>
-      </div>
+      <div class="homeTeamCard homeTeamB" id="teamBBox" onclick="addMainScore('B')">
+        <div class="homeTeamText">
+          <div class="teamName homeTeamName" id="teamNameB">الفريق الثاني</div>
+        </div>
 
-    </div>
-
-    <div class="segmentsGrid" id="segmentsGrid">
-
-      <div class="segmentCard" id="segmentWarmup" onclick="openMainSegment('warmup')">
-        <span>التسخين</span>
-        <div class="segmentWinner" id="winnerWarmup"></div>
-      </div>
-
-      <div class="segmentCard" id="segmentTop10" onclick="openMainSegment('top10')">
-        <span>Top 10</span>
-        <div class="segmentWinner" id="winnerTop10"></div>
-      </div>
-
-      <div class="segmentCard" id="segmentAuction" onclick="openMainSegment('auction')">
-        <span>فتبلة</span>
-        <div class="segmentWinner" id="winnerAuction"></div>
-      </div>
-
-      <div class="segmentCard" id="segmentWho" onclick="openMainSegment('who')">
-        <span>من هو</span>
-        <div class="segmentWinner" id="winnerWho"></div>
-      </div>
-
-      <div class="segmentCard" id="segmentFinal" onclick="openMainSegment('final')">
-        <span>الفاصلة</span>
-        <div class="segmentWinner" id="winnerFinal"></div>
-      </div>
-
-      <div class="segmentCard" id="segmentArchive" onclick="openMainSegment('archive')">
-        <span>الأرشيف</span>
-        <div class="segmentWinner" id="winnerArchive"></div>
+        <div class="teamScore homeTeamScore" id="mainScoreB">0</div>
       </div>
 
     </div>
 
-    <div class="winnerArea" id="winnerArea">
-      <button class="winnerBtn" onclick="announceWinner()">الفائز</button>
+    <!-- مربع النموذج وكود المقدم -->
+    <div id="homeModelPopupArea" class="homeModelPopupArea hidden"></div>
 
-      
+    <div class="homeSegmentsShowcase" id="segmentsGrid">
 
-      <div id="winnerBox"></div>
+      <div class="segmentCard homeSegmentItem" id="segmentWarmup" onclick="openMainSegment('warmup')">
+        <div class="homeSegmentContent">
+          <span>التسخين</span>
+          <div class="segmentWinner homeSegmentWinner" id="winnerWarmup"></div>
+        </div>
+      </div>
+
+      <div class="segmentCard homeSegmentItem" id="segmentTop10" onclick="openMainSegment('top10')">
+        <div class="homeSegmentContent">
+          <span>Top 10</span>
+          <div class="segmentWinner homeSegmentWinner" id="winnerTop10"></div>
+        </div>
+      </div>
+
+      <div class="segmentCard homeSegmentItem" id="segmentAuction" onclick="openMainSegment('auction')">
+        <div class="homeSegmentContent">
+          <span>فتبلة</span>
+          <div class="segmentWinner homeSegmentWinner" id="winnerAuction"></div>
+        </div>
+      </div>
+
+      <div class="segmentCard homeSegmentItem" id="segmentWho" onclick="openMainSegment('who')">
+        <div class="homeSegmentContent">
+          <span>من هو</span>
+          <div class="segmentWinner homeSegmentWinner" id="winnerWho"></div>
+        </div>
+      </div>
+
+      <div class="segmentCard homeSegmentItem" id="segmentFinal" onclick="openMainSegment('final')">
+        <div class="homeSegmentContent">
+          <span>الفاصلة</span>
+          <div class="segmentWinner homeSegmentWinner" id="winnerFinal"></div>
+        </div>
+      </div>
+
+      <div class="segmentCard homeSegmentItem" id="segmentArchive" onclick="openMainSegment('archive')">
+        <div class="homeSegmentContent">
+          <span>الأرشيف</span>
+          <div class="segmentWinner homeSegmentWinner" id="winnerArchive"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="winnerArea homeWinnerArea" id="winnerArea">
+      <button class="winnerBtn homeWinnerBtn" onclick="announceWinner()">الفائز</button>
+      <div id="winnerBox" class="homeWinnerBox"></div>
     </div>
 
   </div>
 
+  <!-- منطقة الفقرات -->
   <div id="segmentArea"></div>
 
+  <!-- نافذة الفائز -->
   <div id="winnerOverlay" class="hidden">
     <div id="winnerOverlayCard">
       <div id="winnerOverlayTitle">الفائز</div>
@@ -90,25 +115,19 @@
       <div id="winnerOverlayBurst">✦ ✦ ✦</div>
 
       <div class="winnerOverlayActions">
-        <button id="winnerOverlayClose" onclick="closeWinnerOverlay()">إغلاق</button>
-        <button id="winnerOverlayEnd" onclick="endGameAndGoIntro()">إنهاء</button>
+        <button id="winnerOverlayClose" type="button" onclick="closeWinnerOverlay()">إغلاق</button>
+        <button id="winnerOverlayEnd" type="button" onclick="endGameAndGoIntro()">إنهاء</button>
       </div>
     </div>
   </div>
 
-  <div id="gameNotice" class="gameNotice hidden">
-    <div class="gameNoticeCard">
-      <div class="gameNoticeIcon">!</div>
-      <div id="gameNoticeText" class="gameNoticeText"></div>
-      <button class="gameNoticeBtn" onclick="closeGameNotice()">حسنًا</button>
-    </div>
-  </div>
-
+  <!-- إشعار سريع يظهر 5 ثواني -->
   <div id="gameToast" class="gameToast hidden">
     <div class="gameToastIcon">!</div>
     <div id="gameToastText" class="gameToastText"></div>
   </div>
 
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
   <script src="assets/js/game.js"></script>

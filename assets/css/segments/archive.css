@@ -1036,3 +1036,1296 @@
     font-size:1.2rem;
   }
 }
+/* =========================================================
+   ARCHIVE CONTROL PANEL - PROJECT GLASS STYLE ONLY
+   تعديل لوحة التحكم فقط بدون لمس لوحة الأرشيف
+========================================================= */
+
+/* حاوية أزرار التحكم */
+.archiveSidePanel .archiveControlButtons{
+  width:100% !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+
+  padding:12px !important;
+  margin:0 !important;
+
+  border-radius:22px !important;
+
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255,255,255,.26), transparent 38%),
+    radial-gradient(circle at 88% 100%, rgba(103,232,249,.12), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.10)) !important;
+
+  border:1px solid rgba(255,255,255,.34) !important;
+
+  box-shadow:
+    0 14px 28px rgba(30,27,75,.08),
+    inset 0 1px 0 rgba(255,255,255,.64),
+    inset 0 -1px 0 rgba(255,255,255,.10) !important;
+
+  backdrop-filter:blur(20px) !important;
+  -webkit-backdrop-filter:blur(20px) !important;
+}
+
+/* الأزرار العامة */
+.archiveSidePanel .archiveCtrlBtn{
+  position:relative !important;
+  overflow:hidden !important;
+
+  width:100% !important;
+  min-width:0 !important;
+
+  height:48px !important;
+  min-height:48px !important;
+
+  padding:0 8px !important;
+
+  border:0 !important;
+  border-radius:15px !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.82rem !important;
+  font-weight:400 !important;
+  line-height:1.1 !important;
+
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+
+  cursor:pointer !important;
+
+  color:#FFFFFF !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+    linear-gradient(180deg,#312E81 0%,#1E1B4B 100%) !important;
+
+  box-shadow:
+    0 10px 20px rgba(30,27,75,.14),
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -1px 0 rgba(0,0,0,.12) !important;
+
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    opacity .18s ease,
+    box-shadow .18s ease !important;
+}
+
+.archiveSidePanel .archiveCtrlBtn::before{
+  content:"";
+  position:absolute;
+  width:52px;
+  height:52px;
+  top:-22px;
+  right:-12px;
+  border-radius:50%;
+  background:rgba(255,255,255,.14);
+  pointer-events:none;
+}
+
+.archiveSidePanel .archiveCtrlBtn:hover:not(:disabled){
+  transform:translateY(-2px) !important;
+  filter:brightness(1.06) !important;
+
+  box-shadow:
+    0 14px 26px rgba(30,27,75,.18),
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 -1px 0 rgba(0,0,0,.12) !important;
+}
+
+.archiveSidePanel .archiveCtrlBtn:active:not(:disabled){
+  transform:scale(.96) !important;
+}
+
+.archiveSidePanel .archiveCtrlBtn:disabled{
+  opacity:.55 !important;
+  cursor:not-allowed !important;
+  transform:none !important;
+  filter:none !important;
+  box-shadow:none !important;
+}
+
+/* زر المؤقت */
+.archiveSideTimerBox .archiveTimerBtn{
+  width:100% !important;
+  height:44px !important;
+  min-height:44px !important;
+  border-radius:14px !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
+
+  color:#12362D !important;
+
+  box-shadow:
+    0 10px 20px rgba(6,182,212,.18),
+    inset 0 1px 0 rgba(255,255,255,.30) !important;
+}
+
+/* دوبيلا */
+.archiveSidePanel .archiveDoubleBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#FB7185 0%,#F97316 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 10px 20px rgba(249,115,22,.20),
+    inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+
+.archiveSidePanel .archiveDoubleBtn.activeDouble{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.34), transparent 42%),
+    linear-gradient(180deg,#FDBA74 0%,#F97316 100%) !important;
+
+  color:#431407 !important;
+
+  box-shadow:
+    0 0 0 5px rgba(249,115,22,.14),
+    0 14px 28px rgba(249,115,22,.24),
+    inset 0 1px 0 rgba(255,255,255,.38) !important;
+}
+
+/* خطأ */
+.archiveSidePanel .archiveErrorBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#EF4444 0%,#DC2626 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 10px 20px rgba(220,38,38,.18),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* إظهار الإجابة */
+.archiveSidePanel .archiveAnswerBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.20), transparent 42%),
+    linear-gradient(180deg,#06B6D4 0%,#0891B2 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 10px 20px rgba(8,145,178,.18),
+    inset 0 1px 0 rgba(255,255,255,.20) !important;
+}
+
+/* تراجع */
+.archiveSidePanel .archiveUndoBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#991B1B 0%,#7F1D1D 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 10px 20px rgba(127,29,29,.18),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* الجولة السابقة */
+.archiveSidePanel .archivePrevBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#64748B 0%,#334155 100%) !important;
+
+  color:#FFFFFF !important;
+}
+
+/* الجولة التالية */
+.archiveSidePanel .archiveNextBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
+
+  color:#12362D !important;
+
+  box-shadow:
+    0 10px 20px rgba(6,182,212,.18),
+    inset 0 1px 0 rgba(255,255,255,.30) !important;
+}
+
+/* الآيباد */
+@media (min-width:768px) and (max-width:1180px){
+  .archiveSidePanel .archiveControlButtons{
+    gap:7px !important;
+    padding:10px !important;
+    border-radius:20px !important;
+  }
+
+  .archiveSidePanel .archiveCtrlBtn{
+    height:42px !important;
+    min-height:42px !important;
+    border-radius:12px !important;
+    font-size:.68rem !important;
+    padding:0 5px !important;
+  }
+
+  .archiveSideTimerBox .archiveTimerBtn{
+    height:40px !important;
+    min-height:40px !important;
+    font-size:.68rem !important;
+  }
+}
+
+/* الجوال */
+@media (max-width:767px){
+  .archiveSidePanel .archiveControlButtons{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
+    padding:10px !important;
+    border-radius:18px !important;
+  }
+
+  .archiveSidePanel .archiveCtrlBtn{
+    height:44px !important;
+    min-height:44px !important;
+    border-radius:13px !important;
+    font-size:.76rem !important;
+    padding:0 6px !important;
+  }
+
+  .archiveSideTimerBox .archiveTimerBtn{
+    height:42px !important;
+    min-height:42px !important;
+  }
+}
+/* =========================================================
+   ARCHIVE SCOREBOARD - PROJECT GLASS STYLE
+   تعديل لوحة النتائج فقط
+========================================================= */
+
+/* كرت الفريق */
+.archiveSidePanel .archiveSideTeamCard{
+  position:relative !important;
+  width:100% !important;
+  min-height:78px !important;
+  padding:10px 12px !important;
+  border-radius:24px !important;
+
+  overflow:hidden !important;
+  cursor:pointer !important;
+
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255,255,255,.30), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.13) 100%) !important;
+
+  border:1px solid rgba(255,255,255,.38) !important;
+
+  box-shadow:
+    0 16px 34px rgba(30,27,75,.10),
+    inset 0 1px 0 rgba(255,255,255,.68),
+    inset 0 -1px 0 rgba(255,255,255,.10) !important;
+
+  backdrop-filter:blur(22px) !important;
+  -webkit-backdrop-filter:blur(22px) !important;
+
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease !important;
+}
+
+/* الفريق الأول */
+#archiveTeamA{
+  background:
+    radial-gradient(circle at 12% 0%, rgba(124,58,237,.24), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,.31) 0%, rgba(255,255,255,.14) 100%) !important;
+}
+
+/* الفريق الثاني */
+#archiveTeamB{
+  background:
+    radial-gradient(circle at 88% 0%, rgba(6,182,212,.22), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,.31) 0%, rgba(255,255,255,.14) 100%) !important;
+}
+
+.archiveSidePanel .archiveSideTeamCard:hover{
+  transform:translateY(-2px) !important;
+  filter:brightness(1.03) !important;
+
+  box-shadow:
+    0 20px 40px rgba(30,27,75,.14),
+    inset 0 1px 0 rgba(255,255,255,.72),
+    inset 0 -1px 0 rgba(255,255,255,.12) !important;
+}
+
+/* زخارف داخل الكرت */
+.archiveSidePanel .archiveSideTeamCard::before{
+  content:"";
+  position:absolute;
+  width:108px;
+  height:108px;
+  top:-54px;
+  right:-24px;
+  border-radius:50%;
+  background:rgba(255,255,255,.14);
+  pointer-events:none;
+}
+
+.archiveSidePanel .archiveSideTeamCard::after{
+  content:"";
+  position:absolute;
+  width:58px;
+  height:58px;
+  bottom:-24px;
+  left:-12px;
+  border-radius:18px;
+  transform:rotate(24deg);
+  background:rgba(255,255,255,.08);
+  pointer-events:none;
+}
+
+/* الفريق النشط */
+.archiveSidePanel .archiveSideTeamCard.activeTeam{
+  border-color:rgba(255,255,255,.68) !important;
+
+  box-shadow:
+    0 0 0 5px rgba(255,255,255,.12),
+    0 18px 38px rgba(30,27,75,.16),
+    inset 0 1px 0 rgba(255,255,255,.76),
+    inset 0 -1px 0 rgba(255,255,255,.12) !important;
+
+  transform:translateY(-2px) scale(1.01) !important;
+}
+
+#archiveTeamA.activeTeam{
+  background:
+    radial-gradient(circle at 12% 0%, rgba(124,58,237,.36), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,.36) 0%, rgba(255,255,255,.18) 100%) !important;
+}
+
+#archiveTeamB.activeTeam{
+  background:
+    radial-gradient(circle at 88% 0%, rgba(6,182,212,.34), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,.36) 0%, rgba(255,255,255,.18) 100%) !important;
+}
+
+/* صف الاسم والنقاط */
+.archiveSidePanel .archiveSideTeamRow{
+  position:relative !important;
+  z-index:2 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+}
+
+/* اسم الفريق */
+.archiveSidePanel .archiveSideTeamName{
+  flex:1 !important;
+  min-width:0 !important;
+
+  padding:8px 12px !important;
+  border-radius:16px !important;
+
+  background:rgba(255,255,255,.26) !important;
+  border:1px solid rgba(255,255,255,.24) !important;
+
+  backdrop-filter:blur(10px) !important;
+  -webkit-backdrop-filter:blur(10px) !important;
+
+  color:#24185E !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.15rem, 1.6vw, 1.65rem) !important;
+  line-height:1.05 !important;
+
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.55),
+    0 8px 18px rgba(255,255,255,.18) !important;
+}
+
+/* مربع النقاط */
+.archiveSidePanel .archiveSideTeamScore{
+  flex-shrink:0 !important;
+
+  width:54px !important;
+  height:42px !important;
+  border-radius:16px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.90) 0%, rgba(255,255,255,.66) 100%) !important;
+
+  border:1px solid rgba(255,255,255,.50) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.92),
+    0 8px 18px rgba(30,27,75,.10) !important;
+
+  backdrop-filter:blur(14px) !important;
+  -webkit-backdrop-filter:blur(14px) !important;
+
+  color:#1E1B4B !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.55rem !important;
+  line-height:1 !important;
+}
+
+/* الأخطاء */
+.archiveSidePanel .archiveSideErrors{
+  position:relative !important;
+  z-index:2 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+
+  margin-top:8px !important;
+}
+
+.archiveSidePanel .archiveSideErrors .errorMark{
+  color:rgba(30,27,75,.22) !important;
+  font-size:1.25rem !important;
+  line-height:1 !important;
+}
+
+.archiveSidePanel .archiveSideErrors .errorMark.active{
+  color:#EF4444 !important;
+  text-shadow:0 6px 14px rgba(239,68,68,.22) !important;
+}
+
+/* =========================================================
+   ARCHIVE TIMER BOX - PROJECT GLASS STYLE
+========================================================= */
+
+.archiveSidePanel .archiveSideTimerBox{
+  position:relative !important;
+  width:100% !important;
+
+  padding:12px !important;
+  border-radius:24px !important;
+
+  overflow:hidden !important;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(103,232,249,.25), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.16) 100%) !important;
+
+  border:1px solid rgba(255,255,255,.40) !important;
+
+  box-shadow:
+    0 16px 32px rgba(30,27,75,.10),
+    inset 0 1px 0 rgba(255,255,255,.72),
+    inset 0 -1px 0 rgba(255,255,255,.10) !important;
+
+  backdrop-filter:blur(22px) !important;
+  -webkit-backdrop-filter:blur(22px) !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+}
+
+.archiveSidePanel .archiveSideTimerBox::before{
+  content:"";
+  position:absolute;
+  width:96px;
+  height:96px;
+  top:-46px;
+  left:50%;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:rgba(255,255,255,.15);
+  pointer-events:none;
+}
+
+.archiveSidePanel .archiveSideTimerLabel{
+  position:relative !important;
+  z-index:2 !important;
+
+  color:#0F4C5C !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.78rem !important;
+  line-height:1 !important;
+}
+
+.archiveSidePanel .archiveSideTimerValue{
+  position:relative !important;
+  z-index:2 !important;
+
+  color:#12362D !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(2rem,2.5vw,2.6rem) !important;
+  line-height:.95 !important;
+
+  text-shadow:0 2px 10px rgba(255,255,255,.22) !important;
+}
+
+/* الآيباد */
+@media (min-width:768px) and (max-width:1180px){
+  .archiveSidePanel .archiveSideTeamCard{
+    min-height:66px !important;
+    padding:8px 10px !important;
+    border-radius:20px !important;
+  }
+
+  .archiveSidePanel .archiveSideTeamName{
+    font-size:1.15rem !important;
+    padding:7px 10px !important;
+    border-radius:14px !important;
+  }
+
+  .archiveSidePanel .archiveSideTeamScore{
+    width:46px !important;
+    height:36px !important;
+    border-radius:13px !important;
+    font-size:1.25rem !important;
+  }
+
+  .archiveSidePanel .archiveSideTimerBox{
+    border-radius:20px !important;
+    padding:10px !important;
+  }
+
+  .archiveSidePanel .archiveSideTimerValue{
+    font-size:1.8rem !important;
+  }
+}
+
+/* الجوال */
+@media (max-width:767px){
+  .archiveSidePanel .archiveSideTeamCard{
+    min-height:66px !important;
+    padding:8px 10px !important;
+    border-radius:18px !important;
+  }
+
+  .archiveSidePanel .archiveSideTeamName{
+    font-size:1.1rem !important;
+  }
+
+  .archiveSidePanel .archiveSideTeamScore{
+    width:46px !important;
+    height:36px !important;
+    border-radius:13px !important;
+    font-size:1.25rem !important;
+  }
+
+  .archiveSidePanel .archiveSideTimerBox{
+    border-radius:18px !important;
+  }
+
+  .archiveSidePanel .archiveSideTimerValue{
+    font-size:1.7rem !important;
+  }
+}
+/* =========================================================
+   ARCHIVE CONTROLS COLORS + REQUIRED INPUTS
+   ألوان الأزرار + مربعات النقاط والمطلوب فقط
+========================================================= */
+
+/* =========================
+   CONTROL BUTTON COLORS
+========================= */
+
+.archiveSidePanel .archiveControlButtons .archiveCtrlBtn{
+  position:relative !important;
+  overflow:hidden !important;
+
+  color:#FFFFFF !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+    linear-gradient(180deg,#312E81 0%,#1E1B4B 100%) !important;
+
+  box-shadow:
+    0 10px 20px rgba(30,27,75,.14),
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -1px 0 rgba(0,0,0,.12) !important;
+}
+
+.archiveSidePanel .archiveControlButtons .archiveCtrlBtn::before{
+  content:"";
+  position:absolute;
+  width:52px;
+  height:52px;
+  top:-22px;
+  right:-12px;
+  border-radius:50%;
+  background:rgba(255,255,255,.14);
+  pointer-events:none;
+}
+
+/* دوبيلا */
+.archiveSidePanel .archiveDoubleBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#FB7185 0%,#F97316 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 22px rgba(249,115,22,.22),
+    inset 0 1px 0 rgba(255,255,255,.24) !important;
+}
+
+.archiveSidePanel .archiveDoubleBtn.activeDouble{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.34), transparent 42%),
+    linear-gradient(180deg,#FDBA74 0%,#F97316 100%) !important;
+
+  color:#431407 !important;
+
+  box-shadow:
+    0 0 0 5px rgba(249,115,22,.14),
+    0 14px 28px rgba(249,115,22,.24),
+    inset 0 1px 0 rgba(255,255,255,.38) !important;
+}
+
+/* خطأ */
+.archiveSidePanel .archiveErrorBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#EF4444 0%,#DC2626 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 22px rgba(220,38,38,.20),
+    inset 0 1px 0 rgba(255,255,255,.20) !important;
+}
+
+/* إظهار الإجابة */
+.archiveSidePanel .archiveAnswerBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.22), transparent 42%),
+    linear-gradient(180deg,#06B6D4 0%,#0891B2 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 22px rgba(8,145,178,.20),
+    inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+
+/* تراجع */
+.archiveSidePanel .archiveUndoBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#991B1B 0%,#7F1D1D 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 22px rgba(127,29,29,.20),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* الجولة السابقة */
+.archiveSidePanel .archivePrevBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#64748B 0%,#334155 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 22px rgba(51,65,85,.18),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* الجولة التالية */
+.archiveSidePanel .archiveNextBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
+
+  color:#12362D !important;
+
+  box-shadow:
+    0 12px 22px rgba(6,182,212,.22),
+    inset 0 1px 0 rgba(255,255,255,.30) !important;
+}
+
+/* hover ثابت للأزرار */
+.archiveSidePanel .archiveControlButtons .archiveCtrlBtn:hover:not(:disabled){
+  transform:translateY(-2px) !important;
+  filter:brightness(1.07) saturate(1.04) !important;
+}
+
+.archiveSidePanel .archiveControlButtons .archiveCtrlBtn:disabled{
+  background:
+    linear-gradient(180deg, rgba(221,214,254,.78), rgba(221,214,254,.52)) !important;
+
+  color:#7C7896 !important;
+
+  box-shadow:none !important;
+  opacity:.78 !important;
+  cursor:not-allowed !important;
+  transform:none !important;
+  filter:none !important;
+}
+
+/* =========================
+   REQUIRED / POINTS INPUTS
+========================= */
+
+.archiveSidePanel .archiveInputsInline{
+  width:100% !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+
+  padding:12px !important;
+  margin:0 !important;
+
+  border-radius:22px !important;
+
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255,255,255,.26), transparent 38%),
+    radial-gradient(circle at 88% 100%, rgba(103,232,249,.12), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.10)) !important;
+
+  border:1px solid rgba(255,255,255,.34) !important;
+
+  box-shadow:
+    0 14px 28px rgba(30,27,75,.08),
+    inset 0 1px 0 rgba(255,255,255,.64),
+    inset 0 -1px 0 rgba(255,255,255,.10) !important;
+
+  backdrop-filter:blur(20px) !important;
+  -webkit-backdrop-filter:blur(20px) !important;
+}
+
+.archiveSidePanel .archiveInputRow{
+  position:relative !important;
+
+  min-width:0 !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  gap:7px !important;
+
+  padding:10px !important;
+  border-radius:18px !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.36), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.14)) !important;
+
+  border:1px solid rgba(255,255,255,.32) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.62),
+    0 8px 16px rgba(30,27,75,.06) !important;
+
+  overflow:hidden !important;
+}
+
+.archiveSidePanel .archiveInputRow::before{
+  content:"";
+  position:absolute;
+  width:58px;
+  height:58px;
+  top:-30px;
+  right:-18px;
+  border-radius:50%;
+  background:rgba(255,255,255,.12);
+  pointer-events:none;
+}
+
+.archiveSidePanel .archiveInputLabel{
+  position:relative !important;
+  z-index:2 !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.78rem !important;
+  line-height:1 !important;
+
+  text-align:center !important;
+}
+
+.archiveSidePanel .archiveMiniInput,
+.archiveSidePanel .archiveMiniInputStrong{
+  position:relative !important;
+  z-index:2 !important;
+
+  width:100% !important;
+  height:48px !important;
+  min-height:48px !important;
+
+  border:0 !important;
+  outline:none !important;
+  border-radius:16px !important;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.68)) !important;
+
+  border:1px solid rgba(255,255,255,.54) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.94),
+    0 8px 18px rgba(30,27,75,.09) !important;
+
+  color:#1E1B4B !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.7rem !important;
+  line-height:1 !important;
+
+  text-align:center !important;
+
+  cursor:default !important;
+}
+
+/* مربع النقاط */
+.archiveSidePanel #archiveManualInput2{
+  color:#14532D !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.72), transparent 42%),
+    linear-gradient(180deg, rgba(240,253,244,.92), rgba(220,252,231,.72)) !important;
+
+  border:1px solid rgba(34,197,94,.28) !important;
+
+  box-shadow:
+    0 8px 18px rgba(34,197,94,.12),
+    inset 0 1px 0 rgba(255,255,255,.92) !important;
+}
+
+/* مربع المطلوب */
+.archiveSidePanel #archiveManualInput1{
+  color:#12362D !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.72), transparent 42%),
+    linear-gradient(180deg, rgba(236,254,255,.94), rgba(207,250,254,.72)) !important;
+
+  border:1px solid rgba(6,182,212,.30) !important;
+
+  box-shadow:
+    0 8px 18px rgba(6,182,212,.12),
+    inset 0 1px 0 rgba(255,255,255,.92) !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (min-width:768px) and (max-width:1180px){
+  .archiveSidePanel .archiveInputsInline{
+    gap:7px !important;
+    padding:10px !important;
+    border-radius:20px !important;
+  }
+
+  .archiveSidePanel .archiveInputRow{
+    padding:8px !important;
+    border-radius:16px !important;
+  }
+
+  .archiveSidePanel .archiveInputLabel{
+    font-size:.66rem !important;
+  }
+
+  .archiveSidePanel .archiveMiniInput,
+  .archiveSidePanel .archiveMiniInputStrong{
+    height:40px !important;
+    min-height:40px !important;
+    border-radius:13px !important;
+    font-size:1.35rem !important;
+  }
+}
+
+@media (max-width:767px){
+  .archiveSidePanel .archiveInputsInline{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
+    padding:10px !important;
+    border-radius:18px !important;
+  }
+
+  .archiveSidePanel .archiveInputRow{
+    padding:8px !important;
+    border-radius:15px !important;
+  }
+
+  .archiveSidePanel .archiveInputLabel{
+    font-size:.72rem !important;
+  }
+
+  .archiveSidePanel .archiveMiniInput,
+  .archiveSidePanel .archiveMiniInputStrong{
+    height:42px !important;
+    min-height:42px !important;
+    border-radius:13px !important;
+    font-size:1.35rem !important;
+  }
+}
+/* =========================================================
+   ARCHIVE FINAL FIX
+   تكبير الأخطاء + ألوان أزرار التحكم نفس المشروع
+========================================================= */
+
+/* =========================
+   BIGGER ERROR MARKS
+========================= */
+
+.archiveSidePanel .archiveSideErrors{
+  gap:10px !important;
+  margin-top:10px !important;
+}
+
+.archiveSidePanel .archiveSideErrors .errorMark{
+  font-size:1.85rem !important;
+  line-height:1 !important;
+
+  color:rgba(30,27,75,.24) !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.45),
+    0 8px 16px rgba(30,27,75,.08) !important;
+}
+
+.archiveSidePanel .archiveSideErrors .errorMark.active{
+  color:#EF4444 !important;
+
+  text-shadow:
+    0 0 0 rgba(239,68,68,0),
+    0 8px 18px rgba(239,68,68,.34) !important;
+
+  transform:scale(1.08);
+}
+
+/* =========================
+   CONTROL BUTTON COLORS - PROJECT STYLE
+========================= */
+
+/* الزر العام */
+.archiveSidePanel .archiveControlButtons .archiveCtrlBtn{
+  color:#FFFFFF !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+    linear-gradient(180deg,#312E81 0%,#1E1B4B 100%) !important;
+
+  box-shadow:
+    0 10px 20px rgba(30,27,75,.14),
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -1px 0 rgba(0,0,0,.12) !important;
+}
+
+/* دوبيلا - نفس المشروع */
+.archiveSidePanel .archiveDoubleBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#FB7185 0%,#F97316 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 24px rgba(249,115,22,.24),
+    inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+
+.archiveSidePanel .archiveDoubleBtn.activeDouble{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.34), transparent 42%),
+    linear-gradient(180deg,#FDBA74 0%,#F97316 100%) !important;
+
+  color:#431407 !important;
+
+  box-shadow:
+    0 0 0 5px rgba(249,115,22,.16),
+    0 14px 28px rgba(249,115,22,.24),
+    inset 0 1px 0 rgba(255,255,255,.38) !important;
+}
+
+/* خطأ */
+.archiveSidePanel .archiveErrorBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#EF4444 0%,#DC2626 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 24px rgba(220,38,38,.22),
+    inset 0 1px 0 rgba(255,255,255,.20) !important;
+}
+
+/* إظهار الإجابة */
+.archiveSidePanel .archiveAnswerBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.20), transparent 42%),
+    linear-gradient(180deg,#06B6D4 0%,#0891B2 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 24px rgba(8,145,178,.22),
+    inset 0 1px 0 rgba(255,255,255,.20) !important;
+}
+
+/* تراجع */
+.archiveSidePanel .archiveUndoBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#991B1B 0%,#7F1D1D 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 24px rgba(127,29,29,.22),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* الجولة السابقة */
+.archiveSidePanel .archivePrevBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#64748B 0%,#334155 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 24px rgba(51,65,85,.20),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* الجولة التالية */
+.archiveSidePanel .archiveNextBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
+
+  color:#12362D !important;
+
+  box-shadow:
+    0 12px 24px rgba(6,182,212,.22),
+    inset 0 1px 0 rgba(255,255,255,.30) !important;
+}
+
+/* زر المؤقت نفس المشروع */
+.archiveSideTimerBox .archiveTimerBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
+
+  color:#12362D !important;
+
+  box-shadow:
+    0 12px 24px rgba(6,182,212,.22),
+    inset 0 1px 0 rgba(255,255,255,.30) !important;
+}
+
+/* Hover */
+.archiveSidePanel .archiveControlButtons .archiveCtrlBtn:hover:not(:disabled),
+.archiveSideTimerBox .archiveTimerBtn:hover:not(:disabled){
+  transform:translateY(-2px) !important;
+  filter:brightness(1.07) saturate(1.05) !important;
+}
+
+/* Disabled */
+.archiveSidePanel .archiveControlButtons .archiveCtrlBtn:disabled,
+.archiveSideTimerBox .archiveTimerBtn:disabled{
+  background:
+    linear-gradient(180deg, rgba(221,214,254,.78), rgba(221,214,254,.52)) !important;
+
+  color:#7C7896 !important;
+
+  box-shadow:none !important;
+  opacity:.78 !important;
+  cursor:not-allowed !important;
+  transform:none !important;
+  filter:none !important;
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .archiveSidePanel .archiveSideErrors .errorMark{
+    font-size:1.45rem !important;
+  }
+}
+
+/* Mobile */
+@media (max-width:767px){
+  .archiveSidePanel .archiveSideErrors .errorMark{
+    font-size:1.45rem !important;
+  }
+}
+/* =========================================================
+   ARCHIVE BUTTON COLORS - FORCE OVERRIDE
+   ضع هذا آخر ملف CSS بالكامل
+========================================================= */
+
+/* الشكل العام لكل أزرار الأرشيف */
+.archiveSidePanel button.archiveCtrlBtn,
+.archiveSidePanel .archiveControlButtons button,
+.archiveSidePanel .archiveSideTimerBox button{
+  position:relative !important;
+  overflow:hidden !important;
+
+  border:0 !important;
+  border-radius:15px !important;
+
+  color:#FFFFFF !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+    linear-gradient(180deg,#312E81 0%,#1E1B4B 100%) !important;
+
+  box-shadow:
+    0 12px 24px rgba(30,27,75,.18),
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -1px 0 rgba(0,0,0,.12) !important;
+}
+
+/* دوبيلا */
+.archiveSidePanel button#archiveDoubleBtn,
+.archiveSidePanel button.archiveDoubleBtn,
+.archiveSidePanel .archiveControlButtons button[onclick*="activateArchiveDouble"]{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#FB7185 0%,#F97316 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 24px rgba(249,115,22,.26),
+    inset 0 1px 0 rgba(255,255,255,.24) !important;
+}
+
+/* دوبيلا مفعلة */
+.archiveSidePanel button#archiveDoubleBtn.activeDouble,
+.archiveSidePanel button.archiveDoubleBtn.activeDouble{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.34), transparent 42%),
+    linear-gradient(180deg,#FDBA74 0%,#F97316 100%) !important;
+
+  color:#431407 !important;
+
+  box-shadow:
+    0 0 0 5px rgba(249,115,22,.16),
+    0 14px 28px rgba(249,115,22,.26),
+    inset 0 1px 0 rgba(255,255,255,.38) !important;
+}
+
+/* خطأ */
+.archiveSidePanel button.archiveErrorBtn,
+.archiveSidePanel .archiveControlButtons button[onclick*="addArchiveError"]{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#EF4444 0%,#DC2626 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 24px rgba(220,38,38,.24),
+    inset 0 1px 0 rgba(255,255,255,.20) !important;
+}
+
+/* إظهار الإجابة */
+.archiveSidePanel button.archiveAnswerBtn,
+.archiveSidePanel .archiveControlButtons button[onclick*="showArchiveAnswer"]{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.20), transparent 42%),
+    linear-gradient(180deg,#06B6D4 0%,#0891B2 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 24px rgba(8,145,178,.24),
+    inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+
+/* تراجع */
+.archiveSidePanel button#archiveUndoBtn,
+.archiveSidePanel button.archiveUndoBtn,
+.archiveSidePanel .archiveControlButtons button[onclick*="undoArchiveAction"]{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#991B1B 0%,#7F1D1D 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 24px rgba(127,29,29,.24),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* الجولة السابقة */
+.archiveSidePanel button.archivePrevBtn,
+.archiveSidePanel .archiveControlButtons button[onclick*="prevArchiveRound"]{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#64748B 0%,#334155 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 24px rgba(51,65,85,.22),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* الجولة التالية */
+.archiveSidePanel button.archiveNextBtn,
+.archiveSidePanel .archiveControlButtons button[onclick*="nextArchiveRound"]{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
+
+  color:#12362D !important;
+
+  box-shadow:
+    0 12px 24px rgba(6,182,212,.24),
+    inset 0 1px 0 rgba(255,255,255,.30) !important;
+}
+
+/* زر المؤقت */
+.archiveSidePanel .archiveSideTimerBox button.archiveTimerBtn,
+.archiveSidePanel .archiveSideTimerBox button[onclick*="startArchiveTimer"]{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
+
+  color:#12362D !important;
+
+  box-shadow:
+    0 12px 24px rgba(6,182,212,.24),
+    inset 0 1px 0 rgba(255,255,255,.30) !important;
+}
+
+/* المعطل */
+.archiveSidePanel button.archiveCtrlBtn:disabled,
+.archiveSidePanel .archiveControlButtons button:disabled,
+.archiveSidePanel .archiveSideTimerBox button:disabled{
+  background:
+    linear-gradient(180deg, rgba(221,214,254,.78), rgba(221,214,254,.52)) !important;
+
+  color:#7C7896 !important;
+
+  box-shadow:none !important;
+  opacity:.78 !important;
+  cursor:not-allowed !important;
+  transform:none !important;
+  filter:none !important;
+}

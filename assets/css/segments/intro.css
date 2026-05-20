@@ -1,598 +1,1003 @@
+/* =========================================================
+   INTRO PAGE - ALHANAKAH FINAL
+   ترتيب نظيف / زجاجي / بدون لاق
+========================================================= */
+
 /* =========================
-   INTRO PAGE - CLEAN PRO
+   Page
 ========================= */
 
 .introPage{
   min-height:100dvh;
   width:100%;
+
   position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:22px;
   overflow:hidden;
+
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+
+  padding:24px 18px 34px;
+
   background:
-    radial-gradient(circle at 82% 12%, rgba(255,155,81,.20), transparent 27%),
-    radial-gradient(circle at 14% 88%, rgba(47,65,88,.10), transparent 30%),
-    linear-gradient(180deg,#F4F7F7 0%,#EAEFEF 100%);
+    radial-gradient(circle at 14% 8%, rgba(255,255,255,.52), transparent 28%),
+    radial-gradient(circle at 84% 12%, rgba(103,232,249,.18), transparent 34%),
+    radial-gradient(circle at 16% 88%, rgba(255,155,81,.17), transparent 34%),
+    radial-gradient(circle at 86% 88%, rgba(47,65,88,.08), transparent 34%),
+    linear-gradient(180deg,#F8FAFC 0%,#EEF3F6 100%);
+
+  color:#24185E;
 }
 
-.introBgShape{
+.introPage::before{
+  content:"";
+  position:absolute;
+  width:520px;
+  height:520px;
+  top:-230px;
+  right:-190px;
+
+  border-radius:50%;
+  background:rgba(255,255,255,.34);
+
+  pointer-events:none;
+}
+
+.introPage::after{
+  content:"";
+  position:absolute;
+  width:360px;
+  height:360px;
+  left:-160px;
+  bottom:-130px;
+
+  border-radius:90px;
+  transform:rotate(20deg);
+
+  background:rgba(103,232,249,.08);
+
+  pointer-events:none;
+}
+
+.introDecor{
   position:absolute;
   pointer-events:none;
-  opacity:.65;
-  filter:blur(.1px);
 }
 
-.introBgShapeOne{
-  width:260px;
-  height:260px;
-  top:8%;
-  right:7%;
+.introDecorOne{
+  width:210px;
+  height:210px;
+  right:8%;
+  bottom:10%;
+
+  border-radius:48px;
+  transform:rotate(-14deg);
+
+  background:rgba(255,155,81,.09);
+}
+
+.introDecorTwo{
+  width:130px;
+  height:130px;
+  left:12%;
+  top:12%;
+
+  border-radius:38px;
+  transform:rotate(18deg);
+
+  background:rgba(103,232,249,.08);
+}
+
+.introDecorThree{
+  width:96px;
+  height:96px;
+  right:18%;
+  top:18%;
+
   border-radius:50%;
-  background:rgba(255,155,81,.10);
+
+  background:rgba(255,255,255,.22);
 }
 
-.introBgShapeTwo{
+/* =========================
+   Shell
+========================= */
+
+.introShell{
+  position:relative;
+  z-index:2;
+
+  width:min(100%, 860px);
+
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  align-items:center;
+}
+
+/* =========================
+   Header
+========================= */
+
+.introHeader{
+  width:100%;
+  min-height:250px;
+
+  position:relative;
+  overflow:hidden;
+
+  padding:28px 24px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+
+  border-radius:42px 24px 42px 24px;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.42), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,.38), rgba(255,255,255,.16));
+
+  border:1px solid rgba(255,255,255,.42);
+
+  box-shadow:
+    0 24px 52px rgba(30,27,75,.12),
+    inset 0 1px 0 rgba(255,255,255,.76),
+    inset 0 -1px 0 rgba(255,255,255,.12);
+
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+}
+
+.introHeader::before{
+  content:"";
+  position:absolute;
   width:190px;
   height:190px;
-  left:8%;
-  bottom:10%;
-  border-radius:42px;
-  transform:rotate(18deg);
-  background:rgba(47,65,88,.06);
+  top:-78px;
+  right:-54px;
+
+  border-radius:50%;
+  background:rgba(255,255,255,.16);
+
+  pointer-events:none;
 }
 
-.introBgShapeThree{
+.introHeader::after{
+  content:"";
+  position:absolute;
   width:110px;
   height:110px;
-  right:18%;
-  bottom:16%;
-  border-radius:34px;
-  transform:rotate(-14deg);
-  background:rgba(255,155,81,.08);
-}
+  left:-34px;
+  bottom:-36px;
 
-/* =========================
-   CARD
-========================= */
-
-.introCard{
-  width:min(100%,680px);
-  position:relative;
-  z-index:2;
-  overflow:hidden;
-  border-radius:36px;
-  padding:30px;
-  background:
-    radial-gradient(circle at top right, rgba(255,155,81,.10), transparent 34%),
-    linear-gradient(180deg,#FFFFFF 0%,#F7FAFA 100%);
-  border:1px solid rgba(217,224,224,.95);
-  box-shadow:
-    0 26px 70px rgba(39,48,61,.13),
-    inset 0 1px 0 rgba(255,255,255,.95);
-  animation:introCardIn .62s cubic-bezier(.22,.61,.36,1) both;
-}
-
-.introCard::before{
-  content:"";
-  position:absolute;
-  width:220px;
-  height:220px;
-  top:-100px;
-  right:-78px;
-  border-radius:50%;
-  background:rgba(255,155,81,.12);
-}
-
-.introCard::after{
-  content:"";
-  position:absolute;
-  width:135px;
-  height:135px;
-  bottom:-58px;
-  left:-42px;
-  border-radius:32px;
+  border-radius:30px;
   transform:rotate(24deg);
-  background:rgba(47,65,88,.055);
+
+  background:rgba(103,232,249,.10);
+
+  pointer-events:none;
 }
 
-.introLogoBox,
-.introForm,
-.introFooterNote{
+.introTitleBox{
   position:relative;
   z-index:2;
+
+  width:100%;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
-/* =========================
-   HEADER
-========================= */
+.introTitleGlow{
+  position:absolute;
+  width:270px;
+  height:100px;
+  top:50%;
+  left:50%;
 
-.introLogoBox{
-  text-align:center;
-  margin-bottom:24px;
-  animation:introFadeDown .65s ease both;
-}
+  transform:translate(-50%,-50%);
 
-.introBadge{
-  width:max-content;
-  min-height:34px;
-  margin:0 auto 12px;
-  padding:7px 18px;
   border-radius:999px;
-  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
-  color:#7A4A22;
-  font-family:"HanakaText",sans-serif;
-  font-size:.96rem;
-  box-shadow:0 10px 20px rgba(255,155,81,.18);
+
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.48), transparent 66%),
+    radial-gradient(circle at 20% 50%, rgba(103,232,249,.18), transparent 54%),
+    radial-gradient(circle at 80% 50%, rgba(255,155,81,.16), transparent 54%);
+
+  filter:blur(10px);
+  pointer-events:none;
 }
 
 .introTitle{
+  position:relative;
+  z-index:2;
+
   margin:0;
-  color:#2F4158 !important;
+
+  color:#24185E;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(3rem,4.7vw,4.75rem);
-  line-height:.96;
+  font-size:clamp(3.8rem, 8vw, 5.8rem);
+  line-height:.86;
   font-weight:400;
+  letter-spacing:-1px;
+
   text-shadow:
-    0 2px 0 rgba(255,255,255,.95),
-    0 10px 24px rgba(47,65,88,.12),
-    0 4px 14px rgba(255,155,81,.10);
-  animation:introTitleGlow 2.9s ease-in-out infinite;
+    0 1px 0 rgba(255,255,255,.78),
+    0 10px 22px rgba(30,27,75,.11),
+    0 0 22px rgba(103,232,249,.16),
+    0 0 30px rgba(255,155,81,.12);
 }
 
 .introTitleLine{
-  width:124px;
-  height:5px;
-  margin:14px auto 11px;
+  width:150px;
+  height:4px;
+  margin:14px auto 0;
+
   border-radius:999px;
-  background:linear-gradient(90deg,transparent,#FF9B51,transparent);
-  box-shadow:0 0 14px rgba(255,155,81,.26);
+
+  background:
+    linear-gradient(90deg, transparent, #67E8F9, #FF9B51, transparent);
+
+  box-shadow:
+    0 0 14px rgba(103,232,249,.24),
+    0 0 16px rgba(255,155,81,.18);
 }
 
 .introSubTitle{
-  margin:0;
-  color:#5E6A76;
+  position:relative;
+  z-index:2;
+
+  max-width:420px;
+
+  margin:16px auto 0;
+
+  color:#64748B;
   font-family:"HanakaText",sans-serif;
-  font-size:1.06rem;
-  line-height:1.7;
+  font-size:1.03rem;
+  line-height:1.8;
 }
 
 /* =========================
-   FORM
+   Setup Card
 ========================= */
 
-.introForm{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  padding:17px;
-  border-radius:28px;
-  background:rgba(255,255,255,.62);
-  border:1px solid rgba(217,224,224,.86);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
-  animation:introFadeUp .72s ease both;
-}
-
-.introFieldsGroup{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.introField{
-  width:100%;
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-}
-
-.introField label{
-  padding-inline:6px;
-  color:#2F4158;
-  font-family:"HanakaText",sans-serif;
-  font-size:.96rem;
-}
-
-.introInputWrap,
-.introSelectWrap{
+.introSetupCard{
   position:relative;
+  overflow:hidden;
+
   width:100%;
+  min-height:auto;
+
+  padding:24px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:18px;
+
+  border-radius:42px 24px 42px 24px;
+
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255,255,255,.42), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,.38), rgba(255,255,255,.16));
+
+  border:1px solid rgba(255,255,255,.42);
+
+  box-shadow:
+    0 24px 52px rgba(30,27,75,.12),
+    inset 0 1px 0 rgba(255,255,255,.76),
+    inset 0 -1px 0 rgba(255,255,255,.12);
+
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
 }
 
-.introFieldIcon{
+.introSetupCard::before{
+  content:"";
   position:absolute;
-  left:15px;
-  top:50%;
-  transform:translateY(-50%);
-  width:28px;
-  height:28px;
-  border-radius:11px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(255,155,81,.12);
-  color:#C96A25;
-  font-family:Arial,sans-serif;
-  font-size:.88rem;
-  font-weight:900;
+  width:170px;
+  height:170px;
+  top:-74px;
+  right:-50px;
+
+  border-radius:50%;
+  background:rgba(255,255,255,.14);
+
   pointer-events:none;
 }
 
-.introField input,
-.introField select{
+.introSetupCard::after{
+  content:"";
+  position:absolute;
+  width:96px;
+  height:96px;
+  left:-24px;
+  bottom:-30px;
+
+  border-radius:26px;
+  transform:rotate(24deg);
+
+  background:rgba(255,255,255,.09);
+
+  pointer-events:none;
+}
+
+/* =========================
+   Teams
+========================= */
+
+.introTeamsRow{
+  position:relative;
+  z-index:2;
+
   width:100%;
-  height:56px;
-  box-sizing:border-box;
-  border-radius:20px;
-  border:1.5px solid rgba(217,224,224,.95);
-  outline:none;
-  background:linear-gradient(180deg,#FFFFFF 0%,#F8FBFB 100%);
-  color:#243447;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  align-items:stretch;
+}
+
+.introTeamCard{
+  position:relative;
+  overflow:hidden;
+
+  min-height:126px;
+
+  padding:16px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:12px;
+
+  border:1px solid rgba(255,255,255,.42);
+  border-radius:28px 18px 28px 18px;
+
+  background:
+    radial-gradient(circle at 14% 0%, rgba(255,255,255,.30), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+
+  box-shadow:
+    0 18px 36px rgba(30,27,75,.09),
+    inset 0 1px 0 rgba(255,255,255,.72),
+    inset 0 -1px 0 rgba(255,255,255,.10);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.introTeamCardA{
+  background:
+    radial-gradient(circle at 12% 0%, rgba(124,58,237,.18), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+}
+
+.introTeamCardB{
+  border-radius:18px 28px 18px 28px;
+
+  background:
+    radial-gradient(circle at 88% 0%, rgba(6,182,212,.18), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+}
+
+.introTeamCard::before{
+  content:"";
+  position:absolute;
+  width:110px;
+  height:110px;
+  top:-54px;
+
+  border-radius:50%;
+  background:rgba(255,255,255,.14);
+
+  pointer-events:none;
+}
+
+.introTeamCardA::before{
+  right:-24px;
+}
+
+.introTeamCardB::before{
+  left:-24px;
+}
+
+.introTeamCard label{
+  position:relative;
+  z-index:2;
+
+  color:#2F4158;
   font-family:"HanakaText",sans-serif;
   font-size:1rem;
+  line-height:1;
+  text-align:center;
+}
+
+.introTeamInputBox{
+  position:relative;
+  z-index:2;
+
+  min-height:58px;
+
+  display:flex;
+  align-items:center;
+
+  border-radius:20px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.28));
+
+  border:1px solid rgba(255,255,255,.38);
+
   box-shadow:
-    0 8px 18px rgba(39,48,61,.05),
-    inset 0 1px 0 rgba(255,255,255,.95);
-  transition:
-    transform .18s ease,
-    box-shadow .18s ease,
-    border-color .18s ease,
-    background .18s ease;
+    inset 0 1px 0 rgba(255,255,255,.74),
+    0 10px 20px rgba(30,27,75,.05);
 }
 
-.introField input{
-  padding:0 18px 0 52px;
+.introTeamInputBox input{
+  width:100%;
+  height:58px;
+
+  border:0;
+  outline:0;
+
+  background:transparent;
+
+  padding:0 16px;
+
+  color:#24185E;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.08rem;
+
+  text-align:center;
 }
 
-.introField select{
-  padding:0 18px 0 46px;
-  cursor:pointer;
-  appearance:none;
-  -webkit-appearance:none;
+.introTeamInputBox input::placeholder{
+  color:rgba(100,116,139,.72);
 }
 
-.introSelectWrap::after{
+.introTeamInputBox:focus-within{
+  border-color:rgba(255,155,81,.42);
+
+  box-shadow:
+    0 0 0 5px rgba(255,155,81,.10),
+    0 16px 30px rgba(30,27,75,.08),
+    inset 0 1px 0 rgba(255,255,255,.82);
+}
+
+/* =========================
+   Model
+========================= */
+
+.introModelCard{
+  position:relative;
+  z-index:2;
+  overflow:hidden;
+
+  width:100%;
+  min-height:116px;
+
+  padding:16px;
+
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) minmax(240px, 330px);
+  gap:16px;
+  align-items:center;
+
+  border-radius:30px 18px 30px 18px;
+
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255,155,81,.16), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+
+  border:1px solid rgba(255,255,255,.42);
+
+  box-shadow:
+    0 18px 36px rgba(30,27,75,.09),
+    inset 0 1px 0 rgba(255,255,255,.72),
+    inset 0 -1px 0 rgba(255,255,255,.10);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.introModelText label{
+  display:block;
+
+  color:#24185E;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.65rem;
+  line-height:1;
+  margin-bottom:8px;
+}
+
+.introModelText p{
+  margin:0;
+
+  color:#64748B;
+  font-family:"HanakaText",sans-serif;
+  font-size:.94rem;
+  line-height:1.5;
+}
+
+.introModelSelectBox{
+  position:relative;
+
+  min-height:58px;
+
+  display:flex;
+  align-items:center;
+
+  border-radius:20px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.28));
+
+  border:1px solid rgba(255,255,255,.38);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.74),
+    0 10px 20px rgba(30,27,75,.05);
+}
+
+.introModelSelectBox::after{
   content:"⌄";
   position:absolute;
   left:18px;
   top:50%;
-  transform:translateY(-53%);
-  color:#FF9B51;
-  font-size:1.45rem;
+
+  transform:translateY(-50%);
+
+  color:#2F4158;
+  font-family:Arial,sans-serif;
+  font-size:1.35rem;
+
   pointer-events:none;
 }
 
-.introField input:focus,
-.introField select:focus{
-  border-color:#FF9B51;
-  background:#FFFFFF;
-  transform:translateY(-2px);
+.introModelSelectBox select{
+  width:100%;
+  height:58px;
+
+  border:0;
+  outline:0;
+
+  background:transparent;
+
+  padding:0 16px 0 48px;
+
+  color:#24185E;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.04rem;
+
+  appearance:none;
+  -webkit-appearance:none;
+
+  cursor:pointer;
+}
+
+.introModelSelectBox:focus-within{
+  border-color:rgba(255,155,81,.42);
+
   box-shadow:
-    0 0 0 4px rgba(255,155,81,.12),
-    0 12px 24px rgba(39,48,61,.08);
-}
-
-.introField input::placeholder{
-  color:#9AA3AA;
-}
-
-.introField input:disabled,
-.introField select:disabled{
-  opacity:.72;
-  cursor:not-allowed;
+    0 0 0 5px rgba(255,155,81,.10),
+    0 16px 30px rgba(30,27,75,.08),
+    inset 0 1px 0 rgba(255,255,255,.82);
 }
 
 /* =========================
-   ACTIONS
+   Start Button
 ========================= */
 
-.introActionsSingle{
+.introActions{
+  position:relative;
+  z-index:2;
+
   display:flex;
+  align-items:center;
   justify-content:center;
+
   margin-top:4px;
 }
 
 #startGameBtn{
-  width:min(370px,100%);
-  min-height:58px;
   position:relative;
   overflow:hidden;
-  border:0;
-  border-radius:22px;
-  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
-  color:#FFFFFF;
-  font-family:"HanakaText",sans-serif;
-  font-size:1.12rem;
+
+  width:min(100%, 360px);
+  min-height:62px;
+
+  border:1px solid rgba(255,255,255,.50);
+  border-radius:24px;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.42), transparent 42%),
+    linear-gradient(180deg, rgba(255,155,81,.86), rgba(249,115,22,.74));
+
+  color:#fff;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.28rem;
+  line-height:1;
+
   cursor:pointer;
+
   box-shadow:
-    0 16px 32px rgba(255,155,81,.25),
-    inset 0 1px 0 rgba(255,255,255,.28);
-  transition:transform .18s ease, filter .18s ease, opacity .18s ease;
+    0 18px 34px rgba(249,115,22,.18),
+    0 0 0 5px rgba(255,255,255,.10),
+    inset 0 1px 0 rgba(255,255,255,.42),
+    inset 0 -1px 0 rgba(0,0,0,.10);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+
+  transition:
+    transform .16s ease,
+    filter .16s ease,
+    opacity .16s ease;
 }
 
-#startGameBtn:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.04);
-}
+#startGameBtn::before{
+  content:"";
+  position:absolute;
+  width:86px;
+  height:86px;
+  top:-42px;
+  right:-22px;
 
-#startGameBtn:active{
-  transform:scale(.97);
+  border-radius:50%;
+  background:rgba(255,255,255,.16);
+
+  pointer-events:none;
 }
 
 #startGameBtn::after{
   content:"";
   position:absolute;
   inset:-45%;
-  background:linear-gradient(120deg,transparent 38%,rgba(255,255,255,.34),transparent 62%);
+
+  background:
+    linear-gradient(120deg, transparent 38%, rgba(255,255,255,.28), transparent 62%);
+
   transform:translateX(120%) rotate(8deg);
-  animation:introBtnShine 2.8s ease-in-out infinite;
+  animation:introBtnShine 3.2s ease-in-out infinite;
+
+  pointer-events:none;
+}
+
+#startGameBtn:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+#startGameBtn:active{
+  transform:scale(.97);
+}
+
+#startGameBtn:disabled{
+  opacity:.88;
+  cursor:not-allowed;
+  transform:none;
+  filter:saturate(.96);
 }
 
 #startGameBtn.loading{
-  pointer-events:none;
-  opacity:.86;
+  filter:saturate(.95);
 }
 
-#startGameBtn.loading::before{
-  content:"";
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  border:3px solid rgba(255,255,255,.55);
-  border-top-color:#fff;
-  position:absolute;
-  right:18px;
-  top:50%;
-  transform:translateY(-50%);
-  animation:introSpin .7s linear infinite;
-  z-index:2;
+@keyframes introBtnShine{
+  0%,45%{
+    transform:translateX(120%) rotate(8deg);
+  }
+
+  72%,100%{
+    transform:translateX(-120%) rotate(8deg);
+  }
 }
 
 /* =========================
-   FOOTER NOTE
+   Error
 ========================= */
 
-.introFooterNote{
-  margin-top:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  color:#7A8793;
-  font-family:"HanakaText",sans-serif;
-  font-size:.88rem;
+.introFieldError{
+  animation:introFieldShake .34s ease both;
 }
 
-.introFooterDot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#FF9B51;
-  box-shadow:0 0 0 4px rgba(255,155,81,.13);
+@keyframes introFieldShake{
+  0%,100%{
+    transform:translateX(0);
+  }
+
+  25%{
+    transform:translateX(5px);
+  }
+
+  50%{
+    transform:translateX(-5px);
+  }
+
+  75%{
+    transform:translateX(3px);
+  }
 }
 
 /* =========================
-   MODAL
+   Presenter Modal
 ========================= */
 
 .introPresenterModal{
   position:fixed;
   inset:0;
-  z-index:9999;
-  padding:18px;
+  z-index:999997;
+
   display:flex;
   align-items:center;
   justify-content:center;
-  background:rgba(20,28,38,.58);
-  backdrop-filter:blur(8px);
-  animation:introModalFade .25s ease both;
+
+  padding:22px;
+
+  background:rgba(20,28,38,.46);
+
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
 }
 
 .introPresenterModal.hidden{
-  display:none !important;
+  display:none;
 }
 
 .introPresenterModalCard{
-  width:min(100%,430px);
   position:relative;
-  overflow:hidden;
+
+  width:min(100%, 760px);
+
+  padding:24px;
+
+  border-radius:38px 22px 38px 22px;
+
   text-align:center;
-  border-radius:30px;
-  padding:28px 20px 20px;
+
   background:
-    radial-gradient(circle at top right, rgba(255,155,81,.12), transparent 36%),
-    linear-gradient(180deg,#FFFFFF 0%,#F4F7F7 100%);
-  border:1px solid #D9E0E0;
-  box-shadow:0 26px 70px rgba(39,48,61,.20);
-  animation:introModalCardIn .48s cubic-bezier(.22,.61,.36,1) both;
+    radial-gradient(circle at 16% 0%, rgba(255,255,255,.44), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,.46));
+
+  border:1px solid rgba(255,255,255,.54);
+
+  box-shadow:
+    0 30px 80px rgba(30,27,75,.24),
+    inset 0 1px 0 rgba(255,255,255,.90);
+
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+
+  animation:introModalIn .26s ease both;
 }
 
-.introPresenterModalCard::before{
-  content:"";
-  position:absolute;
-  width:190px;
-  height:190px;
-  top:-72px;
-  right:-56px;
-  border-radius:50%;
-  background:rgba(255,155,81,.15);
-}
+@keyframes introModalIn{
+  from{
+    opacity:0;
+    transform:translateY(16px) scale(.97);
+  }
 
-.introPresenterModalCard::after{
-  content:"";
-  position:absolute;
-  width:120px;
-  height:120px;
-  bottom:-46px;
-  left:-36px;
-  border-radius:28px;
-  transform:rotate(24deg);
-  background:rgba(47,65,88,.06);
-}
-
-.introPresenterModalHeader,
-.introPresenterQrBox,
-.presenterIntroCodeBox,
-.introPresenterLink,
-.introPresenterModalActions{
-  position:relative;
-  z-index:2;
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
 }
 
 .introPresenterModalClose{
   position:absolute;
   top:14px;
   left:14px;
-  z-index:50;
-  width:48px;
-  height:48px;
-  min-width:48px;
+  z-index:4;
+
+  width:38px;
+  height:38px;
+
   border:0;
-  border-radius:50%;
+  border-radius:14px;
+
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#2F4158;
+
+  background:linear-gradient(180deg,#2F4158,#243447);
   color:#fff;
-  font-size:1.85rem;
+
+  font-family:Arial,sans-serif;
+  font-size:1.35rem;
   line-height:1;
+
   cursor:pointer;
-  box-shadow:0 10px 24px rgba(47,65,88,.22);
+}
+
+.introPresenterModalHeader{
+  padding:4px 46px 18px;
 }
 
 .introPresenterModalBadge{
   width:max-content;
-  margin:0 auto 8px;
-  padding:6px 14px;
+  margin:0 auto 10px;
+  padding:7px 16px;
+
   border-radius:999px;
-  background:rgba(255,155,81,.14);
-  color:#C96A25;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.38));
+
+  border:1px solid rgba(255,255,255,.44);
+
+  color:#7A4A22;
   font-family:"HanakaText",sans-serif;
-  font-size:.85rem;
+  font-size:.84rem;
 }
 
 .introPresenterModalTitle{
+  color:#24185E;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2.35rem;
-  color:#2F4158;
-  line-height:1.08;
+  font-size:2.45rem;
+  line-height:1;
   margin-bottom:8px;
 }
 
 .introPresenterModalText{
-  color:#5F6B7A;
+  color:#64748B;
   font-family:"HanakaText",sans-serif;
-  font-size:.98rem;
-  line-height:1.65;
-  margin-bottom:15px;
+  font-size:.96rem;
+  line-height:1.6;
+}
+
+.introPresenterContent{
+  display:grid;
+  grid-template-columns:240px minmax(0, 1fr);
+  gap:18px;
+  align-items:center;
 }
 
 .introPresenterQrBox{
-  width:218px;
-  height:218px;
-  margin:0 auto 15px;
-  padding:13px;
-  border-radius:26px;
+  width:240px;
+  height:240px;
+
+  padding:12px;
+
+  border-radius:30px;
+
   background:#fff;
-  border:1px solid #D9E0E0;
-  box-shadow:0 14px 30px rgba(39,48,61,.10);
+
+  border:1px solid rgba(255,255,255,.60);
+
+  box-shadow:
+    0 16px 32px rgba(30,27,75,.10),
+    inset 0 1px 0 rgba(255,255,255,.92);
 }
 
 .introPresenterQrBox img{
   width:100%;
   height:100%;
+  display:block;
   object-fit:contain;
   border-radius:18px;
 }
 
+.introPresenterInfoBox{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
 .presenterIntroCodeBox{
-  width:min(100%,270px);
-  margin:14px auto 12px;
-  padding:14px 16px;
-  border-radius:22px;
+  padding:14px;
+
+  border-radius:26px;
+
   background:
-    radial-gradient(circle at 20% 0%, rgba(255,155,81,.24), transparent 44%),
-    linear-gradient(180deg,#fff 0%,#fff1e3 100%);
-  border:1px solid rgba(255,155,81,.36);
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.34), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.50), rgba(255,255,255,.28));
+
+  border:1px solid rgba(255,255,255,.42);
+
   box-shadow:
-    0 14px 30px rgba(47,65,88,.14),
-    inset 0 1px 0 rgba(255,255,255,.95);
+    0 14px 28px rgba(30,27,75,.08),
+    inset 0 1px 0 rgba(255,255,255,.76);
 }
 
 .presenterIntroCodeLabel{
-  margin-bottom:8px;
-  color:#2F4158;
-  opacity:.75;
+  color:#64748B;
   font-family:"HanakaText",sans-serif;
-  font-size:.9rem;
+  font-size:.86rem;
+  margin-bottom:8px;
 }
 
 .presenterIntroCodeValue{
   direction:ltr;
-  min-height:54px;
+
+  width:max-content;
+  min-width:160px;
+  min-height:58px;
+
+  margin:0 auto;
+  padding:0 22px;
+
+  border-radius:20px;
+
   display:flex;
   align-items:center;
   justify-content:center;
-  border-radius:17px;
-  padding:10px 16px;
-  background:#2F4158;
+
+  background:linear-gradient(180deg,#2F4158,#243447);
   color:#fff;
+
   font-family:Arial,sans-serif;
-  font-size:2.35rem;
-  line-height:1;
+  font-size:2.15rem;
   font-weight:900;
-  letter-spacing:9px;
-  text-shadow:0 2px 0 rgba(0,0,0,.18);
+  letter-spacing:6px;
+
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.12),
-    0 10px 22px rgba(47,65,88,.18);
-  animation:codeNumberGlow 1.8s ease-in-out infinite;
+    0 10px 20px rgba(47,65,88,.16),
+    inset 0 1px 0 rgba(255,255,255,.16);
 }
 
 .introPresenterLink{
   direction:ltr;
-  margin-top:10px;
-  margin-bottom:12px;
-  padding:10px;
-  border-radius:14px;
-  background:#F6F8F8;
-  border:1px solid #D9E0E0;
-  color:#5F6B7A;
+
+  min-height:44px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:8px 12px;
+
+  border-radius:17px;
+
+  background:rgba(255,255,255,.44);
+  border:1px solid rgba(255,255,255,.36);
+
+  color:#64748B;
+
+  font-family:Arial,sans-serif;
   font-size:.78rem;
-  line-height:1.4;
-  word-break:break-all;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .introPresenterModalActions{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
+  gap:12px;
+
+  margin-top:18px;
 }
 
 .introPresenterCopyBtn{
-  width:100%;
-  min-height:52px;
-  position:relative;
-  overflow:hidden;
+  min-height:54px;
+
   border:0;
-  border-radius:17px;
+  border-radius:18px;
+
   color:#fff;
+
   font-family:"HanakaText",sans-serif;
   font-size:1rem;
+
   cursor:pointer;
-  transition:transform .18s ease, filter .18s ease;
-}
 
-.introPresenterCopyBtn.primary{
-  background:linear-gradient(180deg,#2F4158 0%,#25343F 100%);
-  box-shadow:0 12px 24px rgba(47,65,88,.22);
-}
+  box-shadow:
+    0 12px 24px rgba(30,27,75,.12),
+    inset 0 1px 0 rgba(255,255,255,.20);
 
-.introPresenterCopyBtn.secondary{
-  background:linear-gradient(180deg,#FFC08E 0%,#FF9B51 100%);
-  box-shadow:0 12px 24px rgba(255,155,81,.25);
+  transition:
+    transform .16s ease,
+    filter .16s ease;
 }
 
 .introPresenterCopyBtn:hover{
@@ -600,290 +1005,202 @@
   filter:brightness(1.04);
 }
 
+.introPresenterCopyBtn.secondary{
+  background:linear-gradient(180deg,#64748B,#334155);
+}
+
+.introPresenterCopyBtn.primary{
+  background:linear-gradient(180deg,#FF9B51,#F97316);
+}
+
 /* =========================
-   EFFECTS
+   Toast
 ========================= */
 
-.softEnter{
-  animation:introCardIn .62s cubic-bezier(.22,.61,.36,1) both;
-}
+.gameToast{
+  position:fixed;
+  top:22px;
+  left:50%;
+  z-index:999999;
 
-.softExit{
-  animation:introExit .23s ease both;
-}
+  min-width:min(92vw, 360px);
+  max-width:min(92vw, 520px);
+  min-height:58px;
 
-.introFieldError{
-  border-color:#FF3B3B !important;
+  display:flex;
+  align-items:center;
+  gap:12px;
+
+  padding:12px 16px;
+  border-radius:22px;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.20), transparent 42%),
+    linear-gradient(180deg, rgba(88,28,45,.88), rgba(76,5,25,.95));
+
+  border:1px solid rgba(255,255,255,.20);
+
+  color:#FFFFFF;
+
   box-shadow:
-    0 0 0 4px rgba(255,59,59,.13),
-    0 10px 20px rgba(255,59,59,.12) !important;
-  animation:introErrorShake .28s ease both;
+    0 18px 42px rgba(76,5,25,.28),
+    inset 0 1px 0 rgba(255,255,255,.20);
+
+  opacity:0;
+  pointer-events:none;
+
+  transform:translateX(-50%) translateY(-18px) scale(.96);
+
+  transition:
+    opacity .28s ease,
+    transform .28s cubic-bezier(.16,1,.3,1);
+}
+
+.gameToast.hidden{
+  display:none;
+}
+
+.gameToast.show{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateX(-50%) translateY(0) scale(1);
+}
+
+.gameToastIcon{
+  flex-shrink:0;
+
+  width:34px;
+  height:34px;
+
+  border-radius:14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.16);
+
+  color:#fff;
+  font-family:Arial,sans-serif;
+  font-weight:900;
+}
+
+.gameToastText{
+  flex:1;
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#fff;
+  font-family:"HanakaText",sans-serif;
+  font-size:.98rem;
+  line-height:1.5;
+  text-align:center;
 }
 
 /* =========================
-   KEYFRAMES
+   Responsive
 ========================= */
 
-@keyframes introCardIn{
-  from{
-    opacity:0;
-    transform:translateY(18px) scale(.97);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-@keyframes introFadeDown{
-  from{
-    opacity:0;
-    transform:translateY(-14px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-@keyframes introFadeUp{
-  from{
-    opacity:0;
-    transform:translateY(16px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-@keyframes introExit{
-  to{
-    opacity:0;
-    transform:translateY(10px) scale(.98);
-  }
-}
-
-@keyframes introTitleGlow{
-  0%,100%{
-    text-shadow:
-      0 2px 0 rgba(255,255,255,.95),
-      0 10px 24px rgba(47,65,88,.12),
-      0 4px 14px rgba(255,155,81,.10);
-  }
-  50%{
-    text-shadow:
-      0 2px 0 rgba(255,255,255,.95),
-      0 12px 28px rgba(255,155,81,.22),
-      0 5px 16px rgba(47,65,88,.14);
-  }
-}
-
-@keyframes introBtnShine{
-  0%,45%{
-    transform:translateX(120%) rotate(8deg);
-  }
-  70%,100%{
-    transform:translateX(-120%) rotate(8deg);
-  }
-}
-
-@keyframes introSpin{
-  to{
-    transform:translateY(-50%) rotate(360deg);
-  }
-}
-
-@keyframes introModalFade{
-  from{
-    opacity:0;
-  }
-  to{
-    opacity:1;
-  }
-}
-
-@keyframes introModalCardIn{
-  from{
-    opacity:0;
-    transform:translateY(20px) scale(.94);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-@keyframes codeNumberGlow{
-  0%,100%{
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.12),
-      0 10px 22px rgba(47,65,88,.18);
-  }
-  50%{
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.12),
-      0 0 0 6px rgba(255,155,81,.12),
-      0 14px 30px rgba(47,65,88,.22);
-  }
-}
-
-@keyframes introErrorShake{
-  0%,100%{
-    transform:translateX(0);
-  }
-  25%{
-    transform:translateX(5px);
-  }
-  50%{
-    transform:translateX(-5px);
-  }
-  75%{
-    transform:translateX(3px);
-  }
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width:760px){
+@media (max-width:767px){
   .introPage{
-    padding:12px;
-    align-items:center;
+    padding:14px;
   }
 
-  .introCard{
-    padding:20px 14px 16px;
-    border-radius:26px;
+  .introShell{
+    width:100%;
+    gap:14px;
   }
 
-  .introLogoBox{
-    margin-bottom:17px;
+  .introHeader,
+  .introSetupCard{
+    border-radius:30px;
   }
 
-  .introBadge{
-    min-height:32px;
-    padding:6px 16px;
-    font-size:.9rem;
+  .introHeader{
+    min-height:230px;
+    padding:24px 16px;
   }
 
   .introTitle{
-    font-size:2.75rem;
-  }
-
-  .introTitleLine{
-    width:108px;
-    height:4px;
-    margin:12px auto 9px;
+    font-size:clamp(3.3rem, 16vw, 4.8rem);
   }
 
   .introSubTitle{
-    font-size:.96rem;
+    font-size:.94rem;
   }
 
-  .introForm{
-    padding:13px;
-    border-radius:21px;
+  .introSetupCard{
+    padding:16px;
+    gap:14px;
+  }
+
+  .introTeamsRow{
+    grid-template-columns:1fr;
     gap:12px;
   }
 
-  .introFieldsGroup{
+  .introTeamCard{
+    min-height:116px;
+    border-radius:24px;
+  }
+
+  .introTeamCardB{
+    border-radius:24px;
+  }
+
+  .introModelCard{
     grid-template-columns:1fr;
-    gap:11px;
-  }
-
-  .introField label{
-    font-size:.9rem;
-  }
-
-  .introField input,
-  .introField select{
-    height:52px;
-    border-radius:17px;
-    font-size:.95rem;
+    min-height:auto;
+    text-align:center;
+    border-radius:24px;
   }
 
   #startGameBtn{
-    min-height:54px;
-    border-radius:18px;
-    font-size:1.02rem;
-  }
-
-  .introFooterNote{
-    font-size:.82rem;
+    width:100%;
+    min-height:58px;
+    border-radius:20px;
+    font-size:1.16rem;
   }
 
   .introPresenterModal{
-    padding:12px;
+    padding:14px;
   }
 
   .introPresenterModalCard{
-    width:100%;
-    max-height:94dvh;
-    overflow:auto;
-    border-radius:24px;
-    padding:24px 14px 16px;
+    border-radius:28px;
+    padding:22px 16px 16px;
   }
 
-  .introPresenterModalClose{
-    width:44px;
-    height:44px;
-    min-width:44px;
-    font-size:1.65rem;
-  }
-
-  .introPresenterModalTitle{
-    font-size:2rem;
+  .introPresenterContent{
+    grid-template-columns:1fr;
   }
 
   .introPresenterQrBox{
-    width:200px;
-    height:200px;
-    border-radius:23px;
-  }
-
-  .presenterIntroCodeBox{
-    width:min(100%,250px);
-  }
-
-  .presenterIntroCodeValue{
-    min-height:50px;
-    font-size:2.05rem;
-    letter-spacing:7px;
+    width:190px;
+    height:190px;
+    margin:0 auto;
   }
 
   .introPresenterModalActions{
     grid-template-columns:1fr;
   }
 
-  .introBgShapeOne{
-    width:200px;
-    height:200px;
-    right:-40px;
+  .gameToast{
+    top:14px;
+    left:12px;
+    right:12px;
+
+    min-width:0;
+    max-width:none;
+
+    transform:translateY(-18px) scale(.96);
   }
 
-  .introBgShapeTwo{
-    width:150px;
-    height:150px;
-    left:-42px;
-  }
-
-  .introBgShapeThree{
-    display:none;
-  }
-}
-
-/* =========================
-   ACCESSIBILITY / PERFORMANCE
-========================= */
-
-@media (prefers-reduced-motion: reduce){
-  *,
-  *::before,
-  *::after{
-    animation:none !important;
-    transition:none !important;
-    scroll-behavior:auto !important;
+  .gameToast.show{
+    transform:translateY(0) scale(1);
   }
 }

@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>الحنكة - المقدمة</title>
 
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="assets/css/segments/intro.css" />
+  <link rel="stylesheet" href="assets/css/segments/intro.css?v=12" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
@@ -16,54 +17,52 @@
 
   <main class="introPage">
 
-    <div class="introBgShape introBgShapeOne"></div>
-    <div class="introBgShape introBgShapeTwo"></div>
-    <div class="introBgShape introBgShapeThree"></div>
+    <div class="introDecor introDecorOne"></div>
+    <div class="introDecor introDecorTwo"></div>
+    <div class="introDecor introDecorThree"></div>
 
-    <section class="introCard" aria-label="إعداد اللعبة">
+    <section class="introShell" aria-label="إعداد اللعبة">
 
-      <header class="introLogoBox">
-        <div class="introBadge">يلا بينا</div>
+      <header class="introHeader">
 
-        <h1 class="introTitle">الحنكة</h1>
-
-        <div class="introTitleLine"></div>
+        <div class="introTitleBox">
+          <div class="introTitleGlow"></div>
+          <h1 class="introTitle">الحنكة</h1>
+          <div class="introTitleLine"></div>
+        </div>
 
         <p class="introSubTitle">
           جهّز الفرق، اختر النموذج، وابدأ التحدي
         </p>
+
       </header>
 
-      <section class="introForm" aria-label="بيانات بداية اللعبة">
+      <section class="introSetupCard">
 
-        <div class="introFieldsGroup">
+        <div class="introTeamsRow">
 
-          <div class="introField introTeamField">
+          <div class="introTeamCard introTeamCardA">
             <label for="teamANameInput">الفريق الأول</label>
 
-            <div class="introInputWrap">
-              
-
+            <div class="introTeamInputBox">
               <input
                 id="teamANameInput"
                 type="text"
-                placeholder="اكتب اسم الفريق الأول"
+                placeholder="اسم الفريق الأول"
                 autocomplete="off"
                 maxlength="18"
               >
             </div>
           </div>
 
-          <div class="introField introTeamField">
+          <div class="introTeamCard introTeamCardB">
             <label for="teamBNameInput">الفريق الثاني</label>
 
-            <div class="introInputWrap">
-              
-
+            <div class="introTeamInputBox">
               <input
                 id="teamBNameInput"
                 type="text"
-                placeholder="اكتب اسم الفريق الثاني"
+                placeholder="اسم الفريق الثاني"
                 autocomplete="off"
                 maxlength="18"
               >
@@ -72,17 +71,20 @@
 
         </div>
 
-        <div class="introField introModelField">
-          <label for="introModelSelect">النموذج</label>
+        <div class="introModelCard">
+          <div class="introModelText">
+            <label for="introModelSelect">النموذج</label>
+            <p>اختر نموذج الأسئلة المناسب للجلسة</p>
+          </div>
 
-          <div class="introSelectWrap">
+          <div class="introModelSelectBox">
             <select id="introModelSelect">
               <option value="">جارٍ تحميل النماذج...</option>
             </select>
           </div>
         </div>
 
-        <div class="introActions introActionsSingle">
+        <div class="introActions">
           <button
             type="button"
             id="startGameBtn"
@@ -94,12 +96,8 @@
 
       </section>
 
-      <footer class="introFooterNote">
-        
-       
-      </footer>
-
     </section>
+
   </main>
 
   <div id="presenterIntroModal" class="introPresenterModal hidden">
@@ -122,16 +120,24 @@
         </div>
       </div>
 
-      <div class="introPresenterQrBox">
-        <img id="presenterIntroQr" alt="QR صفحة المقدم">
-      </div>
+      <div class="introPresenterContent">
 
-      <div class="presenterIntroCodeBox">
-        <div class="presenterIntroCodeLabel">كود الدخول</div>
-        <div id="presenterIntroCode" class="presenterIntroCodeValue">----</div>
-      </div>
+        <div class="introPresenterQrBox">
+          <img id="presenterIntroQr" alt="QR صفحة المقدم">
+        </div>
 
-      <div id="presenterIntroLink" class="introPresenterLink"></div>
+        <div class="introPresenterInfoBox">
+
+          <div class="presenterIntroCodeBox">
+            <div class="presenterIntroCodeLabel">كود الدخول</div>
+            <div id="presenterIntroCode" class="presenterIntroCodeValue">----</div>
+          </div>
+
+          <div id="presenterIntroLink" class="introPresenterLink"></div>
+
+        </div>
+
+      </div>
 
       <div class="introPresenterModalActions">
         <button

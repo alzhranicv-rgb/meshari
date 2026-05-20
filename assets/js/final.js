@@ -1,5 +1,6 @@
 /* =========================
    FINAL - CLEAN VERSION
+   الفاصلة - JS كامل بعد التعديلات
 ========================= */
 
 let finalState = createDefaultFinalState()
@@ -10,6 +11,7 @@ window.finalOpenedNumbers = []
 const FINAL_STORAGE_KEY = "final_state_v3"
 const FINAL_HISTORY_LIMIT = 60
 
+let currentFinalRound1Image = ""
 let currentFinalRound3Image = ""
 let finalHistory = []
 
@@ -104,7 +106,8 @@ function createDefaultFinalState() {
         currentAnswer: "",
         questionShown: false,
         answerShown: false,
-        videoPlayed: false
+        videoPlayed: false,
+        resultType: ""
       }
     }
   }
@@ -276,7 +279,8 @@ function ensureFinalRound3State() {
       currentAnswer: "",
       questionShown: false,
       answerShown: false,
-      videoPlayed: false
+      videoPlayed: false,
+      resultType: ""
     }
   }
 
@@ -294,6 +298,7 @@ function ensureFinalRound3State() {
   m.questionShown = !!m.questionShown
   m.answerShown = !!m.answerShown
   m.videoPlayed = !!m.videoPlayed
+  m.resultType = String(m.resultType || "")
 }
 
 /* =========================
@@ -307,6 +312,7 @@ function cloneFinalData(data) {
 function createFinalSnapshot() {
   return {
     finalState: cloneFinalData(finalState),
+    currentFinalRound1Image,
     currentFinalRound3Image
   }
 }
@@ -327,6 +333,7 @@ function restoreFinalSnapshot(snapshot) {
   clearFinalIntervals()
 
   finalState = cloneFinalData(snapshot.finalState)
+  currentFinalRound1Image = snapshot.currentFinalRound1Image || ""
   currentFinalRound3Image = snapshot.currentFinalRound3Image || ""
 
   ensureFinalStateShape()
@@ -527,7 +534,7 @@ function getFinalRound1ClipStyle(text = "", zoom = false) {
     line = zoom ? "1.62" : "1.46"
   }
 
-  return `font-family:'MolhimCustom', sans-serif !important;font-size:${size};line-height:${line};text-wrap:balance;`
+  return `font-family:'MolhimCustom','HanakaText',sans-serif !important;font-size:${size};line-height:${line};text-wrap:balance;`
 }
 
 /* =========================
@@ -1121,6 +1128,8 @@ function renderFinalRound1Content(data) {
   const isHistoricalTextCard = number >= 1 && number <= 3 && !!fullCardText
   const isQuestionCard = number >= 4 && number <= 6
 
+  currentFinalRound1Image = finalState.round1.currentImage || ""
+
   let mainContent = ""
   let answerContent = ""
 
@@ -1128,8 +1137,8 @@ function renderFinalRound1Content(data) {
     const clipText = removeArabicDots(fullCardText)
 
     mainContent = `
-      <div class="finalRound1MainStageCard">
-        <div class="finalRound1TextCard" onclick="toggleFinalRound1Overlay()">
+      <div class="finalRound1MainStageCard finalRound1PremiumStage">
+        <div class="finalRound1TextCard finalRound1RevealCard" onclick="toggleFinalRound1Overlay()">
           <div class="finalRound1TextCardInner">
             ${clipText}
           </div>
@@ -1143,40 +1152,43 @@ function renderFinalRound1Content(data) {
 
     if (visibleParts.length) {
       mainContent = `
-        <div class="finalRound1MainStageCard">
-          <div class="finalRound1QuestionStage">
-            ${visibleParts.map(part => `
-              <div class="finalRound1QuestionPart">${part}</div>
+        <div class="finalRound1MainStageCard finalRound1PremiumStage">
+          <div class="finalRound1QuestionStage finalRound1RevealCard">
+            ${visibleParts.map((part, idx) => `
+              <div class="finalRound1QuestionPart">
+                <span class="finalRound1PartBadge">${idx + 1}</span>
+                <span>${part}</span>
+              </div>
             `).join("")}
           </div>
         </div>
       `
     } else if (finalState.round1.currentImage) {
       mainContent = `
-        <div class="finalRound1MainStageCard">
-          <div class="finalRound1ImageFrame">
+        <div class="finalRound1MainStageCard finalRound1PremiumStage">
+          <div class="finalRound1ImageFrame finalRound1RevealCard" onclick="toggleFinalRound1ImageOverlay()">
             <img class="finalRound1BigImage" src="${finalState.round1.currentImage}" alt="">
           </div>
         </div>
       `
     } else {
       mainContent = `
-        <div class="finalRound1MainStageCard">
+        <div class="finalRound1MainStageCard finalRound1PremiumStage">
           <div class="finalRoundPlaceholder">اضغط إظهار السؤال</div>
         </div>
       `
     }
   } else if (finalState.round1.currentImage) {
     mainContent = `
-      <div class="finalRound1MainStageCard">
-        <div class="finalRound1ImageFrame">
+      <div class="finalRound1MainStageCard finalRound1PremiumStage">
+        <div class="finalRound1ImageFrame finalRound1RevealCard" onclick="toggleFinalRound1ImageOverlay()">
           <img class="finalRound1BigImage" src="${finalState.round1.currentImage}" alt="">
         </div>
       </div>
     `
   } else {
     mainContent = `
-      <div class="finalRound1MainStageCard">
+      <div class="finalRound1MainStageCard finalRound1PremiumStage">
         <div class="finalRoundPlaceholder">لا توجد صورة</div>
       </div>
     `
@@ -1184,19 +1196,21 @@ function renderFinalRound1Content(data) {
 
   if (finalState.round1.answerShown && finalState.round1.currentAnswer) {
     answerContent = `
-      <div class="finalRound1InfoCard finalRound1AnswerBox ${number >= 4 && number <= 6 ? "finalRound1AnswerProjectFont" : "finalRound1AnswerMolhimFont"}">
-        ${finalState.round1.currentAnswer}
+      <div class="finalRound1ResultBox correctResult">
+        <div class="finalRound1ResultLabel">الإجابة</div>
+        <div class="finalRound1ResultText ${number >= 4 && number <= 6 ? "finalRound1AnswerProjectFont" : "finalRound1AnswerMolhimFont"}">
+          ${finalState.round1.currentAnswer}
+        </div>
       </div>
     `
   }
 
   box.innerHTML = `
-    <div class="finalRound1StageLayout">
+    <div class="finalRound1StageLayout finalRound1PremiumLayout">
       ${mainContent}
 
       ${answerContent ? `
         <div class="finalRound1BottomInfoRow">
-          <div class="finalRound1InfoCard finalRound1InfoEmpty"></div>
           ${answerContent}
         </div>
       ` : ""}
@@ -1311,6 +1325,7 @@ function finalizeRound1Turn() {
   finalState.round1.shownQuestionPartsCount = 0
   finalState.round1.answerShown = false
   finalState.round1.activeTeam = null
+  currentFinalRound1Image = ""
 
   resetFinalTeamSelection()
   renderFinalRound()
@@ -1347,6 +1362,32 @@ function toggleFinalRound1Overlay() {
           ${clipText}
         </div>
       </div>
+    </div>
+  `
+
+  overlay.onclick = function () {
+    overlay.remove()
+  }
+
+  document.body.appendChild(overlay)
+}
+
+function toggleFinalRound1ImageOverlay() {
+  const oldOverlay = document.getElementById("finalRound1ImageOverlay")
+
+  if (oldOverlay) {
+    oldOverlay.remove()
+    return
+  }
+
+  if (!currentFinalRound1Image) return
+
+  const overlay = document.createElement("div")
+  overlay.id = "finalRound1ImageOverlay"
+  overlay.className = "finalRound3ImageOverlay"
+  overlay.innerHTML = `
+    <div class="finalRound3ImageOverlayInner">
+      <img src="${currentFinalRound1Image}" class="finalRound3ImageOverlayImg" alt="">
     </div>
   `
 
@@ -1836,7 +1877,7 @@ function renderFinalRound3Classic() {
 
       <div class="finalRound3ImageStageWrap">
         <div class="finalRound3ImageStage" id="finalRound3ImageStage">
-          اختر الفريق ثم الرقم
+          <div class="finalRoundPlaceholder">اختر الفريق ثم الرقم</div>
         </div>
       </div>
     </div>
@@ -1850,6 +1891,10 @@ function renderFinalRound3Classic() {
   `
 
   updateFinalDoubleButton()
+
+  if (finalState.round3.pendingScore && finalState.round3.answersAllowed) {
+    showFinalRound3Answer()
+  }
 }
 
 async function openFinalRound3Card(number) {
@@ -1934,7 +1979,7 @@ function startFinalRound3Sequence() {
       currentFinalRound3Image = finalState.round3.images[idx] || ""
 
       stage.innerHTML = `
-        <div class="finalRound3ImageFrame" onclick="toggleFinalRound3ImageOverlay()">
+        <div class="finalRound3ImageFrame finalRound1RevealCard" onclick="toggleFinalRound3ImageOverlay()">
           <img src="${currentFinalRound3Image}" class="finalRound3Image" alt="">
         </div>
       `
@@ -1983,20 +2028,27 @@ function showFinalRound3Answer() {
   if (!stage) return
 
   stage.innerHTML = `
-    <div class="finalRound3AnswersList">
-      ${finalState.round3.answers.map((answer, idx) => {
-        const selected = finalState.round3.selectedCorrectIndexes.includes(idx)
+    <div class="finalRound3ResultView">
+      <div class="finalRound3ResultHeader">
+        <div class="finalRound3ResultTitle">اختيار الإجابات الصحيحة</div>
+        <div class="finalRound3ResultCounter">${finalState.round3.correctCount} / ${finalState.round3.answers.length || 5}</div>
+      </div>
 
-        return `
-          <button
-            class="finalRound3AnswerCard ${selected ? "selectedCorrect" : ""}"
-            onclick="toggleFinalRound3CorrectSelection(${idx})"
-          >
-            <div class="finalAnswerChip">${answer}</div>
-            ${finalState.round3.notes[idx] ? `<div class="finalNoteBox">${finalState.round3.notes[idx]}</div>` : ""}
-          </button>
-        `
-      }).join("")}
+      <div class="finalRound3AnswersList finalRound3AnswersPremium">
+        ${finalState.round3.answers.map((answer, idx) => {
+          const selected = finalState.round3.selectedCorrectIndexes.includes(idx)
+
+          return `
+            <button
+              class="finalRound3AnswerCard ${selected ? "selectedCorrect" : ""}"
+              onclick="toggleFinalRound3CorrectSelection(${idx})"
+            >
+              <div class="finalAnswerChip">${answer || "-"}</div>
+              ${finalState.round3.notes[idx] ? `<div class="finalNoteBox">${finalState.round3.notes[idx]}</div>` : ""}
+            </button>
+          `
+        }).join("")}
+      </div>
     </div>
   `
 
@@ -2113,6 +2165,7 @@ function toggleFinalRound3ImageOverlay() {
 
   document.body.appendChild(overlay)
 }
+
 /* =========================
    Round 3 - Team Media
 ========================= */
@@ -2237,7 +2290,7 @@ function buildFinalRound3TeamMediaContent() {
 
   if (state.currentMediaType === "video" && state.currentMedia) {
     mediaHTML = `
-      <div class="finalRound3ImageFrame finalRound3VideoFrame finalRound3VideoFrameSmall">
+      <div class="finalRound3ImageFrame finalRound3VideoFrame finalRound3VideoFrameSmall finalTeamMediaPremiumFrame">
         <video
           id="finalRound3TeamMediaInlineVideo"
           src="${state.currentMedia}"
@@ -2248,11 +2301,19 @@ function buildFinalRound3TeamMediaContent() {
           disablepictureinpicture
           onclick="openFinalRound3TeamMediaOverlay('video')"
         ></video>
+
+        <button
+          type="button"
+          class="finalTeamMediaPlayBadge"
+          onclick="event.stopPropagation(); playFinalRound3TeamMediaVideo()"
+        >
+          ▶
+        </button>
       </div>
     `
   } else if (state.currentMedia) {
     mediaHTML = `
-      <div class="finalRound3ImageFrame" onclick="openFinalRound3TeamMediaOverlay('image')">
+      <div class="finalRound3ImageFrame finalTeamMediaPremiumFrame" onclick="openFinalRound3TeamMediaOverlay('image')">
         <img src="${state.currentMedia}" class="finalRound3Image" alt="">
       </div>
     `
@@ -2260,19 +2321,36 @@ function buildFinalRound3TeamMediaContent() {
     mediaHTML = `<div class="finalRoundPlaceholder">لا توجد صورة أو فيديو</div>`
   }
 
+  const resultClass =
+    state.resultType === "correct"
+      ? "correctResult"
+      : state.resultType === "wrong"
+      ? "wrongResult"
+      : ""
+
   return `
-    <div class="finalRound3TeamMediaContent">
+    <div class="finalRound3TeamMediaContent finalTeamMediaPremiumContent">
       ${mediaHTML}
 
       ${
         state.questionShown && state.currentQuestion
-          ? `<div class="finalRound3QuestionBox">${state.currentQuestion}</div>`
+          ? `
+            <div class="finalRound3QuestionBox finalTeamMediaQuestionBox">
+              <div class="finalTeamMediaSmallLabel">السؤال</div>
+              <div>${state.currentQuestion}</div>
+            </div>
+          `
           : ""
       }
 
       ${
         state.answerShown && state.currentAnswer
-          ? `<div class="finalRound3TeamMediaAnswer">${state.currentAnswer}</div>`
+          ? `
+            <div class="finalTeamMediaResultBox ${resultClass}">
+              <div class="finalTeamMediaSmallLabel">الإجابة</div>
+              <div class="finalRound3TeamMediaAnswer">${state.currentAnswer}</div>
+            </div>
+          `
           : ""
       }
     </div>
@@ -2321,6 +2399,7 @@ async function openFinalRound3TeamMediaCard(number) {
   state.answerShown = false
   state.questionShown = false
   state.videoPlayed = false
+  state.resultType = ""
 
   if (video) {
     state.currentMediaType = "video"
@@ -2388,6 +2467,7 @@ function finalRound3TeamMediaCorrect() {
   pushFinalHistory()
 
   state.answerShown = true
+  state.resultType = "correct"
 
   finalState.round3.scores[team] += getFinalScoreValue(team, 1)
   finalState.round3.scoredNumbers.push(number)
@@ -2403,7 +2483,7 @@ function finalRound3TeamMediaCorrect() {
 
   setTimeout(() => {
     resetFinalRound3TeamMediaCurrent()
-  }, 5000)
+  }, 7000)
 }
 
 function finalRound3TeamMediaWrong() {
@@ -2418,6 +2498,7 @@ function finalRound3TeamMediaWrong() {
   pushFinalHistory()
 
   state.answerShown = true
+  state.resultType = "wrong"
 
   if (!finalState.round3.scoredNumbers.includes(number)) {
     finalState.round3.scoredNumbers.push(number)
@@ -2431,7 +2512,7 @@ function finalRound3TeamMediaWrong() {
 
   setTimeout(() => {
     resetFinalRound3TeamMediaCurrent()
-  }, 5000)
+  }, 7000)
 }
 
 function resetFinalRound3TeamMediaCurrent() {
@@ -2446,6 +2527,7 @@ function resetFinalRound3TeamMediaCurrent() {
   state.answerShown = false
   state.questionShown = false
   state.videoPlayed = false
+  state.resultType = ""
 
   finalState.round3.currentNumber = null
   finalState.round3.pendingScore = false
@@ -2454,6 +2536,7 @@ function resetFinalRound3TeamMediaCurrent() {
   resetFinalTeamSelection()
   renderFinalRound3TeamMedia()
   updateEndRoundButtonState()
+  saveFinalState()
 }
 
 function openFinalRound3TeamMediaOverlay(type) {

@@ -811,33 +811,26 @@ async function renderWarmup() {
 
   presenterWarmupRows = data || []
 
-  const warmupState = getPresenterWarmupState()
   const used = getPresenterWarmupUsed()
   const locked = getPresenterWarmupLocked()
   const currentKey = getPresenterWarmupCurrentKey()
 
   panel.innerHTML = `
-    ${teamButtons()}
+    <section class="presenterCard presenterWarmupPreviewCard presenterMainPreviewCard">
+      <div class="presenterLabel">السؤال</div>
 
-    <div class="presenterActions">
-      <button
-        class="presenterBtn gray"
-        onclick="sendCommand('double')"
-        ${locked || currentKey ? "disabled" : ""}
-      >
-        دوبيلا
-      </button>
+      <div id="presenterWarmupQuestionText" class="presenterQuestionBody presenterBigQuestionBody">
+        اختر رقم السؤال
+      </div>
 
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">
-        ✕ خطأ
-      </button>
+      <div class="presenterLabel">الإجابة</div>
 
-      <button class="presenterBtn green" onclick="sendCommand('correct')">
-        ✓ صح
-      </button>
-    </div>
+      <div id="presenterWarmupAnswerText" class="presenterAnswerBody presenterBigAnswerBody">
+        —
+      </div>
+    </section>
 
-    <section class="presenterCard">
+    <section class="presenterCard presenterNumbersCard">
       <div class="presenterLabel">الفئات والأسئلة</div>
 
       <div class="presenterWarmupCats">
@@ -863,7 +856,7 @@ async function renderWarmup() {
                     <button
                       class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent || isSelected ? "selectedPresenterTeam" : ""}"
                       ${isUsed || locked ? "disabled" : ""}
-                     onclick="openWarmupPresenterQuestion(${cat}, ${num}, event)"
+                      onclick="openWarmupPresenterQuestion(${cat}, ${num}, event)"
                     >
                       ${isUsed ? "" : num}
                     </button>
@@ -876,29 +869,33 @@ async function renderWarmup() {
       </div>
     </section>
 
-    <section class="presenterCard presenterWarmupPreviewCard">
-      
+    ${teamButtons()}
 
-      <div class="presenterLabel">السؤال</div>
-      <div id="presenterWarmupQuestionText" class="presenterQuestionBody">
-        اختر رقم السؤال
-      </div>
+    <div class="presenterActions presenterMainActions">
+      <button
+        class="presenterBtn gray presenterDoubleBtn"
+        onclick="sendCommand('double')"
+        ${locked || currentKey ? "disabled" : ""}
+      >
+        دوبيلا
+      </button>
 
-      <div class="presenterLabel">الإجابة</div>
-      <div id="presenterWarmupAnswerText" class="presenterAnswerBody">
-        —
-      </div>
+      <button class="presenterBtn red presenterWrongBtn" onclick="sendCommand('wrong')">
+        ✕ خطأ
+      </button>
 
-    
-    </section>
+      <button class="presenterBtn green presenterCorrectBtn" onclick="sendCommand('correct')">
+        ✓ صح
+      </button>
+    </div>
   `
 
-if (currentKey) {
-  const [cat, num] = currentKey.split("_")
-  showPresenterWarmupPreview(Number(cat), Number(num))
-} else {
-  presenterWarmupSelected = null
-}
+  if (currentKey) {
+    const [cat, num] = currentKey.split("_")
+    showPresenterWarmupPreview(Number(cat), Number(num))
+  } else {
+    presenterWarmupSelected = null
+  }
 }
 
 function openWarmupPresenterQuestion(category, number, event) {

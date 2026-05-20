@@ -572,6 +572,10 @@ function buildAuctionContentHTML() {
     return `<div class="auctionPlaceholder">اختر رقمًا لعرض الصورة أو الفيديو</div>`
   }
 
+  if (auctionState.answerShown) {
+    return buildAuctionResultHTML(auctionState.resultType || "")
+  }
+
   let html = ""
 
   if (currentAuctionVideo) {
@@ -613,15 +617,72 @@ function buildAuctionContentHTML() {
     `
   }
 
-  if (auctionState.answerShown && currentAuctionAnswer) {
-    html += `
-      <div class="auctionBottomAnswer">
-        ${currentAuctionAnswer}
+  return html
+}
+
+function buildAuctionResultHTML(resultType = "") {
+  const resultClass =
+    resultType === "correct"
+      ? "correctResult"
+      : resultType === "wrong"
+      ? "wrongResult"
+      : ""
+
+  let mediaHTML = ""
+
+  if (currentAuctionVideo) {
+    mediaHTML = `
+      <div class="auctionResultVideoBox" onclick="openAuctionVideoFullscreen(event)">
+        <video
+          class="auctionResultVideo"
+          src="${currentAuctionVideo}"
+          muted
+          playsinline
+          preload="metadata"
+        ></video>
+
+        <div class="auctionResultVideoPlay">▶</div>
       </div>
     `
+  } else if (currentAuctionImage) {
+    mediaHTML = `
+      <img src="${currentAuctionImage}" class="auctionResultImage" alt="">
+    `
+  } else {
+    mediaHTML = `<div class="auctionResultEmpty">لا توجد صورة أو فيديو</div>`
   }
 
-  return html
+  return `
+    <div class="auctionResultView ${resultClass}">
+      <div class="auctionResultImageBox">
+        ${mediaHTML}
+      </div>
+
+      <div class="auctionResultAnswerBox">
+        ${currentAuctionNote ? `<div class="auctionResultNote">${currentAuctionNote}</div>` : ""}
+
+        <div class="auctionResultAnswerLabel">الإجابة</div>
+
+        <div class="auctionResultAnswerText">
+          ${currentAuctionAnswer || "لا توجد إجابة"}
+        </div>
+      </div>
+    </div>
+  `
+}
+function showAuctionAnswer(resultType = "") {
+  auctionState.answerShown = true
+  auctionState.resultType = resultType
+
+  closeAuctionZoomOverlays()
+
+  const videoOverlay = document.getElementById("auctionVideoFullscreenOverlay")
+  if (videoOverlay) {
+    closeAuctionVideoFullscreen()
+  }
+
+  renderAuctionContent()
+  saveAuctionState()
 }
 
 function updateAuctionTurnBox() {
@@ -838,12 +899,11 @@ function auctionCorrect() {
     return
   }
 
-  closeAuctionZoomOverlays()
-
   pushAuctionHistory()
 
   auctionState.pendingScore = false
   auctionState.answerShown = true
+  auctionState.resultType = "correct"
 
   const points = getAuctionScoreValue(team)
 
@@ -853,13 +913,14 @@ function auctionCorrect() {
   clearAuctionActiveDouble(team)
   auctionDoublePickMode = false
 
-  renderAuctionContent()
   playGameSound("correct")
   flashScreen("correct")
+  showAuctionAnswer("correct")
 
   updateAuctionScoresOnly()
   updateAuctionDoubleButton()
   updateAuctionUndoButtonState()
+
   saveAuctionState()
 
   setTimeout(() => {
@@ -887,6 +948,7 @@ function auctionWrong() {
   }
 
   updateAuctionDoubleButton()
+  updateAuctionUndoButtonState()
   saveAuctionState()
 }
 
@@ -894,6 +956,7 @@ function finalizeAuctionTurn() {
   auctionState.pendingScore = false
   auctionState.currentQuestionNumber = null
   auctionState.answerShown = false
+  auctionState.resultType = ""
   auctionState.activeTeam = null
 
   currentAuctionAnswer = ""
