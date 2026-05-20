@@ -1240,8 +1240,18 @@ function flashScreen(type = "correct") {
 }
 
 function zoomCurrentDisplayImage() {
+  let overlay = document.getElementById("displayImageZoomOverlay")
+
+  if (overlay && !overlay.classList.contains("hidden")) {
+    closeCurrentDisplayImageZoom()
+    return
+  }
+
   const img =
     document.querySelector(".auctionBigImage") ||
+    document.querySelector(".auctionImageStage img") ||
+    document.querySelector(".auctionImageBox img") ||
+    document.querySelector(".auctionImageFrame img") ||
     document.querySelector(".whoImageFull") ||
     document.querySelector(".finalRound1BigImage") ||
     document.querySelector(".finalRound3Image") ||
@@ -1251,8 +1261,6 @@ function zoomCurrentDisplayImage() {
     showGameToast("لا توجد صورة للتكبير")
     return
   }
-
-  let overlay = document.getElementById("displayImageZoomOverlay")
 
   if (!overlay) {
     overlay = document.createElement("div")
@@ -1267,8 +1275,15 @@ function zoomCurrentDisplayImage() {
     document.body.appendChild(overlay)
   }
 
-  document.getElementById("displayImageZoomImg").src = img.src
+  const zoomImg = document.getElementById("displayImageZoomImg")
+  if (zoomImg) zoomImg.src = img.src
+
   overlay.classList.remove("hidden")
+}
+
+function closeCurrentDisplayImageZoom() {
+  const overlay = document.getElementById("displayImageZoomOverlay")
+  if (overlay) overlay.classList.add("hidden")
 }
 
 function closeCurrentDisplayImageZoom() {

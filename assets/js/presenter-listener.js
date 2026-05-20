@@ -310,18 +310,44 @@ function handleAuctionPresenterAction(action, data) {
   }
 
   if (action === "correct") {
-    return safeRunPresenterAction(() => auctionCorrect())
+    return safeRunPresenterAction(() => {
+      if (typeof closeCurrentDisplayImageZoom === "function") {
+        closeCurrentDisplayImageZoom()
+      }
+
+      document.getElementById("auctionImageOverlay")?.remove()
+      document.body.classList.remove("auctionOverlayActive")
+
+      if (typeof playGameSound === "function") {
+        playGameSound("correct")
+      }
+
+      if (typeof flashScreen === "function") {
+        flashScreen("correct")
+      }
+
+      auctionCorrect()
+    })
   }
 
   if (action === "wrong") {
-    return safeRunPresenterAction(() => auctionWrong())
+    return safeRunPresenterAction(() => {
+      if (typeof playGameSound === "function") {
+        playGameSound("wrong")
+      }
+
+      if (typeof flashScreen === "function") {
+        flashScreen("wrong")
+      }
+
+      auctionWrong()
+    })
   }
 
   if (action === "undo") {
     return safeRunPresenterAction(() => undoAuctionAction())
   }
 }
-
 /* =========================
    WHO
 ========================= */

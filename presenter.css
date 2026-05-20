@@ -1459,3 +1459,12 @@ body{
     transform:translateY(0) scale(1);
   }
 }
+.hidden{
+  display:none;
+}
+
+#presenterJoin.hidden,
+#presenterHome.hidden,
+#presenterSegmentPage.hidden{
+  display:none;
+}
