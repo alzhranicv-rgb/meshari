@@ -1515,3 +1515,257 @@ body{
   font-size:1.7rem;
   line-height:1;
 }
+/* =========================================================
+   PRESENTER PAGE LAYOUT - CLEAN GRID
+   تقسيم صفحة المقدم بشكل أفقي ومرتب
+========================================================= */
+
+/* الصفحة الداخلية للفقرة */
+.presenterPanel{
+  width:min(100%, 1180px);
+  margin:0 auto;
+
+  display:grid !important;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+
+  align-items:start;
+}
+
+/* أسماء الفرق دائمًا صف واحد فوق */
+.presenterPanel > .presenterTeams{
+  grid-column:1 / -1;
+
+  display:grid !important;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+
+  width:100%;
+}
+
+/* أزرار الفرق */
+.presenterTeams .presenterBtn{
+  width:100%;
+  min-height:62px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:1.12rem;
+}
+
+/* كل الكروت داخل التقسيم */
+.presenterPanel > .presenterCard{
+  width:100%;
+  min-width:0;
+}
+
+/* كروت المعاينة المهمة تاخذ عرض كامل */
+.presenterPanel > .presenterMainPreviewCard,
+.presenterPanel > .presenterWarmupPreviewCard,
+.presenterPanel > .presenterTop10StatusCard,
+.presenterPanel > .presenterAuctionPreviewCard,
+.presenterPanel > .presenterWhoPreviewCard,
+.presenterPanel > .presenterFinalPreviewCard,
+.presenterPanel > .presenterArchiveSimpleCard{
+  grid-column:1 / -1;
+}
+
+/* كرت الأرقام يكون مرتب */
+.presenterPanel > .presenterNumbersCard{
+  grid-column:1 / -1;
+}
+
+/* أزرار التحكم تكون عرض كامل */
+.presenterPanel > .presenterActions,
+.presenterPanel > .presenterMainActions,
+.presenterPanel > #presenterFinalControls{
+  grid-column:1 / -1;
+}
+
+/* أزرار التحكم: صفوف مرتبة وليست تحت بعض */
+.presenterActions,
+.presenterMainActions{
+  width:100%;
+
+  display:grid !important;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:12px;
+
+  align-items:stretch;
+}
+
+/* أزرار التحكم داخل الفاصلة */
+#presenterFinalControls{
+  width:100%;
+
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+#presenterFinalControls .presenterActions{
+  display:grid !important;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:12px;
+}
+
+/* الزر لو كان لحاله مثل الجولة التالية */
+#presenterFinalControls > .presenterBtn{
+  width:100%;
+  min-height:58px;
+}
+
+/* كل أزرار التحكم نفس المقاس */
+.presenterActions .presenterBtn,
+.presenterMainActions .presenterBtn,
+#presenterFinalControls .presenterBtn{
+  width:100%;
+  min-height:58px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+  white-space:normal;
+}
+
+/* لو صف التحكم فيه زرين فقط */
+.presenterActions .presenterBtn:nth-last-child(2):first-child,
+.presenterActions .presenterBtn:nth-last-child(2):first-child ~ .presenterBtn{
+  min-height:58px;
+}
+
+/* تحسين كروت السؤال والإجابة */
+.presenterQuestionBody,
+.presenterAnswerBody,
+.presenterTop10QuestionText{
+  width:100%;
+  min-height:70px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+}
+
+/* صورة المعاينة */
+.presenterImagePreviewBox{
+  width:100%;
+  min-height:150px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.presenterImagePreviewBox img,
+.presenterImagePreviewBox video{
+  max-width:100%;
+  max-height:220px;
+  object-fit:contain;
+}
+
+/* الأرقام تكون واضحة ومنظمة */
+.presenterGrid{
+  width:100%;
+
+  display:grid !important;
+  grid-template-columns:repeat(5, minmax(0, 1fr));
+  gap:12px;
+}
+
+.presenterGrid.four{
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+}
+
+.presenterNumberBtn{
+  min-height:58px;
+}
+
+/* Top 10 الإجابات */
+.presenterTop10Answers{
+  display:grid !important;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+/* التسخين الفئات */
+.presenterWarmupCats{
+  display:grid !important;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:14px;
+}
+
+/* =========================================================
+   iPad / Tablet
+========================================================= */
+
+@media (max-width:1024px){
+  .presenterPanel{
+    width:100%;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+
+  .presenterGrid{
+    grid-template-columns:repeat(4, minmax(0, 1fr));
+  }
+
+  .presenterTop10Answers{
+    grid-template-columns:1fr;
+  }
+}
+
+/* =========================================================
+   Mobile
+========================================================= */
+
+@media (max-width:767px){
+  .presenterPanel{
+    grid-template-columns:1fr !important;
+    gap:12px;
+  }
+
+  .presenterPanel > .presenterTeams,
+  .presenterPanel > .presenterCard,
+  .presenterPanel > .presenterActions,
+  .presenterPanel > .presenterMainActions,
+  .presenterPanel > #presenterFinalControls{
+    grid-column:1 / -1;
+  }
+
+  .presenterPanel > .presenterTeams{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .presenterTeams .presenterBtn{
+    min-height:56px;
+    font-size:1rem;
+  }
+
+  .presenterActions,
+  .presenterMainActions,
+  #presenterFinalControls .presenterActions{
+    grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+    gap:10px;
+  }
+
+  .presenterGrid,
+  .presenterGrid.four{
+    grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+    gap:10px;
+  }
+
+  .presenterWarmupCats{
+    grid-template-columns:1fr !important;
+  }
+
+  .presenterTop10Answers{
+    grid-template-columns:1fr !important;
+  }
+}

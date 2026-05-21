@@ -188,8 +188,16 @@ function handlePresenterCommand(cmd) {
   })
 }
 
- if (action === "zoomImage") {
+if (action === "zoomImage") {
   return safeRunPresenterAction(() => {
+
+    if (segment === "auction") {
+      if (typeof zoomCurrentDisplayImage === "function") {
+        zoomCurrentDisplayImage()
+      }
+      return
+    }
+
     if (
       segment === "final" &&
       window.finalState?.round === 3 &&
@@ -223,18 +231,26 @@ function handlePresenterCommand(cmd) {
       return
     }
 
-    zoomCurrentDisplayImage()
+    if (typeof zoomCurrentDisplayImage === "function") {
+      zoomCurrentDisplayImage()
+    }
   })
 }
 
   if (action === "closeZoomImage") {
   return safeRunPresenterAction(() => {
-    closeCurrentDisplayImageZoom()
+    if (typeof closeCurrentDisplayImageZoom === "function") {
+      closeCurrentDisplayImageZoom()
+    }
 
+    document.getElementById("displayImageZoomOverlay")?.remove()
     document.getElementById("auctionImageOverlay")?.remove()
+    document.getElementById("auctionVideoFullscreenOverlay")?.remove()
     document.getElementById("whoImageOverlay")?.remove()
     document.getElementById("finalRound1Overlay")?.remove()
     document.getElementById("finalRound3ImageOverlay")?.remove()
+
+    document.body.classList.remove("auctionOverlayActive")
   })
 }
   if (action === "endSegment") return safeRunPresenterAction(() => endCurrentSegment())

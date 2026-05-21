@@ -1293,14 +1293,7 @@ function zoomCurrentDisplayImage() {
   document.body.appendChild(overlay)
 }
 
-function closeCurrentDisplayImageZoom() {
-  const overlay = document.getElementById("displayImageZoomOverlay")
-  if (overlay) overlay.classList.add("hidden")
-}
 
-function closeCurrentDisplayImageZoom() {
-  document.getElementById("displayImageZoomOverlay")?.classList.add("hidden")
-}
 
 function updateDisplayControlsEyeButton(isHidden) {
   const btn = document.getElementById("displayControlsEyeBtn")
