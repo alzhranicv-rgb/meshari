@@ -1057,8 +1057,12 @@ function openWarmupPresenterQuestion(category, number, event) {
     btn.innerText = ""
   }
 
-  showPresenterWarmupPreview(category, number)
-  sendCommand("openNumber", { category, number })
+  presenterWhoScoreLocked = false
+  presenterWhoLastScoreKey = ""
+  setPresenterWhoScoreButtonsDisabled(false)
+
+  showPresenterWhoPreview(number)
+  sendCommand("openNumber", { number })
 }
 
 function showPresenterWarmupPreview(category, number) {
@@ -1680,29 +1684,7 @@ function refreshPresenterAuctionFromState() {
 
 let presenterWhoRows = []
 let presenterWhoScoreLocked = false
-
-function sendPresenterWhoScore(action) {
-  if (presenterWhoScoreLocked) {
-    return
-  }
-
-  presenterWhoScoreLocked = true
-
-  const correctBtn = document.getElementById("presenterWhoCorrectBtn")
-  const wrongBtn = document.getElementById("presenterWhoWrongBtn")
-
-  if (correctBtn) correctBtn.disabled = true
-  if (wrongBtn) wrongBtn.disabled = true
-
-  sendCommand(action)
-
-  setTimeout(() => {
-    presenterWhoScoreLocked = false
-
-    if (correctBtn) correctBtn.disabled = false
-    if (wrongBtn) wrongBtn.disabled = false
-  }, 1800)
-}
+let presenterWhoLastScoreKey = ""
 
 function getPresenterWhoStateRoot() {
   return presenterLiveState?.who || {}
@@ -1730,6 +1712,77 @@ function getPresenterWhoCurrentNumber() {
 
 function getPresenterWhoCompensationMode() {
   return !!getPresenterWhoStateRoot()?.whoCompensationMode
+}
+
+function getPresenterWhoScoreKey() {
+  const who = getPresenterWhoState()
+  const number = getPresenterWhoCurrentNumber()
+  const team = who.activeTeam || presenterSelectedTeam || ""
+  const points = Number(who.currentPoints || 0)
+
+  return `${number}_${team}_${points}`
+}
+
+function setPresenterWhoScoreButtonsDisabled(disabled) {
+  const correctBtn = document.getElementById("presenterWhoCorrectBtn")
+  const wrongBtn = document.getElementById("presenterWhoWrongBtn")
+
+  if (correctBtn) correctBtn.disabled = !!disabled
+  if (wrongBtn) wrongBtn.disabled = !!disabled
+}
+
+function resetPresenterWhoScoreGuard() {
+  presenterWhoScoreLocked = false
+  presenterWhoLastScoreKey = ""
+  setPresenterWhoScoreButtonsDisabled(false)
+}
+
+function sendPresenterWhoScore(action) {
+  const who = getPresenterWhoState()
+  const number = getPresenterWhoCurrentNumber()
+  const team = who.activeTeam || presenterSelectedTeam || null
+  const points = Number(who.currentPoints || 0)
+
+  if (!number) {
+    showToast("اختر رقمًا أولاً")
+    return
+  }
+
+  if (!team && !getPresenterWhoCompensationMode()) {
+    showToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (!points && !getPresenterWhoCompensationMode()) {
+    showToast("اختر النقاط أولاً")
+    return
+  }
+
+  const scoreKey = getPresenterWhoScoreKey()
+
+  if (presenterWhoScoreLocked || presenterWhoLastScoreKey === scoreKey) {
+    return
+  }
+
+  presenterWhoScoreLocked = true
+  presenterWhoLastScoreKey = scoreKey
+
+  setPresenterWhoScoreButtonsDisabled(true)
+
+  sendCommand(action, {
+    __who_score_key: scoreKey,
+    number,
+    team,
+    points
+  })
+
+  setTimeout(() => {
+    const currentKey = getPresenterWhoScoreKey()
+
+    if (currentKey !== scoreKey || !getPresenterWhoCurrentNumber()) {
+      resetPresenterWhoScoreGuard()
+    }
+  }, 2500)
 }
 
 function canPresenterWhoCompensation() {
@@ -1844,26 +1897,32 @@ async function renderWho() {
 
     <div class="presenterActions">
       <button
-  id="presenterWhoCorrectBtn"
-  class="presenterBtn green"
-  onclick="sendPresenterWhoScore('correct')"
->
-  ✓ صح
-</button>
+        id="presenterWhoCorrectBtn"
+        class="presenterBtn green"
+        onclick="sendPresenterWhoScore('correct')"
+        ${!currentNumber ? "disabled" : ""}
+      >
+        ✓ صح
+      </button>
 
-<button
-  id="presenterWhoWrongBtn"
-  class="presenterBtn red"
-  onclick="sendPresenterWhoScore('wrong')"
->
-  ✕ خطأ
-</button>
+      <button
+        id="presenterWhoWrongBtn"
+        class="presenterBtn red"
+        onclick="sendPresenterWhoScore('wrong')"
+        ${!currentNumber ? "disabled" : ""}
+      >
+        ✕ خطأ
+      </button>
     </div>
   `
 
   if (currentNumber) {
     showPresenterWhoPreview(currentNumber)
   }
+
+  setPresenterWhoScoreButtonsDisabled(
+    presenterWhoScoreLocked || !currentNumber
+  )
 }
 
 function openWhoPresenterNumber(number) {
@@ -1889,6 +1948,8 @@ function openWhoPresenterNumber(number) {
     showToast("اختر النقاط أولاً")
     return
   }
+
+  resetPresenterWhoScoreGuard()
 
   showPresenterWhoPreview(number)
   sendCommand("openNumber", { number })
@@ -2026,6 +2087,17 @@ function refreshPresenterWhoFromState() {
   if (compensationBtn) {
     compensationBtn.disabled = !canPresenterWhoCompensation()
   }
+
+  const currentScoreKey = getPresenterWhoScoreKey()
+
+  if (!currentNumber || currentScoreKey !== presenterWhoLastScoreKey) {
+    presenterWhoScoreLocked = false
+    presenterWhoLastScoreKey = ""
+  }
+
+  setPresenterWhoScoreButtonsDisabled(
+    presenterWhoScoreLocked || !currentNumber
+  )
 }
 /* =========================
    FINAL

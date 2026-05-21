@@ -359,20 +359,85 @@ function handleAuctionPresenterAction(action, data) {
    WHO
 ========================= */
 
+let displayWhoHandledScoreKeys = new Set()
+
+function getDisplayWhoScoreKey(action, data = {}) {
+  if (data.__who_score_key) {
+    return String(data.__who_score_key)
+  }
+
+  const number =
+    Number(window.whoCurrentNumber || 0) ||
+    Number(window.whoState?.currentNumber || 0)
+
+  const points = Number(window.whoState?.currentPoints || 0)
+  const team = window.whoState?.activeTeam || ""
+
+  return `${number}_${team}_${points}`
+}
+
+function runDisplayWhoScoreOnce(action, data, fn) {
+  const key = getDisplayWhoScoreKey(action, data)
+
+  if (!key || key === "0__0") return
+
+  if (displayWhoHandledScoreKeys.has(key)) {
+    return
+  }
+
+  displayWhoHandledScoreKeys.add(key)
+
+  if (displayWhoHandledScoreKeys.size > 40) {
+    displayWhoHandledScoreKeys = new Set(
+      Array.from(displayWhoHandledScoreKeys).slice(-20)
+    )
+  }
+
+  if (typeof fn === "function") {
+    fn()
+  }
+}
+
 function handleWhoPresenterAction(action, data) {
   if (action === "selectTeam") {
     if (!isValidPresenterTeam(data.team)) return
     return safeRunPresenterAction(() => selectWhoTeam(data.team))
   }
 
-  if (action === "setPoints") return safeRunPresenterAction(() => setWhoPoints(Number(data.points)))
-  if (action === "openNumber") return safeRunPresenterAction(() => chooseWho(Number(data.number)))
-  if (action === "double") return safeRunPresenterAction(() => activateWhoDouble())
-  if (action === "compensation") return safeRunPresenterAction(() => startWhoCompensation())
-  if (action === "correct") return safeRunPresenterAction(() => whoCorrect())
-  if (action === "wrong") return safeRunPresenterAction(() => whoWrong())
-}
+  if (action === "setPoints") {
+    return safeRunPresenterAction(() => setWhoPoints(Number(data.points)))
+  }
 
+  if (action === "openNumber") {
+    return safeRunPresenterAction(() => {
+      displayWhoHandledScoreKeys.clear()
+      chooseWho(Number(data.number))
+    })
+  }
+
+  if (action === "double") {
+    return safeRunPresenterAction(() => activateWhoDouble())
+  }
+
+  if (action === "compensation") {
+    return safeRunPresenterAction(() => {
+      displayWhoHandledScoreKeys.clear()
+      startWhoCompensation()
+    })
+  }
+
+  if (action === "correct") {
+    return safeRunPresenterAction(() => {
+      runDisplayWhoScoreOnce("correct", data, () => whoCorrect())
+    })
+  }
+
+  if (action === "wrong") {
+    return safeRunPresenterAction(() => {
+      runDisplayWhoScoreOnce("wrong", data, () => whoWrong())
+    })
+  }
+}
 /* =========================
    FINAL
 ========================= */
