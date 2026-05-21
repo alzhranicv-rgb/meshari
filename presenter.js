@@ -772,24 +772,64 @@ let presenterToastHideTimer = null
 function showToast(text) {
   const t = document.getElementById("presenterToast")
   const textBox = document.getElementById("presenterToastText")
+  const iconBox = t?.querySelector(".gameToastIcon")
+
   if (!t) return
 
   clearTimeout(presenterToastTimer)
   clearTimeout(presenterToastHideTimer)
 
-  if (textBox) textBox.innerText = text
-  else t.innerText = text
+  const msg = String(text || "")
 
-  t.classList.remove("hidden")
-  t.classList.add("show")
+  if (textBox) textBox.innerText = msg
+  else t.innerText = msg
+
+  t.classList.remove(
+    "hidden",
+    "show",
+    "presenterToastSuccess",
+    "presenterToastError"
+  )
+
+  if (
+    msg.includes("خطأ") ||
+    msg.includes("غير صحيح") ||
+    msg.includes("تعذر") ||
+    msg.includes("مقفل") ||
+    msg.includes("انتهت") ||
+    msg.includes("أولاً")
+  ) {
+    t.classList.add("presenterToastError")
+    if (iconBox) iconBox.innerText = "!"
+  } else if (
+    msg.includes("تم") ||
+    msg.includes("صح") ||
+    msg.includes("نجاح") ||
+    msg.includes("صحيحة")
+  ) {
+    t.classList.add("presenterToastSuccess")
+    if (iconBox) iconBox.innerText = "✓"
+  } else {
+    if (iconBox) iconBox.innerText = "!"
+  }
+
+  void t.offsetWidth
+
+  requestAnimationFrame(() => {
+    t.classList.add("show")
+  })
 
   presenterToastTimer = setTimeout(() => {
     t.classList.remove("show")
 
     presenterToastHideTimer = setTimeout(() => {
       t.classList.add("hidden")
-    }, 120)
-  }, 1250)
+      t.classList.remove("presenterToastSuccess", "presenterToastError")
+
+      if (textBox) textBox.innerText = ""
+      if (iconBox) iconBox.innerText = "!"
+    }, 180)
+  }, 1600)
 }
 
 
