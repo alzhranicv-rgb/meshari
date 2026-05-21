@@ -96,48 +96,89 @@ function getPresenterSegmentName(segment) {
 async function joinGameSession() {
   const input = document.getElementById("joinCodeInput")
   const status = document.getElementById("presenterJoinStatus")
-  const code = (input?.value || "").trim()
+  const btn = document.getElementById("presenterJoinBtn")
+
+  const code = (input?.value || "").replace(/\D/g, "").trim()
+
+  if (input) input.value = code
 
   if (code.length !== 4) {
     if (status) status.innerText = "اكتب كود من 4 أرقام"
     return
   }
 
-  const { data, error } = await db
-    .from("game_sessions")
-    .select("*")
-    .eq("join_code", code)
-    .eq("status", "active")
-    .single()
-
-  if (error || !data) {
-    if (status) status.innerText = "الكود غير صحيح أو اللعبة منتهية"
+  if (!window.db) {
+    if (status) status.innerText = "الاتصال غير جاهز، أعد المحاولة"
     return
   }
 
-  localStorage.setItem("presenter_session_id", data.id)
-  localStorage.setItem("presenter_join_code", code)
-  window.history.replaceState({}, "", "presenter.html")
+  if (btn?.disabled) return
 
-presenterSessionId = data.id
-presenterModel = Number(data.model || 1)
-presenterTeamAName = data.team_a || "الفريق الأول"
-presenterTeamBName = data.team_b || "الفريق الثاني"
-presenterSegment = null
-presenterLiveState = {
-  ...(data.state || {}),
-  presenterStarted: true,
-  presenterStartedAt: new Date().toISOString()
-}
+  if (btn) {
+    btn.disabled = true
+    btn.innerText = "جاري الدخول..."
+  }
 
-presenterJustJoined = true
+  if (status) status.innerText = "جاري التحقق من الكود..."
 
-await markPresenterStartedSession(data.id)
+  try {
+    const { data, error } = await db
+      .from("game_sessions")
+      .select("*")
+      .eq("join_code", code)
+      .eq("status", "active")
+      .maybeSingle()
 
-renderPresenterHome()
-subscribeToGameSession(data.id)
+    if (error || !data) {
+      if (status) status.innerText = "الكود غير صحيح أو اللعبة منتهية"
 
-showToast("تم الدخول للجلسة")
+      if (btn) {
+        btn.disabled = false
+        btn.innerText = "دخول"
+      }
+
+      return
+    }
+
+    localStorage.setItem("presenter_session_id", data.id)
+    localStorage.setItem("presenter_join_code", code)
+
+    window.history.replaceState({}, "", "presenter.html")
+
+    presenterSessionId = data.id
+    presenterModel = Number(data.model || 1)
+    presenterTeamAName = data.team_a || "الفريق الأول"
+    presenterTeamBName = data.team_b || "الفريق الثاني"
+    presenterSegment = null
+
+    presenterLiveState = {
+      ...(data.state || {}),
+      presenterStarted: true,
+      presenterStartedAt: new Date().toISOString()
+    }
+
+    presenterJustJoined = true
+
+    await markPresenterStartedSession(data.id)
+
+    renderPresenterHome()
+    subscribeToGameSession(data.id)
+
+    showToast("تم الدخول للجلسة")
+
+  } catch (e) {
+    console.log("JOIN SESSION ERROR:", e)
+
+    if (status) {
+      status.innerText = "تعذر الدخول، تأكد من الاتصال"
+    }
+
+  } finally {
+    if (btn) {
+      btn.disabled = false
+      btn.innerText = "دخول"
+    }
+  }
 }
 
 /* =========================

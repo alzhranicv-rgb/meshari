@@ -1239,19 +1239,35 @@ function flashScreen(type = "correct") {
   }
 }
 
-function zoomCurrentDisplayImage() {
-  let overlay = document.getElementById("displayImageZoomOverlay")
+function closeCurrentDisplayImageZoom() {
+  const displayOverlay = document.getElementById("displayImageZoomOverlay")
+  if (displayOverlay) displayOverlay.remove()
 
-  if (overlay && !overlay.classList.contains("hidden")) {
+  const auctionOverlay = document.getElementById("auctionImageOverlay")
+  if (auctionOverlay) auctionOverlay.remove()
+
+  const videoOverlay = document.getElementById("auctionVideoFullscreenOverlay")
+  if (videoOverlay && typeof closeAuctionVideoFullscreen === "function") {
+    closeAuctionVideoFullscreen()
+  }
+
+  document.body.classList.remove("auctionOverlayActive")
+}
+
+function zoomCurrentDisplayImage() {
+  const openedDisplayOverlay = document.getElementById("displayImageZoomOverlay")
+  const openedAuctionOverlay = document.getElementById("auctionImageOverlay")
+
+  if (openedDisplayOverlay || openedAuctionOverlay) {
     closeCurrentDisplayImageZoom()
     return
   }
 
   const img =
     document.querySelector(".auctionBigImage") ||
-    document.querySelector(".auctionImageStage img") ||
-    document.querySelector(".auctionImageBox img") ||
     document.querySelector(".auctionImageFrame img") ||
+    document.querySelector(".auctionQuestionBox img") ||
+    document.querySelector(".auctionResultImage") ||
     document.querySelector(".whoImageFull") ||
     document.querySelector(".finalRound1BigImage") ||
     document.querySelector(".finalRound3Image") ||
@@ -1262,23 +1278,19 @@ function zoomCurrentDisplayImage() {
     return
   }
 
-  if (!overlay) {
-    overlay = document.createElement("div")
-    overlay.id = "displayImageZoomOverlay"
-    overlay.className = "displayImageZoomOverlay"
-    overlay.onclick = closeCurrentDisplayImageZoom
-    overlay.innerHTML = `
-      <div class="displayImageZoomInner">
-        <img id="displayImageZoomImg" class="displayImageZoomImg" alt="">
-      </div>
-    `
-    document.body.appendChild(overlay)
-  }
+  const overlay = document.createElement("div")
+  overlay.id = "displayImageZoomOverlay"
+  overlay.className = "displayImageZoomOverlay"
 
-  const zoomImg = document.getElementById("displayImageZoomImg")
-  if (zoomImg) zoomImg.src = img.src
+  overlay.innerHTML = `
+    <div class="displayImageZoomInner">
+      <img id="displayImageZoomImg" class="displayImageZoomImg" src="${img.src}" alt="">
+    </div>
+  `
 
-  overlay.classList.remove("hidden")
+  overlay.onclick = closeCurrentDisplayImageZoom
+
+  document.body.appendChild(overlay)
 }
 
 function closeCurrentDisplayImageZoom() {

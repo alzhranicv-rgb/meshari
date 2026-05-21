@@ -828,21 +828,18 @@ function closeAuctionZoomOverlays() {
   const auctionOverlay = document.getElementById("auctionImageOverlay")
   if (auctionOverlay) auctionOverlay.remove()
 
+  const videoOverlay = document.getElementById("auctionVideoFullscreenOverlay")
+  if (videoOverlay && typeof closeAuctionVideoFullscreen === "function") {
+    closeAuctionVideoFullscreen()
+  }
+
   const displayOverlay = document.getElementById("displayImageZoomOverlay")
-  if (displayOverlay) {
-    displayOverlay.classList.add("hidden")
-    displayOverlay.classList.remove("auctionWrongFlash", "auctionZoomWrongFlash")
+  if (displayOverlay) displayOverlay.remove()
 
-    const img = document.getElementById("displayImageZoomImg")
-    if (img) {
-      img.classList.remove("auctionWrongFlash", "auctionZoomWrongFlash")
-      img.removeAttribute("src")
-    }
-  }
+  document.body.classList.remove("auctionOverlayActive")
 
-  if (typeof closeCurrentDisplayImageZoom === "function") {
-    closeCurrentDisplayImageZoom()
-  }
+  const flashLayer = document.getElementById("auctionZoomFlashLayer")
+  if (flashLayer) flashLayer.remove()
 }
 
 function flashAuctionZoomOverlayWrong() {
@@ -899,6 +896,8 @@ function auctionCorrect() {
     return
   }
 
+  closeAuctionZoomOverlays()
+
   pushAuctionHistory()
 
   auctionState.pendingScore = false
@@ -941,11 +940,8 @@ function auctionWrong() {
 
   playGameSound("wrong")
 
-  const flashedOverlay = flashAuctionZoomOverlayWrong()
-
-  if (!flashedOverlay) {
-    flashScreen("wrong")
-  }
+  flashAuctionZoomOverlayWrong()
+  flashScreen("wrong")
 
   updateAuctionDoubleButton()
   updateAuctionUndoButtonState()

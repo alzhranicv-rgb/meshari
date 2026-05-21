@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>الحنكة - لوحة المقدم</title>
 
   <link rel="stylesheet" href="styles.css" />
@@ -14,11 +15,13 @@
   <link rel="stylesheet" href="assets/css/segments/final.css" />
   <link rel="stylesheet" href="assets/css/segments/archive.css" />
 
-  <link rel="stylesheet" href="presenter.css" />
+  <link rel="stylesheet" href="presenter.css?v=6" />
 </head>
+
 <body>
 
   <div id="presenterJoin" class="homePageShell presenterJoinShell">
+
     <div class="topBoard presenterTopBoard">
       <div class="titleBox presenterJoinTitleBox">
         <h1>الحنكة</h1>
@@ -27,27 +30,37 @@
     </div>
 
     <div class="presenterJoinCard">
+
       <div class="presenterJoinLabel">كود الجلسة</div>
 
       <input
-  id="joinCodeInput"
-  class="presenterJoinInput"
-  type="tel"
-  inputmode="numeric"
-  pattern="[0-9]*"
-  maxlength="4"
-  autocomplete="one-time-code"
-  placeholder="0000"
-/>
+        id="joinCodeInput"
+        class="presenterJoinInput"
+        type="tel"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="4"
+        autocomplete="one-time-code"
+        placeholder="0000"
+        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)"
+        onkeydown="if(event.key === 'Enter'){ event.preventDefault(); joinGameSession(); }"
+      />
 
-      <button class="winnerBtn presenterJoinBtn" onclick="joinGameSession()">
+      <button
+        type="button"
+        id="presenterJoinBtn"
+        class="winnerBtn presenterJoinBtn"
+        onclick="joinGameSession()"
+      >
         دخول
       </button>
 
       <div id="presenterJoinStatus" class="presenterJoinStatus">
         أدخل الكود الظاهر في شاشة الانترو
       </div>
+
     </div>
+
   </div>
 
   <div id="presenterHome" class="homePageShell hidden">
@@ -61,7 +74,9 @@
 
       <div class="titleBox" id="presenterTitleBox">
         <h1 id="presenterTitle">لوحة المقدم</h1>
-        <div id="presenterSubtitle" class="modelNameDisplay">اختر الفقرة وتحكم بالعرض</div>
+        <div id="presenterSubtitle" class="modelNameDisplay">
+          اختر الفقرة وتحكم بالعرض
+        </div>
       </div>
 
       <div class="teamBox" id="presenterHomeTeamBBox">
@@ -70,8 +85,6 @@
       </div>
 
     </div>
-
-    
 
     <div class="segmentsGrid" id="presenterSegmentsGrid">
 
@@ -102,52 +115,56 @@
     </div>
 
     <button
-  id="displayControlsEyeBtn"
-  class="presenterDisplayControlsBtn hideControlsMode"
-  onclick="togglePresenterDisplayControls()"
->
-  إخفاء التحكم
-</button>
+      type="button"
+      id="displayControlsEyeBtn"
+      class="presenterDisplayControlsBtn hideControlsMode"
+      onclick="togglePresenterDisplayControls()"
+    >
+      إخفاء التحكم
+    </button>
 
   </div>
 
   <div id="presenterSegmentPage" class="homePageShell presenterSegmentPage hidden">
 
-<div class="presenterCleanHeader">
+    <div class="presenterCleanHeader">
 
-  <button
-    class="presenterCleanHeaderBtn presenterCleanBackBtn"
-    id="presenterBackBtn"
-    onclick="presenterGoHome()"
-  >
-    رجوع
-  </button>
+      <button
+        type="button"
+        class="presenterCleanHeaderBtn presenterCleanBackBtn"
+        id="presenterBackBtn"
+        onclick="presenterGoHome()"
+      >
+        رجوع
+      </button>
 
-  <div class="presenterCleanHeaderTitle">
-    <h1 id="presenterSegmentTitle">الفقرة</h1>
-  </div>
+      <div class="presenterCleanHeaderTitle">
+        <h1 id="presenterSegmentTitle">الفقرة</h1>
+      </div>
 
-  <button
-    class="presenterCleanHeaderBtn presenterCleanEndBtn"
-    id="presenterEndBtn"
-    onclick="sendCommand('endSegment')"
-  >
-    إنهاء
-  </button>
+      <button
+        type="button"
+        class="presenterCleanHeaderBtn presenterCleanEndBtn"
+        id="presenterEndBtn"
+        onclick="sendCommand('endSegment')"
+      >
+        إنهاء
+      </button>
 
-</div>
+    </div>
 
     <div id="presenterPanel" class="presenterPanel"></div>
 
   </div>
 
   <div class="gameToast presenterToast hidden" id="presenterToast">
-  <div class="gameToastIcon">!</div>
-  <div class="gameToastText" id="presenterToastText"></div>
-</div>
+    <div class="gameToastIcon">!</div>
+    <div class="gameToastText" id="presenterToastText"></div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
-  <script src="presenter.js"></script>
+  <script src="presenter.js?v=6"></script>
+
 </body>
 </html>

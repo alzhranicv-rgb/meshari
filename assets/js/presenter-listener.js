@@ -311,19 +311,10 @@ function handleAuctionPresenterAction(action, data) {
 
   if (action === "correct") {
     return safeRunPresenterAction(() => {
-      if (typeof closeCurrentDisplayImageZoom === "function") {
+      if (typeof closeAuctionZoomOverlays === "function") {
+        closeAuctionZoomOverlays()
+      } else if (typeof closeCurrentDisplayImageZoom === "function") {
         closeCurrentDisplayImageZoom()
-      }
-
-      document.getElementById("auctionImageOverlay")?.remove()
-      document.body.classList.remove("auctionOverlayActive")
-
-      if (typeof playGameSound === "function") {
-        playGameSound("correct")
-      }
-
-      if (typeof flashScreen === "function") {
-        flashScreen("correct")
       }
 
       auctionCorrect()
@@ -332,20 +323,20 @@ function handleAuctionPresenterAction(action, data) {
 
   if (action === "wrong") {
     return safeRunPresenterAction(() => {
-      if (typeof playGameSound === "function") {
-        playGameSound("wrong")
-      }
-
-      if (typeof flashScreen === "function") {
-        flashScreen("wrong")
-      }
-
       auctionWrong()
     })
   }
 
   if (action === "undo") {
-    return safeRunPresenterAction(() => undoAuctionAction())
+    return safeRunPresenterAction(() => {
+      if (typeof closeAuctionZoomOverlays === "function") {
+        closeAuctionZoomOverlays()
+      } else if (typeof closeCurrentDisplayImageZoom === "function") {
+        closeCurrentDisplayImageZoom()
+      }
+
+      undoAuctionAction()
+    })
   }
 }
 /* =========================
