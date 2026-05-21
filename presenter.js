@@ -2493,8 +2493,7 @@ function openPresenterFinalNumber(round, number) {
 }
 
 /* =========================
-   Round 1 Preview
-========================= */
+/* ===== Round 1 preview ===== */
 
 async function renderPresenterFinalRound1Preview() {
   const previewBox = document.getElementById("presenterFinalPreview")
@@ -2525,8 +2524,8 @@ async function renderPresenterFinalRound1Preview() {
       <div class="presenterFinalCleanPreview">
         <div class="presenterFinalPreviewNumber">الرقم ${current}</div>
 
-        <div class="presenterFinalPreviewBlock presenterFinalFullBlock">
-          <div class="presenterFinalPreviewLabel">المحتوى</div>
+        <div class="presenterFinalPreviewBlock presenterFinalAnswerOnlyBig">
+          <div class="presenterFinalPreviewLabel">الإجابة</div>
           <div class="presenterFinalPreviewText">لا توجد بيانات لهذا الرقم</div>
         </div>
       </div>
@@ -2549,6 +2548,29 @@ async function renderPresenterFinalRound1Preview() {
 
   const answerText = data.answer || "لا توجد إجابة"
 
+  /* أول 3 أرقام: إجابة فقط بدون سؤال */
+  if (current >= 1 && current <= 3) {
+    presenterFinalPreviewCache[1] = `
+      <div class="presenterFinalCleanPreview presenterFinalAnswerOnlyMode">
+        <div class="presenterFinalPreviewNumber">
+          الرقم ${current}
+        </div>
+
+        <div class="presenterFinalPreviewBlock presenterFinalAnswerOnlyBig">
+          <div class="presenterFinalPreviewLabel">الإجابة</div>
+
+          <div class="presenterFinalPreviewText presenterFinalAnswerOnlyText">
+            ${answerText}
+          </div>
+        </div>
+      </div>
+    `
+
+    previewBox.innerHTML = presenterFinalPreviewCache[1]
+    return
+  }
+
+  /* الأرقام 4 - 6: سؤال + إجابة */
   presenterFinalPreviewCache[1] = `
     <div class="presenterFinalCleanPreview">
       <div class="presenterFinalPreviewNumber">
@@ -2557,6 +2579,7 @@ async function renderPresenterFinalRound1Preview() {
 
       <div class="presenterFinalPreviewBlock">
         <div class="presenterFinalPreviewLabel">السؤال</div>
+
         <div class="presenterFinalPreviewText">
           ${questionText}
         </div>
@@ -2564,6 +2587,7 @@ async function renderPresenterFinalRound1Preview() {
 
       <div class="presenterFinalPreviewBlock">
         <div class="presenterFinalPreviewLabel">الإجابة</div>
+
         <div class="presenterFinalPreviewText">
           ${answerText}
         </div>
