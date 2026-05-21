@@ -1679,6 +1679,30 @@ function refreshPresenterAuctionFromState() {
 ========================= */
 
 let presenterWhoRows = []
+let presenterWhoScoreLocked = false
+
+function sendPresenterWhoScore(action) {
+  if (presenterWhoScoreLocked) {
+    return
+  }
+
+  presenterWhoScoreLocked = true
+
+  const correctBtn = document.getElementById("presenterWhoCorrectBtn")
+  const wrongBtn = document.getElementById("presenterWhoWrongBtn")
+
+  if (correctBtn) correctBtn.disabled = true
+  if (wrongBtn) wrongBtn.disabled = true
+
+  sendCommand(action)
+
+  setTimeout(() => {
+    presenterWhoScoreLocked = false
+
+    if (correctBtn) correctBtn.disabled = false
+    if (wrongBtn) wrongBtn.disabled = false
+  }, 1800)
+}
 
 function getPresenterWhoStateRoot() {
   return presenterLiveState?.who || {}
@@ -1819,13 +1843,21 @@ async function renderWho() {
     </div>
 
     <div class="presenterActions">
-      <button class="presenterBtn green" onclick="sendCommand('correct')">
-        ✓ صح
-      </button>
+      <button
+  id="presenterWhoCorrectBtn"
+  class="presenterBtn green"
+  onclick="sendPresenterWhoScore('correct')"
+>
+  ✓ صح
+</button>
 
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">
-        ✕ خطأ
-      </button>
+<button
+  id="presenterWhoWrongBtn"
+  class="presenterBtn red"
+  onclick="sendPresenterWhoScore('wrong')"
+>
+  ✕ خطأ
+</button>
     </div>
   `
 
