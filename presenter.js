@@ -1971,6 +1971,10 @@ function clearPresenterFinalPreview(round = presenterFinalRound) {
   if (previewBox) previewBox.innerHTML = "اختر رقمًا"
 }
 
+/* =========================
+   Render Final
+========================= */
+
 async function renderFinal() {
   const panel = document.getElementById("presenterPanel")
   if (!panel) return
@@ -2015,6 +2019,10 @@ async function setPresenterFinalRound(round) {
   sendCommand("setRound", { round: presenterFinalRound })
   await renderPresenterFinalRoundContent()
 }
+
+/* =========================
+   Round Content
+========================= */
 
 async function renderPresenterFinalRoundContent() {
   const numbersBox = document.getElementById("presenterFinalNumbers")
@@ -2073,16 +2081,21 @@ async function renderPresenterFinalRoundContent() {
       <div class="presenterActions">
         <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
         <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">إظهار السؤال</button>
-        <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">تكبير</button>
       </div>
 
       <div class="presenterActions">
+        <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">تكبير</button>
         <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
+      </div>
+
+      <div class="presenterActions">
         <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
         <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
       </div>
 
-      <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
+      <div class="presenterActions">
+        <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
+      </div>
     `
 
     refreshPresenterFinalControlsOnly(1)
@@ -2105,6 +2118,7 @@ async function renderPresenterFinalRoundContent() {
     controlsBox.innerHTML = `
       <div class="presenterActions finalTwoActions">
         <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+
         <button class="presenterBtn dark" onclick="sendCommand('decreaseCountdown')">
           ${isSequenceNumber ? `العداد ${state.countdown ?? 15}` : "العداد"}
         </button>
@@ -2126,11 +2140,12 @@ async function renderPresenterFinalRoundContent() {
         >
           تسجيل التلميح
         </button>
-
-        <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
       </div>
 
-      <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
+      <div class="presenterActions">
+        <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+        <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
+      </div>
     `
 
     refreshPresenterFinalControlsOnly(2)
@@ -2158,7 +2173,9 @@ async function renderPresenterFinalRoundContent() {
         >
           تشغيل الفيديو
         </button>
+      </div>
 
+      <div class="presenterActions">
         <button
           class="presenterBtn blue"
           onclick="sendCommand('restartTeamMediaVideo')"
@@ -2166,9 +2183,7 @@ async function renderPresenterFinalRoundContent() {
         >
           إعادة تشغيل
         </button>
-      </div>
 
-      <div class="presenterActions">
         <button
           class="presenterBtn green"
           onclick="clearPresenterFinalPreview(3); sendCommand('correct')"
@@ -2176,7 +2191,9 @@ async function renderPresenterFinalRoundContent() {
         >
           إجابة صحيحة
         </button>
+      </div>
 
+      <div class="presenterActions">
         <button
           class="presenterBtn red"
           onclick="clearPresenterFinalPreview(3); sendCommand('wrong')"
@@ -2197,10 +2214,11 @@ async function renderPresenterFinalRoundContent() {
     <div class="presenterActions">
       <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
       <button class="presenterBtn dark" onclick="sendCommand('startSequence')">بدء عرض الصور</button>
-      <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">تكبير الصورة</button>
     </div>
 
     <div class="presenterActions">
+      <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">تكبير الصورة</button>
+
       <button
         class="presenterBtn green"
         onclick="clearPresenterFinalPreview(3); sendCommand('recordRound3Score')"
@@ -2208,13 +2226,19 @@ async function renderPresenterFinalRoundContent() {
       >
         تسجيل النتيجة
       </button>
+    </div>
 
+    <div class="presenterActions">
       <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
     </div>
   `
 
   refreshPresenterFinalControlsOnly(3)
 }
+
+/* =========================
+   Refresh
+========================= */
 
 async function refreshPresenterFinalFromState() {
   if (presenterSegment !== "final") return
@@ -2228,9 +2252,9 @@ async function refreshPresenterFinalFromState() {
   document.getElementById("teamB")?.classList.toggle("selectedPresenterTeam", activeTeam === "B")
 
   const roundText = document.getElementById("presenterFinalRoundText")
-if (roundText) {
-  roundText.innerText = round
-}
+  if (roundText) {
+    roundText.innerText = round
+  }
 
   const controlsBox = document.getElementById("presenterFinalControls")
   const currentControlsRound = Number(controlsBox?.dataset.round || 0)
@@ -2424,6 +2448,10 @@ function refreshPresenterFinalControlsOnly(round) {
   }
 }
 
+/* =========================
+   Open Number
+========================= */
+
 function openPresenterFinalNumber(round, number) {
   const state = getPresenterFinalRoundState(round)
   const isTeamMedia = round === 3 && isPresenterFinalRound3TeamMedia()
@@ -2464,7 +2492,9 @@ function openPresenterFinalNumber(round, number) {
   sendCommand("openNumber", { round, number })
 }
 
-/* ===== Round 1 preview ===== */
+/* =========================
+   Round 1 Preview
+========================= */
 
 async function renderPresenterFinalRound1Preview() {
   const previewBox = document.getElementById("presenterFinalPreview")
@@ -2478,64 +2508,75 @@ async function renderPresenterFinalRound1Preview() {
   )
 
   if (!current) {
-    previewBox.innerHTML = presenterFinalPreviewCache[1] || "اختر رقمًا"
+    presenterFinalPreviewCache[1] = ""
+    previewBox.innerHTML = "اختر رقمًا"
     return
   }
 
-  const { data } = await db
+  const { data, error } = await db
     .from("final_round1_items")
     .select("*")
     .eq("model", presenterModel)
     .eq("number", current)
-    .single()
+    .maybeSingle()
 
-  const parts = [
-    data?.question_part1 || "",
-    data?.question_part2 || "",
-    data?.question_part3 || ""
-  ].filter(Boolean)
-
-  const questionText = parts.length ? parts.join("<br>") : "لا يوجد سؤال"
-  const answerText = data?.answer || "لا توجد إجابة"
-
-  if (current >= 1 && current <= 3) {
+  if (error || !data) {
     presenterFinalPreviewCache[1] = `
       <div class="presenterFinalCleanPreview">
-        <div class="presenterFinalPreviewNumber">
-          الرقم ${current}
-        </div>
+        <div class="presenterFinalPreviewNumber">الرقم ${current}</div>
 
-        <div class="presenterFinalPreviewBlock">
-          <div class="presenterFinalPreviewLabel">الإجابة</div>
-          <div class="presenterFinalPreviewText">${answerText}</div>
+        <div class="presenterFinalPreviewBlock presenterFinalFullBlock">
+          <div class="presenterFinalPreviewLabel">المحتوى</div>
+          <div class="presenterFinalPreviewText">لا توجد بيانات لهذا الرقم</div>
         </div>
       </div>
     `
-  } else {
-    presenterFinalPreviewCache[1] = `
-      <div class="presenterFinalCleanPreview">
-        <div class="presenterFinalPreviewNumber">
-          الرقم ${current}
-        </div>
 
-        <div class="presenterFinalPreviewBlock">
-          <div class="presenterFinalPreviewLabel">السؤال</div>
-          <div class="presenterFinalPreviewText">${questionText}</div>
-        </div>
-
-        <div class="presenterFinalPreviewBlock">
-          <div class="presenterFinalPreviewLabel">الإجابة</div>
-          <div class="presenterFinalPreviewText">${answerText}</div>
-        </div>
-      </div>
-    `
+    previewBox.innerHTML = presenterFinalPreviewCache[1]
+    return
   }
 
-  const freshBox = document.getElementById("presenterFinalPreview")
-  if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[1]
+  const questionParts = [
+    data.question_part1 || "",
+    data.question_part2 || "",
+    data.question_part3 || "",
+    data.question || ""
+  ].filter(Boolean)
+
+  const questionText = questionParts.length
+    ? questionParts.join("<br>")
+    : "لا يوجد سؤال"
+
+  const answerText = data.answer || "لا توجد إجابة"
+
+  presenterFinalPreviewCache[1] = `
+    <div class="presenterFinalCleanPreview">
+      <div class="presenterFinalPreviewNumber">
+        الرقم ${current}
+      </div>
+
+      <div class="presenterFinalPreviewBlock">
+        <div class="presenterFinalPreviewLabel">السؤال</div>
+        <div class="presenterFinalPreviewText">
+          ${questionText}
+        </div>
+      </div>
+
+      <div class="presenterFinalPreviewBlock">
+        <div class="presenterFinalPreviewLabel">الإجابة</div>
+        <div class="presenterFinalPreviewText">
+          ${answerText}
+        </div>
+      </div>
+    </div>
+  `
+
+  previewBox.innerHTML = presenterFinalPreviewCache[1]
 }
 
-/* ===== Round 2 preview ===== */
+/* =========================
+   Round 2 Preview
+========================= */
 
 async function renderPresenterFinalRound2Preview() {
   const previewBox = document.getElementById("presenterFinalPreview")
@@ -2618,7 +2659,9 @@ async function renderPresenterFinalRound2Preview() {
   if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[2]
 }
 
-/* ===== Round 3 preview ===== */
+/* =========================
+   Round 3 Preview
+========================= */
 
 async function renderPresenterFinalRound3Preview() {
   const previewBox = document.getElementById("presenterFinalPreview")
@@ -2667,9 +2710,9 @@ async function renderPresenterFinalRound3Preview() {
       ""
 
     const question =
-    teamMediaState.currentQuestion ||
-    data?.question ||
-    ""
+      teamMediaState.currentQuestion ||
+      data?.question ||
+      ""
 
     const answer =
       teamMediaState.currentAnswer ||
@@ -2678,7 +2721,10 @@ async function renderPresenterFinalRound3Preview() {
 
     presenterFinalPreviewCache[3] = `
       <div class="presenterFinalTeamMediaPreview">
-        <div><strong>الرقم:</strong> ${current}</div>
+
+        <div class="presenterFinalPreviewNumber">
+          الرقم ${current}
+        </div>
 
         ${
           media
@@ -2693,20 +2739,29 @@ async function renderPresenterFinalRound3Preview() {
                   <img src="${media}" alt="">
                 </div>
               `
-            : `<div class="presenterAnswerBody">لا توجد صورة أو فيديو</div>`
+            : `
+              <div class="presenterAnswerBody">
+                لا توجد صورة أو فيديو
+              </div>
+            `
         }
 
-        ${
-          question
-            ? `<div><strong>السؤال:</strong><br>${question}</div>`
-            : `<div><strong>السؤال:</strong><br>لا يوجد سؤال</div>`
-        }
+        <div class="presenterFinalCleanPreview">
+          <div class="presenterFinalPreviewBlock">
+            <div class="presenterFinalPreviewLabel">السؤال</div>
+            <div class="presenterFinalPreviewText">
+              ${question || "لا يوجد سؤال"}
+            </div>
+          </div>
 
-        ${
-          answer
-            ? `<div><strong>الإجابة:</strong><br>${answer}</div>`
-            : `<div><strong>الإجابة:</strong><br>لا توجد إجابة</div>`
-        }
+          <div class="presenterFinalPreviewBlock">
+            <div class="presenterFinalPreviewLabel">الإجابة</div>
+            <div class="presenterFinalPreviewText">
+              ${answer || "لا توجد إجابة"}
+            </div>
+          </div>
+        </div>
+
       </div>
     `
 
@@ -2750,7 +2805,11 @@ async function renderPresenterFinalRound3Preview() {
                 <img src="${currentImage}" alt="">
               </div>
             `
-            : `<div class="presenterAnswerBody">لم تبدأ الصور بعد</div>`
+            : `
+              <div class="presenterAnswerBody">
+                لم تبدأ الصور بعد
+              </div>
+            `
         }
       </div>
     </div>

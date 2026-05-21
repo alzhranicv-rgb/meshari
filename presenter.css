@@ -1539,4 +1539,254 @@ body{
   .presenterTop10QuestionText{
     font-size:1rem;
   }
+}/* =========================================================
+   PRESENTER FINAL CLEAN ORDER
+   Header + Actions 2 Columns
+========================================================= */
+
+/* =========================
+   Header ترتيب الهيدر العلوي
+========================= */
+
+.presenterCleanHeader{
+  width:min(100%, 1180px) !important;
+
+  display:grid !important;
+  grid-template-columns:150px minmax(0, 1fr) 150px !important;
+  grid-template-areas:"back title end" !important;
+  gap:14px !important;
+  align-items:center !important;
+
+  direction:ltr !important;
+}
+
+/* رجوع يمين */
+.presenterCleanBackBtn{
+  grid-area:back !important;
+  direction:rtl !important;
+}
+
+/* العنوان في النص */
+.presenterCleanHeaderTitle{
+  grid-area:title !important;
+  direction:rtl !important;
+
+  min-height:70px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  text-align:center !important;
+}
+
+/* إنهاء يسار */
+.presenterCleanEndBtn{
+  grid-area:end !important;
+  direction:rtl !important;
+}
+
+.presenterCleanHeaderBtn{
+  width:100% !important;
+  min-height:64px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  border-radius:22px !important;
+  font-size:1.05rem !important;
+}
+
+/* =========================
+   Panel ترتيب الصفحة
+========================= */
+
+.presenterPanel{
+  width:min(100%, 1180px) !important;
+  margin:0 auto !important;
+
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:16px !important;
+  align-items:start !important;
+}
+
+/* أسماء الفرق صف واحد */
+.presenterPanel > .presenterTeams,
+.presenterTeams{
+  grid-column:1 / -1 !important;
+
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:14px !important;
+
+  width:100% !important;
+}
+
+.presenterTeams .presenterBtn{
+  min-height:64px !important;
+}
+
+/* الكروت المهمة عرض كامل */
+.presenterPanel > .presenterCard,
+.presenterPanel > .presenterMainPreviewCard,
+.presenterPanel > .presenterWarmupPreviewCard,
+.presenterPanel > .presenterTop10StatusCard,
+.presenterPanel > .presenterAuctionPreviewCard,
+.presenterPanel > .presenterWhoPreviewCard,
+.presenterPanel > .presenterFinalPreviewCard,
+.presenterPanel > .presenterArchiveSimpleCard,
+.presenterPanel > .presenterNumbersCard{
+  grid-column:1 / -1 !important;
+}
+
+/* =========================
+   Actions زرين في كل صف
+========================= */
+
+.presenterPanel > .presenterActions,
+.presenterPanel > .presenterMainActions,
+.presenterPanel > #presenterFinalControls{
+  grid-column:1 / -1 !important;
+}
+
+/* كل صف تحكم يكون زرين */
+.presenterActions,
+.presenterMainActions{
+  width:100% !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+  gap:12px !important;
+
+  align-items:stretch !important;
+}
+
+/* أزرار الفاصلة */
+#presenterFinalControls{
+  width:100% !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  gap:12px !important;
+}
+
+#presenterFinalControls .presenterActions{
+  display:grid !important;
+  grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+  gap:12px !important;
+}
+
+/* زر لحاله يمتد كامل */
+#presenterFinalControls > .presenterBtn{
+  width:100% !important;
+}
+
+/* مقاس موحد للأزرار */
+.presenterActions .presenterBtn,
+.presenterMainActions .presenterBtn,
+#presenterFinalControls .presenterBtn{
+  width:100% !important;
+  min-height:62px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  text-align:center !important;
+  line-height:1.25 !important;
+}
+
+/* إذا كان عدد الأزرار فردي، آخر زر يأخذ العرض كامل */
+.presenterActions .presenterBtn:last-child:nth-child(odd),
+.presenterMainActions .presenterBtn:last-child:nth-child(odd),
+#presenterFinalControls .presenterActions .presenterBtn:last-child:nth-child(odd){
+  grid-column:1 / -1 !important;
+}
+
+/* =========================
+   Final Layout الفاصلة
+========================= */
+
+.presenterFinalLayout{
+  width:100% !important;
+
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:16px !important;
+  align-items:start !important;
+}
+
+.presenterFinalTeamsArea,
+.presenterFinalPreviewCard,
+.presenterFinalNumbersCard,
+.presenterFinalControlsArea{
+  grid-column:1 / -1 !important;
+}
+
+.presenterFinalTeamsArea .presenterTeams{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:14px !important;
+}
+
+.presenterFinalControlsArea .presenterActions{
+  display:grid !important;
+  grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+  gap:12px !important;
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width:767px){
+  .presenterCleanHeader{
+    grid-template-columns:82px minmax(0, 1fr) 82px !important;
+    gap:8px !important;
+  }
+
+  .presenterCleanHeaderBtn{
+    min-height:52px !important;
+    border-radius:18px !important;
+    font-size:.88rem !important;
+  }
+
+  .presenterCleanHeaderTitle{
+    min-height:52px !important;
+    border-radius:18px !important;
+  }
+
+  .presenterCleanHeaderTitle h1{
+    font-size:1.35rem !important;
+  }
+
+  .presenterPanel,
+  .presenterFinalLayout{
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+  }
+
+  .presenterTeams,
+  .presenterPanel > .presenterTeams,
+  .presenterFinalTeamsArea .presenterTeams{
+    grid-template-columns:1fr 1fr !important;
+    gap:10px !important;
+  }
+
+  .presenterActions,
+  .presenterMainActions,
+  #presenterFinalControls .presenterActions,
+  .presenterFinalControlsArea .presenterActions{
+    grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+    gap:10px !important;
+  }
+
+  .presenterActions .presenterBtn,
+  .presenterMainActions .presenterBtn,
+  #presenterFinalControls .presenterBtn{
+    min-height:56px !important;
+    font-size:.92rem !important;
+  }
 }
