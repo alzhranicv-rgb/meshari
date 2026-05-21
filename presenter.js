@@ -414,10 +414,59 @@ function renderPresenterEnded() {
   }
 }
 /* =========================
+   Presenter Button Guard
+========================= */
+
+let presenterCommandLocks = {}
+
+function getPresenterActionLockTime(action) {
+  if (action === "correct") return 1400
+  if (action === "wrong") return 1400
+  if (action === "undo") return 1000
+  if (action === "openNumber") return 900
+  if (action === "showAnswer") return 900
+  if (action === "showQuestion") return 900
+  if (action === "nextRound") return 1200
+  if (action === "recordRound3Score") return 1400
+  if (action === "recordScrambleScore") return 1400
+  if (action === "recordSequenceScore") return 1400
+
+  return 650
+}
+
+function getPresenterCommandLockKey(action, payload = {}) {
+  if (action === "openNumber") {
+    return `${presenterSegment || "global"}_${action}_${payload.round || ""}_${payload.category || ""}_${payload.number || ""}`
+  }
+
+  return `${presenterSegment || "global"}_${action}`
+}
+
+function lockPresenterActionButton(action, payload = {}) {
+  const key = getPresenterCommandLockKey(action, payload)
+  const now = Date.now()
+  const lockTime = getPresenterActionLockTime(action)
+
+  if (presenterCommandLocks[key] && now - presenterCommandLocks[key] < lockTime) {
+    return false
+  }
+
+  presenterCommandLocks[key] = now
+
+  setTimeout(() => {
+    delete presenterCommandLocks[key]
+  }, lockTime + 80)
+
+  return true
+}
+/* =========================
    SEND COMMAND - FAST
 ========================= */
 
 async function sendCommand(action, payload = {}) {
+  if (!lockPresenterActionButton(action, payload)) {
+  return false
+}
   const sessionId = localStorage.getItem("presenter_session_id")
 
   if (!sessionId) {

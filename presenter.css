@@ -1894,3 +1894,17 @@ button{
     line-height:1.45 !important;
   }
 }
+/* =========================
+   Presenter Button Anti Double Click
+========================= */
+
+.presenterBtnClickLocked{
+  opacity:.62 !important;
+  pointer-events:none !important;
+  transform:scale(.97) !important;
+  filter:saturate(.85) brightness(.96) !important;
+}
+
+.presenterBtn:disabled{
+  pointer-events:none;
+}
