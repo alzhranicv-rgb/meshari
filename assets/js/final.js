@@ -2165,9 +2165,9 @@ function toggleFinalRound3ImageOverlay() {
 
   document.body.appendChild(overlay)
 }
-
 /* =========================
    Round 3 - Team Media
+   نسخة مرتبة + عرض فيديو مضبوط
 ========================= */
 
 async function loadFinalRound3TeamMediaItem(number) {
@@ -2206,7 +2206,7 @@ function renderFinalRound3TeamMedia() {
 
     grid += `
       <button
-        class="finalRound3Card ${opened ? "used" : ""}"
+        class="finalRound3Card finalTeamMediaNumberCard ${opened ? "used" : ""}"
         ${opened ? "disabled" : ""}
         onclick="openFinalRound3TeamMediaCard(${i})"
       >
@@ -2216,18 +2216,20 @@ function renderFinalRound3TeamMedia() {
   }
 
   stage.innerHTML = `
-    <div class="finalRound3Wrap finalRound3TeamMediaWrap">
+  <div class="finalRound3Wrap finalRound3TeamMediaWrap">
 
-      <div class="finalRound3Grid">${grid}</div>
-
-      <div class="finalRound3ImageStageWrap">
-        <div class="finalRound3ImageStage finalRound3TeamMediaStage" id="finalRound3TeamMediaStage">
-          ${buildFinalRound3TeamMediaContent()}
-        </div>
-      </div>
-
+    <div class="finalRound3Grid finalTeamMediaNumbersGrid">
+      ${grid}
     </div>
-  `
+
+    <div class="finalRound3ImageStageWrap finalTeamMediaStageWrap">
+      <div class="finalRound3ImageStage finalRound3TeamMediaStage" id="finalRound3TeamMediaStage">
+        ${buildFinalRound3TeamMediaContent()}
+      </div>
+    </div>
+
+  </div>
+`
 
   const hasCurrent = !!state.currentNumber
   const canShowQuestion = hasCurrent && !!state.currentQuestion
@@ -2236,7 +2238,7 @@ function renderFinalRound3TeamMedia() {
   controls.innerHTML = `
     <button
       onclick="showFinalRound3TeamMediaQuestion()"
-      class="archiveCtrlBtn btnAnswer"
+      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnAnswer"
       ${canShowQuestion ? "" : "disabled"}
     >
       إظهار السؤال
@@ -2244,29 +2246,40 @@ function renderFinalRound3TeamMedia() {
 
     <button
       onclick="playFinalRound3TeamMediaVideo()"
-      class="archiveCtrlBtn btnStart"
+      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnStart"
       ${isVideo ? "" : "disabled"}
     >
-      تشغيل
+      تشغيل الفيديو
     </button>
 
     <button
       onclick="restartFinalRound3TeamMediaVideo()"
-      class="archiveCtrlBtn btnStart"
+      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnStart"
       ${isVideo ? "" : "disabled"}
     >
       إعادة تشغيل
     </button>
 
-    <button onclick="finalRound3TeamMediaCorrect()" class="archiveCtrlBtn btnCorrect">
+    <button
+      onclick="finalRound3TeamMediaCorrect()"
+      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnCorrect"
+      ${hasCurrent ? "" : "disabled"}
+    >
       إجابة صحيحة
     </button>
 
-    <button onclick="finalRound3TeamMediaWrong()" class="archiveCtrlBtn btnWrong">
+    <button
+      onclick="finalRound3TeamMediaWrong()"
+      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnWrong"
+      ${hasCurrent ? "" : "disabled"}
+    >
       خطأ
     </button>
 
-    <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">
+    <button
+      onclick="undoFinalAction()"
+      class="archiveCtrlBtn finalTeamMediaCtrlBtn undoBtn finalUndoBtn"
+    >
       تراجع
     </button>
   `
@@ -2283,43 +2296,14 @@ function buildFinalRound3TeamMediaContent() {
   const state = finalState.round3.teamMedia
 
   if (!state.currentNumber) {
-    return `<div class="finalRoundPlaceholder">اختر الفريق ثم الرقم</div>`
-  }
-
-  let mediaHTML = ""
-
-  if (state.currentMediaType === "video" && state.currentMedia) {
-    mediaHTML = `
-      <div class="finalRound3ImageFrame finalRound3VideoFrame finalRound3VideoFrameSmall finalTeamMediaPremiumFrame">
-        <video
-          id="finalRound3TeamMediaInlineVideo"
-          src="${state.currentMedia}"
-          class="finalRound3Image finalRound3Video finalRound3VideoSmall"
-          playsinline
-          preload="metadata"
-          controlslist="nodownload noplaybackrate"
-          disablepictureinpicture
-          onclick="openFinalRound3TeamMediaOverlay('video')"
-        ></video>
-
-        <button
-          type="button"
-          class="finalTeamMediaPlayBadge"
-          onclick="event.stopPropagation(); playFinalRound3TeamMediaVideo()"
-        >
-          ▶
-        </button>
+    return `
+      <div class="finalTeamMediaEmptyState">
+        اختر الفريق ثم الرقم
       </div>
     `
-  } else if (state.currentMedia) {
-    mediaHTML = `
-      <div class="finalRound3ImageFrame finalTeamMediaPremiumFrame" onclick="openFinalRound3TeamMediaOverlay('image')">
-        <img src="${state.currentMedia}" class="finalRound3Image" alt="">
-      </div>
-    `
-  } else {
-    mediaHTML = `<div class="finalRoundPlaceholder">لا توجد صورة أو فيديو</div>`
   }
+
+  const isVideo = state.currentMediaType === "video" && state.currentMedia
 
   const resultClass =
     state.resultType === "correct"
@@ -2328,31 +2312,72 @@ function buildFinalRound3TeamMediaContent() {
       ? "wrongResult"
       : ""
 
+  const mediaHTML = state.currentMedia
+    ? isVideo
+      ? `
+        <div class="finalTeamMediaFrame finalTeamMediaVideoFrame" onclick="openFinalRound3TeamMediaOverlay('video')">
+          <video
+            id="finalRound3TeamMediaInlineVideo"
+            src="${state.currentMedia}"
+            class="finalTeamMediaVideo"
+            playsinline
+            preload="metadata"
+            controlslist="nodownload noplaybackrate"
+            disablepictureinpicture
+          ></video>
+
+          <button
+            type="button"
+            class="finalTeamMediaPlayBadge"
+            onclick="event.stopPropagation(); playFinalRound3TeamMediaVideo()"
+          >
+            ▶
+          </button>
+        </div>
+      `
+      : `
+        <div class="finalTeamMediaFrame finalTeamMediaImageFrame" onclick="openFinalRound3TeamMediaOverlay('image')">
+          <img src="${state.currentMedia}" class="finalTeamMediaImage" alt="">
+        </div>
+      `
+    : `
+      <div class="finalTeamMediaEmptyState">
+        لا توجد صورة أو فيديو
+      </div>
+    `
+
+  const questionHTML =
+    state.questionShown && state.currentQuestion
+      ? `
+        <div class="finalTeamMediaQuestionBox">
+          <div class="finalTeamMediaSmallLabel">السؤال</div>
+          <div class="finalTeamMediaQuestionText">
+            ${state.currentQuestion}
+          </div>
+        </div>
+      `
+      : ""
+
+  const answerHTML =
+    state.answerShown && state.currentAnswer
+      ? `
+        <div class="finalTeamMediaResultBox ${resultClass}">
+          <div class="finalTeamMediaSmallLabel">الإجابة</div>
+          <div class="finalRound3TeamMediaAnswer">
+            ${state.currentAnswer}
+          </div>
+        </div>
+      `
+      : ""
+
   return `
-    <div class="finalRound3TeamMediaContent finalTeamMediaPremiumContent">
+    <div class="finalRound3TeamMediaContent">
       ${mediaHTML}
 
-      ${
-        state.questionShown && state.currentQuestion
-          ? `
-            <div class="finalRound3QuestionBox finalTeamMediaQuestionBox">
-              <div class="finalTeamMediaSmallLabel">السؤال</div>
-              <div>${state.currentQuestion}</div>
-            </div>
-          `
-          : ""
-      }
-
-      ${
-        state.answerShown && state.currentAnswer
-          ? `
-            <div class="finalTeamMediaResultBox ${resultClass}">
-              <div class="finalTeamMediaSmallLabel">الإجابة</div>
-              <div class="finalRound3TeamMediaAnswer">${state.currentAnswer}</div>
-            </div>
-          `
-          : ""
-      }
+      <div class="finalTeamMediaTextRow">
+        ${questionHTML}
+        ${answerHTML}
+      </div>
     </div>
   `
 }
@@ -2557,9 +2582,15 @@ function openFinalRound3TeamMediaOverlay(type) {
     closeFinalRound3TeamMediaOverlay()
   }
 
+  overlay.classList.remove("hidden", "imageMode", "videoMode")
+  overlay.classList.add(type === "video" ? "videoMode" : "imageMode")
+
   if (type === "video") {
     overlay.innerHTML = `
-      <button class="finalRound3TeamMediaCloseBtn" onclick="event.stopPropagation(); closeFinalRound3TeamMediaOverlay()">
+      <button
+        class="finalRound3TeamMediaCloseBtn"
+        onclick="event.stopPropagation(); closeFinalRound3TeamMediaOverlay()"
+      >
         ×
       </button>
 
@@ -2577,17 +2608,18 @@ function openFinalRound3TeamMediaOverlay(type) {
     `
   } else {
     overlay.innerHTML = `
-      <button class="finalRound3TeamMediaCloseBtn" onclick="event.stopPropagation(); closeFinalRound3TeamMediaOverlay()">
+      <button
+        class="finalRound3TeamMediaCloseBtn"
+        onclick="event.stopPropagation(); closeFinalRound3TeamMediaOverlay()"
+      >
         ×
       </button>
 
       <div class="finalRound3TeamMediaOverlayInner" onclick="event.stopPropagation()">
-        <img src="${state.currentMedia}" alt="">
+        <img src="${state.currentMedia}" class="finalRound3TeamMediaOverlayImage" alt="">
       </div>
     `
   }
-
-  overlay.classList.remove("hidden")
 }
 
 function closeFinalRound3TeamMediaOverlay() {
@@ -2598,6 +2630,8 @@ function closeFinalRound3TeamMediaOverlay() {
   if (overlayVideo) {
     overlayVideo.pause()
     overlayVideo.currentTime = 0
+    overlayVideo.src = ""
+    overlayVideo.load()
   }
 
   const inlineVideo = document.getElementById("finalRound3TeamMediaInlineVideo")
@@ -2606,6 +2640,7 @@ function closeFinalRound3TeamMediaOverlay() {
   }
 
   overlay.classList.add("hidden")
+  overlay.classList.remove("imageMode", "videoMode")
   overlay.innerHTML = ""
 }
 
@@ -2639,6 +2674,8 @@ function playFinalRound3TeamMediaVideo() {
 
     video.controls = false
     video.currentTime = 0
+    video.muted = false
+    video.volume = 1
 
     video.onended = function () {
       closeFinalRound3TeamMediaOverlay()
@@ -2655,7 +2692,7 @@ function playFinalRound3TeamMediaVideo() {
     }
 
     saveFinalState()
-  }, 80)
+  }, 120)
 }
 
 function restartFinalRound3TeamMediaVideo() {
@@ -2675,6 +2712,8 @@ function restartFinalRound3TeamMediaVideo() {
     video.pause()
     video.currentTime = 0
     video.controls = false
+    video.muted = false
+    video.volume = 1
 
     state.videoPlayed = true
 
@@ -2693,5 +2732,5 @@ function restartFinalRound3TeamMediaVideo() {
     }
 
     saveFinalState()
-  }, 80)
+  }, 120)
 }

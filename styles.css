@@ -730,7 +730,7 @@ h3,
 }
 
 /* =========================================================
-   SEGMENTS GRID
+   SEGMENTS GRID - GLASS CARD DESIGN
 ========================================================= */
 
 .homeSegmentsShowcase{
@@ -758,25 +758,31 @@ h3,
   overflow:hidden;
   cursor:pointer;
 
-  border:1px solid rgba(255,255,255,.42);
   border-radius:34px 20px 34px 20px;
+  border:1px solid rgba(255,255,255,.14);
 
   background:
-    radial-gradient(circle at 16% 0%, rgba(255,255,255,.34), transparent 40%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.055),
+      rgba(255,255,255,.018)
+    );
 
   box-shadow:
-    0 20px 40px rgba(30,27,75,.10),
-    inset 0 1px 0 rgba(255,255,255,.74),
-    inset 0 -1px 0 rgba(255,255,255,.12);
+    0 20px 42px rgba(31,41,55,.14),
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 -1px 0 rgba(255,255,255,.05);
 
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
+  backdrop-filter:blur(28px) saturate(1.18);
+  -webkit-backdrop-filter:blur(28px) saturate(1.18);
+
+  transform:translateZ(0);
 
   transition:
-    transform .22s cubic-bezier(.16,1,.3,1),
-    filter .22s ease,
-    box-shadow .22s ease,
+    transform .24s cubic-bezier(.2,.9,.25,1),
+    box-shadow .24s ease,
+    border-color .24s ease,
+    filter .24s ease,
     opacity .22s ease;
 }
 
@@ -784,85 +790,92 @@ h3,
   border-radius:20px 34px 20px 34px;
 }
 
+/* إطار داخلي للبطاقة */
 .homeSegmentItem::before{
   content:"";
   position:absolute;
-  width:150px;
-  height:150px;
-  top:-62px;
-  right:-38px;
-  border-radius:50%;
-  background:rgba(255,255,255,.14);
+  inset:9px;
+  z-index:1;
+
+  border-radius:26px 15px 26px 15px;
+  border:1px solid rgba(255,255,255,.10);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.035),
+      rgba(255,255,255,.010)
+    );
+
   pointer-events:none;
 }
 
+.homeSegmentItem:nth-child(even)::before{
+  border-radius:15px 26px 15px 26px;
+}
+
+/* خط انعكاس علوي */
 .homeSegmentItem::after{
   content:"";
   position:absolute;
-  width:86px;
-  height:86px;
-  bottom:-32px;
-  left:-16px;
-  border-radius:24px;
-  transform:rotate(24deg);
-  background:rgba(255,255,255,.09);
+  top:12px;
+  right:18%;
+  left:18%;
+  height:1px;
+  z-index:2;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.42),
+      transparent
+    );
+
+  opacity:.85;
   pointer-events:none;
 }
 
+/* ألوان خفيفة لكل فقرة بدون تبييض */
 #segmentWarmup{
   background:
-    radial-gradient(circle at 16% 0%, rgba(249,115,22,.17), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+    radial-gradient(circle at 18% 0%, rgba(249,115,22,.14), transparent 44%),
+    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
 }
 
 #segmentTop10{
   background:
-    radial-gradient(circle at 86% 0%, rgba(124,58,237,.16), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+    radial-gradient(circle at 84% 0%, rgba(124,58,237,.13), transparent 44%),
+    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
 }
 
 #segmentAuction{
   background:
-    radial-gradient(circle at 16% 0%, rgba(34,197,94,.15), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+    radial-gradient(circle at 18% 0%, rgba(34,197,94,.12), transparent 44%),
+    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
 }
 
 #segmentWho{
   background:
-    radial-gradient(circle at 86% 0%, rgba(6,182,212,.17), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+    radial-gradient(circle at 84% 0%, rgba(6,182,212,.14), transparent 44%),
+    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
 }
 
 #segmentFinal{
   background:
-    radial-gradient(circle at 16% 0%, rgba(251,113,133,.14), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+    radial-gradient(circle at 18% 0%, rgba(251,113,133,.12), transparent 44%),
+    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
 }
 
 #segmentArchive{
   background:
-    radial-gradient(circle at 86% 0%, rgba(100,116,139,.14), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
-}
-
-.homeSegmentItem:hover{
-  transform:translateY(-6px) scale(1.018);
-  filter:brightness(1.045);
-
-  box-shadow:
-    0 28px 56px rgba(30,27,75,.15),
-    0 0 0 5px rgba(255,255,255,.12),
-    inset 0 1px 0 rgba(255,255,255,.82),
-    inset 0 -1px 0 rgba(255,255,255,.14);
-}
-
-.homeSegmentItem:active{
-  transform:scale(.97);
+    radial-gradient(circle at 84% 0%, rgba(100,116,139,.13), transparent 44%),
+    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
 }
 
 .homeSegmentContent{
   position:relative;
-  z-index:2;
+  z-index:3;
   width:100%;
   min-height:96px;
 
@@ -875,9 +888,29 @@ h3,
   text-align:center;
 }
 
+/* صندوق الاسم داخل البطاقة */
 .homeSegmentItem span{
   position:relative;
-  z-index:2;
+  z-index:3;
+
+  width:calc(100% - 28px);
+  min-height:76px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px 16px;
+  border-radius:22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.055),
+      rgba(255,255,255,.018)
+    );
+
+  border:1px solid rgba(255,255,255,.09);
 
   color:#24185E;
 
@@ -885,14 +918,55 @@ h3,
   line-height:1;
   font-weight:400;
 
+  text-align:center;
+  letter-spacing:-.3px;
+
   text-shadow:
-    0 1px 0 rgba(255,255,255,.68),
-    0 10px 22px rgba(30,27,75,.10);
+    0 1px 0 rgba(255,255,255,.45),
+    0 8px 18px rgba(31,41,55,.12);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.16),
+    0 10px 24px rgba(31,41,55,.08);
+}
+
+/* نقطة زخرفية داخل كرت الاسم */
+.homeSegmentItem span::before{
+  content:"";
+  position:absolute;
+  top:12px;
+  right:14px;
+
+  width:8px;
+  height:8px;
+  border-radius:50%;
+
+  background:rgba(255,155,81,.55);
+  box-shadow:0 0 14px rgba(255,155,81,.35);
+}
+
+/* خط زخرفي سفلي */
+.homeSegmentItem span::after{
+  content:"";
+  position:absolute;
+  bottom:10px;
+  left:14px;
+
+  width:34px;
+  height:4px;
+  border-radius:999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,155,81,.55),
+      rgba(255,255,255,.12)
+    );
 }
 
 .homeSegmentWinner{
   position:relative;
-  z-index:2;
+  z-index:4;
 
   max-width:92%;
   min-height:34px;
@@ -903,10 +977,8 @@ h3,
   align-items:center;
   justify-content:center;
 
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.42));
-
-  border:1px solid rgba(255,255,255,.46);
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
 
   color:#0F4C5C;
 
@@ -919,12 +991,220 @@ h3,
   text-overflow:ellipsis;
 
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.88),
-    0 8px 18px rgba(30,27,75,.07);
+    inset 0 1px 0 rgba(255,255,255,.16),
+    0 8px 18px rgba(30,27,75,.06);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
 }
 
 .homeSegmentWinner:empty{
   display:none;
+}
+
+/* Hover */
+.homeSegmentItem:hover{
+  transform:translateY(-7px) scale(1.012);
+
+  border-color:rgba(255,255,255,.22);
+
+  box-shadow:
+    0 28px 56px rgba(31,41,55,.18),
+    0 0 0 1px rgba(255,255,255,.08),
+    inset 0 1px 0 rgba(255,255,255,.28);
+
+  filter:brightness(1.04) saturate(1.03);
+}
+
+.homeSegmentItem:active{
+  transform:scale(.97);
+}
+
+/* =========================================================
+   LOCKED SEGMENT CARD
+========================================================= */
+
+.homeSegmentItem.segmentLocked,
+.homeSegmentItem.segmentDone,
+.homeSegmentItem.hasWinner{
+  pointer-events:none;
+  cursor:not-allowed;
+
+  opacity:.78;
+  filter:grayscale(.10) brightness(.95);
+  transform:none;
+}
+
+.homeSegmentItem.segmentLocked::after,
+.homeSegmentItem.segmentDone::after,
+.homeSegmentItem.hasWinner::after{
+  content:"منتهية";
+
+  position:absolute;
+  top:0;
+  left:0;
+  right:auto;
+  bottom:auto;
+
+  width:96px;
+  height:32px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:0 0 16px 0;
+
+  background:rgba(115,32,45,.88);
+  color:#FFF4F4;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:.74rem;
+
+  box-shadow:none;
+  transform:none;
+
+  z-index:5;
+}
+
+.homeSegmentItem.segmentLocked > *,
+.homeSegmentItem.segmentDone > *,
+.homeSegmentItem.hasWinner > *{
+  position:relative;
+  z-index:4;
+}
+
+.homeSegmentItem.segmentLocked .homeSegmentContent,
+.homeSegmentItem.segmentDone .homeSegmentContent,
+.homeSegmentItem.hasWinner .homeSegmentContent{
+  padding-top:10px;
+  gap:12px;
+}
+
+.homeSegmentItem.segmentLocked span,
+.homeSegmentItem.segmentDone span,
+.homeSegmentItem.hasWinner span{
+  color:rgba(36,24,94,.72);
+}
+
+.homeSegmentItem.segmentLocked .homeSegmentWinner,
+.homeSegmentItem.segmentDone .homeSegmentWinner,
+.homeSegmentItem.hasWinner .homeSegmentWinner{
+  display:flex;
+
+  min-height:40px;
+  max-width:92%;
+  padding:8px 22px;
+  border-radius:18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.060),
+      rgba(255,255,255,.020)
+    );
+
+  border:1px solid rgba(255,255,255,.12);
+
+  color:#24185E;
+
+  font-size:1.1rem;
+  line-height:1.1;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  box-shadow:
+    0 12px 24px rgba(30,27,75,.08),
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -1px 0 rgba(255,255,255,.06);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.homeSegmentItem.segmentLocked .homeSegmentWinner::before,
+.homeSegmentItem.segmentDone .homeSegmentWinner::before,
+.homeSegmentItem.hasWinner .homeSegmentWinner::before,
+.homeSegmentItem.segmentLocked .homeSegmentContent::before,
+.homeSegmentItem.segmentDone .homeSegmentContent::before,
+.homeSegmentItem.hasWinner .homeSegmentContent::before{
+  display:none;
+  content:none;
+}
+
+.homeSegmentItem.segmentLocked:hover,
+.homeSegmentItem.segmentDone:hover,
+.homeSegmentItem.hasWinner:hover{
+  transform:none;
+  filter:grayscale(.10) brightness(.95);
+  opacity:.78;
+}
+
+/* =========================================================
+   RESPONSIVE - SEGMENT CARDS
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px){
+  .homeSegmentsShowcase{
+    gap:12px;
+  }
+
+  .homeSegmentItem{
+    min-height:116px;
+    padding:14px;
+  }
+
+  .homeSegmentItem span{
+    min-height:62px;
+    font-size:1.45rem;
+  }
+}
+
+@media (max-width:767px){
+  .homeSegmentsShowcase{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .homeSegmentItem,
+  .homeSegmentItem:nth-child(even){
+    min-height:96px;
+    padding:12px;
+    border-radius:22px;
+  }
+
+  .homeSegmentItem::before,
+  .homeSegmentItem:nth-child(even)::before{
+    inset:8px;
+    border-radius:17px;
+  }
+
+  .homeSegmentItem span{
+    min-height:58px;
+    width:calc(100% - 20px);
+    border-radius:17px;
+
+    font-size:1.38rem;
+  }
+
+  .homeSegmentItem.segmentLocked::after,
+  .homeSegmentItem.segmentDone::after,
+  .homeSegmentItem.hasWinner::after{
+    width:88px;
+    height:30px;
+    border-radius:0 0 15px 0;
+    font-size:.68rem;
+  }
+
+  .homeSegmentItem.segmentLocked .homeSegmentWinner,
+  .homeSegmentItem.segmentDone .homeSegmentWinner,
+  .homeSegmentItem.hasWinner .homeSegmentWinner{
+    min-height:36px;
+    padding:7px 16px;
+    font-size:.95rem;
+  }
 }
 
 /* =========================================================
@@ -2495,5 +2775,1606 @@ body.presenterHideDisplayControls .segmentControlButtons button{
 
   body.presenterHideDisplayControls .archiveInputsInline{
     transform:translateY(-10px);
+  }
+}
+/* =========================================================
+   TRUE GLASS DESIGN
+   زجاج حقيقي بدون تبييض
+========================================================= */
+
+:root{
+  --glass-nav:rgba(255,255,255,.04);
+  --glass-score:rgba(255,255,255,.05);
+  --glass-segment:rgba(255,255,255,.03);
+
+  --glass-border:rgba(255,255,255,.10);
+  --glass-highlight:rgba(255,255,255,.18);
+
+  --glass-shadow:
+    0 18px 42px rgba(31,41,55,.12),
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+/* خلفية خفيفة عشان الزجاج يبان */
+body,
+.homeShowPage,
+.homePageShell,
+#homeScreen,
+#homePage,
+#segmentScreen{
+  background:
+    radial-gradient(circle at 16% 18%, rgba(111,231,255,.32), transparent 35%),
+    radial-gradient(circle at 82% 15%, rgba(255,155,81,.22), transparent 34%),
+    radial-gradient(circle at 18% 88%, rgba(77,91,255,.16), transparent 36%),
+    linear-gradient(135deg, #eaf1f4 0%, #dce8ec 48%, #f1eee8 100%);
+}
+
+/* =========================
+   NAV GLASS - 4%
+========================= */
+
+.homeHero,
+.segmentControls,
+.homeTitleBox,
+.topBoard,
+.titleBox{
+  background:var(--glass-nav);
+  border:1px solid var(--glass-border);
+
+  box-shadow:var(--glass-shadow);
+
+  backdrop-filter:blur(28px) saturate(1.18);
+  -webkit-backdrop-filter:blur(28px) saturate(1.18);
+}
+
+/* =========================
+   SCORE CARD GLASS - 5%
+========================= */
+
+.homeTeamCard,
+.homeTeamText,
+.teamBox,
+.auctionTeamCard,
+.auctionMiddleCard,
+.whoTeamCard{
+  background:var(--glass-score);
+  border:1px solid var(--glass-border);
+
+  box-shadow:
+    0 18px 42px rgba(31,41,55,.12),
+    inset 0 1px 0 var(--glass-highlight);
+
+  backdrop-filter:blur(28px) saturate(1.18);
+  -webkit-backdrop-filter:blur(28px) saturate(1.18);
+}
+
+/* =========================
+   SEGMENT GLASS - 3%
+========================= */
+
+.homeSegmentItem,
+.homeSegmentItem span,
+.homeSegmentWinner,
+.segmentCard,
+.auctionQuestionBox,
+.auctionControlPanel,
+.auctionBtn,
+.auctionImageFrame,
+.auctionResultView,
+.warmupCard,
+.warmupQuestionBox,
+.warmupAnswerBox,
+.top10Card,
+.top10QuestionBox,
+.top10AnswerCard,
+.whoImageBox,
+.whoQuestionBox,
+.whoAnswerBox,
+.whoCard,
+.finalMainCard,
+.finalRound1Card,
+.finalRound2Card,
+.finalRound3Card,
+.archiveModernBigCard,
+.archiveRequiredItem{
+  background:var(--glass-segment);
+  border:1px solid var(--glass-border);
+
+  box-shadow:
+    0 16px 38px rgba(31,41,55,.10),
+    inset 0 1px 0 var(--glass-highlight);
+
+  backdrop-filter:blur(28px) saturate(1.16);
+  -webkit-backdrop-filter:blur(28px) saturate(1.16);
+}
+
+/* =========================
+   INSET HIGHLIGHT
+   خط ضوء علوي داخل البطاقة
+========================= */
+
+.homeTeamCard,
+.homeTeamText,
+.homeSegmentItem,
+.homeSegmentItem span,
+.homeSegmentWinner,
+.segmentControls,
+.auctionQuestionBox,
+.warmupCard,
+.top10Card,
+.whoCard,
+.finalMainCard,
+.archiveModernBigCard{
+  position:relative;
+  overflow:hidden;
+}
+
+.homeTeamCard::before,
+.homeTeamText::before,
+.homeSegmentItem::before,
+.homeSegmentItem span::before,
+.homeSegmentWinner::before,
+.segmentControls::before,
+.auctionQuestionBox::before,
+.warmupCard::before,
+.top10Card::before,
+.whoCard::before,
+.finalMainCard::before,
+.archiveModernBigCard::before{
+  content:"";
+  position:absolute;
+  top:0;
+  right:12%;
+  left:12%;
+  height:1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.32),
+      transparent
+    );
+
+  pointer-events:none;
+}
+
+/* =========================
+   BUTTON GLASS
+========================= */
+
+button,
+.winnerBtn,
+.backBtn,
+.endBtn,
+.auctionDoubleBtn,
+.btnCorrect,
+.btnWrong,
+.undoBtn{
+  border:1px solid rgba(255,255,255,.10);
+
+  box-shadow:
+    0 12px 28px rgba(31,41,55,.10),
+    inset 0 1px 0 rgba(255,255,255,.16);
+
+  backdrop-filter:blur(28px) saturate(1.16);
+  -webkit-backdrop-filter:blur(28px) saturate(1.16);
+}
+
+/* الأزرار العادية شفافة */
+.winnerBtn,
+.backBtn,
+.endBtn,
+.auctionDoubleBtn,
+.undoBtn{
+  background:rgba(255,255,255,.04);
+}
+
+/* لا نخرب ألوان الصح والخطأ */
+.btnCorrect{
+  background:linear-gradient(135deg, rgba(55,190,105,.88), rgba(22,145,75,.88));
+}
+
+.btnWrong{
+  background:linear-gradient(135deg, rgba(255,60,90,.90), rgba(205,28,58,.88));
+}
+
+/* =========================
+   MOTION
+========================= */
+
+.homeSegmentItem,
+.homeTeamCard,
+button,
+.winnerBtn,
+.backBtn,
+.endBtn{
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .18s ease;
+}
+
+.homeSegmentItem:hover,
+.homeTeamCard:hover,
+button:hover,
+.winnerBtn:hover,
+.backBtn:hover,
+.endBtn:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.04);
+}
+
+/* =========================
+   TOAST GLASS
+========================= */
+
+.gameToast{
+  background:rgba(30,41,59,.72);
+  border:1px solid rgba(255,255,255,.10);
+
+  box-shadow:
+    0 18px 42px rgba(79, 5, 5, 0.22),
+    inset 0 1px 0 rgba(197, 6, 6, 0.18);
+
+  backdrop-filter:blur(28px) saturate(1.18);
+  -webkit-backdrop-filter:blur(28px) saturate(1.18);
+}
+/* =========================================================
+   HOME HEADER FINAL RESET
+   تثبيت الهيدر العلوي بدون لخبطة
+========================================================= */
+
+.homeHero{
+  width:min(100%,1220px);
+  margin:0 auto 28px;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 300px minmax(0,1fr);
+  gap:18px;
+  align-items:center;
+}
+
+/* العنوان في المنتصف */
+.homeTitleBox{
+  grid-column:2;
+  justify-self:center;
+
+  width:300px;
+  height:112px;
+  min-height:112px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  overflow:visible;
+}
+
+/* الفريق الأيسر */
+.homeTeamA{
+  grid-column:1;
+  justify-self:end;
+
+  width:100%;
+  max-width:440px;
+}
+
+/* الفريق الأيمن */
+.homeTeamB{
+  grid-column:3;
+  justify-self:start;
+
+  width:100%;
+  max-width:440px;
+}
+
+/* كرت الفريق */
+.homeTeamCard{
+  min-height:86px;
+  padding:10px 12px;
+  gap:12px;
+}
+
+/* مربع اسم الفريق */
+.homeTeamText{
+  min-height:54px;
+  padding:10px 14px;
+  border-radius:18px;
+}
+
+/* اسم الفريق */
+.homeTeamName{
+  font-size:clamp(1.35rem,2vw,2.1rem);
+  line-height:1.15;
+}
+
+/* مربع النتيجة */
+.homeTeamScore{
+  width:62px;
+  height:50px;
+  border-radius:18px;
+  font-size:2rem;
+}
+
+/* عنوان الحنكة */
+.homeTitleBox h1{
+  font-size:clamp(3.45rem,4.6vw,5.2rem);
+  line-height:.86;
+}
+
+/* اسم النموذج */
+.homeModelName,
+#modelNameDisplay{
+  max-width:280px;
+  margin-top:8px;
+  font-size:1.55rem;
+  line-height:1.15;
+}
+
+/* منع أي عنصر من التمدد فوق الثاني */
+.homeTeamCard,
+.homeTitleBox,
+.homeTitleBox h1,
+#modelNameDisplay{
+  min-width:0;
+}
+
+/* =========================================================
+   IPAD / SMALL LAPTOP
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px){
+  .homeHero{
+    width:calc(100% - 28px);
+    grid-template-columns:minmax(0,1fr) 230px minmax(0,1fr);
+    gap:12px;
+    margin-bottom:20px;
+  }
+
+  .homeTeamA,
+  .homeTeamB{
+    max-width:360px;
+  }
+
+  .homeTeamCard{
+    min-height:74px;
+    padding:8px;
+    gap:8px;
+  }
+
+  .homeTeamText{
+    min-height:46px;
+    padding:8px 10px;
+    border-radius:15px;
+  }
+
+  .homeTeamName{
+    font-size:1.3rem;
+  }
+
+  .homeTeamScore{
+    width:52px;
+    height:42px;
+    border-radius:14px;
+    font-size:1.45rem;
+  }
+
+  .homeTitleBox{
+    width:230px;
+    height:84px;
+    min-height:84px;
+  }
+
+  .homeTitleBox h1{
+    font-size:3rem;
+  }
+
+  .homeTitleBox h1::before{
+    display:none;
+  }
+
+  #modelNameDisplay{
+    max-width:220px;
+    font-size:1.2rem;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width:767px){
+  .homeHero{
+    width:100%;
+    grid-template-columns:1fr;
+    gap:10px;
+    margin-bottom:16px;
+  }
+
+  .homeTitleBox{
+    grid-column:auto;
+    order:-1;
+
+    width:100%;
+    height:88px;
+    min-height:88px;
+  }
+
+  .homeTeamA,
+  .homeTeamB{
+    grid-column:auto;
+    justify-self:stretch;
+
+    width:100%;
+    max-width:none;
+  }
+
+  .homeTeamCard{
+    min-height:72px;
+  }
+
+  .homeTeamText{
+    min-height:48px;
+  }
+
+  .homeTeamName{
+    font-size:1.2rem;
+  }
+
+  .homeTeamScore{
+    width:52px;
+    height:42px;
+    font-size:1.42rem;
+  }
+
+  .homeTitleBox h1{
+    font-size:3.15rem;
+  }
+
+  .homeTitleBox h1::before{
+    display:none;
+  }
+
+  #modelNameDisplay{
+    font-size:1.2rem;
+  }
+}
+/* =========================================================
+   REMOVE EXTRA BACKGROUND LAYERS
+   إزالة الطبقات الخلفية المخربة
+========================================================= */
+
+.homeShowPage::before,
+.homeShowPage::after,
+.homePageShell::before,
+.homePageShell::after,
+#homePage::before,
+#homePage::after,
+#homeScreen::before,
+#homeScreen::after,
+#segmentScreen::before,
+#segmentScreen::after{
+  display:none;
+  content:none;
+}
+
+/* إزالة توهج العنوان الخلفي إذا كان عامل طبقة */
+.homeTitleGlow{
+  display:none;
+}
+
+/* تثبيت الخلفية بدون طبقات إضافية */
+.homeShowPage,
+.homePageShell,
+#homePage{
+  background:
+    radial-gradient(circle at 16% 18%, rgba(111,231,255,.24), transparent 35%),
+    radial-gradient(circle at 82% 15%, rgba(255,155,81,.18), transparent 34%),
+    linear-gradient(135deg, #eaf1f4 0%, #dce8ec 48%, #f1eee8 100%);
+}
+
+/* لا تخلي أي كرت العنوان يأخذ خلفية من titleBox */
+.homeTitleBox{
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+/* =========================================================
+   REMOVE HEADER BACK LAYER
+   إزالة الطبقة الكبيرة خلف الهيدر
+========================================================= */
+
+.homeHero{
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  overflow: visible;
+}
+
+.homeHero::before,
+.homeHero::after{
+  display: none;
+  content: none;
+}
+
+/* العنوان بدون طبقة خلفية */
+.homeTitleBox,
+.homeTitleBox::before,
+.homeTitleBox::after{
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.homeTitleBox::before,
+.homeTitleBox::after{
+  display: none;
+  content: none;
+}
+
+/* خفف أي طبقة زايدة حول كرت الفريق */
+.homeTeamCard{
+  overflow: hidden;
+}
+
+.homeTeamCard::after{
+  display: none;
+  content: none;
+}
+/* =========================================================
+   GLASS SHINE EFFECT
+   لمعة زجاج على الكروت فقط
+========================================================= */
+
+/* تجهيز الكروت */
+.homeTeamCard,
+.homeTeamText,
+.homeTeamScore,
+.homeSegmentItem,
+.homeSegmentItem span{
+  position: relative;
+  overflow: hidden;
+}
+
+/* اللمعة المتحركة */
+.homeTeamCard::before,
+.homeTeamText::before,
+.homeTeamScore::before,
+.homeSegmentItem::before,
+.homeSegmentItem span::before{
+  content: "";
+  position: absolute;
+  inset: -60%;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 35%,
+      rgba(255,255,255,.28) 48%,
+      transparent 62%
+    );
+
+  transform: translateX(70%) rotate(8deg);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* تشغيل اللمعة عند مرور الماوس */
+.homeTeamCard:hover::before,
+.homeTeamText:hover::before,
+.homeTeamScore:hover::before,
+.homeSegmentItem:hover::before,
+.homeSegmentItem:hover span::before{
+  animation: glassShineMove .85s ease forwards;
+}
+
+@keyframes glassShineMove{
+  0%{
+    opacity: 0;
+    transform: translateX(70%) rotate(8deg);
+  }
+
+  18%{
+    opacity: .85;
+  }
+
+  100%{
+    opacity: 0;
+    transform: translateX(-70%) rotate(8deg);
+  }
+}
+
+/* خط انعكاس ثابت خفيف أعلى الكرت */
+.homeTeamCard::after,
+.homeSegmentItem::after{
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 12%;
+  left: 12%;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.38),
+      transparent
+    );
+
+  opacity: .75;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* رفع النص فوق اللمعة */
+.homeTeamCard > *,
+.homeTeamText > *,
+.homeTeamScore,
+.homeSegmentContent,
+.homeSegmentItem span{
+  position: relative;
+  z-index: 5;
+}
+/* =========================================================
+   AUTO GLASS SHINE
+   لمعة زجاج تلقائية للكروت بدون الاعتماد على hover
+========================================================= */
+
+.homeTeamCard,
+.homeSegmentItem{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+}
+
+/* نخلي محتوى الكرت فوق اللمعة */
+.homeTeamCard > *,
+.homeSegmentItem > *{
+  position:relative;
+  z-index:3;
+}
+
+/* لمعة كرت الفريق */
+.homeTeamCard .homeTeamText::after,
+.homeTeamCard .homeTeamScore::after{
+  content:"";
+  position:absolute;
+  inset:-80%;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 38%,
+      rgba(255,255,255,.55) 48%,
+      rgba(255,255,255,.18) 52%,
+      transparent 64%
+    );
+
+  transform:translateX(85%) rotate(8deg);
+  opacity:0;
+  pointer-events:none;
+  z-index:4;
+
+  animation:glassShineAuto 3.8s ease-in-out infinite;
+}
+
+/* لمعة كرت الفقرة */
+.homeSegmentContent::after{
+  content:"";
+  position:absolute;
+  inset:-90%;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 38%,
+      rgba(255,255,255,.52) 48%,
+      rgba(255,255,255,.16) 52%,
+      transparent 64%
+    );
+
+  transform:translateX(85%) rotate(8deg);
+  opacity:0;
+  pointer-events:none;
+  z-index:4;
+
+  animation:glassShineAuto 4.2s ease-in-out infinite;
+}
+
+/* لمعة داخل مربع الاسم */
+.homeSegmentItem span{
+  position:relative;
+  overflow:hidden;
+}
+
+.homeSegmentItem span::after{
+  content:"";
+  position:absolute;
+  inset:-90%;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 38%,
+      rgba(255,255,255,.45) 48%,
+      rgba(255,255,255,.14) 52%,
+      transparent 64%
+    );
+
+  transform:translateX(85%) rotate(8deg);
+  opacity:0;
+  pointer-events:none;
+  z-index:2;
+
+  animation:glassShineAuto 4.6s ease-in-out infinite;
+}
+
+/* فرق وقت اللمعة بين الكروت */
+.homeSegmentItem:nth-child(1) .homeSegmentContent::after,
+.homeSegmentItem:nth-child(1) span::after{
+  animation-delay:.1s;
+}
+
+.homeSegmentItem:nth-child(2) .homeSegmentContent::after,
+.homeSegmentItem:nth-child(2) span::after{
+  animation-delay:.45s;
+}
+
+.homeSegmentItem:nth-child(3) .homeSegmentContent::after,
+.homeSegmentItem:nth-child(3) span::after{
+  animation-delay:.8s;
+}
+
+.homeSegmentItem:nth-child(4) .homeSegmentContent::after,
+.homeSegmentItem:nth-child(4) span::after{
+  animation-delay:1.15s;
+}
+
+.homeSegmentItem:nth-child(5) .homeSegmentContent::after,
+.homeSegmentItem:nth-child(5) span::after{
+  animation-delay:1.5s;
+}
+
+.homeSegmentItem:nth-child(6) .homeSegmentContent::after,
+.homeSegmentItem:nth-child(6) span::after{
+  animation-delay:1.85s;
+}
+
+/* تشغيل اللمعة */
+@keyframes glassShineAuto{
+  0%{
+    opacity:0;
+    transform:translateX(85%) rotate(8deg);
+  }
+
+  18%{
+    opacity:0;
+  }
+
+  32%{
+    opacity:.95;
+  }
+
+  52%{
+    opacity:0;
+    transform:translateX(-85%) rotate(8deg);
+  }
+
+  100%{
+    opacity:0;
+    transform:translateX(-85%) rotate(8deg);
+  }
+}
+
+/* لمعة عند الضغط أيضاً */
+.homeSegmentItem:active .homeSegmentContent::after,
+.homeSegmentItem:active span::after,
+.homeTeamCard:active .homeTeamText::after,
+.homeTeamCard:active .homeTeamScore::after{
+  animation:glassShineTap .55s ease forwards;
+}
+
+@keyframes glassShineTap{
+  0%{
+    opacity:0;
+    transform:translateX(85%) rotate(8deg);
+  }
+
+  35%{
+    opacity:1;
+  }
+
+  100%{
+    opacity:0;
+    transform:translateX(-85%) rotate(8deg);
+  }
+}
+/* =========================================================
+   SEGMENT HEADER BUTTONS + OLD TOAST COLORS
+   ألوان زر الرجوع/الإنهاء + الإشعارات القديمة
+========================================================= */
+
+/* هيدر الفقرات */
+.segmentControls{
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255,255,255,.18), transparent 38%),
+    rgba(255,255,255,.04);
+
+  border:1px solid rgba(255,255,255,.10);
+
+  box-shadow:
+    0 16px 34px rgba(30,27,75,.09),
+    inset 0 1px 0 rgba(255,255,255,.16);
+
+  backdrop-filter:blur(28px) saturate(1.16);
+  -webkit-backdrop-filter:blur(28px) saturate(1.16);
+}
+
+/* زر الرجوع */
+.segmentControls .backBtn,
+.backBtn{
+  background:linear-gradient(180deg,#64748B,#334155);
+  color:#FFFFFF;
+
+  border:0;
+
+  box-shadow:
+    0 10px 20px rgba(30,27,75,.16),
+    inset 0 1px 0 rgba(255,255,255,.20);
+
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+
+/* زر الإنهاء */
+.segmentControls .endBtn,
+.endBtn{
+  background:linear-gradient(180deg,#FB7185,#E11D48);
+  color:#FFFFFF;
+
+  border:0;
+
+  box-shadow:
+    0 10px 20px rgba(225,29,72,.18),
+    inset 0 1px 0 rgba(255,255,255,.22);
+
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+
+/* زر الإنهاء وهو مقفل */
+.segmentControls .endBtn:disabled,
+.endBtn:disabled,
+.disabledEndBtn{
+  opacity:.55;
+  cursor:not-allowed;
+  filter:saturate(.8);
+}
+
+/* هوفر بسيط */
+.segmentControls .backBtn:hover,
+.segmentControls .endBtn:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+/* =========================================================
+   OLD TOAST STYLE
+   لون الإشعارات القديم
+========================================================= */
+
+.gameToast{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.20), transparent 42%),
+    radial-gradient(circle at 88% 100%, rgba(244,63,94,.18), transparent 44%),
+    linear-gradient(180deg, rgba(88,28,45,.88), rgba(76,5,25,.95));
+
+  border:1px solid rgba(255,255,255,.20);
+
+  color:#FFFFFF;
+
+  box-shadow:
+    0 18px 42px rgba(76,5,25,.34),
+    0 0 0 5px rgba(136,19,55,.10),
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 -1px 0 rgba(0,0,0,.18);
+
+  backdrop-filter:blur(22px) saturate(1.1);
+  -webkit-backdrop-filter:blur(22px) saturate(1.1);
+}
+
+.gameToastIcon{
+  background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.16);
+  color:#fff;
+}
+
+.gameToastText{
+  color:#fff;
+}
+/* =========================================================
+   WINNER BUTTON + WINNER OVERLAY - DISPLAY STYLE
+   زر الفائز + إعلان الفائز بنفس تصميم العرض
+========================================================= */
+
+/* منطقة زر الفائز */
+.homeWinnerArea{
+  width:min(100%,1180px);
+  margin:22px auto 0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
+  position:relative;
+  z-index:5;
+}
+
+/* زر الفائز */
+.homeWinnerBtn,
+.winnerBtn{
+  position:relative;
+  overflow:hidden;
+
+  min-width:230px;
+  min-height:60px;
+  padding:0 34px;
+
+  border:1px solid rgba(255,255,255,.34);
+  border-radius:24px;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.26), transparent 42%),
+    linear-gradient(180deg, rgba(15, 38, 47, 0.95), rgba(36, 99, 122, 0.9));
+
+  color:#FFFFFF;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.35rem;
+  line-height:1;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 18px 34px rgba(42, 100, 133, 0.26),
+    0 0 0 5px rgba(38, 97, 131, 0.08),
+    inset 0 1px 0 rgba(47, 76, 113, 0.34),
+    inset 0 -1px 0 rgba(67, 106, 133, 0.1);
+
+  backdrop-filter:blur(20px) saturate(1.12);
+  -webkit-backdrop-filter:blur(20px) saturate(1.12);
+
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .18s ease;
+}
+
+/* دائرة زجاجية داخل الزر */
+.homeWinnerBtn::before,
+.winnerBtn::before{
+  content:"";
+  position:absolute;
+  width:78px;
+  height:78px;
+  top:-36px;
+  right:-22px;
+  border-radius:50%;
+
+  background:rgba(255,255,255,.16);
+  pointer-events:none;
+}
+
+/* لمعة زر الفائز */
+.homeWinnerBtn::after,
+.winnerBtn::after{
+  content:"";
+  position:absolute;
+  inset:-50%;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 38%,
+      rgba(255,255,255,.38),
+      transparent 62%
+    );
+
+  transform:translateX(120%) rotate(8deg);
+  animation:winnerButtonShineDisplay 3s ease-in-out infinite;
+  pointer-events:none;
+}
+
+.homeWinnerBtn:hover,
+.winnerBtn:hover{
+  transform:translateY(-3px) scale(1.025);
+  filter:brightness(1.06);
+
+  box-shadow:
+    0 24px 44px rgba(38, 87, 133, 0.32),
+    0 0 0 6px rgba(48, 81, 107, 0.1),
+    inset 0 1px 0 rgba(55, 105, 141, 0.4),
+    inset 0 -1px 0 rgba(11, 52, 79, 0.1);
+}
+
+.homeWinnerBtn:active,
+.winnerBtn:active{
+  transform:scale(.96);
+}
+
+@keyframes winnerButtonShineDisplay{
+  0%,45%{
+    transform:translateX(120%) rotate(8deg);
+  }
+
+  70%,100%{
+    transform:translateX(-120%) rotate(8deg);
+  }
+}
+
+/* =========================================================
+   WINNER OVERLAY
+========================================================= */
+
+#winnerOverlay{
+  position:fixed;
+  inset:0;
+  z-index:999997;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:22px;
+
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,155,81,.30), transparent 34%),
+    radial-gradient(circle at 18% 82%, rgba(103,232,249,.18), transparent 36%),
+    radial-gradient(circle at 84% 78%, rgba(251,113,133,.14), transparent 34%),
+    rgba(20,28,38,.54);
+
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+#winnerOverlay.hidden{
+  display:none;
+}
+
+/* كرت إعلان الفائز */
+#winnerOverlayCard{
+  width:min(100%,560px);
+  position:relative;
+  z-index:3;
+  overflow:hidden;
+
+  padding:34px 28px 24px;
+  border-radius:38px;
+
+  text-align:center;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,155,81,.24), transparent 42%),
+    radial-gradient(circle at 16% 100%, rgba(103,232,249,.14), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.64));
+
+  border:1px solid rgba(255,255,255,.58);
+
+  box-shadow:
+    0 34px 80px rgba(30,27,75,.25),
+    0 0 0 6px rgba(255,255,255,.10),
+    inset 0 1px 0 rgba(255,255,255,.94),
+    inset 0 -1px 0 rgba(255,255,255,.16);
+
+  backdrop-filter:blur(28px) saturate(1.1);
+  -webkit-backdrop-filter:blur(28px) saturate(1.1);
+
+  animation:winnerOverlayCardInDisplay .52s cubic-bezier(.16,1,.3,1) both;
+}
+
+/* فقاعات داخلية */
+#winnerOverlayCard::before{
+  content:"";
+  position:absolute;
+  width:230px;
+  height:230px;
+  top:-112px;
+  right:-74px;
+  border-radius:50%;
+
+  background:rgba(255,255,255,.20);
+  pointer-events:none;
+
+  animation:winnerBubbleMoveDisplay 3.2s ease-in-out infinite;
+}
+
+#winnerOverlayCard::after{
+  content:"";
+  position:absolute;
+  width:130px;
+  height:130px;
+  bottom:-50px;
+  left:-38px;
+  border-radius:32px;
+  transform:rotate(24deg);
+
+  background:rgba(103,232,249,.10);
+  pointer-events:none;
+
+  animation:winnerCornerMoveDisplay 3.8s ease-in-out infinite;
+}
+
+#winnerOverlayTitle,
+#winnerOverlayName,
+#winnerOverlayBurst,
+.winnerOverlayActions{
+  position:relative;
+  z-index:2;
+}
+
+/* عنوان الفائز */
+#winnerOverlayTitle{
+  width:max-content;
+  margin:0 auto 14px;
+
+  padding:8px 24px;
+  border-radius:999px;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.34), transparent 42%),
+    linear-gradient(180deg, rgba(255,155,81,.32), rgba(255,255,255,.48));
+
+  border:1px solid rgba(255,155,81,.26);
+
+  color:#7A4A22;
+  font-family:"HanakaText",sans-serif;
+  font-size:1rem;
+
+  box-shadow:
+    0 10px 20px rgba(255,155,81,.12),
+    inset 0 1px 0 rgba(255,255,255,.82);
+}
+
+/* اسم الفائز */
+#winnerOverlayName{
+  width:auto;
+  max-width:100%;
+
+  padding:0;
+  margin:0 auto;
+
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+
+  color:#24185E;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(3.1rem,5.8vw,5.2rem);
+  line-height:1;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.85),
+    0 14px 28px rgba(30,27,75,.18),
+    0 0 24px rgba(255,155,81,.28),
+    0 0 36px rgba(103,232,249,.18);
+
+  animation:winnerNamePopDisplay .68s cubic-bezier(.16,1,.3,1) both;
+}
+
+/* النجوم */
+#winnerOverlayBurst{
+  margin:18px 0 22px;
+
+  color:#FF9B51;
+  font-size:1.45rem;
+  letter-spacing:10px;
+
+  text-shadow:
+    0 0 16px rgba(255,155,81,.34),
+    0 8px 18px rgba(255,155,81,.12);
+
+  animation:winnerBurstGlowDisplay 1.1s ease-in-out infinite;
+}
+
+/* أزرار النافذة */
+.winnerOverlayActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+#winnerOverlayClose,
+#winnerOverlayEnd{
+  position:relative;
+  overflow:hidden;
+
+  height:54px;
+
+  border:0;
+  border-radius:18px;
+
+  color:#fff;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:1rem;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 12px 24px rgba(30,27,75,.13),
+    inset 0 1px 0 rgba(255,255,255,.22);
+
+  transition:
+    transform .18s ease,
+    filter .18s ease;
+}
+
+#winnerOverlayClose{
+  background:linear-gradient(180deg,#64748B,#334155);
+}
+
+#winnerOverlayEnd{
+  background:linear-gradient(180deg,#FB7185,#E11D48);
+}
+
+#winnerOverlayClose:hover,
+#winnerOverlayEnd:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes winnerOverlayCardInDisplay{
+  from{
+    opacity:0;
+    transform:translateY(26px) scale(.92);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@keyframes winnerNamePopDisplay{
+  0%{
+    opacity:0;
+    transform:translateY(18px) scale(.88);
+  }
+
+  70%{
+    opacity:1;
+    transform:translateY(-3px) scale(1.05);
+  }
+
+  100%{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@keyframes winnerBurstGlowDisplay{
+  0%,100%{
+    opacity:.72;
+    transform:scale(1);
+  }
+
+  50%{
+    opacity:1;
+    transform:scale(1.08);
+  }
+}
+
+@keyframes winnerBubbleMoveDisplay{
+  0%,100%{
+    transform:translate(0,0) scale(1);
+  }
+
+  50%{
+    transform:translate(-12px,10px) scale(1.06);
+  }
+}
+
+@keyframes winnerCornerMoveDisplay{
+  0%,100%{
+    transform:rotate(24deg) translate(0,0);
+  }
+
+  50%{
+    transform:rotate(18deg) translate(10px,-8px);
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width:767px){
+  .homeWinnerArea{
+    margin-top:16px;
+  }
+
+  .homeWinnerBtn,
+  .winnerBtn{
+    width:100%;
+    min-height:54px;
+    font-size:1.08rem;
+    border-radius:18px;
+  }
+
+  #winnerOverlay{
+    padding:14px;
+  }
+
+  #winnerOverlayCard{
+    border-radius:28px;
+    padding:28px 16px 18px;
+  }
+
+  #winnerOverlayName{
+    font-size:clamp(2.5rem,12vw,3.7rem);
+  }
+
+  #winnerOverlayBurst{
+    font-size:1.1rem;
+    letter-spacing:6px;
+  }
+
+  .winnerOverlayActions{
+    grid-template-columns:1fr;
+  }
+
+  #winnerOverlayClose,
+  #winnerOverlayEnd{
+    height:50px;
+  }
+}
+/* =========================================================
+   TEAM NAME PULSE + GLASS WINNER ACTIONS
+   نبض اسم الفريق + أزرار إغلاق/إنهاء زجاجية
+========================================================= */
+
+/* نبض اسم الفريق */
+.homeTeamName,
+.teamName{
+  animation: teamNameSoftPulse 2.6s ease-in-out infinite;
+  transform-origin:center;
+}
+
+@keyframes teamNameSoftPulse{
+  0%,100%{
+    transform:scale(1);
+    text-shadow:
+      0 1px 0 rgba(255,255,255,.55),
+      0 8px 18px rgba(31,41,55,.10);
+  }
+
+  50%{
+    transform:scale(0.990);
+    text-shadow:
+      0 1px 0 rgba(255,255,255,.70),
+      0 10px 22px rgba(31,41,55,.14),
+      0 0 16px rgba(255,155,81,.18);
+  }
+}
+
+/* الفريق المتصدر يكون نبضه أوضح */
+.leadingTeam .homeTeamName,
+.activeTeam .teamName{
+  animation: teamNameWinnerPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes teamNameWinnerPulse{
+  0%,100%{
+    transform:scale(1);
+    filter:brightness(1);
+  }
+
+  50%{
+    transform:scale(1.06);
+    filter:brightness(1.08);
+  }
+}
+
+/* أزرار نافذة الفائز زجاجية */
+#winnerOverlayClose,
+#winnerOverlayEnd{
+  position:relative;
+  overflow:hidden;
+
+  height:54px;
+
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:18px;
+
+  color:#fff;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:1rem;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 14px 28px rgba(30,27,75,.16),
+    inset 0 1px 0 rgba(255,255,255,.24),
+    inset 0 -1px 0 rgba(0,0,0,.10);
+
+  backdrop-filter:blur(24px) saturate(1.16);
+  -webkit-backdrop-filter:blur(24px) saturate(1.16);
+
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .18s ease;
+}
+
+/* زر الإغلاق زجاج كحلي */
+#winnerOverlayClose{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg, rgba(100,116,139,.82), rgba(51,65,85,.84));
+}
+
+/* زر الإنهاء زجاج أحمر */
+#winnerOverlayEnd{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg, rgba(251,113,133,.86), rgba(225,29,72,.86));
+}
+
+/* لمعة داخل أزرار النافذة */
+#winnerOverlayClose::before,
+#winnerOverlayEnd::before{
+  content:"";
+  position:absolute;
+  width:72px;
+  height:72px;
+  top:-36px;
+  right:-20px;
+  border-radius:50%;
+  background:rgba(255,255,255,.14);
+  pointer-events:none;
+}
+
+#winnerOverlayClose::after,
+#winnerOverlayEnd::after{
+  content:"";
+  position:absolute;
+  inset:-60%;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 38%,
+      rgba(255,255,255,.34),
+      transparent 62%
+    );
+
+  transform:translateX(120%) rotate(8deg);
+  animation:winnerActionGlassShine 3.2s ease-in-out infinite;
+  pointer-events:none;
+}
+
+#winnerOverlayClose:hover,
+#winnerOverlayEnd:hover{
+  transform:translateY(-3px) scale(1.02);
+  filter:brightness(1.06);
+
+  box-shadow:
+    0 18px 34px rgba(30,27,75,.20),
+    inset 0 1px 0 rgba(255,255,255,.30),
+    inset 0 -1px 0 rgba(0,0,0,.10);
+}
+
+#winnerOverlayClose:active,
+#winnerOverlayEnd:active{
+  transform:scale(.96);
+}
+
+@keyframes winnerActionGlassShine{
+  0%,45%{
+    transform:translateX(120%) rotate(8deg);
+  }
+
+  70%,100%{
+    transform:translateX(-120%) rotate(8deg);
+  }
+}
+
+/* النص داخل الأزرار فوق اللمعة */
+#winnerOverlayClose,
+#winnerOverlayEnd{
+  z-index:1;
+}
+
+#winnerOverlayClose *,
+#winnerOverlayEnd *{
+  position:relative;
+  z-index:2;
+}
+/* =========================================================
+   WINNER OVERLAY NAME PULSE
+   نبض اسم الفائز داخل مربع إعلان الفائز
+========================================================= */
+
+#winnerOverlayName{
+  animation: winnerOverlayNamePulse 1.35s ease-in-out infinite;
+  transform-origin:center;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.88),
+    0 14px 28px rgba(30,27,75,.20),
+    0 0 24px rgba(255,155,81,.34),
+    0 0 38px rgba(103,232,249,.22);
+}
+
+@keyframes winnerOverlayNamePulse{
+  0%,100%{
+    transform:scale(1);
+    filter:brightness(1);
+  }
+
+  45%{
+    transform:scale(1.08);
+    filter:brightness(1.12);
+  }
+
+  70%{
+    transform:scale(1.03);
+    filter:brightness(1.05);
+  }
+}
+
+/* توهج خفيف حول اسم الفائز */
+#winnerOverlayName::after{
+  content:"";
+  display:block;
+
+  width:70%;
+  height:10px;
+  margin:10px auto 0;
+
+  border-radius:999px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,155,81,.34),
+      rgba(255,155,81,.10) 45%,
+      transparent 72%
+    );
+
+  filter:blur(7px);
+  animation:winnerOverlayNameGlow 1.35s ease-in-out infinite;
+}
+
+@keyframes winnerOverlayNameGlow{
+  0%,100%{
+    opacity:.45;
+    transform:scaleX(.88);
+  }
+
+  50%{
+    opacity:1;
+    transform:scaleX(1.08);
   }
 }

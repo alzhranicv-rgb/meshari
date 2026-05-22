@@ -2555,31 +2555,1380 @@
 }
 
 /* =========================================================
-   ROUND 3 TEAM MEDIA
+   ROUND 3 TEAM MEDIA - CLEAN FINAL
+   السؤال يسار الفيديو + الإجابة تحت
 ========================================================= */
 
 .finalRound3TeamMediaWrap{
-  gap:12px !important;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
-/* المسرح */
+/* أرقام Team Media تكون 4 أرقام تحت */
+.finalRound3TeamMediaWrap .finalRound3Grid{
+  order:2;
+  width:min(100%,560px);
+  margin:0 auto;
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+
+.finalRound3TeamMediaWrap .finalRound3Card{
+  height:64px !important;
+  min-height:64px !important;
+  border-radius:18px !important;
+  font-size:2rem !important;
+}
+
+/* بوكس العرض */
+.finalRound3TeamMediaWrap .finalRound3ImageStageWrap{
+  order:1;
+  width:100%;
+  min-height:330px;
+  padding:20px;
+  border-radius:32px;
+  position:relative;
+  overflow:hidden;
+
+  background:
+    radial-gradient(circle at 12% 0%, rgba(124,58,237,.16), transparent 38%),
+    radial-gradient(circle at 88% 100%, rgba(6,182,212,.16), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.14));
+
+  border:1px solid rgba(255,255,255,.42);
+
+  box-shadow:
+    0 22px 48px rgba(30,27,75,.12),
+    inset 0 1px 0 rgba(255,255,255,.72),
+    inset 0 -1px 0 rgba(255,255,255,.12);
+
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+}
+
+.finalRound3TeamMediaWrap .finalRound3ImageStageWrap::before{
+  content:"";
+  position:absolute;
+  width:220px;
+  height:220px;
+  top:-95px;
+  right:-55px;
+  border-radius:50%;
+  background:rgba(255,255,255,.13);
+  pointer-events:none;
+}
+
+.finalRound3TeamMediaWrap .finalRound3ImageStageWrap::after{
+  content:"";
+  position:absolute;
+  width:95px;
+  height:95px;
+  bottom:-34px;
+  left:-18px;
+  border-radius:24px;
+  transform:rotate(24deg);
+  background:rgba(255,255,255,.08);
+  pointer-events:none;
+}
+
 .finalRound3TeamMediaStage{
   position:relative;
   z-index:2;
+  width:100%;
+  min-height:290px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  padding:0;
+}
+
+/* المحتوى */
+.finalRound3TeamMediaContent{
+  position:relative;
+  z-index:2;
+  width:100%;
+
+  display:grid;
+  grid-template-columns:minmax(230px,320px) minmax(0,560px);
+  grid-template-areas:
+    "question media"
+    "answer answer";
+
+  gap:16px;
+  align-items:center;
+  justify-content:center;
+
+  animation:finalTvCardIn .45s cubic-bezier(.2,.9,.2,1) both;
+}
+
+/* إذا السؤال غير ظاهر، الفيديو يكون بالنص */
+.finalRound3TeamMediaContent:not(:has(.finalTeamMediaQuestionBox)){
+  grid-template-columns:minmax(0,560px);
+  grid-template-areas:
+    "media"
+    "answer";
+}
+
+/* الفيديو / الصورة */
+.finalTeamMediaFrame{
+  grid-area:media;
+  position:relative;
+
+  width:100%;
+  max-width:560px;
+  aspect-ratio:16 / 9;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+  border-radius:24px;
+
+  background:#05070b;
+  border:1px solid rgba(255,255,255,.38);
+
+  box-shadow:
+    0 18px 36px rgba(30,27,75,.12),
+    inset 0 1px 0 rgba(255,255,255,.30);
+
+  cursor:zoom-in;
+}
+
+.finalTeamMediaIdleFrame{
+  max-width:520px;
+}
+
+.finalTeamMediaImage,
+.finalTeamMediaVideo{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  background:#05070b;
+}
+
+.finalTeamMediaPlayBadge{
+  position:absolute;
+  inset:0;
+  margin:auto;
+
+  width:72px;
+  height:72px;
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:50%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255,255,255,.30), transparent 42%),
+    linear-gradient(180deg,#FF9B51,#FF7E30);
+
+  color:#fff;
+  font-size:1.85rem;
+  line-height:1;
+
+  cursor:pointer;
+  z-index:5;
+
+  box-shadow:
+    0 16px 34px rgba(255,126,48,.28),
+    0 0 0 8px rgba(255,155,81,.08),
+    inset 0 1px 0 rgba(255,255,255,.34);
+
+  transition:transform .18s ease, filter .18s ease;
+}
+
+.finalTeamMediaPlayBadge:hover{
+  transform:scale(1.08);
+  filter:brightness(1.08);
+}
+
+/* مربع السؤال يسار الفيديو */
+.finalTeamMediaQuestionBox{
+  grid-area:question;
+
+  width:100%;
+  min-height:135px;
+  max-height:210px;
+  padding:16px 20px;
+  border-radius:26px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  text-align:center;
+  overflow:auto;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(103,232,249,.24), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.72), rgba(236,254,255,.50));
+
+  border:1px solid rgba(103,232,249,.38);
+
+  box-shadow:
+    0 14px 30px rgba(30,27,75,.08),
+    inset 0 1px 0 rgba(255,255,255,.76);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.finalTeamMediaSmallLabel{
+  min-height:30px;
+  padding:6px 16px;
+  border-radius:999px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(255,255,255,.55);
+  border:1px solid rgba(255,255,255,.62);
+
+  color:#0F4C5C;
+  font-size:.95rem;
+  line-height:1;
+}
+
+.finalTeamMediaQuestionText{
+  color:#0F4C5C;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.05rem;
+  line-height:1.55;
+  text-align:center;
+}
+
+/* مربع الإجابة تحت الفيديو والسؤال */
+.finalTeamMediaResultBox{
+  grid-area:answer;
+
+  width:min(100%,760px);
+  min-height:125px;
+  margin:0 auto;
+  padding:22px 30px;
+  border-radius:28px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  text-align:center;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(103,232,249,.24), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.72), rgba(236,254,255,.50));
+
+  border:1px solid rgba(103,232,249,.38);
+
+  box-shadow:
+    0 14px 30px rgba(30,27,75,.08),
+    inset 0 1px 0 rgba(255,255,255,.76);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.finalTeamMediaResultBox.correctResult{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(134,239,172,.30), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.72), rgba(220,252,231,.50));
+
+  border-color:rgba(34,197,94,.42);
+}
+
+.finalTeamMediaResultBox.wrongResult{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(252,165,165,.30), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.72), rgba(254,226,226,.50));
+
+  border-color:rgba(239,68,68,.42);
+}
+
+.finalTeamMediaResultBox.correctResult .finalTeamMediaSmallLabel{
+  color:#166534;
+}
+
+.finalTeamMediaResultBox.wrongResult .finalTeamMediaSmallLabel{
+  color:#991B1B;
+}
+
+.finalRound3TeamMediaAnswer{
+  color:#0F4C5C;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(2.2rem,4vw,4rem);
+  line-height:1.12;
+  text-align:center;
+  padding:0 20px;
+}
+
+/* حالة بدون اختيار */
+.finalTeamMediaEmptyState{
+  width:min(100%,520px);
+  min-height:140px;
+  padding:24px;
+  border-radius:24px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.15));
+
+  border:1px dashed rgba(255,255,255,.30);
+
+  color:rgba(36,24,94,.72);
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(1.8rem,3vw,3rem);
+  text-align:center;
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+/* Overlay */
+.finalRound3TeamMediaOverlay{
+  position:fixed;
+  inset:0;
+  z-index:999995;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:24px;
+
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,155,81,.16), transparent 34%),
+    radial-gradient(circle at 18% 82%, rgba(103,232,249,.10), transparent 36%),
+    rgba(15,23,42,.84);
+
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+
+  cursor:zoom-out;
+}
+
+.finalRound3TeamMediaOverlay.hidden{
+  display:none;
+}
+
+.finalRound3TeamMediaOverlayInner{
+  width:min(96vw,1280px);
+  max-height:90vh;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.finalRound3TeamMediaOverlayVideo,
+#finalRound3TeamMediaOverlayVideo{
+  width:min(96vw,1280px);
+  height:auto;
+  max-height:90vh;
+  aspect-ratio:16 / 9;
+
+  object-fit:contain;
+  display:block;
+
+  background:#000;
+  border-radius:26px;
+
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.42),
+    0 0 0 1px rgba(255,255,255,.12);
+}
+
+.finalRound3TeamMediaOverlayInner img{
+  max-width:96vw;
+  max-height:90vh;
+
+  object-fit:contain;
+  display:block;
+
+  background:#000;
+  border-radius:26px;
+
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.42),
+    0 0 0 1px rgba(255,255,255,.12);
+}
+
+.finalRound3TeamMediaCloseBtn{
+  position:fixed;
+  top:24px;
+  left:24px;
+  z-index:10;
+
+  width:54px;
+  height:54px;
+  border-radius:18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1px solid rgba(255,255,255,.20);
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.20), transparent 42%),
+    linear-gradient(180deg, rgba(251,113,133,.92), rgba(225,29,72,.90));
+
+  color:#fff;
+  font-family:Arial,sans-serif;
+  font-size:2rem;
+  line-height:1;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 16px 34px rgba(225,29,72,.20),
+    inset 0 1px 0 rgba(255,255,255,.24);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+/* Responsive */
+@media (min-width:768px) and (max-width:1180px){
+  .finalRound3TeamMediaWrap .finalRound3ImageStageWrap{
+    min-height:300px;
+    padding:14px;
+    border-radius:26px;
+  }
+
+  .finalRound3TeamMediaStage{
+    min-height:260px;
+  }
+
+  .finalRound3TeamMediaContent{
+    grid-template-columns:minmax(190px,260px) minmax(0,520px);
+    gap:12px;
+  }
+
+  .finalTeamMediaQuestionBox{
+    min-height:110px;
+    max-height:180px;
+    padding:14px 16px;
+  }
+
+  .finalTeamMediaQuestionText{
+    font-size:.9rem;
+    line-height:1.45;
+  }
+
+  .finalTeamMediaResultBox{
+    width:min(100%,680px);
+    min-height:110px;
+    padding:18px 22px;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    font-size:clamp(2rem,3.4vw,3.2rem);
+  }
+
+  .finalRound3TeamMediaWrap .finalRound3Card{
+    height:58px !important;
+    min-height:58px !important;
+    font-size:1.75rem !important;
+  }
+}
+
+@media (max-width:767px){
+  .finalRound3TeamMediaWrap .finalRound3ImageStageWrap{
+    min-height:260px;
+    padding:12px;
+    border-radius:22px;
+  }
+
+  .finalRound3TeamMediaStage{
+    min-height:230px;
+  }
+
+  .finalRound3TeamMediaContent{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .finalTeamMediaFrame,
+  .finalTeamMediaIdleFrame{
+    width:100%;
+    max-width:100%;
+    border-radius:18px;
+  }
+
+  .finalTeamMediaQuestionBox{
+    width:100%;
+    min-height:auto;
+    max-height:140px;
+    padding:12px 14px;
+    border-radius:18px;
+  }
+
+  .finalTeamMediaQuestionText{
+    font-size:.9rem;
+    line-height:1.45;
+  }
+
+  .finalTeamMediaResultBox{
+    width:100%;
+    min-height:76px;
+    padding:14px 18px;
+    border-radius:20px;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    font-size:1.65rem;
+  }
+
+  .finalRound3TeamMediaWrap .finalRound3Grid{
+    width:100%;
+    gap:8px !important;
+  }
+
+  .finalRound3TeamMediaWrap .finalRound3Card{
+    height:54px !important;
+    min-height:54px !important;
+    border-radius:15px !important;
+    font-size:1.45rem !important;
+  }
+
+  .finalRound3TeamMediaOverlay{
+    padding:12px;
+  }
+
+  .finalRound3TeamMediaOverlayVideo,
+  #finalRound3TeamMediaOverlayVideo,
+  .finalRound3TeamMediaOverlayInner img{
+    max-width:96vw;
+    max-height:86vh;
+    border-radius:18px;
+  }
+
+  .finalRound3TeamMediaCloseBtn{
+    top:14px;
+    left:14px;
+    width:46px;
+    height:46px;
+    border-radius:15px;
+    font-size:1.65rem;
+  }
+}
+/* =========================================================
+   FINAL TEAM MEDIA - QUESTION + ANSWER LEFT / MEDIA RIGHT
+   السؤال فوق والجواب تحته + الفيديو يمين
+========================================================= */
+
+/* ترتيب المحتوى */
+.finalRound3TeamMediaContent{
+  position:relative;
+  z-index:2;
+  width:100%;
+
+  display:grid !important;
+  grid-template-columns:minmax(260px,340px) minmax(0,560px) !important;
+  grid-template-areas:
+    "question media"
+    "answer   media" !important;
+
+  gap:14px 16px !important;
+  align-items:stretch !important;
+  justify-content:center !important;
+}
+
+/* إذا السؤال غير ظاهر */
+.finalRound3TeamMediaContent:not(:has(.finalTeamMediaQuestionBox)){
+  grid-template-areas:
+    "media"
+    "answer" !important;
+  grid-template-columns:minmax(0,560px) !important;
+}
+
+/* إذا الإجابة غير ظاهرة */
+.finalRound3TeamMediaContent:not(:has(.finalTeamMediaResultBox)){
+  grid-template-areas:
+    "question media" !important;
+}
+
+/* الفيديو / الصورة يمين */
+.finalTeamMediaFrame{
+  grid-area:media !important;
+  align-self:center !important;
+  width:100% !important;
+  max-width:560px !important;
+}
+
+/* السؤال والجواب نفس المقاس */
+.finalTeamMediaQuestionBox,
+.finalTeamMediaResultBox{
+  width:100% !important;
+  min-height:150px !important;
+  height:150px !important;
+  max-height:150px !important;
+
+  padding:18px 20px !important;
+  border-radius:26px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+
+  text-align:center !important;
+  overflow:auto !important;
+
+  box-sizing:border-box !important;
+}
+
+/* السؤال فوق */
+.finalTeamMediaQuestionBox{
+  grid-area:question !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(103,232,249,.24), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.72), rgba(236,254,255,.50)) !important;
+
+  border:1px solid rgba(103,232,249,.38) !important;
+
+  box-shadow:
+    0 14px 30px rgba(30,27,75,.08),
+    inset 0 1px 0 rgba(255,255,255,.76) !important;
+
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px) !important;
+}
+
+/* الجواب تحت السؤال */
+.finalTeamMediaResultBox{
+  grid-area:answer !important;
+  margin:0 !important;
+}
+
+/* تكبير عنوان السؤال والإجابة */
+.finalTeamMediaSmallLabel{
+  min-height:32px !important;
+  padding:7px 18px !important;
+  border-radius:999px !important;
+
+  font-size:1rem !important;
+  line-height:1 !important;
+}
+
+/* تكبير خط السؤال */
+.finalTeamMediaQuestionText{
+  color:#0F4C5C !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.55rem,2.25vw,2.25rem) !important;
+  line-height:1.35 !important;
+
+  text-align:center !important;
+  text-wrap:balance !important;
+  word-break:break-word !important;
+}
+
+/* خط الإجابة */
+.finalRound3TeamMediaAnswer{
+  color:#0F4C5C !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.75rem,2.55vw,2.7rem) !important;
+  line-height:1.2 !important;
+
+  text-align:center !important;
+  text-wrap:balance !important;
+  word-break:break-word !important;
+
+  padding:0 10px !important;
+}
+
+/* ألوان الصح والخطأ للجواب */
+.finalTeamMediaResultBox.correctResult{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(134,239,172,.30), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.72), rgba(220,252,231,.50)) !important;
+
+  border-color:rgba(34,197,94,.42) !important;
+}
+
+.finalTeamMediaResultBox.wrongResult{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(252,165,165,.30), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.72), rgba(254,226,226,.50)) !important;
+
+  border-color:rgba(239,68,68,.42) !important;
+}
+
+.finalTeamMediaResultBox.correctResult .finalTeamMediaSmallLabel{
+  color:#166534 !important;
+}
+
+.finalTeamMediaResultBox.wrongResult .finalTeamMediaSmallLabel{
+  color:#991B1B !important;
+}
+
+/* =========================================================
+   iPad
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px){
+  .finalRound3TeamMediaContent{
+    grid-template-columns:minmax(220px,280px) minmax(0,520px) !important;
+    gap:12px !important;
+  }
+
+  .finalTeamMediaQuestionBox,
+  .finalTeamMediaResultBox{
+    min-height:125px !important;
+    height:125px !important;
+    max-height:125px !important;
+    padding:14px 16px !important;
+    border-radius:22px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    font-size:1.25rem !important;
+    line-height:1.35 !important;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    font-size:1.45rem !important;
+  }
+}
+
+/* =========================================================
+   iPhone
+========================================================= */
+
+@media (max-width:767px){
+  .finalRound3TeamMediaContent{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:12px !important;
+  }
+
+  .finalTeamMediaFrame{
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  .finalTeamMediaQuestionBox,
+  .finalTeamMediaResultBox{
+    width:100% !important;
+    min-height:110px !important;
+    height:auto !important;
+    max-height:150px !important;
+    padding:14px 16px !important;
+    border-radius:20px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    font-size:1.35rem !important;
+    line-height:1.35 !important;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    font-size:1.5rem !important;
+  }
+}
+/* =========================================================
+   FINAL TEAM MEDIA - CENTER VIDEO THEN SLIDE QUESTION
+   الفيديو في النص ثم يتحرك عند ظهور السؤال
+========================================================= */
+
+/* الحالة الأساسية: الفيديو في النص */
+.finalRound3TeamMediaContent{
+  position:relative;
+  z-index:2;
+  width:100%;
+
+  display:grid !important;
+  grid-template-columns:minmax(0,620px) !important;
+  grid-template-areas:
+    "media"
+    "answer" !important;
+
+  gap:14px !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  transition:all .35s cubic-bezier(.16,1,.3,1) !important;
+}
+
+/* الفيديو في النص قبل السؤال */
+.finalTeamMediaFrame{
+  grid-area:media !important;
+  justify-self:center !important;
+  align-self:center !important;
 
   width:100% !important;
-  min-height:360px !important;
+  max-width:620px !important;
+
+  transition:
+    transform .38s cubic-bezier(.16,1,.3,1),
+    max-width .38s cubic-bezier(.16,1,.3,1),
+    opacity .25s ease !important;
+}
+
+/* عند ظهور السؤال: الفيديو يتحرك يمين والسؤال يظهر يسار */
+.finalRound3TeamMediaContent:has(.finalTeamMediaQuestionBox){
+  grid-template-columns:minmax(260px,360px) minmax(0,560px) !important;
+  grid-template-areas:
+    "question media"
+    "answer   answer" !important;
+
+  justify-content:center !important;
+  align-items:center !important;
+}
+
+/* الفيديو يصغر شوي بعد ظهور السؤال عشان يكون متوازن */
+.finalRound3TeamMediaContent:has(.finalTeamMediaQuestionBox) .finalTeamMediaFrame{
+  max-width:560px !important;
+  transform:translateX(0) !important;
+}
+
+/* =========================================================
+   QUESTION BOX - مستطيل واضح ومتناسق
+========================================================= */
+
+.finalTeamMediaQuestionBox{
+  grid-area:question !important;
+
+  width:100% !important;
+  min-height:112px !important;
+  height:auto !important;
+  max-height:160px !important;
+
+  padding:16px 22px !important;
+  border-radius:22px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+
+  text-align:center !important;
+  overflow:auto !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.46), transparent 42%),
+    radial-gradient(circle at 90% 100%, rgba(103,232,249,.18), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.74), rgba(236,254,255,.48)) !important;
+
+  border:1px solid rgba(103,232,249,.40) !important;
+
+  box-shadow:
+    0 16px 32px rgba(8,145,178,.10),
+    0 0 0 5px rgba(103,232,249,.07),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
+
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px) !important;
+
+  animation:finalTeamMediaQuestionIn .38s cubic-bezier(.16,1,.3,1) both !important;
+}
+
+/* حركة ظهور السؤال */
+@keyframes finalTeamMediaQuestionIn{
+  from{
+    opacity:0;
+    transform:translateX(26px) scale(.96);
+    filter:blur(4px);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0) scale(1);
+    filter:blur(0);
+  }
+}
+
+/* عنوان السؤال */
+.finalTeamMediaSmallLabel{
+  min-height:28px !important;
+  padding:6px 16px !important;
+  border-radius:999px !important;
 
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
 
-  padding:0 !important;
+  background:rgba(255,255,255,.62) !important;
+  border:1px solid rgba(255,255,255,.70) !important;
+
+  color:#0F4C5C !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.9rem !important;
+  line-height:1 !important;
+}
+
+/* نص السؤال - مكبر ومتناسق */
+.finalTeamMediaQuestionText{
+  width:100% !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.35rem,2vw,2rem) !important;
+  line-height:1.35 !important;
+  font-weight:400 !important;
+
+  text-align:center !important;
+  text-wrap:balance !important;
+  white-space:normal !important;
+  word-break:break-word !important;
+}
+
+/* =========================================================
+   ANSWER BOX - تحت الفيديو والسؤال
+========================================================= */
+
+.finalTeamMediaResultBox{
+  grid-area:answer !important;
+
+  width:min(100%,760px) !important;
+  min-height:112px !important;
+  height:auto !important;
+
+  margin:0 auto !important;
+  padding:20px 28px !important;
+  border-radius:26px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+
+  text-align:center !important;
+}
+
+/* الجواب إذا ظهر بدون سؤال يبقى تحت الفيديو في النص */
+.finalRound3TeamMediaContent:not(:has(.finalTeamMediaQuestionBox)) .finalTeamMediaResultBox{
+  width:min(100%,620px) !important;
+}
+
+/* خط الإجابة */
+.finalRound3TeamMediaAnswer{
+  font-size:clamp(1.75rem,2.8vw,3rem) !important;
+  line-height:1.2 !important;
+  padding:0 10px !important;
+}
+
+/* =========================================================
+   IPAD
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px){
+  .finalRound3TeamMediaContent:has(.finalTeamMediaQuestionBox){
+    grid-template-columns:minmax(220px,300px) minmax(0,520px) !important;
+    gap:12px !important;
+  }
+
+  .finalTeamMediaQuestionBox{
+    min-height:100px !important;
+    max-height:145px !important;
+    padding:14px 18px !important;
+    border-radius:20px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    font-size:1.25rem !important;
+    line-height:1.35 !important;
+  }
+}
+
+/* =========================================================
+   IPHONE
+========================================================= */
+
+@media (max-width:767px){
+  .finalRound3TeamMediaContent,
+  .finalRound3TeamMediaContent:has(.finalTeamMediaQuestionBox){
+    display:flex !important;
+    flex-direction:column !important;
+    gap:12px !important;
+  }
+
+  .finalTeamMediaFrame{
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  .finalTeamMediaQuestionBox{
+    width:100% !important;
+    min-height:auto !important;
+    max-height:150px !important;
+    padding:14px 16px !important;
+    border-radius:18px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    font-size:1.25rem !important;
+    line-height:1.35 !important;
+  }
+
+  .finalTeamMediaResultBox{
+    width:100% !important;
+    min-height:86px !important;
+    padding:16px 18px !important;
+    border-radius:20px !important;
+  }
+}
+/* =========================================================
+   FINAL TEAM MEDIA - VIDEO TOP / QUESTION + ANSWER BELOW
+   الفيديو فوق، السؤال والإجابة تحته جنب بعض
+========================================================= */
+
+.finalRound3TeamMediaContent{
+  position:relative;
+  z-index:2;
+  width:100%;
+
+  display:grid !important;
+  grid-template-columns:repeat(2, minmax(0, 300px)) !important;
+  grid-template-areas:
+    "media media"
+    "question answer" !important;
+
+  gap:16px !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+/* قبل ظهور السؤال أو الإجابة: الفيديو في النص فقط */
+.finalRound3TeamMediaContent:not(:has(.finalTeamMediaQuestionBox)):not(:has(.finalTeamMediaResultBox)){
+  grid-template-columns:minmax(0,620px) !important;
+  grid-template-areas:"media" !important;
+}
+
+/* إذا ظهر السؤال فقط بدون إجابة */
+.finalRound3TeamMediaContent:has(.finalTeamMediaQuestionBox):not(:has(.finalTeamMediaResultBox)){
+  grid-template-columns:minmax(0,620px) !important;
+  grid-template-areas:
+    "media"
+    "question" !important;
+}
+
+/* إذا ظهرت الإجابة فقط بدون سؤال */
+.finalRound3TeamMediaContent:has(.finalTeamMediaResultBox):not(:has(.finalTeamMediaQuestionBox)){
+  grid-template-columns:minmax(0,620px) !important;
+  grid-template-areas:
+    "media"
+    "answer" !important;
+}
+
+/* الفيديو فوق */
+.finalTeamMediaFrame{
+  grid-area:media !important;
+
+  width:100% !important;
+  max-width:620px !important;
+  aspect-ratio:16 / 9 !important;
+
+  justify-self:center !important;
+  align-self:center !important;
+
+  border-radius:24px !important;
+}
+
+/* السؤال والإجابة مربعات تحت الفيديو */
+.finalTeamMediaQuestionBox,
+.finalTeamMediaResultBox{
+  width:300px !important;
+  height:170px !important;
+  min-width:300px !important;
+  max-width:300px !important;
+  min-height:170px !important;
+  max-height:170px !important;
+
+  margin:0 !important;
+  padding:16px 18px !important;
+  border-radius:26px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+
+  text-align:center !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px) !important;
+
+  animation:finalTeamMediaBoxIn .34s cubic-bezier(.16,1,.3,1) both !important;
+}
+
+/* مربع السؤال */
+.finalTeamMediaQuestionBox{
+  grid-area:question !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.52), transparent 42%),
+    radial-gradient(circle at 90% 100%, rgba(103,232,249,.20), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(236,254,255,.52)) !important;
+
+  border:1px solid rgba(103,232,249,.42) !important;
+
+  box-shadow:
+    0 16px 32px rgba(8,145,178,.10),
+    0 0 0 5px rgba(103,232,249,.07),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+
+/* مربع الإجابة */
+.finalTeamMediaResultBox{
+  grid-area:answer !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.52), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(236,254,255,.52)) !important;
+
+  border:1px solid rgba(103,232,249,.42) !important;
+
+  box-shadow:
+    0 16px 32px rgba(8,145,178,.10),
+    0 0 0 5px rgba(103,232,249,.07),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+
+/* لون الإجابة إذا صح */
+.finalTeamMediaResultBox.correctResult{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.52), transparent 42%),
+    radial-gradient(circle at 90% 100%, rgba(34,197,94,.20), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(220,252,231,.55)) !important;
+
+  border:1px solid rgba(34,197,94,.46) !important;
+
+  box-shadow:
+    0 16px 32px rgba(34,197,94,.12),
+    0 0 0 5px rgba(34,197,94,.08),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+
+/* لون الإجابة إذا خطأ */
+.finalTeamMediaResultBox.wrongResult{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.52), transparent 42%),
+    radial-gradient(circle at 90% 100%, rgba(239,68,68,.18), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(254,226,226,.55)) !important;
+
+  border:1px solid rgba(239,68,68,.46) !important;
+
+  box-shadow:
+    0 16px 32px rgba(239,68,68,.12),
+    0 0 0 5px rgba(239,68,68,.08),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+
+/* عنوان السؤال والإجابة */
+.finalTeamMediaSmallLabel{
+  flex-shrink:0 !important;
+
+  min-height:28px !important;
+  padding:6px 14px !important;
+  border-radius:999px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:rgba(255,255,255,.62) !important;
+  border:1px solid rgba(255,255,255,.72) !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.82rem !important;
+  line-height:1 !important;
+}
+
+.finalTeamMediaResultBox.correctResult .finalTeamMediaSmallLabel{
+  color:#166534 !important;
+}
+
+.finalTeamMediaResultBox.wrongResult .finalTeamMediaSmallLabel{
+  color:#991B1B !important;
+}
+
+/* نص السؤال */
+.finalTeamMediaQuestionText{
+  width:100% !important;
+  max-height:105px !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.35rem !important;
+  line-height:1.25 !important;
+  font-weight:400 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  text-align:center !important;
+  text-wrap:balance !important;
+  white-space:normal !important;
+  word-break:break-word !important;
+  overflow:hidden !important;
+}
+
+/* نص الإجابة */
+.finalRound3TeamMediaAnswer{
+  width:100% !important;
+  max-height:105px !important;
+  padding:0 6px !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.75rem !important;
+  line-height:1.18 !important;
+  font-weight:400 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  text-align:center !important;
+  text-wrap:balance !important;
+  white-space:normal !important;
+  word-break:break-word !important;
+  overflow:hidden !important;
+}
+
+@keyframes finalTeamMediaBoxIn{
+  from{
+    opacity:0;
+    transform:translateY(10px) scale(.96);
+    filter:blur(3px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    filter:blur(0);
+  }
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .finalRound3TeamMediaContent{
+    grid-template-columns:repeat(2, minmax(0, 250px)) !important;
+    gap:12px !important;
+  }
+
+  .finalTeamMediaFrame{
+    max-width:520px !important;
+  }
+
+  .finalTeamMediaQuestionBox,
+  .finalTeamMediaResultBox{
+    width:250px !important;
+    height:145px !important;
+    min-width:250px !important;
+    max-width:250px !important;
+    min-height:145px !important;
+    max-height:145px !important;
+    border-radius:22px !important;
+    padding:12px 14px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    font-size:1.1rem !important;
+    line-height:1.25 !important;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    font-size:1.45rem !important;
+    line-height:1.16 !important;
+  }
+}
+
+/* iPhone */
+@media (max-width:767px){
+  .finalRound3TeamMediaContent,
+  .finalRound3TeamMediaContent:has(.finalTeamMediaQuestionBox),
+  .finalRound3TeamMediaContent:has(.finalTeamMediaResultBox){
+    display:flex !important;
+    flex-direction:column !important;
+    gap:12px !important;
+  }
+
+  .finalTeamMediaFrame{
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  .finalTeamMediaQuestionBox,
+  .finalTeamMediaResultBox{
+    width:100% !important;
+    height:auto !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    min-height:110px !important;
+    max-height:160px !important;
+    border-radius:20px !important;
+    padding:14px 16px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    font-size:1.15rem !important;
+    line-height:1.3 !important;
+    max-height:95px !important;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    font-size:1.35rem !important;
+    line-height:1.2 !important;
+    max-height:95px !important;
+  }
+}/* =========================================================
+   FINAL ROUND 3 TEAM MEDIA - CLEAN FIX
+   الفيديو فوق، السؤال والجواب تحته بحجم النص
+========================================================= */
+
+.finalRound3TeamMediaStage{
+  width:100% !important;
+  min-height:auto !important;
+  padding:16px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
 }
 
 .finalRound3TeamMediaContent{
+  position:relative !important;
+  z-index:2 !important;
+
   width:100% !important;
-  min-height:320px !important;
+  max-width:760px !important;
+  margin:0 auto !important;
 
   display:flex !important;
   flex-direction:column !important;
@@ -2587,421 +3936,830 @@
   justify-content:center !important;
 
   gap:14px !important;
-
-  animation:finalTvCardIn .45s cubic-bezier(.2,.9,.2,1) both;
 }
 
-/* إطار الصورة والفيديو */
-.finalRound3TeamMediaContent .finalRound3ImageFrame,
-.finalRound3VideoFrame,
-.finalRound3VideoFrameSmall{
-  position:relative !important;
-
-  width:min(680px, 78vw) !important;
+/* الفيديو فوق */
+.finalTeamMediaFrame{
+  width:min(100%,680px) !important;
   max-width:680px !important;
-  min-height:260px !important;
-  height:auto !important;
-
-  padding:12px !important;
-  margin:0 auto !important;
-
-  border-radius:30px !important;
-
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.42), transparent 40%),
-    linear-gradient(180deg, rgba(255,255,255,.38), rgba(255,255,255,.16)) !important;
-
-  border:1px solid rgba(255,255,255,.42) !important;
-
-  box-shadow:
-    0 18px 36px rgba(30,27,75,.12),
-    inset 0 1px 0 rgba(255,255,255,.78),
-    inset 0 -1px 0 rgba(255,255,255,.10) !important;
-
-  backdrop-filter:blur(20px) !important;
-  -webkit-backdrop-filter:blur(20px) !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  overflow:hidden !important;
-  cursor:pointer !important;
-}
-
-.finalRound3TeamMediaContent .finalRound3Image,
-.finalRound3Video,
-.finalRound3VideoSmall{
-  width:100% !important;
-  max-width:100% !important;
-  height:auto !important;
-  max-height:360px !important;
-
-  object-fit:contain !important;
-  display:block !important;
-
-  border-radius:22px !important;
-  background:#000 !important;
-}
-
-/* مربع السؤال */
-.finalRound3QuestionBox{
-  width:min(760px,90%) !important;
-  min-height:72px !important;
+  aspect-ratio:16 / 9 !important;
 
   margin:0 auto !important;
-  padding:16px 24px !important;
+
   border-radius:26px !important;
+  overflow:hidden !important;
 
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.42), transparent 40%),
-    radial-gradient(circle at 88% 100%, rgba(103,232,249,.18), transparent 44%),
-    linear-gradient(180deg, rgba(255,255,255,.42), rgba(236,254,255,.20)) !important;
-
-  border:1px solid rgba(103,232,249,.38) !important;
-
-  box-shadow:
-    0 16px 30px rgba(8,145,178,.10),
-    inset 0 1px 0 rgba(255,255,255,.78),
-    inset 0 -1px 0 rgba(255,255,255,.10) !important;
-
-  backdrop-filter:blur(20px) !important;
-  -webkit-backdrop-filter:blur(20px) !important;
-
-  color:#12475B !important;
-  font-family:"HanakaText",sans-serif !important;
-  font-size:clamp(1.2rem,2vw,2rem) !important;
-  line-height:1.65 !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  text-align:center !important;
-  text-wrap:balance !important;
-}
-
-/* مربع الإجابة */
-.finalRound3TeamMediaAnswer{
-  width:min(760px,90%) !important;
-  min-height:82px !important;
-
-  margin:0 auto !important;
-  padding:18px 28px !important;
-  border-radius:28px !important;
-
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.46), transparent 42%),
-    radial-gradient(circle at 88% 100%, rgba(34,197,94,.20), transparent 45%),
-    linear-gradient(180deg, rgba(240,253,244,.72), rgba(220,252,231,.48)) !important;
-
-  border:1.5px solid rgba(34,197,94,.42) !important;
-
-  box-shadow:
-    0 18px 36px rgba(34,197,94,.16),
-    0 0 0 5px rgba(34,197,94,.10),
-    inset 0 1px 0 rgba(255,255,255,.90) !important;
-
-  backdrop-filter:blur(20px) !important;
-  -webkit-backdrop-filter:blur(20px) !important;
-
-  color:#14532D !important;
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:clamp(1.45rem,2.4vw,2.5rem) !important;
-  line-height:1.45 !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  text-align:center !important;
-  text-wrap:balance !important;
-
-  animation:finalRound1ResultShow .50s cubic-bezier(.2,.9,.2,1) both;
-}
-
-/* =========================================================
-   ROUND 3 TEAM MEDIA OVERLAY
-========================================================= */
-
-.finalRound3TeamMediaOverlay{
-  position:fixed !important;
-  inset:0 !important;
-  z-index:999999 !important;
-
-  background:rgba(20,28,38,.76) !important;
-
-  backdrop-filter:blur(9px) !important;
-  -webkit-backdrop-filter:blur(9px) !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  padding:26px !important;
-}
-
-.finalRound3TeamMediaOverlay.hidden{
-  display:none !important;
-}
-
-.finalRound3TeamMediaOverlayInner{
-  width:min(1280px,96vw) !important;
-  height:auto !important;
-  max-height:90vh !important;
+  background:#05070b !important;
 
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
 }
 
-.finalRound3TeamMediaOverlayInner img,
-.finalRound3TeamMediaOverlayInner video,
-.finalRound3TeamMediaOverlayVideo,
-#finalRound3TeamMediaOverlayVideo{
-  width:auto !important;
-  max-width:96vw !important;
-  height:auto !important;
-  max-height:84vh !important;
-
+.finalTeamMediaVideo,
+.finalTeamMediaImage{
+  width:100% !important;
+  height:100% !important;
   object-fit:contain !important;
   display:block !important;
+  background:#05070b !important;
+}
 
-  border-radius:28px !important;
-  background:#000 !important;
+/* صف السؤال والجواب تحت الفيديو */
+.finalTeamMediaTextRow{
+  width:100% !important;
+
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  gap:14px !important;
+
+  flex-wrap:nowrap !important;
+}
+
+/* إذا فيه عنصر واحد فقط خله بالنص */
+.finalTeamMediaTextRow:has(.finalTeamMediaQuestionBox):not(:has(.finalTeamMediaResultBox)),
+.finalTeamMediaTextRow:has(.finalTeamMediaResultBox):not(:has(.finalTeamMediaQuestionBox)){
+  justify-content:center !important;
+}
+
+/* السؤال والجواب بحجم النص */
+.finalTeamMediaQuestionBox,
+.finalTeamMediaResultBox{
+  width:auto !important;
+  min-width:260px !important;
+  max-width:360px !important;
+
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+
+  margin:0 !important;
+  padding:14px 20px !important;
+  border-radius:22px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+
+  text-align:center !important;
+  overflow:visible !important;
+  box-sizing:border-box !important;
+
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px) !important;
+
+  animation:finalTeamMediaBoxIn .32s cubic-bezier(.16,1,.3,1) both !important;
+}
+
+/* السؤال مستطيل حسب النص */
+.finalTeamMediaQuestionBox{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.52), transparent 42%),
+    radial-gradient(circle at 90% 100%, rgba(103,232,249,.20), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(236,254,255,.52)) !important;
+
+  border:1px solid rgba(103,232,249,.42) !important;
 
   box-shadow:
-    0 30px 80px rgba(0,0,0,.36),
-    0 0 0 6px rgba(255,255,255,.10) !important;
+    0 16px 32px rgba(8,145,178,.10),
+    0 0 0 5px rgba(103,232,249,.07),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
 }
 
-.finalRound3TeamMediaCloseBtn{
-  position:fixed !important;
-  top:22px !important;
-  left:24px !important;
-  z-index:1000000 !important;
+/* الجواب حسب النص */
+.finalTeamMediaResultBox{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.52), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(236,254,255,.52)) !important;
 
-  width:54px !important;
-  height:54px !important;
+  border:1px solid rgba(103,232,249,.42) !important;
 
-  border:0 !important;
-  border-radius:50% !important;
+  box-shadow:
+    0 16px 32px rgba(8,145,178,.10),
+    0 0 0 5px rgba(103,232,249,.07),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
 
-  background:linear-gradient(180deg,#EF4444,#DC2626) !important;
-  color:#FFFFFF !important;
+/* صح */
+.finalTeamMediaResultBox.correctResult{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.52), transparent 42%),
+    radial-gradient(circle at 90% 100%, rgba(34,197,94,.20), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(220,252,231,.55)) !important;
 
-  font-size:2.1rem !important;
+  border-color:rgba(34,197,94,.46) !important;
+}
+
+/* خطأ */
+.finalTeamMediaResultBox.wrongResult{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.52), transparent 42%),
+    radial-gradient(circle at 90% 100%, rgba(239,68,68,.18), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(254,226,226,.55)) !important;
+
+  border-color:rgba(239,68,68,.46) !important;
+}
+
+/* العنوان */
+.finalTeamMediaSmallLabel{
+  width:max-content !important;
+  min-height:24px !important;
+
+  padding:5px 14px !important;
+  border-radius:999px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:rgba(255,255,255,.64) !important;
+  border:1px solid rgba(255,255,255,.72) !important;
+
+  color:#0F4C5C !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.78rem !important;
   line-height:1 !important;
-
-  cursor:pointer !important;
-
-  box-shadow:0 14px 34px rgba(219,26,26,.32) !important;
 }
 
-/* =========================================================
-   ROUND 3 ANIMATIONS
-========================================================= */
+/* نص السؤال */
+.finalTeamMediaQuestionText{
+  width:100% !important;
 
-@keyframes finalRound3AnswersIn{
-  0%{
+  color:#0F4C5C !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.25rem,2vw,1.8rem) !important;
+  line-height:1.25 !important;
+  font-weight:400 !important;
+
+  text-align:center !important;
+  text-wrap:balance !important;
+  white-space:normal !important;
+  word-break:break-word !important;
+}
+
+/* نص الجواب */
+.finalRound3TeamMediaAnswer{
+  width:100% !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.35rem,2.3vw,2.1rem) !important;
+  line-height:1.2 !important;
+  font-weight:400 !important;
+
+  text-align:center !important;
+  text-wrap:balance !important;
+  white-space:normal !important;
+  word-break:break-word !important;
+}
+
+.finalTeamMediaResultBox.correctResult .finalTeamMediaSmallLabel{
+  color:#166534 !important;
+}
+
+.finalTeamMediaResultBox.wrongResult .finalTeamMediaSmallLabel{
+  color:#991B1B !important;
+}
+
+@keyframes finalTeamMediaBoxIn{
+  from{
     opacity:0;
-    transform:translateY(14px) scale(.97);
+    transform:translateY(8px) scale(.96);
+    filter:blur(3px);
   }
-
-  100%{
+  to{
     opacity:1;
     transform:translateY(0) scale(1);
+    filter:blur(0);
   }
 }
 
-/* =========================================================
-   ROUND 3 RESPONSIVE
-========================================================= */
-
+/* iPad */
 @media (min-width:768px) and (max-width:1180px){
-  .finalRound3ImageStageWrap{
-    min-height:270px !important;
-    padding:14px !important;
-    border-radius:26px !important;
-  }
-
-  .finalRound3ImageStage{
-    min-height:240px !important;
-  }
-
-  .finalRound3ImageFrame{
-    min-height:220px !important;
-    border-radius:24px !important;
-  }
-
-  .finalRound3Image{
-    max-height:300px !important;
-    border-radius:18px !important;
-  }
-
-  .finalRound3AnswersList{
-    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-    gap:10px !important;
-  }
-
-  .finalRound3AnswerCard{
-    min-height:118px !important;
-    border-radius:20px !important;
-    padding:10px !important;
-  }
-
-  .finalAnswerChip{
-    font-size:1rem !important;
-  }
-
-  .finalNoteBox{
-    font-size:.82rem !important;
-  }
-
-  .finalRound3TeamMediaStage{
-    min-height:300px !important;
-  }
-
   .finalRound3TeamMediaContent{
-    min-height:280px !important;
+    max-width:680px !important;
+    gap:12px !important;
   }
 
-  .finalRound3TeamMediaContent .finalRound3ImageFrame,
-  .finalRound3VideoFrame,
-  .finalRound3VideoFrameSmall{
-    width:min(560px,76vw) !important;
-    min-height:220px !important;
-    border-radius:24px !important;
+  .finalTeamMediaFrame{
+    width:min(100%,640px) !important;
   }
 
-  .finalRound3TeamMediaContent .finalRound3Image,
-  .finalRound3Video,
-  .finalRound3VideoSmall{
-    max-height:300px !important;
-    border-radius:18px !important;
-  }
-
-  .finalRound3QuestionBox,
-  .finalRound3TeamMediaAnswer{
-    width:min(680px,92%) !important;
-    border-radius:22px !important;
-  }
-}
-
-@media (max-width:767px){
-  .finalRound3Wrap{
-    gap:10px !important;
-  }
-
-  .finalRound3Grid{
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    gap:10px !important;
-  }
-
-  .finalRound3ImageStageWrap{
-    min-height:250px !important;
-    padding:12px !important;
-    border-radius:22px !important;
-  }
-
-  .finalRound3ImageStage{
-    min-height:220px !important;
-  }
-
-  .finalRound3ImageFrame{
-    width:100% !important;
-    min-height:200px !important;
-    padding:10px !important;
-    border-radius:22px !important;
-  }
-
-  .finalRound3Image{
-    max-height:230px !important;
-    border-radius:16px !important;
-  }
-
-  .finalRound3AnswersList{
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    gap:9px !important;
-  }
-
-  .finalRound3AnswerCard{
-    min-height:112px !important;
-    padding:9px !important;
-    border-radius:18px !important;
-  }
-
-  .finalAnswerChip{
-    font-size:.92rem !important;
-  }
-
-  .finalNoteBox{
-    min-height:36px !important;
-    font-size:.78rem !important;
-    border-radius:12px !important;
-  }
-
-  .finalRound3TeamMediaStage{
-    min-height:260px !important;
-  }
-
-  .finalRound3TeamMediaContent{
-    min-height:240px !important;
-    gap:10px !important;
-  }
-
-  .finalRound3TeamMediaContent .finalRound3ImageFrame,
-  .finalRound3VideoFrame,
-  .finalRound3VideoFrameSmall{
-    width:100% !important;
-    min-height:190px !important;
-    padding:10px !important;
-    border-radius:22px !important;
-  }
-
-  .finalRound3TeamMediaContent .finalRound3Image,
-  .finalRound3Video,
-  .finalRound3VideoSmall{
-    max-height:220px !important;
-    border-radius:16px !important;
-  }
-
-  .finalRound3QuestionBox{
-    width:100% !important;
-    min-height:60px !important;
+  .finalTeamMediaQuestionBox,
+  .finalTeamMediaResultBox{
+    min-width:230px !important;
+    max-width:310px !important;
     padding:12px 16px !important;
-    border-radius:18px !important;
-    font-size:1.1rem !important;
+    border-radius:20px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    font-size:1.2rem !important;
   }
 
   .finalRound3TeamMediaAnswer{
-    width:100% !important;
-    min-height:68px !important;
-    padding:14px 18px !important;
-    border-radius:20px !important;
     font-size:1.35rem !important;
   }
+}
 
-  .finalRound3ImageOverlay,
-  .finalRound3TeamMediaOverlay{
-    padding:14px !important;
+/* iPhone */
+@media (max-width:767px){
+  .finalRound3TeamMediaContent{
+    max-width:100% !important;
+    gap:12px !important;
   }
 
-  .finalRound3ImageOverlayImg,
-  .finalRound3TeamMediaOverlayInner img,
-  .finalRound3TeamMediaOverlayInner video,
-  .finalRound3TeamMediaOverlayVideo,
-  #finalRound3TeamMediaOverlayVideo{
-    max-width:94vw !important;
-    max-height:84vh !important;
+  .finalTeamMediaFrame{
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  .finalTeamMediaTextRow{
+    flex-direction:column !important;
+    align-items:center !important;
+    gap:10px !important;
+  }
+
+  .finalTeamMediaQuestionBox,
+  .finalTeamMediaResultBox{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    padding:13px 16px !important;
     border-radius:18px !important;
   }
 
-  .finalRound3TeamMediaCloseBtn{
-    top:14px !important;
-    left:14px !important;
-    width:46px !important;
-    height:46px !important;
-    font-size:1.8rem !important;
+  .finalTeamMediaQuestionText{
+    font-size:1.12rem !important;
+    line-height:1.3 !important;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    font-size:1.25rem !important;
+    line-height:1.25 !important;
+  }
+}
+/* =========================================================
+   FINAL TEAM MEDIA - QUESTION BOX AUTO TEXT SIZE
+   مربع السؤال مستطيل على حجم النص
+========================================================= */
+
+.finalTeamMediaQuestionBox{
+  width:fit-content !important;
+  min-width:260px !important;
+  max-width:520px !important;
+
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+
+  padding:13px 24px !important;
+  border-radius:22px !important;
+
+  align-self:center !important;
+  justify-self:center !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+
+  text-align:center !important;
+  overflow:visible !important;
+}
+
+/* نص السؤال يحدد حجم المستطيل */
+.finalTeamMediaQuestionText{
+  width:auto !important;
+  max-width:470px !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.25rem, 1.8vw, 1.65rem) !important;
+  line-height:1.25 !important;
+
+  text-align:center !important;
+  text-wrap:balance !important;
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+}
+
+/* صف السؤال والجواب يبقى مرتب */
+.finalTeamMediaTextRow{
+  width:100% !important;
+
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  gap:14px !important;
+}
+
+/* على الآيباد */
+@media (min-width:768px) and (max-width:1180px){
+  .finalTeamMediaQuestionBox{
+    min-width:230px !important;
+    max-width:440px !important;
+    padding:12px 20px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    max-width:400px !important;
+    font-size:1.18rem !important;
+  }
+}
+
+/* على الجوال */
+@media (max-width:767px){
+  .finalTeamMediaQuestionBox{
+    width:fit-content !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    padding:12px 18px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    max-width:100% !important;
+    font-size:1.12rem !important;
+    line-height:1.3 !important;
+  }
+}
+/* =========================================================
+   FINAL TEAM MEDIA - ANSWER BOX SAME AS QUESTION
+   مربع الإجابة نفس تنسيق السؤال وعلى حجم النص
+========================================================= */
+
+.finalTeamMediaResultBox{
+  width:fit-content !important;
+  min-width:260px !important;
+  max-width:520px !important;
+
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+
+  padding:13px 24px !important;
+  border-radius:22px !important;
+
+  align-self:center !important;
+  justify-self:center !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+
+  text-align:center !important;
+  overflow:visible !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.52), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(236,254,255,.52)) !important;
+
+  border:1px solid rgba(103,232,249,.42) !important;
+
+  box-shadow:
+    0 16px 32px rgba(8,145,178,.10),
+    0 0 0 5px rgba(103,232,249,.07),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
+
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px) !important;
+}
+
+/* الإجابة إذا صح */
+.finalTeamMediaResultBox.correctResult{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.52), transparent 42%),
+    radial-gradient(circle at 90% 100%, rgba(34,197,94,.20), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(220,252,231,.55)) !important;
+
+  border-color:rgba(34,197,94,.46) !important;
+
+  box-shadow:
+    0 16px 32px rgba(34,197,94,.12),
+    0 0 0 5px rgba(34,197,94,.08),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+
+/* الإجابة إذا خطأ */
+.finalTeamMediaResultBox.wrongResult{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.52), transparent 42%),
+    radial-gradient(circle at 90% 100%, rgba(239,68,68,.18), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.76), rgba(254,226,226,.55)) !important;
+
+  border-color:rgba(239,68,68,.46) !important;
+
+  box-shadow:
+    0 16px 32px rgba(239,68,68,.12),
+    0 0 0 5px rgba(239,68,68,.08),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+
+/* نص الإجابة نفس ضبط نص السؤال */
+.finalRound3TeamMediaAnswer{
+  width:auto !important;
+  max-width:470px !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.25rem, 1.8vw, 1.65rem) !important;
+  line-height:1.25 !important;
+  font-weight:400 !important;
+
+  text-align:center !important;
+  text-wrap:balance !important;
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+}
+
+/* عنوان الإجابة حسب الحالة */
+.finalTeamMediaResultBox.correctResult .finalTeamMediaSmallLabel{
+  color:#166534 !important;
+}
+
+.finalTeamMediaResultBox.wrongResult .finalTeamMediaSmallLabel{
+  color:#991B1B !important;
+}
+
+/* ترتيب السؤال والإجابة جنب بعض */
+.finalTeamMediaTextRow{
+  width:100% !important;
+
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  gap:14px !important;
+  flex-wrap:nowrap !important;
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .finalTeamMediaResultBox{
+    min-width:230px !important;
+    max-width:440px !important;
+    padding:12px 20px !important;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    max-width:400px !important;
+    font-size:1.18rem !important;
+  }
+}
+
+/* iPhone */
+@media (max-width:767px){
+  .finalTeamMediaResultBox{
+    width:fit-content !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    padding:12px 18px !important;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    max-width:100% !important;
+    font-size:1.12rem !important;
+    line-height:1.3 !important;
+  }
+}
+/* =========================================================
+   FINAL TEAM MEDIA - QUESTION WIDE NOT TALL
+   السؤال يتمدد بالعرض بدل الطول
+========================================================= */
+
+.finalTeamMediaQuestionBox{
+  width:fit-content !important;
+  min-width:320px !important;
+  max-width:680px !important;
+
+  height:auto !important;
+  min-height:82px !important;
+  max-height:118px !important;
+
+  padding:14px 30px !important;
+  border-radius:22px !important;
+
+  overflow:hidden !important;
+}
+
+/* نص السؤال: يتمدد عرضياً ويقلل التفاف الأسطر */
+.finalTeamMediaQuestionText{
+  width:auto !important;
+  min-width:0 !important;
+  max-width:620px !important;
+
+  font-size:clamp(1.18rem, 1.65vw, 1.55rem) !important;
+  line-height:1.22 !important;
+
+  text-align:center !important;
+  text-wrap:balance !important;
+
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow-wrap:normal !important;
+
+  display:-webkit-box !important;
+  -webkit-line-clamp:3 !important;
+  -webkit-box-orient:vertical !important;
+  overflow:hidden !important;
+}
+
+/* صف السؤال والجواب يسمح للسؤال يأخذ مساحة أكبر */
+.finalTeamMediaTextRow{
+  width:100% !important;
+  max-width:900px !important;
+
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  gap:14px !important;
+  flex-wrap:nowrap !important;
+}
+
+/* السؤال يأخذ مساحة أكبر من الجواب */
+.finalTeamMediaQuestionBox{
+  flex:0 1 auto !important;
+}
+
+.finalTeamMediaResultBox{
+  flex:0 0 auto !important;
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .finalTeamMediaQuestionBox{
+    min-width:300px !important;
+    max-width:560px !important;
+    min-height:76px !important;
+    max-height:110px !important;
+    padding:12px 24px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    max-width:520px !important;
+    font-size:1.12rem !important;
+    line-height:1.2 !important;
+    -webkit-line-clamp:3 !important;
+  }
+}
+
+/* iPhone */
+@media (max-width:767px){
+  .finalTeamMediaTextRow{
+    flex-direction:column !important;
+    align-items:center !important;
+  }
+
+  .finalTeamMediaQuestionBox{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    min-height:78px !important;
+    max-height:125px !important;
+    padding:12px 18px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    max-width:100% !important;
+    font-size:1.08rem !important;
+    line-height:1.25 !important;
+    -webkit-line-clamp:4 !important;
+  }
+}
+/* =========================================================
+   FINAL TEAM MEDIA - FIX ANSWER TEXT CUT
+   منع قص نص الإجابة مثل السؤال
+========================================================= */
+
+.finalTeamMediaResultBox{
+  width:fit-content !important;
+  min-width:260px !important;
+  max-width:760px !important;
+
+  height:auto !important;
+  min-height:82px !important;
+  max-height:none !important;
+
+  padding:14px 30px !important;
+  border-radius:22px !important;
+
+  overflow:visible !important;
+
+  flex:1 1 auto !important;
+}
+
+/* نص الإجابة يظهر كامل */
+.finalRound3TeamMediaAnswer{
+  width:auto !important;
+  max-width:700px !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.12rem, 1.55vw, 1.45rem) !important;
+  line-height:1.35 !important;
+
+  text-align:center !important;
+  text-wrap:balance !important;
+
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+
+  display:block !important;
+  overflow:visible !important;
+
+  max-height:none !important;
+
+  -webkit-line-clamp:unset !important;
+  -webkit-box-orient:unset !important;
+}
+
+/* صف السؤال والإجابة يسمح لهم يتمددون بدون قص */
+.finalTeamMediaTextRow{
+  width:100% !important;
+  max-width:980px !important;
+
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  gap:14px !important;
+  flex-wrap:wrap !important;
+}
+
+/* السؤال والإجابة نفس السلوك */
+.finalTeamMediaQuestionBox,
+.finalTeamMediaResultBox{
+  flex:1 1 auto !important;
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .finalTeamMediaResultBox{
+    min-width:260px !important;
+    max-width:620px !important;
+    padding:12px 24px !important;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    max-width:580px !important;
+    font-size:1.08rem !important;
+    line-height:1.34 !important;
+  }
+}
+
+/* iPhone */
+@media (max-width:767px){
+  .finalTeamMediaResultBox{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    padding:12px 18px !important;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    max-width:100% !important;
+    font-size:1.08rem !important;
+    line-height:1.35 !important;
+  }
+}
+/* =========================================================
+   FINAL TEAM MEDIA - STOP QUESTION FULL WIDTH
+   منع مربع السؤال من أخذ عرض الشاشة كامل
+========================================================= */
+
+.finalTeamMediaTextRow{
+  width:auto !important;
+  max-width:100% !important;
+
+  display:flex !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  gap:14px !important;
+  flex-wrap:wrap !important;
+}
+
+/* السؤال لا يتمدد كامل */
+.finalTeamMediaQuestionBox{
+  flex:0 1 auto !important;
+
+  width:fit-content !important;
+  min-width:260px !important;
+  max-width:520px !important;
+
+  height:auto !important;
+  min-height:78px !important;
+  max-height:none !important;
+
+  padding:14px 28px !important;
+  border-radius:22px !important;
+
+  align-self:center !important;
+  justify-self:center !important;
+
+  overflow:visible !important;
+}
+
+/* نص السؤال */
+.finalTeamMediaQuestionText{
+  width:auto !important;
+  max-width:470px !important;
+
+  display:block !important;
+
+  font-size:clamp(1.25rem, 1.8vw, 1.7rem) !important;
+  line-height:1.35 !important;
+
+  text-align:center !important;
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+
+  overflow:visible !important;
+  max-height:none !important;
+
+  -webkit-line-clamp:unset !important;
+  -webkit-box-orient:unset !important;
+}
+
+/* الجواب نفس السلوك */
+.finalTeamMediaResultBox{
+  flex:0 1 auto !important;
+
+  width:fit-content !important;
+  min-width:260px !important;
+  max-width:520px !important;
+
+  height:auto !important;
+  min-height:78px !important;
+  max-height:none !important;
+
+  padding:14px 28px !important;
+  border-radius:22px !important;
+
+  overflow:visible !important;
+}
+
+.finalRound3TeamMediaAnswer{
+  width:auto !important;
+  max-width:470px !important;
+
+  display:block !important;
+
+  font-size:clamp(1.25rem, 1.8vw, 1.7rem) !important;
+  line-height:1.35 !important;
+
+  text-align:center !important;
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+
+  overflow:visible !important;
+  max-height:none !important;
+}
+
+/* إذا ظهر السؤال لحاله يكون وسط وتحت الفيديو بحجمه الطبيعي */
+.finalTeamMediaTextRow:has(.finalTeamMediaQuestionBox):not(:has(.finalTeamMediaResultBox)){
+  width:fit-content !important;
+  margin:0 auto !important;
+}
+
+/* إذا ظهر الجواب لحاله */
+.finalTeamMediaTextRow:has(.finalTeamMediaResultBox):not(:has(.finalTeamMediaQuestionBox)){
+  width:fit-content !important;
+  margin:0 auto !important;
+}
+
+/* للجوال */
+@media (max-width:767px){
+  .finalTeamMediaTextRow{
+    width:100% !important;
+    flex-direction:column !important;
+    align-items:center !important;
+  }
+
+  .finalTeamMediaQuestionBox,
+  .finalTeamMediaResultBox{
+    width:fit-content !important;
+    min-width:0 !important;
+    max-width:92% !important;
+    padding:12px 18px !important;
+  }
+
+  .finalTeamMediaQuestionText,
+  .finalRound3TeamMediaAnswer{
+    max-width:100% !important;
+    font-size:1.15rem !important;
   }
 }
