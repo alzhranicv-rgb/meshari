@@ -1,789 +1,940 @@
 /* =========================================================
-   INTRO PAGE - ALHANAKAH FINAL
-   ترتيب نظيف / زجاجي / بدون لاق
+   INTRO PAGE - CLEAN FINAL
+   File: assets/css/segments/intro.css
 ========================================================= */
 
-/* =========================
-   Page
-========================= */
+*{
+  box-sizing:border-box;
+}
 
-.introPage{
-  min-height:100dvh;
+html,
+body{
   width:100%;
+  min-height:100%;
+  margin:0;
+}
 
-  position:relative;
-  overflow:hidden;
-
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
-
-  padding:24px 18px 34px;
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+  font-family:"HanakaText",sans-serif;
 
   background:
-    radial-gradient(circle at 14% 8%, rgba(255,255,255,.52), transparent 28%),
-    radial-gradient(circle at 84% 12%, rgba(103,232,249,.18), transparent 34%),
-    radial-gradient(circle at 16% 88%, rgba(255,155,81,.17), transparent 34%),
-    radial-gradient(circle at 86% 88%, rgba(47,65,88,.08), transparent 34%),
-    linear-gradient(180deg,#F8FAFC 0%,#EEF3F6 100%);
+    radial-gradient(circle at 18% 16%, rgba(255,155,81,.28), transparent 30%),
+    radial-gradient(circle at 82% 18%, rgba(103,232,249,.24), transparent 32%),
+    radial-gradient(circle at 50% 92%, rgba(124,58,237,.18), transparent 36%),
+    linear-gradient(135deg,#F8FAFC 0%,#EEF2FF 48%,#FFF7ED 100%);
+}
 
-  color:#24185E;
+/* =========================================================
+   PAGE
+========================================================= */
+
+.introPage{
+  position:relative;
+  width:100%;
+  min-height:100vh;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:34px 22px;
+  overflow:hidden;
 }
 
 .introPage::before{
   content:"";
   position:absolute;
-  width:520px;
-  height:520px;
-  top:-230px;
-  right:-190px;
-
-  border-radius:50%;
-  background:rgba(255,255,255,.34);
-
+  inset:0;
   pointer-events:none;
+
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.10) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,.10) 1px, transparent 1px);
+
+  background-size:58px 58px;
+  opacity:.55;
 }
 
 .introPage::after{
   content:"";
   position:absolute;
-  width:360px;
-  height:360px;
-  left:-160px;
-  bottom:-130px;
-
-  border-radius:90px;
-  transform:rotate(20deg);
-
-  background:rgba(103,232,249,.08);
-
+  inset:0;
   pointer-events:none;
-}
-
-.introDecor{
-  position:absolute;
-  pointer-events:none;
-}
-
-.introDecorOne{
-  width:210px;
-  height:210px;
-  right:8%;
-  bottom:10%;
-
-  border-radius:48px;
-  transform:rotate(-14deg);
-
-  background:rgba(255,155,81,.09);
-}
-
-.introDecorTwo{
-  width:130px;
-  height:130px;
-  left:12%;
-  top:12%;
-
-  border-radius:38px;
-  transform:rotate(18deg);
-
-  background:rgba(103,232,249,.08);
-}
-
-.introDecorThree{
-  width:96px;
-  height:96px;
-  right:18%;
-  top:18%;
-
-  border-radius:50%;
-
-  background:rgba(255,255,255,.22);
-}
-
-/* =========================
-   Shell
-========================= */
-
-.introShell{
-  position:relative;
-  z-index:2;
-
-  width:min(100%, 860px);
-
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  align-items:center;
-}
-
-/* =========================
-   Header
-========================= */
-
-.introHeader{
-  width:100%;
-  min-height:250px;
-
-  position:relative;
-  overflow:hidden;
-
-  padding:28px 24px;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-
-  text-align:center;
-
-  border-radius:42px 24px 42px 24px;
 
   background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.42), transparent 40%),
-    linear-gradient(180deg, rgba(255,255,255,.38), rgba(255,255,255,.16));
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.58), transparent 30%),
+    linear-gradient(180deg, rgba(255,255,255,.08), transparent 62%);
+}
 
-  border:1px solid rgba(255,255,255,.42);
+.introBgShape{
+  position:absolute;
+  pointer-events:none;
+  border-radius:999px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.40), rgba(255,255,255,.12));
+
+  border:1px solid rgba(255,255,255,.34);
 
   box-shadow:
-    0 24px 52px rgba(30,27,75,.12),
-    inset 0 1px 0 rgba(255,255,255,.76),
+    0 28px 80px rgba(30,27,75,.12),
+    inset 0 1px 0 rgba(255,255,255,.52);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+
+  animation:introFloat 8s ease-in-out infinite alternate;
+}
+
+.introBgShapeOne{
+  width:240px;
+  height:240px;
+  top:8%;
+  right:7%;
+}
+
+.introBgShapeTwo{
+  width:150px;
+  height:150px;
+  bottom:12%;
+  left:8%;
+  animation-delay:.8s;
+}
+
+.introBgShapeThree{
+  width:90px;
+  height:90px;
+  top:66%;
+  right:18%;
+  animation-delay:1.4s;
+}
+
+@keyframes introFloat{
+  from{
+    transform:translateY(0) scale(1);
+  }
+
+  to{
+    transform:translateY(-20px) scale(1.04);
+  }
+}
+
+/* =========================================================
+   MAIN CARD
+========================================================= */
+
+.introCard{
+  position:relative;
+  z-index:3;
+
+  width:min(100%,820px);
+  min-height:640px;
+
+  padding:34px;
+  border-radius:44px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:26px;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.54), transparent 42%),
+    radial-gradient(circle at 12% 100%, rgba(255,155,81,.14), transparent 34%),
+    radial-gradient(circle at 100% 100%, rgba(103,232,249,.14), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,.50), rgba(255,255,255,.20));
+
+  border:1px solid rgba(255,255,255,.50);
+
+  box-shadow:
+    0 34px 90px rgba(30,27,75,.14),
+    inset 0 1px 0 rgba(255,255,255,.82),
     inset 0 -1px 0 rgba(255,255,255,.12);
 
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
+  backdrop-filter:blur(28px);
+  -webkit-backdrop-filter:blur(28px);
+
+  overflow:hidden;
+
+  animation:introCardEnter .55s cubic-bezier(.2,.85,.2,1.05) both;
 }
 
-.introHeader::before{
+.introCard::before{
   content:"";
   position:absolute;
-  width:190px;
-  height:190px;
-  top:-78px;
-  right:-54px;
-
+  width:280px;
+  height:280px;
+  top:-138px;
+  right:-82px;
   border-radius:50%;
-  background:rgba(255,255,255,.16);
+
+  background:
+    radial-gradient(circle, rgba(255,255,255,.24), transparent 70%);
 
   pointer-events:none;
 }
 
-.introHeader::after{
+.introCard::after{
   content:"";
   position:absolute;
-  width:110px;
-  height:110px;
+  width:150px;
+  height:150px;
+  bottom:-58px;
   left:-34px;
-  bottom:-36px;
-
-  border-radius:30px;
+  border-radius:38px;
   transform:rotate(24deg);
 
-  background:rgba(103,232,249,.10);
-
+  background:rgba(255,255,255,.10);
   pointer-events:none;
 }
 
-.introTitleBox{
+.introCard.softEnter{
+  animation:introCardEnter .55s cubic-bezier(.2,.85,.2,1.05) both;
+}
+
+@keyframes introCardEnter{
+  from{
+    opacity:0;
+    transform:translateY(24px) scale(.96);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.introCardHeader{
   position:relative;
   z-index:2;
-
-  width:100%;
 
   display:flex;
   flex-direction:column;
   align-items:center;
+  text-align:center;
+  gap:12px;
 }
 
-.introTitleGlow{
-  position:absolute;
-  width:270px;
-  height:100px;
-  top:50%;
-  left:50%;
+.introMiniBadge{
+  min-height:36px;
+  padding:8px 20px;
 
-  transform:translate(-50%,-50%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
   border-radius:999px;
 
   background:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,.48), transparent 66%),
-    radial-gradient(circle at 20% 50%, rgba(103,232,249,.18), transparent 54%),
-    radial-gradient(circle at 80% 50%, rgba(255,155,81,.16), transparent 54%);
+    linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.34));
 
-  filter:blur(10px);
-  pointer-events:none;
+  border:1px solid rgba(255,255,255,.56);
+
+  color:#0F4C5C;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:.92rem;
+
+  box-shadow:
+    0 10px 24px rgba(8,145,178,.08),
+    inset 0 1px 0 rgba(255,255,255,.82);
 }
+
+/* =========================================================
+   TITLE - FIXED COLOR GLASS EFFECT
+   الحنكة ثابتة اللون بدون ما تتحول رمادي
+========================================================= */
 
 .introTitle{
   position:relative;
-  z-index:2;
 
   margin:0;
 
-  color:#24185E;
+  color:#24185E !important;
+  -webkit-text-fill-color:#24185E !important;
+
+  background:none !important;
+  -webkit-background-clip:initial !important;
+  background-clip:initial !important;
 
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(3.8rem, 8vw, 5.8rem);
+  font-size:clamp(5rem,10vw,8.6rem);
   line-height:.86;
   font-weight:400;
-  letter-spacing:-1px;
 
   text-shadow:
-    0 1px 0 rgba(255,255,255,.78),
-    0 10px 22px rgba(30,27,75,.11),
-    0 0 22px rgba(103,232,249,.16),
-    0 0 30px rgba(255,155,81,.12);
+    0 3px 0 rgba(255,255,255,.88),
+    0 16px 32px rgba(30,27,75,.18),
+    0 0 18px rgba(103,232,249,.16);
+
+  filter:
+    drop-shadow(0 10px 18px rgba(30,27,75,.10));
+
+  animation:hanakaTitleGlassPulse 3.6s ease-in-out infinite;
 }
 
-.introTitleLine{
-  width:150px;
-  height:4px;
-  margin:14px auto 0;
+/* نلغي اللمعة اللي كانت تغير لون الكلمة */
+.introTitle::before{
+  content:none !important;
+  display:none !important;
+}
+
+/* الخط الزجاجي تحت العنوان */
+.introTitle::after{
+  content:"";
+
+  width:170px;
+  height:10px;
+  margin:16px auto 0;
+
+  display:block;
 
   border-radius:999px;
 
   background:
-    linear-gradient(90deg, transparent, #67E8F9, #FF9B51, transparent);
+    linear-gradient(
+      115deg,
+      #FF9B51 0%,
+      #FF9B51 22%,
+      #67E8F9 40%,
+      rgba(255,255,255,.92) 50%,
+      #7C3AED 62%,
+      #FF9B51 100%
+    );
+
+  background-size:260% 100%;
+  background-position:100% 50%;
 
   box-shadow:
-    0 0 14px rgba(103,232,249,.24),
-    0 0 16px rgba(255,155,81,.18);
+    0 10px 24px rgba(249,115,22,.22),
+    0 0 18px rgba(103,232,249,.20);
+
+  animation:hanakaLineGlassMove 3.2s ease-in-out infinite;
 }
 
-.introSubTitle{
+/* تأثير زجاجي بدون تغيير لون النص */
+@keyframes hanakaTitleGlassPulse{
+  0%,100%{
+    transform:translateY(0) scale(1);
+
+    text-shadow:
+      0 3px 0 rgba(255,255,255,.88),
+      0 16px 32px rgba(30,27,75,.18),
+      0 0 14px rgba(103,232,249,.12);
+  }
+
+  50%{
+    transform:translateY(-2px) scale(1.01);
+
+    text-shadow:
+      0 3px 0 rgba(255,255,255,.92),
+      0 18px 36px rgba(30,27,75,.20),
+      0 0 24px rgba(103,232,249,.24);
+  }
+}
+
+@keyframes hanakaLineGlassMove{
+  0%{
+    background-position:100% 50%;
+    filter:brightness(1);
+    transform:scaleX(1);
+  }
+
+  45%{
+    background-position:0% 50%;
+    filter:brightness(1.18);
+    transform:scaleX(1.06);
+  }
+
+  100%{
+    background-position:0% 50%;
+    filter:brightness(1);
+    transform:scaleX(1);
+  }
+}
+
+@media (max-width:767px){
+  .introTitle{
+    font-size:clamp(4rem,18vw,5.8rem);
+  }
+
+  .introTitle::after{
+    width:125px;
+    height:8px;
+    margin-top:12px;
+  }
+}
+
+.introSubtitle{
+  max-width:560px;
+  margin:0 auto;
+
+  color:#0F4C5C;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.05rem,1.7vw,1.4rem);
+  line-height:1.6;
+}
+
+/* =========================================================
+   FORM CARD
+========================================================= */
+
+.introFormCard{
   position:relative;
   z-index:2;
 
-  max-width:420px;
-
-  margin:16px auto 0;
-
-  color:#64748B;
-  font-family:"HanakaText",sans-serif;
-  font-size:1.03rem;
-  line-height:1.8;
-}
-
-/* =========================
-   Setup Card
-========================= */
-
-.introSetupCard{
-  position:relative;
-  overflow:hidden;
-
-  width:100%;
-  min-height:auto;
-
-  padding:24px;
+  padding:20px;
+  border-radius:34px;
 
   display:flex;
   flex-direction:column;
-  justify-content:center;
-  gap:18px;
-
-  border-radius:42px 24px 42px 24px;
+  gap:15px;
 
   background:
-    radial-gradient(circle at 16% 0%, rgba(255,255,255,.42), transparent 40%),
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.36), transparent 42%),
     linear-gradient(180deg, rgba(255,255,255,.38), rgba(255,255,255,.16));
 
   border:1px solid rgba(255,255,255,.42);
 
   box-shadow:
-    0 24px 52px rgba(30,27,75,.12),
-    inset 0 1px 0 rgba(255,255,255,.76),
-    inset 0 -1px 0 rgba(255,255,255,.12);
+    0 20px 50px rgba(30,27,75,.10),
+    inset 0 1px 0 rgba(255,255,255,.74);
 
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
 }
 
-.introSetupCard::before{
-  content:"";
-  position:absolute;
-  width:170px;
-  height:170px;
-  top:-74px;
-  right:-50px;
-
-  border-radius:50%;
-  background:rgba(255,255,255,.14);
-
-  pointer-events:none;
-}
-
-.introSetupCard::after{
-  content:"";
-  position:absolute;
-  width:96px;
-  height:96px;
-  left:-24px;
-  bottom:-30px;
-
-  border-radius:26px;
-  transform:rotate(24deg);
-
-  background:rgba(255,255,255,.09);
-
-  pointer-events:none;
-}
-
-/* =========================
-   Teams
-========================= */
-
-.introTeamsRow{
-  position:relative;
-  z-index:2;
-
-  width:100%;
-
+.introTeamsGrid{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-  align-items:stretch;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
 }
 
-.introTeamCard{
+.introFieldBox{
   position:relative;
-  overflow:hidden;
-
-  min-height:126px;
 
   padding:16px;
+  border-radius:26px;
 
   display:flex;
   flex-direction:column;
-  justify-content:center;
-  gap:12px;
+  gap:10px;
+
+  background:
+    linear-gradient(
+      115deg,
+      rgba(255,255,255,.48) 0%,
+      rgba(255,255,255,.22) 24%,
+      rgba(103,232,249,.14) 38%,
+      rgba(255,255,255,.50) 48%,
+      rgba(255,155,81,.09) 60%,
+      rgba(255,255,255,.22) 74%,
+      rgba(255,255,255,.48) 100%
+    );
+
+  background-size:260% 100%;
+  background-position:100% 50%;
 
   border:1px solid rgba(255,255,255,.42);
-  border-radius:28px 18px 28px 18px;
-
-  background:
-    radial-gradient(circle at 14% 0%, rgba(255,255,255,.30), transparent 38%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
 
   box-shadow:
-    0 18px 36px rgba(30,27,75,.09),
-    inset 0 1px 0 rgba(255,255,255,.72),
-    inset 0 -1px 0 rgba(255,255,255,.10);
+    0 14px 30px rgba(30,27,75,.08),
+    inset 0 1px 0 rgba(255,255,255,.72);
 
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
+  overflow:hidden;
+
+  animation:introBoxSoftShine 5.6s ease-in-out infinite;
 }
 
-.introTeamCardA{
-  background:
-    radial-gradient(circle at 12% 0%, rgba(124,58,237,.18), transparent 40%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+.introTeamsGrid .introFieldBox:nth-child(1){
+  animation-delay:.15s;
 }
 
-.introTeamCardB{
-  border-radius:18px 28px 18px 28px;
-
-  background:
-    radial-gradient(circle at 88% 0%, rgba(6,182,212,.18), transparent 40%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
+.introTeamsGrid .introFieldBox:nth-child(2){
+  animation-delay:.55s;
 }
 
-.introTeamCard::before{
+.introModelBox{
+  animation-delay:.95s;
+}
+
+@keyframes introBoxSoftShine{
+  0%{
+    background-position:100% 50%;
+  }
+
+  38%{
+    background-position:0% 50%;
+  }
+
+  100%{
+    background-position:0% 50%;
+  }
+}
+
+.introFieldBox:hover{
+  filter:brightness(1.04);
+
+  box-shadow:
+    0 18px 38px rgba(30,27,75,.11),
+    0 0 0 1px rgba(103,232,249,.12),
+    inset 0 1px 0 rgba(255,255,255,.82);
+}
+
+.introFieldBox::before{
   content:"";
   position:absolute;
-  width:110px;
-  height:110px;
-  top:-54px;
-
+  width:90px;
+  height:90px;
+  top:-50px;
+  right:-26px;
   border-radius:50%;
   background:rgba(255,255,255,.14);
-
   pointer-events:none;
 }
 
-.introTeamCardA::before{
-  right:-24px;
-}
-
-.introTeamCardB::before{
-  left:-24px;
-}
-
-.introTeamCard label{
+.introFieldBox label{
   position:relative;
   z-index:2;
-
-  color:#2F4158;
-  font-family:"HanakaText",sans-serif;
-  font-size:1rem;
-  line-height:1;
-  text-align:center;
-}
-
-.introTeamInputBox{
-  position:relative;
-  z-index:2;
-
-  min-height:58px;
-
-  display:flex;
-  align-items:center;
-
-  border-radius:20px;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.28));
-
-  border:1px solid rgba(255,255,255,.38);
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.74),
-    0 10px 20px rgba(30,27,75,.05);
-}
-
-.introTeamInputBox input{
-  width:100%;
-  height:58px;
-
-  border:0;
-  outline:0;
-
-  background:transparent;
-
-  padding:0 16px;
 
   color:#24185E;
-  font-family:"HanakaText",sans-serif;
-  font-size:1.08rem;
-
-  text-align:center;
-}
-
-.introTeamInputBox input::placeholder{
-  color:rgba(100,116,139,.72);
-}
-
-.introTeamInputBox:focus-within{
-  border-color:rgba(255,155,81,.42);
-
-  box-shadow:
-    0 0 0 5px rgba(255,155,81,.10),
-    0 16px 30px rgba(30,27,75,.08),
-    inset 0 1px 0 rgba(255,255,255,.82);
-}
-
-/* =========================
-   Model
-========================= */
-
-.introModelCard{
-  position:relative;
-  z-index:2;
-  overflow:hidden;
-
-  width:100%;
-  min-height:116px;
-
-  padding:16px;
-
-  display:grid;
-  grid-template-columns:minmax(0, 1fr) minmax(240px, 330px);
-  gap:16px;
-  align-items:center;
-
-  border-radius:30px 18px 30px 18px;
-
-  background:
-    radial-gradient(circle at 16% 0%, rgba(255,155,81,.16), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.16));
-
-  border:1px solid rgba(255,255,255,.42);
-
-  box-shadow:
-    0 18px 36px rgba(30,27,75,.09),
-    inset 0 1px 0 rgba(255,255,255,.72),
-    inset 0 -1px 0 rgba(255,255,255,.10);
-
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-}
-
-.introModelText label{
-  display:block;
-
-  color:#24185E;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.65rem;
-  line-height:1;
-  margin-bottom:8px;
-}
-
-.introModelText p{
-  margin:0;
-
-  color:#64748B;
-  font-family:"HanakaText",sans-serif;
-  font-size:.94rem;
-  line-height:1.5;
-}
-
-.introModelSelectBox{
-  position:relative;
-
-  min-height:58px;
-
-  display:flex;
-  align-items:center;
-
-  border-radius:20px;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.28));
-
-  border:1px solid rgba(255,255,255,.38);
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.74),
-    0 10px 20px rgba(30,27,75,.05);
-}
-
-.introModelSelectBox::after{
-  content:"⌄";
-  position:absolute;
-  left:18px;
-  top:50%;
-
-  transform:translateY(-50%);
-
-  color:#2F4158;
-  font-family:Arial,sans-serif;
-  font-size:1.35rem;
-
-  pointer-events:none;
-}
-
-.introModelSelectBox select{
-  width:100%;
-  height:58px;
-
-  border:0;
-  outline:0;
-
-  background:transparent;
-
-  padding:0 16px 0 48px;
-
-  color:#24185E;
-  font-family:"HanakaText",sans-serif;
-  font-size:1.04rem;
-
-  appearance:none;
-  -webkit-appearance:none;
-
-  cursor:pointer;
-}
-
-.introModelSelectBox:focus-within{
-  border-color:rgba(255,155,81,.42);
-
-  box-shadow:
-    0 0 0 5px rgba(255,155,81,.10),
-    0 16px 30px rgba(30,27,75,.08),
-    inset 0 1px 0 rgba(255,255,255,.82);
-}
-
-/* =========================
-   Start Button
-========================= */
-
-.introActions{
-  position:relative;
-  z-index:2;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  margin-top:4px;
-}
-
-#startGameBtn{
-  position:relative;
-  overflow:hidden;
-
-  width:min(100%, 360px);
-  min-height:62px;
-
-  border:1px solid rgba(255,255,255,.50);
-  border-radius:24px;
-
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.42), transparent 42%),
-    linear-gradient(180deg, rgba(255,155,81,.86), rgba(249,115,22,.74));
-
-  color:#fff;
 
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.28rem;
   line-height:1;
-
-  cursor:pointer;
-
-  box-shadow:
-    0 18px 34px rgba(249,115,22,.18),
-    0 0 0 5px rgba(255,255,255,.10),
-    inset 0 1px 0 rgba(255,255,255,.42),
-    inset 0 -1px 0 rgba(0,0,0,.10);
-
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-
-  transition:
-    transform .16s ease,
-    filter .16s ease,
-    opacity .16s ease;
 }
 
-#startGameBtn::before{
-  content:"";
-  position:absolute;
-  width:86px;
-  height:86px;
-  top:-42px;
-  right:-22px;
-
-  border-radius:50%;
-  background:rgba(255,255,255,.16);
-
-  pointer-events:none;
+.introModelBox{
+  display:grid;
+  grid-template-columns:120px minmax(0,1fr);
+  align-items:center;
+  gap:12px;
 }
 
-#startGameBtn::after{
-  content:"";
-  position:absolute;
-  inset:-45%;
+.introModelBox label{
+  margin:0;
+}
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+#teamANameInput,
+#teamBNameInput,
+#introModelSelect{
+  position:relative;
+  z-index:2;
+
+  width:100%;
+  height:56px;
+
+  padding:0 17px;
+
+  border:1px solid rgba(255,255,255,.48);
+  border-radius:19px;
+
+  outline:none;
 
   background:
-    linear-gradient(120deg, transparent 38%, rgba(255,255,255,.28), transparent 62%);
+    linear-gradient(
+      115deg,
+      rgba(255,255,255,.72) 0%,
+      rgba(255,255,255,.34) 24%,
+      rgba(103,232,249,.16) 38%,
+      rgba(255,255,255,.78) 48%,
+      rgba(255,255,255,.36) 62%,
+      rgba(255,255,255,.72) 100%
+    );
 
-  transform:translateX(120%) rotate(8deg);
-  animation:introBtnShine 3.2s ease-in-out infinite;
+  background-size:260% 100%;
+  background-position:100% 50%;
 
-  pointer-events:none;
+  box-shadow:
+    0 12px 26px rgba(30,27,75,.07),
+    inset 0 1px 0 rgba(255,255,255,.84);
+
+  color:#24185E;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:1.03rem;
+
+  animation:introInputSoftShine 6.4s ease-in-out infinite;
+
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background .18s ease;
 }
 
-#startGameBtn:hover{
+@keyframes introInputSoftShine{
+  0%{
+    background-position:100% 50%;
+  }
+
+  35%{
+    background-position:0% 50%;
+  }
+
+  100%{
+    background-position:0% 50%;
+  }
+}
+
+#teamANameInput::placeholder,
+#teamBNameInput::placeholder{
+  color:rgba(36,24,94,.44);
+}
+
+#teamANameInput:focus,
+#teamBNameInput:focus,
+#introModelSelect:focus{
   transform:translateY(-2px);
-  filter:brightness(1.05);
+
+  border-color:rgba(103,232,249,.68);
+
+  box-shadow:
+    0 0 0 5px rgba(103,232,249,.14),
+    0 18px 34px rgba(8,145,178,.10),
+    inset 0 1px 0 rgba(255,255,255,.90);
+
+  animation-duration:3.6s;
 }
 
-#startGameBtn:active{
-  transform:scale(.97);
-}
-
-#startGameBtn:disabled{
-  opacity:.88;
+#teamANameInput:disabled,
+#teamBNameInput:disabled,
+#introModelSelect:disabled{
+  opacity:.68;
   cursor:not-allowed;
-  transform:none;
-  filter:saturate(.96);
 }
 
-#startGameBtn.loading{
-  filter:saturate(.95);
+#introModelSelect{
+  cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
+
+  padding-left:42px;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, #24185E 50%),
+    linear-gradient(135deg, #24185E 50%, transparent 50%),
+    linear-gradient(
+      115deg,
+      rgba(255,255,255,.72) 0%,
+      rgba(255,255,255,.34) 24%,
+      rgba(103,232,249,.16) 38%,
+      rgba(255,255,255,.78) 48%,
+      rgba(255,255,255,.36) 62%,
+      rgba(255,255,255,.72) 100%
+    );
+
+  background-position:
+    left 22px center,
+    left 14px center,
+    100% 50%;
+
+  background-size:
+    8px 8px,
+    8px 8px,
+    260% 100%;
+
+  background-repeat:no-repeat;
+
+  animation:introSelectSoftShine 6.4s ease-in-out infinite;
 }
 
-@keyframes introBtnShine{
-  0%,45%{
-    transform:translateX(120%) rotate(8deg);
+@keyframes introSelectSoftShine{
+  0%{
+    background-position:
+      left 22px center,
+      left 14px center,
+      100% 50%;
   }
 
-  72%,100%{
-    transform:translateX(-120%) rotate(8deg);
+  35%{
+    background-position:
+      left 22px center,
+      left 14px center,
+      0% 50%;
+  }
+
+  100%{
+    background-position:
+      left 22px center,
+      left 14px center,
+      0% 50%;
   }
 }
-
-/* =========================
-   Error
-========================= */
 
 .introFieldError{
-  animation:introFieldShake .34s ease both;
+  animation:introFieldShake .38s ease both !important;
+
+  border-color:rgba(239,68,68,.72) !important;
+
+  box-shadow:
+    0 0 0 5px rgba(239,68,68,.13),
+    0 14px 30px rgba(239,68,68,.12),
+    inset 0 1px 0 rgba(255,255,255,.84) !important;
 }
 
 @keyframes introFieldShake{
-  0%,100%{
-    transform:translateX(0);
-  }
-
-  25%{
-    transform:translateX(5px);
-  }
-
-  50%{
-    transform:translateX(-5px);
-  }
-
-  75%{
-    transform:translateX(3px);
-  }
+  0%,100%{ transform:translateX(0); }
+  20%{ transform:translateX(-7px); }
+  40%{ transform:translateX(7px); }
+  60%{ transform:translateX(-5px); }
+  80%{ transform:translateX(5px); }
 }
 
-/* =========================
-   Presenter Modal
-========================= */
+/* =========================================================
+   START BUTTON
+========================================================= */
 
-.introPresenterModal{
-  position:fixed;
-  inset:0;
-  z-index:999997;
+#startGameBtn{
+  position:relative;
+
+  width:100%;
+  height:66px;
+
+  border:1px solid rgba(255,255,255,.56);
+  border-radius:24px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  padding:22px;
+  cursor:pointer;
 
-  background:rgba(20,28,38,.46);
+  color:#24185E;
 
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(1.45rem,2.4vw,2rem);
+  line-height:1;
+
+  background:
+    linear-gradient(
+      115deg,
+      rgba(255,255,255,.54) 0%,
+      rgba(255,255,255,.24) 22%,
+      rgba(103,232,249,.38) 36%,
+      rgba(255,255,255,.82) 47%,
+      rgba(255,155,81,.26) 58%,
+      rgba(255,255,255,.28) 72%,
+      rgba(255,255,255,.58) 100%
+    );
+
+  background-size:280% 100%;
+  background-position:100% 50%;
+
+  box-shadow:
+    0 18px 38px rgba(30,27,75,.12),
+    0 0 0 7px rgba(103,232,249,.08),
+    inset 0 1px 0 rgba(255,255,255,.90),
+    inset 0 -1px 0 rgba(255,255,255,.20);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+
+  overflow:hidden;
+
+  animation:introGlassButtonShine 3.2s ease-in-out infinite;
+
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+}
+
+@keyframes introGlassButtonShine{
+  0%{
+    background-position:100% 50%;
+  }
+
+  45%{
+    background-position:0% 50%;
+  }
+
+  100%{
+    background-position:0% 50%;
+  }
+}
+
+#startGameBtn:hover:not(:disabled){
+  transform:translateY(-3px) scale(1.01);
+  filter:brightness(1.06);
+
+  border-color:rgba(103,232,249,.70);
+
+  box-shadow:
+    0 24px 48px rgba(8,145,178,.16),
+    0 0 0 8px rgba(103,232,249,.12),
+    inset 0 1px 0 rgba(255,255,255,.94),
+    inset 0 -1px 0 rgba(255,255,255,.24);
+}
+
+#startGameBtn:active:not(:disabled){
+  transform:scale(.98);
+}
+
+#startGameBtn:disabled{
+  color:#7C7896 !important;
+
+  background:
+    linear-gradient(
+      115deg,
+      rgba(255,255,255,.36) 0%,
+      rgba(255,255,255,.16) 22%,
+      rgba(103,232,249,.20) 38%,
+      rgba(255,255,255,.48) 50%,
+      rgba(255,255,255,.18) 72%,
+      rgba(255,255,255,.34) 100%
+    ) !important;
+
+  background-size:280% 100% !important;
+
+  animation:introGlassButtonShine 4.4s ease-in-out infinite !important;
+
+  border-color:rgba(255,255,255,.38) !important;
+
+  box-shadow:
+    0 10px 22px rgba(30,27,75,.08),
+    inset 0 1px 0 rgba(255,255,255,.62) !important;
+
+  cursor:not-allowed !important;
+  transform:none !important;
+  filter:none !important;
+}
+
+#startGameBtn.loading{
+  color:transparent !important;
+  animation:none !important;
+}
+
+#startGameBtn.loading::after{
+  content:"";
+  position:absolute;
+
+  width:28px;
+  height:28px;
+
+  top:50%;
+  left:50%;
+
+  border-radius:50%;
+  border:3px solid rgba(36,24,94,.20);
+  border-top-color:#24185E;
+
+  background:transparent;
+
+  transform:translate(-50%,-50%);
+
+  animation:introBtnSpin .75s linear infinite;
+}
+
+@keyframes introBtnSpin{
+  to{
+    transform:translate(-50%,-50%) rotate(360deg);
+  }
+}
+
+/* =========================================================
+   PRESENTER MODAL
+========================================================= */
+
+.introPresenterModal{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:28px;
+
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,155,81,.20), transparent 34%),
+    radial-gradient(circle at 18% 82%, rgba(103,232,249,.14), transparent 34%),
+    rgba(15,23,42,.72);
+
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+
+  opacity:1;
+  transition:opacity .22s ease;
 }
 
 .introPresenterModal.hidden{
-  display:none;
+  display:none !important;
 }
 
 .introPresenterModalCard{
   position:relative;
 
-  width:min(100%, 760px);
+  width:min(100%,760px);
+  padding:26px;
+  border-radius:36px;
 
-  padding:24px;
-
-  border-radius:38px 22px 38px 22px;
-
-  text-align:center;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
 
   background:
-    radial-gradient(circle at 16% 0%, rgba(255,255,255,.44), transparent 40%),
-    linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,.46));
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.50), transparent 42%),
+    radial-gradient(circle at 100% 100%, rgba(103,232,249,.12), transparent 36%),
+    linear-gradient(180deg, rgba(255,255,255,.48), rgba(255,255,255,.20));
 
-  border:1px solid rgba(255,255,255,.54);
+  border:1px solid rgba(255,255,255,.46);
 
   box-shadow:
-    0 30px 80px rgba(30,27,75,.24),
-    inset 0 1px 0 rgba(255,255,255,.90);
+    0 34px 90px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.80),
+    inset 0 -1px 0 rgba(255,255,255,.12);
 
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
+  backdrop-filter:blur(28px);
+  -webkit-backdrop-filter:blur(28px);
 
-  animation:introModalIn .26s ease both;
+  overflow:hidden;
+
+  animation:introPresenterModalEnter .34s cubic-bezier(.2,.85,.2,1.05) both;
 }
 
-@keyframes introModalIn{
+.introPresenterModalCard::before{
+  content:"";
+  position:absolute;
+  width:220px;
+  height:220px;
+  top:-110px;
+  right:-70px;
+  border-radius:50%;
+  background:rgba(255,255,255,.16);
+  pointer-events:none;
+}
+
+.introPresenterModalCard::after{
+  content:"";
+  position:absolute;
+  width:110px;
+  height:110px;
+  left:-34px;
+  bottom:-46px;
+  border-radius:28px;
+  transform:rotate(24deg);
+  background:rgba(255,255,255,.10);
+  pointer-events:none;
+}
+
+@keyframes introPresenterModalEnter{
   from{
     opacity:0;
-    transform:translateY(16px) scale(.97);
+    transform:translateY(18px) scale(.96);
   }
 
   to{
@@ -794,413 +945,921 @@
 
 .introPresenterModalClose{
   position:absolute;
-  top:14px;
-  left:14px;
-  z-index:4;
+  top:18px;
+  left:18px;
+  z-index:5;
 
-  width:38px;
-  height:38px;
+  width:48px;
+  height:48px;
 
   border:0;
-  border-radius:14px;
+  border-radius:17px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  background:linear-gradient(180deg,#2F4158,#243447);
-  color:#fff;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.22), transparent 42%),
+    linear-gradient(180deg,#EF4444 0%,#DC2626 100%);
 
-  font-family:Arial,sans-serif;
-  font-size:1.35rem;
+  color:#FFFFFF;
+  font-size:1.85rem;
   line-height:1;
 
   cursor:pointer;
+
+  box-shadow:
+    0 14px 30px rgba(220,38,38,.28),
+    inset 0 1px 0 rgba(255,255,255,.24);
+
+  transition:
+    transform .18s ease,
+    filter .18s ease;
+}
+
+.introPresenterModalClose:hover{
+  transform:translateY(-2px) scale(1.04);
+  filter:brightness(1.06);
 }
 
 .introPresenterModalHeader{
-  padding:4px 46px 18px;
+  position:relative;
+  z-index:2;
+
+  padding:4px 62px 0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:8px;
 }
 
 .introPresenterModalBadge{
-  width:max-content;
-  margin:0 auto 10px;
-  padding:7px 16px;
-
+  min-height:34px;
+  padding:8px 20px;
   border-radius:999px;
 
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
   background:
-    linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.38));
+    linear-gradient(180deg, rgba(255,255,255,.74), rgba(255,255,255,.34));
 
-  border:1px solid rgba(255,255,255,.44);
+  border:1px solid rgba(255,255,255,.56);
 
-  color:#7A4A22;
+  color:#0F4C5C;
   font-family:"HanakaText",sans-serif;
-  font-size:.84rem;
+  font-size:.9rem;
+
+  box-shadow:
+    0 10px 24px rgba(8,145,178,.08),
+    inset 0 1px 0 rgba(255,255,255,.84);
 }
 
 .introPresenterModalTitle{
   color:#24185E;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2.45rem;
+  font-size:clamp(2.6rem,5vw,4.1rem);
   line-height:1;
-  margin-bottom:8px;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.70),
+    0 16px 34px rgba(30,27,75,.12);
 }
 
 .introPresenterModalText{
-  color:#64748B;
+  color:#0F4C5C;
+
   font-family:"HanakaText",sans-serif;
-  font-size:.96rem;
-  line-height:1.6;
+  font-size:1rem;
+  line-height:1.5;
 }
 
 .introPresenterContent{
+  position:relative;
+  z-index:2;
+
   display:grid;
-  grid-template-columns:240px minmax(0, 1fr);
+  grid-template-columns:260px minmax(0,1fr);
   gap:18px;
-  align-items:center;
+  align-items:stretch;
 }
 
-.introPresenterQrBox{
-  width:240px;
-  height:240px;
-
-  padding:12px;
-
-  border-radius:30px;
-
-  background:#fff;
-
-  border:1px solid rgba(255,255,255,.60);
-
-  box-shadow:
-    0 16px 32px rgba(30,27,75,.10),
-    inset 0 1px 0 rgba(255,255,255,.92);
-}
-
-.introPresenterQrBox img{
-  width:100%;
-  height:100%;
-  display:block;
-  object-fit:contain;
-  border-radius:18px;
-}
-
+.introPresenterQrBox,
 .introPresenterInfoBox{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.presenterIntroCodeBox{
-  padding:14px;
-
-  border-radius:26px;
+  border-radius:28px;
 
   background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.34), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.50), rgba(255,255,255,.28));
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.34), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.48), rgba(255,255,255,.20));
 
   border:1px solid rgba(255,255,255,.42);
 
   box-shadow:
-    0 14px 28px rgba(30,27,75,.08),
+    0 16px 34px rgba(30,27,75,.10),
     inset 0 1px 0 rgba(255,255,255,.76);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.introPresenterQrBox{
+  padding:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#presenterIntroQr{
+  width:218px;
+  height:218px;
+
+  padding:10px;
+  border-radius:22px;
+
+  background:#FFFFFF;
+
+  object-fit:contain;
+  display:block;
+
+  box-shadow:
+    0 16px 34px rgba(30,27,75,.12),
+    inset 0 1px 0 rgba(255,255,255,.90);
+}
+
+.introPresenterInfoBox{
+  min-width:0;
+  padding:18px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:14px;
+}
+
+.presenterIntroCodeBox{
+  padding:16px;
+  border-radius:24px;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(103,232,249,.24), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.68), rgba(236,254,255,.40));
+
+  border:1px solid rgba(103,232,249,.36);
+
+  box-shadow:
+    0 14px 28px rgba(8,145,178,.10),
+    inset 0 1px 0 rgba(255,255,255,.82);
+
+  text-align:center;
 }
 
 .presenterIntroCodeLabel{
-  color:#64748B;
+  margin-bottom:4px;
+
+  color:#0F4C5C;
   font-family:"HanakaText",sans-serif;
-  font-size:.86rem;
-  margin-bottom:8px;
+  font-size:.9rem;
 }
 
 .presenterIntroCodeValue{
+  color:#24185E;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:3rem;
+  line-height:1;
+
+  letter-spacing:2px;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.72),
+    0 10px 22px rgba(30,27,75,.10);
+}
+
+.introPresenterLink{
+  width:100%;
+  max-width:100%;
+
+  padding:12px 14px;
+  border-radius:17px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.52), rgba(255,255,255,.24));
+
+  border:1px solid rgba(255,255,255,.42);
+
+  color:#24185E;
+
+  font-family:Arial,sans-serif;
+  font-size:.82rem;
+  line-height:1.45;
+
   direction:ltr;
+  text-align:left;
 
-  width:max-content;
-  min-width:160px;
-  min-height:58px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 
-  margin:0 auto;
-  padding:0 22px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.70);
+}
 
+.introPresenterModalActions{
+  position:relative;
+  z-index:2;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.introPresenterCopyBtn{
+  position:relative;
+
+  height:52px;
+  padding:0 18px;
+
+  border:0;
+  border-radius:18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  color:#FFFFFF;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:1rem;
+
+  overflow:hidden;
+
+  box-shadow:
+    0 14px 28px rgba(30,27,75,.18),
+    inset 0 1px 0 rgba(255,255,255,.18);
+
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .18s ease;
+}
+
+.introPresenterCopyBtn::before{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  background:
+    linear-gradient(
+      110deg,
+      transparent 0%,
+      transparent 36%,
+      rgba(255,255,255,.26) 48%,
+      rgba(255,255,255,.12) 56%,
+      transparent 72%
+    );
+
+  transform:translateX(120%);
+  pointer-events:none;
+}
+
+.introPresenterCopyBtn:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.06);
+}
+
+.introPresenterCopyBtn:hover::before{
+  animation:introModalBtnShine .7s ease both;
+}
+
+@keyframes introModalBtnShine{
+  from{
+    transform:translateX(120%);
+  }
+
+  to{
+    transform:translateX(-120%);
+  }
+}
+
+.introPresenterCopyBtn.secondary{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#312E81 0%,#1E1B4B 100%);
+}
+
+.introPresenterCopyBtn.primary{
+  color:#24185E;
+
+  background:
+    radial-gradient(circle at 24% 0%, rgba(255,255,255,.42), transparent 42%),
+    radial-gradient(circle at 80% 100%, rgba(103,232,249,.26), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.24));
+
+  border:1px solid rgba(255,255,255,.50);
+
+  box-shadow:
+    0 16px 34px rgba(8,145,178,.12),
+    0 0 0 6px rgba(103,232,249,.08),
+    inset 0 1px 0 rgba(255,255,255,.86);
+}
+/* =========================================================
+   TOAST - TOP CENTER
+   الإشعار في الأعلى بالنص
+========================================================= */
+
+.gameToast{
+  position:fixed;
+  left:50%;
+  top:24px;
+  bottom:auto;
+  z-index:100000;
+
+  min-width:280px;
+  max-width:min(92vw,520px);
+
+  min-height:54px;
+  padding:11px 20px;
   border-radius:20px;
 
   display:flex;
   align-items:center;
   justify-content:center;
-
-  background:linear-gradient(180deg,#2F4158,#243447);
-  color:#fff;
-
-  font-family:Arial,sans-serif;
-  font-size:2.15rem;
-  font-weight:900;
-  letter-spacing:6px;
-
-  box-shadow:
-    0 10px 20px rgba(47,65,88,.16),
-    inset 0 1px 0 rgba(255,255,255,.16);
-}
-
-.introPresenterLink{
-  direction:ltr;
-
-  min-height:44px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  padding:8px 12px;
-
-  border-radius:17px;
-
-  background:rgba(255,255,255,.44);
-  border:1px solid rgba(255,255,255,.36);
-
-  color:#64748B;
-
-  font-family:Arial,sans-serif;
-  font-size:.78rem;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.introPresenterModalActions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-
-  margin-top:18px;
-}
-
-.introPresenterCopyBtn{
-  min-height:54px;
-
-  border:0;
-  border-radius:18px;
-
-  color:#fff;
-
-  font-family:"HanakaText",sans-serif;
-  font-size:1rem;
-
-  cursor:pointer;
-
-  box-shadow:
-    0 12px 24px rgba(30,27,75,.12),
-    inset 0 1px 0 rgba(255,255,255,.20);
-
-  transition:
-    transform .16s ease,
-    filter .16s ease;
-}
-
-.introPresenterCopyBtn:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.04);
-}
-
-.introPresenterCopyBtn.secondary{
-  background:linear-gradient(180deg,#64748B,#334155);
-}
-
-.introPresenterCopyBtn.primary{
-  background:linear-gradient(180deg,#FF9B51,#F97316);
-}
-
-/* =========================
-   Toast
-========================= */
-
-.gameToast{
-  position:fixed;
-  top:22px;
-  left:50%;
-  z-index:999999;
-
-  min-width:min(92vw, 360px);
-  max-width:min(92vw, 520px);
-  min-height:58px;
-
-  display:flex;
-  align-items:center;
-  gap:12px;
-
-  padding:12px 16px;
-  border-radius:22px;
+  gap:10px;
 
   background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.20), transparent 42%),
-    linear-gradient(180deg, rgba(88,28,45,.88), rgba(76,5,25,.95));
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg, rgba(49,46,129,.94) 0%, rgba(30,27,75,.96) 100%);
 
-  border:1px solid rgba(255,255,255,.20);
-
-  color:#FFFFFF;
+  border:1px solid rgba(255,255,255,.24);
 
   box-shadow:
-    0 18px 42px rgba(76,5,25,.28),
-    inset 0 1px 0 rgba(255,255,255,.20);
+    0 18px 42px rgba(30,27,75,.28),
+    0 0 0 7px rgba(103,232,249,.07),
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 -1px 0 rgba(0,0,0,.14);
+
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+
+  color:#FFFFFF;
 
   opacity:0;
   pointer-events:none;
 
-  transform:translateX(-50%) translateY(-18px) scale(.96);
+  transform:translate3d(-50%,-18px,0) scale(.96);
+  will-change:transform, opacity;
 
   transition:
-    opacity .28s ease,
-    transform .28s cubic-bezier(.16,1,.3,1);
+    opacity .22s ease,
+    transform .22s cubic-bezier(.2,.85,.2,1.05);
+
+  overflow:hidden;
 }
 
-.gameToast.hidden{
-  display:none;
+.gameToast::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+
+  background:
+    linear-gradient(
+      110deg,
+      transparent 0%,
+      transparent 34%,
+      rgba(255,255,255,.24) 46%,
+      rgba(255,255,255,.10) 54%,
+      transparent 68%,
+      transparent 100%
+    );
+
+  transform:translateX(120%);
+  pointer-events:none;
 }
 
 .gameToast.show{
   opacity:1;
-  pointer-events:auto;
-  transform:translateX(-50%) translateY(0) scale(1);
+  transform:translate3d(-50%,0,0) scale(1);
+}
+
+.gameToast.show::before{
+  animation:introToastShine .75s ease .08s both;
+}
+
+@keyframes introToastShine{
+  from{
+    transform:translateX(120%);
+  }
+
+  to{
+    transform:translateX(-120%);
+  }
+}
+
+.gameToast.hidden{
+  display:none !important;
 }
 
 .gameToastIcon{
-  flex-shrink:0;
+  position:relative;
+  z-index:2;
 
-  width:34px;
-  height:34px;
+  flex:0 0 auto;
 
-  border-radius:14px;
+  width:30px;
+  height:30px;
+
+  border-radius:50%;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  background:rgba(255,255,255,.16);
-  border:1px solid rgba(255,255,255,.16);
+  background:
+    radial-gradient(circle at 24% 0%, rgba(255,255,255,.30), transparent 42%),
+    linear-gradient(180deg,#FF9B51 0%,#F97316 100%);
 
-  color:#fff;
+  color:#FFFFFF;
+
   font-family:Arial,sans-serif;
-  font-weight:900;
+  font-size:1rem;
+  font-weight:800;
+  line-height:1;
+
+  box-shadow:
+    0 8px 18px rgba(249,115,22,.24),
+    inset 0 1px 0 rgba(255,255,255,.30);
 }
 
 .gameToastText{
-  flex:1;
-  min-width:0;
+  position:relative;
+  z-index:2;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  color:#FFFFFF;
 
-  color:#fff;
   font-family:"HanakaText",sans-serif;
-  font-size:.98rem;
-  line-height:1.5;
+  font-size:1rem;
+  line-height:1.35;
   text-align:center;
+
+  white-space:normal;
+  overflow-wrap:break-word;
 }
 
-/* =========================
-   Responsive
-========================= */
-
+/* iPhone */
 @media (max-width:767px){
+  .gameToast{
+    top:16px;
+    min-width:220px;
+    max-width:calc(100vw - 28px);
+    min-height:48px;
+    padding:9px 14px;
+    border-radius:17px;
+    gap:8px;
+  }
+
+  .gameToastIcon{
+    width:27px;
+    height:27px;
+    font-size:.9rem;
+  }
+
+  .gameToastText{
+    font-size:.9rem;
+  }
+}
+
+/* =========================================================
+   IPAD
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px){
   .introPage{
-    padding:14px;
+    padding:28px 18px;
   }
 
-  .introShell{
-    width:100%;
-    gap:14px;
-  }
-
-  .introHeader,
-  .introSetupCard{
-    border-radius:30px;
-  }
-
-  .introHeader{
-    min-height:230px;
-    padding:24px 16px;
+  .introCard{
+    width:min(100%,760px);
+    min-height:600px;
+    padding:30px;
+    border-radius:40px;
   }
 
   .introTitle{
-    font-size:clamp(3.3rem, 16vw, 4.8rem);
+    font-size:clamp(4.4rem,9vw,7.4rem);
   }
 
-  .introSubTitle{
-    font-size:.94rem;
+  .introFormCard{
+    padding:18px;
   }
 
-  .introSetupCard{
-    padding:16px;
-    gap:14px;
+  #teamANameInput,
+  #teamBNameInput,
+  #introModelSelect{
+    height:54px;
+    border-radius:18px;
+    font-size:1rem;
   }
 
-  .introTeamsRow{
+  #startGameBtn{
+    height:60px;
+    border-radius:22px;
+  }
+
+  .introPresenterModalCard{
+    width:min(100%,720px);
+    padding:24px;
+    border-radius:32px;
+  }
+
+  .introPresenterContent{
+    grid-template-columns:230px minmax(0,1fr);
+  }
+
+  #presenterIntroQr{
+    width:195px;
+    height:195px;
+  }
+
+  .presenterIntroCodeValue{
+    font-size:2.6rem;
+  }
+
+  .introPresenterCopyBtn{
+    height:48px;
+    font-size:.92rem;
+  }
+
+  .gameToast{
+    bottom:22px;
+    min-width:240px;
+    max-width:min(90vw,440px);
+    min-height:50px;
+    padding:9px 16px;
+    border-radius:18px;
+  }
+
+  .gameToastIcon{
+    width:28px;
+    height:28px;
+    font-size:.95rem;
+  }
+
+  .gameToastText{
+    font-size:.9rem;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width:767px){
+  .introPage{
+    align-items:flex-start;
+    padding:16px 14px;
+    overflow:auto;
+  }
+
+  .introCard{
+    width:100%;
+    min-height:auto;
+    padding:20px 14px;
+    border-radius:30px;
+    gap:18px;
+  }
+
+  .introMiniBadge{
+    min-height:32px;
+    padding:7px 16px;
+    font-size:.82rem;
+  }
+
+  .introTitle{
+    font-size:clamp(4rem,18vw,5.8rem);
+  }
+
+  .introTitle::after{
+    width:125px;
+    height:8px;
+    margin-top:12px;
+  }
+
+  .introSubtitle{
+    font-size:1rem;
+    line-height:1.5;
+  }
+
+  .introFormCard{
+    padding:12px;
+    border-radius:24px;
+    gap:12px;
+  }
+
+  .introTeamsGrid{
     grid-template-columns:1fr;
     gap:12px;
   }
 
-  .introTeamCard{
-    min-height:116px;
-    border-radius:24px;
+  .introFieldBox{
+    padding:13px;
+    border-radius:20px;
+    animation-duration:7s;
   }
 
-  .introTeamCardB{
-    border-radius:24px;
+  .introFieldBox label{
+    font-size:1.12rem;
   }
 
-  .introModelCard{
+  .introModelBox{
     grid-template-columns:1fr;
-    min-height:auto;
-    text-align:center;
-    border-radius:24px;
+    gap:10px;
+  }
+
+  #teamANameInput,
+  #teamBNameInput,
+  #introModelSelect{
+    height:52px;
+    border-radius:17px;
+    font-size:.96rem;
+    padding:0 15px;
+    animation-duration:8s;
   }
 
   #startGameBtn{
-    width:100%;
-    min-height:58px;
+    height:58px;
     border-radius:20px;
-    font-size:1.16rem;
+    font-size:1.35rem;
+  }
+
+  .introBgShapeOne{
+    width:130px;
+    height:130px;
+    top:4%;
+    right:-48px;
+  }
+
+  .introBgShapeTwo{
+    width:100px;
+    height:100px;
+    bottom:8%;
+    left:-36px;
+  }
+
+  .introBgShapeThree{
+    display:none;
   }
 
   .introPresenterModal{
+    align-items:flex-start;
     padding:14px;
+    overflow:auto;
   }
 
   .introPresenterModalCard{
+    width:100%;
+    margin:18px 0;
+    padding:18px;
     border-radius:28px;
-    padding:22px 16px 16px;
+    gap:16px;
+  }
+
+  .introPresenterModalClose{
+    top:14px;
+    left:14px;
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    font-size:1.65rem;
+  }
+
+  .introPresenterModalHeader{
+    padding:46px 0 0;
+  }
+
+  .introPresenterModalTitle{
+    font-size:2.35rem;
+  }
+
+  .introPresenterModalText{
+    font-size:.92rem;
   }
 
   .introPresenterContent{
     grid-template-columns:1fr;
+    gap:14px;
   }
 
   .introPresenterQrBox{
-    width:190px;
-    height:190px;
+    width:fit-content;
     margin:0 auto;
+    padding:12px;
+    border-radius:24px;
+  }
+
+  #presenterIntroQr{
+    width:200px;
+    height:200px;
+    border-radius:20px;
+  }
+
+  .introPresenterInfoBox{
+    padding:14px;
+    border-radius:24px;
+  }
+
+  .presenterIntroCodeValue{
+    font-size:2.35rem;
   }
 
   .introPresenterModalActions{
     grid-template-columns:1fr;
   }
 
+  .introPresenterCopyBtn{
+    height:48px;
+    width:100%;
+    font-size:.92rem;
+  }
+
   .gameToast{
-    top:14px;
-    left:12px;
-    right:12px;
+    bottom:16px;
+    min-width:220px;
+    max-width:calc(100vw - 28px);
+    min-height:48px;
+    padding:9px 14px;
+    border-radius:17px;
+    gap:8px;
+  }
 
-    min-width:0;
-    max-width:none;
+  .gameToastIcon{
+    width:27px;
+    height:27px;
+    font-size:.9rem;
+  }
 
-    transform:translateY(-18px) scale(.96);
+  .gameToastText{
+    font-size:.88rem;
+    line-height:1.35;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion:reduce){
+  .introBgShape,
+  .introCard,
+  .introTitle,
+  .introTitle::before,
+  .introTitle::after,
+  .introFieldBox,
+  #teamANameInput,
+  #teamBNameInput,
+  #introModelSelect,
+  #startGameBtn,
+  .gameToast.show::before{
+    animation:none !important;
+  }
+
+  .gameToast{
+    transition:opacity .18s ease !important;
+    transform:translateX(-50%) !important;
   }
 
   .gameToast.show{
-    transform:translateY(0) scale(1);
+    transform:translateX(-50%) !important;
+  }
+}
+/* =========================================================
+   INTRO PERFORMANCE FIX
+   تقليل اللاق مع الحفاظ على التصميم
+========================================================= */
+
+/* أوقف اللمعات المتكررة الثقيلة على المربعات والخانات */
+.introFieldBox,
+#teamANameInput,
+#teamBNameInput,
+#introModelSelect{
+  animation:none !important;
+}
+
+/* خلي اللمعة فقط عند hover/focus بدل طول الوقت */
+.introFieldBox:hover{
+  animation:introBoxSoftShine .9s ease both !important;
+}
+
+#teamANameInput:focus,
+#teamBNameInput:focus,
+#introModelSelect:focus{
+  animation:introInputSoftShine 1.1s ease both !important;
+}
+
+/* خفف حركة الخلفية */
+.introBgShape{
+  animation:none !important;
+  opacity:.72 !important;
+}
+
+/* خفف حركة العنوان */
+.introTitle{
+  animation:hanakaTitleGlassPulse 5.5s ease-in-out infinite !important;
+}
+
+/* خفف لمعة الخط */
+.introTitle::after{
+  animation:hanakaLineGlassMove 5.2s ease-in-out infinite !important;
+}
+
+/* زر البدء: خلي اللمعة أبطأ وأخف */
+#startGameBtn{
+  animation:introGlassButtonShine 5.5s ease-in-out infinite !important;
+}
+
+/* الإشعار خفيف وسريع */
+.gameToast{
+  will-change:opacity, transform !important;
+}
+
+.gameToast::before{
+  display:none !important;
+}
+
+/* لا تستخدم will-change كثير */
+.introCard,
+.introFormCard,
+.introFieldBox,
+#startGameBtn,
+.introPresenterModalCard{
+  will-change:auto !important;
+}
+
+/* خفف blur في العناصر الثقيلة */
+.introCard{
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px) !important;
+}
+
+.introFormCard,
+.introFieldBox,
+.introPresenterQrBox,
+.introPresenterInfoBox{
+  backdrop-filter:blur(12px) !important;
+  -webkit-backdrop-filter:blur(12px) !important;
+}
+
+.introPresenterModalCard{
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px) !important;
+}
+
+.gameToast{
+  backdrop-filter:blur(12px) !important;
+  -webkit-backdrop-filter:blur(12px) !important;
+}
+
+/* على الجوال نوقف أغلب الحركات */
+@media (max-width:767px){
+  .introBgShape,
+  .introFieldBox,
+  #teamANameInput,
+  #teamBNameInput,
+  #introModelSelect{
+    animation:none !important;
+  }
+
+  .introTitle{
+    animation:none !important;
+  }
+
+  .introTitle::before{
+    display:none !important;
+  }
+
+  .introTitle::after{
+    animation:hanakaLineGlassMove 6s ease-in-out infinite !important;
+  }
+
+  #startGameBtn{
+    animation:introGlassButtonShine 6.5s ease-in-out infinite !important;
+  }
+
+  .introCard{
+    backdrop-filter:blur(12px) !important;
+    -webkit-backdrop-filter:blur(12px) !important;
+  }
+
+  .introFormCard,
+  .introFieldBox{
+    backdrop-filter:blur(8px) !important;
+    -webkit-backdrop-filter:blur(8px) !important;
   }
 }

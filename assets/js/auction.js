@@ -9,7 +9,8 @@ let auctionState = {
   currentQuestionNumber: null,
   pendingScore: false,
   answerShown: false,
-  activeTeam: null
+  activeTeam: null,
+  resultType: ""
 }
 
 window.auctionState = auctionState
@@ -119,7 +120,8 @@ function restoreAuctionState(saved) {
     currentQuestionNumber: null,
     pendingScore: false,
     answerShown: false,
-    activeTeam: null
+    activeTeam: null,
+    resultType: ""
   }
 
   if (!Array.isArray(auctionState.usedNumbers)) {
@@ -132,6 +134,7 @@ function restoreAuctionState(saved) {
 
   auctionState.scoreA = Number(auctionState.scoreA || 0)
   auctionState.scoreB = Number(auctionState.scoreB || 0)
+  auctionState.resultType = String(auctionState.resultType || "")
 
   auctionDoubleState = saved.auctionDoubleState || {
     used: { A: false, B: false },
@@ -344,6 +347,8 @@ function restoreAuctionSnapshot(snapshot) {
   clearInterval(timer)
   timer = null
 
+  closeAuctionZoomOverlays()
+
   auctionState = cloneAuctionData(snapshot.auctionState)
   auctionDoubleState = cloneAuctionData(snapshot.auctionDoubleState || {
     used: { A: false, B: false },
@@ -412,6 +417,8 @@ window.renderAuction = async function () {
   clearInterval(timer)
   timer = null
 
+  closeAuctionZoomOverlays()
+
   await loadAuctionMaxNumber()
 
   const saved = getAuctionState()
@@ -426,7 +433,8 @@ window.renderAuction = async function () {
       currentQuestionNumber: null,
       pendingScore: false,
       answerShown: false,
-      activeTeam: null
+      activeTeam: null,
+      resultType: ""
     }
 
     auctionDoubleState = {
@@ -567,6 +575,10 @@ function createAuctionGrid() {
   return html
 }
 
+/* =========================
+   Content
+========================= */
+
 function buildAuctionContentHTML() {
   if (!auctionState.currentQuestionNumber) {
     return `<div class="auctionPlaceholder">اختر رقمًا لعرض الصورة أو الفيديو</div>`
@@ -580,19 +592,20 @@ function buildAuctionContentHTML() {
 
   if (currentAuctionVideo) {
     html += `
-      <div class="auctionImageFrame auctionVideoFrame auctionVideoSmallFrame">
+      <div class="auctionVideoPreviewBox" onclick="openAuctionVideoFullscreen(event)">
         <video
-          class="auctionBigImage auctionBigVideo auctionVideoSmall"
+          class="auctionVideoPreview"
           src="${currentAuctionVideo}"
           muted
           playsinline
           preload="metadata"
-          onclick="openAuctionVideoFullscreen(event)"
+          controlslist="nodownload noplaybackrate"
+          disablepictureinpicture
         ></video>
 
         <button
           type="button"
-          class="auctionVideoPlayOverlay"
+          class="auctionVideoPlayBtn"
           onclick="openAuctionVideoFullscreen(event)"
         >
           ▶
@@ -601,8 +614,12 @@ function buildAuctionContentHTML() {
     `
   } else if (currentAuctionImage) {
     html += `
-      <div class="auctionImageFrame" onclick="toggleAuctionImageOverlay()">
-        <img class="auctionBigImage" src="${currentAuctionImage}" alt="">
+      <div class="auctionImagePreviewBox" onclick="toggleAuctionImageOverlay()">
+        <img
+          class="auctionImagePreview"
+          src="${currentAuctionImage}"
+          alt=""
+        >
       </div>
     `
   } else {
@@ -639,14 +656,28 @@ function buildAuctionResultHTML(resultType = "") {
           muted
           playsinline
           preload="metadata"
+          controlslist="nodownload noplaybackrate"
+          disablepictureinpicture
         ></video>
 
-        <div class="auctionResultVideoPlay">▶</div>
+        <button
+          type="button"
+          class="auctionResultVideoPlay"
+          onclick="openAuctionVideoFullscreen(event)"
+        >
+          ▶
+        </button>
       </div>
     `
   } else if (currentAuctionImage) {
     mediaHTML = `
-      <img src="${currentAuctionImage}" class="auctionResultImage" alt="">
+      <div class="auctionResultImageBoxClean" onclick="toggleAuctionImageOverlay()">
+        <img
+          src="${currentAuctionImage}"
+          class="auctionResultImageClean"
+          alt=""
+        >
+      </div>
     `
   } else {
     mediaHTML = `<div class="auctionResultEmpty">لا توجد صورة أو فيديو</div>`
@@ -654,7 +685,7 @@ function buildAuctionResultHTML(resultType = "") {
 
   return `
     <div class="auctionResultView ${resultClass}">
-      <div class="auctionResultImageBox">
+      <div class="auctionResultMediaBox">
         ${mediaHTML}
       </div>
 
@@ -670,17 +701,12 @@ function buildAuctionResultHTML(resultType = "") {
     </div>
   `
 }
+
 function showAuctionAnswer(resultType = "") {
   auctionState.answerShown = true
   auctionState.resultType = resultType
 
   closeAuctionZoomOverlays()
-
-  const videoOverlay = document.getElementById("auctionVideoFullscreenOverlay")
-  if (videoOverlay) {
-    closeAuctionVideoFullscreen()
-  }
-
   renderAuctionContent()
   saveAuctionState()
 }
@@ -732,6 +758,7 @@ async function openAuction(number) {
   auctionState.usedNumbers.push(number)
   auctionState.pendingScore = true
   auctionState.answerShown = false
+  auctionState.resultType = ""
 
   currentAuctionAnswer = ""
   currentAuctionImage = ""
@@ -829,9 +856,7 @@ function closeAuctionZoomOverlays() {
   if (auctionOverlay) auctionOverlay.remove()
 
   const videoOverlay = document.getElementById("auctionVideoFullscreenOverlay")
-  if (videoOverlay && typeof closeAuctionVideoFullscreen === "function") {
-    closeAuctionVideoFullscreen()
-  }
+  if (videoOverlay) closeAuctionVideoFullscreen()
 
   const displayOverlay = document.getElementById("displayImageZoomOverlay")
   if (displayOverlay) displayOverlay.remove()
@@ -961,6 +986,7 @@ function finalizeAuctionTurn() {
   currentAuctionNote = ""
 
   resetAuctionTimer()
+  closeAuctionZoomOverlays()
   highlightAuctionActiveTeam()
   renderAuctionContent()
   updateAuctionTurnBox()
@@ -981,7 +1007,12 @@ function toggleAuctionImageOverlay() {
   const oldOverlay = document.getElementById("auctionImageOverlay")
 
   if (oldOverlay) {
-    oldOverlay.remove()
+    oldOverlay.classList.add("closing")
+
+    setTimeout(() => {
+      oldOverlay.remove()
+    }, 160)
+
     return
   }
 
@@ -990,18 +1021,28 @@ function toggleAuctionImageOverlay() {
   const overlay = document.createElement("div")
   overlay.id = "auctionImageOverlay"
   overlay.className = "auctionImageOverlay"
+
   overlay.innerHTML = `
-    <div class="auctionImageOverlayInner">
-      <img src="${currentAuctionImage}" class="auctionImageOverlayImg" alt="">
+    <div class="auctionImageOverlayInner" onclick="event.stopPropagation()">
+      <img
+        src="${currentAuctionImage}"
+        class="auctionImageOverlayImg"
+        alt=""
+        onclick="toggleAuctionImageOverlay()"
+      >
     </div>
   `
 
   overlay.onclick = function () {
-    overlay.remove()
+    toggleAuctionImageOverlay()
   }
 
   document.body.appendChild(overlay)
 }
+
+/* =========================
+   Video Fullscreen
+========================= */
 function openAuctionVideoFullscreen(e) {
   if (e) {
     e.preventDefault()
@@ -1018,15 +1059,15 @@ function openAuctionVideoFullscreen(e) {
   overlay.className = "auctionVideoFullscreenOverlay"
 
   overlay.innerHTML = `
-    <div class="auctionVideoFullscreenInner">
-      <button
-        type="button"
-        class="auctionVideoFullscreenClose"
-        onclick="closeAuctionVideoFullscreen(event)"
-      >
-        ×
-      </button>
+    <button
+      type="button"
+      class="auctionVideoFullscreenClose"
+      onclick="closeAuctionVideoFullscreen(event)"
+    >
+      ×
+    </button>
 
+    <div class="auctionVideoFullscreenInner" onclick="event.stopPropagation()">
       <video
         id="auctionFullscreenVideo"
         class="auctionFullscreenVideo"
@@ -1034,6 +1075,9 @@ function openAuctionVideoFullscreen(e) {
         controls
         autoplay
         playsinline
+        preload="auto"
+        controlslist="nodownload noplaybackrate"
+        disablepictureinpicture
       ></video>
     </div>
   `
@@ -1045,14 +1089,18 @@ function openAuctionVideoFullscreen(e) {
   document.body.appendChild(overlay)
 
   const video = document.getElementById("auctionFullscreenVideo")
+
   if (video) {
-    video.onclick = function (event) {
-      event.stopPropagation()
-    }
+    video.currentTime = 0
+    video.muted = false
+    video.volume = 1
 
     const playPromise = video.play()
+
     if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {})
+      playPromise.catch(() => {
+        showGameToast("اضغط تشغيل مرة أخرى")
+      })
     }
   }
 }
@@ -1067,6 +1115,27 @@ function closeAuctionVideoFullscreen(e) {
   if (!overlay) return
 
   const video = document.getElementById("auctionFullscreenVideo")
+
+  if (video) {
+    video.pause()
+    video.removeAttribute("src")
+    video.load()
+  }
+
+  overlay.remove()
+}
+
+function closeAuctionVideoFullscreen(e) {
+  if (e) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const overlay = document.getElementById("auctionVideoFullscreenOverlay")
+  if (!overlay) return
+
+  const video = document.getElementById("auctionFullscreenVideo")
+
   if (video) {
     video.pause()
     video.removeAttribute("src")

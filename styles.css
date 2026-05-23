@@ -1957,7 +1957,7 @@ body.presenterHideDisplayControls .segmentControlButtons button{
 }
 
 /* =========================================================
-   WINNER OVERLAY
+   WINNER OVERLAY - CLEAN FAST VERSION
 ========================================================= */
 
 #winnerOverlay{
@@ -1972,128 +1972,116 @@ body.presenterHideDisplayControls .segmentControlButtons button{
   padding:22px;
 
   background:
-    radial-gradient(circle at 50% 18%, rgba(255,155,81,.30), transparent 34%),
-    radial-gradient(circle at 18% 82%, rgba(103,232,249,.18), transparent 36%),
-    radial-gradient(circle at 84% 78%, rgba(251,113,133,.14), transparent 34%),
-    rgba(20,28,38,.54);
+    radial-gradient(circle at 50% 18%, rgba(255,155,81,.20), transparent 34%),
+    radial-gradient(circle at 18% 82%, rgba(103,232,249,.12), transparent 36%),
+    rgba(20,28,38,.56);
 
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+
+  opacity:1;
 }
 
 #winnerOverlay.hidden{
-  display:none;
+  display:none !important;
 }
 
+/* إلغاء الزخارف المتحركة الثقيلة */
 #winnerOverlay::before,
 #winnerOverlay::after{
-  content:"";
-  position:absolute;
-  pointer-events:none;
-  z-index:1;
+  content:none !important;
+  display:none !important;
 }
 
-#winnerOverlay::before{
-  width:520px;
-  height:520px;
-  border-radius:50%;
-  top:-180px;
-  right:-150px;
-
-  background:
-    conic-gradient(
-      from 180deg,
-      transparent,
-      rgba(255,155,81,.22),
-      transparent,
-      rgba(103,232,249,.18),
-      transparent
-    );
-
-  filter:blur(28px);
-  animation:winnerAuraRotate 8s linear infinite;
-}
-
-#winnerOverlay::after{
-  width:420px;
-  height:420px;
-  border-radius:80px;
-  left:-160px;
-  bottom:-150px;
-
-  background:
-    conic-gradient(
-      from 0deg,
-      transparent,
-      rgba(251,113,133,.18),
-      transparent,
-      rgba(255,155,81,.16),
-      transparent
-    );
-
-  filter:blur(32px);
-  transform:rotate(18deg);
-  animation:winnerAuraFloat 5s ease-in-out infinite;
-}
+/* =========================
+   CARD
+========================= */
 
 #winnerOverlayCard{
-  width:min(100%,560px);
   position:relative;
   z-index:3;
-  overflow:hidden;
+
+  width:min(100%,560px);
 
   padding:34px 28px 24px;
   border-radius:38px;
 
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
   text-align:center;
 
   background:
-    radial-gradient(circle at 50% 0%, rgba(255,155,81,.24), transparent 42%),
-    radial-gradient(circle at 16% 100%, rgba(103,232,249,.14), transparent 44%),
-    linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.64));
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.46), transparent 42%),
+    radial-gradient(circle at 100% 100%, rgba(103,232,249,.12), transparent 36%),
+    linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.42));
 
-  border:1px solid rgba(255,255,255,.58);
+  border:1px solid rgba(255,255,255,.54);
 
   box-shadow:
-    0 34px 80px rgba(30,27,75,.25),
-    0 0 0 6px rgba(255,255,255,.10),
-    inset 0 1px 0 rgba(255,255,255,.94),
-    inset 0 -1px 0 rgba(255,255,255,.16);
+    0 28px 68px rgba(30,27,75,.22),
+    0 0 0 6px rgba(255,255,255,.08),
+    inset 0 1px 0 rgba(255,255,255,.86),
+    inset 0 -1px 0 rgba(255,255,255,.14);
 
-  backdrop-filter:blur(28px) saturate(1.1);
-  -webkit-backdrop-filter:blur(28px) saturate(1.1);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
 
-  animation:
-    winnerOverlayCardIn .52s cubic-bezier(.16,1,.3,1) both,
-    winnerCardBreath 2.4s ease-in-out infinite .6s;
+  overflow:hidden;
+
+  transform:translate3d(0,0,0);
+  backface-visibility:hidden;
+
+  animation:winnerCardEnterFast .24s cubic-bezier(.2,.85,.2,1.05) both;
 }
 
 #winnerOverlayCard::before{
   content:"";
   position:absolute;
-  width:230px;
-  height:230px;
-  top:-112px;
-  right:-74px;
+  width:220px;
+  height:220px;
+  top:-110px;
+  right:-72px;
+
   border-radius:50%;
-  background:rgba(255,255,255,.20);
+  background:rgba(255,255,255,.18);
+
   pointer-events:none;
-  animation:winnerBubbleMove 3.2s ease-in-out infinite;
 }
 
 #winnerOverlayCard::after{
   content:"";
   position:absolute;
-  width:130px;
-  height:130px;
-  bottom:-50px;
-  left:-38px;
-  border-radius:32px;
+  width:120px;
+  height:120px;
+  bottom:-46px;
+  left:-34px;
+
+  border-radius:30px;
   transform:rotate(24deg);
   background:rgba(103,232,249,.10);
+
   pointer-events:none;
-  animation:winnerCornerMove 3.8s ease-in-out infinite;
 }
+
+@keyframes winnerCardEnterFast{
+  from{
+    opacity:0;
+    transform:translate3d(0,18px,0) scale(.96);
+  }
+
+  to{
+    opacity:1;
+    transform:translate3d(0,0,0) scale(1);
+  }
+}
+
+/* =========================
+   CONTENT
+========================= */
 
 #winnerOverlayTitle,
 #winnerOverlayName,
@@ -2105,42 +2093,30 @@ body.presenterHideDisplayControls .segmentControlButtons button{
 
 #winnerOverlayTitle{
   width:max-content;
-  margin:0 auto 14px;
+  margin:0 auto 8px;
 
   padding:8px 22px;
   border-radius:999px;
 
   background:
     radial-gradient(circle at 20% 0%, rgba(255,255,255,.34), transparent 42%),
-    linear-gradient(180deg, rgba(255,155,81,.32), rgba(255,255,255,.48));
+    linear-gradient(180deg, rgba(255,155,81,.24), rgba(255,255,255,.46));
 
-  border:1px solid rgba(255,155,81,.26);
+  border:1px solid rgba(255,155,81,.24);
 
   color:#7A4A22;
   font-family:"HanakaText",sans-serif;
   font-size:.95rem;
 
   box-shadow:
-    0 10px 20px rgba(255,155,81,.12),
-    inset 0 1px 0 rgba(255,255,255,.82);
-
-  animation:winnerTitleFloat 1.9s ease-in-out infinite;
+    0 10px 20px rgba(255,155,81,.10),
+    inset 0 1px 0 rgba(255,255,255,.78);
 }
 
+/* إلغاء الخط المتحرك فوق الفائز */
 #winnerOverlayTitle::before{
-  content:"";
-  position:absolute;
-  width:160px;
-  height:3px;
-  top:-14px;
-  left:50%;
-  transform:translateX(-50%);
-  border-radius:999px;
-  background:linear-gradient(90deg, transparent, rgba(255,155,81,.70), rgba(103,232,249,.55), transparent);
-  box-shadow:
-    0 0 18px rgba(255,155,81,.28),
-    0 0 20px rgba(103,232,249,.18);
-  animation:winnerLightSweep 1.8s ease-in-out infinite;
+  content:none !important;
+  display:none !important;
 }
 
 #winnerOverlayName{
@@ -2152,45 +2128,69 @@ body.presenterHideDisplayControls .segmentControlButtons button{
 
   background:transparent;
   border:0;
-  border-radius:0;
   box-shadow:none;
 
   color:#24185E;
 
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:clamp(3.1rem,5.8vw,5.2rem);
   line-height:1;
 
   text-shadow:
-    0 1px 0 rgba(255,255,255,.85),
-    0 14px 28px rgba(30,27,75,.18),
-    0 0 24px rgba(255,155,81,.28),
-    0 0 36px rgba(103,232,249,.18);
+    0 2px 0 rgba(255,255,255,.85),
+    0 14px 28px rgba(30,27,75,.16),
+    0 0 22px rgba(103,232,249,.16);
 
-  animation:
-    winnerNamePop .68s cubic-bezier(.16,1,.3,1) both,
-    winnerNamePulse 1.25s ease-in-out infinite .7s;
+  animation:winnerNameEnterFast .28s cubic-bezier(.2,.85,.2,1.05) both;
+}
+
+@keyframes winnerNameEnterFast{
+  from{
+    opacity:0;
+    transform:translate3d(0,12px,0) scale(.94);
+  }
+
+  to{
+    opacity:1;
+    transform:translate3d(0,0,0) scale(1);
+  }
 }
 
 #winnerOverlayBurst{
-  margin:18px 0 22px;
+  margin:12px 0 18px;
 
   color:#FF9B51;
-  font-size:1.45rem;
-  letter-spacing:10px;
+  font-size:1.35rem;
+  letter-spacing:8px;
 
   text-shadow:
-    0 0 16px rgba(255,155,81,.34),
-    0 8px 18px rgba(255,155,81,.12);
+    0 0 14px rgba(255,155,81,.30),
+    0 8px 16px rgba(255,155,81,.10);
 
-  animation:
-    winnerBurstGlow 1.1s ease-in-out infinite,
-    winnerBurstFloat 2.2s ease-in-out infinite;
+  animation:winnerBurstLight .9s ease-in-out infinite;
 }
+
+@keyframes winnerBurstLight{
+  0%,100%{
+    opacity:.70;
+  }
+
+  50%{
+    opacity:1;
+  }
+}
+
+/* =========================
+   ACTIONS
+========================= */
 
 .winnerOverlayActions{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
+
+  width:100%;
+  margin-top:2px;
 }
 
 #winnerOverlayClose,
@@ -2198,7 +2198,7 @@ body.presenterHideDisplayControls .segmentControlButtons button{
   position:relative;
   overflow:hidden;
 
-  height:54px;
+  height:52px;
 
   border:0;
   border-radius:18px;
@@ -2215,16 +2215,50 @@ body.presenterHideDisplayControls .segmentControlButtons button{
     inset 0 1px 0 rgba(255,255,255,.22);
 
   transition:
-    transform .18s ease,
-    filter .18s ease;
+    transform .16s ease,
+    filter .16s ease;
 }
 
 #winnerOverlayClose{
-  background:linear-gradient(180deg,#64748B,#334155);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+    linear-gradient(180deg,#64748B,#334155);
 }
 
 #winnerOverlayEnd{
-  background:linear-gradient(180deg,#FB7185,#E11D48);
+  color:#24185E;
+
+  background:
+    linear-gradient(
+      115deg,
+      rgba(255,255,255,.54) 0%,
+      rgba(255,255,255,.24) 22%,
+      rgba(103,232,249,.32) 38%,
+      rgba(255,255,255,.70) 50%,
+      rgba(255,155,81,.20) 64%,
+      rgba(255,255,255,.48) 100%
+    );
+
+  background-size:260% 100%;
+  background-position:100% 50%;
+
+  border:1px solid rgba(255,255,255,.50);
+
+  animation:winnerEndBtnShine 4s ease-in-out infinite;
+}
+
+@keyframes winnerEndBtnShine{
+  0%{
+    background-position:100% 50%;
+  }
+
+  45%{
+    background-position:0% 50%;
+  }
+
+  100%{
+    background-position:0% 50%;
+  }
 }
 
 #winnerOverlayClose:hover,
@@ -2234,7 +2268,7 @@ body.presenterHideDisplayControls .segmentControlButtons button{
 }
 
 /* =========================================================
-   WINNER EFFECTS
+   WINNER EFFECTS - LIGHT VERSION
 ========================================================= */
 
 .winnerConfettiLayer{
@@ -2252,8 +2286,8 @@ body.presenterHideDisplayControls .segmentControlButtons button{
   will-change:transform, opacity;
 
   box-shadow:
-    0 0 8px rgba(255,255,255,.34),
-    0 8px 14px rgba(47,65,88,.12);
+    0 0 6px rgba(255,255,255,.26),
+    0 6px 10px rgba(47,65,88,.10);
 
   animation-name:winnerConfettiFallFixed;
   animation-timing-function:linear;
@@ -2269,161 +2303,32 @@ body.presenterHideDisplayControls .segmentControlButtons button{
 }
 
 .screenFlashLayer.flashCorrect{
-  background:rgba(34,197,94,.30);
-  animation:screenFlashPulse .72s ease both;
+  background:rgba(34,197,94,.24);
+  animation:screenFlashPulseFast .46s ease both;
 }
 
 .screenFlashLayer.flashWrong{
-  background:rgba(239,68,68,.34);
-  animation:screenFlashPulse .72s ease both;
-}
-
-@keyframes winnerOverlayCardIn{
-  from{
-    opacity:0;
-    transform:translateY(26px) scale(.92);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-@keyframes winnerNamePop{
-  0%{
-    opacity:0;
-    transform:translateY(18px) scale(.88);
-  }
-  70%{
-    opacity:1;
-    transform:translateY(-3px) scale(1.05);
-  }
-  100%{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-@keyframes winnerNamePulse{
-  0%,100%{
-    transform:scale(1);
-  }
-  45%{
-    transform:scale(1.06);
-  }
-  70%{
-    transform:scale(1.02);
-  }
-}
-
-@keyframes winnerBurstGlow{
-  0%,100%{
-    opacity:.72;
-    transform:scale(1);
-  }
-  50%{
-    opacity:1;
-    transform:scale(1.08);
-  }
-}
-
-@keyframes winnerBurstFloat{
-  0%,100%{
-    transform:translateY(0) scale(1);
-  }
-  50%{
-    transform:translateY(-5px) scale(1.08);
-  }
-}
-
-@keyframes winnerAuraRotate{
-  from{
-    transform:rotate(0deg) scale(1);
-  }
-  to{
-    transform:rotate(360deg) scale(1.04);
-  }
-}
-
-@keyframes winnerAuraFloat{
-  0%,100%{
-    transform:translateY(0) rotate(18deg) scale(1);
-  }
-  50%{
-    transform:translateY(-18px) rotate(26deg) scale(1.06);
-  }
-}
-
-@keyframes winnerCardBreath{
-  0%,100%{
-    box-shadow:
-      0 34px 80px rgba(30,27,75,.25),
-      0 0 0 6px rgba(255,255,255,.10),
-      inset 0 1px 0 rgba(255,255,255,.94),
-      inset 0 -1px 0 rgba(255,255,255,.16);
-  }
-  50%{
-    box-shadow:
-      0 40px 92px rgba(30,27,75,.30),
-      0 0 0 8px rgba(255,155,81,.10),
-      0 0 42px rgba(255,155,81,.16),
-      inset 0 1px 0 rgba(255,255,255,.98),
-      inset 0 -1px 0 rgba(255,255,255,.18);
-  }
-}
-
-@keyframes winnerBubbleMove{
-  0%,100%{
-    transform:translate(0,0) scale(1);
-  }
-  50%{
-    transform:translate(-12px,10px) scale(1.06);
-  }
-}
-
-@keyframes winnerCornerMove{
-  0%,100%{
-    transform:rotate(24deg) translate(0,0);
-  }
-  50%{
-    transform:rotate(18deg) translate(10px,-8px);
-  }
-}
-
-@keyframes winnerLightSweep{
-  0%,100%{
-    opacity:.45;
-    transform:translateX(-50%) scaleX(.75);
-  }
-  50%{
-    opacity:1;
-    transform:translateX(-50%) scaleX(1.2);
-  }
-}
-
-@keyframes winnerTitleFloat{
-  0%,100%{
-    transform:translateY(0);
-  }
-  50%{
-    transform:translateY(-4px);
-  }
+  background:rgba(239,68,68,.26);
+  animation:screenFlashPulseFast .46s ease both;
 }
 
 @keyframes winnerConfettiFallFixed{
   0%{
     opacity:0;
     transform:
-      translate3d(0,-40px,0)
+      translate3d(0,-30px,0)
       rotate(0deg)
       scale(.78);
   }
-  8%{
+
+  10%{
     opacity:1;
   }
-  68%{
+
+  72%{
     opacity:1;
   }
+
   100%{
     opacity:0;
     transform:
@@ -2433,29 +2338,70 @@ body.presenterHideDisplayControls .segmentControlButtons button{
   }
 }
 
-@keyframes screenFlashPulse{
+@keyframes screenFlashPulseFast{
   0%{
     opacity:0;
-    transform:scale(.96);
   }
-  18%{
+
+  24%{
     opacity:1;
-    transform:scale(1.02);
   }
-  36%{
-    opacity:.42;
-    transform:scale(.99);
-  }
-  54%{
-    opacity:.88;
-    transform:scale(1.015);
-  }
+
   100%{
     opacity:0;
-    transform:scale(1);
   }
 }
 
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width:767px){
+  #winnerOverlay{
+    padding:16px;
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+  }
+
+  #winnerOverlayCard{
+    width:100%;
+    padding:28px 18px 20px;
+    border-radius:28px;
+
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+  }
+
+  #winnerOverlayTitle{
+    font-size:.88rem;
+  }
+
+  #winnerOverlayName{
+    font-size:clamp(2.6rem,13vw,4.2rem);
+  }
+
+  #winnerOverlayBurst{
+    margin:10px 0 14px;
+    font-size:1.1rem;
+    letter-spacing:6px;
+    animation:none;
+  }
+
+  .winnerOverlayActions{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  #winnerOverlayClose,
+  #winnerOverlayEnd{
+    height:48px;
+    width:100%;
+  }
+
+  .winnerConfettiPiece{
+    box-shadow:none;
+  }
+}
 /* =========================================================
    IMAGE ZOOM
 ========================================================= */
@@ -4376,5 +4322,126 @@ button:hover,
   50%{
     opacity:1;
     transform:scaleX(1.08);
+  }
+}
+/* =========================================================
+   HOME DISPLAY TITLE - SAME INTRO EFFECT
+   كلمة الحنكة في العرض بنفس تأثير الانترو
+========================================================= */
+
+.homeTitleBox h1{
+  position:relative !important;
+
+  margin:0 !important;
+
+  color:#24185E !important;
+  -webkit-text-fill-color:#24185E !important;
+
+  background:none !important;
+  -webkit-background-clip:initial !important;
+  background-clip:initial !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-weight:400 !important;
+  line-height:.86 !important;
+
+  text-shadow:
+    0 3px 0 rgba(255,255,255,.88),
+    0 16px 32px rgba(30,27,75,.18),
+    0 0 18px rgba(103,232,249,.16) !important;
+
+  filter:
+    drop-shadow(0 10px 18px rgba(30,27,75,.10)) !important;
+
+  animation:homeHanakaTitleGlassPulse 3.8s ease-in-out infinite !important;
+
+  overflow:visible !important;
+}
+
+/* نلغي أي تأثير قديم يغير لون الكلمة */
+.homeTitleBox h1::before{
+  content:none !important;
+  display:none !important;
+}
+
+/* الخط الزجاجي تحت العنوان */
+.homeTitleBox h1::after{
+  content:"" !important;
+
+  width:170px !important;
+  height:10px !important;
+  margin:16px auto 0 !important;
+
+  display:block !important;
+
+  border-radius:999px !important;
+
+  background:
+    linear-gradient(
+      115deg,
+      #FF9B51 0%,
+      #FF9B51 22%,
+      #67E8F9 40%,
+      rgba(255,255,255,.88) 50%,
+      #7C3AED 62%,
+      #FF9B51 100%
+    ) !important;
+
+  background-size:260% 100% !important;
+  background-position:100% 50% !important;
+
+  box-shadow:
+    0 10px 24px rgba(249,115,22,.22),
+    0 0 18px rgba(103,232,249,.20) !important;
+
+  animation:homeHanakaLineGlassMove 3.2s ease-in-out infinite !important;
+}
+
+@keyframes homeHanakaTitleGlassPulse{
+  0%,100%{
+    transform:translateY(0) scale(1);
+
+    text-shadow:
+      0 3px 0 rgba(255,255,255,.88),
+      0 16px 32px rgba(30,27,75,.18),
+      0 0 14px rgba(103,232,249,.12);
+  }
+
+  50%{
+    transform:translateY(-2px) scale(1.01);
+
+    text-shadow:
+      0 3px 0 rgba(255,255,255,.92),
+      0 18px 36px rgba(30,27,75,.20),
+      0 0 24px rgba(103,232,249,.24);
+  }
+}
+
+@keyframes homeHanakaLineGlassMove{
+  0%{
+    background-position:100% 50%;
+    filter:brightness(1);
+    transform:scaleX(1);
+  }
+
+  45%{
+    background-position:0% 50%;
+    filter:brightness(1.18);
+    transform:scaleX(1.06);
+  }
+
+  100%{
+    background-position:0% 50%;
+    filter:brightness(1);
+    transform:scaleX(1);
+  }
+}
+
+/* الجوال */
+@media (max-width:767px){
+  .homeTitleBox h1::after{
+    width:125px !important;
+    height:8px !important;
+    margin-top:12px !important;
   }
 }

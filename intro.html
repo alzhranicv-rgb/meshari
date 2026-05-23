@@ -7,7 +7,7 @@
   <title>الحنكة - المقدمة</title>
 
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="assets/css/segments/intro.css?v=12" />
+  <link rel="stylesheet" href="assets/css/segments/intro.css?v=40" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
@@ -17,90 +17,82 @@
 
   <main class="introPage">
 
-    <div class="introDecor introDecorOne"></div>
-    <div class="introDecor introDecorTwo"></div>
-    <div class="introDecor introDecorThree"></div>
+    <div class="introBgShape introBgShapeOne"></div>
+    <div class="introBgShape introBgShapeTwo"></div>
+    <div class="introBgShape introBgShapeThree"></div>
 
-    <section class="introShell" aria-label="إعداد اللعبة">
+    <section class="introCard" aria-label="إعداد اللعبة">
 
-      <header class="introHeader">
+      <div class="introCardHeader">
 
-        <div class="introTitleBox">
-          <div class="introTitleGlow"></div>
-          <h1 class="introTitle">الحنكة</h1>
-          <div class="introTitleLine"></div>
+        <div class="introMiniBadge">
+          يلاااا بيينااا
         </div>
 
-        <p class="introSubTitle">
+        <h1 class="introTitle">
+          الحنكة
+        </h1>
+
+        <p class="introSubtitle">
           جهّز الفرق، اختر النموذج، وابدأ التحدي
         </p>
 
-      </header>
+      </div>
 
-      <section class="introSetupCard">
+      <div class="introFormCard">
 
-        <div class="introTeamsRow">
+        <div class="introTeamsGrid">
 
-          <div class="introTeamCard introTeamCardA">
+          <div class="introFieldBox">
             <label for="teamANameInput">الفريق الأول</label>
 
-            <div class="introTeamInputBox">
-              <input
-                id="teamANameInput"
-                type="text"
-                placeholder="اسم الفريق الأول"
-                autocomplete="off"
-                maxlength="18"
-              >
-            </div>
+            <input
+              id="teamANameInput"
+              type="text"
+              placeholder="اكتب اسم الفريق الأول"
+              autocomplete="off"
+              maxlength="18"
+            >
           </div>
 
-          <div class="introTeamCard introTeamCardB">
+          <div class="introFieldBox">
             <label for="teamBNameInput">الفريق الثاني</label>
 
-            <div class="introTeamInputBox">
-              <input
-                id="teamBNameInput"
-                type="text"
-                placeholder="اسم الفريق الثاني"
-                autocomplete="off"
-                maxlength="18"
-              >
-            </div>
+            <input
+              id="teamBNameInput"
+              type="text"
+              placeholder="اكتب اسم الفريق الثاني"
+              autocomplete="off"
+              maxlength="18"
+            >
           </div>
 
         </div>
 
-        <div class="introModelCard">
-          <div class="introModelText">
-            <label for="introModelSelect">النموذج</label>
-            <p>اختر نموذج الأسئلة المناسب للجلسة</p>
-          </div>
+        <div class="introFieldBox introModelBox">
+          <label for="introModelSelect">النموذج</label>
 
-          <div class="introModelSelectBox">
-            <select id="introModelSelect">
-              <option value="">جارٍ تحميل النماذج...</option>
-            </select>
-          </div>
+          <select id="introModelSelect">
+            <option value="">جارٍ تحميل النماذج...</option>
+          </select>
         </div>
 
-        <div class="introActions">
-          <button
-            type="button"
-            id="startGameBtn"
-            onclick="startGameFromIntro()"
-          >
-            بدء اللعبة
-          </button>
-        </div>
+        <button
+  type="button"
+  id="startGameBtn"
+  onclick="startGameFromIntro()"
+>
+  بدء اللعبة
+</button>
 
-      </section>
+      </div>
 
     </section>
 
   </main>
 
   <div id="presenterIntroModal" class="introPresenterModal hidden">
+
     <div class="introPresenterModalCard">
 
       <button
@@ -113,11 +105,19 @@
       </button>
 
       <div class="introPresenterModalHeader">
-        <div class="introPresenterModalBadge">صفحة المقدم</div>
-        <div class="introPresenterModalTitle">اربط المقدم</div>
+
+        <div class="introPresenterModalBadge">
+          صفحة المقدم
+        </div>
+
+        <div class="introPresenterModalTitle">
+          اربط المقدم
+        </div>
+
         <div class="introPresenterModalText">
           امسح QR من جهاز المقدم، أو أدخل الكود يدويًا
         </div>
+
       </div>
 
       <div class="introPresenterContent">
@@ -129,8 +129,13 @@
         <div class="introPresenterInfoBox">
 
           <div class="presenterIntroCodeBox">
-            <div class="presenterIntroCodeLabel">كود الدخول</div>
-            <div id="presenterIntroCode" class="presenterIntroCodeValue">----</div>
+            <div class="presenterIntroCodeLabel">
+              كود الدخول
+            </div>
+
+            <div id="presenterIntroCode" class="presenterIntroCodeValue">
+              ----
+            </div>
           </div>
 
           <div id="presenterIntroLink" class="introPresenterLink"></div>
@@ -140,6 +145,7 @@
       </div>
 
       <div class="introPresenterModalActions">
+
         <button
           type="button"
           class="introPresenterCopyBtn secondary"
@@ -155,9 +161,11 @@
         >
           بدء اللعبة
         </button>
+
       </div>
 
     </div>
+
   </div>
 
   <div id="gameToast" class="gameToast hidden">
@@ -166,5 +174,6 @@
   </div>
 
   <script src="intro.js"></script>
+
 </body>
 </html>

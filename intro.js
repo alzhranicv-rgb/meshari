@@ -30,22 +30,26 @@ function showGameToast(message) {
 
   if (!toast || !text) return
 
+  clearTimeout(gameToastTimer)
+
   text.innerText = message
+
   toast.classList.remove("hidden")
+  toast.classList.remove("show")
 
   requestAnimationFrame(() => {
-    toast.classList.add("show")
+    requestAnimationFrame(() => {
+      toast.classList.add("show")
+    })
   })
-
-  clearTimeout(gameToastTimer)
 
   gameToastTimer = setTimeout(() => {
     toast.classList.remove("show")
 
     setTimeout(() => {
       toast.classList.add("hidden")
-    }, 280)
-  }, 2800)
+    }, 240)
+  }, 2400)
 }
 
 /* =========================
@@ -474,10 +478,15 @@ function openPresenterIntroModal() {
   if (codeBox) codeBox.innerText = joinCode || "----"
 
   if (modal) {
-  modal.classList.remove("hidden")
-}
+    modal.classList.remove("hidden")
+    modal.classList.remove("show")
 
-startPresenterStartWatcher()
+    requestAnimationFrame(() => {
+      modal.classList.add("show")
+    })
+  }
+
+  startPresenterStartWatcher()
 }
 
 function startPresenterStartWatcher() {
@@ -508,19 +517,14 @@ function startPresenterStartWatcher() {
 }
 
 function closePresenterIntroModal() {
-  document.getElementById("presenterIntroModal")?.classList.add("hidden")
-}
+  const modal = document.getElementById("presenterIntroModal")
+  if (!modal) return
 
-async function copyPresenterIntroLink() {
-  const url = getPresenterIntroUrl()
+  modal.classList.remove("show")
 
-  try {
-    await navigator.clipboard.writeText(url)
-    showGameToast("تم نسخ رابط المقدم")
-  } catch (e) {
-    console.log("copy link error:", e)
-    showGameToast("تعذر نسخ الرابط")
-  }
+  setTimeout(() => {
+    modal.classList.add("hidden")
+  }, 220)
 }
 
 function goToDisplayFromIntro() {

@@ -420,86 +420,102 @@ function arrangeAdminInnerTabs() {
   const area = editor()
   if (!area) return
 
-  /*
-    مهم:
-    الفاصلة والأرشيف لا ننقل عناصرهم هنا
-    لأن نقلهم هو سبب اللخبطة
-    نخليهم في مكانهم الطبيعي ويتنسقون بالـ CSS
-  */
-  if (
-    area.querySelector(".finalAdminShell") ||
-    area.querySelector(".archiveAdminShell")
-  ) {
-    const finalTabs = area.querySelector(".finalAdminRoundsBar")
-    const archiveTabs = area.querySelector(".archiveAdminRoundsBar")
-
-    ;(finalTabs || archiveTabs)?.querySelectorAll("button").forEach(btn => {
-      btn.classList.remove("innerTabActive")
-
-      if (
-        btn.classList.contains("activeFinalAdminRound") ||
-        btn.classList.contains("activeArchiveRoundBtn")
-      ) {
-        btn.classList.add("innerTabActive")
-      }
-    })
-
-    return
-  }
-
-  const topBar = area.querySelector(".adminEditorTopBar")
+  const topBar = area.querySelector(".adminEditorTopBar, .compactAdminEditorTopBar")
   if (!topBar) return
 
-  const tabsEl =
-    area.querySelector(".warmupCategoryTabs") ||
-    area.querySelector(".top10RoundTabs") ||
-    area.querySelector(".auctionNumberTabs") ||
-    area.querySelector(".whoNumberTabs")
+  topBar.classList.add("adminSectionHeaderPro")
 
-  const countEl =
-    area.querySelector(".top10RoundCountBox") ||
-    area.querySelector(".auctionCountBox")
-
-  if (!tabsEl && !countEl) return
-
-  topBar.classList.add("adminEditorTopBarWithTabs")
-
-  let toolsBox = topBar.querySelector(".adminInlineTabsBox")
-
-  if (!toolsBox) {
-    toolsBox = document.createElement("div")
-    toolsBox.className = "adminInlineTabsBox"
-    topBar.appendChild(toolsBox)
+  let toolsRow = area.querySelector(".adminSectionToolsRow")
+  if (!toolsRow) {
+    toolsRow = document.createElement("div")
+    toolsRow.className = "adminSectionToolsRow"
+    topBar.insertAdjacentElement("afterend", toolsRow)
   }
 
-  toolsBox.innerHTML = ""
+  toolsRow.innerHTML = ""
 
-  if (countEl) {
-    countEl.classList.add("adminInlineCountBox")
-    toolsBox.appendChild(countEl)
+  function addTool(el, className = "") {
+    if (!el) return
+    el.classList.add(className)
+    toolsRow.appendChild(el)
   }
 
-  if (tabsEl) {
-    tabsEl.classList.add("adminInlineSectionTabs")
-    toolsBox.appendChild(tabsEl)
+  const sectionTitle = topBar.querySelector(".adminSectionTitle")?.innerText?.trim() || ""
+
+  const warmupTabs = area.querySelector(".warmupCategoryTabs")
+  const top10Count = area.querySelector(".top10RoundCountBox")
+  const top10Tabs = area.querySelector(".top10RoundTabs")
+  const auctionCount = area.querySelector(".auctionCountBox")
+  const auctionTabs = area.querySelector(".auctionNumberTabs")
+  const whoTabs = area.querySelector(".whoNumberTabs")
+
+  const finalTitle = area.querySelector(".finalTopCompactTitleBox")
+  const finalCount = area.querySelector(".finalTopCompactCountBox")
+  const finalTabs = area.querySelector(".finalAdminRoundsBar")
+
+  const archiveCount = area.querySelector(".archiveRoundsControl")
+  const archiveTabs = area.querySelector(".archiveAdminRoundsBar")
+  const archiveActions = area.querySelector(".archiveTopActions")
+
+  if (warmupTabs) {
+    toolsRow.classList.add("adminToolsWarmup")
+    addTool(warmupTabs, "adminToolTabs adminToolTabsWide")
   }
 
-  toolsBox.querySelectorAll("button").forEach(btn => {
+  if (top10Tabs || top10Count) {
+    toolsRow.classList.add("adminToolsTop10")
+    addTool(top10Count, "adminToolControl")
+    addTool(top10Tabs, "adminToolTabs adminToolTabsWide")
+  }
+
+  if (auctionTabs || auctionCount) {
+    toolsRow.classList.add("adminToolsAuction")
+    addTool(auctionCount, "adminToolControl")
+    addTool(auctionTabs, "adminToolTabs adminToolNumberTabs")
+  }
+
+  if (whoTabs) {
+    toolsRow.classList.add("adminToolsWho")
+    addTool(whoTabs, "adminToolTabs adminToolNumberTabs adminToolTabsWide")
+  }
+
+  if (finalTabs || finalTitle || finalCount) {
+    toolsRow.classList.add("adminToolsFinal")
+    addTool(finalTitle, "adminToolTitle")
+    addTool(finalCount, "adminToolControl adminToolSmall")
+    addTool(finalTabs, "adminToolTabs adminToolTabsWide")
+  }
+
+  if (archiveTabs || archiveCount || archiveActions) {
+    toolsRow.classList.add("adminToolsArchive")
+    addTool(archiveCount, "adminToolControl")
+    addTool(archiveTabs, "adminToolTabs adminToolTabsWide")
+    addTool(archiveActions, "adminToolActions")
+  }
+
+  area.querySelectorAll(".top10ControlPanel, .auctionControlPanel, .archiveAdminControlBar, .finalTopCompactRow").forEach(row => {
+    if (!row.children.length) row.remove()
+  })
+
+  toolsRow.querySelectorAll("button").forEach(btn => {
     btn.classList.remove("innerTabActive")
-  })
 
-  const activeSelectors = [
-    ".activeWarmupCategoryTab",
-    ".activeTop10RoundTab",
-    ".activeAuctionNumberTab",
-    ".activeWhoNumberTab"
-  ]
-
-  activeSelectors.forEach(selector => {
-    toolsBox.querySelectorAll(selector).forEach(btn => {
+    if (
+      btn.classList.contains("activeWarmupCategoryTab") ||
+      btn.classList.contains("activeTop10RoundTab") ||
+      btn.classList.contains("activeAuctionNumberTab") ||
+      btn.classList.contains("activeWhoNumberTab") ||
+      btn.classList.contains("activeFinalAdminRound") ||
+      btn.classList.contains("activeArchiveRoundBtn")
+    ) {
       btn.classList.add("innerTabActive")
-    })
+    }
   })
+
+  if (!toolsRow.children.length) {
+    toolsRow.remove()
+    return
+  }
 }
 
 /* =========================
@@ -920,7 +936,9 @@ async function checkAuctionReady() {
 
     if (!hasText(row.question)) missing.push(`السؤال ${i}: نص السؤال فارغ`)
     if (!hasText(row.answer)) missing.push(`السؤال ${i}: الإجابة فارغة`)
-    if (!hasText(row.image)) missing.push(`السؤال ${i}: الصورة غير موجودة`)
+    if (!hasText(row.image) && !hasText(row.video)) {
+  missing.push(`السؤال ${i}: الصورة أو الفيديو غير موجود`)
+}
   }
 
   return readinessItem(
@@ -2682,7 +2700,6 @@ function getAuctionDraftItem(number) {
     auctionAdminDraft[n] = {
       question: "",
       answer: "",
-      note: "",
       image: "",
       video: "",
       file: null,
@@ -2699,10 +2716,10 @@ function collectAuctionCurrentDraft() {
 
   item.question = (document.getElementById(`auction${n}`)?.value || "").trim()
   item.answer = (document.getElementById(`auctionAnswer${n}`)?.value || "").trim()
-  item.note = (document.getElementById(`auctionNote${n}`)?.value || "").trim()
 
   const file = document.getElementById(`auctionFile${n}`)?.files?.[0] || null
   if (file) item.file = file
+
   const videoFile = document.getElementById(`auctionVideo${n}`)?.files?.[0] || null
   if (videoFile) item.videoFile = videoFile
 }
@@ -2765,7 +2782,6 @@ async function renderAuctionAdmin() {
 
     item.question = row.question || ""
     item.answer = row.answer || ""
-    item.note = row.note || ""
     item.image = row.image || ""
     item.video = row.video || ""
 
@@ -2908,14 +2924,7 @@ async function renderAuctionAdminFromDraft() {
               >
             </div>
 
-            <div class="adminField">
-              <label>ملاحظة اختيارية</label>
-              <input
-                id="auctionNote${n}"
-                placeholder="ملاحظة اختيارية"
-                value="${escapeHtml(item.note || "")}"
-              >
-            </div>
+          
           </div>
         </div>
       </div>
@@ -3030,7 +3039,7 @@ async function saveAuction() {
 
       const question = String(item.question || "").trim()
       const answer = String(item.answer || "").trim()
-      const note = String(item.note || "").trim()
+      
 
       let image = oldMap[i]?.image || item.image || ""
       let video = oldMap[i]?.video || item.video || ""
@@ -3042,21 +3051,23 @@ async function saveAuction() {
       }
 
       if (item.videoFile) {
-        video = await uploadImageFile(item.videoFile, `auction_video_${i}`)
-        item.videoFile = null
-        item.video = video
-      }
+      video = await uploadVideoFile(item.videoFile, `auction_video_${i}`)
+      item.videoFile = null
+      item.video = video
 
-      if (!question && !answer && !image && !video && !note) continue
+      image = ""
+     }
+
+      if (!question && !answer && !image && !video) continue
 
       rows.push({
-        model: Number(currentModel),
-        number: Number(i),
-        question,
-        answer,
-        image,
-        video,
-        note
+      model: Number(currentModel),
+      number: Number(i),
+      question,
+      answer,
+      image,
+      video,
+      note: ""
       })
 
       keepNumbers.push(Number(i))
@@ -3911,14 +3922,7 @@ async function buildFinalRound1Admin(metaData, countAlreadyShown = false) {
             >
           </div>
 
-          <div class="adminField">
-            <label>التلميحة / التوضيح</label>
-            <input
-              id="finalRound1Note_${i}"
-              placeholder="تظهر مع الصورة مباشرة"
-              value="${escapeHtml(map[i]?.note || "")}"
-            >
-          </div>
+          
         </div>
 
         ${
@@ -4026,7 +4030,7 @@ async function saveFinalRound1(cardsCount, skipSavingLock = false) {
     for (let i = 1; i <= safeCardsCount; i++) {
       const file = document.getElementById(`finalRound1File_${i}`)?.files?.[0]
       const answer = (document.getElementById(`finalRound1Answer_${i}`)?.value || "").trim()
-      const note = (document.getElementById(`finalRound1Note_${i}`)?.value || "").trim()
+      const note = ""
 
       const cardText = i <= 3
         ? (document.getElementById(`finalRound1CardText_${i}`)?.value || "").trim()
