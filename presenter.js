@@ -1080,8 +1080,12 @@ function openWarmupPresenterQuestion(category, number, event) {
   presenterWhoLastScoreKey = ""
   setPresenterWhoScoreButtonsDisabled(false)
 
-  showPresenterWhoPreview(number)
-  sendCommand("openNumber", { number })
+  showPresenterWarmupPreview(category, number)
+
+  sendCommand("openNumber", {
+    category,
+    number
+  })
 }
 
 function showPresenterWarmupPreview(category, number) {
@@ -2212,7 +2216,15 @@ function updatePresenterFinalRound1FocusFromState() {
   }
 
   const state = getPresenterFinalRoundState(1)
-  const currentNumber = Number(state.currentNumber || 0)
+
+  const currentNumber =
+    Number(state.currentNumber || 0) ||
+    (
+      presenterFinalSelected?.round === 1
+        ? Number(presenterFinalSelected.number || 0)
+        : 0
+    )
+
   const pendingScore = !!state.pendingScore
 
   setPresenterFinalRound1FocusMode(!!currentNumber || pendingScore)
@@ -2253,10 +2265,15 @@ async function presenterFinalCorrect() {
 
   if (round === 1) {
     setPresenterFinalRound1FocusMode(false)
+    presenterFinalSelected = { round: 1, number: null }
   }
 
   await sendCommand("stopCurrentFinalVideo")
   await sendCommand("correct")
+
+  setTimeout(() => {
+    refreshPresenterEnhancements()
+  }, 300)
 }
 
 async function presenterFinalWrong() {
@@ -2842,6 +2859,11 @@ function openPresenterFinalNumber(round, number) {
   if (round === 3) renderPresenterFinalRound3Preview()
 
   sendCommand("openNumber", { round, number })
+
+  if (round === 1) {
+    setPresenterFinalRound1FocusMode(true)
+    document.body.classList.add("presenterFinalRound1FocusMode")
+  }
 }
 
 /* =========================

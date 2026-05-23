@@ -1910,10 +1910,10 @@ button{
 }
 /* =========================================================
    PRESENTER - FINAL ROUND 1 FOCUS + VIDEO BUTTON
-   خاص بتعديلات الفاصلة والفيديو
+   نسخة أقوى ومباشرة
 ========================================================= */
 
-/* زر تشغيل الفيديو في صفحة المقدم */
+/* زر تشغيل الفيديو */
 .presenterPlayVideoBtn{
   position:relative !important;
 
@@ -1938,7 +1938,6 @@ button{
   font-size:.9em;
 }
 
-/* زر الفيديو عند التعطيل */
 .presenterPlayVideoBtn:disabled{
   opacity:.45 !important;
   filter:grayscale(.25) !important;
@@ -1947,30 +1946,49 @@ button{
 }
 
 /* =========================================================
-   الجولة الأولى - عند فتح رقم
-   نخفي مربع الأرقام ونرفع التحكم
+   الجولة الأولى - وضع التركيز
 ========================================================= */
 
-.presenterFinalRound1FocusMode .presenterFinalNumbersCard{
+/* نخفي كرت الأرقام كامل */
+body.presenterFinalRound1FocusMode .presenterFinalNumbersCard{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  height:0 !important;
+  min-height:0 !important;
+  max-height:0 !important;
+  padding:0 !important;
+  margin:0 !important;
+  overflow:hidden !important;
+}
+
+/* احتياط: نخفي شبكة الأرقام نفسها */
+body.presenterFinalRound1FocusMode #presenterFinalNumbers{
   display:none !important;
 }
 
-/* رفع أزرار التحكم */
-.presenterFinalRound1FocusMode .presenterFinalControlsArea{
-  margin-top:-12px !important;
-  transform:translateY(-18px) !important;
+/* نرتب صفحة الفاصلة بعد إخفاء الأرقام */
+body.presenterFinalRound1FocusMode .presenterFinalLayout{
+  gap:10px !important;
 }
 
-/* تكبير مساحة المعاينة بعد إخفاء الأرقام */
-.presenterFinalRound1FocusMode .presenterFinalPreviewCard{
+/* نكبر معاينة السؤال/الإجابة */
+body.presenterFinalRound1FocusMode .presenterFinalPreviewCard{
   min-height:360px !important;
 }
 
-.presenterFinalRound1FocusMode .presenterFinalPreviewBox{
+body.presenterFinalRound1FocusMode .presenterFinalPreviewBox{
   min-height:260px !important;
 }
 
-/* تنعيم الانتقال */
+/* نرفع أزرار التحكم */
+body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
+  margin-top:-8px !important;
+  transform:translateY(-16px) !important;
+}
+
+/* الانتقالات */
+.presenterFinalLayout,
 .presenterFinalControlsArea,
 .presenterFinalPreviewCard,
 .presenterFinalPreviewBox,
@@ -1983,7 +2001,7 @@ button{
 }
 
 /* =========================================================
-   تحسين ترتيب أزرار الفاصلة في صفحة المقدم
+   أزرار الفاصلة - صفين مرتبة
 ========================================================= */
 
 .presenterFinalControlsArea{
@@ -2036,28 +2054,29 @@ button{
 }
 
 /* =========================================================
-   استجابة الجوال
+   iPhone صغير
 ========================================================= */
 
 @media (max-width:640px){
   .presenterFinalControlsArea .presenterActions{
-    grid-template-columns:1fr !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
   }
 
   .presenterFinalControlsArea .presenterBtn{
     min-height:50px !important;
-    font-size:.95rem !important;
+    font-size:.9rem !important;
+    padding:8px 6px !important;
   }
 
-  .presenterFinalRound1FocusMode .presenterFinalControlsArea{
-    transform:translateY(-10px) !important;
+  body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
+    transform:translateY(-12px) !important;
   }
 
-  .presenterFinalRound1FocusMode .presenterFinalPreviewCard{
-    min-height:300px !important;
+  body.presenterFinalRound1FocusMode .presenterFinalPreviewCard{
+    min-height:320px !important;
   }
 
-  .presenterFinalRound1FocusMode .presenterFinalPreviewBox{
-    min-height:220px !important;
+  body.presenterFinalRound1FocusMode .presenterFinalPreviewBox{
+    min-height:230px !important;
   }
 }
