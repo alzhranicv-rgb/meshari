@@ -1908,3 +1908,156 @@ button{
 .presenterBtn:disabled{
   pointer-events:none;
 }
+/* =========================================================
+   PRESENTER - FINAL ROUND 1 FOCUS + VIDEO BUTTON
+   خاص بتعديلات الفاصلة والفيديو
+========================================================= */
+
+/* زر تشغيل الفيديو في صفحة المقدم */
+.presenterPlayVideoBtn{
+  position:relative !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.28), transparent 42%),
+    linear-gradient(180deg,#FFB36F 0%,#F97316 100%) !important;
+
+  color:#FFFFFF !important;
+  border:0 !important;
+
+  box-shadow:
+    0 14px 28px rgba(249,115,22,.22),
+    inset 0 1px 0 rgba(255,255,255,.28) !important;
+}
+
+.presenterPlayVideoBtn::before{
+  content:"▶";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:8px;
+  font-size:.9em;
+}
+
+/* زر الفيديو عند التعطيل */
+.presenterPlayVideoBtn:disabled{
+  opacity:.45 !important;
+  filter:grayscale(.25) !important;
+  cursor:not-allowed !important;
+  box-shadow:none !important;
+}
+
+/* =========================================================
+   الجولة الأولى - عند فتح رقم
+   نخفي مربع الأرقام ونرفع التحكم
+========================================================= */
+
+.presenterFinalRound1FocusMode .presenterFinalNumbersCard{
+  display:none !important;
+}
+
+/* رفع أزرار التحكم */
+.presenterFinalRound1FocusMode .presenterFinalControlsArea{
+  margin-top:-12px !important;
+  transform:translateY(-18px) !important;
+}
+
+/* تكبير مساحة المعاينة بعد إخفاء الأرقام */
+.presenterFinalRound1FocusMode .presenterFinalPreviewCard{
+  min-height:360px !important;
+}
+
+.presenterFinalRound1FocusMode .presenterFinalPreviewBox{
+  min-height:260px !important;
+}
+
+/* تنعيم الانتقال */
+.presenterFinalControlsArea,
+.presenterFinalPreviewCard,
+.presenterFinalPreviewBox,
+.presenterFinalNumbersCard{
+  transition:
+    transform .22s ease,
+    margin .22s ease,
+    min-height .22s ease,
+    opacity .22s ease !important;
+}
+
+/* =========================================================
+   تحسين ترتيب أزرار الفاصلة في صفحة المقدم
+========================================================= */
+
+.presenterFinalControlsArea{
+  width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:10px !important;
+}
+
+.presenterFinalControlsArea .presenterActions{
+  width:100% !important;
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+  margin:0 !important;
+}
+
+.presenterFinalControlsArea .presenterActions:has(button:only-child){
+  grid-template-columns:1fr !important;
+}
+
+.presenterFinalControlsArea .presenterBtn{
+  width:100% !important;
+  min-height:54px !important;
+  border-radius:18px !important;
+  font-size:1rem !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+}
+
+/* =========================================================
+   معاينة الفيديو داخل صفحة المقدم
+========================================================= */
+
+.presenterVideoPreviewBox{
+  position:relative !important;
+  overflow:hidden !important;
+  border-radius:22px !important;
+  background:#101828 !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+}
+
+.presenterVideoPreviewBox video{
+  width:100% !important;
+  max-height:260px !important;
+  display:block !important;
+  object-fit:contain !important;
+  background:#101828 !important;
+  border-radius:20px !important;
+}
+
+/* =========================================================
+   استجابة الجوال
+========================================================= */
+
+@media (max-width:640px){
+  .presenterFinalControlsArea .presenterActions{
+    grid-template-columns:1fr !important;
+  }
+
+  .presenterFinalControlsArea .presenterBtn{
+    min-height:50px !important;
+    font-size:.95rem !important;
+  }
+
+  .presenterFinalRound1FocusMode .presenterFinalControlsArea{
+    transform:translateY(-10px) !important;
+  }
+
+  .presenterFinalRound1FocusMode .presenterFinalPreviewCard{
+    min-height:300px !important;
+  }
+
+  .presenterFinalRound1FocusMode .presenterFinalPreviewBox{
+    min-height:220px !important;
+  }
+}
