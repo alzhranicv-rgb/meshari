@@ -4763,3 +4763,92 @@
     font-size:1.15rem !important;
   }
 }
+/* =========================================================
+   FINAL VIDEO WRONG FLASH ONLY
+========================================================= */
+
+.finalTeamMediaVideoFrame,
+.finalRound3TeamMediaOverlayInner{
+  position:relative !important;
+  overflow:hidden !important;
+}
+
+.finalVideoWrongFlash::after{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:30 !important;
+  pointer-events:none !important;
+
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,.24), transparent 38%),
+    rgba(255,45,45,.40) !important;
+
+  animation:finalVideoWrongPulse .9s ease-out both !important;
+}
+
+.finalVideoWrongFlash::before{
+  content:"✕" !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:31 !important;
+  pointer-events:none !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  color:#FFFFFF !important;
+  font-size:clamp(5rem,12vw,10rem) !important;
+  font-weight:900 !important;
+
+  text-shadow:
+    0 8px 24px rgba(120,0,0,.38),
+    0 0 30px rgba(255,255,255,.35) !important;
+
+  animation:finalVideoWrongMark .9s ease-out both !important;
+}
+
+@keyframes finalVideoWrongPulse{
+  0%{
+    opacity:0;
+    transform:scale(.96);
+  }
+
+  18%{
+    opacity:1;
+    transform:scale(1.02);
+  }
+
+  45%{
+    opacity:.95;
+    transform:scale(.99);
+  }
+
+  100%{
+    opacity:0;
+    transform:scale(1);
+  }
+}
+
+@keyframes finalVideoWrongMark{
+  0%{
+    opacity:0;
+    transform:scale(.72);
+  }
+
+  24%{
+    opacity:1;
+    transform:scale(1.08);
+  }
+
+  52%{
+    opacity:1;
+    transform:scale(.96);
+  }
+
+  100%{
+    opacity:0;
+    transform:scale(1.18);
+  }
+}

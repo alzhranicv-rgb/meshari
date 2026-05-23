@@ -659,33 +659,37 @@ async function openPresenterSegmentFromSync(segment) {
   const panel = document.getElementById("presenterPanel")
   const currentRendered = panel?.dataset.segment
 
-if (currentRendered === segment) {
-  if (segment === "warmup") {
-    refreshPresenterWarmupFromState()
-  }
+  if (currentRendered === segment) {
+    if (segment === "warmup") {
+      refreshPresenterWarmupFromState()
+    }
 
-  if (segment === "top10") {
-    refreshPresenterTop10FromState()
-  }
+    if (segment === "top10") {
+      refreshPresenterTop10FromState()
+    }
 
-  if (segment === "auction") {
-    refreshPresenterAuctionFromState()
-  }
+    if (segment === "auction") {
+      refreshPresenterAuctionFromState()
+    }
 
-  if (segment === "who") {
-    refreshPresenterWhoFromState()
-  }
+    if (segment === "who") {
+      refreshPresenterWhoFromState()
+    }
 
-  if (segment === "archive") {
-    refreshPresenterArchiveFromState()
-  }
+    if (segment === "archive") {
+      refreshPresenterArchiveFromState()
+    }
 
-  if (segment === "final") {
-    refreshPresenterFinalFromState()
-  }
+    if (segment === "final") {
+      refreshPresenterFinalFromState()
+    }
 
-  return
-}
+    if (typeof refreshPresenterEnhancements === "function") {
+      refreshPresenterEnhancements()
+    }
+
+    return
+  }
 
   showPresenterSegmentPage()
 
@@ -706,13 +710,25 @@ if (currentRendered === segment) {
   }
 
   try {
-    if (segment === "warmup") await renderWarmup()
-    else if (segment === "top10") await renderTop10()
-    else if (segment === "auction") await renderAuction()
-    else if (segment === "who") await renderWho()
-    else if (segment === "final") await renderFinal()
-    else if (segment === "archive") await renderArchive()
-    else renderPresenterHome()
+    if (segment === "warmup") {
+      await renderWarmup()
+    } else if (segment === "top10") {
+      await renderTop10()
+    } else if (segment === "auction") {
+      await renderAuction()
+    } else if (segment === "who") {
+      await renderWho()
+    } else if (segment === "final") {
+      await renderFinal()
+    } else if (segment === "archive") {
+      await renderArchive()
+    } else {
+      renderPresenterHome()
+    }
+
+    if (typeof refreshPresenterEnhancements === "function") {
+      refreshPresenterEnhancements()
+    }
 
   } catch (e) {
     console.log("Presenter render error:", e)
@@ -733,9 +749,12 @@ if (currentRendered === segment) {
         </section>
       `
     }
+
+    if (typeof refreshPresenterEnhancements === "function") {
+      refreshPresenterEnhancements()
+    }
   }
 }
-
 /* =========================
    SHARED UI
 ========================= */
@@ -2115,6 +2134,8 @@ let presenterFinalPreviewCache = {
   3: ""
 }
 
+let presenterFinalRound1FocusMode = false
+
 function getPresenterFinalState() {
   return presenterLiveState?.final || { round: 1 }
 }
@@ -2165,7 +2186,92 @@ function clearPresenterFinalPreview(round = presenterFinalRound) {
 }
 
 /* =========================
-   Render Final
+   FINAL HELPERS
+========================= */
+
+function setPresenterFinalRound1FocusMode(active) {
+  presenterFinalRound1FocusMode = !!active
+
+  document.body.classList.toggle(
+    "presenterFinalRound1FocusMode",
+    presenterFinalRound1FocusMode
+  )
+}
+
+function updatePresenterFinalRound1FocusFromState() {
+  if (presenterSegment !== "final") {
+    setPresenterFinalRound1FocusMode(false)
+    return
+  }
+
+  const round = getPresenterFinalRound()
+
+  if (round !== 1) {
+    setPresenterFinalRound1FocusMode(false)
+    return
+  }
+
+  const state = getPresenterFinalRoundState(1)
+  const currentNumber = Number(state.currentNumber || 0)
+  const pendingScore = !!state.pendingScore
+
+  setPresenterFinalRound1FocusMode(!!currentNumber || pendingScore)
+}
+
+function refreshPresenterEnhancements() {
+  updatePresenterFinalRound1FocusFromState()
+}
+
+async function presenterPlayCurrentFinalVideo() {
+  const sent = await sendCommand("playCurrentFinalVideo", {
+    round: getPresenterFinalRound()
+  })
+
+  if (!sent) {
+    showToast("تعذر تشغيل الفيديو")
+    return
+  }
+
+  showToast("تم تشغيل الفيديو")
+}
+
+async function presenterRestartCurrentFinalVideo() {
+  const sent = await sendCommand("restartCurrentFinalVideo", {
+    round: getPresenterFinalRound()
+  })
+
+  if (!sent) {
+    showToast("تعذر إعادة تشغيل الفيديو")
+    return
+  }
+
+  showToast("تمت إعادة تشغيل الفيديو")
+}
+
+async function presenterFinalCorrect() {
+  const round = getPresenterFinalRound()
+
+  if (round === 1) {
+    setPresenterFinalRound1FocusMode(false)
+  }
+
+  await sendCommand("stopCurrentFinalVideo")
+  await sendCommand("correct")
+}
+
+async function presenterFinalWrong() {
+  const round = getPresenterFinalRound()
+
+  if (round === 3 && isPresenterFinalRound3TeamMedia()) {
+    await sendCommand("finalWrongVideoOnly")
+    return
+  }
+
+  await sendCommand("wrong")
+}
+
+/* =========================
+   RENDER FINAL
 ========================= */
 
 async function renderFinal() {
@@ -2203,18 +2309,22 @@ async function renderFinal() {
   `
 
   await renderPresenterFinalRoundContent()
+  refreshPresenterEnhancements()
 }
 
 async function setPresenterFinalRound(round) {
   presenterFinalRound = Number(round)
   presenterFinalSelected = { round: presenterFinalRound, number: null }
 
+  setPresenterFinalRound1FocusMode(false)
+
   sendCommand("setRound", { round: presenterFinalRound })
   await renderPresenterFinalRoundContent()
+  refreshPresenterEnhancements()
 }
 
 /* =========================
-   Round Content
+   ROUND CONTENT
 ========================= */
 
 async function renderPresenterFinalRoundContent() {
@@ -2240,7 +2350,11 @@ async function renderPresenterFinalRoundContent() {
 
   const selectedNumber =
     Number(isTeamMedia ? teamMediaState.currentNumber : state.currentNumber || 0) ||
-    (presenterFinalSelected?.round === round ? Number(presenterFinalSelected.number || 0) : 0)
+    (
+      presenterFinalSelected?.round === round
+        ? Number(presenterFinalSelected.number || 0)
+        : 0
+    )
 
   const pendingScore = !!state.pendingScore || !!teamMediaState.currentNumber
 
@@ -2272,26 +2386,44 @@ async function renderPresenterFinalRoundContent() {
   if (round === 1) {
     controlsBox.innerHTML = `
       <div class="presenterActions">
-        <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
-        <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">إظهار السؤال</button>
+        <button class="presenterBtn gray" onclick="sendCommand('double')">
+          دبل
+        </button>
+
+        <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">
+          إظهار السؤال
+        </button>
       </div>
 
       <div class="presenterActions">
-        <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">تكبير</button>
-        <button class="presenterBtn green" onclick="sendCommand('correct')">إجابة صحيحة</button>
+        <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
+          تكبير
+        </button>
+
+        <button class="presenterBtn green" onclick="presenterFinalCorrect()">
+          إجابة صحيحة
+        </button>
       </div>
 
       <div class="presenterActions">
-        <button class="presenterBtn red" onclick="sendCommand('wrong')">خطأ</button>
-        <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+        <button class="presenterBtn red" onclick="presenterFinalWrong()">
+          خطأ
+        </button>
+
+        <button class="presenterBtn gray" onclick="sendCommand('undo')">
+          تراجع
+        </button>
       </div>
 
       <div class="presenterActions">
-        <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
+        <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
+          الجولة التالية
+        </button>
       </div>
     `
 
     refreshPresenterFinalControlsOnly(1)
+    refreshPresenterEnhancements()
     return
   }
 
@@ -2310,7 +2442,9 @@ async function renderPresenterFinalRoundContent() {
 
     controlsBox.innerHTML = `
       <div class="presenterActions finalTwoActions">
-        <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
+        <button class="presenterBtn gray" onclick="sendCommand('double')">
+          دبل
+        </button>
 
         <button class="presenterBtn dark" onclick="sendCommand('decreaseCountdown')">
           ${isSequenceNumber ? `العداد ${state.countdown ?? 15}` : "العداد"}
@@ -2336,12 +2470,18 @@ async function renderPresenterFinalRoundContent() {
       </div>
 
       <div class="presenterActions">
-        <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
-        <button class="presenterBtn blue" onclick="sendCommand('nextRound')">الجولة التالية</button>
+        <button class="presenterBtn gray" onclick="sendCommand('undo')">
+          تراجع
+        </button>
+
+        <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
+          الجولة التالية
+        </button>
       </div>
     `
 
     refreshPresenterFinalControlsOnly(2)
+    refreshPresenterEnhancements()
     return
   }
 
@@ -2360,8 +2500,8 @@ async function renderPresenterFinalRoundContent() {
         </button>
 
         <button
-          class="presenterBtn dark"
-          onclick="sendCommand('playTeamMediaVideo')"
+          class="presenterBtn dark presenterPlayVideoBtn"
+          onclick="presenterPlayCurrentFinalVideo()"
           ${hasCurrent && isVideo ? "" : "disabled"}
         >
           تشغيل الفيديو
@@ -2371,15 +2511,15 @@ async function renderPresenterFinalRoundContent() {
       <div class="presenterActions">
         <button
           class="presenterBtn blue"
-          onclick="sendCommand('restartTeamMediaVideo')"
+          onclick="presenterRestartCurrentFinalVideo()"
           ${hasCurrent && isVideo ? "" : "disabled"}
         >
-          إعادة تشغيل
+          إعادة تشغيل الفيديو
         </button>
 
         <button
           class="presenterBtn green"
-          onclick="clearPresenterFinalPreview(3); sendCommand('correct')"
+          onclick="clearPresenterFinalPreview(3); presenterFinalCorrect()"
           ${hasCurrent ? "" : "disabled"}
         >
           إجابة صحيحة
@@ -2389,28 +2529,38 @@ async function renderPresenterFinalRoundContent() {
       <div class="presenterActions">
         <button
           class="presenterBtn red"
-          onclick="clearPresenterFinalPreview(3); sendCommand('wrong')"
+          onclick="presenterFinalWrong()"
           ${hasCurrent ? "" : "disabled"}
         >
           خطأ
         </button>
 
-        <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+        <button class="presenterBtn gray" onclick="sendCommand('undo')">
+          تراجع
+        </button>
       </div>
     `
 
     refreshPresenterFinalControlsOnly(3)
+    refreshPresenterEnhancements()
     return
   }
 
   controlsBox.innerHTML = `
     <div class="presenterActions">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">دبل</button>
-      <button class="presenterBtn dark" onclick="sendCommand('startSequence')">بدء عرض الصور</button>
+      <button class="presenterBtn gray" onclick="sendCommand('double')">
+        دبل
+      </button>
+
+      <button class="presenterBtn dark" onclick="sendCommand('startSequence')">
+        بدء عرض الصور
+      </button>
     </div>
 
     <div class="presenterActions">
-      <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">تكبير الصورة</button>
+      <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
+        تكبير الصورة
+      </button>
 
       <button
         class="presenterBtn green"
@@ -2422,15 +2572,18 @@ async function renderPresenterFinalRoundContent() {
     </div>
 
     <div class="presenterActions">
-      <button class="presenterBtn gray" onclick="sendCommand('undo')">تراجع</button>
+      <button class="presenterBtn gray" onclick="sendCommand('undo')">
+        تراجع
+      </button>
     </div>
   `
 
   refreshPresenterFinalControlsOnly(3)
+  refreshPresenterEnhancements()
 }
 
 /* =========================
-   Refresh
+   REFRESH FINAL
 ========================= */
 
 async function refreshPresenterFinalFromState() {
@@ -2441,13 +2594,18 @@ async function refreshPresenterFinalFromState() {
 
   const activeTeam = getPresenterActiveTeamFromState() || presenterSelectedTeam || null
 
-  document.getElementById("teamA")?.classList.toggle("selectedPresenterTeam", activeTeam === "A")
-  document.getElementById("teamB")?.classList.toggle("selectedPresenterTeam", activeTeam === "B")
+  document.getElementById("teamA")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "A"
+  )
+
+  document.getElementById("teamB")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "B"
+  )
 
   const roundText = document.getElementById("presenterFinalRoundText")
-  if (roundText) {
-    roundText.innerText = round
-  }
+  if (roundText) roundText.innerText = round
 
   const controlsBox = document.getElementById("presenterFinalControls")
   const currentControlsRound = Number(controlsBox?.dataset.round || 0)
@@ -2455,12 +2613,14 @@ async function refreshPresenterFinalFromState() {
   if (currentControlsRound !== round) {
     presenterFinalSelected = { round, number: null }
     await renderPresenterFinalRoundContent()
+    refreshPresenterEnhancements()
     return
   }
 
   await refreshPresenterFinalNumbersOnly(round)
   await refreshPresenterFinalPreviewOnly(round)
   refreshPresenterFinalControlsOnly(round)
+  refreshPresenterEnhancements()
 }
 
 async function refreshPresenterFinalNumbersOnly(round) {
@@ -2549,11 +2709,11 @@ function refreshPresenterFinalControlsOnly(round) {
     )
 
     const correctBtn = allButtons.find(btn =>
-      (btn.getAttribute("onclick") || "").includes("correct")
+      (btn.getAttribute("onclick") || "").includes("presenterFinalCorrect")
     )
 
     const wrongBtn = allButtons.find(btn =>
-      (btn.getAttribute("onclick") || "").includes("wrong")
+      (btn.getAttribute("onclick") || "").includes("presenterFinalWrong")
     )
 
     if (showQuestionBtn) showQuestionBtn.disabled = !isQuestionCard
@@ -2587,13 +2747,8 @@ function refreshPresenterFinalControlsOnly(round) {
         : "العداد"
     }
 
-    if (scrambleBtn) {
-      scrambleBtn.disabled = !currentNumber || isSequenceNumber
-    }
-
-    if (sequenceBtn) {
-      sequenceBtn.disabled = !currentNumber || isScrambleNumber
-    }
+    if (scrambleBtn) scrambleBtn.disabled = !currentNumber || isSequenceNumber
+    if (sequenceBtn) sequenceBtn.disabled = !currentNumber || isScrambleNumber
 
     return
   }
@@ -2613,15 +2768,17 @@ function refreshPresenterFinalControlsOnly(round) {
           btn.disabled = !(hasCurrent && teamMediaState.currentQuestion)
         }
 
-        if (onclick.includes("playTeamMediaVideo")) {
+        if (
+          onclick.includes("presenterPlayCurrentFinalVideo") ||
+          onclick.includes("presenterRestartCurrentFinalVideo")
+        ) {
           btn.disabled = !(hasCurrent && isVideo)
         }
 
-        if (onclick.includes("restartTeamMediaVideo")) {
-          btn.disabled = !(hasCurrent && isVideo)
-        }
-
-        if (onclick.includes("correct") || onclick.includes("wrong")) {
+        if (
+          onclick.includes("presenterFinalCorrect") ||
+          onclick.includes("presenterFinalWrong")
+        ) {
           btn.disabled = !hasCurrent
         }
       })
@@ -2635,14 +2792,12 @@ function refreshPresenterFinalControlsOnly(round) {
       (btn.getAttribute("onclick") || "").includes("recordRound3Score")
     )
 
-    if (recordBtn) {
-      recordBtn.disabled = !currentNumber
-    }
+    if (recordBtn) recordBtn.disabled = !currentNumber
   }
 }
 
 /* =========================
-   Open Number
+   OPEN FINAL NUMBER
 ========================= */
 
 function openPresenterFinalNumber(round, number) {
@@ -2678,7 +2833,11 @@ function openPresenterFinalNumber(round, number) {
 
   presenterFinalSelected = { round, number }
 
-  if (round === 1) renderPresenterFinalRound1Preview()
+  if (round === 1) {
+    setPresenterFinalRound1FocusMode(true)
+    renderPresenterFinalRound1Preview()
+  }
+
   if (round === 2) renderPresenterFinalRound2Preview()
   if (round === 3) renderPresenterFinalRound3Preview()
 
@@ -2686,7 +2845,8 @@ function openPresenterFinalNumber(round, number) {
 }
 
 /* =========================
-/* ===== Round 1 preview ===== */
+   ROUND 1 PREVIEW
+========================= */
 
 async function renderPresenterFinalRound1Preview() {
   const previewBox = document.getElementById("presenterFinalPreview")
@@ -2741,7 +2901,6 @@ async function renderPresenterFinalRound1Preview() {
 
   const answerText = data.answer || "لا توجد إجابة"
 
-  /* أول 3 أرقام: إجابة فقط بدون سؤال */
   if (current >= 1 && current <= 3) {
     presenterFinalPreviewCache[1] = `
       <div class="presenterFinalCleanPreview presenterFinalAnswerOnlyMode">
@@ -2763,7 +2922,6 @@ async function renderPresenterFinalRound1Preview() {
     return
   }
 
-  /* الأرقام 4 - 6: سؤال + إجابة */
   presenterFinalPreviewCache[1] = `
     <div class="presenterFinalCleanPreview">
       <div class="presenterFinalPreviewNumber">
@@ -2792,7 +2950,7 @@ async function renderPresenterFinalRound1Preview() {
 }
 
 /* =========================
-   Round 2 Preview
+   ROUND 2 PREVIEW
 ========================= */
 
 async function renderPresenterFinalRound2Preview() {
@@ -2877,7 +3035,7 @@ async function renderPresenterFinalRound2Preview() {
 }
 
 /* =========================
-   Round 3 Preview
+   ROUND 3 PREVIEW
 ========================= */
 
 async function renderPresenterFinalRound3Preview() {
@@ -3035,6 +3193,7 @@ async function renderPresenterFinalRound3Preview() {
   const freshBox = document.getElementById("presenterFinalPreview")
   if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[3]
 }
+
 /* =========================
    ARCHIVE
 ========================= */
@@ -3042,7 +3201,6 @@ async function renderPresenterFinalRound3Preview() {
 let presenterArchiveRows = []
 let presenterArchiveBox = null
 let presenterArchiveLoadedRound = null
-
 
 function getPresenterArchiveRoot() {
   return presenterLiveState?.archive || {}
@@ -3056,6 +3214,7 @@ function getPresenterArchiveState() {
     errors: {}
   }
 }
+
 function getPresenterArchiveMaxRound() {
   return Number(getPresenterArchiveRoot()?.archiveMaxRound || 4)
 }
@@ -3206,14 +3365,10 @@ async function refreshPresenterArchiveFromState() {
   )
 
   const roundText = document.getElementById("presenterArchiveRoundText")
-if (roundText) {
-  roundText.innerText = round
-}
+  if (roundText) roundText.innerText = round
 
   const scoreBox = document.querySelector(".presenterArchiveSimpleScore strong")
-  if (scoreBox) {
-    scoreBox.innerText = remainingPoints
-  }
+  if (scoreBox) scoreBox.innerText = remainingPoints
 
   const requiredItems = presenterArchiveRows
     .filter(item => String(item.label || "").trim() === "المطلوب")
@@ -3244,10 +3399,9 @@ if (roundText) {
     `.presenterActions .presenterBtn.gray[onclick="sendCommand('double')"]`
   )
 
-  if (doubleBtn) {
-    doubleBtn.disabled = !activeTeam
-  }
+  if (doubleBtn) doubleBtn.disabled = !activeTeam
 }
+
 function setPresenterArchiveRound(round) {
   const maxRound = getPresenterArchiveMaxRound()
   const safeRound = Math.min(Math.max(Number(round || 1), 1), maxRound)

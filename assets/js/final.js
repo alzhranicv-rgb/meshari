@@ -2651,16 +2651,11 @@ function getFinalRound3ActiveVideo() {
   )
 }
 
-function playFinalRound3TeamMediaVideo() {
+function restartFinalRound3TeamMediaVideo() {
   const state = finalState.round3.teamMedia
 
   if (!state.currentNumber || state.currentMediaType !== "video") {
     showGameToast("لا يوجد فيديو")
-    return
-  }
-
-  if (state.videoPlayed) {
-    showGameToast("الفيديو اشتغل مرة واحدة، اضغط إعادة تشغيل")
     return
   }
 
@@ -2670,24 +2665,20 @@ function playFinalRound3TeamMediaVideo() {
     const video = document.getElementById("finalRound3TeamMediaOverlayVideo")
     if (!video) return
 
-    state.videoPlayed = true
-
-    video.controls = false
+    video.pause()
     video.currentTime = 0
+    video.controls = false
     video.muted = false
     video.volume = 1
 
-    video.onended = function () {
-      closeFinalRound3TeamMediaOverlay()
-      saveFinalState()
-    }
+    state.videoPlayed = true
 
     const playPromise = video.play()
 
     if (playPromise && typeof playPromise.catch === "function") {
       playPromise.catch(err => {
-        console.log("VIDEO PLAY ERROR:", err)
-        showGameToast("اضغط تشغيل مرة أخرى")
+        console.log("VIDEO RESTART ERROR:", err)
+        showGameToast("اضغط إعادة تشغيل مرة أخرى")
       })
     }
 
@@ -2734,3 +2725,106 @@ function restartFinalRound3TeamMediaVideo() {
     saveFinalState()
   }, 120)
 }
+/* =========================================================
+   FINAL - PRESENTER VIDEO COMMANDS
+   أوامر الفيديو القادمة من صفحة المقدم
+========================================================= */
+
+function getCurrentFinalVideoElement() {
+  return (
+    document.getElementById("finalRound3TeamMediaOverlayVideo") ||
+    document.getElementById("finalRound3TeamMediaInlineVideo") ||
+    document.querySelector(".finalRound3TeamMediaOverlay video") ||
+    document.querySelector(".finalTeamMediaVideoFrame video") ||
+    document.querySelector(".finalRound3TeamMediaStage video") ||
+    document.querySelector(".finalMainStage video")
+  )
+}
+
+function getCurrentFinalVideoFrame() {
+  const video = getCurrentFinalVideoElement()
+  if (!video) return null
+
+  return (
+    video.closest(".finalRound3TeamMediaOverlayInner") ||
+    video.closest(".finalTeamMediaVideoFrame") ||
+    video.closest(".finalTeamMediaFrame") ||
+    video.parentElement
+  )
+}
+
+function playCurrentFinalVideo() {
+  const state = finalState.round3?.teamMedia
+
+  if (
+    finalState.round !== 3 ||
+    finalState.round3.mode !== "team_media" ||
+    !state?.currentNumber ||
+    state.currentMediaType !== "video"
+  ) {
+    showGameToast("لا يوجد فيديو حالي")
+    return
+  }
+
+  playFinalRound3TeamMediaVideo()
+}
+
+function restartCurrentFinalVideo() {
+  const state = finalState.round3?.teamMedia
+
+  if (
+    finalState.round !== 3 ||
+    finalState.round3.mode !== "team_media" ||
+    !state?.currentNumber ||
+    state.currentMediaType !== "video"
+  ) {
+    showGameToast("لا يوجد فيديو حالي")
+    return
+  }
+
+  restartFinalRound3TeamMediaVideo()
+}
+
+function stopCurrentFinalVideo() {
+  const overlayVideo = document.getElementById("finalRound3TeamMediaOverlayVideo")
+  const inlineVideo = document.getElementById("finalRound3TeamMediaInlineVideo")
+
+  ;[overlayVideo, inlineVideo].forEach(video => {
+    if (!video) return
+
+    try {
+      video.pause()
+      video.currentTime = 0
+    } catch (e) {
+      console.log("STOP FINAL VIDEO ERROR:", e)
+    }
+  })
+}
+
+function finalWrongVideoOnly() {
+  const video = getCurrentFinalVideoElement()
+
+  if (!video) {
+    showGameToast("لا يوجد فيديو شغال")
+    return
+  }
+
+  const frame = getCurrentFinalVideoFrame()
+  if (!frame) return
+
+ 
+  frame.classList.remove("finalVideoWrongFlash")
+  void frame.offsetWidth
+  frame.classList.add("finalVideoWrongFlash")
+
+  playGameSound("wrong")
+
+  setTimeout(() => {
+    frame.classList.remove("finalVideoWrongFlash")
+  }, 900)
+}
+
+window.playCurrentFinalVideo = playCurrentFinalVideo
+window.restartCurrentFinalVideo = restartCurrentFinalVideo
+window.stopCurrentFinalVideo = stopCurrentFinalVideo
+window.finalWrongVideoOnly = finalWrongVideoOnly

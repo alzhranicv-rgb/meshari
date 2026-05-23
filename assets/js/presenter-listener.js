@@ -1,4 +1,3 @@
-
 let presenterCommandChannel = null
 let lastPresenterCommandId = 0
 let handledPresenterCommandKeys = new Set()
@@ -118,6 +117,7 @@ function isValidPresenterTeam(team) {
 /* =========================
    HANDLE COMMANDS
 ========================= */
+
 function getPresenterCommandKey(cmd) {
   const payload = cmd?.payload || {}
 
@@ -175,86 +175,98 @@ function handlePresenterCommand(cmd) {
     return safeRunPresenterAction(() => openSegmentPage(data.segment))
   }
 
-  if (action === "hideDisplayControls") return safeRunPresenterAction(hideDisplayControls)
-  if (action === "showDisplayControls") return safeRunPresenterAction(showDisplayControls)
-    
+  if (action === "hideDisplayControls") {
+    return safeRunPresenterAction(hideDisplayControls)
+  }
+
+  if (action === "showDisplayControls") {
+    return safeRunPresenterAction(showDisplayControls)
+  }
+
   if (action === "toggleDisplayControls") {
-  return safeRunPresenterAction(() => {
-    if (document.body.classList.contains("presenterHideDisplayControls")) {
-      showDisplayControls()
-    } else {
-      hideDisplayControls()
-    }
-  })
-}
+    return safeRunPresenterAction(() => {
+      if (document.body.classList.contains("presenterHideDisplayControls")) {
+        showDisplayControls()
+      } else {
+        hideDisplayControls()
+      }
+    })
+  }
 
-if (action === "zoomImage") {
-  return safeRunPresenterAction(() => {
+  if (action === "zoomImage") {
+    return safeRunPresenterAction(() => {
+      if (segment === "auction") {
+        if (typeof zoomCurrentDisplayImage === "function") {
+          zoomCurrentDisplayImage()
+        }
+        return
+      }
 
-    if (segment === "auction") {
+      if (
+        segment === "final" &&
+        window.finalState?.round === 3 &&
+        window.finalState?.round3?.mode === "team_media" &&
+        window.finalState?.round3?.teamMedia?.currentMedia
+      ) {
+        const type =
+          window.finalState.round3.teamMedia.currentMediaType === "video"
+            ? "video"
+            : "image"
+
+        openFinalRound3TeamMediaOverlay(type)
+        return
+      }
+
+      if (
+        segment === "final" &&
+        window.finalState?.round === 3 &&
+        Number(window.finalState?.round3?.currentNumber || 0)
+      ) {
+        toggleFinalRound3ImageOverlay()
+        return
+      }
+
+      if (
+        segment === "final" &&
+        window.finalState?.round === 1 &&
+        Number(window.finalState?.round1?.currentNumber || 0) >= 1 &&
+        Number(window.finalState?.round1?.currentNumber || 0) <= 3
+      ) {
+        toggleFinalRound1Overlay()
+        return
+      }
+
       if (typeof zoomCurrentDisplayImage === "function") {
         zoomCurrentDisplayImage()
       }
-      return
-    }
-
-    if (
-      segment === "final" &&
-      window.finalState?.round === 3 &&
-      window.finalState?.round3?.mode === "team_media" &&
-      window.finalState?.round3?.teamMedia?.currentMedia
-    ) {
-      const type = window.finalState.round3.teamMedia.currentMediaType === "video"
-        ? "video"
-        : "image"
-
-      openFinalRound3TeamMediaOverlay(type)
-      return
-    }
-
-    if (
-      segment === "final" &&
-      window.finalState?.round === 3 &&
-      Number(window.finalState?.round3?.currentNumber || 0)
-    ) {
-      toggleFinalRound3ImageOverlay()
-      return
-    }
-
-    if (
-      segment === "final" &&
-      window.finalState?.round === 1 &&
-      Number(window.finalState?.round1?.currentNumber || 0) >= 1 &&
-      Number(window.finalState?.round1?.currentNumber || 0) <= 3
-    ) {
-      toggleFinalRound1Overlay()
-      return
-    }
-
-    if (typeof zoomCurrentDisplayImage === "function") {
-      zoomCurrentDisplayImage()
-    }
-  })
-}
+    })
+  }
 
   if (action === "closeZoomImage") {
-  return safeRunPresenterAction(() => {
-    if (typeof closeCurrentDisplayImageZoom === "function") {
-      closeCurrentDisplayImageZoom()
-    }
+    return safeRunPresenterAction(() => {
+      if (typeof closeCurrentDisplayImageZoom === "function") {
+        closeCurrentDisplayImageZoom()
+      }
 
-    document.getElementById("displayImageZoomOverlay")?.remove()
-    document.getElementById("auctionImageOverlay")?.remove()
-    document.getElementById("auctionVideoFullscreenOverlay")?.remove()
-    document.getElementById("whoImageOverlay")?.remove()
-    document.getElementById("finalRound1Overlay")?.remove()
-    document.getElementById("finalRound3ImageOverlay")?.remove()
+      document.getElementById("displayImageZoomOverlay")?.remove()
+      document.getElementById("auctionImageOverlay")?.remove()
+      document.getElementById("auctionVideoFullscreenOverlay")?.remove()
+      document.getElementById("whoImageOverlay")?.remove()
+      document.getElementById("finalRound1Overlay")?.remove()
+      document.getElementById("finalRound3ImageOverlay")?.remove()
+      document.getElementById("finalRound3TeamMediaOverlay")?.remove()
 
-    document.body.classList.remove("auctionOverlayActive")
-  })
-}
-  if (action === "endSegment") return safeRunPresenterAction(() => endCurrentSegment())
-  if (action === "goHome") return safeRunPresenterAction(() => goHome())
+      document.body.classList.remove("auctionOverlayActive")
+    })
+  }
+
+  if (action === "endSegment") {
+    return safeRunPresenterAction(() => endCurrentSegment())
+  }
+
+  if (action === "goHome") {
+    return safeRunPresenterAction(() => goHome())
+  }
 
   if (segment === "warmup") return handleWarmupPresenterAction(action, data)
   if (segment === "top10") return handleTop10PresenterAction(action, data)
@@ -274,10 +286,23 @@ function handleWarmupPresenterAction(action, data) {
     return safeRunPresenterAction(() => selectWarmupTeam(data.team))
   }
 
-  if (action === "openNumber") return safeRunPresenterAction(() => openWarmupQuestion(Number(data.category), Number(data.number)))
-  if (action === "double") return safeRunPresenterAction(() => activateWarmupDouble())
-  if (action === "correct") return safeRunPresenterAction(() => warmupCorrect())
-  if (action === "wrong") return safeRunPresenterAction(() => warmupWrong())
+  if (action === "openNumber") {
+    return safeRunPresenterAction(() => {
+      openWarmupQuestion(Number(data.category), Number(data.number))
+    })
+  }
+
+  if (action === "double") {
+    return safeRunPresenterAction(() => activateWarmupDouble())
+  }
+
+  if (action === "correct") {
+    return safeRunPresenterAction(() => warmupCorrect())
+  }
+
+  if (action === "wrong") {
+    return safeRunPresenterAction(() => warmupWrong())
+  }
 }
 
 /* =========================
@@ -290,13 +315,33 @@ function handleTop10PresenterAction(action, data) {
     return safeRunPresenterAction(() => selectTop10Team(data.team))
   }
 
-  if (action === "openNumber") return safeRunPresenterAction(() => openTop10Number(Number(data.number)))
-  if (action === "double") return safeRunPresenterAction(() => activateTop10Double())
-  if (action === "showAnswer") return safeRunPresenterAction(() => showTop10Answer())
-  if (action === "wrong") return safeRunPresenterAction(() => addTop10Error())
-  if (action === "undo") return safeRunPresenterAction(() => undoTop10Action())
-  if (action === "switchTurn") return safeRunPresenterAction(() => switchTop10Turn())
-  if (action === "nextRound") return safeRunPresenterAction(() => nextTop10Round())
+  if (action === "openNumber") {
+    return safeRunPresenterAction(() => openTop10Number(Number(data.number)))
+  }
+
+  if (action === "double") {
+    return safeRunPresenterAction(() => activateTop10Double())
+  }
+
+  if (action === "showAnswer") {
+    return safeRunPresenterAction(() => showTop10Answer())
+  }
+
+  if (action === "wrong") {
+    return safeRunPresenterAction(() => addTop10Error())
+  }
+
+  if (action === "undo") {
+    return safeRunPresenterAction(() => undoTop10Action())
+  }
+
+  if (action === "switchTurn") {
+    return safeRunPresenterAction(() => switchTop10Turn())
+  }
+
+  if (action === "nextRound") {
+    return safeRunPresenterAction(() => nextTop10Round())
+  }
 
   if (action === "setRound") {
     return safeRunPresenterAction(() => {
@@ -355,6 +400,7 @@ function handleAuctionPresenterAction(action, data) {
     })
   }
 }
+
 /* =========================
    WHO
 ========================= */
@@ -438,6 +484,7 @@ function handleWhoPresenterAction(action, data) {
     })
   }
 }
+
 /* =========================
    FINAL
 ========================= */
@@ -452,6 +499,100 @@ function handleFinalPresenterAction(action, data) {
     return safeRunPresenterAction(() => {
       const round = Number(data.round || 1)
       if (round !== finalState.round) goToFinalRound(round)
+    })
+  }
+
+  if (action === "playCurrentFinalVideo") {
+    return safeRunPresenterAction(() => {
+      if (typeof playCurrentFinalVideo === "function") {
+        playCurrentFinalVideo()
+        return
+      }
+
+      if (
+        finalState.round === 3 &&
+        finalState.round3?.mode === "team_media" &&
+        finalState.round3?.teamMedia?.currentMediaType === "video"
+      ) {
+        playFinalRound3TeamMediaVideo()
+      }
+    })
+  }
+
+  if (action === "restartCurrentFinalVideo") {
+    return safeRunPresenterAction(() => {
+      if (typeof restartCurrentFinalVideo === "function") {
+        restartCurrentFinalVideo()
+        return
+      }
+
+      if (
+        finalState.round === 3 &&
+        finalState.round3?.mode === "team_media" &&
+        finalState.round3?.teamMedia?.currentMediaType === "video"
+      ) {
+        restartFinalRound3TeamMediaVideo()
+      }
+    })
+  }
+
+  if (action === "stopCurrentFinalVideo") {
+    return safeRunPresenterAction(() => {
+      if (typeof stopCurrentFinalVideo === "function") {
+        stopCurrentFinalVideo()
+        return
+      }
+
+      const overlayVideo = document.getElementById("finalRound3TeamMediaOverlayVideo")
+      const inlineVideo = document.getElementById("finalRound3TeamMediaInlineVideo")
+
+      ;[overlayVideo, inlineVideo].forEach(video => {
+        if (!video) return
+
+        try {
+          video.pause()
+          video.currentTime = 0
+        } catch (e) {
+          console.log("STOP FINAL VIDEO ERROR:", e)
+        }
+      })
+    })
+  }
+
+  if (action === "finalWrongVideoOnly") {
+    return safeRunPresenterAction(() => {
+      if (typeof finalWrongVideoOnly === "function") {
+        finalWrongVideoOnly()
+        return
+      }
+
+      const video =
+        document.getElementById("finalRound3TeamMediaOverlayVideo") ||
+        document.getElementById("finalRound3TeamMediaInlineVideo") ||
+        document.querySelector(".finalRound3TeamMediaStage video") ||
+        document.querySelector(".finalMainStage video")
+
+      if (!video) {
+        showGameToast("لا يوجد فيديو شغال")
+        return
+      }
+
+      const frame =
+        video.closest(".finalRound3TeamMediaOverlayInner") ||
+        video.closest(".finalTeamMediaVideoFrame") ||
+        video.parentElement
+
+      if (!frame) return
+
+      frame.classList.remove("finalVideoWrongFlash")
+      void frame.offsetWidth
+      frame.classList.add("finalVideoWrongFlash")
+
+      playGameSound("wrong")
+
+      setTimeout(() => {
+        frame.classList.remove("finalVideoWrongFlash")
+      }, 900)
     })
   }
 
@@ -544,11 +685,24 @@ function handleFinalPresenterAction(action, data) {
         return
       }
 
-      if (
-        finalState.round === 3 &&
-        finalState.round3?.mode === "team_media"
-      ) {
-        finalRound3TeamMediaCorrect()
+      if (finalState.round === 2) {
+        if (finalState.round2.currentType === "scramble") {
+          finalRound2RecordScore()
+          return
+        }
+
+        if (finalState.round2.currentType === "sequence") {
+          finalRound2RecordSequenceScore()
+          return
+        }
+      }
+
+      if (finalState.round === 3) {
+        if (finalState.round3?.mode === "team_media") {
+          finalRound3TeamMediaCorrect()
+        } else {
+          finalRound3RecordScore()
+        }
       }
     })
   }
@@ -583,11 +737,7 @@ function handleFinalPresenterAction(action, data) {
 
   if (action === "toggleRound3Correct") {
     return safeRunPresenterAction(() => {
-      if (
-        finalState.round3?.mode === "team_media"
-      ) {
-        return
-      }
+      if (finalState.round3?.mode === "team_media") return
 
       toggleFinalRound3CorrectSelection(Number(data.index))
     })
@@ -611,38 +761,11 @@ function handleFinalPresenterAction(action, data) {
         finalState.round3?.mode === "team_media" &&
         finalState.round3?.teamMedia?.currentMediaType === "video"
       ) {
-        openFinalRound3TeamMediaOverlay("video")
-
-        setTimeout(() => {
-          playFinalRound3TeamMediaVideo()
-        }, 120)
-
+        playFinalRound3TeamMediaVideo()
         return
       }
 
       startFinalRound3Sequence()
-    })
-  }
-
-  if (action === "restartTeamMediaVideo") {
-    return safeRunPresenterAction(() => {
-      if (
-        finalState.round !== 3 ||
-        finalState.round3?.mode !== "team_media" ||
-        finalState.round3?.teamMedia?.currentMediaType !== "video"
-      ) {
-        return
-      }
-
-      openFinalRound3TeamMediaOverlay("video")
-
-      setTimeout(() => {
-        restartFinalRound3TeamMediaVideo()
-
-        setTimeout(() => {
-          playFinalRound3TeamMediaVideo()
-        }, 80)
-      }, 120)
     })
   }
 
@@ -656,11 +779,21 @@ function handleFinalPresenterAction(action, data) {
         return
       }
 
-      openFinalRound3TeamMediaOverlay("video")
+      playFinalRound3TeamMediaVideo()
+    })
+  }
 
-      setTimeout(() => {
-        playFinalRound3TeamMediaVideo()
-      }, 120)
+  if (action === "restartTeamMediaVideo") {
+    return safeRunPresenterAction(() => {
+      if (
+        finalState.round !== 3 ||
+        finalState.round3?.mode !== "team_media" ||
+        finalState.round3?.teamMedia?.currentMediaType !== "video"
+      ) {
+        return
+      }
+
+      restartFinalRound3TeamMediaVideo()
     })
   }
 
@@ -684,31 +817,52 @@ function handleFinalPresenterAction(action, data) {
     })
   }
 }
+
 /* =========================
    ARCHIVE
 ========================= */
 
 function handleArchivePresenterAction(action, data) {
   if (action === "selectTeam") {
-  if (!isValidPresenterTeam(data.team)) return
-  return safeRunPresenterAction(() => selectArchiveTeam(data.team))
-}
-  if (action === "openNumber") return safeRunPresenterAction(() => toggleArchiveItem(Number(data.number)))
+    if (!isValidPresenterTeam(data.team)) return
+    return safeRunPresenterAction(() => selectArchiveTeam(data.team))
+  }
 
- if (action === "setRound") {
-  return safeRunPresenterAction(() => {
-    archiveState.round = Number(data.round || 1)
-    renderArchiveRoundUI()
-    saveArchiveState()
-  })
-}
+  if (action === "openNumber") {
+    return safeRunPresenterAction(() => toggleArchiveItem(Number(data.number)))
+  }
 
-  if (action === "double") return safeRunPresenterAction(() => activateArchiveDouble())
-  if (action === "startTimer") return safeRunPresenterAction(() => startArchiveTimer())
-  if (action === "showAnswer") return safeRunPresenterAction(() => showArchiveAnswer())
-  if (action === "wrong") return safeRunPresenterAction(() => addArchiveError())
-  if (action === "undo") return safeRunPresenterAction(() => undoArchiveAction())
-  if (action === "nextRound") return safeRunPresenterAction(() => nextArchiveRound())
+  if (action === "setRound") {
+    return safeRunPresenterAction(() => {
+      archiveState.round = Number(data.round || 1)
+      renderArchiveRoundUI()
+      saveArchiveState()
+    })
+  }
+
+  if (action === "double") {
+    return safeRunPresenterAction(() => activateArchiveDouble())
+  }
+
+  if (action === "startTimer") {
+    return safeRunPresenterAction(() => startArchiveTimer())
+  }
+
+  if (action === "showAnswer") {
+    return safeRunPresenterAction(() => showArchiveAnswer())
+  }
+
+  if (action === "wrong") {
+    return safeRunPresenterAction(() => addArchiveError())
+  }
+
+  if (action === "undo") {
+    return safeRunPresenterAction(() => undoArchiveAction())
+  }
+
+  if (action === "nextRound") {
+    return safeRunPresenterAction(() => nextArchiveRound())
+  }
 }
 
 /* =========================
