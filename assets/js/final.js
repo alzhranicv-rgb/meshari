@@ -1261,6 +1261,48 @@ function showFinalRound1Answer() {
   loadFinalRound1Current()
   saveFinalState()
 }
+function flashFinalRound1OverlayWrong() {
+  const overlay = document.getElementById("finalRound1Overlay")
+  const displayOverlay = document.getElementById("displayImageZoomOverlay")
+
+  const hasOverlay = overlay || displayOverlay
+
+  if (!hasOverlay) {
+    return false
+  }
+
+  let flashLayer = document.getElementById("finalRound1ZoomFlashLayer")
+
+  if (!flashLayer) {
+    flashLayer = document.createElement("div")
+    flashLayer.id = "finalRound1ZoomFlashLayer"
+    flashLayer.className = "finalRound1ZoomFlashLayer"
+    document.body.appendChild(flashLayer)
+  } else {
+    document.body.appendChild(flashLayer)
+  }
+
+  flashLayer.classList.remove("finalRound1ZoomFlashRun")
+  void flashLayer.offsetWidth
+  flashLayer.classList.add("finalRound1ZoomFlashRun")
+
+  const media =
+    document.querySelector("#finalRound1Overlay img") ||
+    document.querySelector("#finalRound1Overlay video") ||
+    document.getElementById("displayImageZoomImg")
+
+  if (media) {
+    media.classList.remove("mediaWrongShake")
+    void media.offsetWidth
+    media.classList.add("mediaWrongShake")
+  }
+
+  setTimeout(() => {
+    flashLayer.classList.remove("finalRound1ZoomFlashRun")
+  }, 850)
+
+  return true
+}
 
 function finalRound1Wrong() {
   if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {

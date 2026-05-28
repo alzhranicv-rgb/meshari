@@ -1454,25 +1454,42 @@ function bumpScore(id) {
 let screenFlashLayer = null
 
 function ensureScreenFlashLayer() {
-  if (screenFlashLayer && document.body.contains(screenFlashLayer)) return screenFlashLayer
+  if (screenFlashLayer && document.body.contains(screenFlashLayer)) {
+    document.body.appendChild(screenFlashLayer)
+    return screenFlashLayer
+  }
 
   screenFlashLayer = document.createElement("div")
   screenFlashLayer.className = "screenFlashLayer"
   document.body.appendChild(screenFlashLayer)
+
   return screenFlashLayer
 }
 
 function flashScreen(type = "correct") {
   const layer = ensureScreenFlashLayer()
 
-  layer.classList.remove("flashCorrect", "flashWrong")
+  layer.classList.remove(
+    "flashCorrect",
+    "flashWrong",
+    "flashWrongStrong"
+  )
+
   void layer.offsetWidth
 
   if (type === "wrong") {
-    layer.classList.add("flashWrong")
+    layer.classList.add("flashWrongStrong")
   } else {
     layer.classList.add("flashCorrect")
   }
+
+  setTimeout(() => {
+    layer.classList.remove(
+      "flashCorrect",
+      "flashWrong",
+      "flashWrongStrong"
+    )
+  }, 900)
 }
 
 function closeCurrentDisplayImageZoom() {

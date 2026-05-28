@@ -803,6 +803,7 @@ function whoWrong() {
   clearWhoActiveDouble()
 
   playGameSound("wrong")
+  flashWhoZoomOverlayWrong()
   flashScreen("wrong")
   showWhoAnswer("wrong")
 
@@ -817,6 +818,43 @@ function whoWrong() {
 
   saveWhoState()
   finishWhoAfterAnswerDelay()
+}
+
+function flashWhoZoomOverlayWrong() {
+  const whoOverlay = document.getElementById("whoImageOverlay")
+
+  const whoVisible = whoOverlay && !whoOverlay.classList.contains("hidden")
+
+  if (!whoVisible) {
+    return false
+  }
+
+  let flashLayer = document.getElementById("whoZoomFlashLayer")
+
+  if (!flashLayer) {
+    flashLayer = document.createElement("div")
+    flashLayer.id = "whoZoomFlashLayer"
+    flashLayer.className = "whoZoomFlashLayer"
+    document.body.appendChild(flashLayer)
+  }
+
+  flashLayer.classList.remove("whoZoomFlashRun")
+  void flashLayer.offsetWidth
+  flashLayer.classList.add("whoZoomFlashRun")
+
+  const img = whoOverlay.querySelector("img")
+
+  if (img) {
+    img.classList.remove("whoZoomImageShake")
+    void img.offsetWidth
+    img.classList.add("whoZoomImageShake")
+  }
+
+  setTimeout(() => {
+    flashLayer.classList.remove("whoZoomFlashRun")
+  }, 800)
+
+  return true
 }
 
 /* =========================

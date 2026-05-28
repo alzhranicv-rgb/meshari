@@ -862,19 +862,16 @@ function closeAuctionZoomOverlays() {
   if (displayOverlay) displayOverlay.remove()
 
   document.body.classList.remove("auctionOverlayActive")
-
-  const flashLayer = document.getElementById("auctionZoomFlashLayer")
-  if (flashLayer) flashLayer.remove()
 }
 
 function flashAuctionZoomOverlayWrong() {
   const auctionOverlay = document.getElementById("auctionImageOverlay")
   const displayOverlay = document.getElementById("displayImageZoomOverlay")
+  const videoOverlay = document.getElementById("auctionVideoFullscreenOverlay")
 
-  const auctionVisible = auctionOverlay && !auctionOverlay.classList.contains("hidden")
-  const displayVisible = displayOverlay && !displayOverlay.classList.contains("hidden")
+  const hasOverlay = auctionOverlay || displayOverlay || videoOverlay
 
-  if (!auctionVisible && !displayVisible) {
+  if (!hasOverlay) {
     return false
   }
 
@@ -885,25 +882,28 @@ function flashAuctionZoomOverlayWrong() {
     flashLayer.id = "auctionZoomFlashLayer"
     flashLayer.className = "auctionZoomFlashLayer"
     document.body.appendChild(flashLayer)
+  } else {
+    document.body.appendChild(flashLayer)
   }
 
   flashLayer.classList.remove("auctionZoomFlashRun")
   void flashLayer.offsetWidth
   flashLayer.classList.add("auctionZoomFlashRun")
 
-  const img =
+  const media =
     document.querySelector("#auctionImageOverlay img") ||
-    document.getElementById("displayImageZoomImg")
+    document.getElementById("displayImageZoomImg") ||
+    document.getElementById("auctionFullscreenVideo")
 
-  if (img) {
-    img.classList.remove("auctionZoomImageShake")
-    void img.offsetWidth
-    img.classList.add("auctionZoomImageShake")
+  if (media) {
+    media.classList.remove("mediaWrongShake")
+    void media.offsetWidth
+    media.classList.add("mediaWrongShake")
   }
 
   setTimeout(() => {
     flashLayer.classList.remove("auctionZoomFlashRun")
-  }, 800)
+  }, 850)
 
   return true
 }
@@ -921,8 +921,6 @@ function auctionCorrect() {
     return
   }
 
-  closeAuctionZoomOverlays()
-
   pushAuctionHistory()
 
   auctionState.pendingScore = false
@@ -939,6 +937,10 @@ function auctionCorrect() {
 
   playGameSound("correct")
   flashScreen("correct")
+
+ 
+  closeAuctionZoomOverlays()
+
   showAuctionAnswer("correct")
 
   updateAuctionScoresOnly()
@@ -964,6 +966,7 @@ function auctionWrong() {
   auctionDoublePickMode = false
 
   playGameSound("wrong")
+
 
   flashAuctionZoomOverlayWrong()
   flashScreen("wrong")
@@ -1074,6 +1077,7 @@ function openAuctionVideoFullscreen(e) {
         src="${currentAuctionVideo}"
         controls
         autoplay
+        loop
         playsinline
         preload="auto"
         controlslist="nodownload noplaybackrate"
@@ -1091,9 +1095,19 @@ function openAuctionVideoFullscreen(e) {
   const video = document.getElementById("auctionFullscreenVideo")
 
   if (video) {
+    video.loop = true
     video.currentTime = 0
     video.muted = false
     video.volume = 1
+
+    video.onended = () => {
+      try {
+        video.currentTime = 0
+        video.play().catch(() => {})
+      } catch (e) {
+        console.log("auction video replay error:", e)
+      }
+    }
 
     const playPromise = video.play()
 

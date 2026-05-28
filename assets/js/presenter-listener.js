@@ -371,17 +371,11 @@ function handleAuctionPresenterAction(action, data) {
     return safeRunPresenterAction(() => activateAuctionDouble())
   }
 
-  if (action === "correct") {
-    return safeRunPresenterAction(() => {
-      if (typeof closeAuctionZoomOverlays === "function") {
-        closeAuctionZoomOverlays()
-      } else if (typeof closeCurrentDisplayImageZoom === "function") {
-        closeCurrentDisplayImageZoom()
-      }
-
-      auctionCorrect()
-    })
-  }
+if (action === "correct") {
+  return safeRunPresenterAction(() => {
+    auctionCorrect()
+  })
+}
 
   if (action === "wrong") {
     return safeRunPresenterAction(() => {
