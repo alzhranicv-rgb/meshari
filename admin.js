@@ -6,6 +6,8 @@ let auctionAdminCount = 8
 let gameToastTimer = null
 
 let finalAdminRound = 1
+let explainAdminCount = 4
+let explainAdminDraft = {}
 let archiveAdminRound = 1
 
 let top10AdminRoundsCount = 3
@@ -18,6 +20,16 @@ let currentAdminSegment = ""
 
 const ARCHIVE_TEXT_START_POSITION = 5
 const ARCHIVE_MAX_TEXT_BOXES = 20
+
+const ALL_GAME_SEGMENTS = [
+  { key: "warmup", title: "التسخين", sort: 1 },
+  { key: "top10", title: "Top 10", sort: 2 },
+  { key: "auction", title: "فتبلة", sort: 3 },
+  { key: "who", title: "من هو", sort: 4 },
+  { key: "explain", title: "اشرح الكلمة", sort: 5 },
+  { key: "final", title: "صح صحلي", sort: 6 },
+  { key: "archive", title: "الأرشيف", sort: 7 }
+]
 
 async function initAdminPanel() {
   await loadModels()
@@ -443,11 +455,26 @@ function arrangeAdminInnerTabs() {
   const sectionTitle = topBar.querySelector(".adminSectionTitle")?.innerText?.trim() || ""
 
   const warmupTabs = area.querySelector(".warmupCategoryTabs")
+
   const top10Count = area.querySelector(".top10RoundCountBox")
   const top10Tabs = area.querySelector(".top10RoundTabs")
-  const auctionCount = area.querySelector(".auctionCountBox")
-  const auctionTabs = area.querySelector(".auctionNumberTabs")
+
+  const auctionCount =
+    sectionTitle === "فتبلة"
+      ? area.querySelector(".auctionCountBox")
+      : null
+
+  const auctionTabs =
+    sectionTitle === "فتبلة"
+      ? area.querySelector(".auctionNumberTabs")
+      : null
+
   const whoTabs = area.querySelector(".whoNumberTabs")
+
+  const explainCount =
+    sectionTitle === "اشرح الكلمة"
+      ? area.querySelector(".explainCountBox")
+      : null
 
   const finalTitle = area.querySelector(".finalTopCompactTitleBox")
   const finalCount = area.querySelector(".finalTopCompactCountBox")
@@ -479,6 +506,11 @@ function arrangeAdminInnerTabs() {
     addTool(whoTabs, "adminToolTabs adminToolNumberTabs adminToolTabsWide")
   }
 
+  if (explainCount) {
+    toolsRow.classList.add("adminToolsExplain")
+    addTool(explainCount, "adminToolControl")
+  }
+
   if (finalTabs || finalTitle || finalCount) {
     toolsRow.classList.add("adminToolsFinal")
     addTool(finalTitle, "adminToolTitle")
@@ -493,9 +525,11 @@ function arrangeAdminInnerTabs() {
     addTool(archiveActions, "adminToolActions")
   }
 
-  area.querySelectorAll(".top10ControlPanel, .auctionControlPanel, .archiveAdminControlBar, .finalTopCompactRow").forEach(row => {
-    if (!row.children.length) row.remove()
-  })
+  area
+    .querySelectorAll(".top10ControlPanel, .auctionControlPanel, .archiveAdminControlBar, .finalTopCompactRow")
+    .forEach(row => {
+      if (!row.children.length) row.remove()
+    })
 
   toolsRow.querySelectorAll("button").forEach(btn => {
     btn.classList.remove("innerTabActive")
@@ -514,10 +548,8 @@ function arrangeAdminInnerTabs() {
 
   if (!toolsRow.children.length) {
     toolsRow.remove()
-    return
   }
 }
-
 /* =========================
    Admin Home / Status
 ========================= */
@@ -528,13 +560,15 @@ async function getAdminCompletionCounts() {
     top10: 0,
     auction: 0,
     who: 0,
+    explain: 0,
     final: 0,
     archive: 0,
 
     top10RoundsCount: 3,
     auctionCount: 8,
     archiveRoundsCount: 4,
-    finalRound1CardsCount: 6
+    finalRound1CardsCount: 6,
+    explainCount: 4
   }
 
   if (!currentModel) return result
@@ -544,8 +578,10 @@ async function getAdminCompletionCounts() {
     q2,
     q3,
     q4,
+    qExplain,
     q5,
     q6,
+    explainSetting,
     top10Setting,
     auctionSetting,
     archiveSetting,
@@ -555,9 +591,11 @@ async function getAdminCompletionCounts() {
     db.from("top10_questions").select("id", { count: "exact", head: true }).eq("model", currentModel),
     db.from("auction_questions").select("id", { count: "exact", head: true }).eq("model", currentModel),
     db.from("who_images").select("id", { count: "exact", head: true }).eq("model", currentModel),
+    db.from("explain_words").select("id", { count: "exact", head: true }).eq("model", currentModel),
     db.from("final_round1_items").select("id", { count: "exact", head: true }).eq("model", currentModel),
     db.from("archive_boxes").select("id", { count: "exact", head: true }).eq("model", currentModel),
 
+    db.from("explain_settings").select("words_count").eq("model", currentModel).maybeSingle(),
     db.from("segment_settings").select("item_count").eq("model", currentModel).eq("segment", "top10").maybeSingle(),
     db.from("segment_settings").select("item_count").eq("model", currentModel).eq("segment", "auction").maybeSingle(),
     db.from("segment_settings").select("item_count").eq("model", currentModel).eq("segment", "archive").maybeSingle(),
@@ -568,9 +606,11 @@ async function getAdminCompletionCounts() {
   result.top10 = q2.count || 0
   result.auction = q3.count || 0
   result.who = q4.count || 0
+  result.explain = qExplain.count || 0
   result.final = q5.count || 0
   result.archive = q6.count || 0
 
+  result.explainCount = Number(explainSetting.data?.words_count || 4) === 6 ? 6 : 4
   result.top10RoundsCount = Math.min(Math.max(Number(top10Setting.data?.item_count || 3), 1), 4)
   result.auctionCount = Math.min(Math.max(Number(auctionSetting.data?.item_count || 8), 1), 8)
   result.archiveRoundsCount = Math.min(Math.max(Number(archiveSetting.data?.item_count || 4), 1), 4)
@@ -593,6 +633,11 @@ function isSegmentDone(key, count, counts = {}) {
   }
 
   if (key === "who") return count >= 15
+
+  if (key === "explain") {
+    const total = Number(counts.explainCount || 4) === 6 ? 6 : 4
+    return count >= total
+  }
 
   if (key === "final") {
     const r1Count = Number(counts.finalRound1CardsCount || 6)
@@ -629,7 +674,8 @@ async function renderAdminTabsUnified() {
     { key: "top10", title: "Top 10", count: counts.top10 || 0 },
     { key: "auction", title: "فتبلة", count: counts.auction || 0 },
     { key: "who", title: "من هو", count: counts.who || 0 },
-    { key: "final", title: "الفاصلة", count: counts.final || 0 },
+    { key: "explain", title: "اشرح الكلمة", count: counts.explain || 0 },
+    { key: "final", title: "صح صحلي", count: counts.final || 0 },
     { key: "archive", title: "الأرشيف", count: counts.archive || 0 }
   ]
 
@@ -676,7 +722,8 @@ async function renderAdminHome() {
     { key: "top10", title: "Top 10", desc: "جولات ترتيب حسب العدد المحدد", count: counts.top10 || 0 },
     { key: "auction", title: "فتبلة", desc: "أسئلة الصور والفتبلة", count: counts.auction || 0 },
     { key: "who", title: "من هو", desc: "تخمين الشخصية", count: counts.who || 0 },
-    { key: "final", title: "الفاصلة", desc: "الجولات النهائية", count: counts.final || 0 },
+    { key: "explain", title: "اشرح الكلمة", desc: "كلمات للشرح مع مؤقت 45 ثانية", count: counts.explain || 0 },
+    { key: "final", title: "صح صحلي", desc: "الجولات النهائية", count: counts.final || 0 },
     { key: "archive", title: "الأرشيف", desc: "بطولات وأرشيف", count: counts.archive || 0 }
   ]
 
@@ -686,6 +733,10 @@ async function renderAdminHome() {
       <div class="adminHomeTopActions">
         <button class="adminSaveBtn" onclick="checkCurrentModelReady()">
           فحص النموذج
+        </button>
+
+        <button class="adminBtn adminBtnMango" onclick="renderVisibleSegmentsAdmin()">
+          اختيار فقرات العرض
         </button>
 
         <button class="adminReloadBtn" onclick="renderAdminHome()">
@@ -719,7 +770,6 @@ async function renderAdminHome() {
     </div>
   `
 }
-
 /* =========================
    Model Readiness Check
 ========================= */
@@ -802,14 +852,36 @@ async function checkCurrentModelReady() {
   showGameToast("جارٍ فحص النموذج...")
 
   try {
+    await ensureVisibleSegmentsDefaults()
+
+    const visibleMap = await getVisibleSegmentsMap()
+
+    const visibleKeys = ALL_GAME_SEGMENTS
+      .filter(item => visibleMap[item.key]?.is_visible)
+      .sort((a, b) => {
+        const av = Number(visibleMap[a.key]?.sort_order || a.sort)
+        const bv = Number(visibleMap[b.key]?.sort_order || b.sort)
+        return av - bv
+      })
+      .map(item => item.key)
+
+    if (visibleKeys.length !== 6) {
+      showGameToast("لازم تختار 6 فقرات للعرض أولاً")
+      await renderVisibleSegmentsAdmin()
+      return
+    }
+
     const results = []
 
-    results.push(await checkWarmupReady())
-    results.push(await checkTop10Ready())
-    results.push(await checkAuctionReady())
-    results.push(await checkWhoReady())
-    results.push(await checkFinalReady())
-    results.push(await checkArchiveReady())
+    for (const key of visibleKeys) {
+      if (key === "warmup") results.push(await checkWarmupReady())
+      if (key === "top10") results.push(await checkTop10Ready())
+      if (key === "auction") results.push(await checkAuctionReady())
+      if (key === "who") results.push(await checkWhoReady())
+      if (key === "explain") results.push(await checkExplainReady())
+      if (key === "final") results.push(await checkFinalReady())
+      if (key === "archive") results.push(await checkArchiveReady())
+    }
 
     renderModelCheckModal(results)
   } catch (err) {
@@ -985,7 +1057,54 @@ async function checkWhoReady() {
     missing.length ? missing : ["15 عنصر مكتملة"]
   )
 }
+async function checkExplainReady() {
+  const [settingsRes, wordsRes] = await Promise.all([
+    db
+      .from("explain_settings")
+      .select("words_count")
+      .eq("model", Number(currentModel))
+      .maybeSingle(),
 
+    db
+      .from("explain_words")
+      .select("*")
+      .eq("model", Number(currentModel))
+      .order("number", { ascending: true })
+  ])
+
+  if (settingsRes.error || wordsRes.error) {
+    console.log(settingsRes.error || wordsRes.error)
+    return readinessItem("اشرح الكلمة", false, ["تعذر قراءة بيانات اشرح الكلمة"])
+  }
+
+  const count = Number(settingsRes.data?.words_count || 4) === 6 ? 6 : 4
+
+  const map = {}
+  ;(wordsRes.data || []).forEach(row => {
+    map[Number(row.number)] = row
+  })
+
+  const missing = []
+
+  for (let i = 1; i <= count; i++) {
+    const row = map[i]
+
+    if (!row) {
+      missing.push(`الكلمة ${i} غير موجودة`)
+      continue
+    }
+
+    if (!hasText(row.word)) {
+      missing.push(`الكلمة ${i} فارغة`)
+    }
+  }
+
+  return readinessItem(
+    "اشرح الكلمة",
+    missing.length === 0,
+    missing.length ? missing : [`مكتملة بعدد ${count} كلمات`]
+  )
+}
 async function checkFinalReady() {
   const [metaRes, r1Res, r2Res, r3Res] = await Promise.all([
     db.from("final_round_meta").select("*").eq("model", Number(currentModel)),
@@ -996,7 +1115,7 @@ async function checkFinalReady() {
 
   if (metaRes.error || r1Res.error || r2Res.error || r3Res.error) {
     console.log(metaRes.error || r1Res.error || r2Res.error || r3Res.error)
-    return readinessItem("الفاصلة", false, ["تعذر قراءة بيانات الفاصلة"])
+    return readinessItem("صح صحلي", false, ["تعذر قراءة بيانات صح صحلي "])
   }
 
   const missing = []
@@ -1017,7 +1136,7 @@ async function checkFinalReady() {
     const row = r1Map[i]
 
     if (!row) {
-      missing.push(`الفاصلة - الجولة 1 - رقم ${i} غير موجود`)
+      missing.push(`صح صحلي - الجولة 1 - رقم ${i} غير موجود`)
       continue
     }
 
@@ -1069,7 +1188,38 @@ async function checkFinalReady() {
     }
   }
 
+  const round3Mode = metaMap[3]?.round3_mode || "classic"
+
+if (round3Mode === "team_media") {
+  const r3TeamMap = {}
+
+  ;(r3Res.data || []).forEach(row => {
+    r3TeamMap[Number(row.number)] = row
+  })
+
+  for (let number = 1; number <= 4; number++) {
+    const row = r3TeamMap[number]
+
+    if (!row) {
+      missing.push(`الفاصلة - الجولة 3 - التركيز - رقم ${number} غير موجود`)
+      continue
+    }
+
+    if (!hasText(row.image) && !hasText(row.video)) {
+      missing.push(`الفاصلة - الجولة 3 - التركيز - رقم ${number}: الصورة أو الفيديو غير موجود`)
+    }
+
+    if (!hasText(row.question)) {
+      missing.push(`الفاصلة - الجولة 3 - التركيز - رقم ${number}: السؤال فارغ`)
+    }
+
+    if (!hasText(row.answer)) {
+      missing.push(`الفاصلة - الجولة 3 - التركيز - رقم ${number}: الإجابة فارغة`)
+    }
+  }
+} else {
   const r3Map = {}
+
   ;(r3Res.data || []).forEach(row => {
     r3Map[`${Number(row.number)}_${Number(row.image_order)}`] = row
   })
@@ -1092,6 +1242,7 @@ async function checkFinalReady() {
       }
     }
   }
+}
 
   return readinessItem(
     "الفاصلة",
@@ -1248,6 +1399,8 @@ async function createModel() {
     if (list) list.value = String(data.id)
 
     tabs()?.classList.remove("hidden")
+
+    await ensureVisibleSegmentsDefaults()
     await renderAdminHome()
   }
 
@@ -1376,6 +1529,7 @@ async function openSelectedModel() {
   updateAdminBrandModel()
   tabs()?.classList.remove("hidden")
 
+  await ensureVisibleSegmentsDefaults()
   await renderAdminHome()
   showGameToast(`تم فتح ${currentModelName}`)
 }
@@ -1404,21 +1558,25 @@ async function deleteSelectedModel() {
     showGameToast("جارٍ حذف النموذج...")
 
     const deleteJobs = [
-      db.from("questions").delete().eq("model", id),
-      db.from("top10_questions").delete().eq("model", id),
-      db.from("auction_questions").delete().eq("model", id),
-      db.from("who_images").delete().eq("model", id),
+  db.from("questions").delete().eq("model", id),
+  db.from("top10_questions").delete().eq("model", id),
+  db.from("auction_questions").delete().eq("model", id),
+  db.from("who_images").delete().eq("model", id),
 
-      db.from("final_round_meta").delete().eq("model", id),
-      db.from("final_round1_items").delete().eq("model", id),
-      db.from("final_round2_items").delete().eq("model", id),
-      db.from("final_round3_items").delete().eq("model", id),
+  db.from("explain_words").delete().eq("model", id),
+  db.from("explain_settings").delete().eq("model", id),
 
-      db.from("archive_boxes").delete().eq("model", id),
-      db.from("archive_items").delete().eq("model", id),
+  db.from("final_round_meta").delete().eq("model", id),
+  db.from("final_round1_items").delete().eq("model", id),
+  db.from("final_round2_items").delete().eq("model", id),
+  db.from("final_round3_items").delete().eq("model", id),
 
-      db.from("segment_settings").delete().eq("model", id)
-    ]
+  db.from("archive_boxes").delete().eq("model", id),
+  db.from("archive_items").delete().eq("model", id),
+
+  db.from("segment_settings").delete().eq("model", id),
+db.from("visible_segments").delete().eq("model", id)
+]
 
     const results = await Promise.all(deleteJobs)
     const failed = results.find(result => result.error)
@@ -1484,6 +1642,7 @@ async function openAdminSegment(segment) {
   if (segment === "top10") await renderTop10Admin()
   if (segment === "auction") await renderAuctionAdmin()
   if (segment === "who") await renderWhoAdmin()
+  if (segment === "explain") await renderExplainAdmin()
   if (segment === "final") await renderFinalAdmin()
   if (segment === "archive") await renderArchiveAdmin()
 }
@@ -1877,23 +2036,298 @@ function isTop10DraftComplete(roundNumber) {
   return true
 }
 
-function isAuctionDraftComplete(number) {
-  const item = getAuctionDraftItem(number)
 
-  return (
-    String(item.question || "").trim() &&
-    String(item.answer || "").trim() &&
-    String(item.image || "").trim()
-  )
+/* =========================
+   Visible Segments Admin
+========================= */
+
+let visibleSegmentsClickOrder = []
+
+async function getVisibleSegmentsMap() {
+  const map = {}
+
+  ALL_GAME_SEGMENTS.forEach(item => {
+    map[item.key] = {
+      is_visible: item.sort <= 6,
+      sort_order: item.sort
+    }
+  })
+
+  if (!currentModel) return map
+
+  const { data, error } = await db
+    .from("visible_segments")
+    .select("*")
+    .eq("model", Number(currentModel))
+    .order("sort_order", { ascending: true })
+
+  if (error) {
+    console.log("GET VISIBLE SEGMENTS ERROR:", error)
+    return map
+  }
+
+  ;(data || []).forEach(row => {
+    if (!map[row.segment_key]) return
+
+    map[row.segment_key] = {
+      is_visible: !!row.is_visible,
+      sort_order: Number(row.sort_order || map[row.segment_key].sort_order)
+    }
+  })
+
+  return map
 }
 
-function isWhoDraftComplete(number) {
-  const item = getWhoDraftItem(number)
+async function ensureVisibleSegmentsDefaults() {
+  if (!currentModel) return false
 
-  return (
-    String(item.image || "").trim() &&
-    String(item.answer || "").trim()
-  )
+  const { data: existingRows, error: readError } = await db
+    .from("visible_segments")
+    .select("segment_key")
+    .eq("model", Number(currentModel))
+
+  if (readError) {
+    console.log("READ VISIBLE SEGMENTS DEFAULTS ERROR:", readError)
+    showGameToast("تعذر قراءة فقرات العرض")
+    return false
+  }
+
+  const existingKeys = (existingRows || []).map(row => row.segment_key)
+
+  const rows = ALL_GAME_SEGMENTS
+    .filter(item => !existingKeys.includes(item.key))
+    .map(item => ({
+      model: Number(currentModel),
+      segment_key: item.key,
+      is_visible: item.sort <= 6,
+      sort_order: item.sort,
+      updated_at: new Date().toISOString()
+    }))
+
+  if (!rows.length) return true
+
+  const { error } = await db
+    .from("visible_segments")
+    .insert(rows)
+
+  if (error) {
+    console.log("ENSURE VISIBLE SEGMENTS ERROR:", error)
+    showGameToast("تعذر تجهيز فقرات العرض")
+    return false
+  }
+
+  return true
+}
+
+async function renderVisibleSegmentsAdmin() {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  await ensureVisibleSegmentsDefaults()
+
+  const visibleMap = await getVisibleSegmentsMap()
+
+  const sortedSegments = [...ALL_GAME_SEGMENTS].sort((a, b) => {
+    const av = Number(visibleMap[a.key]?.sort_order || a.sort)
+    const bv = Number(visibleMap[b.key]?.sort_order || b.sort)
+    return av - bv
+  })
+
+  visibleSegmentsClickOrder = sortedSegments
+    .filter(item => visibleMap[item.key]?.is_visible)
+    .map(item => item.key)
+
+  const visibleCount = visibleSegmentsClickOrder.length
+
+  editor().innerHTML = `
+    <div class="visibleSegmentsAdminShell">
+
+      <div class="adminEditorTopBar compactAdminEditorTopBar">
+        <div>
+          <h2 class="adminSectionTitle">فقرات العرض</h2>
+          <div class="adminSectionSubTitle">
+            اختر 6 فقرات فقط. الترتيب يكون حسب ضغطك على الفقرات.
+          </div>
+        </div>
+      </div>
+
+      <div class="adminCard visibleSegmentsCard">
+        <div class="visibleSegmentsHead">
+          <h3>الفقرات الظاهرة في العرض</h3>
+
+          <div class="visibleSegmentsCounter ${visibleCount === 6 ? "ok" : "bad"}">
+            المختار: ${visibleCount} / 6
+          </div>
+        </div>
+
+        <div class="visibleSegmentsGrid">
+          ${ALL_GAME_SEGMENTS.map(item => {
+            const selectedIndex = visibleSegmentsClickOrder.indexOf(item.key)
+            const visible = selectedIndex !== -1
+
+            return `
+              <button
+                type="button"
+                class="visibleSegmentPickBtn ${visible ? "selected" : ""}"
+                id="visibleSegmentBtn_${item.key}"
+                onclick="toggleVisibleSegmentPick('${item.key}')"
+              >
+                <span class="visibleSegmentPickTitle">${item.title}</span>
+
+                <span class="visibleSegmentPickState">
+                  ${visible ? `مختارة ${selectedIndex + 1}` : "اضغط للاختيار"}
+                </span>
+              </button>
+            `
+          }).join("")}
+        </div>
+
+        <div class="visibleSegmentsOrderPreview" id="visibleSegmentsOrderPreview">
+          ${buildVisibleSegmentsOrderPreview()}
+        </div>
+
+        <div class="whoSmallHint">
+          اضغط على الفقرة لإضافتها. إذا ضغطت عليها مرة ثانية تنحذف من الاختيار.
+          ترتيب العرض يكون بنفس ترتيب الضغط.
+        </div>
+      </div>
+
+      <div class="adminActionRow">
+        <button class="adminSaveBtn" onclick="saveVisibleSegmentsAdmin()">حفظ فقرات العرض</button>
+        <button class="adminReloadBtn" onclick="renderAdminHome()">رجوع</button>
+      </div>
+
+    </div>
+  `
+
+  arrangeAdminInnerTabs()
+}
+
+function buildVisibleSegmentsOrderPreview() {
+  if (!visibleSegmentsClickOrder.length) {
+    return `<div class="visibleSegmentsEmptyOrder">لم يتم اختيار فقرات بعد</div>`
+  }
+
+  return `
+    <div class="visibleSegmentsOrderTitle">ترتيب الظهور</div>
+
+    <div class="visibleSegmentsOrderList">
+      ${visibleSegmentsClickOrder.map((key, index) => {
+        const item = ALL_GAME_SEGMENTS.find(seg => seg.key === key)
+        return `
+          <div class="visibleSegmentsOrderItem">
+            <span>${index + 1}</span>
+            <strong>${item?.title || key}</strong>
+          </div>
+        `
+      }).join("")}
+    </div>
+  `
+}
+
+function refreshVisibleSegmentsPickUI() {
+  const count = visibleSegmentsClickOrder.length
+  const counter = document.querySelector(".visibleSegmentsCounter")
+  const preview = document.getElementById("visibleSegmentsOrderPreview")
+
+  if (counter) {
+    counter.textContent = `المختار: ${count} / 6`
+    counter.classList.toggle("ok", count === 6)
+    counter.classList.toggle("bad", count !== 6)
+  }
+
+  ALL_GAME_SEGMENTS.forEach(item => {
+    const btn = document.getElementById(`visibleSegmentBtn_${item.key}`)
+    if (!btn) return
+
+    const selectedIndex = visibleSegmentsClickOrder.indexOf(item.key)
+    const visible = selectedIndex !== -1
+    const state = btn.querySelector(".visibleSegmentPickState")
+
+    btn.classList.toggle("selected", visible)
+
+    if (state) {
+      state.textContent = visible ? `مختارة ${selectedIndex + 1}` : "اضغط للاختيار"
+    }
+  })
+
+  if (preview) {
+    preview.innerHTML = buildVisibleSegmentsOrderPreview()
+  }
+}
+
+function toggleVisibleSegmentPick(key) {
+  const currentIndex = visibleSegmentsClickOrder.indexOf(key)
+
+  if (currentIndex !== -1) {
+    visibleSegmentsClickOrder.splice(currentIndex, 1)
+    refreshVisibleSegmentsPickUI()
+    return
+  }
+
+  if (visibleSegmentsClickOrder.length >= 6) {
+    showGameToast("مسموح اختيار 6 فقرات فقط")
+    return
+  }
+
+  visibleSegmentsClickOrder.push(key)
+  refreshVisibleSegmentsPickUI()
+}
+
+async function saveVisibleSegmentsAdmin() {
+  if (isAdminSaving()) return false
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return false
+  }
+
+  if (visibleSegmentsClickOrder.length !== 6) {
+    showGameToast("لازم تختار 6 فقرات بالضبط")
+    return false
+  }
+
+  try {
+    setAdminSaving(true, "جارٍ حفظ الفقرات...")
+
+    const rows = ALL_GAME_SEGMENTS.map(item => {
+      const selectedIndex = visibleSegmentsClickOrder.indexOf(item.key)
+      const visible = selectedIndex !== -1
+
+      return {
+        model: Number(currentModel),
+        segment_key: item.key,
+        is_visible: visible,
+        sort_order: visible ? selectedIndex + 1 : 99 + item.sort,
+        updated_at: new Date().toISOString()
+      }
+    })
+
+    const { error } = await db
+      .from("visible_segments")
+      .upsert(rows, {
+        onConflict: "model,segment_key"
+      })
+
+    if (error) {
+      console.log("SAVE VISIBLE SEGMENTS ERROR:", error)
+      showGameToast("تعذر حفظ فقرات العرض")
+      return false
+    }
+
+    showGameToast("تم حفظ فقرات العرض")
+    await renderVisibleSegmentsAdmin()
+    return true
+
+  } catch (err) {
+    console.log("SAVE VISIBLE SEGMENTS CATCH:", err)
+    showGameToast("حدث خطأ أثناء حفظ فقرات العرض")
+    return false
+  } finally {
+    setAdminSaving(false)
+  }
 }
 /* =========================
    Warmup - Compact Admin
@@ -3457,6 +3891,408 @@ async function saveWho() {
 }
 
 /* =========================
+   Explain Word - Admin
+========================= */
+
+function getExplainDraftItem(number) {
+  const n = Number(number || 1)
+
+  if (!explainAdminDraft[n]) {
+    explainAdminDraft[n] = {
+      id: null,
+      word: ""
+    }
+  }
+
+  return explainAdminDraft[n]
+}
+
+function collectExplainDraft() {
+  const count = Number(
+    document.getElementById("explainWordsCountInput")?.value ||
+    explainAdminCount ||
+    4
+  )
+
+  explainAdminCount = count === 6 ? 6 : 4
+
+  for (let i = 1; i <= 6; i++) {
+    const item = getExplainDraftItem(i)
+    item.word = (document.getElementById(`explainWord_${i}`)?.value || "").trim()
+  }
+}
+
+function isExplainDraftComplete(number) {
+  const item = getExplainDraftItem(number)
+  return String(item.word || "").trim().length > 0
+}
+
+async function renderExplainAdmin() {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const [settingsRes, wordsRes] = await Promise.all([
+    db
+      .from("explain_settings")
+      .select("*")
+      .eq("model", Number(currentModel))
+      .maybeSingle(),
+
+    db
+      .from("explain_words")
+      .select("*")
+      .eq("model", Number(currentModel))
+      .order("number", { ascending: true })
+  ])
+
+  if (settingsRes.error || wordsRes.error) {
+    console.log(settingsRes.error || wordsRes.error)
+    showGameToast("تعذر تحميل اشرح الكلمة")
+    return
+  }
+
+  explainAdminCount = Number(settingsRes.data?.words_count || 4) === 6 ? 6 : 4
+  explainAdminDraft = {}
+
+  for (let i = 1; i <= 6; i++) {
+    getExplainDraftItem(i)
+  }
+
+  ;(wordsRes.data || []).forEach(row => {
+    const n = Number(row.number || 1)
+    const item = getExplainDraftItem(n)
+
+    item.id = row.id || null
+    item.word = row.word || ""
+  })
+
+  renderExplainAdminFromDraft()
+}
+
+async function renderExplainAdminFromDraft() {
+  const area = editor()
+  if (!area) return
+
+  area.innerHTML = `
+    <div class="explainAdminShell compactExplainAdminShell">
+
+      <div class="adminEditorTopBar compactAdminEditorTopBar">
+        <div>
+          <h2 class="adminSectionTitle">اشرح الكلمة</h2>
+        </div>
+      </div>
+
+      ${await buildSegmentStatusGrid()}
+
+      <div class="auctionControlPanel explainControlPanel">
+        <div class="auctionCountBox explainCountBox">
+          <div class="adminField compactCountField">
+            <label for="explainWordsCountInput">عدد الكلمات</label>
+
+            <div class="compactCountSelectWrap">
+              <select
+                id="explainWordsCountInput"
+                class="compactCountSelect"
+                onchange="changeExplainWordsCount()"
+              >
+                <option value="4" ${explainAdminCount === 4 ? "selected" : ""}>4</option>
+                <option value="6" ${explainAdminCount === 6 ? "selected" : ""}>6</option>
+              </select>
+            </div>
+          </div>
+
+          <button onclick="saveExplainSettingsOnly()" class="adminBtn adminBtnMango compactCountBtn">
+            حفظ العدد
+          </button>
+        </div>
+      </div>
+
+      <div class="adminCard explainWordsCard">
+        <div class="auctionSingleQuestionHead">
+          <div>
+            <h3>كلمات الفقرة</h3>
+          </div>
+
+          <button class="adminDeleteBtn" onclick="deleteExplainSegment()">
+            حذف الفقرة
+          </button>
+        </div>
+
+        <div class="explainWordsGrid">
+          ${Array.from({ length: 6 }, (_, idx) => {
+            const number = idx + 1
+            const item = getExplainDraftItem(number)
+            const disabled = number > explainAdminCount
+            const complete = isExplainDraftComplete(number)
+
+            return `
+              <div class="explainWordRow ${disabled ? "explainWordDisabled" : ""} ${complete ? "explainWordDone" : ""}">
+                <div class="top10AnswerNo">${number}</div>
+
+                <input
+                  id="explainWord_${number}"
+                  placeholder="اكتب الكلمة رقم ${number}"
+                  value="${escapeHtml(item.word || "")}"
+                  ${disabled ? "disabled" : ""}
+                >
+
+                <button
+                  type="button"
+                  class="adminDeleteMiniBtn"
+                  onclick="clearExplainWord(${number})"
+                  ${!item.word ? "disabled" : ""}
+                >
+                  حذف
+                </button>
+              </div>
+            `
+          }).join("")}
+        </div>
+
+        <div class="whoSmallHint">
+          عدد الكلمات يكون 4 أو 6 فقط، وتتوزع بالتساوي بين الفريقين.
+        </div>
+      </div>
+
+      <div class="adminActionRow explainStickyActions">
+        <button onclick="saveExplain()" class="adminSaveBtn">حفظ اشرح الكلمة</button>
+        <button onclick="deleteExplainSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
+        <button onclick="renderExplainAdmin()" class="adminReloadBtn">إعادة تحميل</button>
+      </div>
+
+    </div>
+  `
+
+  arrangeAdminInnerTabs()
+}
+
+function changeExplainWordsCount() {
+  collectExplainDraft()
+
+  const count = Number(document.getElementById("explainWordsCountInput")?.value || 4)
+  explainAdminCount = count === 6 ? 6 : 4
+
+  renderExplainAdminFromDraft()
+}
+
+async function saveExplainSettingsOnly() {
+  if (isAdminSaving()) return false
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return false
+  }
+
+  try {
+    collectExplainDraft()
+
+    setAdminSaving(true, "جارٍ حفظ العدد...")
+
+    const count = Number(document.getElementById("explainWordsCountInput")?.value || 4)
+    explainAdminCount = count === 6 ? 6 : 4
+
+    const { error } = await db
+      .from("explain_settings")
+      .upsert(
+        {
+          model: Number(currentModel),
+          words_count: explainAdminCount,
+          updated_at: new Date().toISOString()
+        },
+        {
+          onConflict: "model"
+        }
+      )
+
+    if (error) {
+      console.log(error)
+      showGameToast("تعذر حفظ عدد الكلمات")
+      return false
+    }
+
+    showGameToast("تم حفظ عدد الكلمات")
+    await renderExplainAdminFromDraft()
+    return true
+
+  } catch (err) {
+    console.log("SAVE EXPLAIN SETTINGS ERROR:", err)
+    showGameToast("تعذر حفظ عدد الكلمات")
+    return false
+  } finally {
+    setAdminSaving(false)
+  }
+}
+
+async function saveExplain() {
+  if (isAdminSaving()) return false
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return false
+  }
+
+  try {
+    collectExplainDraft()
+
+    setAdminSaving(true, "جارٍ حفظ اشرح الكلمة...")
+    showGameToast("جارٍ حفظ اشرح الكلمة...")
+
+    const count = Number(
+      document.getElementById("explainWordsCountInput")?.value ||
+      explainAdminCount ||
+      4
+    )
+
+    explainAdminCount = count === 6 ? 6 : 4
+
+    const rows = []
+    const keepNumbers = []
+
+    for (let i = 1; i <= explainAdminCount; i++) {
+      const item = getExplainDraftItem(i)
+      const word = String(item.word || "").trim()
+
+      if (!word) continue
+
+      rows.push({
+        model: Number(currentModel),
+        number: Number(i),
+        word,
+        updated_at: new Date().toISOString()
+      })
+
+      keepNumbers.push(Number(i))
+    }
+
+    const { error: settingsError } = await db
+      .from("explain_settings")
+      .upsert(
+        {
+          model: Number(currentModel),
+          words_count: explainAdminCount,
+          updated_at: new Date().toISOString()
+        },
+        {
+          onConflict: "model"
+        }
+      )
+
+    if (settingsError) {
+      console.log(settingsError)
+      showGameToast("تعذر حفظ إعدادات اشرح الكلمة")
+      return false
+    }
+
+    const { data: oldRows, error: oldError } = await db
+      .from("explain_words")
+      .select("number")
+      .eq("model", Number(currentModel))
+
+    if (oldError) {
+      console.log(oldError)
+      showGameToast("تعذر قراءة كلمات اشرح القديمة")
+      return false
+    }
+
+    for (const oldRow of oldRows || []) {
+      const oldNumber = Number(oldRow.number)
+
+      if (!keepNumbers.includes(oldNumber)) {
+        const { error: deleteError } = await db
+          .from("explain_words")
+          .delete()
+          .eq("model", Number(currentModel))
+          .eq("number", oldNumber)
+
+        if (deleteError) {
+          console.log(deleteError)
+          showGameToast("تعذر تنظيف بعض كلمات اشرح")
+          return false
+        }
+      }
+    }
+
+    if (rows.length) {
+      const { error: saveError } = await db
+        .from("explain_words")
+        .upsert(rows, {
+          onConflict: "model,number"
+        })
+
+      if (saveError) {
+        console.log(saveError)
+        showGameToast("فشل حفظ كلمات اشرح")
+        return false
+      }
+    }
+
+    showGameToast(rows.length ? "تم حفظ اشرح الكلمة" : "تم حذف كلمات اشرح الكلمة")
+    await renderExplainAdmin()
+    await renderAdminTabsUnified()
+    return true
+
+  } catch (err) {
+    console.log("SAVE EXPLAIN ERROR:", err)
+    showGameToast("توقف حفظ اشرح الكلمة بسبب خطأ")
+    return false
+  } finally {
+    setAdminSaving(false)
+  }
+}
+
+async function clearExplainWord(number) {
+  const n = Number(number || 0)
+  if (!n) return
+
+  const item = getExplainDraftItem(n)
+  item.word = ""
+
+  const input = document.getElementById(`explainWord_${n}`)
+  if (input) input.value = ""
+
+  showGameToast(`تم تفريغ الكلمة ${n}`)
+  await renderExplainAdminFromDraft()
+}
+
+async function deleteExplainSegment() {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm("هل تريد حذف فقرة اشرح الكلمة كاملة؟")
+  if (!ok) return
+
+  try {
+    const [wordsRes, settingsRes] = await Promise.all([
+      db.from("explain_words").delete().eq("model", Number(currentModel)),
+      db.from("explain_settings").delete().eq("model", Number(currentModel))
+    ])
+
+    if (wordsRes.error || settingsRes.error) {
+      console.log(wordsRes.error || settingsRes.error)
+      showGameToast("تعذر حذف فقرة اشرح الكلمة")
+      return
+    }
+
+    explainAdminCount = 4
+    explainAdminDraft = {}
+
+    showGameToast("تم حذف فقرة اشرح الكلمة")
+    await renderExplainAdmin()
+    await renderAdminTabsUnified()
+
+  } catch (err) {
+    console.log("DELETE EXPLAIN ERROR:", err)
+    showGameToast("حدث خطأ أثناء حذف اشرح الكلمة")
+  }
+}
+
+/* =========================
    Final - Admin كامل
 ========================= */
 
@@ -3598,10 +4434,12 @@ async function getFinalAdminDoneMap() {
       const video = String(row.video || "").trim()
       const answer = String(row.answer || "").trim()
 
-      if ((!image && !video) || !answer) {
-        round3Done = false
-        break
-      }
+      const question = String(row.question || "").trim()
+
+if ((!image && !video) || !question || !answer) {
+  round3Done = false
+  break
+}
     }
 
     doneMap[3] = round3Done
@@ -4593,7 +5431,138 @@ async function saveFinalRound3(mode = "classic", skipSavingLock = false) {
     }
   }
 }
+async function saveFinalRound3Classic(skipSavingLock = false) {
+  try {
+    const { data: oldRows, error: oldError } = await db
+      .from("final_round3_items")
+      .select("*")
+      .eq("model", Number(currentModel))
 
+    if (oldError) {
+      console.log(oldError)
+      showGameToast("تعذر قراءة الجولة الثالثة القديمة")
+      return false
+    }
+
+    const oldMap = {}
+
+    ;(oldRows || []).forEach(row => {
+      oldMap[`${Number(row.number)}_${Number(row.image_order)}`] = row
+    })
+
+    const rows = []
+
+    for (let number = 1; number <= 2; number++) {
+      for (let i = 1; i <= 5; i++) {
+        const file =
+          document.getElementById(`finalRound3File_${number}_${i}`)?.files?.[0] || null
+
+        const answer =
+          (document.getElementById(`finalRound3Answer_${number}_${i}`)?.value || "").trim()
+
+        let image = oldMap[`${number}_${i}`]?.image || ""
+
+        if (file) {
+          showGameToast(`جارٍ رفع صورة ${i} للرقم ${number}...`)
+
+          image = await uploadImageFile(file, `final_r3_${number}_${i}`)
+
+          if (!image) {
+            showGameToast(`تعذر رفع صورة ${i} للرقم ${number}`)
+            return false
+          }
+        }
+
+        if (!image && !answer) continue
+
+        rows.push({
+          model: Number(currentModel),
+          number: Number(number),
+          image_order: Number(i),
+          image,
+          video: "",
+          question: "",
+          answer
+        })
+      }
+    }
+
+    if (!rows.length) {
+      const ok = confirm("الجولة الثالثة فارغة، هل تريد حذف بياناتها؟")
+
+      if (!ok) {
+        showGameToast("تم إلغاء الحفظ")
+        return false
+      }
+
+      const { error: clearError } = await db
+        .from("final_round3_items")
+        .delete()
+        .eq("model", Number(currentModel))
+
+      if (clearError) {
+        console.log(clearError)
+        showGameToast("تعذر تفريغ الجولة الثالثة")
+        return false
+      }
+
+      showGameToast("تم تفريغ الجولة الثالثة")
+      return true
+    }
+
+    const keepKeys = rows.map(row => `${Number(row.number)}_${Number(row.image_order)}`)
+
+    const { data: existingRows, error: existingError } = await db
+      .from("final_round3_items")
+      .select("number,image_order")
+      .eq("model", Number(currentModel))
+
+    if (existingError) {
+      console.log(existingError)
+      showGameToast("تعذر قراءة الجولة الثالثة الحالية")
+      return false
+    }
+
+    for (const oldRow of existingRows || []) {
+      const key = `${Number(oldRow.number)}_${Number(oldRow.image_order)}`
+
+      if (!keepKeys.includes(key)) {
+        const { error: deleteError } = await db
+          .from("final_round3_items")
+          .delete()
+          .eq("model", Number(currentModel))
+          .eq("number", Number(oldRow.number))
+          .eq("image_order", Number(oldRow.image_order))
+
+        if (deleteError) {
+          console.log(deleteError)
+          showGameToast("تعذر تنظيف صور الجولة الثالثة")
+          return false
+        }
+      }
+    }
+
+    const { error: saveError } = await db
+      .from("final_round3_items")
+      .upsert(rows, {
+        onConflict: "model,number,image_order"
+      })
+
+    if (saveError) {
+      console.log(saveError)
+      showGameToast("فشل حفظ الجولة الثالثة")
+      return false
+    }
+
+    showGameToast("تم حفظ الجولة الثالثة")
+    return true
+
+  } catch (err) {
+    console.log("SAVE FINAL ROUND 3 CLASSIC ERROR:", err)
+    showGameToast("توقف حفظ الجولة الثالثة بسبب خطأ")
+    return false
+  }
+}
 /* =========================
    Save Round 3 Team Media
 ========================= */

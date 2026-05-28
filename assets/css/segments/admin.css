@@ -2293,3 +2293,315 @@ button:disabled{
     grid-template-columns:1fr !important;
   }
 }
+/* =========================
+   Explain Word Admin
+========================= */
+
+.explainAdminShell{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.explainControlPanel{
+  width:100%;
+}
+
+.explainWordsCard{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.explainWordsGrid{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+
+.explainWordRow{
+  width:100%;
+  min-height:58px;
+
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr) 72px;
+  gap:10px;
+  align-items:center;
+
+  padding:10px;
+
+  border-radius:18px;
+  background:rgba(255,255,255,.48);
+  border:1px solid rgba(255,255,255,.52);
+}
+
+.explainWordRow input{
+  width:100%;
+  min-height:46px;
+
+  border:1px solid rgba(203,213,225,.8);
+  border-radius:14px;
+
+  padding:0 12px;
+
+  color:#24185E;
+  font-size:1rem;
+  font-weight:900;
+
+  background:#fff;
+}
+
+.explainWordDisabled{
+  opacity:.42;
+}
+
+.explainWordDone{
+  outline:2px solid rgba(22,163,74,.16);
+}
+
+@media (max-width:520px){
+  .explainWordRow{
+    grid-template-columns:38px minmax(0,1fr);
+  }
+
+  .explainWordRow .adminDeleteMiniBtn{
+    grid-column:1 / -1;
+  }
+}
+/* =========================
+   Visible Segments Admin
+========================= */
+
+.visibleSegmentsAdminShell{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.visibleSegmentsCard{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.visibleSegmentsHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.visibleSegmentsHead h3{
+  margin:0;
+  color:#24185E;
+  font-size:1.25rem;
+  font-weight:1000;
+}
+
+.visibleSegmentsCounter{
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:.9rem;
+  font-weight:1000;
+}
+
+.visibleSegmentsCounter.ok{
+  background:rgba(22,163,74,.12);
+  color:#15803d;
+}
+
+.visibleSegmentsCounter.bad{
+  background:rgba(239,68,68,.12);
+  color:#b91c1c;
+}
+
+.visibleSegmentsGrid{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.visibleSegmentRow{
+  min-height:74px;
+  padding:12px;
+  border-radius:20px;
+  background:rgba(255,255,255,.55);
+  border:1px solid rgba(203,213,225,.75);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  transition:.18s ease;
+}
+
+.visibleSegmentRow.selected{
+  border-color:rgba(255,155,81,.65);
+  background:rgba(255,155,81,.10);
+  box-shadow:0 10px 24px rgba(255,155,81,.10);
+}
+
+.visibleSegmentCheck{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  color:#24185E;
+  font-size:1rem;
+  font-weight:1000;
+}
+
+.visibleSegmentCheck input{
+  width:20px;
+  height:20px;
+  accent-color:#ff9b51;
+}
+
+.visibleSegmentOrderBox{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.visibleSegmentOrderBox label{
+  color:#64748b;
+  font-size:.8rem;
+  font-weight:900;
+}
+
+.visibleSegmentOrderBox select{
+  min-width:66px;
+  height:38px;
+  border-radius:12px;
+  border:1px solid rgba(203,213,225,.9);
+  background:#fff;
+  color:#24185E;
+  font-weight:1000;
+  text-align:center;
+}
+
+@media(max-width:700px){
+  .visibleSegmentsGrid{
+    grid-template-columns:1fr;
+  }
+
+  .visibleSegmentRow{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .visibleSegmentOrderBox{
+    justify-content:space-between;
+  }
+}
+.visibleSegmentsGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+}
+
+.visibleSegmentPickBtn{
+  border:2px solid rgba(47,65,88,.16);
+  border-radius:22px;
+  padding:20px;
+  min-height:115px;
+  background:#fff;
+  color:#25343F;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  box-shadow:0 12px 28px rgba(0,0,0,.08);
+  transition:.18s ease;
+}
+
+.visibleSegmentPickBtn:hover{
+  transform:translateY(-3px);
+  border-color:rgba(255,155,81,.55);
+}
+
+.visibleSegmentPickBtn.selected{
+  background:linear-gradient(135deg,#FF9B51,#FFC08E);
+  border-color:#FF9B51;
+  color:#25343F;
+  box-shadow:0 18px 38px rgba(255,155,81,.26);
+}
+
+.visibleSegmentPickTitle{
+  font-size:24px;
+  font-weight:1000;
+}
+
+.visibleSegmentPickState{
+  padding:7px 13px;
+  border-radius:999px;
+  background:rgba(37,52,63,.08);
+  font-size:14px;
+  font-weight:900;
+}
+
+.visibleSegmentPickBtn.selected .visibleSegmentPickState{
+  background:rgba(255,255,255,.55);
+}
+
+.visibleSegmentsOrderPreview{
+  margin-top:20px;
+  padding:16px;
+  border-radius:20px;
+  background:rgba(47,65,88,.06);
+}
+
+.visibleSegmentsOrderTitle{
+  margin-bottom:12px;
+  font-size:16px;
+  font-weight:1000;
+  color:#25343F;
+}
+
+.visibleSegmentsOrderList{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.visibleSegmentsOrderItem{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 13px;
+  border-radius:999px;
+  background:#fff;
+  box-shadow:0 8px 18px rgba(0,0,0,.07);
+}
+
+.visibleSegmentsOrderItem span{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#FF9B51;
+  color:#25343F;
+  font-weight:1000;
+}
+
+.visibleSegmentsOrderItem strong{
+  font-size:14px;
+  font-weight:900;
+}
+
+.visibleSegmentsEmptyOrder{
+  color:#667085;
+  font-weight:800;
+}
+
+@media(max-width:900px){
+  .visibleSegmentsGrid{
+    grid-template-columns:1fr;
+  }
+}

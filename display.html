@@ -11,11 +11,12 @@
   <link rel="stylesheet" href="assets/css/segments/top10.css" />
   <link rel="stylesheet" href="assets/css/segments/auction.css" />
   <link rel="stylesheet" href="assets/css/segments/who.css" />
+  <link rel="stylesheet" href="assets/css/segments/explain.css" />
   <link rel="stylesheet" href="assets/css/segments/final.css" />
   <link rel="stylesheet" href="assets/css/segments/archive.css" />
 
   <!-- ملف التصميم الرئيسي أخيراً -->
-  <link rel="stylesheet" href="styles.css?v=213" />
+  <link rel="stylesheet" href="styles.css?v=214" />
 </head>
 
 <body>
@@ -51,51 +52,8 @@
     <!-- مربع النموذج وكود المقدم -->
     <div id="homeModelPopupArea" class="homeModelPopupArea hidden"></div>
 
-    <div class="homeSegmentsShowcase" id="segmentsGrid">
-
-      <div class="segmentCard homeSegmentItem" id="segmentWarmup" onclick="openMainSegment('warmup')">
-        <div class="homeSegmentContent">
-          <span>التسخين</span>
-          <div class="segmentWinner homeSegmentWinner" id="winnerWarmup"></div>
-        </div>
-      </div>
-
-      <div class="segmentCard homeSegmentItem" id="segmentTop10" onclick="openMainSegment('top10')">
-        <div class="homeSegmentContent">
-          <span>Top 10</span>
-          <div class="segmentWinner homeSegmentWinner" id="winnerTop10"></div>
-        </div>
-      </div>
-
-      <div class="segmentCard homeSegmentItem" id="segmentAuction" onclick="openMainSegment('auction')">
-        <div class="homeSegmentContent">
-          <span>فتبلة</span>
-          <div class="segmentWinner homeSegmentWinner" id="winnerAuction"></div>
-        </div>
-      </div>
-
-      <div class="segmentCard homeSegmentItem" id="segmentWho" onclick="openMainSegment('who')">
-        <div class="homeSegmentContent">
-          <span>من هو</span>
-          <div class="segmentWinner homeSegmentWinner" id="winnerWho"></div>
-        </div>
-      </div>
-
-      <div class="segmentCard homeSegmentItem" id="segmentFinal" onclick="openMainSegment('final')">
-        <div class="homeSegmentContent">
-          <span>الفاصلة</span>
-          <div class="segmentWinner homeSegmentWinner" id="winnerFinal"></div>
-        </div>
-      </div>
-
-      <div class="segmentCard homeSegmentItem" id="segmentArchive" onclick="openMainSegment('archive')">
-        <div class="homeSegmentContent">
-          <span>الأرشيف</span>
-          <div class="segmentWinner homeSegmentWinner" id="winnerArchive"></div>
-        </div>
-      </div>
-
-    </div>
+    <!-- فقرات العرض تظهر من JavaScript حسب اختيار الأدمن -->
+    <div class="homeSegmentsShowcase" id="segmentsGrid"></div>
 
     <div class="winnerArea homeWinnerArea" id="winnerArea">
       <button class="winnerBtn homeWinnerBtn" onclick="announceWinner()">الفائز</button>
@@ -115,8 +73,21 @@
       <div id="winnerOverlayBurst">✦ ✦ ✦</div>
 
       <div class="winnerOverlayActions">
-        <button id="winnerOverlayClose" type="button" onclick="closeWinnerOverlay()">إغلاق</button>
-        <button id="winnerOverlayEnd" type="button" onclick="endGameAndGoIntro()">إنهاء</button>
+        <button
+          id="winnerOverlayClose"
+          type="button"
+          onclick="closeWinnerOverlay()"
+        >
+          إغلاق
+        </button>
+
+        <button
+          id="winnerOverlayEnd"
+          type="button"
+          onclick="endGameAndGoIntro()"
+        >
+          إنهاء
+        </button>
       </div>
     </div>
   </div>
@@ -130,13 +101,17 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
+
   <script src="assets/js/game.js"></script>
+
   <script src="assets/js/warmup.js"></script>
   <script src="assets/js/top10.js"></script>
   <script src="assets/js/auction.js"></script>
   <script src="assets/js/who.js"></script>
+  <script src="assets/js/explain.js?v=10"></script>
   <script src="assets/js/final.js"></script>
   <script src="assets/js/archive.js"></script>
+
   <script src="assets/js/presenter-listener.js"></script>
 
 </body>

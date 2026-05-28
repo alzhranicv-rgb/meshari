@@ -20,6 +20,31 @@ window.top10MaxRound = Number(localStorage.getItem("top10_max_round") || 3)
 window.auctionMaxNumber = Number(localStorage.getItem("auction_max_number") || 8)
 window.archiveMaxRound = Number(localStorage.getItem("archive_max_round") || 4)
 
+const ALL_DISPLAY_SEGMENTS = [
+  { key: "warmup", title: "التسخين", sort: 1 },
+  { key: "top10", title: "Top 10", sort: 2 },
+  { key: "auction", title: "فتبلة", sort: 3 },
+  { key: "who", title: "من هو", sort: 4 },
+  { key: "explain", title: "اشرح الكلمة", sort: 5 },
+  { key: "final", title: "صح صحلي", sort: 6 },
+  { key: "archive", title: "الأرشيف", sort: 7 }
+]
+
+let visibleDisplaySegments = ALL_DISPLAY_SEGMENTS.map(item => ({
+  ...item,
+  is_visible: item.sort <= 6,
+  sort_order: item.sort
+}))
+
+function escapeDisplayHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
+}
+
 const SEGMENT_STATUS_KEY = "segment_status_v1"
 
 function defaultSegmentStatus() {
@@ -28,6 +53,7 @@ function defaultSegmentStatus() {
     top10: { locked: false, winner: "" },
     auction: { locked: false, winner: "" },
     who: { locked: false, winner: "" },
+    explain: { locked: false, winner: "" },
     final: { locked: false, winner: "" },
     archive: { locked: false, winner: "" }
   }
@@ -43,6 +69,7 @@ function loadSegmentStatus() {
       top10: { locked: !!saved?.top10?.locked, winner: saved?.top10?.winner || "" },
       auction: { locked: !!saved?.auction?.locked, winner: saved?.auction?.winner || "" },
       who: { locked: !!saved?.who?.locked, winner: saved?.who?.winner || "" },
+      explain: { locked: !!saved?.explain?.locked, winner: saved?.explain?.winner || "" },
       final: { locked: !!saved?.final?.locked, winner: saved?.final?.winner || "" },
       archive: { locked: !!saved?.archive?.locked, winner: saved?.archive?.winner || "" }
     }
@@ -92,6 +119,7 @@ async function syncDisplayStateToSession() {
       top10: getSafeJson("top10_state_v1"),
       auction: getSafeJson("auction_state_v2"),
       who: getSafeJson("who_state_v1"),
+      explain: getSafeJson("explain_state_v1"),
       final: getSafeJson("final_state_v3"),
       archive: getSafeJson("archive_state_v1"),
       toast: window.lastDisplayToast || null
@@ -110,13 +138,13 @@ async function syncDisplayStateToSession() {
     }
 
     try {
-      if (presenterCommandChannel) {
-        presenterCommandChannel.send({
-          type: "broadcast",
-          event: "session_state",
-          payload: sessionData
-        })
-      }
+     if (typeof presenterCommandChannel !== "undefined" && presenterCommandChannel) {
+  presenterCommandChannel.send({
+    type: "broadcast",
+    event: "session_state",
+    payload: sessionData
+  })
+}
     } catch (e) {
       console.log("Display session broadcast error:", e)
     }
@@ -450,6 +478,66 @@ async function loadDisplayCountForSegment(segmentKey) {
   }
 }
 
+async function loadVisibleSegmentsForDisplay() {
+  visibleDisplaySegments = ALL_DISPLAY_SEGMENTS.map(item => ({
+    ...item,
+    is_visible: item.sort <= 6,
+    sort_order: item.sort
+  }))
+
+  const modelId = Number(
+    localStorage.getItem("game_model") ||
+    window.currentModel ||
+    currentModel ||
+    0
+  )
+
+  if (!modelId) {
+    return visibleDisplaySegments
+  }
+
+  const { data, error } = await db
+    .from("visible_segments")
+    .select("*")
+    .eq("model", modelId)
+    .order("sort_order", { ascending: true })
+
+  if (error) {
+    console.log("LOAD VISIBLE SEGMENTS ERROR:", error)
+    return visibleDisplaySegments
+  }
+
+  if (!data || !data.length) {
+    return visibleDisplaySegments
+  }
+
+  const map = {}
+
+  ALL_DISPLAY_SEGMENTS.forEach(item => {
+    map[item.key] = {
+      ...item,
+      is_visible: item.sort <= 6,
+      sort_order: item.sort
+    }
+  })
+
+  data.forEach(row => {
+    if (!map[row.segment_key]) return
+
+    map[row.segment_key] = {
+      ...map[row.segment_key],
+      is_visible: !!row.is_visible,
+      sort_order: Number(row.sort_order || map[row.segment_key].sort)
+    }
+  })
+
+  visibleDisplaySegments = Object.values(map)
+    .sort((a, b) => {
+      return Number(a.sort_order || a.sort) - Number(b.sort_order || b.sort)
+    })
+
+  return visibleDisplaySegments
+}
 /* =========================
    Helpers
 ========================= */
@@ -491,6 +579,7 @@ function getSegmentWinnerLabelIds(key) {
   if (key === "top10") return ["segmentWinnerTop10", "winnerTop10"]
   if (key === "auction") return ["segmentWinnerAuction", "winnerAuction"]
   if (key === "who") return ["segmentWinnerWho", "winnerWho"]
+  if (key === "explain") return ["segmentWinnerExplain", "winnerExplain"]
   if (key === "final") return ["segmentWinnerFinal", "winnerFinal"]
   if (key === "archive") return ["segmentWinnerArchive", "winnerArchive"]
   return []
@@ -501,6 +590,7 @@ function getSegmentCardIds(key) {
   if (key === "top10") return ["segmentCardTop10", "segmentTop10"]
   if (key === "auction") return ["segmentCardAuction", "segmentAuction"]
   if (key === "who") return ["segmentCardWho", "segmentWho"]
+  if (key === "explain") return ["segmentCardExplain", "segmentExplain"]
   if (key === "final") return ["segmentCardFinal", "segmentFinal"]
   if (key === "archive") return ["segmentCardArchive", "segmentArchive"]
   return []
@@ -552,8 +642,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   bindAudioUnlock()
 
   await loadDisplaySegmentCounts()
+  await loadVisibleSegmentsForDisplay()
 
   segmentStatus = loadSegmentStatus()
+
+  renderVisibleSegmentsHome()
   updateSegmentCards()
 
   renderMainHome(true)
@@ -578,6 +671,7 @@ function renderMainHome(force = false) {
 
   stopEndButtonWatcher()
 
+  renderVisibleSegmentsHome()
   updateMainScoreBoard()
   updateSegmentCards()
   updateLeadingTeamStyle()
@@ -629,7 +723,8 @@ function increaseMainScore(team) {
 
   if (team === "A") bumpScore("mainScoreA")
   if (team === "B") bumpScore("mainScoreB")
-    syncDisplayStateToSession()
+
+syncDisplayStateToSession()
 }
 
 function addMainScore(team) {
@@ -718,6 +813,7 @@ async function endGameAndGoIntro() {
   localStorage.removeItem("auction_state_v1")
   localStorage.removeItem("auction_state_v2")
   localStorage.removeItem("who_state_v1")
+  localStorage.removeItem("explain_state_v1")
   localStorage.removeItem("final_state_v2")
   localStorage.removeItem("final_state_v3")
   localStorage.removeItem("archive_state_v1")
@@ -735,11 +831,70 @@ async function endGameAndGoIntro() {
    Segment Cards
 ========================= */
 
+function getVisibleDisplaySegments() {
+  return visibleDisplaySegments
+    .filter(item => item.is_visible)
+    .sort((a, b) => Number(a.sort_order || a.sort) - Number(b.sort_order || b.sort))
+    .slice(0, 6)
+}
+
+function isSegmentVisibleOnDisplay(segmentKey) {
+  return getVisibleDisplaySegments().some(item => item.key === segmentKey)
+}
+
+function getDisplaySegmentDomId(key) {
+  if (key === "warmup") return "segmentWarmup"
+  if (key === "top10") return "segmentTop10"
+  if (key === "auction") return "segmentAuction"
+  if (key === "who") return "segmentWho"
+  if (key === "explain") return "segmentExplain"
+  if (key === "final") return "segmentFinal"
+  if (key === "archive") return "segmentArchive"
+  return `segment_${key}`
+}
+
+function getDisplayWinnerDomId(key) {
+  if (key === "warmup") return "winnerWarmup"
+  if (key === "top10") return "winnerTop10"
+  if (key === "auction") return "winnerAuction"
+  if (key === "who") return "winnerWho"
+  if (key === "explain") return "winnerExplain"
+  if (key === "final") return "winnerFinal"
+  if (key === "archive") return "winnerArchive"
+  return `winner_${key}`
+}
+
+function renderVisibleSegmentsHome() {
+  const grid = document.getElementById("segmentsGrid")
+  if (!grid) return
+
+  const segments = getVisibleDisplaySegments()
+
+  grid.innerHTML = segments.map(item => {
+    const cardId = getDisplaySegmentDomId(item.key)
+    const winnerId = getDisplayWinnerDomId(item.key)
+
+    return `
+      <div
+        class="segmentCard homeSegmentItem"
+        id="${cardId}"
+        onclick="openMainSegment('${item.key}')"
+      >
+        <div class="homeSegmentContent">
+          <span>${escapeDisplayHtml(item.title)}</span>
+          <div class="segmentWinner homeSegmentWinner" id="${winnerId}"></div>
+        </div>
+      </div>
+    `
+  }).join("")
+}
+
 function updateSegmentCards() {
   setSegmentWinnerLabel("warmup")
   setSegmentWinnerLabel("top10")
   setSegmentWinnerLabel("auction")
   setSegmentWinnerLabel("who")
+  setSegmentWinnerLabel("explain")
   setSegmentWinnerLabel("final")
   setSegmentWinnerLabel("archive")
 }
@@ -764,12 +919,20 @@ function setSegmentWinnerLabel(key) {
     }
   }
 }
-
 /* =========================
    Open Segment
 ========================= */
 
 async function openSegmentPage(segmentKey) {
+  await loadVisibleSegmentsForDisplay()
+
+  if (!isSegmentVisibleOnDisplay(segmentKey)) {
+    showGameToast("هذه الفقرة غير مفعلة في العرض")
+    renderVisibleSegmentsHome()
+    updateSegmentCards()
+    return
+  }
+
   if (segmentStatus[segmentKey]?.locked) return
 
   await loadDisplayCountForSegment(segmentKey)
@@ -791,6 +954,7 @@ async function openSegmentPage(segmentKey) {
     if (segmentKey === "top10") window.renderTop10()
     if (segmentKey === "auction") window.renderAuction()
     if (segmentKey === "who") window.renderWho()
+    if (segmentKey === "explain") window.renderExplain()
     if (segmentKey === "final") window.renderFinal()
     if (segmentKey === "archive") window.renderArchive()
   })
@@ -1004,7 +1168,7 @@ function endCurrentSegment() {
 
 function getCurrentSegmentKey() {
   const title = document.querySelector(".segmentTitle")
-  if (!title) return null
+  if (!title) return localStorage.getItem("active_segment") || null
 
   const text = title.innerText || ""
 
@@ -1012,6 +1176,7 @@ function getCurrentSegmentKey() {
   if (text.includes("Top 10")) return "top10"
   if (text.includes("فتبلة")) return "auction"
   if (text.includes("من هو")) return "who"
+  if (text.includes("اشرح الكلمة")) return "explain"
   if (text.includes("الفاصلة")) return "final"
   if (text.includes("الأرشيف")) return "archive"
 
@@ -1065,32 +1230,39 @@ function canEndSegment(segmentKey) {
     return (window.whoState.usedNumbers || []).length >= 15
   }
 
-if (segmentKey === "final") {
-  if (!window.finalState) return false
+  if (segmentKey === "explain") {
+    if (!window.explainState) return false
 
-  const r1Count = Number(window.finalState.round1?.cardsCount || 6)
-
-  const r1Done =
-    (window.finalState.round1?.opened || []).length >= r1Count
-
-  const r2Done =
-    (window.finalState.round2?.opened || []).length >= 4 &&
-    (window.finalState.round2?.scoredNumbers || []).length >= 4
-
-  let r3Done = false
-
-  if (window.finalState.round3?.mode === "team_media") {
-    r3Done =
-      (window.finalState.round3?.teamMedia?.usedNumbers || []).length >= 4 &&
-      (window.finalState.round3?.scoredNumbers || []).length >= 4
-  } else {
-    r3Done =
-      (window.finalState.round3?.opened || []).length >= 2 &&
-      (window.finalState.round3?.scoredNumbers || []).length >= 2
+    const total = Number(window.explainState.wordsCount || 4) === 6 ? 6 : 4
+    return (window.explainState.usedNumbers || []).length >= total
   }
 
-  return r1Done && r2Done && r3Done
-}
+  if (segmentKey === "final") {
+    if (!window.finalState) return false
+
+    const r1Count = Number(window.finalState.round1?.cardsCount || 6)
+
+    const r1Done =
+      (window.finalState.round1?.opened || []).length >= r1Count
+
+    const r2Done =
+      (window.finalState.round2?.opened || []).length >= 4 &&
+      (window.finalState.round2?.scoredNumbers || []).length >= 4
+
+    let r3Done = false
+
+    if (window.finalState.round3?.mode === "team_media") {
+      r3Done =
+        (window.finalState.round3?.teamMedia?.usedNumbers || []).length >= 4 &&
+        (window.finalState.round3?.scoredNumbers || []).length >= 4
+    } else {
+      r3Done =
+        (window.finalState.round3?.opened || []).length >= 2 &&
+        (window.finalState.round3?.scoredNumbers || []).length >= 2
+    }
+
+    return r1Done && r2Done && r3Done
+  }
 
   if (segmentKey === "archive") {
     if (!window.archiveState) return false

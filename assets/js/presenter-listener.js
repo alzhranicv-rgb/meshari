@@ -272,6 +272,7 @@ function handlePresenterCommand(cmd) {
   if (segment === "top10") return handleTop10PresenterAction(action, data)
   if (segment === "auction") return handleAuctionPresenterAction(action, data)
   if (segment === "who") return handleWhoPresenterAction(action, data)
+  if (segment === "explain") return handleExplainPresenterAction(action, data)
   if (segment === "final") return handleFinalPresenterAction(action, data)
   if (segment === "archive") return handleArchivePresenterAction(action, data)
 }
@@ -481,6 +482,60 @@ function handleWhoPresenterAction(action, data) {
   if (action === "wrong") {
     return safeRunPresenterAction(() => {
       runDisplayWhoScoreOnce("wrong", data, () => whoWrong())
+    })
+  }
+}
+
+/* =========================
+   EXPLAIN WORD
+========================= */
+
+function handleExplainPresenterAction(action, data) {
+  if (action === "selectTeam") {
+    if (!isValidPresenterTeam(data.team)) return
+
+    return safeRunPresenterAction(() => {
+      selectExplainTeam(data.team)
+    })
+  }
+
+  if (action === "openNumber") {
+    return safeRunPresenterAction(() => {
+      const number = Number(data.number || 0)
+
+      if (!number) return
+
+      if (isValidPresenterTeam(data.team)) {
+        selectExplainTeam(data.team)
+      }
+
+      setTimeout(() => {
+        openExplainNumber(number)
+      }, 80)
+    })
+  }
+
+  if (action === "startTimer") {
+    return safeRunPresenterAction(() => {
+      startExplainTimer()
+    })
+  }
+
+  if (action === "toggleWord") {
+    return safeRunPresenterAction(() => {
+      hideExplainWord()
+    })
+  }
+
+  if (action === "correct") {
+    return safeRunPresenterAction(() => {
+      correctExplainAnswer()
+    })
+  }
+
+  if (action === "wrong") {
+    return safeRunPresenterAction(() => {
+      wrongExplainAnswer()
     })
   }
 }

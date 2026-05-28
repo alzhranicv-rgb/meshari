@@ -12,14 +12,16 @@
   <link rel="stylesheet" href="assets/css/segments/top10.css" />
   <link rel="stylesheet" href="assets/css/segments/auction.css" />
   <link rel="stylesheet" href="assets/css/segments/who.css" />
+  <link rel="stylesheet" href="assets/css/segments/explain.css" />
   <link rel="stylesheet" href="assets/css/segments/final.css" />
   <link rel="stylesheet" href="assets/css/segments/archive.css" />
 
-  <link rel="stylesheet" href="presenter.css?v=50" />
+  <link rel="stylesheet" href="presenter.css" />
 </head>
 
 <body>
 
+  <!-- شاشة دخول المقدم -->
   <div id="presenterJoin" class="homePageShell presenterJoinShell">
 
     <div class="topBoard presenterTopBoard">
@@ -63,6 +65,7 @@
 
   </div>
 
+  <!-- الصفحة الرئيسية للمقدم -->
   <div id="presenterHome" class="homePageShell hidden">
 
     <div class="topBoard" id="presenterScoreBoard">
@@ -74,6 +77,7 @@
 
       <div class="titleBox" id="presenterTitleBox">
         <h1 id="presenterTitle">لوحة المقدم</h1>
+
         <div id="presenterSubtitle" class="modelNameDisplay">
           اختر الفقرة وتحكم بالعرض
         </div>
@@ -86,33 +90,8 @@
 
     </div>
 
-    <div class="segmentsGrid" id="presenterSegmentsGrid">
-
-      <div class="segmentCard" onclick="openPresenterSegment('warmup')">
-        <span>التسخين</span>
-      </div>
-
-      <div class="segmentCard" onclick="openPresenterSegment('top10')">
-        <span>Top 10</span>
-      </div>
-
-      <div class="segmentCard" onclick="openPresenterSegment('auction')">
-        <span>فتبلة</span>
-      </div>
-
-      <div class="segmentCard" onclick="openPresenterSegment('who')">
-        <span>من هو</span>
-      </div>
-
-      <div class="segmentCard" onclick="openPresenterSegment('final')">
-        <span>الفاصلة</span>
-      </div>
-
-      <div class="segmentCard" onclick="openPresenterSegment('archive')">
-        <span>الأرشيف</span>
-      </div>
-
-    </div>
+    <!-- الفقرات ترسم تلقائياً حسب النموذج المختار -->
+    <div class="segmentsGrid" id="presenterSegmentsGrid"></div>
 
     <button
       type="button"
@@ -125,6 +104,7 @@
 
   </div>
 
+  <!-- صفحة الفقرة -->
   <div id="presenterSegmentPage" class="homePageShell presenterSegmentPage hidden">
 
     <div class="presenterCleanHeader">
@@ -157,6 +137,7 @@
 
   </div>
 
+  <!-- Toast -->
   <div class="gameToast presenterToast hidden" id="presenterToast">
     <div class="gameToastIcon">!</div>
     <div class="gameToastText" id="presenterToastText"></div>
@@ -164,7 +145,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
-  <script src="presenter.js?v=61"></script>
+  <script src="presenter.js"></script>
 
 </body>
 </html>

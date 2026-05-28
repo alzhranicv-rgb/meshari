@@ -15,6 +15,23 @@ let lastPresenterToastTime = 0
 let presenterSyncTimer = null
 let presenterGoingHome = false
 let presenterJustJoined = false
+const ALL_PRESENTER_SEGMENTS = [
+  { key: "warmup", title: "التسخين", sort: 1 },
+  { key: "top10", title: "Top 10", sort: 2 },
+  { key: "auction", title: "فتبلة", sort: 3 },
+  { key: "who", title: "من هو", sort: 4 },
+  { key: "explain", title: "اشرح الكلمة", sort: 5 },
+  { key: "final", title: "الفاصلة", sort: 6 },
+  { key: "archive", title: "الأرشيف", sort: 7 }
+]
+
+let presenterVisibleSegments = ALL_PRESENTER_SEGMENTS
+  .filter(item => item.sort <= 6)
+  .map(item => ({
+    ...item,
+    is_visible: true,
+    sort_order: item.sort
+  }))
 
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search)
@@ -77,18 +94,93 @@ function showPresenterSegmentPage() {
 }
 
 function getPresenterSegmentName(segment) {
-  const names = {
-    warmup: "التسخين",
-    top10: "Top 10",
-    auction: "فتبلة",
-    who: "من هو",
-    final: "الفاصلة",
-    archive: "الأرشيف"
+  const item = ALL_PRESENTER_SEGMENTS.find(x => x.key === segment)
+  return item?.title || "لوحة المقدم"
+}
+async function loadPresenterVisibleSegments() {
+  presenterVisibleSegments = ALL_PRESENTER_SEGMENTS
+    .filter(item => item.sort <= 6)
+    .map(item => ({
+      ...item,
+      is_visible: true,
+      sort_order: item.sort
+    }))
+
+  const modelId = Number(presenterModel || 0)
+
+  if (!modelId) {
+    return presenterVisibleSegments
   }
 
-  return names[segment] || "لوحة المقدم"
+  const { data, error } = await db
+    .from("visible_segments")
+    .select("*")
+    .eq("model", modelId)
+    .order("sort_order", { ascending: true })
+
+  if (error) {
+    console.log("LOAD PRESENTER VISIBLE SEGMENTS ERROR:", error)
+    return presenterVisibleSegments
+  }
+
+  if (!data || !data.length) {
+    return presenterVisibleSegments
+  }
+
+  const map = {}
+
+  ALL_PRESENTER_SEGMENTS.forEach(item => {
+    map[item.key] = {
+      ...item,
+      is_visible: item.sort <= 6,
+      sort_order: item.sort
+    }
+  })
+
+  data.forEach(row => {
+    if (!map[row.segment_key]) return
+
+    map[row.segment_key] = {
+      ...map[row.segment_key],
+      is_visible: !!row.is_visible,
+      sort_order: Number(row.sort_order || map[row.segment_key].sort)
+    }
+  })
+
+  presenterVisibleSegments = Object.values(map)
+    .filter(item => item.is_visible)
+    .sort((a, b) => Number(a.sort_order || a.sort) - Number(b.sort_order || b.sort))
+    .slice(0, 6)
+
+  return presenterVisibleSegments
 }
 
+function isPresenterSegmentVisible(segment) {
+  return presenterVisibleSegments.some(item => item.key === segment)
+}
+
+async function renderPresenterSegmentsGrid() {
+  const grid = document.getElementById("presenterSegmentsGrid")
+  if (!grid) return
+
+  await loadPresenterVisibleSegments()
+
+  grid.innerHTML = presenterVisibleSegments.map(item => {
+    const locked = !!presenterLiveState?.segmentStatus?.[item.key]?.locked
+
+    return `
+      <button
+        type="button"
+        class="segmentCard presenterSegmentCard ${locked ? "presenterLockedSegment" : ""}"
+        data-segment="${item.key}"
+        onclick="openPresenterSegment('${item.key}')"
+        ${locked ? "disabled" : ""}
+      >
+        <span>${item.title}</span>
+      </button>
+    `
+  }).join("")
+}
 /* =========================
    JOIN SESSION
 ========================= */
@@ -210,13 +302,17 @@ if (
     refreshPresenterAuctionFromState()
   }
 
-  if (presenterSegment === "who") {
-    refreshPresenterWhoFromState()
-  }
+if (presenterSegment === "who") {
+  refreshPresenterWhoFromState()
+}
 
-  if (presenterSegment === "archive") {
-    refreshPresenterArchiveFromState()
-  }
+if (presenterSegment === "explain") {
+  refreshPresenterExplainFromState()
+}
+
+if (presenterSegment === "archive") {
+  refreshPresenterArchiveFromState()
+}
 
   if (presenterSegment === "final") {
     refreshPresenterFinalFromState()
@@ -284,6 +380,10 @@ if (presenterSegment === "auction") {
 
 if (presenterSegment === "who") {
   refreshPresenterWhoFromState()
+}
+
+if (presenterSegment === "explain") {
+  refreshPresenterExplainFromState()
 }
 
 if (presenterSegment === "archive") {
@@ -569,6 +669,7 @@ function renderPresenterHome() {
 
   if (panel) panel.dataset.segment = ""
 
+  renderPresenterSegmentsGrid()
   updatePresenterLockedSegments()
 }
 function updatePresenterHomeScoresOnly() {
@@ -583,26 +684,17 @@ function updatePresenterHomeScoresOnly() {
 function updatePresenterLockedSegments() {
   const locked = presenterLiveState?.segmentStatus || {}
 
-  const map = {
-    warmup: 0,
-    top10: 1,
-    auction: 2,
-    who: 3,
-    final: 4,
-    archive: 5
-  }
+  document
+    .querySelectorAll("#presenterSegmentsGrid .segmentCard")
+    .forEach(card => {
+      const key = card.dataset.segment
+      if (!key) return
 
-  const cards = document.querySelectorAll("#presenterSegmentsGrid .segmentCard")
+      const isLocked = !!locked?.[key]?.locked
 
-  Object.keys(map).forEach(key => {
-    const card = cards[map[key]]
-
-    if (!card) return
-
-    const isLocked = !!locked?.[key]?.locked
-
-    card.classList.toggle("presenterLockedSegment", isLocked)
-  })
+      card.classList.toggle("presenterLockedSegment", isLocked)
+      card.disabled = isLocked
+    })
 }
 
 async function presenterGoHome() {
@@ -636,6 +728,14 @@ async function presenterGoHome() {
 }
 
 async function openPresenterSegment(segment) {
+  await loadPresenterVisibleSegments()
+
+  if (!isPresenterSegmentVisible(segment)) {
+    showToast("هذه الفقرة غير مفعلة في هذا النموذج")
+    renderPresenterHome()
+    return
+  }
+
   const locked = !!presenterLiveState?.segmentStatus?.[segment]?.locked
 
   if (locked) {
@@ -676,6 +776,10 @@ async function openPresenterSegmentFromSync(segment) {
       refreshPresenterWhoFromState()
     }
 
+    if (segment === "explain") {
+  refreshPresenterExplainFromState()
+}
+
     if (segment === "archive") {
       refreshPresenterArchiveFromState()
     }
@@ -710,21 +814,23 @@ async function openPresenterSegmentFromSync(segment) {
   }
 
   try {
-    if (segment === "warmup") {
-      await renderWarmup()
-    } else if (segment === "top10") {
-      await renderTop10()
-    } else if (segment === "auction") {
-      await renderAuction()
-    } else if (segment === "who") {
-      await renderWho()
-    } else if (segment === "final") {
-      await renderFinal()
-    } else if (segment === "archive") {
-      await renderArchive()
-    } else {
-      renderPresenterHome()
-    }
+if (segment === "warmup") {
+  await renderWarmup()
+} else if (segment === "top10") {
+  await renderTop10()
+} else if (segment === "auction") {
+  await renderAuction()
+} else if (segment === "who") {
+  await renderWho()
+} else if (segment === "explain") {
+  await renderExplain()
+} else if (segment === "final") {
+  await renderFinal()
+} else if (segment === "archive") {
+  await renderArchive()
+} else {
+  renderPresenterHome()
+}
 
     if (typeof refreshPresenterEnhancements === "function") {
       refreshPresenterEnhancements()
@@ -775,6 +881,12 @@ function getPresenterActiveTeamFromState() {
   if (presenterSegment === "who") {
     return presenterLiveState?.who?.whoState?.activeTeam || null
   }
+
+  if (presenterSegment === "explain") {
+  return presenterLiveState?.explain?.explainState?.currentTeam ||
+         presenterLiveState?.explain?.explainState?.activeTeam ||
+         null
+}
 
   if (presenterSegment === "final") {
     const round = presenterLiveState?.final?.round || presenterFinalRound || 1
@@ -827,6 +939,10 @@ function selectTeam(team) {
 
   if (presenterSegment === "final") {
     renderPresenterFinalRoundContent()
+  }
+
+  if (presenterSegment === "explain") {
+    refreshPresenterExplainFromState()
   }
 }
 
@@ -2122,6 +2238,263 @@ function refreshPresenterWhoFromState() {
     presenterWhoScoreLocked || !currentNumber
   )
 }
+
+/* =========================
+   EXPLAIN WORD
+========================= */
+
+let presenterExplainRows = []
+
+function getPresenterExplainRoot() {
+  return presenterLiveState?.explain || {}
+}
+
+function getPresenterExplainState() {
+  return getPresenterExplainRoot()?.explainState || {
+    wordsCount: 4,
+    usedNumbers: [],
+    currentNumber: null,
+    currentWord: "",
+    currentTeam: null,
+    wordVisible: true,
+    timerVisible: false,
+    timeLeft: 45,
+    revealLock: false,
+    scores: { A: 0, B: 0 },
+    attempts: { A: 0, B: 0 }
+  }
+}
+
+function getPresenterExplainWordsCount() {
+  return Number(getPresenterExplainState()?.wordsCount || 4) === 6 ? 6 : 4
+}
+
+function getPresenterExplainCurrentNumber() {
+  return Number(getPresenterExplainState()?.currentNumber || 0)
+}
+
+function getPresenterExplainUsedNumbers() {
+  return (getPresenterExplainState()?.usedNumbers || []).map(Number)
+}
+
+async function renderExplain() {
+  const panel = document.getElementById("presenterPanel")
+  if (!panel) return
+
+  const explain = getPresenterExplainState()
+  const count = getPresenterExplainWordsCount()
+  const used = getPresenterExplainUsedNumbers()
+  const currentNumber = getPresenterExplainCurrentNumber()
+  const currentWord = explain.currentWord || ""
+  const currentTeam = explain.currentTeam || presenterSelectedTeam || null
+  const revealLock = !!explain.revealLock
+
+  const { data } = await db
+    .from("explain_words")
+    .select("number, word")
+    .eq("model", presenterModel)
+    .order("number", { ascending: true })
+
+  presenterExplainRows = data || []
+
+  panel.innerHTML = `
+    ${teamButtons()}
+
+    <section class="presenterCard presenterExplainPreviewCard presenterMainPreviewCard">
+      <div class="presenterLabel">الكلمة الحالية</div>
+
+      <div id="presenterExplainWordText" class="presenterAnswerBody presenterBigAnswerBody">
+        ${currentNumber ? (currentWord || getPresenterExplainWord(currentNumber) || "—") : "اختر رقمًا"}
+      </div>
+
+      <div class="presenterLabel">المؤقت</div>
+
+      <div id="presenterExplainTimerText" class="presenterQuestionBody presenterBigQuestionBody">
+        ${explain.timerVisible ? Number(explain.timeLeft || 45) : "—"}
+      </div>
+    </section>
+
+    <section class="presenterCard presenterNumbersCard">
+      <div class="presenterLabel">الأرقام</div>
+
+      <div class="presenterGrid" id="presenterExplainNumbersGrid">
+        ${Array.from({ length: count }, (_, i) => i + 1).map(num => {
+          const isUsed = used.includes(num)
+          const isCurrent = currentNumber === num
+          const locked = isUsed || !!currentNumber || revealLock
+
+          return `
+            <button
+              class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
+              ${locked ? "disabled" : ""}
+              onclick="openExplainPresenterNumber(${num})"
+            >
+              ${isUsed ? "" : num}
+            </button>
+          `
+        }).join("")}
+      </div>
+    </section>
+
+    <div class="presenterActions">
+      <button
+        class="presenterBtn dark"
+        onclick="sendCommand('startTimer')"
+        ${!currentNumber || revealLock ? "disabled" : ""}
+      >
+        بدء المؤقت
+      </button>
+
+      <button
+        class="presenterBtn blue"
+        onclick="sendCommand('toggleWord')"
+        ${!currentNumber || revealLock ? "disabled" : ""}
+      >
+        إخفاء / إظهار الكلمة
+      </button>
+    </div>
+
+    <div class="presenterActions">
+      <button
+        class="presenterBtn green"
+        onclick="sendCommand('correct')"
+        ${!currentNumber || revealLock ? "disabled" : ""}
+      >
+        ✓ صح
+      </button>
+
+      <button
+        class="presenterBtn red"
+        onclick="sendCommand('wrong')"
+        ${!currentNumber || revealLock ? "disabled" : ""}
+      >
+        ✕ خطأ
+      </button>
+    </div>
+  `
+
+  refreshPresenterExplainFromState()
+}
+
+function getPresenterExplainWord(number) {
+  const item = presenterExplainRows.find(row => Number(row.number) === Number(number))
+  return item?.word || ""
+}
+
+function openExplainPresenterNumber(number) {
+  const explain = getPresenterExplainState()
+  const used = getPresenterExplainUsedNumbers()
+  const currentNumber = getPresenterExplainCurrentNumber()
+  const activeTeam = explain.currentTeam || presenterSelectedTeam || null
+
+  if (!activeTeam) {
+    showToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (currentNumber) {
+    showToast("أنهِ الكلمة الحالية أولاً")
+    return
+  }
+
+  if (used.includes(Number(number))) {
+    showToast("الرقم مستخدم")
+    return
+  }
+
+  const word = getPresenterExplainWord(number)
+  const wordBox = document.getElementById("presenterExplainWordText")
+
+  if (wordBox) {
+    wordBox.innerText = word || "—"
+  }
+
+  sendCommand("openNumber", {
+    number,
+    team: activeTeam
+  })
+}
+
+function refreshPresenterExplainFromState() {
+  if (presenterSegment !== "explain") return
+
+  const explain = getPresenterExplainState()
+  const count = getPresenterExplainWordsCount()
+  const used = getPresenterExplainUsedNumbers()
+  const currentNumber = getPresenterExplainCurrentNumber()
+  const activeTeam = explain.currentTeam || presenterSelectedTeam || null
+  const revealLock = !!explain.revealLock
+
+  document.getElementById("teamA")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "A"
+  )
+
+  document.getElementById("teamB")?.classList.toggle(
+    "selectedPresenterTeam",
+    activeTeam === "B"
+  )
+
+  const wordBox = document.getElementById("presenterExplainWordText")
+  const timerBox = document.getElementById("presenterExplainTimerText")
+  const grid = document.getElementById("presenterExplainNumbersGrid")
+
+  if (wordBox) {
+    if (!currentNumber) {
+      wordBox.innerText = "اختر رقمًا"
+    } else if (explain.wordVisible === false) {
+      wordBox.innerText = "الكلمة مخفية"
+    } else {
+      wordBox.innerText =
+        explain.currentWord ||
+        getPresenterExplainWord(currentNumber) ||
+        "—"
+    }
+  }
+
+  if (timerBox) {
+    timerBox.innerText = explain.timerVisible
+      ? Number(explain.timeLeft || 45)
+      : "—"
+
+    timerBox.classList.toggle(
+      "presenterTimerDanger",
+      explain.timerVisible && Number(explain.timeLeft || 45) <= 5
+    )
+  }
+
+  if (grid) {
+    grid.innerHTML = Array.from({ length: count }, (_, i) => i + 1).map(num => {
+      const isUsed = used.includes(num)
+      const isCurrent = currentNumber === num
+      const locked = isUsed || !!currentNumber || revealLock
+
+      return `
+        <button
+          class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
+          ${locked ? "disabled" : ""}
+          onclick="openExplainPresenterNumber(${num})"
+        >
+          ${isUsed ? "" : num}
+        </button>
+      `
+    }).join("")
+  }
+
+  document.querySelectorAll(".presenterActions .presenterBtn").forEach(btn => {
+    const onclick = btn.getAttribute("onclick") || ""
+
+    if (
+      onclick.includes("startTimer") ||
+      onclick.includes("toggleWord") ||
+      onclick.includes("correct") ||
+      onclick.includes("wrong")
+    ) {
+      btn.disabled = !currentNumber || revealLock
+    }
+  })
+}
+
 /* =========================
    FINAL
 ========================= */
