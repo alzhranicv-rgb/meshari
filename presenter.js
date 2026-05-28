@@ -277,61 +277,58 @@ async function joinGameSession() {
    SESSION WATCHER
 ========================= */
 
-function applyPresenterSessionData(data) {
-  if (!data) return
-
-if (
-  presenterSessionId === data.id &&
-  JSON.stringify(presenterLiveState) === JSON.stringify(data.state) &&
-  presenterSegment === (data.active_segment || null)
-) {
-  presenterLiveState = data.state || presenterLiveState || {}
-
-  updatePresenterHomeScoresOnly()
-  updatePresenterLockedSegments()
-
+function refreshPresenterCurrentSegmentFromState() {
   if (presenterSegment === "warmup") {
     refreshPresenterWarmupFromState()
+    return
   }
 
   if (presenterSegment === "top10") {
     refreshPresenterTop10FromState()
+    return
   }
 
   if (presenterSegment === "auction") {
     refreshPresenterAuctionFromState()
+    return
   }
 
-if (presenterSegment === "who") {
-  refreshPresenterWhoFromState()
-}
+  if (presenterSegment === "who") {
+    refreshPresenterWhoFromState()
+    return
+  }
 
-if (presenterSegment === "explain") {
-  refreshPresenterExplainFromState()
-}
+  if (presenterSegment === "explain") {
+    refreshPresenterExplainFromState()
+    return
+  }
 
-if (presenterSegment === "archive") {
-  refreshPresenterArchiveFromState()
-}
+  if (presenterSegment === "archive") {
+    refreshPresenterArchiveFromState()
+    return
+  }
 
   if (presenterSegment === "final") {
     refreshPresenterFinalFromState()
   }
-
-  return
 }
 
+function applyPresenterSessionData(data) {
+  if (!data) return
 
   if (data.status === "ended") {
     renderPresenterEnded()
     return
   }
 
+  const nextSegment = data.active_segment || null
+  const segmentChanged = presenterSegment !== nextSegment
+  const oldSessionId = presenterSessionId
+
   presenterSessionId = data.id
   presenterModel = Number(data.model || 1)
   presenterTeamAName = data.team_a || "الفريق الأول"
   presenterTeamBName = data.team_b || "الفريق الثاني"
-  presenterSegment = data.active_segment || null
   presenterLiveState = data.state || {}
 
   updatePresenterHomeScoresOnly()
@@ -345,11 +342,16 @@ if (presenterSegment === "archive") {
   }
 
   if (presenterGoingHome) {
-    if (!data.active_segment) {
+    if (!nextSegment) {
       presenterGoingHome = false
     }
 
-    renderPresenterHome()
+    presenterSegment = nextSegment
+
+    if (!presenterSegment) {
+      renderPresenterHome()
+    }
+
     return
   }
 
@@ -359,41 +361,22 @@ if (presenterSegment === "archive") {
     showToast(toast.text)
   }
 
+  presenterSegment = nextSegment
+
   if (!presenterSegment) {
-  renderPresenterHome()
-  return
-}
+    renderPresenterHome()
+    return
+  }
 
-openPresenterSegmentFromSync(presenterSegment)
+  const panel = document.getElementById("presenterPanel")
+  const panelIsEmpty = !panel || !panel.innerHTML.trim()
 
-if (presenterSegment === "warmup") {
-  refreshPresenterWarmupFromState()
-}
+  if (segmentChanged || oldSessionId !== data.id || panelIsEmpty) {
+    openPresenterSegmentFromSync(presenterSegment)
+    return
+  }
 
-if (presenterSegment === "top10") {
-  refreshPresenterTop10FromState()
-}
-
-if (presenterSegment === "auction") {
-  refreshPresenterAuctionFromState()
-}
-
-if (presenterSegment === "who") {
-  refreshPresenterWhoFromState()
-}
-
-if (presenterSegment === "explain") {
-  refreshPresenterExplainFromState()
-}
-
-if (presenterSegment === "archive") {
-  refreshPresenterArchiveFromState()
-}
-
-if (presenterSegment === "final") {
-  refreshPresenterFinalFromState()
-}
-
+  refreshPresenterCurrentSegmentFromState()
 }
 
 async function markPresenterStartedSession(sessionId) {
