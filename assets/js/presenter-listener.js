@@ -519,11 +519,7 @@ function syncAfterExplainAction() {
 }
 
 function handleExplainPresenterAction(action, data) {
-  console.log("EXPLAIN PRESENTER ACTION:", action, data)
-
-  if (typeof showGameToast === "function") {
-    showGameToast(`أمر من المقدم: ${action}`)
-  }
+  
 
   if (action === "selectTeam") {
     if (!isValidPresenterTeam(data.team)) return
