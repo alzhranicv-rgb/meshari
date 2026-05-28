@@ -646,7 +646,57 @@ function stopEndButtonWatcher() {
   }
 }
 
+/* =========================
+   New Session Reset
+========================= */
+
+const DISPLAY_SESSION_MARKER_KEY = "display_session_marker_v1"
+
+function clearAllSegmentPlayStatesForNewSession() {
+  localStorage.removeItem("active_segment")
+  localStorage.removeItem("segment_status_v1")
+
+  localStorage.removeItem("warmup_state_v1")
+  localStorage.removeItem("top10_state_v1")
+
+  localStorage.removeItem("auction_state_v1")
+  localStorage.removeItem("auction_state_v2")
+
+  localStorage.removeItem("who_state_v1")
+  localStorage.removeItem("explain_state_v1")
+
+  localStorage.removeItem("final_state_v1")
+  localStorage.removeItem("final_state_v2")
+  localStorage.removeItem("final_state_v3")
+
+  localStorage.removeItem("archive_state_v1")
+
+  segmentStatus = defaultSegmentStatus()
+
+  window.usedQuestions = {}
+  window.top10State = null
+  window.auctionState = null
+  window.whoState = null
+  window.explainState = null
+  window.finalState = null
+  window.archiveState = null
+}
+
+function resetDisplayStatesIfNewSession() {
+  const sessionId = localStorage.getItem("game_session_id") || ""
+  if (!sessionId) return
+
+  const lastSessionId = localStorage.getItem(DISPLAY_SESSION_MARKER_KEY) || ""
+
+  if (lastSessionId === sessionId) return
+
+  clearAllSegmentPlayStatesForNewSession()
+  localStorage.setItem(DISPLAY_SESSION_MARKER_KEY, sessionId)
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
+  resetDisplayStatesIfNewSession()
+
   initWinnerSound()
   initGameSounds()
   bindAudioUnlock()
@@ -830,6 +880,7 @@ async function endGameAndGoIntro() {
 
   localStorage.removeItem("game_session_id")
   localStorage.removeItem("game_join_code")
+  localStorage.removeItem("display_session_marker_v1")
 
   const overlay = document.getElementById("winnerOverlay")
   if (overlay) overlay.classList.add("hidden")
