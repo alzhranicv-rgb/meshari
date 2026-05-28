@@ -949,24 +949,27 @@ async function openSegmentPage(segmentKey) {
 
   homeRefreshLocked = true
   localStorage.setItem("active_segment", segmentKey)
-  syncDisplayStateToSession()
 
   const homeScreen = getFirstElement(["homeScreen", "homePage"])
   const segmentScreen = getFirstElement(["segmentScreen"])
 
   document.body.classList.add("segmentMode")
 
-  playSoftExit(homeScreen, () => {
+  playSoftExit(homeScreen, async () => {
     if (homeScreen) homeScreen.classList.add("hidden")
     if (segmentScreen) segmentScreen.classList.remove("hidden")
 
-    if (segmentKey === "warmup") window.renderWarmup()
-    if (segmentKey === "top10") window.renderTop10()
-    if (segmentKey === "auction") window.renderAuction()
-    if (segmentKey === "who") window.renderWho()
-    if (segmentKey === "explain") window.renderExplain()
-    if (segmentKey === "final") window.renderFinal()
-    if (segmentKey === "archive") window.renderArchive()
+    if (segmentKey === "warmup") await window.renderWarmup()
+    if (segmentKey === "top10") await window.renderTop10()
+    if (segmentKey === "auction") await window.renderAuction()
+    if (segmentKey === "who") await window.renderWho()
+    if (segmentKey === "explain") await window.renderExplain()
+    if (segmentKey === "final") await window.renderFinal()
+    if (segmentKey === "archive") await window.renderArchive()
+
+    if (typeof syncDisplayStateToSession === "function") {
+      syncDisplayStateToSession()
+    }
   })
 }
 
