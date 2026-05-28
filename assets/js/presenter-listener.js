@@ -490,6 +490,40 @@ function handleWhoPresenterAction(action, data) {
    EXPLAIN WORD
 ========================= */
 
+let displayExplainHandledScoreKeys = new Set()
+
+function getDisplayExplainScoreKey(action) {
+  const number = Number(window.explainState?.currentNumber || 0)
+  const team = window.explainState?.currentTeam || ""
+  const word = window.explainState?.currentWord || ""
+
+  if (!number || !team) return ""
+
+  return `${action}_${number}_${team}_${word}`
+}
+
+function runDisplayExplainScoreOnce(action, fn) {
+  const key = getDisplayExplainScoreKey(action)
+
+  if (!key) return
+
+  if (displayExplainHandledScoreKeys.has(key)) {
+    return
+  }
+
+  displayExplainHandledScoreKeys.add(key)
+
+  if (displayExplainHandledScoreKeys.size > 40) {
+    displayExplainHandledScoreKeys = new Set(
+      Array.from(displayExplainHandledScoreKeys).slice(-20)
+    )
+  }
+
+  if (typeof fn === "function") {
+    fn()
+  }
+}
+
 function syncAfterExplainAction() {
   if (typeof saveExplainState === "function") {
     saveExplainState()
@@ -533,6 +567,8 @@ function handleExplainPresenterAction(action, data) {
           return
         }
 
+        displayExplainHandledScoreKeys.clear()
+
         openExplainNumber(number)
         syncAfterExplainAction()
       }, 60)
@@ -558,8 +594,10 @@ function handleExplainPresenterAction(action, data) {
         return
       }
 
-      correctExplainAnswer()
-      syncAfterExplainAction()
+      runDisplayExplainScoreOnce("correct", () => {
+        correctExplainAnswer()
+        syncAfterExplainAction()
+      })
     })
   }
 
@@ -570,8 +608,10 @@ function handleExplainPresenterAction(action, data) {
         return
       }
 
-      wrongExplainAnswer()
-      syncAfterExplainAction()
+      runDisplayExplainScoreOnce("wrong", () => {
+        wrongExplainAnswer()
+        syncAfterExplainAction()
+      })
     })
   }
 }

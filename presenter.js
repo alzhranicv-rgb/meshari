@@ -545,11 +545,111 @@ function lockPresenterActionButton(action, payload = {}) {
 /* =========================
    SEND COMMAND - FAST
 ========================= */
+let presenterActionLocks = new Map()
+
+function getPresenterCurrentNumberForLock() {
+  if (presenterSegment === "explain") {
+    return presenterLiveState?.explain?.explainState?.currentNumber || ""
+  }
+
+  if (presenterSegment === "who") {
+    return presenterLiveState?.who?.currentNumber || ""
+  }
+
+  if (presenterSegment === "auction") {
+    return presenterLiveState?.auction?.currentNumber || ""
+  }
+
+  if (presenterSegment === "archive") {
+    return presenterLiveState?.archive?.currentNumber || ""
+  }
+
+  if (presenterSegment === "final") {
+    return (
+      presenterLiveState?.final?.round1?.currentNumber ||
+      presenterLiveState?.final?.round2?.currentNumber ||
+      presenterLiveState?.final?.round3?.currentNumber ||
+      presenterLiveState?.final?.round3?.teamMedia?.currentNumber ||
+      ""
+    )
+  }
+
+  return ""
+}
+
+function getPresenterActionLockKey(action, payload = {}) {
+  const segment = presenterSegment || "global"
+
+  if (action === "correct" || action === "wrong") {
+    return `${segment}_${action}_${getPresenterCurrentNumberForLock()}`
+  }
+
+  if (action === "openNumber") {
+    return `${segment}_${action}_${payload.round || ""}_${payload.number || ""}`
+  }
+
+  if (action === "startTimer") {
+    return `${segment}_${action}_${getPresenterCurrentNumberForLock()}`
+  }
+
+  if (action === "double") {
+    return `${segment}_${action}_${getPresenterCurrentNumberForLock()}`
+  }
+
+  if (action === "nextRound") {
+    return `${segment}_${action}`
+  }
+
+  if (action === "undo") {
+    return `${segment}_${action}_${Date.now()}`
+  }
+
+  return `${segment}_${action}_${JSON.stringify(payload || {})}`
+}
+
+function lockPresenterActionButton(action, payload = {}) {
+  const key = getPresenterActionLockKey(action, payload)
+  const now = Date.now()
+
+  /*
+    أوامر النقاط لازم تكون محمية أكثر
+    عشان لا تتسجل النقطة مرتين
+  */
+  const importantActions = [
+    "correct",
+    "wrong",
+    "recordRound3Score",
+    "recordScrambleScore",
+    "recordSequenceScore",
+    "openNumber",
+    "startTimer",
+    "double",
+    "nextRound"
+  ]
+
+  const lockTime = importantActions.includes(action) ? 1200 : 500
+  const lastTime = presenterActionLocks.get(key) || 0
+
+  if (now - lastTime < lockTime) {
+    return false
+  }
+
+  presenterActionLocks.set(key, now)
+
+  if (presenterActionLocks.size > 100) {
+    presenterActionLocks = new Map(
+      Array.from(presenterActionLocks.entries()).slice(-50)
+    )
+  }
+
+  return true
+}
 
 async function sendCommand(action, payload = {}) {
   if (!lockPresenterActionButton(action, payload)) {
-  return false
-}
+    return false
+  }
+
   const sessionId = localStorage.getItem("presenter_session_id")
 
   if (!sessionId) {
@@ -603,7 +703,6 @@ async function sendCommand(action, payload = {}) {
 
   return true
 }
-
 /* =========================
    HOME / NAV
 ========================= */
