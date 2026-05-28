@@ -504,17 +504,37 @@ function syncAfterExplainAction() {
   }
 }
 
+function syncAfterExplainAction() {
+  if (typeof updateExplainUI === "function") {
+    updateExplainUI()
+  }
+
+  if (typeof saveExplainState === "function") {
+    saveExplainState()
+  }
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
+}
+
 function handleExplainPresenterAction(action, data) {
+  console.log("EXPLAIN PRESENTER ACTION:", action, data)
+
+  if (typeof showGameToast === "function") {
+    showGameToast(`أمر من المقدم: ${action}`)
+  }
+
   if (action === "selectTeam") {
     if (!isValidPresenterTeam(data.team)) return
 
     return safeRunPresenterAction(() => {
-      if (typeof selectExplainTeam !== "function") {
-        console.log("selectExplainTeam not ready")
-        return
+      selectedTeam = data.team
+
+      if (typeof selectExplainTeam === "function") {
+        selectExplainTeam(data.team)
       }
 
-      selectExplainTeam(data.team)
       syncAfterExplainAction()
     })
   }
@@ -522,20 +542,34 @@ function handleExplainPresenterAction(action, data) {
   if (action === "openNumber") {
     return safeRunPresenterAction(() => {
       const number = Number(data.number || 0)
+      const team = data.team
+
+      console.log("OPEN EXPLAIN FROM PRESENTER:", {
+        number,
+        team,
+        hasOpenExplainNumber: typeof openExplainNumber,
+        selectedTeam
+      })
+
       if (!number) return
 
-      if (typeof openExplainNumber !== "function") {
-        console.log("openExplainNumber not ready")
-        return
+      if (isValidPresenterTeam(team)) {
+        selectedTeam = team
       }
 
-      if (isValidPresenterTeam(data.team)) {
-        if (typeof selectExplainTeam === "function") {
-          selectExplainTeam(data.team)
-        }
+      if (typeof updateExplainUI === "function") {
+        updateExplainUI()
       }
 
       setTimeout(() => {
+        if (typeof openExplainNumber !== "function") {
+          console.log("openExplainNumber not ready")
+          if (typeof showGameToast === "function") {
+            showGameToast("دالة فتح الرقم غير جاهزة")
+          }
+          return
+        }
+
         openExplainNumber(number)
         syncAfterExplainAction()
       }, 120)
