@@ -934,6 +934,8 @@ function selectTeam(team) {
 
   document.getElementById("teamA")?.classList.toggle("selectedPresenterTeam", team === "A")
   document.getElementById("teamB")?.classList.toggle("selectedPresenterTeam", team === "B")
+  document.getElementById("teamA")?.classList.toggle("activeTeam", team === "A")
+  document.getElementById("teamB")?.classList.toggle("activeTeam", team === "B")
 
   sendCommand("selectTeam", { team })
 
@@ -2240,7 +2242,7 @@ function refreshPresenterWhoFromState() {
 }
 
 /* =========================
-   EXPLAIN WORD - PRESENTER
+   EXPLAIN WORD - PRESENTER MATCH DISPLAY
 ========================= */
 
 function getPresenterExplainRoot() {
@@ -2268,16 +2270,15 @@ function getPresenterExplainState() {
 }
 
 function getPresenterExplainWordsCount() {
-  const explain = getPresenterExplainState()
-  return Number(explain.wordsCount || 4) === 6 ? 6 : 4
+  return Number(getPresenterExplainState()?.wordsCount || 4) === 6 ? 6 : 4
 }
 
 function getPresenterExplainUsedNumbers() {
-  return (getPresenterExplainState().usedNumbers || []).map(Number)
+  return (getPresenterExplainState()?.usedNumbers || []).map(Number)
 }
 
 function getPresenterExplainCurrentNumber() {
-  return Number(getPresenterExplainState().currentNumber || 0)
+  return Number(getPresenterExplainState()?.currentNumber || 0)
 }
 
 function getPresenterExplainCurrentTeam() {
@@ -2295,12 +2296,6 @@ function getPresenterExplainWord(number) {
   return item?.word || ""
 }
 
-function getPresenterExplainAttemptsText(team) {
-  const explain = getPresenterExplainState()
-  const attempts = Number(explain.attempts?.[team] || 0)
-  return `المحاولات: ${attempts}`
-}
-
 async function renderExplain() {
   const panel = document.getElementById("presenterPanel")
   if (!panel) return
@@ -2309,103 +2304,96 @@ async function renderExplain() {
   const count = getPresenterExplainWordsCount()
   const used = getPresenterExplainUsedNumbers()
   const currentNumber = getPresenterExplainCurrentNumber()
-  const currentTeam = getPresenterExplainCurrentTeam()
+  const activeTeam = getPresenterExplainCurrentTeam()
   const revealLock = !!explain.revealLock
 
   panel.innerHTML = `
-    <div class="presenterExplainShell">
+    <div class="presenterExplainGameShell explainGameShell">
 
-      <div class="presenterExplainTeams">
+      <div class="explainTopBoard presenterExplainTopBoard">
+
         <button
           type="button"
           id="teamA"
-          class="presenterExplainTeamBtn ${currentTeam === "A" ? "selectedPresenterTeam" : ""}"
+          class="explainTeamBox presenterExplainTeamBox ${activeTeam === "A" ? "activeTeam selectedPresenterTeam" : ""}"
           onclick="selectTeam('A')"
         >
-          <span>${presenterTeamAName}</span>
+          <span class="explainTeamLabel">${presenterTeamAName}</span>
           <strong id="presenterExplainScoreA">${Number(explain.scores?.A || 0)}</strong>
-          <small id="presenterExplainAttemptsA">${getPresenterExplainAttemptsText("A")}</small>
+          <small id="presenterExplainAttemptsA">${Number(explain.attempts?.A || 0)}</small>
         </button>
 
-        <div class="presenterExplainCenter">
-          <span>اشرح الكلمة</span>
-          <strong id="presenterExplainActiveTeam">
+        <div class="explainCenterTitle presenterExplainCenterTitle">
+          <h3 id="presenterExplainActiveTeam">
             ${
-              currentTeam === "A"
+              activeTeam === "A"
                 ? presenterTeamAName
-                : currentTeam === "B"
+                : activeTeam === "B"
                   ? presenterTeamBName
                   : "اختر الفريق"
             }
-          </strong>
+          </h3>
         </div>
 
         <button
           type="button"
           id="teamB"
-          class="presenterExplainTeamBtn ${currentTeam === "B" ? "selectedPresenterTeam" : ""}"
+          class="explainTeamBox presenterExplainTeamBox ${activeTeam === "B" ? "activeTeam selectedPresenterTeam" : ""}"
           onclick="selectTeam('B')"
         >
-          <span>${presenterTeamBName}</span>
+          <span class="explainTeamLabel">${presenterTeamBName}</span>
           <strong id="presenterExplainScoreB">${Number(explain.scores?.B || 0)}</strong>
-          <small id="presenterExplainAttemptsB">${getPresenterExplainAttemptsText("B")}</small>
+          <small id="presenterExplainAttemptsB">${Number(explain.attempts?.B || 0)}</small>
         </button>
+
       </div>
 
-      <section class="presenterCard presenterExplainMainCard">
+      <div class="explainNumbersGrid presenterExplainNumbersGrid" id="presenterExplainNumbersGrid">
+        ${Array.from({ length: count }, (_, i) => i + 1).map(num => {
+          const isUsed = used.includes(num)
+          const isCurrent = currentNumber === num
+          const disabled = isUsed || !!currentNumber || revealLock
 
-        <div class="presenterExplainWordLabel">الكلمة الحالية</div>
+          return `
+            <button
+              type="button"
+              class="explainNumberCard presenterExplainNumberCard ${isUsed ? "used presenterOpened" : ""} ${isCurrent ? "active selectedPresenterTeam" : ""}"
+              ${disabled ? "disabled" : ""}
+              onclick="openExplainPresenterNumber(${num})"
+            >
+              <span>${num}</span>
+            </button>
+          `
+        }).join("")}
+      </div>
+
+      <div class="explainMainStage presenterExplainMainStage">
 
         <div
           id="presenterExplainWordText"
-          class="presenterExplainWordText ${explain.answerResult === "correct" ? "answerCorrect" : ""} ${explain.answerResult === "wrong" ? "answerWrong" : ""}"
+          class="explainWordBox presenterExplainWordBox ${explain.answerResult === "correct" ? "answerCorrect" : ""} ${explain.answerResult === "wrong" ? "answerWrong" : ""}"
         >
           ${
             currentNumber
-              ? explain.wordVisible === false
-                ? "الكلمة مخفية"
-                : explain.currentWord || getPresenterExplainWord(currentNumber) || "—"
-              : "اختر رقمًا"
+              ? explain.currentWord || getPresenterExplainWord(currentNumber) || "—"
+              : ""
           }
         </div>
 
-        <div class="presenterExplainTimerLabel">المؤقت</div>
-
         <div
           id="presenterExplainTimerText"
-          class="presenterExplainTimerText ${explain.timerVisible && Number(explain.timeLeft || 45) <= 5 ? "presenterTimerDanger" : ""}"
+          class="explainTimerBox presenterExplainTimerBox ${explain.timerVisible ? "" : "hidden"} ${explain.timerVisible && Number(explain.timeLeft || 45) <= 5 ? "danger presenterTimerDanger" : ""}"
         >
-          ${explain.timerVisible ? Number(explain.timeLeft || 45) : "—"}
+          ${Number(explain.timeLeft || 45)}
         </div>
 
-      </section>
+      </div>
 
-      <section class="presenterCard presenterExplainNumbersCard">
-        <div class="presenterLabel">الأرقام</div>
+      <div class="explainControls presenterExplainControls">
 
-        <div class="presenterExplainNumbersGrid" id="presenterExplainNumbersGrid">
-          ${Array.from({ length: count }, (_, i) => i + 1).map(num => {
-            const isUsed = used.includes(num)
-            const isCurrent = currentNumber === num
-            const disabled = isUsed || !!currentNumber || revealLock
-
-            return `
-              <button
-                type="button"
-                class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
-                ${disabled ? "disabled" : ""}
-                onclick="openExplainPresenterNumber(${num})"
-              >
-                ${isUsed ? "" : num}
-              </button>
-            `
-          }).join("")}
-        </div>
-      </section>
-
-      <div class="presenterExplainActions">
         <button
-          class="presenterBtn dark"
+          type="button"
+          class="explainControlBtn explainStartBtn"
           onclick="sendCommand('startTimer')"
           ${!currentNumber || revealLock ? "disabled" : ""}
         >
@@ -2413,17 +2401,8 @@ async function renderExplain() {
         </button>
 
         <button
-          class="presenterBtn blue"
-          onclick="sendCommand('toggleWord')"
-          ${!currentNumber || revealLock ? "disabled" : ""}
-        >
-          إخفاء / إظهار
-        </button>
-      </div>
-
-      <div class="presenterExplainActions">
-        <button
-          class="presenterBtn green"
+          type="button"
+          class="explainControlBtn explainCorrectBtn"
           onclick="sendCommand('correct')"
           ${!currentNumber || revealLock ? "disabled" : ""}
         >
@@ -2431,12 +2410,14 @@ async function renderExplain() {
         </button>
 
         <button
-          class="presenterBtn red"
+          type="button"
+          class="explainControlBtn explainWrongBtn"
           onclick="sendCommand('wrong')"
           ${!currentNumber || revealLock ? "disabled" : ""}
         >
           خطأ
         </button>
+
       </div>
 
     </div>
@@ -2482,16 +2463,8 @@ function refreshPresenterExplainFromState() {
   const activeTeam = getPresenterExplainCurrentTeam()
   const revealLock = !!explain.revealLock
 
-  document.getElementById("teamA")?.classList.toggle(
-    "selectedPresenterTeam",
-    activeTeam === "A"
-  )
-
-  document.getElementById("teamB")?.classList.toggle(
-    "selectedPresenterTeam",
-    activeTeam === "B"
-  )
-
+  const teamA = document.getElementById("teamA")
+  const teamB = document.getElementById("teamB")
   const scoreA = document.getElementById("presenterExplainScoreA")
   const scoreB = document.getElementById("presenterExplainScoreB")
   const attemptsA = document.getElementById("presenterExplainAttemptsA")
@@ -2501,11 +2474,20 @@ function refreshPresenterExplainFromState() {
   const timerBox = document.getElementById("presenterExplainTimerText")
   const grid = document.getElementById("presenterExplainNumbersGrid")
 
+  if (teamA) {
+    teamA.classList.toggle("activeTeam", activeTeam === "A")
+    teamA.classList.toggle("selectedPresenterTeam", activeTeam === "A")
+  }
+
+  if (teamB) {
+    teamB.classList.toggle("activeTeam", activeTeam === "B")
+    teamB.classList.toggle("selectedPresenterTeam", activeTeam === "B")
+  }
+
   if (scoreA) scoreA.innerText = Number(explain.scores?.A || 0)
   if (scoreB) scoreB.innerText = Number(explain.scores?.B || 0)
-
-  if (attemptsA) attemptsA.innerText = getPresenterExplainAttemptsText("A")
-  if (attemptsB) attemptsB.innerText = getPresenterExplainAttemptsText("B")
+  if (attemptsA) attemptsA.innerText = Number(explain.attempts?.A || 0)
+  if (attemptsB) attemptsB.innerText = Number(explain.attempts?.B || 0)
 
   if (activeTeamBox) {
     activeTeamBox.innerText =
@@ -2516,15 +2498,19 @@ function refreshPresenterExplainFromState() {
           : "اختر الفريق"
   }
 
+  /*
+    مهم:
+    هنا الكلمة تبقى ظاهرة للمقدم دائمًا
+    حتى لو explain.wordVisible صار false في شاشة العرض
+  */
   if (wordBox) {
+    wordBox.classList.toggle("hasWord", !!currentNumber)
+    wordBox.classList.toggle("emptyWord", !currentNumber)
     wordBox.classList.toggle("answerCorrect", explain.answerResult === "correct")
     wordBox.classList.toggle("answerWrong", explain.answerResult === "wrong")
-    wordBox.classList.toggle("wordHidden", !!currentNumber && explain.wordVisible === false)
 
     if (!currentNumber) {
-      wordBox.innerText = "اختر رقمًا"
-    } else if (explain.wordVisible === false) {
-      wordBox.innerText = "الكلمة مخفية"
+      wordBox.innerText = ""
     } else {
       wordBox.innerText =
         explain.currentWord ||
@@ -2534,10 +2520,12 @@ function refreshPresenterExplainFromState() {
   }
 
   if (timerBox) {
-    timerBox.innerText = explain.timerVisible
-      ? Number(explain.timeLeft || 45)
-      : "—"
-
+    timerBox.innerText = Number(explain.timeLeft || 45)
+    timerBox.classList.toggle("hidden", !explain.timerVisible)
+    timerBox.classList.toggle(
+      "danger",
+      explain.timerVisible && Number(explain.timeLeft || 45) <= 5
+    )
     timerBox.classList.toggle(
       "presenterTimerDanger",
       explain.timerVisible && Number(explain.timeLeft || 45) <= 5
@@ -2553,29 +2541,20 @@ function refreshPresenterExplainFromState() {
       return `
         <button
           type="button"
-          class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
+          class="explainNumberCard presenterExplainNumberCard ${isUsed ? "used presenterOpened" : ""} ${isCurrent ? "active selectedPresenterTeam" : ""}"
           ${disabled ? "disabled" : ""}
           onclick="openExplainPresenterNumber(${num})"
         >
-          ${isUsed ? "" : num}
+          <span>${num}</span>
         </button>
       `
     }).join("")
   }
 
   document
-    .querySelectorAll(".presenterExplainActions .presenterBtn")
+    .querySelectorAll(".presenterExplainControls .explainControlBtn")
     .forEach(btn => {
-      const onclick = btn.getAttribute("onclick") || ""
-
-      if (
-        onclick.includes("startTimer") ||
-        onclick.includes("toggleWord") ||
-        onclick.includes("correct") ||
-        onclick.includes("wrong")
-      ) {
-        btn.disabled = !currentNumber || revealLock
-      }
+      btn.disabled = !currentNumber || revealLock
     })
 }
 /* =========================
@@ -2856,49 +2835,43 @@ async function renderPresenterFinalRoundContent() {
 
   controlsBox.dataset.round = String(round)
 
-  if (round === 1) {
-    controlsBox.innerHTML = `
-      <div class="presenterActions">
-        <button class="presenterBtn gray" onclick="sendCommand('double')">
-          دبل
-        </button>
+if (round === 1) {
+  controlsBox.innerHTML = `
+    <div class="presenterActions presenterFinalRound1TwoRows">
+      <button class="presenterBtn gray" onclick="sendCommand('double')">
+        دبل
+      </button>
 
-        <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">
-          إظهار السؤال
-        </button>
-      </div>
+      <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">
+        إظهار السؤال
+      </button>
 
-      <div class="presenterActions">
-        <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
-          تكبير
-        </button>
+      <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
+        تكبير
+      </button>
 
-        <button class="presenterBtn green" onclick="presenterFinalCorrect()">
-          إجابة صحيحة
-        </button>
-      </div>
+      <button class="presenterBtn green" onclick="presenterFinalCorrect()">
+        إجابة صحيحة
+      </button>
 
-      <div class="presenterActions">
-        <button class="presenterBtn red" onclick="presenterFinalWrong()">
-          خطأ
-        </button>
+      <button class="presenterBtn red" onclick="presenterFinalWrong()">
+        خطأ
+      </button>
 
-        <button class="presenterBtn gray" onclick="sendCommand('undo')">
-          تراجع
-        </button>
-      </div>
+      <button class="presenterBtn gray" onclick="sendCommand('undo')">
+        تراجع
+      </button>
 
-      <div class="presenterActions">
-        <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
-          الجولة التالية
-        </button>
-      </div>
-    `
+      <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
+        الجولة التالية
+      </button>
+    </div>
+  `
 
-    refreshPresenterFinalControlsOnly(1)
-    refreshPresenterEnhancements()
-    return
-  }
+  refreshPresenterFinalControlsOnly(1)
+  refreshPresenterEnhancements()
+  return
+}
 
   if (round === 2) {
     const finalCurrentNumber = Number(
