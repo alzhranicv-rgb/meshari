@@ -491,26 +491,9 @@ function handleWhoPresenterAction(action, data) {
 ========================= */
 
 function syncAfterExplainAction() {
-  if (typeof updateExplainUI === "function") {
-    updateExplainUI()
-  }
-
   if (typeof saveExplainState === "function") {
     saveExplainState()
-  }
-
-  if (typeof syncDisplayStateToSession === "function") {
-    syncDisplayStateToSession()
-  }
-}
-
-function syncAfterExplainAction() {
-  if (typeof updateExplainUI === "function") {
-    updateExplainUI()
-  }
-
-  if (typeof saveExplainState === "function") {
-    saveExplainState()
+    return
   }
 
   if (typeof syncDisplayStateToSession === "function") {
@@ -519,8 +502,6 @@ function syncAfterExplainAction() {
 }
 
 function handleExplainPresenterAction(action, data) {
-  
-
   if (action === "selectTeam") {
     if (!isValidPresenterTeam(data.team)) return
 
@@ -540,35 +521,21 @@ function handleExplainPresenterAction(action, data) {
       const number = Number(data.number || 0)
       const team = data.team
 
-      console.log("OPEN EXPLAIN FROM PRESENTER:", {
-        number,
-        team,
-        hasOpenExplainNumber: typeof openExplainNumber,
-        selectedTeam
-      })
-
       if (!number) return
 
       if (isValidPresenterTeam(team)) {
         selectedTeam = team
       }
 
-      if (typeof updateExplainUI === "function") {
-        updateExplainUI()
-      }
-
       setTimeout(() => {
         if (typeof openExplainNumber !== "function") {
           console.log("openExplainNumber not ready")
-          if (typeof showGameToast === "function") {
-            showGameToast("دالة فتح الرقم غير جاهزة")
-          }
           return
         }
 
         openExplainNumber(number)
         syncAfterExplainAction()
-      }, 120)
+      }, 60)
     })
   }
 
