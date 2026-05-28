@@ -2371,3 +2371,301 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
     font-size:1.35rem !important;
   }
 }
+/* =========================
+   Presenter Explain - Matching Display
+========================= */
+
+.presenterExplainShell{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.presenterExplainTeams{
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  gap:14px;
+  align-items:stretch;
+}
+
+.presenterExplainTeamBtn{
+  border:0;
+  cursor:pointer;
+  min-height:92px;
+  border-radius:26px;
+  padding:14px 16px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.22), transparent 42%),
+    linear-gradient(180deg, rgba(49,46,129,.90), rgba(30,27,75,.96));
+  color:#fff;
+  box-shadow:
+    0 16px 34px rgba(30,27,75,.16),
+    inset 0 1px 0 rgba(255,255,255,.24);
+}
+
+.presenterExplainTeamBtn span{
+  font-family:"HanakaText",sans-serif;
+  font-size:1rem;
+  opacity:.9;
+}
+
+.presenterExplainTeamBtn strong{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2.4rem;
+  line-height:1;
+}
+
+.presenterExplainTeamBtn small{
+  font-family:"HanakaText",sans-serif;
+  font-size:.8rem;
+  opacity:.75;
+}
+
+.presenterExplainTeamBtn.selectedPresenterTeam{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.38), transparent 42%),
+    linear-gradient(180deg, rgba(103,232,249,.85), rgba(6,182,212,.92));
+  color:#12362D;
+  box-shadow:
+    0 0 0 5px rgba(6,182,212,.12),
+    0 18px 36px rgba(6,182,212,.20),
+    inset 0 1px 0 rgba(255,255,255,.40);
+}
+
+.presenterExplainCenter{
+  min-width:170px;
+  border-radius:26px;
+  padding:14px 18px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.94), rgba(250,248,255,.82));
+  border:1px solid rgba(255,255,255,.60);
+  box-shadow:
+    0 14px 30px rgba(30,27,75,.10),
+    inset 0 1px 0 rgba(255,255,255,.90);
+}
+
+.presenterExplainCenter span{
+  font-family:"HanakaText",sans-serif;
+  color:#7C3AED;
+  font-size:.9rem;
+}
+
+.presenterExplainCenter strong{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  color:#1E1B4B;
+  font-size:1.4rem;
+  white-space:nowrap;
+}
+
+.presenterExplainMainCard{
+  position:relative;
+  overflow:hidden;
+  border-radius:30px !important;
+  padding:20px !important;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(103,232,249,.16), transparent 42%),
+    radial-gradient(circle at 82% 100%, rgba(124,58,237,.13), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.94), rgba(250,248,255,.82)) !important;
+  border:1px solid rgba(255,255,255,.58) !important;
+  box-shadow:
+    0 18px 42px rgba(30,27,75,.14),
+    inset 0 1px 0 rgba(255,255,255,.90) !important;
+}
+
+.presenterExplainWordLabel,
+.presenterExplainTimerLabel{
+  width:max-content;
+  margin:0 auto 10px;
+  padding:7px 16px;
+  border-radius:999px;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(124,58,237,.13);
+  color:#312E81;
+  font-family:"HanakaText",sans-serif;
+  font-size:.95rem;
+}
+
+.presenterExplainWordText{
+  width:min(100%, 760px);
+  min-height:120px;
+  margin:0 auto 18px;
+  padding:18px 24px;
+  border-radius:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 44%),
+    linear-gradient(180deg, rgba(49,46,129,.95), rgba(30,27,75,.98));
+  color:#fff;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(2.4rem,5vw,5rem);
+  line-height:1.05;
+  box-shadow:
+    0 20px 42px rgba(30,27,75,.20),
+    inset 0 1px 0 rgba(255,255,255,.25),
+    inset 0 -1px 0 rgba(0,0,0,.22);
+  text-shadow:
+    0 2px 0 rgba(0,0,0,.16),
+    0 12px 24px rgba(0,0,0,.18);
+}
+
+.presenterExplainWordText.wordHidden{
+  color:rgba(255,255,255,.72);
+  font-size:clamp(1.6rem,3vw,2.4rem);
+}
+
+.presenterExplainWordText.answerCorrect{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.32), transparent 44%),
+    linear-gradient(180deg,#22C55E,#15803D) !important;
+}
+
+.presenterExplainWordText.answerWrong{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.32), transparent 44%),
+    linear-gradient(180deg,#EF4444,#DC2626) !important;
+}
+
+.presenterExplainTimerText{
+  width:220px;
+  height:104px;
+  margin:0 auto;
+  border-radius:30px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(103,232,249,.28), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.94), rgba(250,248,255,.82));
+  color:#1E1B4B;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(3.5rem,7vw,6rem);
+  line-height:1;
+  box-shadow:
+    0 16px 34px rgba(30,27,75,.12),
+    inset 0 1px 0 rgba(255,255,255,.92);
+}
+
+.presenterExplainTimerText.presenterTimerDanger{
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.34), transparent 44%),
+    linear-gradient(180deg,#EF4444,#DC2626) !important;
+  color:#fff !important;
+  animation:presenterExplainDangerPulse .36s ease-in-out infinite alternate;
+}
+
+@keyframes presenterExplainDangerPulse{
+  from{ transform:scale(.98); }
+  to{ transform:scale(1.04); }
+}
+
+.presenterExplainNumbersCard{
+  border-radius:26px !important;
+}
+
+.presenterExplainNumbersGrid{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit, minmax(82px, 106px)) !important;
+  justify-content:center !important;
+  gap:12px !important;
+}
+
+.presenterExplainNumbersGrid .presenterNumberBtn{
+  width:106px !important;
+  height:54px !important;
+  min-height:54px !important;
+  border-radius:17px !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.55rem !important;
+}
+
+.presenterExplainActions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.presenterExplainActions .presenterBtn{
+  min-height:58px;
+  border-radius:18px;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.05rem;
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .presenterExplainTeams{
+    gap:10px;
+  }
+
+  .presenterExplainCenter{
+    min-width:140px;
+  }
+
+  .presenterExplainWordText{
+    min-height:100px;
+    font-size:clamp(2rem,4vw,4rem);
+  }
+
+  .presenterExplainTimerText{
+    width:190px;
+    height:92px;
+    font-size:clamp(3rem,6vw,5rem);
+  }
+}
+
+/* iPhone */
+@media (max-width:767px){
+  .presenterExplainTeams{
+    grid-template-columns:1fr;
+  }
+
+  .presenterExplainCenter{
+    order:-1;
+    min-width:0;
+  }
+
+  .presenterExplainTeamBtn{
+    min-height:78px;
+    border-radius:22px;
+  }
+
+  .presenterExplainWordText{
+    width:100%;
+    min-height:88px;
+    border-radius:22px;
+    font-size:clamp(1.9rem,9vw,3.2rem);
+    padding:14px 16px;
+  }
+
+  .presenterExplainTimerText{
+    width:165px;
+    height:86px;
+    border-radius:24px;
+    font-size:clamp(3rem,12vw,4.8rem);
+  }
+
+  .presenterExplainNumbersGrid{
+    grid-template-columns:repeat(auto-fit, minmax(72px, 86px)) !important;
+  }
+
+  .presenterExplainNumbersGrid .presenterNumberBtn{
+    width:86px !important;
+    height:48px !important;
+    min-height:48px !important;
+    font-size:1.35rem !important;
+  }
+}
