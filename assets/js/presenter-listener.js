@@ -490,12 +490,32 @@ function handleWhoPresenterAction(action, data) {
    EXPLAIN WORD
 ========================= */
 
+function syncAfterExplainAction() {
+  if (typeof updateExplainUI === "function") {
+    updateExplainUI()
+  }
+
+  if (typeof saveExplainState === "function") {
+    saveExplainState()
+  }
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
+}
+
 function handleExplainPresenterAction(action, data) {
   if (action === "selectTeam") {
     if (!isValidPresenterTeam(data.team)) return
 
     return safeRunPresenterAction(() => {
+      if (typeof selectExplainTeam !== "function") {
+        console.log("selectExplainTeam not ready")
+        return
+      }
+
       selectExplainTeam(data.team)
+      syncAfterExplainAction()
     })
   }
 
@@ -504,31 +524,57 @@ function handleExplainPresenterAction(action, data) {
       const number = Number(data.number || 0)
       if (!number) return
 
+      if (typeof openExplainNumber !== "function") {
+        console.log("openExplainNumber not ready")
+        return
+      }
+
       if (isValidPresenterTeam(data.team)) {
-        selectExplainTeam(data.team)
+        if (typeof selectExplainTeam === "function") {
+          selectExplainTeam(data.team)
+        }
       }
 
       setTimeout(() => {
         openExplainNumber(number)
-      }, 80)
+        syncAfterExplainAction()
+      }, 120)
     })
   }
 
   if (action === "startTimer") {
     return safeRunPresenterAction(() => {
+      if (typeof startExplainTimer !== "function") {
+        console.log("startExplainTimer not ready")
+        return
+      }
+
       startExplainTimer()
+      syncAfterExplainAction()
     })
   }
 
   if (action === "correct") {
     return safeRunPresenterAction(() => {
+      if (typeof correctExplainAnswer !== "function") {
+        console.log("correctExplainAnswer not ready")
+        return
+      }
+
       correctExplainAnswer()
+      syncAfterExplainAction()
     })
   }
 
   if (action === "wrong") {
     return safeRunPresenterAction(() => {
+      if (typeof wrongExplainAnswer !== "function") {
+        console.log("wrongExplainAnswer not ready")
+        return
+      }
+
       wrongExplainAnswer()
+      syncAfterExplainAction()
     })
   }
 }
