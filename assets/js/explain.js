@@ -263,7 +263,7 @@ function buildExplainHtml() {
           
           <h3> </h3>
         </div>
-
+ 
         <button
           type="button"
           id="teamBBox"
