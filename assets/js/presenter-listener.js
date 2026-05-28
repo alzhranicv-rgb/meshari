@@ -502,7 +502,6 @@ function handleExplainPresenterAction(action, data) {
   if (action === "openNumber") {
     return safeRunPresenterAction(() => {
       const number = Number(data.number || 0)
-
       if (!number) return
 
       if (isValidPresenterTeam(data.team)) {
@@ -521,12 +520,6 @@ function handleExplainPresenterAction(action, data) {
     })
   }
 
-  if (action === "toggleWord") {
-    return safeRunPresenterAction(() => {
-      hideExplainWord()
-    })
-  }
-
   if (action === "correct") {
     return safeRunPresenterAction(() => {
       correctExplainAnswer()
@@ -539,7 +532,6 @@ function handleExplainPresenterAction(action, data) {
     })
   }
 }
-
 /* =========================
    FINAL
 ========================= */

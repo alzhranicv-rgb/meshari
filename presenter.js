@@ -2250,7 +2250,7 @@ function getPresenterExplainRoot() {
 }
 
 function getPresenterExplainState() {
-  const root = getPresenterExplainRoot()
+  const root = presenterLiveState?.explain || {}
 
   return root.explainState || {
     wordsCount: 4,

@@ -107,19 +107,30 @@ async function syncDisplayStateToSession() {
     currentModelName = localStorage.getItem("game_model_name") || currentModelName || ""
     window.currentModelName = currentModelName
 
+    const explainSavedState =
+      window.explainState ||
+      getSafeJson("explain_state_v1") ||
+      null
+
     const state = {
       mainScores: {
         A: Number(localStorage.getItem("main_score_a") || scoreA || 0),
         B: Number(localStorage.getItem("main_score_b") || scoreB || 0)
       },
+
       currentModelName: localStorage.getItem("game_model_name") || currentModelName || "",
       displayControlsHidden: localStorage.getItem("presenter_hide_controls") === "1",
       segmentStatus: getSafeJson("segment_status_v1") || defaultSegmentStatus(),
+
       warmup: getSafeJson("warmup_state_v1"),
       top10: getSafeJson("top10_state_v1"),
       auction: getSafeJson("auction_state_v2"),
       who: getSafeJson("who_state_v1"),
-      explain: getSafeJson("explain_state_v1"),
+
+      explain: {
+        explainState: explainSavedState
+      },
+
       final: getSafeJson("final_state_v3"),
       archive: getSafeJson("archive_state_v1"),
       toast: window.lastDisplayToast || null
@@ -138,13 +149,13 @@ async function syncDisplayStateToSession() {
     }
 
     try {
-     if (typeof presenterCommandChannel !== "undefined" && presenterCommandChannel) {
-  presenterCommandChannel.send({
-    type: "broadcast",
-    event: "session_state",
-    payload: sessionData
-  })
-}
+      if (typeof presenterCommandChannel !== "undefined" && presenterCommandChannel) {
+        presenterCommandChannel.send({
+          type: "broadcast",
+          event: "session_state",
+          payload: sessionData
+        })
+      }
     } catch (e) {
       console.log("Display session broadcast error:", e)
     }
@@ -155,7 +166,6 @@ async function syncDisplayStateToSession() {
     console.log("sync session error:", e)
   }
 }
-
 /* =========================
    Winner Sound + Effects
 ========================= */
