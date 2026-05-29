@@ -1167,10 +1167,9 @@ async function renderWarmup() {
   panel.innerHTML = `
     <div class="presenterWarmupLayout">
 
-      <!-- اليسار: الفئات + الفرق + التحكم -->
       <div class="presenterWarmupLeft">
 
-        <section class="presenterCard presenterNumbersCard presenterWarmupNumbersCard">
+        <section class="presenterCard presenterWarmupNumbersCard">
           <div class="presenterLabel">الفئات والأسئلة</div>
 
           <div class="presenterWarmupCats">
@@ -1212,82 +1211,41 @@ async function renderWarmup() {
         <div class="presenterWarmupBottom">
           ${teamButtons()}
 
-          <div
-  class="presenterWarmupActions"
-  style="
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:6px;
-    width:100%;
-  "
->
-  <button
-    class="presenterBtn gray presenterDoubleBtn"
-    style="
-      height:42px;
-      min-height:42px;
-      border-radius:14px;
-      font-size:.86rem;
-      padding:5px;
-      grid-column:auto;
-    "
-    onclick="sendCommand('double')"
-    ${locked || currentKey ? "disabled" : ""}
-  >
-    دوبيلا
-  </button>
+          <div class="presenterWarmupActions">
+            <button
+              class="presenterBtn gray presenterDoubleBtn"
+              onclick="sendCommand('double')"
+              ${locked || currentKey ? "disabled" : ""}
+            >
+              دوبيلا
+            </button>
 
-  <button
-    class="presenterBtn red presenterWrongBtn"
-    style="
-      height:42px;
-      min-height:42px;
-      border-radius:14px;
-      font-size:.86rem;
-      padding:5px;
-      grid-column:auto;
-    "
-    onclick="sendCommand('wrong')"
-  >
-    ✕ خطأ
-  </button>
+            <button class="presenterBtn red presenterWrongBtn" onclick="sendCommand('wrong')">
+              ✕ خطأ
+            </button>
 
-  <button
-    class="presenterBtn green presenterCorrectBtn"
-    style="
-      height:42px;
-      min-height:42px;
-      border-radius:14px;
-      font-size:.86rem;
-      padding:5px;
-      grid-column:auto;
-    "
-    onclick="sendCommand('correct')"
-  >
-    ✓ صح
-  </button>
-</div>
+            <button class="presenterBtn green presenterCorrectBtn" onclick="sendCommand('correct')">
+              ✓ صح
+            </button>
+          </div>
         </div>
 
       </div>
 
-      <!-- اليمين: السؤال + الإجابة -->
       <div class="presenterWarmupRight">
-
-        <section class="presenterCard presenterWarmupPreviewCard presenterMainPreviewCard">
+        <section class="presenterCard presenterWarmupPreviewCard">
           <div class="presenterLabel">السؤال</div>
 
           <div id="presenterWarmupQuestionText" class="presenterQuestionBody presenterBigQuestionBody">
             اختر رقم السؤال
           </div>
 
-          <div class="presenterLabel answerLabel">الإجابة</div>
+          <div class="presenterLabel">الإجابة</div>
 
           <div id="presenterWarmupAnswerText" class="presenterAnswerBody presenterBigAnswerBody">
             —
           </div>
         </section>
-
       </div>
 
     </div>
