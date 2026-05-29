@@ -1498,15 +1498,15 @@ async function renderTop10() {
 
           <div class="presenterTop10AnswersCols">
 
-            <div class="presenterTop10AnswersCol">
-              ${[1, 2, 3, 4, 5].map(num => buildTop10AnswerButton(num)).join("")}
-            </div>
+  <div class="presenterTop10AnswersCol presenterTop10RightCol">
+    ${[1, 2, 3, 4, 5].map(num => buildTop10AnswerButton(num)).join("")}
+  </div>
 
-            <div class="presenterTop10AnswersCol">
-              ${[6, 7, 8, 9, 10].map(num => buildTop10AnswerButton(num)).join("")}
-            </div>
+  <div class="presenterTop10AnswersCol presenterTop10LeftCol">
+    ${[6, 7, 8, 9, 10].map(num => buildTop10AnswerButton(num)).join("")}
+  </div>
 
-          </div>
+</div>
         </section>
 
       </div>
@@ -2106,94 +2106,104 @@ async function renderWho() {
   presenterWhoRows = data || []
 
   panel.innerHTML = `
-    ${teamButtons()}
+    <div class="presenterWhoLayout">
 
-    <section class="presenterCard">
-      <div class="presenterLabel">النقاط</div>
+      <div class="presenterWhoLeft">
 
-      <div class="presenterGrid">
-        ${[1, 2, 3, 4, 5].map(p => `
+        <section class="presenterCard presenterWhoNumbersCard">
+          <div class="presenterLabel">النقاط</div>
+
+          <div class="presenterWhoPointsGrid">
+            ${[1, 2, 3, 4, 5].map(p => `
+              <button
+                class="presenterNumberBtn ${currentPoints === p ? "selectedPresenterTeam" : ""}"
+                ${locked || compensationMode ? "disabled" : ""}
+                onclick="sendCommand('setPoints',{points:${p}})"
+              >
+                ${p}
+              </button>
+            `).join("")}
+          </div>
+
+          <div class="presenterLabel presenterWhoNumbersLabel">الأرقام</div>
+
+          <div class="presenterWhoGrid">
+            ${Array.from({ length: 15 }, (_, i) => i + 1).map(num => {
+              const isUsed = used.includes(num)
+              const isCurrent = currentNumber === num
+              const isLocked15 = num === 15 && (lock15 || waitCompensation)
+
+              return `
+                <button
+                  class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
+                  ${(isUsed || locked || isLocked15) ? "disabled" : ""}
+                  onclick="openWhoPresenterNumber(${num})"
+                >
+                  ${isUsed ? "" : num}
+                </button>
+              `
+            }).join("")}
+          </div>
+        </section>
+
+      </div>
+
+      <div class="presenterWhoRight">
+
+        <div class="presenterWhoTeamsBox">
+          ${teamButtons()}
+        </div>
+
+        <section class="presenterCard presenterWhoPreviewCard">
+          <div class="presenterLabel">الإجابة</div>
+
+          <div id="presenterWhoAnswerText" class="presenterAnswerBody">
+            —
+          </div>
+
+          <div class="presenterLabel">الصورة</div>
+
+          <div id="presenterWhoImageBox" class="presenterImagePreviewBox hidden"></div>
+        </section>
+
+        <div class="presenterWhoActions">
           <button
-            class="presenterNumberBtn ${currentPoints === p ? "selectedPresenterTeam" : ""}"
-            ${locked || compensationMode ? "disabled" : ""}
-            onclick="sendCommand('setPoints',{points:${p}})"
+            class="presenterBtn gray"
+            onclick="sendCommand('double')"
+            ${locked || currentNumber ? "disabled" : ""}
           >
-            ${p}
+            دوبيلا
           </button>
-        `).join("")}
+
+          <button
+            class="presenterBtn gray"
+            onclick="sendCommand('compensation')"
+            ${canPresenterWhoCompensation() ? "" : "disabled"}
+          >
+            التعويض
+          </button>
+
+          <button
+            id="presenterWhoCorrectBtn"
+            class="presenterBtn green"
+            onclick="sendPresenterWhoScore('correct')"
+            ${!currentNumber ? "disabled" : ""}
+          >
+            ✓ صح
+          </button>
+
+          <button
+            id="presenterWhoWrongBtn"
+            class="presenterBtn red"
+            onclick="sendPresenterWhoScore('wrong')"
+            ${!currentNumber ? "disabled" : ""}
+          >
+            ✕ خطأ
+          </button>
+        </div>
+
       </div>
-    </section>
 
-    <section class="presenterCard presenterWhoPreviewCard">
-      <div class="presenterLabel">الإجابة</div>
-
-      <div id="presenterWhoAnswerText" class="presenterAnswerBody">
-        —
-      </div>
-
-      <div class="presenterLabel">الصورة</div>
-
-      <div id="presenterWhoImageBox" class="presenterImagePreviewBox hidden"></div>
-    </section>
-
-    <section class="presenterCard">
-      <div class="presenterLabel">الأرقام</div>
-
-      <div class="presenterGrid">
-        ${Array.from({ length: 15 }, (_, i) => i + 1).map(num => {
-          const isUsed = used.includes(num)
-          const isCurrent = currentNumber === num
-          const isLocked15 = num === 15 && (lock15 || waitCompensation)
-
-          return `
-            <button
-              class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
-              ${(isUsed || locked || isLocked15) ? "disabled" : ""}
-              onclick="openWhoPresenterNumber(${num})"
-            >
-              ${isUsed ? "" : num}
-            </button>
-          `
-        }).join("")}
-      </div>
-    </section>
-
-    <div class="presenterActions">
-      <button
-        class="presenterBtn gray"
-        onclick="sendCommand('double')"
-        ${locked || currentNumber ? "disabled" : ""}
-      >
-        دوبيلا
-      </button>
-
-      <button
-        class="presenterBtn gray"
-        onclick="sendCommand('compensation')"
-        ${canPresenterWhoCompensation() ? "" : "disabled"}
-      >
-        التعويض
-      </button>
-    </div>
-
-    <div class="presenterActions">
-      <button
-        id="presenterWhoCorrectBtn"
-        class="presenterBtn green"
-        onclick="sendPresenterWhoScore('correct')"
-        ${!currentNumber ? "disabled" : ""}
-      >
-        ✓ صح
-      </button>
-
-      <button
-        id="presenterWhoWrongBtn"
-        class="presenterBtn red"
-        onclick="sendPresenterWhoScore('wrong')"
-        ${!currentNumber ? "disabled" : ""}
-      >
-        ✕ خطأ
-      </button>
     </div>
   `
 
@@ -2448,115 +2458,93 @@ async function renderExplain() {
   const revealLock = !!explain.revealLock
 
   panel.innerHTML = `
-    <div class="presenterExplainGameShell explainGameShell">
+    <div class="presenterExplainLayout">
 
-      <div class="explainTopBoard presenterExplainTopBoard">
+      <div class="presenterExplainLeft">
 
-        <button
-          type="button"
-          id="teamA"
-          class="explainTeamBox presenterExplainTeamBox ${activeTeam === "A" ? "activeTeam selectedPresenterTeam" : ""}"
-          onclick="selectTeam('A')"
-        >
-          <span class="explainTeamLabel">${presenterTeamAName}</span>
-          <strong id="presenterExplainScoreA">${Number(explain.scores?.A || 0)}</strong>
-          <small id="presenterExplainAttemptsA">${Number(explain.attempts?.A || 0)}</small>
-        </button>
+        <section class="presenterCard presenterExplainNumbersCard">
+          <div class="presenterLabel">الأرقام</div>
 
-        <div class="explainCenterTitle presenterExplainCenterTitle">
-          <h3 id="presenterExplainActiveTeam">
+          <div class="presenterExplainNumbersGrid" id="presenterExplainNumbersGrid">
+            ${Array.from({ length: count }, (_, i) => i + 1).map(num => {
+              const isUsed = used.includes(num)
+              const isCurrent = currentNumber === num
+              const disabled = isUsed || !!currentNumber || revealLock
+
+              return `
+                <button
+                  type="button"
+                  class="presenterNumberBtn presenterExplainNumberCard ${isUsed ? "used presenterOpened" : ""} ${isCurrent ? "active selectedPresenterTeam" : ""}"
+                  ${disabled ? "disabled" : ""}
+                  onclick="openExplainPresenterNumber(${num})"
+                >
+                  <span>${num}</span>
+                </button>
+              `
+            }).join("")}
+          </div>
+        </section>
+
+      </div>
+
+      <div class="presenterExplainRight">
+
+        <div class="presenterExplainTeamsBox">
+          ${teamButtons()}
+        </div>
+
+        <section class="presenterCard presenterExplainPreviewCard">
+
+          <div class="presenterLabel">الكلمة</div>
+
+          <div
+            id="presenterExplainWordText"
+            class="presenterExplainWordBox ${explain.answerResult === "correct" ? "answerCorrect" : ""} ${explain.answerResult === "wrong" ? "answerWrong" : ""}"
+          >
             ${
-              activeTeam === "A"
-                ? presenterTeamAName
-                : activeTeam === "B"
-                  ? presenterTeamBName
-                  : "اختر الفريق"
+              currentNumber
+                ? explain.currentWord || getPresenterExplainWord(currentNumber) || "—"
+                : ""
             }
-          </h3>
+          </div>
+
+          <div
+            id="presenterExplainTimerText"
+            class="presenterExplainTimerBox ${explain.timerVisible ? "" : "hidden"} ${explain.timerVisible && Number(explain.timeLeft || 45) <= 5 ? "danger presenterTimerDanger" : ""}"
+          >
+            ${Number(explain.timeLeft || 45)}
+          </div>
+
+        </section>
+
+        <div class="presenterExplainActions">
+          <button
+            type="button"
+            class="presenterBtn dark"
+            onclick="sendCommand('startTimer')"
+            ${!currentNumber || revealLock ? "disabled" : ""}
+          >
+            بدء المؤقت
+          </button>
+
+          <button
+            type="button"
+            class="presenterBtn green"
+            onclick="sendCommand('correct')"
+            ${!currentNumber || revealLock ? "disabled" : ""}
+          >
+            صح
+          </button>
+
+          <button
+            type="button"
+            class="presenterBtn red"
+            onclick="sendCommand('wrong')"
+            ${!currentNumber || revealLock ? "disabled" : ""}
+          >
+            خطأ
+          </button>
         </div>
-
-        <button
-          type="button"
-          id="teamB"
-          class="explainTeamBox presenterExplainTeamBox ${activeTeam === "B" ? "activeTeam selectedPresenterTeam" : ""}"
-          onclick="selectTeam('B')"
-        >
-          <span class="explainTeamLabel">${presenterTeamBName}</span>
-          <strong id="presenterExplainScoreB">${Number(explain.scores?.B || 0)}</strong>
-          <small id="presenterExplainAttemptsB">${Number(explain.attempts?.B || 0)}</small>
-        </button>
-
-      </div>
-
-      <div class="explainNumbersGrid presenterExplainNumbersGrid" id="presenterExplainNumbersGrid">
-        ${Array.from({ length: count }, (_, i) => i + 1).map(num => {
-          const isUsed = used.includes(num)
-          const isCurrent = currentNumber === num
-          const disabled = isUsed || !!currentNumber || revealLock
-
-          return `
-            <button
-              type="button"
-              class="explainNumberCard presenterExplainNumberCard ${isUsed ? "used presenterOpened" : ""} ${isCurrent ? "active selectedPresenterTeam" : ""}"
-              ${disabled ? "disabled" : ""}
-              onclick="openExplainPresenterNumber(${num})"
-            >
-              <span>${num}</span>
-            </button>
-          `
-        }).join("")}
-      </div>
-
-      <div class="explainMainStage presenterExplainMainStage">
-
-        <div
-          id="presenterExplainWordText"
-          class="explainWordBox presenterExplainWordBox ${explain.answerResult === "correct" ? "answerCorrect" : ""} ${explain.answerResult === "wrong" ? "answerWrong" : ""}"
-        >
-          ${
-            currentNumber
-              ? explain.currentWord || getPresenterExplainWord(currentNumber) || "—"
-              : ""
-          }
-        </div>
-
-        <div
-          id="presenterExplainTimerText"
-          class="explainTimerBox presenterExplainTimerBox ${explain.timerVisible ? "" : "hidden"} ${explain.timerVisible && Number(explain.timeLeft || 45) <= 5 ? "danger presenterTimerDanger" : ""}"
-        >
-          ${Number(explain.timeLeft || 45)}
-        </div>
-
-      </div>
-
-      <div class="explainControls presenterExplainControls">
-
-        <button
-          type="button"
-          class="explainControlBtn explainStartBtn"
-          onclick="sendCommand('startTimer')"
-          ${!currentNumber || revealLock ? "disabled" : ""}
-        >
-          بدء المؤقت
-        </button>
-
-        <button
-          type="button"
-          class="explainControlBtn explainCorrectBtn"
-          onclick="sendCommand('correct')"
-          ${!currentNumber || revealLock ? "disabled" : ""}
-        >
-          صح
-        </button>
-
-        <button
-          type="button"
-          class="explainControlBtn explainWrongBtn"
-          onclick="sendCommand('wrong')"
-          ${!currentNumber || revealLock ? "disabled" : ""}
-        >
-          خطأ
-        </button>
 
       </div>
 
@@ -2880,27 +2868,35 @@ async function renderFinal() {
   panel.innerHTML = `
     <div class="presenterFinalLayout">
 
-      <div class="presenterFinalTeamsArea">
-        ${teamButtons()}
+      <div class="presenterFinalLeft">
+
+        <section class="presenterCard presenterFinalNumbersCard">
+          <div class="presenterLabel">الأرقام</div>
+          <div class="presenterGrid" id="presenterFinalNumbers"></div>
+        </section>
+
+        <div id="presenterFinalControls" class="presenterFinalControlsArea"></div>
+
       </div>
 
-      <section class="presenterCard presenterFinalPreviewCard">
-        <div class="presenterFinalRoundHeader">
-          <span>الجولة الحالية</span>
-          <strong id="presenterFinalRoundText">${presenterFinalRound}</strong>
+      <div class="presenterFinalRight">
+
+        <div class="presenterFinalTeamsArea">
+          ${teamButtons()}
         </div>
 
-        <div id="presenterFinalPreview" class="presenterFinalPreviewBox">
-          ${presenterFinalPreviewCache[presenterFinalRound] || "اختر رقمًا"}
-        </div>
-      </section>
+        <section class="presenterCard presenterFinalPreviewCard">
+          <div class="presenterFinalRoundHeader">
+            <span>الجولة الحالية</span>
+            <strong id="presenterFinalRoundText">${presenterFinalRound}</strong>
+          </div>
 
-      <section class="presenterCard presenterFinalNumbersCard">
-        <div class="presenterLabel">الأرقام</div>
-        <div class="presenterGrid" id="presenterFinalNumbers"></div>
-      </section>
+          <div id="presenterFinalPreview" class="presenterFinalPreviewBox">
+            ${presenterFinalPreviewCache[presenterFinalRound] || "اختر رقمًا"}
+          </div>
+        </section>
 
-      <div id="presenterFinalControls" class="presenterFinalControlsArea"></div>
+      </div>
 
     </div>
   `

@@ -2206,58 +2206,169 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   }
 }
 /* =========================================================
-   Warmup - Tablet Landscape
-   نفس التصميم اللي ضبط
+   PRESENTER TABLET LANDSCAPE - ALL SEGMENTS
+   نفس منطق التسخين
 ========================================================= */
 
 @media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
 
-  .presenterPanel:has(.presenterWarmupLayout){
+  body{
+    overflow:hidden;
+  }
+
+  .homePageShell,
+  .presenterSegmentPage{
+    height:100dvh;
+    min-height:100dvh;
+    padding:10px;
+    gap:10px;
+    overflow:hidden;
+  }
+
+  .presenterCleanHeader{
+    width:100%;
+    max-width:1100px;
+    min-height:68px;
+    grid-template-columns:140px minmax(0,1fr) 140px;
+    border-radius:20px;
+  }
+
+  .presenterCleanHeaderBtn,
+  .presenterCleanHeaderTitle{
+    min-height:52px;
+    border-radius:16px;
+  }
+
+  .presenterCleanHeaderTitle h1{
+    font-size:1.28rem;
+  }
+
+  .presenterPanel{
+    width:100%;
+    max-width:1100px;
+    flex:1;
+    min-height:0;
     display:block;
     overflow:hidden;
   }
 
-  .presenterWarmupLayout{
-    height:100%;
+  .presenterCard{
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
 
+  .presenterWarmupLayout,
+  .presenterTop10Layout,
+  .presenterAuctionLayout,
+  .presenterWhoLayout,
+  .presenterExplainLayout,
+  .presenterFinalLayout,
+  .presenterArchiveLayout{
+    height:100%;
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:10px;
-
     direction:ltr;
     overflow:hidden;
   }
 
   .presenterWarmupLeft,
-  .presenterWarmupRight{
+  .presenterWarmupRight,
+  .presenterTop10Left,
+  .presenterTop10Right,
+  .presenterAuctionLeft,
+  .presenterAuctionRight,
+  .presenterWhoLeft,
+  .presenterWhoRight,
+  .presenterExplainLeft,
+  .presenterExplainRight,
+  .presenterFinalLeft,
+  .presenterFinalRight,
+  .presenterArchiveLeft,
+  .presenterArchiveRight{
     direction:rtl;
     min-width:0;
     height:100%;
     overflow:hidden;
   }
 
-  /* اليسار */
-  .presenterWarmupNumbersCard{
+  .presenterWarmupNumbersCard,
+  .presenterTop10AnswersCard,
+  .presenterAuctionNumbersCard,
+  .presenterWhoNumbersCard,
+  .presenterExplainNumbersCard,
+  .presenterArchiveSimpleCard{
     height:100%;
     padding:12px;
     border-radius:18px;
     overflow:hidden;
   }
 
-  .presenterWarmupNumbersCard .presenterLabel{
-    margin-bottom:10px;
-    font-size:1rem;
-    font-weight:900;
-    line-height:1;
+  .presenterWarmupTeamsBox .presenterCard,
+  .presenterTop10TeamsBox .presenterCard,
+  .presenterAuctionTeamsBox .presenterCard,
+  .presenterWhoTeamsBox .presenterCard,
+  .presenterExplainTeamsBox .presenterCard,
+  .presenterFinalTeamsArea .presenterCard,
+  .presenterArchiveTeamsBox .presenterCard{
+    padding:0;
+    margin:0;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    overflow:visible;
   }
+
+  .presenterWarmupTeamsBox .presenterLabel,
+  .presenterTop10TeamsBox .presenterLabel,
+  .presenterAuctionTeamsBox .presenterLabel,
+  .presenterWhoTeamsBox .presenterLabel,
+  .presenterExplainTeamsBox .presenterLabel,
+  .presenterFinalTeamsArea .presenterLabel,
+  .presenterArchiveTeamsBox .presenterLabel{
+    display:none;
+  }
+
+  .presenterWarmupTeamsBox .presenterTeams,
+  .presenterTop10TeamsBox .presenterTeams,
+  .presenterAuctionTeamsBox .presenterTeams,
+  .presenterWhoTeamsBox .presenterTeams,
+  .presenterExplainTeamsBox .presenterTeams,
+  .presenterFinalTeamsArea .presenterTeams,
+  .presenterArchiveTeamsBox .presenterTeams{
+    height:48px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+
+  .presenterWarmupTeamsBox .presenterBtn,
+  .presenterTop10TeamsBox .presenterBtn,
+  .presenterAuctionTeamsBox .presenterBtn,
+  .presenterWhoTeamsBox .presenterBtn,
+  .presenterExplainTeamsBox .presenterBtn,
+  .presenterFinalTeamsArea .presenterBtn,
+  .presenterArchiveTeamsBox .presenterBtn{
+    height:48px;
+    min-height:48px;
+    border-radius:14px;
+    font-size:.95rem;
+    font-weight:900;
+    padding:6px;
+  }
+}
+
+/* =========================
+   Warmup
+========================= */
+
+@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
 
   .presenterWarmupCats{
     height:calc(100% - 32px);
-
     display:grid;
     grid-template-columns:1fr;
     gap:9px;
-
     overflow:hidden;
   }
 
@@ -2266,7 +2377,6 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
     grid-template-columns:112px minmax(0,1fr);
     gap:8px;
     align-items:center;
-
     padding:8px;
     border-radius:17px;
   }
@@ -2274,16 +2384,12 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   .presenterWarmupCatTitle{
     height:44px;
     min-height:44px;
-
     display:flex;
     align-items:center;
     justify-content:center;
-
     margin:0;
     padding:6px;
-
     border-radius:14px;
-
     font-size:.92rem;
     line-height:1.2;
     font-weight:900;
@@ -2299,68 +2405,29 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   .presenterWarmupNumbers .presenterNumberBtn{
     min-height:44px;
     border-radius:14px;
-
     font-size:1.2rem;
     font-weight:900;
   }
 
-  /* اليمين */
-  .presenterWarmupRight{
+  .presenterWarmupRight,
+  .presenterTop10Right,
+  .presenterAuctionRight,
+  .presenterWhoRight,
+  .presenterExplainRight,
+  .presenterArchiveRight{
     display:grid;
     grid-template-rows:48px 265px 44px;
     gap:8px;
     align-content:start;
   }
 
-  .presenterWarmupTeamsBox{
-    height:48px;
-  }
-
-  .presenterWarmupTeamsBox .presenterCard{
-    padding:0;
-    margin:0;
-
-    background:transparent;
-    border:0;
-    box-shadow:none;
-
-    overflow:visible;
-  }
-
-  .presenterWarmupTeamsBox .presenterLabel{
-    display:none;
-  }
-
-  .presenterWarmupTeamsBox .presenterTeams{
-    height:48px;
-
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-  }
-
-  .presenterWarmupTeamsBox .presenterBtn{
-    height:48px;
-    min-height:48px;
-
-    border-radius:14px;
-
-    font-size:.95rem;
-    font-weight:900;
-    padding:6px;
-  }
-
   .presenterWarmupPreviewCard{
     height:265px;
-    max-height:265px;
-
     padding:10px;
     border-radius:18px;
-
     display:grid;
     grid-template-rows:auto 105px auto 68px;
     gap:6px;
-
     overflow:hidden;
   }
 
@@ -2368,175 +2435,200 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
     margin:0;
     font-size:.9rem;
     line-height:1;
-    font-weight:900;
   }
 
   #presenterWarmupQuestionText{
     height:105px;
     min-height:105px;
     max-height:105px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    padding:12px;
-    border-radius:16px;
-
     font-size:1.18rem;
     line-height:1.45;
-    font-weight:900;
-    text-align:center;
+    padding:12px;
   }
 
   #presenterWarmupAnswerText{
     height:68px;
     min-height:68px;
     max-height:68px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    padding:10px;
-    border-radius:16px;
-
     font-size:1.28rem;
     line-height:1.25;
-    font-weight:900;
-    text-align:center;
-
-    color:#0F766E;
+    padding:10px;
   }
 
   .presenterWarmupActions{
     height:44px;
-
     display:grid;
     grid-template-columns:repeat(3,1fr);
     gap:8px;
-
     overflow:hidden;
   }
 
   .presenterWarmupActions .presenterBtn{
     height:44px;
     min-height:44px;
-
     border-radius:14px;
-
     font-size:.86rem;
-    font-weight:900;
     padding:6px;
-
-    grid-column:auto;
-  }
-
-  .presenterWarmupActions .presenterBtn:last-child:nth-child(odd){
     grid-column:auto;
   }
 }
-/* =========================================================
-   Auction - Tablet Landscape
-   نفس نظام التسخين
-========================================================= */
+
+/* =========================
+   Top 10
+========================= */
 
 @media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
 
-  .presenterPanel:has(.presenterAuctionLayout){
-    display:block;
-    overflow:hidden;
-  }
-
-  .presenterAuctionLayout{
-    height:100%;
+  .presenterTop10AnswersCols{
+    height:calc(100% - 32px);
     display:grid;
     grid-template-columns:1fr 1fr;
+    grid-template-areas:"right left";
     gap:10px;
-    direction:ltr;
-    overflow:hidden;
-  }
-
-  .presenterAuctionLeft,
-  .presenterAuctionRight{
     direction:rtl;
-    min-width:0;
-    height:100%;
     overflow:hidden;
   }
 
-  .presenterAuctionNumbersCard{
-    height:100%;
-    padding:12px;
+  .presenterTop10RightCol{
+    grid-area:right;
+  }
+
+  .presenterTop10LeftCol{
+    grid-area:left;
+  }
+
+  .presenterTop10AnswersCol{
+    min-width:0;
+    display:grid;
+    grid-template-rows:repeat(5,1fr);
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .presenterTop10AnswerBtn{
+    min-height:44px;
+    display:grid;
+    grid-template-columns:34px minmax(0,1fr) 58px;
+    gap:6px;
+    align-items:center;
+    padding:6px 7px;
+    border-radius:14px;
+  }
+
+  .presenterTop10AnswerNo{
+    width:28px;
+    height:28px;
+    border-radius:10px;
+    font-size:.95rem;
+  }
+
+  .presenterTop10AnswerText{
+    font-size:1rem;
+    line-height:1.2;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .presenterTop10OpenedBy{
+    font-size:.6rem;
+    line-height:1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .presenterTop10QuestionCard{
+    height:265px;
+    padding:10px;
     border-radius:18px;
     overflow:hidden;
   }
 
-  .presenterAuctionNumbersCard .presenterLabel{
-    margin-bottom:10px;
-    font-size:1rem;
-    font-weight:900;
-    line-height:1;
+  .presenterTop10StatusTop{
+    display:grid;
+    grid-template-columns:76px minmax(0,1fr);
+    gap:7px;
+    margin-bottom:7px;
+  }
+
+  .presenterTop10RoundMini,
+  .presenterTop10ErrorMiniBox{
+    min-height:44px;
+    padding:5px;
+    border-radius:13px;
+  }
+
+  .presenterTop10QuestionText{
+    height:110px;
+    min-height:110px;
+    max-height:110px;
+    font-size:1.12rem;
+    line-height:1.4;
+    padding:10px;
+  }
+
+  .presenterTop10Actions{
+    height:44px;
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:7px;
+    overflow:hidden;
+  }
+
+  .presenterTop10Actions .presenterBtn{
+    height:44px;
+    min-height:44px;
+    border-radius:13px;
+    font-size:.72rem;
+    padding:5px;
+    grid-column:auto;
+  }
+}
+
+/* =========================
+   Auction + Who
+========================= */
+
+@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
+
+  .presenterAuctionGrid,
+  .presenterWhoGrid{
+    height:calc(100% - 118px);
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:8px;
+    overflow:hidden;
   }
 
   .presenterAuctionGrid{
     height:calc(100% - 32px);
-    display:grid;
     grid-template-columns:repeat(4,1fr);
-    gap:9px;
-    overflow:hidden;
   }
 
-  .presenterAuctionGrid .presenterNumberBtn{
-    min-height:48px;
+  .presenterWhoPointsGrid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:8px;
+    margin-bottom:10px;
+  }
+
+  .presenterWhoNumbersLabel{
+    margin-top:4px;
+  }
+
+  .presenterAuctionGrid .presenterNumberBtn,
+  .presenterWhoGrid .presenterNumberBtn,
+  .presenterWhoPointsGrid .presenterNumberBtn{
+    min-height:44px;
     border-radius:14px;
-    font-size:1.2rem;
+    font-size:1.1rem;
     font-weight:900;
   }
 
-  .presenterAuctionRight{
-    display:grid;
-    grid-template-rows:48px 265px 44px;
-    gap:8px;
-    align-content:start;
-  }
-
-  .presenterAuctionTeamsBox{
-    height:48px;
-  }
-
-  .presenterAuctionTeamsBox .presenterCard{
-    padding:0;
-    margin:0;
-    background:transparent;
-    border:0;
-    box-shadow:none;
-    overflow:visible;
-  }
-
-  .presenterAuctionTeamsBox .presenterLabel{
-    display:none;
-  }
-
-  .presenterAuctionTeamsBox .presenterTeams{
-    height:48px;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-  }
-
-  .presenterAuctionTeamsBox .presenterBtn{
-    height:48px;
-    min-height:48px;
-    border-radius:14px;
-    font-size:.95rem;
-    font-weight:900;
-    padding:6px;
-  }
-
-  .presenterAuctionPreviewCard{
+  .presenterAuctionPreviewCard,
+  .presenterWhoPreviewCard{
     height:265px;
-    max-height:265px;
     padding:10px;
     border-radius:18px;
     display:grid;
@@ -2545,14 +2637,8 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
     overflow:hidden;
   }
 
-  .presenterAuctionPreviewCard .presenterLabel{
-    margin:0;
-    font-size:.9rem;
-    line-height:1;
-    font-weight:900;
-  }
-
-  #presenterAuctionAnswerText{
+  #presenterAuctionAnswerText,
+  #presenterWhoAnswerText{
     height:76px;
     min-height:76px;
     max-height:76px;
@@ -2561,7 +2647,8 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
     padding:10px;
   }
 
-  #presenterAuctionImageBox{
+  #presenterAuctionImageBox,
+  #presenterWhoImageBox{
     min-height:110px;
     max-height:130px;
     border-radius:16px;
@@ -2569,27 +2656,259 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   }
 
   #presenterAuctionImageBox img,
-  #presenterAuctionImageBox video{
+  #presenterAuctionImageBox video,
+  #presenterWhoImageBox img,
+  #presenterWhoImageBox video{
     width:100%;
     height:100%;
     max-height:130px;
     object-fit:contain;
   }
 
-  .presenterAuctionActions{
+  .presenterAuctionActions,
+  .presenterWhoActions{
     height:44px;
     display:grid;
-    grid-template-columns:repeat(5,1fr);
     gap:7px;
     overflow:hidden;
   }
 
-  .presenterAuctionActions .presenterBtn{
+  .presenterAuctionActions{
+    grid-template-columns:repeat(5,1fr);
+  }
+
+  .presenterWhoActions{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .presenterAuctionActions .presenterBtn,
+  .presenterWhoActions .presenterBtn{
     height:44px;
     min-height:44px;
     border-radius:13px;
     font-size:.72rem;
     padding:5px;
     grid-column:auto;
+  }
+}
+
+/* =========================
+   Explain
+========================= */
+
+@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
+
+  .presenterExplainNumbersGrid{
+    height:calc(100% - 32px);
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    overflow:hidden;
+  }
+
+  .presenterExplainNumberCard{
+    min-height:60px;
+    border-radius:16px;
+    font-size:1.4rem;
+  }
+
+  .presenterExplainPreviewCard{
+    height:265px;
+    padding:10px;
+    border-radius:18px;
+    display:grid;
+    grid-template-rows:auto 1fr 78px;
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .presenterExplainWordBox{
+    width:100%;
+    min-height:0;
+    margin:0;
+    padding:14px;
+    border-radius:18px;
+    font-size:clamp(2rem,4vw,3.4rem);
+  }
+
+  .presenterExplainTimerBox{
+    width:170px;
+    min-width:170px;
+    max-width:170px;
+    height:76px;
+    min-height:76px;
+    max-height:76px;
+    border-radius:20px;
+    font-size:3rem;
+  }
+
+  .presenterExplainActions{
+    height:44px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .presenterExplainActions .presenterBtn{
+    height:44px;
+    min-height:44px;
+    border-radius:13px;
+    font-size:.82rem;
+    padding:5px;
+  }
+}
+
+/* =========================
+   Final
+========================= */
+
+@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
+
+  .presenterFinalLeft{
+    display:grid;
+    grid-template-rows:1fr auto;
+    gap:8px;
+  }
+
+  .presenterFinalRight{
+    display:grid;
+    grid-template-rows:48px 1fr;
+    gap:8px;
+  }
+
+  .presenterFinalNumbersCard,
+  .presenterFinalPreviewCard{
+    height:100%;
+    padding:12px;
+    border-radius:18px;
+    overflow:hidden;
+  }
+
+  #presenterFinalNumbers,
+  .presenterFinalRound2SimpleGrid,
+  .finalSequenceWordsWrap,
+  .finalRound3AnswersList{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    overflow:hidden;
+  }
+
+  #presenterFinalNumbers .presenterNumberBtn,
+  .presenterFinalRound2SimpleCard,
+  .finalSequenceWordBtn,
+  .finalRound3AnswerCard{
+    min-height:44px;
+    border-radius:14px;
+    font-size:.9rem;
+    padding:6px;
+  }
+
+  .presenterFinalPreviewBox{
+    height:calc(100% - 42px);
+    min-height:0;
+    max-height:none;
+    overflow:auto;
+    border-radius:16px;
+    font-size:1.05rem;
+    line-height:1.45;
+    padding:12px;
+  }
+
+  .presenterFinalControlsArea{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    overflow:hidden;
+  }
+
+  .presenterFinalControlsArea .presenterActions,
+  .presenterFinalRound1TwoRows{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:7px;
+    margin:0;
+  }
+
+  .presenterFinalRound1TwoRows{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .presenterFinalControlsArea .presenterBtn,
+  .presenterFinalRound1TwoRows .presenterBtn{
+    height:42px;
+    min-height:42px;
+    border-radius:13px;
+    font-size:.72rem;
+    padding:5px;
+  }
+
+  .presenterFinalRound1TwoRows .presenterBtn:nth-child(5){
+    grid-column:1 / 2;
+  }
+
+  .presenterFinalRound1TwoRows .presenterBtn:nth-child(6){
+    grid-column:2 / 3;
+  }
+
+  .presenterFinalRound1TwoRows .presenterBtn:nth-child(7){
+    grid-column:3 / 5;
+  }
+}
+
+/* =========================
+   Archive
+========================= */
+
+@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
+
+  .presenterArchiveSimpleCard{
+    height:100%;
+  }
+
+  .presenterArchiveSimpleScore{
+    min-height:70px;
+    margin-bottom:10px;
+  }
+
+  .presenterArchiveSimpleScore strong{
+    font-size:2rem;
+  }
+
+  .presenterArchiveRequiredList{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .presenterArchiveRequiredItem{
+    min-height:44px;
+    border-radius:14px;
+    font-size:.85rem;
+  }
+
+  .presenterArchiveActionsCard{
+    height:265px;
+    padding:10px;
+    border-radius:18px;
+    overflow:hidden;
+  }
+
+  .presenterArchiveActions{
+    height:calc(100% - 32px);
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .presenterArchiveActions .presenterBtn{
+    height:44px;
+    min-height:44px;
+    border-radius:13px;
+    font-size:.8rem;
+    padding:5px;
   }
 }
