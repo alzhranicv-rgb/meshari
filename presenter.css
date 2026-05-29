@@ -2735,26 +2735,33 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   }
 }
 /* =========================================================
-   GALAXY TAB A11 LANDSCAPE - PRESENTER OPTIMIZED
-   تابلت بالعرض فقط - بدون تأثير على الآيفون
+   GALAXY TAB A11 LANDSCAPE - ONE SCREEN PRESENTER
+   تابلت بالعرض فقط - صفحة وحدة بدون نزول
 ========================================================= */
 
 @media (min-width:700px) and (max-width:1180px) and (orientation:landscape){
 
   /* =========================
-     Performance - Reduce Lag
+     Performance
   ========================= */
 
+  html,
   body{
+    width:100vw !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
     overflow:hidden !important;
-    background:linear-gradient(180deg,#F8FAFC 0%,#EEF3F6 100%) !important;
+  }
+
+  body{
+    background:#EEF3F6 !important;
   }
 
   *,
   *::before,
   *::after{
-    animation-duration:.01ms !important;
-    animation-iteration-count:1 !important;
+    animation:none !important;
+    transition:none !important;
     scroll-behavior:auto !important;
   }
 
@@ -2762,7 +2769,6 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   .presenterCleanHeader,
   .presenterCard,
   .segmentCard,
-  .presenterJoinCard,
   .teamBox,
   .titleBox,
   .presenterQuestionBody,
@@ -2783,24 +2789,11 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   .titleBox,
   .presenterCleanHeader,
   .topBoard{
-    box-shadow:0 7px 16px rgba(30,27,75,.07) !important;
-  }
-
-  .presenterBtn,
-  .presenterNumberBtn,
-  .presenterTop10AnswerBtn,
-  .presenterFinalRound2SimpleCard,
-  .finalSequenceWordBtn,
-  .finalRound3AnswerCard{
-    transition:none !important;
-  }
-
-  .presenterBtn:active{
-    transform:none !important;
+    box-shadow:0 6px 14px rgba(30,27,75,.06) !important;
   }
 
   /* =========================
-     Page Layout
+     Page
   ========================= */
 
   .homePageShell.presenterSegmentPage,
@@ -2809,8 +2802,8 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
     height:100dvh !important;
     min-height:100dvh !important;
 
-    padding:8px 10px !important;
-    gap:8px !important;
+    padding:6px 8px !important;
+    gap:6px !important;
 
     display:flex !important;
     flex-direction:column !important;
@@ -2819,51 +2812,60 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
     overflow:hidden !important;
   }
 
+  /* =========================
+     Header
+  ========================= */
+
   .presenterCleanHeader{
     width:100% !important;
     max-width:100% !important;
-    min-height:66px !important;
+    height:58px !important;
+    min-height:58px !important;
 
-    flex:0 0 auto !important;
+    flex:0 0 58px !important;
 
-    grid-template-columns:150px minmax(0,1fr) 150px !important;
-    gap:8px !important;
+    display:grid !important;
+    grid-template-columns:130px minmax(0,1fr) 130px !important;
+    gap:6px !important;
 
-    padding:7px !important;
-    border-radius:20px !important;
+    padding:6px !important;
+    border-radius:18px !important;
   }
 
   .presenterCleanHeaderBtn,
   .presenterCleanHeaderTitle{
-    min-height:52px !important;
-    border-radius:16px !important;
-  }
-
-  .presenterCleanHeaderTitle h1{
-    font-size:1.15rem !important;
+    min-height:46px !important;
+    height:46px !important;
+    border-radius:14px !important;
+    padding:6px !important;
   }
 
   .presenterCleanHeaderBtn{
-    font-size:.8rem !important;
+    font-size:.72rem !important;
+    line-height:1.1 !important;
+  }
+
+  .presenterCleanHeaderTitle h1{
+    font-size:1rem !important;
+    line-height:1 !important;
   }
 
   /* =========================
-     Main Panel Split
-     اليمين تحكم - اليسار محتوى
+     Main Layout
+     يسار محتوى - يمين تحكم
   ========================= */
 
   .presenterPanel{
     width:100% !important;
     max-width:100% !important;
-    height:calc(100dvh - 82px) !important;
+    height:calc(100dvh - 70px) !important;
 
     display:grid !important;
-    grid-template-columns:minmax(0,1fr) 270px !important;
+    grid-template-columns:minmax(0,1fr) 285px !important;
     grid-auto-rows:min-content !important;
-    gap:8px !important;
+    gap:6px !important;
 
     align-items:start !important;
-
     overflow:hidden !important;
   }
 
@@ -2872,25 +2874,31 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   }
 
   .presenterCard{
-    padding:9px !important;
-    border-radius:18px !important;
+    padding:7px !important;
+    border-radius:16px !important;
+    overflow:hidden !important;
   }
 
   .presenterLabel{
-    margin-bottom:6px !important;
-    font-size:.68rem !important;
+    margin-bottom:5px !important;
+    font-size:.62rem !important;
     line-height:1.1 !important;
   }
 
-  /* أزرار التحكم والفرق يمين */
+  /* افتراضيًا كل الكروت يسار */
+  .presenterPanel > .presenterCard{
+    grid-column:1 !important;
+  }
+
+  /* كروت التحكم يمين */
+  .presenterPanel > .presenterCard:has(.presenterTeams),
   .presenterPanel > .presenterCard:has(.presenterActions),
   .presenterPanel > .presenterCard:has(.presenterMainActions),
-  .presenterPanel > .presenterCard:has(.presenterTeams),
   .presenterPanel > .presenterCard:has(.presenterFinalControlsArea){
     grid-column:2 !important;
   }
 
-  /* محتوى السؤال والأرقام يسار */
+  /* كروت المحتوى يسار */
   .presenterPanel > .presenterCard:has(.presenterQuestionBody),
   .presenterPanel > .presenterCard:has(.presenterAnswerBody),
   .presenterPanel > .presenterCard:has(.presenterBigQuestionBody),
@@ -2902,50 +2910,56 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
     grid-column:1 !important;
   }
 
-  .presenterPanel,
-  .presenterCard{
-    overscroll-behavior:contain !important;
-  }
-
   /* =========================
-     Buttons Right Side
+     Right Controls
   ========================= */
 
   .presenterActions,
   .presenterMainActions,
   .presenterFinalControlsArea .presenterActions{
     width:100% !important;
-    display:grid !important;
-    grid-template-columns:1fr !important;
-    gap:7px !important;
-  }
 
-  .presenterActions .presenterBtn,
-  .presenterMainActions .presenterBtn,
-  .presenterFinalControlsArea .presenterBtn,
-  .presenterBtn{
-    min-height:42px !important;
-    border-radius:13px !important;
-    font-size:.82rem !important;
-    padding:7px 7px !important;
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:6px !important;
   }
 
   .presenterActions .presenterBtn:last-child:nth-child(odd),
   .presenterMainActions .presenterBtn:last-child:nth-child(odd){
-    grid-column:auto !important;
+    grid-column:1 / -1 !important;
+  }
+
+  .presenterBtn,
+  .presenterActions .presenterBtn,
+  .presenterMainActions .presenterBtn,
+  .presenterFinalControlsArea .presenterBtn{
+    min-height:38px !important;
+    height:38px !important;
+
+    padding:5px 6px !important;
+    border-radius:12px !important;
+
+    font-size:.74rem !important;
+    line-height:1.15 !important;
+    font-weight:900 !important;
+
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
   }
 
   .presenterTeams{
-    grid-template-columns:1fr !important;
-    gap:7px !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:6px !important;
   }
 
   .presenterTeams .presenterBtn{
-    min-height:42px !important;
+    min-height:38px !important;
+    height:38px !important;
   }
 
   /* =========================
-     Content Left Side
+     Left Content
   ========================= */
 
   .presenterQuestionBody,
@@ -2954,21 +2968,26 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   .presenterBigAnswerBody,
   .presenterTop10QuestionText,
   .presenterFinalPreviewBox{
-    min-height:68px !important;
-    padding:10px !important;
-    border-radius:16px !important;
-    font-size:.86rem !important;
-    line-height:1.35 !important;
+    min-height:56px !important;
+    max-height:86px !important;
+
+    padding:8px !important;
+    border-radius:14px !important;
+
+    font-size:.8rem !important;
+    line-height:1.3 !important;
+    overflow:hidden !important;
   }
 
   .presenterBigQuestionBody,
   .presenterBigAnswerBody{
-    min-height:82px !important;
+    min-height:66px !important;
+    max-height:96px !important;
   }
 
   .presenterGrid{
     grid-template-columns:repeat(5,1fr) !important;
-    gap:7px !important;
+    gap:6px !important;
   }
 
   .presenterGrid.four{
@@ -2976,74 +2995,119 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   }
 
   .presenterNumberBtn{
-    min-height:40px !important;
-    border-radius:13px !important;
-    font-size:1rem !important;
+    min-height:36px !important;
+    height:36px !important;
+
+    border-radius:12px !important;
+
+    font-size:.95rem !important;
+    line-height:1 !important;
   }
 
   /* =========================
-     TOP 10
+     Warmup / Taskeen
+  ========================= */
+
+  .presenterWarmupCats{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+
+  .presenterWarmupCat{
+    padding:6px !important;
+    border-radius:14px !important;
+  }
+
+  .presenterWarmupCatTitle{
+    margin-bottom:5px !important;
+    font-size:.72rem !important;
+    line-height:1.1 !important;
+  }
+
+  .presenterWarmupNumbers{
+    gap:5px !important;
+  }
+
+  /* =========================
+     Top 10
   ========================= */
 
   .presenterTop10StatusTop{
-    grid-template-columns:78px 1fr !important;
-    gap:7px !important;
-    margin-bottom:7px !important;
+    grid-template-columns:70px 1fr !important;
+    gap:6px !important;
+    margin-bottom:6px !important;
   }
 
   .presenterTop10RoundMini,
   .presenterTop10ErrorMiniBox{
-    border-radius:15px !important;
-    padding:7px 5px !important;
+    padding:6px 4px !important;
+    border-radius:13px !important;
+  }
+
+  .presenterTop10RoundMini span,
+  .presenterTop10ErrorMiniBox span{
+    font-size:.55rem !important;
+  }
+
+  .presenterTop10RoundMini strong,
+  .presenterTop10ErrorMiniBox strong{
+    font-size:.9rem !important;
   }
 
   .presenterTop10Answers{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
     gap:6px !important;
-    max-height:calc(100dvh - 210px) !important;
-    overflow:auto !important;
+
+    max-height:calc(100dvh - 180px) !important;
+    overflow:hidden !important;
   }
 
   .presenterTop10AnswerBtn{
-    min-height:42px !important;
-    border-radius:14px !important;
-    grid-template-columns:32px minmax(0,1fr) 54px !important;
-    gap:6px !important;
-    padding:6px 7px !important;
+    min-height:38px !important;
+    height:38px !important;
+
+    grid-template-columns:28px minmax(0,1fr) 44px !important;
+    gap:5px !important;
+
+    padding:5px !important;
+    border-radius:12px !important;
   }
 
   .presenterTop10AnswerNo{
-    width:30px !important;
-    height:30px !important;
-    border-radius:10px !important;
+    width:26px !important;
+    height:26px !important;
+    border-radius:9px !important;
+    font-size:.72rem !important;
   }
 
   .presenterTop10AnswerText{
-    font-size:.78rem !important;
-    line-height:1.25 !important;
+    font-size:.68rem !important;
+    line-height:1.15 !important;
   }
 
   .presenterTop10OpenedBy{
-    font-size:.56rem !important;
+    font-size:.5rem !important;
   }
 
   /* =========================
-     Image / Media Preview
+     Image Preview
   ========================= */
 
   .presenterImagePreviewBox{
-    min-height:145px !important;
-    max-height:230px !important;
-    border-radius:16px !important;
+    min-height:120px !important;
+    max-height:185px !important;
+    border-radius:14px !important;
   }
 
   .presenterImagePreviewBox img,
   .presenterImagePreviewBox video{
-    max-height:230px !important;
+    max-height:185px !important;
   }
 
   /* =========================
-     Final Layout Specific
-     الفاصلة
+     Final
   ========================= */
 
   .presenterFinalLayout{
@@ -3051,9 +3115,11 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
     height:100% !important;
 
     display:grid !important;
-    grid-template-columns:minmax(0,1fr) 270px !important;
-    gap:8px !important;
+    grid-template-columns:minmax(0,1fr) 285px !important;
+    gap:6px !important;
     align-items:start !important;
+
+    overflow:hidden !important;
   }
 
   .presenterFinalTeamsArea,
@@ -3067,54 +3133,54 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   }
 
   .presenterFinalControlsArea{
-    gap:7px !important;
+    gap:6px !important;
   }
 
   .presenterFinalPreviewBox{
-    min-height:140px !important;
-    max-height:230px !important;
-    overflow:auto !important;
-  }
-
-  .presenterFinalPreviewText{
-    font-size:.86rem !important;
-    line-height:1.35 !important;
+    min-height:100px !important;
+    max-height:175px !important;
+    overflow:hidden !important;
   }
 
   .presenterFinalRoundHeader{
-    margin-bottom:7px !important;
-    font-size:.68rem !important;
+    margin-bottom:5px !important;
+    font-size:.6rem !important;
   }
 
   .presenterFinalRoundHeader strong{
-    min-width:28px !important;
-    height:28px !important;
-    border-radius:10px !important;
-    font-size:.86rem !important;
-  }
-
-  .presenterFinalCleanPreview{
-    gap:7px !important;
+    min-width:24px !important;
+    height:24px !important;
+    border-radius:8px !important;
+    font-size:.75rem !important;
   }
 
   .presenterFinalPreviewNumber{
-    padding:6px 12px !important;
-    font-size:.78rem !important;
+    padding:5px 10px !important;
+    font-size:.7rem !important;
+  }
+
+  .presenterFinalCleanPreview{
+    gap:6px !important;
   }
 
   .presenterFinalPreviewBlock{
-    padding:9px !important;
-    border-radius:15px !important;
+    padding:7px !important;
+    border-radius:13px !important;
   }
 
   .presenterFinalPreviewLabel{
-    margin-bottom:5px !important;
-    font-size:.64rem !important;
+    margin-bottom:4px !important;
+    font-size:.55rem !important;
+  }
+
+  .presenterFinalPreviewText{
+    font-size:.76rem !important;
+    line-height:1.25 !important;
   }
 
   .presenterFinalRound1TwoRows{
-    grid-template-columns:1fr !important;
-    gap:7px !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:6px !important;
   }
 
   .presenterFinalRound1TwoRows .presenterBtn,
@@ -3122,7 +3188,12 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   .presenterFinalRound1TwoRows .presenterBtn:nth-child(6),
   .presenterFinalRound1TwoRows .presenterBtn:nth-child(7){
     grid-column:auto !important;
-    min-height:42px !important;
+    min-height:38px !important;
+    height:38px !important;
+  }
+
+  .presenterVideoPreviewBox video{
+    max-height:170px !important;
   }
 
   body.presenterFinalRound1FocusMode .presenterFinalPreviewCard{
@@ -3130,7 +3201,7 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   }
 
   body.presenterFinalRound1FocusMode .presenterFinalPreviewBox{
-    min-height:170px !important;
+    min-height:120px !important;
   }
 
   body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
@@ -3138,86 +3209,84 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
     margin-top:0 !important;
   }
 
-  .presenterVideoPreviewBox video{
-    max-height:200px !important;
-  }
-
   /* =========================
      Explain
-     اشرح الكلمة
   ========================= */
 
   .presenterExplainGameShell{
     height:100% !important;
     overflow:hidden !important;
-    gap:8px !important;
+    gap:6px !important;
   }
 
   .presenterExplainTopBoard{
-    min-height:60px !important;
+    min-height:50px !important;
   }
 
   .presenterExplainTeamBox{
-    min-height:56px !important;
+    min-height:48px !important;
   }
 
   .presenterExplainCenterTitle{
-    min-width:130px !important;
+    min-width:120px !important;
   }
 
   .presenterExplainCenterTitle h3{
-    font-size:1rem !important;
+    font-size:.9rem !important;
   }
 
   .presenterExplainMainStage{
-    min-height:145px !important;
-    gap:8px !important;
+    min-height:115px !important;
+    gap:6px !important;
   }
 
   .presenterExplainWordBox{
-    min-height:78px !important;
-    border-radius:18px !important;
-    font-size:clamp(1.8rem,4vw,3.2rem) !important;
-    padding:10px 15px !important;
+    min-height:58px !important;
+    border-radius:15px !important;
+    font-size:clamp(1.45rem,3.4vw,2.6rem) !important;
+    padding:8px 12px !important;
   }
 
   .presenterExplainTimerBox{
-    width:160px !important;
-    min-width:160px !important;
-    max-width:160px !important;
+    width:130px !important;
+    min-width:130px !important;
+    max-width:130px !important;
 
-    height:78px !important;
-    min-height:78px !important;
-    max-height:78px !important;
+    height:62px !important;
+    min-height:62px !important;
+    max-height:62px !important;
 
-    border-radius:18px !important;
-    font-size:clamp(2.8rem,6vw,4.4rem) !important;
+    border-radius:15px !important;
+    font-size:clamp(2.2rem,5vw,3.6rem) !important;
   }
 
   .presenterExplainNumbersGrid{
-    grid-template-columns:repeat(auto-fit,minmax(66px,78px)) !important;
-    gap:7px !important;
+    grid-template-columns:repeat(auto-fit,minmax(56px,68px)) !important;
+    gap:5px !important;
   }
 
   .presenterExplainNumberCard,
   #presenterExplainNumbersGrid .presenterNumberBtn{
-    width:78px !important;
-    max-width:78px !important;
-    height:40px !important;
-    min-height:40px !important;
-    border-radius:12px !important;
-    font-size:1.1rem !important;
+    width:68px !important;
+    max-width:68px !important;
+
+    height:34px !important;
+    min-height:34px !important;
+
+    border-radius:10px !important;
+    font-size:.95rem !important;
   }
 
   .presenterExplainControls{
-    grid-template-columns:1fr !important;
-    gap:7px !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:6px !important;
   }
 
   .presenterExplainControls .explainControlBtn{
-    min-height:42px !important;
-    font-size:.82rem !important;
-    border-radius:13px !important;
+    min-height:38px !important;
+    height:38px !important;
+    font-size:.74rem !important;
+    border-radius:12px !important;
   }
 
   /* =========================
@@ -3225,24 +3294,26 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   ========================= */
 
   #presenterToast.gameToast.presenterToast{
-    max-width:420px !important;
-    min-height:54px !important;
-    bottom:12px !important;
-    padding:10px 12px !important;
+    max-width:380px !important;
+    min-height:48px !important;
+
+    bottom:10px !important;
+    padding:8px 10px !important;
+
     backdrop-filter:none !important;
     -webkit-backdrop-filter:none !important;
     transition:none !important;
   }
 
   #presenterToast .gameToastIcon{
-    width:30px !important;
-    height:30px !important;
-    min-width:30px !important;
-    border-radius:11px !important;
+    width:28px !important;
+    height:28px !important;
+    min-width:28px !important;
+    border-radius:10px !important;
   }
 
   #presenterToast .gameToastText{
-    font-size:.82rem !important;
-    line-height:1.35 !important;
+    font-size:.76rem !important;
+    line-height:1.3 !important;
   }
 }
