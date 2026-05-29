@@ -1165,77 +1165,93 @@ async function renderWarmup() {
   const currentKey = getPresenterWarmupCurrentKey()
 
   panel.innerHTML = `
-    ${teamButtons()}
+    <div class="presenterWarmupLayout">
 
-    <section class="presenterCard presenterWarmupPreviewCard presenterMainPreviewCard">
-      <div class="presenterLabel">السؤال</div>
+      <!-- اليسار: الفئات + الفرق + التحكم -->
+      <div class="presenterWarmupLeft">
 
-      <div id="presenterWarmupQuestionText" class="presenterQuestionBody presenterBigQuestionBody">
-        اختر رقم السؤال
+        <section class="presenterCard presenterNumbersCard presenterWarmupNumbersCard">
+          <div class="presenterLabel">الفئات والأسئلة</div>
+
+          <div class="presenterWarmupCats">
+            ${[1, 2, 3, 4].map(cat => {
+              const catRows = presenterWarmupRows.filter(r => Number(r.category) === cat)
+              const catName = catRows[0]?.category_name || `الفئة ${cat}`
+
+              return `
+                <div class="presenterWarmupCat">
+                  <div class="presenterWarmupCatTitle">${catName}</div>
+
+                  <div class="presenterWarmupNumbers">
+                    ${[1, 2, 4].map(num => {
+                      const key = `${cat}_${num}`
+                      const isUsed = !!used[key]
+                      const isCurrent = currentKey === key
+                      const isSelected =
+                        presenterWarmupSelected &&
+                        Number(presenterWarmupSelected.category) === Number(cat) &&
+                        Number(presenterWarmupSelected.number) === Number(num)
+
+                      return `
+                        <button
+                          class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent || isSelected ? "selectedPresenterTeam" : ""}"
+                          ${isUsed || locked ? "disabled" : ""}
+                          onclick="openWarmupPresenterQuestion(${cat}, ${num}, event)"
+                        >
+                          ${isUsed ? "" : num}
+                        </button>
+                      `
+                    }).join("")}
+                  </div>
+                </div>
+              `
+            }).join("")}
+          </div>
+        </section>
+
+        <div class="presenterWarmupBottom">
+          ${teamButtons()}
+
+          <div class="presenterActions presenterMainActions presenterWarmupActions">
+            <button
+              class="presenterBtn gray presenterDoubleBtn"
+              onclick="sendCommand('double')"
+              ${locked || currentKey ? "disabled" : ""}
+            >
+              دوبيلا
+            </button>
+
+            <button class="presenterBtn red presenterWrongBtn" onclick="sendCommand('wrong')">
+              ✕ خطأ
+            </button>
+
+            <button class="presenterBtn green presenterCorrectBtn" onclick="sendCommand('correct')">
+              ✓ صح
+            </button>
+          </div>
+        </div>
+
       </div>
 
-      <div class="presenterLabel">الإجابة</div>
+      <!-- اليمين: السؤال + الإجابة -->
+      <div class="presenterWarmupRight">
 
-      <div id="presenterWarmupAnswerText" class="presenterAnswerBody presenterBigAnswerBody">
-        —
+        <section class="presenterCard presenterWarmupPreviewCard presenterMainPreviewCard">
+          <div class="presenterLabel">السؤال</div>
+
+          <div id="presenterWarmupQuestionText" class="presenterQuestionBody presenterBigQuestionBody">
+            اختر رقم السؤال
+          </div>
+
+          <div class="presenterLabel answerLabel">الإجابة</div>
+
+          <div id="presenterWarmupAnswerText" class="presenterAnswerBody presenterBigAnswerBody">
+            —
+          </div>
+        </section>
+
       </div>
-    </section>
 
-    <section class="presenterCard presenterNumbersCard">
-      <div class="presenterLabel">الفئات والأسئلة</div>
-
-      <div class="presenterWarmupCats">
-        ${[1, 2, 3, 4].map(cat => {
-          const catRows = presenterWarmupRows.filter(r => Number(r.category) === cat)
-          const catName = catRows[0]?.category_name || `الفئة ${cat}`
-
-          return `
-            <div class="presenterWarmupCat">
-              <div class="presenterWarmupCatTitle">${catName}</div>
-
-              <div class="presenterWarmupNumbers">
-                ${[1, 2, 4].map(num => {
-                  const key = `${cat}_${num}`
-                  const isUsed = !!used[key]
-                  const isCurrent = currentKey === key
-                  const isSelected =
-                    presenterWarmupSelected &&
-                    Number(presenterWarmupSelected.category) === Number(cat) &&
-                    Number(presenterWarmupSelected.number) === Number(num)
-
-                  return `
-                    <button
-                      class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent || isSelected ? "selectedPresenterTeam" : ""}"
-                      ${isUsed || locked ? "disabled" : ""}
-                      onclick="openWarmupPresenterQuestion(${cat}, ${num}, event)"
-                    >
-                      ${isUsed ? "" : num}
-                    </button>
-                  `
-                }).join("")}
-              </div>
-            </div>
-          `
-        }).join("")}
-      </div>
-    </section>
-
-    <div class="presenterActions presenterMainActions">
-      <button
-        class="presenterBtn gray presenterDoubleBtn"
-        onclick="sendCommand('double')"
-        ${locked || currentKey ? "disabled" : ""}
-      >
-        دوبيلا
-      </button>
-
-      <button class="presenterBtn red presenterWrongBtn" onclick="sendCommand('wrong')">
-        ✕ خطأ
-      </button>
-
-      <button class="presenterBtn green presenterCorrectBtn" onclick="sendCommand('correct')">
-        ✓ صح
-      </button>
     </div>
   `
 
