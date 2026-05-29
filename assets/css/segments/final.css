@@ -4913,3 +4913,241 @@
   cursor:pointer !important;
   z-index:5 !important;
 }
+/* =========================
+   Final Round 3 Team Media
+   Question / Answer Cards Polish
+========================= */
+
+.finalRound3TeamMediaContent{
+  width:100% !important;
+  height:100% !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  gap:22px !important;
+  padding:18px !important;
+}
+
+.finalTeamMediaTextRow{
+  width:100% !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  gap:18px !important;
+}
+
+/* مربع السؤال */
+.finalTeamMediaQuestionBox{
+  width:min(100%, 920px) !important;
+  min-height:190px !important;
+
+  padding:26px 34px !important;
+  border-radius:30px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  text-align:center !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.42), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.96), rgba(250,248,255,.88)) !important;
+
+  border:1px solid rgba(255,255,255,.72) !important;
+
+  box-shadow:
+    0 22px 46px rgba(30,27,75,.14),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+
+/* مربع السؤال فقط بعد إخفاء المعاينة */
+.finalTeamMediaQuestionOnly{
+  min-height:260px !important;
+  animation:finalTeamMediaCardEnter .32s ease-out both;
+}
+
+.finalTeamMediaSmallLabel{
+  margin-bottom:12px !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:clamp(.9rem,1.2vw,1.15rem) !important;
+  font-weight:900 !important;
+
+  color:#7C3AED !important;
+  letter-spacing:.04em !important;
+}
+
+.finalTeamMediaQuestionText{
+  width:100% !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(2.1rem,4.4vw,4.8rem) !important;
+  font-weight:900 !important;
+  line-height:1.18 !important;
+
+  color:#1E1B4B !important;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.75),
+    0 10px 24px rgba(30,27,75,.10) !important;
+}
+
+/* مربع الإجابة */
+.finalTeamMediaResultBox{
+  width:min(100%, 920px) !important;
+  min-height:190px !important;
+
+  padding:26px 34px !important;
+  border-radius:30px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  text-align:center !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.42), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.96), rgba(250,248,255,.88)) !important;
+
+  border:1px solid rgba(255,255,255,.72) !important;
+
+  box-shadow:
+    0 22px 46px rgba(30,27,75,.14),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+
+  animation:finalTeamMediaCardEnter .32s ease-out both;
+}
+
+.finalRound3TeamMediaAnswer{
+  width:100% !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(2.2rem,4.8vw,5.2rem) !important;
+  font-weight:900 !important;
+  line-height:1.15 !important;
+
+  color:#1E1B4B !important;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.75),
+    0 10px 24px rgba(30,27,75,.10) !important;
+}
+
+/* الإجابة الصحيحة */
+.finalTeamMediaResultBox.correctResult{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.32), transparent 42%),
+    linear-gradient(180deg, #22C55E, #15803D) !important;
+
+  border:1px solid rgba(255,255,255,.55) !important;
+
+  box-shadow:
+    0 0 0 7px rgba(34,197,94,.14),
+    0 24px 48px rgba(21,128,61,.24),
+    inset 0 1px 0 rgba(255,255,255,.36) !important;
+}
+
+.finalTeamMediaResultBox.correctResult .finalTeamMediaSmallLabel,
+.finalTeamMediaResultBox.correctResult .finalRound3TeamMediaAnswer{
+  color:#FFFFFF !important;
+  text-shadow:0 10px 24px rgba(0,0,0,.18) !important;
+}
+
+/* الإجابة الخاطئة */
+.finalTeamMediaResultBox.wrongResult{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.32), transparent 42%),
+    linear-gradient(180deg, #EF4444, #B91C1C) !important;
+
+  border:1px solid rgba(255,255,255,.55) !important;
+
+  box-shadow:
+    0 0 0 7px rgba(239,68,68,.14),
+    0 24px 48px rgba(185,28,28,.24),
+    inset 0 1px 0 rgba(255,255,255,.36) !important;
+}
+
+.finalTeamMediaResultBox.wrongResult .finalTeamMediaSmallLabel,
+.finalTeamMediaResultBox.wrongResult .finalRound3TeamMediaAnswer{
+  color:#FFFFFF !important;
+  text-shadow:0 10px 24px rgba(0,0,0,.20) !important;
+}
+
+/* حركة ظهور */
+@keyframes finalTeamMediaCardEnter{
+  from{
+    opacity:0;
+    transform:translateY(10px) scale(.98);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+/* iPad */
+@media (min-width:768px) and (max-width:1180px){
+  .finalTeamMediaQuestionBox,
+  .finalTeamMediaResultBox{
+    width:min(100%, 760px) !important;
+    min-height:170px !important;
+    border-radius:26px !important;
+    padding:22px 28px !important;
+  }
+
+  .finalTeamMediaQuestionOnly{
+    min-height:230px !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    font-size:clamp(1.9rem,4vw,4rem) !important;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    font-size:clamp(2rem,4.4vw,4.4rem) !important;
+  }
+}
+
+/* iPhone */
+@media (max-width:767px){
+  .finalRound3TeamMediaContent{
+    gap:14px !important;
+    padding:12px !important;
+  }
+
+  .finalTeamMediaQuestionBox,
+  .finalTeamMediaResultBox{
+    width:100% !important;
+    min-height:140px !important;
+    border-radius:22px !important;
+    padding:18px 20px !important;
+  }
+
+  .finalTeamMediaQuestionOnly{
+    min-height:190px !important;
+  }
+
+  .finalTeamMediaSmallLabel{
+    margin-bottom:8px !important;
+    font-size:.9rem !important;
+  }
+
+  .finalTeamMediaQuestionText{
+    font-size:clamp(1.7rem,8vw,3.2rem) !important;
+  }
+
+  .finalRound3TeamMediaAnswer{
+    font-size:clamp(1.8rem,8.5vw,3.4rem) !important;
+  }
+}
