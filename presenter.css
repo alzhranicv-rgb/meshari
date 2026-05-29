@@ -2734,3 +2734,433 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
     grid-column:1 / -1 !important;
   }
 }
+/* =========================================================
+   GALAXY TAB A11 LANDSCAPE - PRESENTER OPTIMIZED
+   شاشة تابلت بالعرض فقط - بدون تأثير على الآيفون
+========================================================= */
+
+@media (min-width:900px) and (max-width:1400px) and (orientation:landscape){
+
+  /* =========================
+     Performance - Reduce Lag
+  ========================= */
+
+  body{
+    overflow:hidden !important;
+    background:linear-gradient(180deg,#F8FAFC 0%,#EEF3F6 100%) !important;
+  }
+
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    scroll-behavior:auto !important;
+  }
+
+  .topBoard,
+  .presenterCleanHeader,
+  .presenterCard,
+  .segmentCard,
+  .presenterJoinCard,
+  .teamBox,
+  .titleBox,
+  .presenterQuestionBody,
+  .presenterAnswerBody,
+  .presenterBigQuestionBody,
+  .presenterBigAnswerBody,
+  .presenterTop10QuestionText,
+  .presenterFinalPreviewBox,
+  .presenterImagePreviewBox,
+  #presenterToast{
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+
+  .presenterCard,
+  .segmentCard,
+  .teamBox,
+  .titleBox,
+  .presenterCleanHeader,
+  .topBoard{
+    box-shadow:0 8px 18px rgba(30,27,75,.08) !important;
+  }
+
+  .presenterBtn,
+  .presenterNumberBtn,
+  .presenterTop10AnswerBtn,
+  .presenterFinalRound2SimpleCard,
+  .finalSequenceWordBtn,
+  .finalRound3AnswerCard{
+    transition:none !important;
+  }
+
+  .presenterBtn:active{
+    transform:none !important;
+  }
+
+  /* =========================
+     Page Layout
+  ========================= */
+
+  .homePageShell.presenterSegmentPage,
+  .presenterSegmentPage{
+    width:100vw !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
+
+    padding:10px 12px !important;
+    gap:10px !important;
+
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+
+    overflow:hidden !important;
+  }
+
+  .presenterCleanHeader{
+    width:100% !important;
+    max-width:1280px !important;
+    min-height:76px !important;
+
+    flex:0 0 auto !important;
+
+    grid-template-columns:170px minmax(0,1fr) 170px !important;
+    gap:10px !important;
+
+    padding:8px !important;
+    border-radius:22px !important;
+  }
+
+  .presenterCleanHeaderBtn,
+  .presenterCleanHeaderTitle{
+    min-height:60px !important;
+    border-radius:18px !important;
+  }
+
+  .presenterCleanHeaderTitle h1{
+    font-size:1.35rem !important;
+  }
+
+  /* =========================
+     Main Panel Split
+     اليمين تحكم - اليسار محتوى
+  ========================= */
+
+  .presenterPanel{
+    width:100% !important;
+    max-width:1280px !important;
+    height:calc(100dvh - 96px) !important;
+
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) 330px !important;
+    grid-auto-rows:min-content !important;
+    gap:10px !important;
+
+    align-items:start !important;
+
+    overflow:hidden !important;
+  }
+
+  /* الكروت العامة */
+  .presenterCard{
+    padding:12px !important;
+    border-radius:20px !important;
+  }
+
+  /* أي كرت فيه أزرار تحكم يروح يمين */
+  .presenterPanel > .presenterCard:has(.presenterActions),
+  .presenterPanel > .presenterCard:has(.presenterMainActions),
+  .presenterPanel > .presenterCard:has(.presenterTeams),
+  .presenterPanel > .presenterCard:has(.presenterFinalControlsArea){
+    grid-column:2 !important;
+  }
+
+  /* أي كرت فيه محتوى/سؤال/إجابة/أرقام يروح يسار */
+  .presenterPanel > .presenterCard:has(.presenterQuestionBody),
+  .presenterPanel > .presenterCard:has(.presenterAnswerBody),
+  .presenterPanel > .presenterCard:has(.presenterBigQuestionBody),
+  .presenterPanel > .presenterCard:has(.presenterBigAnswerBody),
+  .presenterPanel > .presenterCard:has(.presenterGrid),
+  .presenterPanel > .presenterCard:has(.presenterTop10Answers),
+  .presenterPanel > .presenterCard:has(.presenterFinalPreviewBox),
+  .presenterPanel > .presenterCard:has(.presenterImagePreviewBox){
+    grid-column:1 !important;
+  }
+
+  /* منع السكرول الثقيل داخل الصفحة */
+  .presenterPanel,
+  .presenterCard{
+    overscroll-behavior:contain !important;
+  }
+
+  /* =========================
+     Buttons Right Side
+  ========================= */
+
+  .presenterActions,
+  .presenterMainActions,
+  .presenterFinalControlsArea .presenterActions{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+  }
+
+  .presenterActions .presenterBtn,
+  .presenterMainActions .presenterBtn,
+  .presenterFinalControlsArea .presenterBtn{
+    min-height:48px !important;
+    border-radius:16px !important;
+    font-size:.92rem !important;
+    padding:8px 8px !important;
+  }
+
+  .presenterActions .presenterBtn:last-child:nth-child(odd),
+  .presenterMainActions .presenterBtn:last-child:nth-child(odd){
+    grid-column:auto !important;
+  }
+
+  .presenterTeams{
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+  }
+
+  .presenterTeams .presenterBtn{
+    min-height:48px !important;
+  }
+
+  .presenterLabel{
+    margin-bottom:7px !important;
+    font-size:.7rem !important;
+  }
+
+  /* =========================
+     Content Left Side
+  ========================= */
+
+  .presenterQuestionBody,
+  .presenterAnswerBody,
+  .presenterBigQuestionBody,
+  .presenterBigAnswerBody,
+  .presenterTop10QuestionText,
+  .presenterFinalPreviewBox{
+    min-height:84px !important;
+    padding:12px !important;
+    border-radius:18px !important;
+    font-size:.95rem !important;
+    line-height:1.45 !important;
+  }
+
+  .presenterBigQuestionBody,
+  .presenterBigAnswerBody{
+    min-height:110px !important;
+  }
+
+  .presenterGrid{
+    grid-template-columns:repeat(6,1fr) !important;
+    gap:8px !important;
+  }
+
+  .presenterGrid.four{
+    grid-template-columns:repeat(4,1fr) !important;
+  }
+
+  .presenterNumberBtn{
+    min-height:48px !important;
+    border-radius:15px !important;
+    font-size:1.15rem !important;
+  }
+
+  /* =========================
+     Final Layout Specific
+     الفاصلة
+  ========================= */
+
+  .presenterFinalLayout{
+    width:100% !important;
+    height:100% !important;
+
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) 330px !important;
+    gap:10px !important;
+    align-items:start !important;
+  }
+
+  .presenterFinalTeamsArea,
+  .presenterFinalControlsArea{
+    grid-column:2 !important;
+  }
+
+  .presenterFinalPreviewCard,
+  .presenterFinalNumbersCard{
+    grid-column:1 !important;
+  }
+
+  .presenterFinalControlsArea{
+    gap:8px !important;
+  }
+
+  .presenterFinalPreviewBox{
+    min-height:160px !important;
+    max-height:260px !important;
+    overflow:auto !important;
+  }
+
+  .presenterFinalPreviewText{
+    font-size:.95rem !important;
+    line-height:1.45 !important;
+  }
+
+  .presenterFinalRound1TwoRows{
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+  }
+
+  .presenterFinalRound1TwoRows .presenterBtn,
+  .presenterFinalRound1TwoRows .presenterBtn:nth-child(5),
+  .presenterFinalRound1TwoRows .presenterBtn:nth-child(6),
+  .presenterFinalRound1TwoRows .presenterBtn:nth-child(7){
+    grid-column:auto !important;
+    min-height:48px !important;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalPreviewCard{
+    min-height:auto !important;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalPreviewBox{
+    min-height:190px !important;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
+    transform:none !important;
+    margin-top:0 !important;
+  }
+
+  .presenterVideoPreviewBox video{
+    max-height:220px !important;
+  }
+
+  /* =========================
+     Top10
+  ========================= */
+
+  .presenterTop10StatusTop{
+    grid-template-columns:90px 1fr !important;
+    gap:8px !important;
+    margin-bottom:8px !important;
+  }
+
+  .presenterTop10Answers{
+    gap:7px !important;
+    max-height:calc(100dvh - 230px) !important;
+    overflow:auto !important;
+  }
+
+  .presenterTop10AnswerBtn{
+    min-height:46px !important;
+    border-radius:15px !important;
+    grid-template-columns:36px minmax(0,1fr) 60px !important;
+  }
+
+  .presenterTop10AnswerNo{
+    width:32px !important;
+    height:32px !important;
+    border-radius:11px !important;
+  }
+
+  .presenterTop10AnswerText{
+    font-size:.82rem !important;
+    line-height:1.25 !important;
+  }
+
+  /* =========================
+     Explain
+     اشرح الكلمة
+  ========================= */
+
+  .presenterExplainGameShell{
+    height:100% !important;
+    overflow:hidden !important;
+    gap:10px !important;
+  }
+
+  .presenterExplainMainStage{
+    min-height:160px !important;
+    gap:10px !important;
+  }
+
+  .presenterExplainWordBox{
+    min-height:88px !important;
+    border-radius:20px !important;
+    font-size:clamp(2rem,4vw,3.6rem) !important;
+    padding:12px 18px !important;
+  }
+
+  .presenterExplainTimerBox{
+    width:180px !important;
+    min-width:180px !important;
+    max-width:180px !important;
+
+    height:88px !important;
+    min-height:88px !important;
+    max-height:88px !important;
+
+    border-radius:20px !important;
+    font-size:clamp(3rem,6vw,4.8rem) !important;
+  }
+
+  .presenterExplainNumbersGrid{
+    grid-template-columns:repeat(auto-fit,minmax(72px,84px)) !important;
+    gap:8px !important;
+  }
+
+  .presenterExplainNumberCard,
+  #presenterExplainNumbersGrid .presenterNumberBtn{
+    width:84px !important;
+    max-width:84px !important;
+    height:44px !important;
+    min-height:44px !important;
+    border-radius:14px !important;
+    font-size:1.2rem !important;
+  }
+
+  .presenterExplainControls{
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+  }
+
+  .presenterExplainControls .explainControlBtn{
+    min-height:48px !important;
+    font-size:.92rem !important;
+  }
+
+  /* =========================
+     Image / Media Preview
+  ========================= */
+
+  .presenterImagePreviewBox{
+    min-height:160px !important;
+    max-height:250px !important;
+    border-radius:18px !important;
+  }
+
+  .presenterImagePreviewBox img,
+  .presenterImagePreviewBox video{
+    max-height:250px !important;
+  }
+
+  /* =========================
+     Toast
+  ========================= */
+
+  #presenterToast.gameToast.presenterToast{
+    max-width:440px !important;
+    min-height:58px !important;
+    bottom:14px !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    transition:none !important;
+  }
+}
