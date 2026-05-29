@@ -1463,6 +1463,30 @@ async function renderTop10() {
 
   await loadPresenterTop10RoundRows(round)
 
+  function buildTop10AnswerButton(num) {
+    const item = presenterTop10Rows.find(r => Number(r.position) === num)
+    const isOpened = opened.includes(num)
+    const openedName = getTop10OpenedTeamName(round, num)
+
+    return `
+      <button
+        class="presenterTop10AnswerBtn ${isOpened ? "opened" : ""}"
+        ${isOpened ? "disabled" : ""}
+        onclick="openTop10PresenterNumber(${num}, event)"
+      >
+        <span class="presenterTop10AnswerNo">${num}</span>
+
+        <span class="presenterTop10AnswerText">
+          ${item?.answer || "-"}
+        </span>
+
+        <span class="presenterTop10OpenedBy">
+          ${isOpened ? (openedName || "تم الفتح") : ""}
+        </span>
+      </button>
+    `
+  }
+
   panel.innerHTML = `
     <div class="presenterTop10Layout">
 
@@ -1472,30 +1496,16 @@ async function renderTop10() {
         <section class="presenterCard presenterTop10AnswersCard">
           <div class="presenterLabel">الإجابات</div>
 
-          <div class="presenterTop10Answers">
-            ${Array.from({ length: 10 }, (_, i) => i + 1).map(num => {
-              const item = presenterTop10Rows.find(r => Number(r.position) === num)
-              const isOpened = opened.includes(num)
-              const openedName = getTop10OpenedTeamName(round, num)
+          <div class="presenterTop10AnswersCols">
 
-              return `
-                <button
-                  class="presenterTop10AnswerBtn ${isOpened ? "opened" : ""}"
-                  ${isOpened ? "disabled" : ""}
-                  onclick="openTop10PresenterNumber(${num}, event)"
-                >
-                  <span class="presenterTop10AnswerNo">${num}</span>
+            <div class="presenterTop10AnswersCol">
+              ${[1, 2, 3, 4, 5].map(num => buildTop10AnswerButton(num)).join("")}
+            </div>
 
-                  <span class="presenterTop10AnswerText">
-                    ${item?.answer || "-"}
-                  </span>
+            <div class="presenterTop10AnswersCol">
+              ${[6, 7, 8, 9, 10].map(num => buildTop10AnswerButton(num)).join("")}
+            </div>
 
-                  <span class="presenterTop10OpenedBy">
-                    ${isOpened ? (openedName || "تم الفتح") : ""}
-                  </span>
-                </button>
-              `
-            }).join("")}
           </div>
         </section>
 

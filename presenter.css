@@ -3695,3 +3695,109 @@ body.tabletPresenterMode .presenterTop10Actions .presenterBtn{
   border-radius:13px !important;
   padding:5px !important;
 }
+/* =========================================================
+   TOP 10 ANSWERS TWO COLUMNS
+========================================================= */
+
+body.tabletPresenterMode .presenterTop10AnswersCols{
+  height:calc(100% - 34px) !important;
+
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+
+  direction:rtl !important;
+  overflow:hidden !important;
+}
+
+body.tabletPresenterMode .presenterTop10AnswersCol{
+  min-width:0 !important;
+
+  display:grid !important;
+  grid-template-rows:repeat(5, 1fr) !important;
+  gap:8px !important;
+
+  overflow:hidden !important;
+}
+
+body.tabletPresenterMode .presenterTop10AnswerBtn{
+  height:44px !important;
+  min-height:44px !important;
+
+  display:grid !important;
+  grid-template-columns:34px minmax(0,1fr) 58px !important;
+  gap:6px !important;
+  align-items:center !important;
+
+  padding:6px 7px !important;
+  border-radius:14px !important;
+
+  font-weight:900 !important;
+}
+
+body.tabletPresenterMode .presenterTop10AnswerNo{
+  width:28px !important;
+  height:28px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  border-radius:10px !important;
+
+  font-size:.95rem !important;
+  font-weight:900 !important;
+}
+
+body.tabletPresenterMode .presenterTop10AnswerText{
+  font-size:1rem !important;
+  line-height:1.2 !important;
+  font-weight:900 !important;
+  text-align:right !important;
+
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+body.tabletPresenterMode .presenterTop10OpenedBy{
+  font-size:.6rem !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* تصغير الجهة اليمنى شوي */
+body.tabletPresenterMode .presenterTop10Right{
+  grid-template-rows:46px 230px 92px !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+
+body.tabletPresenterMode .presenterTop10QuestionCard{
+  height:230px !important;
+  max-height:230px !important;
+}
+
+body.tabletPresenterMode .presenterTop10QuestionText{
+  min-height:92px !important;
+  max-height:92px !important;
+
+  font-size:1.12rem !important;
+  line-height:1.45 !important;
+}
+
+body.tabletPresenterMode .presenterTop10Actions{
+  height:92px !important;
+}
+
+body.tabletPresenterMode .presenterTop10Actions .presenterBtn{
+  height:42px !important;
+  min-height:42px !important;
+
+  font-size:.76rem !important;
+  border-radius:13px !important;
+}
