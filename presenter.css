@@ -3433,3 +3433,184 @@ body.tabletPresenterMode #presenterToast.gameToast.presenterToast{
 body.tabletPresenterMode #presenterToast .gameToastText{
   font-size:.94rem !important;
 }
+/* =========================================================
+   TABLET PRESENTER MODE - WARMUP ONLY
+   تحسين فقرة التسخين داخل لوحة المقدم
+   ضعه آخر presenter.css
+========================================================= */
+
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats){
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 360px !important;
+  grid-template-rows:auto auto !important;
+  gap:12px !important;
+  align-items:start !important;
+  overflow:hidden !important;
+}
+
+/* كرت الفئات والأرقام يسار */
+body.tabletPresenterMode .presenterPanel > .presenterCard:has(.presenterWarmupCats),
+body.tabletPresenterMode .presenterPanel > .presenterCard:has(.presenterGrid){
+  grid-column:1 !important;
+  grid-row:auto !important;
+}
+
+/* كرت الفرق والتحكم يمين */
+body.tabletPresenterMode .presenterPanel > .presenterCard:has(.presenterTeams),
+body.tabletPresenterMode .presenterPanel > .presenterCard:has(.presenterActions),
+body.tabletPresenterMode .presenterPanel > .presenterCard:has(.presenterMainActions){
+  grid-column:2 !important;
+}
+
+/* الكروت العامة داخل التسخين */
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterCard{
+  padding:14px !important;
+  border-radius:20px !important;
+}
+
+/* عنوان الكرت */
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterLabel{
+  font-size:.95rem !important;
+  margin-bottom:10px !important;
+  font-weight:900 !important;
+}
+
+/* شبكة فئات التسخين */
+body.tabletPresenterMode .presenterWarmupCats{
+  width:100% !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:12px !important;
+
+  max-height:calc(100dvh - 135px) !important;
+  overflow:hidden !important;
+}
+
+/* كرت الفئة */
+body.tabletPresenterMode .presenterWarmupCat{
+  min-height:150px !important;
+
+  padding:12px !important;
+  border-radius:20px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  gap:10px !important;
+}
+
+/* اسم الفئة */
+body.tabletPresenterMode .presenterWarmupCatTitle{
+  min-height:34px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  margin:0 !important;
+
+  font-size:1.08rem !important;
+  line-height:1.2 !important;
+  font-weight:900 !important;
+  text-align:center !important;
+}
+
+/* أرقام كل فئة */
+body.tabletPresenterMode .presenterWarmupNumbers{
+  flex:1 !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:8px !important;
+  align-items:stretch !important;
+}
+
+/* زر الرقم */
+body.tabletPresenterMode .presenterWarmupNumbers .presenterNumberBtn,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterNumberBtn{
+  min-height:48px !important;
+  height:48px !important;
+
+  border-radius:16px !important;
+
+  font-size:1.25rem !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+}
+
+/* السؤال والإجابة لو ظهرت في التسخين */
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterQuestionBody,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterAnswerBody,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterBigQuestionBody,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterBigAnswerBody{
+  min-height:120px !important;
+
+  padding:18px !important;
+  border-radius:20px !important;
+
+  font-size:1.2rem !important;
+  line-height:1.75 !important;
+  font-weight:900 !important;
+  text-align:center !important;
+}
+
+/* أزرار الفرق في اليمين */
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterTeams{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:10px !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterTeams .presenterBtn{
+  min-height:58px !important;
+  border-radius:18px !important;
+  font-size:1.05rem !important;
+}
+
+/* أزرار التحكم في اليمين */
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterActions,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterMainActions{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:10px !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterBtn{
+  min-height:56px !important;
+  border-radius:18px !important;
+
+  font-size:1rem !important;
+  font-weight:900 !important;
+  line-height:1.2 !important;
+}
+
+/* لو فيه زر فردي لا يخرب */
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterActions .presenterBtn:last-child:nth-child(odd),
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterMainActions .presenterBtn:last-child:nth-child(odd){
+  grid-column:auto !important;
+}
+
+/* تحسين المقاسات إذا كان شريط المتصفح آخذ مساحة */
+@media (max-height:620px){
+  body.tabletPresenterMode .presenterWarmupCat{
+    min-height:128px !important;
+    padding:10px !important;
+  }
+
+  body.tabletPresenterMode .presenterWarmupCatTitle{
+    font-size:.98rem !important;
+    min-height:28px !important;
+  }
+
+  body.tabletPresenterMode .presenterWarmupNumbers .presenterNumberBtn,
+  body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterNumberBtn{
+    min-height:42px !important;
+    height:42px !important;
+    font-size:1.15rem !important;
+  }
+
+  body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterBtn{
+    min-height:50px !important;
+    font-size:.94rem !important;
+  }
+}
