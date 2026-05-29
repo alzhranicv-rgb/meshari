@@ -3152,3 +3152,260 @@ body.tabletLandscapePresenterMode .presenterWarmupActions .presenterBtn{
 body.tabletLandscapePresenterMode .presenterWarmupActions .presenterBtn:last-child:nth-child(odd){
   grid-column:auto;
 }
+/* =========================================================
+   TOP 10 - TABLET LANDSCAPE CLEAN
+   بدون تمدد وبدون important
+========================================================= */
+
+body.tabletLandscapePresenterMode .presenterPanel:has(.presenterTop10Layout){
+  display:block;
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10Layout{
+  height:100%;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+
+  direction:ltr;
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10Left,
+body.tabletLandscapePresenterMode .presenterTop10Right{
+  direction:rtl;
+  min-width:0;
+  height:100%;
+  overflow:hidden;
+}
+
+/* =========================
+   اليسار: الإجابات
+========================= */
+
+body.tabletLandscapePresenterMode .presenterTop10AnswersCard{
+  height:100%;
+  padding:12px;
+  border-radius:18px;
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10AnswersCard .presenterLabel{
+  margin-bottom:10px;
+  font-size:1rem;
+  font-weight:900;
+  line-height:1;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10AnswersCols{
+  height:calc(100% - 32px);
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+
+  direction:rtl;
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10AnswersCol{
+  min-width:0;
+
+  display:grid;
+  grid-template-rows:repeat(5,1fr);
+  gap:8px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10AnswerBtn{
+  min-height:44px;
+
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) 58px;
+  gap:6px;
+  align-items:center;
+
+  padding:6px 7px;
+  border-radius:14px;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10AnswerNo{
+  width:28px;
+  height:28px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:10px;
+
+  font-size:.95rem;
+  font-weight:900;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10AnswerText{
+  font-size:1rem;
+  line-height:1.2;
+  font-weight:900;
+  text-align:right;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10OpenedBy{
+  font-size:.6rem;
+  line-height:1;
+  font-weight:900;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* =========================
+   اليمين: الفرق + السؤال + التحكم
+========================= */
+
+body.tabletLandscapePresenterMode .presenterTop10Right{
+  display:grid;
+  grid-template-rows:48px 230px 92px;
+  gap:8px;
+  align-content:start;
+}
+
+/* الفرق */
+body.tabletLandscapePresenterMode .presenterTop10TeamsBox{
+  height:48px;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterCard{
+  padding:0;
+  margin:0;
+
+  background:transparent;
+  border:0;
+  box-shadow:none;
+
+  overflow:visible;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterLabel{
+  display:none;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterTeams{
+  height:48px;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterBtn{
+  height:48px;
+  min-height:48px;
+
+  border-radius:14px;
+
+  font-size:.95rem;
+  font-weight:900;
+  padding:6px;
+}
+
+/* كرت السؤال */
+body.tabletLandscapePresenterMode .presenterTop10QuestionCard{
+  height:230px;
+  max-height:230px;
+
+  padding:10px;
+  border-radius:18px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10StatusTop{
+  display:grid;
+  grid-template-columns:76px minmax(0,1fr);
+  gap:7px;
+  margin-bottom:7px;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10RoundMini,
+body.tabletLandscapePresenterMode .presenterTop10ErrorMiniBox{
+  min-height:44px;
+
+  padding:5px;
+  border-radius:13px;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10RoundMini span,
+body.tabletLandscapePresenterMode .presenterTop10ErrorMiniBox span{
+  font-size:.6rem;
+  line-height:1;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10RoundMini strong,
+body.tabletLandscapePresenterMode .presenterTop10ErrorMiniBox strong{
+  font-size:.95rem;
+  line-height:1;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10ErrorsMini{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10QuestionCard .presenterLabel{
+  margin-bottom:5px;
+  font-size:.82rem;
+  line-height:1;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10QuestionText{
+  height:88px;
+  min-height:88px;
+  max-height:88px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px;
+  border-radius:15px;
+
+  font-size:1.08rem;
+  line-height:1.4;
+  font-weight:900;
+  text-align:center;
+}
+
+/* أزرار التحكم */
+body.tabletLandscapePresenterMode .presenterTop10Actions{
+  height:92px;
+
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(2,1fr);
+  gap:7px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterTop10Actions .presenterBtn{
+  height:42px;
+  min-height:42px;
+
+  border-radius:13px;
+
+  font-size:.76rem;
+  font-weight:900;
+  padding:5px;
+
+  grid-column:auto;
+}
