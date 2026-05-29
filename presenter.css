@@ -3736,3 +3736,311 @@ body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterNum
     font-size:1.05rem !important;
   }
 }
+/* =========================================================
+   TABLET WARMUP - COMPACT FINAL TUNING
+   يخلي التسخين ملموم + يوضح الخط + يرتب الفرق
+   ضعه آخر presenter.css
+========================================================= */
+
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats),
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody):not(:has(.presenterFinalLayout)){
+  height:calc(100dvh - 92px) !important;
+  max-width:1180px !important;
+
+  display:grid !important;
+  grid-template-columns:48% 52% !important;
+  gap:10px !important;
+
+  align-items:start !important;
+  overflow:hidden !important;
+
+  direction:ltr !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) > *,
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody):not(:has(.presenterFinalLayout)) > *{
+  direction:rtl !important;
+}
+
+/* =========================
+   اليمين: السؤال والإجابة
+========================= */
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) > .presenterCard:has(.presenterQuestionBody){
+  grid-column:2 !important;
+  grid-row:1 !important;
+  align-self:start !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) > .presenterCard:has(.presenterAnswerBody){
+  grid-column:2 !important;
+  grid-row:2 !important;
+  align-self:start !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) > .presenterCard:has(.presenterQuestionBody),
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) > .presenterCard:has(.presenterAnswerBody){
+  padding:12px !important;
+  border-radius:20px !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterLabel{
+  font-size:.92rem !important;
+  margin-bottom:8px !important;
+  font-weight:900 !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterQuestionBody{
+  min-height:128px !important;
+  max-height:150px !important;
+
+  padding:16px !important;
+  border-radius:20px !important;
+
+  font-size:1.34rem !important;
+  line-height:1.55 !important;
+  font-weight:900 !important;
+  text-align:center !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterAnswerBody{
+  min-height:100px !important;
+  max-height:120px !important;
+
+  padding:14px !important;
+  border-radius:20px !important;
+
+  font-size:1.65rem !important;
+  line-height:1.35 !important;
+  font-weight:900 !important;
+  text-align:center !important;
+
+  color:#0F766E !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+/* =========================
+   اليسار: الفئات والأرقام
+========================= */
+
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) > .presenterCard:has(.presenterWarmupCats),
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) > .presenterCard:has(.presenterGrid){
+  grid-column:1 !important;
+  grid-row:1 / span 2 !important;
+
+  padding:12px !important;
+  border-radius:20px !important;
+  overflow:hidden !important;
+}
+
+/* عنوان الفئات */
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) > .presenterCard:has(.presenterWarmupCats) .presenterLabel{
+  font-size:.9rem !important;
+  margin-bottom:8px !important;
+  font-weight:900 !important;
+}
+
+/* شبكة الفئات */
+body.tabletPresenterMode .presenterWarmupCats{
+  width:100% !important;
+
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:7px !important;
+
+  overflow:hidden !important;
+}
+
+/* كل فئة كسطر مرتب */
+body.tabletPresenterMode .presenterWarmupCat{
+  min-height:58px !important;
+  max-height:66px !important;
+
+  padding:7px !important;
+  border-radius:16px !important;
+
+  display:grid !important;
+  grid-template-columns:100px minmax(0,1fr) !important;
+  gap:7px !important;
+  align-items:center !important;
+}
+
+body.tabletPresenterMode .presenterWarmupCatTitle{
+  min-height:42px !important;
+  height:42px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  margin:0 !important;
+  padding:5px !important;
+
+  border-radius:13px !important;
+
+  font-size:.92rem !important;
+  line-height:1.15 !important;
+  font-weight:900 !important;
+  text-align:center !important;
+}
+
+body.tabletPresenterMode .presenterWarmupNumbers{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:6px !important;
+}
+
+body.tabletPresenterMode .presenterWarmupNumbers .presenterNumberBtn,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterNumberBtn{
+  min-height:42px !important;
+  height:42px !important;
+
+  border-radius:13px !important;
+
+  font-size:1.12rem !important;
+  font-weight:900 !important;
+}
+
+/* =========================
+   اليسار تحت: أزرار الفريق
+========================= */
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) > .presenterCard:has(.presenterTeams),
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) > .presenterCard:has(.presenterTeams){
+  grid-column:1 !important;
+  grid-row:3 !important;
+
+  padding:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterTeams,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterTeams{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:8px !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterTeams .presenterBtn,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterTeams .presenterBtn{
+  min-height:52px !important;
+  height:52px !important;
+
+  border-radius:17px !important;
+
+  font-size:1.12rem !important;
+  font-weight:900 !important;
+}
+
+/* =========================
+   اليمين/تحت: أزرار صح وخطأ ودبلك
+   نخليها تحت السؤال والإجابة عشان تكون واضحة
+========================= */
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) > .presenterCard:has(.presenterActions),
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) > .presenterCard:has(.presenterMainActions),
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) > .presenterCard:has(.presenterActions),
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) > .presenterCard:has(.presenterMainActions){
+  grid-column:2 !important;
+  grid-row:3 !important;
+
+  padding:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterActions,
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterMainActions,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterActions,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterMainActions{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:8px !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterActions .presenterBtn,
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterMainActions .presenterBtn,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterActions .presenterBtn,
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterMainActions .presenterBtn{
+  min-height:52px !important;
+  height:52px !important;
+
+  border-radius:17px !important;
+
+  font-size:1.05rem !important;
+  font-weight:900 !important;
+}
+
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterActions .presenterBtn:last-child:nth-child(odd),
+body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterMainActions .presenterBtn:last-child:nth-child(odd),
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterActions .presenterBtn:last-child:nth-child(odd),
+body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterMainActions .presenterBtn:last-child:nth-child(odd){
+  grid-column:1 / -1 !important;
+}
+
+/* =========================
+   ضغط إضافي إذا المتصفح آخذ مساحة
+========================= */
+
+@media (max-height:620px){
+
+  body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats),
+  body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody):not(:has(.presenterFinalLayout)){
+    height:calc(100dvh - 86px) !important;
+    gap:8px !important;
+  }
+
+  body.tabletPresenterMode .presenterWarmupCat{
+    min-height:50px !important;
+    max-height:56px !important;
+    grid-template-columns:88px minmax(0,1fr) !important;
+    gap:6px !important;
+    padding:6px !important;
+  }
+
+  body.tabletPresenterMode .presenterWarmupCatTitle{
+    min-height:36px !important;
+    height:36px !important;
+    font-size:.82rem !important;
+  }
+
+  body.tabletPresenterMode .presenterWarmupNumbers .presenterNumberBtn,
+  body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterNumberBtn{
+    min-height:36px !important;
+    height:36px !important;
+    font-size:1rem !important;
+  }
+
+  body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterQuestionBody{
+    min-height:105px !important;
+    max-height:120px !important;
+    font-size:1.22rem !important;
+    padding:14px !important;
+  }
+
+  body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterAnswerBody{
+    min-height:80px !important;
+    max-height:95px !important;
+    font-size:1.42rem !important;
+    padding:12px !important;
+  }
+
+  body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterTeams .presenterBtn,
+  body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterTeams .presenterBtn,
+  body.tabletPresenterMode .presenterPanel:has(.presenterQuestionBody) .presenterActions .presenterBtn,
+  body.tabletPresenterMode .presenterPanel:has(.presenterWarmupCats) .presenterActions .presenterBtn{
+    min-height:44px !important;
+    height:44px !important;
+    font-size:.95rem !important;
+  }
+}
