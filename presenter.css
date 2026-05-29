@@ -3559,4 +3559,139 @@ body.tabletPresenterMode .presenterTop10Actions .presenterBtn{
     min-height:42px !important;
     font-size:.74rem !important;
   }
+}/* =========================================================
+   TOP 10 FINAL TUNING
+   الإجابات عمودين + تصغير الجهة اليمنى شوي
+========================================================= */
+
+/* تقسيم الإجابات إلى عمودين */
+body.tabletPresenterMode .presenterTop10Answers{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  grid-template-rows:repeat(5, 1fr) !important;
+  grid-auto-flow:column !important;
+
+  gap:8px !important;
+  height:calc(100% - 34px) !important;
+}
+
+/* زر الإجابة أوضح */
+body.tabletPresenterMode .presenterTop10AnswerBtn{
+  height:44px !important;
+  min-height:44px !important;
+
+  grid-template-columns:34px minmax(0,1fr) 58px !important;
+  gap:6px !important;
+
+  padding:6px 7px !important;
+  border-radius:14px !important;
+}
+
+/* رقم الإجابة */
+body.tabletPresenterMode .presenterTop10AnswerNo{
+  width:28px !important;
+  height:28px !important;
+
+  border-radius:10px !important;
+
+  font-size:.95rem !important;
+  font-weight:900 !important;
+}
+
+/* نص الإجابة */
+body.tabletPresenterMode .presenterTop10AnswerText{
+  font-size:.98rem !important;
+  line-height:1.2 !important;
+  font-weight:900 !important;
+
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* اسم الفريق اللي فتح الإجابة */
+body.tabletPresenterMode .presenterTop10OpenedBy{
+  font-size:.6rem !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* تصغير الجهة اليمنى شوي */
+body.tabletPresenterMode .presenterTop10Right{
+  grid-template-rows:46px 230px 92px !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+
+/* أزرار الفرق فوق */
+body.tabletPresenterMode .presenterTop10TeamsBox,
+body.tabletPresenterMode .presenterTop10TeamsBox .presenterTeams,
+body.tabletPresenterMode .presenterTop10TeamsBox .presenterBtn{
+  height:46px !important;
+  min-height:46px !important;
+}
+
+body.tabletPresenterMode .presenterTop10TeamsBox .presenterBtn{
+  font-size:.9rem !important;
+  border-radius:14px !important;
+}
+
+/* كرت السؤال */
+body.tabletPresenterMode .presenterTop10QuestionCard{
+  height:230px !important;
+  max-height:230px !important;
+  padding:10px !important;
+}
+
+/* مربع السؤال */
+body.tabletPresenterMode .presenterTop10QuestionText{
+  min-height:92px !important;
+  max-height:92px !important;
+
+  font-size:1.12rem !important;
+  line-height:1.45 !important;
+  padding:12px !important;
+}
+
+/* الجولة والأخطاء */
+body.tabletPresenterMode .presenterTop10StatusTop{
+  grid-template-columns:76px minmax(0,1fr) !important;
+  gap:7px !important;
+  margin-bottom:7px !important;
+}
+
+body.tabletPresenterMode .presenterTop10RoundMini,
+body.tabletPresenterMode .presenterTop10ErrorMiniBox{
+  min-height:44px !important;
+  padding:5px !important;
+  border-radius:13px !important;
+}
+
+body.tabletPresenterMode .presenterTop10RoundMini span,
+body.tabletPresenterMode .presenterTop10ErrorMiniBox span{
+  font-size:.6rem !important;
+}
+
+body.tabletPresenterMode .presenterTop10RoundMini strong,
+body.tabletPresenterMode .presenterTop10ErrorMiniBox strong{
+  font-size:.95rem !important;
+}
+
+/* أزرار التحكم */
+body.tabletPresenterMode .presenterTop10Actions{
+  height:92px !important;
+  gap:7px !important;
+}
+
+body.tabletPresenterMode .presenterTop10Actions .presenterBtn{
+  height:42px !important;
+  min-height:42px !important;
+
+  font-size:.76rem !important;
+  border-radius:13px !important;
+  padding:5px !important;
 }
