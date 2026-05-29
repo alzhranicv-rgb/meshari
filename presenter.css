@@ -2901,3 +2901,254 @@ body.tabletLandscapePresenterMode .presenterBtn,
 body.tabletLandscapePresenterMode .presenterNumberBtn{
   transition:none;
 }
+/* =========================================================
+   TABLET LANDSCAPE PANEL
+   مساحة المحتوى فقط - بدون تمدد وبدون important
+========================================================= */
+
+body.tabletLandscapePresenterMode .presenterPanel{
+  width:100%;
+  max-width:1100px;
+
+  flex:1;
+  min-height:0;
+
+  display:block;
+  overflow:hidden;
+}
+/* =========================================================
+   WARMUP - TABLET LANDSCAPE CLEAN
+   التسخين فقط - بدون تمدد وبدون important
+========================================================= */
+
+body.tabletLandscapePresenterMode .presenterPanel:has(.presenterWarmupLayout){
+  display:block;
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupLayout{
+  height:100%;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+
+  direction:ltr;
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupLeft,
+body.tabletLandscapePresenterMode .presenterWarmupRight{
+  direction:rtl;
+  min-width:0;
+  height:100%;
+  overflow:hidden;
+}
+
+/* =========================
+   اليسار: الفئات والأرقام
+========================= */
+
+body.tabletLandscapePresenterMode .presenterWarmupNumbersCard{
+  height:100%;
+  padding:12px;
+  border-radius:18px;
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupNumbersCard .presenterLabel{
+  margin-bottom:10px;
+  font-size:1rem;
+  font-weight:900;
+  line-height:1;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupCats{
+  height:calc(100% - 32px);
+
+  display:grid;
+  grid-template-columns:1fr;
+  gap:9px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupCat{
+  display:grid;
+  grid-template-columns:112px minmax(0,1fr);
+  gap:8px;
+  align-items:center;
+
+  padding:8px;
+  border-radius:17px;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupCatTitle{
+  height:44px;
+  min-height:44px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  margin:0;
+  padding:6px;
+
+  border-radius:14px;
+
+  font-size:.92rem;
+  line-height:1.2;
+  font-weight:900;
+  text-align:center;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupNumbers{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupNumbers .presenterNumberBtn{
+  min-height:44px;
+  border-radius:14px;
+
+  font-size:1.2rem;
+  font-weight:900;
+}
+
+/* =========================
+   اليمين: الفرق + السؤال + الإجابة + التحكم
+========================= */
+
+body.tabletLandscapePresenterMode .presenterWarmupRight{
+  display:grid;
+  grid-template-rows:48px 265px 44px;
+  gap:8px;
+  align-content:start;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupTeamsBox{
+  height:48px;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterCard{
+  padding:0;
+  margin:0;
+
+  background:transparent;
+  border:0;
+  box-shadow:none;
+
+  overflow:visible;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterLabel{
+  display:none;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterTeams{
+  height:48px;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterBtn{
+  height:48px;
+  min-height:48px;
+
+  border-radius:14px;
+
+  font-size:.95rem;
+  font-weight:900;
+  padding:6px;
+}
+
+/* كرت السؤال والإجابة */
+body.tabletLandscapePresenterMode .presenterWarmupPreviewCard{
+  height:265px;
+  max-height:265px;
+
+  padding:10px;
+  border-radius:18px;
+
+  display:grid;
+  grid-template-rows:auto 105px auto 68px;
+  gap:6px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupPreviewCard .presenterLabel{
+  margin:0;
+  font-size:.9rem;
+  line-height:1;
+  font-weight:900;
+}
+
+body.tabletLandscapePresenterMode #presenterWarmupQuestionText{
+  height:105px;
+  min-height:105px;
+  max-height:105px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:12px;
+  border-radius:16px;
+
+  font-size:1.18rem;
+  line-height:1.45;
+  font-weight:900;
+  text-align:center;
+}
+
+body.tabletLandscapePresenterMode #presenterWarmupAnswerText{
+  height:68px;
+  min-height:68px;
+  max-height:68px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px;
+  border-radius:16px;
+
+  font-size:1.28rem;
+  line-height:1.25;
+  font-weight:900;
+  text-align:center;
+
+  color:#0F766E;
+}
+
+/* أزرار التحكم */
+body.tabletLandscapePresenterMode .presenterWarmupActions{
+  height:44px;
+
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupActions .presenterBtn{
+  height:44px;
+  min-height:44px;
+
+  border-radius:14px;
+
+  font-size:.86rem;
+  font-weight:900;
+  padding:6px;
+
+  grid-column:auto;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupActions .presenterBtn:last-child:nth-child(odd){
+  grid-column:auto;
+}
