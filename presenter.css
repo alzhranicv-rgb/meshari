@@ -4023,13 +4023,13 @@ body.tabletPresenterMode .presenterTop10Layout .presenterTop10Actions .presenter
   grid-column:auto !important;
 }
 /* =========================================================
-   AUCTION TABLET
-   اليسار: الأرقام
-   اليمين: الفرق + الإجابة + الصورة + التحكم
+   AUCTION SIMPLE TABLET
+   المزاد فقط
 ========================================================= */
 
 body.tabletPresenterMode .presenterAuctionLayout{
   width:100% !important;
+  max-width:1180px !important;
   height:calc(100dvh - 92px) !important;
 
   display:grid !important;
@@ -4048,72 +4048,50 @@ body.tabletPresenterMode .presenterAuctionRight{
   overflow:hidden !important;
 }
 
-/* =========================
-   LEFT - Numbers
-========================= */
-
+/* اليسار: الأرقام */
 body.tabletPresenterMode .presenterAuctionNumbersCard{
   height:100% !important;
-
   padding:12px !important;
   border-radius:18px !important;
-
   overflow:hidden !important;
 }
 
 body.tabletPresenterMode .presenterAuctionNumbersCard .presenterLabel{
   margin-bottom:10px !important;
-
-  font-size:1.05rem !important;
-  line-height:1 !important;
+  font-size:1rem !important;
   font-weight:900 !important;
 }
 
 body.tabletPresenterMode .presenterAuctionGrid{
-  height:calc(100% - 34px) !important;
+  height:calc(100% - 35px) !important;
 
   display:grid !important;
   grid-template-columns:repeat(4,1fr) !important;
   gap:10px !important;
-
-  overflow:hidden !important;
 }
 
 body.tabletPresenterMode .presenterAuctionGrid .presenterNumberBtn{
-  height:auto !important;
-  min-height:52px !important;
-
+  min-height:54px !important;
   border-radius:16px !important;
-
   font-size:1.35rem !important;
   font-weight:900 !important;
 }
 
-/* =========================
-   RIGHT - Teams + Preview + Actions
-========================= */
-
+/* اليمين */
 body.tabletPresenterMode .presenterAuctionRight{
   display:grid !important;
-  grid-template-rows:52px 275px 104px !important;
+  grid-template-rows:52px 280px 104px !important;
   gap:10px !important;
   align-content:start !important;
 }
 
-/* الفرق فوق */
-body.tabletPresenterMode .presenterAuctionTeamsBox{
-  height:52px !important;
-}
-
+/* الفرق */
 body.tabletPresenterMode .presenterAuctionTeamsBox .presenterCard{
   padding:0 !important;
   margin:0 !important;
-
   background:transparent !important;
-  border:0 !important;
   box-shadow:none !important;
-
-  overflow:visible !important;
+  border:0 !important;
 }
 
 body.tabletPresenterMode .presenterAuctionTeamsBox .presenterLabel{
@@ -4121,8 +4099,6 @@ body.tabletPresenterMode .presenterAuctionTeamsBox .presenterLabel{
 }
 
 body.tabletPresenterMode .presenterAuctionTeamsBox .presenterTeams{
-  height:52px !important;
-
   display:grid !important;
   grid-template-columns:1fr 1fr !important;
   gap:8px !important;
@@ -4131,61 +4107,49 @@ body.tabletPresenterMode .presenterAuctionTeamsBox .presenterTeams{
 body.tabletPresenterMode .presenterAuctionTeamsBox .presenterBtn{
   height:52px !important;
   min-height:52px !important;
-
   border-radius:16px !important;
-
   font-size:1rem !important;
   font-weight:900 !important;
-  padding:6px !important;
 }
 
 /* كرت الإجابة والصورة */
 body.tabletPresenterMode .presenterAuctionPreviewCard{
-  height:275px !important;
-  max-height:275px !important;
-
+  height:280px !important;
   padding:12px !important;
   border-radius:18px !important;
 
   display:grid !important;
-  grid-template-rows:auto 82px auto minmax(0,1fr) !important;
-  gap:7px !important;
+  grid-template-rows:auto 80px auto 1fr !important;
+  gap:8px !important;
 
   overflow:hidden !important;
 }
 
 body.tabletPresenterMode .presenterAuctionPreviewCard .presenterLabel{
   margin:0 !important;
-
   font-size:.95rem !important;
-  line-height:1 !important;
   font-weight:900 !important;
 }
 
 body.tabletPresenterMode #presenterAuctionAnswerText{
-  height:82px !important;
-  min-height:82px !important;
-  max-height:82px !important;
+  height:80px !important;
+  min-height:80px !important;
 
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
 
-  padding:10px !important;
+  padding:12px !important;
   border-radius:16px !important;
 
   font-size:1.35rem !important;
-  line-height:1.35 !important;
   font-weight:900 !important;
   text-align:center !important;
-
-  color:#0F766E !important;
 }
 
 body.tabletPresenterMode #presenterAuctionImageBox{
-  min-height:110px !important;
-  max-height:135px !important;
-
+  min-height:120px !important;
+  max-height:140px !important;
   border-radius:16px !important;
   overflow:hidden !important;
 }
@@ -4193,7 +4157,6 @@ body.tabletPresenterMode #presenterAuctionImageBox{
 body.tabletPresenterMode #presenterAuctionImageBox img{
   width:100% !important;
   height:100% !important;
-  max-height:135px !important;
   object-fit:contain !important;
 }
 
@@ -4205,90 +4168,13 @@ body.tabletPresenterMode .presenterAuctionActions{
   grid-template-columns:repeat(3,1fr) !important;
   grid-template-rows:repeat(2,1fr) !important;
   gap:8px !important;
-
-  overflow:hidden !important;
 }
 
 body.tabletPresenterMode .presenterAuctionActions .presenterBtn{
   height:48px !important;
   min-height:48px !important;
-
   border-radius:15px !important;
-
-  font-size:.84rem !important;
+  font-size:.85rem !important;
   font-weight:900 !important;
   padding:6px !important;
-
-  grid-column:auto !important;
-}
-
-/* زر تراجع يأخذ خانة عادية */
-body.tabletPresenterMode .presenterAuctionActions .presenterBtn:last-child{
-  grid-column:auto !important;
-}
-
-/* =========================
-   Short Screen
-========================= */
-
-@media (max-height:620px){
-
-  body.tabletPresenterMode .presenterAuctionLayout{
-    height:calc(100dvh - 84px) !important;
-    gap:8px !important;
-  }
-
-  body.tabletPresenterMode .presenterAuctionGrid{
-    gap:7px !important;
-  }
-
-  body.tabletPresenterMode .presenterAuctionGrid .presenterNumberBtn{
-    min-height:44px !important;
-    font-size:1.15rem !important;
-  }
-
-  body.tabletPresenterMode .presenterAuctionRight{
-    grid-template-rows:46px 245px 92px !important;
-    gap:8px !important;
-  }
-
-  body.tabletPresenterMode .presenterAuctionTeamsBox,
-  body.tabletPresenterMode .presenterAuctionTeamsBox .presenterTeams,
-  body.tabletPresenterMode .presenterAuctionTeamsBox .presenterBtn{
-    height:46px !important;
-    min-height:46px !important;
-  }
-
-  body.tabletPresenterMode .presenterAuctionTeamsBox .presenterBtn{
-    font-size:.9rem !important;
-  }
-
-  body.tabletPresenterMode .presenterAuctionPreviewCard{
-    height:245px !important;
-    max-height:245px !important;
-    grid-template-rows:auto 70px auto minmax(0,1fr) !important;
-  }
-
-  body.tabletPresenterMode #presenterAuctionAnswerText{
-    height:70px !important;
-    min-height:70px !important;
-    max-height:70px !important;
-    font-size:1.2rem !important;
-  }
-
-  body.tabletPresenterMode #presenterAuctionImageBox{
-    min-height:90px !important;
-    max-height:110px !important;
-  }
-
-  body.tabletPresenterMode .presenterAuctionActions{
-    height:92px !important;
-    gap:6px !important;
-  }
-
-  body.tabletPresenterMode .presenterAuctionActions .presenterBtn{
-    height:42px !important;
-    min-height:42px !important;
-    font-size:.74rem !important;
-  }
 }
