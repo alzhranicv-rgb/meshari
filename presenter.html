@@ -152,27 +152,28 @@
   <script src="presenter.js"></script>
 
   <script>
-    function updatePresenterDeviceMode() {
-      const width = window.innerWidth
-      const height = window.innerHeight
-      const isLandscape = width > height
+  function updatePresenterDeviceMode() {
+    const width = window.innerWidth
+    const height = window.innerHeight
+    const isLandscape = width > height
 
-      
-      const isTabletLandscape =
-        width >= 700 &&
-        width <= 1400 &&
-        isLandscape
+    const isPhone = width < 700
+    const isTablet = width >= 700 && width <= 1400
 
-      document.body.classList.toggle("tabletPresenterMode", isTabletLandscape)
-    }
+    document.body.classList.toggle("phonePresenterMode", isPhone)
+    document.body.classList.toggle("tabletPortraitPresenterMode", isTablet && !isLandscape)
+    document.body.classList.toggle("tabletLandscapePresenterMode", isTablet && isLandscape)
+    
+    document.body.classList.toggle("tabletPresenterMode", isTablet)
+  }
 
-    window.addEventListener("load", updatePresenterDeviceMode)
-    window.addEventListener("resize", updatePresenterDeviceMode)
+  window.addEventListener("load", updatePresenterDeviceMode)
+  window.addEventListener("resize", updatePresenterDeviceMode)
 
-    window.addEventListener("orientationchange", () => {
-      setTimeout(updatePresenterDeviceMode, 300)
-    })
-  </script>
+  window.addEventListener("orientationchange", () => {
+    setTimeout(updatePresenterDeviceMode, 300)
+  })
+</script>
 
 </body>
 </html>
