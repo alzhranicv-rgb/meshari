@@ -2,7 +2,11 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
 
   <title>الحنكة - لوحة المقدم</title>
 
@@ -146,6 +150,29 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
   <script src="presenter.js"></script>
+
+  <script>
+    function updatePresenterDeviceMode() {
+      const width = window.innerWidth
+      const height = window.innerHeight
+      const isLandscape = width > height
+
+      
+      const isTabletLandscape =
+        width >= 700 &&
+        width <= 1400 &&
+        isLandscape
+
+      document.body.classList.toggle("tabletPresenterMode", isTabletLandscape)
+    }
+
+    window.addEventListener("load", updatePresenterDeviceMode)
+    window.addEventListener("resize", updatePresenterDeviceMode)
+
+    window.addEventListener("orientationchange", () => {
+      setTimeout(updatePresenterDeviceMode, 300)
+    })
+  </script>
 
 </body>
 </html>
