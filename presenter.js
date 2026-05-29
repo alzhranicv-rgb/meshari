@@ -3373,18 +3373,6 @@ function openPresenterFinalNumber(round, number) {
     return
   }
 
-  if (round === 2 || round === 3) {
-    const activeTeam =
-      state.activeTeam ||
-      presenterSelectedTeam ||
-      getPresenterActiveTeamFromState()
-
-    if (!activeTeam) {
-      showToast("اختر الفريق أولاً")
-      return
-    }
-  }
-
   presenterFinalSelected = { round, number }
 
   if (round === 1) {

@@ -377,6 +377,81 @@ function getOtherTeam(team) {
   return team === "A" ? "B" : "A"
 }
 
+/* =========================
+   Final Auto Team Turn
+   Round 2 / Round 3 فقط
+========================= */
+
+function getFinalAutoTeam(round) {
+  if (round !== 2 && round !== 3) return null
+
+  const state = round === 2
+    ? finalState.round2
+    : finalState.round3
+
+  if (state.activeTeam === "A" || state.activeTeam === "B") {
+    return state.activeTeam
+  }
+
+  return "A"
+}
+
+function setFinalAutoTeam(round) {
+  const team = getFinalAutoTeam(round)
+
+  if (!team) return null
+
+  if (round === 2) {
+    finalState.round2.activeTeam = team
+  }
+
+  if (round === 3) {
+    finalState.round3.activeTeam = team
+
+    if (finalState.round3.teamMedia) {
+      finalState.round3.teamMedia.currentTeam =
+        finalState.round3.teamMedia.currentTeam || team
+    }
+  }
+
+  highlightFinalTeam(team)
+  renderFinalRoundTitle()
+  saveFinalState()
+
+  return team
+}
+
+function moveFinalTurnToNextTeam(round, currentTeam = null) {
+  if (round !== 2 && round !== 3) return
+
+  const team =
+    currentTeam ||
+    (
+      round === 2
+        ? finalState.round2.lastTeamPlayed || finalState.round2.activeTeam
+        : finalState.round3.lastTeamPlayed || finalState.round3.activeTeam
+    ) ||
+    "A"
+
+  const nextTeam = getOtherTeam(team)
+
+  if (round === 2) {
+    finalState.round2.activeTeam = nextTeam
+  }
+
+  if (round === 3) {
+    finalState.round3.activeTeam = nextTeam
+
+    if (finalState.round3.teamMedia) {
+      finalState.round3.teamMedia.currentTeam = null
+    }
+  }
+
+  highlightFinalTeam(nextTeam)
+  renderFinalRoundTitle()
+  saveFinalState()
+}
+
 function getRound2GroupKey(number) {
   return number === 1 || number === 3 ? "scramble" : "sequence"
 }
@@ -1508,12 +1583,7 @@ async function openFinalRound2Card(number) {
     return
   }
 
-  const team = finalState.round2.activeTeam
-
-  if (!team) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
+  const team = setFinalAutoTeam(2)
 
   if (finalState.round2.opened.includes(number)) return
 
@@ -1865,10 +1935,14 @@ function finalizeRound2Number() {
   finalState.round2.hiddenSequence = []
   finalState.round2.selectedCorrectIndexes = []
 
-  resetFinalTeamSelection()
-  renderFinalRound()
-  saveFinalState()
-  updateEndRoundButtonState()
+  const nextTeam = getOtherTeam(finalState.round2.lastTeamPlayed || "A")
+
+finalState.round2.activeTeam = nextTeam
+
+renderFinalRound()
+highlightFinalTeam(nextTeam)
+saveFinalState()
+updateEndRoundButtonState()
 }
 
 /* =========================
@@ -1945,14 +2019,11 @@ async function openFinalRound3Card(number) {
     return
   }
 
-  const team = finalState.round3.activeTeam
-
-  if (!team) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
+  const team = setFinalAutoTeam(3)
 
   if (finalState.round3.opened.includes(number)) return
+
+
 
   if (Object.values(finalState.round3.assignedTeams).includes(team)) {
     showGameToast("كل فريق له رقم واحد فقط")
@@ -2170,16 +2241,17 @@ function finalizeRound3Number(nextTeam = null) {
   finalState.round3.selectedCorrectIndexes = []
   currentFinalRound3Image = ""
 
-  resetFinalTeamSelection()
-  renderFinalRound()
+  const autoNextTeam =
+  nextTeam ||
+  getOtherTeam(finalState.round3.lastTeamPlayed || finalState.round3.activeTeam || "A")
 
-  if (nextTeam) {
-    finalState.round3.activeTeam = nextTeam
-    highlightFinalTeam(nextTeam)
-  }
+finalState.round3.activeTeam = autoNextTeam
 
-  saveFinalState()
-  updateEndRoundButtonState()
+renderFinalRound()
+highlightFinalTeam(autoNextTeam)
+
+saveFinalState()
+updateEndRoundButtonState()
 }
 
 function toggleFinalRound3ImageOverlay() {
@@ -2443,17 +2515,14 @@ async function openFinalRound3TeamMediaCard(number) {
   ensureFinalRound3State()
 
   const state = finalState.round3.teamMedia
-  const team = finalState.round3.activeTeam
+const team = setFinalAutoTeam(3)
 
   if (state.currentNumber) {
     showGameToast("أغلق الرقم الحالي أولاً")
     return
   }
 
-  if (!team) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
+  
 
   if (state.teamNumbers[team].length >= 2) {
     showGameToast("هذا الفريق أخذ رقمين")
@@ -2558,6 +2627,7 @@ function finalRound3TeamMediaCorrect() {
 
   finalState.round3.scores[team] += getFinalScoreValue(team, 1)
   finalState.round3.scoredNumbers.push(number)
+  finalState.round3.lastTeamPlayed = team
 
   clearFinalActiveDouble()
 
@@ -2569,7 +2639,7 @@ function finalRound3TeamMediaCorrect() {
   renderFinalRound3TeamMedia()
 
   setTimeout(() => {
-    resetFinalRound3TeamMediaCurrent()
+    resetFinalRound3TeamMediaCurrent(getOtherTeam(team))
   }, 7000)
 }
 
@@ -2592,6 +2662,8 @@ function finalRound3TeamMediaWrong() {
   if (!finalState.round3.scoredNumbers.includes(number)) {
     finalState.round3.scoredNumbers.push(number)
   }
+  const team = state.currentTeam || finalState.round3.activeTeam || "A"
+finalState.round3.lastTeamPlayed = team
 
   playGameSound("wrong")
 
@@ -2602,11 +2674,11 @@ function finalRound3TeamMediaWrong() {
   saveFinalState()
 
   setTimeout(() => {
-    resetFinalRound3TeamMediaCurrent()
+    resetFinalRound3TeamMediaCurrent(getOtherTeam(team))
   }, 7000)
 }
 
-function resetFinalRound3TeamMediaCurrent() {
+function resetFinalRound3TeamMediaCurrent(nextTeam = null) {
   const state = finalState.round3.teamMedia
 
   state.currentNumber = null
@@ -2622,10 +2694,14 @@ function resetFinalRound3TeamMediaCurrent() {
 
   finalState.round3.currentNumber = null
   finalState.round3.pendingScore = false
-  finalState.round3.activeTeam = null
 
-  resetFinalTeamSelection()
+  if (nextTeam === "A" || nextTeam === "B") {
+    finalState.round3.activeTeam = nextTeam
+    highlightFinalTeam(nextTeam)
+  }
+
   renderFinalRound3TeamMedia()
+  renderFinalRoundTitle()
   updateEndRoundButtonState()
   saveFinalState()
 }
