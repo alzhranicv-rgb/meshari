@@ -21,7 +21,7 @@ const ALL_PRESENTER_SEGMENTS = [
   { key: "auction", title: "فتبلة", sort: 3 },
   { key: "who", title: "من هو", sort: 4 },
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
-  { key: "final", title: "الفاصلة", sort: 6 },
+  { key: "final", title: "صح صحلي", sort: 6 },
   { key: "archive", title: "الأرشيف", sort: 7 }
 ]
 
@@ -2639,6 +2639,7 @@ function refreshPresenterExplainFromState() {
       btn.disabled = !currentNumber || revealLock
     })
 }
+
 /* =========================
    FINAL
 ========================= */
@@ -2796,12 +2797,17 @@ async function presenterFinalCorrect() {
 async function presenterFinalWrong() {
   const round = getPresenterFinalRound()
 
-  if (round === 3 && isPresenterFinalRound3TeamMedia()) {
-    await sendCommand("finalWrongVideoOnly")
-    return
+  if (round === 1) {
+    setPresenterFinalRound1FocusMode(false)
+    presenterFinalSelected = { round: 1, number: null }
   }
 
+
   await sendCommand("wrong")
+
+  setTimeout(() => {
+    refreshPresenterEnhancements()
+  }, 300)
 }
 
 /* =========================
@@ -3288,26 +3294,39 @@ function refreshPresenterFinalControlsOnly(round) {
     if (isTeamMedia) {
       const hasCurrent = !!teamMediaState.currentNumber
       const isVideo = teamMediaState.currentMediaType === "video"
+      const questionShown = !!teamMediaState.questionShown
+      const answerShown = !!teamMediaState.answerShown
 
       allButtons.forEach(btn => {
         const onclick = btn.getAttribute("onclick") || ""
 
         if (onclick.includes("showQuestion")) {
-          btn.disabled = !(hasCurrent && teamMediaState.currentQuestion)
+          btn.disabled = !(
+            hasCurrent &&
+            teamMediaState.currentQuestion &&
+            !questionShown &&
+            !answerShown
+          )
         }
 
         if (
           onclick.includes("presenterPlayCurrentFinalVideo") ||
           onclick.includes("presenterRestartCurrentFinalVideo")
         ) {
-          btn.disabled = !(hasCurrent && isVideo)
+          btn.disabled = !(
+            hasCurrent &&
+            isVideo &&
+            !questionShown &&
+            !answerShown
+          )
         }
 
-        if (
-          onclick.includes("presenterFinalCorrect") ||
-          onclick.includes("presenterFinalWrong")
-        ) {
-          btn.disabled = !hasCurrent
+        if (onclick.includes("presenterFinalCorrect")) {
+          btn.disabled = !hasCurrent || answerShown
+        }
+
+        if (onclick.includes("presenterFinalWrong")) {
+          btn.disabled = !hasCurrent || answerShown
         }
       })
 

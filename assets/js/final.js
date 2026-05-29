@@ -2207,6 +2207,7 @@ function toggleFinalRound3ImageOverlay() {
 
   document.body.appendChild(overlay)
 }
+
 /* =========================
    Round 3 - Team Media
    نسخة مرتبة + عرض فيديو مضبوط
@@ -2274,8 +2275,13 @@ function renderFinalRound3TeamMedia() {
 `
 
   const hasCurrent = !!state.currentNumber
-  const canShowQuestion = hasCurrent && !!state.currentQuestion
-  const isVideo = hasCurrent && state.currentMediaType === "video" && !!state.currentMedia
+  const questionShown = !!state.questionShown
+  const canShowQuestion = hasCurrent && !!state.currentQuestion && !questionShown
+  const isVideo =
+  hasCurrent &&
+  !questionShown &&
+  state.currentMediaType === "video" &&
+  !!state.currentMedia
 
   controls.innerHTML = `
     <button
@@ -2346,6 +2352,7 @@ function buildFinalRound3TeamMediaContent() {
   }
 
   const isVideo = state.currentMediaType === "video" && state.currentMedia
+  const showMedia = !state.questionShown && !state.answerShown
 
   const resultClass =
     state.resultType === "correct"
@@ -2354,44 +2361,41 @@ function buildFinalRound3TeamMediaContent() {
       ? "wrongResult"
       : ""
 
-  const mediaHTML = state.currentMedia
-    ? isVideo
-      ? `
-        <div class="finalTeamMediaFrame finalTeamMediaVideoFrame" onclick="openFinalRound3TeamMediaOverlay('video')">
-          <video
-            id="finalRound3TeamMediaInlineVideo"
-            src="${state.currentMedia}"
-            class="finalTeamMediaVideo"
-            playsinline
-            preload="metadata"
-            controlslist="nodownload noplaybackrate"
-            disablepictureinpicture
-          ></video>
+  const mediaHTML =
+    showMedia && state.currentMedia
+      ? isVideo
+        ? `
+          <div class="finalTeamMediaFrame finalTeamMediaVideoFrame" onclick="openFinalRound3TeamMediaOverlay('video')">
+            <video
+              id="finalRound3TeamMediaInlineVideo"
+              src="${state.currentMedia}"
+              class="finalTeamMediaVideo"
+              playsinline
+              preload="metadata"
+              controlslist="nodownload noplaybackrate"
+              disablepictureinpicture
+            ></video>
 
-          <button
-            type="button"
-            class="finalTeamMediaPlayBadge"
-            onclick="event.stopPropagation(); playFinalRound3TeamMediaVideo()"
-          >
-            ▶
-          </button>
-        </div>
-      `
-      : `
-        <div class="finalTeamMediaFrame finalTeamMediaImageFrame" onclick="openFinalRound3TeamMediaOverlay('image')">
-          <img src="${state.currentMedia}" class="finalTeamMediaImage" alt="">
-        </div>
-      `
-    : `
-      <div class="finalTeamMediaEmptyState">
-        لا توجد صورة أو فيديو
-      </div>
-    `
+            <button
+              type="button"
+              class="finalTeamMediaPlayBadge"
+              onclick="event.stopPropagation(); playFinalRound3TeamMediaVideo()"
+            >
+              ▶
+            </button>
+          </div>
+        `
+        : `
+          <div class="finalTeamMediaFrame finalTeamMediaImageFrame" onclick="openFinalRound3TeamMediaOverlay('image')">
+            <img src="${state.currentMedia}" class="finalTeamMediaImage" alt="">
+          </div>
+        `
+      : ""
 
   const questionHTML =
     state.questionShown && state.currentQuestion
       ? `
-        <div class="finalTeamMediaQuestionBox">
+        <div class="finalTeamMediaQuestionBox finalTeamMediaQuestionOnly">
           <div class="finalTeamMediaSmallLabel">السؤال</div>
           <div class="finalTeamMediaQuestionText">
             ${state.currentQuestion}
@@ -2506,9 +2510,14 @@ function showFinalRound3TeamMediaQuestion() {
   pushFinalHistory()
 
   state.questionShown = true
+  state.answerShown = false
+  state.resultType = ""
+
+  closeFinalRound3TeamMediaOverlay()
 
   playGameSound("answer")
   renderFinalRound3TeamMedia()
+  saveFinalState()
 }
 
 function finalRound3TeamMediaCorrect() {
@@ -2564,7 +2573,9 @@ function finalRound3TeamMediaWrong() {
 
   pushFinalHistory()
 
+
   state.answerShown = true
+  state.questionShown = false
   state.resultType = "wrong"
 
   if (!finalState.round3.scoredNumbers.includes(number)) {
@@ -2572,10 +2583,12 @@ function finalRound3TeamMediaWrong() {
   }
 
   playGameSound("wrong")
-  flashScreen("wrong")
+
   closeFinalRound3TeamMediaOverlay()
+  flashScreen("wrong")
 
   renderFinalRound3TeamMedia()
+  saveFinalState()
 
   setTimeout(() => {
     resetFinalRound3TeamMediaCurrent()
@@ -2638,14 +2651,15 @@ function openFinalRound3TeamMediaOverlay(type) {
 
       <div class="finalRound3TeamMediaOverlayInner" onclick="event.stopPropagation()">
         <video
-          id="finalRound3TeamMediaOverlayVideo"
-          src="${state.currentMedia}"
-          class="finalRound3TeamMediaOverlayVideo"
-          playsinline
-          preload="auto"
-          controlslist="nodownload noplaybackrate"
-          disablepictureinpicture
-        ></video>
+  id="finalRound3TeamMediaOverlayVideo"
+  src="${state.currentMedia}"
+  class="finalRound3TeamMediaOverlayVideo"
+  controls
+  playsinline
+  preload="auto"
+  controlslist="nodownload noplaybackrate"
+  disablepictureinpicture
+></video>
       </div>
     `
   } else {
@@ -2693,11 +2707,16 @@ function getFinalRound3ActiveVideo() {
   )
 }
 
-function restartFinalRound3TeamMediaVideo() {
+function playFinalRound3TeamMediaVideo() {
   const state = finalState.round3.teamMedia
 
-  if (!state.currentNumber || state.currentMediaType !== "video") {
+  if (!state.currentNumber || state.currentMediaType !== "video" || !state.currentMedia) {
     showGameToast("لا يوجد فيديو")
+    return
+  }
+
+  if (state.questionShown || state.answerShown) {
+    showGameToast("الفيديو غير متاح بعد إظهار السؤال")
     return
   }
 
@@ -2707,44 +2726,8 @@ function restartFinalRound3TeamMediaVideo() {
     const video = document.getElementById("finalRound3TeamMediaOverlayVideo")
     if (!video) return
 
-    video.pause()
-    video.currentTime = 0
-    video.controls = false
-    video.muted = false
-    video.volume = 1
-
-    state.videoPlayed = true
-
-    const playPromise = video.play()
-
-    if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(err => {
-        console.log("VIDEO RESTART ERROR:", err)
-        showGameToast("اضغط إعادة تشغيل مرة أخرى")
-      })
-    }
-
-    saveFinalState()
-  }, 120)
-}
-
-function restartFinalRound3TeamMediaVideo() {
-  const state = finalState.round3.teamMedia
-
-  if (!state.currentNumber || state.currentMediaType !== "video") {
-    showGameToast("لا يوجد فيديو")
-    return
-  }
-
-  openFinalRound3TeamMediaOverlay("video")
-
-  setTimeout(() => {
-    const video = document.getElementById("finalRound3TeamMediaOverlayVideo")
-    if (!video) return
-
-    video.pause()
-    video.currentTime = 0
-    video.controls = false
+    video.loop = false
+    video.controls = true
     video.muted = false
     video.volume = 1
 
@@ -2759,7 +2742,53 @@ function restartFinalRound3TeamMediaVideo() {
 
     if (playPromise && typeof playPromise.catch === "function") {
       playPromise.catch(err => {
-        console.log("VIDEO RESTART ERROR:", err)
+        console.log("FINAL TEAM MEDIA VIDEO PLAY ERROR:", err)
+        showGameToast("اضغط تشغيل مرة أخرى")
+      })
+    }
+
+    saveFinalState()
+  }, 120)
+}
+
+function restartFinalRound3TeamMediaVideo() {
+  const state = finalState.round3.teamMedia
+
+  if (!state.currentNumber || state.currentMediaType !== "video" || !state.currentMedia) {
+    showGameToast("لا يوجد فيديو")
+    return
+  }
+
+  if (state.questionShown || state.answerShown) {
+    showGameToast("الفيديو غير متاح بعد إظهار السؤال")
+    return
+  }
+
+  openFinalRound3TeamMediaOverlay("video")
+
+  setTimeout(() => {
+    const video = document.getElementById("finalRound3TeamMediaOverlayVideo")
+    if (!video) return
+
+    video.pause()
+    video.currentTime = 0
+    video.loop = false
+    video.controls = true
+    video.muted = false
+    video.volume = 1
+
+    state.videoPlayed = true
+
+    video.onended = function () {
+      closeFinalRound3TeamMediaOverlay()
+      saveFinalState()
+    }
+
+    const playPromise = video.play()
+
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(err => {
+        console.log("FINAL TEAM MEDIA VIDEO RESTART ERROR:", err)
         showGameToast("اضغط إعادة تشغيل مرة أخرى")
       })
     }
@@ -2767,6 +2796,7 @@ function restartFinalRound3TeamMediaVideo() {
     saveFinalState()
   }, 120)
 }
+
 /* =========================================================
    FINAL - PRESENTER VIDEO COMMANDS
    أوامر الفيديو القادمة من صفحة المقدم
