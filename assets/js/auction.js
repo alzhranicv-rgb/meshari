@@ -88,6 +88,10 @@ function saveAuctionState() {
 
   syncAuctionGlobals()
 
+  if (typeof saveUnifiedGameState === "function") {
+    saveUnifiedGameState()
+  }
+
   if (typeof syncDisplayStateToSession === "function") {
     syncDisplayStateToSession()
   }

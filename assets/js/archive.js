@@ -220,21 +220,25 @@ function saveArchiveState() {
   const timerBox = document.getElementById("archiveTimerValue")
 
   const state = {
-    archiveRevealState,
+    archiveRevealState: JSON.parse(JSON.stringify(archiveRevealState || {})),
     archiveRemainingPoints,
     archiveLastTeam,
     archiveTurnLocked,
     archiveTimerStarted,
     archiveLastTickPlayed,
-    archiveState,
-    archiveDoubleState,
+    archiveState: JSON.parse(JSON.stringify(archiveState || {})),
+    archiveDoubleState: JSON.parse(JSON.stringify(archiveDoubleState || {})),
     archiveMaxRound,
     timerValue: timerBox ? Number(timerBox.innerText || 0) : 30,
-    archiveHistory
+    archiveHistory: JSON.parse(JSON.stringify(archiveHistory || []))
   }
 
   localStorage.setItem(ARCHIVE_STORAGE_KEY, JSON.stringify(state))
   localStorage.setItem("active_segment", "archive")
+
+  if (typeof saveUnifiedGameState === "function") {
+    saveUnifiedGameState()
+  }
 
   if (typeof syncDisplayStateToSession === "function") {
     syncDisplayStateToSession()

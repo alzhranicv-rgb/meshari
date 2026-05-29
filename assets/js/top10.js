@@ -136,14 +136,14 @@ function saveTop10State() {
   const timerBox = document.getElementById("timer")
 
   const state = {
-    top10State,
-    top10DoubleState,
+    top10State: JSON.parse(JSON.stringify(top10State)),
+    top10DoubleState: JSON.parse(JSON.stringify(top10DoubleState)),
     currentTop10Answer,
     currentTop10Number,
     top10TimerStarted,
     top10MaxRound,
     timerValue: timerBox ? Number(timerBox.innerText || 0) : 0,
-    top10History
+    top10History: JSON.parse(JSON.stringify(top10History || []))
   }
 
   localStorage.setItem(TOP10_STORAGE_KEY, JSON.stringify(state))
@@ -151,6 +151,10 @@ function saveTop10State() {
   localStorage.setItem("active_segment", "top10")
 
   syncTop10Globals()
+
+  if (typeof saveUnifiedGameState === "function") {
+    saveUnifiedGameState()
+  }
 
   if (typeof syncDisplayStateToSession === "function") {
     syncDisplayStateToSession()

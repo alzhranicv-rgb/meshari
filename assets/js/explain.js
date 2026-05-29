@@ -87,10 +87,15 @@ function buildRandomExplainWords(rawWords, wordsCount) {
 function saveExplainState() {
   try {
     localStorage.setItem(EXPLAIN_STORAGE_KEY, JSON.stringify(window.explainState))
+    localStorage.setItem("active_segment", "explain")
 
     window.currentSegmentScores = {
       A: Number(window.explainState.scores?.A || 0),
       B: Number(window.explainState.scores?.B || 0)
+    }
+
+    if (typeof saveUnifiedGameState === "function") {
+      saveUnifiedGameState()
     }
 
     if (typeof syncDisplayStateToSession === "function") {

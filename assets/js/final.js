@@ -138,6 +138,12 @@ function saveFinalState() {
 
   syncFinalGlobals()
 
+ 
+  if (typeof saveUnifiedGameState === "function") {
+    saveUnifiedGameState()
+  }
+
+  
   if (typeof syncDisplayStateToSession === "function") {
     syncDisplayStateToSession()
   }
@@ -378,6 +384,110 @@ function getOtherTeam(team) {
 }
 
 /* =========================
+   Final Turn Bar
+========================= */
+
+function getFinalActiveTurnTeam() {
+  if (finalState.round === 1) {
+    return finalState.round1.activeTeam || null
+  }
+
+  if (finalState.round === 2) {
+    return finalState.round2.activeTeam || "A"
+  }
+
+  if (finalState.round === 3) {
+    if (finalState.round3.mode === "team_media") {
+      return (
+        finalState.round3.teamMedia.currentTeam ||
+        finalState.round3.activeTeam ||
+        "A"
+      )
+    }
+
+    return finalState.round3.activeTeam || "A"
+  }
+
+  return null
+}
+
+function getFinalTurnTeamName() {
+  const team = getFinalActiveTurnTeam()
+
+  if (team === "A") return teamAName || "الفريق الأول"
+  if (team === "B") return teamBName || "الفريق الثاني"
+
+  return "اختر فريق"
+}
+
+function getFinalTurnTeamClass() {
+  const team = getFinalActiveTurnTeam()
+
+  if (team === "A") return "teamA"
+  if (team === "B") return "teamB"
+
+  return "noTeam"
+}
+
+function getFinalRoundTextLabel() {
+  if (finalState.round === 1) return finalState.round1.title || "الجولة الأولى"
+  if (finalState.round === 2) return finalState.round2.title || "الجولة الثانية"
+  if (finalState.round === 3) return finalState.round3.title || "الجولة الثالثة"
+
+  return "الفاصلة"
+}
+
+function getFinalCurrentNumberText() {
+  if (finalState.round === 1) {
+    return finalState.round1.currentNumber
+      ? `الرقم ${finalState.round1.currentNumber}`
+      : "بدون رقم"
+  }
+
+  if (finalState.round === 2) {
+    return finalState.round2.currentNumber
+      ? `الرقم ${finalState.round2.currentNumber}`
+      : "بانتظار رقم"
+  }
+
+  if (finalState.round === 3) {
+    if (finalState.round3.mode === "team_media") {
+      return finalState.round3.teamMedia.currentNumber
+        ? `الرقم ${finalState.round3.teamMedia.currentNumber}`
+        : "بانتظار رقم"
+    }
+
+    return finalState.round3.currentNumber
+      ? `الرقم ${finalState.round3.currentNumber}`
+      : "بانتظار رقم"
+  }
+
+  return ""
+}
+
+function renderFinalTurnBar() {
+  const box = document.getElementById("finalTurnBar")
+  if (!box) return
+
+  const teamClass = getFinalTurnTeamClass()
+  const teamName = getFinalTurnTeamName()
+  const numberText = getFinalCurrentNumberText()
+
+  box.className = `finalTurnBar finalTurnBarHeader ${teamClass}`
+
+  box.innerHTML = `
+    <div class="finalTurnMain">
+      <span class="finalTurnBadge">الدور الآن</span>
+      <strong class="finalTurnTeam">${teamName}</strong>
+    </div>
+
+    <div class="finalTurnInfo">
+      <span>${numberText}</span>
+    </div>
+  `
+}
+
+/* =========================
    Final Auto Team Turn
    Round 2 / Round 3 فقط
 ========================= */
@@ -415,10 +525,11 @@ function setFinalAutoTeam(round) {
   }
 
   highlightFinalTeam(team)
-  renderFinalRoundTitle()
-  saveFinalState()
+renderFinalRoundTitle()
+renderFinalTurnBar()
+saveFinalState()
 
-  return team
+return team
 }
 
 function moveFinalTurnToNextTeam(round, currentTeam = null) {
@@ -448,8 +559,9 @@ function moveFinalTurnToNextTeam(round, currentTeam = null) {
   }
 
   highlightFinalTeam(nextTeam)
-  renderFinalRoundTitle()
-  saveFinalState()
+renderFinalRoundTitle()
+renderFinalTurnBar()
+saveFinalState()
 }
 
 function getRound2GroupKey(number) {
@@ -818,16 +930,6 @@ function buildFinalHTML() {
   return `
     <div class="finalWrapNew">
 
-      <div class="finalHeaderQuestionRow">
-        <div class="finalMiniTabs">
-          <button id="finalRoundTab1" onclick="goToFinalRound(1)">1</button>
-          <button id="finalRoundTab2" onclick="goToFinalRound(2)">2</button>
-          <button id="finalRoundTab3" onclick="goToFinalRound(3)">3</button>
-        </div>
-
-        <div class="finalMiniTitle" id="finalRoundTitleBar"></div>
-      </div>
-
       <div class="finalScoreBoards" id="finalScoreBoards">
 
         <div class="finalScorePanel finalScorePanelLeft" id="finalTeamABox" onclick="selectFinalTeam('A')">
@@ -836,11 +938,11 @@ function buildFinalHTML() {
           <div class="finalScoreValueBox" id="finalScoreA">0</div>
         </div>
 
-        <div class="finalScoreCenterPanel">
-          <div class="finalScoreCenterTop" id="finalRoundCenterTop"></div>
-          <div class="finalScoreCenterValue" id="finalRoundCenterNum">1</div>
-          <div class="finalScoreCenterBottom" id="finalRoundCenterBottom"></div>
-        </div>
+        <div class="finalScoreCenterPanel finalCenterMiniGlass">
+  <div class="finalCenterRoundNumber" id="finalRoundCenterNum">1</div>
+  <div class="finalCenterTurnTeam" id="finalRoundCenterBottom"></div>
+  <div id="finalRoundCenterTop" style="display:none"></div>
+</div>
 
         <div class="finalScorePanel finalScorePanelRight" id="finalTeamBBox" onclick="selectFinalTeam('B')">
           <div class="finalScoreValueBox" id="finalScoreB">0</div>
@@ -856,15 +958,17 @@ function buildFinalHTML() {
   `
 }
 
+
 function renderFinalRound() {
   clearFinalIntervals()
   ensureFinalStateShape()
 
   renderFinalTabs()
-  renderFinalScores()
-  renderFinalErrors()
-  renderFinalRoundTitle()
-  renderFinalTeamLayout()
+renderFinalScores()
+renderFinalErrors()
+renderFinalRoundTitle()
+renderFinalTeamLayout()
+renderFinalTurnBar()
 
   if (finalState.round === 1) renderFinalRound1()
   if (finalState.round === 2) renderFinalRound2()
@@ -895,12 +999,7 @@ function renderFinalRoundTitle() {
   const centerBottom = document.getElementById("finalRoundCenterBottom")
   const boards = document.getElementById("finalScoreBoards")
 
-  let title = ""
-  if (finalState.round === 1) title = finalState.round1.title
-  if (finalState.round === 2) title = finalState.round2.title
-  if (finalState.round === 3) title = finalState.round3.title
-
-  if (titleBox) titleBox.innerText = title
+  if (titleBox) titleBox.innerText = ""
 
   if (boards) {
     boards.classList.remove("finalBoardRound1", "finalBoardRoundOther", "finalRound1Mode")
@@ -912,45 +1011,11 @@ function renderFinalRoundTitle() {
     }
   }
 
-  if (finalState.round === 1) {
-    if (centerTop) centerTop.innerText = "الجولة 1"
-    if (centerNum) centerNum.innerText = "0"
-    if (centerBottom) {
-      centerBottom.innerText = finalState.round1.activeTeam
-        ? "الدور: فريق مختار"
-        : "الدور: اختر فريق"
-    }
-    return
-  }
+  if (centerTop) centerTop.innerText = ""
+  if (centerNum) centerNum.innerText = String(finalState.round)
 
-  if (finalState.round === 2) {
-    if (finalState.round2.currentType === "sequence") {
-      if (centerTop) centerTop.innerText = "المتبقي"
-      if (centerNum) centerNum.innerText = String(finalState.round2.countdown ?? 15)
-      if (centerBottom) centerBottom.innerText = "الجولة 2"
-    } else {
-      if (centerTop) centerTop.innerText = "الصح"
-      if (centerNum) centerNum.innerText = `${finalState.round2.correctCount} / 6`
-      if (centerBottom) centerBottom.innerText = "الجولة 2"
-    }
-    return
-  }
-
-  if (finalState.round === 3) {
-    if (finalState.round3.mode === "team_media") {
-      const used = finalState.round3.teamMedia.usedNumbers.length
-      if (centerTop) centerTop.innerText = "المفتوح"
-      if (centerNum) centerNum.innerText = `${used} / 4`
-      if (centerBottom) centerBottom.innerText = "الجولة 3"
-      return
-    }
-
-    const totalImages = finalState.round3.images.length || 5
-
-    if (centerTop) centerTop.innerText = "الصح"
-    if (centerNum) centerNum.innerText = `${finalState.round3.correctCount} / ${totalImages}`
-    if (centerBottom) centerBottom.innerText = "الجولة 3"
-  }
+  const teamName = getFinalTurnTeamName()
+  if (centerBottom) centerBottom.innerText = teamName
 }
 
 function renderFinalScores() {
@@ -1015,9 +1080,10 @@ function selectFinalTeam(team) {
   const current = getFinalCurrentRoundState()
 
   highlightFinalTeam(current?.activeTeam || null)
-  renderFinalRoundTitle()
-  updateFinalDoubleButton()
-  saveFinalState()
+renderFinalRoundTitle()
+renderFinalTurnBar()
+updateFinalDoubleButton()
+saveFinalState()
 }
 
 function isFinalRoundFinished(round) {
@@ -2416,11 +2482,12 @@ const canRestartVideo = videoAvailable
   `
 
   renderFinalRoundTitle()
-  renderFinalScores()
-  updateFinalUndoButtonState()
-  updateFinalDoubleButton()
-  updateEndRoundButtonState()
-  saveFinalState()
+renderFinalScores()
+renderFinalTurnBar()
+updateFinalUndoButtonState()
+updateFinalDoubleButton()
+updateEndRoundButtonState()
+saveFinalState()
 }
 
 function buildFinalRound3TeamMediaContent() {

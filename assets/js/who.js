@@ -36,13 +36,22 @@ function getWhoState() {
     return null
   }
 }
+function syncWhoGlobals() {
+  window.whoState = whoState
+  window.whoCurrentNumber = whoCurrentNumber
+
+  window.currentSegmentScores = {
+    A: Number(whoState?.scoreA || 0),
+    B: Number(whoState?.scoreB || 0)
+  }
+}
 
 function saveWhoState() {
   const timerBox = document.getElementById("timer")
 
   const state = {
-    whoState,
-    whoDoubleState,
+    whoState: JSON.parse(JSON.stringify(whoState)),
+    whoDoubleState: JSON.parse(JSON.stringify(whoDoubleState)),
     currentWhoAnswer,
     currentWhoImage,
     whoQuestionLocked,
@@ -55,6 +64,12 @@ function saveWhoState() {
   localStorage.setItem(WHO_STORAGE_KEY, JSON.stringify(state))
   localStorage.setItem("active_segment", "who")
 
+  syncWhoGlobals()
+
+  if (typeof saveUnifiedGameState === "function") {
+    saveUnifiedGameState()
+  }
+
   if (typeof syncDisplayStateToSession === "function") {
     syncDisplayStateToSession()
   }
@@ -64,12 +79,11 @@ function restoreWhoState(saved) {
   if (!saved) return
 
   whoState = saved.whoState || whoState
+
   whoDoubleState = saved.whoDoubleState || {
     used: { A: false, B: false },
     activeTeam: null
   }
-
-  window.whoState = whoState
 
   currentWhoAnswer = saved.currentWhoAnswer || null
   currentWhoImage = saved.currentWhoImage || null
@@ -78,6 +92,8 @@ function restoreWhoState(saved) {
   whoTimerStarted = !!saved.whoTimerStarted
   whoCompensationMode = !!saved.whoCompensationMode
   whoLastTickPlayed = null
+
+  syncWhoGlobals()
 
   const scoreABox = document.getElementById("whoScoreA")
   const scoreBBox = document.getElementById("whoScoreB")
@@ -91,23 +107,18 @@ function restoreWhoState(saved) {
   updateWhoDoubleButton()
 
   const grid = document.querySelector(".whoGrid")
-if (grid) {
-  grid.innerHTML = createWhoGrid()
-}
+  if (grid) {
+    grid.innerHTML = createWhoGrid()
+  }
 
-updateWhoCompensationButton()
-
+  updateWhoCompensationButton()
 
   if (currentWhoImage) {
     showWhoImageFullscreen(currentWhoImage)
   }
 
-  window.currentSegmentScores = {
-    A: whoState.scoreA,
-    B: whoState.scoreB
-  }
-
   const timerValue = Number(saved.timerValue || 0)
+
   if (whoTimerStarted && timerValue > 0) {
     resumeWhoTimer(timerValue)
   }

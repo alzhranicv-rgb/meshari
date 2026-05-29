@@ -34,14 +34,14 @@ function saveWarmupState() {
   const timerBox = document.getElementById("timer")
 
   const state = {
-    usedQuestions,
+    usedQuestions: JSON.parse(JSON.stringify(usedQuestions || {})),
     warmupScoreA,
     warmupScoreB,
     lastAnsweredTeam,
     warmupManualSelectionDone,
     warmupQuestionLocked,
     currentWarmupQuestionKey,
-    warmupDoubleState,
+    warmupDoubleState: JSON.parse(JSON.stringify(warmupDoubleState || {})),
     selectedTeam,
     currentPoints,
     currentAnswer: window.currentAnswer || "",
@@ -51,6 +51,10 @@ function saveWarmupState() {
 
   localStorage.setItem(WARMUP_STORAGE_KEY, JSON.stringify(state))
   localStorage.setItem("active_segment", "warmup")
+
+  if (typeof saveUnifiedGameState === "function") {
+    saveUnifiedGameState()
+  }
 
   if (typeof syncDisplayStateToSession === "function") {
     syncDisplayStateToSession()

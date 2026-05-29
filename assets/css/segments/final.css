@@ -5151,3 +5151,257 @@
     font-size:clamp(1.8rem,8.5vw,3.4rem) !important;
   }
 }
+/* =========================
+   FORCE Final Center Box
+========================= */
+
+#finalScoreBoards{
+  align-items:center !important;
+  gap:18px !important;
+}
+
+#finalScoreBoards #finalRoundCenterTop{
+  display:none !important;
+}
+
+#finalScoreBoards .finalScoreCenterPanel{
+  width:112px !important;
+  min-width:112px !important;
+  max-width:112px !important;
+
+  height:76px !important;
+  min-height:76px !important;
+  max-height:76px !important;
+
+  padding:8px 10px !important;
+  margin:0 !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:4px !important;
+
+  position:relative !important;
+  overflow:hidden !important;
+
+  border-radius:22px !important;
+  border:1px solid rgba(255,255,255,.62) !important;
+
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.72), rgba(255,255,255,.26)) !important;
+
+  backdrop-filter:blur(18px) saturate(150%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(150%) !important;
+
+  box-shadow:
+    0 12px 24px rgba(30,27,75,.10),
+    inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+
+#finalScoreBoards .finalScoreCenterPanel::before{
+  content:"" !important;
+  position:absolute !important;
+  top:0 !important;
+  left:14% !important;
+  right:14% !important;
+  height:40% !important;
+  border-radius:0 0 999px 999px !important;
+  background:linear-gradient(
+    180deg,
+    rgba(255,255,255,.65),
+    rgba(255,255,255,.04)
+  ) !important;
+  pointer-events:none !important;
+}
+
+#finalScoreBoards #finalRoundCenterNum{
+  position:relative !important;
+  z-index:2 !important;
+
+  font-size:44px !important;
+  font-weight:950 !important;
+  line-height:.82 !important;
+  color:#27324f !important;
+
+  padding:0 !important;
+  margin:0 !important;
+
+  text-shadow:
+    0 2px 8px rgba(255,255,255,.7),
+    0 5px 14px rgba(30,27,75,.12) !important;
+}
+
+#finalScoreBoards #finalRoundCenterBottom{
+  position:relative !important;
+  z-index:2 !important;
+
+  display:block !important;
+  width:92px !important;
+  max-width:92px !important;
+
+  padding:0 !important;
+  margin:0 !important;
+
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+
+  font-size:11px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  color:#5B21B6 !important;
+
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  text-align:center !important;
+}
+
+@media (max-width:767px){
+  #finalScoreBoards .finalScoreCenterPanel{
+    width:78px !important;
+    min-width:78px !important;
+    max-width:78px !important;
+
+    height:56px !important;
+    min-height:56px !important;
+    max-height:56px !important;
+
+    padding:5px !important;
+    border-radius:15px !important;
+    gap:2px !important;
+  }
+
+  #finalScoreBoards #finalRoundCenterNum{
+    font-size:26px !important;
+  }
+
+  #finalScoreBoards #finalRoundCenterBottom{
+    width:68px !important;
+    max-width:68px !important;
+    font-size:8px !important;
+  }
+}
+/* =========================
+   Final Layout - Remove Extra Gaps
+========================= */
+
+/* تقليل الفراغ العام داخل صفحة الفاصلة */
+.finalWrapNew{
+  gap:8px !important;
+  padding-top:0 !important;
+}
+
+/* إخفاء الهيدر اللي فوق لوحة النتائج */
+.finalHeaderQuestionRow,
+.finalMiniTitle,
+.finalTurnBar{
+  display:none !important;
+  height:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+/* لوحة النتائج قريبة من العنوان */
+.finalScoreBoards{
+  margin-top:0 !important;
+  margin-bottom:8px !important;
+  gap:14px !important;
+  align-items:center !important;
+}
+
+/* تقليل الفراغ بين لوحة النتائج ومنطقة اللعب */
+.finalMainStage{
+  margin-top:0 !important;
+  padding-top:0 !important;
+}
+
+/* لو فيه حاوية داخلية مسببة فراغ */
+.finalRound1StartView,
+.finalRound1PlayLayout,
+.finalRound2Wrap,
+.finalRound3Wrap,
+.finalRound3TeamMediaWrap{
+  margin-top:0 !important;
+  padding-top:0 !important;
+}
+
+/* المربع الأوسط زجاجي صغير ومتمركز */
+#finalScoreBoards .finalCenterMiniGlass,
+#finalScoreBoards .finalScoreCenterPanel{
+  width:110px !important;
+  min-width:110px !important;
+  max-width:110px !important;
+
+  height:66px !important;
+  min-height:66px !important;
+  max-height:66px !important;
+
+  padding:6px 8px !important;
+  margin:0 !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:2px !important;
+
+  border-radius:18px !important;
+  border:1px solid rgba(255,255,255,.62) !important;
+
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.72), rgba(255,255,255,.26)) !important;
+
+  backdrop-filter:blur(18px) saturate(150%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(150%) !important;
+
+  box-shadow:
+    0 10px 20px rgba(30,27,75,.09),
+    inset 0 1px 0 rgba(255,255,255,.85) !important;
+
+  position:relative !important;
+  overflow:hidden !important;
+}
+
+/* الرقم */
+#finalScoreBoards #finalRoundCenterNum,
+#finalScoreBoards .finalCenterRoundNumber{
+  font-size:38px !important;
+  font-weight:950 !important;
+  line-height:.85 !important;
+  margin:0 !important;
+  padding:0 !important;
+  color:#27324f !important;
+}
+
+/* اسم الفريق */
+#finalScoreBoards #finalRoundCenterBottom,
+#finalScoreBoards .finalCenterTurnTeam{
+  width:92px !important;
+  max-width:92px !important;
+
+  font-size:10px !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+
+  padding:0 !important;
+  margin:0 !important;
+
+  color:#5B21B6 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+
+  text-align:center !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* إخفاء السطر العلوي */
+#finalScoreBoards #finalRoundCenterTop,
+.finalScoreCenterTop{
+  display:none !important;
+}
