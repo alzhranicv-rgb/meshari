@@ -2802,7 +2802,6 @@ async function presenterFinalWrong() {
     presenterFinalSelected = { round: 1, number: null }
   }
 
-
   await sendCommand("wrong")
 
   setTimeout(() => {
@@ -3292,46 +3291,54 @@ function refreshPresenterFinalControlsOnly(round) {
     const teamMediaState = getPresenterFinalRound3TeamMediaState()
 
     if (isTeamMedia) {
-      const hasCurrent = !!teamMediaState.currentNumber
-      const isVideo = teamMediaState.currentMediaType === "video"
-      const questionShown = !!teamMediaState.questionShown
-      const answerShown = !!teamMediaState.answerShown
+  const hasCurrent = !!teamMediaState.currentNumber
+  const isVideo = teamMediaState.currentMediaType === "video"
+  const questionShown = !!teamMediaState.questionShown
+  const answerShown = !!teamMediaState.answerShown
+  const videoPlayed = !!teamMediaState.videoPlayed
 
-      allButtons.forEach(btn => {
-        const onclick = btn.getAttribute("onclick") || ""
+  allButtons.forEach(btn => {
+    const onclick = btn.getAttribute("onclick") || ""
 
-        if (onclick.includes("showQuestion")) {
-          btn.disabled = !(
-            hasCurrent &&
-            teamMediaState.currentQuestion &&
-            !questionShown &&
-            !answerShown
-          )
-        }
-
-        if (
-          onclick.includes("presenterPlayCurrentFinalVideo") ||
-          onclick.includes("presenterRestartCurrentFinalVideo")
-        ) {
-          btn.disabled = !(
-            hasCurrent &&
-            isVideo &&
-            !questionShown &&
-            !answerShown
-          )
-        }
-
-        if (onclick.includes("presenterFinalCorrect")) {
-          btn.disabled = !hasCurrent || answerShown
-        }
-
-        if (onclick.includes("presenterFinalWrong")) {
-          btn.disabled = !hasCurrent || answerShown
-        }
-      })
-
-      return
+    if (onclick.includes("showQuestion")) {
+      btn.disabled = !(
+        hasCurrent &&
+        teamMediaState.currentQuestion &&
+        !questionShown &&
+        !answerShown
+      )
     }
+
+    if (onclick.includes("presenterPlayCurrentFinalVideo")) {
+      btn.disabled = !(
+        hasCurrent &&
+        isVideo &&
+        !questionShown &&
+        !answerShown &&
+        !videoPlayed
+      )
+    }
+
+    if (onclick.includes("presenterRestartCurrentFinalVideo")) {
+      btn.disabled = !(
+        hasCurrent &&
+        isVideo &&
+        !questionShown &&
+        !answerShown
+      )
+    }
+
+    if (onclick.includes("presenterFinalCorrect")) {
+      btn.disabled = !hasCurrent || answerShown
+    }
+
+    if (onclick.includes("presenterFinalWrong")) {
+      btn.disabled = !hasCurrent || answerShown
+    }
+  })
+
+  return
+}
 
     const currentNumber = Number(state.currentNumber || 0)
 

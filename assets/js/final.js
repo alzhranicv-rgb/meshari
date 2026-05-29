@@ -2275,13 +2275,24 @@ function renderFinalRound3TeamMedia() {
 `
 
   const hasCurrent = !!state.currentNumber
-  const questionShown = !!state.questionShown
-  const canShowQuestion = hasCurrent && !!state.currentQuestion && !questionShown
-  const isVideo =
+const questionShown = !!state.questionShown
+const answerShown = !!state.answerShown
+
+const canShowQuestion =
+  hasCurrent &&
+  !!state.currentQuestion &&
+  !questionShown &&
+  !answerShown
+
+const videoAvailable =
   hasCurrent &&
   !questionShown &&
+  !answerShown &&
   state.currentMediaType === "video" &&
   !!state.currentMedia
+
+const canPlayVideo = videoAvailable && !state.videoPlayed
+const canRestartVideo = videoAvailable
 
   controls.innerHTML = `
     <button
@@ -2293,20 +2304,20 @@ function renderFinalRound3TeamMedia() {
     </button>
 
     <button
-      onclick="playFinalRound3TeamMediaVideo()"
-      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnStart"
-      ${isVideo ? "" : "disabled"}
-    >
-      تشغيل الفيديو
-    </button>
+  onclick="playFinalRound3TeamMediaVideo()"
+  class="archiveCtrlBtn finalTeamMediaCtrlBtn btnStart"
+  ${canPlayVideo ? "" : "disabled"}
+>
+  تشغيل الفيديو
+</button>
 
     <button
-      onclick="restartFinalRound3TeamMediaVideo()"
-      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnStart"
-      ${isVideo ? "" : "disabled"}
-    >
-      إعادة تشغيل
-    </button>
+  onclick="restartFinalRound3TeamMediaVideo()"
+  class="archiveCtrlBtn finalTeamMediaCtrlBtn btnStart"
+  ${canRestartVideo ? "" : "disabled"}
+>
+  إعادة تشغيل
+</button>
 
     <button
       onclick="finalRound3TeamMediaCorrect()"
