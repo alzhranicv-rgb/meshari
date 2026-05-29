@@ -2735,99 +2735,13 @@ body.presenterFinalRound1FocusMode .presenterFinalControlsArea{
   }
 }
 /* =========================================================
-   TABLET LANDSCAPE - BASE ONLY
-   تابلت بالعرض فقط
+   PRESENTER TABLET SYSTEM
+   تابلت بالعرض فقط - بدون تمدد وبدون important
 ========================================================= */
 
-body.tabletLandscapePresenterMode{
-  overflow:hidden !important;
-  background:#EEF3F6 !important;
-}
-
-body.tabletLandscapePresenterMode *,
-body.tabletLandscapePresenterMode *::before,
-body.tabletLandscapePresenterMode *::after{
-  transition:none !important;
-  animation:none !important;
-  scroll-behavior:auto !important;
-}
-
-body.tabletLandscapePresenterMode .homePageShell{
-  width:100vw !important;
-  height:100dvh !important;
-  min-height:100dvh !important;
-
-  padding:10px !important;
-  gap:10px !important;
-
-  overflow:hidden !important;
-}
-
-body.tabletLandscapePresenterMode .presenterSegmentPage{
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-}
-
-body.tabletLandscapePresenterMode .presenterCleanHeader{
-  width:100% !important;
-  max-width:1180px !important;
-
-  min-height:72px !important;
-  flex:0 0 auto !important;
-
-  display:grid !important;
-  grid-template-columns:150px minmax(0,1fr) 150px !important;
-  gap:8px !important;
-
-  padding:7px !important;
-  border-radius:20px !important;
-
-  box-shadow:0 6px 14px rgba(30,27,75,.07) !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-
-body.tabletLandscapePresenterMode .presenterCleanHeaderBtn,
-body.tabletLandscapePresenterMode .presenterCleanHeaderTitle{
-  min-height:56px !important;
-  border-radius:16px !important;
-}
-
-body.tabletLandscapePresenterMode .presenterCleanHeaderBtn{
-  font-size:.9rem !important;
-  font-weight:900 !important;
-}
-
-body.tabletLandscapePresenterMode .presenterCleanHeaderTitle h1{
-  font-size:1.35rem !important;
-  font-weight:900 !important;
-}
-
-body.tabletLandscapePresenterMode .presenterPanel{
-  width:100% !important;
-  max-width:1180px !important;
-
-  flex:1 1 auto !important;
-  min-height:0 !important;
-
-  overflow:hidden !important;
-}
-
-body.tabletLandscapePresenterMode .presenterCard{
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-  box-shadow:0 6px 14px rgba(30,27,75,.07) !important;
-}
-
-body.tabletLandscapePresenterMode .presenterBtn,
-body.tabletLandscapePresenterMode .presenterNumberBtn{
-  transition:none !important;
-}
-/* =========================================================
-   TABLET LANDSCAPE BASE - CLEAN
-   بدون تمدد وبدون important
-========================================================= */
+/* =========================
+   Tablet Base
+========================= */
 
 body.tabletLandscapePresenterMode{
   overflow:hidden;
@@ -2886,9 +2800,10 @@ body.tabletLandscapePresenterMode .presenterPanel{
   width:100%;
   max-width:1100px;
 
-  flex:1 1 auto;
+  flex:1;
   min-height:0;
 
+  display:block;
   overflow:hidden;
 }
 
@@ -2897,36 +2812,15 @@ body.tabletLandscapePresenterMode .presenterCard{
   -webkit-backdrop-filter:none;
 }
 
-body.tabletLandscapePresenterMode .presenterBtn,
-body.tabletLandscapePresenterMode .presenterNumberBtn{
-  transition:none;
-}
 /* =========================================================
-   TABLET LANDSCAPE PANEL
-   مساحة المحتوى فقط - بدون تمدد وبدون important
+   Shared Tablet Layout
 ========================================================= */
 
-body.tabletLandscapePresenterMode .presenterPanel{
-  width:100%;
-  max-width:1100px;
-
-  flex:1;
-  min-height:0;
-
-  display:block;
-  overflow:hidden;
-}
-/* =========================================================
-   WARMUP - TABLET LANDSCAPE CLEAN
-   التسخين فقط - بدون تمدد وبدون important
-========================================================= */
-
-body.tabletLandscapePresenterMode .presenterPanel:has(.presenterWarmupLayout){
-  display:block;
-  overflow:hidden;
-}
-
-body.tabletLandscapePresenterMode .presenterWarmupLayout{
+body.tabletLandscapePresenterMode .presenterWarmupLayout,
+body.tabletLandscapePresenterMode .presenterTop10Layout,
+body.tabletLandscapePresenterMode .presenterAuctionLayout,
+body.tabletLandscapePresenterMode .presenterWhoLayout,
+body.tabletLandscapePresenterMode .presenterFinalLayout{
   height:100%;
 
   display:grid;
@@ -2938,30 +2832,90 @@ body.tabletLandscapePresenterMode .presenterWarmupLayout{
 }
 
 body.tabletLandscapePresenterMode .presenterWarmupLeft,
-body.tabletLandscapePresenterMode .presenterWarmupRight{
+body.tabletLandscapePresenterMode .presenterWarmupRight,
+body.tabletLandscapePresenterMode .presenterTop10Left,
+body.tabletLandscapePresenterMode .presenterTop10Right,
+body.tabletLandscapePresenterMode .presenterAuctionLeft,
+body.tabletLandscapePresenterMode .presenterAuctionRight,
+body.tabletLandscapePresenterMode .presenterWhoLeft,
+body.tabletLandscapePresenterMode .presenterWhoRight{
   direction:rtl;
   min-width:0;
   height:100%;
   overflow:hidden;
 }
 
-/* =========================
-   اليسار: الفئات والأرقام
-========================= */
-
-body.tabletLandscapePresenterMode .presenterWarmupNumbersCard{
+/* كروت اليسار العامة */
+body.tabletLandscapePresenterMode .presenterWarmupNumbersCard,
+body.tabletLandscapePresenterMode .presenterTop10AnswersCard,
+body.tabletLandscapePresenterMode .presenterAuctionNumbersCard,
+body.tabletLandscapePresenterMode .presenterWhoNumbersCard{
   height:100%;
   padding:12px;
   border-radius:18px;
   overflow:hidden;
 }
 
-body.tabletLandscapePresenterMode .presenterWarmupNumbersCard .presenterLabel{
+body.tabletLandscapePresenterMode .presenterWarmupNumbersCard .presenterLabel,
+body.tabletLandscapePresenterMode .presenterTop10AnswersCard .presenterLabel,
+body.tabletLandscapePresenterMode .presenterAuctionNumbersCard .presenterLabel,
+body.tabletLandscapePresenterMode .presenterWhoNumbersCard .presenterLabel{
   margin-bottom:10px;
   font-size:1rem;
-  font-weight:900;
   line-height:1;
+  font-weight:900;
 }
+
+/* فرق فوق يمين */
+body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterCard,
+body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterCard,
+body.tabletLandscapePresenterMode .presenterAuctionTeamsBox .presenterCard,
+body.tabletLandscapePresenterMode .presenterWhoTeamsBox .presenterCard{
+  padding:0;
+  margin:0;
+
+  background:transparent;
+  border:0;
+  box-shadow:none;
+
+  overflow:visible;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterLabel,
+body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterLabel,
+body.tabletLandscapePresenterMode .presenterAuctionTeamsBox .presenterLabel,
+body.tabletLandscapePresenterMode .presenterWhoTeamsBox .presenterLabel{
+  display:none;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterTeams,
+body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterTeams,
+body.tabletLandscapePresenterMode .presenterAuctionTeamsBox .presenterTeams,
+body.tabletLandscapePresenterMode .presenterWhoTeamsBox .presenterTeams{
+  height:48px;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterBtn,
+body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterBtn,
+body.tabletLandscapePresenterMode .presenterAuctionTeamsBox .presenterBtn,
+body.tabletLandscapePresenterMode .presenterWhoTeamsBox .presenterBtn{
+  height:48px;
+  min-height:48px;
+
+  border-radius:14px;
+
+  font-size:.95rem;
+  font-weight:900;
+  padding:6px;
+}
+
+/* =========================================================
+   Warmup
+========================================================= */
 
 body.tabletLandscapePresenterMode .presenterWarmupCats{
   height:calc(100% - 32px);
@@ -3016,10 +2970,6 @@ body.tabletLandscapePresenterMode .presenterWarmupNumbers .presenterNumberBtn{
   font-weight:900;
 }
 
-/* =========================
-   اليمين: الفرق + السؤال + الإجابة + التحكم
-========================= */
-
 body.tabletLandscapePresenterMode .presenterWarmupRight{
   display:grid;
   grid-template-rows:48px 265px 44px;
@@ -3027,45 +2977,6 @@ body.tabletLandscapePresenterMode .presenterWarmupRight{
   align-content:start;
 }
 
-body.tabletLandscapePresenterMode .presenterWarmupTeamsBox{
-  height:48px;
-}
-
-body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterCard{
-  padding:0;
-  margin:0;
-
-  background:transparent;
-  border:0;
-  box-shadow:none;
-
-  overflow:visible;
-}
-
-body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterLabel{
-  display:none;
-}
-
-body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterTeams{
-  height:48px;
-
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-body.tabletLandscapePresenterMode .presenterWarmupTeamsBox .presenterBtn{
-  height:48px;
-  min-height:48px;
-
-  border-radius:14px;
-
-  font-size:.95rem;
-  font-weight:900;
-  padding:6px;
-}
-
-/* كرت السؤال والإجابة */
 body.tabletLandscapePresenterMode .presenterWarmupPreviewCard{
   height:265px;
   max-height:265px;
@@ -3125,7 +3036,6 @@ body.tabletLandscapePresenterMode #presenterWarmupAnswerText{
   color:#0F766E;
 }
 
-/* أزرار التحكم */
 body.tabletLandscapePresenterMode .presenterWarmupActions{
   height:44px;
 
@@ -3152,52 +3062,10 @@ body.tabletLandscapePresenterMode .presenterWarmupActions .presenterBtn{
 body.tabletLandscapePresenterMode .presenterWarmupActions .presenterBtn:last-child:nth-child(odd){
   grid-column:auto;
 }
+
 /* =========================================================
-   TOP 10 - TABLET LANDSCAPE CLEAN
-   بدون تمدد وبدون important
+   Top 10
 ========================================================= */
-
-body.tabletLandscapePresenterMode .presenterPanel:has(.presenterTop10Layout){
-  display:block;
-  overflow:hidden;
-}
-
-body.tabletLandscapePresenterMode .presenterTop10Layout{
-  height:100%;
-
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-
-  direction:ltr;
-  overflow:hidden;
-}
-
-body.tabletLandscapePresenterMode .presenterTop10Left,
-body.tabletLandscapePresenterMode .presenterTop10Right{
-  direction:rtl;
-  min-width:0;
-  height:100%;
-  overflow:hidden;
-}
-
-/* =========================
-   اليسار: الإجابات
-========================= */
-
-body.tabletLandscapePresenterMode .presenterTop10AnswersCard{
-  height:100%;
-  padding:12px;
-  border-radius:18px;
-  overflow:hidden;
-}
-
-body.tabletLandscapePresenterMode .presenterTop10AnswersCard .presenterLabel{
-  margin-bottom:10px;
-  font-size:1rem;
-  font-weight:900;
-  line-height:1;
-}
 
 body.tabletLandscapePresenterMode .presenterTop10AnswersCols{
   height:calc(100% - 32px);
@@ -3267,10 +3135,6 @@ body.tabletLandscapePresenterMode .presenterTop10OpenedBy{
   text-overflow:ellipsis;
 }
 
-/* =========================
-   اليمين: الفرق + السؤال + التحكم
-========================= */
-
 body.tabletLandscapePresenterMode .presenterTop10Right{
   display:grid;
   grid-template-rows:48px 230px 92px;
@@ -3278,46 +3142,6 @@ body.tabletLandscapePresenterMode .presenterTop10Right{
   align-content:start;
 }
 
-/* الفرق */
-body.tabletLandscapePresenterMode .presenterTop10TeamsBox{
-  height:48px;
-}
-
-body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterCard{
-  padding:0;
-  margin:0;
-
-  background:transparent;
-  border:0;
-  box-shadow:none;
-
-  overflow:visible;
-}
-
-body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterLabel{
-  display:none;
-}
-
-body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterTeams{
-  height:48px;
-
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-body.tabletLandscapePresenterMode .presenterTop10TeamsBox .presenterBtn{
-  height:48px;
-  min-height:48px;
-
-  border-radius:14px;
-
-  font-size:.95rem;
-  font-weight:900;
-  padding:6px;
-}
-
-/* كرت السؤال */
 body.tabletLandscapePresenterMode .presenterTop10QuestionCard{
   height:230px;
   max-height:230px;
@@ -3385,7 +3209,6 @@ body.tabletLandscapePresenterMode .presenterTop10QuestionText{
   text-align:center;
 }
 
-/* أزرار التحكم */
 body.tabletLandscapePresenterMode .presenterTop10Actions{
   height:92px;
 
@@ -3408,4 +3231,423 @@ body.tabletLandscapePresenterMode .presenterTop10Actions .presenterBtn{
   padding:5px;
 
   grid-column:auto;
+}
+
+/* =========================================================
+   Auction
+========================================================= */
+
+body.tabletLandscapePresenterMode .presenterAuctionRight{
+  display:grid;
+  grid-template-rows:48px 265px 92px;
+  gap:8px;
+  align-content:start;
+}
+
+body.tabletLandscapePresenterMode .presenterAuctionGrid{
+  height:calc(100% - 32px);
+
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterAuctionGrid .presenterNumberBtn{
+  min-height:48px;
+  border-radius:14px;
+
+  font-size:1.2rem;
+  font-weight:900;
+}
+
+body.tabletLandscapePresenterMode .presenterAuctionPreviewCard{
+  height:265px;
+  max-height:265px;
+
+  padding:10px;
+  border-radius:18px;
+
+  display:grid;
+  grid-template-rows:auto 76px auto 1fr;
+  gap:6px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterAuctionPreviewCard .presenterLabel{
+  margin:0;
+  font-size:.9rem;
+  line-height:1;
+  font-weight:900;
+}
+
+body.tabletLandscapePresenterMode #presenterAuctionAnswerText{
+  height:76px;
+  min-height:76px;
+  max-height:76px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px;
+  border-radius:16px;
+
+  font-size:1.25rem;
+  line-height:1.3;
+  font-weight:900;
+  text-align:center;
+
+  color:#0F766E;
+}
+
+body.tabletLandscapePresenterMode #presenterAuctionImageBox{
+  min-height:110px;
+  max-height:130px;
+
+  border-radius:16px;
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode #presenterAuctionImageBox img,
+body.tabletLandscapePresenterMode #presenterAuctionImageBox video{
+  width:100%;
+  height:100%;
+  max-height:130px;
+
+  object-fit:contain;
+}
+
+body.tabletLandscapePresenterMode .presenterAuctionActions{
+  height:92px;
+
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(2,1fr);
+  gap:7px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterAuctionActions .presenterBtn{
+  height:42px;
+  min-height:42px;
+
+  border-radius:13px;
+
+  font-size:.76rem;
+  font-weight:900;
+  padding:5px;
+
+  grid-column:auto;
+}
+
+/* =========================================================
+   Who
+   يحتاج renderWho يكون فيه:
+   presenterWhoLayout / presenterWhoLeft / presenterWhoRight
+========================================================= */
+
+body.tabletLandscapePresenterMode .presenterWhoRight{
+  display:grid;
+  grid-template-rows:48px 265px 92px;
+  gap:8px;
+  align-content:start;
+}
+
+body.tabletLandscapePresenterMode .presenterWhoGrid{
+  height:calc(100% - 32px);
+
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterWhoGrid .presenterNumberBtn{
+  min-height:48px;
+  border-radius:14px;
+
+  font-size:1.2rem;
+  font-weight:900;
+}
+
+body.tabletLandscapePresenterMode .presenterWhoPreviewCard{
+  height:265px;
+  max-height:265px;
+
+  padding:10px;
+  border-radius:18px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterWhoActions{
+  height:92px;
+
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(2,1fr);
+  gap:7px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterWhoActions .presenterBtn{
+  height:42px;
+  min-height:42px;
+
+  border-radius:13px;
+
+  font-size:.76rem;
+  font-weight:900;
+  padding:5px;
+
+  grid-column:auto;
+}
+
+/* =========================================================
+   Explain
+========================================================= */
+
+body.tabletLandscapePresenterMode .presenterExplainGameShell{
+  width:100%;
+  height:100%;
+
+  display:grid;
+  grid-template-rows:92px 64px 1fr 58px;
+  gap:10px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterExplainTopBoard{
+  max-width:none;
+  width:100%;
+
+  min-height:0;
+  margin:0;
+}
+
+body.tabletLandscapePresenterMode .presenterExplainTeamBox{
+  min-height:74px;
+}
+
+body.tabletLandscapePresenterMode .presenterExplainNumbersGrid{
+  width:100%;
+
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(72px,86px));
+  justify-content:center;
+  gap:8px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterExplainNumberCard{
+  width:86px;
+  height:44px;
+  min-height:44px;
+
+  border-radius:14px;
+}
+
+body.tabletLandscapePresenterMode .presenterExplainNumberCard span{
+  font-size:1.25rem;
+}
+
+body.tabletLandscapePresenterMode .presenterExplainMainStage{
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:1fr 92px;
+  gap:10px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterExplainWordBox{
+  width:100%;
+  min-height:0;
+
+  padding:14px;
+  border-radius:22px;
+
+  font-size:clamp(2rem,4vw,3.6rem);
+}
+
+body.tabletLandscapePresenterMode .presenterExplainTimerBox{
+  width:180px;
+  min-width:180px;
+  max-width:180px;
+
+  height:92px;
+  min-height:92px;
+  max-height:92px;
+
+  border-radius:22px;
+
+  font-size:clamp(3rem,6vw,4.8rem);
+}
+
+body.tabletLandscapePresenterMode .presenterExplainControls{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+
+body.tabletLandscapePresenterMode .presenterExplainControls .explainControlBtn,
+body.tabletLandscapePresenterMode .presenterExplainControls .presenterBtn{
+  height:48px;
+  min-height:48px;
+
+  border-radius:14px;
+
+  font-size:.9rem;
+}
+
+/* =========================================================
+   Final
+========================================================= */
+
+body.tabletLandscapePresenterMode .presenterFinalLayout{
+  height:100%;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+
+  direction:ltr;
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterFinalTeamsArea,
+body.tabletLandscapePresenterMode .presenterFinalPreviewCard,
+body.tabletLandscapePresenterMode .presenterFinalNumbersCard,
+body.tabletLandscapePresenterMode .presenterFinalControlsArea{
+  direction:rtl;
+}
+
+body.tabletLandscapePresenterMode .presenterFinalPreviewCard,
+body.tabletLandscapePresenterMode .presenterFinalNumbersCard{
+  height:100%;
+  padding:12px;
+  border-radius:18px;
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterFinalPreviewBox{
+  min-height:150px;
+  max-height:260px;
+
+  overflow:auto;
+}
+
+body.tabletLandscapePresenterMode .presenterFinalControlsArea{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterFinalControlsArea .presenterActions{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+
+body.tabletLandscapePresenterMode .presenterFinalControlsArea .presenterBtn{
+  height:44px;
+  min-height:44px;
+
+  border-radius:14px;
+
+  font-size:.8rem;
+  padding:5px;
+}
+
+/* =========================================================
+   Archive
+========================================================= */
+
+body.tabletLandscapePresenterMode .presenterArchiveLayout{
+  height:100%;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterArchiveSimpleScore{
+  min-height:80px;
+}
+
+body.tabletLandscapePresenterMode .presenterArchiveRequiredList{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+
+  overflow:hidden;
+}
+
+body.tabletLandscapePresenterMode .presenterArchiveRequiredItem{
+  min-height:48px;
+  border-radius:14px;
+
+  font-size:.9rem;
+}
+
+/* =========================================================
+   Short Height
+========================================================= */
+
+@media (max-height:620px){
+
+  body.tabletLandscapePresenterMode .presenterCleanHeader{
+    min-height:62px;
+  }
+
+  body.tabletLandscapePresenterMode .presenterCleanHeaderBtn,
+  body.tabletLandscapePresenterMode .presenterCleanHeaderTitle{
+    min-height:48px;
+  }
+
+  body.tabletLandscapePresenterMode .presenterWarmupRight,
+  body.tabletLandscapePresenterMode .presenterTop10Right,
+  body.tabletLandscapePresenterMode .presenterAuctionRight,
+  body.tabletLandscapePresenterMode .presenterWhoRight{
+    grid-template-rows:44px 225px 86px;
+    gap:7px;
+  }
+
+  body.tabletLandscapePresenterMode .presenterWarmupPreviewCard,
+  body.tabletLandscapePresenterMode .presenterTop10QuestionCard,
+  body.tabletLandscapePresenterMode .presenterAuctionPreviewCard,
+  body.tabletLandscapePresenterMode .presenterWhoPreviewCard{
+    height:225px;
+    max-height:225px;
+  }
+
+  body.tabletLandscapePresenterMode .presenterWarmupActions,
+  body.tabletLandscapePresenterMode .presenterTop10Actions,
+  body.tabletLandscapePresenterMode .presenterAuctionActions,
+  body.tabletLandscapePresenterMode .presenterWhoActions{
+    height:86px;
+    gap:6px;
+  }
+
+  body.tabletLandscapePresenterMode .presenterWarmupActions .presenterBtn,
+  body.tabletLandscapePresenterMode .presenterTop10Actions .presenterBtn,
+  body.tabletLandscapePresenterMode .presenterAuctionActions .presenterBtn,
+  body.tabletLandscapePresenterMode .presenterWhoActions .presenterBtn{
+    height:40px;
+    min-height:40px;
+    font-size:.72rem;
+  }
 }
