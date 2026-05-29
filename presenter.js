@@ -1752,67 +1752,81 @@ async function renderAuction() {
   presenterAuctionRows = data || []
 
   panel.innerHTML = `
-    ${teamButtons()}
+    <div class="presenterAuctionLayout">
 
-    <section class="presenterCard presenterAuctionPreviewCard">
-      <div class="presenterLabel">الإجابة</div>
+      <!-- اليسار: الأرقام -->
+      <div class="presenterAuctionLeft">
 
-      <div id="presenterAuctionAnswerText" class="presenterAnswerBody">
-        —
+        <section class="presenterCard presenterAuctionNumbersCard">
+          <div class="presenterLabel">الأرقام</div>
+
+          <div class="presenterGrid four presenterAuctionGrid" id="presenterAuctionGrid">
+            ${Array.from({ length: maxNumber }, (_, i) => i + 1).map(num => {
+              const isUsed = used.includes(num)
+              const isCurrent = currentNumber === num
+
+              return `
+                <button
+                  class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
+                  ${isUsed || pendingScore ? "disabled" : ""}
+                  onclick="openAuctionPresenterNumber(${num})"
+                >
+                  ${isUsed ? "" : num}
+                </button>
+              `
+            }).join("")}
+          </div>
+        </section>
+
       </div>
 
-      <div class="presenterLabel">الصورة</div>
+      <!-- اليمين: الفرق + الإجابة + الصورة + التحكم -->
+      <div class="presenterAuctionRight">
 
-      <div id="presenterAuctionImageBox" class="presenterImagePreviewBox hidden"></div>
-    </section>
+        <div class="presenterAuctionTeamsBox">
+          ${teamButtons()}
+        </div>
 
-    <section class="presenterCard">
-      <div class="presenterLabel">الأرقام</div>
+        <section class="presenterCard presenterAuctionPreviewCard">
+          <div class="presenterLabel">الإجابة</div>
 
-      <div class="presenterGrid four" id="presenterAuctionGrid">
-        ${Array.from({ length: maxNumber }, (_, i) => i + 1).map(num => {
-          const isUsed = used.includes(num)
-          const isCurrent = currentNumber === num
+          <div id="presenterAuctionAnswerText" class="presenterAnswerBody">
+            —
+          </div>
 
-          return `
-            <button
-              class="presenterNumberBtn ${isUsed ? "presenterOpened" : ""} ${isCurrent ? "selectedPresenterTeam" : ""}"
-              ${isUsed || pendingScore ? "disabled" : ""}
-              onclick="openAuctionPresenterNumber(${num})"
-            >
-              ${isUsed ? "" : num}
-            </button>
-          `
-        }).join("")}
+          <div class="presenterLabel">الصورة</div>
+
+          <div id="presenterAuctionImageBox" class="presenterImagePreviewBox hidden"></div>
+        </section>
+
+        <div class="presenterAuctionActions">
+          <button
+            class="presenterBtn gray"
+            onclick="sendCommand('double')"
+            ${currentNumber || pendingScore ? "disabled" : ""}
+          >
+            دوبيلا
+          </button>
+
+          <button class="presenterBtn green" onclick="sendCommand('correct')">
+            ✓ صحيحة
+          </button>
+
+          <button class="presenterBtn red" onclick="sendCommand('wrong')">
+            ✕ خطأ
+          </button>
+
+          <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
+            تكبير الصورة
+          </button>
+
+          <button class="presenterBtn gray" onclick="sendCommand('undo')">
+            تراجع
+          </button>
+        </div>
+
       </div>
-    </section>
 
-    <div class="presenterActions">
-      <button
-        class="presenterBtn gray"
-        onclick="sendCommand('double')"
-        ${currentNumber || pendingScore ? "disabled" : ""}
-      >
-        دوبيلا
-      </button>
-
-      <button class="presenterBtn green" onclick="sendCommand('correct')">
-        ✓ إجابة صحيحة
-      </button>
-
-      <button class="presenterBtn red" onclick="sendCommand('wrong')">
-        ✕ خطأ
-      </button>
-    </div>
-
-    <div class="presenterActions">
-      <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
-        تكبير الصورة
-      </button>
-
-      <button class="presenterBtn gray" onclick="sendCommand('undo')">
-        تراجع
-      </button>
     </div>
   `
 
