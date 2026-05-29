@@ -3097,286 +3097,75 @@ body.tabletPresenterMode .presenterNumberBtn{
   font-weight:900 !important;
 }
 
-/* =========================
-   Warmup Clean Layout
-   يسار: الفئات + الفرق + التحكم
-   يمين: السؤال + الإجابة
-========================= */
-
-body.tabletPresenterMode .presenterPanel:has(.presenterWarmupLayout){
-  width:100% !important;
-  max-width:1180px !important;
-  height:calc(100dvh - 92px) !important;
-
-  display:block !important;
-  overflow:hidden !important;
-}
-
-body.tabletPresenterMode .presenterWarmupLayout{
-  width:100% !important;
-  height:100% !important;
-
-  display:grid !important;
-  grid-template-columns:48% 52% !important;
-  gap:10px !important;
-
-  direction:ltr !important;
-}
-
-body.tabletPresenterMode .presenterWarmupLeft,
-body.tabletPresenterMode .presenterWarmupRight{
-  direction:rtl !important;
-  min-width:0 !important;
-  height:100% !important;
-}
-
-/* اليسار */
-body.tabletPresenterMode .presenterWarmupLeft{
-  display:grid !important;
-  grid-template-rows:minmax(0,1fr) auto !important;
-  gap:8px !important;
-}
-
-body.tabletPresenterMode .presenterWarmupNumbersCard{
-  padding:10px !important;
-  border-radius:18px !important;
-  overflow:hidden !important;
-}
-
-body.tabletPresenterMode .presenterWarmupNumbersCard .presenterLabel{
-  font-size:.9rem !important;
-  margin-bottom:7px !important;
-  font-weight:900 !important;
-}
-
-body.tabletPresenterMode .presenterWarmupCats{
-  height:calc(100% - 30px) !important;
-
-  display:grid !important;
-  grid-template-columns:1fr !important;
-  gap:6px !important;
-
-  overflow:hidden !important;
-}
-
-body.tabletPresenterMode .presenterWarmupCat{
-  min-height:0 !important;
-
-  display:grid !important;
-  grid-template-columns:92px minmax(0,1fr) !important;
-  gap:6px !important;
-  align-items:center !important;
-
-  padding:6px !important;
-  border-radius:15px !important;
-}
-
-body.tabletPresenterMode .presenterWarmupCatTitle{
-  height:38px !important;
-  min-height:38px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  margin:0 !important;
-  padding:4px !important;
-
-  border-radius:12px !important;
-
-  font-size:.86rem !important;
-  line-height:1.15 !important;
-  font-weight:900 !important;
-  text-align:center !important;
-}
-
-body.tabletPresenterMode .presenterWarmupNumbers{
-  display:grid !important;
-  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-  gap:5px !important;
-}
-
-body.tabletPresenterMode .presenterWarmupNumbers .presenterNumberBtn{
-  height:38px !important;
-  min-height:38px !important;
-
-  border-radius:12px !important;
-
-  font-size:1.1rem !important;
-  font-weight:900 !important;
-}
-
-/* أسفل اليسار: الفرق + التحكم */
-body.tabletPresenterMode .presenterWarmupBottom{
-  display:grid !important;
-  grid-template-rows:auto auto !important;
-  gap:8px !important;
-}
-
-body.tabletPresenterMode .presenterWarmupBottom .presenterCard{
-  padding:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  border:0 !important;
-}
-
-body.tabletPresenterMode .presenterWarmupBottom .presenterLabel{
-  display:none !important;
-}
-
-body.tabletPresenterMode .presenterWarmupBottom .presenterTeams{
-  display:grid !important;
-  grid-template-columns:1fr 1fr !important;
-  gap:8px !important;
-}
-
-body.tabletPresenterMode .presenterWarmupBottom .presenterTeams .presenterBtn{
-  height:50px !important;
-  min-height:50px !important;
-
-  border-radius:16px !important;
-
-  font-size:1.05rem !important;
-  font-weight:900 !important;
-}
+/* =========================================================
+   WARMUP SMALL TUNING
+   تحكم صف واحد + تصغير السؤال والإجابة
+========================================================= */
 
 body.tabletPresenterMode .presenterWarmupActions{
   display:grid !important;
-  grid-template-columns:1fr 1fr 1fr !important;
-  gap:8px !important;
+  grid-template-columns:repeat(3,1fr) !important;
+  gap:6px !important;
 }
 
 body.tabletPresenterMode .presenterWarmupActions .presenterBtn{
-  height:50px !important;
-  min-height:50px !important;
-
-  border-radius:16px !important;
-
-  font-size:.95rem !important;
+  height:42px !important;
+  min-height:42px !important;
+  border-radius:14px !important;
+  font-size:.86rem !important;
   font-weight:900 !important;
-  padding:6px !important;
+  padding:5px !important;
 }
 
-/* اليمين */
-body.tabletPresenterMode .presenterWarmupRight{
-  display:grid !important;
-  grid-template-rows:1fr !important;
+body.tabletPresenterMode .presenterWarmupBottom .presenterTeams .presenterBtn{
+  height:44px !important;
+  min-height:44px !important;
+  border-radius:14px !important;
+  font-size:.95rem !important;
+  font-weight:900 !important;
 }
 
 body.tabletPresenterMode .presenterWarmupPreviewCard{
-  height:100% !important;
-
+  height:auto !important;
+  max-height:360px !important;
   padding:12px !important;
   border-radius:20px !important;
-
   display:grid !important;
-  grid-template-rows:auto minmax(0,1fr) auto minmax(0,.75fr) !important;
+  grid-template-rows:auto 155px auto 105px !important;
   gap:8px !important;
-
   overflow:hidden !important;
-}
-
-body.tabletPresenterMode .presenterWarmupPreviewCard .presenterLabel{
-  font-size:.95rem !important;
-  margin:0 !important;
-  font-weight:900 !important;
-  color:#1E1B4B !important;
-}
-
-body.tabletPresenterMode .presenterWarmupPreviewCard .answerLabel{
-  margin-top:2px !important;
+  align-self:start !important;
 }
 
 body.tabletPresenterMode #presenterWarmupQuestionText{
-  min-height:0 !important;
-  height:100% !important;
-
+  min-height:155px !important;
+  height:155px !important;
+  max-height:155px !important;
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
-
-  padding:18px !important;
-  border-radius:20px !important;
-
-  font-size:1.45rem !important;
-  line-height:1.65 !important;
+  padding:16px !important;
+  border-radius:18px !important;
+  font-size:1.32rem !important;
+  line-height:1.55 !important;
   font-weight:900 !important;
   text-align:center !important;
 }
 
 body.tabletPresenterMode #presenterWarmupAnswerText{
-  min-height:0 !important;
-  height:100% !important;
-
+  min-height:105px !important;
+  height:105px !important;
+  max-height:105px !important;
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
-
-  padding:16px !important;
-  border-radius:20px !important;
-
-  font-size:1.7rem !important;
-  line-height:1.45 !important;
+  padding:14px !important;
+  border-radius:18px !important;
+  font-size:1.5rem !important;
+  line-height:1.35 !important;
   font-weight:900 !important;
   text-align:center !important;
-
   color:#0F766E !important;
-}
-
-/* ضغط الشاشة القصيرة */
-@media (max-height:620px){
-
-  body.tabletPresenterMode .presenterPanel:has(.presenterWarmupLayout){
-    height:calc(100dvh - 84px) !important;
-  }
-
-  body.tabletPresenterMode .presenterWarmupLayout{
-    grid-template-columns:48% 52% !important;
-    gap:8px !important;
-  }
-
-  body.tabletPresenterMode .presenterWarmupLeft{
-    gap:7px !important;
-  }
-
-  body.tabletPresenterMode .presenterWarmupNumbersCard{
-    padding:8px !important;
-  }
-
-  body.tabletPresenterMode .presenterWarmupCat{
-    grid-template-columns:82px minmax(0,1fr) !important;
-    padding:5px !important;
-    gap:5px !important;
-  }
-
-  body.tabletPresenterMode .presenterWarmupCatTitle{
-    height:32px !important;
-    min-height:32px !important;
-    font-size:.78rem !important;
-  }
-
-  body.tabletPresenterMode .presenterWarmupNumbers .presenterNumberBtn{
-    height:32px !important;
-    min-height:32px !important;
-    font-size:1rem !important;
-  }
-
-  body.tabletPresenterMode .presenterWarmupBottom .presenterTeams .presenterBtn,
-  body.tabletPresenterMode .presenterWarmupActions .presenterBtn{
-    height:44px !important;
-    min-height:44px !important;
-    font-size:.88rem !important;
-  }
-
-  body.tabletPresenterMode #presenterWarmupQuestionText{
-    font-size:1.28rem !important;
-    padding:14px !important;
-  }
-
-  body.tabletPresenterMode #presenterWarmupAnswerText{
-    font-size:1.5rem !important;
-    padding:12px !important;
-  }
 }
 
 /* =========================
