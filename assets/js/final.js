@@ -573,7 +573,7 @@ function activateFinalDouble() {
   }
 
   if (finalState.doubleState.used[team]) {
-    showGameToast("هذا الفريق استخدم الدبل مسبقًا في الفاصلة")
+    showGameToast("هذا الفريق استخدم الدبل مسبقًا في صح صحلي")
     return
   }
 
@@ -674,7 +674,7 @@ window.renderFinal = async function () {
   await loadFinalRoundMeta()
   await loadFinalRound1CardTexts()
 
-  openSegment("الفاصلة", buildFinalHTML())
+  openSegment("صح صحلي", buildFinalHTML())
   renderFinalRound()
   saveFinalState()
   updateEndRoundButtonState()
