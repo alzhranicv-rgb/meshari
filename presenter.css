@@ -3373,7 +3373,38 @@ body.tabletPresenterMode #presenterWarmupAnswerText{
     font-size:1.22rem !important;
   }
 }
+/* WARMUP FORCE TUNING */
 
+body.tabletPresenterMode .presenterWarmupRight{
+  align-self:start !important;
+}
+
+body.tabletPresenterMode #presenterWarmupQuestionText{
+  height:125px !important;
+  min-height:125px !important;
+  max-height:125px !important;
+  padding:12px !important;
+  border-radius:16px !important;
+  font-size:1.18rem !important;
+  line-height:1.5 !important;
+}
+
+body.tabletPresenterMode #presenterWarmupAnswerText{
+  height:82px !important;
+  min-height:82px !important;
+  max-height:82px !important;
+  padding:10px !important;
+  border-radius:16px !important;
+  font-size:1.35rem !important;
+  line-height:1.3 !important;
+}
+
+body.tabletPresenterMode .presenterWarmupBottom .presenterTeams .presenterBtn{
+  height:42px !important;
+  min-height:42px !important;
+  font-size:.9rem !important;
+  border-radius:14px !important;
+}
 /* =========================
    Top 10
 ========================= */

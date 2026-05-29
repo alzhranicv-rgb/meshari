@@ -1212,23 +1212,61 @@ async function renderWarmup() {
         <div class="presenterWarmupBottom">
           ${teamButtons()}
 
-          <div class="presenterActions presenterMainActions presenterWarmupActions">
-            <button
-              class="presenterBtn gray presenterDoubleBtn"
-              onclick="sendCommand('double')"
-              ${locked || currentKey ? "disabled" : ""}
-            >
-              دوبيلا
-            </button>
+          <div
+  class="presenterWarmupActions"
+  style="
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:6px;
+    width:100%;
+  "
+>
+  <button
+    class="presenterBtn gray presenterDoubleBtn"
+    style="
+      height:42px;
+      min-height:42px;
+      border-radius:14px;
+      font-size:.86rem;
+      padding:5px;
+      grid-column:auto;
+    "
+    onclick="sendCommand('double')"
+    ${locked || currentKey ? "disabled" : ""}
+  >
+    دوبيلا
+  </button>
 
-            <button class="presenterBtn red presenterWrongBtn" onclick="sendCommand('wrong')">
-              ✕ خطأ
-            </button>
+  <button
+    class="presenterBtn red presenterWrongBtn"
+    style="
+      height:42px;
+      min-height:42px;
+      border-radius:14px;
+      font-size:.86rem;
+      padding:5px;
+      grid-column:auto;
+    "
+    onclick="sendCommand('wrong')"
+  >
+    ✕ خطأ
+  </button>
 
-            <button class="presenterBtn green presenterCorrectBtn" onclick="sendCommand('correct')">
-              ✓ صح
-            </button>
-          </div>
+  <button
+    class="presenterBtn green presenterCorrectBtn"
+    style="
+      height:42px;
+      min-height:42px;
+      border-radius:14px;
+      font-size:.86rem;
+      padding:5px;
+      grid-column:auto;
+    "
+    onclick="sendCommand('correct')"
+  >
+    ✓ صح
+  </button>
+</div>
         </div>
 
       </div>
