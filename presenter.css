@@ -3175,3 +3175,61 @@ body.tabletPresenterMode .presenterWarmupActions .presenterBtn:last-child:nth-ch
     font-size:.82rem !important;
   }
 }
+/* =========================================================
+   WARMUP RIGHT SIDE SMALL TUNING
+   تصغير الجهة اليمنى فقط
+========================================================= */
+
+body.tabletPresenterMode .presenterWarmupRight{
+  grid-template-rows:48px 265px 44px !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+
+body.tabletPresenterMode .presenterWarmupTeamsBox,
+body.tabletPresenterMode .presenterWarmupTeamsBox .presenterTeams,
+body.tabletPresenterMode .presenterWarmupTeamsBox .presenterBtn{
+  height:48px !important;
+  min-height:48px !important;
+}
+
+body.tabletPresenterMode .presenterWarmupTeamsBox .presenterBtn{
+  font-size:.95rem !important;
+  border-radius:14px !important;
+}
+
+body.tabletPresenterMode .presenterWarmupPreviewCard{
+  max-height:265px !important;
+  grid-template-rows:auto 105px auto 68px !important;
+  gap:6px !important;
+  padding:10px !important;
+}
+
+body.tabletPresenterMode #presenterWarmupQuestionText{
+  height:105px !important;
+  min-height:105px !important;
+  max-height:105px !important;
+  font-size:1.18rem !important;
+  line-height:1.45 !important;
+  padding:12px !important;
+}
+
+body.tabletPresenterMode #presenterWarmupAnswerText{
+  height:68px !important;
+  min-height:68px !important;
+  max-height:68px !important;
+  font-size:1.28rem !important;
+  line-height:1.25 !important;
+  padding:10px !important;
+}
+
+body.tabletPresenterMode .presenterWarmupActions,
+body.tabletPresenterMode .presenterWarmupActions .presenterBtn{
+  height:44px !important;
+  min-height:44px !important;
+}
+
+body.tabletPresenterMode .presenterWarmupActions .presenterBtn{
+  font-size:.86rem !important;
+  border-radius:14px !important;
+}
