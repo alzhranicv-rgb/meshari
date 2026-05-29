@@ -3234,12 +3234,21 @@ body.tabletPresenterMode .presenterWarmupActions .presenterBtn{
   border-radius:14px !important;
 }
 /* =========================================================
-   TOP 10 TABLET
+   TOP 10 TABLET CLEAN
+   نفس فكرة التسخين
    اليسار: الإجابات
-   اليمين: الفرق + السؤال + الأخطاء + التحكم
+   اليمين: الفرق + السؤال + التحكم
 ========================================================= */
 
-body.tabletPresenterMode .presenterTop10Layout{
+body.tabletPresenterMode #presenterPanel{
+  width:100% !important;
+  max-width:1180px !important;
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+
+body.tabletPresenterMode #presenterPanel .presenterTop10Layout{
   width:100% !important;
   height:calc(100dvh - 92px) !important;
 
@@ -3256,15 +3265,12 @@ body.tabletPresenterMode .presenterTop10Right{
   direction:rtl !important;
   min-width:0 !important;
   height:100% !important;
+  overflow:hidden !important;
 }
 
 /* =========================
-   LEFT - Answers
+   اليسار: الإجابات
 ========================= */
-
-body.tabletPresenterMode .presenterTop10Left{
-  overflow:hidden !important;
-}
 
 body.tabletPresenterMode .presenterTop10AnswersCard{
   height:100% !important;
@@ -3277,7 +3283,6 @@ body.tabletPresenterMode .presenterTop10AnswersCard{
 
 body.tabletPresenterMode .presenterTop10AnswersCard .presenterLabel{
   margin-bottom:10px !important;
-
   font-size:1.05rem !important;
   line-height:1 !important;
   font-weight:900 !important;
@@ -3294,8 +3299,8 @@ body.tabletPresenterMode .presenterTop10Answers{
 }
 
 body.tabletPresenterMode .presenterTop10AnswerBtn{
-  min-height:0 !important;
   height:40px !important;
+  min-height:40px !important;
 
   display:grid !important;
   grid-template-columns:38px minmax(0,1fr) 70px !important;
@@ -3335,7 +3340,6 @@ body.tabletPresenterMode .presenterTop10AnswerText{
 
 body.tabletPresenterMode .presenterTop10OpenedBy{
   font-size:.68rem !important;
-  line-height:1.1 !important;
   font-weight:900 !important;
 
   white-space:nowrap !important;
@@ -3344,20 +3348,19 @@ body.tabletPresenterMode .presenterTop10OpenedBy{
 }
 
 /* =========================
-   RIGHT - Teams + Question + Actions
+   اليمين: الفرق + السؤال + التحكم
 ========================= */
 
 body.tabletPresenterMode .presenterTop10Right{
   display:grid !important;
-  grid-template-rows:52px auto 108px !important;
-  gap:10px !important;
-
-  overflow:hidden !important;
+  grid-template-rows:48px 250px 100px !important;
+  gap:8px !important;
+  align-content:start !important;
 }
 
-/* الفرق فوق */
+/* أسماء الفرق */
 body.tabletPresenterMode .presenterTop10TeamsBox{
-  height:52px !important;
+  height:48px !important;
 }
 
 body.tabletPresenterMode .presenterTop10TeamsBox .presenterCard{
@@ -3376,7 +3379,7 @@ body.tabletPresenterMode .presenterTop10TeamsBox .presenterLabel{
 }
 
 body.tabletPresenterMode .presenterTop10TeamsBox .presenterTeams{
-  height:52px !important;
+  height:48px !important;
 
   display:grid !important;
   grid-template-columns:1fr 1fr !important;
@@ -3384,52 +3387,51 @@ body.tabletPresenterMode .presenterTop10TeamsBox .presenterTeams{
 }
 
 body.tabletPresenterMode .presenterTop10TeamsBox .presenterBtn{
-  height:52px !important;
-  min-height:52px !important;
+  height:48px !important;
+  min-height:48px !important;
 
-  border-radius:16px !important;
+  border-radius:15px !important;
 
-  font-size:1.05rem !important;
+  font-size:.95rem !important;
   font-weight:900 !important;
   padding:6px !important;
 }
 
 /* كرت السؤال */
 body.tabletPresenterMode .presenterTop10QuestionCard{
-  height:auto !important;
-  max-height:265px !important;
+  height:250px !important;
+  max-height:250px !important;
 
-  padding:12px !important;
+  padding:10px !important;
   border-radius:18px !important;
 
   overflow:hidden !important;
-  align-self:start !important;
 }
 
 /* الجولة والأخطاء */
 body.tabletPresenterMode .presenterTop10StatusTop{
   display:grid !important;
-  grid-template-columns:88px minmax(0,1fr) !important;
+  grid-template-columns:80px minmax(0,1fr) !important;
   gap:8px !important;
   margin-bottom:8px !important;
 }
 
 body.tabletPresenterMode .presenterTop10RoundMini,
 body.tabletPresenterMode .presenterTop10ErrorMiniBox{
-  min-height:52px !important;
-  padding:7px !important;
-  border-radius:15px !important;
+  min-height:48px !important;
+  padding:6px !important;
+  border-radius:14px !important;
 }
 
 body.tabletPresenterMode .presenterTop10RoundMini span,
 body.tabletPresenterMode .presenterTop10ErrorMiniBox span{
-  font-size:.7rem !important;
+  font-size:.66rem !important;
   font-weight:900 !important;
 }
 
 body.tabletPresenterMode .presenterTop10RoundMini strong,
 body.tabletPresenterMode .presenterTop10ErrorMiniBox strong{
-  font-size:1.15rem !important;
+  font-size:1.05rem !important;
   font-weight:900 !important;
 }
 
@@ -3441,32 +3443,31 @@ body.tabletPresenterMode .presenterTop10ErrorsMini{
 
 body.tabletPresenterMode .presenterTop10QuestionCard .presenterLabel{
   margin-bottom:6px !important;
-
-  font-size:.95rem !important;
+  font-size:.9rem !important;
   line-height:1 !important;
   font-weight:900 !important;
 }
 
 body.tabletPresenterMode .presenterTop10QuestionText{
-  min-height:120px !important;
-  max-height:120px !important;
+  min-height:115px !important;
+  max-height:115px !important;
 
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
 
-  padding:14px !important;
+  padding:12px !important;
   border-radius:16px !important;
 
-  font-size:1.28rem !important;
-  line-height:1.55 !important;
+  font-size:1.2rem !important;
+  line-height:1.45 !important;
   font-weight:900 !important;
   text-align:center !important;
 }
 
-/* أزرار التحكم تحت */
+/* أزرار التحكم */
 body.tabletPresenterMode .presenterTop10Actions{
-  height:108px !important;
+  height:100px !important;
 
   display:grid !important;
   grid-template-columns:repeat(3,1fr) !important;
@@ -3477,12 +3478,12 @@ body.tabletPresenterMode .presenterTop10Actions{
 }
 
 body.tabletPresenterMode .presenterTop10Actions .presenterBtn{
-  height:50px !important;
-  min-height:50px !important;
+  height:46px !important;
+  min-height:46px !important;
 
-  border-radius:15px !important;
+  border-radius:14px !important;
 
-  font-size:.86rem !important;
+  font-size:.82rem !important;
   font-weight:900 !important;
   padding:6px !important;
 
@@ -3490,22 +3491,19 @@ body.tabletPresenterMode .presenterTop10Actions .presenterBtn{
 }
 
 /* =========================
-   Short Screen
+   شاشة قصيرة
 ========================= */
 
 @media (max-height:620px){
 
-  body.tabletPresenterMode .presenterTop10Layout{
+  body.tabletPresenterMode #presenterPanel .presenterTop10Layout{
     height:calc(100dvh - 84px) !important;
     gap:8px !important;
   }
 
-  body.tabletPresenterMode .presenterTop10Answers{
-    gap:5px !important;
-  }
-
   body.tabletPresenterMode .presenterTop10AnswerBtn{
     height:34px !important;
+    min-height:34px !important;
     grid-template-columns:32px minmax(0,1fr) 62px !important;
     gap:6px !important;
   }
@@ -3525,39 +3523,40 @@ body.tabletPresenterMode .presenterTop10Actions .presenterBtn{
   }
 
   body.tabletPresenterMode .presenterTop10Right{
-    grid-template-rows:46px auto 94px !important;
-    gap:8px !important;
+    grid-template-rows:44px 225px 90px !important;
+    gap:7px !important;
   }
 
   body.tabletPresenterMode .presenterTop10TeamsBox,
   body.tabletPresenterMode .presenterTop10TeamsBox .presenterTeams,
   body.tabletPresenterMode .presenterTop10TeamsBox .presenterBtn{
-    height:46px !important;
-    min-height:46px !important;
+    height:44px !important;
+    min-height:44px !important;
   }
 
   body.tabletPresenterMode .presenterTop10TeamsBox .presenterBtn{
-    font-size:.92rem !important;
+    font-size:.86rem !important;
   }
 
   body.tabletPresenterMode .presenterTop10QuestionCard{
-    max-height:240px !important;
+    height:225px !important;
+    max-height:225px !important;
   }
 
   body.tabletPresenterMode .presenterTop10QuestionText{
-    min-height:100px !important;
-    max-height:100px !important;
-    font-size:1.12rem !important;
+    min-height:96px !important;
+    max-height:96px !important;
+    font-size:1.08rem !important;
   }
 
   body.tabletPresenterMode .presenterTop10Actions{
-    height:94px !important;
+    height:90px !important;
     gap:6px !important;
   }
 
   body.tabletPresenterMode .presenterTop10Actions .presenterBtn{
-    height:44px !important;
-    min-height:44px !important;
-    font-size:.76rem !important;
+    height:42px !important;
+    min-height:42px !important;
+    font-size:.74rem !important;
   }
 }
