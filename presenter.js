@@ -1167,6 +1167,7 @@ async function renderWarmup() {
   panel.innerHTML = `
     <div class="presenterWarmupLayout">
 
+      <!-- اليسار: الفئات والأرقام فقط -->
       <div class="presenterWarmupLeft">
 
         <section class="presenterCard presenterWarmupNumbersCard">
@@ -1208,32 +1209,17 @@ async function renderWarmup() {
           </div>
         </section>
 
-        <div class="presenterWarmupBottom">
-          ${teamButtons()}
-
-          <div class="presenterWarmupActions">
-            <button
-              class="presenterBtn gray presenterDoubleBtn"
-              onclick="sendCommand('double')"
-              ${locked || currentKey ? "disabled" : ""}
-            >
-              دوبيلا
-            </button>
-
-            <button class="presenterBtn red presenterWrongBtn" onclick="sendCommand('wrong')">
-              ✕ خطأ
-            </button>
-
-            <button class="presenterBtn green presenterCorrectBtn" onclick="sendCommand('correct')">
-              ✓ صح
-            </button>
-          </div>
-        </div>
-
       </div>
 
+      <!-- اليمين: الفرق + السؤال + الإجابة + التحكم -->
       <div class="presenterWarmupRight">
+
+        <div class="presenterWarmupTeamsBox">
+          ${teamButtons()}
+        </div>
+
         <section class="presenterCard presenterWarmupPreviewCard">
+
           <div class="presenterLabel">السؤال</div>
 
           <div id="presenterWarmupQuestionText" class="presenterQuestionBody presenterBigQuestionBody">
@@ -1245,7 +1231,27 @@ async function renderWarmup() {
           <div id="presenterWarmupAnswerText" class="presenterAnswerBody presenterBigAnswerBody">
             —
           </div>
+
         </section>
+
+        <div class="presenterWarmupActions">
+          <button
+            class="presenterBtn gray presenterDoubleBtn"
+            onclick="sendCommand('double')"
+            ${locked || currentKey ? "disabled" : ""}
+          >
+            دوبيلا
+          </button>
+
+          <button class="presenterBtn red presenterWrongBtn" onclick="sendCommand('wrong')">
+            ✕ خطأ
+          </button>
+
+          <button class="presenterBtn green presenterCorrectBtn" onclick="sendCommand('correct')">
+            ✓ صح
+          </button>
+        </div>
+
       </div>
 
     </div>
