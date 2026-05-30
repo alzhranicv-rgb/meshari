@@ -1839,20 +1839,21 @@ button{
   ========================= */
 
   .presenterWarmupRight{
-    display:grid;
-    grid-template-rows:52px 242px 46px;
-    gap:8px;
-    align-content:start;
-  }
+  display:grid;
+  grid-template-rows:58px 236px 46px;
+  gap:8px;
+  align-content:start;
+  overflow:visible;
+}
 
-  /* اختيار الفريق - زجاجي */
+  /* اختيار الفريق - زجاجي بدون قص */
   .presenterWarmupTeamsBox{
-    height:52px;
-    overflow:hidden;
+    height:58px;
+    overflow:visible;
   }
 
   .presenterWarmupTeamsBox .presenterCard{
-    height:52px;
+    height:58px;
     padding:0;
     background:transparent;
     border:0;
@@ -1865,58 +1866,63 @@ button{
   }
 
   .presenterWarmupTeamsBox .presenterTeams{
-    height:52px;
+    height:58px;
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:8px;
+    gap:10px;
+    overflow:visible;
   }
 
   .presenterWarmupTeamsBox .presenterBtn{
-    height:52px;
-    min-height:52px;
-    border-radius:18px;
-    padding:6px 10px;
+    height:54px;
+    min-height:54px;
+    border-radius:20px;
+    padding:6px 12px;
 
-    font-size:.95rem;
+    font-size:1rem;
     font-weight:900;
 
     color:#24185E;
 
     background:
-      radial-gradient(circle at 18% 0%, rgba(255,255,255,.36), transparent 42%),
-      linear-gradient(180deg, rgba(255,255,255,.52), rgba(255,255,255,.22));
+      radial-gradient(circle at 18% 0%, rgba(255,255,255,.38), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.56), rgba(255,255,255,.24));
 
-    border:1px solid rgba(255,255,255,.48);
+    border:1px solid rgba(255,255,255,.54);
 
     box-shadow:
-      0 12px 24px rgba(30,27,75,.09),
-      inset 0 1px 0 rgba(255,255,255,.72);
+      0 12px 24px rgba(30,27,75,.10),
+      inset 0 1px 0 rgba(255,255,255,.76);
+
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
   }
 
   .presenterWarmupTeamsBox .presenterBtn.orange{
     background:
       radial-gradient(circle at 12% 0%, rgba(124,58,237,.24), transparent 40%),
-      linear-gradient(180deg, rgba(255,255,255,.46), rgba(255,255,255,.20));
+      linear-gradient(180deg, rgba(255,255,255,.50), rgba(255,255,255,.22));
   }
 
   .presenterWarmupTeamsBox .presenterBtn.blue{
     background:
       radial-gradient(circle at 88% 0%, rgba(6,182,212,.24), transparent 40%),
-      linear-gradient(180deg, rgba(255,255,255,.46), rgba(255,255,255,.20));
+      linear-gradient(180deg, rgba(255,255,255,.50), rgba(255,255,255,.22));
   }
 
   .presenterWarmupTeamsBox .presenterBtn.selectedPresenterTeam{
     color:#24185E;
-    border-color:rgba(255,255,255,.74);
+    border-color:rgba(255,255,255,.78);
 
     background:
-      radial-gradient(circle at 18% 0%, rgba(255,155,81,.26), transparent 42%),
-      linear-gradient(180deg, rgba(255,255,255,.64), rgba(255,255,255,.32));
+      radial-gradient(circle at 18% 0%, rgba(255,155,81,.28), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.34));
 
     box-shadow:
       0 0 0 4px rgba(255,155,81,.12),
-      0 14px 28px rgba(30,27,75,.12),
-      inset 0 1px 0 rgba(255,255,255,.82);
+      0 14px 28px rgba(30,27,75,.13),
+      inset 0 1px 0 rgba(255,255,255,.86);
   }
 
   /* كرت السؤال والإجابة */
