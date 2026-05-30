@@ -3008,11 +3008,6 @@ async function renderFinal() {
         </div>
 
         <section class="presenterCard presenterFinalPreviewCard">
-  <div id="presenterFinalPreview" class="presenterFinalPreviewBox">
-    ${presenterFinalPreviewCache[presenterFinalRound] || "اختر رقمًا"}
-  </div>
-</section>
-
           <div id="presenterFinalPreview" class="presenterFinalPreviewBox">
             ${presenterFinalPreviewCache[presenterFinalRound] || "اختر رقمًا"}
           </div>
@@ -3026,18 +3021,6 @@ async function renderFinal() {
   await renderPresenterFinalRoundContent()
   refreshPresenterEnhancements()
 }
-
-async function setPresenterFinalRound(round) {
-  presenterFinalRound = Number(round)
-  presenterFinalSelected = { round: presenterFinalRound, number: null }
-
-  setPresenterFinalRound1FocusMode(false)
-
-  sendCommand("setRound", { round: presenterFinalRound })
-  await renderPresenterFinalRoundContent()
-  refreshPresenterEnhancements()
-}
-
 /* =========================
    ROUND CONTENT
 ========================= */
