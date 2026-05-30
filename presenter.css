@@ -2373,8 +2373,8 @@ button{
 
   .presenterTop10Right{
     display:grid;
-    grid-template-rows:64px 194px 104px;
-    gap:12px;
+    grid-template-rows:64px 164px 104px;
+    gap:10px;
     align-content:start;
     overflow:hidden;
   }
@@ -2459,35 +2459,36 @@ button{
 
   /* كرت السؤال + الحالة */
   .presenterTop10QuestionCard{
-    height:194px;
-    padding:10px;
+    height:164px;
+    padding:9px;
     border-radius:22px;
     overflow:hidden;
 
     display:grid;
-    grid-template-rows:58px 104px;
-    gap:10px;
+    grid-template-rows:50px 88px;
+    gap:8px;
 
     box-shadow:
       0 8px 16px rgba(30,27,75,.06),
       inset 0 1px 0 rgba(255,255,255,.82);
   }
 
+  /* الحالة / الجولة / الأخطاء */
   .presenterTop10StatusTop{
-    height:58px;
+    height:50px;
     margin:0;
     display:grid;
-    grid-template-columns:78px minmax(0,1fr);
+    grid-template-columns:72px minmax(0,1fr);
     gap:8px;
     overflow:hidden;
   }
 
   .presenterTop10RoundMini,
   .presenterTop10ErrorMiniBox{
-    height:58px;
+    height:50px;
     min-height:0;
-    padding:6px;
-    border-radius:17px;
+    padding:5px;
+    border-radius:16px;
 
     background:
       linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.32));
@@ -2501,13 +2502,13 @@ button{
 
   .presenterTop10RoundMini span,
   .presenterTop10ErrorMiniBox span{
-    font-size:.6rem;
-    line-height:1.1;
+    font-size:.56rem;
+    line-height:1.05;
   }
 
   .presenterTop10RoundMini strong,
   .presenterTop10ErrorMiniBox strong{
-    font-size:1rem;
+    font-size:.92rem;
     line-height:1;
   }
 
@@ -2517,31 +2518,32 @@ button{
     gap:8px;
   }
 
+  /* السؤال */
   .presenterTop10QuestionClear{
-    height:104px;
+    height:88px;
     margin:0;
     display:grid;
-    grid-template-rows:16px 78px;
+    grid-template-rows:14px 66px;
     gap:8px;
     overflow:hidden;
   }
 
   .presenterTop10QuestionClear .presenterLabel{
-    height:16px;
+    height:14px;
     margin:0;
-    font-size:.78rem;
+    font-size:.74rem;
     line-height:1;
     color:#64748B;
   }
 
   .presenterTop10QuestionText,
   #presenterTop10QuestionText{
-    height:78px;
-    min-height:78px;
-    max-height:78px;
+    height:66px;
+    min-height:66px;
+    max-height:66px;
 
-    padding:9px 14px;
-    border-radius:18px;
+    padding:8px 12px;
+    border-radius:17px;
 
     display:flex;
     align-items:center;
@@ -2554,8 +2556,8 @@ button{
     border:1px solid rgba(124,58,237,.12);
 
     color:#1E1B4B;
-    font-size:1rem;
-    line-height:1.32;
+    font-size:.94rem;
+    line-height:1.28;
     font-weight:900;
     text-align:center;
 
@@ -2603,12 +2605,14 @@ button{
     background:linear-gradient(180deg,#06B6D4,#0891B2);
   }
 
+  /* زر دوبيلا: أول زر gray */
   .presenterTop10Actions .presenterBtn.gray:first-child{
     background:
       radial-gradient(circle at 20% 0%, rgba(255,255,255,.22), transparent 42%),
       linear-gradient(180deg,#FB7185,#F97316);
   }
 
+  /* زر تراجع: رابع زر gray */
   .presenterTop10Actions .presenterBtn.gray:nth-child(4){
     background:linear-gradient(180deg,#991B1B,#7F1D1D);
   }
