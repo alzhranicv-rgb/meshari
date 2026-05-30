@@ -2634,3 +2634,379 @@ button{
     opacity:.82;
   }
 }
+/* =========================================================
+   TABLET LANDSCAPE - AUCTION ONLY
+   صفحة المقدم - فتبلة / المزايدة فقط
+========================================================= */
+
+@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
+
+  .presenterAuctionLayout{
+    width:100%;
+    height:100%;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    direction:ltr;
+    overflow:hidden;
+  }
+
+  .presenterAuctionLeft,
+  .presenterAuctionRight{
+    direction:rtl;
+    min-width:0;
+    height:100%;
+    overflow:hidden;
+  }
+
+  /* اليسار: الأرقام + التحكم */
+  .presenterAuctionLeft{
+    display:grid;
+    grid-template-rows:1fr 112px;
+    gap:10px;
+  }
+
+  .presenterAuctionNumbersCard{
+    height:100%;
+    padding:12px;
+    border-radius:22px;
+    overflow:hidden;
+  }
+
+  .presenterAuctionNumbersCard > .presenterLabel{
+    height:20px;
+    margin:0 0 8px;
+    font-size:.86rem;
+    line-height:1;
+  }
+
+  .presenterAuctionGrid{
+    height:calc(100% - 28px);
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .presenterAuctionGrid .presenterNumberBtn{
+    position:relative;
+    height:100%;
+    min-height:0;
+    border-radius:16px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.14), transparent 42%),
+      linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
+
+    color:#FFFFFF;
+    border:1px solid rgba(255,255,255,.22);
+
+    font-size:1.35rem;
+    line-height:1;
+
+    box-shadow:
+      0 9px 18px rgba(30,27,75,.15),
+      inset 0 1px 0 rgba(255,255,255,.18);
+  }
+
+  .presenterAuctionGrid .presenterNumberBtn.presenterOpened{
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.42), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.36));
+
+    color:transparent;
+    border:1px solid rgba(255,255,255,.58);
+
+    box-shadow:
+      0 6px 14px rgba(30,27,75,.05),
+      inset 0 1px 0 rgba(255,255,255,.84);
+
+    opacity:1;
+  }
+
+  .presenterAuctionGrid .presenterNumberBtn.presenterOpened::after{
+    content:"✓";
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#7C3AED;
+    font-size:1.45rem;
+  }
+
+  .presenterAuctionGrid .presenterNumberBtn:disabled:not(.presenterOpened){
+    opacity:.42;
+    filter:saturate(.75);
+  }
+
+  /* أزرار التحكم تحت الأرقام */
+  .presenterAuctionActions{
+    height:112px;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-auto-rows:52px;
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .presenterAuctionActions .presenterBtn{
+    height:52px;
+    min-height:52px;
+    border-radius:15px;
+    padding:5px 6px;
+
+    font-size:.76rem;
+    line-height:1.1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    grid-column:auto;
+
+    box-shadow:
+      0 8px 16px rgba(30,27,75,.10),
+      inset 0 1px 0 rgba(255,255,255,.22);
+  }
+
+  .presenterAuctionActions .presenterBtn.green{
+    background:linear-gradient(180deg,#22C55E,#15803D);
+  }
+
+  .presenterAuctionActions .presenterBtn.red{
+    background:linear-gradient(180deg,#EF4444,#DC2626);
+  }
+
+  .presenterAuctionActions .presenterBtn.blue{
+    background:linear-gradient(180deg,#06B6D4,#0891B2);
+  }
+
+  .presenterAuctionActions .presenterBtn.gray:first-child{
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.22), transparent 42%),
+      linear-gradient(180deg,#FB7185,#F97316);
+  }
+
+  .presenterAuctionActions .presenterBtn.gray:last-child{
+    background:linear-gradient(180deg,#991B1B,#7F1D1D);
+  }
+
+  .presenterAuctionActions .presenterBtn:disabled{
+    background:#DDD6FE;
+    color:#7C7896;
+    box-shadow:none;
+    opacity:.82;
+  }
+
+  /* اليمين: الفرق + المحتوى */
+  .presenterAuctionRight{
+    display:grid;
+    grid-template-rows:60px 1fr;
+    gap:10px;
+    overflow:hidden;
+  }
+
+  .presenterAuctionTeamsBox{
+    height:60px;
+    overflow:hidden;
+  }
+
+  .presenterAuctionTeamsBox .presenterCard{
+    height:60px;
+    padding:0;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    overflow:hidden;
+  }
+
+  .presenterAuctionTeamsBox .presenterLabel{
+    display:none;
+  }
+
+  .presenterAuctionTeamsBox .presenterTeams{
+    height:60px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    overflow:hidden;
+  }
+
+  .presenterAuctionTeamsBox .presenterBtn{
+    height:56px;
+    min-height:56px;
+    border-radius:20px;
+    padding:6px 12px;
+
+    color:#24185E;
+    font-size:.96rem;
+    font-weight:900;
+
+    background:
+      radial-gradient(circle at 18% 0%, rgba(255,255,255,.38), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.28));
+
+    border:1px solid rgba(255,255,255,.56);
+
+    box-shadow:
+      0 8px 16px rgba(30,27,75,.08),
+      inset 0 1px 0 rgba(255,255,255,.78);
+
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+  }
+
+  .presenterAuctionTeamsBox .presenterBtn.orange{
+    background:
+      radial-gradient(circle at 12% 0%, rgba(124,58,237,.24), transparent 40%),
+      linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.26));
+  }
+
+  .presenterAuctionTeamsBox .presenterBtn.blue{
+    background:
+      radial-gradient(circle at 88% 0%, rgba(6,182,212,.24), transparent 40%),
+      linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.26));
+  }
+
+  .presenterAuctionTeamsBox .presenterBtn.selectedPresenterTeam{
+    color:#24185E;
+    border-color:rgba(255,155,81,.42);
+
+    background:
+      radial-gradient(circle at 18% 0%, rgba(255,155,81,.28), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.34));
+
+    box-shadow:
+      0 0 0 3px rgba(255,155,81,.10),
+      0 8px 18px rgba(30,27,75,.09),
+      inset 0 1px 0 rgba(255,255,255,.84);
+  }
+
+  .presenterAuctionPreviewCard{
+    height:100%;
+    padding:10px;
+    border-radius:22px;
+    overflow:hidden;
+
+    display:grid;
+    grid-template-rows:16px 66px 16px minmax(0,1fr) 48px;
+    gap:8px;
+
+    box-shadow:
+      0 8px 16px rgba(30,27,75,.06),
+      inset 0 1px 0 rgba(255,255,255,.82);
+  }
+
+  .presenterAuctionPreviewCard .presenterLabel{
+    height:16px;
+    margin:0;
+    font-size:.76rem;
+    line-height:1;
+    color:#64748B;
+  }
+
+  #presenterAuctionAnswerText{
+    height:66px;
+    min-height:66px;
+    max-height:66px;
+
+    padding:8px 12px;
+    border-radius:17px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      radial-gradient(circle at 16% 0%, rgba(15,118,110,.07), transparent 44%),
+      linear-gradient(180deg, rgba(255,255,255,.82), rgba(240,253,250,.66));
+
+    border:1px solid rgba(15,118,110,.14);
+
+    color:#0F766E;
+    font-size:1.02rem;
+    line-height:1.24;
+    font-weight:900;
+    text-align:center;
+
+    overflow:hidden;
+  }
+
+  #presenterAuctionImageBox{
+    width:100%;
+    height:100%;
+    min-height:0;
+    max-height:none;
+
+    border-radius:18px;
+    overflow:hidden;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.30));
+
+    border:1px solid rgba(255,255,255,.54);
+
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.80),
+      0 8px 16px rgba(30,27,75,.06);
+  }
+
+  #presenterAuctionImageBox.hidden{
+    display:flex !important;
+  }
+
+  #presenterAuctionImageBox.hidden::before{
+    content:"اختر رقمًا لعرض الصورة أو الفيديو";
+    color:#64748B;
+    font-size:.9rem;
+    font-weight:900;
+  }
+
+  #presenterAuctionImageBox img,
+  #presenterAuctionImageBox video{
+    width:100%;
+    height:100%;
+    max-height:100%;
+    object-fit:contain;
+    display:block;
+    border-radius:14px;
+  }
+
+  #presenterAuctionImageBox video{
+    background:#000;
+  }
+
+  .presenterAuctionPlayVideoBtn{
+    height:48px;
+    min-height:48px;
+    border:0;
+    border-radius:16px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#12362D;
+    font-size:.88rem;
+    font-weight:900;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.26), transparent 42%),
+      linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%);
+
+    box-shadow:
+      0 10px 20px rgba(6,182,212,.18),
+      inset 0 1px 0 rgba(255,255,255,.30);
+
+    cursor:pointer;
+  }
+
+  .presenterAuctionPlayVideoBtn.hidden{
+    display:none !important;
+  }
+}
