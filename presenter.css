@@ -3071,7 +3071,7 @@ button{
     height:100%;
 
     display:grid;
-    grid-template-rows:1fr 104px;
+    grid-template-rows:238px 48px;
     gap:10px;
 
     overflow:hidden;
@@ -3095,24 +3095,24 @@ button{
   ========================= */
 
   .presenterWhoNumbersCard{
-    height:100%;
+    height:238px;
     min-height:0;
 
-    padding:12px;
+    padding:10px;
     border-radius:22px;
     overflow:hidden;
 
     display:grid;
-    grid-template-rows:18px 46px 18px 1fr;
-    gap:8px;
+    grid-template-rows:16px 40px 16px 132px;
+    gap:7px;
   }
 
   .presenterWhoNumbersCard > .presenterLabel{
-    height:18px;
+    height:16px;
     margin:0;
 
     color:#64748B;
-    font-size:.82rem;
+    font-size:.78rem;
     line-height:1;
   }
 
@@ -3120,10 +3120,13 @@ button{
     margin:0;
   }
 
-  /* النقاط */
+  /* =========================
+     النقاط
+  ========================= */
+
   .presenterWhoPointsGrid{
-    height:46px;
-    min-height:46px;
+    height:40px;
+    min-height:40px;
 
     display:grid;
     grid-template-columns:repeat(5,minmax(0,1fr));
@@ -3136,48 +3139,62 @@ button{
   .presenterWhoPointsGrid .presenterNumberBtn{
     position:relative;
 
-    height:46px;
-    min-height:46px;
+    height:40px;
+    min-height:40px;
 
-    border-radius:15px;
-    border:1px solid rgba(255,255,255,.22);
+    border-radius:14px;
+    border:1px solid rgba(6,182,212,.22);
 
     background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.14), transparent 42%),
-      linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.28), transparent 42%),
+      linear-gradient(180deg, rgba(103,232,249,.82), rgba(6,182,212,.88));
 
-    color:#FFFFFF;
-    font-size:1.25rem;
+    color:#12362D;
+    font-size:1.15rem;
     line-height:1;
+    font-weight:900;
 
     box-shadow:
-      0 9px 18px rgba(30,27,75,.15),
-      inset 0 1px 0 rgba(255,255,255,.18);
+      0 8px 16px rgba(6,182,212,.12),
+      inset 0 1px 0 rgba(255,255,255,.30);
   }
 
   .presenterWhoPointsGrid .presenterNumberBtn.selectedPresenterTeam{
-    color:#24185E;
-    border-color:rgba(255,155,81,.42);
+    color:#FFFFFF;
+    border-color:rgba(249,115,22,.48);
 
     background:
-      radial-gradient(circle at 18% 0%, rgba(255,155,81,.30), transparent 42%),
-      linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.38));
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.30), transparent 42%),
+      linear-gradient(180deg,#FB7185 0%,#F97316 100%);
 
     box-shadow:
-      0 0 0 3px rgba(255,155,81,.10),
-      0 8px 18px rgba(30,27,75,.09),
-      inset 0 1px 0 rgba(255,255,255,.84);
+      0 0 0 3px rgba(249,115,22,.16),
+      0 10px 20px rgba(249,115,22,.22),
+      inset 0 1px 0 rgba(255,255,255,.28);
   }
 
-  /* الأرقام */
+  .presenterWhoPointsGrid .presenterNumberBtn:disabled:not(.selectedPresenterTeam){
+    background:
+      linear-gradient(180deg, rgba(103,232,249,.58), rgba(6,182,212,.56));
+
+    color:#0F4C5C;
+    opacity:.46;
+    filter:saturate(.8);
+    cursor:not-allowed;
+  }
+
+  /* =========================
+     أرقام من هو
+  ========================= */
+
   .presenterWhoGrid{
-    height:100%;
-    min-height:0;
+    height:132px;
+    min-height:132px;
 
     display:grid;
     grid-template-columns:repeat(5,minmax(0,1fr));
-    grid-template-rows:repeat(3,46px);
-    gap:8px;
+    grid-template-rows:repeat(3,40px);
+    gap:6px 8px;
 
     direction:rtl;
     align-content:start;
@@ -3187,10 +3204,10 @@ button{
   .presenterWhoGrid .presenterNumberBtn{
     position:relative;
 
-    height:46px;
-    min-height:46px;
+    height:40px;
+    min-height:40px;
 
-    border-radius:15px;
+    border-radius:14px;
     border:1px solid rgba(255,255,255,.22);
 
     background:
@@ -3198,17 +3215,31 @@ button{
       linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
 
     color:#FFFFFF;
-    font-size:1.24rem;
+    font-size:1.14rem;
     line-height:1;
 
     box-shadow:
-      0 9px 18px rgba(30,27,75,.15),
+      0 8px 16px rgba(30,27,75,.15),
       inset 0 1px 0 rgba(255,255,255,.18);
   }
 
   .presenterWhoGrid .presenterNumberBtn:active,
   .presenterWhoPointsGrid .presenterNumberBtn:active{
     transform:scale(.96);
+  }
+
+  .presenterWhoGrid .presenterNumberBtn.selectedPresenterTeam{
+    color:#FFFFFF;
+    border-color:rgba(103,232,249,.42);
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(103,232,249,.24), transparent 42%),
+      linear-gradient(180deg, rgba(14,116,144,.96), rgba(15,76,92,.98));
+
+    box-shadow:
+      0 0 0 3px rgba(6,182,212,.12),
+      0 9px 18px rgba(6,182,212,.16),
+      inset 0 1px 0 rgba(255,255,255,.20);
   }
 
   .presenterWhoGrid .presenterNumberBtn.presenterOpened{
@@ -3227,24 +3258,20 @@ button{
   }
 
   .presenterWhoGrid .presenterNumberBtn.presenterOpened::after{
-    content:"";
+    content:"✓";
     position:absolute;
     inset:0;
 
     display:flex;
     align-items:center;
     justify-content:center;
-  }
 
-  .presenterWhoGrid .presenterNumberBtn.presenterOpened::after{
-    content:"✓";
     color:#7C3AED;
-    font-size:1.45rem;
+    font-size:1.35rem;
     line-height:1;
   }
 
-  .presenterWhoGrid .presenterNumberBtn:disabled:not(.presenterOpened),
-  .presenterWhoPointsGrid .presenterNumberBtn:disabled:not(.selectedPresenterTeam){
+  .presenterWhoGrid .presenterNumberBtn:disabled:not(.presenterOpened){
     background:
       linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
 
@@ -3259,14 +3286,14 @@ button{
   }
 
   /* =========================
-     أزرار التحكم تحت الأرقام
+     أزرار التحكم - صف واحد
   ========================= */
 
   .presenterWhoActions{
-    height:104px;
+    height:48px;
 
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-columns:repeat(4,minmax(0,1fr));
     grid-auto-rows:48px;
     gap:8px;
 
@@ -3280,7 +3307,7 @@ button{
     border-radius:15px;
     padding:5px 6px;
 
-    font-size:.76rem;
+    font-size:.72rem;
     line-height:1.1;
 
     white-space:nowrap;
