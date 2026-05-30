@@ -3811,3 +3811,644 @@ button{
 .presenterExplainLayout{
   outline:8px solid red;
 }
+/* =========================================================
+   TABLET LANDSCAPE - FINAL ONLY
+   صفحة المقدم - الفاصلة كاملة
+========================================================= */
+
+@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
+
+  .presenterFinalLayout{
+    width:100%;
+    height:100%;
+    display:grid;
+    grid-template-columns:1.02fr .98fr;
+    gap:12px;
+    direction:ltr;
+    overflow:hidden;
+  }
+
+  .presenterFinalLeft,
+  .presenterFinalRight{
+    direction:rtl;
+    min-width:0;
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  /* =========================
+     اليسار: الأرقام + التحكم
+  ========================= */
+
+  .presenterFinalLeft{
+    display:grid;
+    grid-template-rows:minmax(0,1fr) auto;
+    gap:10px;
+  }
+
+  .presenterFinalNumbersCard{
+    height:100%;
+    min-height:0;
+    padding:14px;
+    border-radius:24px;
+    overflow:hidden;
+
+    display:grid;
+    grid-template-rows:18px minmax(0,1fr);
+    gap:12px;
+
+    background:
+      radial-gradient(circle at 15% 0%, rgba(255,255,255,.38), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.30));
+
+    border:1px solid rgba(255,255,255,.54);
+
+    box-shadow:
+      0 10px 22px rgba(30,27,75,.07),
+      inset 0 1px 0 rgba(255,255,255,.82);
+  }
+
+  .presenterFinalNumbersCard > .presenterLabel{
+    height:18px;
+    margin:0;
+    color:#64748B;
+    font-size:.82rem;
+    line-height:1;
+    font-weight:900;
+  }
+
+  #presenterFinalNumbers.presenterGrid{
+    height:100%;
+    min-height:0;
+
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-auto-rows:66px;
+    align-content:center;
+    gap:10px;
+    direction:rtl;
+
+    overflow:hidden;
+  }
+
+  #presenterFinalNumbers .presenterNumberBtn{
+    position:relative;
+    width:100%;
+    height:66px;
+    min-height:66px;
+
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,.22);
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.14), transparent 42%),
+      linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
+
+    color:#FFFFFF;
+    font-size:1.65rem;
+    line-height:1;
+    font-weight:900;
+
+    box-shadow:
+      0 10px 20px rgba(30,27,75,.15),
+      inset 0 1px 0 rgba(255,255,255,.18);
+
+    overflow:hidden;
+  }
+
+  #presenterFinalNumbers .presenterNumberBtn.selectedPresenterTeam{
+    color:#24185E;
+    border-color:rgba(255,155,81,.46);
+
+    background:
+      radial-gradient(circle at 18% 0%, rgba(255,155,81,.32), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.40));
+
+    box-shadow:
+      0 0 0 3px rgba(255,155,81,.12),
+      0 10px 20px rgba(249,115,22,.14),
+      inset 0 1px 0 rgba(255,255,255,.86);
+  }
+
+  #presenterFinalNumbers .presenterNumberBtn.presenterOpened{
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.42), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.36));
+
+    color:transparent;
+    border-color:rgba(255,255,255,.58);
+
+    box-shadow:
+      0 6px 14px rgba(30,27,75,.05),
+      inset 0 1px 0 rgba(255,255,255,.84);
+
+    opacity:1;
+  }
+
+  #presenterFinalNumbers .presenterNumberBtn.presenterOpened::after{
+    content:"✓";
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#7C3AED;
+    font-size:1.7rem;
+    line-height:1;
+  }
+
+  #presenterFinalNumbers .presenterNumberBtn:disabled:not(.presenterOpened):not(.selectedPresenterTeam){
+    opacity:.42;
+    filter:saturate(.75);
+    cursor:not-allowed;
+  }
+
+  /* =========================
+     أزرار التحكم
+  ========================= */
+
+  .presenterFinalControlsArea{
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .presenterFinalControlsArea .presenterActions,
+  .presenterFinalControlsArea .finalTwoActions,
+  .presenterFinalRound1TwoRows{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+    margin:0 0 8px;
+  }
+
+  .presenterFinalControlsArea .presenterActions:last-child,
+  .presenterFinalControlsArea .finalTwoActions:last-child,
+  .presenterFinalRound1TwoRows:last-child{
+    margin-bottom:0;
+  }
+
+  .presenterFinalControlsArea .presenterBtn{
+    height:48px;
+    min-height:48px;
+    border-radius:15px;
+    padding:5px 7px;
+
+    font-size:.74rem;
+    line-height:1.1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    box-shadow:
+      0 8px 16px rgba(30,27,75,.10),
+      inset 0 1px 0 rgba(255,255,255,.22);
+  }
+
+  .presenterFinalControlsArea .presenterBtn.green{
+    background:linear-gradient(180deg,#22C55E,#15803D);
+  }
+
+  .presenterFinalControlsArea .presenterBtn.red{
+    background:linear-gradient(180deg,#EF4444,#DC2626);
+  }
+
+  .presenterFinalControlsArea .presenterBtn.blue{
+    background:linear-gradient(180deg,#06B6D4,#0891B2);
+  }
+
+  .presenterFinalControlsArea .presenterBtn.dark{
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+      linear-gradient(180deg,#312E81,#1E1B4B);
+  }
+
+  .presenterFinalControlsArea .presenterBtn.gray{
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+      linear-gradient(180deg,#64748B,#475569);
+  }
+
+  .presenterFinalControlsArea .presenterBtn:disabled{
+    background:#DDD6FE;
+    color:#7C7896;
+    box-shadow:none;
+    opacity:.82;
+  }
+
+  /* الجولة الأولى: أزرار صفوف مرتبة */
+  .presenterFinalRound1TwoRows{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+
+  .presenterFinalRound1TwoRows .presenterBtn{
+    height:44px;
+    min-height:44px;
+    font-size:.7rem;
+  }
+
+  /* =========================
+     اليمين: الفرق + المحتوى
+  ========================= */
+
+  .presenterFinalRight{
+    display:grid;
+    grid-template-rows:58px minmax(0,1fr);
+    gap:10px;
+  }
+
+  .presenterFinalTeamsArea{
+    height:58px;
+    overflow:hidden;
+  }
+
+  .presenterFinalTeamsArea .presenterCard{
+    height:58px;
+    padding:0;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    overflow:hidden;
+  }
+
+  .presenterFinalTeamsArea .presenterLabel{
+    display:none;
+  }
+
+  .presenterFinalTeamsArea .presenterTeams{
+    height:58px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .presenterFinalTeamsArea .presenterBtn{
+    height:56px;
+    min-height:56px;
+    border-radius:20px;
+    padding:6px 12px;
+
+    color:#24185E;
+    font-size:.96rem;
+    font-weight:900;
+
+    background:
+      radial-gradient(circle at 18% 0%, rgba(255,255,255,.38), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.28));
+
+    border:1px solid rgba(255,255,255,.56);
+
+    box-shadow:
+      0 8px 16px rgba(30,27,75,.08),
+      inset 0 1px 0 rgba(255,255,255,.78);
+
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+  }
+
+  .presenterFinalTeamsArea .presenterBtn.orange{
+    background:
+      radial-gradient(circle at 12% 0%, rgba(124,58,237,.24), transparent 40%),
+      linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.26));
+  }
+
+  .presenterFinalTeamsArea .presenterBtn.blue{
+    background:
+      radial-gradient(circle at 88% 0%, rgba(6,182,212,.24), transparent 40%),
+      linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.26));
+  }
+
+  .presenterFinalTeamsArea .presenterBtn.selectedPresenterTeam,
+  .presenterFinalTeamsArea .presenterBtn.activeTeam{
+    color:#24185E;
+    border-color:rgba(255,155,81,.42);
+
+    background:
+      radial-gradient(circle at 18% 0%, rgba(255,155,81,.28), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.34));
+
+    box-shadow:
+      0 0 0 3px rgba(255,155,81,.10),
+      0 8px 18px rgba(30,27,75,.09),
+      inset 0 1px 0 rgba(255,255,255,.84);
+  }
+
+  .presenterFinalPreviewCard{
+    height:100%;
+    min-height:0;
+    padding:12px;
+    border-radius:24px;
+    overflow:hidden;
+
+    display:grid;
+    grid-template-rows:52px minmax(0,1fr);
+    gap:10px;
+
+    background:
+      radial-gradient(circle at 15% 0%, rgba(255,255,255,.38), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.30));
+
+    border:1px solid rgba(255,255,255,.54);
+
+    box-shadow:
+      0 10px 22px rgba(30,27,75,.07),
+      inset 0 1px 0 rgba(255,255,255,.82);
+  }
+
+  .presenterFinalRoundHeader{
+    height:52px;
+    border-radius:18px;
+    padding:6px 12px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+
+    background:
+      radial-gradient(circle at 18% 0%, rgba(255,255,255,.42), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.74), rgba(255,255,255,.36));
+
+    border:1px solid rgba(255,255,255,.58);
+
+    color:#24185E;
+    overflow:hidden;
+  }
+
+  .presenterFinalRoundHeader span{
+    font-size:.82rem;
+    font-weight:900;
+    color:#64748B;
+  }
+
+  .presenterFinalRoundHeader strong{
+    width:40px;
+    height:36px;
+    border-radius:14px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      linear-gradient(180deg,#312E81,#1E1B4B);
+
+    color:#FFFFFF;
+    font-size:1.2rem;
+    line-height:1;
+  }
+
+  .presenterFinalPreviewBox{
+    height:100%;
+    min-height:0;
+    border-radius:22px;
+    padding:10px;
+
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.84), rgba(248,250,252,.62));
+
+    border:1px solid rgba(255,255,255,.58);
+
+    color:#1E1B4B;
+    overflow:hidden;
+  }
+
+  /* =========================
+     محتوى الجولة الأولى
+  ========================= */
+
+  .presenterFinalCleanPreview{
+    height:100%;
+    min-height:0;
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr) minmax(0,1fr);
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .presenterFinalAnswerOnlyMode{
+    grid-template-rows:auto minmax(0,1fr);
+  }
+
+  .presenterFinalPreviewNumber{
+    min-height:34px;
+    padding:7px 12px;
+    border-radius:15px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,155,81,.22), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.38));
+
+    border:1px solid rgba(255,155,81,.24);
+
+    color:#24185E;
+    font-size:.9rem;
+    font-weight:900;
+  }
+
+  .presenterFinalPreviewBlock{
+    min-height:0;
+    border-radius:18px;
+    padding:10px;
+
+    display:grid;
+    grid-template-rows:18px minmax(0,1fr);
+    gap:8px;
+
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.34));
+
+    border:1px solid rgba(255,255,255,.50);
+
+    overflow:hidden;
+  }
+
+  .presenterFinalPreviewLabel{
+    height:18px;
+    margin:0;
+    color:#64748B;
+    font-size:.78rem;
+    line-height:1;
+    font-weight:900;
+  }
+
+  .presenterFinalPreviewText{
+    min-height:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#1E1B4B;
+    font-size:1.05rem;
+    line-height:1.35;
+    font-weight:900;
+    text-align:center;
+
+    overflow:hidden;
+  }
+
+  .presenterFinalAnswerOnlyBig{
+    background:
+      radial-gradient(circle at 16% 0%, rgba(15,118,110,.07), transparent 44%),
+      linear-gradient(180deg, rgba(255,255,255,.82), rgba(240,253,250,.66));
+
+    border:1px solid rgba(15,118,110,.14);
+  }
+
+  .presenterFinalAnswerOnlyText{
+    color:#0F766E;
+    font-size:1.55rem;
+    line-height:1.25;
+  }
+
+  /* =========================
+     الجولة الثانية
+  ========================= */
+
+  .presenterFinalRound2SimpleGrid{
+    height:100%;
+    min-height:0;
+
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-auto-rows:minmax(54px,1fr);
+    gap:8px;
+
+    overflow:hidden;
+  }
+
+  .presenterFinalRound2SimpleCard{
+    border:1px solid rgba(255,255,255,.44);
+    border-radius:16px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+      linear-gradient(180deg, rgba(49,46,129,.86), rgba(30,27,75,.96));
+
+    color:#FFFFFF;
+    font-size:.9rem;
+    line-height:1.2;
+    font-weight:900;
+
+    overflow:hidden;
+  }
+
+  .presenterFinalRound2SimpleCard.selectedCorrect{
+    background:
+      linear-gradient(180deg,#22C55E,#15803D);
+
+    color:#FFFFFF;
+  }
+
+  .presenterFinalRound2PreviewStage{
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .finalSequenceWordsWrap{
+    height:100%;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .finalSequenceWordBtn{
+    border:1px solid rgba(255,255,255,.44);
+    border-radius:16px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+      linear-gradient(180deg,#06B6D4,#0891B2);
+
+    color:#FFFFFF;
+    font-size:.9rem;
+    font-weight:900;
+    line-height:1.2;
+
+    overflow:hidden;
+  }
+
+  /* =========================
+     الجولة الثالثة
+  ========================= */
+
+  .presenterFinalRound3Preview,
+  .presenterFinalTeamMediaPreview{
+    height:100%;
+    min-height:0;
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr);
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .finalRound3AnswersList{
+    min-height:0;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .finalRound3AnswerCard{
+    border:1px solid rgba(255,255,255,.44);
+    border-radius:16px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+      linear-gradient(180deg, rgba(49,46,129,.86), rgba(30,27,75,.96));
+
+    color:#FFFFFF;
+    font-size:.85rem;
+    line-height:1.2;
+    font-weight:900;
+
+    overflow:hidden;
+  }
+
+  .finalRound3AnswerCard.selectedCorrect{
+    background:
+      linear-gradient(180deg,#22C55E,#15803D);
+
+    color:#FFFFFF;
+  }
+
+  .presenterFinalRound3ImageStage,
+  .presenterImagePreviewBox,
+  .presenterVideoPreviewBox{
+    min-height:0;
+    border-radius:18px;
+    overflow:hidden;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.64), rgba(255,255,255,.30));
+
+    border:1px solid rgba(255,255,255,.50);
+  }
+
+  .presenterImagePreviewBox img,
+  .presenterVideoPreviewBox video{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+  }
+
+  .presenterVideoPreviewBox video{
+    background:#000;
+  }
+}
