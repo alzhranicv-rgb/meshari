@@ -3008,10 +3008,10 @@ async function renderFinal() {
         </div>
 
         <section class="presenterCard presenterFinalPreviewCard">
-          <div class="presenterFinalRoundHeader">
-            <span>الجولة الحالية</span>
-            <strong id="presenterFinalRoundText">${presenterFinalRound}</strong>
-          </div>
+  <div id="presenterFinalPreview" class="presenterFinalPreviewBox">
+    ${presenterFinalPreviewCache[presenterFinalRound] || "اختر رقمًا"}
+  </div>
+</section>
 
           <div id="presenterFinalPreview" class="presenterFinalPreviewBox">
             ${presenterFinalPreviewCache[presenterFinalRound] || "اختر رقمًا"}
@@ -3114,7 +3114,7 @@ if (round === 1) {
       </button>
 
       <button class="presenterBtn green" onclick="presenterFinalCorrect()">
-        إجابة صحيحة
+        صحيحة
       </button>
 
       <button class="presenterBtn red" onclick="presenterFinalWrong()">
@@ -3126,7 +3126,7 @@ if (round === 1) {
       </button>
 
       <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
-        الجولة التالية
+        التالية
       </button>
     </div>
   `
@@ -3313,8 +3313,7 @@ async function refreshPresenterFinalFromState() {
     activeTeam === "B"
   )
 
-  const roundText = document.getElementById("presenterFinalRoundText")
-  if (roundText) roundText.innerText = round
+  
 
   const controlsBox = document.getElementById("presenterFinalControls")
   const currentControlsRound = Number(controlsBox?.dataset.round || 0)
@@ -3597,74 +3596,24 @@ async function renderPresenterFinalRound1Preview() {
 
   if (error || !data) {
     presenterFinalPreviewCache[1] = `
-      <div class="presenterFinalCleanPreview">
-        <div class="presenterFinalPreviewNumber">الرقم ${current}</div>
-
-        <div class="presenterFinalPreviewBlock presenterFinalAnswerOnlyBig">
-          <div class="presenterFinalPreviewLabel">الإجابة</div>
-          <div class="presenterFinalPreviewText">لا توجد بيانات لهذا الرقم</div>
-        </div>
+      <div class="presenterFinalOnlyAnswerView">
+        <div class="presenterFinalOnlyAnswerLabel">الإجابة</div>
+        <div class="presenterFinalOnlyAnswerText">لا توجد بيانات لهذا الرقم</div>
       </div>
     `
 
     previewBox.innerHTML = presenterFinalPreviewCache[1]
     return
   }
-
-  const questionParts = [
-    data.question_part1 || "",
-    data.question_part2 || "",
-    data.question_part3 || "",
-    data.question || ""
-  ].filter(Boolean)
-
-  const questionText = questionParts.length
-    ? questionParts.join("<br>")
-    : "لا يوجد سؤال"
 
   const answerText = data.answer || "لا توجد إجابة"
 
-  if (current >= 1 && current <= 3) {
-    presenterFinalPreviewCache[1] = `
-      <div class="presenterFinalCleanPreview presenterFinalAnswerOnlyMode">
-        <div class="presenterFinalPreviewNumber">
-          الرقم ${current}
-        </div>
-
-        <div class="presenterFinalPreviewBlock presenterFinalAnswerOnlyBig">
-          <div class="presenterFinalPreviewLabel">الإجابة</div>
-
-          <div class="presenterFinalPreviewText presenterFinalAnswerOnlyText">
-            ${answerText}
-          </div>
-        </div>
-      </div>
-    `
-
-    previewBox.innerHTML = presenterFinalPreviewCache[1]
-    return
-  }
-
   presenterFinalPreviewCache[1] = `
-    <div class="presenterFinalCleanPreview">
-      <div class="presenterFinalPreviewNumber">
-        الرقم ${current}
-      </div>
+    <div class="presenterFinalOnlyAnswerView">
+      <div class="presenterFinalOnlyAnswerLabel">الإجابة</div>
 
-      <div class="presenterFinalPreviewBlock">
-        <div class="presenterFinalPreviewLabel">السؤال</div>
-
-        <div class="presenterFinalPreviewText">
-          ${questionText}
-        </div>
-      </div>
-
-      <div class="presenterFinalPreviewBlock">
-        <div class="presenterFinalPreviewLabel">الإجابة</div>
-
-        <div class="presenterFinalPreviewText">
-          ${answerText}
-        </div>
+      <div class="presenterFinalOnlyAnswerText">
+        ${answerText}
       </div>
     </div>
   `
