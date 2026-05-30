@@ -3043,3 +3043,432 @@ button{
     display:none !important;
   }
 }
+
+/* =========================================================
+   TABLET LANDSCAPE - WHO ONLY
+   صفحة المقدم - من هو فقط
+========================================================= */
+
+@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
+
+  .presenterWhoLayout{
+    width:100%;
+    height:100%;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    direction:ltr;
+    overflow:hidden;
+  }
+
+  .presenterWhoLeft,
+  .presenterWhoRight{
+    direction:rtl;
+    min-width:0;
+    height:100%;
+    overflow:hidden;
+  }
+
+  /* =========================
+     اليسار: النقاط + الأرقام + التحكم
+  ========================= */
+
+  .presenterWhoLeft{
+    display:grid;
+    grid-template-rows:1fr 104px;
+    gap:10px;
+    overflow:hidden;
+  }
+
+  .presenterWhoNumbersCard{
+    height:100%;
+    padding:12px;
+    border-radius:22px;
+    overflow:hidden;
+
+    display:grid;
+    grid-template-rows:18px 46px 18px 1fr;
+    gap:8px;
+  }
+
+  .presenterWhoNumbersCard > .presenterLabel{
+    height:18px;
+    margin:0;
+    font-size:.82rem;
+    line-height:1;
+    color:#64748B;
+  }
+
+  .presenterWhoNumbersLabel{
+    margin-top:0;
+  }
+
+  /* النقاط */
+  .presenterWhoPointsGrid{
+    height:46px;
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:7px;
+    direction:rtl;
+    overflow:hidden;
+  }
+
+  .presenterWhoPointsGrid .presenterNumberBtn{
+    position:relative;
+    height:46px;
+    min-height:46px;
+    border-radius:15px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.14), transparent 42%),
+      linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
+
+    color:#FFFFFF;
+    border:1px solid rgba(255,255,255,.22);
+
+    font-size:1.25rem;
+    line-height:1;
+
+    box-shadow:
+      0 9px 18px rgba(30,27,75,.15),
+      inset 0 1px 0 rgba(255,255,255,.18);
+  }
+
+  .presenterWhoPointsGrid .presenterNumberBtn.selectedPresenterTeam{
+    color:#24185E;
+    border-color:rgba(255,155,81,.42);
+
+    background:
+      radial-gradient(circle at 18% 0%, rgba(255,155,81,.30), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.38));
+
+    box-shadow:
+      0 0 0 3px rgba(255,155,81,.10),
+      0 8px 18px rgba(30,27,75,.09),
+      inset 0 1px 0 rgba(255,255,255,.84);
+  }
+
+  /* أرقام من هو */
+  .presenterWhoGrid{
+    height:100%;
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    grid-auto-rows:46px;
+    align-content:start;
+    gap:8px;
+    direction:rtl;
+    overflow:hidden;
+  }
+
+  .presenterWhoGrid .presenterNumberBtn{
+    position:relative;
+    height:46px;
+    min-height:46px;
+    border-radius:15px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.14), transparent 42%),
+      linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
+
+    color:#FFFFFF;
+    border:1px solid rgba(255,255,255,.22);
+
+    font-size:1.24rem;
+    line-height:1;
+
+    box-shadow:
+      0 9px 18px rgba(30,27,75,.15),
+      inset 0 1px 0 rgba(255,255,255,.18);
+  }
+
+  .presenterWhoGrid .presenterNumberBtn:active,
+  .presenterWhoPointsGrid .presenterNumberBtn:active{
+    transform:scale(.96);
+  }
+
+  .presenterWhoGrid .presenterNumberBtn.presenterOpened{
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.42), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.36));
+
+    color:transparent;
+    border:1px solid rgba(255,255,255,.58);
+
+    box-shadow:
+      0 6px 14px rgba(30,27,75,.05),
+      inset 0 1px 0 rgba(255,255,255,.84);
+
+    opacity:1;
+  }
+
+  .presenterWhoGrid .presenterNumberBtn.presenterOpened::after{
+    content:"✓";
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#7C3AED;
+    font-size:1.45rem;
+    line-height:1;
+  }
+
+  .presenterWhoGrid .presenterNumberBtn:disabled:not(.presenterOpened),
+  .presenterWhoPointsGrid .presenterNumberBtn:disabled:not(.selectedPresenterTeam){
+    background:
+      linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
+
+    color:#FFFFFF;
+    opacity:.42;
+    filter:saturate(.75);
+    cursor:not-allowed;
+  }
+
+  .presenterWhoGrid .presenterNumberBtn:disabled:not(.presenterOpened)::after{
+    content:"";
+  }
+
+  /* =========================
+     أزرار التحكم
+  ========================= */
+
+  .presenterWhoActions{
+    height:104px;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-auto-rows:48px;
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .presenterWhoActions .presenterBtn{
+    height:48px;
+    min-height:48px;
+    border-radius:15px;
+    padding:5px 6px;
+
+    font-size:.76rem;
+    line-height:1.1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    grid-column:auto;
+
+    box-shadow:
+      0 8px 16px rgba(30,27,75,.10),
+      inset 0 1px 0 rgba(255,255,255,.22);
+  }
+
+  .presenterWhoActions .presenterBtn.green{
+    background:linear-gradient(180deg,#22C55E,#15803D);
+  }
+
+  .presenterWhoActions .presenterBtn.red{
+    background:linear-gradient(180deg,#EF4444,#DC2626);
+  }
+
+  .presenterWhoActions .presenterBtn.gray:first-child{
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.22), transparent 42%),
+      linear-gradient(180deg,#FB7185,#F97316);
+  }
+
+  .presenterWhoActions .presenterBtn.gray:nth-child(2){
+    background:linear-gradient(180deg,#06B6D4,#0891B2);
+  }
+
+  .presenterWhoActions .presenterBtn:disabled{
+    background:#DDD6FE;
+    color:#7C7896;
+    box-shadow:none;
+    opacity:.82;
+  }
+
+  /* =========================
+     اليمين: الفرق + المحتوى
+  ========================= */
+
+  .presenterWhoRight{
+    display:grid;
+    grid-template-rows:60px 1fr;
+    gap:10px;
+    overflow:hidden;
+  }
+
+  .presenterWhoTeamsBox{
+    height:60px;
+    overflow:hidden;
+  }
+
+  .presenterWhoTeamsBox .presenterCard{
+    height:60px;
+    padding:0;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    overflow:hidden;
+  }
+
+  .presenterWhoTeamsBox .presenterLabel{
+    display:none;
+  }
+
+  .presenterWhoTeamsBox .presenterTeams{
+    height:60px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    overflow:hidden;
+  }
+
+  .presenterWhoTeamsBox .presenterBtn{
+    height:56px;
+    min-height:56px;
+    border-radius:20px;
+    padding:6px 12px;
+
+    color:#24185E;
+    font-size:.96rem;
+    font-weight:900;
+
+    background:
+      radial-gradient(circle at 18% 0%, rgba(255,255,255,.38), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.28));
+
+    border:1px solid rgba(255,255,255,.56);
+
+    box-shadow:
+      0 8px 16px rgba(30,27,75,.08),
+      inset 0 1px 0 rgba(255,255,255,.78);
+
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+  }
+
+  .presenterWhoTeamsBox .presenterBtn.orange{
+    background:
+      radial-gradient(circle at 12% 0%, rgba(124,58,237,.24), transparent 40%),
+      linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.26));
+  }
+
+  .presenterWhoTeamsBox .presenterBtn.blue{
+    background:
+      radial-gradient(circle at 88% 0%, rgba(6,182,212,.24), transparent 40%),
+      linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.26));
+  }
+
+  .presenterWhoTeamsBox .presenterBtn.selectedPresenterTeam{
+    color:#24185E;
+    border-color:rgba(255,155,81,.42);
+
+    background:
+      radial-gradient(circle at 18% 0%, rgba(255,155,81,.28), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.34));
+
+    box-shadow:
+      0 0 0 3px rgba(255,155,81,.10),
+      0 8px 18px rgba(30,27,75,.09),
+      inset 0 1px 0 rgba(255,255,255,.84);
+  }
+
+  /* =========================
+     المحتوى: الإجابة + الصورة
+  ========================= */
+
+  .presenterWhoPreviewCard{
+    height:100%;
+    padding:10px;
+    border-radius:22px;
+    overflow:hidden;
+
+    display:grid;
+    grid-template-rows:16px 66px 16px minmax(0,1fr);
+    gap:8px;
+
+    box-shadow:
+      0 8px 16px rgba(30,27,75,.06),
+      inset 0 1px 0 rgba(255,255,255,.82);
+  }
+
+  .presenterWhoPreviewCard .presenterLabel{
+    height:16px;
+    margin:0;
+    font-size:.76rem;
+    line-height:1;
+    color:#64748B;
+  }
+
+  #presenterWhoAnswerText{
+    height:66px;
+    min-height:66px;
+    max-height:66px;
+
+    padding:8px 12px;
+    border-radius:17px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      radial-gradient(circle at 16% 0%, rgba(15,118,110,.07), transparent 44%),
+      linear-gradient(180deg, rgba(255,255,255,.82), rgba(240,253,250,.66));
+
+    border:1px solid rgba(15,118,110,.14);
+
+    color:#0F766E;
+    font-size:1.02rem;
+    line-height:1.24;
+    font-weight:900;
+    text-align:center;
+
+    overflow:hidden;
+  }
+
+  #presenterWhoImageBox{
+    width:100%;
+    height:100%;
+    min-height:0;
+    max-height:none;
+
+    border-radius:18px;
+    overflow:hidden;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.30));
+
+    border:1px solid rgba(255,255,255,.54);
+
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.80),
+      0 8px 16px rgba(30,27,75,.06);
+  }
+
+  #presenterWhoImageBox.hidden{
+    display:flex !important;
+  }
+
+  #presenterWhoImageBox.hidden::before{
+    content:"اختر رقمًا لعرض الصورة";
+    color:#64748B;
+    font-size:.9rem;
+    font-weight:900;
+  }
+
+  #presenterWhoImageBox img{
+    width:100%;
+    height:100%;
+    max-height:100%;
+    object-fit:contain;
+    display:block;
+    border-radius:14px;
+  }
+}

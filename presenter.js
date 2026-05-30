@@ -2242,6 +2242,7 @@ async function renderWho() {
   panel.innerHTML = `
     <div class="presenterWhoLayout">
 
+      <!-- اليسار: النقاط + الأرقام + التحكم -->
       <div class="presenterWhoLeft">
 
         <section class="presenterCard presenterWhoNumbersCard">
@@ -2280,26 +2281,6 @@ async function renderWho() {
           </div>
         </section>
 
-      </div>
-
-      <div class="presenterWhoRight">
-
-        <div class="presenterWhoTeamsBox">
-          ${teamButtons()}
-        </div>
-
-        <section class="presenterCard presenterWhoPreviewCard">
-          <div class="presenterLabel">الإجابة</div>
-
-          <div id="presenterWhoAnswerText" class="presenterAnswerBody">
-            —
-          </div>
-
-          <div class="presenterLabel">الصورة</div>
-
-          <div id="presenterWhoImageBox" class="presenterImagePreviewBox hidden"></div>
-        </section>
-
         <div class="presenterWhoActions">
           <button
             class="presenterBtn gray"
@@ -2335,6 +2316,27 @@ async function renderWho() {
             ✕ خطأ
           </button>
         </div>
+
+      </div>
+
+      <!-- اليمين: الفرق + المحتوى -->
+      <div class="presenterWhoRight">
+
+        <div class="presenterWhoTeamsBox">
+          ${teamButtons()}
+        </div>
+
+        <section class="presenterCard presenterWhoPreviewCard">
+          <div class="presenterLabel">الإجابة</div>
+
+          <div id="presenterWhoAnswerText" class="presenterAnswerBody">
+            —
+          </div>
+
+          <div class="presenterLabel">الصورة</div>
+
+          <div id="presenterWhoImageBox" class="presenterImagePreviewBox hidden"></div>
+        </section>
 
       </div>
 
