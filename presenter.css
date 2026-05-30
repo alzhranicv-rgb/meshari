@@ -3808,3 +3808,6 @@ button{
     color:#FFFFFF;
   }
 }
+.presenterExplainLayout{
+  outline:8px solid red;
+}
