@@ -1672,18 +1672,167 @@ button{
   }
 }
 /* =========================================================
+   TABLET LANDSCAPE - PRESENTER TOAST CLEAN
+   إشعارات المقدم للتابلت
+========================================================= */
+
+@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
+
+  #presenterToast,
+  #presenterToast.gameToast,
+  #presenterToast.presenterToast,
+  #presenterToast.gameToast.presenterToast,
+  .presenterToast,
+  .gameToast{
+    position:fixed;
+    left:50%;
+    right:auto;
+    top:auto;
+    bottom:18px;
+
+    width:auto;
+    min-width:260px;
+    max-width:420px;
+    min-height:46px;
+
+    padding:8px 12px;
+    border-radius:16px;
+
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
+
+    background:
+      radial-gradient(circle at 14% 0%, rgba(255,255,255,.24), transparent 42%),
+      linear-gradient(180deg, #312E81 0%, #1E1B4B 100%);
+
+    border:1px solid rgba(255,255,255,.22);
+
+    color:#FFFFFF;
+
+    box-shadow:
+      0 10px 22px rgba(30,27,75,.22),
+      inset 0 1px 0 rgba(255,255,255,.20);
+
+    opacity:0;
+    pointer-events:none;
+
+    transform:translateX(-50%) translateY(14px) scale(.96);
+
+    font-family:"HanakaText", system-ui, sans-serif;
+
+    z-index:999999;
+  }
+
+  #presenterToast.show,
+  #presenterToast.gameToast.show,
+  #presenterToast.presenterToast.show,
+  #presenterToast.gameToast.presenterToast.show,
+  .presenterToast.show,
+  .gameToast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0) scale(1);
+  }
+
+  #presenterToast .gameToastIcon,
+  .presenterToast .gameToastIcon,
+  .gameToast .gameToastIcon{
+    width:28px;
+    height:28px;
+    min-width:28px;
+
+    border-radius:11px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      radial-gradient(circle at 30% 18%, rgba(255,255,255,.28), transparent 42%),
+      linear-gradient(180deg, #FFB36F 0%, #F97316 100%);
+
+    color:#FFFFFF;
+
+    font-family:Arial, sans-serif;
+    font-size:.84rem;
+    line-height:1;
+    font-weight:900;
+
+    box-shadow:
+      0 6px 12px rgba(249,115,22,.20),
+      inset 0 1px 0 rgba(255,255,255,.24);
+  }
+
+  #presenterToast .gameToastText,
+  .presenterToast .gameToastText,
+  .gameToast .gameToastText{
+    flex:1;
+
+    color:#FFFFFF;
+
+    font-size:.82rem;
+    line-height:1.35;
+    font-weight:900;
+
+    text-align:right;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  #presenterToast.success,
+  #presenterToast.presenterToastSuccess,
+  .presenterToast.success,
+  .gameToast.success{
+    background:
+      radial-gradient(circle at 14% 0%, rgba(255,255,255,.24), transparent 42%),
+      linear-gradient(180deg, #22C55E 0%, #15803D 100%);
+  }
+
+  #presenterToast.success .gameToastIcon,
+  #presenterToast.presenterToastSuccess .gameToastIcon,
+  .presenterToast.success .gameToastIcon,
+  .gameToast.success .gameToastIcon{
+    background:
+      linear-gradient(180deg, #86EFAC 0%, #22C55E 100%);
+  }
+
+  #presenterToast.error,
+  #presenterToast.presenterToastError,
+  .presenterToast.error,
+  .gameToast.error{
+    background:
+      radial-gradient(circle at 14% 0%, rgba(255,255,255,.22), transparent 42%),
+      linear-gradient(180deg, #EF4444 0%, #DC2626 100%);
+  }
+
+  #presenterToast.error .gameToastIcon,
+  #presenterToast.presenterToastError .gameToastIcon,
+  .presenterToast.error .gameToastIcon,
+  .gameToast.error .gameToastIcon{
+    background:
+      linear-gradient(180deg, #FCA5A5 0%, #EF4444 100%);
+  }
+
+  #presenterToast.hidden,
+  .presenterToast.hidden,
+  .gameToast.hidden{
+    display:none !important;
+  }
+}
+/* =========================================================
    TABLET LANDSCAPE - WARMUP ONLY
    صفحة المقدم - التسخين فقط
 ========================================================= */
 
 @media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
 
-  /* التخطيط العام */
   .presenterWarmupLayout{
     height:100%;
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:10px;
+    gap:12px;
     direction:ltr;
     overflow:hidden;
   }
@@ -1708,7 +1857,7 @@ button{
   }
 
   .presenterWarmupCats{
-    height:calc(100% - 30px);
+    height:100%;
     display:grid;
     grid-template-columns:1fr;
     gap:8px;
@@ -1719,16 +1868,16 @@ button{
     min-height:0;
     padding:8px;
     display:grid;
-    grid-template-columns:115px minmax(0,1fr);
+    grid-template-columns:120px minmax(0,1fr);
     gap:8px;
     align-items:center;
 
     border-radius:20px;
     background:
-      linear-gradient(180deg, rgba(255,255,255,.64), rgba(255,255,255,.30));
-    border:1px solid rgba(255,255,255,.54);
+      linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.34));
+    border:1px solid rgba(255,255,255,.56);
     box-shadow:
-      0 10px 20px rgba(30,27,75,.07),
+      0 8px 16px rgba(30,27,75,.06),
       inset 0 1px 0 rgba(255,255,255,.82);
   }
 
@@ -1743,7 +1892,6 @@ button{
     justify-content:center;
 
     border-radius:16px;
-
     background:
       radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
       linear-gradient(180deg, #FFB36F 0%, #F97316 100%);
@@ -1756,7 +1904,7 @@ button{
     overflow:hidden;
 
     box-shadow:
-      0 10px 20px rgba(249,115,22,.18),
+      0 8px 16px rgba(249,115,22,.16),
       inset 0 1px 0 rgba(255,255,255,.28);
   }
 
@@ -1768,12 +1916,12 @@ button{
 
   .presenterWarmupNumbers .presenterNumberBtn{
     position:relative;
-    min-height:46px;
     height:46px;
+    min-height:46px;
     border-radius:15px;
 
     background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.14), transparent 42%),
       linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
 
     color:#FFFFFF;
@@ -1783,7 +1931,7 @@ button{
     line-height:1;
 
     box-shadow:
-      0 10px 20px rgba(30,27,75,.16),
+      0 9px 18px rgba(30,27,75,.15),
       inset 0 1px 0 rgba(255,255,255,.18);
   }
 
@@ -1794,14 +1942,14 @@ button{
   .presenterWarmupNumbers .presenterNumberBtn.presenterOpened{
     background:
       radial-gradient(circle at 20% 0%, rgba(255,255,255,.42), transparent 42%),
-      linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.34));
+      linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.36));
 
     color:transparent;
-    border:1px solid rgba(255,255,255,.56);
+    border:1px solid rgba(255,255,255,.58);
 
     box-shadow:
-      0 8px 16px rgba(30,27,75,.06),
-      inset 0 1px 0 rgba(255,255,255,.82);
+      0 6px 14px rgba(30,27,75,.05),
+      inset 0 1px 0 rgba(255,255,255,.84);
 
     opacity:1;
   }
@@ -1835,30 +1983,30 @@ button{
   }
 
   /* =========================
-     اليمين: الفريق + السؤال + الإجابة + التحكم
+     اليمين: لوحة الفريق + السؤال + التحكم
   ========================= */
 
   .presenterWarmupRight{
-  display:grid;
-  grid-template-rows:58px 236px 46px;
-  gap:8px;
-  align-content:start;
-  overflow:visible;
-}
+    display:grid;
+    grid-template-rows:64px 226px 48px;
+    gap:12px;
+    align-content:start;
+    overflow:hidden;
+  }
 
-  /* اختيار الفريق - زجاجي بدون قص */
+  /* لوحة الفريق */
   .presenterWarmupTeamsBox{
-    height:58px;
-    overflow:visible;
+    height:64px;
+    overflow:hidden;
   }
 
   .presenterWarmupTeamsBox .presenterCard{
-    height:58px;
+    height:64px;
     padding:0;
     background:transparent;
     border:0;
     box-shadow:none;
-    overflow:visible;
+    overflow:hidden;
   }
 
   .presenterWarmupTeamsBox .presenterLabel{
@@ -1866,17 +2014,17 @@ button{
   }
 
   .presenterWarmupTeamsBox .presenterTeams{
-    height:58px;
+    height:64px;
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:10px;
-    overflow:visible;
+    overflow:hidden;
   }
 
   .presenterWarmupTeamsBox .presenterBtn{
-    height:54px;
-    min-height:54px;
-    border-radius:20px;
+    height:60px;
+    min-height:60px;
+    border-radius:22px;
     padding:6px 12px;
 
     font-size:1rem;
@@ -1886,13 +2034,13 @@ button{
 
     background:
       radial-gradient(circle at 18% 0%, rgba(255,255,255,.38), transparent 42%),
-      linear-gradient(180deg, rgba(255,255,255,.56), rgba(255,255,255,.24));
+      linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.28));
 
-    border:1px solid rgba(255,255,255,.54);
+    border:1px solid rgba(255,255,255,.56);
 
     box-shadow:
-      0 12px 24px rgba(30,27,75,.10),
-      inset 0 1px 0 rgba(255,255,255,.76);
+      0 8px 16px rgba(30,27,75,.08),
+      inset 0 1px 0 rgba(255,255,255,.78);
 
     overflow:hidden;
     white-space:nowrap;
@@ -1902,40 +2050,44 @@ button{
   .presenterWarmupTeamsBox .presenterBtn.orange{
     background:
       radial-gradient(circle at 12% 0%, rgba(124,58,237,.24), transparent 40%),
-      linear-gradient(180deg, rgba(255,255,255,.50), rgba(255,255,255,.22));
+      linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.26));
   }
 
   .presenterWarmupTeamsBox .presenterBtn.blue{
     background:
       radial-gradient(circle at 88% 0%, rgba(6,182,212,.24), transparent 40%),
-      linear-gradient(180deg, rgba(255,255,255,.50), rgba(255,255,255,.22));
+      linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.26));
   }
 
   .presenterWarmupTeamsBox .presenterBtn.selectedPresenterTeam{
     color:#24185E;
-    border-color:rgba(255,255,255,.78);
+    border-color:rgba(255,155,81,.42);
 
     background:
       radial-gradient(circle at 18% 0%, rgba(255,155,81,.28), transparent 42%),
       linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.34));
 
     box-shadow:
-      0 0 0 4px rgba(255,155,81,.12),
-      0 14px 28px rgba(30,27,75,.13),
-      inset 0 1px 0 rgba(255,255,255,.86);
+      0 0 0 3px rgba(255,155,81,.10),
+      0 8px 18px rgba(30,27,75,.09),
+      inset 0 1px 0 rgba(255,255,255,.84);
   }
 
   /* كرت السؤال والإجابة */
   .presenterWarmupPreviewCard{
-    height:242px;
+    height:226px;
     padding:10px;
 
     display:grid;
-    grid-template-rows:18px 88px 18px 72px;
-    gap:6px;
+    grid-template-rows:18px 80px 18px 66px;
+    gap:8px;
 
     border-radius:22px;
     overflow:hidden;
+
+    box-shadow:
+      0 8px 16px rgba(30,27,75,.06),
+      inset 0 1px 0 rgba(255,255,255,.82);
   }
 
   .presenterWarmupPreviewCard .presenterLabel{
@@ -1946,10 +2098,10 @@ button{
   }
 
   #presenterWarmupQuestionText{
-    height:88px;
-    min-height:88px;
-    max-height:88px;
-    padding:10px 14px;
+    height:80px;
+    min-height:80px;
+    max-height:80px;
+    padding:9px 14px;
 
     border-radius:18px;
     background:
@@ -1959,8 +2111,8 @@ button{
     border:1px solid rgba(124,58,237,.12);
 
     color:#1E1B4B;
-    font-size:1.03rem;
-    line-height:1.35;
+    font-size:1rem;
+    line-height:1.32;
     font-weight:900;
     text-align:center;
 
@@ -1968,10 +2120,10 @@ button{
   }
 
   #presenterWarmupAnswerText{
-    height:72px;
-    min-height:72px;
-    max-height:72px;
-    padding:10px 14px;
+    height:66px;
+    min-height:66px;
+    max-height:66px;
+    padding:9px 14px;
 
     border-radius:18px;
     background:
@@ -1981,8 +2133,8 @@ button{
     border:1px solid rgba(15,118,110,.14);
 
     color:#0F766E;
-    font-size:1.12rem;
-    line-height:1.25;
+    font-size:1.08rem;
+    line-height:1.22;
     font-weight:900;
     text-align:center;
 
@@ -1991,7 +2143,7 @@ button{
 
   /* أزرار التحكم */
   .presenterWarmupActions{
-    height:46px;
+    height:48px;
     display:grid;
     grid-template-columns:repeat(3,minmax(0,1fr));
     gap:8px;
@@ -1999,8 +2151,8 @@ button{
   }
 
   .presenterWarmupActions .presenterBtn{
-    height:46px;
-    min-height:46px;
+    height:48px;
+    min-height:48px;
     border-radius:15px;
     padding:5px 6px;
 
@@ -2011,6 +2163,10 @@ button{
     text-overflow:ellipsis;
 
     grid-column:auto;
+
+    box-shadow:
+      0 8px 16px rgba(30,27,75,.10),
+      inset 0 1px 0 rgba(255,255,255,.22);
   }
 
   .presenterWarmupActions .presenterBtn.green{
