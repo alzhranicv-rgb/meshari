@@ -2595,7 +2595,6 @@ async function renderExplain() {
   panel.innerHTML = `
     <div class="presenterExplainLayout">
 
-      <!-- اليسار: الأرقام + التحكم -->
       <div class="presenterExplainLeft">
 
         <section class="presenterCard presenterExplainNumbersCard">
@@ -2652,7 +2651,6 @@ async function renderExplain() {
 
       </div>
 
-      <!-- اليمين: الفرق + الكلمة -->
       <div class="presenterExplainRight">
 
         <div class="presenterExplainTeamsBox">

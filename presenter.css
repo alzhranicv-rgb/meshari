@@ -3500,6 +3500,7 @@ button{
     border-radius:14px;
   }
 }
+
 /* =========================================================
    TABLET LANDSCAPE - EXPLAIN ONLY
    صفحة المقدم - اشرح الكلمة فقط
@@ -3511,7 +3512,7 @@ button{
     width:100%;
     height:100%;
     display:grid;
-    grid-template-columns:1.02fr .98fr;
+    grid-template-columns:1.04fr .96fr;
     gap:12px;
     direction:ltr;
     overflow:hidden;
@@ -3526,10 +3527,7 @@ button{
     overflow:hidden;
   }
 
-  /* =========================
-     اليسار: الأرقام + التحكم
-  ========================= */
-
+  /* اليسار */
   .presenterExplainLeft{
     display:grid;
     grid-template-rows:minmax(0,1fr) 54px;
@@ -3548,7 +3546,7 @@ button{
     gap:12px;
 
     background:
-      radial-gradient(circle at 15% 0%, rgba(255,255,255,.40), transparent 42%),
+      radial-gradient(circle at 15% 0%, rgba(255,255,255,.38), transparent 42%),
       linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.30));
 
     border:1px solid rgba(255,255,255,.54);
@@ -3570,39 +3568,33 @@ button{
   .presenterExplainNumbersGrid{
     height:100%;
     min-height:0;
+
     display:grid;
-    direction:rtl;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-auto-rows:78px;
+    align-content:center;
     gap:10px;
+
+    direction:rtl;
     overflow:hidden;
   }
 
-  .presenterExplainNumbersGrid:has(.presenterExplainNumberCard:nth-child(6)){
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    grid-template-rows:repeat(2,72px);
-    align-content:center;
-  }
-
-  .presenterExplainNumbersGrid:not(:has(.presenterExplainNumberCard:nth-child(6))){
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    grid-template-rows:repeat(2,82px);
-    align-content:center;
-  }
-
   .presenterExplainNumberCard,
+  .presenterExplainNumbersGrid .explainNumberCard,
   .presenterExplainNumbersGrid .presenterNumberBtn{
     position:relative;
     width:100%;
-    height:100%;
-    min-height:0;
+    height:78px;
+    min-height:78px;
+
     border-radius:22px;
+    border:1px solid rgba(255,255,255,.22);
 
     background:
       radial-gradient(circle at 20% 0%, rgba(255,255,255,.14), transparent 42%),
       linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
 
     color:#FFFFFF;
-    border:1px solid rgba(255,255,255,.22);
-
     font-size:1.9rem;
     line-height:1;
     font-weight:900;
@@ -3610,6 +3602,8 @@ button{
     box-shadow:
       0 12px 24px rgba(30,27,75,.16),
       inset 0 1px 0 rgba(255,255,255,.18);
+
+    overflow:hidden;
   }
 
   .presenterExplainNumberCard span{
@@ -3617,17 +3611,13 @@ button{
     z-index:2;
   }
 
-  .presenterExplainNumberCard:active{
-    transform:scale(.97);
-  }
-
-  .presenterExplainNumberCard.selectedPresenterTeam,
-  .presenterExplainNumberCard.active{
+  .presenterExplainNumberCard.active,
+  .presenterExplainNumberCard.selectedPresenterTeam{
     color:#24185E;
-    border-color:rgba(255,155,81,.48);
+    border-color:rgba(255,155,81,.46);
 
     background:
-      radial-gradient(circle at 18% 0%, rgba(255,155,81,.32), transparent 42%),
+      radial-gradient(circle at 18% 0%, rgba(255,155,81,.30), transparent 42%),
       linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.40));
 
     box-shadow:
@@ -3636,14 +3626,14 @@ button{
       inset 0 1px 0 rgba(255,255,255,.86);
   }
 
-  .presenterExplainNumberCard.presenterOpened,
-  .presenterExplainNumberCard.used{
+  .presenterExplainNumberCard.used,
+  .presenterExplainNumberCard.presenterOpened{
     background:
       radial-gradient(circle at 20% 0%, rgba(255,255,255,.42), transparent 42%),
       linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.36));
 
     color:transparent;
-    border:1px solid rgba(255,255,255,.58);
+    border-color:rgba(255,255,255,.58);
 
     box-shadow:
       0 6px 14px rgba(30,27,75,.05),
@@ -3652,8 +3642,8 @@ button{
     opacity:1;
   }
 
-  .presenterExplainNumberCard.presenterOpened::after,
-  .presenterExplainNumberCard.used::after{
+  .presenterExplainNumberCard.used::after,
+  .presenterExplainNumberCard.presenterOpened::after{
     content:"✓";
     position:absolute;
     inset:0;
@@ -3667,16 +3657,13 @@ button{
     line-height:1;
   }
 
-  .presenterExplainNumberCard:disabled:not(.presenterOpened):not(.used):not(.selectedPresenterTeam){
+  .presenterExplainNumberCard:disabled:not(.used):not(.presenterOpened):not(.selectedPresenterTeam){
     opacity:.42;
     filter:saturate(.75);
     cursor:not-allowed;
   }
 
-  /* =========================
-     أزرار التحكم
-  ========================= */
-
+  /* أزرار التحكم */
   .presenterExplainActions{
     height:54px;
     min-height:54px;
@@ -3691,7 +3678,7 @@ button{
     height:54px;
     min-height:54px;
     border-radius:16px;
-    padding:5px 7px;
+    padding:5px 8px;
 
     font-size:.78rem;
     line-height:1.1;
@@ -3725,10 +3712,7 @@ button{
     opacity:.82;
   }
 
-  /* =========================
-     اليمين: الفرق + الكلمة
-  ========================= */
-
+  /* اليمين */
   .presenterExplainRight{
     display:grid;
     grid-template-rows:58px minmax(0,1fr);
@@ -3914,15 +3898,13 @@ button{
   .presenterExplainTimerBox.hidden{
     display:flex;
     opacity:.24;
+    color:transparent;
   }
 
   .presenterExplainTimerBox.hidden::before{
     content:"المؤقت";
+    color:#12362D;
     font-size:1rem;
-  }
-
-  .presenterExplainTimerBox.hidden{
-    color:transparent;
   }
 
   .presenterExplainTimerBox.danger,
