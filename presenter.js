@@ -2590,12 +2590,12 @@ async function renderExplain() {
   const count = getPresenterExplainWordsCount()
   const used = getPresenterExplainUsedNumbers()
   const currentNumber = getPresenterExplainCurrentNumber()
-  const activeTeam = getPresenterExplainCurrentTeam()
   const revealLock = !!explain.revealLock
 
   panel.innerHTML = `
     <div class="presenterExplainLayout">
 
+      <!-- اليسار: الأرقام + التحكم -->
       <div class="presenterExplainLeft">
 
         <section class="presenterCard presenterExplainNumbersCard">
@@ -2619,38 +2619,6 @@ async function renderExplain() {
               `
             }).join("")}
           </div>
-        </section>
-
-      </div>
-
-      <div class="presenterExplainRight">
-
-        <div class="presenterExplainTeamsBox">
-          ${teamButtons()}
-        </div>
-
-        <section class="presenterCard presenterExplainPreviewCard">
-
-          <div class="presenterLabel">الكلمة</div>
-
-          <div
-            id="presenterExplainWordText"
-            class="presenterExplainWordBox ${explain.answerResult === "correct" ? "answerCorrect" : ""} ${explain.answerResult === "wrong" ? "answerWrong" : ""}"
-          >
-            ${
-              currentNumber
-                ? explain.currentWord || getPresenterExplainWord(currentNumber) || "—"
-                : ""
-            }
-          </div>
-
-          <div
-            id="presenterExplainTimerText"
-            class="presenterExplainTimerBox ${explain.timerVisible ? "" : "hidden"} ${explain.timerVisible && Number(explain.timeLeft || 45) <= 5 ? "danger presenterTimerDanger" : ""}"
-          >
-            ${Number(explain.timeLeft || 45)}
-          </div>
-
         </section>
 
         <div class="presenterExplainActions">
@@ -2681,6 +2649,41 @@ async function renderExplain() {
             خطأ
           </button>
         </div>
+
+      </div>
+
+      <!-- اليمين: الفرق + الكلمة -->
+      <div class="presenterExplainRight">
+
+        <div class="presenterExplainTeamsBox">
+          ${teamButtons()}
+        </div>
+
+        <section class="presenterCard presenterExplainPreviewCard">
+
+          <div class="presenterLabel">الكلمة</div>
+
+          <div
+            id="presenterExplainWordText"
+            class="presenterExplainWordBox ${explain.answerResult === "correct" ? "answerCorrect" : ""} ${explain.answerResult === "wrong" ? "answerWrong" : ""}"
+          >
+            ${
+              currentNumber
+                ? explain.currentWord || getPresenterExplainWord(currentNumber) || "—"
+                : ""
+            }
+          </div>
+
+          <div class="presenterLabel">المؤقت</div>
+
+          <div
+            id="presenterExplainTimerText"
+            class="presenterExplainTimerBox ${explain.timerVisible ? "" : "hidden"} ${explain.timerVisible && Number(explain.timeLeft || 45) <= 5 ? "danger presenterTimerDanger" : ""}"
+          >
+            ${Number(explain.timeLeft || 45)}
+          </div>
+
+        </section>
 
       </div>
 
@@ -2816,10 +2819,10 @@ function refreshPresenterExplainFromState() {
   }
 
   document
-    .querySelectorAll(".presenterExplainControls .explainControlBtn")
-    .forEach(btn => {
-      btn.disabled = !currentNumber || revealLock
-    })
+  .querySelectorAll(".presenterExplainActions .presenterBtn")
+  .forEach(btn => {
+    btn.disabled = !currentNumber || revealLock
+  })
 }
 
 /* =========================
