@@ -1919,6 +1919,69 @@ function openAuctionPresenterNumber(number) {
   })
 }
 
+function renderPresenterAuctionMedia(box, mediaUrl) {
+  if (!box || !mediaUrl) return
+
+  box.classList.remove("hidden")
+
+  const safeUrl = String(mediaUrl)
+
+  if (isPresenterAuctionVideo(safeUrl)) {
+    box.innerHTML = `
+      <video
+        src="${safeUrl}"
+        playsinline
+        preload="metadata"
+      ></video>
+    `
+
+    setTimeout(ensurePresenterAuctionVideoButton, 80)
+    return
+  }
+
+  box.innerHTML = `
+    <video
+      src="${safeUrl}"
+      playsinline
+      preload="metadata"
+      muted
+    ></video>
+  `
+
+  const video = box.querySelector("video")
+  if (!video) return
+
+  let loadedAsVideo = false
+
+  video.onloadedmetadata = () => {
+    loadedAsVideo = true
+    video.muted = false
+    setTimeout(ensurePresenterAuctionVideoButton, 80)
+  }
+
+  video.onerror = () => {
+    if (loadedAsVideo) return
+
+    box.innerHTML = `
+      <img src="${safeUrl}" alt="">
+    `
+
+    setTimeout(ensurePresenterAuctionVideoButton, 80)
+  }
+
+  setTimeout(() => {
+    const currentVideo = box.querySelector("video")
+
+    if (currentVideo && !loadedAsVideo && currentVideo.readyState === 0) {
+      box.innerHTML = `
+        <img src="${safeUrl}" alt="">
+      `
+
+      setTimeout(ensurePresenterAuctionVideoButton, 80)
+    }
+  }, 700)
+}
+
 function showPresenterAuctionPreview(number) {
   const item = presenterAuctionRows.find(row => Number(row.number) === Number(number))
 
@@ -1931,28 +1994,13 @@ function showPresenterAuctionPreview(number) {
 
   if (imageBox) {
     if (item?.image) {
-      imageBox.classList.remove("hidden")
-
-      if (isPresenterAuctionVideo(item.image)) {
-        imageBox.innerHTML = `
-          <video
-            src="${item.image}"
-            playsinline
-            preload="metadata"
-          ></video>
-        `
-      } else {
-        imageBox.innerHTML = `
-          <img src="${item.image}" alt="">
-        `
-      }
+      renderPresenterAuctionMedia(imageBox, item.image)
     } else {
       imageBox.classList.add("hidden")
       imageBox.innerHTML = ""
+      setTimeout(ensurePresenterAuctionVideoButton, 80)
     }
   }
-
-  setTimeout(ensurePresenterAuctionVideoButton, 80)
 }
 
 function refreshPresenterAuctionFromState() {
@@ -2016,24 +2064,11 @@ function refreshPresenterAuctionFromState() {
 
     if (imageBox) {
       if (image) {
-        imageBox.classList.remove("hidden")
-
-        if (isPresenterAuctionVideo(image)) {
-          imageBox.innerHTML = `
-            <video
-              src="${image}"
-              playsinline
-              preload="metadata"
-            ></video>
-          `
-        } else {
-          imageBox.innerHTML = `
-            <img src="${image}" alt="">
-          `
-        }
+        renderPresenterAuctionMedia(imageBox, image)
       } else {
         imageBox.classList.add("hidden")
         imageBox.innerHTML = ""
+        setTimeout(ensurePresenterAuctionVideoButton, 80)
       }
     }
   } else {
@@ -2044,6 +2079,7 @@ function refreshPresenterAuctionFromState() {
     if (imageBox) {
       imageBox.classList.add("hidden")
       imageBox.innerHTML = ""
+      setTimeout(ensurePresenterAuctionVideoButton, 80)
     }
   }
 
