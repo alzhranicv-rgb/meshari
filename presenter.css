@@ -3808,6 +3808,7 @@ button{
     color:#FFFFFF;
   }
 }
+
 /* =========================================================
    TABLET LANDSCAPE - FINAL ONLY
    صفحة المقدم - الفاصلة
@@ -3834,10 +3835,13 @@ button{
     overflow:hidden;
   }
 
-  /* اليسار */
+  /* =========================
+     اليسار: الأرقام + التحكم
+  ========================= */
+
   .presenterFinalLeft{
     display:grid;
-    grid-template-rows:minmax(0,1fr) 104px;
+    grid-template-rows:minmax(0,1fr) 122px;
     gap:10px;
   }
 
@@ -3955,21 +3959,47 @@ button{
     cursor:not-allowed;
   }
 
-  /* أزرار التحكم صفين */
+  /* =========================
+     أزرار التحكم
+  ========================= */
+
   .presenterFinalControlsArea{
-    height:104px;
-    min-height:104px;
+    height:122px;
+    min-height:122px;
     overflow:hidden;
   }
 
   .presenterFinalRound1TwoRows{
-    height:104px;
+    height:122px;
     display:grid;
     grid-template-columns:repeat(4,minmax(0,1fr));
-    grid-auto-rows:48px;
+    grid-template-rows:57px 57px;
     gap:8px;
     margin:0;
     overflow:hidden;
+  }
+
+  .presenterFinalRound1TwoRows .presenterBtn{
+    height:57px;
+    min-height:57px;
+    border-radius:16px;
+    padding:5px 6px;
+
+    font-size:.73rem;
+    line-height:1.1;
+    font-weight:900;
+
+    white-space:normal;
+    overflow:hidden;
+    text-overflow:clip;
+
+    box-shadow:
+      0 8px 16px rgba(30,27,75,.10),
+      inset 0 1px 0 rgba(255,255,255,.22);
+  }
+
+  .presenterFinalRound1TwoRows .presenterBtn:last-child{
+    grid-column:3 / 5;
   }
 
   .presenterFinalControlsArea .presenterActions:not(.presenterFinalRound1TwoRows){
@@ -3984,16 +4014,17 @@ button{
   }
 
   .presenterFinalControlsArea .presenterBtn{
-    height:48px;
-    min-height:48px;
+    height:52px;
+    min-height:52px;
     border-radius:15px;
     padding:5px 7px;
 
     font-size:.72rem;
     line-height:1.1;
-    white-space:nowrap;
+    font-weight:900;
+
+    white-space:normal;
     overflow:hidden;
-    text-overflow:ellipsis;
 
     box-shadow:
       0 8px 16px rgba(30,27,75,.10),
@@ -4031,7 +4062,10 @@ button{
     opacity:.82;
   }
 
-  /* اليمين */
+  /* =========================
+     اليمين: الفرق + الإجابة
+  ========================= */
+
   .presenterFinalRight{
     display:grid;
     grid-template-rows:58px minmax(0,1fr);
@@ -4157,7 +4191,10 @@ button{
     overflow:hidden;
   }
 
-  /* مربع الإجابة فقط */
+  /* =========================
+     مربع الإجابة - الجولة الأولى
+  ========================= */
+
   .presenterFinalOnlyAnswerView{
     width:100%;
     height:100%;
@@ -4171,6 +4208,8 @@ button{
 
   .presenterFinalOnlyAnswerLabel{
     height:22px;
+    margin:0;
+
     color:#64748B;
     font-size:.82rem;
     line-height:1;
@@ -4178,9 +4217,12 @@ button{
   }
 
   .presenterFinalOnlyAnswerText{
+    width:100%;
+    height:100%;
     min-height:0;
+
     border-radius:22px;
-    padding:16px;
+    padding:18px 20px;
 
     display:flex;
     align-items:center;
@@ -4193,15 +4235,20 @@ button{
     border:1px solid rgba(15,118,110,.14);
 
     color:#0F766E;
-    font-size:1.75rem;
-    line-height:1.25;
+    font-size:clamp(1.05rem, 2.2vw, 1.55rem);
+    line-height:1.32;
     font-weight:900;
     text-align:center;
 
     overflow:hidden;
+    word-break:normal;
+    overflow-wrap:break-word;
   }
 
-  /* دعم محتوى الجولات الثانية والثالثة */
+  /* =========================
+     دعم محتوى الجولات الثانية والثالثة
+  ========================= */
+
   .presenterFinalCleanPreview{
     height:100%;
     min-height:0;
@@ -4249,5 +4296,138 @@ button{
     text-align:center;
 
     overflow:hidden;
+  }
+
+  /* الجولة الثانية */
+  .presenterFinalRound2SimpleGrid{
+    height:100%;
+    min-height:0;
+
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-auto-rows:minmax(54px,1fr);
+    gap:8px;
+
+    overflow:hidden;
+  }
+
+  .presenterFinalRound2SimpleCard{
+    border:1px solid rgba(255,255,255,.44);
+    border-radius:16px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+      linear-gradient(180deg, rgba(49,46,129,.86), rgba(30,27,75,.96));
+
+    color:#FFFFFF;
+    font-size:.9rem;
+    line-height:1.2;
+    font-weight:900;
+
+    overflow:hidden;
+  }
+
+  .presenterFinalRound2SimpleCard.selectedCorrect{
+    background:linear-gradient(180deg,#22C55E,#15803D);
+    color:#FFFFFF;
+  }
+
+  .presenterFinalRound2PreviewStage{
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .finalSequenceWordsWrap{
+    height:100%;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .finalSequenceWordBtn{
+    border:1px solid rgba(255,255,255,.44);
+    border-radius:16px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+      linear-gradient(180deg,#06B6D4,#0891B2);
+
+    color:#FFFFFF;
+    font-size:.9rem;
+    font-weight:900;
+    line-height:1.2;
+
+    overflow:hidden;
+  }
+
+  /* الجولة الثالثة */
+  .presenterFinalRound3Preview,
+  .presenterFinalTeamMediaPreview{
+    height:100%;
+    min-height:0;
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr);
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .finalRound3AnswersList{
+    min-height:0;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .finalRound3AnswerCard{
+    border:1px solid rgba(255,255,255,.44);
+    border-radius:16px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+      linear-gradient(180deg, rgba(49,46,129,.86), rgba(30,27,75,.96));
+
+    color:#FFFFFF;
+    font-size:.85rem;
+    line-height:1.2;
+    font-weight:900;
+
+    overflow:hidden;
+  }
+
+  .finalRound3AnswerCard.selectedCorrect{
+    background:linear-gradient(180deg,#22C55E,#15803D);
+    color:#FFFFFF;
+  }
+
+  .presenterFinalRound3ImageStage,
+  .presenterImagePreviewBox,
+  .presenterVideoPreviewBox{
+    min-height:0;
+    border-radius:18px;
+    overflow:hidden;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.64), rgba(255,255,255,.30));
+
+    border:1px solid rgba(255,255,255,.50);
+  }
+
+  .presenterImagePreviewBox img,
+  .presenterVideoPreviewBox video{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+  }
+
+  .presenterVideoPreviewBox video{
+    background:#000;
   }
 }
