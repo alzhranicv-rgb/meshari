@@ -3512,7 +3512,7 @@ button{
     width:100%;
     height:100%;
     display:grid;
-    grid-template-columns:1.04fr .96fr;
+    grid-template-columns:1.08fr .92fr;
     gap:12px;
     direction:ltr;
     overflow:hidden;
@@ -3522,42 +3522,42 @@ button{
   .presenterExplainRight{
     direction:rtl;
     min-width:0;
-    height:100%;
     min-height:0;
+    height:100%;
     overflow:hidden;
   }
 
-  /* اليسار */
+  /* =========================
+     اليسار
+     الأرقام + الكلمة + الأزرار
+  ========================= */
+
   .presenterExplainLeft{
     display:grid;
-    grid-template-rows:minmax(0,1fr) 54px;
+    grid-template-rows:108px minmax(0,1fr) 54px;
     gap:10px;
   }
 
-  .presenterExplainNumbersCard{
-    height:100%;
-    min-height:0;
-    padding:14px;
+  .presenterExplainNumbersCard,
+  .presenterExplainWordCard,
+  .presenterExplainTimerCard{
+    background:#EAEFEF;
+    border:1px solid #CBD5E1;
+    box-shadow:0 4px 12px rgba(30,27,75,.05);
     border-radius:24px;
-    overflow:hidden;
-
-    display:grid;
-    grid-template-rows:18px minmax(0,1fr);
-    gap:12px;
-
-    background:
-      radial-gradient(circle at 15% 0%, rgba(255,255,255,.38), transparent 42%),
-      linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.30));
-
-    border:1px solid rgba(255,255,255,.54);
-
-    box-shadow:
-      0 10px 22px rgba(30,27,75,.07),
-      inset 0 1px 0 rgba(255,255,255,.82);
   }
 
-  .presenterExplainNumbersCard > .presenterLabel{
-    height:18px;
+  .presenterExplainNumbersCard{
+    padding:12px 14px;
+    display:grid;
+    grid-template-rows:18px 1fr;
+    gap:10px;
+    overflow:hidden;
+  }
+
+  .presenterExplainNumbersCard > .presenterLabel,
+  .presenterExplainWordCard > .presenterLabel,
+  .presenterExplainTimerCard > .presenterLabel{
     margin:0;
     color:#64748B;
     font-size:.82rem;
@@ -3567,43 +3567,26 @@ button{
 
   .presenterExplainNumbersGrid{
     height:100%;
-    min-height:0;
-
     display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    grid-auto-rows:78px;
-    align-content:center;
     gap:10px;
-
-    direction:rtl;
-    overflow:hidden;
+    align-items:center;
   }
 
-  .presenterExplainNumberCard,
-  .presenterExplainNumbersGrid .explainNumberCard,
-  .presenterExplainNumbersGrid .presenterNumberBtn{
+  .presenterExplainNumberCard{
     position:relative;
     width:100%;
-    height:78px;
-    min-height:78px;
-
-    border-radius:22px;
-    border:1px solid rgba(255,255,255,.22);
-
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.14), transparent 42%),
-      linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
-
+    height:56px;
+    min-height:56px;
+    border-radius:18px;
+    border:1px solid #1E1B4B;
+    background:#312E81;
     color:#FFFFFF;
-    font-size:1.9rem;
+    font-size:1.55rem;
     line-height:1;
     font-weight:900;
-
-    box-shadow:
-      0 12px 24px rgba(30,27,75,.16),
-      inset 0 1px 0 rgba(255,255,255,.18);
-
+    box-shadow:0 4px 8px rgba(30,27,75,.10);
     overflow:hidden;
+    transition:.18s ease;
   }
 
   .presenterExplainNumberCard span{
@@ -3614,31 +3597,17 @@ button{
   .presenterExplainNumberCard.active,
   .presenterExplainNumberCard.selectedPresenterTeam{
     color:#24185E;
-    border-color:rgba(255,155,81,.46);
-
-    background:
-      radial-gradient(circle at 18% 0%, rgba(255,155,81,.30), transparent 42%),
-      linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.40));
-
-    box-shadow:
-      0 0 0 3px rgba(255,155,81,.12),
-      0 10px 20px rgba(249,115,22,.14),
-      inset 0 1px 0 rgba(255,255,255,.86);
+    border-color:#FF9B51;
+    background:#FFE4D6;
+    box-shadow:0 0 0 3px rgba(255,155,81,.18);
   }
 
   .presenterExplainNumberCard.used,
   .presenterExplainNumberCard.presenterOpened{
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.42), transparent 42%),
-      linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.36));
-
+    background:#F8FAFC;
     color:transparent;
-    border-color:rgba(255,255,255,.58);
-
-    box-shadow:
-      0 6px 14px rgba(30,27,75,.05),
-      inset 0 1px 0 rgba(255,255,255,.84);
-
+    border-color:#D8E0EA;
+    box-shadow:none;
     opacity:1;
   }
 
@@ -3647,27 +3616,63 @@ button{
     content:"✓";
     position:absolute;
     inset:0;
-
     display:flex;
     align-items:center;
     justify-content:center;
-
     color:#7C3AED;
-    font-size:1.9rem;
+    font-size:1.55rem;
     line-height:1;
+    font-weight:900;
   }
 
   .presenterExplainNumberCard:disabled:not(.used):not(.presenterOpened):not(.selectedPresenterTeam){
-    opacity:.42;
-    filter:saturate(.75);
+    opacity:.38;
+    filter:grayscale(1);
     cursor:not-allowed;
   }
 
-  /* أزرار التحكم */
+  .presenterExplainWordCard{
+    padding:12px;
+    display:grid;
+    grid-template-rows:16px minmax(0,1fr);
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .presenterExplainWordBox{
+    width:100%;
+    height:100%;
+    min-height:0;
+    border-radius:22px;
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#FFFFFF;
+    border:1px solid #E2E8F0;
+    color:#1E1B4B;
+    font-size:2rem;
+    line-height:1.2;
+    font-weight:900;
+    text-align:center;
+    overflow:hidden;
+  }
+
+  .presenterExplainWordBox.answerCorrect{
+    background:#DCFCE7;
+    border-color:#86EFAC;
+    color:#166534;
+  }
+
+  .presenterExplainWordBox.answerWrong{
+    background:#FEE2E2;
+    border-color:#FCA5A5;
+    color:#991B1B;
+  }
+
   .presenterExplainActions{
     height:54px;
     min-height:54px;
-
     display:grid;
     grid-template-columns:repeat(3,minmax(0,1fr));
     gap:8px;
@@ -3679,40 +3684,40 @@ button{
     min-height:54px;
     border-radius:16px;
     padding:5px 8px;
-
     font-size:.78rem;
     line-height:1.1;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-
-    box-shadow:
-      0 10px 18px rgba(30,27,75,.10),
-      inset 0 1px 0 rgba(255,255,255,.22);
+    border:none;
+    color:#FFF;
+    font-weight:700;
   }
 
   .presenterExplainActions .presenterBtn.dark{
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
-      linear-gradient(180deg,#312E81,#1E1B4B);
+    background:#1E1B4B;
   }
 
   .presenterExplainActions .presenterBtn.green{
-    background:linear-gradient(180deg,#22C55E,#15803D);
+    background:#15803D;
   }
 
   .presenterExplainActions .presenterBtn.red{
-    background:linear-gradient(180deg,#EF4444,#DC2626);
+    background:#DC2626;
   }
 
   .presenterExplainActions .presenterBtn:disabled{
-    background:#DDD6FE;
-    color:#7C7896;
+    background:#E2E8F0;
+    color:#94A3B8;
     box-shadow:none;
     opacity:.82;
   }
 
-  /* اليمين */
+  /* =========================
+     اليمين
+     الفرق + المؤقت فقط
+  ========================= */
+
   .presenterExplainRight{
     display:grid;
     grid-template-rows:58px minmax(0,1fr);
@@ -3749,169 +3754,57 @@ button{
     min-height:56px;
     border-radius:20px;
     padding:6px 12px;
-
     color:#24185E;
     font-size:.96rem;
     font-weight:900;
-
-    background:
-      radial-gradient(circle at 18% 0%, rgba(255,255,255,.38), transparent 42%),
-      linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.28));
-
-    border:1px solid rgba(255,255,255,.56);
-
-    box-shadow:
-      0 8px 16px rgba(30,27,75,.08),
-      inset 0 1px 0 rgba(255,255,255,.78);
-
+    background:#FFFFFF;
+    border:1px solid #E2E8F0;
+    box-shadow:0 4px 6px rgba(0,0,0,.05);
     overflow:hidden;
     white-space:nowrap;
     text-overflow:ellipsis;
   }
 
-  .presenterExplainTeamsBox .presenterBtn.orange{
-    background:
-      radial-gradient(circle at 12% 0%, rgba(124,58,237,.24), transparent 40%),
-      linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.26));
-  }
-
-  .presenterExplainTeamsBox .presenterBtn.blue{
-    background:
-      radial-gradient(circle at 88% 0%, rgba(6,182,212,.24), transparent 40%),
-      linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.26));
-  }
-
   .presenterExplainTeamsBox .presenterBtn.selectedPresenterTeam,
   .presenterExplainTeamsBox .presenterBtn.activeTeam{
     color:#24185E;
-    border-color:rgba(255,155,81,.42);
-
-    background:
-      radial-gradient(circle at 18% 0%, rgba(255,155,81,.28), transparent 42%),
-      linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.34));
-
-    box-shadow:
-      0 0 0 3px rgba(255,155,81,.10),
-      0 8px 18px rgba(30,27,75,.09),
-      inset 0 1px 0 rgba(255,255,255,.84);
+    border-color:#FF9B51;
+    background:#FFE4D6;
+    box-shadow:0 0 0 3px rgba(255,155,81,.18);
   }
 
-  .presenterExplainPreviewCard{
-    height:100%;
-    min-height:0;
+  .presenterExplainTimerCard{
     padding:12px;
-    border-radius:24px;
-    overflow:hidden;
-
     display:grid;
-    grid-template-rows:16px minmax(0,1fr) 16px 74px;
+    grid-template-rows:16px minmax(0,1fr);
     gap:8px;
-
-    box-shadow:
-      0 8px 16px rgba(30,27,75,.06),
-      inset 0 1px 0 rgba(255,255,255,.82);
-  }
-
-  .presenterExplainPreviewCard .presenterLabel{
-    margin:0;
-    font-size:.76rem;
-    line-height:1;
-    color:#64748B;
-  }
-
-  .presenterExplainWordBox{
-    width:100%;
-    height:100%;
-    min-height:0;
-
-    border-radius:22px;
-    padding:16px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    background:
-      radial-gradient(circle at 16% 0%, rgba(124,58,237,.08), transparent 44%),
-      linear-gradient(180deg, rgba(255,255,255,.84), rgba(250,248,255,.66));
-
-    border:1px solid rgba(124,58,237,.14);
-
-    color:#1E1B4B;
-    font-size:2.2rem;
-    line-height:1.25;
-    font-weight:900;
-    text-align:center;
-
     overflow:hidden;
-  }
-
-  .presenterExplainWordBox.emptyWord{
-    color:#94A3B8;
-  }
-
-  .presenterExplainWordBox.emptyWord::before{
-    content:"اختر الفريق ثم الرقم";
-  }
-
-  .presenterExplainWordBox.answerCorrect{
-    background:
-      radial-gradient(circle at 16% 0%, rgba(34,197,94,.16), transparent 44%),
-      linear-gradient(180deg, rgba(255,255,255,.84), rgba(220,252,231,.66));
-    border-color:rgba(34,197,94,.24);
-    color:#166534;
-  }
-
-  .presenterExplainWordBox.answerWrong{
-    background:
-      radial-gradient(circle at 16% 0%, rgba(239,68,68,.16), transparent 44%),
-      linear-gradient(180deg, rgba(255,255,255,.84), rgba(254,226,226,.66));
-    border-color:rgba(239,68,68,.24);
-    color:#991B1B;
   }
 
   .presenterExplainTimerBox{
     width:100%;
-    height:74px;
-    min-height:74px;
-
-    border-radius:20px;
-
+    height:100%;
+    min-height:0;
+    border-radius:22px;
     display:flex;
     align-items:center;
     justify-content:center;
-
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.26), transparent 42%),
-      linear-gradient(180deg,#67E8F9,#06B6D4);
-
-    color:#12362D;
-    font-size:2.1rem;
+    background:#06B6D4;
+    color:#FFFFFF;
+    font-size:3rem;
     line-height:1;
     font-weight:900;
-
-    box-shadow:
-      0 10px 20px rgba(6,182,212,.16),
-      inset 0 1px 0 rgba(255,255,255,.30);
   }
 
   .presenterExplainTimerBox.hidden{
-    display:flex;
-    opacity:.24;
-    color:transparent;
-  }
-
-  .presenterExplainTimerBox.hidden::before{
-    content:"المؤقت";
-    color:#12362D;
-    font-size:1rem;
+    background:#E2E8F0;
+    color:#94A3B8;
+    opacity:.9;
   }
 
   .presenterExplainTimerBox.danger,
   .presenterExplainTimerBox.presenterTimerDanger{
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.20), transparent 42%),
-      linear-gradient(180deg,#EF4444,#DC2626);
+    background:#DC2626;
     color:#FFFFFF;
   }
 }
