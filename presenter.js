@@ -3021,6 +3021,16 @@ async function renderFinal() {
   await renderPresenterFinalRoundContent()
   refreshPresenterEnhancements()
 }
+async function setPresenterFinalRound(round) {
+  presenterFinalRound = Number(round)
+  presenterFinalSelected = { round: presenterFinalRound, number: null }
+
+  setPresenterFinalRound1FocusMode(false)
+
+  sendCommand("setRound", { round: presenterFinalRound })
+  await renderPresenterFinalRoundContent()
+  refreshPresenterEnhancements()
+}
 /* =========================
    ROUND CONTENT
 ========================= */
@@ -3619,13 +3629,6 @@ async function renderPresenterFinalRound2Preview() {
     (presenterFinalSelected?.round === 2 ? presenterFinalSelected.number : 0)
   )
 
-  if (!state.pendingScore && !state.currentNumber && presenterFinalSelected?.round === 2) {
-    presenterFinalPreviewCache[2] = ""
-    presenterFinalSelected = { round: 2, number: null }
-    previewBox.innerHTML = "اختر رقمًا"
-    return
-  }
-
   if (!current) {
     previewBox.innerHTML = presenterFinalPreviewCache[2] || "اختر رقمًا"
     return
@@ -3657,11 +3660,17 @@ async function renderPresenterFinalRound2Preview() {
         `).join("")}
       </div>
     `
-  } else {
-    const hidden = state.hiddenSequence || []
 
-    presenterFinalPreviewCache[2] = `
-      <div class="presenterAnswerBody">
+    previewBox.innerHTML = presenterFinalPreviewCache[2]
+    return
+  }
+
+  const hidden = state.hiddenSequence || []
+
+  presenterFinalPreviewCache[2] = `
+    <div class="presenterFinalSequencePreview">
+
+      <div class="presenterFinalCountdownBox">
         العداد: ${state.countdown ?? 15}
       </div>
 
@@ -3682,11 +3691,11 @@ async function renderPresenterFinalRound2Preview() {
           }).join("")}
         </div>
       </div>
-    `
-  }
 
-  const freshBox = document.getElementById("presenterFinalPreview")
-  if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[2]
+    </div>
+  `
+
+  previewBox.innerHTML = presenterFinalPreviewCache[2]
 }
 
 /* =========================
@@ -3707,13 +3716,6 @@ async function renderPresenterFinalRound3Preview() {
       : state.currentNumber ||
         (presenterFinalSelected?.round === 3 ? presenterFinalSelected.number : 0)
   )
-
-  if (!state.pendingScore && !state.currentNumber && !teamMediaState.currentNumber && presenterFinalSelected?.round === 3) {
-    presenterFinalPreviewCache[3] = ""
-    presenterFinalSelected = { round: 3, number: null }
-    previewBox.innerHTML = "اختر رقمًا"
-    return
-  }
 
   if (!current) {
     previewBox.innerHTML = presenterFinalPreviewCache[3] || "اختر رقمًا"
@@ -3751,10 +3753,6 @@ async function renderPresenterFinalRound3Preview() {
 
     presenterFinalPreviewCache[3] = `
       <div class="presenterFinalTeamMediaPreview">
-
-        <div class="presenterFinalPreviewNumber">
-          الرقم ${current}
-        </div>
 
         ${
           media
@@ -3795,8 +3793,7 @@ async function renderPresenterFinalRound3Preview() {
       </div>
     `
 
-    const freshBox = document.getElementById("presenterFinalPreview")
-    if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[3]
+    previewBox.innerHTML = presenterFinalPreviewCache[3]
     return
   }
 
@@ -3815,6 +3812,7 @@ async function renderPresenterFinalRound3Preview() {
 
   presenterFinalPreviewCache[3] = `
     <div class="presenterFinalRound3Preview">
+
       <div class="finalRound3AnswersList">
         ${rows.map((r, idx) => `
           <button
@@ -3842,11 +3840,11 @@ async function renderPresenterFinalRound3Preview() {
             `
         }
       </div>
+
     </div>
   `
 
-  const freshBox = document.getElementById("presenterFinalPreview")
-  if (freshBox) freshBox.innerHTML = presenterFinalPreviewCache[3]
+  previewBox.innerHTML = presenterFinalPreviewCache[3]
 }
 
 /* =========================

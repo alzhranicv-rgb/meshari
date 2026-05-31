@@ -3811,7 +3811,7 @@ button{
 
 /* =========================================================
    TABLET LANDSCAPE - FINAL ONLY
-   صفحة المقدم - الفاصلة
+   صفحة المقدم - الفاصلة كاملة
 ========================================================= */
 
 @media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
@@ -3841,20 +3841,20 @@ button{
 
   .presenterFinalLeft{
     display:grid;
-    grid-template-rows:minmax(0,1fr) 122px;
+    grid-template-rows:minmax(0,1fr) 158px;
     gap:10px;
   }
 
   .presenterFinalNumbersCard{
     height:100%;
     min-height:0;
-    padding:14px;
+    padding:12px;
     border-radius:24px;
     overflow:hidden;
 
     display:grid;
     grid-template-rows:18px minmax(0,1fr);
-    gap:12px;
+    gap:10px;
 
     background:
       radial-gradient(circle at 15% 0%, rgba(255,255,255,.38), transparent 42%),
@@ -3882,7 +3882,7 @@ button{
 
     display:grid;
     grid-template-columns:repeat(3,minmax(0,1fr));
-    grid-auto-rows:64px;
+    grid-template-rows:repeat(2,58px);
     align-content:center;
     gap:10px;
     direction:rtl;
@@ -3893,10 +3893,10 @@ button{
   #presenterFinalNumbers .presenterNumberBtn{
     position:relative;
     width:100%;
-    height:64px;
-    min-height:64px;
+    height:58px;
+    min-height:58px;
 
-    border-radius:20px;
+    border-radius:18px;
     border:1px solid rgba(255,255,255,.22);
 
     background:
@@ -3904,12 +3904,12 @@ button{
       linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
 
     color:#FFFFFF;
-    font-size:1.6rem;
+    font-size:1.5rem;
     line-height:1;
     font-weight:900;
 
     box-shadow:
-      0 10px 20px rgba(30,27,75,.15),
+      0 9px 18px rgba(30,27,75,.14),
       inset 0 1px 0 rgba(255,255,255,.18);
 
     overflow:hidden;
@@ -3949,7 +3949,7 @@ button{
     justify-content:center;
 
     color:#7C3AED;
-    font-size:1.7rem;
+    font-size:1.55rem;
     line-height:1;
   }
 
@@ -3964,30 +3964,41 @@ button{
   ========================= */
 
   .presenterFinalControlsArea{
-    height:122px;
-    min-height:122px;
+    height:158px;
+    min-height:158px;
+    max-height:158px;
     overflow:hidden;
   }
 
+  /* الجولة الأولى: 7 أزرار / صفين */
   .presenterFinalRound1TwoRows{
-    height:122px;
+    height:158px;
+    min-height:158px;
+
     display:grid;
     grid-template-columns:repeat(4,minmax(0,1fr));
-    grid-template-rows:57px 57px;
+    grid-template-rows:75px 75px;
     gap:8px;
     margin:0;
     overflow:hidden;
   }
 
   .presenterFinalRound1TwoRows .presenterBtn{
-    height:57px;
-    min-height:57px;
-    border-radius:16px;
-    padding:5px 6px;
+    width:100%;
+    height:75px;
+    min-height:75px;
 
-    font-size:.73rem;
-    line-height:1.1;
+    border-radius:17px;
+    padding:6px 7px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:.76rem;
+    line-height:1.16;
     font-weight:900;
+    text-align:center;
 
     white-space:normal;
     overflow:hidden;
@@ -3998,30 +4009,45 @@ button{
       inset 0 1px 0 rgba(255,255,255,.22);
   }
 
-  .presenterFinalRound1TwoRows .presenterBtn:last-child{
+  .presenterFinalRound1TwoRows .presenterBtn:nth-child(7){
     grid-column:3 / 5;
   }
 
-  .presenterFinalControlsArea .presenterActions:not(.presenterFinalRound1TwoRows){
+  /* الجولات الثانية والثالثة: 3 صفوف */
+  .presenterFinalControlsArea .presenterActions:not(.presenterFinalRound1TwoRows),
+  .presenterFinalControlsArea .finalTwoActions{
+    height:48px;
+    min-height:48px;
+
     display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:8px;
-    margin:0 0 8px;
+    margin:0 0 7px;
+    overflow:hidden;
   }
 
-  .presenterFinalControlsArea .presenterActions:last-child{
+  .presenterFinalControlsArea .presenterActions:last-child,
+  .presenterFinalControlsArea .finalTwoActions:last-child{
     margin-bottom:0;
   }
 
-  .presenterFinalControlsArea .presenterBtn{
-    height:52px;
-    min-height:52px;
+  .presenterFinalControlsArea .presenterActions:not(.presenterFinalRound1TwoRows) .presenterBtn,
+  .presenterFinalControlsArea .finalTwoActions .presenterBtn{
+    width:100%;
+    height:48px;
+    min-height:48px;
+
     border-radius:15px;
     padding:5px 7px;
 
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
     font-size:.72rem;
-    line-height:1.1;
+    line-height:1.12;
     font-weight:900;
+    text-align:center;
 
     white-space:normal;
     overflow:hidden;
@@ -4063,7 +4089,7 @@ button{
   }
 
   /* =========================
-     اليمين: الفرق + الإجابة
+     اليمين: الفرق + المحتوى
   ========================= */
 
   .presenterFinalRight{
@@ -4192,7 +4218,7 @@ button{
   }
 
   /* =========================
-     مربع الإجابة - الجولة الأولى
+     الجولة الأولى: مربع الإجابة
   ========================= */
 
   .presenterFinalOnlyAnswerView{
@@ -4230,13 +4256,13 @@ button{
 
     background:
       radial-gradient(circle at 16% 0%, rgba(15,118,110,.07), transparent 44%),
-      linear-gradient(180deg, rgba(255,255,255,.82), rgba(240,253,250,.66));
+      linear-gradient(180deg, rgba(255,255,255,.86), rgba(240,253,250,.68));
 
     border:1px solid rgba(15,118,110,.14);
 
     color:#0F766E;
-    font-size:clamp(1.05rem, 2.2vw, 1.55rem);
-    line-height:1.32;
+    font-size:clamp(1rem, 2.05vw, 1.45rem);
+    line-height:1.34;
     font-weight:900;
     text-align:center;
 
@@ -4246,13 +4272,219 @@ button{
   }
 
   /* =========================
-     دعم محتوى الجولات الثانية والثالثة
+     الجولة الثانية
   ========================= */
+
+  .presenterFinalRound2SimpleGrid{
+    height:100%;
+    min-height:0;
+
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-auto-rows:minmax(54px,1fr);
+    gap:8px;
+
+    overflow:hidden;
+  }
+
+  .presenterFinalRound2SimpleCard{
+    border:1px solid rgba(255,255,255,.44);
+    border-radius:16px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+      linear-gradient(180deg, rgba(49,46,129,.86), rgba(30,27,75,.96));
+
+    color:#FFFFFF;
+    font-size:.9rem;
+    line-height:1.2;
+    font-weight:900;
+
+    overflow:hidden;
+  }
+
+  .presenterFinalRound2SimpleCard.selectedCorrect{
+    background:linear-gradient(180deg,#22C55E,#15803D);
+    color:#FFFFFF;
+  }
+
+  .presenterFinalSequencePreview{
+    height:100%;
+    min-height:0;
+
+    display:grid;
+    grid-template-rows:50px minmax(0,1fr);
+    gap:10px;
+    overflow:hidden;
+  }
+
+  .presenterFinalCountdownBox,
+  .presenterAnswerBody{
+    min-height:0;
+    border-radius:18px;
+    padding:10px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+      linear-gradient(180deg,#312E81,#1E1B4B);
+
+    color:#FFFFFF;
+    font-size:1.05rem;
+    line-height:1.2;
+    font-weight:900;
+    text-align:center;
+
+    overflow:hidden;
+  }
+
+  .presenterFinalRound2PreviewStage{
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .finalSequenceWordsWrap{
+    height:100%;
+    min-height:0;
+
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .finalSequenceWordBtn{
+    min-height:0;
+    border:1px solid rgba(255,255,255,.44);
+    border-radius:16px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+      linear-gradient(180deg,#06B6D4,#0891B2);
+
+    color:#FFFFFF;
+    font-size:.9rem;
+    font-weight:900;
+    line-height:1.2;
+
+    overflow:hidden;
+  }
+
+  /* =========================
+     الجولة الثالثة
+  ========================= */
+
+  .presenterFinalRound3Preview{
+    height:100%;
+    min-height:0;
+
+    display:grid;
+    grid-template-rows:42% minmax(0,1fr);
+    gap:10px;
+    overflow:hidden;
+  }
+
+  .finalRound3AnswersList{
+    min-height:0;
+
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    overflow:hidden;
+  }
+
+  .finalRound3AnswerCard{
+    min-height:0;
+    border:1px solid rgba(255,255,255,.44);
+    border-radius:16px;
+
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+      linear-gradient(180deg, rgba(49,46,129,.86), rgba(30,27,75,.96));
+
+    color:#FFFFFF;
+    font-size:.85rem;
+    line-height:1.2;
+    font-weight:900;
+
+    overflow:hidden;
+  }
+
+  .finalRound3AnswerCard.selectedCorrect{
+    background:linear-gradient(180deg,#22C55E,#15803D);
+    color:#FFFFFF;
+  }
+
+  .presenterFinalRound3ImageStage{
+    height:100%;
+    min-height:0;
+
+    border-radius:18px;
+    overflow:hidden;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.64), rgba(255,255,255,.30));
+
+    border:1px solid rgba(255,255,255,.50);
+  }
+
+  .presenterFinalRound3ImageStage .presenterImagePreviewBox,
+  .presenterImagePreviewBox,
+  .presenterVideoPreviewBox{
+    width:100%;
+    height:100%;
+    min-height:0;
+
+    border-radius:18px;
+    overflow:hidden;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.64), rgba(255,255,255,.30));
+
+    border:1px solid rgba(255,255,255,.50);
+  }
+
+  .presenterImagePreviewBox img,
+  .presenterVideoPreviewBox video{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+  }
+
+  .presenterVideoPreviewBox video{
+    background:#000;
+  }
+
+  /* الجولة الثالثة - فريق وصورة/فيديو */
+  .presenterFinalTeamMediaPreview{
+    height:100%;
+    min-height:0;
+
+    display:grid;
+    grid-template-rows:44% minmax(0,1fr);
+    gap:10px;
+    overflow:hidden;
+  }
 
   .presenterFinalCleanPreview{
     height:100%;
     min-height:0;
+
     display:grid;
+    grid-template-rows:1fr 1fr;
     gap:8px;
     overflow:hidden;
   }
@@ -4290,387 +4522,12 @@ button{
     justify-content:center;
 
     color:#1E1B4B;
-    font-size:1.05rem;
+    font-size:1rem;
     line-height:1.35;
     font-weight:900;
     text-align:center;
 
     overflow:hidden;
-  }
-
-  /* الجولة الثانية */
-  .presenterFinalRound2SimpleGrid{
-    height:100%;
-    min-height:0;
-
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    grid-auto-rows:minmax(54px,1fr);
-    gap:8px;
-
-    overflow:hidden;
-  }
-
-  .presenterFinalRound2SimpleCard{
-    border:1px solid rgba(255,255,255,.44);
-    border-radius:16px;
-
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-      linear-gradient(180deg, rgba(49,46,129,.86), rgba(30,27,75,.96));
-
-    color:#FFFFFF;
-    font-size:.9rem;
-    line-height:1.2;
-    font-weight:900;
-
-    overflow:hidden;
-  }
-
-  .presenterFinalRound2SimpleCard.selectedCorrect{
-    background:linear-gradient(180deg,#22C55E,#15803D);
-    color:#FFFFFF;
-  }
-
-  .presenterFinalRound2PreviewStage{
-    height:100%;
-    min-height:0;
-    overflow:hidden;
-  }
-
-  .finalSequenceWordsWrap{
-    height:100%;
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:8px;
-    overflow:hidden;
-  }
-
-  .finalSequenceWordBtn{
-    border:1px solid rgba(255,255,255,.44);
-    border-radius:16px;
-
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-      linear-gradient(180deg,#06B6D4,#0891B2);
-
-    color:#FFFFFF;
-    font-size:.9rem;
-    font-weight:900;
-    line-height:1.2;
-
-    overflow:hidden;
-  }
-
-  /* الجولة الثالثة */
-  .presenterFinalRound3Preview,
-  .presenterFinalTeamMediaPreview{
-    height:100%;
-    min-height:0;
-    display:grid;
-    grid-template-rows:auto minmax(0,1fr);
-    gap:8px;
-    overflow:hidden;
-  }
-
-  .finalRound3AnswersList{
-    min-height:0;
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:8px;
-    overflow:hidden;
-  }
-
-  .finalRound3AnswerCard{
-    border:1px solid rgba(255,255,255,.44);
-    border-radius:16px;
-
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-      linear-gradient(180deg, rgba(49,46,129,.86), rgba(30,27,75,.96));
-
-    color:#FFFFFF;
-    font-size:.85rem;
-    line-height:1.2;
-    font-weight:900;
-
-    overflow:hidden;
-  }
-
-  .finalRound3AnswerCard.selectedCorrect{
-    background:linear-gradient(180deg,#22C55E,#15803D);
-    color:#FFFFFF;
-  }
-
-  .presenterFinalRound3ImageStage,
-  .presenterImagePreviewBox,
-  .presenterVideoPreviewBox{
-    min-height:0;
-    border-radius:18px;
-    overflow:hidden;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.64), rgba(255,255,255,.30));
-
-    border:1px solid rgba(255,255,255,.50);
-  }
-
-  .presenterImagePreviewBox img,
-  .presenterVideoPreviewBox video{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    display:block;
-  }
-
-  .presenterVideoPreviewBox video{
-    background:#000;
-  }
-}
-/* =========================================================
-   FORCE FIX - FINAL ROUND 1 PRESENTER
-   إصلاح إجباري للجولة الأولى في الفاصلة
-========================================================= */
-
-@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
-
-  body.presenterFinalRound1FocusMode .presenterFinalLayout,
-  .presenterFinalLayout{
-    width:100%;
-    height:100%;
-    display:grid;
-    grid-template-columns:1.04fr .96fr;
-    gap:12px;
-    direction:ltr;
-    overflow:hidden;
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalLeft,
-  .presenterFinalLeft{
-    direction:rtl;
-    min-width:0;
-    height:100%;
-    min-height:0;
-    overflow:hidden;
-
-    display:grid;
-    grid-template-rows:minmax(0,1fr) 128px;
-    gap:10px;
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalRight,
-  .presenterFinalRight{
-    direction:rtl;
-    min-width:0;
-    height:100%;
-    min-height:0;
-    overflow:hidden;
-
-    display:grid;
-    grid-template-rows:58px minmax(0,1fr);
-    gap:10px;
-  }
-
-  /* الأرقام */
-  body.presenterFinalRound1FocusMode .presenterFinalNumbersCard,
-  .presenterFinalNumbersCard{
-    height:100%;
-    min-height:0;
-    padding:14px;
-    border-radius:24px;
-    overflow:hidden;
-
-    display:grid;
-    grid-template-rows:18px minmax(0,1fr);
-    gap:12px;
-  }
-
-  body.presenterFinalRound1FocusMode #presenterFinalNumbers.presenterGrid,
-  #presenterFinalNumbers.presenterGrid{
-    height:100%;
-    min-height:0;
-
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    grid-template-rows:repeat(2,64px);
-    align-content:center;
-    gap:10px;
-    direction:rtl;
-    overflow:hidden;
-  }
-
-  body.presenterFinalRound1FocusMode #presenterFinalNumbers .presenterNumberBtn,
-  #presenterFinalNumbers .presenterNumberBtn{
-    height:64px;
-    min-height:64px;
-    border-radius:20px;
-    font-size:1.6rem;
-    font-weight:900;
-  }
-
-  /* منطقة أزرار التحكم */
-  body.presenterFinalRound1FocusMode .presenterFinalControlsArea,
-  .presenterFinalControlsArea{
-    height:128px;
-    min-height:128px;
-    max-height:128px;
-    overflow:hidden;
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows,
-  .presenterFinalRound1TwoRows{
-    height:128px;
-    min-height:128px;
-    max-height:128px;
-
-    display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    grid-template-rows:60px 60px;
-    gap:8px;
-    margin:0;
-    overflow:hidden;
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn,
-  .presenterFinalRound1TwoRows .presenterBtn{
-    width:100%;
-    height:60px;
-    min-height:60px;
-    max-height:60px;
-
-    border-radius:16px;
-    padding:5px 6px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:.74rem;
-    line-height:1.12;
-    font-weight:900;
-    text-align:center;
-
-    white-space:normal;
-    overflow:hidden;
-    text-overflow:clip;
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn:nth-child(7),
-  .presenterFinalRound1TwoRows .presenterBtn:nth-child(7){
-    grid-column:3 / 5;
-  }
-
-  /* ألوان الأزرار */
-  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn.green,
-  .presenterFinalRound1TwoRows .presenterBtn.green{
-    background:linear-gradient(180deg,#22C55E,#15803D);
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn.red,
-  .presenterFinalRound1TwoRows .presenterBtn.red{
-    background:linear-gradient(180deg,#EF4444,#DC2626);
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn.blue,
-  .presenterFinalRound1TwoRows .presenterBtn.blue{
-    background:linear-gradient(180deg,#06B6D4,#0891B2);
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn.gray,
-  .presenterFinalRound1TwoRows .presenterBtn.gray{
-    background:linear-gradient(180deg,#64748B,#475569);
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn:disabled,
-  .presenterFinalRound1TwoRows .presenterBtn:disabled{
-    background:#DDD6FE;
-    color:#7C7896;
-    box-shadow:none;
-    opacity:.82;
-  }
-
-  /* إلغاء مربع الجولة والرقم */
-  body.presenterFinalRound1FocusMode .presenterFinalRoundHeader,
-  body.presenterFinalRound1FocusMode .presenterFinalPreviewNumber,
-  .presenterFinalRoundHeader,
-  .presenterFinalPreviewNumber{
-    display:none;
-  }
-
-  /* مربع الإجابة يمين */
-  body.presenterFinalRound1FocusMode .presenterFinalPreviewCard,
-  .presenterFinalPreviewCard{
-    height:100%;
-    min-height:0;
-    padding:12px;
-    border-radius:24px;
-    overflow:hidden;
-    display:block;
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalPreviewBox,
-  .presenterFinalPreviewBox{
-    width:100%;
-    height:100%;
-    min-height:0;
-    border-radius:22px;
-    padding:12px;
-    overflow:hidden;
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalOnlyAnswerView,
-  .presenterFinalOnlyAnswerView{
-    width:100%;
-    height:100%;
-    min-height:0;
-
-    display:grid;
-    grid-template-rows:22px minmax(0,1fr);
-    gap:10px;
-    overflow:hidden;
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalOnlyAnswerLabel,
-  .presenterFinalOnlyAnswerLabel{
-    height:22px;
-    margin:0;
-    color:#64748B;
-    font-size:.82rem;
-    line-height:1;
-    font-weight:900;
-  }
-
-  body.presenterFinalRound1FocusMode .presenterFinalOnlyAnswerText,
-  .presenterFinalOnlyAnswerText{
-    width:100%;
-    height:100%;
-    min-height:0;
-
-    border-radius:22px;
-    padding:18px 20px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    background:
-      radial-gradient(circle at 16% 0%, rgba(15,118,110,.07), transparent 44%),
-      linear-gradient(180deg, rgba(255,255,255,.86), rgba(240,253,250,.68));
-
-    border:1px solid rgba(15,118,110,.14);
-
-    color:#0F766E;
-    font-size:clamp(1.05rem, 2.1vw, 1.48rem);
-    line-height:1.32;
-    font-weight:900;
-    text-align:center;
-
-    overflow:hidden;
-    word-break:normal;
     overflow-wrap:break-word;
   }
 }
