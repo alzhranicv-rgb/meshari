@@ -2245,6 +2245,20 @@ function sendPresenterWhoScore(action) {
     }
   }, 2500)
 }
+function selectPresenterWhoPoints(points) {
+  points = Number(points || 0)
+
+  document.querySelectorAll(".presenterWhoPointBtn").forEach(btn => {
+    const isSelected = Number(btn.dataset.points) === points
+
+    btn.classList.toggle("selectedPresenterTeam", isSelected)
+    btn.classList.toggle("activeWhoPoint", isSelected)
+  })
+
+  sendCommand("setPoints", {
+    points
+  })
+}
 
 function canPresenterWhoCompensation() {
   const who = getPresenterWhoState()
@@ -2295,16 +2309,17 @@ async function renderWho() {
           <div class="presenterLabel">النقاط</div>
 
           <div class="presenterWhoPointsGrid">
-            ${[1, 2, 3, 4, 5].map(p => `
-              <button
-                class="presenterNumberBtn ${currentPoints === p ? "selectedPresenterTeam" : ""}"
-                ${locked || compensationMode ? "disabled" : ""}
-                onclick="sendCommand('setPoints',{points:${p}})"
-              >
-                ${p}
-              </button>
-            `).join("")}
-          </div>
+  ${[1, 2, 3, 4, 5].map(p => `
+    <button
+      class="presenterNumberBtn presenterWhoPointBtn ${currentPoints === p ? "selectedPresenterTeam activeWhoPoint" : ""}"
+      data-points="${p}"
+      ${locked || compensationMode ? "disabled" : ""}
+      onclick="selectPresenterWhoPoints(${p})"
+    >
+      ${p}
+    </button>
+  `).join("")}
+</div>
 
           <div class="presenterLabel presenterWhoNumbersLabel">الأرقام</div>
 
@@ -2470,19 +2485,23 @@ function refreshPresenterWhoFromState() {
     activeTeam === "B"
   )
 
-  document.querySelectorAll(".presenterGrid .presenterNumberBtn").forEach(btn => {
+  document
+  .querySelectorAll(".presenterWhoPointsGrid .presenterNumberBtn, .presenterWhoGrid .presenterNumberBtn")
+  .forEach(btn => {
     const onclick = btn.getAttribute("onclick") || ""
     const pointsMatch = onclick.match(/setPoints.*points:(\d+)/)
     const numberMatch = onclick.match(/openWhoPresenterNumber\((\d+)\)/)
 
-    if (pointsMatch) {
-      const p = Number(pointsMatch[1])
+    if (pointsMatch || btn.dataset.points) {
+  const p = Number(btn.dataset.points || pointsMatch?.[1] || 0)
+  const selected = currentPoints === p
 
-      btn.classList.toggle("selectedPresenterTeam", currentPoints === p)
-      btn.disabled = !!locked || !!compensationMode
+  btn.classList.toggle("selectedPresenterTeam", selected)
+  btn.classList.toggle("activeWhoPoint", selected)
+  btn.disabled = !!locked || !!compensationMode
 
-      return
-    }
+  return
+}
 
     if (numberMatch) {
       const num = Number(numberMatch[1])

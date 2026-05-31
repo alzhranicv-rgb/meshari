@@ -3500,7 +3500,18 @@ button{
     border-radius:14px;
   }
 }
+.presenterWhoPointBtn.activeWhoPoint,
+.presenterWhoPointBtn.selectedPresenterTeam{
+  opacity:1 !important;
+  transform:translateY(-2px) scale(1.04) !important;
 
+  background:linear-gradient(180deg,#FFE08A,#FFB84D) !important;
+  color:#24185E !important;
+
+  box-shadow:
+    0 10px 24px rgba(255,184,77,.32),
+    inset 0 1px 0 rgba(255,255,255,.55) !important;
+}
 /* =========================================================
    TABLET LANDSCAPE - EXPLAIN ONLY
    صفحة المقدم - اشرح الكلمة فقط
