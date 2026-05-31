@@ -6404,3 +6404,47 @@
     line-height:1.32 !important;
   }
 }
+/* =========================
+   Final Header Round Text - Plain
+========================= */
+
+.finalTopRoundBadge{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:7px !important;
+
+  margin-inline-start:10px !important;
+
+  font-family:inherit !important;
+  font-size:inherit !important;
+  font-weight:inherit !important;
+  color:inherit !important;
+
+  vertical-align:middle !important;
+}
+
+.finalTopRoundNumber,
+.finalTopRoundName{
+  display:inline !important;
+
+  padding:0 !important;
+  margin:0 !important;
+
+  background:none !important;
+  border:0 !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+
+  font-family:inherit !important;
+  font-size:inherit !important;
+  font-weight:inherit !important;
+  color:inherit !important;
+
+  line-height:inherit !important;
+  white-space:nowrap !important;
+}
+
+.finalTopRoundNumber::after{
+  content:" - " !important;
+}

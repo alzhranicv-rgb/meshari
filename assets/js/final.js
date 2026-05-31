@@ -495,6 +495,36 @@ function getFinalRoundTextLabel() {
   return "الفاصلة"
 }
 
+function updateFinalTopHeaderRoundInfo() {
+  const roundNumber = Number(finalState.round || 1)
+  const roundTitle = getFinalRoundTextLabel()
+
+  const titleBox =
+    document.querySelector(".segmentTitle") ||
+    document.querySelector(".displaySegmentTitle") ||
+    document.querySelector(".mainSegmentTitle") ||
+    document.querySelector(".currentSegmentTitle") ||
+    document.querySelector(".segmentHeaderTitle") ||
+    document.querySelector(".displayHeaderTitle") ||
+    document.querySelector(".topSegmentTitle")
+
+  if (!titleBox) return
+
+  let badge = document.getElementById("finalTopRoundBadge")
+
+  if (!badge) {
+    badge = document.createElement("span")
+    badge.id = "finalTopRoundBadge"
+    badge.className = "finalTopRoundBadge"
+    titleBox.appendChild(badge)
+  }
+
+  badge.innerHTML = `
+    <span class="finalTopRoundNumber">${roundNumber}</span>
+    <span class="finalTopRoundName">${roundTitle}</span>
+  `
+}
+
 function getFinalStatusTeamName() {
   let team = null
 
@@ -1121,6 +1151,7 @@ function renderFinalRound() {
 renderFinalScores()
 renderFinalErrors()
 renderFinalRoundTitle()
+updateFinalTopHeaderRoundInfo()
 renderFinalTeamLayout()
 renderFinalTurnBar()
 
@@ -1277,7 +1308,8 @@ function goToFinalRound(round) {
   resetFinalTeamSelection()
 
   renderFinalRound()
-  updateEndRoundButtonState()
+updateFinalTopHeaderRoundInfo()
+updateEndRoundButtonState()
 }
 
 /* =========================
