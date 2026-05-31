@@ -4558,3 +4558,381 @@ button{
   font-size:.85rem;
   font-weight:900;
 }
+
+
+/* =========================================================
+   FINAL FIX - Samsung Tablet / A11 Safe Touch Layout
+   يمنع القص + يمنع الطبقات فوق بعض
+   ضعه في آخر ملف CSS
+========================================================= */
+
+/* الأساس */
+html,
+body{
+  width:100%;
+  min-height:100%;
+  margin:0;
+  padding:0;
+  overflow-x:hidden !important;
+}
+
+body{
+  min-height:100dvh;
+  overflow-y:auto !important;
+  overscroll-behavior:none;
+}
+
+/* لا تخلي أي شاشة تقص المحتوى بالغصب */
+.homePageShell,
+.presenterSegmentPage{
+  width:100%;
+  min-height:100dvh;
+  height:auto !important;
+  max-height:none !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+}
+
+/* منع خروج العناصر برا الشاشة */
+.homePageShell *,
+.presenterSegmentPage *,
+.presenterPanel *,
+.presenterCard *{
+  max-width:100%;
+}
+
+/* الصور والفيديو بدون قص */
+img,
+video,
+canvas{
+  max-width:100%;
+  height:auto;
+  object-fit:contain;
+}
+
+/* أزرار لمس مريحة */
+button,
+.presenterBtn,
+.presenterNumberBtn{
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* =========================================================
+   Tablet Landscape Safe Override
+========================================================= */
+
+@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
+
+  body{
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+  }
+
+  .homePageShell,
+  .presenterSegmentPage{
+    height:auto !important;
+    min-height:100svh !important;
+    max-height:none !important;
+    padding:10px !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+  }
+
+  /* الهيدر لا يتداخل مع المحتوى */
+  .presenterCleanHeader,
+  .topBoard{
+    flex:0 0 auto;
+    position:relative;
+    z-index:10;
+  }
+
+  /* منطقة المحتوى لا تنقص */
+  .presenterPanel{
+    width:100%;
+    flex:1 1 auto;
+    min-height:0;
+    height:auto !important;
+    max-height:none !important;
+    display:flex !important;
+    flex-direction:column;
+    gap:10px;
+    overflow:visible !important;
+  }
+
+  .presenterCard{
+    position:relative;
+    overflow:visible;
+  }
+
+  /* كل تخطيطات الجولات: لا قص ولا ارتفاع إجباري */
+  .presenterWarmupLayout,
+  .presenterTop10Layout,
+  .presenterAuctionLayout,
+  .presenterWhoLayout,
+  .presenterExplainLayout,
+  .presenterFinalLayout{
+    width:100%;
+    height:auto !important;
+    min-height:calc(100svh - 100px);
+    max-height:none !important;
+    overflow:visible !important;
+    align-items:stretch;
+  }
+
+  .presenterWarmupLeft,
+  .presenterWarmupRight,
+  .presenterTop10Left,
+  .presenterTop10Right,
+  .presenterAuctionLeft,
+  .presenterAuctionRight,
+  .presenterWhoLeft,
+  .presenterWhoRight,
+  .presenterExplainLeft,
+  .presenterExplainRight,
+  .presenterFinalLeft,
+  .presenterFinalRight{
+    min-width:0;
+    min-height:0;
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+
+  /* إلغاء القص من الكروت اللي كانت overflow hidden */
+  .presenterWarmupNumbersCard,
+  .presenterWarmupPreviewCard,
+  .presenterTop10AnswersCard,
+  .presenterTop10QuestionCard,
+  .presenterAuctionNumbersCard,
+  .presenterAuctionPreviewCard,
+  .presenterWhoNumbersCard,
+  .presenterWhoPreviewCard,
+  .presenterExplainNumbersCard,
+  .presenterExplainWordCard,
+  .presenterExplainTimerCard,
+  .presenterFinalNumbersCard,
+  .presenterFinalPreviewCard{
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+
+  /* أزرار التحكم: لا تتقص ولا تركب فوق بعض */
+  .presenterWarmupActions,
+  .presenterTop10Actions,
+  .presenterAuctionActions,
+  .presenterWhoActions,
+  .presenterExplainActions,
+  .presenterFinalControlsArea{
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+    display:grid !important;
+    gap:8px !important;
+  }
+
+  .presenterWarmupActions,
+  .presenterTop10Actions,
+  .presenterAuctionActions,
+  .presenterExplainActions{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    grid-auto-rows:minmax(52px, auto) !important;
+  }
+
+  .presenterWhoActions{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    grid-auto-rows:minmax(52px, auto) !important;
+  }
+
+  .presenterFinalControlsArea{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    grid-auto-rows:minmax(64px, auto) !important;
+  }
+
+  .presenterWarmupActions .presenterBtn,
+  .presenterTop10Actions .presenterBtn,
+  .presenterAuctionActions .presenterBtn,
+  .presenterWhoActions .presenterBtn,
+  .presenterExplainActions .presenterBtn,
+  .presenterFinalControlsArea .presenterBtn{
+    height:auto !important;
+    min-height:52px !important;
+    max-height:none !important;
+    padding:8px 7px !important;
+    white-space:normal !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+    line-height:1.15 !important;
+  }
+
+  .presenterFinalControlsArea .presenterBtn{
+    min-height:64px !important;
+  }
+
+  /* السؤال والإجابة: لا تقص النص */
+  #presenterWarmupQuestionText,
+  #presenterWarmupAnswerText,
+  #presenterTop10QuestionText,
+  #presenterAuctionAnswerText,
+  #presenterWhoAnswerText,
+  .presenterQuestionBody,
+  .presenterAnswerBody,
+  .presenterBigQuestionBody,
+  .presenterBigAnswerBody,
+  .presenterTop10QuestionText,
+  .presenterFinalPreviewBox,
+  .presenterFinalOnlyAnswerText,
+  .presenterFinalPreviewText{
+    height:auto !important;
+    min-height:58px !important;
+    max-height:none !important;
+    overflow:visible !important;
+    white-space:normal !important;
+    overflow-wrap:break-word !important;
+  }
+
+  /* صور وفيديو بدون قص */
+  .presenterImagePreviewBox,
+  #presenterAuctionImageBox,
+  #presenterWhoImageBox,
+  .presenterVideoPreviewBox{
+    height:auto !important;
+    min-height:160px !important;
+    max-height:42svh !important;
+    overflow:hidden !important;
+  }
+
+  .presenterImagePreviewBox img,
+  .presenterImagePreviewBox video,
+  #presenterAuctionImageBox img,
+  #presenterAuctionImageBox video,
+  #presenterWhoImageBox img,
+  .presenterVideoPreviewBox video{
+    width:100% !important;
+    height:100% !important;
+    max-height:42svh !important;
+    object-fit:contain !important;
+    display:block;
+  }
+
+  /* الفرق فوق لا تتقص */
+  .presenterWarmupTeamsBox,
+  .presenterTop10TeamsBox,
+  .presenterAuctionTeamsBox,
+  .presenterWhoTeamsBox,
+  .presenterExplainTeamsBox,
+  .presenterFinalTeamsArea{
+    height:auto !important;
+    min-height:58px !important;
+    overflow:visible !important;
+  }
+
+  .presenterWarmupTeamsBox .presenterCard,
+  .presenterTop10TeamsBox .presenterCard,
+  .presenterAuctionTeamsBox .presenterCard,
+  .presenterWhoTeamsBox .presenterCard,
+  .presenterExplainTeamsBox .presenterCard,
+  .presenterFinalTeamsArea .presenterCard{
+    height:auto !important;
+    overflow:visible !important;
+  }
+
+  .presenterTeams{
+    height:auto !important;
+    min-height:58px !important;
+  }
+
+  .presenterTeams .presenterBtn{
+    height:auto !important;
+    min-height:56px !important;
+    white-space:normal !important;
+  }
+
+  /* الأرقام لا تتراكب */
+  .presenterGrid,
+  .presenterWarmupNumbers,
+  .presenterAuctionGrid,
+  .presenterWhoGrid,
+  .presenterWhoPointsGrid,
+  #presenterFinalNumbers{
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+
+  .presenterNumberBtn{
+    height:auto !important;
+    min-height:48px !important;
+  }
+
+  /* التوست فوق الكل فقط وما يأثر على الطبقات */
+  .presenterToast,
+  .gameToast,
+  #presenterToast{
+    position:fixed !important;
+    z-index:999999 !important;
+    pointer-events:none !important;
+  }
+}
+
+/* =========================================================
+   Samsung narrow landscape 700-740px
+   مثل بعض أجهزة سامسونج إذا ظهر المتصفح أو الشريط
+========================================================= */
+
+@media (min-width:700px) and (max-width:740px) and (orientation:landscape){
+
+  .presenterCleanHeader{
+    grid-template-columns:105px minmax(0,1fr) 105px !important;
+  }
+
+  .presenterCleanHeaderBtn{
+    font-size:.78rem !important;
+    padding:6px 5px !important;
+  }
+
+  .presenterCleanHeaderTitle h1{
+    font-size:1.05rem !important;
+  }
+
+  .presenterBtn{
+    font-size:.74rem !important;
+  }
+
+  .presenterNumberBtn{
+    min-height:44px !important;
+    font-size:1rem !important;
+  }
+
+  .presenterFinalControlsArea{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  }
+
+  .presenterFinalControlsArea .presenterBtn{
+    min-height:58px !important;
+    font-size:.68rem !important;
+  }
+}
+
+/* =========================================================
+   Touch Size Safety
+========================================================= */
+
+@media (pointer:coarse){
+
+  .presenterBtn,
+  .presenterNumberBtn,
+  .segmentCard,
+  .presenterCleanHeaderBtn,
+  .presenterDisplayControlsBtn{
+    min-height:48px;
+  }
+
+  .presenterBtn:active,
+  .presenterNumberBtn:active,
+  .segmentCard:active{
+    transform:scale(.97);
+  }
+}
