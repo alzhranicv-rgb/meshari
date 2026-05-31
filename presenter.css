@@ -3835,26 +3835,23 @@ button{
     overflow:hidden;
   }
 
-  /* =========================
-     اليسار: الأرقام + التحكم
-  ========================= */
-
+  /* اليسار */
   .presenterFinalLeft{
     display:grid;
-    grid-template-rows:minmax(0,1fr) 158px;
+    grid-template-rows:104px minmax(0,1fr);
     gap:10px;
   }
 
   .presenterFinalNumbersCard{
-    height:100%;
-    min-height:0;
-    padding:12px;
-    border-radius:24px;
+    height:104px;
+    min-height:104px;
+    padding:10px 12px;
+    border-radius:22px;
     overflow:hidden;
 
     display:grid;
-    grid-template-rows:18px minmax(0,1fr);
-    gap:10px;
+    grid-template-rows:16px minmax(0,1fr);
+    gap:8px;
 
     background:
       radial-gradient(circle at 15% 0%, rgba(255,255,255,.38), transparent 42%),
@@ -3863,31 +3860,41 @@ button{
     border:1px solid rgba(255,255,255,.54);
 
     box-shadow:
-      0 10px 22px rgba(30,27,75,.07),
+      0 8px 16px rgba(30,27,75,.06),
       inset 0 1px 0 rgba(255,255,255,.82);
   }
 
   .presenterFinalNumbersCard > .presenterLabel{
-    height:18px;
+    height:16px;
     margin:0;
     color:#64748B;
-    font-size:.82rem;
+    font-size:.76rem;
     line-height:1;
     font-weight:900;
   }
 
-  #presenterFinalNumbers.presenterGrid{
+  #presenterFinalNumbers.presenterGrid,
+  #presenterFinalNumbers.presenterFinalNumbersGrid{
+    width:100%;
     height:100%;
     min-height:0;
-
     display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    grid-template-rows:repeat(2,58px);
-    align-content:center;
-    gap:10px;
+    gap:8px;
     direction:rtl;
-
+    align-items:center;
     overflow:hidden;
+  }
+
+  #presenterFinalNumbers.finalNumbersCount6{
+    grid-template-columns:repeat(6,minmax(0,1fr));
+  }
+
+  #presenterFinalNumbers.finalNumbersCount4{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+
+  #presenterFinalNumbers.finalNumbersCount2{
+    grid-template-columns:repeat(2,minmax(0,1fr));
   }
 
   #presenterFinalNumbers .presenterNumberBtn{
@@ -3896,7 +3903,7 @@ button{
     height:58px;
     min-height:58px;
 
-    border-radius:18px;
+    border-radius:17px;
     border:1px solid rgba(255,255,255,.22);
 
     background:
@@ -3904,12 +3911,12 @@ button{
       linear-gradient(180deg, rgba(49,46,129,.88), rgba(30,27,75,.96));
 
     color:#FFFFFF;
-    font-size:1.5rem;
+    font-size:1.35rem;
     line-height:1;
     font-weight:900;
 
     box-shadow:
-      0 9px 18px rgba(30,27,75,.14),
+      0 8px 16px rgba(30,27,75,.14),
       inset 0 1px 0 rgba(255,255,255,.18);
 
     overflow:hidden;
@@ -3925,7 +3932,7 @@ button{
 
     box-shadow:
       0 0 0 3px rgba(255,155,81,.12),
-      0 10px 20px rgba(249,115,22,.14),
+      0 8px 16px rgba(249,115,22,.14),
       inset 0 1px 0 rgba(255,255,255,.86);
   }
 
@@ -3949,7 +3956,7 @@ button{
     justify-content:center;
 
     color:#7C3AED;
-    font-size:1.55rem;
+    font-size:1.4rem;
     line-height:1;
   }
 
@@ -3959,34 +3966,30 @@ button{
     cursor:not-allowed;
   }
 
-  /* =========================
-     أزرار التحكم
-  ========================= */
-
+  /* أزرار التحكم */
   .presenterFinalControlsArea{
-    height:158px;
-    min-height:158px;
-    max-height:158px;
+    min-height:0;
+    height:100%;
     overflow:hidden;
   }
 
-  /* الجولة الأولى: 7 أزرار / صفين */
-  .presenterFinalRound1TwoRows{
-    height:158px;
-    min-height:158px;
+  .presenterFinalControlsGrid{
+    width:100%;
+    height:100%;
+    min-height:0;
 
     display:grid;
     grid-template-columns:repeat(4,minmax(0,1fr));
-    grid-template-rows:75px 75px;
+    grid-template-rows:repeat(2,minmax(0,1fr));
     gap:8px;
     margin:0;
     overflow:hidden;
   }
 
-  .presenterFinalRound1TwoRows .presenterBtn{
+  .presenterFinalControlsGrid .presenterBtn{
     width:100%;
-    height:75px;
-    min-height:75px;
+    height:100%;
+    min-height:0;
 
     border-radius:17px;
     padding:6px 7px;
@@ -3995,8 +3998,8 @@ button{
     align-items:center;
     justify-content:center;
 
-    font-size:.76rem;
-    line-height:1.16;
+    font-size:.78rem;
+    line-height:1.15;
     font-weight:900;
     text-align:center;
 
@@ -4009,52 +4012,12 @@ button{
       inset 0 1px 0 rgba(255,255,255,.22);
   }
 
-  .presenterFinalRound1TwoRows .presenterBtn:nth-child(7){
+  .presenterFinalControlsGrid .presenterBtn:nth-child(7){
     grid-column:3 / 5;
   }
 
-  /* الجولات الثانية والثالثة: 3 صفوف */
-  .presenterFinalControlsArea .presenterActions:not(.presenterFinalRound1TwoRows),
-  .presenterFinalControlsArea .finalTwoActions{
-    height:48px;
-    min-height:48px;
-
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:8px;
-    margin:0 0 7px;
-    overflow:hidden;
-  }
-
-  .presenterFinalControlsArea .presenterActions:last-child,
-  .presenterFinalControlsArea .finalTwoActions:last-child{
-    margin-bottom:0;
-  }
-
-  .presenterFinalControlsArea .presenterActions:not(.presenterFinalRound1TwoRows) .presenterBtn,
-  .presenterFinalControlsArea .finalTwoActions .presenterBtn{
-    width:100%;
-    height:48px;
-    min-height:48px;
-
-    border-radius:15px;
-    padding:5px 7px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:.72rem;
-    line-height:1.12;
-    font-weight:900;
-    text-align:center;
-
-    white-space:normal;
-    overflow:hidden;
-
-    box-shadow:
-      0 8px 16px rgba(30,27,75,.10),
-      inset 0 1px 0 rgba(255,255,255,.22);
+  .finalControlsRound3 .presenterFinalControlsGrid .presenterBtn:nth-child(5){
+    grid-column:auto;
   }
 
   .presenterFinalControlsArea .presenterBtn.green{
@@ -4088,10 +4051,7 @@ button{
     opacity:.82;
   }
 
-  /* =========================
-     اليمين: الفرق + المحتوى
-  ========================= */
-
+  /* اليمين */
   .presenterFinalRight{
     display:grid;
     grid-template-rows:58px minmax(0,1fr);
@@ -4217,10 +4177,7 @@ button{
     overflow:hidden;
   }
 
-  /* =========================
-     الجولة الأولى: مربع الإجابة
-  ========================= */
-
+  /* الجولة الأولى */
   .presenterFinalOnlyAnswerView{
     width:100%;
     height:100%;
@@ -4271,39 +4228,44 @@ button{
     overflow-wrap:break-word;
   }
 
-  /* =========================
-     الجولة الثانية
-  ========================= */
-
-  .presenterFinalRound2SimpleGrid{
+  /* الجولة الثانية والثالثة - إجابات موحدة */
+  .presenterFinalUnifiedAnswersGrid{
+    width:100%;
     height:100%;
     min-height:0;
 
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
-    grid-auto-rows:minmax(54px,1fr);
-    gap:8px;
+    gap:10px;
 
     overflow:hidden;
   }
 
-  .presenterFinalRound2SimpleCard{
+  .presenterFinalUnifiedAnswerCard{
+    min-height:0;
+
     border:1px solid rgba(255,255,255,.44);
-    border-radius:16px;
+    border-radius:18px;
 
     background:
       radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-      linear-gradient(180deg, rgba(49,46,129,.86), rgba(30,27,75,.96));
+      linear-gradient(180deg,#06B6D4,#0891B2);
 
     color:#FFFFFF;
-    font-size:.9rem;
-    line-height:1.2;
+    font-size:clamp(.82rem, 1.35vw, 1.05rem);
+    line-height:1.24;
     font-weight:900;
+    text-align:center;
 
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:10px;
     overflow:hidden;
   }
 
-  .presenterFinalRound2SimpleCard.selectedCorrect{
+  .presenterFinalUnifiedAnswerCard.selectedCorrect{
     background:linear-gradient(180deg,#22C55E,#15803D);
     color:#FFFFFF;
   }
@@ -4313,13 +4275,12 @@ button{
     min-height:0;
 
     display:grid;
-    grid-template-rows:50px minmax(0,1fr);
+    grid-template-rows:46px minmax(0,1fr);
     gap:10px;
     overflow:hidden;
   }
 
-  .presenterFinalCountdownBox,
-  .presenterAnswerBody{
+  .presenterFinalCountdownBox{
     min-height:0;
     border-radius:18px;
     padding:10px;
@@ -4333,7 +4294,7 @@ button{
       linear-gradient(180deg,#312E81,#1E1B4B);
 
     color:#FFFFFF;
-    font-size:1.05rem;
+    font-size:1rem;
     line-height:1.2;
     font-weight:900;
     text-align:center;
@@ -4341,175 +4302,39 @@ button{
     overflow:hidden;
   }
 
-  .presenterFinalRound2PreviewStage{
-    height:100%;
-    min-height:0;
-    overflow:hidden;
-  }
-
-  .finalSequenceWordsWrap{
-    height:100%;
-    min-height:0;
-
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:8px;
-    overflow:hidden;
-  }
-
-  .finalSequenceWordBtn{
-    min-height:0;
-    border:1px solid rgba(255,255,255,.44);
-    border-radius:16px;
-
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-      linear-gradient(180deg,#06B6D4,#0891B2);
-
-    color:#FFFFFF;
-    font-size:.9rem;
-    font-weight:900;
-    line-height:1.2;
-
-    overflow:hidden;
-  }
-
-  /* =========================
-     الجولة الثالثة
-  ========================= */
-
-  .presenterFinalRound3Preview{
-    height:100%;
-    min-height:0;
-
-    display:grid;
-    grid-template-rows:42% minmax(0,1fr);
-    gap:10px;
-    overflow:hidden;
-  }
-
-  .finalRound3AnswersList{
-    min-height:0;
-
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:8px;
-    overflow:hidden;
-  }
-
-  .finalRound3AnswerCard{
-    min-height:0;
-    border:1px solid rgba(255,255,255,.44);
-    border-radius:16px;
-
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-      linear-gradient(180deg, rgba(49,46,129,.86), rgba(30,27,75,.96));
-
-    color:#FFFFFF;
-    font-size:.85rem;
-    line-height:1.2;
-    font-weight:900;
-
-    overflow:hidden;
-  }
-
-  .finalRound3AnswerCard.selectedCorrect{
-    background:linear-gradient(180deg,#22C55E,#15803D);
-    color:#FFFFFF;
-  }
-
-  .presenterFinalRound3ImageStage{
-    height:100%;
-    min-height:0;
-
-    border-radius:18px;
-    overflow:hidden;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.64), rgba(255,255,255,.30));
-
-    border:1px solid rgba(255,255,255,.50);
-  }
-
-  .presenterFinalRound3ImageStage .presenterImagePreviewBox,
-  .presenterImagePreviewBox,
-  .presenterVideoPreviewBox{
+  /* الجولة الثالثة سؤال + إجابة فقط */
+  .presenterFinalQuestionAnswerOnly{
     width:100%;
-    height:100%;
-    min-height:0;
-
-    border-radius:18px;
-    overflow:hidden;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.64), rgba(255,255,255,.30));
-
-    border:1px solid rgba(255,255,255,.50);
-  }
-
-  .presenterImagePreviewBox img,
-  .presenterVideoPreviewBox video{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    display:block;
-  }
-
-  .presenterVideoPreviewBox video{
-    background:#000;
-  }
-
-  /* الجولة الثالثة - فريق وصورة/فيديو */
-  .presenterFinalTeamMediaPreview{
-    height:100%;
-    min-height:0;
-
-    display:grid;
-    grid-template-rows:44% minmax(0,1fr);
-    gap:10px;
-    overflow:hidden;
-  }
-
-  .presenterFinalCleanPreview{
     height:100%;
     min-height:0;
 
     display:grid;
     grid-template-rows:1fr 1fr;
-    gap:8px;
+    gap:10px;
     overflow:hidden;
   }
 
   .presenterFinalPreviewBlock{
     min-height:0;
-    border-radius:18px;
-    padding:10px;
+    border-radius:20px;
+    padding:12px;
 
     display:grid;
-    grid-template-rows:18px minmax(0,1fr);
-    gap:8px;
+    grid-template-rows:20px minmax(0,1fr);
+    gap:10px;
 
     background:
-      linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.34));
+      linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,.38));
 
-    border:1px solid rgba(255,255,255,.50);
+    border:1px solid rgba(255,255,255,.55);
 
     overflow:hidden;
   }
 
   .presenterFinalPreviewLabel{
-    height:18px;
+    height:20px;
     color:#64748B;
-    font-size:.78rem;
+    font-size:.82rem;
     line-height:1;
     font-weight:900;
   }
@@ -4522,12 +4347,17 @@ button{
     justify-content:center;
 
     color:#1E1B4B;
-    font-size:1rem;
+    font-size:clamp(.95rem, 1.7vw, 1.25rem);
     line-height:1.35;
     font-weight:900;
     text-align:center;
 
     overflow:hidden;
     overflow-wrap:break-word;
+  }
+
+  .presenterFinalPreviewText.answerText{
+    color:#0F766E;
+    font-size:clamp(1.05rem, 1.9vw, 1.38rem);
   }
 }

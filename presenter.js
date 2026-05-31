@@ -3052,6 +3052,8 @@ async function renderPresenterFinalRoundContent() {
   if (round === 2) nums = [1, 2, 3, 4]
   if (round === 3) nums = isTeamMedia ? [1, 2, 3, 4] : [1, 2]
 
+  numbersBox.className = `presenterGrid presenterFinalNumbersGrid finalNumbersCount${nums.length}`
+
   const openedNumbers = isTeamMedia
     ? (teamMediaState.usedNumbers || [])
     : (state.opened || [])
@@ -3090,44 +3092,45 @@ async function renderPresenterFinalRoundContent() {
   }
 
   controlsBox.dataset.round = String(round)
+  controlsBox.className = `presenterFinalControlsArea finalControlsRound${round}`
 
-if (round === 1) {
-  controlsBox.innerHTML = `
-    <div class="presenterActions presenterFinalRound1TwoRows">
-      <button class="presenterBtn gray" onclick="sendCommand('double')">
-        دبل
-      </button>
+  if (round === 1) {
+    controlsBox.innerHTML = `
+      <div class="presenterActions presenterFinalControlsGrid">
+        <button class="presenterBtn gray" onclick="sendCommand('double')">
+          دبل
+        </button>
 
-      <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">
-        إظهار السؤال
-      </button>
+        <button class="presenterBtn blue" onclick="sendCommand('showQuestion')">
+          السؤال
+        </button>
 
-      <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
-        تكبير
-      </button>
+        <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
+          تكبير
+        </button>
 
-      <button class="presenterBtn green" onclick="presenterFinalCorrect()">
-        صحيحة
-      </button>
+        <button class="presenterBtn green" onclick="presenterFinalCorrect()">
+          صحيحة
+        </button>
 
-      <button class="presenterBtn red" onclick="presenterFinalWrong()">
-        خطأ
-      </button>
+        <button class="presenterBtn red" onclick="presenterFinalWrong()">
+          خطأ
+        </button>
 
-      <button class="presenterBtn gray" onclick="sendCommand('undo')">
-        تراجع
-      </button>
+        <button class="presenterBtn gray" onclick="sendCommand('undo')">
+          تراجع
+        </button>
 
-      <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
-        التالية
-      </button>
-    </div>
-  `
+        <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
+          التالية
+        </button>
+      </div>
+    `
 
-  refreshPresenterFinalControlsOnly(1)
-  refreshPresenterEnhancements()
-  return
-}
+    refreshPresenterFinalControlsOnly(1)
+    refreshPresenterEnhancements()
+    return
+  }
 
   if (round === 2) {
     const finalCurrentNumber = Number(
@@ -3143,7 +3146,7 @@ if (round === 1) {
     const isSequenceNumber = finalCurrentNumber === 2 || finalCurrentNumber === 4
 
     controlsBox.innerHTML = `
-      <div class="presenterActions finalTwoActions">
+      <div class="presenterActions presenterFinalControlsGrid">
         <button class="presenterBtn gray" onclick="sendCommand('double')">
           دبل
         </button>
@@ -3151,9 +3154,7 @@ if (round === 1) {
         <button class="presenterBtn dark" onclick="sendCommand('decreaseCountdown')">
           ${isSequenceNumber ? `العداد ${state.countdown ?? 15}` : "العداد"}
         </button>
-      </div>
 
-      <div class="presenterActions">
         <button
           class="presenterBtn green"
           onclick="clearPresenterFinalPreview(2); sendCommand('recordScrambleScore')"
@@ -3169,15 +3170,13 @@ if (round === 1) {
         >
           تسجيل التلميح
         </button>
-      </div>
 
-      <div class="presenterActions">
         <button class="presenterBtn gray" onclick="sendCommand('undo')">
           تراجع
         </button>
 
         <button class="presenterBtn blue" onclick="sendCommand('nextRound')">
-          الجولة التالية
+          التالية
         </button>
       </div>
     `
@@ -3192,13 +3191,13 @@ if (round === 1) {
     const isVideo = teamMediaState.currentMediaType === "video"
 
     controlsBox.innerHTML = `
-      <div class="presenterActions">
+      <div class="presenterActions presenterFinalControlsGrid">
         <button
           class="presenterBtn blue"
           onclick="sendCommand('showQuestion')"
           ${hasCurrent && teamMediaState.currentQuestion ? "" : "disabled"}
         >
-          إظهار السؤال
+          السؤال
         </button>
 
         <button
@@ -3206,17 +3205,15 @@ if (round === 1) {
           onclick="presenterPlayCurrentFinalVideo()"
           ${hasCurrent && isVideo ? "" : "disabled"}
         >
-          تشغيل الفيديو
+          تشغيل
         </button>
-      </div>
 
-      <div class="presenterActions">
         <button
           class="presenterBtn blue"
           onclick="presenterRestartCurrentFinalVideo()"
           ${hasCurrent && isVideo ? "" : "disabled"}
         >
-          إعادة تشغيل الفيديو
+          إعادة
         </button>
 
         <button
@@ -3224,11 +3221,9 @@ if (round === 1) {
           onclick="clearPresenterFinalPreview(3); presenterFinalCorrect()"
           ${hasCurrent ? "" : "disabled"}
         >
-          إجابة صحيحة
+          صحيحة
         </button>
-      </div>
 
-      <div class="presenterActions">
         <button
           class="presenterBtn red"
           onclick="presenterFinalWrong()"
@@ -3249,19 +3244,17 @@ if (round === 1) {
   }
 
   controlsBox.innerHTML = `
-    <div class="presenterActions">
+    <div class="presenterActions presenterFinalControlsGrid">
       <button class="presenterBtn gray" onclick="sendCommand('double')">
         دبل
       </button>
 
       <button class="presenterBtn dark" onclick="sendCommand('startSequence')">
-        بدء عرض الصور
+        بدء الصور
       </button>
-    </div>
 
-    <div class="presenterActions">
       <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
-        تكبير الصورة
+        تكبير
       </button>
 
       <button
@@ -3269,11 +3262,9 @@ if (round === 1) {
         onclick="clearPresenterFinalPreview(3); sendCommand('recordRound3Score')"
         ${!Number(state.currentNumber || 0) ? "disabled" : ""}
       >
-        تسجيل النتيجة
+        تسجيل
       </button>
-    </div>
 
-    <div class="presenterActions">
       <button class="presenterBtn gray" onclick="sendCommand('undo')">
         تراجع
       </button>
@@ -3283,7 +3274,6 @@ if (round === 1) {
   refreshPresenterFinalControlsOnly(3)
   refreshPresenterEnhancements()
 }
-
 /* =========================
    REFRESH FINAL
 ========================= */
@@ -3335,6 +3325,8 @@ async function refreshPresenterFinalNumbersOnly(round) {
   let nums = [1, 2, 3, 4, 5, 6]
   if (round === 2) nums = [1, 2, 3, 4]
   if (round === 3) nums = isTeamMedia ? [1, 2, 3, 4] : [1, 2]
+
+  numbersBox.className = `presenterGrid presenterFinalNumbersGrid finalNumbersCount${nums.length}`
 
   const openedNumbers = isTeamMedia
     ? (teamMediaState.usedNumbers || [])
@@ -3634,24 +3626,31 @@ async function renderPresenterFinalRound2Preview() {
     return
   }
 
-  const { data } = await db
-    .from("final_round2_items")
-    .select("*")
-    .eq("model", presenterModel)
-    .eq("number", current)
-    .order("item_order", { ascending: true })
+  if (!presenterFinalRound2Rows.length) {
+    const { data } = await db
+      .from("final_round2_items")
+      .select("*")
+      .eq("model", presenterModel)
+      .order("number", { ascending: true })
+      .order("item_order", { ascending: true })
 
-  const rows = data || []
+    presenterFinalRound2Rows = data || []
+  }
+
+  const rows = presenterFinalRound2Rows.filter(row => {
+    return Number(row.number) === Number(current)
+  })
+
   const isScramble = current === 1 || current === 3
 
   if (isScramble) {
     const selected = state.selectedCorrectIndexes || []
 
     presenterFinalPreviewCache[2] = `
-      <div class="presenterFinalRound2SimpleGrid">
+      <div class="presenterFinalUnifiedAnswersGrid">
         ${rows.map((r, idx) => `
           <button
-            class="presenterFinalRound2SimpleCard ${selected.includes(idx) ? "selectedCorrect" : ""}"
+            class="presenterFinalUnifiedAnswerCard ${selected.includes(idx) ? "selectedCorrect" : ""}"
             type="button"
             onclick="sendCommand('toggleRound2Correct',{index:${idx}})"
           >
@@ -3674,22 +3673,20 @@ async function renderPresenterFinalRound2Preview() {
         العداد: ${state.countdown ?? 15}
       </div>
 
-      <div class="finalRound2WordsStage presenterFinalRound2PreviewStage">
-        <div class="finalSequenceWordsWrap">
-          ${rows.map((r, idx) => {
-            if (hidden.includes(idx)) return ""
+      <div class="presenterFinalUnifiedAnswersGrid">
+        ${rows.map((r, idx) => {
+          if (hidden.includes(idx)) return ""
 
-            return `
-              <button
-                class="finalSequenceWordBtn"
-                type="button"
-                onclick="sendCommand('hideRound2SequenceWord',{index:${idx}})"
-              >
-                ${r.prompt || r.answer || "-"}
-              </button>
-            `
-          }).join("")}
-        </div>
+          return `
+            <button
+              class="presenterFinalUnifiedAnswerCard"
+              type="button"
+              onclick="sendCommand('hideRound2SequenceWord',{index:${idx}})"
+            >
+              ${r.prompt || r.answer || "-"}
+            </button>
+          `
+        }).join("")}
       </div>
 
     </div>
@@ -3697,7 +3694,6 @@ async function renderPresenterFinalRound2Preview() {
 
   previewBox.innerHTML = presenterFinalPreviewCache[2]
 }
-
 /* =========================
    ROUND 3 PREVIEW
 ========================= */
@@ -3723,70 +3719,46 @@ async function renderPresenterFinalRound3Preview() {
   }
 
   if (isTeamMedia) {
-    const { data } = await db
-      .from("final_round3_items")
-      .select("*")
-      .eq("model", presenterModel)
-      .eq("number", current)
-      .eq("image_order", 1)
-      .maybeSingle()
+    if (!presenterFinalRound3Rows.length) {
+      const { data } = await db
+        .from("final_round3_items")
+        .select("*")
+        .eq("model", presenterModel)
+        .order("number", { ascending: true })
+        .order("image_order", { ascending: true })
 
-    const mediaType =
-      teamMediaState.currentMediaType ||
-      (data?.video ? "video" : data?.image ? "image" : "")
+      presenterFinalRound3Rows = data || []
+    }
 
-    const media =
-      teamMediaState.currentMedia ||
-      data?.video ||
-      data?.image ||
-      ""
+    const item =
+      presenterFinalRound3Rows.find(row => {
+        return Number(row.number) === Number(current) && Number(row.image_order || 1) === 1
+      }) || {}
 
     const question =
       teamMediaState.currentQuestion ||
-      data?.question ||
-      ""
+      item.question ||
+      "لا يوجد سؤال"
 
     const answer =
       teamMediaState.currentAnswer ||
-      data?.answer ||
-      ""
+      item.answer ||
+      "لا توجد إجابة"
 
     presenterFinalPreviewCache[3] = `
-      <div class="presenterFinalTeamMediaPreview">
+      <div class="presenterFinalQuestionAnswerOnly">
 
-        ${
-          media
-            ? mediaType === "video"
-              ? `
-                <div class="presenterImagePreviewBox presenterVideoPreviewBox">
-                  <video src="${media}" muted playsinline preload="metadata"></video>
-                </div>
-              `
-              : `
-                <div class="presenterImagePreviewBox">
-                  <img src="${media}" alt="">
-                </div>
-              `
-            : `
-              <div class="presenterAnswerBody">
-                لا توجد صورة أو فيديو
-              </div>
-            `
-        }
-
-        <div class="presenterFinalCleanPreview">
-          <div class="presenterFinalPreviewBlock">
-            <div class="presenterFinalPreviewLabel">السؤال</div>
-            <div class="presenterFinalPreviewText">
-              ${question || "لا يوجد سؤال"}
-            </div>
+        <div class="presenterFinalPreviewBlock">
+          <div class="presenterFinalPreviewLabel">السؤال</div>
+          <div class="presenterFinalPreviewText">
+            ${question}
           </div>
+        </div>
 
-          <div class="presenterFinalPreviewBlock">
-            <div class="presenterFinalPreviewLabel">الإجابة</div>
-            <div class="presenterFinalPreviewText">
-              ${answer || "لا توجد إجابة"}
-            </div>
+        <div class="presenterFinalPreviewBlock">
+          <div class="presenterFinalPreviewLabel">الإجابة</div>
+          <div class="presenterFinalPreviewText answerText">
+            ${answer}
           </div>
         </div>
 
@@ -3797,50 +3769,34 @@ async function renderPresenterFinalRound3Preview() {
     return
   }
 
-  const { data } = await db
-    .from("final_round3_items")
-    .select("*")
-    .eq("model", presenterModel)
-    .eq("number", current)
-    .order("image_order", { ascending: true })
+  if (!presenterFinalRound3Rows.length) {
+    const { data } = await db
+      .from("final_round3_items")
+      .select("*")
+      .eq("model", presenterModel)
+      .order("number", { ascending: true })
+      .order("image_order", { ascending: true })
 
-  const rows = data || []
+    presenterFinalRound3Rows = data || []
+  }
+
+  const rows = presenterFinalRound3Rows.filter(row => {
+    return Number(row.number) === Number(current)
+  })
+
   const selected = state.selectedCorrectIndexes || []
-  const shownCount = Number(state.shownCount || 0)
-  const currentImageIndex = Math.max(0, Math.min(shownCount - 1, rows.length - 1))
-  const currentImage = rows[currentImageIndex]?.image || ""
 
   presenterFinalPreviewCache[3] = `
-    <div class="presenterFinalRound3Preview">
-
-      <div class="finalRound3AnswersList">
-        ${rows.map((r, idx) => `
-          <button
-            class="finalRound3AnswerCard ${selected.includes(idx) ? "selectedCorrect" : ""}"
-            type="button"
-            onclick="sendCommand('toggleRound3Correct',{index:${idx}})"
-          >
-            ${r.answer || "-"}
-          </button>
-        `).join("")}
-      </div>
-
-      <div class="presenterFinalRound3ImageStage">
-        ${
-          currentImage
-            ? `
-              <div class="presenterImagePreviewBox">
-                <img src="${currentImage}" alt="">
-              </div>
-            `
-            : `
-              <div class="presenterAnswerBody">
-                لم تبدأ الصور بعد
-              </div>
-            `
-        }
-      </div>
-
+    <div class="presenterFinalUnifiedAnswersGrid">
+      ${rows.map((r, idx) => `
+        <button
+          class="presenterFinalUnifiedAnswerCard ${selected.includes(idx) ? "selectedCorrect" : ""}"
+          type="button"
+          onclick="sendCommand('toggleRound3Correct',{index:${idx}})"
+        >
+          ${r.answer || "-"}
+        </button>
+      `).join("")}
     </div>
   `
 
