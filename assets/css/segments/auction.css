@@ -3165,3 +3165,97 @@
   height:190px !important;
   overflow:hidden !important;
 }
+/* =========================
+   Auction Fullscreen Video Wrong Flash
+========================= */
+
+#auctionZoomFlashLayer{
+  position:fixed;
+  inset:0;
+  z-index:9999999;
+  pointer-events:none;
+  opacity:0;
+}
+
+#auctionZoomFlashLayer.auctionZoomFlashRun{
+  animation:auctionWrongFullFlash .85s ease-out both;
+}
+
+@keyframes auctionWrongFullFlash{
+  0%{
+    opacity:0;
+    background:rgba(255,0,0,0);
+  }
+
+  12%{
+    opacity:1;
+    background:rgba(255,0,0,.38);
+  }
+
+  26%{
+    opacity:.35;
+    background:rgba(255,0,0,.18);
+  }
+
+  42%{
+    opacity:1;
+    background:rgba(255,0,0,.32);
+  }
+
+  100%{
+    opacity:0;
+    background:rgba(255,0,0,0);
+  }
+}
+
+#auctionVideoFullscreenOverlay.auctionVideoWrongPulse{
+  animation:auctionVideoWrongPulse .55s ease-out both;
+}
+
+@keyframes auctionVideoWrongPulse{
+  0%{
+    filter:none;
+    transform:scale(1);
+  }
+
+  30%{
+    filter:drop-shadow(0 0 38px rgba(255,0,0,.75));
+    transform:scale(.985);
+  }
+
+  62%{
+    filter:drop-shadow(0 0 56px rgba(255,0,0,.9));
+    transform:scale(1.012);
+  }
+
+  100%{
+    filter:none;
+    transform:scale(1);
+  }
+}
+
+#auctionFullscreenVideo.mediaWrongShake{
+  animation:auctionVideoWrongShake .55s ease both;
+}
+
+@keyframes auctionVideoWrongShake{
+  0%,100%{
+    transform:translateX(0) scale(1);
+  }
+
+  18%{
+    transform:translateX(-14px) scale(.992);
+  }
+
+  36%{
+    transform:translateX(14px) scale(1.006);
+  }
+
+  54%{
+    transform:translateX(-9px) scale(.996);
+  }
+
+  72%{
+    transform:translateX(9px) scale(1.004);
+  }
+}

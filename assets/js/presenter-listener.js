@@ -371,15 +371,61 @@ function handleAuctionPresenterAction(action, data) {
     return safeRunPresenterAction(() => activateAuctionDouble())
   }
 
-if (action === "correct") {
-  return safeRunPresenterAction(() => {
-    auctionCorrect()
-  })
-}
+  if (action === "correct") {
+    return safeRunPresenterAction(() => {
+      auctionCorrect()
+    })
+  }
 
   if (action === "wrong") {
     return safeRunPresenterAction(() => {
       auctionWrong()
+    })
+  }
+
+  /* تشغيل فيديو الفتبلة من المقدم */
+  if (action === "playAuctionVideo") {
+    return safeRunPresenterAction(() => {
+      if (typeof playCurrentAuctionVideo === "function") {
+        playCurrentAuctionVideo()
+        return
+      }
+
+      if (typeof openAuctionVideoFullscreen === "function") {
+        openAuctionVideoFullscreen()
+      }
+    })
+  }
+
+  if (action === "restartAuctionVideo") {
+    return safeRunPresenterAction(() => {
+      if (typeof restartCurrentAuctionVideo === "function") {
+        restartCurrentAuctionVideo()
+        return
+      }
+
+      if (typeof closeAuctionVideoFullscreen === "function") {
+        closeAuctionVideoFullscreen()
+      }
+
+      if (typeof openAuctionVideoFullscreen === "function") {
+        setTimeout(() => {
+          openAuctionVideoFullscreen()
+        }, 80)
+      }
+    })
+  }
+
+  if (action === "stopAuctionVideo") {
+    return safeRunPresenterAction(() => {
+      if (typeof stopCurrentAuctionVideo === "function") {
+        stopCurrentAuctionVideo()
+        return
+      }
+
+      if (typeof closeAuctionVideoFullscreen === "function") {
+        closeAuctionVideoFullscreen()
+      }
     })
   }
 
@@ -395,7 +441,6 @@ if (action === "correct") {
     })
   }
 }
-
 /* =========================
    WHO
 ========================= */

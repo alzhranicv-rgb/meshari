@@ -1844,13 +1844,13 @@ async function renderAuction() {
           <div id="presenterAuctionImageBox" class="presenterImagePreviewBox hidden"></div>
 
           <button
-            id="presenterAuctionPlayVideoBtn"
-            class="presenterAuctionPlayVideoBtn hidden"
-            onclick="playPresenterAuctionVideo()"
-            type="button"
-          >
-            ▶ تشغيل الفيديو
-          </button>
+  id="presenterAuctionPlayVideoBtn"
+  class="presenterAuctionPlayVideoBtn hidden"
+  onclick="playAuctionVideoOnDisplay()"
+  type="button"
+>
+  ▶ تشغيل الفيديو في العرض
+</button>
         </section>
 
       </div>
@@ -1896,6 +1896,22 @@ function playPresenterAuctionVideo() {
   video.play().catch(() => {
     showToast("اضغط على الفيديو للتشغيل")
   })
+}
+async function playAuctionVideoOnDisplay() {
+  const auction = getPresenterAuctionData()
+
+  if (!auction.currentQuestionNumber) {
+    showToast("افتح رقم أولاً")
+    return
+  }
+
+  const sent = await sendCommand("playAuctionVideo", {
+    number: auction.currentQuestionNumber
+  })
+
+  if (!sent) return
+
+  showToast("تم تشغيل الفيديو في العرض")
 }
 
 function openAuctionPresenterNumber(number) {

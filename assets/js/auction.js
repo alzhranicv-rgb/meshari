@@ -886,8 +886,6 @@ function flashAuctionZoomOverlayWrong() {
     flashLayer.id = "auctionZoomFlashLayer"
     flashLayer.className = "auctionZoomFlashLayer"
     document.body.appendChild(flashLayer)
-  } else {
-    document.body.appendChild(flashLayer)
   }
 
   flashLayer.classList.remove("auctionZoomFlashRun")
@@ -895,9 +893,10 @@ function flashAuctionZoomOverlayWrong() {
   flashLayer.classList.add("auctionZoomFlashRun")
 
   const media =
+    document.getElementById("auctionFullscreenVideo") ||
+    document.querySelector("#auctionVideoFullscreenOverlay video") ||
     document.querySelector("#auctionImageOverlay img") ||
-    document.getElementById("displayImageZoomImg") ||
-    document.getElementById("auctionFullscreenVideo")
+    document.getElementById("displayImageZoomImg")
 
   if (media) {
     media.classList.remove("mediaWrongShake")
@@ -905,13 +904,22 @@ function flashAuctionZoomOverlayWrong() {
     media.classList.add("mediaWrongShake")
   }
 
+  if (videoOverlay) {
+    videoOverlay.classList.remove("auctionVideoWrongPulse")
+    void videoOverlay.offsetWidth
+    videoOverlay.classList.add("auctionVideoWrongPulse")
+  }
+
   setTimeout(() => {
     flashLayer.classList.remove("auctionZoomFlashRun")
+
+    if (videoOverlay) {
+      videoOverlay.classList.remove("auctionVideoWrongPulse")
+    }
   }, 850)
 
   return true
 }
-
 function auctionCorrect() {
   const team = auctionState.activeTeam
 
@@ -1143,22 +1151,52 @@ function closeAuctionVideoFullscreen(e) {
   overlay.remove()
 }
 
-function closeAuctionVideoFullscreen(e) {
-  if (e) {
-    e.preventDefault()
-    e.stopPropagation()
+
+/* =========================
+   Auction - Presenter Video Commands
+   تشغيل فيديو الفتبلة من المقدم
+========================= */
+
+function playCurrentAuctionVideo() {
+  if (!auctionState.currentQuestionNumber) {
+    showGameToast("افتح رقم أولاً")
+    return
   }
 
-  const overlay = document.getElementById("auctionVideoFullscreenOverlay")
-  if (!overlay) return
+  if (!currentAuctionVideo) {
+    showGameToast("لا يوجد فيديو حالي")
+    return
+  }
 
+  openAuctionVideoFullscreen()
+}
+
+function restartCurrentAuctionVideo() {
+  if (!auctionState.currentQuestionNumber) {
+    showGameToast("افتح رقم أولاً")
+    return
+  }
+
+  if (!currentAuctionVideo) {
+    showGameToast("لا يوجد فيديو حالي")
+    return
+  }
+
+  closeAuctionVideoFullscreen()
+  openAuctionVideoFullscreen()
+}
+
+function stopCurrentAuctionVideo() {
   const video = document.getElementById("auctionFullscreenVideo")
 
   if (video) {
     video.pause()
-    video.removeAttribute("src")
-    video.load()
+    video.currentTime = 0
   }
 
-  overlay.remove()
+  closeAuctionVideoFullscreen()
 }
+
+window.playCurrentAuctionVideo = playCurrentAuctionVideo
+window.restartCurrentAuctionVideo = restartCurrentAuctionVideo
+window.stopCurrentAuctionVideo = stopCurrentAuctionVideo
