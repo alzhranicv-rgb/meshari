@@ -382,7 +382,65 @@ function getFinalCurrentRoundState() {
 function getOtherTeam(team) {
   return team === "A" ? "B" : "A"
 }
+function getFinalStatusTeamName() {
+  let team = null
 
+  if (finalState.round === 1) {
+    team = finalState.round1.activeTeam
+  }
+
+  if (finalState.round === 2) {
+    team = finalState.round2.activeTeam
+  }
+
+  if (finalState.round === 3) {
+    if (finalState.round3.mode === "team_media") {
+      team = finalState.round3.teamMedia.currentTeam || finalState.round3.activeTeam
+    } else {
+      team = finalState.round3.activeTeam
+    }
+  }
+
+  if (team === "A") return teamAName || "الفريق الأول"
+  if (team === "B") return teamBName || "الفريق الثاني"
+
+  return "اختر الفريق"
+}
+
+function getFinalStatusDetails() {
+  const teamName = getFinalStatusTeamName()
+
+  if (finalState.round === 1) {
+    return `الجولة الأولى · ${teamName}`
+  }
+
+  if (finalState.round === 2) {
+    const n = Number(finalState.round2.currentNumber || 0)
+
+    if (n === 1 || n === 3) {
+      return `الجولة الثانية · ${teamName} · الصح ${Number(finalState.round2.correctCount || 0)}`
+    }
+
+    if (n === 2 || n === 4) {
+      return `الجولة الثانية · ${teamName} · التلميح ${Number(finalState.round2.countdown ?? 15)}`
+    }
+
+    return `الجولة الثانية · ${teamName}`
+  }
+
+  if (finalState.round === 3) {
+    return `الجولة الثالثة · ${teamName}`
+  }
+
+  return "الفاصلة"
+}
+
+function renderFinalCenterStatus() {
+  const box = document.getElementById("finalCenterStatusText")
+  if (!box) return
+
+  box.innerText = getFinalStatusDetails()
+}
 /* =========================
    Final Turn Bar
 ========================= */
@@ -437,32 +495,68 @@ function getFinalRoundTextLabel() {
   return "الفاصلة"
 }
 
-function getFinalCurrentNumberText() {
+function getFinalStatusTeamName() {
+  let team = null
+
   if (finalState.round === 1) {
-    return finalState.round1.currentNumber
-      ? `الرقم ${finalState.round1.currentNumber}`
-      : "بدون رقم"
+    team = finalState.round1.activeTeam
   }
 
   if (finalState.round === 2) {
-    return finalState.round2.currentNumber
-      ? `الرقم ${finalState.round2.currentNumber}`
-      : "بانتظار رقم"
+    team = finalState.round2.activeTeam
   }
 
   if (finalState.round === 3) {
     if (finalState.round3.mode === "team_media") {
-      return finalState.round3.teamMedia.currentNumber
-        ? `الرقم ${finalState.round3.teamMedia.currentNumber}`
-        : "بانتظار رقم"
+      team = finalState.round3.teamMedia.currentTeam || finalState.round3.activeTeam
+    } else {
+      team = finalState.round3.activeTeam
     }
-
-    return finalState.round3.currentNumber
-      ? `الرقم ${finalState.round3.currentNumber}`
-      : "بانتظار رقم"
   }
 
-  return ""
+  if (team === "A") return teamAName || "الفريق الأول"
+  if (team === "B") return teamBName || "الفريق الثاني"
+
+  return "اختر الفريق"
+}
+
+function getFinalStatusDetails() {
+  const teamName = getFinalStatusTeamName()
+
+  if (finalState.round === 1) {
+    return `الجولة الأولى  •  الفريق المختار: ${teamName}`
+  }
+
+  if (finalState.round === 2) {
+    const n = Number(finalState.round2.currentNumber || 0)
+
+    if (n === 1 || n === 3) {
+      return `الجولة الثانية  •  ${teamName}  •  عدد الصح: ${Number(finalState.round2.correctCount || 0)}`
+    }
+
+    if (n === 2 || n === 4) {
+      return `الجولة الثانية  •  ${teamName}  •  التلميح المتبقي: ${Number(finalState.round2.countdown ?? 15)}`
+    }
+
+    return `الجولة الثانية  •  الفريق المختار: ${teamName}`
+  }
+
+  if (finalState.round === 3) {
+    return `الجولة الثالثة  •  الفريق المختار: ${teamName}`
+  }
+
+  return "الفاصلة"
+}
+
+function renderFinalStatusPanel() {
+  const box = document.getElementById("finalStatusPanel")
+  if (!box) return
+
+  box.innerHTML = `
+    <div class="finalStatusText">
+      ${getFinalStatusDetails()}
+    </div>
+  `
 }
 
 function renderFinalTurnBar() {
@@ -486,7 +580,65 @@ function renderFinalTurnBar() {
     </div>
   `
 }
+function getFinalStatusTeamName() {
+  let team = null
 
+  if (finalState.round === 1) {
+    team = finalState.round1.activeTeam
+  }
+
+  if (finalState.round === 2) {
+    team = finalState.round2.activeTeam
+  }
+
+  if (finalState.round === 3) {
+    if (finalState.round3.mode === "team_media") {
+      team = finalState.round3.teamMedia.currentTeam || finalState.round3.activeTeam
+    } else {
+      team = finalState.round3.activeTeam
+    }
+  }
+
+  if (team === "A") return teamAName || "الفريق الأول"
+  if (team === "B") return teamBName || "الفريق الثاني"
+
+  return "اختر الفريق"
+}
+
+function getFinalStatusDetails() {
+  const teamName = getFinalStatusTeamName()
+
+  if (finalState.round === 1) {
+    return `الجولة الأولى · ${teamName}`
+  }
+
+  if (finalState.round === 2) {
+    const n = Number(finalState.round2.currentNumber || 0)
+
+    if (n === 1 || n === 3) {
+      return `الجولة الثانية · ${teamName} · الصح: ${Number(finalState.round2.correctCount || 0)}`
+    }
+
+    if (n === 2 || n === 4) {
+      return `الجولة الثانية · ${teamName} · التلميح: ${Number(finalState.round2.countdown ?? 15)}`
+    }
+
+    return `الجولة الثانية · ${teamName}`
+  }
+
+  if (finalState.round === 3) {
+    return `الجولة الثالثة · ${teamName}`
+  }
+
+  return ""
+}
+
+function renderFinalCenterStatus() {
+  const box = document.getElementById("finalCenterStatusText")
+  if (!box) return
+
+  box.innerText = getFinalStatusDetails()
+}
 /* =========================
    Final Auto Team Turn
    Round 2 / Round 3 فقط
@@ -641,7 +793,8 @@ function highlightFinalTeam(team) {
   if (team === "A" && a) a.classList.add("activeTeam")
   if (team === "B" && b) b.classList.add("activeTeam")
 
-  updateFinalDoubleButton()
+    updateFinalDoubleButton()
+  renderFinalCenterStatus()
 }
 
 function shuffleArabicWord(text) {
@@ -939,10 +1092,10 @@ function buildFinalHTML() {
         </div>
 
         <div class="finalScoreCenterPanel finalCenterMiniGlass">
-  <div class="finalCenterRoundNumber" id="finalRoundCenterNum">1</div>
-  <div class="finalCenterTurnTeam" id="finalRoundCenterBottom"></div>
-  <div id="finalRoundCenterTop" style="display:none"></div>
-</div>
+          <div class="finalCenterStatusText" id="finalCenterStatusText">
+            الجولة الأولى · اختر الفريق
+          </div>
+        </div>
 
         <div class="finalScorePanel finalScorePanelRight" id="finalTeamBBox" onclick="selectFinalTeam('B')">
           <div class="finalScoreValueBox" id="finalScoreB">0</div>
@@ -954,6 +1107,7 @@ function buildFinalHTML() {
 
       <div class="finalMainStage" id="finalMainStage"></div>
       <div class="finalControlsBar" id="finalControlsBar"></div>
+
     </div>
   `
 }
@@ -1012,10 +1166,10 @@ function renderFinalRoundTitle() {
   }
 
   if (centerTop) centerTop.innerText = ""
-  if (centerNum) centerNum.innerText = String(finalState.round)
+  if (centerNum) centerNum.innerText = ""
+  if (centerBottom) centerBottom.innerText = ""
 
-  const teamName = getFinalTurnTeamName()
-  if (centerBottom) centerBottom.innerText = teamName
+  renderFinalCenterStatus()
 }
 
 function renderFinalScores() {
