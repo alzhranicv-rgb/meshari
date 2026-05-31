@@ -2011,58 +2011,17 @@ function renderPresenterAuctionMedia(box, mediaUrl) {
 
   if (isPresenterAuctionVideo(safeUrl)) {
     box.innerHTML = `
-      <video
-        src="${safeUrl}"
-        playsinline
-        preload="metadata"
-      ></video>
+      <div class="presenterVideoNoPreviewBox">
+        <div class="presenterVideoNoPreviewIcon">▶</div>
+        <div class="presenterVideoNoPreviewText">فيديو جاهز للتشغيل في العرض</div>
+      </div>
     `
-
-    
     return
   }
 
   box.innerHTML = `
-    <video
-      src="${safeUrl}"
-      playsinline
-      preload="metadata"
-      muted
-    ></video>
+    <img src="${safeUrl}" alt="">
   `
-
-  const video = box.querySelector("video")
-  if (!video) return
-
-  let loadedAsVideo = false
-
-  video.onloadedmetadata = () => {
-    loadedAsVideo = true
-    video.muted = false
-    
-  }
-
-  video.onerror = () => {
-    if (loadedAsVideo) return
-
-    box.innerHTML = `
-      <img src="${safeUrl}" alt="">
-    `
-
-    
-  }
-
-  setTimeout(() => {
-    const currentVideo = box.querySelector("video")
-
-    if (currentVideo && !loadedAsVideo && currentVideo.readyState === 0) {
-      box.innerHTML = `
-        <img src="${safeUrl}" alt="">
-      `
-
-      
-    }
-  }, 700)
 }
 
 function showPresenterAuctionPreview(number) {

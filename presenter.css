@@ -4519,3 +4519,42 @@ button{
     font-size: .72rem;
   }
 }
+.presenterVideoNoPreviewBox{
+  width:100%;
+  min-height:130px;
+  border-radius:18px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  background:rgba(15,23,42,.08);
+  border:1px dashed rgba(15,23,42,.22);
+
+  color:#1E293B;
+  text-align:center;
+}
+
+.presenterVideoNoPreviewIcon{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#06B6D4;
+  color:#fff;
+
+  font-size:1.2rem;
+  font-weight:900;
+}
+
+.presenterVideoNoPreviewText{
+  font-family:"HanakaText",sans-serif;
+  font-size:.85rem;
+  font-weight:900;
+}
