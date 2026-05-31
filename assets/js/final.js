@@ -636,31 +636,7 @@ function getFinalStatusTeamName() {
 }
 
 function getFinalStatusDetails() {
-  const teamName = getFinalStatusTeamName()
-
-  if (finalState.round === 1) {
-    return `الجولة الأولى · ${teamName}`
-  }
-
-  if (finalState.round === 2) {
-    const n = Number(finalState.round2.currentNumber || 0)
-
-    if (n === 1 || n === 3) {
-      return `الجولة الثانية · ${teamName} · الصح: ${Number(finalState.round2.correctCount || 0)}`
-    }
-
-    if (n === 2 || n === 4) {
-      return `الجولة الثانية · ${teamName} · التلميح: ${Number(finalState.round2.countdown ?? 15)}`
-    }
-
-    return `الجولة الثانية · ${teamName}`
-  }
-
-  if (finalState.round === 3) {
-    return `الجولة الثالثة · ${teamName}`
-  }
-
-  return ""
+  return getFinalStatusTeamName()
 }
 
 function renderFinalCenterStatus() {
@@ -1123,8 +1099,8 @@ function buildFinalHTML() {
 
         <div class="finalScoreCenterPanel finalCenterMiniGlass">
           <div class="finalCenterStatusText" id="finalCenterStatusText">
-            الجولة الأولى · اختر الفريق
-          </div>
+  اختر الفريق
+</div>
         </div>
 
         <div class="finalScorePanel finalScorePanelRight" id="finalTeamBBox" onclick="selectFinalTeam('B')">
