@@ -1764,16 +1764,36 @@ async function renderAuction() {
 
   const { data } = await db
     .from("auction_questions")
-    .select("number, answer, image")
+    .select("number, answer, image, video")
     .eq("model", presenterModel)
     .order("number", { ascending: true })
 
   presenterAuctionRows = data || []
 
+  const auctionRoot = getPresenterAuctionState()
+
+  const currentMediaVideo =
+    !!auctionRoot.currentAuctionVideo ||
+    !!auctionRoot.video
+
+  const currentMediaImage =
+    !currentMediaVideo && (
+      !!auctionRoot.currentAuctionImage ||
+      !!auctionRoot.image
+    )
+
+  const mediaActionText = currentMediaVideo ? "▶ تشغيل الفيديو" : "تكبير"
+
+  const mediaActionCommand = currentMediaVideo
+    ? "playAuctionVideo"
+    : "zoomImage"
+
+  const mediaActionDisabled =
+    !currentNumber || (!currentMediaVideo && !currentMediaImage)
+
   panel.innerHTML = `
     <div class="presenterAuctionLayout">
 
-      <!-- اليسار: الأرقام + التحكم -->
       <div class="presenterAuctionLeft">
 
         <section class="presenterCard presenterAuctionNumbersCard">
@@ -1814,9 +1834,14 @@ async function renderAuction() {
             ✕ خطأ
           </button>
 
-          <button class="presenterBtn blue" onclick="sendCommand('zoomImage')">
-            تكبير
-          </button>
+          <button
+  id="presenterAuctionMediaActionBtn"
+  class="presenterBtn blue"
+  onclick="runPresenterAuctionMediaAction()"
+  ${mediaActionDisabled ? "disabled" : ""}
+>
+  ${mediaActionText}
+</button>
 
           <button class="presenterBtn gray" onclick="sendCommand('undo')">
             تراجع
@@ -1825,7 +1850,6 @@ async function renderAuction() {
 
       </div>
 
-      <!-- اليمين: الفرق + المحتوى -->
       <div class="presenterAuctionRight">
 
         <div class="presenterAuctionTeamsBox">
@@ -1842,15 +1866,6 @@ async function renderAuction() {
           <div class="presenterLabel">الصورة / الفيديو</div>
 
           <div id="presenterAuctionImageBox" class="presenterImagePreviewBox hidden"></div>
-
-          <button
-  id="presenterAuctionPlayVideoBtn"
-  class="presenterAuctionPlayVideoBtn hidden"
-  onclick="playAuctionVideoOnDisplay()"
-  type="button"
->
-  ▶ تشغيل الفيديو في العرض
-</button>
         </section>
 
       </div>
@@ -1860,25 +1875,10 @@ async function renderAuction() {
 
   if (currentNumber) {
     refreshPresenterAuctionFromState()
-    setTimeout(ensurePresenterAuctionVideoButton, 80)
   }
 }
 
-function ensurePresenterAuctionVideoButton() {
-  const box = document.getElementById("presenterAuctionImageBox")
-  const btn = document.getElementById("presenterAuctionPlayVideoBtn")
-  if (!box || !btn) return
 
-  const video = box.querySelector("video")
-  const hasVideo = !!video
-
-  btn.classList.toggle("hidden", !hasVideo)
-
-  if (video) {
-    video.removeAttribute("controls")
-    video.pause()
-  }
-}
 
 function playPresenterAuctionVideo() {
   const box = document.getElementById("presenterAuctionImageBox")
@@ -1912,6 +1912,73 @@ async function playAuctionVideoOnDisplay() {
   if (!sent) return
 
   showToast("تم تشغيل الفيديو في العرض")
+}
+
+function getPresenterAuctionCurrentMediaType() {
+  const auctionRoot = getPresenterAuctionState()
+  const auction = getPresenterAuctionData()
+  const currentNumber = Number(auction.currentQuestionNumber || 0)
+
+  if (
+    auctionRoot.currentAuctionVideo ||
+    auctionRoot.video
+  ) {
+    return "video"
+  }
+
+  if (
+    auctionRoot.currentAuctionImage ||
+    auctionRoot.image
+  ) {
+    return "image"
+  }
+
+  const item = presenterAuctionRows.find(row => Number(row.number) === currentNumber)
+
+  if (item?.video) return "video"
+  if (item?.image) return "image"
+
+  return ""
+}
+
+function updatePresenterAuctionMediaActionButton() {
+  const btn = document.getElementById("presenterAuctionMediaActionBtn")
+  if (!btn) return
+
+  const auction = getPresenterAuctionData()
+  const currentNumber = Number(auction.currentQuestionNumber || 0)
+  const mediaType = getPresenterAuctionCurrentMediaType()
+
+  if (!currentNumber || !mediaType) {
+    btn.disabled = true
+    btn.innerText = "تكبير"
+    return
+  }
+
+  btn.disabled = false
+
+  if (mediaType === "video") {
+    btn.innerText = "▶ تشغيل الفيديو"
+    return
+  }
+
+  btn.innerText = "تكبير"
+}
+
+function runPresenterAuctionMediaAction() {
+  const mediaType = getPresenterAuctionCurrentMediaType()
+
+  if (mediaType === "video") {
+    sendCommand("playAuctionVideo")
+    return
+  }
+
+  if (mediaType === "image") {
+    sendCommand("zoomImage")
+    return
+  }
+
+  showToast("لا توجد صورة أو فيديو")
 }
 
 function openAuctionPresenterNumber(number) {
@@ -1951,7 +2018,7 @@ function renderPresenterAuctionMedia(box, mediaUrl) {
       ></video>
     `
 
-    setTimeout(ensurePresenterAuctionVideoButton, 80)
+    
     return
   }
 
@@ -1972,7 +2039,7 @@ function renderPresenterAuctionMedia(box, mediaUrl) {
   video.onloadedmetadata = () => {
     loadedAsVideo = true
     video.muted = false
-    setTimeout(ensurePresenterAuctionVideoButton, 80)
+    
   }
 
   video.onerror = () => {
@@ -1982,7 +2049,7 @@ function renderPresenterAuctionMedia(box, mediaUrl) {
       <img src="${safeUrl}" alt="">
     `
 
-    setTimeout(ensurePresenterAuctionVideoButton, 80)
+    
   }
 
   setTimeout(() => {
@@ -1993,7 +2060,7 @@ function renderPresenterAuctionMedia(box, mediaUrl) {
         <img src="${safeUrl}" alt="">
       `
 
-      setTimeout(ensurePresenterAuctionVideoButton, 80)
+      
     }
   }, 700)
 }
@@ -2009,12 +2076,14 @@ function showPresenterAuctionPreview(number) {
   }
 
   if (imageBox) {
-    if (item?.image) {
-      renderPresenterAuctionMedia(imageBox, item.image)
+    const media = item?.video || item?.image || ""
+
+    if (media) {
+      renderPresenterAuctionMedia(imageBox, media)
     } else {
       imageBox.classList.add("hidden")
       imageBox.innerHTML = ""
-      setTimeout(ensurePresenterAuctionVideoButton, 80)
+      updatePresenterAuctionMediaActionButton()
     }
   }
 }
@@ -2069,9 +2138,11 @@ function refreshPresenterAuctionFromState() {
     ""
 
   const image =
-    auctionRoot.currentAuctionImage ||
-    auctionRoot.image ||
-    ""
+  auctionRoot.currentAuctionVideo ||
+  auctionRoot.video ||
+  auctionRoot.currentAuctionImage ||
+  auctionRoot.image ||
+  ""
 
   if (currentNumber) {
     if (answerBox) {
@@ -2084,7 +2155,7 @@ function refreshPresenterAuctionFromState() {
       } else {
         imageBox.classList.add("hidden")
         imageBox.innerHTML = ""
-        setTimeout(ensurePresenterAuctionVideoButton, 80)
+        
       }
     }
   } else {
@@ -2095,7 +2166,7 @@ function refreshPresenterAuctionFromState() {
     if (imageBox) {
       imageBox.classList.add("hidden")
       imageBox.innerHTML = ""
-      setTimeout(ensurePresenterAuctionVideoButton, 80)
+      
     }
   }
 
@@ -2107,7 +2178,7 @@ function refreshPresenterAuctionFromState() {
     doubleBtn.disabled = !!currentNumber || !!pendingScore
   }
 
-  setTimeout(ensurePresenterAuctionVideoButton, 80)
+  updatePresenterAuctionMediaActionButton()
 }
 /* =========================
    WHO
@@ -2249,7 +2320,7 @@ async function renderWho() {
 
   const { data } = await db
     .from("who_images")
-    .select("number, answer, image")
+    .select("number, answer, image, video")
     .eq("model", presenterModel)
     .order("number", { ascending: true })
 
