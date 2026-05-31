@@ -4431,3 +4431,246 @@ button{
     background:#000;
   }
 }
+/* =========================================================
+   FORCE FIX - FINAL ROUND 1 PRESENTER
+   إصلاح إجباري للجولة الأولى في الفاصلة
+========================================================= */
+
+@media (min-width:700px) and (max-width:1200px) and (orientation:landscape){
+
+  body.presenterFinalRound1FocusMode .presenterFinalLayout,
+  .presenterFinalLayout{
+    width:100%;
+    height:100%;
+    display:grid;
+    grid-template-columns:1.04fr .96fr;
+    gap:12px;
+    direction:ltr;
+    overflow:hidden;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalLeft,
+  .presenterFinalLeft{
+    direction:rtl;
+    min-width:0;
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+
+    display:grid;
+    grid-template-rows:minmax(0,1fr) 128px;
+    gap:10px;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalRight,
+  .presenterFinalRight{
+    direction:rtl;
+    min-width:0;
+    height:100%;
+    min-height:0;
+    overflow:hidden;
+
+    display:grid;
+    grid-template-rows:58px minmax(0,1fr);
+    gap:10px;
+  }
+
+  /* الأرقام */
+  body.presenterFinalRound1FocusMode .presenterFinalNumbersCard,
+  .presenterFinalNumbersCard{
+    height:100%;
+    min-height:0;
+    padding:14px;
+    border-radius:24px;
+    overflow:hidden;
+
+    display:grid;
+    grid-template-rows:18px minmax(0,1fr);
+    gap:12px;
+  }
+
+  body.presenterFinalRound1FocusMode #presenterFinalNumbers.presenterGrid,
+  #presenterFinalNumbers.presenterGrid{
+    height:100%;
+    min-height:0;
+
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-rows:repeat(2,64px);
+    align-content:center;
+    gap:10px;
+    direction:rtl;
+    overflow:hidden;
+  }
+
+  body.presenterFinalRound1FocusMode #presenterFinalNumbers .presenterNumberBtn,
+  #presenterFinalNumbers .presenterNumberBtn{
+    height:64px;
+    min-height:64px;
+    border-radius:20px;
+    font-size:1.6rem;
+    font-weight:900;
+  }
+
+  /* منطقة أزرار التحكم */
+  body.presenterFinalRound1FocusMode .presenterFinalControlsArea,
+  .presenterFinalControlsArea{
+    height:128px;
+    min-height:128px;
+    max-height:128px;
+    overflow:hidden;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows,
+  .presenterFinalRound1TwoRows{
+    height:128px;
+    min-height:128px;
+    max-height:128px;
+
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    grid-template-rows:60px 60px;
+    gap:8px;
+    margin:0;
+    overflow:hidden;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn,
+  .presenterFinalRound1TwoRows .presenterBtn{
+    width:100%;
+    height:60px;
+    min-height:60px;
+    max-height:60px;
+
+    border-radius:16px;
+    padding:5px 6px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:.74rem;
+    line-height:1.12;
+    font-weight:900;
+    text-align:center;
+
+    white-space:normal;
+    overflow:hidden;
+    text-overflow:clip;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn:nth-child(7),
+  .presenterFinalRound1TwoRows .presenterBtn:nth-child(7){
+    grid-column:3 / 5;
+  }
+
+  /* ألوان الأزرار */
+  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn.green,
+  .presenterFinalRound1TwoRows .presenterBtn.green{
+    background:linear-gradient(180deg,#22C55E,#15803D);
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn.red,
+  .presenterFinalRound1TwoRows .presenterBtn.red{
+    background:linear-gradient(180deg,#EF4444,#DC2626);
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn.blue,
+  .presenterFinalRound1TwoRows .presenterBtn.blue{
+    background:linear-gradient(180deg,#06B6D4,#0891B2);
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn.gray,
+  .presenterFinalRound1TwoRows .presenterBtn.gray{
+    background:linear-gradient(180deg,#64748B,#475569);
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalRound1TwoRows .presenterBtn:disabled,
+  .presenterFinalRound1TwoRows .presenterBtn:disabled{
+    background:#DDD6FE;
+    color:#7C7896;
+    box-shadow:none;
+    opacity:.82;
+  }
+
+  /* إلغاء مربع الجولة والرقم */
+  body.presenterFinalRound1FocusMode .presenterFinalRoundHeader,
+  body.presenterFinalRound1FocusMode .presenterFinalPreviewNumber,
+  .presenterFinalRoundHeader,
+  .presenterFinalPreviewNumber{
+    display:none;
+  }
+
+  /* مربع الإجابة يمين */
+  body.presenterFinalRound1FocusMode .presenterFinalPreviewCard,
+  .presenterFinalPreviewCard{
+    height:100%;
+    min-height:0;
+    padding:12px;
+    border-radius:24px;
+    overflow:hidden;
+    display:block;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalPreviewBox,
+  .presenterFinalPreviewBox{
+    width:100%;
+    height:100%;
+    min-height:0;
+    border-radius:22px;
+    padding:12px;
+    overflow:hidden;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalOnlyAnswerView,
+  .presenterFinalOnlyAnswerView{
+    width:100%;
+    height:100%;
+    min-height:0;
+
+    display:grid;
+    grid-template-rows:22px minmax(0,1fr);
+    gap:10px;
+    overflow:hidden;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalOnlyAnswerLabel,
+  .presenterFinalOnlyAnswerLabel{
+    height:22px;
+    margin:0;
+    color:#64748B;
+    font-size:.82rem;
+    line-height:1;
+    font-weight:900;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalOnlyAnswerText,
+  .presenterFinalOnlyAnswerText{
+    width:100%;
+    height:100%;
+    min-height:0;
+
+    border-radius:22px;
+    padding:18px 20px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+      radial-gradient(circle at 16% 0%, rgba(15,118,110,.07), transparent 44%),
+      linear-gradient(180deg, rgba(255,255,255,.86), rgba(240,253,250,.68));
+
+    border:1px solid rgba(15,118,110,.14);
+
+    color:#0F766E;
+    font-size:clamp(1.05rem, 2.1vw, 1.48rem);
+    line-height:1.32;
+    font-weight:900;
+    text-align:center;
+
+    overflow:hidden;
+    word-break:normal;
+    overflow-wrap:break-word;
+  }
+}
