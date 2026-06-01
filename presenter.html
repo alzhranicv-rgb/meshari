@@ -3,9 +3,14 @@
 <head>
   <meta charset="UTF-8" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, 
-      viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0"
+  />
 
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
   <title>الحنكة - لوحة المقدم</title>
 
@@ -151,28 +156,39 @@
   <script src="presenter.js"></script>
 
   <script>
+  /* =========================
+     Device Mode Detection
+     Samsung A11 + Tablet Support
+  ========================= */
   function updatePresenterDeviceMode() {
-    const width = window.innerWidth
+    const width  = window.innerWidth
     const height = window.innerHeight
     const isLandscape = width > height
 
-    const isPhone = width < 700
+    const isPhone  = width < 700
     const isTablet = width >= 700 && width <= 1400
 
-    document.body.classList.toggle("phonePresenterMode", isPhone)
-    document.body.classList.toggle("tabletPortraitPresenterMode", isTablet && !isLandscape)
-    document.body.classList.toggle("tabletLandscapePresenterMode", isTablet && isLandscape)
-    
-    document.body.classList.toggle("tabletPresenterMode", isTablet)
+    // Samsung A11 specific (720px = ~360 CSS px at 2x DPR)
+    const isA11Range = width <= 390
+
+    document.body.classList.toggle("phonePresenterMode",            isPhone)
+    document.body.classList.toggle("a11PresenterMode",              isA11Range)
+    document.body.classList.toggle("tabletPortraitPresenterMode",   isTablet && !isLandscape)
+    document.body.classList.toggle("tabletLandscapePresenterMode",  isTablet && isLandscape)
+    document.body.classList.toggle("tabletPresenterMode",           isTablet)
+
+    // Fix 100dvh on older Android WebView
+    document.documentElement.style.setProperty(
+      "--vh", (window.innerHeight * 0.01) + "px"
+    )
   }
 
-  window.addEventListener("load", updatePresenterDeviceMode)
-  window.addEventListener("resize", updatePresenterDeviceMode)
-
+  window.addEventListener("load",             updatePresenterDeviceMode)
+  window.addEventListener("resize",           updatePresenterDeviceMode)
   window.addEventListener("orientationchange", () => {
     setTimeout(updatePresenterDeviceMode, 300)
   })
-</script>
+  </script>
 
 </body>
 </html>
