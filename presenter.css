@@ -1758,10 +1758,164 @@ button:disabled{
     grid-template-columns:1fr;
   }
 }
+/* =========================================================
+   WARMUP FIX - Header + Question/Answer readability
+   ضعه قبل FINAL VISIBILITY FIX
+========================================================= */
 
+@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape){
+
+  /* تصغير هيدر الفقرة */
+  .presenterCleanHeader{
+    min-height:62px;
+    padding:7px;
+    grid-template-columns:112px minmax(0,1fr) 112px;
+    gap:8px;
+    border-radius:22px;
+  }
+
+  .presenterCleanHeaderBtn,
+  .presenterCleanHeaderTitle{
+    min-height:48px;
+    border-radius:16px;
+  }
+
+  .presenterCleanHeaderBtn{
+    font-size:.86rem;
+    padding:6px 8px;
+  }
+
+  .presenterCleanHeaderTitle h1{
+    font-size:1.42rem;
+    line-height:1;
+  }
+
+  /* إعطاء مساحة أكبر لمحتوى التسخين */
+  .presenterPanel{
+    max-width:1080px;
+    flex:1;
+    min-height:0;
+  }
+
+  .presenterWarmupLayout{
+    height:100%;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  /* ترتيب يمين التسخين */
+  .presenterWarmupRight{
+    grid-template-rows:54px minmax(0,1fr) 52px;
+    gap:8px;
+  }
+
+  .presenterWarmupTeamsBox{
+    height:54px;
+    min-height:54px;
+  }
+
+  .presenterWarmupTeamsBox .presenterBtn,
+  .presenterTeams .presenterBtn{
+    height:52px;
+    min-height:52px;
+    font-size:.92rem;
+    border-radius:17px;
+  }
+
+  /* كرت السؤال والإجابة */
+  .presenterWarmupPreviewCard{
+    padding:10px;
+    border-radius:22px;
+
+    display:grid;
+    grid-template-rows:16px minmax(0,1.18fr) 16px minmax(0,1fr);
+    gap:8px;
+  }
+
+  .presenterWarmupPreviewCard .presenterLabel{
+    height:16px;
+    font-size:.78rem;
+    line-height:1;
+  }
+
+  /* تكبير خط السؤال */
+  #presenterWarmupQuestionText,
+  .presenterBigQuestionBody{
+    min-height:0;
+    height:100%;
+
+    padding:10px 14px;
+    border-radius:18px;
+
+    font-size:1.32rem;
+    line-height:1.38;
+    font-weight:900;
+
+    color:#1E1B4B;
+  }
+
+  /* تكبير خط الإجابة */
+  #presenterWarmupAnswerText,
+  .presenterBigAnswerBody{
+    min-height:0;
+    height:100%;
+
+    padding:10px 14px;
+    border-radius:18px;
+
+    font-size:1.42rem;
+    line-height:1.32;
+    font-weight:900;
+
+    color:#0F766E;
+  }
+
+  /* أزرار التحكم */
+  .presenterWarmupActions{
+    height:52px;
+    min-height:52px;
+    gap:8px;
+  }
+
+  .presenterWarmupActions .presenterBtn{
+    height:52px;
+    min-height:52px;
+    border-radius:16px;
+    font-size:.82rem;
+  }
+}
+
+/* للشاشات الأقل ارتفاعًا */
+@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
+
+  .presenterCleanHeader{
+    min-height:56px;
+  }
+
+  .presenterCleanHeaderBtn,
+  .presenterCleanHeaderTitle{
+    min-height:42px;
+  }
+
+  .presenterCleanHeaderTitle h1{
+    font-size:1.24rem;
+  }
+
+  #presenterWarmupQuestionText,
+  .presenterBigQuestionBody{
+    font-size:1.18rem;
+    line-height:1.32;
+  }
+
+  #presenterWarmupAnswerText,
+  .presenterBigAnswerBody{
+    font-size:1.28rem;
+    line-height:1.28;
+  }
+}
 /* =========================================================
    FINAL VISIBILITY FIX
-   لازم يكون آخر شيء في الملف
+   لا تضع أي كود بعد هذا البلوك
 ========================================================= */
 
 body .hidden{
