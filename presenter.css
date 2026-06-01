@@ -1819,6 +1819,770 @@ button:disabled{
     grid-template-columns:1fr;
   }
 }
+
+/* =========================================================
+   PRESENTER TOP 10
+   Galaxy Tab A 11 Landscape - Clean Low Lag Version
+   ضعه قبل FINAL VISIBILITY FIX
+========================================================= */
+
+/* =========================================================
+   TOP10 LAYOUT
+========================================================= */
+
+.presenterTop10Layout{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+
+  direction:ltr;
+  overflow:hidden;
+}
+
+.presenterTop10Left,
+.presenterTop10Right{
+  direction:rtl;
+  min-width:0;
+  height:100%;
+  min-height:0;
+  overflow:hidden;
+}
+
+/* =========================================================
+   LEFT SIDE - ANSWERS
+========================================================= */
+
+.presenterTop10AnswersCard{
+  height:100%;
+  min-height:0;
+
+  padding:10px;
+
+  display:grid;
+  grid-template-rows:18px minmax(0,1fr);
+  gap:8px;
+
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.10);
+
+  box-shadow:
+    0 8px 18px rgba(31,41,55,.08),
+    inset 0 1px 0 rgba(255,255,255,.14);
+
+  overflow:hidden;
+}
+
+.presenterTop10AnswersCard > .presenterLabel{
+  height:18px;
+  display:flex;
+  align-items:center;
+
+  margin:0;
+  color:#64748B;
+  font-size:.78rem;
+  line-height:1;
+  font-weight:900;
+}
+
+/* عمودين: 1-5 يمين / 6-10 يسار */
+.presenterTop10AnswersCols{
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+
+  overflow:hidden;
+}
+
+.presenterTop10AnswersCol,
+.presenterTop10RightCol,
+.presenterTop10LeftCol{
+  min-width:0;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:repeat(5,minmax(0,1fr));
+  gap:7px;
+
+  overflow:hidden;
+}
+
+/* =========================
+   Answer Button
+========================= */
+
+.presenterTop10AnswerBtn{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  padding:6px 7px;
+
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) 58px;
+  gap:7px;
+  align-items:center;
+
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.18);
+
+  background:linear-gradient(180deg,#0891B2,#0F4C5C);
+
+  color:#FFFFFF;
+
+  box-shadow:
+    0 7px 14px rgba(8,145,178,.14),
+    inset 0 1px 0 rgba(255,255,255,.14);
+
+  overflow:hidden;
+}
+
+.presenterTop10AnswerBtn:active:not(:disabled){
+  transform:scale(.97);
+}
+
+.presenterTop10AnswerNo{
+  width:30px;
+  height:30px;
+  min-width:30px;
+
+  border-radius:12px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(255,255,255,.18);
+
+  color:#FFFFFF;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:.92rem;
+  line-height:1.15;
+  font-weight:400;
+
+  overflow:hidden;
+}
+
+.presenterTop10AnswerText{
+  min-width:0;
+
+  color:#FFFFFF;
+
+  font-size:.9rem;
+  line-height:1.25;
+  font-weight:900;
+  text-align:right;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.presenterTop10OpenedBy{
+  min-width:0;
+
+  color:rgba(255,255,255,.82);
+
+  font-size:.58rem;
+  line-height:1.15;
+  font-weight:900;
+  text-align:center;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* الإجابة المفتوحة */
+.presenterTop10AnswerBtn.opened{
+  background:linear-gradient(180deg, rgba(236,254,255,.84), rgba(207,250,254,.54));
+  border-color:rgba(103,232,249,.34);
+
+  box-shadow:
+    0 5px 10px rgba(8,145,178,.06),
+    inset 0 1px 0 rgba(255,255,255,.70);
+
+  opacity:1;
+  filter:none;
+}
+
+.presenterTop10AnswerBtn.opened .presenterTop10AnswerNo{
+  background:rgba(255,255,255,.62);
+  color:#0F4C5C;
+}
+
+.presenterTop10AnswerBtn.opened .presenterTop10AnswerText{
+  color:#0F4C5C;
+}
+
+.presenterTop10AnswerBtn.opened .presenterTop10OpenedBy{
+  color:#64748B;
+}
+
+/* =========================================================
+   RIGHT SIDE
+========================================================= */
+
+.presenterTop10Right{
+  display:grid;
+  grid-template-rows:54px 142px minmax(104px,auto);
+  gap:8px;
+}
+
+/* =========================
+   Teams
+========================= */
+
+.presenterTop10TeamsBox{
+  height:54px;
+  min-height:54px;
+  overflow:hidden;
+}
+
+.presenterTop10TeamsBox .presenterCard{
+  height:100%;
+  padding:0;
+
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+
+.presenterTop10TeamsBox .presenterLabel{
+  display:none;
+}
+
+.presenterTop10TeamsBox .presenterTeams{
+  width:100%;
+  height:100%;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.presenterTop10TeamsBox .presenterBtn{
+  height:52px;
+  min-height:52px;
+
+  border-radius:17px;
+  padding:7px 9px;
+
+  color:#24185E;
+
+  background:linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,255,255,.50));
+  border:1px solid rgba(255,255,255,.32);
+
+  font-size:.9rem;
+  line-height:1.25;
+  font-weight:900;
+
+  box-shadow:
+    0 7px 14px rgba(30,27,75,.10),
+    inset 0 1px 0 rgba(255,255,255,.14);
+
+  overflow:hidden;
+}
+
+.presenterTop10TeamsBox .presenterBtn.selectedPresenterTeam,
+.presenterTop10TeamsBox .presenterBtn.activeTeam{
+  background:linear-gradient(180deg, #FFE6D4, rgba(255,255,255,.68));
+  border-color:rgba(255,155,81,.48);
+
+  box-shadow:
+    0 0 0 3px rgba(255,155,81,.14),
+    0 8px 16px rgba(249,115,22,.10),
+    inset 0 1px 0 rgba(255,255,255,.62);
+}
+
+/* =========================================================
+   QUESTION CARD
+========================================================= */
+
+.presenterTop10QuestionCard{
+  height:142px;
+  min-height:142px;
+
+  padding:8px;
+
+  display:grid;
+  grid-template-rows:42px minmax(0,1fr);
+  gap:7px;
+
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.10);
+
+  box-shadow:
+    0 8px 18px rgba(31,41,55,.08),
+    inset 0 1px 0 rgba(255,255,255,.14);
+
+  overflow:hidden;
+}
+
+/* =========================
+   Round / Errors
+========================= */
+
+.presenterTop10StatusTop{
+  height:42px;
+  min-height:42px;
+
+  display:grid;
+  grid-template-columns:66px minmax(0,1fr);
+  gap:7px;
+
+  margin:0;
+  overflow:hidden;
+}
+
+.presenterTop10RoundMini,
+.presenterTop10ErrorMiniBox{
+  height:42px;
+  min-height:0;
+
+  padding:4px 6px;
+
+  border-radius:15px;
+  border:1px solid rgba(255,255,255,.18);
+
+  background:rgba(255,255,255,.14);
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
+
+  overflow:hidden;
+}
+
+.presenterTop10RoundMini span,
+.presenterTop10ErrorMiniBox span{
+  color:#64748B;
+
+  font-size:.52rem;
+  line-height:1;
+  font-weight:900;
+
+  white-space:nowrap;
+}
+
+.presenterTop10RoundMini strong,
+.presenterTop10ErrorMiniBox strong{
+  color:#24185E;
+
+  font-size:.86rem;
+  line-height:1.1;
+  font-weight:900;
+
+  white-space:nowrap;
+}
+
+.presenterTop10ErrorsMini{
+  min-width:0;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+
+  overflow:hidden;
+}
+
+/* =========================
+   Question Text
+========================= */
+
+.presenterTop10QuestionClear{
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:14px minmax(0,1fr);
+  gap:6px;
+
+  margin:0;
+  overflow:hidden;
+}
+
+.presenterTop10QuestionClear .presenterLabel{
+  height:14px;
+
+  display:flex;
+  align-items:center;
+
+  margin:0;
+  color:#64748B;
+  font-size:.7rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.presenterTop10QuestionText,
+#presenterTop10QuestionText{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  padding:8px 12px;
+
+  border-radius:16px;
+  border:1px solid rgba(124,58,237,.12);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(250,248,255,.72));
+
+  color:#1E1B4B;
+
+  font-size:1.08rem;
+  line-height:1.34;
+  font-weight:900;
+  text-align:center;
+
+  overflow:hidden;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+.presenterTop10Actions{
+  height:104px;
+  min-height:104px;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(2,48px);
+  gap:8px;
+
+  overflow:hidden;
+}
+
+.presenterTop10Actions .presenterBtn{
+  width:100%;
+  height:48px;
+  min-height:48px;
+
+  border-radius:15px;
+
+  padding:6px 7px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#FFFFFF;
+
+  font-size:.72rem;
+  line-height:1.15;
+  font-weight:900;
+  text-align:center;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  box-shadow:
+    0 7px 14px rgba(30,27,75,.12),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+.presenterTop10Actions .presenterBtn:active:not(:disabled){
+  transform:scale(.96);
+}
+
+/* دوبيلا */
+.presenterTop10Actions .presenterBtn.gray:first-child,
+.presenterTop10Actions .presenterDoubleBtn,
+.presenterTop10Actions .top10DoubleBtn{
+  background:linear-gradient(180deg,#FB7185,#F97316);
+}
+
+/* إظهار الإجابات */
+.presenterTop10Actions .presenterBtn.green,
+.presenterTop10Actions .btnAnswer{
+  background:linear-gradient(180deg,#22C55E,#15803D);
+}
+
+/* خطأ */
+.presenterTop10Actions .presenterBtn.red,
+.presenterTop10Actions .top10ErrorBtnSingle{
+  background:linear-gradient(180deg,#EF4444,#DC2626);
+}
+
+/* تراجع */
+.presenterTop10Actions .presenterBtn.gray:nth-child(4),
+.presenterTop10Actions .undoBtn{
+  background:linear-gradient(180deg,#991B1B,#7F1D1D);
+}
+
+/* تبديل الدور / الجولة التالية */
+.presenterTop10Actions .presenterBtn.blue,
+.presenterTop10Actions .presenterBtn.dark,
+.presenterTop10Actions .switchTurnBtn,
+.presenterTop10Actions .roundNavBtn{
+  background:linear-gradient(180deg,#312E81,#1E1B4B);
+}
+
+.presenterTop10Actions .presenterBtn:disabled{
+  background:#DDD6FE;
+  color:#7C7896;
+  box-shadow:none;
+  opacity:.82;
+}
+
+/* =========================================================
+   REMOVE EXTRA LAYERS - TOP10
+========================================================= */
+
+.presenterTop10Layout::before,
+.presenterTop10Layout::after,
+.presenterTop10AnswersCard::before,
+.presenterTop10AnswersCard::after,
+.presenterTop10AnswerBtn::before,
+.presenterTop10AnswerBtn::after,
+.presenterTop10QuestionCard::before,
+.presenterTop10QuestionCard::after,
+.presenterTop10RoundMini::before,
+.presenterTop10RoundMini::after,
+.presenterTop10ErrorMiniBox::before,
+.presenterTop10ErrorMiniBox::after,
+.presenterTop10QuestionText::before,
+.presenterTop10QuestionText::after,
+#presenterTop10QuestionText::before,
+#presenterTop10QuestionText::after,
+.presenterTop10Actions .presenterBtn::before,
+.presenterTop10Actions .presenterBtn::after{
+  content:none;
+  display:none;
+}
+
+/* =========================================================
+   TOP10 - Compact Height
+========================================================= */
+
+@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
+
+  .presenterTop10Layout{
+    gap:8px;
+  }
+
+  .presenterTop10AnswersCard{
+    padding:8px;
+    border-radius:19px;
+    grid-template-rows:16px minmax(0,1fr);
+    gap:6px;
+  }
+
+  .presenterTop10AnswersCard > .presenterLabel{
+    height:16px;
+    font-size:.7rem;
+  }
+
+  .presenterTop10AnswersCols{
+    gap:7px;
+  }
+
+  .presenterTop10AnswersCol,
+  .presenterTop10RightCol,
+  .presenterTop10LeftCol{
+    gap:6px;
+  }
+
+  .presenterTop10AnswerBtn{
+    padding:5px 6px;
+    grid-template-columns:30px minmax(0,1fr) 50px;
+    gap:6px;
+    border-radius:14px;
+  }
+
+  .presenterTop10AnswerNo{
+    width:26px;
+    height:26px;
+    min-width:26px;
+    border-radius:10px;
+    font-size:.78rem;
+  }
+
+  .presenterTop10AnswerText{
+    font-size:.78rem;
+    line-height:1.22;
+  }
+
+  .presenterTop10OpenedBy{
+    font-size:.5rem;
+  }
+
+  .presenterTop10Right{
+    grid-template-rows:50px 128px 98px;
+    gap:7px;
+  }
+
+  .presenterTop10TeamsBox{
+    height:50px;
+    min-height:50px;
+  }
+
+  .presenterTop10TeamsBox .presenterBtn{
+    height:48px;
+    min-height:48px;
+    border-radius:15px;
+    font-size:.8rem;
+  }
+
+  .presenterTop10QuestionCard{
+    height:128px;
+    min-height:128px;
+    padding:7px;
+    border-radius:18px;
+    grid-template-rows:38px minmax(0,1fr);
+    gap:6px;
+  }
+
+  .presenterTop10StatusTop{
+    height:38px;
+    min-height:38px;
+    grid-template-columns:58px minmax(0,1fr);
+    gap:6px;
+  }
+
+  .presenterTop10RoundMini,
+  .presenterTop10ErrorMiniBox{
+    height:38px;
+    border-radius:13px;
+    padding:3px 5px;
+  }
+
+  .presenterTop10RoundMini span,
+  .presenterTop10ErrorMiniBox span{
+    font-size:.48rem;
+  }
+
+  .presenterTop10RoundMini strong,
+  .presenterTop10ErrorMiniBox strong{
+    font-size:.76rem;
+  }
+
+  .presenterTop10ErrorsMini{
+    gap:6px;
+  }
+
+  .presenterTop10QuestionClear{
+    grid-template-rows:12px minmax(0,1fr);
+    gap:5px;
+  }
+
+  .presenterTop10QuestionClear .presenterLabel{
+    height:12px;
+    font-size:.62rem;
+  }
+
+  .presenterTop10QuestionText,
+  #presenterTop10QuestionText{
+    padding:7px 10px;
+    border-radius:14px;
+    font-size:.92rem;
+    line-height:1.28;
+  }
+
+  .presenterTop10Actions{
+    height:98px;
+    min-height:98px;
+    grid-template-rows:repeat(2,45px);
+    gap:7px;
+  }
+
+  .presenterTop10Actions .presenterBtn{
+    height:45px;
+    min-height:45px;
+    border-radius:14px;
+    font-size:.64rem;
+    padding:5px 6px;
+  }
+}
+
+/* =========================================================
+   TOP10 - Portrait / Small Fallback
+========================================================= */
+
+@media screen and (max-width:799px), screen and (orientation:portrait){
+
+  .presenterTop10Layout{
+    height:auto;
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+
+    overflow:visible;
+  }
+
+  .presenterTop10Left,
+  .presenterTop10Right{
+    height:auto;
+    overflow:visible;
+  }
+
+  .presenterTop10AnswersCard{
+    height:auto;
+  }
+
+  .presenterTop10AnswersCols{
+    height:auto;
+    grid-template-columns:1fr;
+  }
+
+  .presenterTop10AnswersCol,
+  .presenterTop10RightCol,
+  .presenterTop10LeftCol{
+    height:auto;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .presenterTop10AnswerBtn{
+    min-height:56px;
+  }
+
+  .presenterTop10Right{
+    display:flex;
+    flex-direction:column;
+  }
+
+  .presenterTop10TeamsBox{
+    height:auto;
+  }
+
+  .presenterTop10QuestionCard{
+    height:auto;
+    min-height:150px;
+  }
+
+  .presenterTop10Actions{
+    height:auto;
+    grid-template-columns:1fr;
+    grid-template-rows:auto;
+  }
+
+  .presenterTop10Actions .presenterBtn{
+    height:52px;
+    min-height:52px;
+  }
+}
+
 /* =========================================================
    FINAL VISIBILITY FIX
    لا تضع أي كود بعد هذا البلوك
