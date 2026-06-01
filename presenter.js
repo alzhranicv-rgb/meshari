@@ -1393,8 +1393,8 @@ function refreshPresenterWarmupFromState() {
   }
 
   const doubleBtn = document.querySelector(
-    `.presenterActions .presenterBtn.gray[onclick="sendCommand('double')"]`
-  )
+  `.presenterWarmupActions .presenterBtn.gray[onclick="sendCommand('double')"]`
+)
 
   if (doubleBtn) {
     doubleBtn.disabled = !!locked || !!currentKey
