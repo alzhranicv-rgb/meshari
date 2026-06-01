@@ -1821,14 +1821,14 @@ button:disabled{
 }
 
 /* =========================================================
-   PRESENTER TOP 10
-   Galaxy Tab A 11 Landscape - Clean Low Lag Version
+   PRESENTER TOP 10 - PRO DASHBOARD
+   Galaxy Tab A 11 Landscape - Clean / Modern / Low Lag
    ضعه قبل FINAL VISIBILITY FIX
 ========================================================= */
 
-/* =========================================================
-   TOP10 LAYOUT
-========================================================= */
+/* =========================
+   Top10 Layout
+========================= */
 
 .presenterTop10Layout{
   width:100%;
@@ -1836,8 +1836,8 @@ button:disabled{
   min-height:0;
 
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
+  grid-template-columns:1.12fr .88fr;
+  gap:12px;
 
   direction:ltr;
   overflow:hidden;
@@ -1852,51 +1852,64 @@ button:disabled{
   overflow:hidden;
 }
 
-/* =========================================================
-   LEFT SIDE - ANSWERS
-========================================================= */
+/* =========================
+   Left: Answers Bank
+========================= */
 
 .presenterTop10AnswersCard{
   height:100%;
   min-height:0;
 
-  padding:10px;
+  padding:14px;
 
   display:grid;
-  grid-template-rows:18px minmax(0,1fr);
-  gap:8px;
+  grid-template-rows:32px minmax(0,1fr);
+  gap:12px;
 
-  border-radius:22px;
-  border:1px solid rgba(255,255,255,.16);
-  background:rgba(255,255,255,.10);
+  border-radius:26px;
+  border:1px solid rgba(30,41,59,.10);
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.82), rgba(248,250,252,.66));
 
   box-shadow:
-    0 8px 18px rgba(31,41,55,.08),
-    inset 0 1px 0 rgba(255,255,255,.14);
+    0 14px 28px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.80);
 
   overflow:hidden;
 }
 
 .presenterTop10AnswersCard > .presenterLabel{
-  height:18px;
+  height:32px;
+
   display:flex;
   align-items:center;
 
   margin:0;
-  color:#64748B;
-  font-size:.78rem;
+
+  color:#1E293B;
+  font-size:1rem;
   line-height:1;
   font-weight:900;
 }
 
-/* عمودين: 1-5 يمين / 6-10 يسار */
+.presenterTop10AnswersCard > .presenterLabel::before{
+  content:"";
+  width:8px;
+  height:22px;
+  margin-left:8px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#67E8F9,#06B6D4);
+}
+
+/* 5 يمين + 5 يسار */
 .presenterTop10AnswersCols{
   height:100%;
   min-height:0;
 
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:8px;
+  gap:10px;
 
   overflow:hidden;
 }
@@ -1910,13 +1923,13 @@ button:disabled{
 
   display:grid;
   grid-template-rows:repeat(5,minmax(0,1fr));
-  gap:7px;
+  gap:9px;
 
   overflow:hidden;
 }
 
 /* =========================
-   Answer Button
+   Answer Buttons
 ========================= */
 
 .presenterTop10AnswerBtn{
@@ -1924,23 +1937,24 @@ button:disabled{
   height:100%;
   min-height:0;
 
-  padding:6px 7px;
+  padding:8px 9px;
 
   display:grid;
-  grid-template-columns:34px minmax(0,1fr) 58px;
-  gap:7px;
+  grid-template-columns:38px minmax(0,1fr) 64px;
+  gap:8px;
   align-items:center;
 
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.18);
+  border-radius:18px;
+  border:1px solid rgba(14,116,144,.18);
 
-  background:linear-gradient(180deg,#0891B2,#0F4C5C);
+  background:
+    linear-gradient(180deg,#0E7490,#164E63);
 
   color:#FFFFFF;
 
   box-shadow:
-    0 7px 14px rgba(8,145,178,.14),
-    inset 0 1px 0 rgba(255,255,255,.14);
+    0 9px 18px rgba(14,116,144,.16),
+    inset 0 1px 0 rgba(255,255,255,.16);
 
   overflow:hidden;
 }
@@ -1950,23 +1964,24 @@ button:disabled{
 }
 
 .presenterTop10AnswerNo{
-  width:30px;
-  height:30px;
-  min-width:30px;
+  width:34px;
+  height:34px;
+  min-width:34px;
 
-  border-radius:12px;
+  border-radius:13px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
   background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.14);
 
   color:#FFFFFF;
 
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:.92rem;
-  line-height:1.15;
+  font-size:1rem;
+  line-height:1.1;
   font-weight:400;
 
   overflow:hidden;
@@ -1977,8 +1992,8 @@ button:disabled{
 
   color:#FFFFFF;
 
-  font-size:.9rem;
-  line-height:1.25;
+  font-size:1.04rem;
+  line-height:1.28;
   font-weight:900;
   text-align:right;
 
@@ -1990,10 +2005,10 @@ button:disabled{
 .presenterTop10OpenedBy{
   min-width:0;
 
-  color:rgba(255,255,255,.82);
+  color:rgba(255,255,255,.76);
 
-  font-size:.58rem;
-  line-height:1.15;
+  font-size:.66rem;
+  line-height:1.1;
   font-weight:900;
   text-align:center;
 
@@ -2004,19 +2019,22 @@ button:disabled{
 
 /* الإجابة المفتوحة */
 .presenterTop10AnswerBtn.opened{
-  background:linear-gradient(180deg, rgba(236,254,255,.84), rgba(207,250,254,.54));
-  border-color:rgba(103,232,249,.34);
+  background:
+    linear-gradient(180deg,#ECFEFF,#CFFAFE);
+
+  border-color:rgba(6,182,212,.26);
 
   box-shadow:
-    0 5px 10px rgba(8,145,178,.06),
-    inset 0 1px 0 rgba(255,255,255,.70);
+    0 6px 12px rgba(14,116,144,.08),
+    inset 0 1px 0 rgba(255,255,255,.90);
 
   opacity:1;
   filter:none;
 }
 
 .presenterTop10AnswerBtn.opened .presenterTop10AnswerNo{
-  background:rgba(255,255,255,.62);
+  background:#FFFFFF;
+  border-color:rgba(6,182,212,.18);
   color:#0F4C5C;
 }
 
@@ -2028,14 +2046,14 @@ button:disabled{
   color:#64748B;
 }
 
-/* =========================================================
-   RIGHT SIDE
-========================================================= */
+/* =========================
+   Right: Control Dashboard
+========================= */
 
 .presenterTop10Right{
   display:grid;
-  grid-template-rows:54px 142px minmax(104px,auto);
-  gap:8px;
+  grid-template-rows:62px minmax(0,1fr) 118px;
+  gap:12px;
 }
 
 /* =========================
@@ -2043,15 +2061,14 @@ button:disabled{
 ========================= */
 
 .presenterTop10TeamsBox{
-  height:54px;
-  min-height:54px;
+  height:62px;
+  min-height:62px;
   overflow:hidden;
 }
 
 .presenterTop10TeamsBox .presenterCard{
   height:100%;
   padding:0;
-
   background:transparent;
   border:0;
   box-shadow:none;
@@ -2067,79 +2084,85 @@ button:disabled{
 
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:8px;
+  gap:10px;
 }
 
 .presenterTop10TeamsBox .presenterBtn{
-  height:52px;
-  min-height:52px;
+  height:60px;
+  min-height:60px;
 
-  border-radius:17px;
-  padding:7px 9px;
+  border-radius:20px;
 
-  color:#24185E;
+  padding:8px 12px;
 
-  background:linear-gradient(180deg, rgba(255,255,255,.80), rgba(255,255,255,.50));
-  border:1px solid rgba(255,255,255,.32);
+  color:#1E293B;
 
-  font-size:.9rem;
-  line-height:1.25;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.88), rgba(241,245,249,.76));
+
+  border:1px solid rgba(30,41,59,.10);
+
+  font-size:1.02rem;
+  line-height:1.15;
   font-weight:900;
 
   box-shadow:
-    0 7px 14px rgba(30,27,75,.10),
-    inset 0 1px 0 rgba(255,255,255,.14);
+    0 10px 20px rgba(15,23,42,.07),
+    inset 0 1px 0 rgba(255,255,255,.80);
 
   overflow:hidden;
 }
 
 .presenterTop10TeamsBox .presenterBtn.selectedPresenterTeam,
 .presenterTop10TeamsBox .presenterBtn.activeTeam{
-  background:linear-gradient(180deg, #FFE6D4, rgba(255,255,255,.68));
-  border-color:rgba(255,155,81,.48);
+  background:
+    linear-gradient(180deg,#FFE6D4,#FFFFFF);
+
+  border-color:rgba(249,115,22,.34);
+
+  color:#24185E;
 
   box-shadow:
-    0 0 0 3px rgba(255,155,81,.14),
-    0 8px 16px rgba(249,115,22,.10),
-    inset 0 1px 0 rgba(255,255,255,.62);
+    0 0 0 4px rgba(249,115,22,.12),
+    0 12px 22px rgba(249,115,22,.12),
+    inset 0 1px 0 rgba(255,255,255,.86);
 }
 
-/* =========================================================
-   QUESTION CARD
-========================================================= */
+/* =========================
+   Question / Status Card
+========================= */
 
 .presenterTop10QuestionCard{
-  height:142px;
-  min-height:142px;
+  height:100%;
+  min-height:0;
 
-  padding:8px;
+  padding:14px;
 
   display:grid;
-  grid-template-rows:42px minmax(0,1fr);
-  gap:7px;
+  grid-template-rows:64px minmax(0,1fr);
+  gap:12px;
 
-  border-radius:20px;
-  border:1px solid rgba(255,255,255,.16);
-  background:rgba(255,255,255,.10);
+  border-radius:26px;
+  border:1px solid rgba(30,41,59,.10);
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.86), rgba(248,250,252,.70));
 
   box-shadow:
-    0 8px 18px rgba(31,41,55,.08),
-    inset 0 1px 0 rgba(255,255,255,.14);
+    0 14px 28px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.84);
 
   overflow:hidden;
 }
 
-/* =========================
-   Round / Errors
-========================= */
-
+/* الجولة والأخطاء */
 .presenterTop10StatusTop{
-  height:42px;
-  min-height:42px;
+  height:64px;
+  min-height:64px;
 
   display:grid;
-  grid-template-columns:66px minmax(0,1fr);
-  gap:7px;
+  grid-template-columns:88px minmax(0,1fr);
+  gap:10px;
 
   margin:0;
   overflow:hidden;
@@ -2147,47 +2170,63 @@ button:disabled{
 
 .presenterTop10RoundMini,
 .presenterTop10ErrorMiniBox{
-  height:42px;
+  height:64px;
   min-height:0;
 
-  padding:4px 6px;
+  padding:8px 10px;
 
-  border-radius:15px;
-  border:1px solid rgba(255,255,255,.18);
+  border-radius:20px;
 
-  background:rgba(255,255,255,.14);
+  background:#FFFFFF;
+  border:1px solid rgba(30,41,59,.09);
 
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:3px;
+  gap:5px;
 
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
+  box-shadow:
+    0 8px 16px rgba(15,23,42,.06),
+    inset 0 1px 0 rgba(255,255,255,.90);
 
   overflow:hidden;
+}
+
+.presenterTop10RoundMini{
+  background:
+    linear-gradient(180deg,#EEF2FF,#FFFFFF);
+}
+
+.presenterTop10ErrorMiniBox{
+  background:
+    linear-gradient(180deg,#FFF1F2,#FFFFFF);
+  border-color:rgba(239,68,68,.16);
 }
 
 .presenterTop10RoundMini span,
 .presenterTop10ErrorMiniBox span{
   color:#64748B;
 
-  font-size:.52rem;
+  font-size:.72rem;
   line-height:1;
   font-weight:900;
 
   white-space:nowrap;
 }
 
-.presenterTop10RoundMini strong,
-.presenterTop10ErrorMiniBox strong{
-  color:#24185E;
-
-  font-size:.86rem;
-  line-height:1.1;
+.presenterTop10RoundMini strong{
+  color:#312E81;
+  font-size:1.28rem;
+  line-height:1;
   font-weight:900;
+}
 
-  white-space:nowrap;
+.presenterTop10ErrorMiniBox strong{
+  color:#B91C1C;
+  font-size:1.28rem;
+  line-height:1;
+  font-weight:900;
 }
 
 .presenterTop10ErrorsMini{
@@ -2195,37 +2234,43 @@ button:disabled{
 
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:7px;
+  gap:10px;
 
   overflow:hidden;
 }
 
-/* =========================
-   Question Text
-========================= */
-
+/* السؤال */
 .presenterTop10QuestionClear{
   min-height:0;
 
   display:grid;
-  grid-template-rows:14px minmax(0,1fr);
-  gap:6px;
+  grid-template-rows:24px minmax(0,1fr);
+  gap:8px;
 
   margin:0;
   overflow:hidden;
 }
 
 .presenterTop10QuestionClear .presenterLabel{
-  height:14px;
+  height:24px;
 
   display:flex;
   align-items:center;
 
   margin:0;
-  color:#64748B;
-  font-size:.7rem;
+  color:#1E293B;
+  font-size:.92rem;
   line-height:1;
   font-weight:900;
+}
+
+.presenterTop10QuestionClear .presenterLabel::before{
+  content:"";
+  width:7px;
+  height:18px;
+  margin-left:7px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#A78BFA,#7C3AED);
 }
 
 .presenterTop10QuestionText,
@@ -2234,38 +2279,43 @@ button:disabled{
   height:100%;
   min-height:0;
 
-  padding:8px 12px;
+  padding:16px 18px;
 
-  border-radius:16px;
+  border-radius:22px;
   border:1px solid rgba(124,58,237,.12);
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(250,248,255,.72));
+  background:
+    linear-gradient(180deg,#FFFFFF,#F5F3FF);
 
   color:#1E1B4B;
 
-  font-size:1.08rem;
-  line-height:1.34;
+  font-size:1.48rem;
+  line-height:1.36;
   font-weight:900;
   text-align:center;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.90),
+    0 8px 16px rgba(124,58,237,.06);
 
   overflow:hidden;
 }
 
-/* =========================================================
-   ACTION BUTTONS
-========================================================= */
+/* =========================
+   Actions
+========================= */
 
 .presenterTop10Actions{
-  height:104px;
-  min-height:104px;
+  height:118px;
+  min-height:118px;
 
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
-  grid-template-rows:repeat(2,48px);
+  grid-template-rows:repeat(2,55px);
   gap:8px;
 
   overflow:hidden;
@@ -2273,12 +2323,12 @@ button:disabled{
 
 .presenterTop10Actions .presenterBtn{
   width:100%;
-  height:48px;
-  min-height:48px;
+  height:55px;
+  min-height:55px;
 
-  border-radius:15px;
+  border-radius:18px;
 
-  padding:6px 7px;
+  padding:7px 8px;
 
   display:flex;
   align-items:center;
@@ -2286,8 +2336,8 @@ button:disabled{
 
   color:#FFFFFF;
 
-  font-size:.72rem;
-  line-height:1.15;
+  font-size:.86rem;
+  line-height:1.18;
   font-weight:900;
   text-align:center;
 
@@ -2296,8 +2346,8 @@ button:disabled{
   text-overflow:ellipsis;
 
   box-shadow:
-    0 7px 14px rgba(30,27,75,.12),
-    inset 0 1px 0 rgba(255,255,255,.14);
+    0 9px 18px rgba(15,23,42,.12),
+    inset 0 1px 0 rgba(255,255,255,.16);
 }
 
 .presenterTop10Actions .presenterBtn:active:not(:disabled){
@@ -2338,15 +2388,15 @@ button:disabled{
 }
 
 .presenterTop10Actions .presenterBtn:disabled{
-  background:#DDD6FE;
-  color:#7C7896;
+  background:#E5E7EB;
+  color:#94A3B8;
   box-shadow:none;
-  opacity:.82;
+  opacity:.88;
 }
 
-/* =========================================================
-   REMOVE EXTRA LAYERS - TOP10
-========================================================= */
+/* =========================
+   Remove Extra Decorative Layers
+========================= */
 
 .presenterTop10Layout::before,
 .presenterTop10Layout::after,
@@ -2371,151 +2421,150 @@ button:disabled{
 }
 
 /* =========================================================
-   TOP10 - Compact Height
+   Compact Height
 ========================================================= */
 
 @media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
 
   .presenterTop10Layout{
-    gap:8px;
+    grid-template-columns:1.12fr .88fr;
+    gap:10px;
   }
 
   .presenterTop10AnswersCard{
-    padding:8px;
-    border-radius:19px;
-    grid-template-rows:16px minmax(0,1fr);
-    gap:6px;
+    padding:11px;
+    border-radius:22px;
+    grid-template-rows:26px minmax(0,1fr);
+    gap:9px;
   }
 
   .presenterTop10AnswersCard > .presenterLabel{
-    height:16px;
-    font-size:.7rem;
+    height:26px;
+    font-size:.86rem;
   }
 
   .presenterTop10AnswersCols{
-    gap:7px;
+    gap:8px;
   }
 
   .presenterTop10AnswersCol,
   .presenterTop10RightCol,
   .presenterTop10LeftCol{
-    gap:6px;
+    gap:7px;
   }
 
   .presenterTop10AnswerBtn{
-    padding:5px 6px;
-    grid-template-columns:30px minmax(0,1fr) 50px;
-    gap:6px;
-    border-radius:14px;
+    padding:6px 7px;
+    grid-template-columns:32px minmax(0,1fr) 58px;
+    gap:7px;
+    border-radius:15px;
   }
 
   .presenterTop10AnswerNo{
-    width:26px;
-    height:26px;
-    min-width:26px;
-    border-radius:10px;
-    font-size:.78rem;
+    width:28px;
+    height:28px;
+    min-width:28px;
+    border-radius:11px;
+    font-size:.86rem;
   }
 
   .presenterTop10AnswerText{
-    font-size:.78rem;
+    font-size:.88rem;
     line-height:1.22;
   }
 
   .presenterTop10OpenedBy{
-    font-size:.5rem;
+    font-size:.56rem;
   }
 
   .presenterTop10Right{
-    grid-template-rows:50px 128px 98px;
-    gap:7px;
+    grid-template-rows:54px minmax(0,1fr) 106px;
+    gap:9px;
   }
 
   .presenterTop10TeamsBox{
-    height:50px;
-    min-height:50px;
+    height:54px;
+    min-height:54px;
   }
 
   .presenterTop10TeamsBox .presenterBtn{
-    height:48px;
-    min-height:48px;
-    border-radius:15px;
-    font-size:.8rem;
+    height:52px;
+    min-height:52px;
+    border-radius:17px;
+    font-size:.9rem;
   }
 
   .presenterTop10QuestionCard{
-    height:128px;
-    min-height:128px;
-    padding:7px;
-    border-radius:18px;
-    grid-template-rows:38px minmax(0,1fr);
-    gap:6px;
+    padding:10px;
+    border-radius:22px;
+    grid-template-rows:54px minmax(0,1fr);
+    gap:9px;
   }
 
   .presenterTop10StatusTop{
-    height:38px;
-    min-height:38px;
-    grid-template-columns:58px minmax(0,1fr);
-    gap:6px;
+    height:54px;
+    min-height:54px;
+    grid-template-columns:76px minmax(0,1fr);
+    gap:8px;
   }
 
   .presenterTop10RoundMini,
   .presenterTop10ErrorMiniBox{
-    height:38px;
-    border-radius:13px;
-    padding:3px 5px;
+    height:54px;
+    border-radius:17px;
+    padding:6px 8px;
   }
 
   .presenterTop10RoundMini span,
   .presenterTop10ErrorMiniBox span{
-    font-size:.48rem;
+    font-size:.6rem;
   }
 
   .presenterTop10RoundMini strong,
   .presenterTop10ErrorMiniBox strong{
-    font-size:.76rem;
+    font-size:1.02rem;
   }
 
   .presenterTop10ErrorsMini{
-    gap:6px;
+    gap:8px;
   }
 
   .presenterTop10QuestionClear{
-    grid-template-rows:12px minmax(0,1fr);
-    gap:5px;
+    grid-template-rows:20px minmax(0,1fr);
+    gap:6px;
   }
 
   .presenterTop10QuestionClear .presenterLabel{
-    height:12px;
-    font-size:.62rem;
+    height:20px;
+    font-size:.78rem;
   }
 
   .presenterTop10QuestionText,
   #presenterTop10QuestionText{
-    padding:7px 10px;
-    border-radius:14px;
-    font-size:.92rem;
-    line-height:1.28;
+    padding:10px 12px;
+    border-radius:18px;
+    font-size:1.14rem;
+    line-height:1.32;
   }
 
   .presenterTop10Actions{
-    height:98px;
-    min-height:98px;
-    grid-template-rows:repeat(2,45px);
-    gap:7px;
+    height:106px;
+    min-height:106px;
+    grid-template-rows:repeat(2,49px);
+    gap:8px;
   }
 
   .presenterTop10Actions .presenterBtn{
-    height:45px;
-    min-height:45px;
-    border-radius:14px;
-    font-size:.64rem;
-    padding:5px 6px;
+    height:49px;
+    min-height:49px;
+    border-radius:15px;
+    font-size:.72rem;
+    padding:6px;
   }
 }
 
 /* =========================================================
-   TOP10 - Portrait / Small Fallback
+   Portrait / Small Fallback
 ========================================================= */
 
 @media screen and (max-width:799px), screen and (orientation:portrait){
@@ -2554,7 +2603,7 @@ button:disabled{
   }
 
   .presenterTop10AnswerBtn{
-    min-height:56px;
+    min-height:58px;
   }
 
   .presenterTop10Right{
@@ -2568,7 +2617,7 @@ button:disabled{
 
   .presenterTop10QuestionCard{
     height:auto;
-    min-height:150px;
+    min-height:220px;
   }
 
   .presenterTop10Actions{
@@ -2578,202 +2627,10 @@ button:disabled{
   }
 
   .presenterTop10Actions .presenterBtn{
-    height:52px;
-    min-height:52px;
+    height:54px;
+    min-height:54px;
   }
 }
-
-/* =========================================================
-   TOP10 READABILITY FIX
-   تكبير الأخطاء والخطوط للمقدم
-   ضعه بعد كود Top10 وقبل FINAL VISIBILITY FIX
-========================================================= */
-
-@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape){
-
-  /* كرت السؤال أكبر شوي */
-  .presenterTop10QuestionCard{
-    height:156px;
-    min-height:156px;
-    grid-template-rows:52px minmax(0,1fr);
-    gap:8px;
-  }
-
-  /* صف الجولة والأخطاء */
-  .presenterTop10StatusTop{
-    height:52px;
-    min-height:52px;
-    grid-template-columns:78px minmax(0,1fr);
-    gap:8px;
-  }
-
- .presenterTop10ErrorMiniBox{
-  height:52px;
-  background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,235,235,.58));
-  border-color:rgba(239,68,68,.20);
-}
-
-.presenterTop10ErrorMiniBox strong{
-  color:#B91C1C;
-}
-
-  .presenterTop10RoundMini span,
-  .presenterTop10ErrorMiniBox span{
-    font-size:.64rem;
-  }
-
-  .presenterTop10RoundMini strong,
-  .presenterTop10ErrorMiniBox strong{
-    font-size:1.08rem;
-    line-height:1.05;
-  }
-
-  .presenterTop10ErrorsMini{
-    gap:8px;
-  }
-
-  /* السؤال */
-  .presenterTop10QuestionClear{
-    grid-template-rows:15px minmax(0,1fr);
-    gap:6px;
-  }
-
-  .presenterTop10QuestionClear .presenterLabel{
-    height:15px;
-    font-size:.74rem;
-  }
-
-  .presenterTop10QuestionText,
-  #presenterTop10QuestionText{
-    font-size:1.28rem;
-    line-height:1.35;
-    padding:8px 14px;
-  }
-
-  /* الإجابات */
-  .presenterTop10AnswerBtn{
-    grid-template-columns:38px minmax(0,1fr) 68px;
-    gap:8px;
-    padding:7px 8px;
-  }
-
-  .presenterTop10AnswerNo{
-    width:34px;
-    height:34px;
-    min-width:34px;
-    border-radius:12px;
-    font-size:1.04rem;
-  }
-
-  .presenterTop10AnswerText{
-    font-size:1.02rem;
-    line-height:1.25;
-  }
-
-  .presenterTop10OpenedBy{
-    font-size:.66rem;
-    line-height:1.15;
-  }
-
-  /* أزرار الفريق */
-  .presenterTop10TeamsBox .presenterBtn{
-    font-size:1rem;
-  }
-
-  /* أزرار التحكم */
-  .presenterTop10Actions{
-    height:112px;
-    min-height:112px;
-    grid-template-rows:repeat(2,52px);
-  }
-
-  .presenterTop10Actions .presenterBtn{
-    height:52px;
-    min-height:52px;
-    font-size:.82rem;
-    line-height:1.18;
-  }
-
-  /* تعديل تقسيم يمين الصفحة عشان يستوعب كرت السؤال الأكبر */
-  .presenterTop10Right{
-    grid-template-rows:54px 156px minmax(112px,auto);
-  }
-}
-
-/* للشاشات القصيرة */
-@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
-
-  .presenterTop10QuestionCard{
-    height:142px;
-    min-height:142px;
-    grid-template-rows:48px minmax(0,1fr);
-  }
-
-  .presenterTop10StatusTop{
-    height:48px;
-    min-height:48px;
-    grid-template-columns:72px minmax(0,1fr);
-  }
-
-  .presenterTop10RoundMini,
-  .presenterTop10ErrorMiniBox{
-    height:48px;
-    border-radius:15px;
-    padding:4px 7px;
-  }
-
-  .presenterTop10RoundMini span,
-  .presenterTop10ErrorMiniBox span{
-    font-size:.58rem;
-  }
-
-  .presenterTop10RoundMini strong,
-  .presenterTop10ErrorMiniBox strong{
-    font-size:.96rem;
-  }
-
-  .presenterTop10QuestionText,
-  #presenterTop10QuestionText{
-    font-size:1.12rem;
-    line-height:1.32;
-  }
-
-  .presenterTop10AnswerBtn{
-    grid-template-columns:34px minmax(0,1fr) 60px;
-  }
-
-  .presenterTop10AnswerNo{
-    width:30px;
-    height:30px;
-    min-width:30px;
-    font-size:.92rem;
-  }
-
-  .presenterTop10AnswerText{
-    font-size:.9rem;
-  }
-
-  .presenterTop10OpenedBy{
-    font-size:.58rem;
-  }
-
-  .presenterTop10Actions{
-    height:104px;
-    min-height:104px;
-    grid-template-rows:repeat(2,48px);
-  }
-
-  .presenterTop10Actions .presenterBtn{
-    height:48px;
-    min-height:48px;
-    font-size:.74rem;
-  }
-
-  .presenterTop10Right{
-    grid-template-rows:50px 142px 104px;
-  }
-}
-
 /* =========================================================
    FINAL VISIBILITY FIX
 
