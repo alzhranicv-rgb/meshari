@@ -2584,8 +2584,199 @@ button:disabled{
 }
 
 /* =========================================================
+   TOP10 READABILITY FIX
+   تكبير الأخطاء والخطوط للمقدم
+   ضعه بعد كود Top10 وقبل FINAL VISIBILITY FIX
+========================================================= */
+
+@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape){
+
+  /* كرت السؤال أكبر شوي */
+  .presenterTop10QuestionCard{
+    height:156px;
+    min-height:156px;
+    grid-template-rows:52px minmax(0,1fr);
+    gap:8px;
+  }
+
+  /* صف الجولة والأخطاء */
+  .presenterTop10StatusTop{
+    height:52px;
+    min-height:52px;
+    grid-template-columns:78px minmax(0,1fr);
+    gap:8px;
+  }
+
+ .presenterTop10ErrorMiniBox{
+  height:52px;
+  background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,235,235,.58));
+  border-color:rgba(239,68,68,.20);
+}
+
+.presenterTop10ErrorMiniBox strong{
+  color:#B91C1C;
+}
+
+  .presenterTop10RoundMini span,
+  .presenterTop10ErrorMiniBox span{
+    font-size:.64rem;
+  }
+
+  .presenterTop10RoundMini strong,
+  .presenterTop10ErrorMiniBox strong{
+    font-size:1.08rem;
+    line-height:1.05;
+  }
+
+  .presenterTop10ErrorsMini{
+    gap:8px;
+  }
+
+  /* السؤال */
+  .presenterTop10QuestionClear{
+    grid-template-rows:15px minmax(0,1fr);
+    gap:6px;
+  }
+
+  .presenterTop10QuestionClear .presenterLabel{
+    height:15px;
+    font-size:.74rem;
+  }
+
+  .presenterTop10QuestionText,
+  #presenterTop10QuestionText{
+    font-size:1.28rem;
+    line-height:1.35;
+    padding:8px 14px;
+  }
+
+  /* الإجابات */
+  .presenterTop10AnswerBtn{
+    grid-template-columns:38px minmax(0,1fr) 68px;
+    gap:8px;
+    padding:7px 8px;
+  }
+
+  .presenterTop10AnswerNo{
+    width:34px;
+    height:34px;
+    min-width:34px;
+    border-radius:12px;
+    font-size:1.04rem;
+  }
+
+  .presenterTop10AnswerText{
+    font-size:1.02rem;
+    line-height:1.25;
+  }
+
+  .presenterTop10OpenedBy{
+    font-size:.66rem;
+    line-height:1.15;
+  }
+
+  /* أزرار الفريق */
+  .presenterTop10TeamsBox .presenterBtn{
+    font-size:1rem;
+  }
+
+  /* أزرار التحكم */
+  .presenterTop10Actions{
+    height:112px;
+    min-height:112px;
+    grid-template-rows:repeat(2,52px);
+  }
+
+  .presenterTop10Actions .presenterBtn{
+    height:52px;
+    min-height:52px;
+    font-size:.82rem;
+    line-height:1.18;
+  }
+
+  /* تعديل تقسيم يمين الصفحة عشان يستوعب كرت السؤال الأكبر */
+  .presenterTop10Right{
+    grid-template-rows:54px 156px minmax(112px,auto);
+  }
+}
+
+/* للشاشات القصيرة */
+@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
+
+  .presenterTop10QuestionCard{
+    height:142px;
+    min-height:142px;
+    grid-template-rows:48px minmax(0,1fr);
+  }
+
+  .presenterTop10StatusTop{
+    height:48px;
+    min-height:48px;
+    grid-template-columns:72px minmax(0,1fr);
+  }
+
+  .presenterTop10RoundMini,
+  .presenterTop10ErrorMiniBox{
+    height:48px;
+    border-radius:15px;
+    padding:4px 7px;
+  }
+
+  .presenterTop10RoundMini span,
+  .presenterTop10ErrorMiniBox span{
+    font-size:.58rem;
+  }
+
+  .presenterTop10RoundMini strong,
+  .presenterTop10ErrorMiniBox strong{
+    font-size:.96rem;
+  }
+
+  .presenterTop10QuestionText,
+  #presenterTop10QuestionText{
+    font-size:1.12rem;
+    line-height:1.32;
+  }
+
+  .presenterTop10AnswerBtn{
+    grid-template-columns:34px minmax(0,1fr) 60px;
+  }
+
+  .presenterTop10AnswerNo{
+    width:30px;
+    height:30px;
+    min-width:30px;
+    font-size:.92rem;
+  }
+
+  .presenterTop10AnswerText{
+    font-size:.9rem;
+  }
+
+  .presenterTop10OpenedBy{
+    font-size:.58rem;
+  }
+
+  .presenterTop10Actions{
+    height:104px;
+    min-height:104px;
+    grid-template-rows:repeat(2,48px);
+  }
+
+  .presenterTop10Actions .presenterBtn{
+    height:48px;
+    min-height:48px;
+    font-size:.74rem;
+  }
+
+  .presenterTop10Right{
+    grid-template-rows:50px 142px 104px;
+  }
+}
+
+/* =========================================================
    FINAL VISIBILITY FIX
-   لا تضع أي كود بعد هذا البلوك
+
 ========================================================= */
 
 body .hidden{
