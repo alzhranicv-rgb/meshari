@@ -986,14 +986,6 @@ button:disabled{
   }
 }
 
-body .hidden,
-body .homePageShell.hidden,
-body .presenterJoinShell.hidden,
-body .presenterSegmentPage.hidden,
-body .presenterToast.hidden,
-body .gameToast.hidden{
-  display:none;
-}
 
 /* =========================================================
    PRESENTER WARMUP CLEAN CSS
@@ -1765,4 +1757,21 @@ body .gameToast.hidden{
     height:auto;
     grid-template-columns:1fr;
   }
+}
+
+/* =========================================================
+   FINAL VISIBILITY FIX
+   لازم يكون آخر شيء في الملف
+========================================================= */
+
+body .hidden{
+  display:none;
+}
+
+body .homePageShell.hidden,
+body .presenterJoinShell.hidden,
+body .presenterSegmentPage.hidden,
+body .presenterToast.hidden,
+body .gameToast.hidden{
+  display:none;
 }
