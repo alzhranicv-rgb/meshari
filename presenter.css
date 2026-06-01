@@ -106,9 +106,7 @@ button:disabled{
   filter:saturate(.75);
 }
 
-.hidden{
-  display:none;
-}
+
 
 /* =========================
    Shared Page Shell
@@ -988,6 +986,14 @@ button:disabled{
   }
 }
 
+body .hidden,
+body .homePageShell.hidden,
+body .presenterJoinShell.hidden,
+body .presenterSegmentPage.hidden,
+body .presenterToast.hidden,
+body .gameToast.hidden{
+  display:none;
+}
 
 /* =========================================================
    PRESENTER WARMUP CLEAN CSS
