@@ -1899,3 +1899,51 @@ body.whoOverlayActive .whoGrid{
     font-size:1.35rem !important;
   }
 }
+/* =========================================================
+   WHO - IPAD FIT
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+
+  .whoWrap,
+  .whoContainer{
+    height:100% !important;
+    display:grid !important;
+    grid-template-rows:auto 1fr auto !important;
+    gap:12px !important;
+    overflow:hidden !important;
+  }
+
+  .whoNumbersGrid,
+  .whoGrid{
+    width:min(100%,940px) !important;
+    margin:0 auto !important;
+
+    display:grid !important;
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    gap:12px !important;
+  }
+
+  .whoNumberBtn,
+  .whoCard{
+    min-height:64px !important;
+    border-radius:20px !important;
+    font-size:1.75rem !important;
+  }
+
+  .whoImageStage,
+  .whoImageBox{
+    height:calc(100vh - 180px) !important;
+    min-height:340px !important;
+    border-radius:28px !important;
+    overflow:hidden !important;
+  }
+
+  .whoImageStage img,
+  .whoImageBox img,
+  .whoImageFull{
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+  }
+}

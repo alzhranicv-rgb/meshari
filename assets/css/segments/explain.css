@@ -1350,3 +1350,109 @@
     padding:14px 18px !important;
   }
 }
+/* =========================================================
+   EXPLAIN / اشرح الكلمة - IPAD FIT
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+
+  .explainWrap,
+  .explainContainer,
+  .explainMainWrap{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+
+    display:grid !important;
+    grid-template-rows:auto 1fr auto !important;
+    gap:10px !important;
+
+    overflow:hidden !important;
+  }
+
+  .explainBoard,
+  .explainGrid,
+  .explainNumbersGrid{
+    width:min(100%,900px) !important;
+    margin:0 auto !important;
+
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:12px !important;
+
+    align-self:center !important;
+  }
+
+  .explainNumberBtn,
+  .explainCard,
+  .explainTile{
+    min-height:78px !important;
+    border-radius:24px !important;
+
+    font-size:2rem !important;
+    line-height:1 !important;
+  }
+
+  .explainStage,
+  .explainQuestionStage,
+  .explainWordStage{
+    width:100% !important;
+    height:calc(100vh - 178px) !important;
+    min-height:340px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    overflow:hidden !important;
+  }
+
+  .explainWordBox,
+  .explainQuestionBox{
+    width:min(100%,860px) !important;
+    min-height:170px !important;
+
+    padding:22px 28px !important;
+    border-radius:34px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    text-align:center !important;
+
+    font-size:clamp(2.2rem,5vw,4rem) !important;
+    line-height:1.15 !important;
+  }
+
+  .explainHintBox,
+  .explainAnswerBox,
+  .explainStatusBox{
+    width:min(100%,760px) !important;
+    min-height:72px !important;
+
+    padding:14px 18px !important;
+    border-radius:22px !important;
+
+    font-size:1.25rem !important;
+    line-height:1.35 !important;
+  }
+
+  .explainWordsList,
+  .explainUsedList{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:10px !important;
+
+    max-height:220px !important;
+    overflow:hidden !important;
+  }
+
+  .explainWordItem{
+    min-height:46px !important;
+    border-radius:16px !important;
+    padding:8px 12px !important;
+
+    font-size:1rem !important;
+  }
+}

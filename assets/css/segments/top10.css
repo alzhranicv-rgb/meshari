@@ -1724,3 +1724,53 @@
     0 18px 34px rgba(8,145,178,.20),
     inset 0 1px 0 rgba(255,255,255,.38) !important;
 }
+
+/* =========================================================
+   TOP 10 - IPAD FIT
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+
+  .top10Wrap,
+  .top10Container{
+    height:100% !important;
+    display:grid !important;
+    grid-template-rows:auto 1fr auto !important;
+    gap:12px !important;
+    overflow:hidden !important;
+  }
+
+  .top10Board,
+  .top10Grid{
+    width:min(100%,920px) !important;
+    margin:0 auto !important;
+
+    display:grid !important;
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    gap:12px !important;
+    align-self:center !important;
+  }
+
+  .top10Number,
+  .top10Card,
+  .top10Tile{
+    min-height:72px !important;
+    border-radius:22px !important;
+    font-size:2rem !important;
+  }
+
+  .top10QuestionBox,
+  .top10AnswerBox{
+    min-height:90px !important;
+    padding:16px 20px !important;
+    border-radius:24px !important;
+    font-size:1.45rem !important;
+    line-height:1.35 !important;
+  }
+
+  .top10Attempts,
+  .top10Status{
+    min-height:54px !important;
+    font-size:1rem !important;
+  }
+}

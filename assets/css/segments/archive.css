@@ -2329,3 +2329,149 @@
   transform:none !important;
   filter:none !important;
 }
+/* =========================================================
+   ARCHIVE / الأرشيف - IPAD FIT
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+
+  .archiveWrap,
+  .archiveContainer,
+  .archiveMainWrap{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+
+    display:grid !important;
+    grid-template-rows:auto 1fr auto !important;
+    gap:10px !important;
+
+    overflow:hidden !important;
+  }
+
+  .archiveStage,
+  .archiveModernStage,
+  .archiveBoard{
+    width:100% !important;
+    height:calc(100vh - 170px) !important;
+    min-height:360px !important;
+
+    display:grid !important;
+    gap:12px !important;
+
+    overflow:hidden !important;
+  }
+
+  .archiveModernGrid,
+  .archiveGrid{
+    width:min(100%,980px) !important;
+    height:100% !important;
+    margin:0 auto !important;
+
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    grid-auto-rows:minmax(0,1fr) !important;
+    gap:12px !important;
+
+    overflow:hidden !important;
+  }
+
+  .archiveModernCard,
+  .archiveCard,
+  .archiveItem{
+    min-height:0 !important;
+    padding:12px !important;
+    border-radius:24px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    overflow:hidden !important;
+  }
+
+  .archiveModernCardText,
+  .archiveCardText,
+  .archiveItemText{
+    font-size:clamp(1.05rem,2.2vw,1.55rem) !important;
+    line-height:1.25 !important;
+
+    text-align:center !important;
+
+    display:-webkit-box !important;
+    -webkit-line-clamp:3 !important;
+    -webkit-box-orient:vertical !important;
+    overflow:hidden !important;
+  }
+
+  .archiveModernBigCard,
+  .archiveBigCard,
+  .archiveImageCard{
+    min-height:0 !important;
+    border-radius:26px !important;
+    overflow:hidden !important;
+  }
+
+  .archiveModernBigCard img,
+  .archiveBigCard img,
+  .archiveImageCard img,
+  .archiveImageFrame img{
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+  }
+
+  .archiveTopInfo,
+  .archiveRoundInfo,
+  .archiveStatusRow{
+    min-height:58px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:10px !important;
+
+    padding:8px 12px !important;
+    overflow:hidden !important;
+  }
+
+  .archiveTopInfo > *,
+  .archiveRoundInfo > *,
+  .archiveStatusRow > *{
+    min-height:46px !important;
+    border-radius:18px !important;
+    padding:8px 12px !important;
+
+    font-size:.95rem !important;
+    line-height:1.2 !important;
+  }
+
+  .archiveTimer,
+  .archiveTimerBox{
+    min-width:82px !important;
+    height:58px !important;
+    border-radius:20px !important;
+
+    font-size:2rem !important;
+  }
+
+  .archiveErrorsRow,
+  .archiveTeamsErrors{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:10px !important;
+
+    min-height:54px !important;
+    overflow:hidden !important;
+  }
+
+  .archiveErrorBox,
+  .archiveTeamErrorBox{
+    min-width:120px !important;
+    height:46px !important;
+
+    border-radius:18px !important;
+    font-size:.95rem !important;
+  }
+}
