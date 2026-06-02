@@ -787,7 +787,7 @@ h3,
 }
 
 /* إخفاء أزرار التحكم */
-body.presenterHideDisplayControls .segmentControls,
+/* إخفاء أزرار التحكم فقط بدون إخفاء الهيدر العلوي */
 body.presenterHideDisplayControls .displayControls,
 body.presenterHideDisplayControls .controlsBar,
 body.presenterHideDisplayControls .finalControlsBar,
@@ -5859,8 +5859,7 @@ button:hover,
   transform:scale(.97) !important;
 }
 
-/* إخفاء أزرار التحكم */
-body.presenterHideDisplayControls .segmentControls,
+/* إخفاء أزرار التحكم فقط بدون إخفاء الهيدر العلوي */
 body.presenterHideDisplayControls .displayControls,
 body.presenterHideDisplayControls .controlsBar,
 body.presenterHideDisplayControls .finalControlsBar,
