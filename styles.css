@@ -7134,3 +7134,265 @@ video::-webkit-media-controls-panel{
     object-fit:contain !important;
   }
 }
+/* =========================================================
+   WHO CLEAN PREVIEW + ANSWER - FORCE OVERRIDE
+========================================================= */
+
+#whoImageStage.whoImageStage{
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  padding:0 !important;
+  margin:0 auto !important;
+
+  overflow:visible !important;
+}
+
+/* معاينة الصورة قبل الإجابة */
+.whoPreviewClean{
+  width:min(100%,680px) !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+
+  margin:0 auto !important;
+}
+
+.whoPreviewCleanImage{
+  width:min(100%,560px) !important;
+  height:300px !important;
+  min-height:300px !important;
+  max-height:300px !important;
+
+  border:0 !important;
+  border-radius:30px !important;
+
+  padding:10px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:linear-gradient(180deg,#0F172A,#111827) !important;
+
+  box-shadow:
+    0 22px 54px rgba(15,23,42,.24),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+
+  overflow:hidden !important;
+  cursor:pointer !important;
+}
+
+.whoPreviewCleanImg{
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+
+  object-fit:contain !important;
+  object-position:center center !important;
+
+  display:block !important;
+  border-radius:22px !important;
+
+  background:#0F172A !important;
+}
+
+.whoPreviewCleanHint{
+  min-height:30px !important;
+  padding:7px 16px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  border-radius:999px !important;
+
+  background:rgba(255,255,255,.82) !important;
+  border:1px solid rgba(255,255,255,.70) !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.82rem !important;
+  font-weight:900 !important;
+
+  box-shadow:0 10px 24px rgba(15,23,42,.10) !important;
+}
+
+/* شكل ظهور الإجابة */
+.whoAnswerClean{
+  width:min(100%,900px) !important;
+
+  display:grid !important;
+  grid-template-columns:320px minmax(0,1fr) !important;
+  gap:18px !important;
+  align-items:stretch !important;
+
+  margin:0 auto !important;
+}
+
+.whoAnswerCleanImage{
+  width:100% !important;
+  height:300px !important;
+  min-height:300px !important;
+  max-height:300px !important;
+
+  border:0 !important;
+  border-radius:30px !important;
+
+  padding:10px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:linear-gradient(180deg,#0F172A,#111827) !important;
+
+  box-shadow:
+    0 22px 54px rgba(15,23,42,.22),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+
+  overflow:hidden !important;
+  cursor:pointer !important;
+}
+
+.whoAnswerCleanImg{
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+
+  object-fit:contain !important;
+  object-position:center center !important;
+
+  display:block !important;
+  border-radius:22px !important;
+
+  background:#0F172A !important;
+}
+
+.whoAnswerCleanBox{
+  min-height:300px !important;
+  height:300px !important;
+  max-height:300px !important;
+
+  padding:20px 24px !important;
+  border-radius:30px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+
+  text-align:center !important;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.65), transparent 46%),
+    linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.72)) !important;
+
+  border:1px solid rgba(255,255,255,.72) !important;
+
+  box-shadow:
+    0 22px 54px rgba(30,27,75,.14),
+    inset 0 1px 0 rgba(255,255,255,.96) !important;
+
+  overflow:hidden !important;
+}
+
+.whoAnswerCleanStatus{
+  min-height:34px !important;
+  padding:8px 18px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  border-radius:999px !important;
+
+  color:#fff !important;
+  background:linear-gradient(180deg,#312E81,#24185E) !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.9rem !important;
+  font-weight:900 !important;
+}
+
+.whoAnswerClean.correctResult .whoAnswerCleanStatus{
+  background:linear-gradient(180deg,#16A34A,#15803D) !important;
+}
+
+.whoAnswerClean.wrongResult .whoAnswerCleanStatus{
+  background:linear-gradient(180deg,#EF4444,#B91C1C) !important;
+}
+
+.whoAnswerCleanLabel{
+  color:#0F4C5C !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.95rem !important;
+  font-weight:900 !important;
+}
+
+.whoAnswerCleanText{
+  width:100% !important;
+
+  color:#24185E !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(2.2rem,4.6vw,3.8rem) !important;
+  line-height:1.08 !important;
+  font-weight:400 !important;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.85),
+    0 14px 28px rgba(30,27,75,.12) !important;
+
+  overflow-wrap:break-word !important;
+}
+
+/* منع كود الصور العام من التحكم في من هو */
+.segmentContentWrap .whoPreviewCleanImage,
+.segmentContentWrap .whoAnswerCleanImage,
+.segmentContentWrap .whoAnswerCleanBox{
+  width:auto;
+  max-width:none;
+}
+
+/* iPad Air */
+@media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
+
+  .whoPreviewCleanImage{
+    width:540px !important;
+    height:280px !important;
+    min-height:280px !important;
+    max-height:280px !important;
+  }
+
+  .whoAnswerClean{
+    width:min(100%,850px) !important;
+    grid-template-columns:300px minmax(0,1fr) !important;
+    gap:14px !important;
+  }
+
+  .whoAnswerCleanImage,
+  .whoAnswerCleanBox{
+    height:280px !important;
+    min-height:280px !important;
+    max-height:280px !important;
+  }
+
+  .whoAnswerCleanText{
+    font-size:clamp(2rem,4vw,3.3rem) !important;
+  }
+}

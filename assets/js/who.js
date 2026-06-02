@@ -585,18 +585,17 @@ function showWhoImageFullscreen(imageUrl) {
   if (!stage || !imageUrl) return
 
   stage.innerHTML = `
-    <div class="whoPreviewCard">
+    <div class="whoPreviewClean">
 
       <button
         type="button"
-        class="whoPreviewImageFrame"
+        class="whoPreviewCleanImage"
         onclick="toggleWhoImageOverlay()"
-        title="اضغط لتكبير الصورة"
       >
-        <img src="${imageUrl}" class="whoImageFull" alt="">
+        <img src="${imageUrl}" class="whoPreviewCleanImg" alt="">
       </button>
 
-      <div class="whoPreviewHint">
+      <div class="whoPreviewCleanHint">
         اضغط على الصورة للتكبير
       </div>
 
@@ -607,10 +606,6 @@ function showWhoImageFullscreen(imageUrl) {
 
   if (typeof protectDisplayMedia === "function") {
     protectDisplayMedia(stage)
-  }
-
-  if (typeof enhanceDisplayMediaFrames === "function") {
-    enhanceDisplayMediaFrames(stage)
   }
 
   if (typeof applyDisplayMediaRevealFx === "function") {
@@ -655,31 +650,20 @@ function showWhoAnswer(resultType = "") {
       : "الإجابة"
 
   stage.innerHTML = `
-    <div class="whoResultView ${resultClass}">
+    <div class="whoAnswerClean ${resultClass}">
 
       <button
         type="button"
-        class="whoResultImageBox"
+        class="whoAnswerCleanImage"
         onclick="toggleWhoImageOverlay()"
-        title="اضغط لتكبير الصورة"
       >
-        <img src="${currentWhoImage || ""}" class="whoResultImage" alt="">
+        <img src="${currentWhoImage || ""}" class="whoAnswerCleanImg" alt="">
       </button>
 
-      <div class="whoResultAnswerBox">
-
-        <div class="whoResultStatus">
-          ${escapeDisplayHtml(resultLabel)}
-        </div>
-
-        <div class="whoResultAnswerLabel">
-          الإجابة
-        </div>
-
-        <div class="whoResultAnswerText">
-          ${escapeDisplayHtml(currentWhoAnswer)}
-        </div>
-
+      <div class="whoAnswerCleanBox">
+        <div class="whoAnswerCleanStatus">${escapeDisplayHtml(resultLabel)}</div>
+        <div class="whoAnswerCleanLabel">الإجابة</div>
+        <div class="whoAnswerCleanText">${escapeDisplayHtml(currentWhoAnswer)}</div>
       </div>
 
     </div>
@@ -689,10 +673,6 @@ function showWhoAnswer(resultType = "") {
 
   if (typeof protectDisplayMedia === "function") {
     protectDisplayMedia(stage)
-  }
-
-  if (typeof enhanceDisplayMediaFrames === "function") {
-    enhanceDisplayMediaFrames(stage)
   }
 
   if (typeof applyDisplayMediaRevealFx === "function") {
