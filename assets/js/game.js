@@ -908,12 +908,15 @@ async function restoreDisplayAfterRefresh() {
 
 function observeDisplayMedia() {
   protectDisplayMedia(document)
+  enhanceDisplayMediaFrames(document)
 
   const observer = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
       mutation.addedNodes.forEach(node => {
         if (!(node instanceof HTMLElement)) return
+
         protectDisplayMedia(node)
+        enhanceDisplayMediaFrames(node)
       })
     })
   })
@@ -921,6 +924,42 @@ function observeDisplayMedia() {
   observer.observe(document.body, {
     childList: true,
     subtree: true
+  })
+}
+
+function enhanceDisplayMediaFrames(root = document) {
+  const scope = root || document
+
+  const mediaSelectors = [
+    ".whoImageFull",
+    ".auctionBigImage",
+    ".auctionImageFrame img",
+    ".auctionImageBox img",
+    ".archiveModernBigCard img",
+    ".archiveImageFrame img",
+    ".finalRound1BigImage",
+    ".finalRound3Image",
+    ".finalRound3ImageStage img",
+    "video"
+  ]
+
+  scope.querySelectorAll(mediaSelectors.join(",")).forEach(media => {
+    if (media.dataset.displayEnhanced === "1") return
+
+    media.dataset.displayEnhanced = "1"
+    media.classList.add("displayUnifiedMedia")
+
+    const parent = media.parentElement
+    if (parent) {
+      parent.classList.add("displayUnifiedMediaFrame")
+    }
+
+    if (media.tagName.toLowerCase() === "video") {
+      media.classList.add("displayUnifiedVideo")
+      media.setAttribute("playsinline", "true")
+      media.setAttribute("controls", "true")
+      media.setAttribute("preload", "metadata")
+    }
   })
 }
 
@@ -1279,6 +1318,7 @@ try {
   if (segmentKey === "archive") await window.renderArchive()
 
   protectDisplayMedia(document.getElementById("segmentArea") || document)
+  enhanceDisplayMediaFrames(document.getElementById("segmentArea") || document)
 
 } catch (e) {
   console.log("DISPLAY SEGMENT RENDER ERROR:", e)

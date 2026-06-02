@@ -6750,3 +6750,151 @@ body.presenterHideDisplayControls .archiveControls{
     font-size:1.25rem !important;
   }
 }
+/* =========================================================
+   DISPLAY UNIFIED MEDIA SYSTEM
+   نظام موحد للصور والفيديو داخل العرض
+========================================================= */
+
+.displayUnifiedMediaFrame{
+  position:relative !important;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.08), transparent 42%),
+    linear-gradient(180deg,#0F172A,#111827) !important;
+
+  border:1px solid rgba(255,255,255,.10) !important;
+
+  box-shadow:
+    0 22px 60px rgba(15,23,42,.24),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+
+  overflow:hidden !important;
+}
+
+.displayUnifiedMediaFrame::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:2;
+
+  pointer-events:none;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.10),
+      transparent 22%,
+      transparent 78%,
+      rgba(0,0,0,.18)
+    );
+}
+
+.displayUnifiedMedia{
+  width:100% !important;
+  height:100% !important;
+
+  max-width:100% !important;
+  max-height:100% !important;
+
+  object-fit:contain !important;
+  object-position:center center !important;
+
+  display:block !important;
+
+  background:#0F172A !important;
+
+  opacity:0;
+  filter:blur(10px);
+  transform:scale(1.018);
+
+  animation:displayUnifiedMediaIn .38s cubic-bezier(.2,.85,.2,1.05) forwards;
+}
+
+@keyframes displayUnifiedMediaIn{
+  to{
+    opacity:1;
+    filter:blur(0);
+    transform:scale(1);
+  }
+}
+
+/* الفيديو */
+.displayUnifiedVideo{
+  border-radius:inherit !important;
+  background:#0F172A !important;
+}
+
+.displayUnifiedMediaFrame:has(video)::after{
+  content:"فيديو";
+  position:absolute;
+  top:14px;
+  right:14px;
+  z-index:3;
+
+  min-height:30px;
+  padding:7px 13px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:999px;
+
+  background:rgba(255,255,255,.88);
+  color:#24185E;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:.76rem;
+  font-weight:900;
+
+  box-shadow:
+    0 10px 22px rgba(15,23,42,.18),
+    inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+/* إطار تحميل ناعم */
+.displayUnifiedMediaFrame:has(.displayImagePreparing){
+  background:
+    linear-gradient(
+      110deg,
+      #0F172A 0%,
+      #172033 35%,
+      #243047 50%,
+      #172033 65%,
+      #0F172A 100%
+    ) !important;
+
+  background-size:220% 100% !important;
+  animation:displayUnifiedMediaSkeleton 1.15s ease-in-out infinite;
+}
+
+@keyframes displayUnifiedMediaSkeleton{
+  from{
+    background-position:100% 50%;
+  }
+
+  to{
+    background-position:0% 50%;
+  }
+}
+/* =========================================================
+   VIDEO DISPLAY FIX
+========================================================= */
+
+video,
+.displayUnifiedVideo,
+.auctionVideo,
+.archiveVideo{
+  width:100% !important;
+  height:100% !important;
+
+  max-width:100% !important;
+  max-height:100% !important;
+
+  object-fit:contain !important;
+  background:#0F172A !important;
+}
+
+video::-webkit-media-controls-panel{
+  background-color:rgba(15,23,42,.82);
+}
