@@ -1,6 +1,7 @@
 /* =========================================================
    PRESENTER CLEAN CSS
-   Galaxy Tab A 11 Landscape - Home + Join Only
+   Galaxy Tab A 11 Landscape
+   Home + Join + Presenter Segments
 ========================================================= */
 
 /* =========================
@@ -106,11 +107,9 @@ button:disabled{
   filter:saturate(.75);
 }
 
-
-
-/* =========================
-   Shared Page Shell
-========================= */
+/* =========================================================
+   HOME / JOIN PAGE
+========================================================= */
 
 .homePageShell{
   width:100vw;
@@ -758,236 +757,7 @@ button:disabled{
 }
 
 /* =========================================================
-   Galaxy Tab A 11 Landscape Compact Height
-========================================================= */
-
-@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
-
-  .homePageShell{
-    padding:10px 20px;
-    gap:10px;
-  }
-
-  .topBoard{
-    min-height:82px;
-    padding:8px;
-    gap:12px;
-    grid-template-columns:minmax(0,1fr) 235px minmax(0,1fr);
-  }
-
-  .presenterTopBoard{
-    grid-template-columns:1fr;
-  }
-
-  .teamBox{
-    min-height:64px;
-    padding:8px 10px;
-  }
-
-  .teamName{
-    font-size:1.28rem;
-  }
-
-  .teamScore{
-    width:52px;
-    height:42px;
-    min-width:52px;
-    font-size:1.48rem;
-  }
-
-  .titleBox{
-    height:64px;
-    min-height:64px;
-  }
-
-  .presenterJoinShell .titleBox{
-    height:82px;
-    min-height:82px;
-  }
-
-  .titleBox h1{
-    font-size:1.95rem;
-  }
-
-  .presenterJoinShell .titleBox h1{
-    font-size:2.35rem;
-  }
-
-  .modelNameDisplay,
-  #presenterSubtitle{
-    font-size:.82rem;
-    min-height:22px;
-  }
-
-  .segmentsGrid,
-  #presenterSegmentsGrid{
-    gap:10px;
-  }
-
-  .segmentCard{
-    padding:10px;
-    border-radius:26px 17px 26px 17px;
-  }
-
-  .segmentCard:nth-child(even){
-    border-radius:17px 26px 17px 26px;
-  }
-
-  .segmentCard span{
-    min-height:52px;
-    font-size:1.62rem;
-    border-radius:18px;
-  }
-
-  .presenterDisplayControlsBtn,
-  #displayControlsEyeBtn{
-    min-height:46px;
-    border-radius:17px;
-    font-size:.92rem;
-  }
-
-  .presenterJoinCard{
-    max-width:520px;
-    padding:18px;
-    gap:12px;
-  }
-
-  .presenterJoinInput{
-    height:62px;
-    font-size:1.9rem;
-  }
-
-  .presenterJoinBtn{
-    min-height:56px;
-    font-size:1.22rem;
-  }
-}
-
-/* =========================================================
-   Fallback Portrait / Small Screens
-   فقط عشان لو انفتحت الصفحة بالغلط بالطول
-========================================================= */
-
-@media screen and (max-width:799px), screen and (orientation:portrait){
-
-  body{
-    overflow:auto;
-  }
-
-  .homePageShell{
-    width:100%;
-    min-height:100dvh;
-    height:auto;
-    max-height:none;
-
-    padding:14px 12px 24px;
-    gap:12px;
-
-    overflow:visible;
-  }
-
-  .topBoard{
-    max-width:480px;
-    min-height:0;
-
-    grid-template-columns:minmax(0,1fr) 130px minmax(0,1fr);
-    gap:8px;
-
-    border-radius:26px;
-  }
-
-  .presenterTopBoard{
-    grid-template-columns:1fr;
-  }
-
-  .teamBox{
-    min-height:72px;
-    flex-direction:column;
-    justify-content:center;
-    gap:5px;
-    border-radius:22px;
-  }
-
-  .teamBox:last-child{
-    flex-direction:column;
-    border-radius:22px;
-  }
-
-  .teamName{
-    font-size:.9rem;
-    text-align:center;
-  }
-
-  .teamBox:first-child .teamName,
-  .teamBox:last-child .teamName{
-    text-align:center;
-  }
-
-  .teamScore{
-    width:auto;
-    min-width:48px;
-    height:auto;
-    min-height:36px;
-    font-size:1.8rem;
-    background:transparent;
-    border:0;
-    box-shadow:none;
-  }
-
-  .titleBox{
-    height:72px;
-    min-height:72px;
-  }
-
-  .titleBox h1{
-    font-size:1.45rem;
-  }
-
-  .modelNameDisplay,
-  #presenterSubtitle{
-    font-size:.72rem;
-  }
-
-  .segmentsGrid,
-  #presenterSegmentsGrid{
-    max-width:480px;
-
-    grid-template-columns:1fr 1fr;
-    grid-template-rows:auto;
-    gap:10px;
-
-    flex:0;
-    overflow:visible;
-  }
-
-  .segmentCard{
-    min-height:96px;
-    height:auto;
-    border-radius:24px;
-  }
-
-  .segmentCard:nth-child(even){
-    border-radius:24px;
-  }
-
-  .segmentCard span{
-    min-height:58px;
-    font-size:1.35rem;
-  }
-
-  .presenterDisplayControlsBtn,
-  #displayControlsEyeBtn{
-    max-width:480px;
-    min-height:54px;
-  }
-
-  .presenterJoinCard{
-    max-width:480px;
-  }
-}
-/* =========================================================
    PRESENTER SEGMENT BASE + HEADER
-   Pro Dashboard - Clean Fixed Layout
 ========================================================= */
 
 #presenterSegmentPage{
@@ -995,11 +765,14 @@ button:disabled{
   height:100dvh;
   min-height:100dvh;
   max-height:100dvh;
+
   padding:10px 18px;
+
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:10px;
+
   overflow:hidden;
   box-sizing:border-box;
 }
@@ -1013,15 +786,22 @@ button:disabled{
   width:100%;
   max-width:1180px;
   min-height:58px;
+
   padding:7px;
   border-radius:22px;
+
   display:grid;
   grid-template-columns:112px minmax(0,1fr) 112px;
   gap:8px;
   align-items:center;
+
   background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(248,250,252,.62));
   border:1px solid rgba(30,41,59,.10);
-  box-shadow:0 12px 24px rgba(15,23,42,.07), inset 0 1px 0 rgba(255,255,255,.82);
+
+  box-shadow:
+    0 12px 24px rgba(15,23,42,.07),
+    inset 0 1px 0 rgba(255,255,255,.82);
+
   flex-shrink:0;
   overflow:hidden;
 }
@@ -1030,20 +810,26 @@ button:disabled{
 .presenterCleanHeaderTitle{
   min-height:44px;
   border-radius:16px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   text-align:center;
   overflow:hidden;
 }
 
 .presenterCleanHeaderBtn{
   padding:6px 8px;
+
   color:#fff;
   font-size:.86rem;
   line-height:1.2;
   font-weight:900;
-  box-shadow:0 8px 16px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,.16);
+
+  box-shadow:
+    0 8px 16px rgba(15,23,42,.12),
+    inset 0 1px 0 rgba(255,255,255,.16);
 }
 
 .presenterCleanBackBtn{
@@ -1060,18 +846,25 @@ button:disabled{
 
 .presenterCleanHeaderTitle{
   padding:6px 12px;
+
   background:#fff;
   border:1px solid rgba(30,41,59,.08);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.90), 0 6px 12px rgba(15,23,42,.05);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.90),
+    0 6px 12px rgba(15,23,42,.05);
 }
 
 .presenterCleanHeaderTitle h1{
   margin:0;
+
   color:#24185E;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.34rem;
   line-height:1.25;
   font-weight:400;
+
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -1080,9 +873,11 @@ button:disabled{
 #presenterPanel{
   width:100%;
   max-width:1180px;
+
   flex:1;
   min-height:0;
   height:auto;
+
   display:block;
   overflow:hidden;
 }
@@ -1104,8 +899,14 @@ button:disabled{
 .presenterCard{
   border-radius:26px;
   border:1px solid rgba(30,41,59,.10);
-  background:linear-gradient(180deg,rgba(255,255,255,.84),rgba(248,250,252,.68));
-  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.82);
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.84),rgba(248,250,252,.68));
+
+  box-shadow:
+    0 14px 28px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.82);
+
   overflow:hidden;
 }
 
@@ -1132,9 +933,11 @@ button:disabled{
   width:100%;
   height:100%;
   min-height:0;
+
   display:grid;
   grid-template-columns:1.08fr .92fr;
   gap:12px;
+
   direction:ltr;
   overflow:hidden;
 }
@@ -1151,7 +954,9 @@ button:disabled{
 .presenterWarmupNumbersCard{
   height:100%;
   min-height:0;
+
   padding:14px;
+
   display:grid;
   grid-template-rows:32px minmax(0,1fr);
   gap:12px;
@@ -1176,46 +981,62 @@ button:disabled{
 .presenterWarmupCats{
   height:100%;
   min-height:0;
+
   display:grid;
   grid-template-rows:repeat(4,minmax(0,1fr));
   gap:10px;
+
   overflow:hidden;
 }
 
 .presenterWarmupCat{
   min-height:0;
+
   padding:10px;
+
   display:grid;
   grid-template-columns:150px minmax(0,1fr);
   gap:10px;
   align-items:center;
+
   border-radius:22px;
   border:1px solid rgba(30,41,59,.09);
+
   background:#fff;
-  box-shadow:0 8px 16px rgba(15,23,42,.06), inset 0 1px 0 rgba(255,255,255,.90);
+
+  box-shadow:
+    0 8px 16px rgba(15,23,42,.06),
+    inset 0 1px 0 rgba(255,255,255,.90);
+
   overflow:hidden;
 }
 
 .presenterWarmupCatTitle{
   height:54px;
   min-height:54px;
+
   padding:8px 10px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   border-radius:18px;
   background:linear-gradient(180deg,#FFF7ED,#fff);
   border:1px solid rgba(249,115,22,.18);
+
   color:#9A3412;
   font-size:1rem;
   line-height:1.25;
   font-weight:900;
   text-align:center;
+
   overflow:hidden;
 }
 
 .presenterWarmupNumbers{
   min-width:0;
+
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:10px;
@@ -1225,18 +1046,26 @@ button:disabled{
   min-width:0;
   height:54px;
   min-height:54px;
+
   border-radius:18px;
   border:1px solid rgba(49,46,129,.20);
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   color:#fff;
   background:linear-gradient(180deg,#312E81,#1E1B4B);
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.5rem;
   line-height:1.18;
   font-weight:400;
-  box-shadow:0 9px 18px rgba(49,46,129,.16), inset 0 1px 0 rgba(255,255,255,.16);
+
+  box-shadow:
+    0 9px 18px rgba(49,46,129,.16),
+    inset 0 1px 0 rgba(255,255,255,.16);
+
   overflow:hidden;
 }
 
@@ -1251,21 +1080,29 @@ button:disabled{
 
 .presenterNumberBtn.presenterOpened{
   position:relative;
+
   color:transparent;
   opacity:1;
   filter:none;
+
   background:linear-gradient(180deg,#F8FAFC,#E2E8F0);
   border-color:rgba(148,163,184,.22);
-  box-shadow:0 5px 10px rgba(15,23,42,.05), inset 0 1px 0 rgba(255,255,255,.80);
+
+  box-shadow:
+    0 5px 10px rgba(15,23,42,.05),
+    inset 0 1px 0 rgba(255,255,255,.80);
 }
 
 .presenterNumberBtn.presenterOpened::after{
   content:"✓";
+
   position:absolute;
   inset:0;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   color:#7C3AED;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.45rem;
@@ -1274,9 +1111,14 @@ button:disabled{
 
 .presenterNumberBtn.selectedPresenterTeam:not(.presenterOpened){
   color:#24185E;
+
   background:linear-gradient(180deg,#FFE6D4,#fff);
   border-color:rgba(249,115,22,.34);
-  box-shadow:0 0 0 4px rgba(249,115,22,.12), 0 9px 18px rgba(249,115,22,.12), inset 0 1px 0 rgba(255,255,255,.86);
+
+  box-shadow:
+    0 0 0 4px rgba(249,115,22,.12),
+    0 9px 18px rgba(249,115,22,.12),
+    inset 0 1px 0 rgba(255,255,255,.86);
 }
 
 .presenterWarmupRight{
@@ -1306,6 +1148,7 @@ button:disabled{
 .presenterTeams{
   width:100%;
   height:100%;
+
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
@@ -1314,17 +1157,25 @@ button:disabled{
 .presenterBtn{
   min-width:0;
   min-height:60px;
+
   border-radius:20px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   padding:8px 12px;
+
   color:#fff;
   font-size:1rem;
   line-height:1.15;
   font-weight:900;
   text-align:center;
-  box-shadow:0 10px 20px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.16);
+
+  box-shadow:
+    0 10px 20px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.16);
+
   overflow:hidden;
 }
 
@@ -1334,7 +1185,10 @@ button:disabled{
 
 .presenterBtn.orange{
   color:#1E293B;
-  background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(241,245,249,.76));
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.88),rgba(241,245,249,.76));
+
   border:1px solid rgba(30,41,59,.10);
 }
 
@@ -1342,21 +1196,35 @@ button:disabled{
 .presenterBtn.orange.activeTeam{
   background:linear-gradient(180deg,#FFE6D4,#fff);
   border:1px solid rgba(249,115,22,.34);
+
   color:#24185E;
-  box-shadow:0 0 0 4px rgba(249,115,22,.12), 0 12px 22px rgba(249,115,22,.12), inset 0 1px 0 rgba(255,255,255,.86);
+
+  box-shadow:
+    0 0 0 4px rgba(249,115,22,.12),
+    0 12px 22px rgba(249,115,22,.12),
+    inset 0 1px 0 rgba(255,255,255,.86);
 }
 
 .presenterWarmupPreviewCard{
   height:100%;
   min-height:0;
+
   padding:14px;
+
   display:grid;
   grid-template-rows:24px minmax(0,1fr) 24px minmax(0,1fr);
   gap:8px;
+
   border-radius:26px;
   border:1px solid rgba(30,41,59,.10);
-  background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
-  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.84);
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
+
+  box-shadow:
+    0 14px 28px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.84);
+
   overflow:hidden;
 }
 
@@ -1364,6 +1232,7 @@ button:disabled{
   height:24px;
   display:flex;
   align-items:center;
+
   color:#1E293B;
   font-size:.9rem;
   line-height:1;
@@ -1395,22 +1264,32 @@ button:disabled{
   width:100%;
   height:100%;
   min-height:0;
+
   border-radius:22px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   padding:16px 18px;
+
   text-align:center;
   overflow:hidden;
+
   font-weight:900;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.90), 0 8px 16px rgba(15,23,42,.04);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.90),
+    0 8px 16px rgba(15,23,42,.04);
 }
 
 .presenterBigQuestionBody,
 #presenterWarmupQuestionText{
   background:linear-gradient(180deg,#fff,#F5F3FF);
   border:1px solid rgba(124,58,237,.12);
+
   color:#1E1B4B;
+
   font-size:1.52rem;
   line-height:1.36;
 }
@@ -1419,7 +1298,9 @@ button:disabled{
 #presenterWarmupAnswerText{
   background:linear-gradient(180deg,#fff,#ECFDF5);
   border:1px solid rgba(15,118,110,.14);
+
   color:#0F766E;
+
   font-size:1.72rem;
   line-height:1.30;
 }
@@ -1427,9 +1308,11 @@ button:disabled{
 .presenterWarmupActions{
   height:62px;
   min-height:62px;
+
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:10px;
+
   overflow:hidden;
 }
 
@@ -1437,17 +1320,25 @@ button:disabled{
   width:100%;
   height:60px;
   min-height:60px;
+
   border-radius:20px;
+
   padding:8px 10px;
+
   color:#fff;
+
   font-size:.95rem;
   line-height:1.18;
   font-weight:900;
   text-align:center;
+
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  box-shadow:0 10px 20px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,.16);
+
+  box-shadow:
+    0 10px 20px rgba(15,23,42,.12),
+    inset 0 1px 0 rgba(255,255,255,.16);
 }
 
 .presenterWarmupActions .presenterDoubleBtn,
@@ -1480,9 +1371,11 @@ button:disabled{
   width:100%;
   height:100%;
   min-height:0;
+
   display:grid;
   grid-template-columns:1.12fr .88fr;
   gap:12px;
+
   direction:ltr;
   overflow:hidden;
 }
@@ -1499,22 +1392,34 @@ button:disabled{
 .presenterTop10AnswersCard{
   height:100%;
   min-height:0;
+
   padding:14px;
+
   display:grid;
   grid-template-rows:32px minmax(0,1fr);
   gap:12px;
+
   border-radius:26px;
   border:1px solid rgba(30,41,59,.10);
-  background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(248,250,252,.66));
-  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.80);
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.82),rgba(248,250,252,.66));
+
+  box-shadow:
+    0 14px 28px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.80);
+
   overflow:hidden;
 }
 
 .presenterTop10AnswersCard > .presenterLabel{
   height:32px;
+
   display:flex;
   align-items:center;
+
   margin:0;
+
   color:#1E293B;
   font-size:1rem;
   line-height:1;
@@ -1533,9 +1438,11 @@ button:disabled{
 .presenterTop10AnswersCols{
   height:100%;
   min-height:0;
+
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
+
   overflow:hidden;
 }
 
@@ -1545,9 +1452,11 @@ button:disabled{
   min-width:0;
   height:100%;
   min-height:0;
+
   display:grid;
   grid-template-rows:repeat(5,minmax(0,1fr));
   gap:9px;
+
   overflow:hidden;
 }
 
@@ -1555,16 +1464,25 @@ button:disabled{
   width:100%;
   height:100%;
   min-height:0;
+
   padding:8px 9px;
+
   display:grid;
   grid-template-columns:38px minmax(0,1fr) 64px;
   gap:8px;
   align-items:center;
+
   border-radius:18px;
   border:1px solid rgba(14,116,144,.18);
+
   background:linear-gradient(180deg,#0E7490,#164E63);
+
   color:#fff;
-  box-shadow:0 9px 18px rgba(14,116,144,.16), inset 0 1px 0 rgba(255,255,255,.16);
+
+  box-shadow:
+    0 9px 18px rgba(14,116,144,.16),
+    inset 0 1px 0 rgba(255,255,255,.16);
+
   overflow:hidden;
 }
 
@@ -1576,27 +1494,36 @@ button:disabled{
   width:34px;
   height:34px;
   min-width:34px;
+
   border-radius:13px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   background:rgba(255,255,255,.18);
   border:1px solid rgba(255,255,255,.14);
+
   color:#fff;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1rem;
   line-height:1.1;
   font-weight:400;
+
   overflow:hidden;
 }
 
 .presenterTop10AnswerText{
   min-width:0;
+
   color:#fff;
+
   font-size:1.04rem;
   line-height:1.28;
   font-weight:900;
   text-align:right;
+
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -1604,11 +1531,14 @@ button:disabled{
 
 .presenterTop10OpenedBy{
   min-width:0;
+
   color:rgba(255,255,255,.76);
+
   font-size:.66rem;
   line-height:1.1;
   font-weight:900;
   text-align:center;
+
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -1617,7 +1547,11 @@ button:disabled{
 .presenterTop10AnswerBtn.opened{
   background:linear-gradient(180deg,#ECFEFF,#CFFAFE);
   border-color:rgba(6,182,212,.26);
-  box-shadow:0 6px 12px rgba(14,116,144,.08), inset 0 1px 0 rgba(255,255,255,.90);
+
+  box-shadow:
+    0 6px 12px rgba(14,116,144,.08),
+    inset 0 1px 0 rgba(255,255,255,.90);
+
   opacity:1;
   filter:none;
 }
@@ -1663,6 +1597,7 @@ button:disabled{
 .presenterTop10TeamsBox .presenterTeams{
   width:100%;
   height:100%;
+
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
@@ -1671,15 +1606,26 @@ button:disabled{
 .presenterTop10TeamsBox .presenterBtn{
   height:60px;
   min-height:60px;
+
   border-radius:20px;
+
   padding:8px 12px;
+
   color:#1E293B;
-  background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(241,245,249,.76));
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.88),rgba(241,245,249,.76));
+
   border:1px solid rgba(30,41,59,.10);
+
   font-size:1.02rem;
   line-height:1.15;
   font-weight:900;
-  box-shadow:0 10px 20px rgba(15,23,42,.07), inset 0 1px 0 rgba(255,255,255,.80);
+
+  box-shadow:
+    0 10px 20px rgba(15,23,42,.07),
+    inset 0 1px 0 rgba(255,255,255,.80);
+
   overflow:hidden;
 }
 
@@ -1687,30 +1633,46 @@ button:disabled{
 .presenterTop10TeamsBox .presenterBtn.activeTeam{
   background:linear-gradient(180deg,#FFE6D4,#fff);
   border-color:rgba(249,115,22,.34);
+
   color:#24185E;
-  box-shadow:0 0 0 4px rgba(249,115,22,.12), 0 12px 22px rgba(249,115,22,.12), inset 0 1px 0 rgba(255,255,255,.86);
+
+  box-shadow:
+    0 0 0 4px rgba(249,115,22,.12),
+    0 12px 22px rgba(249,115,22,.12),
+    inset 0 1px 0 rgba(255,255,255,.86);
 }
 
 .presenterTop10QuestionCard{
   height:100%;
   min-height:0;
+
   padding:14px;
+
   display:grid;
   grid-template-rows:64px minmax(0,1fr);
   gap:12px;
+
   border-radius:26px;
   border:1px solid rgba(30,41,59,.10);
-  background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
-  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.84);
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
+
+  box-shadow:
+    0 14px 28px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.84);
+
   overflow:hidden;
 }
 
 .presenterTop10StatusTop{
   height:64px;
   min-height:64px;
+
   display:grid;
   grid-template-columns:88px minmax(0,1fr);
   gap:10px;
+
   margin:0;
   overflow:hidden;
 }
@@ -1719,16 +1681,24 @@ button:disabled{
 .presenterTop10ErrorMiniBox{
   height:64px;
   min-height:0;
+
   padding:8px 10px;
+
   border-radius:20px;
+
   background:#fff;
   border:1px solid rgba(30,41,59,.09);
+
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   gap:5px;
-  box-shadow:0 8px 16px rgba(15,23,42,.06), inset 0 1px 0 rgba(255,255,255,.90);
+
+  box-shadow:
+    0 8px 16px rgba(15,23,42,.06),
+    inset 0 1px 0 rgba(255,255,255,.90);
+
   overflow:hidden;
 }
 
@@ -1744,9 +1714,11 @@ button:disabled{
 .presenterTop10RoundMini span,
 .presenterTop10ErrorMiniBox span{
   color:#64748B;
+
   font-size:.72rem;
   line-height:1;
   font-weight:900;
+
   white-space:nowrap;
 }
 
@@ -1766,25 +1738,31 @@ button:disabled{
 
 .presenterTop10ErrorsMini{
   min-width:0;
+
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
+
   overflow:hidden;
 }
 
 .presenterTop10QuestionClear{
   min-height:0;
+
   display:grid;
   grid-template-rows:24px minmax(0,1fr);
   gap:8px;
+
   margin:0;
   overflow:hidden;
 }
 
 .presenterTop10QuestionClear .presenterLabel{
   height:24px;
+
   display:flex;
   align-items:center;
+
   margin:0;
   color:#1E293B;
   font-size:.92rem;
@@ -1806,29 +1784,41 @@ button:disabled{
   width:100%;
   height:100%;
   min-height:0;
+
   padding:16px 18px;
+
   border-radius:22px;
   border:1px solid rgba(124,58,237,.12);
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   background:linear-gradient(180deg,#fff,#F5F3FF);
+
   color:#1E1B4B;
+
   font-size:1.48rem;
   line-height:1.36;
   font-weight:900;
   text-align:center;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.90), 0 8px 16px rgba(124,58,237,.06);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.90),
+    0 8px 16px rgba(124,58,237,.06);
+
   overflow:hidden;
 }
 
 .presenterTop10Actions{
   height:118px;
   min-height:118px;
+
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   grid-template-rows:repeat(2,55px);
   gap:8px;
+
   overflow:hidden;
 }
 
@@ -1836,20 +1826,29 @@ button:disabled{
   width:100%;
   height:55px;
   min-height:55px;
+
   border-radius:18px;
+
   padding:7px 8px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   color:#fff;
+
   font-size:.86rem;
   line-height:1.18;
   font-weight:900;
   text-align:center;
+
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  box-shadow:0 9px 18px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,.16);
+
+  box-shadow:
+    0 9px 18px rgba(15,23,42,.12),
+    inset 0 1px 0 rgba(255,255,255,.16);
 }
 
 .presenterTop10Actions .presenterBtn:active:not(:disabled){
@@ -1892,13 +1891,14 @@ button:disabled{
 }
 
 /* =========================================================
-   AUCTION / فتبلة - ACTUAL CLASSES FIX
+   AUCTION / فتبلة
 ========================================================= */
 
 #presenterPanel .auctionWrap{
   width:100%;
   height:100%;
   min-height:0;
+
   display:grid;
   grid-template-columns:1.08fr .92fr;
   grid-template-rows:62px minmax(0,1fr) 118px;
@@ -1906,27 +1906,41 @@ button:disabled{
     "numbers teams"
     "numbers preview"
     "actions preview";
+
   gap:12px;
+
   padding:0;
   margin:0;
+
   overflow:hidden;
 }
 
 #presenterPanel .auctionGrid{
   grid-area:numbers;
+
   width:100%;
   height:100%;
   min-height:0;
+
   padding:16px;
+
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   grid-auto-rows:86px;
   gap:14px;
+
   align-content:start;
+
   border-radius:26px;
   border:1px solid rgba(30,41,59,.10);
-  background:linear-gradient(180deg,rgba(255,255,255,.84),rgba(248,250,252,.68));
-  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.82);
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.84),rgba(248,250,252,.68));
+
+  box-shadow:
+    0 14px 28px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.82);
+
   overflow:hidden;
 }
 
@@ -1934,18 +1948,26 @@ button:disabled{
   width:100%;
   height:86px;
   min-height:86px;
+
   border-radius:24px;
   border:1px solid rgba(49,46,129,.20);
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   color:#fff;
   background:linear-gradient(180deg,#312E81,#1E1B4B);
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:2.25rem;
   line-height:1;
   font-weight:400;
-  box-shadow:0 10px 20px rgba(49,46,129,.16), inset 0 1px 0 rgba(255,255,255,.16);
+
+  box-shadow:
+    0 10px 20px rgba(49,46,129,.16),
+    inset 0 1px 0 rgba(255,255,255,.16);
+
   overflow:hidden;
 }
 
@@ -1955,22 +1977,32 @@ button:disabled{
 
 #presenterPanel .auctionBtn.used{
   position:relative;
+
   color:transparent;
+
   background:linear-gradient(180deg,#F8FAFC,#E2E8F0);
   border-color:rgba(148,163,184,.22);
-  box-shadow:0 5px 10px rgba(15,23,42,.05), inset 0 1px 0 rgba(255,255,255,.80);
+
+  box-shadow:
+    0 5px 10px rgba(15,23,42,.05),
+    inset 0 1px 0 rgba(255,255,255,.80);
+
   opacity:1;
   filter:none;
 }
 
 #presenterPanel .auctionBtn.used::after{
   content:"✓";
+
   position:absolute;
   inset:0;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   color:#7C3AED;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.9rem;
   line-height:1;
@@ -1978,17 +2010,22 @@ button:disabled{
 
 #presenterPanel .auctionTopBar{
   grid-area:teams;
+
   width:100%;
   height:62px;
   min-height:62px;
+
   display:grid;
   grid-template-columns:1fr 92px 1fr;
   gap:10px;
+
   padding:0;
   margin:0;
+
   background:transparent;
   border:0;
   box-shadow:none;
+
   overflow:hidden;
 }
 
@@ -1996,19 +2033,28 @@ button:disabled{
 #presenterPanel .auctionMiddleCard{
   height:60px;
   min-height:60px;
+
   border-radius:20px;
   border:1px solid rgba(30,41,59,.10);
-  background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(241,245,249,.76));
-  box-shadow:0 10px 20px rgba(15,23,42,.07), inset 0 1px 0 rgba(255,255,255,.80);
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.88),rgba(241,245,249,.76));
+
+  box-shadow:
+    0 10px 20px rgba(15,23,42,.07),
+    inset 0 1px 0 rgba(255,255,255,.80);
+
   overflow:hidden;
 }
 
 #presenterPanel .auctionTeamCard{
   padding:8px 10px;
+
   display:grid;
   grid-template-columns:minmax(0,1fr) 42px;
   gap:8px;
   align-items:center;
+
   cursor:pointer;
 }
 
@@ -2018,10 +2064,13 @@ button:disabled{
 
 #presenterPanel .auctionTeamName{
   min-width:0;
+
   color:#1E293B;
+
   font-size:.92rem;
   line-height:1.15;
   font-weight:900;
+
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -2030,27 +2079,38 @@ button:disabled{
 #presenterPanel .auctionTeamScore{
   width:42px;
   height:38px;
+
   border-radius:14px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   background:#fff;
   border:1px solid rgba(30,41,59,.08);
+
   color:#312E81;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.25rem;
   line-height:1;
+
   box-shadow:inset 0 1px 0 rgba(255,255,255,.90);
 }
 
 #presenterPanel .auctionTeamCard.activeTeam{
   background:linear-gradient(180deg,#FFE6D4,#fff);
   border-color:rgba(249,115,22,.34);
-  box-shadow:0 0 0 4px rgba(249,115,22,.12), 0 12px 22px rgba(249,115,22,.12), inset 0 1px 0 rgba(255,255,255,.86);
+
+  box-shadow:
+    0 0 0 4px rgba(249,115,22,.12),
+    0 12px 22px rgba(249,115,22,.12),
+    inset 0 1px 0 rgba(255,255,255,.86);
 }
 
 #presenterPanel .auctionMiddleCard{
   padding:6px;
+
   display:flex;
   align-items:center;
   justify-content:center;
@@ -2059,9 +2119,11 @@ button:disabled{
 
 #presenterPanel .auctionTurnLabel{
   color:#0F4C5C;
+
   font-size:.78rem;
   line-height:1.2;
   font-weight:900;
+
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -2069,30 +2131,45 @@ button:disabled{
 
 #presenterPanel .auctionQuestionBox{
   grid-area:preview;
+
   width:100%;
   height:100%;
   min-height:0;
+
   padding:14px;
+
   border-radius:26px;
   border:1px solid rgba(30,41,59,.10);
-  background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
-  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.84);
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
+
+  box-shadow:
+    0 14px 28px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.84);
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   overflow:hidden;
 }
 
 #presenterPanel .auctionPlaceholder{
   width:100%;
   height:100%;
+
   border-radius:24px;
   border:1px dashed rgba(100,116,139,.24);
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   background:linear-gradient(180deg,#fff,#F8FAFC);
+
   color:#64748B;
+
   font-size:1.25rem;
   line-height:1.35;
   font-weight:900;
@@ -2104,11 +2181,15 @@ button:disabled{
   width:100%;
   height:100%;
   min-height:0;
+
   border-radius:24px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   background:#0F172A;
+
   overflow:hidden;
 }
 
@@ -2116,6 +2197,7 @@ button:disabled{
 #presenterPanel .auctionVideoPreview{
   width:100%;
   height:100%;
+
   object-fit:contain;
   display:block;
 }
@@ -2127,36 +2209,51 @@ button:disabled{
 #presenterPanel .auctionVideoPlayBtn{
   position:absolute;
   inset:auto auto 14px 14px;
+
   width:58px;
   height:58px;
+
   border-radius:50%;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   background:linear-gradient(180deg,#67E8F9,#06B6D4);
+
   color:#12362D;
+
   font-size:1.2rem;
   font-weight:900;
-  box-shadow:0 10px 20px rgba(6,182,212,.22), inset 0 1px 0 rgba(255,255,255,.24);
+
+  box-shadow:
+    0 10px 20px rgba(6,182,212,.22),
+    inset 0 1px 0 rgba(255,255,255,.24);
 }
 
 #presenterPanel .auctionResultView{
   width:100%;
   height:100%;
   min-height:0;
+
   display:grid;
   grid-template-rows:minmax(0,1fr) 118px;
   gap:10px;
+
   overflow:hidden;
 }
 
 #presenterPanel .auctionResultMediaBox{
   min-height:0;
+
   border-radius:24px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   background:#0F172A;
+
   overflow:hidden;
 }
 
@@ -2165,9 +2262,11 @@ button:disabled{
   width:100%;
   height:100%;
   min-height:0;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   overflow:hidden;
 }
 
@@ -2175,25 +2274,35 @@ button:disabled{
 #presenterPanel .auctionResultVideo{
   width:100%;
   height:100%;
+
   object-fit:contain;
   display:block;
 }
 
 #presenterPanel .auctionResultAnswerBox{
   min-height:0;
+
   padding:10px 12px;
+
   border-radius:22px;
   border:1px solid rgba(15,118,110,.14);
+
   background:linear-gradient(180deg,#fff,#ECFDF5);
+
   display:grid;
   grid-template-rows:18px minmax(0,1fr);
   gap:6px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.90), 0 8px 16px rgba(15,118,110,.05);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.90),
+    0 8px 16px rgba(15,118,110,.05);
+
   overflow:hidden;
 }
 
 #presenterPanel .auctionResultAnswerLabel{
   color:#0F766E;
+
   font-size:.76rem;
   line-height:1;
   font-weight:900;
@@ -2201,31 +2310,40 @@ button:disabled{
 
 #presenterPanel .auctionResultAnswerText{
   min-height:0;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   color:#0F766E;
+
   font-size:1.55rem;
   line-height:1.25;
   font-weight:900;
   text-align:center;
+
   overflow:hidden;
 }
 
 #presenterPanel .auctionControlPanel{
   grid-area:actions;
+
   width:100%;
   height:118px;
   min-height:118px;
+
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
   grid-template-rows:repeat(2,55px);
   gap:8px;
+
   padding:0;
   margin:0;
+
   background:transparent;
   border:0;
   box-shadow:none;
+
   overflow:hidden;
 }
 
@@ -2233,21 +2351,30 @@ button:disabled{
   width:100%;
   height:55px;
   min-height:55px;
+
   border:0;
   border-radius:18px;
+
   padding:7px 8px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   color:#fff;
+
   font-size:.9rem;
   line-height:1.18;
   font-weight:900;
   text-align:center;
+
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  box-shadow:0 9px 18px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,.16);
+
+  box-shadow:
+    0 9px 18px rgba(15,23,42,.12),
+    inset 0 1px 0 rgba(255,255,255,.16);
 }
 
 #presenterPanel .auctionControlPanel button:active:not(:disabled){
@@ -2357,23 +2484,109 @@ button:disabled{
 }
 
 /* =========================================================
-   GALAXY TAB A 11 / LANDSCAPE COMPACT
+   Galaxy Tab A 11 Landscape Compact Height
 ========================================================= */
 
-@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape){
-
-  #presenterSegmentPage{
-    padding:9px 16px;
-    gap:8px;
-  }
-
-  #presenterSegmentPage .presenterCleanHeader,
-  #presenterPanel{
-    max-width:1120px;
-  }
-}
-
 @media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
+
+  .homePageShell{
+    padding:10px 20px;
+    gap:10px;
+  }
+
+  .topBoard{
+    min-height:82px;
+    padding:8px;
+    gap:12px;
+    grid-template-columns:minmax(0,1fr) 235px minmax(0,1fr);
+  }
+
+  .presenterTopBoard{
+    grid-template-columns:1fr;
+  }
+
+  .teamBox{
+    min-height:64px;
+    padding:8px 10px;
+  }
+
+  .teamName{
+    font-size:1.28rem;
+  }
+
+  .teamScore{
+    width:52px;
+    height:42px;
+    min-width:52px;
+    font-size:1.48rem;
+  }
+
+  .titleBox{
+    height:64px;
+    min-height:64px;
+  }
+
+  .presenterJoinShell .titleBox{
+    height:82px;
+    min-height:82px;
+  }
+
+  .titleBox h1{
+    font-size:1.95rem;
+  }
+
+  .presenterJoinShell .titleBox h1{
+    font-size:2.35rem;
+  }
+
+  .modelNameDisplay,
+  #presenterSubtitle{
+    font-size:.82rem;
+    min-height:22px;
+  }
+
+  .segmentsGrid,
+  #presenterSegmentsGrid{
+    gap:10px;
+  }
+
+  .segmentCard{
+    padding:10px;
+    border-radius:26px 17px 26px 17px;
+  }
+
+  .segmentCard:nth-child(even){
+    border-radius:17px 26px 17px 26px;
+  }
+
+  .segmentCard span{
+    min-height:52px;
+    font-size:1.62rem;
+    border-radius:18px;
+  }
+
+  .presenterDisplayControlsBtn,
+  #displayControlsEyeBtn{
+    min-height:46px;
+    border-radius:17px;
+    font-size:.92rem;
+  }
+
+  .presenterJoinCard{
+    max-width:520px;
+    padding:18px;
+    gap:12px;
+  }
+
+  .presenterJoinInput{
+    height:62px;
+    font-size:1.9rem;
+  }
+
+  .presenterJoinBtn{
+    min-height:56px;
+    font-size:1.22rem;
+  }
 
   #presenterSegmentPage{
     padding:8px 14px;
@@ -2381,10 +2594,15 @@ button:disabled{
   }
 
   #presenterSegmentPage .presenterCleanHeader{
+    max-width:1100px;
     min-height:54px;
     padding:6px;
     border-radius:20px;
     grid-template-columns:106px minmax(0,1fr) 106px;
+  }
+
+  #presenterPanel{
+    max-width:1100px;
   }
 
   .presenterCleanHeaderBtn,
@@ -2399,11 +2617,6 @@ button:disabled{
 
   .presenterCleanHeaderTitle h1{
     font-size:1.18rem;
-  }
-
-  #presenterSegmentPage .presenterCleanHeader,
-  #presenterPanel{
-    max-width:1100px;
   }
 
   .presenterWarmupLayout,
@@ -2736,6 +2949,245 @@ button:disabled{
 }
 
 /* =========================================================
+   Fallback Portrait / Small Screens
+========================================================= */
+
+@media screen and (max-width:799px), screen and (orientation:portrait){
+
+  body{
+    overflow:auto;
+  }
+
+  .homePageShell{
+    width:100%;
+    min-height:100dvh;
+    height:auto;
+    max-height:none;
+
+    padding:14px 12px 24px;
+    gap:12px;
+
+    overflow:visible;
+  }
+
+  .topBoard{
+    max-width:480px;
+    min-height:0;
+
+    grid-template-columns:minmax(0,1fr) 130px minmax(0,1fr);
+    gap:8px;
+
+    border-radius:26px;
+  }
+
+  .presenterTopBoard{
+    grid-template-columns:1fr;
+  }
+
+  .teamBox{
+    min-height:72px;
+    flex-direction:column;
+    justify-content:center;
+    gap:5px;
+    border-radius:22px;
+  }
+
+  .teamBox:last-child{
+    flex-direction:column;
+    border-radius:22px;
+  }
+
+  .teamName{
+    font-size:.9rem;
+    text-align:center;
+  }
+
+  .teamBox:first-child .teamName,
+  .teamBox:last-child .teamName{
+    text-align:center;
+  }
+
+  .teamScore{
+    width:auto;
+    min-width:48px;
+    height:auto;
+    min-height:36px;
+    font-size:1.8rem;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+  }
+
+  .titleBox{
+    height:72px;
+    min-height:72px;
+  }
+
+  .titleBox h1{
+    font-size:1.45rem;
+  }
+
+  .modelNameDisplay,
+  #presenterSubtitle{
+    font-size:.72rem;
+  }
+
+  .segmentsGrid,
+  #presenterSegmentsGrid{
+    max-width:480px;
+
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto;
+    gap:10px;
+
+    flex:0;
+    overflow:visible;
+  }
+
+  .segmentCard{
+    min-height:96px;
+    height:auto;
+    border-radius:24px;
+  }
+
+  .segmentCard:nth-child(even){
+    border-radius:24px;
+  }
+
+  .segmentCard span{
+    min-height:58px;
+    font-size:1.35rem;
+  }
+
+  .presenterDisplayControlsBtn,
+  #displayControlsEyeBtn{
+    max-width:480px;
+    min-height:54px;
+  }
+
+  .presenterJoinCard{
+    max-width:480px;
+  }
+
+  #presenterSegmentPage{
+    height:auto;
+    max-height:none;
+    min-height:100dvh;
+
+    padding:12px;
+    overflow:visible;
+  }
+
+  #presenterSegmentPage .presenterCleanHeader{
+    width:100%;
+    max-width:480px;
+
+    grid-template-columns:1fr;
+    gap:8px;
+
+    min-height:0;
+    border-radius:24px;
+  }
+
+  .presenterCleanHeaderTitle{
+    order:-1;
+  }
+
+  #presenterPanel{
+    max-width:480px;
+    overflow:visible;
+  }
+
+  #presenterPanel > *{
+    height:auto;
+    overflow:visible;
+  }
+
+  .presenterWarmupLayout,
+  .presenterTop10Layout,
+  #presenterPanel .auctionWrap{
+    height:auto;
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+
+    overflow:visible;
+  }
+
+  .presenterWarmupLeft,
+  .presenterWarmupRight,
+  .presenterTop10Left,
+  .presenterTop10Right{
+    height:auto;
+    overflow:visible;
+  }
+
+  .presenterWarmupCats{
+    height:auto;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .presenterWarmupCat{
+    grid-template-columns:1fr;
+  }
+
+  .presenterTop10AnswersCols{
+    height:auto;
+    grid-template-columns:1fr;
+  }
+
+  .presenterTop10AnswersCol,
+  .presenterTop10RightCol,
+  .presenterTop10LeftCol{
+    height:auto;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .presenterTop10AnswerBtn{
+    min-height:58px;
+  }
+
+  .presenterWarmupActions,
+  .presenterTop10Actions,
+  #presenterPanel .auctionControlPanel{
+    height:auto;
+    grid-template-columns:1fr;
+    grid-template-rows:auto;
+  }
+
+  .presenterWarmupActions .presenterBtn,
+  .presenterTop10Actions .presenterBtn,
+  #presenterPanel .auctionControlPanel button{
+    height:54px;
+    min-height:54px;
+  }
+
+  #presenterPanel .auctionTopBar{
+    height:auto;
+    grid-template-columns:1fr;
+  }
+
+  #presenterPanel .auctionTeamCard,
+  #presenterPanel .auctionMiddleCard{
+    height:58px;
+    min-height:58px;
+  }
+
+  #presenterPanel .auctionGrid{
+    height:auto;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-auto-rows:64px;
+  }
+
+  #presenterPanel .auctionQuestionBox{
+    min-height:320px;
+  }
+}
+
+/* =========================================================
    FINAL VISIBILITY FIX
    لا تضع أي كود بعد هذا البلوك
 ========================================================= */
@@ -2744,6 +3196,10 @@ body .hidden{
   display:none;
 }
 
+#presenterJoin.hidden,
+#presenterHome.hidden,
+#presenterSegmentPage.hidden,
+#presenterToast.hidden,
 body .homePageShell.hidden,
 body .presenterJoinShell.hidden,
 body .presenterSegmentPage.hidden,
