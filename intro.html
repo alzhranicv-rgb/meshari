@@ -78,12 +78,12 @@
         </div>
 
         <button
-  type="button"
-  id="startGameBtn"
-  onclick="startGameFromIntro()"
->
-  بدء اللعبة
-</button>
+          type="button"
+          id="startGameBtn"
+          onclick="startGameFromIntro()"
+        >
+          بدء اللعبة
+        </button>
 
       </div>
 
@@ -99,7 +99,7 @@
         type="button"
         class="introPresenterModalClose"
         onclick="goToDisplayFromIntro()"
-        aria-label="إغلاق"
+        aria-label="الانتقال للعرض"
       >
         ×
       </button>
@@ -133,7 +133,11 @@
               كود الدخول
             </div>
 
-            <div id="presenterIntroCode" class="presenterIntroCodeValue">
+            <div
+              id="presenterIntroCode"
+              class="presenterIntroCodeValue"
+              onclick="copyPresenterIntroCode()"
+            >
               ----
             </div>
           </div>

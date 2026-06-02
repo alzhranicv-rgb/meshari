@@ -4,6 +4,8 @@ let gameToastTimer = null
 let presenterStartWatchTimer = null
 
 document.addEventListener("DOMContentLoaded", async () => {
+  await endOldIntroSessionIfExists()
+
   resetIntroPageState()
   prepareIntroInputs()
 
@@ -149,6 +151,15 @@ async function loadIntroModels() {
   select.disabled = true
   select.innerHTML = `<option value="">جارٍ تحميل النماذج...</option>`
 
+  if (!window.db) {
+    select.innerHTML = `<option value="">تعذر الاتصال بقاعدة البيانات</option>`
+    select.disabled = false
+
+    setIntroStartLoading(false, "بدء اللعبة", true)
+    showGameToast("تعذر الاتصال بقاعدة البيانات")
+    return
+  }
+
   const { data, error } = await db
     .from("models")
     .select("*")
@@ -160,12 +171,22 @@ async function loadIntroModels() {
     select.innerHTML = `<option value="">تعذر تحميل النماذج</option>`
     select.disabled = false
 
-    setIntroStartLoading(false, "بدء اللعبة", false)
+    setIntroStartLoading(false, "بدء اللعبة", true)
     showGameToast("تعذر تحميل النماذج")
     return
   }
 
   const rows = data || []
+
+  if (!rows.length) {
+    select.innerHTML = `<option value="">لا توجد نماذج متاحة</option>`
+    select.disabled = false
+
+    introModelsLoaded = false
+    setIntroStartLoading(false, "بدء اللعبة", true)
+    showGameToast("لا توجد نماذج متاحة")
+    return
+  }
 
   select.innerHTML = `<option value="">اختر النموذج</option>`
 
@@ -308,6 +329,30 @@ function showIntroFieldError(field, message) {
 }
 
 /* =========================
+   Old Session Cleanup
+========================= */
+
+async function endOldIntroSessionIfExists() {
+  const oldSessionId = localStorage.getItem("game_session_id")
+
+  if (!oldSessionId || !window.db) return
+
+  try {
+    await db
+      .from("game_sessions")
+      .update({
+        status: "ended",
+        active_segment: null,
+        ended_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", oldSessionId)
+  } catch (e) {
+    console.log("end old intro session error:", e)
+  }
+}
+
+/* =========================
    Reset
 ========================= */
 
@@ -322,6 +367,7 @@ function resetIntroPageState() {
   localStorage.removeItem("auction_state_v1")
   localStorage.removeItem("auction_state_v2")
   localStorage.removeItem("who_state_v1")
+  localStorage.removeItem("explain_state_v1")
   localStorage.removeItem("final_state_v2")
   localStorage.removeItem("final_state_v3")
   localStorage.removeItem("archive_state_v1")
@@ -347,6 +393,7 @@ function resetGameStateBeforeStart() {
   localStorage.removeItem("auction_state_v1")
   localStorage.removeItem("auction_state_v2")
   localStorage.removeItem("who_state_v1")
+  localStorage.removeItem("explain_state_v1")
   localStorage.removeItem("final_state_v2")
   localStorage.removeItem("final_state_v3")
   localStorage.removeItem("archive_state_v1")
@@ -364,6 +411,17 @@ function resetGameStateBeforeStart() {
   localStorage.setItem("main_score_b", "0")
 }
 
+function defaultIntroSegmentStatus() {
+  return {
+    warmup: { locked: false, winner: "" },
+    top10: { locked: false, winner: "" },
+    auction: { locked: false, winner: "" },
+    who: { locked: false, winner: "" },
+    explain: { locked: false, winner: "" },
+    final: { locked: false, winner: "" },
+    archive: { locked: false, winner: "" }
+  }
+}
 /* =========================
    Start Game
 ========================= */
@@ -378,6 +436,8 @@ window.startGameFromIntro = async function () {
   if (!validateIntroForm()) return
 
   introStarting = true
+  clearInterval(presenterStartWatchTimer)
+  presenterStartWatchTimer = null
   setIntroStartLoading(true, "جارٍ تجهيز اللعبة...")
   setIntroFormDisabled(true)
 
@@ -402,19 +462,24 @@ window.startGameFromIntro = async function () {
     localStorage.setItem("presenter_join_code_temp", joinCode)
 
     const sessionState = {
-      mainScores: { A: 0, B: 0 },
-      currentModelName: modelText,
-      displayControlsHidden: false,
-      presenterStarted: false,
-      segmentStatus: {},
-      warmup: null,
-      top10: null,
-      auction: null,
-      who: null,
-      final: null,
-      archive: null,
-      toast: null
-    }
+  mainScores: { A: 0, B: 0 },
+  currentModelName: modelText,
+  displayControlsHidden: false,
+  presenterStarted: false,
+  presenterStartedAt: null,
+
+  segmentStatus: defaultIntroSegmentStatus(),
+
+  warmup: null,
+  top10: null,
+  auction: null,
+  who: null,
+  explain: null,
+  final: null,
+  archive: null,
+
+  toast: null
+}
 
     const { error } = await db.from("game_sessions").upsert({
       id: gameSessionId,
@@ -458,14 +523,33 @@ window.startGameFromIntro = async function () {
 function getPresenterIntroUrl() {
   return new URL("presenter.html?join=1", window.location.href).href
 }
+function renderPresenterIntroCode(code) {
+  const codeWrap = document.querySelector(".presenterIntroCodeBox")
+  const finalCode = String(code || "").trim() || "----"
+
+  if (!codeWrap) return
+
+  codeWrap.innerHTML = `
+    <div class="presenterIntroCodeLabel">
+      كود الدخول
+    </div>
+
+    <div id="presenterIntroCode" class="presenterIntroCodeValue">
+      ${finalCode}
+    </div>
+  `
+}
 
 function openPresenterIntroModal() {
   const modal = document.getElementById("presenterIntroModal")
   const qr = document.getElementById("presenterIntroQr")
   const linkBox = document.getElementById("presenterIntroLink")
-  const codeBox = document.getElementById("presenterIntroCode")
 
-  const joinCode = localStorage.getItem("game_join_code") || ""
+  const joinCode =
+    localStorage.getItem("game_join_code") ||
+    localStorage.getItem("presenter_join_code_temp") ||
+    ""
+
   const url = getPresenterIntroUrl()
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=${encodeURIComponent(url)}`
 
@@ -474,8 +558,13 @@ function openPresenterIntroModal() {
     qr.src = qrUrl
   }
 
-  if (linkBox) linkBox.innerText = url
-  if (codeBox) codeBox.innerText = joinCode || "----"
+  if (linkBox) {
+    linkBox.innerText = url
+  }
+
+  renderPresenterIntroCode(joinCode)
+
+  bindPresenterIntroCopyActions()
 
   if (modal) {
     modal.classList.remove("hidden")
@@ -489,6 +578,75 @@ function openPresenterIntroModal() {
   startPresenterStartWatcher()
 }
 
+async function copyIntroText(value, successMessage = "تم النسخ") {
+  const text = String(value || "").trim()
+
+  if (!text || text === "----") {
+    showGameToast("لا يوجد شيء للنسخ")
+    return
+  }
+
+  try {
+    await navigator.clipboard.writeText(text)
+    showGameToast(successMessage)
+  } catch (e) {
+    console.log("copy error:", e)
+
+    const textarea = document.createElement("textarea")
+    textarea.value = text
+    textarea.style.position = "fixed"
+    textarea.style.opacity = "0"
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+
+    try {
+      document.execCommand("copy")
+      showGameToast(successMessage)
+    } catch {
+      showGameToast("تعذر النسخ")
+    }
+
+    textarea.remove()
+  }
+}
+
+window.copyPresenterIntroLink = function () {
+  const linkBox = document.getElementById("presenterIntroLink")
+  const url = linkBox?.innerText || getPresenterIntroUrl()
+
+  copyIntroText(url, "تم نسخ رابط المقدم")
+}
+
+window.copyPresenterIntroCode = function () {
+  const codeBox = document.getElementById("presenterIntroCode")
+  const code = codeBox?.innerText || localStorage.getItem("game_join_code") || ""
+
+  copyIntroText(code, "تم نسخ كود المقدم")
+}
+
+function bindPresenterIntroCopyActions() {
+  const linkBox = document.getElementById("presenterIntroLink")
+  const codeBox = document.getElementById("presenterIntroCode")
+
+  if (linkBox) {
+    linkBox.title = "اضغط لنسخ الرابط"
+    linkBox.style.cursor = "pointer"
+
+    linkBox.onclick = () => {
+      window.copyPresenterIntroLink()
+    }
+  }
+
+  if (codeBox) {
+    codeBox.title = "اضغط لنسخ الكود"
+    codeBox.style.cursor = "pointer"
+
+    codeBox.onclick = () => {
+      window.copyPresenterIntroCode()
+    }
+  }
+}
 function startPresenterStartWatcher() {
   clearInterval(presenterStartWatchTimer)
 
@@ -540,3 +698,7 @@ function goToDisplayFromIntro() {
 
   window.location.href = "display.html"
 }
+window.addEventListener("beforeunload", () => {
+  clearInterval(presenterStartWatchTimer)
+  presenterStartWatchTimer = null
+})

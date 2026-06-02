@@ -1416,14 +1416,15 @@ body{
 /* iPhone */
 @media (max-width:767px){
   .gameToast{
-    top:16px;
-    min-width:220px;
-    max-width:calc(100vw - 28px);
-    min-height:48px;
-    padding:9px 14px;
-    border-radius:17px;
-    gap:8px;
-  }
+  top:16px;
+  bottom:auto;
+  min-width:220px;
+  max-width:calc(100vw - 28px);
+  min-height:48px;
+  padding:9px 14px;
+  border-radius:17px;
+  gap:8px;
+}
 
   .gameToastIcon{
     width:27px;
@@ -1498,13 +1499,14 @@ body{
   }
 
   .gameToast{
-    bottom:22px;
-    min-width:240px;
-    max-width:min(90vw,440px);
-    min-height:50px;
-    padding:9px 16px;
-    border-radius:18px;
-  }
+  top:22px;
+  bottom:auto;
+  min-width:240px;
+  max-width:min(90vw,440px);
+  min-height:50px;
+  padding:9px 16px;
+  border-radius:18px;
+}
 
   .gameToastIcon{
     width:28px;
@@ -1862,4 +1864,87 @@ body{
     backdrop-filter:blur(8px) !important;
     -webkit-backdrop-filter:blur(8px) !important;
   }
+}
+/* =========================================================
+   PRESENTER COPY HINT
+   توضيح أن الكود والرابط قابلين للنسخ
+========================================================= */
+
+.presenterIntroCodeValue,
+.introPresenterLink{
+  cursor:pointer;
+  user-select:none;
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .18s ease;
+}
+
+.presenterIntroCodeValue:hover{
+  transform:translateY(-2px) scale(1.02);
+  filter:brightness(1.08);
+}
+
+.introPresenterLink:hover{
+  filter:brightness(1.04);
+  box-shadow:
+    0 0 0 4px rgba(103,232,249,.10),
+    inset 0 1px 0 rgba(255,255,255,.75);
+}
+
+.presenterIntroCodeValue:active,
+.introPresenterLink:active{
+  transform:scale(.98);
+}
+#startGameBtn.loading{
+  pointer-events:none;
+}
+
+#startGameBtn.loading::before{
+  display:none;
+}
+.presenterIntroCodeBox{
+  position:relative;
+  overflow:hidden;
+}
+
+.presenterIntroCodeValue{
+  position:relative !important;
+  inset:auto !important;
+  display:block !important;
+  width:100% !important;
+  text-align:center !important;
+}
+.presenterIntroCodeBox{
+  position:relative !important;
+  overflow:hidden !important;
+}
+
+.presenterIntroCodeLabel{
+  position:relative !important;
+  z-index:2 !important;
+}
+
+#presenterIntroCode.presenterIntroCodeValue{
+  position:relative !important;
+  top:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  left:auto !important;
+  inset:auto !important;
+
+  display:block !important;
+  width:100% !important;
+
+  margin:4px 0 0 !important;
+  padding:0 !important;
+
+  text-align:center !important;
+  line-height:1 !important;
+
+  color:#24185E !important;
+  -webkit-text-fill-color:#24185E !important;
+
+  background:none !important;
+  transform:none !important;
 }

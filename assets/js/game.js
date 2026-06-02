@@ -932,6 +932,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   bindAudioUnlock()
 
   observeDisplayMedia()
+  restoreDisplayControlsEye()
 
   await loadDisplaySegmentCounts()
   await loadVisibleSegmentsForDisplay()
@@ -2054,9 +2055,6 @@ function protectDisplayMedia(root = document) {
     })
   })
 }
-
-
-
 function updateDisplayControlsEyeButton(isHidden) {
   const btn = document.getElementById("displayControlsEyeBtn")
   if (!btn) return
@@ -2069,8 +2067,15 @@ function updateDisplayControlsEyeButton(isHidden) {
 
 function toggleDisplayControlsFromScreen() {
   const isHidden = document.body.classList.toggle("presenterHideDisplayControls")
+
   localStorage.setItem("presenter_hide_controls", isHidden ? "1" : "0")
   updateDisplayControlsEyeButton(isHidden)
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
+
+  hideJoinCodePopup()
 }
 
 function restoreDisplayControlsEye() {
@@ -2078,10 +2083,45 @@ function restoreDisplayControlsEye() {
   document.body.classList.toggle("presenterHideDisplayControls", isHidden)
   updateDisplayControlsEyeButton(isHidden)
 }
+
+async function copyDisplayJoinCodeFromPopup() {
+  const code = localStorage.getItem("game_join_code") || ""
+
+  if (!code) {
+    showGameToast("لا يوجد كود جلسة")
+    return
+  }
+
+  try {
+    await navigator.clipboard.writeText(code)
+    showGameToast("تم نسخ كود المقدم")
+  } catch (e) {
+    const textarea = document.createElement("textarea")
+    textarea.value = code
+    textarea.style.position = "fixed"
+    textarea.style.opacity = "0"
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+
+    try {
+      document.execCommand("copy")
+      showGameToast("تم نسخ كود المقدم")
+    } catch {
+      showGameToast("تعذر نسخ الكود")
+    }
+
+    textarea.remove()
+  }
+}
+
+window.copyDisplayJoinCodeFromPopup = copyDisplayJoinCodeFromPopup
+
 let joinCodePopTimer = null
+
 function showJoinCodePopup() {
   const code = localStorage.getItem("game_join_code") || ""
-  const modelName = localStorage.getItem("game_model_name") || currentModelName || "النموذج الحالي"
+  const modelName = localStorage.getItem("game_model_name") || currentModelName || "النموذج"
 
   if (!code) {
     showGameToast("لا يوجد كود جلسة")
@@ -2094,30 +2134,30 @@ function showJoinCodePopup() {
   const isHidden = localStorage.getItem("presenter_hide_controls") === "1"
 
   box.innerHTML = `
-    <div class="homeModelClassicBox">
+  <div class="homeModelClassicBox">
 
-      <button class="homeModelClassicClose" onclick="hideJoinCodePopup()">×</button>
+    <button class="homeModelClassicClose" onclick="hideJoinCodePopup()">×</button>
 
-      <div class="homeModelClassicHeader">
-        <div class="homeModelClassicLabel">النموذج الحالي</div>
-        <div class="homeModelClassicName">${modelName}</div>
-      </div>
+    <button
+      id="displayControlsEyeBtn"
+      class="homeModelClassicControl ${isHidden ? "showControlsMode" : "hideControlsMode"}"
+      type="button"
+    >
+      ${isHidden ? "إظهار التحكم" : "إخفاء التحكم"}
+    </button>
 
-      <div class="homeModelClassicBody">
-        <div class="homeModelClassicCodeLabel">كود المقدم</div>
-        <div class="homeModelClassicCode">${code}</div>
-      </div>
+    <button
+      type="button"
+      class="homeModelClassicBody"
+      onclick="copyDisplayJoinCodeFromPopup()"
+      title="اضغط لنسخ كود المقدم"
+    >
+      <span class="homeModelClassicCodeLabel">كود المقدم</span>
+      <span class="homeModelClassicCode">${escapeDisplayHtml(code)}</span>
+    </button>
 
-      <button
-        id="displayControlsEyeBtn"
-        class="homeModelClassicControl ${isHidden ? "showControlsMode" : "hideControlsMode"}"
-        type="button"
-      >
-        ${isHidden ? "إظهار أزرار التحكم" : "إخفاء أزرار التحكم"}
-      </button>
-
-    </div>
-  `
+  </div>
+`
 
   const ctrlBtn = box.querySelector("#displayControlsEyeBtn")
 
@@ -2132,23 +2172,28 @@ function showJoinCodePopup() {
 
   box.classList.remove("hidden")
   box.classList.remove("show")
+
   void box.offsetWidth
+
   box.classList.add("show")
 
   clearTimeout(joinCodePopTimer)
   joinCodePopTimer = setTimeout(() => {
     hideJoinCodePopup()
-  }, 10000)
+  }, 9000)
 }
 
 function hideJoinCodePopup() {
   const box = document.getElementById("homeModelPopupArea")
   if (!box) return
 
+  clearTimeout(joinCodePopTimer)
+  joinCodePopTimer = null
+
   box.classList.remove("show")
 
   setTimeout(() => {
     box.classList.add("hidden")
     box.innerHTML = ""
-  }, 240)
+  }, 220)
 }
