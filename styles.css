@@ -5920,6 +5920,7 @@ body.presenterHideDisplayControls .archiveControls{
     font-size:1.08rem !important;
   }
 }
+
 /* =========================================================
    DISPLAY IMAGES - PRO IPAD APPEARANCE
    ظهور احترافي للصور على الآيباد
@@ -5944,8 +5945,6 @@ body.presenterHideDisplayControls .archiveControls{
 }
 
 /* إطار سينمائي عام للصور */
-.whoImageStage,
-.whoImageBox,
 .auctionImageFrame,
 .auctionImageBox,
 .auctionBigImageWrap,
@@ -5972,8 +5971,6 @@ body.presenterHideDisplayControls .archiveControls{
 }
 
 /* لمعة خفيفة فوق إطار الصورة */
-.whoImageStage::before,
-.whoImageBox::before,
 .auctionImageFrame::before,
 .auctionImageBox::before,
 .auctionBigImageWrap::before,
@@ -6002,9 +5999,6 @@ body.presenterHideDisplayControls .archiveControls{
 }
 
 /* الصور نفسها */
-.whoImageStage img,
-.whoImageBox img,
-.whoImageFull,
 .auctionImageFrame img,
 .auctionImageBox img,
 .auctionBigImage,
@@ -6027,8 +6021,6 @@ body.presenterHideDisplayControls .archiveControls{
 }
 
 /* تحميل ناعم قبل ظهور الصورة */
-.whoImageStage:has(.displayImagePreparing),
-.whoImageBox:has(.displayImagePreparing),
 .auctionImageFrame:has(.displayImagePreparing),
 .auctionImageBox:has(.displayImagePreparing),
 .auctionBigImageWrap:has(.displayImagePreparing),
