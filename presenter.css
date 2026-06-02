@@ -986,24 +986,155 @@ button:disabled{
   }
 }
 /* =========================================================
-   PRESENTER WARMUP - PRO DASHBOARD
-   Galaxy Tab A 11 Landscape - Clean / Modern / Low Lag
-   ضعه قبل FINAL VISIBILITY FIX
+   PRESENTER SEGMENT BASE + HEADER
+   Pro Dashboard - Clean Fixed Layout
 ========================================================= */
 
-/* =========================
-   Warmup Layout
-========================= */
+#presenterSegmentPage{
+  width:100vw;
+  height:100dvh;
+  min-height:100dvh;
+  max-height:100dvh;
+  padding:10px 18px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+
+#presenterSegmentPage,
+#presenterSegmentPage *{
+  box-sizing:border-box;
+}
+
+#presenterSegmentPage .presenterCleanHeader{
+  width:100%;
+  max-width:1180px;
+  min-height:58px;
+  padding:7px;
+  border-radius:22px;
+  display:grid;
+  grid-template-columns:112px minmax(0,1fr) 112px;
+  gap:8px;
+  align-items:center;
+  background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(248,250,252,.62));
+  border:1px solid rgba(30,41,59,.10);
+  box-shadow:0 12px 24px rgba(15,23,42,.07), inset 0 1px 0 rgba(255,255,255,.82);
+  flex-shrink:0;
+  overflow:hidden;
+}
+
+.presenterCleanHeaderBtn,
+.presenterCleanHeaderTitle{
+  min-height:44px;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  overflow:hidden;
+}
+
+.presenterCleanHeaderBtn{
+  padding:6px 8px;
+  color:#fff;
+  font-size:.86rem;
+  line-height:1.2;
+  font-weight:900;
+  box-shadow:0 8px 16px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,.16);
+}
+
+.presenterCleanBackBtn{
+  background:linear-gradient(180deg,#64748B,#334155);
+}
+
+.presenterCleanEndBtn{
+  background:linear-gradient(180deg,#EF4444,#B91C1C);
+}
+
+.presenterCleanHeaderBtn:active{
+  transform:scale(.96);
+}
+
+.presenterCleanHeaderTitle{
+  padding:6px 12px;
+  background:#fff;
+  border:1px solid rgba(30,41,59,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.90), 0 6px 12px rgba(15,23,42,.05);
+}
+
+.presenterCleanHeaderTitle h1{
+  margin:0;
+  color:#24185E;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.34rem;
+  line-height:1.25;
+  font-weight:400;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+#presenterPanel{
+  width:100%;
+  max-width:1180px;
+  flex:1;
+  min-height:0;
+  height:auto;
+  display:block;
+  overflow:hidden;
+}
+
+#presenterPanel > *{
+  width:100%;
+  height:100%;
+  min-height:0;
+  max-width:none;
+  margin:0;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+
+/* =========================================================
+   SHARED PRESENTER COMPONENTS
+========================================================= */
+
+.presenterCard{
+  border-radius:26px;
+  border:1px solid rgba(30,41,59,.10);
+  background:linear-gradient(180deg,rgba(255,255,255,.84),rgba(248,250,252,.68));
+  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.82);
+  overflow:hidden;
+}
+
+.presenterLabel{
+  margin:0;
+  color:#1E293B;
+  font-size:.9rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.presenterBtn{
+  min-width:0;
+  border:0;
+  cursor:pointer;
+  user-select:none;
+}
+
+/* =========================================================
+   WARMUP - PRO DASHBOARD
+========================================================= */
 
 .presenterWarmupLayout{
   width:100%;
   height:100%;
   min-height:0;
-
   display:grid;
   grid-template-columns:1.08fr .92fr;
   gap:12px;
-
   direction:ltr;
   overflow:hidden;
 }
@@ -1017,43 +1148,10 @@ button:disabled{
   overflow:hidden;
 }
 
-/* =========================
-   Shared Clean Card
-========================= */
-
-.presenterCard{
-  border-radius:26px;
-  border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.84), rgba(248,250,252,.68));
-
-  box-shadow:
-    0 14px 28px rgba(15,23,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.82);
-
-  overflow:hidden;
-}
-
-.presenterLabel{
-  margin:0;
-
-  color:#1E293B;
-  font-size:.9rem;
-  line-height:1;
-  font-weight:900;
-}
-
-/* =========================================================
-   LEFT SIDE - QUESTION BANK
-========================================================= */
-
 .presenterWarmupNumbersCard{
   height:100%;
   min-height:0;
-
   padding:14px;
-
   display:grid;
   grid-template-rows:32px minmax(0,1fr);
   gap:12px;
@@ -1061,10 +1159,8 @@ button:disabled{
 
 .presenterWarmupNumbersCard > .presenterLabel{
   height:32px;
-
   display:flex;
   align-items:center;
-
   font-size:1rem;
 }
 
@@ -1080,99 +1176,67 @@ button:disabled{
 .presenterWarmupCats{
   height:100%;
   min-height:0;
-
   display:grid;
   grid-template-rows:repeat(4,minmax(0,1fr));
   gap:10px;
-
   overflow:hidden;
 }
 
 .presenterWarmupCat{
   min-height:0;
-
   padding:10px;
-
   display:grid;
   grid-template-columns:150px minmax(0,1fr);
   gap:10px;
   align-items:center;
-
   border-radius:22px;
   border:1px solid rgba(30,41,59,.09);
-
-  background:#FFFFFF;
-
-  box-shadow:
-    0 8px 16px rgba(15,23,42,.06),
-    inset 0 1px 0 rgba(255,255,255,.90);
-
+  background:#fff;
+  box-shadow:0 8px 16px rgba(15,23,42,.06), inset 0 1px 0 rgba(255,255,255,.90);
   overflow:hidden;
 }
 
 .presenterWarmupCatTitle{
   height:54px;
   min-height:54px;
-
   padding:8px 10px;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   border-radius:18px;
-
-  background:
-    linear-gradient(180deg,#FFF7ED,#FFFFFF);
-
+  background:linear-gradient(180deg,#FFF7ED,#fff);
   border:1px solid rgba(249,115,22,.18);
-
   color:#9A3412;
-
   font-size:1rem;
   line-height:1.25;
   font-weight:900;
   text-align:center;
-
   overflow:hidden;
 }
 
 .presenterWarmupNumbers{
   min-width:0;
-
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:10px;
 }
 
-/* =========================
-   Number Buttons
-========================= */
-
 .presenterNumberBtn{
   min-width:0;
   height:54px;
   min-height:54px;
-
   border-radius:18px;
   border:1px solid rgba(49,46,129,.20);
-
   display:flex;
   align-items:center;
   justify-content:center;
-
-  color:#FFFFFF;
+  color:#fff;
   background:linear-gradient(180deg,#312E81,#1E1B4B);
-
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.5rem;
   line-height:1.18;
   font-weight:400;
-
-  box-shadow:
-    0 9px 18px rgba(49,46,129,.16),
-    inset 0 1px 0 rgba(255,255,255,.16);
-
+  box-shadow:0 9px 18px rgba(49,46,129,.16), inset 0 1px 0 rgba(255,255,255,.16);
   overflow:hidden;
 }
 
@@ -1187,31 +1251,21 @@ button:disabled{
 
 .presenterNumberBtn.presenterOpened{
   position:relative;
-
   color:transparent;
   opacity:1;
   filter:none;
-
-  background:
-    linear-gradient(180deg,#F8FAFC,#E2E8F0);
-
+  background:linear-gradient(180deg,#F8FAFC,#E2E8F0);
   border-color:rgba(148,163,184,.22);
-
-  box-shadow:
-    0 5px 10px rgba(15,23,42,.05),
-    inset 0 1px 0 rgba(255,255,255,.80);
+  box-shadow:0 5px 10px rgba(15,23,42,.05), inset 0 1px 0 rgba(255,255,255,.80);
 }
 
 .presenterNumberBtn.presenterOpened::after{
   content:"✓";
-
   position:absolute;
   inset:0;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   color:#7C3AED;
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1.45rem;
@@ -1220,31 +1274,16 @@ button:disabled{
 
 .presenterNumberBtn.selectedPresenterTeam:not(.presenterOpened){
   color:#24185E;
-
-  background:
-    linear-gradient(180deg,#FFE6D4,#FFFFFF);
-
+  background:linear-gradient(180deg,#FFE6D4,#fff);
   border-color:rgba(249,115,22,.34);
-
-  box-shadow:
-    0 0 0 4px rgba(249,115,22,.12),
-    0 9px 18px rgba(249,115,22,.12),
-    inset 0 1px 0 rgba(255,255,255,.86);
+  box-shadow:0 0 0 4px rgba(249,115,22,.12), 0 9px 18px rgba(249,115,22,.12), inset 0 1px 0 rgba(255,255,255,.86);
 }
-
-/* =========================================================
-   RIGHT SIDE - CONTROL DASHBOARD
-========================================================= */
 
 .presenterWarmupRight{
   display:grid;
   grid-template-rows:62px minmax(0,1fr) 62px;
   gap:12px;
 }
-
-/* =========================
-   Team Buttons
-========================= */
 
 .presenterWarmupTeamsBox{
   height:62px;
@@ -1267,7 +1306,6 @@ button:disabled{
 .presenterTeams{
   width:100%;
   height:100%;
-
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
@@ -1276,25 +1314,17 @@ button:disabled{
 .presenterBtn{
   min-width:0;
   min-height:60px;
-
   border-radius:20px;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   padding:8px 12px;
-
-  color:#FFFFFF;
+  color:#fff;
   font-size:1rem;
   line-height:1.15;
   font-weight:900;
   text-align:center;
-
-  box-shadow:
-    0 10px 20px rgba(15,23,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.16);
-
+  box-shadow:0 10px 20px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.16);
   overflow:hidden;
 }
 
@@ -1304,61 +1334,36 @@ button:disabled{
 
 .presenterBtn.orange{
   color:#1E293B;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.88), rgba(241,245,249,.76));
-
+  background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(241,245,249,.76));
   border:1px solid rgba(30,41,59,.10);
 }
 
 .presenterBtn.orange.selectedPresenterTeam,
 .presenterBtn.orange.activeTeam{
-  background:
-    linear-gradient(180deg,#FFE6D4,#FFFFFF);
-
+  background:linear-gradient(180deg,#FFE6D4,#fff);
   border:1px solid rgba(249,115,22,.34);
-
   color:#24185E;
-
-  box-shadow:
-    0 0 0 4px rgba(249,115,22,.12),
-    0 12px 22px rgba(249,115,22,.12),
-    inset 0 1px 0 rgba(255,255,255,.86);
+  box-shadow:0 0 0 4px rgba(249,115,22,.12), 0 12px 22px rgba(249,115,22,.12), inset 0 1px 0 rgba(255,255,255,.86);
 }
-
-/* =========================
-   Preview Card
-========================= */
 
 .presenterWarmupPreviewCard{
   height:100%;
   min-height:0;
-
   padding:14px;
-
   display:grid;
   grid-template-rows:24px minmax(0,1fr) 24px minmax(0,1fr);
   gap:8px;
-
   border-radius:26px;
   border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.86), rgba(248,250,252,.70));
-
-  box-shadow:
-    0 14px 28px rgba(15,23,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.84);
-
+  background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
+  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.84);
   overflow:hidden;
 }
 
 .presenterWarmupPreviewCard .presenterLabel{
   height:24px;
-
   display:flex;
   align-items:center;
-
   color:#1E293B;
   font-size:.9rem;
   line-height:1;
@@ -1390,65 +1395,41 @@ button:disabled{
   width:100%;
   height:100%;
   min-height:0;
-
   border-radius:22px;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   padding:16px 18px;
-
   text-align:center;
   overflow:hidden;
-
   font-weight:900;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.90),
-    0 8px 16px rgba(15,23,42,.04);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.90), 0 8px 16px rgba(15,23,42,.04);
 }
 
-/* السؤال */
 .presenterBigQuestionBody,
 #presenterWarmupQuestionText{
-  background:
-    linear-gradient(180deg,#FFFFFF,#F5F3FF);
-
+  background:linear-gradient(180deg,#fff,#F5F3FF);
   border:1px solid rgba(124,58,237,.12);
-
   color:#1E1B4B;
-
   font-size:1.52rem;
   line-height:1.36;
 }
 
-/* الإجابة */
 .presenterBigAnswerBody,
 #presenterWarmupAnswerText{
-  background:
-    linear-gradient(180deg,#FFFFFF,#ECFDF5);
-
+  background:linear-gradient(180deg,#fff,#ECFDF5);
   border:1px solid rgba(15,118,110,.14);
-
   color:#0F766E;
-
   font-size:1.72rem;
   line-height:1.30;
 }
 
-/* =========================
-   Actions
-========================= */
-
 .presenterWarmupActions{
   height:62px;
   min-height:62px;
-
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:10px;
-
   overflow:hidden;
 }
 
@@ -1456,40 +1437,29 @@ button:disabled{
   width:100%;
   height:60px;
   min-height:60px;
-
   border-radius:20px;
-
   padding:8px 10px;
-
-  color:#FFFFFF;
-
+  color:#fff;
   font-size:.95rem;
   line-height:1.18;
   font-weight:900;
   text-align:center;
-
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-
-  box-shadow:
-    0 10px 20px rgba(15,23,42,.12),
-    inset 0 1px 0 rgba(255,255,255,.16);
+  box-shadow:0 10px 20px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,.16);
 }
 
-/* دوبيلا */
 .presenterWarmupActions .presenterDoubleBtn,
 .presenterWarmupActions .presenterBtn.gray{
   background:linear-gradient(180deg,#FB7185,#F97316);
 }
 
-/* خطأ */
 .presenterWarmupActions .presenterWrongBtn,
 .presenterWarmupActions .presenterBtn.red{
   background:linear-gradient(180deg,#EF4444,#DC2626);
 }
 
-/* صح */
 .presenterWarmupActions .presenterCorrectBtn,
 .presenterWarmupActions .presenterBtn.green{
   background:linear-gradient(180deg,#22C55E,#15803D);
@@ -1502,9 +1472,819 @@ button:disabled{
   opacity:.88;
 }
 
-/* =========================
-   Remove Extra Decorative Layers
-========================= */
+/* =========================================================
+   TOP 10 - PRO DASHBOARD
+========================================================= */
+
+.presenterTop10Layout{
+  width:100%;
+  height:100%;
+  min-height:0;
+  display:grid;
+  grid-template-columns:1.12fr .88fr;
+  gap:12px;
+  direction:ltr;
+  overflow:hidden;
+}
+
+.presenterTop10Left,
+.presenterTop10Right{
+  direction:rtl;
+  min-width:0;
+  height:100%;
+  min-height:0;
+  overflow:hidden;
+}
+
+.presenterTop10AnswersCard{
+  height:100%;
+  min-height:0;
+  padding:14px;
+  display:grid;
+  grid-template-rows:32px minmax(0,1fr);
+  gap:12px;
+  border-radius:26px;
+  border:1px solid rgba(30,41,59,.10);
+  background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(248,250,252,.66));
+  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.80);
+  overflow:hidden;
+}
+
+.presenterTop10AnswersCard > .presenterLabel{
+  height:32px;
+  display:flex;
+  align-items:center;
+  margin:0;
+  color:#1E293B;
+  font-size:1rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.presenterTop10AnswersCard > .presenterLabel::before{
+  content:"";
+  width:8px;
+  height:22px;
+  margin-left:8px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#67E8F9,#06B6D4);
+}
+
+.presenterTop10AnswersCols{
+  height:100%;
+  min-height:0;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  overflow:hidden;
+}
+
+.presenterTop10AnswersCol,
+.presenterTop10RightCol,
+.presenterTop10LeftCol{
+  min-width:0;
+  height:100%;
+  min-height:0;
+  display:grid;
+  grid-template-rows:repeat(5,minmax(0,1fr));
+  gap:9px;
+  overflow:hidden;
+}
+
+.presenterTop10AnswerBtn{
+  width:100%;
+  height:100%;
+  min-height:0;
+  padding:8px 9px;
+  display:grid;
+  grid-template-columns:38px minmax(0,1fr) 64px;
+  gap:8px;
+  align-items:center;
+  border-radius:18px;
+  border:1px solid rgba(14,116,144,.18);
+  background:linear-gradient(180deg,#0E7490,#164E63);
+  color:#fff;
+  box-shadow:0 9px 18px rgba(14,116,144,.16), inset 0 1px 0 rgba(255,255,255,.16);
+  overflow:hidden;
+}
+
+.presenterTop10AnswerBtn:active:not(:disabled){
+  transform:scale(.97);
+}
+
+.presenterTop10AnswerNo{
+  width:34px;
+  height:34px;
+  min-width:34px;
+  border-radius:13px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.14);
+  color:#fff;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1rem;
+  line-height:1.1;
+  font-weight:400;
+  overflow:hidden;
+}
+
+.presenterTop10AnswerText{
+  min-width:0;
+  color:#fff;
+  font-size:1.04rem;
+  line-height:1.28;
+  font-weight:900;
+  text-align:right;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.presenterTop10OpenedBy{
+  min-width:0;
+  color:rgba(255,255,255,.76);
+  font-size:.66rem;
+  line-height:1.1;
+  font-weight:900;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.presenterTop10AnswerBtn.opened{
+  background:linear-gradient(180deg,#ECFEFF,#CFFAFE);
+  border-color:rgba(6,182,212,.26);
+  box-shadow:0 6px 12px rgba(14,116,144,.08), inset 0 1px 0 rgba(255,255,255,.90);
+  opacity:1;
+  filter:none;
+}
+
+.presenterTop10AnswerBtn.opened .presenterTop10AnswerNo{
+  background:#fff;
+  border-color:rgba(6,182,212,.18);
+  color:#0F4C5C;
+}
+
+.presenterTop10AnswerBtn.opened .presenterTop10AnswerText{
+  color:#0F4C5C;
+}
+
+.presenterTop10AnswerBtn.opened .presenterTop10OpenedBy{
+  color:#64748B;
+}
+
+.presenterTop10Right{
+  display:grid;
+  grid-template-rows:62px minmax(0,1fr) 118px;
+  gap:12px;
+}
+
+.presenterTop10TeamsBox{
+  height:62px;
+  min-height:62px;
+  overflow:hidden;
+}
+
+.presenterTop10TeamsBox .presenterCard{
+  height:100%;
+  padding:0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+
+.presenterTop10TeamsBox .presenterLabel{
+  display:none;
+}
+
+.presenterTop10TeamsBox .presenterTeams{
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.presenterTop10TeamsBox .presenterBtn{
+  height:60px;
+  min-height:60px;
+  border-radius:20px;
+  padding:8px 12px;
+  color:#1E293B;
+  background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(241,245,249,.76));
+  border:1px solid rgba(30,41,59,.10);
+  font-size:1.02rem;
+  line-height:1.15;
+  font-weight:900;
+  box-shadow:0 10px 20px rgba(15,23,42,.07), inset 0 1px 0 rgba(255,255,255,.80);
+  overflow:hidden;
+}
+
+.presenterTop10TeamsBox .presenterBtn.selectedPresenterTeam,
+.presenterTop10TeamsBox .presenterBtn.activeTeam{
+  background:linear-gradient(180deg,#FFE6D4,#fff);
+  border-color:rgba(249,115,22,.34);
+  color:#24185E;
+  box-shadow:0 0 0 4px rgba(249,115,22,.12), 0 12px 22px rgba(249,115,22,.12), inset 0 1px 0 rgba(255,255,255,.86);
+}
+
+.presenterTop10QuestionCard{
+  height:100%;
+  min-height:0;
+  padding:14px;
+  display:grid;
+  grid-template-rows:64px minmax(0,1fr);
+  gap:12px;
+  border-radius:26px;
+  border:1px solid rgba(30,41,59,.10);
+  background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
+  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.84);
+  overflow:hidden;
+}
+
+.presenterTop10StatusTop{
+  height:64px;
+  min-height:64px;
+  display:grid;
+  grid-template-columns:88px minmax(0,1fr);
+  gap:10px;
+  margin:0;
+  overflow:hidden;
+}
+
+.presenterTop10RoundMini,
+.presenterTop10ErrorMiniBox{
+  height:64px;
+  min-height:0;
+  padding:8px 10px;
+  border-radius:20px;
+  background:#fff;
+  border:1px solid rgba(30,41,59,.09);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  box-shadow:0 8px 16px rgba(15,23,42,.06), inset 0 1px 0 rgba(255,255,255,.90);
+  overflow:hidden;
+}
+
+.presenterTop10RoundMini{
+  background:linear-gradient(180deg,#EEF2FF,#fff);
+}
+
+.presenterTop10ErrorMiniBox{
+  background:linear-gradient(180deg,#FFF1F2,#fff);
+  border-color:rgba(239,68,68,.16);
+}
+
+.presenterTop10RoundMini span,
+.presenterTop10ErrorMiniBox span{
+  color:#64748B;
+  font-size:.72rem;
+  line-height:1;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.presenterTop10RoundMini strong{
+  color:#312E81;
+  font-size:1.28rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.presenterTop10ErrorMiniBox strong{
+  color:#B91C1C;
+  font-size:1.28rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.presenterTop10ErrorsMini{
+  min-width:0;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  overflow:hidden;
+}
+
+.presenterTop10QuestionClear{
+  min-height:0;
+  display:grid;
+  grid-template-rows:24px minmax(0,1fr);
+  gap:8px;
+  margin:0;
+  overflow:hidden;
+}
+
+.presenterTop10QuestionClear .presenterLabel{
+  height:24px;
+  display:flex;
+  align-items:center;
+  margin:0;
+  color:#1E293B;
+  font-size:.92rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.presenterTop10QuestionClear .presenterLabel::before{
+  content:"";
+  width:7px;
+  height:18px;
+  margin-left:7px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#A78BFA,#7C3AED);
+}
+
+.presenterTop10QuestionText,
+#presenterTop10QuestionText{
+  width:100%;
+  height:100%;
+  min-height:0;
+  padding:16px 18px;
+  border-radius:22px;
+  border:1px solid rgba(124,58,237,.12);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,#fff,#F5F3FF);
+  color:#1E1B4B;
+  font-size:1.48rem;
+  line-height:1.36;
+  font-weight:900;
+  text-align:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.90), 0 8px 16px rgba(124,58,237,.06);
+  overflow:hidden;
+}
+
+.presenterTop10Actions{
+  height:118px;
+  min-height:118px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(2,55px);
+  gap:8px;
+  overflow:hidden;
+}
+
+.presenterTop10Actions .presenterBtn{
+  width:100%;
+  height:55px;
+  min-height:55px;
+  border-radius:18px;
+  padding:7px 8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:.86rem;
+  line-height:1.18;
+  font-weight:900;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  box-shadow:0 9px 18px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,.16);
+}
+
+.presenterTop10Actions .presenterBtn:active:not(:disabled){
+  transform:scale(.96);
+}
+
+.presenterTop10Actions .presenterBtn.gray:first-child,
+.presenterTop10Actions .presenterDoubleBtn,
+.presenterTop10Actions .top10DoubleBtn{
+  background:linear-gradient(180deg,#FB7185,#F97316);
+}
+
+.presenterTop10Actions .presenterBtn.green,
+.presenterTop10Actions .btnAnswer{
+  background:linear-gradient(180deg,#22C55E,#15803D);
+}
+
+.presenterTop10Actions .presenterBtn.red,
+.presenterTop10Actions .top10ErrorBtnSingle{
+  background:linear-gradient(180deg,#EF4444,#DC2626);
+}
+
+.presenterTop10Actions .presenterBtn.gray:nth-child(4),
+.presenterTop10Actions .undoBtn{
+  background:linear-gradient(180deg,#991B1B,#7F1D1D);
+}
+
+.presenterTop10Actions .presenterBtn.blue,
+.presenterTop10Actions .presenterBtn.dark,
+.presenterTop10Actions .switchTurnBtn,
+.presenterTop10Actions .roundNavBtn{
+  background:linear-gradient(180deg,#312E81,#1E1B4B);
+}
+
+.presenterTop10Actions .presenterBtn:disabled{
+  background:#E5E7EB;
+  color:#94A3B8;
+  box-shadow:none;
+  opacity:.88;
+}
+
+/* =========================================================
+   AUCTION / فتبلة - ACTUAL CLASSES FIX
+========================================================= */
+
+#presenterPanel .auctionWrap{
+  width:100%;
+  height:100%;
+  min-height:0;
+  display:grid;
+  grid-template-columns:1.08fr .92fr;
+  grid-template-rows:62px minmax(0,1fr) 118px;
+  grid-template-areas:
+    "numbers teams"
+    "numbers preview"
+    "actions preview";
+  gap:12px;
+  padding:0;
+  margin:0;
+  overflow:hidden;
+}
+
+#presenterPanel .auctionGrid{
+  grid-area:numbers;
+  width:100%;
+  height:100%;
+  min-height:0;
+  padding:16px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-auto-rows:86px;
+  gap:14px;
+  align-content:start;
+  border-radius:26px;
+  border:1px solid rgba(30,41,59,.10);
+  background:linear-gradient(180deg,rgba(255,255,255,.84),rgba(248,250,252,.68));
+  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.82);
+  overflow:hidden;
+}
+
+#presenterPanel .auctionBtn{
+  width:100%;
+  height:86px;
+  min-height:86px;
+  border-radius:24px;
+  border:1px solid rgba(49,46,129,.20);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  background:linear-gradient(180deg,#312E81,#1E1B4B);
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2.25rem;
+  line-height:1;
+  font-weight:400;
+  box-shadow:0 10px 20px rgba(49,46,129,.16), inset 0 1px 0 rgba(255,255,255,.16);
+  overflow:hidden;
+}
+
+#presenterPanel .auctionBtn:active:not(:disabled){
+  transform:scale(.94);
+}
+
+#presenterPanel .auctionBtn.used{
+  position:relative;
+  color:transparent;
+  background:linear-gradient(180deg,#F8FAFC,#E2E8F0);
+  border-color:rgba(148,163,184,.22);
+  box-shadow:0 5px 10px rgba(15,23,42,.05), inset 0 1px 0 rgba(255,255,255,.80);
+  opacity:1;
+  filter:none;
+}
+
+#presenterPanel .auctionBtn.used::after{
+  content:"✓";
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#7C3AED;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.9rem;
+  line-height:1;
+}
+
+#presenterPanel .auctionTopBar{
+  grid-area:teams;
+  width:100%;
+  height:62px;
+  min-height:62px;
+  display:grid;
+  grid-template-columns:1fr 92px 1fr;
+  gap:10px;
+  padding:0;
+  margin:0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  overflow:hidden;
+}
+
+#presenterPanel .auctionTeamCard,
+#presenterPanel .auctionMiddleCard{
+  height:60px;
+  min-height:60px;
+  border-radius:20px;
+  border:1px solid rgba(30,41,59,.10);
+  background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(241,245,249,.76));
+  box-shadow:0 10px 20px rgba(15,23,42,.07), inset 0 1px 0 rgba(255,255,255,.80);
+  overflow:hidden;
+}
+
+#presenterPanel .auctionTeamCard{
+  padding:8px 10px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 42px;
+  gap:8px;
+  align-items:center;
+  cursor:pointer;
+}
+
+#presenterPanel #auctionTeamBBox{
+  grid-template-columns:42px minmax(0,1fr);
+}
+
+#presenterPanel .auctionTeamName{
+  min-width:0;
+  color:#1E293B;
+  font-size:.92rem;
+  line-height:1.15;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+#presenterPanel .auctionTeamScore{
+  width:42px;
+  height:38px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  border:1px solid rgba(30,41,59,.08);
+  color:#312E81;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.25rem;
+  line-height:1;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.90);
+}
+
+#presenterPanel .auctionTeamCard.activeTeam{
+  background:linear-gradient(180deg,#FFE6D4,#fff);
+  border-color:rgba(249,115,22,.34);
+  box-shadow:0 0 0 4px rgba(249,115,22,.12), 0 12px 22px rgba(249,115,22,.12), inset 0 1px 0 rgba(255,255,255,.86);
+}
+
+#presenterPanel .auctionMiddleCard{
+  padding:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+#presenterPanel .auctionTurnLabel{
+  color:#0F4C5C;
+  font-size:.78rem;
+  line-height:1.2;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+#presenterPanel .auctionQuestionBox{
+  grid-area:preview;
+  width:100%;
+  height:100%;
+  min-height:0;
+  padding:14px;
+  border-radius:26px;
+  border:1px solid rgba(30,41,59,.10);
+  background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
+  box-shadow:0 14px 28px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.84);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+#presenterPanel .auctionPlaceholder{
+  width:100%;
+  height:100%;
+  border-radius:24px;
+  border:1px dashed rgba(100,116,139,.24);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,#fff,#F8FAFC);
+  color:#64748B;
+  font-size:1.25rem;
+  line-height:1.35;
+  font-weight:900;
+  text-align:center;
+}
+
+#presenterPanel .auctionImagePreviewBox,
+#presenterPanel .auctionVideoPreviewBox{
+  width:100%;
+  height:100%;
+  min-height:0;
+  border-radius:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#0F172A;
+  overflow:hidden;
+}
+
+#presenterPanel .auctionImagePreview,
+#presenterPanel .auctionVideoPreview{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+#presenterPanel .auctionVideoPreviewBox{
+  position:relative;
+}
+
+#presenterPanel .auctionVideoPlayBtn{
+  position:absolute;
+  inset:auto auto 14px 14px;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,#67E8F9,#06B6D4);
+  color:#12362D;
+  font-size:1.2rem;
+  font-weight:900;
+  box-shadow:0 10px 20px rgba(6,182,212,.22), inset 0 1px 0 rgba(255,255,255,.24);
+}
+
+#presenterPanel .auctionResultView{
+  width:100%;
+  height:100%;
+  min-height:0;
+  display:grid;
+  grid-template-rows:minmax(0,1fr) 118px;
+  gap:10px;
+  overflow:hidden;
+}
+
+#presenterPanel .auctionResultMediaBox{
+  min-height:0;
+  border-radius:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#0F172A;
+  overflow:hidden;
+}
+
+#presenterPanel .auctionResultImageBoxClean,
+#presenterPanel .auctionResultVideoBox{
+  width:100%;
+  height:100%;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+#presenterPanel .auctionResultImageClean,
+#presenterPanel .auctionResultVideo{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+#presenterPanel .auctionResultAnswerBox{
+  min-height:0;
+  padding:10px 12px;
+  border-radius:22px;
+  border:1px solid rgba(15,118,110,.14);
+  background:linear-gradient(180deg,#fff,#ECFDF5);
+  display:grid;
+  grid-template-rows:18px minmax(0,1fr);
+  gap:6px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.90), 0 8px 16px rgba(15,118,110,.05);
+  overflow:hidden;
+}
+
+#presenterPanel .auctionResultAnswerLabel{
+  color:#0F766E;
+  font-size:.76rem;
+  line-height:1;
+  font-weight:900;
+}
+
+#presenterPanel .auctionResultAnswerText{
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#0F766E;
+  font-size:1.55rem;
+  line-height:1.25;
+  font-weight:900;
+  text-align:center;
+  overflow:hidden;
+}
+
+#presenterPanel .auctionControlPanel{
+  grid-area:actions;
+  width:100%;
+  height:118px;
+  min-height:118px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(2,55px);
+  gap:8px;
+  padding:0;
+  margin:0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  overflow:hidden;
+}
+
+#presenterPanel .auctionControlPanel button{
+  width:100%;
+  height:55px;
+  min-height:55px;
+  border:0;
+  border-radius:18px;
+  padding:7px 8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:.9rem;
+  line-height:1.18;
+  font-weight:900;
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  box-shadow:0 9px 18px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,.16);
+}
+
+#presenterPanel .auctionControlPanel button:active:not(:disabled){
+  transform:scale(.96);
+}
+
+#presenterPanel .auctionDoubleBtn{
+  background:linear-gradient(180deg,#FB7185,#F97316);
+}
+
+#presenterPanel .auctionDoubleBtn.activeDouble{
+  color:#431407;
+  background:linear-gradient(180deg,#FDBA74,#F97316);
+}
+
+#presenterPanel .btnCorrect{
+  background:linear-gradient(180deg,#22C55E,#15803D);
+}
+
+#presenterPanel .btnWrong{
+  background:linear-gradient(180deg,#EF4444,#DC2626);
+}
+
+#presenterPanel .undoBtn{
+  background:linear-gradient(180deg,#991B1B,#7F1D1D);
+}
+
+#presenterPanel .auctionControlPanel button:disabled{
+  background:#E5E7EB;
+  color:#94A3B8;
+  box-shadow:none;
+  opacity:.88;
+}
+
+/* =========================================================
+   REMOVE OLD DECORATIVE LAYERS
+========================================================= */
 
 .presenterWarmupLayout::before,
 .presenterWarmupLayout::after,
@@ -1527,36 +2307,120 @@ button:disabled{
 .presenterBigAnswerBody::before,
 .presenterBigAnswerBody::after,
 .presenterWarmupActions .presenterBtn::before,
-.presenterWarmupActions .presenterBtn::after{
+.presenterWarmupActions .presenterBtn::after,
+.presenterTop10Layout::before,
+.presenterTop10Layout::after,
+.presenterTop10AnswersCard::before,
+.presenterTop10AnswersCard::after,
+.presenterTop10AnswerBtn::before,
+.presenterTop10AnswerBtn::after,
+.presenterTop10QuestionCard::before,
+.presenterTop10QuestionCard::after,
+.presenterTop10RoundMini::before,
+.presenterTop10RoundMini::after,
+.presenterTop10ErrorMiniBox::before,
+.presenterTop10ErrorMiniBox::after,
+.presenterTop10QuestionText::before,
+.presenterTop10QuestionText::after,
+#presenterTop10QuestionText::before,
+#presenterTop10QuestionText::after,
+.presenterTop10Actions .presenterBtn::before,
+.presenterTop10Actions .presenterBtn::after,
+#presenterPanel .auctionWrap::before,
+#presenterPanel .auctionWrap::after,
+#presenterPanel .auctionGrid::before,
+#presenterPanel .auctionGrid::after,
+#presenterPanel .auctionBtn::before,
+#presenterPanel .auctionBtn::after,
+#presenterPanel .auctionTeamCard::before,
+#presenterPanel .auctionTeamCard::after,
+#presenterPanel .auctionMiddleCard::before,
+#presenterPanel .auctionMiddleCard::after,
+#presenterPanel .auctionQuestionBox::before,
+#presenterPanel .auctionQuestionBox::after,
+#presenterPanel .auctionControlPanel::before,
+#presenterPanel .auctionControlPanel::after,
+#presenterPanel .auctionControlPanel button::before,
+#presenterPanel .auctionControlPanel button::after{
   content:none;
   display:none;
 }
 
-/* استرجاع علامة الصح للأرقام المفتوحة */
 .presenterNumberBtn.presenterOpened::after{
   content:"✓";
   display:flex;
 }
 
+#presenterPanel .auctionBtn.used::after{
+  content:"✓";
+  display:flex;
+}
+
 /* =========================================================
-   Compact Height
+   GALAXY TAB A 11 / LANDSCAPE COMPACT
 ========================================================= */
+
+@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape){
+
+  #presenterSegmentPage{
+    padding:9px 16px;
+    gap:8px;
+  }
+
+  #presenterSegmentPage .presenterCleanHeader,
+  #presenterPanel{
+    max-width:1120px;
+  }
+}
 
 @media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
 
-  .presenterWarmupLayout{
-    grid-template-columns:1.08fr .92fr;
+  #presenterSegmentPage{
+    padding:8px 14px;
+    gap:8px;
+  }
+
+  #presenterSegmentPage .presenterCleanHeader{
+    min-height:54px;
+    padding:6px;
+    border-radius:20px;
+    grid-template-columns:106px minmax(0,1fr) 106px;
+  }
+
+  .presenterCleanHeaderBtn,
+  .presenterCleanHeaderTitle{
+    min-height:40px;
+    border-radius:14px;
+  }
+
+  .presenterCleanHeaderBtn{
+    font-size:.78rem;
+  }
+
+  .presenterCleanHeaderTitle h1{
+    font-size:1.18rem;
+  }
+
+  #presenterSegmentPage .presenterCleanHeader,
+  #presenterPanel{
+    max-width:1100px;
+  }
+
+  .presenterWarmupLayout,
+  .presenterTop10Layout{
     gap:10px;
   }
 
-  .presenterWarmupNumbersCard{
+  .presenterWarmupNumbersCard,
+  .presenterTop10AnswersCard{
     padding:11px;
     border-radius:22px;
     grid-template-rows:26px minmax(0,1fr);
     gap:9px;
   }
 
-  .presenterWarmupNumbersCard > .presenterLabel{
+  .presenterWarmupNumbersCard > .presenterLabel,
+  .presenterTop10AnswersCard > .presenterLabel{
     height:26px;
     font-size:.86rem;
   }
@@ -1646,699 +2510,6 @@ button:disabled{
     border-radius:17px;
     font-size:.78rem;
     padding:7px 8px;
-  }
-}
-
-/* =========================================================
-   Portrait / Small Fallback
-========================================================= */
-
-@media screen and (max-width:799px), screen and (orientation:portrait){
-
-  .presenterWarmupLayout{
-    height:auto;
-
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-
-    overflow:visible;
-  }
-
-  .presenterWarmupLeft,
-  .presenterWarmupRight{
-    height:auto;
-    overflow:visible;
-  }
-
-  .presenterWarmupNumbersCard{
-    height:auto;
-  }
-
-  .presenterWarmupCats{
-    height:auto;
-    display:flex;
-    flex-direction:column;
-  }
-
-  .presenterWarmupCat{
-    grid-template-columns:1fr;
-  }
-
-  .presenterWarmupRight{
-    display:flex;
-    flex-direction:column;
-  }
-
-  .presenterWarmupTeamsBox{
-    height:auto;
-  }
-
-  .presenterWarmupPreviewCard{
-    height:auto;
-  }
-
-  .presenterQuestionBody,
-  .presenterAnswerBody,
-  .presenterBigQuestionBody,
-  .presenterBigAnswerBody,
-  #presenterWarmupQuestionText,
-  #presenterWarmupAnswerText{
-    min-height:110px;
-  }
-
-  .presenterWarmupActions{
-    height:auto;
-    grid-template-columns:1fr;
-  }
-
-  .presenterWarmupActions .presenterBtn{
-    height:54px;
-    min-height:54px;
-  }
-}
-
-/* =========================================================
-   PRESENTER TOP 10 - PRO DASHBOARD
-   Galaxy Tab A 11 Landscape - Clean / Modern / Low Lag
-   ضعه قبل FINAL VISIBILITY FIX
-========================================================= */
-
-/* =========================
-   Top10 Layout
-========================= */
-
-.presenterTop10Layout{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:1.12fr .88fr;
-  gap:12px;
-
-  direction:ltr;
-  overflow:hidden;
-}
-
-.presenterTop10Left,
-.presenterTop10Right{
-  direction:rtl;
-  min-width:0;
-  height:100%;
-  min-height:0;
-  overflow:hidden;
-}
-
-/* =========================
-   Left: Answers Bank
-========================= */
-
-.presenterTop10AnswersCard{
-  height:100%;
-  min-height:0;
-
-  padding:14px;
-
-  display:grid;
-  grid-template-rows:32px minmax(0,1fr);
-  gap:12px;
-
-  border-radius:26px;
-  border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.82), rgba(248,250,252,.66));
-
-  box-shadow:
-    0 14px 28px rgba(15,23,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.80);
-
-  overflow:hidden;
-}
-
-.presenterTop10AnswersCard > .presenterLabel{
-  height:32px;
-
-  display:flex;
-  align-items:center;
-
-  margin:0;
-
-  color:#1E293B;
-  font-size:1rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.presenterTop10AnswersCard > .presenterLabel::before{
-  content:"";
-  width:8px;
-  height:22px;
-  margin-left:8px;
-  border-radius:999px;
-  background:linear-gradient(180deg,#67E8F9,#06B6D4);
-}
-
-/* 5 يمين + 5 يسار */
-.presenterTop10AnswersCols{
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-
-  overflow:hidden;
-}
-
-.presenterTop10AnswersCol,
-.presenterTop10RightCol,
-.presenterTop10LeftCol{
-  min-width:0;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:repeat(5,minmax(0,1fr));
-  gap:9px;
-
-  overflow:hidden;
-}
-
-/* =========================
-   Answer Buttons
-========================= */
-
-.presenterTop10AnswerBtn{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  padding:8px 9px;
-
-  display:grid;
-  grid-template-columns:38px minmax(0,1fr) 64px;
-  gap:8px;
-  align-items:center;
-
-  border-radius:18px;
-  border:1px solid rgba(14,116,144,.18);
-
-  background:
-    linear-gradient(180deg,#0E7490,#164E63);
-
-  color:#FFFFFF;
-
-  box-shadow:
-    0 9px 18px rgba(14,116,144,.16),
-    inset 0 1px 0 rgba(255,255,255,.16);
-
-  overflow:hidden;
-}
-
-.presenterTop10AnswerBtn:active:not(:disabled){
-  transform:scale(.97);
-}
-
-.presenterTop10AnswerNo{
-  width:34px;
-  height:34px;
-  min-width:34px;
-
-  border-radius:13px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:rgba(255,255,255,.18);
-  border:1px solid rgba(255,255,255,.14);
-
-  color:#FFFFFF;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1rem;
-  line-height:1.1;
-  font-weight:400;
-
-  overflow:hidden;
-}
-
-.presenterTop10AnswerText{
-  min-width:0;
-
-  color:#FFFFFF;
-
-  font-size:1.04rem;
-  line-height:1.28;
-  font-weight:900;
-  text-align:right;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.presenterTop10OpenedBy{
-  min-width:0;
-
-  color:rgba(255,255,255,.76);
-
-  font-size:.66rem;
-  line-height:1.1;
-  font-weight:900;
-  text-align:center;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-/* الإجابة المفتوحة */
-.presenterTop10AnswerBtn.opened{
-  background:
-    linear-gradient(180deg,#ECFEFF,#CFFAFE);
-
-  border-color:rgba(6,182,212,.26);
-
-  box-shadow:
-    0 6px 12px rgba(14,116,144,.08),
-    inset 0 1px 0 rgba(255,255,255,.90);
-
-  opacity:1;
-  filter:none;
-}
-
-.presenterTop10AnswerBtn.opened .presenterTop10AnswerNo{
-  background:#FFFFFF;
-  border-color:rgba(6,182,212,.18);
-  color:#0F4C5C;
-}
-
-.presenterTop10AnswerBtn.opened .presenterTop10AnswerText{
-  color:#0F4C5C;
-}
-
-.presenterTop10AnswerBtn.opened .presenterTop10OpenedBy{
-  color:#64748B;
-}
-
-/* =========================
-   Right: Control Dashboard
-========================= */
-
-.presenterTop10Right{
-  display:grid;
-  grid-template-rows:62px minmax(0,1fr) 118px;
-  gap:12px;
-}
-
-/* =========================
-   Teams
-========================= */
-
-.presenterTop10TeamsBox{
-  height:62px;
-  min-height:62px;
-  overflow:hidden;
-}
-
-.presenterTop10TeamsBox .presenterCard{
-  height:100%;
-  padding:0;
-  background:transparent;
-  border:0;
-  box-shadow:none;
-}
-
-.presenterTop10TeamsBox .presenterLabel{
-  display:none;
-}
-
-.presenterTop10TeamsBox .presenterTeams{
-  width:100%;
-  height:100%;
-
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.presenterTop10TeamsBox .presenterBtn{
-  height:60px;
-  min-height:60px;
-
-  border-radius:20px;
-
-  padding:8px 12px;
-
-  color:#1E293B;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.88), rgba(241,245,249,.76));
-
-  border:1px solid rgba(30,41,59,.10);
-
-  font-size:1.02rem;
-  line-height:1.15;
-  font-weight:900;
-
-  box-shadow:
-    0 10px 20px rgba(15,23,42,.07),
-    inset 0 1px 0 rgba(255,255,255,.80);
-
-  overflow:hidden;
-}
-
-.presenterTop10TeamsBox .presenterBtn.selectedPresenterTeam,
-.presenterTop10TeamsBox .presenterBtn.activeTeam{
-  background:
-    linear-gradient(180deg,#FFE6D4,#FFFFFF);
-
-  border-color:rgba(249,115,22,.34);
-
-  color:#24185E;
-
-  box-shadow:
-    0 0 0 4px rgba(249,115,22,.12),
-    0 12px 22px rgba(249,115,22,.12),
-    inset 0 1px 0 rgba(255,255,255,.86);
-}
-
-/* =========================
-   Question / Status Card
-========================= */
-
-.presenterTop10QuestionCard{
-  height:100%;
-  min-height:0;
-
-  padding:14px;
-
-  display:grid;
-  grid-template-rows:64px minmax(0,1fr);
-  gap:12px;
-
-  border-radius:26px;
-  border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.86), rgba(248,250,252,.70));
-
-  box-shadow:
-    0 14px 28px rgba(15,23,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.84);
-
-  overflow:hidden;
-}
-
-/* الجولة والأخطاء */
-.presenterTop10StatusTop{
-  height:64px;
-  min-height:64px;
-
-  display:grid;
-  grid-template-columns:88px minmax(0,1fr);
-  gap:10px;
-
-  margin:0;
-  overflow:hidden;
-}
-
-.presenterTop10RoundMini,
-.presenterTop10ErrorMiniBox{
-  height:64px;
-  min-height:0;
-
-  padding:8px 10px;
-
-  border-radius:20px;
-
-  background:#FFFFFF;
-  border:1px solid rgba(30,41,59,.09);
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:5px;
-
-  box-shadow:
-    0 8px 16px rgba(15,23,42,.06),
-    inset 0 1px 0 rgba(255,255,255,.90);
-
-  overflow:hidden;
-}
-
-.presenterTop10RoundMini{
-  background:
-    linear-gradient(180deg,#EEF2FF,#FFFFFF);
-}
-
-.presenterTop10ErrorMiniBox{
-  background:
-    linear-gradient(180deg,#FFF1F2,#FFFFFF);
-  border-color:rgba(239,68,68,.16);
-}
-
-.presenterTop10RoundMini span,
-.presenterTop10ErrorMiniBox span{
-  color:#64748B;
-
-  font-size:.72rem;
-  line-height:1;
-  font-weight:900;
-
-  white-space:nowrap;
-}
-
-.presenterTop10RoundMini strong{
-  color:#312E81;
-  font-size:1.28rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.presenterTop10ErrorMiniBox strong{
-  color:#B91C1C;
-  font-size:1.28rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.presenterTop10ErrorsMini{
-  min-width:0;
-
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-
-  overflow:hidden;
-}
-
-/* السؤال */
-.presenterTop10QuestionClear{
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:24px minmax(0,1fr);
-  gap:8px;
-
-  margin:0;
-  overflow:hidden;
-}
-
-.presenterTop10QuestionClear .presenterLabel{
-  height:24px;
-
-  display:flex;
-  align-items:center;
-
-  margin:0;
-  color:#1E293B;
-  font-size:.92rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.presenterTop10QuestionClear .presenterLabel::before{
-  content:"";
-  width:7px;
-  height:18px;
-  margin-left:7px;
-  border-radius:999px;
-  background:linear-gradient(180deg,#A78BFA,#7C3AED);
-}
-
-.presenterTop10QuestionText,
-#presenterTop10QuestionText{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  padding:16px 18px;
-
-  border-radius:22px;
-  border:1px solid rgba(124,58,237,.12);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:
-    linear-gradient(180deg,#FFFFFF,#F5F3FF);
-
-  color:#1E1B4B;
-
-  font-size:1.48rem;
-  line-height:1.36;
-  font-weight:900;
-  text-align:center;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.90),
-    0 8px 16px rgba(124,58,237,.06);
-
-  overflow:hidden;
-}
-
-/* =========================
-   Actions
-========================= */
-
-.presenterTop10Actions{
-  height:118px;
-  min-height:118px;
-
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  grid-template-rows:repeat(2,55px);
-  gap:8px;
-
-  overflow:hidden;
-}
-
-.presenterTop10Actions .presenterBtn{
-  width:100%;
-  height:55px;
-  min-height:55px;
-
-  border-radius:18px;
-
-  padding:7px 8px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#FFFFFF;
-
-  font-size:.86rem;
-  line-height:1.18;
-  font-weight:900;
-  text-align:center;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-
-  box-shadow:
-    0 9px 18px rgba(15,23,42,.12),
-    inset 0 1px 0 rgba(255,255,255,.16);
-}
-
-.presenterTop10Actions .presenterBtn:active:not(:disabled){
-  transform:scale(.96);
-}
-
-/* دوبيلا */
-.presenterTop10Actions .presenterBtn.gray:first-child,
-.presenterTop10Actions .presenterDoubleBtn,
-.presenterTop10Actions .top10DoubleBtn{
-  background:linear-gradient(180deg,#FB7185,#F97316);
-}
-
-/* إظهار الإجابات */
-.presenterTop10Actions .presenterBtn.green,
-.presenterTop10Actions .btnAnswer{
-  background:linear-gradient(180deg,#22C55E,#15803D);
-}
-
-/* خطأ */
-.presenterTop10Actions .presenterBtn.red,
-.presenterTop10Actions .top10ErrorBtnSingle{
-  background:linear-gradient(180deg,#EF4444,#DC2626);
-}
-
-/* تراجع */
-.presenterTop10Actions .presenterBtn.gray:nth-child(4),
-.presenterTop10Actions .undoBtn{
-  background:linear-gradient(180deg,#991B1B,#7F1D1D);
-}
-
-/* تبديل الدور / الجولة التالية */
-.presenterTop10Actions .presenterBtn.blue,
-.presenterTop10Actions .presenterBtn.dark,
-.presenterTop10Actions .switchTurnBtn,
-.presenterTop10Actions .roundNavBtn{
-  background:linear-gradient(180deg,#312E81,#1E1B4B);
-}
-
-.presenterTop10Actions .presenterBtn:disabled{
-  background:#E5E7EB;
-  color:#94A3B8;
-  box-shadow:none;
-  opacity:.88;
-}
-
-/* =========================
-   Remove Extra Decorative Layers
-========================= */
-
-.presenterTop10Layout::before,
-.presenterTop10Layout::after,
-.presenterTop10AnswersCard::before,
-.presenterTop10AnswersCard::after,
-.presenterTop10AnswerBtn::before,
-.presenterTop10AnswerBtn::after,
-.presenterTop10QuestionCard::before,
-.presenterTop10QuestionCard::after,
-.presenterTop10RoundMini::before,
-.presenterTop10RoundMini::after,
-.presenterTop10ErrorMiniBox::before,
-.presenterTop10ErrorMiniBox::after,
-.presenterTop10QuestionText::before,
-.presenterTop10QuestionText::after,
-#presenterTop10QuestionText::before,
-#presenterTop10QuestionText::after,
-.presenterTop10Actions .presenterBtn::before,
-.presenterTop10Actions .presenterBtn::after{
-  content:none;
-  display:none;
-}
-
-/* =========================================================
-   Compact Height
-========================================================= */
-
-@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
-
-  .presenterTop10Layout{
-    grid-template-columns:1.12fr .88fr;
-    gap:10px;
-  }
-
-  .presenterTop10AnswersCard{
-    padding:11px;
-    border-radius:22px;
-    grid-template-rows:26px minmax(0,1fr);
-    gap:9px;
-  }
-
-  .presenterTop10AnswersCard > .presenterLabel{
-    height:26px;
-    font-size:.86rem;
   }
 
   .presenterTop10AnswersCols{
@@ -2459,763 +2630,103 @@ button:disabled{
     font-size:.72rem;
     padding:6px;
   }
-}
 
-/* =========================================================
-   Portrait / Small Fallback
-========================================================= */
-
-@media screen and (max-width:799px), screen and (orientation:portrait){
-
-  .presenterTop10Layout{
-    height:auto;
-
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-
-    overflow:visible;
-  }
-
-  .presenterTop10Left,
-  .presenterTop10Right{
-    height:auto;
-    overflow:visible;
-  }
-
-  .presenterTop10AnswersCard{
-    height:auto;
-  }
-
-  .presenterTop10AnswersCols{
-    height:auto;
-    grid-template-columns:1fr;
-  }
-
-  .presenterTop10AnswersCol,
-  .presenterTop10RightCol,
-  .presenterTop10LeftCol{
-    height:auto;
-    display:flex;
-    flex-direction:column;
-  }
-
-  .presenterTop10AnswerBtn{
-    min-height:58px;
-  }
-
-  .presenterTop10Right{
-    display:flex;
-    flex-direction:column;
-  }
-
-  .presenterTop10TeamsBox{
-    height:auto;
-  }
-
-  .presenterTop10QuestionCard{
-    height:auto;
-    min-height:220px;
-  }
-
-  .presenterTop10Actions{
-    height:auto;
-    grid-template-columns:1fr;
-    grid-template-rows:auto;
-  }
-
-  .presenterTop10Actions .presenterBtn{
-    height:54px;
-    min-height:54px;
-  }
-}
-
-/* =========================================================
-   AUCTION / فتبلة - PRESENTER PRO DASHBOARD FIX
-   يستهدف الكلاسات الفعلية الموجودة عندك
-   ضعه قبل FINAL VISIBILITY FIX
-========================================================= */
-
-/* =========================
-   Main Layout
-========================= */
-
-.presenterSegmentPage .auctionWrap{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:1.08fr .92fr;
-  grid-template-rows:62px minmax(0,1fr) 118px;
-  grid-template-areas:
-    "numbers teams"
-    "numbers preview"
-    "actions preview";
-
-  gap:12px;
-
-  padding:0;
-  margin:0;
-
-  overflow:hidden;
-}
-
-/* =========================
-   Numbers Bank
-========================= */
-
-.presenterSegmentPage .auctionGrid{
-  grid-area:numbers;
-
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  padding:16px;
-
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  grid-auto-rows:86px;
-  gap:14px;
-
-  align-content:start;
-
-  border-radius:26px;
-  border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.84), rgba(248,250,252,.68));
-
-  box-shadow:
-    0 14px 28px rgba(15,23,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.82);
-
-  overflow:hidden;
-}
-
-.presenterSegmentPage .auctionBtn{
-  width:100%;
-  height:86px;
-  min-height:86px;
-
-  border-radius:24px;
-  border:1px solid rgba(49,46,129,.20);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#FFFFFF;
-  background:linear-gradient(180deg,#312E81,#1E1B4B);
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2.25rem;
-  line-height:1;
-  font-weight:400;
-
-  box-shadow:
-    0 10px 20px rgba(49,46,129,.16),
-    inset 0 1px 0 rgba(255,255,255,.16);
-
-  overflow:hidden;
-}
-
-.presenterSegmentPage .auctionBtn:active:not(:disabled){
-  transform:scale(.94);
-}
-
-.presenterSegmentPage .auctionBtn.used{
-  position:relative;
-
-  color:transparent;
-
-  background:
-    linear-gradient(180deg,#F8FAFC,#E2E8F0);
-
-  border-color:rgba(148,163,184,.22);
-
-  box-shadow:
-    0 5px 10px rgba(15,23,42,.05),
-    inset 0 1px 0 rgba(255,255,255,.80);
-
-  opacity:1;
-  filter:none;
-}
-
-.presenterSegmentPage .auctionBtn.used::after{
-  content:"✓";
-
-  position:absolute;
-  inset:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#7C3AED;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.9rem;
-  line-height:1;
-}
-
-/* =========================
-   Teams Top Bar
-========================= */
-
-.presenterSegmentPage .auctionTopBar{
-  grid-area:teams;
-
-  width:100%;
-  height:62px;
-  min-height:62px;
-
-  display:grid;
-  grid-template-columns:1fr 92px 1fr;
-  gap:10px;
-
-  padding:0;
-  margin:0;
-
-  background:transparent;
-  border:0;
-  box-shadow:none;
-
-  overflow:hidden;
-}
-
-.presenterSegmentPage .auctionTeamCard,
-.presenterSegmentPage .auctionMiddleCard{
-  height:60px;
-  min-height:60px;
-
-  border-radius:20px;
-  border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.88), rgba(241,245,249,.76));
-
-  box-shadow:
-    0 10px 20px rgba(15,23,42,.07),
-    inset 0 1px 0 rgba(255,255,255,.80);
-
-  overflow:hidden;
-}
-
-.presenterSegmentPage .auctionTeamCard{
-  padding:8px 10px;
-
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 42px;
-  gap:8px;
-  align-items:center;
-
-  cursor:pointer;
-}
-
-.presenterSegmentPage #auctionTeamBBox{
-  grid-template-columns:42px minmax(0,1fr);
-}
-
-.presenterSegmentPage .auctionTeamName{
-  min-width:0;
-
-  color:#1E293B;
-
-  font-size:.92rem;
-  line-height:1.15;
-  font-weight:900;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.presenterSegmentPage .auctionTeamScore{
-  width:42px;
-  height:38px;
-
-  border-radius:14px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:#FFFFFF;
-  border:1px solid rgba(30,41,59,.08);
-
-  color:#312E81;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.25rem;
-  line-height:1;
-
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.90);
-}
-
-.presenterSegmentPage .auctionTeamCard.activeTeam{
-  background:
-    linear-gradient(180deg,#FFE6D4,#FFFFFF);
-
-  border-color:rgba(249,115,22,.34);
-
-  box-shadow:
-    0 0 0 4px rgba(249,115,22,.12),
-    0 12px 22px rgba(249,115,22,.12),
-    inset 0 1px 0 rgba(255,255,255,.86);
-}
-
-.presenterSegmentPage .auctionMiddleCard{
-  padding:6px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-}
-
-.presenterSegmentPage .auctionTurnLabel{
-  color:#0F4C5C;
-
-  font-size:.78rem;
-  line-height:1.2;
-  font-weight:900;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-/* =========================
-   Preview / Answer Box
-========================= */
-
-.presenterSegmentPage .auctionQuestionBox{
-  grid-area:preview;
-
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  padding:14px;
-
-  border-radius:26px;
-  border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.86), rgba(248,250,252,.70));
-
-  box-shadow:
-    0 14px 28px rgba(15,23,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.84);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  overflow:hidden;
-}
-
-.presenterSegmentPage .auctionPlaceholder{
-  width:100%;
-  height:100%;
-
-  border-radius:24px;
-  border:1px dashed rgba(100,116,139,.24);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:
-    linear-gradient(180deg,#FFFFFF,#F8FAFC);
-
-  color:#64748B;
-
-  font-size:1.25rem;
-  line-height:1.35;
-  font-weight:900;
-  text-align:center;
-}
-
-/* =========================
-   Image / Video Preview
-========================= */
-
-.presenterSegmentPage .auctionImagePreviewBox,
-.presenterSegmentPage .auctionVideoPreviewBox{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  border-radius:24px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:#0F172A;
-
-  overflow:hidden;
-}
-
-.presenterSegmentPage .auctionImagePreview,
-.presenterSegmentPage .auctionVideoPreview{
-  width:100%;
-  height:100%;
-
-  object-fit:contain;
-  display:block;
-}
-
-.presenterSegmentPage .auctionVideoPreviewBox{
-  position:relative;
-}
-
-.presenterSegmentPage .auctionVideoPlayBtn{
-  position:absolute;
-  inset:auto auto 14px 14px;
-
-  width:58px;
-  height:58px;
-
-  border-radius:50%;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:linear-gradient(180deg,#67E8F9,#06B6D4);
-
-  color:#12362D;
-
-  font-size:1.2rem;
-  font-weight:900;
-
-  box-shadow:
-    0 10px 20px rgba(6,182,212,.22),
-    inset 0 1px 0 rgba(255,255,255,.24);
-}
-
-/* =========================
-   Result View
-========================= */
-
-.presenterSegmentPage .auctionResultView{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:minmax(0,1fr) 118px;
-  gap:10px;
-
-  overflow:hidden;
-}
-
-.presenterSegmentPage .auctionResultMediaBox{
-  min-height:0;
-
-  border-radius:24px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:#0F172A;
-
-  overflow:hidden;
-}
-
-.presenterSegmentPage .auctionResultImageBoxClean,
-.presenterSegmentPage .auctionResultVideoBox{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  overflow:hidden;
-}
-
-.presenterSegmentPage .auctionResultImageClean,
-.presenterSegmentPage .auctionResultVideo{
-  width:100%;
-  height:100%;
-
-  object-fit:contain;
-  display:block;
-}
-
-.presenterSegmentPage .auctionResultAnswerBox{
-  min-height:0;
-
-  padding:10px 12px;
-
-  border-radius:22px;
-  border:1px solid rgba(15,118,110,.14);
-
-  background:
-    linear-gradient(180deg,#FFFFFF,#ECFDF5);
-
-  display:grid;
-  grid-template-rows:18px minmax(0,1fr);
-  gap:6px;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.90),
-    0 8px 16px rgba(15,118,110,.05);
-
-  overflow:hidden;
-}
-
-.presenterSegmentPage .auctionResultAnswerLabel{
-  color:#0F766E;
-
-  font-size:.76rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.presenterSegmentPage .auctionResultAnswerText{
-  min-height:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#0F766E;
-
-  font-size:1.55rem;
-  line-height:1.25;
-  font-weight:900;
-  text-align:center;
-
-  overflow:hidden;
-}
-
-/* =========================
-   Control Buttons
-========================= */
-
-.presenterSegmentPage .auctionControlPanel{
-  grid-area:actions;
-
-  width:100%;
-  height:118px;
-  min-height:118px;
-
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-template-rows:repeat(2,55px);
-  gap:8px;
-
-  padding:0;
-  margin:0;
-
-  background:transparent;
-  border:0;
-  box-shadow:none;
-
-  overflow:hidden;
-}
-
-.presenterSegmentPage .auctionControlPanel button{
-  width:100%;
-  height:55px;
-  min-height:55px;
-
-  border:0;
-  border-radius:18px;
-
-  padding:7px 8px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#FFFFFF;
-
-  font-size:.9rem;
-  line-height:1.18;
-  font-weight:900;
-  text-align:center;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-
-  box-shadow:
-    0 9px 18px rgba(15,23,42,.12),
-    inset 0 1px 0 rgba(255,255,255,.16);
-}
-
-.presenterSegmentPage .auctionControlPanel button:active:not(:disabled){
-  transform:scale(.96);
-}
-
-.presenterSegmentPage .auctionDoubleBtn{
-  background:linear-gradient(180deg,#FB7185,#F97316);
-}
-
-.presenterSegmentPage .auctionDoubleBtn.activeDouble{
-  color:#431407;
-  background:linear-gradient(180deg,#FDBA74,#F97316);
-}
-
-.presenterSegmentPage .btnCorrect{
-  background:linear-gradient(180deg,#22C55E,#15803D);
-}
-
-.presenterSegmentPage .btnWrong{
-  background:linear-gradient(180deg,#EF4444,#DC2626);
-}
-
-.presenterSegmentPage .undoBtn{
-  background:linear-gradient(180deg,#991B1B,#7F1D1D);
-}
-
-.presenterSegmentPage .auctionControlPanel button:disabled{
-  background:#E5E7EB;
-  color:#94A3B8;
-  box-shadow:none;
-  opacity:.88;
-}
-
-/* =========================
-   Remove Old / Heavy Layers
-========================= */
-
-.presenterSegmentPage .auctionWrap::before,
-.presenterSegmentPage .auctionWrap::after,
-.presenterSegmentPage .auctionGrid::before,
-.presenterSegmentPage .auctionGrid::after,
-.presenterSegmentPage .auctionBtn::before,
-.presenterSegmentPage .auctionBtn::after,
-.presenterSegmentPage .auctionTeamCard::before,
-.presenterSegmentPage .auctionTeamCard::after,
-.presenterSegmentPage .auctionMiddleCard::before,
-.presenterSegmentPage .auctionMiddleCard::after,
-.presenterSegmentPage .auctionQuestionBox::before,
-.presenterSegmentPage .auctionQuestionBox::after,
-.presenterSegmentPage .auctionControlPanel::before,
-.presenterSegmentPage .auctionControlPanel::after,
-.presenterSegmentPage .auctionControlPanel button::before,
-.presenterSegmentPage .auctionControlPanel button::after{
-  content:none;
-  display:none;
-}
-
-.presenterSegmentPage .auctionBtn.used::after{
-  content:"✓";
-  display:flex;
-}
-
-/* =========================================================
-   Galaxy Tab / Compact Height
-========================================================= */
-
-@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
-
-  .presenterSegmentPage .auctionWrap{
+  #presenterPanel .auctionWrap{
     grid-template-columns:1.08fr .92fr;
     grid-template-rows:54px minmax(0,1fr) 106px;
     gap:10px;
   }
 
-  .presenterSegmentPage .auctionGrid{
+  #presenterPanel .auctionGrid{
     padding:12px;
     border-radius:22px;
     grid-auto-rows:66px;
     gap:10px;
   }
 
-  .presenterSegmentPage .auctionBtn{
+  #presenterPanel .auctionBtn{
     height:66px;
     min-height:66px;
     border-radius:19px;
     font-size:1.75rem;
   }
 
-  .presenterSegmentPage .auctionTopBar{
+  #presenterPanel .auctionTopBar{
     height:54px;
     min-height:54px;
     grid-template-columns:1fr 78px 1fr;
     gap:8px;
   }
 
-  .presenterSegmentPage .auctionTeamCard,
-  .presenterSegmentPage .auctionMiddleCard{
+  #presenterPanel .auctionTeamCard,
+  #presenterPanel .auctionMiddleCard{
     height:52px;
     min-height:52px;
     border-radius:17px;
   }
 
-  .presenterSegmentPage .auctionTeamCard{
+  #presenterPanel .auctionTeamCard{
     grid-template-columns:minmax(0,1fr) 36px;
     padding:7px 8px;
   }
 
-  .presenterSegmentPage #auctionTeamBBox{
+  #presenterPanel #auctionTeamBBox{
     grid-template-columns:36px minmax(0,1fr);
   }
 
-  .presenterSegmentPage .auctionTeamName{
+  #presenterPanel .auctionTeamName{
     font-size:.8rem;
   }
 
-  .presenterSegmentPage .auctionTeamScore{
+  #presenterPanel .auctionTeamScore{
     width:36px;
     height:32px;
     border-radius:12px;
     font-size:1.05rem;
   }
 
-  .presenterSegmentPage .auctionTurnLabel{
+  #presenterPanel .auctionTurnLabel{
     font-size:.66rem;
   }
 
-  .presenterSegmentPage .auctionQuestionBox{
+  #presenterPanel .auctionQuestionBox{
     padding:10px;
     border-radius:22px;
   }
 
-  .presenterSegmentPage .auctionPlaceholder{
+  #presenterPanel .auctionPlaceholder{
     border-radius:18px;
     font-size:1rem;
   }
 
-  .presenterSegmentPage .auctionImagePreviewBox,
-  .presenterSegmentPage .auctionVideoPreviewBox,
-  .presenterSegmentPage .auctionResultMediaBox{
+  #presenterPanel .auctionImagePreviewBox,
+  #presenterPanel .auctionVideoPreviewBox,
+  #presenterPanel .auctionResultMediaBox{
     border-radius:18px;
   }
 
-  .presenterSegmentPage .auctionResultView{
+  #presenterPanel .auctionResultView{
     grid-template-rows:minmax(0,1fr) 92px;
     gap:8px;
   }
 
-  .presenterSegmentPage .auctionResultAnswerBox{
+  #presenterPanel .auctionResultAnswerBox{
     border-radius:18px;
     padding:8px 10px;
   }
 
-  .presenterSegmentPage .auctionResultAnswerText{
+  #presenterPanel .auctionResultAnswerText{
     font-size:1.22rem;
   }
 
-  .presenterSegmentPage .auctionControlPanel{
+  #presenterPanel .auctionControlPanel{
     height:106px;
     min-height:106px;
     grid-template-rows:repeat(2,49px);
     gap:8px;
   }
 
-  .presenterSegmentPage .auctionControlPanel button{
+  #presenterPanel .auctionControlPanel button{
     height:49px;
     min-height:49px;
     border-radius:15px;
@@ -3225,175 +2736,8 @@ button:disabled{
 }
 
 /* =========================================================
-   Mobile / Portrait Fallback
-========================================================= */
-
-@media screen and (max-width:799px), screen and (orientation:portrait){
-
-  .presenterSegmentPage .auctionWrap{
-    height:auto;
-
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-
-    overflow:visible;
-  }
-
-  .presenterSegmentPage .auctionTopBar{
-    height:auto;
-    grid-template-columns:1fr;
-  }
-
-  .presenterSegmentPage .auctionTeamCard,
-  .presenterSegmentPage .auctionMiddleCard{
-    height:58px;
-    min-height:58px;
-  }
-
-  .presenterSegmentPage .auctionGrid{
-    height:auto;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    grid-auto-rows:64px;
-  }
-
-  .presenterSegmentPage .auctionQuestionBox{
-    min-height:320px;
-  }
-
-  .presenterSegmentPage .auctionControlPanel{
-    height:auto;
-    grid-template-columns:1fr;
-    grid-template-rows:auto;
-  }
-
-  .presenterSegmentPage .auctionControlPanel button{
-    height:54px;
-    min-height:54px;
-  }
-}
-/* =========================================================
-   PRESENTER SEGMENT FULL WIDTH FIX
-   حل تصغير الفقرات في صفحة المقدم
-   ضعه قبل FINAL VISIBILITY FIX
-========================================================= */
-
-#presenterSegmentPage{
-  width:100vw;
-  height:100dvh;
-  min-height:100dvh;
-  max-height:100dvh;
-
-  padding:10px 18px;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
-
-  overflow:hidden;
-}
-
-#presenterSegmentPage .presenterCleanHeader{
-  width:100%;
-  max-width:1180px;
-  flex-shrink:0;
-}
-
-#presenterPanel{
-  width:100%;
-  max-width:1180px;
-
-  flex:1;
-  min-height:0;
-  height:auto;
-
-  display:block;
-
-  overflow:hidden;
-}
-
-/* مهم: أي فقرة داخل لوحة المقدم تأخذ كامل المساحة */
-#presenterPanel > *{
-  width:100%;
-  height:100%;
-  min-height:0;
-  margin:0;
-
-  box-sizing:border-box;
-}
-
-/* إلغاء أي تصغير قديم من فقرات العرض */
-#presenterPanel .auctionWrap,
-#presenterPanel .presenterWarmupLayout,
-#presenterPanel .presenterTop10Layout{
-  width:100%;
-  height:100%;
-  min-height:0;
-  max-width:none;
-  margin:0;
-  padding:0;
-
-  box-sizing:border-box;
-  overflow:hidden;
-}
-
-/* إصلاح خاص إذا الفقرة جاية من أكواد العرض القديمة */
-#presenterPanel .auctionWrap{
-  align-self:stretch;
-}
-
-/* يخلي الكروت تتمدد بدل ما تصير صغيرة بالنص */
-#presenterPanel .auctionGrid,
-#presenterPanel .auctionTopBar,
-#presenterPanel .auctionQuestionBox,
-#presenterPanel .auctionControlPanel,
-#presenterPanel .presenterWarmupLeft,
-#presenterPanel .presenterWarmupRight,
-#presenterPanel .presenterTop10Left,
-#presenterPanel .presenterTop10Right{
-  width:100%;
-  min-width:0;
-  max-width:none;
-  box-sizing:border-box;
-}
-
-/* =========================================================
-   Galaxy Tab A 11 Landscape
-========================================================= */
-
-@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape){
-
-  #presenterSegmentPage{
-    padding:9px 16px;
-    gap:8px;
-  }
-
-  #presenterSegmentPage .presenterCleanHeader,
-  #presenterPanel{
-    max-width:1120px;
-  }
-}
-
-/* =========================================================
-   Short Height Fix
-========================================================= */
-
-@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
-
-  #presenterSegmentPage{
-    padding:8px 14px;
-    gap:8px;
-  }
-
-  #presenterSegmentPage .presenterCleanHeader,
-  #presenterPanel{
-    max-width:1100px;
-  }
-}
-/* =========================================================
    FINAL VISIBILITY FIX
-
+   لا تضع أي كود بعد هذا البلوك
 ========================================================= */
 
 body .hidden{
