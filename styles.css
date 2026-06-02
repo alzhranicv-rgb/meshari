@@ -7379,3 +7379,246 @@ video::-webkit-media-controls-panel{
     font-size:clamp(1.55rem,3.5vw,2.65rem) !important;
   }
 }
+/* =========================================================
+   WHO PREVIEW + ANSWER FINAL DESIGN
+   من هو - معاينة صغيرة وإجابة مرتبة
+========================================================= */
+
+#whoImageStage,
+.whoImageStage{
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  margin:0 auto !important;
+  padding:0 !important;
+
+  overflow:visible !important;
+}
+
+/* معاينة الصورة قبل الإجابة */
+#whoImageStage .whoImageFrame{
+  width:min(100%,520px) !important;
+  height:250px !important;
+  min-height:250px !important;
+  max-height:250px !important;
+
+  margin:0 auto !important;
+
+  padding:8px !important;
+  border-radius:26px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:linear-gradient(180deg,#0F172A,#111827) !important;
+
+  box-shadow:
+    0 16px 38px rgba(15,23,42,.18),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+
+  overflow:hidden !important;
+  cursor:pointer !important;
+}
+
+#whoImageStage .whoImageFrame img,
+#whoImageStage .whoImageFull{
+  width:100% !important;
+  height:100% !important;
+
+  max-width:100% !important;
+  max-height:100% !important;
+
+  object-fit:contain !important;
+  object-position:center center !important;
+
+  display:block !important;
+
+  border-radius:18px !important;
+  background:#0F172A !important;
+}
+
+/* شاشة الإجابة */
+#whoImageStage .whoResultView{
+  width:min(100%,820px) !important;
+
+  display:grid !important;
+  grid-template-columns:280px minmax(0,1fr) !important;
+  gap:14px !important;
+  align-items:stretch !important;
+
+  margin:0 auto !important;
+
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+
+  overflow:visible !important;
+}
+
+/* صورة الإجابة */
+#whoImageStage .whoResultImageBox{
+  width:280px !important;
+  height:240px !important;
+  min-height:240px !important;
+  max-height:240px !important;
+
+  padding:8px !important;
+  border-radius:26px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:linear-gradient(180deg,#0F172A,#111827) !important;
+
+  box-shadow:
+    0 16px 38px rgba(15,23,42,.18),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+
+  overflow:hidden !important;
+  cursor:pointer !important;
+}
+
+#whoImageStage .whoResultImage{
+  width:100% !important;
+  height:100% !important;
+
+  max-width:100% !important;
+  max-height:100% !important;
+
+  object-fit:contain !important;
+  object-position:center center !important;
+
+  display:block !important;
+
+  border-radius:18px !important;
+  background:#0F172A !important;
+}
+
+/* كرت الإجابة */
+#whoImageStage .whoResultAnswerBox{
+  height:240px !important;
+  min-height:240px !important;
+  max-height:240px !important;
+
+  padding:16px 20px !important;
+  border-radius:26px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:12px !important;
+
+  text-align:center !important;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.70), transparent 45%),
+    linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.76)) !important;
+
+  border:1px solid rgba(255,255,255,.75) !important;
+
+  box-shadow:
+    0 16px 38px rgba(30,27,75,.12),
+    inset 0 1px 0 rgba(255,255,255,.96) !important;
+
+  overflow:hidden !important;
+}
+
+/* حالة صح / خطأ */
+#whoImageStage .whoResultAnswerLabel{
+  min-height:32px !important;
+  padding:7px 18px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  border-radius:999px !important;
+
+  color:#fff !important;
+  background:linear-gradient(180deg,#312E81,#24185E) !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.86rem !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+}
+
+#whoImageStage .whoResultView.correctResult .whoResultAnswerLabel{
+  background:linear-gradient(180deg,#16A34A,#15803D) !important;
+}
+
+#whoImageStage .whoResultView.wrongResult .whoResultAnswerLabel{
+  background:linear-gradient(180deg,#EF4444,#B91C1C) !important;
+}
+
+/* نص الإجابة */
+#whoImageStage .whoResultAnswerText{
+  width:100% !important;
+  max-width:100% !important;
+
+  color:#24185E !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.75rem,3.7vw,3rem) !important;
+  line-height:1.12 !important;
+  font-weight:400 !important;
+
+  text-align:center !important;
+
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow-wrap:break-word !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  overflow:visible !important;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.85),
+    0 12px 24px rgba(30,27,75,.12) !important;
+}
+
+/* iPad Air */
+@media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
+
+  #whoImageStage .whoImageFrame{
+    width:500px !important;
+    height:235px !important;
+    min-height:235px !important;
+    max-height:235px !important;
+  }
+
+  #whoImageStage .whoResultView{
+    width:min(100%,790px) !important;
+    grid-template-columns:270px minmax(0,1fr) !important;
+    gap:12px !important;
+  }
+
+  #whoImageStage .whoResultImageBox{
+    width:270px !important;
+    height:230px !important;
+    min-height:230px !important;
+    max-height:230px !important;
+  }
+
+  #whoImageStage .whoResultAnswerBox{
+    height:230px !important;
+    min-height:230px !important;
+    max-height:230px !important;
+  }
+
+  #whoImageStage .whoResultAnswerText{
+    font-size:clamp(1.55rem,3.3vw,2.55rem) !important;
+  }
+}

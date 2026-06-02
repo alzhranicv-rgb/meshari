@@ -585,20 +585,8 @@ function showWhoImageFullscreen(imageUrl) {
   if (!stage || !imageUrl) return
 
   stage.innerHTML = `
-    <div class="whoPreviewClean">
-
-      <button
-        type="button"
-        class="whoPreviewCleanImage"
-        onclick="toggleWhoImageOverlay()"
-      >
-        <img src="${imageUrl}" class="whoPreviewCleanImg" alt="">
-      </button>
-
-      <div class="whoPreviewCleanHint">
-        اضغط على الصورة للتكبير
-      </div>
-
+    <div class="whoImageFrame" onclick="toggleWhoImageOverlay()">
+      <img src="${imageUrl}" class="whoImageFull" alt="">
     </div>
   `
 
@@ -650,20 +638,15 @@ function showWhoAnswer(resultType = "") {
       : "الإجابة"
 
   stage.innerHTML = `
-    <div class="whoAnswerClean ${resultClass}">
+    <div class="whoResultView ${resultClass}">
 
-      <button
-        type="button"
-        class="whoAnswerCleanImage"
-        onclick="toggleWhoImageOverlay()"
-      >
-        <img src="${currentWhoImage || ""}" class="whoAnswerCleanImg" alt="">
-      </button>
+      <div class="whoResultImageBox" onclick="toggleWhoImageOverlay()">
+        <img src="${currentWhoImage || ""}" class="whoResultImage" alt="">
+      </div>
 
-      <div class="whoAnswerCleanBox">
-        <div class="whoAnswerCleanStatus">${escapeDisplayHtml(resultLabel)}</div>
-        <div class="whoAnswerCleanLabel">الإجابة</div>
-        <div class="whoAnswerCleanText">${escapeDisplayHtml(currentWhoAnswer)}</div>
+      <div class="whoResultAnswerBox">
+        <div class="whoResultAnswerLabel">${escapeDisplayHtml(resultLabel)}</div>
+        <div class="whoResultAnswerText">${escapeDisplayHtml(currentWhoAnswer)}</div>
       </div>
 
     </div>
