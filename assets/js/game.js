@@ -2021,40 +2021,59 @@ function protectDisplayMedia(root = document) {
     if (img.dataset.mediaProtected === "1") return
 
     img.dataset.mediaProtected = "1"
+    img.classList.add("displayImagePreparing")
 
-    img.addEventListener("load", () => {
-      img.classList.add("displayMediaLoaded")
-    })
+    const markLoaded = () => {
+      img.classList.remove("displayImagePreparing")
+      img.classList.add("displayMediaLoaded", "displayImagePro")
+    }
 
-    img.addEventListener("error", () => {
+    const markError = () => {
       const parent = img.parentElement
       if (!parent) return
 
       parent.classList.add("displayMediaErrorBox")
       parent.innerHTML = ""
       parent.appendChild(createDisplayMediaFallback("image"))
-    })
+    }
+
+    if (img.complete && img.naturalWidth > 0) {
+      markLoaded()
+    } else {
+      img.addEventListener("load", markLoaded, { once: true })
+      img.addEventListener("error", markError, { once: true })
+    }
   })
 
   scope.querySelectorAll("video").forEach(video => {
     if (video.dataset.mediaProtected === "1") return
 
     video.dataset.mediaProtected = "1"
+    video.classList.add("displayImagePreparing")
 
-    video.addEventListener("loadeddata", () => {
-      video.classList.add("displayMediaLoaded")
-    })
+    const markLoaded = () => {
+      video.classList.remove("displayImagePreparing")
+      video.classList.add("displayMediaLoaded", "displayImagePro")
+    }
 
-    video.addEventListener("error", () => {
+    const markError = () => {
       const parent = video.parentElement
       if (!parent) return
 
       parent.classList.add("displayMediaErrorBox")
       parent.innerHTML = ""
       parent.appendChild(createDisplayMediaFallback("video"))
-    })
+    }
+
+    if (video.readyState >= 2) {
+      markLoaded()
+    } else {
+      video.addEventListener("loadeddata", markLoaded, { once: true })
+      video.addEventListener("error", markError, { once: true })
+    }
   })
 }
+
 function updateDisplayControlsEyeButton(isHidden) {
   const btn = document.getElementById("displayControlsEyeBtn")
   if (!btn) return
