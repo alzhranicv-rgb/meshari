@@ -6898,3 +6898,239 @@ video,
 video::-webkit-media-controls-panel{
   background-color:rgba(15,23,42,.82);
 }
+
+/* =========================================================
+   DISPLAY MEDIA REVEAL FX
+   ظهور احترافي للصور والفيديو
+========================================================= */
+
+.displayMediaRevealFx{
+  animation:displayMediaRevealIn .42s cubic-bezier(.2,.85,.2,1.05) both;
+}
+
+@keyframes displayMediaRevealIn{
+  0%{
+    opacity:0;
+    filter:blur(14px) brightness(.88);
+    transform:scale(1.035);
+  }
+
+  55%{
+    opacity:1;
+    filter:blur(3px) brightness(1.03);
+  }
+
+  100%{
+    opacity:1;
+    filter:blur(0) brightness(1);
+    transform:scale(1);
+  }
+}
+
+/* إطار تحميل ناعم أثناء انتظار الصورة */
+.displayImagePreparing,
+.displayUnifiedMedia.displayImagePreparing{
+  opacity:0;
+  filter:blur(14px);
+  transform:scale(1.025);
+}
+
+/* بعد التحميل */
+.displayMediaLoaded,
+.displayImagePro,
+.displayUnifiedMedia{
+  transition:
+    opacity .32s ease,
+    filter .32s ease,
+    transform .32s cubic-bezier(.2,.85,.2,1.05);
+}
+
+/* تحسين ظهور الصور داخل إطارات العرض */
+.whoImageStage img,
+.whoImageBox img,
+.whoImageFull,
+.auctionImageFrame img,
+.auctionImageBox img,
+.auctionBigImage,
+.archiveImageFrame img,
+.archiveImageCard img,
+.archiveModernBigCard img,
+.finalRound1BigImage,
+.finalRound1ImageStage img,
+.finalRound3Image,
+.finalRound3ImageStage img,
+.segmentContentWrap video{
+  will-change:opacity, filter, transform;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+/* =========================================================
+   IPAD AIR MEDIA REVEAL
+========================================================= */
+
+@media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
+
+  .displayMediaRevealFx{
+    animation-duration:.36s !important;
+  }
+
+  @keyframes displayMediaRevealIn{
+    0%{
+      opacity:0;
+      filter:blur(10px) brightness(.9);
+      transform:scale(1.025);
+    }
+
+    100%{
+      opacity:1;
+      filter:blur(0) brightness(1);
+      transform:scale(1);
+    }
+  }
+}
+/* =========================================================
+   MEDIA PREVIEW SIZE - DISPLAY
+   تصغير الصور والفيديو في وضع المعاينة فقط
+========================================================= */
+
+/* وضع المعاينة داخل الفقرات */
+.segmentContentWrap .displayUnifiedMediaFrame,
+.segmentContentWrap .whoImageStage,
+.segmentContentWrap .whoImageBox,
+.segmentContentWrap .auctionImageFrame,
+.segmentContentWrap .auctionImageBox,
+.segmentContentWrap .auctionBigImageWrap,
+.segmentContentWrap .archiveImageFrame,
+.segmentContentWrap .archiveImageCard,
+.segmentContentWrap .archiveModernBigCard,
+.segmentContentWrap .finalRound1ImageStage,
+.segmentContentWrap .finalRound1ImageWrap,
+.segmentContentWrap .finalRound3ImageStage,
+.segmentContentWrap .finalRound3ImageStageWrap{
+  width:min(100%,720px) !important;
+  height:min(52vh,380px) !important;
+  min-height:260px !important;
+  max-height:380px !important;
+
+  margin:0 auto !important;
+
+  border-radius:28px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  overflow:hidden !important;
+}
+
+/* الصورة أو الفيديو داخل المعاينة */
+.segmentContentWrap .displayUnifiedMedia,
+.segmentContentWrap .whoImageStage img,
+.segmentContentWrap .whoImageBox img,
+.segmentContentWrap .whoImageFull,
+.segmentContentWrap .auctionImageFrame img,
+.segmentContentWrap .auctionImageBox img,
+.segmentContentWrap .auctionBigImage,
+.segmentContentWrap .archiveImageFrame img,
+.segmentContentWrap .archiveImageCard img,
+.segmentContentWrap .archiveModernBigCard img,
+.segmentContentWrap .finalRound1BigImage,
+.segmentContentWrap .finalRound1ImageStage img,
+.segmentContentWrap .finalRound3Image,
+.segmentContentWrap .finalRound3ImageStage img,
+.segmentContentWrap video{
+  width:100% !important;
+  height:100% !important;
+
+  max-width:100% !important;
+  max-height:100% !important;
+
+  object-fit:contain !important;
+  object-position:center center !important;
+}
+
+/* لا نطبق التصغير على وضع التكبير */
+.displayImageZoomOverlay .displayUnifiedMediaFrame,
+.displayImageZoomOverlay .displayUnifiedMedia,
+.displayImageZoomOverlay img,
+.displayImageZoomOverlay video,
+#displayImageZoomOverlay .displayUnifiedMediaFrame,
+#displayImageZoomOverlay .displayUnifiedMedia,
+#displayImageZoomOverlay img,
+#displayImageZoomOverlay video,
+.auctionImageOverlay img,
+#auctionImageOverlay img,
+.auctionVideoFullscreenOverlay video,
+#auctionVideoFullscreenOverlay video{
+  width:auto !important;
+  height:auto !important;
+
+  max-width:100% !important;
+  max-height:100% !important;
+
+  object-fit:contain !important;
+}
+/* =========================================================
+   IPAD AIR - MEDIA PREVIEW SMALLER
+========================================================= */
+
+@media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
+
+  .segmentContentWrap .displayUnifiedMediaFrame,
+  .segmentContentWrap .whoImageStage,
+  .segmentContentWrap .whoImageBox,
+  .segmentContentWrap .auctionImageFrame,
+  .segmentContentWrap .auctionImageBox,
+  .segmentContentWrap .auctionBigImageWrap,
+  .segmentContentWrap .archiveImageFrame,
+  .segmentContentWrap .archiveImageCard,
+  .segmentContentWrap .archiveModernBigCard,
+  .segmentContentWrap .finalRound1ImageStage,
+  .segmentContentWrap .finalRound1ImageWrap,
+  .segmentContentWrap .finalRound3ImageStage,
+  .segmentContentWrap .finalRound3ImageStageWrap{
+    width:min(100%,680px) !important;
+    height:340px !important;
+    min-height:300px !important;
+    max-height:340px !important;
+
+    border-radius:28px !important;
+  }
+
+  .segmentContentWrap .displayUnifiedMedia,
+  .segmentContentWrap .whoImageStage img,
+  .segmentContentWrap .whoImageBox img,
+  .segmentContentWrap .whoImageFull,
+  .segmentContentWrap .auctionImageFrame img,
+  .segmentContentWrap .auctionImageBox img,
+  .segmentContentWrap .auctionBigImage,
+  .segmentContentWrap .archiveImageFrame img,
+  .segmentContentWrap .archiveImageCard img,
+  .segmentContentWrap .archiveModernBigCard img,
+  .segmentContentWrap .finalRound1BigImage,
+  .segmentContentWrap .finalRound1ImageStage img,
+  .segmentContentWrap .finalRound3Image,
+  .segmentContentWrap .finalRound3ImageStage img,
+  .segmentContentWrap video{
+    object-fit:contain !important;
+  }
+
+  /* التكبير يبقى كبير */
+  .displayImageZoomOverlay,
+  #displayImageZoomOverlay,
+  .auctionImageOverlay,
+  #auctionImageOverlay{
+    padding:24px !important;
+  }
+
+  .displayImageZoomOverlay img,
+  #displayImageZoomOverlay img,
+  .auctionImageOverlay img,
+  #auctionImageOverlay img{
+    max-width:100% !important;
+    max-height:100% !important;
+    width:auto !important;
+    height:auto !important;
+    object-fit:contain !important;
+  }
+}

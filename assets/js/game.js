@@ -908,7 +908,13 @@ async function restoreDisplayAfterRefresh() {
 
 function observeDisplayMedia() {
   protectDisplayMedia(document)
-  enhanceDisplayMediaFrames(document)
+
+  if (typeof enhanceDisplayMediaFrames === "function") {
+    enhanceDisplayMediaFrames(document)
+  }
+
+  preloadDisplayMediaInRoot(document)
+  applyDisplayMediaRevealFx(document)
 
   const observer = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
@@ -916,7 +922,13 @@ function observeDisplayMedia() {
         if (!(node instanceof HTMLElement)) return
 
         protectDisplayMedia(node)
-        enhanceDisplayMediaFrames(node)
+
+        if (typeof enhanceDisplayMediaFrames === "function") {
+          enhanceDisplayMediaFrames(node)
+        }
+
+        preloadDisplayMediaInRoot(node)
+        applyDisplayMediaRevealFx(node)
       })
     })
   })
@@ -960,6 +972,122 @@ function enhanceDisplayMediaFrames(root = document) {
       media.setAttribute("controls", "true")
       media.setAttribute("preload", "metadata")
     }
+  })
+}
+
+/* =========================
+   DISPLAY MEDIA PRELOAD
+   تحميل مسبق للصور والفيديو
+========================= */
+
+const displayPreloadedMedia = new Set()
+
+function getDisplayMediaSrc(media) {
+  if (!media) return ""
+
+  if (media.tagName?.toLowerCase() === "img") {
+    return media.currentSrc || media.src || ""
+  }
+
+  if (media.tagName?.toLowerCase() === "video") {
+    return media.currentSrc || media.src || media.querySelector("source")?.src || ""
+  }
+
+  return ""
+}
+
+function preloadDisplayImage(src) {
+  return new Promise(resolve => {
+    if (!src || displayPreloadedMedia.has(src)) {
+      resolve(false)
+      return
+    }
+
+    const img = new Image()
+
+    img.onload = () => {
+      displayPreloadedMedia.add(src)
+      resolve(true)
+    }
+
+    img.onerror = () => {
+      resolve(false)
+    }
+
+    img.src = src
+  })
+}
+
+function preloadDisplayVideo(src) {
+  return new Promise(resolve => {
+    if (!src || displayPreloadedMedia.has(src)) {
+      resolve(false)
+      return
+    }
+
+    const video = document.createElement("video")
+    video.preload = "metadata"
+    video.muted = true
+    video.playsInline = true
+
+    video.onloadedmetadata = () => {
+      displayPreloadedMedia.add(src)
+      resolve(true)
+    }
+
+    video.onerror = () => {
+      resolve(false)
+    }
+
+    video.src = src
+  })
+}
+
+async function preloadDisplayMediaInRoot(root = document) {
+  const scope = root || document
+
+  const images = Array.from(scope.querySelectorAll("img"))
+    .map(img => getDisplayMediaSrc(img))
+    .filter(Boolean)
+
+  const videos = Array.from(scope.querySelectorAll("video"))
+    .map(video => getDisplayMediaSrc(video))
+    .filter(Boolean)
+
+  const imageTasks = images.map(src => preloadDisplayImage(src))
+  const videoTasks = videos.map(src => preloadDisplayVideo(src))
+
+  await Promise.allSettled([
+    ...imageTasks,
+    ...videoTasks
+  ])
+}
+/* =========================
+   DISPLAY MEDIA REVEAL FX
+   مؤثر ظهور الصور والفيديو
+========================= */
+
+function applyDisplayMediaRevealFx(root = document) {
+  const scope = root || document
+
+  const mediaList = scope.querySelectorAll(`
+    img,
+    video,
+    .whoImageFull,
+    .auctionBigImage,
+    .finalRound1BigImage,
+    .finalRound3Image
+  `)
+
+  mediaList.forEach(media => {
+    if (media.dataset.revealFxDone === "1") return
+
+    media.dataset.revealFxDone = "1"
+    media.classList.remove("displayMediaRevealFx")
+
+    void media.offsetWidth
+
+    media.classList.add("displayMediaRevealFx")
   })
 }
 
@@ -1308,26 +1436,37 @@ async function openSegmentPage(segmentKey) {
 
     showDisplayLoading("جاري تجهيز الفقرة...")
 
-try {
-  if (segmentKey === "warmup") await window.renderWarmup()
-  if (segmentKey === "top10") await window.renderTop10()
-  if (segmentKey === "auction") await window.renderAuction()
-  if (segmentKey === "who") await window.renderWho()
-  if (segmentKey === "explain") await window.renderExplain()
-  if (segmentKey === "final") await window.renderFinal()
-  if (segmentKey === "archive") await window.renderArchive()
+    try {
+      if (segmentKey === "warmup") await window.renderWarmup()
+      if (segmentKey === "top10") await window.renderTop10()
+      if (segmentKey === "auction") await window.renderAuction()
+      if (segmentKey === "who") await window.renderWho()
+      if (segmentKey === "explain") await window.renderExplain()
+      if (segmentKey === "final") await window.renderFinal()
+      if (segmentKey === "archive") await window.renderArchive()
 
-  protectDisplayMedia(document.getElementById("segmentArea") || document)
-  enhanceDisplayMediaFrames(document.getElementById("segmentArea") || document)
+      const mediaRoot = document.getElementById("segmentArea") || document
 
-} catch (e) {
-  console.log("DISPLAY SEGMENT RENDER ERROR:", e)
-  showGameToast("تعذر تجهيز الفقرة")
-} finally {
-  hideDisplayLoading()
-}
+      protectDisplayMedia(mediaRoot)
 
-      protectDisplayMedia(document.getElementById("segmentArea") || document)
+      if (typeof enhanceDisplayMediaFrames === "function") {
+        enhanceDisplayMediaFrames(mediaRoot)
+      }
+
+      if (typeof preloadDisplayMediaInRoot === "function") {
+        await preloadDisplayMediaInRoot(mediaRoot)
+      }
+
+      if (typeof applyDisplayMediaRevealFx === "function") {
+        applyDisplayMediaRevealFx(mediaRoot)
+      }
+
+    } catch (e) {
+      console.log("DISPLAY SEGMENT RENDER ERROR:", e)
+      showGameToast("تعذر تجهيز الفقرة")
+    } finally {
+      hideDisplayLoading()
+    }
 
     const segmentArea = document.getElementById("segmentArea")
     if (segmentArea) {
@@ -1345,80 +1484,6 @@ try {
     }, 350)
   })
 }
-
-function openMainSegment(segmentKey) {
-  openSegmentPage(segmentKey)
-}
-
-function openSegment(title, content) {
-  const area = document.getElementById("segmentArea")
-  if (!area) return
-
-  area.innerHTML = `
-    <div class="segmentControls">
-      <button onclick="goHome()" class="backBtn">رجوع</button>
-      <h2 class="segmentTitle">${title}</h2>
-      <button id="endRoundBtn" onclick="endCurrentSegment()" class="endBtn" disabled>إنهاء</button>
-    </div>
-
-    <div class="segmentContentWrap">
-      ${content}
-    </div>
-  `
-
-  syncDisplayStateToSession()
-updateEndRoundButtonState()
-startEndButtonWatcher()
-}
-
-function goHome() {
-  clearDisplayTemporaryFx()
-
-  clearInterval(timer)
-  timer = null
-  window.currentSegmentScores = null
-
-  localStorage.removeItem("active_segment")
-  homeRefreshLocked = false
-
-  syncDisplayStateToSession()
-
-  stopEndButtonWatcher()
-
-  const content = document.querySelector(".segmentContentWrap")
-
-  playSoftExit(content, () => {
-    renderMainHome(true)
-    syncDisplayStateToSession()
-  })
-}
-
-function updateEndRoundButtonState() {
-  const btn = document.getElementById("endRoundBtn")
-  if (!btn) return
-
-  const key = getCurrentSegmentKey()
-  if (!key) {
-    btn.disabled = true
-    btn.innerText = "إنهاء"
-    btn.classList.add("disabledEndBtn")
-    return
-  }
-
-  const canEnd = canEndSegment(key)
-
-  if (!canEnd) {
-    btn.disabled = true
-    btn.innerText = "إنهاء"
-    btn.classList.add("disabledEndBtn")
-    return
-  }
-
-  btn.disabled = false
-  btn.innerText = "إنهاء"
-  btn.classList.remove("disabledEndBtn")
-}
-
 /* =========================
    Teams / Answers
 ========================= */
