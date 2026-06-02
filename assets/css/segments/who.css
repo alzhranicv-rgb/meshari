@@ -1947,3 +1947,321 @@ body.whoOverlayActive .whoGrid{
     object-fit:contain !important;
   }
 }
+
+/* =========================================================
+   WHO PREVIEW / RESULT - CLEAN DISPLAY
+   ترتيب معاينة من هو والإجابة
+========================================================= */
+
+.whoImageStage{
+  width:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+.whoPreviewCard{
+  width:min(100%,720px);
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  margin:0 auto;
+}
+
+.whoPreviewImageFrame{
+  width:min(100%,620px);
+  height:340px;
+
+  border:0;
+  border-radius:30px;
+
+  padding:10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.10), transparent 44%),
+    linear-gradient(180deg,#0F172A,#111827);
+
+  box-shadow:
+    0 22px 54px rgba(15,23,42,.24),
+    inset 0 1px 0 rgba(255,255,255,.12);
+
+  overflow:hidden;
+}
+
+.whoPreviewImageFrame img,
+.whoImageFull{
+  width:100%;
+  height:100%;
+
+  object-fit:contain !important;
+  object-position:center center !important;
+
+  display:block;
+
+  border-radius:22px;
+  background:#0F172A;
+}
+
+.whoPreviewHint{
+  min-height:32px;
+  padding:7px 14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:999px;
+
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(255,255,255,.58);
+
+  color:#0F4C5C;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:.82rem;
+  font-weight:900;
+
+  box-shadow:
+    0 10px 22px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.86);
+}
+
+/* النتيجة بعد صح / خطأ */
+.whoResultView{
+  width:min(100%,900px);
+
+  display:grid;
+  grid-template-columns:minmax(260px,360px) minmax(0,1fr);
+  align-items:stretch;
+  gap:18px;
+
+  margin:0 auto;
+}
+
+.whoResultImageBox{
+  min-height:310px;
+
+  border:0;
+  border-radius:30px;
+
+  padding:10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.10), transparent 44%),
+    linear-gradient(180deg,#0F172A,#111827);
+
+  box-shadow:
+    0 22px 54px rgba(15,23,42,.22),
+    inset 0 1px 0 rgba(255,255,255,.12);
+
+  overflow:hidden;
+}
+
+.whoResultImage{
+  width:100%;
+  height:100%;
+
+  object-fit:contain !important;
+  object-position:center center !important;
+
+  display:block;
+
+  border-radius:22px;
+  background:#0F172A;
+}
+
+.whoResultAnswerBox{
+  position:relative;
+
+  min-height:310px;
+
+  padding:22px 24px;
+  border-radius:30px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  text-align:center;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.58), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.68));
+
+  border:1px solid rgba(255,255,255,.68);
+
+  box-shadow:
+    0 22px 54px rgba(30,27,75,.14),
+    0 0 0 5px rgba(103,232,249,.06),
+    inset 0 1px 0 rgba(255,255,255,.96);
+
+  overflow:hidden;
+}
+
+.whoResultStatus{
+  min-height:34px;
+  padding:8px 18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:999px;
+
+  color:#FFFFFF;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:.9rem;
+  font-weight:900;
+
+  background:linear-gradient(180deg,#312E81,#24185E);
+
+  box-shadow:
+    0 12px 26px rgba(30,27,75,.16),
+    inset 0 1px 0 rgba(255,255,255,.20);
+}
+
+.whoResultView.correctResult .whoResultStatus{
+  background:linear-gradient(180deg,#16A34A,#15803D);
+}
+
+.whoResultView.wrongResult .whoResultStatus{
+  background:linear-gradient(180deg,#EF4444,#B91C1C);
+}
+
+.whoResultAnswerLabel{
+  color:#0F4C5C;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:.95rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.whoResultAnswerText{
+  width:100%;
+
+  color:#24185E;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(2.2rem,4.8vw,4.1rem);
+  line-height:1.08;
+  font-weight:400;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.80),
+    0 14px 28px rgba(30,27,75,.12);
+
+  overflow-wrap:break-word;
+}
+
+/* iPad Air */
+@media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
+
+  .whoPreviewCard{
+    width:min(100%,680px);
+    gap:8px;
+  }
+
+  .whoPreviewImageFrame{
+    width:min(100%,600px);
+    height:300px;
+    border-radius:28px;
+  }
+
+  .whoResultView{
+    width:min(100%,860px);
+    grid-template-columns:320px minmax(0,1fr);
+    gap:14px;
+  }
+
+  .whoResultImageBox,
+  .whoResultAnswerBox{
+    min-height:290px;
+    border-radius:28px;
+  }
+
+  .whoResultAnswerText{
+    font-size:clamp(2rem,4.3vw,3.5rem);
+  }
+}
+
+/* إذا الشاشة ضاقت */
+@media (max-width:767px){
+
+  .whoPreviewImageFrame{
+    width:100%;
+    height:270px;
+    border-radius:24px;
+  }
+
+  .whoResultView{
+    width:100%;
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .whoResultImageBox{
+    min-height:240px;
+  }
+
+  .whoResultAnswerBox{
+    min-height:210px;
+  }
+
+  .whoResultAnswerText{
+    font-size:2.3rem;
+  }
+}
+
+/* أولوية خاصة لمن هو */
+.segmentContentWrap .whoPreviewImageFrame{
+  width:min(100%,600px) !important;
+  height:300px !important;
+  min-height:300px !important;
+  max-height:300px !important;
+}
+
+.segmentContentWrap .whoResultImageBox{
+  height:auto !important;
+  min-height:290px !important;
+  max-height:none !important;
+}
+
+.segmentContentWrap .whoResultAnswerBox{
+  height:auto !important;
+  min-height:290px !important;
+  max-height:none !important;
+}
+/* حماية أزرار تسجيل النتيجة */
+.whoScoreBtnLocked,
+.btnCorrect:disabled,
+.btnWrong:disabled{
+  opacity:.45 !important;
+  pointer-events:none !important;
+  filter:grayscale(.35) !important;
+  transform:none !important;
+  cursor:not-allowed !important;
+}

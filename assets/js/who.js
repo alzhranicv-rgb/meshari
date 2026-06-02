@@ -22,6 +22,7 @@ let whoCurrentNumber = null
 let whoLastTickPlayed = null
 let whoTimerStarted = false
 let whoCompensationMode = false
+let whoScoringLocked = false
 
 const WHO_STORAGE_KEY = "who_state_v1"
 
@@ -584,11 +585,37 @@ function showWhoImageFullscreen(imageUrl) {
   if (!stage || !imageUrl) return
 
   stage.innerHTML = `
-    <div class="whoImageFrame" onclick="toggleWhoImageOverlay()">
-      <img src="${imageUrl}" class="whoImageFull" alt="">
+    <div class="whoPreviewCard">
+
+      <button
+        type="button"
+        class="whoPreviewImageFrame"
+        onclick="toggleWhoImageOverlay()"
+        title="اضغط لتكبير الصورة"
+      >
+        <img src="${imageUrl}" class="whoImageFull" alt="">
+      </button>
+
+      <div class="whoPreviewHint">
+        اضغط على الصورة للتكبير
+      </div>
+
     </div>
   `
+
   stage.classList.remove("hidden")
+
+  if (typeof protectDisplayMedia === "function") {
+    protectDisplayMedia(stage)
+  }
+
+  if (typeof enhanceDisplayMediaFrames === "function") {
+    enhanceDisplayMediaFrames(stage)
+  }
+
+  if (typeof applyDisplayMediaRevealFx === "function") {
+    applyDisplayMediaRevealFx(stage)
+  }
 }
 
 function hideWhoImage() {
@@ -620,20 +647,58 @@ function showWhoAnswer(resultType = "") {
       ? "wrongResult"
       : ""
 
+  const resultLabel =
+    resultType === "correct"
+      ? "إجابة صحيحة"
+      : resultType === "wrong"
+      ? "إجابة خاطئة"
+      : "الإجابة"
+
   stage.innerHTML = `
     <div class="whoResultView ${resultClass}">
-      <div class="whoResultImageBox">
+
+      <button
+        type="button"
+        class="whoResultImageBox"
+        onclick="toggleWhoImageOverlay()"
+        title="اضغط لتكبير الصورة"
+      >
         <img src="${currentWhoImage || ""}" class="whoResultImage" alt="">
-      </div>
+      </button>
 
       <div class="whoResultAnswerBox">
-        <div class="whoResultAnswerLabel">الإجابة</div>
-        <div class="whoResultAnswerText">${currentWhoAnswer}</div>
+
+        <div class="whoResultStatus">
+          ${escapeDisplayHtml(resultLabel)}
+        </div>
+
+        <div class="whoResultAnswerLabel">
+          الإجابة
+        </div>
+
+        <div class="whoResultAnswerText">
+          ${escapeDisplayHtml(currentWhoAnswer)}
+        </div>
+
       </div>
+
     </div>
   `
 
   stage.classList.remove("hidden")
+
+  if (typeof protectDisplayMedia === "function") {
+    protectDisplayMedia(stage)
+  }
+
+  if (typeof enhanceDisplayMediaFrames === "function") {
+    enhanceDisplayMediaFrames(stage)
+  }
+
+  if (typeof applyDisplayMediaRevealFx === "function") {
+    applyDisplayMediaRevealFx(stage)
+  }
+
   saveWhoState()
 }
 
@@ -717,6 +782,37 @@ function resetWhoTimer() {
 
   saveWhoState()
 }
+/* =========================
+   Score Buttons Guard
+   حماية أزرار التسجيل من التكرار
+========================= */
+
+function setWhoScoreButtonsLocked(isLocked) {
+  whoScoringLocked = !!isLocked
+
+  const buttons = [
+    document.querySelector(".btnCorrect"),
+    document.querySelector(".btnWrong")
+  ]
+
+  buttons.forEach(btn => {
+    if (!btn) return
+
+    btn.disabled = whoScoringLocked
+    btn.classList.toggle("whoScoreBtnLocked", whoScoringLocked)
+  })
+}
+
+function canScoreWhoNow() {
+  if (whoScoringLocked) {
+    return false
+  }
+
+  whoScoringLocked = true
+  setWhoScoreButtonsLocked(true)
+
+  return true
+}
 
 /* =========================
    Result
@@ -732,7 +828,9 @@ function finishWhoAfterAnswerDelay() {
 
     whoQuestionLocked = false
     whoCurrentNumber = null
+    whoScoringLocked = false
 
+    setWhoScoreButtonsLocked(false)
     updateWhoDoubleButton()
     updateWhoCompensationButton()
     saveWhoState()
@@ -740,17 +838,22 @@ function finishWhoAfterAnswerDelay() {
 }
 
 function whoCorrect() {
+  if (!canScoreWhoNow()) return
+
   if (!whoQuestionLocked) {
+    setWhoScoreButtonsLocked(false)
     showGameToast("اختر رقمًا أولاً")
     return
   }
 
   if (whoCompensationMode && !whoState.activeTeam) {
+    setWhoScoreButtonsLocked(false)
     showGameToast("اختر الفريق الذي يأخذ التعويض ثم اضغط صح")
     return
   }
 
   if (!whoState.activeTeam) {
+    setWhoScoreButtonsLocked(false)
     showGameToast("اختر الفريق أولاً")
     return
   }
@@ -777,25 +880,31 @@ function whoCorrect() {
     A: whoState.scoreA,
     B: whoState.scoreB
   }
+
   whoCompensationMode = false
-updateWhoCompensationButton()
+  updateWhoCompensationButton()
 
   saveWhoState()
   finishWhoAfterAnswerDelay()
 }
 
 function whoWrong() {
+  if (!canScoreWhoNow()) return
+
   if (!whoState.activeTeam) {
+    setWhoScoreButtonsLocked(false)
     showGameToast("اختر الفريق أولاً")
     return
   }
 
   if (!whoQuestionLocked) {
+    setWhoScoreButtonsLocked(false)
     showGameToast("اختر رقمًا أولاً")
     return
   }
 
   if (whoState.currentPoints === 0 && !whoCompensationMode) {
+    setWhoScoreButtonsLocked(false)
     showGameToast("اختر النقاط أولاً")
     return
   }
