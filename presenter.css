@@ -1868,56 +1868,57 @@ button:disabled{
 }
 
 /* =========================================================
-   AUCTION / فتبلة - FINAL PRESENTER FIX
-   يدعم #presenterPanel + .presenterPanel + .presenterSegmentPage
+   AUCTION / فتبلة - ACTUAL PRESENTER CLASSES
+   بدون important
 ========================================================= */
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionWrap{
+.presenterAuctionLayout{
   width:100%;
   height:100%;
   min-height:0;
-  max-width:none;
 
   display:grid;
   grid-template-columns:1.08fr .92fr;
-  grid-template-rows:62px minmax(0,1fr) 118px;
-  grid-template-areas:
-    "numbers teams"
-    "numbers preview"
-    "actions preview";
-
   gap:12px;
-  padding:0;
-  margin:0;
 
-  background:transparent;
-  border:0;
-  box-shadow:none;
-
+  direction:ltr;
   overflow:hidden;
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionGrid{
-  grid-area:numbers;
-
-  width:100%;
+.presenterAuctionLeft,
+.presenterAuctionRight{
+  direction:rtl;
+  min-width:0;
   height:100%;
   min-height:0;
-  max-width:none;
+  overflow:hidden;
+}
 
-  padding:16px;
+/* =========================
+   Left Side - Numbers + Actions
+========================= */
+
+.presenterAuctionLeft{
+  display:grid;
+  grid-template-rows:minmax(0,1fr) 118px;
+  gap:12px;
+}
+
+.presenterAuctionNumbersCard{
+  height:100%;
+  min-height:0;
+
+  padding:14px;
 
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  grid-auto-rows:86px;
-  gap:14px;
-  align-content:start;
+  grid-template-rows:32px minmax(0,1fr);
+  gap:12px;
 
   border-radius:26px;
   border:1px solid rgba(30,41,59,.10);
 
   background:
-    linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.72));
+    linear-gradient(180deg,rgba(255,255,255,.84),rgba(248,250,252,.68));
 
   box-shadow:
     0 14px 28px rgba(15,23,42,.08),
@@ -1926,14 +1927,44 @@ button:disabled{
   overflow:hidden;
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn{
+.presenterAuctionNumbersCard > .presenterLabel{
+  height:32px;
+  display:flex;
+  align-items:center;
+
+  color:#1E293B;
+  font-size:1rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.presenterAuctionNumbersCard > .presenterLabel::before{
+  content:"";
+  width:8px;
+  height:22px;
+  margin-left:8px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#FB7185,#F97316);
+}
+
+.presenterAuctionGrid{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-auto-rows:86px;
+  gap:14px;
+
+  align-content:start;
+  overflow:hidden;
+}
+
+.presenterAuctionGrid .presenterNumberBtn{
   width:100%;
   height:86px;
   min-height:86px;
-  max-width:none;
-
-  padding:0;
-  margin:0;
 
   border-radius:24px;
   border:1px solid rgba(49,46,129,.20);
@@ -1957,14 +1988,12 @@ button:disabled{
   overflow:hidden;
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn:active:not(:disabled){
-  transform:scale(.94);
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn.used{
+.presenterAuctionGrid .presenterNumberBtn.presenterOpened{
   position:relative;
 
   color:transparent;
+  opacity:1;
+  filter:none;
 
   background:linear-gradient(180deg,#F8FAFC,#E2E8F0);
   border-color:rgba(148,163,184,.22);
@@ -1972,12 +2001,9 @@ button:disabled{
   box-shadow:
     0 5px 10px rgba(15,23,42,.05),
     inset 0 1px 0 rgba(255,255,255,.80);
-
-  opacity:1;
-  filter:none;
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn.used::after{
+.presenterAuctionGrid .presenterNumberBtn.presenterOpened::after{
   content:"✓";
 
   position:absolute;
@@ -1994,358 +2020,39 @@ button:disabled{
   line-height:1;
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTopBar{
-  grid-area:teams;
+.presenterAuctionGrid .presenterNumberBtn.selectedPresenterTeam:not(.presenterOpened){
+  color:#24185E;
 
-  width:100%;
-  height:62px;
-  min-height:62px;
-  max-width:none;
-
-  display:grid;
-  grid-template-columns:1fr 92px 1fr;
-  gap:10px;
-  align-items:stretch;
-
-  padding:0;
-  margin:0;
-
-  background:transparent;
-  border:0;
-  box-shadow:none;
-
-  overflow:hidden;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamCard,
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionMiddleCard{
-  width:100%;
-  height:60px;
-  min-height:60px;
-
-  border-radius:20px;
-  border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.90),rgba(241,245,249,.78));
-
-  box-shadow:
-    0 10px 20px rgba(15,23,42,.07),
-    inset 0 1px 0 rgba(255,255,255,.82);
-
-  overflow:hidden;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamCard{
-  padding:8px 10px;
-
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 42px;
-  gap:8px;
-  align-items:center;
-
-  cursor:pointer;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) #auctionTeamBBox{
-  grid-template-columns:42px minmax(0,1fr);
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamName{
-  min-width:0;
-
-  color:#1E293B;
-
-  font-size:.92rem;
-  line-height:1.15;
-  font-weight:900;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamScore{
-  width:42px;
-  height:38px;
-  min-width:42px;
-
-  border-radius:14px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:#FFFFFF;
-  border:1px solid rgba(30,41,59,.08);
-
-  color:#312E81;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.25rem;
-  line-height:1;
-
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.90);
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamCard.activeTeam{
   background:linear-gradient(180deg,#FFE6D4,#FFFFFF);
   border-color:rgba(249,115,22,.34);
 
   box-shadow:
     0 0 0 4px rgba(249,115,22,.12),
-    0 12px 22px rgba(249,115,22,.12),
+    0 9px 18px rgba(249,115,22,.12),
     inset 0 1px 0 rgba(255,255,255,.86);
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionMiddleCard{
-  padding:6px;
+/* =========================
+   Auction Actions
+========================= */
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTurnLabel{
-  color:#0F4C5C;
-
-  font-size:.78rem;
-  line-height:1.2;
-  font-weight:900;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionQuestionBox{
-  grid-area:preview;
-
-  width:100%;
-  height:100%;
-  min-height:0;
-  max-width:none;
-
-  padding:14px;
-
-  border-radius:26px;
-  border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
-
-  box-shadow:
-    0 14px 28px rgba(15,23,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.84);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  overflow:hidden;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionPlaceholder{
-  width:100%;
-  height:100%;
-
-  border-radius:24px;
-  border:1px dashed rgba(100,116,139,.24);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:linear-gradient(180deg,#FFFFFF,#F8FAFC);
-
-  color:#64748B;
-
-  font-size:1.25rem;
-  line-height:1.35;
-  font-weight:900;
-  text-align:center;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionImagePreviewBox,
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionVideoPreviewBox{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  border-radius:24px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:#0F172A;
-
-  overflow:hidden;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionImagePreview,
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionVideoPreview{
-  width:100%;
-  height:100%;
-
-  object-fit:contain;
-  display:block;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionVideoPreviewBox{
-  position:relative;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionVideoPlayBtn{
-  position:absolute;
-  left:14px;
-  bottom:14px;
-
-  width:58px;
-  height:58px;
-
-  border-radius:50%;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:linear-gradient(180deg,#67E8F9,#06B6D4);
-
-  color:#12362D;
-
-  font-size:1.2rem;
-  font-weight:900;
-
-  box-shadow:
-    0 10px 20px rgba(6,182,212,.22),
-    inset 0 1px 0 rgba(255,255,255,.24);
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultView{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:minmax(0,1fr) 118px;
-  gap:10px;
-
-  overflow:hidden;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultMediaBox{
-  min-height:0;
-
-  border-radius:24px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:#0F172A;
-
-  overflow:hidden;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultImageBoxClean,
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultVideoBox{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  overflow:hidden;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultImageClean,
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultVideo{
-  width:100%;
-  height:100%;
-
-  object-fit:contain;
-  display:block;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultAnswerBox{
-  min-height:0;
-
-  padding:10px 12px;
-
-  border-radius:22px;
-  border:1px solid rgba(15,118,110,.14);
-
-  background:linear-gradient(180deg,#FFFFFF,#ECFDF5);
-
-  display:grid;
-  grid-template-rows:18px minmax(0,1fr);
-  gap:6px;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.90),
-    0 8px 16px rgba(15,118,110,.05);
-
-  overflow:hidden;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultAnswerLabel{
-  color:#0F766E;
-
-  font-size:.76rem;
-  line-height:1;
-  font-weight:900;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultAnswerText{
-  min-height:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#0F766E;
-
-  font-size:1.55rem;
-  line-height:1.25;
-  font-weight:900;
-  text-align:center;
-
-  overflow:hidden;
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel{
-  grid-area:actions;
-
-  width:100%;
+.presenterAuctionActions{
   height:118px;
   min-height:118px;
-  max-width:none;
 
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:repeat(3,minmax(0,1fr));
   grid-template-rows:repeat(2,55px);
   gap:8px;
 
-  padding:0;
-  margin:0;
-
-  background:transparent;
-  border:0;
-  box-shadow:none;
-
   overflow:hidden;
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel button{
+.presenterAuctionActions .presenterBtn{
   width:100%;
   height:55px;
   min-height:55px;
 
-  border:0;
   border-radius:18px;
 
   padding:7px 8px;
@@ -2356,7 +2063,7 @@ button:disabled{
 
   color:#FFFFFF;
 
-  font-size:.9rem;
+  font-size:.86rem;
   line-height:1.18;
   font-weight:900;
   text-align:center;
@@ -2370,36 +2077,373 @@ button:disabled{
     inset 0 1px 0 rgba(255,255,255,.16);
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel button:active:not(:disabled){
+.presenterAuctionActions .presenterBtn:active:not(:disabled){
   transform:scale(.96);
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionDoubleBtn{
+.presenterAuctionActions .presenterBtn.gray{
   background:linear-gradient(180deg,#FB7185,#F97316);
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionDoubleBtn.activeDouble{
-  color:#431407;
-  background:linear-gradient(180deg,#FDBA74,#F97316);
-}
-
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .btnCorrect{
+.presenterAuctionActions .presenterBtn.green{
   background:linear-gradient(180deg,#22C55E,#15803D);
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .btnWrong{
+.presenterAuctionActions .presenterBtn.red{
   background:linear-gradient(180deg,#EF4444,#DC2626);
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .undoBtn{
-  background:linear-gradient(180deg,#991B1B,#7F1D1D);
+.presenterAuctionActions .presenterBtn.blue{
+  background:linear-gradient(180deg,#0E7490,#164E63);
 }
 
-:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel button:disabled{
+.presenterAuctionActions .presenterBtn:disabled{
   background:#E5E7EB;
   color:#94A3B8;
   box-shadow:none;
   opacity:.88;
+}
+
+/* =========================
+   Right Side - Teams + Preview
+========================= */
+
+.presenterAuctionRight{
+  display:grid;
+  grid-template-rows:62px minmax(0,1fr);
+  gap:12px;
+}
+
+.presenterAuctionTeamsBox{
+  height:62px;
+  min-height:62px;
+  overflow:hidden;
+}
+
+.presenterAuctionTeamsBox .presenterCard{
+  height:100%;
+  padding:0;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+
+.presenterAuctionTeamsBox .presenterLabel{
+  display:none;
+}
+
+.presenterAuctionTeamsBox .presenterTeams{
+  width:100%;
+  height:100%;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.presenterAuctionTeamsBox .presenterBtn{
+  height:60px;
+  min-height:60px;
+
+  border-radius:20px;
+
+  padding:8px 12px;
+
+  color:#1E293B;
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.90),rgba(241,245,249,.78));
+
+  border:1px solid rgba(30,41,59,.10);
+
+  font-size:1.02rem;
+  line-height:1.15;
+  font-weight:900;
+
+  box-shadow:
+    0 10px 20px rgba(15,23,42,.07),
+    inset 0 1px 0 rgba(255,255,255,.82);
+
+  overflow:hidden;
+}
+
+.presenterAuctionTeamsBox .presenterBtn.selectedPresenterTeam,
+.presenterAuctionTeamsBox .presenterBtn.activeTeam{
+  background:linear-gradient(180deg,#FFE6D4,#FFFFFF);
+  border-color:rgba(249,115,22,.34);
+
+  color:#24185E;
+
+  box-shadow:
+    0 0 0 4px rgba(249,115,22,.12),
+    0 12px 22px rgba(249,115,22,.12),
+    inset 0 1px 0 rgba(255,255,255,.86);
+}
+
+/* =========================
+   Preview Card
+========================= */
+
+.presenterAuctionPreviewCard{
+  height:100%;
+  min-height:0;
+
+  padding:14px;
+
+  display:grid;
+  grid-template-rows:24px 118px 24px minmax(0,1fr);
+  gap:8px;
+
+  border-radius:26px;
+  border:1px solid rgba(30,41,59,.10);
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
+
+  box-shadow:
+    0 14px 28px rgba(15,23,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.84);
+
+  overflow:hidden;
+}
+
+.presenterAuctionPreviewCard .presenterLabel{
+  height:24px;
+  display:flex;
+  align-items:center;
+
+  color:#1E293B;
+  font-size:.9rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.presenterAuctionPreviewCard .presenterLabel::before{
+  content:"";
+  width:7px;
+  height:18px;
+  margin-left:7px;
+  border-radius:999px;
+}
+
+.presenterAuctionPreviewCard .presenterLabel:nth-of-type(1)::before{
+  background:linear-gradient(180deg,#5EEAD4,#0F766E);
+}
+
+.presenterAuctionPreviewCard .presenterLabel:nth-of-type(2)::before{
+  background:linear-gradient(180deg,#A78BFA,#7C3AED);
+}
+
+#presenterAuctionAnswerText{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  border-radius:22px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:14px 16px;
+
+  background:linear-gradient(180deg,#FFFFFF,#ECFDF5);
+  border:1px solid rgba(15,118,110,.14);
+
+  color:#0F766E;
+
+  font-size:1.55rem;
+  line-height:1.28;
+  font-weight:900;
+  text-align:center;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.90),
+    0 8px 16px rgba(15,118,110,.05);
+
+  overflow:hidden;
+}
+
+#presenterAuctionImageBox{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  border-radius:24px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#0F172A;
+
+  overflow:hidden;
+}
+
+#presenterAuctionImageBox.hidden{
+  display:none;
+}
+
+#presenterAuctionImageBox img,
+#presenterAuctionImageBox video{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+.presenterVideoNoPreviewBox{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  text-align:center;
+
+  color:#FFFFFF;
+  background:
+    radial-gradient(circle at 50% 18%,rgba(103,232,249,.18),transparent 38%),
+    linear-gradient(180deg,#172554,#0F172A);
+}
+
+.presenterVideoNoPreviewIcon{
+  width:72px;
+  height:72px;
+
+  border-radius:50%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:linear-gradient(180deg,#67E8F9,#06B6D4);
+
+  color:#12362D;
+
+  font-size:2rem;
+  font-weight:900;
+
+  box-shadow:
+    0 14px 28px rgba(6,182,212,.22),
+    inset 0 1px 0 rgba(255,255,255,.28);
+}
+
+.presenterVideoNoPreviewText{
+  max-width:80%;
+
+  color:#FFFFFF;
+  font-size:1.05rem;
+  line-height:1.35;
+  font-weight:900;
+}
+
+/* =========================
+   Auction Compact Height
+========================= */
+
+@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
+
+  .presenterAuctionLayout{
+    gap:10px;
+  }
+
+  .presenterAuctionLeft{
+    grid-template-rows:minmax(0,1fr) 106px;
+    gap:9px;
+  }
+
+  .presenterAuctionNumbersCard{
+    padding:11px;
+    border-radius:22px;
+    grid-template-rows:26px minmax(0,1fr);
+    gap:9px;
+  }
+
+  .presenterAuctionNumbersCard > .presenterLabel{
+    height:26px;
+    font-size:.86rem;
+  }
+
+  .presenterAuctionGrid{
+    grid-auto-rows:66px;
+    gap:10px;
+  }
+
+  .presenterAuctionGrid .presenterNumberBtn{
+    height:66px;
+    min-height:66px;
+    border-radius:19px;
+    font-size:1.75rem;
+  }
+
+  .presenterAuctionActions{
+    height:106px;
+    min-height:106px;
+    grid-template-rows:repeat(2,49px);
+    gap:8px;
+  }
+
+  .presenterAuctionActions .presenterBtn{
+    height:49px;
+    min-height:49px;
+    border-radius:15px;
+    font-size:.76rem;
+    padding:6px;
+  }
+
+  .presenterAuctionRight{
+    grid-template-rows:54px minmax(0,1fr);
+    gap:9px;
+  }
+
+  .presenterAuctionTeamsBox{
+    height:54px;
+    min-height:54px;
+  }
+
+  .presenterAuctionTeamsBox .presenterBtn{
+    height:52px;
+    min-height:52px;
+    border-radius:17px;
+    font-size:.9rem;
+  }
+
+  .presenterAuctionPreviewCard{
+    padding:10px;
+    border-radius:22px;
+    grid-template-rows:20px 92px 20px minmax(0,1fr);
+    gap:6px;
+  }
+
+  .presenterAuctionPreviewCard .presenterLabel{
+    height:20px;
+    font-size:.78rem;
+  }
+
+  #presenterAuctionAnswerText{
+    padding:10px 12px;
+    border-radius:18px;
+    font-size:1.18rem;
+    line-height:1.28;
+  }
+
+  #presenterAuctionImageBox{
+    border-radius:18px;
+  }
+
+  .presenterVideoNoPreviewIcon{
+    width:56px;
+    height:56px;
+    font-size:1.55rem;
+  }
+
+  .presenterVideoNoPreviewText{
+    font-size:.86rem;
+  }
 }
 
 /* =========================================================
