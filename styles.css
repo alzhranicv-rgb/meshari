@@ -4611,3 +4611,779 @@ button:hover,
     transform:translateX(0) scale(1);
   }
 }
+/* =========================
+   DISPLAY PRO FLOW FX
+========================= */
+
+.displayProLayer{
+  position:fixed;
+  inset:0;
+  z-index:999999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(9, 14, 24, .42);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+
+  pointer-events:none;
+}
+
+.displayProLayer.hidden{
+  display:none;
+}
+
+.displayProCard{
+  min-width:min(620px, 82vw);
+  max-width:min(860px, 88vw);
+
+  padding:34px 42px;
+  border-radius:34px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.82));
+  border:1px solid rgba(255,255,255,.45);
+
+  box-shadow:
+    0 30px 90px rgba(15,23,42,.32),
+    inset 0 1px 0 rgba(255,255,255,.90);
+
+  text-align:center;
+
+  animation:displayProPop .36s cubic-bezier(.2,.9,.2,1);
+}
+
+.displayProEyebrow{
+  color:#64748B;
+  font-size:1.05rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.displayProTitle{
+  color:#24185E;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:4rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.displayProSubtitle{
+  color:#2F4158;
+  font-size:1.25rem;
+  line-height:1.2;
+  font-weight:900;
+}
+
+.displayProLayer.correct .displayProTitle{
+  color:#15803D;
+}
+
+.displayProLayer.wrong .displayProTitle{
+  color:#DC2626;
+}
+
+.displayProLayer.winner .displayProTitle{
+  color:#F97316;
+}
+
+.displayProLayerHide{
+  animation:displayProFadeOut .26s ease forwards;
+}
+
+@keyframes displayProPop{
+  from{
+    opacity:0;
+    transform:translateY(22px) scale(.92);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@keyframes displayProFadeOut{
+  to{
+    opacity:0;
+  }
+}
+
+.displaySegmentEnterFx{
+  animation:displaySegmentEnterFx .42s ease both;
+}
+
+@keyframes displaySegmentEnterFx{
+  from{
+    opacity:0;
+    transform:translateY(18px) scale(.985);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+.displayCurrentTurnBadge,
+.displayLastScoreUpdate{
+  position:fixed;
+  top:22px;
+  left:50%;
+  z-index:999998;
+
+  transform:translateX(-50%);
+
+  min-width:260px;
+  padding:12px 18px;
+  border-radius:999px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.45);
+
+  box-shadow:
+    0 18px 46px rgba(15,23,42,.20),
+    inset 0 1px 0 rgba(255,255,255,.90);
+
+  animation:displaySmallBadgeIn .28s ease both;
+}
+
+.displayLastScoreUpdate{
+  top:auto;
+  bottom:24px;
+}
+
+.displayCurrentTurnBadge span,
+.displayLastScoreUpdate span{
+  color:#64748B;
+  font-size:.9rem;
+  font-weight:900;
+}
+
+.displayCurrentTurnBadge strong,
+.displayLastScoreUpdate strong{
+  color:#24185E;
+  font-size:1.05rem;
+  font-weight:900;
+}
+
+.displayCurrentTurnBadge.hide,
+.displayLastScoreUpdate.hide{
+  animation:displaySmallBadgeOut .26s ease forwards;
+}
+
+@keyframes displaySmallBadgeIn{
+  from{
+    opacity:0;
+    transform:translateX(-50%) translateY(-14px);
+  }
+  to{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes displaySmallBadgeOut{
+  to{
+    opacity:0;
+    transform:translateX(-50%) translateY(-14px);
+  }
+}
+/* =========================
+   FULL SCREEN STRONG PULSE FLASH
+   فلاش يغطي الشاشة كاملة بنبضات قوية
+========================= */
+
+.screenFlashLayer{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+
+  z-index:1000005;
+
+  pointer-events:none;
+  opacity:0;
+
+  transform-origin:center;
+  mix-blend-mode:normal;
+}
+
+/* صح - أخضر واضح يغطي كامل الشاشة */
+.screenFlashLayer.flashCorrectPro{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(34,197,94,.82),
+      rgba(22,163,74,.68)
+    );
+
+  animation:fullStrongCorrectPulse .86s ease-out;
+}
+
+.screenFlashLayer.flashWrongPro{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(239,68,68,.88),
+      rgba(185,28,28,.72)
+    );
+
+  animation:fullStrongWrongPulse .86s ease-out;
+}
+
+/* نبضات الصح */
+@keyframes fullStrongCorrectPulse{
+  0%{
+    opacity:0;
+    transform:scale(.96);
+  }
+
+  9%{
+    opacity:1;
+    transform:scale(1.02);
+  }
+
+  20%{
+    opacity:.40;
+    transform:scale(.99);
+  }
+
+  32%{
+    opacity:.95;
+    transform:scale(1.025);
+  }
+
+  46%{
+    opacity:.38;
+    transform:scale(1);
+  }
+
+  60%{
+    opacity:.78;
+    transform:scale(1.03);
+  }
+
+  78%{
+    opacity:.28;
+    transform:scale(1.01);
+  }
+
+  100%{
+    opacity:0;
+    transform:scale(1.06);
+  }
+}
+
+/* نبضات الخطأ أقوى وأسرع */
+@keyframes fullStrongWrongPulse{
+  0%{
+    opacity:0;
+    transform:scale(.95);
+  }
+
+  8%{
+    opacity:1;
+    transform:scale(1.025);
+  }
+
+  18%{
+    opacity:.34;
+    transform:scale(.985);
+  }
+
+  28%{
+    opacity:1;
+    transform:scale(1.03);
+  }
+
+  40%{
+    opacity:.36;
+    transform:scale(.995);
+  }
+
+  52%{
+    opacity:.90;
+    transform:scale(1.035);
+  }
+
+  68%{
+    opacity:.32;
+    transform:scale(1.01);
+  }
+
+  100%{
+    opacity:0;
+    transform:scale(1.07);
+  }
+}
+/* =========================
+   DISPLAY PHASE 2
+   Current Turn + Score Update
+========================= */
+
+.displayCurrentTurnBadge{
+  position:fixed;
+  top:22px;
+  left:50%;
+  z-index:999998;
+
+  transform:translateX(-50%);
+
+  min-width:290px;
+  max-width:80vw;
+
+  padding:12px 20px;
+  border-radius:999px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(255,255,255,.55);
+
+  box-shadow:
+    0 18px 46px rgba(15,23,42,.20),
+    inset 0 1px 0 rgba(255,255,255,.90);
+
+  animation:displaySmallBadgeIn .28s ease both;
+}
+
+.displayCurrentTurnBadge::before{
+  content:"";
+  width:12px;
+  height:12px;
+  min-width:12px;
+
+  border-radius:999px;
+
+  background:#F97316;
+  box-shadow:0 0 0 5px rgba(249,115,22,.16);
+}
+
+.displayCurrentTurnBadge.teamA::before{
+  background:#F97316;
+  box-shadow:0 0 0 5px rgba(249,115,22,.16);
+}
+
+.displayCurrentTurnBadge.teamB::before{
+  background:#06B6D4;
+  box-shadow:0 0 0 5px rgba(6,182,212,.16);
+}
+
+.displayCurrentTurnBadge span{
+  color:#64748B;
+  font-size:.92rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.displayCurrentTurnBadge strong{
+  color:#24185E;
+  font-size:1.15rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.displayCurrentTurnBadge.hide{
+  animation:displaySmallBadgeOut .26s ease forwards;
+}
+
+.displayLastScoreUpdate{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  z-index:999998;
+
+  transform:translateX(-50%);
+
+  min-width:280px;
+  max-width:80vw;
+
+  padding:12px 20px;
+  border-radius:999px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(255,255,255,.55);
+
+  box-shadow:
+    0 18px 46px rgba(15,23,42,.20),
+    inset 0 1px 0 rgba(255,255,255,.90);
+
+  animation:displayScoreBadgeIn .28s ease both;
+}
+
+.displayLastScoreUpdate::before{
+  content:"+";
+  width:30px;
+  height:30px;
+  min-width:30px;
+
+  border-radius:999px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#fff;
+  background:linear-gradient(180deg,#22C55E,#15803D);
+
+  font-size:1.05rem;
+  font-weight:900;
+}
+
+.displayLastScoreUpdate span{
+  color:#64748B;
+  font-size:.9rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.displayLastScoreUpdate strong{
+  color:#15803D;
+  font-size:1.15rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.displayLastScoreUpdate.hide{
+  animation:displayScoreBadgeOut .26s ease forwards;
+}
+
+@keyframes displaySmallBadgeIn{
+  from{
+    opacity:0;
+    transform:translateX(-50%) translateY(-16px) scale(.96);
+  }
+  to{
+    opacity:1;
+    transform:translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes displaySmallBadgeOut{
+  to{
+    opacity:0;
+    transform:translateX(-50%) translateY(-16px) scale(.96);
+  }
+}
+
+@keyframes displayScoreBadgeIn{
+  from{
+    opacity:0;
+    transform:translateX(-50%) translateY(16px) scale(.96);
+  }
+  to{
+    opacity:1;
+    transform:translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes displayScoreBadgeOut{
+  to{
+    opacity:0;
+    transform:translateX(-50%) translateY(16px) scale(.96);
+  }
+}
+
+/* =========================
+   TIMER TIMEOUT PRO FX
+========================= */
+
+.screenFlashLayer.flashTimeoutPro{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(245,158,11,.82),
+      rgba(249,115,22,.68)
+    );
+
+  animation:timerTimeoutPulse .9s ease-out;
+}
+
+@keyframes timerTimeoutPulse{
+  0%{
+    opacity:0;
+    transform:scale(.96);
+  }
+
+  9%{
+    opacity:1;
+    transform:scale(1.025);
+  }
+
+  22%{
+    opacity:.36;
+    transform:scale(.99);
+  }
+
+  36%{
+    opacity:.92;
+    transform:scale(1.03);
+  }
+
+  54%{
+    opacity:.34;
+    transform:scale(1);
+  }
+
+  72%{
+    opacity:.70;
+    transform:scale(1.035);
+  }
+
+  100%{
+    opacity:0;
+    transform:scale(1.07);
+  }
+}
+
+.timerDanger{
+  animation:timerDangerPulse .55s ease-in-out infinite;
+  color:#DC2626;
+}
+
+.timerTimeoutFx{
+  animation:timerTimeoutShake .65s ease both;
+  color:#F97316;
+}
+
+@keyframes timerDangerPulse{
+  0%,100%{
+    transform:scale(1);
+    filter:brightness(1);
+  }
+
+  50%{
+    transform:scale(1.08);
+    filter:brightness(1.18);
+  }
+}
+
+@keyframes timerTimeoutShake{
+  0%,100%{
+    transform:translateX(0) scale(1);
+  }
+
+  18%{
+    transform:translateX(-10px) scale(1.08);
+  }
+
+  36%{
+    transform:translateX(10px) scale(1.08);
+  }
+
+  54%{
+    transform:translateX(-6px) scale(1.04);
+  }
+
+  72%{
+    transform:translateX(6px) scale(1.04);
+  }
+}
+
+/* =========================
+   SEGMENT END PRO CARD
+========================= */
+
+.displayProLayer.winner .displayProCard{
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,155,81,.22), transparent 46%),
+    linear-gradient(180deg, rgba(255,255,255,.97), rgba(255,247,237,.90));
+
+  border:1px solid rgba(249,115,22,.26);
+}
+
+.displayProLayer.winner .displayProEyebrow{
+  color:#9A3412;
+}
+
+.displayProLayer.winner .displayProTitle{
+  color:#F97316;
+  text-shadow:
+    0 3px 0 rgba(255,255,255,.85),
+    0 18px 34px rgba(249,115,22,.20);
+}
+
+.displayProLayer.winner .displayProSubtitle{
+  color:#7C2D12;
+}
+
+.displayProLayer.neutral .displayProTitle{
+  color:#475569;
+}
+
+/* =========================
+   DISPLAY MEDIA FAILSAFE
+========================= */
+
+.displayMediaErrorBox{
+  width:100%;
+  height:100%;
+  min-height:220px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(239,68,68,.12), transparent 44%),
+    linear-gradient(180deg, #0F172A, #111827);
+
+  border-radius:inherit;
+  overflow:hidden;
+}
+
+.displayMediaFallback{
+  width:100%;
+  height:100%;
+  min-height:220px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  padding:24px;
+
+  text-align:center;
+  color:#fff;
+}
+
+.displayMediaFallbackIcon{
+  width:70px;
+  height:70px;
+
+  border-radius:50%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:linear-gradient(180deg,#EF4444,#B91C1C);
+  color:#fff;
+
+  font-size:2rem;
+  font-weight:900;
+
+  box-shadow:
+    0 16px 34px rgba(239,68,68,.25),
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+.displayMediaFallbackTitle{
+  color:#fff;
+  font-size:1.35rem;
+  line-height:1.2;
+  font-weight:900;
+}
+
+.displayMediaFallbackText{
+  color:rgba(255,255,255,.72);
+  font-size:.95rem;
+  line-height:1.4;
+  font-weight:800;
+}
+
+.displayMediaLoaded{
+  animation:displayMediaLoaded .28s ease both;
+}
+
+@keyframes displayMediaLoaded{
+  from{
+    opacity:0;
+    filter:blur(8px);
+    transform:scale(1.015);
+  }
+
+  to{
+    opacity:1;
+    filter:blur(0);
+    transform:scale(1);
+  }
+}
+/* =========================
+   DISPLAY LOADING STATE
+========================= */
+
+.displayLoadingLayer{
+  position:fixed;
+  inset:0;
+  z-index:999995;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(15,23,42,.24);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+
+  pointer-events:none;
+}
+
+.displayLoadingLayer.hidden{
+  display:none;
+}
+
+.displayLoadingCard{
+  min-width:280px;
+
+  padding:22px 28px;
+  border-radius:26px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(255,255,255,.55);
+
+  box-shadow:
+    0 22px 58px rgba(15,23,42,.22),
+    inset 0 1px 0 rgba(255,255,255,.90);
+}
+
+.displayLoadingSpinner{
+  width:30px;
+  height:30px;
+
+  border-radius:50%;
+
+  border:4px solid rgba(249,115,22,.22);
+  border-top-color:#F97316;
+
+  animation:displayLoadingSpin .75s linear infinite;
+}
+
+.displayLoadingText{
+  color:#24185E;
+  font-size:1.05rem;
+  line-height:1;
+  font-weight:900;
+}
+
+@keyframes displayLoadingSpin{
+  to{
+    transform:rotate(360deg);
+  }
+}

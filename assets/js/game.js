@@ -632,6 +632,203 @@ function playSoftExit(selector, callback) {
   }, 90)
 }
 
+/* =========================
+   DISPLAY ACTION GUARD
+   حماية العرض من تكرار الأوامر
+========================= */
+
+const displayActionGuard = new Map()
+
+function canRunDisplayAction(key, delay = 900) {
+  const now = Date.now()
+  const last = displayActionGuard.get(key) || 0
+
+  if (now - last < delay) {
+    return false
+  }
+
+  displayActionGuard.set(key, now)
+
+  if (displayActionGuard.size > 80) {
+    const latest = Array.from(displayActionGuard.entries()).slice(-40)
+    displayActionGuard.clear()
+    latest.forEach(([k, v]) => displayActionGuard.set(k, v))
+  }
+
+  return true
+}
+
+function getDisplayActiveSegmentKey() {
+  return localStorage.getItem("active_segment") || getCurrentSegmentKey() || "home"
+}
+
+/* =========================
+   DISPLAY PRO FLOW FX
+   انتقالات ولقطات احترافية للعرض
+========================= */
+
+let displayProFxLock = false
+let displayLastFxKey = ""
+let displayLastFxTime = 0
+
+function getDisplaySegmentTitle(segmentKey) {
+  const item = ALL_DISPLAY_SEGMENTS.find(x => x.key === segmentKey)
+  return item?.title || "الفقرة"
+}
+
+function shouldSkipRepeatedFx(key, delay = 900) {
+  const now = Date.now()
+
+  if (displayLastFxKey === key && now - displayLastFxTime < delay) {
+    return true
+  }
+
+  displayLastFxKey = key
+  displayLastFxTime = now
+
+  return false
+}
+
+function ensureDisplayProLayer() {
+  let layer = document.getElementById("displayProLayer")
+
+  if (!layer) {
+    layer = document.createElement("div")
+    layer.id = "displayProLayer"
+    layer.className = "displayProLayer hidden"
+    document.body.appendChild(layer)
+  }
+
+  return layer
+}
+
+function showDisplayProOverlay({
+  eyebrow = "",
+  title = "",
+  subtitle = "",
+  type = "neutral",
+  duration = 1200,
+  sound = ""
+} = {}) {
+  return new Promise(resolve => {
+    const layer = ensureDisplayProLayer()
+
+    layer.className = `displayProLayer displayProLayerShow ${type}`
+
+    layer.innerHTML = `
+      <div class="displayProCard">
+        ${eyebrow ? `<div class="displayProEyebrow">${escapeDisplayHtml(eyebrow)}</div>` : ""}
+        ${title ? `<div class="displayProTitle">${escapeDisplayHtml(title)}</div>` : ""}
+        ${subtitle ? `<div class="displayProSubtitle">${escapeDisplayHtml(subtitle)}</div>` : ""}
+      </div>
+    `
+
+    if (sound) {
+      playGameSound(sound)
+    }
+
+    setTimeout(() => {
+      layer.classList.add("displayProLayerHide")
+
+      setTimeout(() => {
+        layer.className = "displayProLayer hidden"
+        layer.innerHTML = ""
+        resolve()
+      }, 260)
+    }, duration)
+  })
+}
+
+async function showSegmentIntro(segmentKey) {
+  if (shouldSkipRepeatedFx(`intro_${segmentKey}`, 1200)) return
+
+  const title = getDisplaySegmentTitle(segmentKey)
+
+  await showDisplayProOverlay({
+    eyebrow: "الفقرة التالية",
+    title,
+    subtitle: "استعدوا",
+    type: "segment",
+    duration: 950,
+    sound: "open"
+  })
+}
+
+async function showSegmentEndOverlay(segmentKey, winner) {
+  const title = getDisplaySegmentTitle(segmentKey)
+  const isTie = !winner || winner === "تعادل"
+
+  await showDisplayProOverlay({
+    eyebrow: `انتهت فقرة ${title}`,
+    title: isTie ? "تعادل" : winner,
+    subtitle: isTie ? "لا يوجد فائز في هذه الفقرة" : "الفائز في الفقرة +1",
+    type: isTie ? "neutral" : "winner",
+    duration: 1800,
+    sound: isTie ? "answer" : "correct"
+  })
+}
+
+function showAnswerResultOverlay(type = "correct", points = "") {
+  const isCorrect = type === "correct"
+
+  if (shouldSkipRepeatedFx(`answer_${type}_${points}`, 700)) return
+
+  showDisplayProOverlay({
+    eyebrow: isCorrect ? "إجابة صحيحة" : "إجابة خاطئة",
+    title: isCorrect && points ? `+${points}` : (isCorrect ? "صح" : "خطأ"),
+    subtitle: "",
+    type: isCorrect ? "correct" : "wrong",
+    duration: 780,
+    sound: isCorrect ? "correct" : "wrong"
+  })
+}
+
+function showDisplayCurrentTurn(team) {
+  const old = document.getElementById("displayCurrentTurnBadge")
+  if (old) old.remove()
+
+  if (!team) return
+
+  const teamName = team === "A" ? teamAName : team === "B" ? teamBName : team
+
+  const badge = document.createElement("div")
+  badge.id = "displayCurrentTurnBadge"
+  badge.className = `displayCurrentTurnBadge team${team}`
+  badge.innerHTML = `
+    <span>الدور الآن</span>
+    <strong>${escapeDisplayHtml(teamName)}</strong>
+  `
+
+  document.body.appendChild(badge)
+
+  setTimeout(() => {
+    badge.classList.add("hide")
+    setTimeout(() => badge.remove(), 260)
+  }, 2200)
+}
+
+function showLastScoreUpdate(team, points = 1) {
+  const old = document.getElementById("displayLastScoreUpdate")
+  if (old) old.remove()
+
+  const teamName = team === "A" ? teamAName : team === "B" ? teamBName : team
+
+  const box = document.createElement("div")
+  box.id = "displayLastScoreUpdate"
+  box.className = "displayLastScoreUpdate"
+  box.innerHTML = `
+    <span>آخر تحديث</span>
+    <strong>${escapeDisplayHtml(teamName)} +${points}</strong>
+  `
+
+  document.body.appendChild(box)
+
+  setTimeout(() => {
+    box.classList.add("hide")
+    setTimeout(() => box.remove(), 260)
+  }, 2400)
+}
+
 function startEndButtonWatcher() {
   stopEndButtonWatcher()
   endButtonWatcher = setInterval(() => {
@@ -693,6 +890,39 @@ function resetDisplayStatesIfNewSession() {
   clearAllSegmentPlayStatesForNewSession()
   localStorage.setItem(DISPLAY_SESSION_MARKER_KEY, sessionId)
 }
+async function restoreDisplayAfterRefresh() {
+  const activeSegment = localStorage.getItem("active_segment")
+
+  if (
+    activeSegment &&
+    isSegmentVisibleOnDisplay(activeSegment) &&
+    !segmentStatus?.[activeSegment]?.locked
+  ) {
+    homeRefreshLocked = false
+    await openSegmentPage(activeSegment)
+    return
+  }
+
+  renderMainHome(true)
+}
+
+function observeDisplayMedia() {
+  protectDisplayMedia(document)
+
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(mutation => {
+      mutation.addedNodes.forEach(node => {
+        if (!(node instanceof HTMLElement)) return
+        protectDisplayMedia(node)
+      })
+    })
+  })
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  })
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
   resetDisplayStatesIfNewSession()
@@ -700,6 +930,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   initWinnerSound()
   initGameSounds()
   bindAudioUnlock()
+
+  observeDisplayMedia()
 
   await loadDisplaySegmentCounts()
   await loadVisibleSegmentsForDisplay()
@@ -709,7 +941,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderVisibleSegmentsHome()
   updateSegmentCards()
 
-  renderMainHome(true)
+  await restoreDisplayAfterRefresh()
 })
 
 /* =========================
@@ -718,6 +950,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function renderMainHome(force = false) {
   if (homeRefreshLocked && !force) return
+  clearDisplayTemporaryFx()
 
   const homeScreen = getFirstElement(["homeScreen", "homePage"])
   const segmentScreen = getFirstElement(["segmentScreen"])
@@ -766,16 +999,24 @@ function updateMainScoreBoard() {
 ========================= */
 
 function increaseMainScore(team) {
+  if (!canRunDisplayAction(`main_score_${team}`, 650)) {
+    return
+  }
+
+  let addedTeam = null
+
   if (team === "A") {
     scoreA++
     if (scoreA > 6) scoreA = 0
     localStorage.setItem("main_score_a", scoreA)
+    addedTeam = "A"
   }
 
   if (team === "B") {
     scoreB++
     if (scoreB > 6) scoreB = 0
     localStorage.setItem("main_score_b", scoreB)
+    addedTeam = "B"
   }
 
   updateMainScoreBoard()
@@ -784,7 +1025,11 @@ function increaseMainScore(team) {
   if (team === "A") bumpScore("mainScoreA")
   if (team === "B") bumpScore("mainScoreB")
 
-syncDisplayStateToSession()
+  if (addedTeam) {
+    showLastScoreUpdate(addedTeam, 1)
+  }
+
+  syncDisplayStateToSession()
 }
 
 function addMainScore(team) {
@@ -985,6 +1230,12 @@ function setSegmentWinnerLabel(key) {
 ========================= */
 
 async function openSegmentPage(segmentKey) {
+  if (!canRunDisplayAction(`open_segment_${segmentKey}`, 1400)) {
+    return
+  }
+
+  clearDisplayTemporaryFx()
+
   await loadVisibleSegmentsForDisplay()
 
   if (!isSegmentVisibleOnDisplay(segmentKey)) {
@@ -996,6 +1247,9 @@ async function openSegmentPage(segmentKey) {
 
   if (segmentStatus[segmentKey]?.locked) return
 
+  if (displayProFxLock) return
+  displayProFxLock = true
+
   await loadDisplayCountForSegment(segmentKey)
 
   homeRefreshLocked = true
@@ -1006,21 +1260,48 @@ async function openSegmentPage(segmentKey) {
 
   document.body.classList.add("segmentMode")
 
+  await showSegmentIntro(segmentKey)
+
   playSoftExit(homeScreen, async () => {
     if (homeScreen) homeScreen.classList.add("hidden")
     if (segmentScreen) segmentScreen.classList.remove("hidden")
 
-    if (segmentKey === "warmup") await window.renderWarmup()
-    if (segmentKey === "top10") await window.renderTop10()
-    if (segmentKey === "auction") await window.renderAuction()
-    if (segmentKey === "who") await window.renderWho()
-    if (segmentKey === "explain") await window.renderExplain()
-    if (segmentKey === "final") await window.renderFinal()
-    if (segmentKey === "archive") await window.renderArchive()
+    showDisplayLoading("جاري تجهيز الفقرة...")
+
+try {
+  if (segmentKey === "warmup") await window.renderWarmup()
+  if (segmentKey === "top10") await window.renderTop10()
+  if (segmentKey === "auction") await window.renderAuction()
+  if (segmentKey === "who") await window.renderWho()
+  if (segmentKey === "explain") await window.renderExplain()
+  if (segmentKey === "final") await window.renderFinal()
+  if (segmentKey === "archive") await window.renderArchive()
+
+  protectDisplayMedia(document.getElementById("segmentArea") || document)
+
+} catch (e) {
+  console.log("DISPLAY SEGMENT RENDER ERROR:", e)
+  showGameToast("تعذر تجهيز الفقرة")
+} finally {
+  hideDisplayLoading()
+}
+
+      protectDisplayMedia(document.getElementById("segmentArea") || document)
+
+    const segmentArea = document.getElementById("segmentArea")
+    if (segmentArea) {
+      segmentArea.classList.remove("displaySegmentEnterFx")
+      void segmentArea.offsetWidth
+      segmentArea.classList.add("displaySegmentEnterFx")
+    }
 
     if (typeof syncDisplayStateToSession === "function") {
       syncDisplayStateToSession()
     }
+
+    setTimeout(() => {
+      displayProFxLock = false
+    }, 350)
   })
 }
 
@@ -1050,6 +1331,8 @@ startEndButtonWatcher()
 }
 
 function goHome() {
+  clearDisplayTemporaryFx()
+
   clearInterval(timer)
   timer = null
   window.currentSegmentScores = null
@@ -1112,37 +1395,49 @@ function selectTeam(team) {
 
   if (team === "A" && a) a.classList.add("activeTeam")
   if (team === "B" && b) b.classList.add("activeTeam")
+
+  showDisplayCurrentTurn(team)
 }
 
 function correctAnswer() {
   unlockAudioContext()
+
+  if (!canRunDisplayAction(`correct_${getDisplayActiveSegmentKey()}`, 900)) {
+    return
+  }
 
   if (!selectedTeam) {
     showGameToast("اختر الفريق أولاً")
     return
   }
 
+  let addedTeam = null
+
   if (selectedTeam === "A") {
     scoreA++
     if (scoreA > 6) scoreA = 0
     localStorage.setItem("main_score_a", scoreA)
+    addedTeam = "A"
+    bumpScore("mainScoreA")
   }
 
   if (selectedTeam === "B") {
     scoreB++
     if (scoreB > 6) scoreB = 0
     localStorage.setItem("main_score_b", scoreB)
+    addedTeam = "B"
+    bumpScore("mainScoreB")
   }
 
   updateMainScoreBoard()
   updateLeadingTeamStyle()
-}
+  syncDisplayStateToSession()
 
-function wrongAnswer() {
-  clearInterval(timer)
-  timer = null
-  const timerBox = document.getElementById("timer")
-  if (timerBox) timerBox.innerText = 0
+  if (addedTeam) {
+    showLastScoreUpdate(addedTeam, 1)
+  }
+
+  flashScreen("correct")
 }
 
 function startQuestion(points) {
@@ -1160,12 +1455,20 @@ function startQuestion(points) {
   clearInterval(timer)
   timer = null
 
+  currentPoints = Number(points || 0)
+  timeLeft = time
+
   let lastTickPlayed = null
+
   timerBox.innerText = time
+  timerBox.classList.remove("timerDanger", "timerTimeoutFx")
 
   timer = setInterval(() => {
     time--
+    timeLeft = time
     timerBox.innerText = time
+
+    timerBox.classList.toggle("timerDanger", time > 0 && time <= 5)
 
     if (time > 0 && time <= 5 && lastTickPlayed !== time) {
       lastTickPlayed = time
@@ -1175,8 +1478,18 @@ function startQuestion(points) {
     if (time <= 0) {
       clearInterval(timer)
       timer = null
+      timeLeft = 0
+
       timerBox.innerText = 0
+      timerBox.classList.remove("timerDanger")
+      timerBox.classList.add("timerTimeoutFx")
+
       playGameSound("timeout")
+      flashTimerTimeout()
+
+      setTimeout(() => {
+        timerBox.classList.remove("timerTimeoutFx")
+      }, 1200)
     }
   }, 1000)
 }
@@ -1185,7 +1498,10 @@ function startQuestion(points) {
    Finish Segment
 ========================= */
 
-function endCurrentSegment() {
+async function endCurrentSegment() {
+    if (!canRunDisplayAction("end_current_segment", 1600)) {
+    return
+  }
   const key = getCurrentSegmentKey()
   if (!key) return
 
@@ -1195,19 +1511,27 @@ function endCurrentSegment() {
     return
   }
 
+  if (displayProFxLock) return
+  displayProFxLock = true
+
   const winner = getWinnerFromSegmentScores()
 
   if (winner === teamAName) {
     scoreA++
     localStorage.setItem("main_score_a", scoreA)
+    updateMainScoreBoard()
+    bumpScore("mainScoreA")
+    showLastScoreUpdate("A", 1)
   }
 
   if (winner === teamBName) {
     scoreB++
     localStorage.setItem("main_score_b", scoreB)
+    updateMainScoreBoard()
+    bumpScore("mainScoreB")
+    showLastScoreUpdate("B", 1)
   }
 
-  updateMainScoreBoard()
   updateLeadingTeamStyle()
   syncDisplayStateToSession()
 
@@ -1226,6 +1550,10 @@ function endCurrentSegment() {
 
   localStorage.removeItem("active_segment")
   syncDisplayStateToSession()
+
+  await showSegmentEndOverlay(key, winner)
+
+  displayProFxLock = false
 
   goHome()
 }
@@ -1472,24 +1800,137 @@ function flashScreen(type = "correct") {
   layer.classList.remove(
     "flashCorrect",
     "flashWrong",
-    "flashWrongStrong"
+    "flashWrongStrong",
+    "flashCorrectPro",
+    "flashWrongPro"
   )
 
   void layer.offsetWidth
 
   if (type === "wrong") {
-    layer.classList.add("flashWrongStrong")
+    layer.classList.add("flashWrongPro")
+    playGameSound("wrong")
   } else {
-    layer.classList.add("flashCorrect")
+    layer.classList.add("flashCorrectPro")
+    playGameSound("correct")
   }
 
   setTimeout(() => {
     layer.classList.remove(
       "flashCorrect",
       "flashWrong",
-      "flashWrongStrong"
+      "flashWrongStrong",
+      "flashCorrectPro",
+      "flashWrongPro"
     )
+  }, 860)
+}
+
+function flashTimerTimeout() {
+  const layer = ensureScreenFlashLayer()
+
+  layer.classList.remove(
+    "flashCorrect",
+    "flashWrong",
+    "flashWrongStrong",
+    "flashCorrectPro",
+    "flashWrongPro",
+    "flashTimeoutPro"
+  )
+
+  void layer.offsetWidth
+
+  layer.classList.add("flashTimeoutPro")
+
+  setTimeout(() => {
+    layer.classList.remove("flashTimeoutPro")
   }, 900)
+}
+function clearDisplayTemporaryFx() {
+  const idsToRemove = [
+  "displayCurrentTurnBadge",
+  "displayLastScoreUpdate",
+  "displayImageZoomOverlay",
+  "auctionImageOverlay",
+  "auctionVideoFullscreenOverlay",
+  "displayReadyHint",
+  "displayLoadingLayer"
+]
+
+  idsToRemove.forEach(id => {
+    const el = document.getElementById(id)
+    if (el) el.remove()
+  })
+
+  const proLayer = document.getElementById("displayProLayer")
+  if (proLayer) {
+    proLayer.className = "displayProLayer hidden"
+    proLayer.innerHTML = ""
+  }
+
+  const toast = document.getElementById("gameToast")
+  const toastText = document.getElementById("gameToastText")
+
+  if (toast) {
+    toast.classList.remove("show")
+    toast.classList.add("hidden")
+  }
+
+  if (toastText) {
+    toastText.innerText = ""
+  }
+
+  if (screenFlashLayer) {
+    screenFlashLayer.classList.remove(
+      "flashCorrect",
+      "flashWrong",
+      "flashWrongStrong",
+      "flashCorrectPro",
+      "flashWrongPro",
+      "flashTimeoutPro"
+    )
+  }
+
+  document.body.classList.remove("auctionOverlayActive")
+
+  document
+    .querySelectorAll(".timerDanger, .timerTimeoutFx, .displaySegmentEnterFx")
+    .forEach(el => {
+      el.classList.remove("timerDanger", "timerTimeoutFx", "displaySegmentEnterFx")
+    })
+}
+
+/* =========================
+   DISPLAY LOADING STATE
+   شاشة تحميل خفيفة عند فتح الفقرات
+========================= */
+
+function showDisplayLoading(text = "جاري تجهيز الفقرة...") {
+  let layer = document.getElementById("displayLoadingLayer")
+
+  if (!layer) {
+    layer = document.createElement("div")
+    layer.id = "displayLoadingLayer"
+    layer.className = "displayLoadingLayer"
+    document.body.appendChild(layer)
+  }
+
+  layer.innerHTML = `
+    <div class="displayLoadingCard">
+      <div class="displayLoadingSpinner"></div>
+      <div class="displayLoadingText">${escapeDisplayHtml(text)}</div>
+    </div>
+  `
+
+  layer.classList.remove("hidden")
+}
+
+function hideDisplayLoading() {
+  const layer = document.getElementById("displayLoadingLayer")
+  if (!layer) return
+
+  layer.classList.add("hidden")
+  layer.innerHTML = ""
 }
 
 function closeCurrentDisplayImageZoom() {
@@ -1544,6 +1985,74 @@ function zoomCurrentDisplayImage() {
   overlay.onclick = closeCurrentDisplayImageZoom
 
   document.body.appendChild(overlay)
+}
+
+/* =========================
+   DISPLAY MEDIA FAILSAFE
+   حماية الصور والفيديو من الظهور بشكل مكسور
+========================= */
+
+function createDisplayMediaFallback(type = "image") {
+  const box = document.createElement("div")
+  box.className = "displayMediaFallback"
+
+  box.innerHTML = `
+    <div class="displayMediaFallbackIcon">
+      ${type === "video" ? "▶" : "!"}
+    </div>
+
+    <div class="displayMediaFallbackTitle">
+      ${type === "video" ? "تعذر تشغيل الفيديو" : "تعذر تحميل الصورة"}
+    </div>
+
+    <div class="displayMediaFallbackText">
+      تحقق من الملف أو أعد رفعه من لوحة التحكم
+    </div>
+  `
+
+  return box
+}
+
+function protectDisplayMedia(root = document) {
+  const scope = root || document
+
+  scope.querySelectorAll("img").forEach(img => {
+    if (img.dataset.mediaProtected === "1") return
+
+    img.dataset.mediaProtected = "1"
+
+    img.addEventListener("load", () => {
+      img.classList.add("displayMediaLoaded")
+    })
+
+    img.addEventListener("error", () => {
+      const parent = img.parentElement
+      if (!parent) return
+
+      parent.classList.add("displayMediaErrorBox")
+      parent.innerHTML = ""
+      parent.appendChild(createDisplayMediaFallback("image"))
+    })
+  })
+
+  scope.querySelectorAll("video").forEach(video => {
+    if (video.dataset.mediaProtected === "1") return
+
+    video.dataset.mediaProtected = "1"
+
+    video.addEventListener("loadeddata", () => {
+      video.classList.add("displayMediaLoaded")
+    })
+
+    video.addEventListener("error", () => {
+      const parent = video.parentElement
+      if (!parent) return
+
+      parent.classList.add("displayMediaErrorBox")
+      parent.innerHTML = ""
+      parent.appendChild(createDisplayMediaFallback("video"))
+    })
+  })
 }
 
 
