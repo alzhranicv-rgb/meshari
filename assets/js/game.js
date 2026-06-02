@@ -1484,6 +1484,85 @@ async function openSegmentPage(segmentKey) {
     }, 350)
   })
 }
+
+function openMainSegment(segmentKey) {
+  openSegmentPage(segmentKey)
+}
+
+/* حل احتياطي لو فيه مكان قديم يستدعي الاسم الغلط */
+function openMaToSegment(segmentKey) {
+  openMainSegment(segmentKey)
+}
+
+function openSegment(title, content) {
+  const area = document.getElementById("segmentArea")
+  if (!area) return
+
+  area.innerHTML = `
+    <div class="segmentControls">
+      <button onclick="goHome()" class="backBtn">رجوع</button>
+      <h2 class="segmentTitle">${title}</h2>
+      <button id="endRoundBtn" onclick="endCurrentSegment()" class="endBtn" disabled>إنهاء</button>
+    </div>
+
+    <div class="segmentContentWrap">
+      ${content}
+    </div>
+  `
+
+  syncDisplayStateToSession()
+  updateEndRoundButtonState()
+  startEndButtonWatcher()
+}
+
+function goHome() {
+  clearDisplayTemporaryFx()
+
+  clearInterval(timer)
+  timer = null
+  window.currentSegmentScores = null
+
+  localStorage.removeItem("active_segment")
+  homeRefreshLocked = false
+
+  syncDisplayStateToSession()
+
+  stopEndButtonWatcher()
+
+  const content = document.querySelector(".segmentContentWrap")
+
+  playSoftExit(content, () => {
+    renderMainHome(true)
+    syncDisplayStateToSession()
+  })
+}
+
+function updateEndRoundButtonState() {
+  const btn = document.getElementById("endRoundBtn")
+  if (!btn) return
+
+  const key = getCurrentSegmentKey()
+  if (!key) {
+    btn.disabled = true
+    btn.innerText = "إنهاء"
+    btn.classList.add("disabledEndBtn")
+    return
+  }
+
+  const canEnd = canEndSegment(key)
+
+  if (!canEnd) {
+    btn.disabled = true
+    btn.innerText = "إنهاء"
+    btn.classList.add("disabledEndBtn")
+    return
+  }
+
+  btn.disabled = false
+  btn.innerText = "إنهاء"
+  btn.classList.remove("disabledEndBtn")
+}
+
 /* =========================
    Teams / Answers
 ========================= */
