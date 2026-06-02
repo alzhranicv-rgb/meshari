@@ -1,7 +1,7 @@
 /* =========================================================
    PRESENTER CLEAN CSS
    Galaxy Tab A 11 Landscape
-   Home + Join + Presenter Segments
+   Home + Join + Warmup + Top10 + Auction
 ========================================================= */
 
 /* =========================
@@ -80,12 +80,12 @@ body{
   direction:rtl;
   overflow:hidden;
   color:var(--text);
-  font-family:"HanakaText", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:"HanakaText",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 
   background:
-    radial-gradient(circle at 16% 18%, rgba(111,231,255,.24), transparent 35%),
-    radial-gradient(circle at 82% 15%, rgba(255,155,81,.18), transparent 34%),
-    linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 48%, var(--bg-3) 100%);
+    radial-gradient(circle at 16% 18%,rgba(111,231,255,.24),transparent 35%),
+    radial-gradient(circle at 82% 15%,rgba(255,155,81,.18),transparent 34%),
+    linear-gradient(135deg,var(--bg-1) 0%,var(--bg-2) 48%,var(--bg-3) 100%);
 }
 
 button,
@@ -132,10 +132,6 @@ button:disabled{
   justify-content:center;
 }
 
-/* =========================
-   Glass Helpers
-========================= */
-
 .topBoard,
 .presenterJoinCard,
 .teamBox,
@@ -151,10 +147,6 @@ button:disabled{
   backdrop-filter:blur(28px) saturate(1.16);
   -webkit-backdrop-filter:blur(28px) saturate(1.16);
 }
-
-/* =========================
-   Top Board
-========================= */
 
 .topBoard{
   width:100%;
@@ -180,10 +172,6 @@ button:disabled{
 .presenterJoinTitleBox{
   grid-column:auto;
 }
-
-/* =========================
-   Team Boxes
-========================= */
 
 .teamBox{
   min-width:0;
@@ -246,7 +234,7 @@ button:disabled{
   border:1px solid rgba(255,255,255,.48);
 
   background:
-    linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.62));
+    linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.62));
 
   color:var(--dark);
   font-family:"HanakaDisplay","HanakaText",sans-serif;
@@ -258,10 +246,6 @@ button:disabled{
     inset 0 1px 0 rgba(255,255,255,.94),
     0 10px 20px rgba(30,27,75,.10);
 }
-
-/* =========================
-   Title Box
-========================= */
 
 .titleBox{
   min-width:0;
@@ -372,7 +356,7 @@ button:disabled{
   outline:0;
 
   background:
-    linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.50));
+    linear-gradient(180deg,rgba(255,255,255,.86),rgba(255,255,255,.50));
 
   color:var(--text);
 
@@ -409,8 +393,8 @@ button:disabled{
   font-weight:400;
 
   background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.28), transparent 42%),
-    linear-gradient(180deg, rgba(15,38,47,.96), rgba(36,99,122,.94));
+    radial-gradient(circle at 18% 0%,rgba(255,255,255,.28),transparent 42%),
+    linear-gradient(180deg,rgba(15,38,47,.96),rgba(36,99,122,.94));
 
   box-shadow:
     0 18px 34px rgba(42,100,133,.22),
@@ -511,12 +495,7 @@ button:disabled{
   z-index:2;
 
   background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(255,255,255,.38),
-      transparent
-    );
+    linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent);
 
   opacity:.8;
   pointer-events:none;
@@ -616,8 +595,8 @@ button:disabled{
   font-weight:900;
 
   background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.20), transparent 42%),
-    linear-gradient(180deg, rgba(47,65,88,.96), rgba(37,52,63,.96));
+    radial-gradient(circle at 18% 0%,rgba(255,255,255,.20),transparent 42%),
+    linear-gradient(180deg,rgba(47,65,88,.96),rgba(37,52,63,.96));
 
   box-shadow:
     0 14px 28px rgba(47,65,88,.16),
@@ -628,14 +607,14 @@ button:disabled{
 
 #displayControlsEyeBtn.showControlsMode{
   background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.22), transparent 42%),
-    linear-gradient(180deg, #22C55E, #15803D);
+    radial-gradient(circle at 18% 0%,rgba(255,255,255,.22),transparent 42%),
+    linear-gradient(180deg,#22C55E,#15803D);
 }
 
 #displayControlsEyeBtn.hideControlsMode{
   background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.22), transparent 42%),
-    linear-gradient(180deg, #EF4444, #B91C1C);
+    radial-gradient(circle at 18% 0%,rgba(255,255,255,.22),transparent 42%),
+    linear-gradient(180deg,#EF4444,#B91C1C);
 }
 
 .presenterDisplayControlsBtn:active,
@@ -668,8 +647,8 @@ button:disabled{
   gap:9px;
 
   background:
-    radial-gradient(circle at 14% 0%, rgba(255,255,255,.24), transparent 42%),
-    linear-gradient(180deg, #312E81 0%, #1E1B4B 100%);
+    radial-gradient(circle at 14% 0%,rgba(255,255,255,.24),transparent 42%),
+    linear-gradient(180deg,#312E81 0%,#1E1B4B 100%);
 
   color:#FFFFFF;
 
@@ -702,11 +681,11 @@ button:disabled{
   justify-content:center;
 
   background:
-    radial-gradient(circle at 30% 18%, rgba(255,255,255,.28), transparent 42%),
-    linear-gradient(180deg, #FFB36F 0%, #F97316 100%);
+    radial-gradient(circle at 30% 18%,rgba(255,255,255,.28),transparent 42%),
+    linear-gradient(180deg,#FFB36F 0%,#F97316 100%);
 
   color:#FFFFFF;
-  font-family:Arial, sans-serif;
+  font-family:Arial,sans-serif;
   font-size:.9rem;
   line-height:1;
   font-weight:900;
@@ -733,21 +712,17 @@ button:disabled{
 .presenterToast.success,
 .gameToast.success{
   background:
-    radial-gradient(circle at 14% 0%, rgba(255,255,255,.24), transparent 42%),
-    linear-gradient(180deg, #22C55E 0%, #15803D 100%);
+    radial-gradient(circle at 14% 0%,rgba(255,255,255,.24),transparent 42%),
+    linear-gradient(180deg,#22C55E 0%,#15803D 100%);
 }
 
 .presenterToastError,
 .presenterToast.error,
 .gameToast.error{
   background:
-    radial-gradient(circle at 14% 0%, rgba(255,255,255,.22), transparent 42%),
-    linear-gradient(180deg, #EF4444 0%, #DC2626 100%);
+    radial-gradient(circle at 14% 0%,rgba(255,255,255,.22),transparent 42%),
+    linear-gradient(180deg,#EF4444 0%,#DC2626 100%);
 }
-
-/* =========================
-   Shared Button Lock
-========================= */
 
 .presenterBtnClickLocked{
   opacity:.62;
@@ -822,7 +797,7 @@ button:disabled{
 .presenterCleanHeaderBtn{
   padding:6px 8px;
 
-  color:#fff;
+  color:#FFFFFF;
   font-size:.86rem;
   line-height:1.2;
   font-weight:900;
@@ -847,7 +822,7 @@ button:disabled{
 .presenterCleanHeaderTitle{
   padding:6px 12px;
 
-  background:#fff;
+  background:#FFFFFF;
   border:1px solid rgba(30,41,59,.08);
 
   box-shadow:
@@ -870,7 +845,8 @@ button:disabled{
   text-overflow:ellipsis;
 }
 
-#presenterPanel{
+#presenterPanel,
+.presenterPanel{
   width:100%;
   max-width:1180px;
 
@@ -882,7 +858,8 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel > *{
+#presenterPanel > *,
+.presenterPanel > *{
   width:100%;
   height:100%;
   min-height:0;
@@ -1002,7 +979,7 @@ button:disabled{
   border-radius:22px;
   border:1px solid rgba(30,41,59,.09);
 
-  background:#fff;
+  background:#FFFFFF;
 
   box-shadow:
     0 8px 16px rgba(15,23,42,.06),
@@ -1022,7 +999,7 @@ button:disabled{
   justify-content:center;
 
   border-radius:18px;
-  background:linear-gradient(180deg,#FFF7ED,#fff);
+  background:linear-gradient(180deg,#FFF7ED,#FFFFFF);
   border:1px solid rgba(249,115,22,.18);
 
   color:#9A3412;
@@ -1054,7 +1031,7 @@ button:disabled{
   align-items:center;
   justify-content:center;
 
-  color:#fff;
+  color:#FFFFFF;
   background:linear-gradient(180deg,#312E81,#1E1B4B);
 
   font-family:"HanakaDisplay","HanakaText",sans-serif;
@@ -1112,7 +1089,7 @@ button:disabled{
 .presenterNumberBtn.selectedPresenterTeam:not(.presenterOpened){
   color:#24185E;
 
-  background:linear-gradient(180deg,#FFE6D4,#fff);
+  background:linear-gradient(180deg,#FFE6D4,#FFFFFF);
   border-color:rgba(249,115,22,.34);
 
   box-shadow:
@@ -1166,7 +1143,7 @@ button:disabled{
 
   padding:8px 12px;
 
-  color:#fff;
+  color:#FFFFFF;
   font-size:1rem;
   line-height:1.15;
   font-weight:900;
@@ -1194,7 +1171,7 @@ button:disabled{
 
 .presenterBtn.orange.selectedPresenterTeam,
 .presenterBtn.orange.activeTeam{
-  background:linear-gradient(180deg,#FFE6D4,#fff);
+  background:linear-gradient(180deg,#FFE6D4,#FFFFFF);
   border:1px solid rgba(249,115,22,.34);
 
   color:#24185E;
@@ -1285,7 +1262,7 @@ button:disabled{
 
 .presenterBigQuestionBody,
 #presenterWarmupQuestionText{
-  background:linear-gradient(180deg,#fff,#F5F3FF);
+  background:linear-gradient(180deg,#FFFFFF,#F5F3FF);
   border:1px solid rgba(124,58,237,.12);
 
   color:#1E1B4B;
@@ -1296,7 +1273,7 @@ button:disabled{
 
 .presenterBigAnswerBody,
 #presenterWarmupAnswerText{
-  background:linear-gradient(180deg,#fff,#ECFDF5);
+  background:linear-gradient(180deg,#FFFFFF,#ECFDF5);
   border:1px solid rgba(15,118,110,.14);
 
   color:#0F766E;
@@ -1325,7 +1302,7 @@ button:disabled{
 
   padding:8px 10px;
 
-  color:#fff;
+  color:#FFFFFF;
 
   font-size:.95rem;
   line-height:1.18;
@@ -1477,7 +1454,7 @@ button:disabled{
 
   background:linear-gradient(180deg,#0E7490,#164E63);
 
-  color:#fff;
+  color:#FFFFFF;
 
   box-shadow:
     0 9px 18px rgba(14,116,144,.16),
@@ -1504,7 +1481,7 @@ button:disabled{
   background:rgba(255,255,255,.18);
   border:1px solid rgba(255,255,255,.14);
 
-  color:#fff;
+  color:#FFFFFF;
 
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:1rem;
@@ -1517,7 +1494,7 @@ button:disabled{
 .presenterTop10AnswerText{
   min-width:0;
 
-  color:#fff;
+  color:#FFFFFF;
 
   font-size:1.04rem;
   line-height:1.28;
@@ -1557,7 +1534,7 @@ button:disabled{
 }
 
 .presenterTop10AnswerBtn.opened .presenterTop10AnswerNo{
-  background:#fff;
+  background:#FFFFFF;
   border-color:rgba(6,182,212,.18);
   color:#0F4C5C;
 }
@@ -1631,7 +1608,7 @@ button:disabled{
 
 .presenterTop10TeamsBox .presenterBtn.selectedPresenterTeam,
 .presenterTop10TeamsBox .presenterBtn.activeTeam{
-  background:linear-gradient(180deg,#FFE6D4,#fff);
+  background:linear-gradient(180deg,#FFE6D4,#FFFFFF);
   border-color:rgba(249,115,22,.34);
 
   color:#24185E;
@@ -1686,7 +1663,7 @@ button:disabled{
 
   border-radius:20px;
 
-  background:#fff;
+  background:#FFFFFF;
   border:1px solid rgba(30,41,59,.09);
 
   display:flex;
@@ -1703,11 +1680,11 @@ button:disabled{
 }
 
 .presenterTop10RoundMini{
-  background:linear-gradient(180deg,#EEF2FF,#fff);
+  background:linear-gradient(180deg,#EEF2FF,#FFFFFF);
 }
 
 .presenterTop10ErrorMiniBox{
-  background:linear-gradient(180deg,#FFF1F2,#fff);
+  background:linear-gradient(180deg,#FFF1F2,#FFFFFF);
   border-color:rgba(239,68,68,.16);
 }
 
@@ -1794,7 +1771,7 @@ button:disabled{
   align-items:center;
   justify-content:center;
 
-  background:linear-gradient(180deg,#fff,#F5F3FF);
+  background:linear-gradient(180deg,#FFFFFF,#F5F3FF);
 
   color:#1E1B4B;
 
@@ -1835,7 +1812,7 @@ button:disabled{
   align-items:center;
   justify-content:center;
 
-  color:#fff;
+  color:#FFFFFF;
 
   font-size:.86rem;
   line-height:1.18;
@@ -1891,13 +1868,15 @@ button:disabled{
 }
 
 /* =========================================================
-   AUCTION / فتبلة
+   AUCTION / فتبلة - FINAL PRESENTER FIX
+   يدعم #presenterPanel + .presenterPanel + .presenterSegmentPage
 ========================================================= */
 
-#presenterPanel .auctionWrap{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionWrap{
   width:100%;
   height:100%;
   min-height:0;
+  max-width:none;
 
   display:grid;
   grid-template-columns:1.08fr .92fr;
@@ -1908,19 +1887,23 @@ button:disabled{
     "actions preview";
 
   gap:12px;
-
   padding:0;
   margin:0;
+
+  background:transparent;
+  border:0;
+  box-shadow:none;
 
   overflow:hidden;
 }
 
-#presenterPanel .auctionGrid{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionGrid{
   grid-area:numbers;
 
   width:100%;
   height:100%;
   min-height:0;
+  max-width:none;
 
   padding:16px;
 
@@ -1928,14 +1911,13 @@ button:disabled{
   grid-template-columns:repeat(4,minmax(0,1fr));
   grid-auto-rows:86px;
   gap:14px;
-
   align-content:start;
 
   border-radius:26px;
   border:1px solid rgba(30,41,59,.10);
 
   background:
-    linear-gradient(180deg,rgba(255,255,255,.84),rgba(248,250,252,.68));
+    linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.72));
 
   box-shadow:
     0 14px 28px rgba(15,23,42,.08),
@@ -1944,10 +1926,14 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel .auctionBtn{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn{
   width:100%;
   height:86px;
   min-height:86px;
+  max-width:none;
+
+  padding:0;
+  margin:0;
 
   border-radius:24px;
   border:1px solid rgba(49,46,129,.20);
@@ -1956,7 +1942,7 @@ button:disabled{
   align-items:center;
   justify-content:center;
 
-  color:#fff;
+  color:#FFFFFF;
   background:linear-gradient(180deg,#312E81,#1E1B4B);
 
   font-family:"HanakaDisplay","HanakaText",sans-serif;
@@ -1971,11 +1957,11 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel .auctionBtn:active:not(:disabled){
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn:active:not(:disabled){
   transform:scale(.94);
 }
 
-#presenterPanel .auctionBtn.used{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn.used{
   position:relative;
 
   color:transparent;
@@ -1991,7 +1977,7 @@ button:disabled{
   filter:none;
 }
 
-#presenterPanel .auctionBtn.used::after{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn.used::after{
   content:"✓";
 
   position:absolute;
@@ -2008,16 +1994,18 @@ button:disabled{
   line-height:1;
 }
 
-#presenterPanel .auctionTopBar{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTopBar{
   grid-area:teams;
 
   width:100%;
   height:62px;
   min-height:62px;
+  max-width:none;
 
   display:grid;
   grid-template-columns:1fr 92px 1fr;
   gap:10px;
+  align-items:stretch;
 
   padding:0;
   margin:0;
@@ -2029,8 +2017,9 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel .auctionTeamCard,
-#presenterPanel .auctionMiddleCard{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamCard,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionMiddleCard{
+  width:100%;
   height:60px;
   min-height:60px;
 
@@ -2038,16 +2027,16 @@ button:disabled{
   border:1px solid rgba(30,41,59,.10);
 
   background:
-    linear-gradient(180deg,rgba(255,255,255,.88),rgba(241,245,249,.76));
+    linear-gradient(180deg,rgba(255,255,255,.90),rgba(241,245,249,.78));
 
   box-shadow:
     0 10px 20px rgba(15,23,42,.07),
-    inset 0 1px 0 rgba(255,255,255,.80);
+    inset 0 1px 0 rgba(255,255,255,.82);
 
   overflow:hidden;
 }
 
-#presenterPanel .auctionTeamCard{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamCard{
   padding:8px 10px;
 
   display:grid;
@@ -2058,11 +2047,11 @@ button:disabled{
   cursor:pointer;
 }
 
-#presenterPanel #auctionTeamBBox{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) #auctionTeamBBox{
   grid-template-columns:42px minmax(0,1fr);
 }
 
-#presenterPanel .auctionTeamName{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamName{
   min-width:0;
 
   color:#1E293B;
@@ -2076,9 +2065,10 @@ button:disabled{
   text-overflow:ellipsis;
 }
 
-#presenterPanel .auctionTeamScore{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamScore{
   width:42px;
   height:38px;
+  min-width:42px;
 
   border-radius:14px;
 
@@ -2086,7 +2076,7 @@ button:disabled{
   align-items:center;
   justify-content:center;
 
-  background:#fff;
+  background:#FFFFFF;
   border:1px solid rgba(30,41,59,.08);
 
   color:#312E81;
@@ -2098,8 +2088,8 @@ button:disabled{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.90);
 }
 
-#presenterPanel .auctionTeamCard.activeTeam{
-  background:linear-gradient(180deg,#FFE6D4,#fff);
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamCard.activeTeam{
+  background:linear-gradient(180deg,#FFE6D4,#FFFFFF);
   border-color:rgba(249,115,22,.34);
 
   box-shadow:
@@ -2108,7 +2098,7 @@ button:disabled{
     inset 0 1px 0 rgba(255,255,255,.86);
 }
 
-#presenterPanel .auctionMiddleCard{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionMiddleCard{
   padding:6px;
 
   display:flex;
@@ -2117,7 +2107,7 @@ button:disabled{
   text-align:center;
 }
 
-#presenterPanel .auctionTurnLabel{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTurnLabel{
   color:#0F4C5C;
 
   font-size:.78rem;
@@ -2129,12 +2119,13 @@ button:disabled{
   text-overflow:ellipsis;
 }
 
-#presenterPanel .auctionQuestionBox{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionQuestionBox{
   grid-area:preview;
 
   width:100%;
   height:100%;
   min-height:0;
+  max-width:none;
 
   padding:14px;
 
@@ -2155,7 +2146,7 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel .auctionPlaceholder{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionPlaceholder{
   width:100%;
   height:100%;
 
@@ -2166,7 +2157,7 @@ button:disabled{
   align-items:center;
   justify-content:center;
 
-  background:linear-gradient(180deg,#fff,#F8FAFC);
+  background:linear-gradient(180deg,#FFFFFF,#F8FAFC);
 
   color:#64748B;
 
@@ -2176,8 +2167,8 @@ button:disabled{
   text-align:center;
 }
 
-#presenterPanel .auctionImagePreviewBox,
-#presenterPanel .auctionVideoPreviewBox{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionImagePreviewBox,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionVideoPreviewBox{
   width:100%;
   height:100%;
   min-height:0;
@@ -2193,8 +2184,8 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel .auctionImagePreview,
-#presenterPanel .auctionVideoPreview{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionImagePreview,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionVideoPreview{
   width:100%;
   height:100%;
 
@@ -2202,13 +2193,14 @@ button:disabled{
   display:block;
 }
 
-#presenterPanel .auctionVideoPreviewBox{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionVideoPreviewBox{
   position:relative;
 }
 
-#presenterPanel .auctionVideoPlayBtn{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionVideoPlayBtn{
   position:absolute;
-  inset:auto auto 14px 14px;
+  left:14px;
+  bottom:14px;
 
   width:58px;
   height:58px;
@@ -2231,7 +2223,7 @@ button:disabled{
     inset 0 1px 0 rgba(255,255,255,.24);
 }
 
-#presenterPanel .auctionResultView{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultView{
   width:100%;
   height:100%;
   min-height:0;
@@ -2243,7 +2235,7 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel .auctionResultMediaBox{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultMediaBox{
   min-height:0;
 
   border-radius:24px;
@@ -2257,8 +2249,8 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel .auctionResultImageBoxClean,
-#presenterPanel .auctionResultVideoBox{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultImageBoxClean,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultVideoBox{
   width:100%;
   height:100%;
   min-height:0;
@@ -2270,8 +2262,8 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel .auctionResultImageClean,
-#presenterPanel .auctionResultVideo{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultImageClean,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultVideo{
   width:100%;
   height:100%;
 
@@ -2279,7 +2271,7 @@ button:disabled{
   display:block;
 }
 
-#presenterPanel .auctionResultAnswerBox{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultAnswerBox{
   min-height:0;
 
   padding:10px 12px;
@@ -2287,7 +2279,7 @@ button:disabled{
   border-radius:22px;
   border:1px solid rgba(15,118,110,.14);
 
-  background:linear-gradient(180deg,#fff,#ECFDF5);
+  background:linear-gradient(180deg,#FFFFFF,#ECFDF5);
 
   display:grid;
   grid-template-rows:18px minmax(0,1fr);
@@ -2300,7 +2292,7 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel .auctionResultAnswerLabel{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultAnswerLabel{
   color:#0F766E;
 
   font-size:.76rem;
@@ -2308,7 +2300,7 @@ button:disabled{
   font-weight:900;
 }
 
-#presenterPanel .auctionResultAnswerText{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultAnswerText{
   min-height:0;
 
   display:flex;
@@ -2325,12 +2317,13 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel .auctionControlPanel{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel{
   grid-area:actions;
 
   width:100%;
   height:118px;
   min-height:118px;
+  max-width:none;
 
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -2347,7 +2340,7 @@ button:disabled{
   overflow:hidden;
 }
 
-#presenterPanel .auctionControlPanel button{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel button{
   width:100%;
   height:55px;
   min-height:55px;
@@ -2361,7 +2354,7 @@ button:disabled{
   align-items:center;
   justify-content:center;
 
-  color:#fff;
+  color:#FFFFFF;
 
   font-size:.9rem;
   line-height:1.18;
@@ -2377,32 +2370,32 @@ button:disabled{
     inset 0 1px 0 rgba(255,255,255,.16);
 }
 
-#presenterPanel .auctionControlPanel button:active:not(:disabled){
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel button:active:not(:disabled){
   transform:scale(.96);
 }
 
-#presenterPanel .auctionDoubleBtn{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionDoubleBtn{
   background:linear-gradient(180deg,#FB7185,#F97316);
 }
 
-#presenterPanel .auctionDoubleBtn.activeDouble{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionDoubleBtn.activeDouble{
   color:#431407;
   background:linear-gradient(180deg,#FDBA74,#F97316);
 }
 
-#presenterPanel .btnCorrect{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .btnCorrect{
   background:linear-gradient(180deg,#22C55E,#15803D);
 }
 
-#presenterPanel .btnWrong{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .btnWrong{
   background:linear-gradient(180deg,#EF4444,#DC2626);
 }
 
-#presenterPanel .undoBtn{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .undoBtn{
   background:linear-gradient(180deg,#991B1B,#7F1D1D);
 }
 
-#presenterPanel .auctionControlPanel button:disabled{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel button:disabled{
   background:#E5E7EB;
   color:#94A3B8;
   box-shadow:none;
@@ -2453,32 +2446,28 @@ button:disabled{
 #presenterTop10QuestionText::after,
 .presenterTop10Actions .presenterBtn::before,
 .presenterTop10Actions .presenterBtn::after,
-#presenterPanel .auctionWrap::before,
-#presenterPanel .auctionWrap::after,
-#presenterPanel .auctionGrid::before,
-#presenterPanel .auctionGrid::after,
-#presenterPanel .auctionBtn::before,
-#presenterPanel .auctionBtn::after,
-#presenterPanel .auctionTeamCard::before,
-#presenterPanel .auctionTeamCard::after,
-#presenterPanel .auctionMiddleCard::before,
-#presenterPanel .auctionMiddleCard::after,
-#presenterPanel .auctionQuestionBox::before,
-#presenterPanel .auctionQuestionBox::after,
-#presenterPanel .auctionControlPanel::before,
-#presenterPanel .auctionControlPanel::after,
-#presenterPanel .auctionControlPanel button::before,
-#presenterPanel .auctionControlPanel button::after{
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionWrap::before,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionWrap::after,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionGrid::before,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionGrid::after,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn::before,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn::after,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamCard::before,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamCard::after,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionMiddleCard::before,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionMiddleCard::after,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionQuestionBox::before,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionQuestionBox::after,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel::before,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel::after,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel button::before,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel button::after{
   content:none;
   display:none;
 }
 
-.presenterNumberBtn.presenterOpened::after{
-  content:"✓";
-  display:flex;
-}
-
-#presenterPanel .auctionBtn.used::after{
+.presenterNumberBtn.presenterOpened::after,
+:is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn.used::after{
   content:"✓";
   display:flex;
 }
@@ -2601,7 +2590,8 @@ button:disabled{
     grid-template-columns:106px minmax(0,1fr) 106px;
   }
 
-  #presenterPanel{
+  #presenterPanel,
+  .presenterPanel{
     max-width:1100px;
   }
 
@@ -2844,102 +2834,103 @@ button:disabled{
     padding:6px;
   }
 
-  #presenterPanel .auctionWrap{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionWrap{
     grid-template-columns:1.08fr .92fr;
     grid-template-rows:54px minmax(0,1fr) 106px;
     gap:10px;
   }
 
-  #presenterPanel .auctionGrid{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionGrid{
     padding:12px;
     border-radius:22px;
     grid-auto-rows:66px;
     gap:10px;
   }
 
-  #presenterPanel .auctionBtn{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionBtn{
     height:66px;
     min-height:66px;
     border-radius:19px;
     font-size:1.75rem;
   }
 
-  #presenterPanel .auctionTopBar{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTopBar{
     height:54px;
     min-height:54px;
     grid-template-columns:1fr 78px 1fr;
     gap:8px;
   }
 
-  #presenterPanel .auctionTeamCard,
-  #presenterPanel .auctionMiddleCard{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamCard,
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionMiddleCard{
     height:52px;
     min-height:52px;
     border-radius:17px;
   }
 
-  #presenterPanel .auctionTeamCard{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamCard{
     grid-template-columns:minmax(0,1fr) 36px;
     padding:7px 8px;
   }
 
-  #presenterPanel #auctionTeamBBox{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) #auctionTeamBBox{
     grid-template-columns:36px minmax(0,1fr);
   }
 
-  #presenterPanel .auctionTeamName{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamName{
     font-size:.8rem;
   }
 
-  #presenterPanel .auctionTeamScore{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamScore{
     width:36px;
     height:32px;
+    min-width:36px;
     border-radius:12px;
     font-size:1.05rem;
   }
 
-  #presenterPanel .auctionTurnLabel{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTurnLabel{
     font-size:.66rem;
   }
 
-  #presenterPanel .auctionQuestionBox{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionQuestionBox{
     padding:10px;
     border-radius:22px;
   }
 
-  #presenterPanel .auctionPlaceholder{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionPlaceholder{
     border-radius:18px;
     font-size:1rem;
   }
 
-  #presenterPanel .auctionImagePreviewBox,
-  #presenterPanel .auctionVideoPreviewBox,
-  #presenterPanel .auctionResultMediaBox{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionImagePreviewBox,
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionVideoPreviewBox,
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultMediaBox{
     border-radius:18px;
   }
 
-  #presenterPanel .auctionResultView{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultView{
     grid-template-rows:minmax(0,1fr) 92px;
     gap:8px;
   }
 
-  #presenterPanel .auctionResultAnswerBox{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultAnswerBox{
     border-radius:18px;
     padding:8px 10px;
   }
 
-  #presenterPanel .auctionResultAnswerText{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionResultAnswerText{
     font-size:1.22rem;
   }
 
-  #presenterPanel .auctionControlPanel{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel{
     height:106px;
     min-height:106px;
     grid-template-rows:repeat(2,49px);
     gap:8px;
   }
 
-  #presenterPanel .auctionControlPanel button{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel button{
     height:49px;
     min-height:49px;
     border-radius:15px;
@@ -3093,19 +3084,21 @@ button:disabled{
     order:-1;
   }
 
-  #presenterPanel{
+  #presenterPanel,
+  .presenterPanel{
     max-width:480px;
     overflow:visible;
   }
 
-  #presenterPanel > *{
+  #presenterPanel > *,
+  .presenterPanel > *{
     height:auto;
     overflow:visible;
   }
 
   .presenterWarmupLayout,
   .presenterTop10Layout,
-  #presenterPanel .auctionWrap{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionWrap{
     height:auto;
 
     display:flex;
@@ -3152,7 +3145,7 @@ button:disabled{
 
   .presenterWarmupActions,
   .presenterTop10Actions,
-  #presenterPanel .auctionControlPanel{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel{
     height:auto;
     grid-template-columns:1fr;
     grid-template-rows:auto;
@@ -3160,701 +3153,33 @@ button:disabled{
 
   .presenterWarmupActions .presenterBtn,
   .presenterTop10Actions .presenterBtn,
-  #presenterPanel .auctionControlPanel button{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionControlPanel button{
     height:54px;
     min-height:54px;
   }
 
-  #presenterPanel .auctionTopBar{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTopBar{
     height:auto;
     grid-template-columns:1fr;
   }
 
-  #presenterPanel .auctionTeamCard,
-  #presenterPanel .auctionMiddleCard{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionTeamCard,
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionMiddleCard{
     height:58px;
     min-height:58px;
   }
 
-  #presenterPanel .auctionGrid{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionGrid{
     height:auto;
     grid-template-columns:repeat(2,minmax(0,1fr));
     grid-auto-rows:64px;
   }
 
-  #presenterPanel .auctionQuestionBox{
+  :is(#presenterPanel,.presenterPanel,.presenterSegmentPage) .auctionQuestionBox{
     min-height:320px;
   }
 }
 
-/* =========================================================
-   AUCTION / فتبلة - PRO DASHBOARD
-   بدون important
-   ضعه قبل FINAL VISIBILITY FIX مباشرة
-========================================================= */
-
-#presenterPanel .auctionWrap{
-  width:100%;
-  height:100%;
-  min-height:0;
-  max-width:none;
-
-  display:grid;
-  grid-template-columns:1.08fr .92fr;
-  grid-template-rows:62px minmax(0,1fr) 118px;
-  grid-template-areas:
-    "numbers teams"
-    "numbers preview"
-    "actions preview";
-
-  gap:12px;
-
-  padding:0;
-  margin:0;
-
-  background:transparent;
-  border:0;
-  box-shadow:none;
-
-  overflow:hidden;
-}
-
-/* =========================
-   Numbers
-========================= */
-
-#presenterPanel .auctionGrid{
-  grid-area:numbers;
-
-  width:100%;
-  height:100%;
-  min-height:0;
-  max-width:none;
-
-  padding:16px;
-
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  grid-auto-rows:86px;
-  gap:14px;
-
-  align-content:start;
-
-  border-radius:26px;
-  border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.72));
-
-  box-shadow:
-    0 14px 28px rgba(15,23,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.82);
-
-  overflow:hidden;
-}
-
-#presenterPanel .auctionBtn{
-  width:100%;
-  height:86px;
-  min-height:86px;
-  max-width:none;
-
-  padding:0;
-  margin:0;
-
-  border-radius:24px;
-  border:1px solid rgba(49,46,129,.20);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#FFFFFF;
-  background:linear-gradient(180deg,#312E81,#1E1B4B);
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2.25rem;
-  line-height:1;
-  font-weight:400;
-
-  box-shadow:
-    0 10px 20px rgba(49,46,129,.16),
-    inset 0 1px 0 rgba(255,255,255,.16);
-
-  overflow:hidden;
-}
-
-#presenterPanel .auctionBtn:active:not(:disabled){
-  transform:scale(.94);
-}
-
-#presenterPanel .auctionBtn.used{
-  position:relative;
-
-  color:transparent;
-
-  background:linear-gradient(180deg,#F8FAFC,#E2E8F0);
-  border-color:rgba(148,163,184,.22);
-
-  box-shadow:
-    0 5px 10px rgba(15,23,42,.05),
-    inset 0 1px 0 rgba(255,255,255,.80);
-
-  opacity:1;
-  filter:none;
-}
-
-#presenterPanel .auctionBtn.used::after{
-  content:"✓";
-
-  position:absolute;
-  inset:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#7C3AED;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.9rem;
-  line-height:1;
-}
-
-/* =========================
-   Teams
-========================= */
-
-#presenterPanel .auctionTopBar{
-  grid-area:teams;
-
-  width:100%;
-  height:62px;
-  min-height:62px;
-  max-width:none;
-
-  display:grid;
-  grid-template-columns:1fr 92px 1fr;
-  gap:10px;
-  align-items:stretch;
-
-  padding:0;
-  margin:0;
-
-  background:transparent;
-  border:0;
-  box-shadow:none;
-
-  overflow:hidden;
-}
-
-#presenterPanel .auctionTeamCard,
-#presenterPanel .auctionMiddleCard{
-  width:100%;
-  height:60px;
-  min-height:60px;
-
-  border-radius:20px;
-  border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.90),rgba(241,245,249,.78));
-
-  box-shadow:
-    0 10px 20px rgba(15,23,42,.07),
-    inset 0 1px 0 rgba(255,255,255,.82);
-
-  overflow:hidden;
-}
-
-#presenterPanel .auctionTeamCard{
-  padding:8px 10px;
-
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 42px;
-  gap:8px;
-  align-items:center;
-
-  cursor:pointer;
-}
-
-#presenterPanel #auctionTeamBBox{
-  grid-template-columns:42px minmax(0,1fr);
-}
-
-#presenterPanel .auctionTeamName{
-  min-width:0;
-
-  color:#1E293B;
-
-  font-size:.92rem;
-  line-height:1.15;
-  font-weight:900;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-#presenterPanel .auctionTeamScore{
-  width:42px;
-  height:38px;
-  min-width:42px;
-
-  border-radius:14px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:#FFFFFF;
-  border:1px solid rgba(30,41,59,.08);
-
-  color:#312E81;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.25rem;
-  line-height:1;
-
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.90);
-}
-
-#presenterPanel .auctionTeamCard.activeTeam{
-  background:linear-gradient(180deg,#FFE6D4,#FFFFFF);
-  border-color:rgba(249,115,22,.34);
-
-  box-shadow:
-    0 0 0 4px rgba(249,115,22,.12),
-    0 12px 22px rgba(249,115,22,.12),
-    inset 0 1px 0 rgba(255,255,255,.86);
-}
-
-#presenterPanel .auctionMiddleCard{
-  padding:6px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-}
-
-#presenterPanel .auctionTurnLabel{
-  color:#0F4C5C;
-
-  font-size:.78rem;
-  line-height:1.2;
-  font-weight:900;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-/* =========================
-   Preview
-========================= */
-
-#presenterPanel .auctionQuestionBox{
-  grid-area:preview;
-
-  width:100%;
-  height:100%;
-  min-height:0;
-  max-width:none;
-
-  padding:14px;
-
-  border-radius:26px;
-  border:1px solid rgba(30,41,59,.10);
-
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.86),rgba(248,250,252,.70));
-
-  box-shadow:
-    0 14px 28px rgba(15,23,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.84);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  overflow:hidden;
-}
-
-#presenterPanel .auctionPlaceholder{
-  width:100%;
-  height:100%;
-
-  border-radius:24px;
-  border:1px dashed rgba(100,116,139,.24);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:linear-gradient(180deg,#FFFFFF,#F8FAFC);
-
-  color:#64748B;
-
-  font-size:1.25rem;
-  line-height:1.35;
-  font-weight:900;
-  text-align:center;
-}
-
-#presenterPanel .auctionImagePreviewBox,
-#presenterPanel .auctionVideoPreviewBox{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  border-radius:24px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:#0F172A;
-
-  overflow:hidden;
-}
-
-#presenterPanel .auctionImagePreview,
-#presenterPanel .auctionVideoPreview{
-  width:100%;
-  height:100%;
-
-  object-fit:contain;
-  display:block;
-}
-
-#presenterPanel .auctionVideoPreviewBox{
-  position:relative;
-}
-
-#presenterPanel .auctionVideoPlayBtn{
-  position:absolute;
-  left:14px;
-  bottom:14px;
-
-  width:58px;
-  height:58px;
-
-  border-radius:50%;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:linear-gradient(180deg,#67E8F9,#06B6D4);
-
-  color:#12362D;
-
-  font-size:1.2rem;
-  font-weight:900;
-
-  box-shadow:
-    0 10px 20px rgba(6,182,212,.22),
-    inset 0 1px 0 rgba(255,255,255,.24);
-}
-
-/* =========================
-   Result View
-========================= */
-
-#presenterPanel .auctionResultView{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:minmax(0,1fr) 118px;
-  gap:10px;
-
-  overflow:hidden;
-}
-
-#presenterPanel .auctionResultMediaBox{
-  min-height:0;
-
-  border-radius:24px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:#0F172A;
-
-  overflow:hidden;
-}
-
-#presenterPanel .auctionResultImageBoxClean,
-#presenterPanel .auctionResultVideoBox{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  overflow:hidden;
-}
-
-#presenterPanel .auctionResultImageClean,
-#presenterPanel .auctionResultVideo{
-  width:100%;
-  height:100%;
-
-  object-fit:contain;
-  display:block;
-}
-
-#presenterPanel .auctionResultAnswerBox{
-  min-height:0;
-
-  padding:10px 12px;
-
-  border-radius:22px;
-  border:1px solid rgba(15,118,110,.14);
-
-  background:linear-gradient(180deg,#FFFFFF,#ECFDF5);
-
-  display:grid;
-  grid-template-rows:18px minmax(0,1fr);
-  gap:6px;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.90),
-    0 8px 16px rgba(15,118,110,.05);
-
-  overflow:hidden;
-}
-
-#presenterPanel .auctionResultAnswerLabel{
-  color:#0F766E;
-
-  font-size:.76rem;
-  line-height:1;
-  font-weight:900;
-}
-
-#presenterPanel .auctionResultAnswerText{
-  min-height:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#0F766E;
-
-  font-size:1.55rem;
-  line-height:1.25;
-  font-weight:900;
-  text-align:center;
-
-  overflow:hidden;
-}
-
-/* =========================
-   Controls
-========================= */
-
-#presenterPanel .auctionControlPanel{
-  grid-area:actions;
-
-  width:100%;
-  height:118px;
-  min-height:118px;
-  max-width:none;
-
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-template-rows:repeat(2,55px);
-  gap:8px;
-
-  padding:0;
-  margin:0;
-
-  background:transparent;
-  border:0;
-  box-shadow:none;
-
-  overflow:hidden;
-}
-
-#presenterPanel .auctionControlPanel button{
-  width:100%;
-  height:55px;
-  min-height:55px;
-
-  border:0;
-  border-radius:18px;
-
-  padding:7px 8px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#FFFFFF;
-
-  font-size:.9rem;
-  line-height:1.18;
-  font-weight:900;
-  text-align:center;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-
-  box-shadow:
-    0 9px 18px rgba(15,23,42,.12),
-    inset 0 1px 0 rgba(255,255,255,.16);
-}
-
-#presenterPanel .auctionControlPanel button:active:not(:disabled){
-  transform:scale(.96);
-}
-
-#presenterPanel .auctionDoubleBtn{
-  background:linear-gradient(180deg,#FB7185,#F97316);
-}
-
-#presenterPanel .auctionDoubleBtn.activeDouble{
-  color:#431407;
-  background:linear-gradient(180deg,#FDBA74,#F97316);
-}
-
-#presenterPanel .btnCorrect{
-  background:linear-gradient(180deg,#22C55E,#15803D);
-}
-
-#presenterPanel .btnWrong{
-  background:linear-gradient(180deg,#EF4444,#DC2626);
-}
-
-#presenterPanel .undoBtn{
-  background:linear-gradient(180deg,#991B1B,#7F1D1D);
-}
-
-#presenterPanel .auctionControlPanel button:disabled{
-  background:#E5E7EB;
-  color:#94A3B8;
-  box-shadow:none;
-  opacity:.88;
-}
-
-/* =========================
-   Compact Height
-========================= */
-
-@media screen and (min-width:800px) and (max-width:1280px) and (orientation:landscape) and (max-height:650px){
-
-  #presenterPanel .auctionWrap{
-    grid-template-columns:1.08fr .92fr;
-    grid-template-rows:54px minmax(0,1fr) 106px;
-    gap:10px;
-  }
-
-  #presenterPanel .auctionGrid{
-    padding:12px;
-    border-radius:22px;
-    grid-auto-rows:66px;
-    gap:10px;
-  }
-
-  #presenterPanel .auctionBtn{
-    height:66px;
-    min-height:66px;
-    border-radius:19px;
-    font-size:1.75rem;
-  }
-
-  #presenterPanel .auctionTopBar{
-    height:54px;
-    min-height:54px;
-    grid-template-columns:1fr 78px 1fr;
-    gap:8px;
-  }
-
-  #presenterPanel .auctionTeamCard,
-  #presenterPanel .auctionMiddleCard{
-    height:52px;
-    min-height:52px;
-    border-radius:17px;
-  }
-
-  #presenterPanel .auctionTeamCard{
-    grid-template-columns:minmax(0,1fr) 36px;
-    padding:7px 8px;
-  }
-
-  #presenterPanel #auctionTeamBBox{
-    grid-template-columns:36px minmax(0,1fr);
-  }
-
-  #presenterPanel .auctionTeamName{
-    font-size:.8rem;
-  }
-
-  #presenterPanel .auctionTeamScore{
-    width:36px;
-    height:32px;
-    min-width:36px;
-    border-radius:12px;
-    font-size:1.05rem;
-  }
-
-  #presenterPanel .auctionTurnLabel{
-    font-size:.66rem;
-  }
-
-  #presenterPanel .auctionQuestionBox{
-    padding:10px;
-    border-radius:22px;
-  }
-
-  #presenterPanel .auctionPlaceholder{
-    border-radius:18px;
-    font-size:1rem;
-  }
-
-  #presenterPanel .auctionImagePreviewBox,
-  #presenterPanel .auctionVideoPreviewBox,
-  #presenterPanel .auctionResultMediaBox{
-    border-radius:18px;
-  }
-
-  #presenterPanel .auctionResultView{
-    grid-template-rows:minmax(0,1fr) 92px;
-    gap:8px;
-  }
-
-  #presenterPanel .auctionResultAnswerBox{
-    border-radius:18px;
-    padding:8px 10px;
-  }
-
-  #presenterPanel .auctionResultAnswerText{
-    font-size:1.22rem;
-  }
-
-  #presenterPanel .auctionControlPanel{
-    height:106px;
-    min-height:106px;
-    grid-template-rows:repeat(2,49px);
-    gap:8px;
-  }
-
-  #presenterPanel .auctionControlPanel button{
-    height:49px;
-    min-height:49px;
-    border-radius:15px;
-    font-size:.76rem;
-    padding:6px;
-  }
-}
 /* =========================================================
    FINAL VISIBILITY FIX
    لا تضع أي كود بعد هذا البلوك
