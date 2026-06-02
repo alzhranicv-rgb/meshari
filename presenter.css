@@ -3720,6 +3720,298 @@ button:disabled{
   }
 }
 /* =========================================================
+   PRO POLISH FIX - WHO + EXPLAIN + FINAL
+   ضعه قبل FINAL VISIBILITY FIX مباشرة
+========================================================= */
+
+/* =========================
+   من هو - ضبط نهائي للأرقام والنقاط
+========================= */
+
+.presenterWhoLeft{
+  grid-template-rows:minmax(0,1fr) 84px;
+  gap:7px;
+}
+
+.presenterWhoNumbersCard{
+  padding:8px;
+  grid-template-rows:20px 40px 16px minmax(0,1fr);
+  gap:5px;
+}
+
+.presenterWhoNumbersCard > .presenterLabel,
+.presenterWhoNumbersLabel{
+  height:auto;
+  font-size:.74rem;
+  line-height:1;
+}
+
+.presenterWhoPointsGrid{
+  height:40px;
+  min-height:40px;
+  gap:6px;
+}
+
+.presenterWhoPointsGrid .presenterNumberBtn{
+  height:40px;
+  min-height:40px;
+  border-radius:12px;
+
+  color:#064E3B;
+  background:linear-gradient(180deg,#A7F3D0,#5EEAD4);
+  border:1px solid rgba(15,118,110,.24);
+
+  font-size:1rem;
+  line-height:1;
+}
+
+.presenterWhoPointsGrid .presenterNumberBtn.selectedPresenterTeam,
+.presenterWhoPointsGrid .presenterNumberBtn.activeWhoPoint{
+  color:#fff;
+  background:linear-gradient(180deg,#14B8A6,#0F766E);
+  box-shadow:
+    0 0 0 3px rgba(20,184,166,.15),
+    0 8px 16px rgba(15,118,110,.16);
+}
+
+.presenterWhoGrid{
+  min-height:0;
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-rows:repeat(3,minmax(0,1fr));
+  gap:6px;
+  overflow:hidden;
+}
+
+.presenterWhoGrid .presenterNumberBtn{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  border-radius:12px;
+  font-size:.96rem;
+  line-height:1;
+}
+
+.presenterWhoActions{
+  height:84px;
+  min-height:84px;
+
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:6px;
+}
+
+.presenterWhoActions .presenterBtn{
+  height:84px;
+  min-height:84px;
+
+  border-radius:13px;
+  padding:5px 3px;
+
+  font-size:.6rem;
+  line-height:1.2;
+  white-space:normal;
+}
+
+.presenterWhoPreviewCard{
+  padding:8px;
+  grid-template-rows:18px 72px 18px minmax(0,1fr);
+  gap:5px;
+}
+
+#presenterWhoAnswerText{
+  border-radius:16px;
+  padding:8px;
+  font-size:.92rem;
+  line-height:1.25;
+}
+
+/* =========================
+   اشرح الكلمة - منع قص الأرقام
+========================= */
+
+.presenterExplainLeft{
+  grid-template-rows:78px minmax(0,1fr) 48px;
+  gap:7px;
+}
+
+.presenterExplainNumbersCard{
+  height:78px;
+  min-height:78px;
+
+  padding:8px;
+
+  display:grid;
+  grid-template-rows:18px minmax(0,1fr);
+  gap:5px;
+}
+
+.presenterExplainNumbersCard > .presenterLabel{
+  height:18px;
+  font-size:.74rem;
+  line-height:1;
+}
+
+.presenterExplainNumbersGrid{
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  gap:6px;
+  align-items:stretch;
+  overflow:hidden;
+}
+
+.presenterExplainNumbersGrid .presenterNumberBtn,
+.presenterExplainNumberCard{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  border-radius:12px;
+  font-size:1.05rem;
+  line-height:1;
+}
+
+.presenterExplainNumbersGrid .presenterNumberBtn span,
+.presenterExplainNumberCard span{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  line-height:1;
+}
+
+.presenterExplainWordCard{
+  padding:10px;
+  grid-template-rows:22px minmax(0,1fr);
+  gap:7px;
+}
+
+.presenterExplainWordCard > .presenterLabel{
+  height:22px;
+  font-size:.78rem;
+}
+
+.presenterExplainWordBox{
+  border-radius:18px;
+  padding:10px 12px;
+
+  font-size:2.3rem;
+  line-height:1.08;
+
+  white-space:normal;
+  overflow-wrap:break-word;
+  word-break:normal;
+}
+
+.presenterExplainActions{
+  height:48px;
+  min-height:48px;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+}
+
+.presenterExplainActions .presenterBtn{
+  height:48px;
+  min-height:48px;
+
+  border-radius:12px;
+  padding:5px;
+
+  font-size:.66rem;
+  line-height:1.15;
+}
+
+.presenterExplainRight{
+  grid-template-rows:48px minmax(0,1fr);
+  gap:7px;
+}
+
+.presenterExplainTeamsBox{
+  height:48px;
+  min-height:48px;
+}
+
+.presenterExplainTimerCard{
+  padding:10px;
+  grid-template-rows:22px minmax(0,1fr);
+  gap:7px;
+}
+
+.presenterExplainTimerBox{
+  border-radius:20px;
+  font-size:4rem;
+}
+
+/* =========================
+   الفاصلة - نص الإجابة بشكل احترافي
+========================= */
+
+.presenterFinalOnlyAnswerView{
+  width:100%;
+  height:100%;
+
+  display:grid;
+  grid-template-rows:28px minmax(0,1fr);
+  gap:8px;
+
+  overflow:hidden;
+}
+
+.presenterFinalOnlyAnswerLabel{
+  height:28px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#64748B;
+  font-size:.78rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.presenterFinalOnlyAnswerText{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  border-radius:18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:12px 14px;
+
+  background:linear-gradient(180deg,#FFFFFF,#ECFDF5);
+  border:1px solid rgba(15,118,110,.14);
+
+  color:#0F766E;
+
+  font-size:clamp(1.15rem,2.7vw,1.65rem);
+  line-height:1.25;
+  font-weight:900;
+  text-align:center;
+
+  white-space:normal;
+  overflow-wrap:break-word;
+  word-break:normal;
+
+  overflow:hidden;
+}
+
+.presenterFinalPreviewBox{
+  padding:10px;
+}
+/* =========================================================
    FINAL VISIBILITY FIX
    لا تضع أي كود بعد هذا البلوك
 ========================================================= */
