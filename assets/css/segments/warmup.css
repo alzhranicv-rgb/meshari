@@ -1268,3 +1268,162 @@
     font-size:2rem !important;
   }
 }
+/* =========================================================
+   WARMUP ONLY - IPAD SIZES
+   ملف: warmup.css
+   مقاسات فقط بدون تغيير التصميم
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+
+  .warmupWrap,
+  .warmupContainer,
+  .warmupMainWrap{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    gap:10px !important;
+
+    padding:10px 0 4px !important;
+
+    overflow:hidden !important;
+  }
+
+  .warmupTopBar,
+  .warmupHeader,
+  .warmupScoreBoard{
+    width:100% !important;
+    min-height:72px !important;
+    max-height:76px !important;
+
+    gap:10px !important;
+
+    overflow:visible !important;
+  }
+
+  .warmupTeamCard,
+  .warmupTeamBox{
+    height:62px !important;
+    min-height:62px !important;
+
+    padding:7px 8px !important;
+    border-radius:22px !important;
+  }
+
+  .warmupTeamName{
+    font-size:1.35rem !important;
+    line-height:1.05 !important;
+  }
+
+  .warmupTeamScore{
+    width:48px !important;
+    height:38px !important;
+
+    font-size:1.35rem !important;
+  }
+
+  .warmupMainStage,
+  .warmupStage,
+  .warmupQuestionStage{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+
+    padding:8px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    overflow:hidden !important;
+  }
+
+  .warmupCategoriesGrid,
+  .warmupGrid{
+    width:min(100%,940px) !important;
+    margin:0 auto !important;
+
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+
+  .warmupCategoryCard{
+    min-height:170px !important;
+    padding:10px !important;
+    border-radius:22px !important;
+  }
+
+  .warmupCategoryTitle{
+    min-height:34px !important;
+
+    font-size:1.05rem !important;
+    line-height:1.1 !important;
+  }
+
+  .warmupNumbersGrid{
+    gap:8px !important;
+  }
+
+  .warmupNumberBtn,
+  .warmupQuestionBtn,
+  .warmupGrid button{
+    height:48px !important;
+    min-height:48px !important;
+
+    border-radius:15px !important;
+
+    font-size:1.35rem !important;
+  }
+
+  .warmupQuestionBox,
+  .warmupAnswerBox,
+  .warmupHintBox{
+    width:min(100%,760px) !important;
+    min-height:135px !important;
+    max-height:250px !important;
+
+    padding:18px 24px !important;
+    border-radius:24px !important;
+
+    font-size:clamp(1.55rem,3.3vw,2.7rem) !important;
+    line-height:1.25 !important;
+
+    overflow:hidden !important;
+  }
+
+  .warmupTimerBox,
+  .warmupTimer{
+    width:78px !important;
+    height:58px !important;
+    min-height:58px !important;
+
+    border-radius:20px !important;
+
+    font-size:1.9rem !important;
+  }
+
+  .warmupControlPanel,
+  .warmupControls{
+    width:min(100%,680px) !important;
+    margin:0 auto !important;
+
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:7px !important;
+  }
+
+  .warmupControlPanel button,
+  .warmupControls button{
+    height:42px !important;
+    min-height:42px !important;
+
+    border-radius:12px !important;
+
+    font-size:.72rem !important;
+    padding:0 6px !important;
+  }
+}

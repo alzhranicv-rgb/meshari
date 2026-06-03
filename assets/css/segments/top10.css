@@ -1774,3 +1774,192 @@
     font-size:1rem !important;
   }
 }
+/* =========================================================
+   TOP 10 ONLY - IPAD SIZES
+   ملف: top10.css
+   مقاسات فقط بدون تغيير التصميم
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+
+  .top10Wrap,
+  .top10Container,
+  .top10MainWrap,
+  .top10GameShell{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    gap:10px !important;
+
+    padding:10px 0 4px !important;
+
+    overflow:hidden !important;
+  }
+
+  .top10TopBar,
+  .top10Header,
+  .top10ScoreBoard{
+    width:100% !important;
+
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) 118px minmax(0,1fr) !important;
+    gap:10px !important;
+    align-items:center !important;
+
+    min-height:72px !important;
+    max-height:76px !important;
+
+    padding:0 2px !important;
+
+    overflow:visible !important;
+  }
+
+  .top10TeamCard,
+  .top10TeamBox{
+    height:62px !important;
+    min-height:62px !important;
+
+    padding:7px 8px !important;
+    border-radius:22px !important;
+  }
+
+  .top10TeamName{
+    font-size:1.35rem !important;
+    line-height:1.05 !important;
+
+    padding:6px 10px !important;
+    border-radius:15px !important;
+  }
+
+  .top10TeamScore{
+    width:48px !important;
+    height:38px !important;
+
+    border-radius:14px !important;
+
+    font-size:1.35rem !important;
+  }
+
+  .top10TimerBox,
+  .top10Timer,
+  .top10MiddleCard{
+    width:118px !important;
+    height:72px !important;
+    min-height:72px !important;
+
+    border-radius:26px !important;
+
+    font-size:1.85rem !important;
+  }
+
+  .top10TimerLabel,
+  .top10TurnLabel{
+    font-size:.66rem !important;
+  }
+
+  .top10TimerValue{
+    font-size:1.85rem !important;
+  }
+
+  .top10MainStage,
+  .top10Stage,
+  .top10QuestionStage,
+  .top10Content{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+
+    padding:8px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    overflow:hidden !important;
+  }
+
+  .top10Board,
+  .top10Grid,
+  .top10NumbersGrid{
+    width:min(100%,940px) !important;
+    margin:0 auto !important;
+
+    display:grid !important;
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    gap:10px !important;
+
+    align-self:center !important;
+  }
+
+  .top10Btn,
+  .top10NumberBtn,
+  .top10Card,
+  .top10Tile,
+  .top10Grid button{
+    height:48px !important;
+    min-height:48px !important;
+
+    border-radius:15px !important;
+
+    font-size:1.35rem !important;
+  }
+
+  .top10QuestionBox,
+  .top10AnswerBox,
+  .top10HintBox,
+  .top10ResultBox{
+    width:min(100%,780px) !important;
+    min-height:135px !important;
+    max-height:260px !important;
+
+    padding:18px 24px !important;
+    border-radius:24px !important;
+
+    font-size:clamp(1.55rem,3.3vw,2.7rem) !important;
+    line-height:1.25 !important;
+
+    overflow:hidden !important;
+  }
+
+  .top10AnswerText,
+  .top10ResultText{
+    font-size:clamp(1.7rem,3.6vw,3rem) !important;
+    line-height:1.15 !important;
+  }
+
+  .top10AttemptsBox,
+  .top10StatusBox,
+  .top10InfoBox{
+    min-height:48px !important;
+
+    padding:8px 12px !important;
+    border-radius:16px !important;
+
+    font-size:.85rem !important;
+    line-height:1.2 !important;
+  }
+
+  .top10ControlPanel,
+  .top10Controls{
+    width:min(100%,680px) !important;
+    margin:0 auto !important;
+
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:7px !important;
+  }
+
+  .top10ControlPanel button,
+  .top10Controls button{
+    height:42px !important;
+    min-height:42px !important;
+
+    padding:0 6px !important;
+    border-radius:12px !important;
+
+    font-size:.72rem !important;
+  }
+}

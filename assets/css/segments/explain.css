@@ -1456,3 +1456,369 @@
     font-size:1rem !important;
   }
 }
+/* =========================================================
+   EXPLAIN WORD - ANSWER ONLY + IPAD FIT
+   ظهور الإجابات فقط + مقاس الآيباد
+========================================================= */
+
+/* =========================
+   FULL SCREEN FIT
+========================= */
+
+.explainGameShell{
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+
+  display:grid !important;
+  grid-template-rows:auto auto minmax(0,1fr) auto !important;
+  gap:12px !important;
+
+  padding:10px 0 4px !important;
+
+  overflow:hidden !important;
+}
+
+/* =========================
+   MAIN STAGE
+========================= */
+
+.explainMainStage{
+  position:relative !important;
+
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  padding:10px !important;
+
+  overflow:hidden !important;
+}
+
+/* =========================
+   WORD / ANSWER BOX BASE
+========================= */
+
+.explainWordBox{
+  position:relative !important;
+
+  width:min(100%,820px) !important;
+  min-height:170px !important;
+
+  margin:0 auto !important;
+  padding:24px 34px !important;
+
+  border-radius:32px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  text-align:center !important;
+
+  color:#24185E !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(2.3rem,5vw,4.6rem) !important;
+  line-height:1.12 !important;
+  font-weight:400 !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.72), transparent 42%),
+    radial-gradient(circle at 85% 100%, rgba(103,232,249,.22), transparent 48%),
+    linear-gradient(180deg, rgba(255,255,255,.88), rgba(236,254,255,.52)) !important;
+
+  border:1px solid rgba(103,232,249,.38) !important;
+
+  box-shadow:
+    0 18px 42px rgba(30,27,75,.12),
+    0 0 0 5px rgba(103,232,249,.06),
+    inset 0 1px 0 rgba(255,255,255,.92),
+    inset 0 -1px 0 rgba(8,145,178,.08) !important;
+
+  backdrop-filter:blur(20px) saturate(1.18) !important;
+  -webkit-backdrop-filter:blur(20px) saturate(1.18) !important;
+
+  overflow:hidden !important;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.86),
+    0 14px 28px rgba(30,27,75,.12) !important;
+
+  animation:explainAnswerEnter .38s cubic-bezier(.2,.85,.2,1.05) both;
+}
+
+/* لمعة داخل الكرت */
+.explainWordBox::before{
+  content:"";
+
+  position:absolute;
+  inset:0;
+  z-index:0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.32),
+      transparent 30%,
+      transparent 70%,
+      rgba(255,255,255,.10)
+    );
+
+  pointer-events:none;
+}
+
+.explainWordBox{
+  isolation:isolate;
+}
+
+.explainWordBox::after{
+  content:"";
+
+  position:absolute;
+  width:120px;
+  height:120px;
+  top:-54px;
+  right:-36px;
+  z-index:0;
+
+  border-radius:50%;
+
+  background:rgba(255,255,255,.18);
+
+  pointer-events:none;
+}
+
+.explainWordBox.hasWord{
+  cursor:pointer !important;
+}
+
+.explainWordBox.emptyWord{
+  opacity:.0 !important;
+  pointer-events:none !important;
+}
+
+.explainWordBox.wordBoxInvisible,
+.explainWordBox.hiddenWord{
+  opacity:.12 !important;
+  transform:scale(.96) !important;
+  filter:blur(10px) !important;
+}
+
+/* حركة ظهور */
+@keyframes explainAnswerEnter{
+  from{
+    opacity:0;
+    transform:translateY(14px) scale(.97);
+    filter:blur(8px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    filter:blur(0);
+  }
+}
+
+/* =========================
+   CORRECT ANSWER - GREEN GLASS
+========================= */
+
+.explainWordBox.answerCorrect{
+  color:#14532D !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.72), transparent 42%),
+    radial-gradient(circle at 85% 100%, rgba(34,197,94,.32), transparent 48%),
+    linear-gradient(180deg, rgba(240,253,244,.88), rgba(187,247,208,.42)) !important;
+
+  border:1px solid rgba(34,197,94,.46) !important;
+
+  box-shadow:
+    0 18px 42px rgba(22,163,74,.18),
+    0 0 0 5px rgba(34,197,94,.08),
+    inset 0 1px 0 rgba(255,255,255,.92),
+    inset 0 -1px 0 rgba(22,163,74,.10) !important;
+
+  animation:explainCorrectPop .42s cubic-bezier(.2,.85,.2,1.08) both !important;
+}
+
+/* =========================
+   WRONG ANSWER - RED GLASS
+========================= */
+
+.explainWordBox.answerWrong{
+  color:#7F1D1D !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.72), transparent 42%),
+    radial-gradient(circle at 85% 100%, rgba(239,68,68,.34), transparent 48%),
+    linear-gradient(180deg, rgba(254,242,242,.90), rgba(254,202,202,.44)) !important;
+
+  border:1px solid rgba(239,68,68,.48) !important;
+
+  box-shadow:
+    0 18px 42px rgba(220,38,38,.18),
+    0 0 0 5px rgba(239,68,68,.08),
+    inset 0 1px 0 rgba(255,255,255,.92),
+    inset 0 -1px 0 rgba(220,38,38,.10) !important;
+
+  animation:explainWrongShake .42s ease both !important;
+}
+
+@keyframes explainCorrectPop{
+  0%{
+    opacity:.65;
+    transform:scale(.94);
+  }
+
+  65%{
+    opacity:1;
+    transform:scale(1.035);
+  }
+
+  100%{
+    opacity:1;
+    transform:scale(1);
+  }
+}
+
+@keyframes explainWrongShake{
+  0%,100%{
+    transform:translateX(0) scale(1);
+  }
+
+  18%{
+    transform:translateX(-10px) scale(.992);
+  }
+
+  36%{
+    transform:translateX(10px) scale(1.006);
+  }
+
+  54%{
+    transform:translateX(-6px) scale(.996);
+  }
+
+  72%{
+    transform:translateX(6px) scale(1.004);
+  }
+}
+
+/* =========================
+   TIMER
+========================= */
+
+.explainTimerBox{
+  position:absolute !important;
+  top:14px !important;
+  right:18px !important;
+  z-index:5 !important;
+
+  width:86px !important;
+  height:70px !important;
+
+  border-radius:24px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  color:#12362D !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:2.35rem !important;
+  line-height:1 !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.32), transparent 42%),
+    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
+
+  box-shadow:
+    0 18px 38px rgba(6,182,212,.22),
+    inset 0 1px 0 rgba(255,255,255,.34) !important;
+}
+
+.explainTimerBox.danger{
+  color:#FFFFFF !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#EF4444,#B91C1C) !important;
+
+  animation:explainTimerDanger .42s ease-in-out infinite alternate;
+}
+
+@keyframes explainTimerDanger{
+  from{
+    transform:scale(1);
+    filter:brightness(1);
+  }
+
+  to{
+    transform:scale(1.06);
+    filter:brightness(1.08);
+  }
+}
+
+/* =========================
+   IPAD LANDSCAPE FIT
+========================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+
+  .explainGameShell{
+    width:100% !important;
+    height:100% !important;
+
+    display:grid !important;
+    grid-template-rows:74px 58px minmax(0,1fr) 50px !important;
+    gap:9px !important;
+
+    padding:8px 0 4px !important;
+
+    overflow:hidden !important;
+  }
+
+  .explainMainStage{
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+
+    padding:8px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    overflow:hidden !important;
+  }
+
+  .explainWordBox{
+    width:min(100%,760px) !important;
+    min-height:150px !important;
+    max-height:260px !important;
+
+    padding:20px 28px !important;
+    border-radius:28px !important;
+
+    font-size:clamp(2rem,4.2vw,3.55rem) !important;
+    line-height:1.1 !important;
+  }
+
+  .explainTimerBox{
+    top:10px !important;
+    right:14px !important;
+
+    width:74px !important;
+    height:58px !important;
+
+    border-radius:20px !important;
+
+    font-size:1.95rem !important;
+  }
+}
