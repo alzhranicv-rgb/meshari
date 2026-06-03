@@ -1,6 +1,6 @@
 /* =========================================================
    AUCTION DISPLAY PAGE
-   Candy Glass Style - Clean Version
+   Candy Glass Style - Clean Final
    File: assets/css/segments/auction.css
 ========================================================= */
 
@@ -8,12 +8,20 @@
    WRAP
 ========================= */
 
-.auctionWrap{
+.auctionWrap,
+.auctionContainer,
+.auctionMainWrap{
   width:100% !important;
-  display:flex !important;
-  flex-direction:column !important;
-  gap:14px !important;
+  height:100% !important;
+  min-height:0 !important;
+
+  display:grid !important;
+  grid-template-rows:auto minmax(0,1fr) auto !important;
+  gap:12px !important;
+
   padding:10px 0 8px !important;
+
+  overflow:hidden !important;
 }
 
 /* =========================
@@ -22,14 +30,18 @@
 
 .auctionTopBar{
   width:100%;
+
   display:grid !important;
   grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr) !important;
   gap:16px !important;
   align-items:center !important;
+
   padding:6px 4px 2px !important;
+
   background:transparent !important;
   border:0 !important;
   box-shadow:none !important;
+
   overflow:visible !important;
   isolation:isolate;
 }
@@ -37,10 +49,12 @@
 .auctionTeamCard,
 .auctionMiddleCard{
   position:relative !important;
+
   min-width:0;
   max-width:100%;
   min-height:76px !important;
   height:76px !important;
+
   box-sizing:border-box;
   overflow:hidden !important;
 
@@ -67,16 +81,21 @@
 
 .auctionTeamCard{
   padding:10px 12px !important;
+
   cursor:pointer;
+
   display:flex !important;
   align-items:center !important;
   gap:12px !important;
 }
 
-#auctionTeamABox{
+#auctionTeamABox,
+.auctionTeamABox{
   flex-direction:row !important;
   justify-self:end !important;
+
   width:min(100%,430px) !important;
+
   border-radius:30px 18px 30px 18px !important;
 
   background:
@@ -84,10 +103,13 @@
     linear-gradient(180deg, rgba(255,255,255,.31) 0%, rgba(255,255,255,.14) 100%) !important;
 }
 
-#auctionTeamBBox{
+#auctionTeamBBox,
+.auctionTeamBBox{
   flex-direction:row-reverse !important;
   justify-self:start !important;
+
   width:min(100%,430px) !important;
+
   border-radius:18px 30px 18px 30px !important;
 
   background:
@@ -98,6 +120,7 @@
 .auctionTeamCard:hover{
   transform:translateY(-3px);
   filter:brightness(1.03);
+
   box-shadow:
     0 20px 40px rgba(30,27,75,.14),
     inset 0 1px 0 rgba(255,255,255,.72),
@@ -107,20 +130,27 @@
 .auctionTeamCard::before,
 .auctionMiddleCard::before{
   content:"";
+
   position:absolute;
+
   width:108px;
   height:108px;
   top:-54px;
+
   border-radius:50%;
+
   background:rgba(255,255,255,.14);
+
   pointer-events:none;
 }
 
-#auctionTeamABox::before{
+#auctionTeamABox::before,
+.auctionTeamABox::before{
   right:-24px;
 }
 
-#auctionTeamBBox::before{
+#auctionTeamBBox::before,
+.auctionTeamBBox::before{
   left:-24px;
   right:auto;
 }
@@ -134,21 +164,28 @@
 .auctionTeamCard::after,
 .auctionMiddleCard::after{
   content:"";
+
   position:absolute;
+
   width:58px;
   height:58px;
   bottom:-24px;
+
   border-radius:18px;
   transform:rotate(24deg);
+
   background:rgba(255,255,255,.08);
+
   pointer-events:none;
 }
 
-#auctionTeamABox::after{
+#auctionTeamABox::after,
+.auctionTeamABox::after{
   left:-12px;
 }
 
-#auctionTeamBBox::after{
+#auctionTeamBBox::after,
+.auctionTeamBBox::after{
   right:-12px;
   left:auto;
 }
@@ -159,7 +196,9 @@
   bottom:10px;
   left:50%;
   right:auto;
+
   transform:translateX(-50%);
+
   border-radius:999px;
   background:rgba(255,255,255,.22);
 }
@@ -170,21 +209,25 @@
 
 .auctionTeamCard.activeTeam{
   border-color:rgba(255,255,255,.68) !important;
+
   box-shadow:
     0 0 0 5px rgba(255,255,255,.12),
     0 18px 38px rgba(30,27,75,.16),
     inset 0 1px 0 rgba(255,255,255,.76),
     inset 0 -1px 0 rgba(255,255,255,.12) !important;
+
   transform:translateY(-2px) scale(1.01);
 }
 
-#auctionTeamABox.activeTeam{
+#auctionTeamABox.activeTeam,
+.auctionTeamABox.activeTeam{
   background:
     radial-gradient(circle at 12% 0%, rgba(124,58,237,.36), transparent 40%),
     linear-gradient(180deg, rgba(255,255,255,.36) 0%, rgba(255,255,255,.18) 100%) !important;
 }
 
-#auctionTeamBBox.activeTeam{
+#auctionTeamBBox.activeTeam,
+.auctionTeamBBox.activeTeam{
   background:
     radial-gradient(circle at 88% 0%, rgba(6,182,212,.34), transparent 40%),
     linear-gradient(180deg, rgba(255,255,255,.36) 0%, rgba(255,255,255,.18) 100%) !important;
@@ -197,17 +240,21 @@
 .auctionTeamName{
   position:relative;
   z-index:3;
+
   flex:1;
   min-width:0;
 
   padding:8px 12px !important;
   border-radius:18px;
+
   background:rgba(255,255,255,.26);
   border:1px solid rgba(255,255,255,.24);
+
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
 
   color:#24185E !important;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif !important;
   font-size:clamp(1.45rem,2.15vw,2.25rem) !important;
   line-height:1.05 !important;
@@ -221,17 +268,20 @@
     0 8px 18px rgba(255,255,255,.18) !important;
 }
 
-#auctionTeamABox .auctionTeamName{
+#auctionTeamABox .auctionTeamName,
+.auctionTeamABox .auctionTeamName{
   text-align:right !important;
 }
 
-#auctionTeamBBox .auctionTeamName{
+#auctionTeamBBox .auctionTeamName,
+.auctionTeamBBox .auctionTeamName{
   text-align:left !important;
 }
 
 .auctionTeamScore{
   position:relative;
   z-index:3;
+
   flex-shrink:0;
 
   width:60px !important;
@@ -255,28 +305,36 @@
   -webkit-backdrop-filter:blur(14px);
 
   color:#1E1B4B !important;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif !important;
   font-size:clamp(1.55rem,2vw,2.1rem) !important;
   line-height:1 !important;
 }
 
 /* =========================
-   MIDDLE CARD
+   MIDDLE CARD / TIMER
 ========================= */
 
-.auctionMiddleCard{
-  width:150px;
+.auctionMiddleCard,
+.auctionTimerBox,
+.auctionTimer,
+.auctionTimerBoxDisplay{
+  width:150px !important;
   min-height:88px !important;
   height:88px !important;
+
   justify-self:center;
+
   border-radius:32px !important;
 
   padding:8px 10px;
+
   display:flex !important;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   gap:3px;
+
   text-align:center;
 
   background:
@@ -290,23 +348,32 @@
 .auctionTurnLabel{
   position:relative;
   z-index:2;
+
+  max-width:100%;
+
   color:#0F4C5C !important;
+
   font-family:"HanakaText",sans-serif;
   font-size:.78rem !important;
   line-height:1.1;
-  max-width:100%;
+
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
 
-.auctionTimerValue{
+.auctionTimerValue,
+.auctionTimerBox span,
+#auctionTimer{
   position:relative;
   z-index:2;
+
   color:#12362D !important;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
   font-size:clamp(2rem,2.9vw,2.7rem) !important;
-  line-height:.92;
+  line-height:.92 !important;
+
   text-shadow:0 2px 10px rgba(255,255,255,.22);
 }
 
@@ -314,8 +381,15 @@
    QUESTION / CONTENT BOX
 ========================= */
 
-.auctionQuestionBox{
+.auctionQuestionBox,
+.auctionQuestionStage,
+.auctionStage{
   position:relative;
+
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+
   border-radius:26px !important;
   border:1px solid rgba(255,255,255,.40) !important;
 
@@ -336,50 +410,60 @@
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:14px;
+  gap:12px;
 
-  overflow:hidden;
-  transition:min-height .25s ease, padding .25s ease;
+  padding:12px !important;
+
+  overflow:hidden !important;
 }
 
 .auctionQuestionBox::before{
   content:"";
+
   position:absolute;
+
   width:160px;
   height:160px;
   top:-64px;
   right:-36px;
+
   border-radius:50%;
+
   background:rgba(255,255,255,.10);
+
   pointer-events:none;
 }
 
 .auctionQuestionBox::after{
   content:"";
+
   position:absolute;
+
   width:78px;
   height:78px;
   bottom:-28px;
   left:-10px;
+
   border-radius:18px;
   transform:rotate(24deg);
+
   background:rgba(255,255,255,.08);
+
   pointer-events:none;
 }
 
 .auctionQuestionBox.auctionQuestionBoxEmpty{
-  min-height:88px !important;
-  padding:12px 20px !important;
+  min-height:100% !important;
 }
 
 .auctionQuestionBox.auctionQuestionBoxFilled{
-  min-height:300px !important;
-  padding:14px !important;
+  min-height:100% !important;
 }
 
 .auctionPlaceholder{
   position:relative;
   z-index:2;
+
   min-height:34px !important;
 
   display:flex;
@@ -387,152 +471,34 @@
   justify-content:center;
 
   text-align:center;
+
   color:#24185E !important;
+
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.35rem,2vw,2rem) !important;
   line-height:1.4 !important;
 }
 
 /* =========================
-   IMAGE / VIDEO PREVIEW
-   مهم: يمنع تمدد الفيديو
-========================= */
-
-.auctionImageFrame{
-  position:relative !important;
-  z-index:2 !important;
-
-  width:min(100%,760px) !important;
-  min-height:270px !important;
-  max-height:360px !important;
-
-  border-radius:28px !important;
-  padding:14px !important;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.46), rgba(255,255,255,.20)) !important;
-
-  border:1px solid rgba(255,255,255,.38) !important;
-
-  box-shadow:
-    0 14px 30px rgba(30,27,75,.08),
-    inset 0 1px 0 rgba(255,255,255,.76) !important;
-
-  backdrop-filter:blur(18px) !important;
-  -webkit-backdrop-filter:blur(18px) !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  overflow:hidden !important;
-  cursor:zoom-in !important;
-}
-
-.auctionBigImage{
-  max-width:100% !important;
-  max-height:270px !important;
-  width:auto !important;
-  height:auto !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  display:block !important;
-  border-radius:22px !important;
-  background:transparent !important;
-}
-
-/* إطار الفيديو قبل التشغيل */
-.auctionVideoFrame,
-.auctionVideoSmallFrame{
-  width:min(100%,620px) !important;
-  height:auto !important;
-  min-height:0 !important;
-  aspect-ratio:16 / 9 !important;
-
-  padding:0 !important;
-  margin:0 auto !important;
-
-  border-radius:24px !important;
-  background:#000 !important;
-  overflow:hidden !important;
-  cursor:pointer !important;
-
-  box-shadow:
-    0 18px 36px rgba(30,27,75,.16),
-    0 0 0 1px rgba(255,255,255,.18) !important;
-}
-
-/* الفيديو نفسه بدون تمدد */
-.auctionBigVideo,
-.auctionVideoSmall{
-  width:100% !important;
-  height:100% !important;
-  max-width:100% !important;
-  max-height:100% !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  display:block !important;
-  background:#000 !important;
-  border-radius:24px !important;
-  pointer-events:auto !important;
-}
-
-/* زر تشغيل الفيديو */
-.auctionVideoPlayOverlay{
-  position:absolute !important;
-  left:50% !important;
-  top:50% !important;
-  transform:translate(-50%,-50%) !important;
-
-  width:78px !important;
-  height:78px !important;
-
-  border:1px solid rgba(255,255,255,.28) !important;
-  border-radius:50% !important;
-
-  background:
-    radial-gradient(circle at 28% 18%, rgba(255,255,255,.30), transparent 42%),
-    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
-
-  color:#12362D !important;
-  font-size:2rem !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  cursor:pointer !important;
-  box-shadow:
-    0 18px 40px rgba(6,182,212,.28),
-    0 0 0 8px rgba(103,232,249,.08),
-    inset 0 1px 0 rgba(255,255,255,.34) !important;
-  z-index:5 !important;
-  transition:transform .18s ease, filter .18s ease !important;
-}
-
-.auctionVideoPlayOverlay:hover{
-  transform:translate(-50%,-50%) scale(1.06) !important;
-  filter:brightness(1.08) !important;
-}
-
-/* =========================
-   NOTE
+   TOP NOTE
 ========================= */
 
 .auctionTopNote{
   position:relative;
   z-index:2;
+
   order:-1 !important;
 
-  width:min(100%,520px) !important;
-  min-height:58px !important;
-  margin:0 auto 12px !important;
-  padding:12px 30px !important;
-  border-radius:22px !important;
+  width:fit-content !important;
+  min-width:260px !important;
+  max-width:520px !important;
+
+  min-height:48px !important;
+
+  margin:0 auto 8px !important;
+  padding:9px 22px !important;
+
+  border-radius:20px !important;
 
   background:
     radial-gradient(circle at top right, rgba(251,113,133,.22), transparent 45%),
@@ -546,9 +512,10 @@
     inset 0 1px 0 rgba(255,255,255,.82) !important;
 
   color:#24185E !important;
+
   font-family:"HanakaText",sans-serif !important;
-  font-size:clamp(1.45rem,2.5vw,1.95rem) !important;
-  line-height:1.45 !important;
+  font-size:clamp(1.15rem,1.9vw,1.55rem) !important;
+  line-height:1.35 !important;
   text-align:center !important;
 
   display:flex !important;
@@ -568,6 +535,7 @@
       0 12px 24px rgba(249,115,22,.12),
       inset 0 1px 0 rgba(255,255,255,.82);
   }
+
   to{
     box-shadow:
       0 0 0 6px rgba(249,115,22,.12),
@@ -577,1733 +545,37 @@
 }
 
 /* =========================
-   RESULT VIEW
+   IMAGE PREVIEW
 ========================= */
 
-.auctionResultView{
-  width:100% !important;
-  display:grid !important;
-  grid-template-columns:1.15fr .75fr !important;
-  gap:18px !important;
-  align-items:center !important;
-  position:relative !important;
-  z-index:2 !important;
-  animation:auctionResultEnter .48s cubic-bezier(.2,.85,.2,1.05) both !important;
-}
-
-@keyframes auctionResultEnter{
-  from{
-    opacity:0;
-    transform:translateY(16px) scale(.97);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-.auctionResultImageBox,
-.auctionResultAnswerBox{
-  border-radius:28px !important;
-  border:1px solid rgba(255,255,255,.38) !important;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.46), rgba(255,255,255,.20)) !important;
-
-  box-shadow:
-    0 14px 30px rgba(30,27,75,.08),
-    inset 0 1px 0 rgba(255,255,255,.76) !important;
-
-  backdrop-filter:blur(18px) !important;
-  -webkit-backdrop-filter:blur(18px) !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  overflow:hidden !important;
-}
-
-.auctionResultImageBox{
-  min-height:270px !important;
-  padding:14px !important;
-}
-
-.auctionResultImage{
-  max-width:100% !important;
-  max-height:270px !important;
-  width:auto !important;
-  height:auto !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  display:block !important;
-  border-radius:22px !important;
-}
-
-/* فيديو النتيجة بدون تمدد */
-.auctionResultVideoBox{
-  position:relative !important;
-  width:100% !important;
-  height:270px !important;
-  border-radius:22px !important;
-  background:#000 !important;
-  overflow:hidden !important;
-  cursor:pointer !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-}
-
-.auctionResultVideo{
-  width:100% !important;
-  height:100% !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  display:block !important;
-  background:#000 !important;
-}
-
-.auctionResultVideoPlay{
-  position:absolute !important;
-  left:50% !important;
-  top:50% !important;
-  transform:translate(-50%,-50%) !important;
-
-  width:72px !important;
-  height:72px !important;
-  border-radius:50% !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  background:
-    radial-gradient(circle at 28% 18%, rgba(255,255,255,.30), transparent 42%),
-    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
-
-  color:#12362D !important;
-  font-size:1.85rem !important;
-  box-shadow:0 18px 40px rgba(0,0,0,.28) !important;
-}
-
-.auctionResultEmpty{
-  color:#6B7280 !important;
-  font-family:"HanakaText",sans-serif !important;
-  font-size:1.1rem !important;
-}
-
-/* مربع الإجابة */
-.auctionResultAnswerBox{
-  min-height:150px !important;
-  height:auto !important;
-  align-self:center !important;
-  padding:22px 30px !important;
-
-  flex-direction:column !important;
-  gap:12px !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(103,232,249,.24), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.72), rgba(236,254,255,.50)) !important;
-
-  border:1px solid rgba(103,232,249,.38) !important;
-}
-
-.auctionResultAnswerLabel{
-  min-height:30px !important;
-  padding:6px 16px !important;
-  border-radius:999px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  background:rgba(255,255,255,.55) !important;
-  border:1px solid rgba(255,255,255,.62) !important;
-
-  color:#0F4C5C !important;
-  font-family:"HanakaText",sans-serif !important;
-  font-size:1rem !important;
-  line-height:1 !important;
-}
-
-.auctionResultAnswerText{
-  color:#0F4C5C !important;
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:clamp(2.3rem,4.4vw,4.4rem) !important;
-  line-height:1.12 !important;
-  text-align:center !important;
-  padding:0 20px !important;
-}
-
-.auctionResultNote{
-  width:100% !important;
-  min-height:38px !important;
-  border-radius:16px !important;
-  padding:8px 14px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.36), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.52), rgba(255,255,255,.24)) !important;
-
-  border:1px solid rgba(255,255,255,.42) !important;
-
-  color:#24185E !important;
-  font-family:"HanakaText",sans-serif !important;
-  font-size:1.05rem !important;
-  line-height:1.3 !important;
-  text-align:center !important;
-}
-
-/* نتيجة صح */
-.auctionResultView.correctResult .auctionResultAnswerBox{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(134,239,172,.30), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.72), rgba(220,252,231,.50)) !important;
-
-  border-color:rgba(34,197,94,.42) !important;
-}
-
-.auctionResultView.correctResult .auctionResultAnswerLabel{
-  color:#166534 !important;
-}
-
-/* نتيجة خطأ */
-.auctionResultView.wrongResult .auctionResultAnswerBox{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(252,165,165,.30), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.72), rgba(254,226,226,.50)) !important;
-
-  border-color:rgba(239,68,68,.42) !important;
-}
-
-.auctionResultView.wrongResult .auctionResultAnswerLabel{
-  color:#991B1B !important;
-}
-
-/* =========================
-   NUMBER GRID
-   نفس أرقام التسخين
-========================= */
-
-.auctionGrid{
-  display:grid !important;
-  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-  gap:12px !important;
-}
-
-.auctionBtn,
-.auctionGrid button{
-  position:relative !important;
-  width:100% !important;
-  height:56px !important;
-  min-height:56px !important;
-
-  border:0 !important;
-  border-radius:18px !important;
-  overflow:hidden !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-    linear-gradient(180deg, rgba(49,46,129,.78) 0%, rgba(30,27,75,.88) 100%) !important;
-
-  color:#FFFFFF !important;
-  border:1px solid rgba(255,255,255,.22) !important;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:1.75rem !important;
-  line-height:1 !important;
-
-  cursor:pointer !important;
-
-  box-shadow:
-    0 12px 24px rgba(30,27,75,.18),
-    inset 0 1px 0 rgba(255,255,255,.24),
-    inset 0 -1px 0 rgba(0,0,0,.18) !important;
-
-  opacity:1 !important;
-  filter:none !important;
-
-  backdrop-filter:blur(18px) !important;
-  -webkit-backdrop-filter:blur(18px) !important;
-
-  transition:
-    transform .18s ease,
-    filter .18s ease,
-    box-shadow .18s ease !important;
-}
-
-.auctionBtn:hover:not(:disabled):not(.used),
-.auctionGrid button:hover:not(:disabled):not(.used){
-  transform:translateY(-3px) scale(1.01) !important;
-  filter:brightness(1.08) !important;
-
-  box-shadow:
-    0 18px 34px rgba(30,27,75,.24),
-    0 0 0 4px rgba(255,255,255,.12),
-    inset 0 1px 0 rgba(255,255,255,.30),
-    inset 0 -1px 0 rgba(0,0,0,.18) !important;
-}
-
-.auctionBtn:active,
-.auctionGrid button:active{
-  transform:scale(.96) !important;
-}
-
-.auctionBtn::before,
-.auctionGrid button::before{
-  content:"" !important;
-  position:absolute !important;
-  width:52px !important;
-  height:52px !important;
-  top:-18px !important;
-  right:-10px !important;
-  border-radius:50% !important;
-  background:rgba(255,255,255,.16) !important;
-  pointer-events:none !important;
-}
-
-.auctionBtn::after,
-.auctionGrid button::after{
-  content:"" !important;
-  position:absolute !important;
-  inset:0 !important;
-  border-radius:18px !important;
-  box-shadow:inset 0 -6px 12px rgba(255,255,255,.06) !important;
-  pointer-events:none !important;
-}
-
-.auctionBtn.used,
-.auctionBtn:disabled,
-.auctionGrid button.used,
-.auctionGrid button:disabled{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.46), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.56) 0%, rgba(255,255,255,.30) 100%) !important;
-
-  color:transparent !important;
-
-  border:1px solid rgba(255,255,255,.46) !important;
-
-  box-shadow:
-    0 8px 18px rgba(30,27,75,.06),
-    inset 0 1px 0 rgba(255,255,255,.82),
-    inset 0 -1px 0 rgba(255,255,255,.16) !important;
-
-  opacity:1 !important;
-  filter:saturate(.9) brightness(1.02) !important;
-  cursor:default !important;
-  transform:none !important;
-}
-
-.auctionBtn.used::after,
-.auctionBtn:disabled::after,
-.auctionGrid button.used::after,
-.auctionGrid button:disabled::after{
-  content:"✓" !important;
-  position:absolute !important;
-  inset:0 !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  color:#7C3AED !important;
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:1.7rem !important;
-  line-height:1 !important;
-
-  background:transparent !important;
-  box-shadow:none !important;
-
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.60),
-    0 8px 18px rgba(30,27,75,.10) !important;
-}
-
-.auctionBtn.used::before,
-.auctionBtn:disabled::before,
-.auctionGrid button.used::before,
-.auctionGrid button:disabled::before{
-  background:rgba(255,255,255,.22) !important;
-}
-
-/* =========================
-   CONTROL PANEL
-========================= */
-
-.auctionControlPanel{
-  width:min(100%,760px) !important;
-  margin:0 auto !important;
-
-  display:grid !important;
-  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-  gap:10px !important;
-  align-items:stretch !important;
-
-  padding:0 !important;
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-}
-
-.auctionControlPanel button{
-  position:relative !important;
-  width:100% !important;
-  min-width:0 !important;
-
-  height:52px !important;
-  min-height:52px !important;
-
-  padding:0 10px !important;
-  border:0 !important;
-  border-radius:16px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  font-family:"HanakaText",sans-serif !important;
-  font-size:.92rem !important;
-  font-weight:400 !important;
-  line-height:1.1 !important;
-
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-
-  cursor:pointer !important;
-  color:#FFFFFF !important;
-
-  box-shadow:
-    0 12px 24px rgba(30,27,75,.14),
-    inset 0 1px 0 rgba(255,255,255,.18) !important;
-
-  transition:
-    transform .18s ease,
-    filter .18s ease,
-    box-shadow .18s ease !important;
-}
-
-.auctionControlPanel button::before,
-.auctionControlPanel button::after{
-  content:none !important;
-  display:none !important;
-  box-shadow:none !important;
-}
-
-.auctionControlPanel button:hover:not(:disabled){
-  transform:translateY(-2px) !important;
-  filter:brightness(1.06) !important;
-}
-
-.auctionControlPanel button:active:not(:disabled){
-  transform:scale(.96) !important;
-}
-
-/* دوبيلا */
-.auctionDoubleBtn,
-#auctionDoubleBtn{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
-    linear-gradient(180deg,#FB7185 0%,#F97316 100%) !important;
-  color:#FFFFFF !important;
-}
-
-.auctionDoubleBtn.activeDouble,
-#auctionDoubleBtn.activeDouble{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.30), transparent 42%),
-    linear-gradient(180deg,#FDBA74 0%,#F97316 100%) !important;
-  color:#431407 !important;
-
-  box-shadow:
-    0 0 0 5px rgba(249,115,22,.16),
-    0 14px 28px rgba(249,115,22,.24),
-    inset 0 1px 0 rgba(255,255,255,.38) !important;
-
-  animation:auctionDoublePulse .75s ease-in-out infinite alternate;
-}
-
-@keyframes auctionDoublePulse{
-  from{
-    box-shadow:
-      0 0 0 rgba(249,115,22,0),
-      0 12px 24px rgba(249,115,22,.20);
-  }
-  to{
-    box-shadow:
-      0 0 18px rgba(249,115,22,.42),
-      0 14px 28px rgba(249,115,22,.28);
-  }
-}
-
-/* صح */
-.auctionControlPanel .btnCorrect,
-.auctionControlPanel button[onclick*="auctionCorrect"]{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
-    linear-gradient(180deg,#22C55E 0%,#15803D 100%) !important;
-  color:#FFFFFF !important;
-}
-
-/* خطأ */
-.auctionControlPanel .btnWrong,
-.auctionControlPanel button[onclick*="auctionWrong"]{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
-    linear-gradient(180deg,#EF4444 0%,#DC2626 100%) !important;
-  color:#FFFFFF !important;
-}
-
-/* تراجع */
-.auctionControlPanel .undoBtn,
-#auctionUndoBtn{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-    linear-gradient(180deg,#991B1B 0%,#7F1D1D 100%) !important;
-
-  color:#FFFFFF !important;
-
-  box-shadow:
-    0 12px 24px rgba(127,29,29,.22),
-    inset 0 1px 0 rgba(255,255,255,.16) !important;
-}
-
-.auctionControlPanel button:disabled{
-  background:#DDD6FE !important;
-  color:#7C7896 !important;
-  opacity:.82 !important;
-  box-shadow:none !important;
-  cursor:not-allowed !important;
-  transform:none !important;
-  filter:none !important;
-}
-
-/* =========================
-   IMAGE OVERLAY
-========================= */
-
-.auctionImageOverlay{
-  position:fixed;
-  inset:0;
-  z-index:5000;
-
-  background:rgba(20,28,38,.72);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  padding:24px;
-  cursor:zoom-out;
-}
-
-.auctionImageOverlayInner{
-  width:min(1100px,100%);
-  max-height:90vh;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.auctionImageOverlayImg{
-  max-width:100%;
-  max-height:90vh;
-
-  object-fit:contain;
-  object-position:center;
-
-  border-radius:24px;
-  background:#fff;
-  box-shadow:0 24px 60px rgba(0,0,0,.28);
-  display:block;
-}
-
-.auctionImageOverlay.auctionWrongFlash::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(255,0,0,.35);
-  pointer-events:none;
-  animation:auctionWrongFlash .65s ease;
-  z-index:50;
-}
-
-@keyframes auctionWrongFlash{
-  0%{opacity:0}
-  18%{opacity:1}
-  38%{opacity:.15}
-  58%{opacity:1}
-  100%{opacity:0}
-}
-
-/* =========================
-   VIDEO FULLSCREEN
-   مهم: جودة بدون تمدد
-========================= */
-
-.auctionVideoFullscreenOverlay{
-  position:fixed !important;
-  inset:0 !important;
-  z-index:999999 !important;
-
-  background:
-    radial-gradient(circle at 50% 18%, rgba(103,232,249,.12), transparent 34%),
-    rgba(0,0,0,.88) !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  padding:24px !important;
-}
-
-.auctionVideoFullscreenInner{
-  position:relative !important;
-
-  width:min(1280px,96vw) !important;
-  height:auto !important;
-  max-height:88vh !important;
-
-  aspect-ratio:16 / 9 !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-}
-
-.auctionFullscreenVideo{
-  width:100% !important;
-  height:100% !important;
-  max-width:96vw !important;
-  max-height:88vh !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  background:#000 !important;
-  border-radius:24px !important;
-
-  display:block !important;
-
-  box-shadow:
-    0 28px 70px rgba(0,0,0,.45),
-    0 0 0 1px rgba(255,255,255,.12) !important;
-}
-
-.auctionVideoFullscreenClose{
-  position:absolute !important;
-  top:-18px !important;
-  left:-18px !important;
-  z-index:10 !important;
-
-  width:54px !important;
-  height:54px !important;
-
-  border:0 !important;
-  border-radius:50% !important;
-
-  background:#DC2626 !important;
-  color:#fff !important;
-
-  font-size:2rem !important;
-  line-height:1 !important;
-
-  cursor:pointer !important;
-  box-shadow:0 12px 26px rgba(220,38,38,.35) !important;
-}
-
-/* =========================
-   RESPONSIVE - IPAD
-========================= */
-
-@media (min-width:768px) and (max-width:1180px){
-  .auctionWrap{
-    gap:10px !important;
-    padding:34px 0 4px !important;
-  }
-
-  .auctionTopBar{
-    grid-template-columns:1fr 118px 1fr !important;
-    gap:10px !important;
-    padding:4px 2px !important;
-  }
-
-  .auctionTeamCard{
-    min-height:62px !important;
-    height:62px !important;
-    padding:7px 8px !important;
-  }
-
-  #auctionTeamABox{
-    border-radius:24px 15px 24px 15px !important;
-  }
-
-  #auctionTeamBBox{
-    border-radius:15px 24px 15px 24px !important;
-  }
-
-  .auctionTeamName{
-    font-size:1.35rem !important;
-    padding:6px 10px !important;
-    border-radius:15px;
-  }
-
-  .auctionTeamScore{
-    width:48px !important;
-    height:38px !important;
-    border-radius:14px !important;
-    font-size:1.35rem !important;
-  }
-
-  .auctionMiddleCard{
-    width:118px;
-    min-height:72px !important;
-    height:72px !important;
-    border-radius:26px !important;
-  }
-
-  .auctionTimerLabel,
-  .auctionTurnLabel{
-    font-size:.66rem !important;
-  }
-
-  .auctionTimerValue{
-    font-size:1.85rem !important;
-  }
-
-  .auctionQuestionBox.auctionQuestionBoxEmpty{
-    min-height:58px !important;
-    padding:8px 16px !important;
-  }
-
-  .auctionQuestionBox.auctionQuestionBoxFilled{
-    min-height:250px !important;
-    padding:10px !important;
-  }
-
-  .auctionImageFrame{
-    min-height:210px !important;
-    max-height:300px !important;
-    border-radius:22px !important;
-  }
-
-  .auctionBigImage{
-    max-height:210px !important;
-    border-radius:18px !important;
-  }
-
-  .auctionVideoFrame,
-  .auctionVideoSmallFrame{
-    width:min(100%,560px) !important;
-  }
-
-  .auctionTopNote{
-    width:min(100%,460px) !important;
-    min-height:50px !important;
-    padding:10px 22px !important;
-    border-radius:18px !important;
-    font-size:1.35rem !important;
-  }
-
-  .auctionResultView{
-    gap:12px !important;
-  }
-
-  .auctionResultImageBox,
-  .auctionResultAnswerBox{
-    min-height:210px !important;
-  }
-
-  .auctionResultImage,
-  .auctionResultVideoBox{
-    max-height:200px !important;
-    height:200px !important;
-  }
-
-  .auctionResultAnswerText{
-    font-size:clamp(1.8rem,3.5vw,3rem) !important;
-  }
-
-  .auctionGrid{
-    gap:10px !important;
-  }
-
-  .auctionBtn,
-  .auctionGrid button{
-    height:42px !important;
-    min-height:42px !important;
-    border-radius:14px !important;
-    font-size:1.35rem !important;
-  }
-
-  .auctionBtn::after,
-  .auctionGrid button::after{
-    border-radius:14px !important;
-  }
-
-  .auctionBtn.used::after,
-  .auctionBtn:disabled::after,
-  .auctionGrid button.used::after,
-  .auctionGrid button:disabled::after{
-    font-size:1.35rem !important;
-  }
-
-  .auctionControlPanel{
-    width:min(100%,620px) !important;
-    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-    gap:7px !important;
-  }
-
-  .auctionControlPanel button{
-    height:42px !important;
-    min-height:42px !important;
-    border-radius:12px !important;
-    font-size:.72rem !important;
-    padding:0 5px !important;
-  }
-}
-
-/* =========================
-   RESPONSIVE - IPHONE
-========================= */
-
-@media (max-width:767px){
-  .auctionWrap{
-    gap:10px !important;
-    padding:10px 0 8px !important;
-  }
-
-  .auctionTopBar{
-    grid-template-columns:1fr !important;
-    gap:8px !important;
-    padding:8px 0 !important;
-  }
-
-  .auctionTeamCard,
-  .auctionMiddleCard{
-    width:100% !important;
-    justify-self:stretch !important;
-    min-height:62px !important;
-    height:62px !important;
-    border-radius:18px !important;
-  }
-
-  #auctionTeamABox,
-  #auctionTeamBBox{
-    width:100% !important;
-    border-radius:18px !important;
-  }
-
-  .auctionTeamName{
-    font-size:1.25rem !important;
-  }
-
-  .auctionTeamScore{
-    width:50px !important;
-    height:38px !important;
-    font-size:1.4rem !important;
-  }
-
-  .auctionTimerValue{
-    font-size:1.8rem !important;
-  }
-
-  .auctionTimerLabel,
-  .auctionTurnLabel{
-    font-size:.78rem !important;
-  }
-
-  .auctionQuestionBox.auctionQuestionBoxEmpty{
-    min-height:74px !important;
-    border-radius:20px !important;
-    padding:10px 14px !important;
-  }
-
-  .auctionQuestionBox.auctionQuestionBoxEmpty .auctionPlaceholder{
-    font-size:1.05rem !important;
-  }
-
-  .auctionQuestionBox.auctionQuestionBoxFilled{
-    min-height:260px !important;
-    padding:10px !important;
-    border-radius:20px !important;
-  }
-
-  .auctionImageFrame{
-    width:100% !important;
-    min-height:220px !important;
-    max-height:260px !important;
-    border-radius:20px !important;
-    padding:10px !important;
-  }
-
-  .auctionBigImage{
-    max-height:220px !important;
-    border-radius:14px !important;
-  }
-
-  .auctionVideoFrame,
-  .auctionVideoSmallFrame{
-    width:100% !important;
-    border-radius:18px !important;
-  }
-
-  .auctionBigVideo,
-  .auctionVideoSmall{
-    border-radius:18px !important;
-  }
-
-  .auctionVideoPlayOverlay{
-    width:64px !important;
-    height:64px !important;
-    font-size:1.65rem !important;
-  }
-
-  .auctionTopNote{
-    width:100% !important;
-    min-height:52px !important;
-    padding:10px 16px !important;
-    border-radius:18px !important;
-    font-size:1.15rem !important;
-  }
-
-  .auctionResultView{
-    grid-template-columns:1fr !important;
-    gap:10px !important;
-  }
-
-  .auctionResultImageBox,
-  .auctionResultAnswerBox{
-    min-height:190px !important;
-    border-radius:20px !important;
-  }
-
-  .auctionResultAnswerBox{
-    min-height:76px !important;
-    padding:14px 18px !important;
-  }
-
-  .auctionResultAnswerText{
-    font-size:1.6rem !important;
-  }
-
-  .auctionResultNote{
-    font-size:.9rem !important;
-    border-radius:14px !important;
-  }
-
-  .auctionResultVideoBox{
-    height:220px !important;
-    border-radius:18px !important;
-  }
-
-  .auctionResultVideoPlay{
-    width:64px !important;
-    height:64px !important;
-    font-size:1.6rem !important;
-  }
-
-  .auctionGrid{
-    grid-template-columns:1fr !important;
-    gap:10px !important;
-  }
-
-  .auctionBtn,
-  .auctionGrid button{
-    height:44px !important;
-    min-height:44px !important;
-    border-radius:14px !important;
-    font-size:1.35rem !important;
-  }
-
-  .auctionBtn::after,
-  .auctionGrid button::after{
-    border-radius:14px !important;
-  }
-
-  .auctionBtn.used::after,
-  .auctionBtn:disabled::after,
-  .auctionGrid button.used::after,
-  .auctionGrid button:disabled::after{
-    font-size:1.35rem !important;
-  }
-
-  .auctionControlPanel{
-    width:100% !important;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    gap:8px !important;
-  }
-
-  .auctionControlPanel button{
-    height:46px !important;
-    min-height:46px !important;
-    border-radius:13px !important;
-    font-size:.78rem !important;
-    padding:0 6px !important;
-  }
-
-  .auctionImageOverlay{
-    padding:14px;
-  }
-
-  .auctionImageOverlayImg{
-    border-radius:16px;
-  }
-
-  .auctionVideoFullscreenOverlay{
-    padding:12px !important;
-  }
-
-  .auctionVideoFullscreenInner{
-    width:96vw !important;
-    max-height:78vh !important;
-  }
-
-  .auctionFullscreenVideo{
-    max-width:96vw !important;
-    max-height:78vh !important;
-    border-radius:18px !important;
-  }
-
-  .auctionVideoFullscreenClose{
-    top:-12px !important;
-    left:-8px !important;
-    width:46px !important;
-    height:46px !important;
-    font-size:1.7rem !important;
-  }
-}
-/* =========================================================
-   AUCTION - SMALLER PREVIEW + QUESTION BOX
-   تصغير مربع المعاينة ومربع السؤال
-========================================================= */
-
-/* مربع السؤال / المحتوى كامل */
-.auctionQuestionBox.auctionQuestionBoxFilled{
-  min-height:230px !important;
-  padding:10px !important;
-  border-radius:22px !important;
-}
-
-/* مربع المعاينة للصورة والفيديو */
-.auctionImageFrame{
-  width:min(100%,560px) !important;
-  min-height:190px !important;
-  max-height:230px !important;
-
-  padding:10px !important;
-  border-radius:22px !important;
-}
-
-/* الصورة داخل المعاينة */
-.auctionBigImage{
-  max-height:210px !important;
-  border-radius:18px !important;
-}
-
-/* الفيديو قبل التشغيل */
-.auctionVideoFrame,
-.auctionVideoSmallFrame{
-  width:min(100%,460px) !important;
-  aspect-ratio:16 / 9 !important;
-
-  min-height:0 !important;
-  max-height:none !important;
-
-  border-radius:20px !important;
-}
-
-/* الفيديو نفسه بدون تمدد */
-.auctionBigVideo,
-.auctionVideoSmall{
-  width:100% !important;
-  height:100% !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  border-radius:20px !important;
-  background:#000 !important;
-}
-
-/* زر تشغيل أصغر */
-.auctionVideoPlayOverlay{
-  width:62px !important;
-  height:62px !important;
-  font-size:1.55rem !important;
-}
-
-/* الملاحظة / السؤال فوق الصورة */
-.auctionTopNote{
-  width:fit-content !important;
-  min-width:260px !important;
-  max-width:480px !important;
-
-  min-height:44px !important;
-  margin:0 auto 8px !important;
-  padding:9px 22px !important;
-
-  border-radius:18px !important;
-
-  font-size:clamp(1.15rem,1.9vw,1.55rem) !important;
-  line-height:1.35 !important;
-}
-
-/* مربع النتيجة بعد الإجابة */
-.auctionResultImageBox{
-  min-height:220px !important;
-  padding:10px !important;
-  border-radius:22px !important;
-}
-
-.auctionResultImage,
-.auctionResultVideoBox{
-  max-height:220px !important;
-  height:220px !important;
-  border-radius:18px !important;
-}
-
-/* مربع الإجابة يصغر شوي */
-.auctionResultAnswerBox{
-  min-height:120px !important;
-  padding:18px 24px !important;
-  border-radius:22px !important;
-}
-
-.auctionResultAnswerText{
-  font-size:clamp(1.9rem,3.5vw,3.5rem) !important;
-}
-
-/* iPad */
-@media (min-width:768px) and (max-width:1180px){
-  .auctionQuestionBox.auctionQuestionBoxFilled{
-    min-height:205px !important;
-    padding:8px !important;
-  }
-
-  .auctionImageFrame{
-    width:min(100%,500px) !important;
-    min-height:170px !important;
-    max-height:210px !important;
-  }
-
-  .auctionBigImage{
-    max-height:190px !important;
-  }
-
-  .auctionVideoFrame,
-  .auctionVideoSmallFrame{
-    width:min(100%,470px) !important;
-  }
-
-  .auctionTopNote{
-    max-width:420px !important;
-    min-height:40px !important;
-    padding:8px 18px !important;
-    font-size:1.15rem !important;
-  }
-
-  .auctionVideoPlayOverlay{
-    width:56px !important;
-    height:56px !important;
-    font-size:1.4rem !important;
-  }
-
-  .auctionResultImageBox{
-    min-height:190px !important;
-  }
-
-  .auctionResultImage,
-  .auctionResultVideoBox{
-    max-height:185px !important;
-    height:185px !important;
-  }
-}
-
-/* iPhone */
-@media (max-width:767px){
-  .auctionQuestionBox.auctionQuestionBoxFilled{
-    min-height:220px !important;
-    padding:8px !important;
-    border-radius:18px !important;
-  }
-
-  .auctionImageFrame{
-    width:100% !important;
-    min-height:170px !important;
-    max-height:210px !important;
-    padding:8px !important;
-    border-radius:18px !important;
-  }
-
-  .auctionBigImage{
-    max-height:190px !important;
-    border-radius:14px !important;
-  }
-
-  .auctionVideoFrame,
-  .auctionVideoSmallFrame{
-    width:100% !important;
-    border-radius:16px !important;
-  }
-
-  .auctionBigVideo,
-  .auctionVideoSmall{
-    border-radius:16px !important;
-  }
-
-  .auctionVideoPlayOverlay{
-    width:54px !important;
-    height:54px !important;
-    font-size:1.3rem !important;
-  }
-
-  .auctionTopNote{
-    width:fit-content !important;
-    min-width:0 !important;
-    max-width:92% !important;
-
-    min-height:38px !important;
-    padding:8px 16px !important;
-
-    border-radius:16px !important;
-    font-size:1.05rem !important;
-  }
-
-  .auctionResultImageBox{
-    min-height:170px !important;
-  }
-
-  .auctionResultImage,
-  .auctionResultVideoBox{
-    max-height:170px !important;
-    height:170px !important;
-  }
-
-  .auctionResultAnswerBox{
-    min-height:76px !important;
-    padding:12px 16px !important;
-  }
-
-  .auctionResultAnswerText{
-    font-size:1.45rem !important;
-  }
-}
-/* =========================================================
-   AUCTION IMAGE SMALL PREVIEW + CLICK TO ZOOM
-   الصورة صغيرة وتكبر بالضغط وتصغر بالضغط
-========================================================= */
-
-/* مربع المعاينة صغير */
-.auctionImageFrame{
-  width:min(100%,420px) !important;
-  min-height:0 !important;
-  height:auto !important;
-  max-height:none !important;
-
-  aspect-ratio:16 / 9 !important;
-
-  padding:8px !important;
-  border-radius:20px !important;
-
-  cursor:zoom-in !important;
-}
-
-/* الصورة داخل المعاينة صغيرة وواضحة */
-.auctionBigImage,
-.auctionMediaImage{
-  width:100% !important;
-  height:100% !important;
-
-  max-width:100% !important;
-  max-height:100% !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  border-radius:16px !important;
-  background:transparent !important;
-}
-
-/* خلفية التكبير */
-.auctionImageOverlay{
-  position:fixed !important;
-  inset:0 !important;
-  z-index:999998 !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  padding:26px !important;
-
-  background:
-    radial-gradient(circle at 50% 18%, rgba(103,232,249,.12), transparent 34%),
-    rgba(0,0,0,.82) !important;
-
-  backdrop-filter:blur(10px) !important;
-  -webkit-backdrop-filter:blur(10px) !important;
-
-  cursor:zoom-out !important;
-
-  animation:auctionImageOverlayFade .18s ease both !important;
-}
-
-.auctionImageOverlay.closing{
-  animation:auctionImageOverlayOut .18s ease both !important;
-}
-
-/* الصورة المكبرة */
-.auctionImageOverlayInner{
-  width:min(96vw,1100px) !important;
-  max-height:90vh !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  cursor:default !important;
-}
-
-.auctionImageOverlayImg{
-  max-width:100% !important;
-  max-height:90vh !important;
-
-  width:auto !important;
-  height:auto !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  display:block !important;
-
-  border-radius:24px !important;
-  background:#fff !important;
-
-  box-shadow:
-    0 28px 80px rgba(0,0,0,.44),
-    0 0 0 1px rgba(255,255,255,.18) !important;
-
-  cursor:zoom-out !important;
-
-  animation:auctionImageZoomIn .22s cubic-bezier(.2,.85,.2,1.05) both !important;
-}
-
-.auctionImageOverlay.closing .auctionImageOverlayImg{
-  animation:auctionImageZoomOut .16s ease both !important;
-}
-
-@keyframes auctionImageOverlayFade{
-  from{ opacity:0; }
-  to{ opacity:1; }
-}
-
-@keyframes auctionImageOverlayOut{
-  from{ opacity:1; }
-  to{ opacity:0; }
-}
-
-@keyframes auctionImageZoomIn{
-  from{
-    opacity:0;
-    transform:scale(.72);
-  }
-  to{
-    opacity:1;
-    transform:scale(1);
-  }
-}
-
-@keyframes auctionImageZoomOut{
-  from{
-    opacity:1;
-    transform:scale(1);
-  }
-  to{
-    opacity:0;
-    transform:scale(.72);
-  }
-}
-
-/* iPad */
-@media (min-width:768px) and (max-width:1180px){
-  .auctionImageFrame{
-    width:min(100%,360px) !important;
-    border-radius:18px !important;
-  }
-
-  .auctionBigImage,
-  .auctionMediaImage{
-    border-radius:14px !important;
-  }
-}
-
-/* iPhone */
-@media (max-width:767px){
-  .auctionImageFrame{
-    width:min(100%,320px) !important;
-    border-radius:16px !important;
-    padding:7px !important;
-  }
-
-  .auctionBigImage,
-  .auctionMediaImage{
-    border-radius:12px !important;
-  }
-
-  .auctionImageOverlay{
-    padding:14px !important;
-  }
-
-  .auctionImageOverlayImg{
-    max-height:84vh !important;
-    border-radius:18px !important;
-  }
-}
-/* =========================================================
-   AUCTION IMAGE - REMOVE BLACK BACKGROUND
-   الصورة بدون سواد في الخلفية
-========================================================= */
-
-/* فريم الصورة في المعاينة */
-.auctionImageFrame{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.48), rgba(255,255,255,.22)) !important;
-
-  border:1px solid rgba(255,255,255,.40) !important;
-  box-shadow:
-    0 14px 30px rgba(30,27,75,.08),
-    inset 0 1px 0 rgba(255,255,255,.76) !important;
-
-  overflow:hidden !important;
-}
-
-/* الصورة نفسها بدون خلفية */
-.auctionBigImage,
-.auctionMediaImage{
-  background:transparent !important;
-  object-fit:contain !important;
-}
-
-/* خلفية التكبير بدل الأسود */
-.auctionImageOverlay{
-  background:
-    radial-gradient(circle at 50% 18%, rgba(103,232,249,.16), transparent 34%),
-    radial-gradient(circle at 18% 82%, rgba(124,58,237,.14), transparent 36%),
-    rgba(241,245,249,.72) !important;
-
-  backdrop-filter:blur(14px) !important;
-  -webkit-backdrop-filter:blur(14px) !important;
-}
-
-/* الصورة المكبرة بدون خلفية سوداء */
-.auctionImageOverlayImg{
-  background:transparent !important;
-  box-shadow:
-    0 28px 80px rgba(30,27,75,.24),
-    0 0 0 1px rgba(255,255,255,.28) !important;
-}
-
-/* إذا الصورة شفافة، خلي خلفيتها زجاجية فاتحة بدل الأسود */
-.auctionImageOverlayInner{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.32), rgba(255,255,255,.14)) !important;
-
-  border:1px solid rgba(255,255,255,.26) !important;
-  border-radius:28px !important;
-
-  padding:12px !important;
-
-  box-shadow:
-    0 24px 70px rgba(30,27,75,.16),
-    inset 0 1px 0 rgba(255,255,255,.40) !important;
-}
-
-/* لا تطبق هذا على الفيديو */
-.auctionVideoFrame,
-.auctionVideoSmallFrame,
-.auctionResultVideoBox,
-.auctionFullscreenVideo,
-.auctionBigVideo,
-.auctionVideoSmall,
-.auctionResultVideo{
-  background:#000 !important;
-}
-/* =========================================================
-   AUCTION RESULT IMAGE - REMOVE BLACK BACKGROUND
-   إلغاء السواد عند الإجابة للصورة
-========================================================= */
-
-/* صندوق الصورة عند الإجابة */
-.auctionResultImageBox{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.48), rgba(255,255,255,.22)) !important;
-
-  border:1px solid rgba(255,255,255,.40) !important;
-
-  box-shadow:
-    0 14px 30px rgba(30,27,75,.08),
-    inset 0 1px 0 rgba(255,255,255,.76) !important;
-
-  overflow:hidden !important;
-}
-
-/* الصورة عند الإجابة بدون خلفية سوداء */
-.auctionResultImage{
-  background:transparent !important;
-
-  width:auto !important;
-  height:auto !important;
-
-  max-width:100% !important;
-  max-height:220px !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  display:block !important;
-}
-
-/* لو الصورة داخل auctionResultVideoBox بسبب JS الجديد */
-.auctionResultVideoBox:has(.auctionResultImage){
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.14)) !important;
-
-  border:1px solid rgba(255,255,255,.28) !important;
-
-  box-shadow:
-    0 14px 30px rgba(30,27,75,.08),
-    inset 0 1px 0 rgba(255,255,255,.54) !important;
-}
-
-/* تأكيد أن الصورة داخل هذا الصندوق بدون سواد */
-.auctionResultVideoBox:has(.auctionResultImage) .auctionResultImage{
-  background:transparent !important;
-}
-
-/* السواد يبقى للفيديو فقط */
-.auctionResultVideoBox:has(.auctionResultVideo),
-.auctionResultVideo,
-.auctionFullscreenVideo,
-.auctionVideoFrame,
-.auctionVideoSmallFrame,
-.auctionBigVideo,
-.auctionVideoSmall{
-  background:#000 !important;
-}
-/* =========================================================
-   AUCTION IMAGE ONLY - SMALL PREVIEW
-   الصورة فقط معاينة صغيرة وتكبر بالضغط
-========================================================= */
-
+.auctionImageFrame,
+.auctionImagePreviewBox,
 .auctionImageThumbFrame{
   position:relative !important;
   z-index:2 !important;
 
-  width:320px !important;
-  height:150px !important;
+  width:520px !important;
+  height:240px !important;
+  min-height:240px !important;
+  max-height:240px !important;
 
   margin:0 auto !important;
   padding:10px !important;
 
-  border-radius:20px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.48), rgba(255,255,255,.22)) !important;
-
-  border:1px solid rgba(255,255,255,.40) !important;
-
-  box-shadow:
-    0 12px 24px rgba(30,27,75,.08),
-    inset 0 1px 0 rgba(255,255,255,.76) !important;
-
-  backdrop-filter:blur(14px) !important;
-  -webkit-backdrop-filter:blur(14px) !important;
-
-  overflow:hidden !important;
-  cursor:zoom-in !important;
-
-  transition:
-    transform .18s ease,
-    filter .18s ease !important;
-}
-
-.auctionImageThumbFrame:hover{
-  transform:translateY(-2px) scale(1.02) !important;
-  filter:brightness(1.04) !important;
-}
-
-.auctionImageThumb{
-  max-width:100% !important;
-  max-height:130px !important;
-
-  width:auto !important;
-  height:auto !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  display:block !important;
-
-  border-radius:14px !important;
-  background:transparent !important;
-}
-
-/* لا يطبق على الفيديو */
-.auctionMediaFrame.auctionVideoFrameClean{
-  background:#000 !important;
-}
-
-/* iPad */
-@media (min-width:768px) and (max-width:1180px){
-  .auctionImageThumbFrame{
-    width:280px !important;
-    height:130px !important;
-    border-radius:18px !important;
-  }
-
-  .auctionImageThumb{
-    max-height:112px !important;
-    border-radius:12px !important;
-  }
-}
-
-/* iPhone */
-@media (max-width:767px){
-  .auctionImageThumbFrame{
-    width:230px !important;
-    height:118px !important;
-    padding:8px !important;
-    border-radius:16px !important;
-  }
-
-  .auctionImageThumb{
-    max-height:100px !important;
-    border-radius:10px !important;
-  }
-}
-/* =========================================================
-   AUCTION IMAGE ZOOM - FORCE IMAGE TO ENLARGE
-   تكبير الصورة نفسها وليس الخلفية
-========================================================= */
-
-.auctionImageOverlayInner{
-  width:auto !important;
-  max-width:94vw !important;
-  max-height:90vh !important;
-
-  padding:0 !important;
-  margin:0 !important;
-
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-}
-
-/* هنا المهم: نخلي الصورة نفسها تكبر */
-.auctionImageOverlayImg{
-  width:min(96vw, 1250px) !important;
-  height:auto !important;
-
-  max-width:92vw !important;
-  max-height:88vh !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  display:block !important;
-
-  background:transparent !important;
-  border-radius:22px !important;
-
-  box-shadow:
-    0 28px 80px rgba(0,0,0,.32),
-    0 0 0 1px rgba(255,255,255,.24) !important;
-
-  cursor:zoom-out !important;
-}
-
-/* للجوال */
-@media (max-width:767px){
-  .auctionImageOverlayImg{
-    width:94vw !important;
-    max-width:94vw !important;
-    max-height:84vh !important;
-    border-radius:16px !important;
-  }
-}
-/* =========================================================
-   AUCTION MEDIA CLEAN FINAL
-   فيديو وصورة بدون تمدد وبدون سواد للصورة
-========================================================= */
-
-/* =========================
-   MAIN QUESTION BOX SIZE
-========================= */
-
-.auctionQuestionBox.auctionQuestionBoxFilled{
-  min-height:260px !important;
-  padding:12px !important;
   border-radius:24px !important;
 
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
-  gap:12px !important;
-
-  overflow:hidden !important;
-}
-
-/* =========================
-   IMAGE PREVIEW
-   الصورة في المعاينة
-========================= */
-
-.auctionImagePreviewBox{
-  position:relative !important;
-  z-index:2 !important;
-
-  width:420px !important;
-  height:190px !important;
-
-  margin:0 auto !important;
-  padding:10px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  border-radius:22px !important;
 
   background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
     linear-gradient(180deg, rgba(255,255,255,.50), rgba(255,255,255,.22)) !important;
 
   border:1px solid rgba(255,255,255,.42) !important;
 
   box-shadow:
-    0 14px 28px rgba(30,27,75,.10),
+    0 14px 30px rgba(30,27,75,.10),
     inset 0 1px 0 rgba(255,255,255,.78) !important;
 
   backdrop-filter:blur(16px) !important;
@@ -2317,37 +589,44 @@
     filter .18s ease !important;
 }
 
-.auctionImagePreviewBox:hover{
+.auctionImageFrame:hover,
+.auctionImagePreviewBox:hover,
+.auctionImageThumbFrame:hover{
   transform:translateY(-2px) scale(1.015) !important;
   filter:brightness(1.04) !important;
 }
 
-.auctionImagePreview{
-  max-width:100% !important;
-  max-height:170px !important;
+.auctionBigImage,
+.auctionImagePreview,
+.auctionImageThumb,
+.auctionMediaImage{
+  width:100% !important;
+  height:100% !important;
 
-  width:auto !important;
-  height:auto !important;
+  max-width:100% !important;
+  max-height:100% !important;
 
   object-fit:contain !important;
   object-position:center !important;
 
   display:block !important;
 
-  border-radius:16px !important;
+  border-radius:18px !important;
   background:transparent !important;
 }
 
 /* =========================
    VIDEO PREVIEW
-   الفيديو في المعاينة
 ========================= */
 
-.auctionVideoPreviewBox{
+.auctionVideoFrame,
+.auctionVideoSmallFrame,
+.auctionVideoPreviewBox,
+.auctionMediaFrame.auctionVideoFrameClean{
   position:relative !important;
   z-index:2 !important;
 
-  width:560px !important;
+  width:620px !important;
   max-width:100% !important;
 
   aspect-ratio:16 / 9 !important;
@@ -2373,18 +652,26 @@
   cursor:pointer !important;
 }
 
-.auctionVideoPreview{
+.auctionBigVideo,
+.auctionVideoSmall,
+.auctionVideoPreview,
+.auctionMediaVideo{
   width:100% !important;
   height:100% !important;
+
+  max-width:100% !important;
+  max-height:100% !important;
 
   object-fit:contain !important;
   object-position:center !important;
 
   display:block !important;
+
   background:#000 !important;
   border-radius:24px !important;
 }
 
+.auctionVideoPlayOverlay,
 .auctionVideoPlayBtn{
   position:absolute !important;
   left:50% !important;
@@ -2417,24 +704,28 @@
     inset 0 1px 0 rgba(255,255,255,.36) !important;
 }
 
+.auctionVideoPlayOverlay:hover,
 .auctionVideoPlayBtn:hover{
   transform:translate(-50%,-50%) scale(1.06) !important;
 }
 
 /* =========================
-   RESULT LAYOUT
+   RESULT VIEW
 ========================= */
 
 .auctionResultView{
   width:100% !important;
+  height:100% !important;
 
   display:grid !important;
-  grid-template-columns:1fr .8fr !important;
-  gap:18px !important;
+  grid-template-columns:minmax(0,1fr) minmax(300px,.8fr) !important;
+  gap:16px !important;
   align-items:center !important;
 
   position:relative !important;
   z-index:2 !important;
+
+  overflow:hidden !important;
 
   animation:auctionResultEnter .42s cubic-bezier(.2,.85,.2,1.05) both !important;
 }
@@ -2444,15 +735,20 @@
     opacity:0;
     transform:translateY(14px) scale(.97);
   }
+
   to{
     opacity:1;
     transform:translateY(0) scale(1);
   }
 }
 
+.auctionResultImageBox,
 .auctionResultMediaBox{
-  min-height:230px !important;
-  padding:12px !important;
+  min-height:0 !important;
+  height:260px !important;
+  max-height:260px !important;
+
+  padding:10px !important;
 
   display:flex !important;
   align-items:center !important;
@@ -2475,15 +771,9 @@
   overflow:hidden !important;
 }
 
-/* =========================
-   RESULT IMAGE
-   الصورة عند الإجابة بدون سواد
-========================= */
-
 .auctionResultImageBoxClean{
-  width:420px !important;
-  max-width:100% !important;
-  height:190px !important;
+  width:100% !important;
+  height:100% !important;
 
   padding:10px !important;
 
@@ -2506,34 +796,33 @@
   cursor:zoom-in !important;
 }
 
+.auctionResultImage,
 .auctionResultImageClean{
-  max-width:100% !important;
-  max-height:170px !important;
+  width:100% !important;
+  height:100% !important;
 
-  width:auto !important;
-  height:auto !important;
+  max-width:100% !important;
+  max-height:100% !important;
 
   object-fit:contain !important;
   object-position:center !important;
 
   display:block !important;
 
-  border-radius:16px !important;
+  border-radius:18px !important;
   background:transparent !important;
 }
 
 /* =========================
    RESULT VIDEO
-   الفيديو عند الإجابة
 ========================= */
 
 .auctionResultVideoBox{
   position:relative !important;
 
-  width:520px !important;
-  max-width:100% !important;
-
-  aspect-ratio:16 / 9 !important;
+  width:100% !important;
+  height:250px !important;
+  max-height:250px !important;
 
   display:flex !important;
   align-items:center !important;
@@ -2592,12 +881,12 @@
 }
 
 /* =========================
-   ANSWER BOX
+   ANSWER BOX - GLASS RESULT
 ========================= */
 
 .auctionResultAnswerBox{
-  min-height:130px !important;
-  height:auto !important;
+  min-height:160px !important;
+  max-height:260px !important;
 
   padding:20px 26px !important;
 
@@ -2627,6 +916,7 @@
 
 .auctionResultAnswerLabel{
   min-height:30px !important;
+
   padding:6px 16px !important;
   border-radius:999px !important;
 
@@ -2638,13 +928,17 @@
   border:1px solid rgba(255,255,255,.62) !important;
 
   color:#0F4C5C !important;
+
   font-family:"HanakaText",sans-serif !important;
   font-size:1rem !important;
   line-height:1 !important;
 }
 
 .auctionResultAnswerText{
+  max-width:100% !important;
+
   color:#0F4C5C !important;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif !important;
   font-size:clamp(2rem,3.6vw,3.6rem) !important;
   line-height:1.14 !important;
@@ -2652,15 +946,14 @@
 
   white-space:normal !important;
   overflow-wrap:break-word !important;
-
-  max-width:100% !important;
 }
 
 .auctionResultNote{
   width:100% !important;
   min-height:36px !important;
-  border-radius:16px !important;
+
   padding:8px 14px !important;
+  border-radius:16px !important;
 
   display:flex !important;
   align-items:center !important;
@@ -2672,41 +965,413 @@
   border:1px solid rgba(255,255,255,.42) !important;
 
   color:#24185E !important;
+
   font-family:"HanakaText",sans-serif !important;
   font-size:1rem !important;
   line-height:1.3 !important;
   text-align:center !important;
 }
 
-/* صح */
+/* صحيح */
 .auctionResultView.correctResult .auctionResultAnswerBox{
   background:
-    radial-gradient(circle at 20% 0%, rgba(134,239,172,.30), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.72), rgba(220,252,231,.52)) !important;
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.72), transparent 42%),
+    radial-gradient(circle at 85% 100%, rgba(34,197,94,.32), transparent 48%),
+    linear-gradient(180deg, rgba(240,253,244,.88), rgba(187,247,208,.42)) !important;
 
-  border-color:rgba(34,197,94,.42) !important;
+  border:1px solid rgba(34,197,94,.46) !important;
+
+  box-shadow:
+    0 18px 42px rgba(22,163,74,.18),
+    0 0 0 5px rgba(34,197,94,.08),
+    inset 0 1px 0 rgba(255,255,255,.92),
+    inset 0 -1px 0 rgba(22,163,74,.10) !important;
+
+  color:#14532D !important;
 }
 
 .auctionResultView.correctResult .auctionResultAnswerLabel{
-  color:#166534 !important;
+  color:#FFFFFF !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.22), transparent 42%),
+    linear-gradient(180deg,#22C55E,#15803D) !important;
+}
+
+.auctionResultView.correctResult .auctionResultAnswerText{
+  color:#14532D !important;
 }
 
 /* خطأ */
 .auctionResultView.wrongResult .auctionResultAnswerBox{
   background:
-    radial-gradient(circle at 20% 0%, rgba(252,165,165,.30), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.72), rgba(254,226,226,.52)) !important;
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.72), transparent 42%),
+    radial-gradient(circle at 85% 100%, rgba(239,68,68,.34), transparent 48%),
+    linear-gradient(180deg, rgba(254,242,242,.90), rgba(254,202,202,.44)) !important;
 
-  border-color:rgba(239,68,68,.42) !important;
+  border:1px solid rgba(239,68,68,.48) !important;
+
+  box-shadow:
+    0 18px 42px rgba(220,38,38,.18),
+    0 0 0 5px rgba(239,68,68,.08),
+    inset 0 1px 0 rgba(255,255,255,.92),
+    inset 0 -1px 0 rgba(220,38,38,.10) !important;
+
+  color:#7F1D1D !important;
 }
 
 .auctionResultView.wrongResult .auctionResultAnswerLabel{
-  color:#991B1B !important;
+  color:#FFFFFF !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.22), transparent 42%),
+    linear-gradient(180deg,#EF4444,#B91C1C) !important;
+}
+
+.auctionResultView.wrongResult .auctionResultAnswerText{
+  color:#7F1D1D !important;
+}
+
+/* =========================
+   NUMBER GRID
+========================= */
+
+.auctionGrid,
+.auctionBoard,
+.auctionNumbersGrid{
+  width:min(100%,920px) !important;
+  margin:0 auto !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:12px !important;
+
+  align-self:center !important;
+}
+
+.auctionBtn,
+.auctionNumberBtn,
+.auctionCard,
+.auctionTile,
+.auctionGrid button{
+  position:relative !important;
+
+  width:100% !important;
+  height:56px !important;
+  min-height:56px !important;
+
+  border:0 !important;
+  border-radius:18px !important;
+  overflow:hidden !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+    linear-gradient(180deg, rgba(49,46,129,.78) 0%, rgba(30,27,75,.88) 100%) !important;
+
+  color:#FFFFFF !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.75rem !important;
+  line-height:1 !important;
+
+  cursor:pointer !important;
+
+  box-shadow:
+    0 12px 24px rgba(30,27,75,.18),
+    inset 0 1px 0 rgba(255,255,255,.24),
+    inset 0 -1px 0 rgba(0,0,0,.18) !important;
+
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px) !important;
+
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .18s ease !important;
+}
+
+.auctionBtn:hover:not(:disabled):not(.used),
+.auctionNumberBtn:hover:not(:disabled):not(.used),
+.auctionCard:hover:not(:disabled):not(.used),
+.auctionTile:hover:not(:disabled):not(.used),
+.auctionGrid button:hover:not(:disabled):not(.used){
+  transform:translateY(-3px) scale(1.01) !important;
+  filter:brightness(1.08) !important;
+
+  box-shadow:
+    0 18px 34px rgba(30,27,75,.24),
+    0 0 0 4px rgba(255,255,255,.12),
+    inset 0 1px 0 rgba(255,255,255,.30),
+    inset 0 -1px 0 rgba(0,0,0,.18) !important;
+}
+
+.auctionBtn::before,
+.auctionNumberBtn::before,
+.auctionCard::before,
+.auctionTile::before,
+.auctionGrid button::before{
+  content:"" !important;
+
+  position:absolute !important;
+
+  width:52px !important;
+  height:52px !important;
+  top:-18px !important;
+  right:-10px !important;
+
+  border-radius:50% !important;
+
+  background:rgba(255,255,255,.16) !important;
+
+  pointer-events:none !important;
+}
+
+.auctionBtn::after,
+.auctionNumberBtn::after,
+.auctionCard::after,
+.auctionTile::after,
+.auctionGrid button::after{
+  content:"" !important;
+
+  position:absolute !important;
+  inset:0 !important;
+
+  border-radius:18px !important;
+
+  box-shadow:inset 0 -6px 12px rgba(255,255,255,.06) !important;
+
+  pointer-events:none !important;
+}
+
+.auctionBtn.used,
+.auctionBtn:disabled,
+.auctionNumberBtn.used,
+.auctionNumberBtn:disabled,
+.auctionCard.used,
+.auctionCard:disabled,
+.auctionTile.used,
+.auctionTile:disabled,
+.auctionGrid button.used,
+.auctionGrid button:disabled{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.46), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.56) 0%, rgba(255,255,255,.30) 100%) !important;
+
+  color:transparent !important;
+
+  border:1px solid rgba(255,255,255,.46) !important;
+
+  box-shadow:
+    0 8px 18px rgba(30,27,75,.06),
+    inset 0 1px 0 rgba(255,255,255,.82),
+    inset 0 -1px 0 rgba(255,255,255,.16) !important;
+
+  opacity:1 !important;
+  filter:saturate(.9) brightness(1.02) !important;
+  cursor:default !important;
+  transform:none !important;
+}
+
+.auctionBtn.used::after,
+.auctionBtn:disabled::after,
+.auctionNumberBtn.used::after,
+.auctionNumberBtn:disabled::after,
+.auctionCard.used::after,
+.auctionCard:disabled::after,
+.auctionTile.used::after,
+.auctionTile:disabled::after,
+.auctionGrid button.used::after,
+.auctionGrid button:disabled::after{
+  content:"✓" !important;
+
+  position:absolute !important;
+  inset:0 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  color:#7C3AED !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.7rem !important;
+  line-height:1 !important;
+
+  background:transparent !important;
+  box-shadow:none !important;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.60),
+    0 8px 18px rgba(30,27,75,.10) !important;
+}
+
+/* =========================
+   CONTROL PANEL
+========================= */
+
+.auctionControlPanel,
+.auctionControls{
+  width:min(100%,760px) !important;
+  margin:0 auto !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:10px !important;
+  align-items:stretch !important;
+
+  padding:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+
+  overflow:hidden !important;
+}
+
+.auctionControlPanel button,
+.auctionControls button{
+  position:relative !important;
+
+  width:100% !important;
+  min-width:0 !important;
+
+  height:52px !important;
+  min-height:52px !important;
+
+  padding:0 10px !important;
+
+  border:0 !important;
+  border-radius:16px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.92rem !important;
+  font-weight:400 !important;
+  line-height:1.1 !important;
+
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+
+  cursor:pointer !important;
+  color:#FFFFFF !important;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+    linear-gradient(180deg,#312E81 0%,#1E1B4B 100%) !important;
+
+  box-shadow:
+    0 12px 24px rgba(30,27,75,.14),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .18s ease !important;
+}
+
+.auctionControlPanel button:hover:not(:disabled),
+.auctionControls button:hover:not(:disabled){
+  transform:translateY(-2px) !important;
+  filter:brightness(1.06) !important;
+}
+
+.auctionControlPanel button:active:not(:disabled),
+.auctionControls button:active:not(:disabled){
+  transform:scale(.96) !important;
+}
+
+.auctionDoubleBtn,
+#auctionDoubleBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#FB7185 0%,#F97316 100%) !important;
+
+  color:#FFFFFF !important;
+}
+
+.auctionDoubleBtn.activeDouble,
+#auctionDoubleBtn.activeDouble{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.30), transparent 42%),
+    linear-gradient(180deg,#FDBA74 0%,#F97316 100%) !important;
+
+  color:#431407 !important;
+
+  box-shadow:
+    0 0 0 5px rgba(249,115,22,.16),
+    0 14px 28px rgba(249,115,22,.24),
+    inset 0 1px 0 rgba(255,255,255,.38) !important;
+
+  animation:auctionDoublePulse .75s ease-in-out infinite alternate;
+}
+
+@keyframes auctionDoublePulse{
+  from{
+    box-shadow:
+      0 0 0 rgba(249,115,22,0),
+      0 12px 24px rgba(249,115,22,.20);
+  }
+
+  to{
+    box-shadow:
+      0 0 18px rgba(249,115,22,.42),
+      0 14px 28px rgba(249,115,22,.28);
+  }
+}
+
+.auctionControlPanel .btnCorrect,
+.auctionControls .btnCorrect,
+.auctionControlPanel button[onclick*="auctionCorrect"],
+.auctionControls button[onclick*="auctionCorrect"]{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#22C55E 0%,#15803D 100%) !important;
+
+  color:#FFFFFF !important;
+}
+
+.auctionControlPanel .btnWrong,
+.auctionControls .btnWrong,
+.auctionControlPanel button[onclick*="auctionWrong"],
+.auctionControls button[onclick*="auctionWrong"]{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(180deg,#EF4444 0%,#DC2626 100%) !important;
+
+  color:#FFFFFF !important;
+}
+
+.auctionControlPanel .undoBtn,
+.auctionControls .undoBtn,
+#auctionUndoBtn{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
+    linear-gradient(180deg,#991B1B 0%,#7F1D1D 100%) !important;
+
+  color:#FFFFFF !important;
+
+  box-shadow:
+    0 12px 24px rgba(127,29,29,.22),
+    inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+
+.auctionControlPanel button:disabled,
+.auctionControls button:disabled{
+  background:#DDD6FE !important;
+  color:#7C7896 !important;
+  opacity:.82 !important;
+  box-shadow:none !important;
+  cursor:not-allowed !important;
+  transform:none !important;
+  filter:none !important;
 }
 
 /* =========================
    IMAGE OVERLAY
-   تكبير الصورة بدون سواد
 ========================= */
 
 .auctionImageOverlay{
@@ -2781,6 +1446,20 @@
   animation:auctionImageZoomOut .14s ease both !important;
 }
 
+.auctionImageOverlay.auctionWrongFlash::after{
+  content:"";
+
+  position:absolute;
+  inset:0;
+  z-index:50;
+
+  background:rgba(255,0,0,.35);
+
+  pointer-events:none;
+
+  animation:auctionWrongFlash .65s ease;
+}
+
 @keyframes auctionImageOverlayIn{
   from{opacity:0}
   to{opacity:1}
@@ -2796,6 +1475,7 @@
     opacity:0;
     transform:scale(.78);
   }
+
   to{
     opacity:1;
     transform:scale(1);
@@ -2807,10 +1487,19 @@
     opacity:1;
     transform:scale(1);
   }
+
   to{
     opacity:0;
     transform:scale(.78);
   }
+}
+
+@keyframes auctionWrongFlash{
+  0%{opacity:0}
+  18%{opacity:1}
+  38%{opacity:.15}
+  58%{opacity:1}
+  100%{opacity:0}
 }
 
 /* =========================
@@ -2894,281 +1583,7 @@
     inset 0 1px 0 rgba(255,255,255,.24) !important;
 }
 
-/* =========================
-   IMPORTANT RESET
-   يمنع الكلاسات القديمة من تخريب التصميم
-========================= */
-
-.auctionImageFrame,
-.auctionBigImage,
-.auctionVideoSmallFrame,
-.auctionVideoSmall,
-.auctionMediaFrame,
-.auctionMediaVideo,
-.auctionMediaImage,
-.auctionResultImage,
-.auctionBigVideo{
-  all:unset;
-}
-
-/* =========================
-   IPAD
-========================= */
-
-@media (min-width:768px) and (max-width:1180px){
-  .auctionQuestionBox.auctionQuestionBoxFilled{
-    min-height:230px !important;
-    padding:10px !important;
-  }
-
-  .auctionImagePreviewBox,
-  .auctionResultImageBoxClean{
-    width:360px !important;
-    height:165px !important;
-    border-radius:20px !important;
-  }
-
-  .auctionImagePreview,
-  .auctionResultImageClean{
-    max-height:145px !important;
-    border-radius:14px !important;
-  }
-
-  .auctionVideoPreviewBox{
-    width:480px !important;
-    border-radius:22px !important;
-  }
-
-  .auctionVideoPreview{
-    border-radius:22px !important;
-  }
-
-  .auctionVideoPlayBtn{
-    width:62px !important;
-    height:62px !important;
-    font-size:1.55rem !important;
-  }
-
-  .auctionResultView{
-    gap:12px !important;
-  }
-
-  .auctionResultMediaBox{
-    min-height:200px !important;
-    padding:10px !important;
-  }
-
-  .auctionResultVideoBox{
-    width:440px !important;
-  }
-
-  .auctionResultAnswerBox{
-    min-height:112px !important;
-    padding:16px 20px !important;
-  }
-
-  .auctionResultAnswerText{
-    font-size:clamp(1.7rem,3vw,3rem) !important;
-  }
-}
-
-/* =========================
-   IPHONE
-========================= */
-
-@media (max-width:767px){
-  .auctionQuestionBox.auctionQuestionBoxFilled{
-    min-height:220px !important;
-    padding:8px !important;
-    border-radius:20px !important;
-  }
-
-  .auctionImagePreviewBox,
-  .auctionResultImageBoxClean{
-    width:290px !important;
-    max-width:100% !important;
-    height:138px !important;
-    padding:8px !important;
-    border-radius:17px !important;
-  }
-
-  .auctionImagePreview,
-  .auctionResultImageClean{
-    max-height:120px !important;
-    border-radius:12px !important;
-  }
-
-  .auctionVideoPreviewBox{
-    width:100% !important;
-    border-radius:18px !important;
-  }
-
-  .auctionVideoPreview{
-    border-radius:18px !important;
-  }
-
-  .auctionVideoPlayBtn{
-    width:56px !important;
-    height:56px !important;
-    font-size:1.35rem !important;
-  }
-
-  .auctionResultView{
-    grid-template-columns:1fr !important;
-    gap:10px !important;
-  }
-
-  .auctionResultMediaBox{
-    min-height:160px !important;
-    padding:8px !important;
-    border-radius:20px !important;
-  }
-
-  .auctionResultVideoBox{
-    width:100% !important;
-    border-radius:18px !important;
-  }
-
-  .auctionResultVideo{
-    border-radius:18px !important;
-  }
-
-  .auctionResultVideoPlay{
-    width:56px !important;
-    height:56px !important;
-    font-size:1.35rem !important;
-  }
-
-  .auctionResultAnswerBox{
-    min-height:76px !important;
-    padding:13px 16px !important;
-    border-radius:20px !important;
-  }
-
-  .auctionResultAnswerText{
-    font-size:1.45rem !important;
-  }
-
-  .auctionImageOverlay{
-    padding:14px !important;
-  }
-
-  .auctionImageOverlayImg{
-    max-width:94vw !important;
-    max-height:84vh !important;
-    border-radius:18px !important;
-  }
-
-  .auctionVideoFullscreenOverlay{
-    padding:12px !important;
-  }
-
-  .auctionVideoFullscreenInner{
-    width:96vw !important;
-    max-height:78vh !important;
-    border-radius:18px !important;
-  }
-
-  .auctionVideoFullscreenClose{
-    top:14px !important;
-    left:14px !important;
-    width:46px !important;
-    height:46px !important;
-    font-size:1.7rem !important;
-  }
-}
-/* =========================================================
-   AUCTION IMAGE PREVIEW - BIGGER
-   تكبير صورة المعاينة شوي بدون تخريب التكبير
-========================================================= */
-
-.auctionImagePreviewBox,
-.auctionResultImageBoxClean{
-  width:700px !important;
-  height:330px !important;
-  padding:12px !important;
-  border-radius:24px !important;
-}
-
-.auctionImagePreview,
-.auctionResultImageClean{
-  max-width:100% !important;
-  max-height:205px !important;
-
-  width:auto !important;
-  height:auto !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  border-radius:18px !important;
-}
-
-/* iPad */
-@media (min-width:768px) and (max-width:1180px){
-  .auctionImagePreviewBox,
-  .auctionResultImageBoxClean{
-    width:430px !important;
-    height:200px !important;
-  }
-
-  .auctionImagePreview,
-  .auctionResultImageClean{
-    max-height:176px !important;
-  }
-}
-
-/* iPhone */
-@media (max-width:767px){
-  .auctionImagePreviewBox,
-  .auctionResultImageBoxClean{
-    width:340px !important;
-    max-width:100% !important;
-    height:165px !important;
-    padding:9px !important;
-    border-radius:18px !important;
-  }
-
-  .auctionImagePreview,
-  .auctionResultImageClean{
-    max-height:145px !important;
-    border-radius:13px !important;
-  }
-}
-/* =========================================================
-   AUCTION IMAGE PREVIEW - SCALE IMAGE MORE
-   تكبير الصورة نفسها داخل الفريم
-========================================================= */
-
-.auctionImagePreview,
-.auctionResultImageClean{
-  width:100% !important;
-  height:100% !important;
-
-  max-width:none !important;
-  max-height:none !important;
-
-  object-fit:contain !important;
-  object-position:center !important;
-
-  transform:scale(1.18) !important;
-  transform-origin:center center !important;
-
-  display:block !important;
-  background:transparent !important;
-}
-
-/* الفريم ثابت لا يكبر */
-.auctionImagePreviewBox,
-.auctionResultImageBoxClean{
-  width:420px !important;
-  height:190px !important;
-  overflow:hidden !important;
-}
-/* =========================
-   Auction Fullscreen Video Wrong Flash
-========================= */
-
+/* خطأ على الفيديو المكبر */
 #auctionZoomFlashLayer{
   position:fixed;
   inset:0;
@@ -3259,9 +1674,10 @@
     transform:translateX(9px) scale(1.004);
   }
 }
-/* =========================================================
-   AUCTION / فتبلة - IPAD FIT
-========================================================= */
+
+/* =========================
+   IPAD LANDSCAPE
+========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
 
@@ -3273,108 +1689,454 @@
     min-height:0 !important;
 
     display:grid !important;
-    grid-template-rows:auto 1fr auto !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
     gap:10px !important;
 
+    padding:10px 0 4px !important;
+
     overflow:hidden !important;
   }
 
-  .auctionBoard,
-  .auctionNumbersGrid,
-  .auctionGrid{
-    width:min(100%,920px) !important;
-    margin:0 auto !important;
-
-    display:grid !important;
-    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-    gap:12px !important;
-
-    align-self:center !important;
+  .auctionTopBar{
+    grid-template-columns:minmax(0,1fr) 118px minmax(0,1fr) !important;
+    gap:10px !important;
+    padding:0 2px !important;
   }
 
-  .auctionNumberBtn,
-  .auctionCard,
-  .auctionTile{
+  .auctionTeamCard{
+    height:62px !important;
+    min-height:62px !important;
+    padding:7px 8px !important;
+  }
+
+  #auctionTeamABox,
+  .auctionTeamABox{
+    border-radius:24px 15px 24px 15px !important;
+  }
+
+  #auctionTeamBBox,
+  .auctionTeamBBox{
+    border-radius:15px 24px 15px 24px !important;
+  }
+
+  .auctionTeamName{
+    font-size:1.35rem !important;
+    padding:6px 10px !important;
+    border-radius:15px !important;
+  }
+
+  .auctionTeamScore{
+    width:48px !important;
+    height:38px !important;
+    border-radius:14px !important;
+    font-size:1.35rem !important;
+  }
+
+  .auctionMiddleCard,
+  .auctionTimerBox,
+  .auctionTimer,
+  .auctionTimerBoxDisplay{
+    width:118px !important;
+    height:72px !important;
     min-height:72px !important;
-    border-radius:22px !important;
-
-    font-size:1.75rem !important;
-    line-height:1 !important;
+    border-radius:26px !important;
   }
 
-  .auctionQuestionStage,
+  .auctionTimerLabel,
+  .auctionTurnLabel{
+    font-size:.66rem !important;
+  }
+
+  .auctionTimerValue,
+  .auctionTimerBox span,
+  #auctionTimer{
+    font-size:1.85rem !important;
+  }
+
   .auctionQuestionBox,
+  .auctionQuestionStage,
   .auctionStage{
     width:100% !important;
-    height:calc(100vh - 180px) !important;
-    min-height:340px !important;
+    height:100% !important;
+    min-height:0 !important;
 
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
+    padding:10px !important;
 
     overflow:hidden !important;
   }
 
-  .auctionTextBox,
-  .auctionAnswerBox,
-  .auctionHintBox{
-    max-width:min(100%,860px) !important;
-    min-height:86px !important;
-
-    padding:16px 22px !important;
-    border-radius:26px !important;
-
+  .auctionPlaceholder{
     font-size:1.45rem !important;
-    line-height:1.35 !important;
+  }
+
+  .auctionTopNote{
+    max-width:420px !important;
+    min-height:40px !important;
+    padding:8px 18px !important;
+    border-radius:18px !important;
+    font-size:1.15rem !important;
   }
 
   .auctionImageFrame,
-  .auctionImageBox,
-  .auctionBigImageWrap{
-    width:min(100%,900px) !important;
-    height:calc(100vh - 210px) !important;
-    min-height:330px !important;
-    max-height:520px !important;
-
-    margin:0 auto !important;
-    border-radius:28px !important;
-
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-
-    overflow:hidden !important;
+  .auctionImagePreviewBox,
+  .auctionImageThumbFrame{
+    width:430px !important;
+    height:200px !important;
+    min-height:200px !important;
+    max-height:200px !important;
+    padding:10px !important;
+    border-radius:20px !important;
   }
 
-  .auctionImageFrame img,
-  .auctionImageBox img,
   .auctionBigImage,
-  .auctionQuestionBox img{
+  .auctionImagePreview,
+  .auctionImageThumb,
+  .auctionMediaImage{
+    border-radius:14px !important;
+  }
+
+  .auctionVideoFrame,
+  .auctionVideoSmallFrame,
+  .auctionVideoPreviewBox{
+    width:560px !important;
+    max-width:100% !important;
+    border-radius:22px !important;
+  }
+
+  .auctionBigVideo,
+  .auctionVideoSmall,
+  .auctionVideoPreview,
+  .auctionMediaVideo{
+    border-radius:22px !important;
+  }
+
+  .auctionVideoPlayOverlay,
+  .auctionVideoPlayBtn{
+    width:62px !important;
+    height:62px !important;
+    font-size:1.55rem !important;
+  }
+
+  .auctionResultView{
     width:100% !important;
     height:100% !important;
-    object-fit:contain !important;
+
+    grid-template-columns:minmax(0,1fr) minmax(270px,.8fr) !important;
+    gap:12px !important;
   }
 
-  .auctionScoreBox,
-  .auctionStatusBox,
-  .auctionBidBox{
-    min-height:58px !important;
-    padding:10px 14px !important;
-    border-radius:20px !important;
-
-    font-size:1rem !important;
-    line-height:1.2 !important;
+  .auctionResultImageBox,
+  .auctionResultMediaBox{
+    height:230px !important;
+    max-height:230px !important;
+    padding:10px !important;
+    border-radius:24px !important;
   }
 
-  .auctionTimer,
-  .auctionTimerBox,
-  .auctionRoundTimer{
-    min-width:82px !important;
-    height:58px !important;
-    border-radius:20px !important;
+  .auctionResultVideoBox{
+    height:220px !important;
+    max-height:220px !important;
+    border-radius:22px !important;
+  }
 
-    font-size:2rem !important;
-    line-height:1 !important;
+  .auctionResultAnswerBox{
+    min-height:130px !important;
+    max-height:230px !important;
+    padding:16px 20px !important;
+    border-radius:24px !important;
+  }
+
+  .auctionResultAnswerLabel{
+    font-size:.86rem !important;
+  }
+
+  .auctionResultAnswerText{
+    font-size:clamp(1.7rem,3vw,3rem) !important;
+  }
+
+  .auctionGrid,
+  .auctionBoard,
+  .auctionNumbersGrid{
+    width:min(100%,920px) !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+
+  .auctionBtn,
+  .auctionNumberBtn,
+  .auctionCard,
+  .auctionTile,
+  .auctionGrid button{
+    height:46px !important;
+    min-height:46px !important;
+    border-radius:15px !important;
+    font-size:1.35rem !important;
+  }
+
+  .auctionControlPanel,
+  .auctionControls{
+    width:min(100%,680px) !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:7px !important;
+  }
+
+  .auctionControlPanel button,
+  .auctionControls button{
+    height:42px !important;
+    min-height:42px !important;
+    border-radius:12px !important;
+    font-size:.72rem !important;
+    padding:0 6px !important;
+  }
+
+  .auctionImageOverlay{
+    padding:20px !important;
+  }
+
+  .auctionImageOverlayImg{
+    max-width:94vw !important;
+    max-height:86vh !important;
+    border-radius:22px !important;
+  }
+
+  .auctionVideoFullscreenOverlay{
+    padding:20px !important;
+  }
+
+  .auctionVideoFullscreenInner{
+    width:94vw !important;
+    max-height:84vh !important;
+  }
+
+  .auctionVideoFullscreenClose{
+    top:18px !important;
+    left:18px !important;
+    width:48px !important;
+    height:48px !important;
+    font-size:1.75rem !important;
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width:767px){
+
+  .auctionWrap,
+  .auctionContainer,
+  .auctionMainWrap{
+    gap:10px !important;
+    padding:10px 0 8px !important;
+  }
+
+  .auctionTopBar{
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+    padding:8px 0 !important;
+  }
+
+  .auctionTeamCard,
+  .auctionMiddleCard{
+    width:100% !important;
+    justify-self:stretch !important;
+    min-height:62px !important;
+    height:62px !important;
+    border-radius:18px !important;
+  }
+
+  #auctionTeamABox,
+  #auctionTeamBBox,
+  .auctionTeamABox,
+  .auctionTeamBBox{
+    width:100% !important;
+    border-radius:18px !important;
+  }
+
+  .auctionTeamName{
+    font-size:1.25rem !important;
+  }
+
+  .auctionTeamScore{
+    width:50px !important;
+    height:38px !important;
+    font-size:1.4rem !important;
+  }
+
+  .auctionTimerValue{
+    font-size:1.8rem !important;
+  }
+
+  .auctionTimerLabel,
+  .auctionTurnLabel{
+    font-size:.78rem !important;
+  }
+
+  .auctionQuestionBox,
+  .auctionQuestionStage,
+  .auctionStage{
+    border-radius:20px !important;
+    padding:8px !important;
+  }
+
+  .auctionQuestionBox.auctionQuestionBoxEmpty .auctionPlaceholder{
+    font-size:1.05rem !important;
+  }
+
+  .auctionImageFrame,
+  .auctionImagePreviewBox,
+  .auctionImageThumbFrame{
+    width:340px !important;
+    max-width:100% !important;
+    height:165px !important;
+    min-height:165px !important;
+    max-height:165px !important;
+    padding:9px !important;
+    border-radius:18px !important;
+  }
+
+  .auctionBigImage,
+  .auctionImagePreview,
+  .auctionImageThumb,
+  .auctionMediaImage{
+    border-radius:13px !important;
+  }
+
+  .auctionVideoFrame,
+  .auctionVideoSmallFrame,
+  .auctionVideoPreviewBox{
+    width:100% !important;
+    border-radius:18px !important;
+  }
+
+  .auctionBigVideo,
+  .auctionVideoSmall,
+  .auctionVideoPreview,
+  .auctionMediaVideo{
+    border-radius:18px !important;
+  }
+
+  .auctionVideoPlayOverlay,
+  .auctionVideoPlayBtn{
+    width:56px !important;
+    height:56px !important;
+    font-size:1.35rem !important;
+  }
+
+  .auctionTopNote{
+    width:fit-content !important;
+    min-width:0 !important;
+    max-width:92% !important;
+    min-height:38px !important;
+    padding:8px 16px !important;
+    border-radius:16px !important;
+    font-size:1.05rem !important;
+  }
+
+  .auctionResultView{
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+  }
+
+  .auctionResultImageBox,
+  .auctionResultMediaBox{
+    height:170px !important;
+    max-height:170px !important;
+    padding:8px !important;
+    border-radius:20px !important;
+  }
+
+  .auctionResultVideoBox{
+    height:170px !important;
+    max-height:170px !important;
+    border-radius:18px !important;
+  }
+
+  .auctionResultVideo{
+    border-radius:18px !important;
+  }
+
+  .auctionResultVideoPlay{
+    width:56px !important;
+    height:56px !important;
+    font-size:1.35rem !important;
+  }
+
+  .auctionResultAnswerBox{
+    min-height:76px !important;
+    max-height:none !important;
+    padding:13px 16px !important;
+    border-radius:20px !important;
+  }
+
+  .auctionResultAnswerText{
+    font-size:1.45rem !important;
+  }
+
+  .auctionResultNote{
+    font-size:.9rem !important;
+    border-radius:14px !important;
+  }
+
+  .auctionGrid,
+  .auctionBoard,
+  .auctionNumbersGrid{
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+  }
+
+  .auctionBtn,
+  .auctionNumberBtn,
+  .auctionCard,
+  .auctionTile,
+  .auctionGrid button{
+    height:44px !important;
+    min-height:44px !important;
+    border-radius:14px !important;
+    font-size:1.35rem !important;
+  }
+
+  .auctionControlPanel,
+  .auctionControls{
+    width:100% !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+
+  .auctionControlPanel button,
+  .auctionControls button{
+    height:46px !important;
+    min-height:46px !important;
+    border-radius:13px !important;
+    font-size:.78rem !important;
+    padding:0 6px !important;
+  }
+
+  .auctionImageOverlay{
+    padding:14px !important;
+  }
+
+  .auctionImageOverlayImg{
+    max-width:94vw !important;
+    max-height:84vh !important;
+    border-radius:18px !important;
+  }
+
+  .auctionVideoFullscreenOverlay{
+    padding:12px !important;
+  }
+
+  .auctionVideoFullscreenInner{
+    width:96vw !important;
+    max-height:78vh !important;
+    border-radius:18px !important;
+  }
+
+  .auctionVideoFullscreenClose{
+    top:14px !important;
+    left:14px !important;
+    width:46px !important;
+    height:46px !important;
+    font-size:1.7rem !important;
   }
 }
