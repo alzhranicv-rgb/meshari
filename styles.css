@@ -19,8 +19,30 @@
 }
 
 /* =========================================================
-   GLOBAL
+   ROOT + GLOBAL
 ========================================================= */
+
+:root{
+  --main-bg:#EEF3F6;
+  --main-text:#24185E;
+  --slate:#334155;
+  --muted:#64748B;
+  --orange:#FF9B51;
+  --orange-dark:#F97316;
+  --cyan:#67E8F9;
+  --green:#16A34A;
+  --red:#E11D48;
+
+  --glass-nav:rgba(255,255,255,.04);
+  --glass-score:rgba(255,255,255,.05);
+  --glass-segment:rgba(255,255,255,.03);
+  --glass-border:rgba(255,255,255,.10);
+  --glass-highlight:rgba(255,255,255,.18);
+
+  --glass-shadow:
+    0 18px 42px rgba(31,41,55,.12),
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
 
 *{
   box-sizing:border-box;
@@ -34,9 +56,12 @@ body{
 
 body{
   font-family:"HanakaText",sans-serif;
-  background:#EEF3F6;
-  color:#24185E;
+  color:var(--main-text);
   overflow-x:hidden;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(111,231,255,.24), transparent 35%),
+    radial-gradient(circle at 82% 15%, rgba(255,155,81,.18), transparent 34%),
+    linear-gradient(135deg,#EAF1F4 0%,#DCE8EC 48%,#F1EEE8 100%);
 }
 
 button,
@@ -61,11 +86,11 @@ h3,
 }
 
 .hidden{
-  display:none;
+  display:none !important;
 }
 
 /* =========================================================
-   ANIMATIONS
+   GENERAL ANIMATIONS
 ========================================================= */
 
 .softEnter{
@@ -89,6 +114,7 @@ h3,
     opacity:0;
     transform:translateY(12px) scale(.985);
   }
+
   to{
     opacity:1;
     transform:translateY(0) scale(1);
@@ -106,9 +132,11 @@ h3,
   0%{
     transform:scale(1);
   }
+
   45%{
     transform:scale(1.16);
   }
+
   100%{
     transform:scale(1);
   }
@@ -118,44 +146,37 @@ h3,
    HOME PAGE
 ========================================================= */
 
+.homeShowPage,
+.homePageShell,
+#homePage,
+#homeScreen,
+#segmentScreen{
+  background:
+    radial-gradient(circle at 16% 18%, rgba(111,231,255,.24), transparent 35%),
+    radial-gradient(circle at 82% 15%, rgba(255,155,81,.18), transparent 34%),
+    linear-gradient(135deg,#EAF1F4 0%,#DCE8EC 48%,#F1EEE8 100%);
+}
+
 .homeShowPage{
-  min-height:100dvh;
   width:100%;
+  min-height:100dvh;
   position:relative;
   overflow:hidden;
   padding:24px 28px 22px;
-
-  background:
-    radial-gradient(circle at 14% 8%, rgba(255,255,255,.50), transparent 28%),
-    radial-gradient(circle at 84% 12%, rgba(103,232,249,.16), transparent 34%),
-    radial-gradient(circle at 16% 88%, rgba(255,179,71,.14), transparent 34%),
-    radial-gradient(circle at 86% 88%, rgba(124,58,237,.08), transparent 34%),
-    linear-gradient(180deg,#F8FAFC 0%,#EEF3F6 100%);
 }
 
-.homeShowPage::before{
-  content:"";
-  position:absolute;
-  width:520px;
-  height:520px;
-  top:-230px;
-  right:-190px;
-  border-radius:50%;
-  background:rgba(255,255,255,.36);
-  pointer-events:none;
-}
-
-.homeShowPage::after{
-  content:"";
-  position:absolute;
-  width:360px;
-  height:360px;
-  left:-160px;
-  bottom:-130px;
-  border-radius:90px;
-  transform:rotate(20deg);
-  background:rgba(103,232,249,.08);
-  pointer-events:none;
+.homeShowPage::before,
+.homeShowPage::after,
+.homePageShell::before,
+.homePageShell::after,
+#homePage::before,
+#homePage::after,
+#homeScreen::before,
+#homeScreen::after,
+#segmentScreen::before,
+#segmentScreen::after{
+  display:none !important;
+  content:none !important;
 }
 
 .homeShowPage > *{
@@ -164,17 +185,30 @@ h3,
 }
 
 /* =========================================================
-   HOME HERO
+   HOME HEADER
 ========================================================= */
 
 .homeHero{
   width:min(100%,1220px);
-  margin:0 auto 22px;
+  margin:0 auto 28px;
 
   display:grid;
   grid-template-columns:minmax(0,1fr) 300px minmax(0,1fr);
   gap:18px;
   align-items:center;
+
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  overflow:visible;
+}
+
+.homeHero::before,
+.homeHero::after{
+  display:none !important;
+  content:none !important;
 }
 
 /* =========================================================
@@ -183,30 +217,28 @@ h3,
 
 .homeTeamCard{
   position:relative;
-  min-height:96px;
-  padding:12px 14px;
+  min-height:86px;
+  padding:10px 12px;
 
   display:flex;
   align-items:center;
-  gap:14px;
+  gap:12px;
 
   overflow:hidden;
   cursor:pointer;
+  isolation:isolate;
 
   border-radius:32px 18px 32px 18px;
-  border:1px solid rgba(255,255,255,.40);
+  border:1px solid var(--glass-border);
 
-  background:
-    radial-gradient(circle at 14% 0%, rgba(255,255,255,.30), transparent 38%),
-    linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.14));
+  background:var(--glass-score);
 
   box-shadow:
-    0 18px 38px rgba(30,27,75,.10),
-    inset 0 1px 0 rgba(255,255,255,.72),
-    inset 0 -1px 0 rgba(255,255,255,.10);
+    0 18px 42px rgba(31,41,55,.12),
+    inset 0 1px 0 var(--glass-highlight);
 
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
+  backdrop-filter:blur(28px) saturate(1.18);
+  -webkit-backdrop-filter:blur(28px) saturate(1.18);
 
   transition:
     transform .18s ease,
@@ -215,62 +247,19 @@ h3,
 }
 
 .homeTeamA{
+  grid-column:1;
   justify-self:end;
-  width:min(100%,440px);
-
-  background:
-    radial-gradient(circle at 12% 0%, rgba(124,58,237,.24), transparent 40%),
-    linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.14));
+  width:100%;
+  max-width:440px;
 }
 
 .homeTeamB{
+  grid-column:3;
   justify-self:start;
-  width:min(100%,440px);
+  width:100%;
+  max-width:440px;
   flex-direction:row-reverse;
   border-radius:18px 32px 18px 32px;
-
-  background:
-    radial-gradient(circle at 88% 0%, rgba(6,182,212,.23), transparent 40%),
-    linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.14));
-}
-
-.homeTeamCard::before{
-  content:"";
-  position:absolute;
-  width:128px;
-  height:128px;
-  top:-62px;
-  border-radius:50%;
-  background:rgba(255,255,255,.15);
-  pointer-events:none;
-}
-
-.homeTeamA::before{
-  right:-28px;
-}
-
-.homeTeamB::before{
-  left:-28px;
-}
-
-.homeTeamCard::after{
-  content:"";
-  position:absolute;
-  width:62px;
-  height:62px;
-  bottom:-24px;
-  border-radius:18px;
-  transform:rotate(24deg);
-  background:rgba(255,255,255,.08);
-  pointer-events:none;
-}
-
-.homeTeamA::after{
-  left:-12px;
-}
-
-.homeTeamB::after{
-  right:-12px;
 }
 
 .homeTeamCard:hover{
@@ -278,8 +267,7 @@ h3,
   filter:brightness(1.04);
   box-shadow:
     0 24px 48px rgba(30,27,75,.14),
-    inset 0 1px 0 rgba(255,255,255,.78),
-    inset 0 -1px 0 rgba(255,255,255,.12);
+    inset 0 1px 0 rgba(255,255,255,.78);
 }
 
 .homeTeamCard.leadingTeam{
@@ -295,40 +283,36 @@ h3,
   z-index:2;
   flex:1;
   min-width:0;
-  min-height:58px;
+  min-height:54px;
 
-  padding:12px 16px;
-  border-radius:20px;
+  padding:10px 14px;
+  border-radius:18px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  overflow:visible;
+  overflow:hidden;
 
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.18));
-
-  border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--glass-border);
 
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.60),
+    inset 0 1px 0 rgba(255,255,255,.18),
     0 8px 18px rgba(30,27,75,.05);
 
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
 }
 
 .homeTeamName{
   width:100%;
+  min-width:0;
 
-  color:#24185E;
-  font-size:clamp(1.55rem,2.25vw,2.42rem);
-  line-height:1.25;
+  color:var(--main-text);
+  font-size:clamp(1.35rem,2vw,2.1rem);
+  line-height:1.15;
   font-weight:400;
-
-  padding-top:2px;
-  padding-bottom:4px;
 
   white-space:nowrap;
   overflow:hidden;
@@ -337,6 +321,9 @@ h3,
   text-shadow:
     0 1px 0 rgba(255,255,255,.62),
     0 8px 18px rgba(30,27,75,.08);
+
+  animation:teamNameSoftPulse 2.6s ease-in-out infinite;
+  transform-origin:center;
 }
 
 .homeTeamA .homeTeamName{
@@ -347,26 +334,31 @@ h3,
   text-align:left;
 }
 
+.leadingTeam .homeTeamName,
+.activeTeam .teamName{
+  animation:teamNameWinnerPulse 1.8s ease-in-out infinite;
+}
+
 .homeTeamScore{
   position:relative;
   z-index:2;
   flex-shrink:0;
 
-  width:68px;
-  height:54px;
-  border-radius:20px;
+  width:62px;
+  height:50px;
+  border-radius:18px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
   background:
-    linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.66));
+    linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.66));
 
   border:1px solid rgba(255,255,255,.52);
 
   color:#1E1B4B;
-  font-size:clamp(1.75rem,2.4vw,2.45rem);
+  font-size:2rem;
   line-height:1;
 
   box-shadow:
@@ -381,14 +373,42 @@ h3,
     inset 0 1px 0 rgba(255,255,255,.96);
 }
 
+@keyframes teamNameSoftPulse{
+  0%,100%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(.99);
+  }
+}
+
+@keyframes teamNameWinnerPulse{
+  0%,100%{
+    transform:scale(1);
+    filter:brightness(1);
+  }
+
+  50%{
+    transform:scale(1.06);
+    filter:brightness(1.08);
+  }
+}
+
 /* =========================================================
    TITLE
 ========================================================= */
 
 .homeTitleBox{
+  grid-column:2;
+  justify-self:center;
+
   position:relative;
+  width:300px;
   height:112px;
   min-height:112px;
+  min-width:0;
+
   padding:0;
 
   display:flex;
@@ -396,87 +416,95 @@ h3,
   align-items:center;
   justify-content:center;
 
-  background:transparent;
-  border:0;
-  box-shadow:none;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
   overflow:visible;
 }
 
-.homeTitleGlow{
-  position:absolute;
-  width:292px;
-  height:94px;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  border-radius:999px;
-
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,.54), transparent 66%),
-    radial-gradient(circle at 20% 50%, rgba(103,232,249,.16), transparent 54%),
-    radial-gradient(circle at 80% 50%, rgba(255,179,71,.15), transparent 54%);
-
-  filter:blur(10px);
-  pointer-events:none;
+.homeTitleGlow,
+.homeTitleBox::before,
+.homeTitleBox::after{
+  display:none !important;
+  content:none !important;
 }
 
 .homeTitleBox h1{
-  position:relative;
-  z-index:2;
-  margin:0;
+  position:relative !important;
 
-  color:#24185E;
+  margin:0 !important;
 
-  font-size:clamp(3.55rem,4.85vw,5.65rem);
-  line-height:.86;
-  font-weight:400;
-  letter-spacing:-1px;
+  color:var(--main-text) !important;
+  -webkit-text-fill-color:var(--main-text) !important;
+
+  background:none !important;
+  -webkit-background-clip:initial !important;
+  background-clip:initial !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(3.45rem,4.6vw,5.2rem);
+  font-weight:400 !important;
+  line-height:.86 !important;
 
   text-shadow:
-    0 1px 0 rgba(255,255,255,.78),
-    0 10px 22px rgba(30,27,75,.10),
-    0 0 22px rgba(103,232,249,.16),
-    0 0 30px rgba(255,179,71,.08);
+    0 3px 0 rgba(255,255,255,.88),
+    0 16px 32px rgba(30,27,75,.18),
+    0 0 18px rgba(103,232,249,.16) !important;
+
+  filter:drop-shadow(0 10px 18px rgba(30,27,75,.10)) !important;
+  animation:homeHanakaTitleGlassPulse 3.8s ease-in-out infinite !important;
+
+  overflow:visible !important;
 }
 
 .homeTitleBox h1::before{
-  content:"";
-  position:absolute;
-  width:38px;
-  height:38px;
-  right:-34px;
-  top:-8px;
-  border-radius:14px;
-  transform:rotate(18deg);
-  background:rgba(255,255,255,.32);
-  border:1px solid rgba(255,255,255,.32);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.70),
-    0 10px 20px rgba(30,27,75,.06);
+  display:none !important;
+  content:none !important;
 }
 
 .homeTitleBox h1::after{
-  content:"";
-  display:block;
-  width:132px;
-  height:4px;
-  margin:12px auto 0;
-  border-radius:999px;
-  background:linear-gradient(90deg,transparent,#67E8F9,#FDBA74,transparent);
-  box-shadow:
-    0 0 14px rgba(103,232,249,.24),
-    0 0 16px rgba(255,179,71,.16);
-}
+  content:"" !important;
 
+  width:170px !important;
+  height:10px !important;
+  margin:16px auto 0 !important;
+
+  display:block !important;
+
+  border-radius:999px !important;
+
+  background:
+    linear-gradient(
+      115deg,
+      #FF9B51 0%,
+      #FF9B51 22%,
+      #67E8F9 40%,
+      rgba(255,255,255,.88) 50%,
+      #7C3AED 62%,
+      #FF9B51 100%
+    ) !important;
+
+  background-size:260% 100% !important;
+  background-position:100% 50% !important;
+
+  box-shadow:
+    0 10px 24px rgba(249,115,22,.22),
+    0 0 18px rgba(103,232,249,.20) !important;
+
+  animation:homeHanakaLineGlassMove 3.2s ease-in-out infinite !important;
+}
 
 .homeModelName,
 #modelNameDisplay{
   position:relative;
   z-index:5;
 
-  max-width:320px;
+  max-width:280px;
+  min-width:0;
   min-height:36px;
-  margin-top:10px;
+  margin-top:8px;
   padding:7px 22px;
 
   display:flex;
@@ -485,18 +513,14 @@ h3,
 
   border-radius:999px;
 
- 
-
-  color:#000000;
+  color:#000;
   font-family:"HanakaText",sans-serif;
-  font-size:1.86rem;
+  font-size:1.55rem;
   line-height:1.15;
 
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-
- 
 
   cursor:pointer;
 
@@ -510,15 +534,44 @@ h3,
   filter:brightness(1.04);
 }
 
+@keyframes homeHanakaTitleGlassPulse{
+  0%,100%{
+    transform:translateY(0) scale(1);
+  }
+
+  50%{
+    transform:translateY(-2px) scale(1.01);
+  }
+}
+
+@keyframes homeHanakaLineGlassMove{
+  0%{
+    background-position:100% 50%;
+    filter:brightness(1);
+    transform:scaleX(1);
+  }
+
+  45%{
+    background-position:0% 50%;
+    filter:brightness(1.18);
+    transform:scaleX(1.06);
+  }
+
+  100%{
+    background-position:0% 50%;
+    filter:brightness(1);
+    transform:scaleX(1);
+  }
+}
+
 /* =========================================================
-   MODEL POPUP - CLEAN NOTICE
-   إشعار كود المقدم والتحكم
+   MODEL POPUP / JOIN CODE NOTICE
 ========================================================= */
 
 .homeModelPopupArea,
 #homeModelPopupArea{
   position:fixed !important;
-  top:18px !important;
+  top:22px !important;
   left:50% !important;
   right:auto !important;
   bottom:auto !important;
@@ -526,12 +579,17 @@ h3,
   width:auto !important;
   max-width:calc(100vw - 32px) !important;
   margin:0 !important;
+  padding:0 !important;
 
   z-index:999980 !important;
 
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
+
+  background:transparent !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
 
   opacity:0 !important;
   pointer-events:none !important;
@@ -555,26 +613,28 @@ h3,
   transform:translate(-50%,0) scale(1) !important;
 }
 
-/* الحاوية */
 .homeModelNotifyBox,
 .homeModelClassicBox{
   width:auto !important;
   min-width:0 !important;
   max-width:100% !important;
 
-  min-height:52px !important;
-  padding:7px !important;
+  min-height:68px !important;
+  padding:10px !important;
 
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
-  gap:8px !important;
+  gap:12px !important;
 
-  border-radius:20px !important;
+  direction:ltr !important;
+  text-align:center !important;
+
+  border-radius:24px !important;
   overflow:hidden !important;
 
   background:
-    linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.78)) !important;
+    linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.78)) !important;
 
   border:1px solid rgba(255,255,255,.72) !important;
 
@@ -585,42 +645,36 @@ h3,
 
   backdrop-filter:blur(14px) !important;
   -webkit-backdrop-filter:blur(14px) !important;
-
-  text-align:center !important;
 }
 
-/* إلغاء الزخارف القديمة */
 .homeModelClassicBox::before,
-.homeModelClassicBox::after{
-  display:none !important;
-}
-
-/* الهيدر القديم نخفيه لو موجود */
+.homeModelClassicBox::after,
 .homeModelClassicHeader,
 .homeModelClassicLabel,
 .homeModelClassicName{
   display:none !important;
 }
 
-/* جسم الكود */
 .homeModelClassicBody,
 .homeModelNotifyCode{
-  height:38px !important;
-  min-width:150px !important;
-  padding:0 12px !important;
+  height:52px !important;
+  min-width:210px !important;
+
+  padding:0 18px !important;
   margin:0 !important;
 
-  border-radius:15px !important;
+  border-radius:18px !important;
 
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
-  gap:8px !important;
+  gap:12px !important;
 
   cursor:pointer !important;
+  direction:rtl !important;
 
   background:
-    linear-gradient(180deg, rgba(236,254,255,.94), rgba(255,255,255,.80)) !important;
+    linear-gradient(180deg,rgba(236,254,255,.94),rgba(255,255,255,.80)) !important;
 
   border:1px solid rgba(103,232,249,.32) !important;
 
@@ -633,7 +687,6 @@ h3,
     filter .15s ease !important;
 }
 
-/* كلمة كود المقدم */
 .homeModelClassicCodeLabel,
 .homeModelNotifyCode span{
   display:block !important;
@@ -641,7 +694,7 @@ h3,
   color:#0F4C5C !important;
 
   font-family:"HanakaText",sans-serif !important;
-  font-size:.66rem !important;
+  font-size:.82rem !important;
   line-height:1 !important;
   font-weight:900 !important;
 
@@ -649,7 +702,6 @@ h3,
   white-space:nowrap !important;
 }
 
-/* الرقم */
 .homeModelClassicCode,
 .homeModelNotifyCode strong{
   direction:ltr !important;
@@ -667,30 +719,29 @@ h3,
   background:none !important;
   box-shadow:none !important;
 
-  color:#24185E !important;
+  color:var(--main-text) !important;
 
   font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:1.25rem !important;
+  font-size:1.75rem !important;
   line-height:1 !important;
   font-weight:400 !important;
-  letter-spacing:1.4px !important;
+  letter-spacing:2px !important;
 
   white-space:nowrap !important;
 }
 
-/* زر التحكم */
 .homeModelClassicControl,
 #displayControlsEyeBtn,
 .homeModelNotifyControl{
   width:auto !important;
-  min-width:110px !important;
-  height:38px !important;
+  min-width:150px !important;
+  height:52px !important;
 
   margin:0 !important;
-  padding:0 13px !important;
+  padding:0 20px !important;
 
   border:0 !important;
-  border-radius:15px !important;
+  border-radius:18px !important;
 
   display:flex !important;
   align-items:center !important;
@@ -701,7 +752,7 @@ h3,
   color:#fff !important;
 
   font-family:"HanakaText",sans-serif !important;
-  font-size:.74rem !important;
+  font-size:.95rem !important;
   line-height:1 !important;
   font-weight:900 !important;
 
@@ -714,22 +765,18 @@ h3,
     filter .15s ease !important;
 }
 
-/* بدل الأحمر نخليه بنفس لون المشروع */
 .homeModelClassicControl.hideControlsMode,
 #displayControlsEyeBtn.hideControlsMode,
 .homeModelNotifyControl.hideControlsMode{
-  background:
-    linear-gradient(180deg,#312E81,#24185E) !important;
+  background:linear-gradient(180deg,#312E81,#24185E) !important;
 }
 
 .homeModelClassicControl.showControlsMode,
 #displayControlsEyeBtn.showControlsMode,
 .homeModelNotifyControl.showControlsMode{
-  background:
-    linear-gradient(180deg,#16A34A,#15803D) !important;
+  background:linear-gradient(180deg,#16A34A,#15803D) !important;
 }
 
-/* زر الإغلاق */
 .homeModelClassicClose,
 .homeModelNotifyClose{
   position:relative !important;
@@ -738,14 +785,14 @@ h3,
   right:auto !important;
   bottom:auto !important;
 
-  width:34px !important;
-  height:34px !important;
-  min-width:34px !important;
+  width:42px !important;
+  height:42px !important;
+  min-width:42px !important;
 
   padding:0 !important;
 
   border:0 !important;
-  border-radius:13px !important;
+  border-radius:16px !important;
 
   display:flex !important;
   align-items:center !important;
@@ -754,10 +801,10 @@ h3,
   cursor:pointer !important;
 
   background:rgba(36,24,94,.08) !important;
-  color:#24185E !important;
+  color:var(--main-text) !important;
 
   font-family:Arial,sans-serif !important;
-  font-size:1.2rem !important;
+  font-size:1.45rem !important;
   font-weight:700 !important;
   line-height:1 !important;
 
@@ -786,196 +833,8 @@ h3,
   color:#B91C1C !important;
 }
 
-/* إخفاء أزرار التحكم */
-/* إخفاء أزرار التحكم فقط بدون إخفاء الهيدر العلوي */
-body.presenterHideDisplayControls .displayControls,
-body.presenterHideDisplayControls .controlsBar,
-body.presenterHideDisplayControls .finalControlsBar,
-body.presenterHideDisplayControls #finalControlsBar,
-body.presenterHideDisplayControls .auctionControls,
-body.presenterHideDisplayControls .top10Controls,
-body.presenterHideDisplayControls .warmupControls,
-body.presenterHideDisplayControls .whoControls,
-body.presenterHideDisplayControls .archiveControls{
-  display:none !important;
-}
-
-/* Tablet */
-@media (max-width:1180px){
-  .homeModelPopupArea,
-  #homeModelPopupArea{
-    top:12px !important;
-    max-width:calc(100vw - 22px) !important;
-  }
-
-  .homeModelNotifyBox,
-  .homeModelClassicBox{
-    min-height:48px !important;
-    padding:6px !important;
-    gap:6px !important;
-    border-radius:18px !important;
-  }
-
-  .homeModelClassicBody,
-  .homeModelNotifyCode{
-    height:35px !important;
-    min-width:132px !important;
-    padding:0 10px !important;
-    border-radius:13px !important;
-    gap:6px !important;
-  }
-
-  .homeModelClassicCodeLabel,
-  .homeModelNotifyCode span{
-    font-size:.58rem !important;
-  }
-
-  .homeModelClassicCode,
-  .homeModelNotifyCode strong{
-    font-size:1.05rem !important;
-  }
-
-  .homeModelClassicControl,
-  #displayControlsEyeBtn,
-  .homeModelNotifyControl{
-    height:35px !important;
-    min-width:96px !important;
-    padding:0 10px !important;
-    border-radius:13px !important;
-    font-size:.66rem !important;
-  }
-
-  .homeModelClassicClose,
-  .homeModelNotifyClose{
-    width:31px !important;
-    height:31px !important;
-    min-width:31px !important;
-    border-radius:11px !important;
-    font-size:1.1rem !important;
-  }
-}
 /* =========================================================
-   MODEL POPUP - BIGGER BUTTONS
-   تكبير إشعار الكود وزر إخفاء التحكم
-========================================================= */
-
-.homeModelPopupArea,
-#homeModelPopupArea{
-  top:22px !important;
-}
-
-.homeModelNotifyBox,
-.homeModelClassicBox{
-  min-height:68px !important;
-  padding:10px !important;
-  gap:12px !important;
-  border-radius:24px !important;
-}
-
-/* زر الكود */
-.homeModelClassicBody,
-.homeModelNotifyCode{
-  height:52px !important;
-  min-width:210px !important;
-  padding:0 18px !important;
-  border-radius:18px !important;
-  gap:12px !important;
-}
-
-/* كلمة كود المقدم */
-.homeModelClassicCodeLabel,
-.homeModelNotifyCode span{
-  font-size:.82rem !important;
-  font-weight:900 !important;
-}
-
-/* رقم الكود */
-.homeModelClassicCode,
-.homeModelNotifyCode strong{
-  font-size:1.75rem !important;
-  letter-spacing:2px !important;
-}
-
-/* زر إخفاء / إظهار التحكم */
-.homeModelClassicControl,
-#displayControlsEyeBtn,
-.homeModelNotifyControl{
-  height:52px !important;
-  min-width:150px !important;
-  padding:0 20px !important;
-  border-radius:18px !important;
-
-  font-size:.95rem !important;
-  font-weight:900 !important;
-}
-
-/* زر الإغلاق */
-.homeModelClassicClose,
-.homeModelNotifyClose{
-  width:42px !important;
-  height:42px !important;
-  min-width:42px !important;
-
-  border-radius:16px !important;
-  font-size:1.45rem !important;
-}
-
-/* Tablet */
-@media (max-width:1180px){
-  .homeModelPopupArea,
-  #homeModelPopupArea{
-    top:16px !important;
-  }
-
-  .homeModelNotifyBox,
-  .homeModelClassicBox{
-    min-height:62px !important;
-    padding:9px !important;
-    gap:9px !important;
-    border-radius:22px !important;
-  }
-
-  .homeModelClassicBody,
-  .homeModelNotifyCode{
-    height:48px !important;
-    min-width:185px !important;
-    padding:0 15px !important;
-    border-radius:16px !important;
-    gap:10px !important;
-  }
-
-  .homeModelClassicCodeLabel,
-  .homeModelNotifyCode span{
-    font-size:.75rem !important;
-  }
-
-  .homeModelClassicCode,
-  .homeModelNotifyCode strong{
-    font-size:1.5rem !important;
-    letter-spacing:1.8px !important;
-  }
-
-  .homeModelClassicControl,
-  #displayControlsEyeBtn,
-  .homeModelNotifyControl{
-    height:48px !important;
-    min-width:132px !important;
-    padding:0 16px !important;
-    border-radius:16px !important;
-    font-size:.85rem !important;
-  }
-
-  .homeModelClassicClose,
-  .homeModelNotifyClose{
-    width:38px !important;
-    height:38px !important;
-    min-width:38px !important;
-    border-radius:14px !important;
-    font-size:1.3rem !important;
-  }
-}
-/* =========================================================
-   SEGMENTS GRID - GLASS CARD DESIGN
+   SEGMENTS GRID
 ========================================================= */
 
 .homeSegmentsShowcase{
@@ -1002,21 +861,16 @@ body.presenterHideDisplayControls .archiveControls{
 
   overflow:hidden;
   cursor:pointer;
+  isolation:isolate;
 
   border-radius:34px 20px 34px 20px;
-  border:1px solid rgba(255,255,255,.14);
+  border:1px solid var(--glass-border);
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.055),
-      rgba(255,255,255,.018)
-    );
+  background:var(--glass-segment);
 
   box-shadow:
     0 20px 42px rgba(31,41,55,.14),
-    inset 0 1px 0 rgba(255,255,255,.22),
-    inset 0 -1px 0 rgba(255,255,255,.05);
+    inset 0 1px 0 var(--glass-highlight);
 
   backdrop-filter:blur(28px) saturate(1.18);
   -webkit-backdrop-filter:blur(28px) saturate(1.18);
@@ -1035,7 +889,6 @@ body.presenterHideDisplayControls .archiveControls{
   border-radius:20px 34px 20px 34px;
 }
 
-/* إطار داخلي للبطاقة */
 .homeSegmentItem::before{
   content:"";
   position:absolute;
@@ -1045,13 +898,7 @@ body.presenterHideDisplayControls .archiveControls{
   border-radius:26px 15px 26px 15px;
   border:1px solid rgba(255,255,255,.10);
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.035),
-      rgba(255,255,255,.010)
-    );
-
+  background:rgba(255,255,255,.025);
   pointer-events:none;
 }
 
@@ -1059,7 +906,6 @@ body.presenterHideDisplayControls .archiveControls{
   border-radius:15px 26px 15px 26px;
 }
 
-/* خط انعكاس علوي */
 .homeSegmentItem::after{
   content:"";
   position:absolute;
@@ -1070,52 +916,46 @@ body.presenterHideDisplayControls .archiveControls{
   z-index:2;
 
   background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(255,255,255,.42),
-      transparent
-    );
+    linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent);
 
   opacity:.85;
   pointer-events:none;
 }
 
-/* ألوان خفيفة لكل فقرة بدون تبييض */
 #segmentWarmup{
   background:
-    radial-gradient(circle at 18% 0%, rgba(249,115,22,.14), transparent 44%),
-    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+    radial-gradient(circle at 18% 0%,rgba(249,115,22,.14),transparent 44%),
+    var(--glass-segment);
 }
 
 #segmentTop10{
   background:
-    radial-gradient(circle at 84% 0%, rgba(124,58,237,.13), transparent 44%),
-    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+    radial-gradient(circle at 84% 0%,rgba(124,58,237,.13),transparent 44%),
+    var(--glass-segment);
 }
 
 #segmentAuction{
   background:
-    radial-gradient(circle at 18% 0%, rgba(34,197,94,.12), transparent 44%),
-    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+    radial-gradient(circle at 18% 0%,rgba(34,197,94,.12),transparent 44%),
+    var(--glass-segment);
 }
 
 #segmentWho{
   background:
-    radial-gradient(circle at 84% 0%, rgba(6,182,212,.14), transparent 44%),
-    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+    radial-gradient(circle at 84% 0%,rgba(6,182,212,.14),transparent 44%),
+    var(--glass-segment);
 }
 
 #segmentFinal{
   background:
-    radial-gradient(circle at 18% 0%, rgba(251,113,133,.12), transparent 44%),
-    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+    radial-gradient(circle at 18% 0%,rgba(251,113,133,.12),transparent 44%),
+    var(--glass-segment);
 }
 
 #segmentArchive{
   background:
-    radial-gradient(circle at 84% 0%, rgba(100,116,139,.13), transparent 44%),
-    linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+    radial-gradient(circle at 84% 0%,rgba(100,116,139,.13),transparent 44%),
+    var(--glass-segment);
 }
 
 .homeSegmentContent{
@@ -1133,7 +973,6 @@ body.presenterHideDisplayControls .archiveControls{
   text-align:center;
 }
 
-/* صندوق الاسم داخل البطاقة */
 .homeSegmentItem span{
   position:relative;
   z-index:3;
@@ -1148,16 +987,10 @@ body.presenterHideDisplayControls .archiveControls{
   padding:10px 16px;
   border-radius:22px;
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.055),
-      rgba(255,255,255,.018)
-    );
-
+  background:rgba(255,255,255,.035);
   border:1px solid rgba(255,255,255,.09);
 
-  color:#24185E;
+  color:var(--main-text);
 
   font-size:clamp(1.95rem,2.8vw,2.85rem);
   line-height:1;
@@ -1173,9 +1006,10 @@ body.presenterHideDisplayControls .archiveControls{
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.16),
     0 10px 24px rgba(31,41,55,.08);
+
+  overflow:hidden;
 }
 
-/* نقطة زخرفية داخل كرت الاسم */
 .homeSegmentItem span::before{
   content:"";
   position:absolute;
@@ -1190,7 +1024,6 @@ body.presenterHideDisplayControls .archiveControls{
   box-shadow:0 0 14px rgba(255,155,81,.35);
 }
 
-/* خط زخرفي سفلي */
 .homeSegmentItem span::after{
   content:"";
   position:absolute;
@@ -1202,11 +1035,7 @@ body.presenterHideDisplayControls .archiveControls{
   border-radius:999px;
 
   background:
-    linear-gradient(
-      90deg,
-      rgba(255,155,81,.55),
-      rgba(255,255,255,.12)
-    );
+    linear-gradient(90deg,rgba(255,155,81,.55),rgba(255,255,255,.12));
 }
 
 .homeSegmentWinner{
@@ -1247,10 +1076,8 @@ body.presenterHideDisplayControls .archiveControls{
   display:none;
 }
 
-/* Hover */
 .homeSegmentItem:hover{
   transform:translateY(-7px) scale(1.012);
-
   border-color:rgba(255,255,255,.22);
 
   box-shadow:
@@ -1266,7 +1093,7 @@ body.presenterHideDisplayControls .archiveControls{
 }
 
 /* =========================================================
-   LOCKED SEGMENT CARD
+   LOCKED SEGMENT
 ========================================================= */
 
 .homeSegmentItem.segmentLocked,
@@ -1274,10 +1101,15 @@ body.presenterHideDisplayControls .archiveControls{
 .homeSegmentItem.hasWinner{
   pointer-events:none;
   cursor:not-allowed;
-
-  opacity:.78;
-  filter:grayscale(.10) brightness(.95);
+  opacity:.98;
+  filter:saturate(.82) brightness(.96);
   transform:none;
+}
+
+.homeSegmentItem.segmentLocked::before,
+.homeSegmentItem.segmentDone::before,
+.homeSegmentItem.hasWinner::before{
+  opacity:.55;
 }
 
 .homeSegmentItem.segmentLocked::after,
@@ -1343,197 +1175,12 @@ body.presenterHideDisplayControls .archiveControls{
   border-radius:18px;
 
   background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.060),
-      rgba(255,255,255,.020)
-    );
-
-  border:1px solid rgba(255,255,255,.12);
-
-  color:#24185E;
-
-  font-size:1.1rem;
-  line-height:1.1;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-
-  box-shadow:
-    0 12px 24px rgba(30,27,75,.08),
-    inset 0 1px 0 rgba(255,255,255,.18),
-    inset 0 -1px 0 rgba(255,255,255,.06);
-
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-}
-
-.homeSegmentItem.segmentLocked .homeSegmentWinner::before,
-.homeSegmentItem.segmentDone .homeSegmentWinner::before,
-.homeSegmentItem.hasWinner .homeSegmentWinner::before,
-.homeSegmentItem.segmentLocked .homeSegmentContent::before,
-.homeSegmentItem.segmentDone .homeSegmentContent::before,
-.homeSegmentItem.hasWinner .homeSegmentContent::before{
-  display:none;
-  content:none;
-}
-
-.homeSegmentItem.segmentLocked:hover,
-.homeSegmentItem.segmentDone:hover,
-.homeSegmentItem.hasWinner:hover{
-  transform:none;
-  filter:grayscale(.10) brightness(.95);
-  opacity:.78;
-}
-
-/* =========================================================
-   RESPONSIVE - SEGMENT CARDS
-========================================================= */
-
-@media (min-width:768px) and (max-width:1180px){
-  .homeSegmentsShowcase{
-    gap:12px;
-  }
-
-  .homeSegmentItem{
-    min-height:116px;
-    padding:14px;
-  }
-
-  .homeSegmentItem span{
-    min-height:62px;
-    font-size:1.45rem;
-  }
-}
-
-@media (max-width:767px){
-  .homeSegmentsShowcase{
-    grid-template-columns:1fr;
-    gap:10px;
-  }
-
-  .homeSegmentItem,
-  .homeSegmentItem:nth-child(even){
-    min-height:96px;
-    padding:12px;
-    border-radius:22px;
-  }
-
-  .homeSegmentItem::before,
-  .homeSegmentItem:nth-child(even)::before{
-    inset:8px;
-    border-radius:17px;
-  }
-
-  .homeSegmentItem span{
-    min-height:58px;
-    width:calc(100% - 20px);
-    border-radius:17px;
-
-    font-size:1.38rem;
-  }
-
-  .homeSegmentItem.segmentLocked::after,
-  .homeSegmentItem.segmentDone::after,
-  .homeSegmentItem.hasWinner::after{
-    width:88px;
-    height:30px;
-    border-radius:0 0 15px 0;
-    font-size:.68rem;
-  }
-
-  .homeSegmentItem.segmentLocked .homeSegmentWinner,
-  .homeSegmentItem.segmentDone .homeSegmentWinner,
-  .homeSegmentItem.hasWinner .homeSegmentWinner{
-    min-height:36px;
-    padding:7px 16px;
-    font-size:.95rem;
-  }
-}
-
-/* =========================================================
-   LOCKED SEGMENT CARD
-========================================================= */
-
-.homeSegmentItem.segmentLocked,
-.homeSegmentItem.segmentDone,
-.homeSegmentItem.hasWinner{
-  pointer-events:none;
-  cursor:not-allowed;
-  opacity:.98;
-  filter:saturate(.82) brightness(.96);
-  transform:none;
-}
-
-.homeSegmentItem.segmentLocked::before,
-.homeSegmentItem.segmentDone::before,
-.homeSegmentItem.hasWinner::before{
-  opacity:.55;
-}
-
-.homeSegmentItem.segmentLocked::after,
-.homeSegmentItem.segmentDone::after,
-.homeSegmentItem.hasWinner::after{
-  content:"منتهية";
-
-  position:absolute;
-  top:0;
-  left:0;
-  bottom:auto;
-
-  width:96px;
-  height:32px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border-radius:0 0 16px 0;
-
-  background:rgba(115,32,45,.88);
-  color:#FFF4F4;
-
-  font-family:"HanakaText",sans-serif;
-  font-size:.74rem;
-
-  box-shadow:none;
-  transform:none;
-
-  z-index:5;
-}
-
-.homeSegmentItem.segmentLocked > *,
-.homeSegmentItem.segmentDone > *,
-.homeSegmentItem.hasWinner > *{
-  position:relative;
-  z-index:4;
-}
-
-.homeSegmentItem.segmentLocked .homeSegmentContent,
-.homeSegmentItem.segmentDone .homeSegmentContent,
-.homeSegmentItem.hasWinner .homeSegmentContent{
-  padding-top:10px;
-  gap:12px;
-}
-
-.homeSegmentItem.segmentLocked .homeSegmentWinner,
-.homeSegmentItem.segmentDone .homeSegmentWinner,
-.homeSegmentItem.hasWinner .homeSegmentWinner{
-  display:flex;
-
-  min-height:40px;
-  max-width:92%;
-  padding:8px 22px;
-  border-radius:18px;
-
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.30), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.18));
+    radial-gradient(circle at 18% 0%,rgba(255,255,255,.30),transparent 42%),
+    linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.18));
 
   border:1px solid rgba(255,255,255,.34);
 
-  color:#24185E;
+  color:var(--main-text);
 
   font-size:1.1rem;
   line-height:1.1;
@@ -1544,21 +1191,10 @@ body.presenterHideDisplayControls .archiveControls{
 
   box-shadow:
     0 12px 24px rgba(30,27,75,.10),
-    inset 0 1px 0 rgba(255,255,255,.72),
-    inset 0 -1px 0 rgba(255,255,255,.10);
+    inset 0 1px 0 rgba(255,255,255,.72);
 
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
-}
-
-.homeSegmentItem.segmentLocked .homeSegmentWinner::before,
-.homeSegmentItem.segmentDone .homeSegmentWinner::before,
-.homeSegmentItem.hasWinner .homeSegmentWinner::before,
-.homeSegmentItem.segmentLocked .homeSegmentContent::before,
-.homeSegmentItem.segmentDone .homeSegmentContent::before,
-.homeSegmentItem.hasWinner .homeSegmentContent::before{
-  display:none;
-  content:none;
 }
 
 .homeSegmentItem.segmentLocked:hover,
@@ -1570,17 +1206,20 @@ body.presenterHideDisplayControls .archiveControls{
 }
 
 /* =========================================================
-   WINNER BUTTON
+   HOME WINNER BUTTON
 ========================================================= */
 
 .homeWinnerArea{
   width:min(100%,1180px);
-  margin:20px auto 0;
+  margin:22px auto 0;
 
   display:flex;
   align-items:center;
   justify-content:center;
   gap:14px;
+
+  position:relative;
+  z-index:5;
 }
 
 .homeWinnerBtn,
@@ -1588,32 +1227,32 @@ body.presenterHideDisplayControls .archiveControls{
   position:relative;
   overflow:hidden;
 
-  min-width:220px;
-  min-height:58px;
-  padding:0 30px;
+  min-width:230px;
+  min-height:60px;
+  padding:0 34px;
 
-  border:1px solid rgba(255,255,255,.42);
-  border-radius:22px;
+  border:1px solid rgba(255,255,255,.34);
+  border-radius:24px;
 
   background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.34), transparent 42%),
-    linear-gradient(180deg, rgba(255,155,81,.92), rgba(255,126,48,.88));
+    radial-gradient(circle at 18% 0%,rgba(255,255,255,.26),transparent 42%),
+    linear-gradient(180deg,rgba(15,38,47,.95),rgba(36,99,122,.90));
 
-  color:#FFFFFF;
+  color:#fff;
 
-  font-size:1.22rem;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.35rem;
   line-height:1;
 
   cursor:pointer;
 
   box-shadow:
-    0 18px 34px rgba(255,126,48,.25),
-    0 0 0 5px rgba(255,155,81,.08),
-    inset 0 1px 0 rgba(255,255,255,.36),
-    inset 0 -1px 0 rgba(0,0,0,.10);
+    0 18px 34px rgba(42,100,133,.26),
+    0 0 0 5px rgba(38,97,131,.08),
+    inset 0 1px 0 rgba(47,76,113,.34);
 
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(20px) saturate(1.12);
+  -webkit-backdrop-filter:blur(20px) saturate(1.12);
 
   transition:
     transform .18s ease,
@@ -1625,10 +1264,10 @@ body.presenterHideDisplayControls .archiveControls{
 .winnerBtn::before{
   content:"";
   position:absolute;
-  width:74px;
-  height:74px;
-  top:-34px;
-  right:-20px;
+  width:78px;
+  height:78px;
+  top:-36px;
+  right:-22px;
   border-radius:50%;
   background:rgba(255,255,255,.16);
   pointer-events:none;
@@ -1638,17 +1277,20 @@ body.presenterHideDisplayControls .archiveControls{
 .winnerBtn::after{
   content:"";
   position:absolute;
-  inset:-45%;
-  background:linear-gradient(120deg, transparent 38%, rgba(255,255,255,.34), transparent 62%);
+  inset:-50%;
+
+  background:
+    linear-gradient(120deg,transparent 38%,rgba(255,255,255,.38),transparent 62%);
+
   transform:translateX(120%) rotate(8deg);
-  animation:winnerButtonShine 3s ease-in-out infinite;
+  animation:winnerButtonShineDisplay 3s ease-in-out infinite;
   pointer-events:none;
 }
 
 .homeWinnerBtn:hover,
 .winnerBtn:hover{
   transform:translateY(-3px) scale(1.025);
-  filter:brightness(1.05);
+  filter:brightness(1.06);
 }
 
 .homeWinnerBtn:active,
@@ -1656,10 +1298,11 @@ body.presenterHideDisplayControls .archiveControls{
   transform:scale(.96);
 }
 
-@keyframes winnerButtonShine{
+@keyframes winnerButtonShineDisplay{
   0%,45%{
     transform:translateX(120%) rotate(8deg);
   }
+
   70%,100%{
     transform:translateX(-120%) rotate(8deg);
   }
@@ -1690,23 +1333,23 @@ body.presenterHideDisplayControls .archiveControls{
   border-radius:26px;
 
   background:
-    radial-gradient(circle at 16% 0%, rgba(255,255,255,.30), transparent 38%),
-    linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.15));
+    radial-gradient(circle at 16% 0%,rgba(255,255,255,.18),transparent 38%),
+    rgba(255,255,255,.04);
 
-  border:1px solid rgba(255,255,255,.40);
+  border:1px solid rgba(255,255,255,.10);
 
   box-shadow:
     0 16px 34px rgba(30,27,75,.09),
-    inset 0 1px 0 rgba(255,255,255,.70);
+    inset 0 1px 0 rgba(255,255,255,.16);
 
-  backdrop-filter:blur(22px);
-  -webkit-backdrop-filter:blur(22px);
+  backdrop-filter:blur(28px) saturate(1.16);
+  -webkit-backdrop-filter:blur(28px) saturate(1.16);
 }
 
 .segmentTitle{
   margin:0;
   text-align:center;
-  color:#24185E;
+  color:var(--main-text);
   font-size:clamp(1.8rem,2.8vw,2.6rem);
   line-height:1;
   font-weight:400;
@@ -1720,7 +1363,7 @@ body.presenterHideDisplayControls .archiveControls{
   cursor:pointer;
   color:#fff;
   box-shadow:
-    0 10px 20px rgba(30,27,75,.12),
+    0 10px 20px rgba(30,27,75,.16),
     inset 0 1px 0 rgba(255,255,255,.20);
 }
 
@@ -1739,18 +1382,20 @@ body.presenterHideDisplayControls .archiveControls{
   filter:saturate(.8);
 }
 
+.segmentControls .backBtn:hover,
+.segmentControls .endBtn:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.05);
+}
+
 .segmentContentWrap{
   width:min(100%,1180px);
   margin:0 auto 24px;
 }
-/* =========================================================
-   PRESENTER HIDE CONTROLS
-   إخفاء التحكم بدون حذف الهيدر العلوي
-========================================================= */
 
-/* =========================
-   الهيدر العلوي يبقى ظاهر
-========================= */
+/* =========================================================
+   PRESENTER HIDE DISPLAY CONTROLS
+========================================================= */
 
 body.presenterHideDisplayControls .segmentControls,
 body.presenterHideDisplayControls .segmentControls *,
@@ -1762,28 +1407,38 @@ body.presenterHideDisplayControls .segmentTitle{
   pointer-events:auto;
 }
 
-/* =========================
-   الفاصلة
-========================= */
+body.presenterHideDisplayControls .displayControls,
+body.presenterHideDisplayControls .controlsBar,
+body.presenterHideDisplayControls .finalControlsBar,
+body.presenterHideDisplayControls #finalControlsBar,
+body.presenterHideDisplayControls .auctionControls,
+body.presenterHideDisplayControls .top10Controls,
+body.presenterHideDisplayControls .warmupControls,
+body.presenterHideDisplayControls .whoControls,
+body.presenterHideDisplayControls .archiveControls{
+  display:none !important;
+}
 
 body.presenterHideDisplayControls .finalControlsBar button,
 body.presenterHideDisplayControls #finalControlsBar button,
 body.presenterHideDisplayControls .finalRound1ControlsBar button,
 body.presenterHideDisplayControls .finalRound2ControlsBar button,
-body.presenterHideDisplayControls .finalRound3ControlsBar button{
-  visibility:hidden;
-  opacity:0;
-  pointer-events:none;
-}
-
-/* =========================
-   التسخين
-========================= */
-
+body.presenterHideDisplayControls .finalRound3ControlsBar button,
 body.presenterHideDisplayControls .warmupControlPanel button,
 body.presenterHideDisplayControls .warmupControls button,
 body.presenterHideDisplayControls .warmupActions button,
-body.presenterHideDisplayControls .warmupButtons button{
+body.presenterHideDisplayControls .warmupButtons button,
+body.presenterHideDisplayControls .top10Controls button,
+body.presenterHideDisplayControls .top10ControlPanel button,
+body.presenterHideDisplayControls .top10Actions button,
+body.presenterHideDisplayControls .top10Buttons button,
+body.presenterHideDisplayControls .auctionControls button,
+body.presenterHideDisplayControls .auctionControlPanel button,
+body.presenterHideDisplayControls .auctionActions button,
+body.presenterHideDisplayControls .auctionButtons button,
+body.presenterHideDisplayControls .controlButtons button,
+body.presenterHideDisplayControls .controlsBar button,
+body.presenterHideDisplayControls .segmentControlButtons button{
   visibility:hidden;
   opacity:0;
   pointer-events:none;
@@ -1808,37 +1463,7 @@ body.presenterHideDisplayControls .warmupCard{
   pointer-events:auto;
 }
 
-/* =========================
-   Top 10
-========================= */
-
-body.presenterHideDisplayControls .top10Controls button,
-body.presenterHideDisplayControls .top10ControlPanel button,
-body.presenterHideDisplayControls .top10Actions button,
-body.presenterHideDisplayControls .top10Buttons button{
-  visibility:hidden;
-  opacity:0;
-  pointer-events:none;
-}
-
-/* =========================
-   فتبلة
-========================= */
-
-body.presenterHideDisplayControls .auctionControls button,
-body.presenterHideDisplayControls .auctionControlPanel button,
-body.presenterHideDisplayControls .auctionActions button,
-body.presenterHideDisplayControls .auctionButtons button{
-  visibility:hidden;
-  opacity:0;
-  pointer-events:none;
-}
-
-/* =========================================================
-   WHO - FORCE HIDE CONTROL PANEL + CENTER POINTS
-========================================================= */
-
-/* عند إخفاء التحكم: الصف السفلي يصير عنصر واحد بالوسط */
+/* WHO */
 body.presenterHideDisplayControls .whoWrap .whoBottomRow{
   display:flex !important;
   align-items:center !important;
@@ -1847,7 +1472,6 @@ body.presenterHideDisplayControls .whoWrap .whoBottomRow{
   gap:0 !important;
 }
 
-/* إخفاء لوحة التحكم كاملة */
 body.presenterHideDisplayControls .whoWrap .whoBottomRow .whoControlPanel,
 body.presenterHideDisplayControls .whoWrap .whoControlPanel{
   display:none !important;
@@ -1856,7 +1480,6 @@ body.presenterHideDisplayControls .whoWrap .whoControlPanel{
   pointer-events:none !important;
 }
 
-/* مربع النقاط يبقى ظاهر ويتوسط */
 body.presenterHideDisplayControls .whoWrap .whoPointsSelect{
   display:flex !important;
   align-items:center !important;
@@ -1876,7 +1499,6 @@ body.presenterHideDisplayControls .whoWrap .whoPointsSelect{
   transform:none !important;
 }
 
-/* محتوى مربع النقاط يبقى ظاهر */
 body.presenterHideDisplayControls .whoWrap .whoPointsSelect *,
 body.presenterHideDisplayControls .whoWrap .whoTurnSide,
 body.presenterHideDisplayControls .whoWrap .whoPointsSide,
@@ -1887,20 +1509,7 @@ body.presenterHideDisplayControls .whoWrap .whoPointBtn{
   pointer-events:auto !important;
 }
 
-/* ترتيب النقاط داخل المربع */
-body.presenterHideDisplayControls .whoWrap .whoPointsSide{
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  flex-wrap:wrap !important;
-}
-
-/* =========================================================
-   ARCHIVE - HIDE CONTROL ONLY + RAISE INPUTS
-   الأرشيف: نفس الترتيب، فقط إخفاء التحكم ورفع النقاط والمطلوب
-========================================================= */
-
-/* إخفاء مربع التحكم في الأرشيف فقط */
+/* ARCHIVE */
 body.presenterHideDisplayControls .archiveControlButtons,
 body.presenterHideDisplayControls .archiveControlPanel,
 body.presenterHideDisplayControls .archiveControls,
@@ -1911,7 +1520,6 @@ body.presenterHideDisplayControls .archiveButtons{
   pointer-events:none !important;
 }
 
-/* المؤقت يبقى بنفس شكله وترتيبه */
 body.presenterHideDisplayControls .archiveSideTimerBox,
 body.presenterHideDisplayControls .archiveTimerBox,
 body.presenterHideDisplayControls .archiveTimer,
@@ -1919,11 +1527,9 @@ body.presenterHideDisplayControls #archiveTimer{
   visibility:visible !important;
   opacity:1 !important;
   pointer-events:auto !important;
-
   transform:none !important;
 }
 
-/* إخفاء أزرار المؤقت فقط بدون تغيير شكل الصندوق */
 body.presenterHideDisplayControls .archiveSideTimerBox button,
 body.presenterHideDisplayControls .archiveTimerBox button{
   visibility:hidden !important;
@@ -1931,28 +1537,6 @@ body.presenterHideDisplayControls .archiveTimerBox button{
   pointer-events:none !important;
 }
 
-/* النقاط والمطلوب تبقى ظاهرة */
-body.presenterHideDisplayControls .archiveInputsInline,
-body.presenterHideDisplayControls .archiveInputsInline *,
-body.presenterHideDisplayControls .archiveInputsWrap,
-body.presenterHideDisplayControls .archiveInputsWrap *,
-body.presenterHideDisplayControls .archiveInputsBox,
-body.presenterHideDisplayControls .archiveInputsBox *,
-body.presenterHideDisplayControls .archiveManualInputs,
-body.presenterHideDisplayControls .archiveManualInputs *,
-body.presenterHideDisplayControls .archiveInputRow,
-body.presenterHideDisplayControls .archiveInputHalf,
-body.presenterHideDisplayControls .archiveMiniInput,
-body.presenterHideDisplayControls .archiveMiniInputStrong,
-body.presenterHideDisplayControls .archiveInputLabel,
-body.presenterHideDisplayControls #archiveManualInput1,
-body.presenterHideDisplayControls #archiveManualInput2{
-  visibility:visible !important;
-  opacity:1 !important;
-  pointer-events:auto !important;
-}
-
-/* رفع مربع النقاط والمطلوب فقط */
 body.presenterHideDisplayControls .archiveInputsInline,
 body.presenterHideDisplayControls .archiveInputsWrap,
 body.presenterHideDisplayControls .archiveInputsBox,
@@ -1961,13 +1545,21 @@ body.presenterHideDisplayControls .archiveManualInputs{
   transition:transform .22s ease !important;
 }
 
-/* تبويبات الأرشيف تبقى كما هي */
+body.presenterHideDisplayControls .archiveInputsInline,
+body.presenterHideDisplayControls .archiveInputsInline *,
+body.presenterHideDisplayControls .archiveInputsWrap,
+body.presenterHideDisplayControls .archiveInputsWrap *,
+body.presenterHideDisplayControls .archiveInputsBox,
+body.presenterHideDisplayControls .archiveInputsBox *,
+body.presenterHideDisplayControls .archiveManualInputs,
+body.presenterHideDisplayControls .archiveManualInputs *,
 body.presenterHideDisplayControls .archiveRoundTabs,
 body.presenterHideDisplayControls .archiveRoundTabs *{
   visibility:visible !important;
   opacity:1 !important;
   pointer-events:auto !important;
 }
+
 body.presenterHideDisplayControls .archiveSideTimerBox > div,
 body.presenterHideDisplayControls .archiveTimerBox > div{
   font-size:4.4rem !important;
@@ -1976,45 +1568,11 @@ body.presenterHideDisplayControls .archiveTimerBox > div{
 
 body.presenterHideDisplayControls .archiveSideTimerBox > div:first-child,
 body.presenterHideDisplayControls .archiveTimerBox > div:first-child{
-  font-size:1.0rem !important;
+  font-size:1rem !important;
 }
 
-/* للجوال */
-@media (max-width:767px){
-  body.presenterHideDisplayControls .archiveInputsInline,
-  body.presenterHideDisplayControls .archiveInputsWrap,
-  body.presenterHideDisplayControls .archiveInputsBox,
-  body.presenterHideDisplayControls .archiveManualInputs{
-    transform:translateY(-26px) !important;
-  }
-}
-/* =========================
-   أزرار عامة
-========================= */
-
-body.presenterHideDisplayControls .controlButtons button,
-body.presenterHideDisplayControls .controlsBar button,
-body.presenterHideDisplayControls .segmentControlButtons button{
-  visibility:hidden;
-  opacity:0;
-  pointer-events:none;
-}
-
-/* =========================
-   الجوال
-========================= */
-
-@media (max-width:767px){
-  body.presenterHideDisplayControls .archiveInputsInline{
-    transform:translateY(-18px);
-  }
-
-  body.presenterHideDisplayControls .archiveSideTimerBox{
-    transform:scale(1.04);
-  }
-}
 /* =========================================================
-   TOAST
+   TOAST + NOTICE
 ========================================================= */
 
 .gameToast{
@@ -2035,13 +1593,13 @@ body.presenterHideDisplayControls .segmentControlButtons button{
   border-radius:22px;
 
   background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.20), transparent 42%),
-    radial-gradient(circle at 88% 100%, rgba(244,63,94,.18), transparent 44%),
-    linear-gradient(180deg, rgba(88,28,45,.88), rgba(76,5,25,.95));
+    radial-gradient(circle at 18% 0%,rgba(255,255,255,.20),transparent 42%),
+    radial-gradient(circle at 88% 100%,rgba(244,63,94,.18),transparent 44%),
+    linear-gradient(180deg,rgba(88,28,45,.88),rgba(76,5,25,.95));
 
   border:1px solid rgba(255,255,255,.20);
 
-  color:#FFFFFF;
+  color:#fff;
 
   box-shadow:
     0 18px 42px rgba(76,5,25,.34),
@@ -2101,10 +1659,6 @@ body.presenterHideDisplayControls .segmentControlButtons button{
   justify-content:center;
 }
 
-/* =========================================================
-   NOTICE MODAL
-========================================================= */
-
 .gameNotice{
   position:fixed;
   inset:0;
@@ -2132,8 +1686,8 @@ body.presenterHideDisplayControls .segmentControlButtons button{
   text-align:center;
 
   background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.42), transparent 44%),
-    linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.62));
+    radial-gradient(circle at 20% 0%,rgba(255,255,255,.42),transparent 44%),
+    linear-gradient(180deg,rgba(255,255,255,.86),rgba(255,255,255,.62));
 
   border:1px solid rgba(255,255,255,.52);
 
@@ -2162,12 +1716,10 @@ body.presenterHideDisplayControls .segmentControlButtons button{
   font-family:Arial,sans-serif;
   font-size:1.8rem;
   font-weight:900;
-
-  box-shadow:0 14px 26px rgba(225,29,72,.18);
 }
 
 .gameNoticeText{
-  color:#24185E;
+  color:var(--main-text);
   font-size:1.1rem;
   line-height:1.7;
   margin-bottom:16px;
@@ -2184,10 +1736,6 @@ body.presenterHideDisplayControls .segmentControlButtons button{
 
   font-size:1rem;
   cursor:pointer;
-
-  box-shadow:
-    0 12px 24px rgba(6,182,212,.20),
-    inset 0 1px 0 rgba(255,255,255,.34);
 }
 
 @keyframes noticeIn{
@@ -2195,6 +1743,7 @@ body.presenterHideDisplayControls .segmentControlButtons button{
     opacity:0;
     transform:translateY(16px) scale(.96);
   }
+
   to{
     opacity:1;
     transform:translateY(0) scale(1);
@@ -2202,7 +1751,7 @@ body.presenterHideDisplayControls .segmentControlButtons button{
 }
 
 /* =========================================================
-   WINNER OVERLAY - CLEAN FAST VERSION
+   WINNER OVERLAY
 ========================================================= */
 
 #winnerOverlay{
@@ -2217,116 +1766,78 @@ body.presenterHideDisplayControls .segmentControlButtons button{
   padding:22px;
 
   background:
-    radial-gradient(circle at 50% 18%, rgba(255,155,81,.20), transparent 34%),
-    radial-gradient(circle at 18% 82%, rgba(103,232,249,.12), transparent 36%),
-    rgba(20,28,38,.56);
+    radial-gradient(circle at 50% 18%,rgba(255,155,81,.30),transparent 34%),
+    radial-gradient(circle at 18% 82%,rgba(103,232,249,.18),transparent 36%),
+    radial-gradient(circle at 84% 78%,rgba(251,113,133,.14),transparent 34%),
+    rgba(20,28,38,.54);
 
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-
-  opacity:1;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
 }
 
 #winnerOverlay.hidden{
   display:none !important;
 }
 
-/* إلغاء الزخارف المتحركة الثقيلة */
 #winnerOverlay::before,
 #winnerOverlay::after{
-  content:none !important;
   display:none !important;
+  content:none !important;
 }
 
-/* =========================
-   CARD
-========================= */
-
 #winnerOverlayCard{
+  width:min(100%,560px);
   position:relative;
   z-index:3;
-
-  width:min(100%,560px);
+  overflow:hidden;
 
   padding:34px 28px 24px;
   border-radius:38px;
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-
   text-align:center;
 
   background:
-    radial-gradient(circle at 50% 0%, rgba(255,255,255,.46), transparent 42%),
-    radial-gradient(circle at 100% 100%, rgba(103,232,249,.12), transparent 36%),
-    linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.42));
+    radial-gradient(circle at 50% 0%,rgba(255,155,81,.24),transparent 42%),
+    radial-gradient(circle at 16% 100%,rgba(103,232,249,.14),transparent 44%),
+    linear-gradient(180deg,rgba(255,255,255,.90),rgba(255,255,255,.64));
 
-  border:1px solid rgba(255,255,255,.54);
+  border:1px solid rgba(255,255,255,.58);
 
   box-shadow:
-    0 28px 68px rgba(30,27,75,.22),
-    0 0 0 6px rgba(255,255,255,.08),
-    inset 0 1px 0 rgba(255,255,255,.86),
-    inset 0 -1px 0 rgba(255,255,255,.14);
+    0 34px 80px rgba(30,27,75,.25),
+    0 0 0 6px rgba(255,255,255,.10),
+    inset 0 1px 0 rgba(255,255,255,.94);
 
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(28px) saturate(1.1);
+  -webkit-backdrop-filter:blur(28px) saturate(1.1);
 
-  overflow:hidden;
-
-  transform:translate3d(0,0,0);
-  backface-visibility:hidden;
-
-  animation:winnerCardEnterFast .24s cubic-bezier(.2,.85,.2,1.05) both;
+  animation:winnerOverlayCardInDisplay .52s cubic-bezier(.16,1,.3,1) both;
 }
 
 #winnerOverlayCard::before{
   content:"";
   position:absolute;
-  width:220px;
-  height:220px;
-  top:-110px;
-  right:-72px;
-
+  width:230px;
+  height:230px;
+  top:-112px;
+  right:-74px;
   border-radius:50%;
-  background:rgba(255,255,255,.18);
-
+  background:rgba(255,255,255,.20);
   pointer-events:none;
 }
 
 #winnerOverlayCard::after{
   content:"";
   position:absolute;
-  width:120px;
-  height:120px;
-  bottom:-46px;
-  left:-34px;
-
-  border-radius:30px;
+  width:130px;
+  height:130px;
+  bottom:-50px;
+  left:-38px;
+  border-radius:32px;
   transform:rotate(24deg);
   background:rgba(103,232,249,.10);
-
   pointer-events:none;
 }
-
-@keyframes winnerCardEnterFast{
-  from{
-    opacity:0;
-    transform:translate3d(0,18px,0) scale(.96);
-  }
-
-  to{
-    opacity:1;
-    transform:translate3d(0,0,0) scale(1);
-  }
-}
-
-/* =========================
-   CONTENT
-========================= */
 
 #winnerOverlayTitle,
 #winnerOverlayName,
@@ -2338,30 +1849,20 @@ body.presenterHideDisplayControls .segmentControlButtons button{
 
 #winnerOverlayTitle{
   width:max-content;
-  margin:0 auto 8px;
+  margin:0 auto 14px;
 
-  padding:8px 22px;
+  padding:8px 24px;
   border-radius:999px;
 
   background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.34), transparent 42%),
-    linear-gradient(180deg, rgba(255,155,81,.24), rgba(255,255,255,.46));
+    radial-gradient(circle at 20% 0%,rgba(255,255,255,.34),transparent 42%),
+    linear-gradient(180deg,rgba(255,155,81,.32),rgba(255,255,255,.48));
 
-  border:1px solid rgba(255,155,81,.24);
+  border:1px solid rgba(255,155,81,.26);
 
   color:#7A4A22;
   font-family:"HanakaText",sans-serif;
-  font-size:.95rem;
-
-  box-shadow:
-    0 10px 20px rgba(255,155,81,.10),
-    inset 0 1px 0 rgba(255,255,255,.78);
-}
-
-/* إلغاء الخط المتحرك فوق الفائز */
-#winnerOverlayTitle::before{
-  content:none !important;
-  display:none !important;
+  font-size:1rem;
 }
 
 #winnerOverlayName{
@@ -2373,69 +1874,56 @@ body.presenterHideDisplayControls .segmentControlButtons button{
 
   background:transparent;
   border:0;
+  border-radius:0;
   box-shadow:none;
 
-  color:#24185E;
+  color:var(--main-text);
 
   font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-size:clamp(3.1rem,5.8vw,5.2rem);
   line-height:1;
 
   text-shadow:
-    0 2px 0 rgba(255,255,255,.85),
-    0 14px 28px rgba(30,27,75,.16),
-    0 0 22px rgba(103,232,249,.16);
+    0 1px 0 rgba(255,255,255,.85),
+    0 14px 28px rgba(30,27,75,.18),
+    0 0 24px rgba(255,155,81,.28),
+    0 0 36px rgba(103,232,249,.18);
 
-  animation:winnerNameEnterFast .28s cubic-bezier(.2,.85,.2,1.05) both;
+  animation:winnerOverlayNamePulse 1.35s ease-in-out infinite;
+  transform-origin:center;
 }
 
-@keyframes winnerNameEnterFast{
-  from{
-    opacity:0;
-    transform:translate3d(0,12px,0) scale(.94);
-  }
+#winnerOverlayName::after{
+  content:"";
+  display:block;
 
-  to{
-    opacity:1;
-    transform:translate3d(0,0,0) scale(1);
-  }
+  width:70%;
+  height:10px;
+  margin:10px auto 0;
+
+  border-radius:999px;
+
+  background:
+    radial-gradient(circle,rgba(255,155,81,.34),rgba(255,155,81,.10) 45%,transparent 72%);
+
+  filter:blur(7px);
+  animation:winnerOverlayNameGlow 1.35s ease-in-out infinite;
 }
 
 #winnerOverlayBurst{
-  margin:12px 0 18px;
+  margin:18px 0 22px;
 
   color:#FF9B51;
-  font-size:1.35rem;
-  letter-spacing:8px;
+  font-size:1.45rem;
+  letter-spacing:10px;
 
-  text-shadow:
-    0 0 14px rgba(255,155,81,.30),
-    0 8px 16px rgba(255,155,81,.10);
-
-  animation:winnerBurstLight .9s ease-in-out infinite;
+  animation:winnerBurstGlowDisplay 1.1s ease-in-out infinite;
 }
-
-@keyframes winnerBurstLight{
-  0%,100%{
-    opacity:.70;
-  }
-
-  50%{
-    opacity:1;
-  }
-}
-
-/* =========================
-   ACTIONS
-========================= */
 
 .winnerOverlayActions{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
-
-  width:100%;
-  margin-top:2px;
 }
 
 #winnerOverlayClose,
@@ -2443,9 +1931,9 @@ body.presenterHideDisplayControls .segmentControlButtons button{
   position:relative;
   overflow:hidden;
 
-  height:52px;
+  height:54px;
 
-  border:0;
+  border:1px solid rgba(255,255,255,.16);
   border-radius:18px;
 
   color:#fff;
@@ -2456,197 +1944,95 @@ body.presenterHideDisplayControls .segmentControlButtons button{
   cursor:pointer;
 
   box-shadow:
-    0 12px 24px rgba(30,27,75,.13),
-    inset 0 1px 0 rgba(255,255,255,.22);
+    0 14px 28px rgba(30,27,75,.16),
+    inset 0 1px 0 rgba(255,255,255,.24),
+    inset 0 -1px 0 rgba(0,0,0,.10);
+
+  backdrop-filter:blur(24px) saturate(1.16);
+  -webkit-backdrop-filter:blur(24px) saturate(1.16);
 
   transition:
-    transform .16s ease,
-    filter .16s ease;
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .18s ease;
 }
 
 #winnerOverlayClose{
   background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-    linear-gradient(180deg,#64748B,#334155);
+    radial-gradient(circle at 20% 0%,rgba(255,255,255,.18),transparent 42%),
+    linear-gradient(180deg,rgba(100,116,139,.82),rgba(51,65,85,.84));
 }
 
 #winnerOverlayEnd{
-  color:#24185E;
-
   background:
-    linear-gradient(
-      115deg,
-      rgba(255,255,255,.54) 0%,
-      rgba(255,255,255,.24) 22%,
-      rgba(103,232,249,.32) 38%,
-      rgba(255,255,255,.70) 50%,
-      rgba(255,155,81,.20) 64%,
-      rgba(255,255,255,.48) 100%
-    );
-
-  background-size:260% 100%;
-  background-position:100% 50%;
-
-  border:1px solid rgba(255,255,255,.50);
-
-  animation:winnerEndBtnShine 4s ease-in-out infinite;
-}
-
-@keyframes winnerEndBtnShine{
-  0%{
-    background-position:100% 50%;
-  }
-
-  45%{
-    background-position:0% 50%;
-  }
-
-  100%{
-    background-position:0% 50%;
-  }
+    radial-gradient(circle at 20% 0%,rgba(255,255,255,.18),transparent 42%),
+    linear-gradient(180deg,rgba(251,113,133,.86),rgba(225,29,72,.86));
 }
 
 #winnerOverlayClose:hover,
 #winnerOverlayEnd:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.05);
+  transform:translateY(-3px) scale(1.02);
+  filter:brightness(1.06);
 }
 
-/* =========================================================
-   WINNER EFFECTS - LIGHT VERSION
-========================================================= */
-
-.winnerConfettiLayer{
-  position:fixed;
-  inset:0;
-  z-index:1000000;
-  pointer-events:none;
-  overflow:hidden;
+#winnerOverlayClose:active,
+#winnerOverlayEnd:active{
+  transform:scale(.96);
 }
 
-.winnerConfettiPiece{
-  position:absolute;
-  display:block;
-  opacity:0;
-  will-change:transform, opacity;
-
-  box-shadow:
-    0 0 6px rgba(255,255,255,.26),
-    0 6px 10px rgba(47,65,88,.10);
-
-  animation-name:winnerConfettiFallFixed;
-  animation-timing-function:linear;
-  animation-fill-mode:forwards;
-}
-
-.screenFlashLayer{
-  position:fixed;
-  inset:0;
-  z-index:999996;
-  pointer-events:none;
-  opacity:0;
-}
-
-.screenFlashLayer.flashCorrect{
-  background:rgba(34,197,94,.24);
-  animation:screenFlashPulseFast .46s ease both;
-}
-
-.screenFlashLayer.flashWrong{
-  background:rgba(239,68,68,.26);
-  animation:screenFlashPulseFast .46s ease both;
-}
-
-@keyframes winnerConfettiFallFixed{
-  0%{
+@keyframes winnerOverlayCardInDisplay{
+  from{
     opacity:0;
-    transform:
-      translate3d(0,-30px,0)
-      rotate(0deg)
-      scale(.78);
+    transform:translateY(26px) scale(.92);
   }
 
-  10%{
+  to{
     opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@keyframes winnerOverlayNamePulse{
+  0%,100%{
+    transform:scale(1);
+    filter:brightness(1);
   }
 
-  72%{
+  45%{
+    transform:scale(1.08);
+    filter:brightness(1.12);
+  }
+
+  70%{
+    transform:scale(1.03);
+    filter:brightness(1.05);
+  }
+}
+
+@keyframes winnerOverlayNameGlow{
+  0%,100%{
+    opacity:.45;
+    transform:scaleX(.88);
+  }
+
+  50%{
     opacity:1;
-  }
-
-  100%{
-    opacity:0;
-    transform:
-      translate3d(var(--confetti-drift),112vh,0)
-      rotate(var(--confetti-rotate))
-      scale(.9);
+    transform:scaleX(1.08);
   }
 }
 
-@keyframes screenFlashPulseFast{
-  0%{
-    opacity:0;
+@keyframes winnerBurstGlowDisplay{
+  0%,100%{
+    opacity:.72;
+    transform:scale(1);
   }
 
-  24%{
+  50%{
     opacity:1;
-  }
-
-  100%{
-    opacity:0;
+    transform:scale(1.08);
   }
 }
 
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width:767px){
-  #winnerOverlay{
-    padding:16px;
-    backdrop-filter:blur(4px);
-    -webkit-backdrop-filter:blur(4px);
-  }
-
-  #winnerOverlayCard{
-    width:100%;
-    padding:28px 18px 20px;
-    border-radius:28px;
-
-    backdrop-filter:blur(6px);
-    -webkit-backdrop-filter:blur(6px);
-  }
-
-  #winnerOverlayTitle{
-    font-size:.88rem;
-  }
-
-  #winnerOverlayName{
-    font-size:clamp(2.6rem,13vw,4.2rem);
-  }
-
-  #winnerOverlayBurst{
-    margin:10px 0 14px;
-    font-size:1.1rem;
-    letter-spacing:6px;
-    animation:none;
-  }
-
-  .winnerOverlayActions{
-    grid-template-columns:1fr;
-    gap:10px;
-  }
-
-  #winnerOverlayClose,
-  #winnerOverlayEnd{
-    height:48px;
-    width:100%;
-  }
-
-  .winnerConfettiPiece{
-    box-shadow:none;
-  }
-}
 /* =========================================================
    IMAGE ZOOM
 ========================================================= */
@@ -2688,1556 +2074,116 @@ body.presenterHideDisplayControls .segmentControlButtons button{
 }
 
 /* =========================================================
-   RESPONSIVE - IPAD
+   DISPLAY FLOW FX
 ========================================================= */
 
-@media (min-width:768px) and (max-width:1180px){
-  .homeShowPage{
-    padding:18px;
-  }
-
-  .homeHero{
-    grid-template-columns:1fr 220px 1fr;
-    gap:10px;
-    margin-bottom:16px;
-  }
-
-  .homeTeamCard{
-    min-height:74px;
-    padding:8px;
-    border-radius:24px 15px 24px 15px;
-  }
-
-  .homeTeamB{
-    border-radius:15px 24px 15px 24px;
-  }
-
-  .homeTeamText{
-    min-height:48px;
-    padding:8px 10px;
-    border-radius:15px;
-  }
-
-  .homeTeamName{
-    font-size:1.32rem;
-  }
-
-  .homeTeamScore{
-    width:50px;
-    height:40px;
-    border-radius:14px;
-    font-size:1.35rem;
-  }
-
-  .homeTitleBox{
-    height:78px;
-    min-height:78px;
-  }
-
-  .homeTitleGlow{
-    width:220px;
-    height:70px;
-  }
-
-  .homeTitleBox h1{
-    font-size:3.05rem;
-  }
-
-  .homeTitleBox h1::before{
-    display:none;
-  }
-
-  .homeSegmentsShowcase{
-    gap:12px;
-  }
-
-  .homeSegmentItem{
-    min-height:116px;
-    gap:10px;
-    padding:14px;
-  }
-
-  .homeSegmentItem span{
-    font-size:1.45rem;
-  }
-
-  .segmentControls{
-    grid-template-columns:100px 1fr 100px;
-    margin:14px auto 12px;
-  }
-
-  .segmentTitle{
-    font-size:1.8rem;
-  }
-}
-
-/* =========================================================
-   RESPONSIVE - MOBILE
-========================================================= */
-
-@media (max-width:767px){
-  .homeShowPage{
-    padding:12px;
-  }
-
-  .homeHero{
-    grid-template-columns:1fr;
-    gap:10px;
-    margin-bottom:14px;
-  }
-
-  .homeTitleBox{
-    order:-1;
-    height:86px;
-    min-height:86px;
-  }
-
-  .homeTitleGlow{
-    width:230px;
-    height:78px;
-  }
-
-  .homeTitleBox h1{
-    font-size:3.15rem;
-  }
-
-  .homeTitleBox h1::before{
-    display:none;
-  }
-
-  .homeTeamCard{
-    width:100%;
-    min-height:72px;
-    border-radius:20px;
-  }
-
-  .homeTeamText{
-    min-height:48px;
-    padding:8px 10px;
-    border-radius:16px;
-  }
-
-  .homeTeamName{
-    font-size:1.18rem;
-    line-height:1.25;
-  }
-
-  .homeTeamScore{
-    width:50px;
-    height:40px;
-    font-size:1.28rem;
-    border-radius:14px;
-  }
-
-  .homeModelPopupArea{
-    width:min(100%,320px);
-    margin:0 auto 12px;
-  }
-
-  .homeModelClassicBox{
-    padding:12px;
-    border-radius:20px;
-  }
-
-  .homeModelClassicName{
-    font-size:1.02rem;
-  }
-
-  .homeModelClassicCode{
-    height:40px;
-    font-size:1.35rem;
-  }
-
-  .homeModelClassicControl,
-  #displayControlsEyeBtn{
-    height:40px;
-    font-size:.84rem;
-  }
-
-  .homeSegmentsShowcase{
-    grid-template-columns:1fr;
-    gap:10px;
-  }
-
-  .homeSegmentItem{
-    min-height:96px;
-    padding:12px;
-    border-radius:22px;
-  }
-
-  .homeSegmentItem:nth-child(even){
-    border-radius:22px;
-  }
-
-  .homeSegmentItem span{
-    font-size:1.38rem;
-  }
-
-  .homeSegmentItem.segmentLocked::after,
-  .homeSegmentItem.segmentDone::after,
-  .homeSegmentItem.hasWinner::after{
-    width:88px;
-    height:30px;
-    border-radius:0 0 15px 0;
-    font-size:.68rem;
-  }
-
-  .homeSegmentItem.segmentLocked .homeSegmentWinner,
-  .homeSegmentItem.segmentDone .homeSegmentWinner,
-  .homeSegmentItem.hasWinner .homeSegmentWinner{
-    min-height:36px;
-    padding:7px 16px;
-    font-size:.95rem;
-  }
-
-  .homeWinnerArea{
-    flex-direction:column;
-    margin-top:14px;
-  }
-
-  .homeWinnerBtn,
-  .winnerBtn{
-    width:100%;
-    min-height:54px;
-    font-size:1.05rem;
-    border-radius:18px;
-  }
-
-  .segmentControls{
-    width:calc(100% - 20px);
-    grid-template-columns:1fr;
-    gap:8px;
-    margin:12px auto 10px;
-  }
-
-  .segmentTitle{
-    order:-1;
-    font-size:1.65rem;
-  }
-
-  .backBtn,
-  .endBtn{
-    height:44px;
-  }
-
-  .gameToast{
-    top:14px;
-    left:12px;
-    right:12px;
-
-    min-width:0;
-    max-width:none;
-
-    transform:translateY(-18px) scale(.96);
-  }
-
-  .gameToast.show{
-    transform:translateY(0) scale(1);
-  }
-
-  #winnerOverlay{
-    padding:14px;
-  }
-
-  #winnerOverlayCard{
-    border-radius:28px;
-    padding:28px 16px 18px;
-  }
-
-  #winnerOverlayName{
-    width:auto;
-    padding:0;
-    font-size:clamp(2.5rem,12vw,3.7rem);
-  }
-
-  #winnerOverlayBurst{
-    font-size:1.1rem;
-    letter-spacing:6px;
-  }
-
-  .winnerOverlayActions{
-    grid-template-columns:1fr;
-  }
-
-  #winnerOverlayClose,
-  #winnerOverlayEnd{
-    height:50px;
-  }
-
-  body.presenterHideDisplayControls .archiveInputsInline{
-    transform:translateY(-10px);
-  }
-}
-/* =========================================================
-   TRUE GLASS DESIGN
-   زجاج حقيقي بدون تبييض
-========================================================= */
-
-:root{
-  --glass-nav:rgba(255,255,255,.04);
-  --glass-score:rgba(255,255,255,.05);
-  --glass-segment:rgba(255,255,255,.03);
-
-  --glass-border:rgba(255,255,255,.10);
-  --glass-highlight:rgba(255,255,255,.18);
-
-  --glass-shadow:
-    0 18px 42px rgba(31,41,55,.12),
-    inset 0 1px 0 rgba(255,255,255,.18);
-}
-
-/* خلفية خفيفة عشان الزجاج يبان */
-body,
-.homeShowPage,
-.homePageShell,
-#homeScreen,
-#homePage,
-#segmentScreen{
-  background:
-    radial-gradient(circle at 16% 18%, rgba(111,231,255,.32), transparent 35%),
-    radial-gradient(circle at 82% 15%, rgba(255,155,81,.22), transparent 34%),
-    radial-gradient(circle at 18% 88%, rgba(77,91,255,.16), transparent 36%),
-    linear-gradient(135deg, #eaf1f4 0%, #dce8ec 48%, #f1eee8 100%);
-}
-
-/* =========================
-   NAV GLASS - 4%
-========================= */
-
-.homeHero,
-.segmentControls,
-.homeTitleBox,
-.topBoard,
-.titleBox{
-  background:var(--glass-nav);
-  border:1px solid var(--glass-border);
-
-  box-shadow:var(--glass-shadow);
-
-  backdrop-filter:blur(28px) saturate(1.18);
-  -webkit-backdrop-filter:blur(28px) saturate(1.18);
-}
-
-/* =========================
-   SCORE CARD GLASS - 5%
-========================= */
-
-.homeTeamCard,
-.homeTeamText,
-.teamBox,
-.auctionTeamCard,
-.auctionMiddleCard,
-.whoTeamCard{
-  background:var(--glass-score);
-  border:1px solid var(--glass-border);
-
-  box-shadow:
-    0 18px 42px rgba(31,41,55,.12),
-    inset 0 1px 0 var(--glass-highlight);
-
-  backdrop-filter:blur(28px) saturate(1.18);
-  -webkit-backdrop-filter:blur(28px) saturate(1.18);
-}
-
-/* =========================
-   SEGMENT GLASS - 3%
-========================= */
-
-.homeSegmentItem,
-.homeSegmentItem span,
-.homeSegmentWinner,
-.segmentCard,
-.auctionQuestionBox,
-.auctionControlPanel,
-.auctionBtn,
-.auctionImageFrame,
-.auctionResultView,
-.warmupCard,
-.warmupQuestionBox,
-.warmupAnswerBox,
-.top10Card,
-.top10QuestionBox,
-.top10AnswerCard,
-.whoImageBox,
-.whoQuestionBox,
-.whoAnswerBox,
-.whoCard,
-.finalMainCard,
-.finalRound1Card,
-.finalRound2Card,
-.finalRound3Card,
-.archiveModernBigCard,
-.archiveRequiredItem{
-  background:var(--glass-segment);
-  border:1px solid var(--glass-border);
-
-  box-shadow:
-    0 16px 38px rgba(31,41,55,.10),
-    inset 0 1px 0 var(--glass-highlight);
-
-  backdrop-filter:blur(28px) saturate(1.16);
-  -webkit-backdrop-filter:blur(28px) saturate(1.16);
-}
-
-/* =========================
-   INSET HIGHLIGHT
-   خط ضوء علوي داخل البطاقة
-========================= */
-
-.homeTeamCard,
-.homeTeamText,
-.homeSegmentItem,
-.homeSegmentItem span,
-.homeSegmentWinner,
-.segmentControls,
-.auctionQuestionBox,
-.warmupCard,
-.top10Card,
-.whoCard,
-.finalMainCard,
-.archiveModernBigCard{
-  position:relative;
-  overflow:hidden;
-}
-
-.homeTeamCard::before,
-.homeTeamText::before,
-.homeSegmentItem::before,
-.homeSegmentItem span::before,
-.homeSegmentWinner::before,
-.segmentControls::before,
-.auctionQuestionBox::before,
-.warmupCard::before,
-.top10Card::before,
-.whoCard::before,
-.finalMainCard::before,
-.archiveModernBigCard::before{
-  content:"";
-  position:absolute;
-  top:0;
-  right:12%;
-  left:12%;
-  height:1px;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(255,255,255,.32),
-      transparent
-    );
-
-  pointer-events:none;
-}
-
-/* =========================
-   BUTTON GLASS
-========================= */
-
-button,
-.winnerBtn,
-.backBtn,
-.endBtn,
-.auctionDoubleBtn,
-.btnCorrect,
-.btnWrong,
-.undoBtn{
-  border:1px solid rgba(255,255,255,.10);
-
-  box-shadow:
-    0 12px 28px rgba(31,41,55,.10),
-    inset 0 1px 0 rgba(255,255,255,.16);
-
-  backdrop-filter:blur(28px) saturate(1.16);
-  -webkit-backdrop-filter:blur(28px) saturate(1.16);
-}
-
-/* الأزرار العادية شفافة */
-.winnerBtn,
-.backBtn,
-.endBtn,
-.auctionDoubleBtn,
-.undoBtn{
-  background:rgba(255,255,255,.04);
-}
-
-/* لا نخرب ألوان الصح والخطأ */
-.btnCorrect{
-  background:linear-gradient(135deg, rgba(55,190,105,.88), rgba(22,145,75,.88));
-}
-
-.btnWrong{
-  background:linear-gradient(135deg, rgba(255,60,90,.90), rgba(205,28,58,.88));
-}
-
-/* =========================
-   MOTION
-========================= */
-
-.homeSegmentItem,
-.homeTeamCard,
-button,
-.winnerBtn,
-.backBtn,
-.endBtn{
-  transition:
-    transform .18s ease,
-    filter .18s ease,
-    box-shadow .18s ease;
-}
-
-.homeSegmentItem:hover,
-.homeTeamCard:hover,
-button:hover,
-.winnerBtn:hover,
-.backBtn:hover,
-.endBtn:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.04);
-}
-
-/* =========================
-   TOAST GLASS
-========================= */
-
-.gameToast{
-  background:rgba(30,41,59,.72);
-  border:1px solid rgba(255,255,255,.10);
-
-  box-shadow:
-    0 18px 42px rgba(79, 5, 5, 0.22),
-    inset 0 1px 0 rgba(197, 6, 6, 0.18);
-
-  backdrop-filter:blur(28px) saturate(1.18);
-  -webkit-backdrop-filter:blur(28px) saturate(1.18);
-}
-/* =========================================================
-   HOME HEADER FINAL RESET
-   تثبيت الهيدر العلوي بدون لخبطة
-========================================================= */
-
-.homeHero{
-  width:min(100%,1220px);
-  margin:0 auto 28px;
-
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 300px minmax(0,1fr);
-  gap:18px;
-  align-items:center;
-}
-
-/* العنوان في المنتصف */
-.homeTitleBox{
-  grid-column:2;
-  justify-self:center;
-
-  width:300px;
-  height:112px;
-  min-height:112px;
+.displayProLayer{
+  position:fixed;
+  inset:0;
+  z-index:999999;
 
   display:flex;
   align-items:center;
   justify-content:center;
-  flex-direction:column;
 
-  background:transparent;
-  border:0;
-  box-shadow:none;
-  overflow:visible;
+  background:rgba(9,14,24,.42);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+
+  pointer-events:none;
 }
 
-/* الفريق الأيسر */
-.homeTeamA{
-  grid-column:1;
-  justify-self:end;
-
-  width:100%;
-  max-width:440px;
-}
-
-/* الفريق الأيمن */
-.homeTeamB{
-  grid-column:3;
-  justify-self:start;
-
-  width:100%;
-  max-width:440px;
-}
-
-/* كرت الفريق */
-.homeTeamCard{
-  min-height:86px;
-  padding:10px 12px;
-  gap:12px;
-}
-
-/* مربع اسم الفريق */
-.homeTeamText{
-  min-height:54px;
-  padding:10px 14px;
-  border-radius:18px;
-}
-
-/* اسم الفريق */
-.homeTeamName{
-  font-size:clamp(1.35rem,2vw,2.1rem);
-  line-height:1.15;
-}
-
-/* مربع النتيجة */
-.homeTeamScore{
-  width:62px;
-  height:50px;
-  border-radius:18px;
-  font-size:2rem;
-}
-
-/* عنوان الحنكة */
-.homeTitleBox h1{
-  font-size:clamp(3.45rem,4.6vw,5.2rem);
-  line-height:.86;
-}
-
-/* اسم النموذج */
-.homeModelName,
-#modelNameDisplay{
-  max-width:280px;
-  margin-top:8px;
-  font-size:1.55rem;
-  line-height:1.15;
-}
-
-/* منع أي عنصر من التمدد فوق الثاني */
-.homeTeamCard,
-.homeTitleBox,
-.homeTitleBox h1,
-#modelNameDisplay{
-  min-width:0;
-}
-
-/* =========================================================
-   IPAD / SMALL LAPTOP
-========================================================= */
-
-@media (min-width:768px) and (max-width:1180px){
-  .homeHero{
-    width:calc(100% - 28px);
-    grid-template-columns:minmax(0,1fr) 230px minmax(0,1fr);
-    gap:12px;
-    margin-bottom:20px;
-  }
-
-  .homeTeamA,
-  .homeTeamB{
-    max-width:360px;
-  }
-
-  .homeTeamCard{
-    min-height:74px;
-    padding:8px;
-    gap:8px;
-  }
-
-  .homeTeamText{
-    min-height:46px;
-    padding:8px 10px;
-    border-radius:15px;
-  }
-
-  .homeTeamName{
-    font-size:1.3rem;
-  }
-
-  .homeTeamScore{
-    width:52px;
-    height:42px;
-    border-radius:14px;
-    font-size:1.45rem;
-  }
-
-  .homeTitleBox{
-    width:230px;
-    height:84px;
-    min-height:84px;
-  }
-
-  .homeTitleBox h1{
-    font-size:3rem;
-  }
-
-  .homeTitleBox h1::before{
-    display:none;
-  }
-
-  #modelNameDisplay{
-    max-width:220px;
-    font-size:1.2rem;
-  }
-}
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width:767px){
-  .homeHero{
-    width:100%;
-    grid-template-columns:1fr;
-    gap:10px;
-    margin-bottom:16px;
-  }
-
-  .homeTitleBox{
-    grid-column:auto;
-    order:-1;
-
-    width:100%;
-    height:88px;
-    min-height:88px;
-  }
-
-  .homeTeamA,
-  .homeTeamB{
-    grid-column:auto;
-    justify-self:stretch;
-
-    width:100%;
-    max-width:none;
-  }
-
-  .homeTeamCard{
-    min-height:72px;
-  }
-
-  .homeTeamText{
-    min-height:48px;
-  }
-
-  .homeTeamName{
-    font-size:1.2rem;
-  }
-
-  .homeTeamScore{
-    width:52px;
-    height:42px;
-    font-size:1.42rem;
-  }
-
-  .homeTitleBox h1{
-    font-size:3.15rem;
-  }
-
-  .homeTitleBox h1::before{
-    display:none;
-  }
-
-  #modelNameDisplay{
-    font-size:1.2rem;
-  }
-}
-/* =========================================================
-   REMOVE EXTRA BACKGROUND LAYERS
-   إزالة الطبقات الخلفية المخربة
-========================================================= */
-
-.homeShowPage::before,
-.homeShowPage::after,
-.homePageShell::before,
-.homePageShell::after,
-#homePage::before,
-#homePage::after,
-#homeScreen::before,
-#homeScreen::after,
-#segmentScreen::before,
-#segmentScreen::after{
-  display:none;
-  content:none;
-}
-
-/* إزالة توهج العنوان الخلفي إذا كان عامل طبقة */
-.homeTitleGlow{
+.displayProLayer.hidden{
   display:none;
 }
 
-/* تثبيت الخلفية بدون طبقات إضافية */
-.homeShowPage,
-.homePageShell,
-#homePage{
-  background:
-    radial-gradient(circle at 16% 18%, rgba(111,231,255,.24), transparent 35%),
-    radial-gradient(circle at 82% 15%, rgba(255,155,81,.18), transparent 34%),
-    linear-gradient(135deg, #eaf1f4 0%, #dce8ec 48%, #f1eee8 100%);
-}
-
-/* لا تخلي أي كرت العنوان يأخذ خلفية من titleBox */
-.homeTitleBox{
-  background:transparent;
-  border:0;
-  box-shadow:none;
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-}
-/* =========================================================
-   REMOVE HEADER BACK LAYER
-   إزالة الطبقة الكبيرة خلف الهيدر
-========================================================= */
-
-.homeHero{
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  overflow: visible;
-}
-
-.homeHero::before,
-.homeHero::after{
-  display: none;
-  content: none;
-}
-
-/* العنوان بدون طبقة خلفية */
-.homeTitleBox,
-.homeTitleBox::before,
-.homeTitleBox::after{
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-.homeTitleBox::before,
-.homeTitleBox::after{
-  display: none;
-  content: none;
-}
-
-/* خفف أي طبقة زايدة حول كرت الفريق */
-.homeTeamCard{
-  overflow: hidden;
-}
-
-.homeTeamCard::after{
-  display: none;
-  content: none;
-}
-/* =========================================================
-   GLASS SHINE EFFECT
-   لمعة زجاج على الكروت فقط
-========================================================= */
-
-/* تجهيز الكروت */
-.homeTeamCard,
-.homeTeamText,
-.homeTeamScore,
-.homeSegmentItem,
-.homeSegmentItem span{
-  position: relative;
-  overflow: hidden;
-}
-
-/* اللمعة المتحركة */
-.homeTeamCard::before,
-.homeTeamText::before,
-.homeTeamScore::before,
-.homeSegmentItem::before,
-.homeSegmentItem span::before{
-  content: "";
-  position: absolute;
-  inset: -60%;
-
-  background:
-    linear-gradient(
-      115deg,
-      transparent 35%,
-      rgba(255,255,255,.28) 48%,
-      transparent 62%
-    );
-
-  transform: translateX(70%) rotate(8deg);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 3;
-}
-
-/* تشغيل اللمعة عند مرور الماوس */
-.homeTeamCard:hover::before,
-.homeTeamText:hover::before,
-.homeTeamScore:hover::before,
-.homeSegmentItem:hover::before,
-.homeSegmentItem:hover span::before{
-  animation: glassShineMove .85s ease forwards;
-}
-
-@keyframes glassShineMove{
-  0%{
-    opacity: 0;
-    transform: translateX(70%) rotate(8deg);
-  }
-
-  18%{
-    opacity: .85;
-  }
-
-  100%{
-    opacity: 0;
-    transform: translateX(-70%) rotate(8deg);
-  }
-}
-
-/* خط انعكاس ثابت خفيف أعلى الكرت */
-.homeTeamCard::after,
-.homeSegmentItem::after{
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 12%;
-  left: 12%;
-  height: 1px;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(255,255,255,.38),
-      transparent
-    );
-
-  opacity: .75;
-  pointer-events: none;
-  z-index: 4;
-}
-
-/* رفع النص فوق اللمعة */
-.homeTeamCard > *,
-.homeTeamText > *,
-.homeTeamScore,
-.homeSegmentContent,
-.homeSegmentItem span{
-  position: relative;
-  z-index: 5;
-}
-/* =========================================================
-   AUTO GLASS SHINE
-   لمعة زجاج تلقائية للكروت بدون الاعتماد على hover
-========================================================= */
-
-.homeTeamCard,
-.homeSegmentItem{
-  position:relative;
-  overflow:hidden;
-  isolation:isolate;
-}
-
-/* نخلي محتوى الكرت فوق اللمعة */
-.homeTeamCard > *,
-.homeSegmentItem > *{
-  position:relative;
-  z-index:3;
-}
-
-/* لمعة كرت الفريق */
-.homeTeamCard .homeTeamText::after,
-.homeTeamCard .homeTeamScore::after{
-  content:"";
-  position:absolute;
-  inset:-80%;
-
-  background:
-    linear-gradient(
-      115deg,
-      transparent 38%,
-      rgba(255,255,255,.55) 48%,
-      rgba(255,255,255,.18) 52%,
-      transparent 64%
-    );
-
-  transform:translateX(85%) rotate(8deg);
-  opacity:0;
-  pointer-events:none;
-  z-index:4;
-
-  animation:glassShineAuto 3.8s ease-in-out infinite;
-}
-
-/* لمعة كرت الفقرة */
-.homeSegmentContent::after{
-  content:"";
-  position:absolute;
-  inset:-90%;
-
-  background:
-    linear-gradient(
-      115deg,
-      transparent 38%,
-      rgba(255,255,255,.52) 48%,
-      rgba(255,255,255,.16) 52%,
-      transparent 64%
-    );
-
-  transform:translateX(85%) rotate(8deg);
-  opacity:0;
-  pointer-events:none;
-  z-index:4;
-
-  animation:glassShineAuto 4.2s ease-in-out infinite;
-}
-
-/* لمعة داخل مربع الاسم */
-.homeSegmentItem span{
-  position:relative;
-  overflow:hidden;
-}
-
-.homeSegmentItem span::after{
-  content:"";
-  position:absolute;
-  inset:-90%;
-
-  background:
-    linear-gradient(
-      115deg,
-      transparent 38%,
-      rgba(255,255,255,.45) 48%,
-      rgba(255,255,255,.14) 52%,
-      transparent 64%
-    );
-
-  transform:translateX(85%) rotate(8deg);
-  opacity:0;
-  pointer-events:none;
-  z-index:2;
-
-  animation:glassShineAuto 4.6s ease-in-out infinite;
-}
-
-/* فرق وقت اللمعة بين الكروت */
-.homeSegmentItem:nth-child(1) .homeSegmentContent::after,
-.homeSegmentItem:nth-child(1) span::after{
-  animation-delay:.1s;
-}
-
-.homeSegmentItem:nth-child(2) .homeSegmentContent::after,
-.homeSegmentItem:nth-child(2) span::after{
-  animation-delay:.45s;
-}
-
-.homeSegmentItem:nth-child(3) .homeSegmentContent::after,
-.homeSegmentItem:nth-child(3) span::after{
-  animation-delay:.8s;
-}
-
-.homeSegmentItem:nth-child(4) .homeSegmentContent::after,
-.homeSegmentItem:nth-child(4) span::after{
-  animation-delay:1.15s;
-}
-
-.homeSegmentItem:nth-child(5) .homeSegmentContent::after,
-.homeSegmentItem:nth-child(5) span::after{
-  animation-delay:1.5s;
-}
-
-.homeSegmentItem:nth-child(6) .homeSegmentContent::after,
-.homeSegmentItem:nth-child(6) span::after{
-  animation-delay:1.85s;
-}
-
-/* تشغيل اللمعة */
-@keyframes glassShineAuto{
-  0%{
-    opacity:0;
-    transform:translateX(85%) rotate(8deg);
-  }
-
-  18%{
-    opacity:0;
-  }
-
-  32%{
-    opacity:.95;
-  }
-
-  52%{
-    opacity:0;
-    transform:translateX(-85%) rotate(8deg);
-  }
-
-  100%{
-    opacity:0;
-    transform:translateX(-85%) rotate(8deg);
-  }
-}
-
-/* لمعة عند الضغط أيضاً */
-.homeSegmentItem:active .homeSegmentContent::after,
-.homeSegmentItem:active span::after,
-.homeTeamCard:active .homeTeamText::after,
-.homeTeamCard:active .homeTeamScore::after{
-  animation:glassShineTap .55s ease forwards;
-}
-
-@keyframes glassShineTap{
-  0%{
-    opacity:0;
-    transform:translateX(85%) rotate(8deg);
-  }
-
-  35%{
-    opacity:1;
-  }
-
-  100%{
-    opacity:0;
-    transform:translateX(-85%) rotate(8deg);
-  }
-}
-/* =========================================================
-   SEGMENT HEADER BUTTONS + OLD TOAST COLORS
-   ألوان زر الرجوع/الإنهاء + الإشعارات القديمة
-========================================================= */
-
-/* هيدر الفقرات */
-.segmentControls{
-  background:
-    radial-gradient(circle at 16% 0%, rgba(255,255,255,.18), transparent 38%),
-    rgba(255,255,255,.04);
-
-  border:1px solid rgba(255,255,255,.10);
-
-  box-shadow:
-    0 16px 34px rgba(30,27,75,.09),
-    inset 0 1px 0 rgba(255,255,255,.16);
-
-  backdrop-filter:blur(28px) saturate(1.16);
-  -webkit-backdrop-filter:blur(28px) saturate(1.16);
-}
-
-/* زر الرجوع */
-.segmentControls .backBtn,
-.backBtn{
-  background:linear-gradient(180deg,#64748B,#334155);
-  color:#FFFFFF;
-
-  border:0;
-
-  box-shadow:
-    0 10px 20px rgba(30,27,75,.16),
-    inset 0 1px 0 rgba(255,255,255,.20);
-
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-}
-
-/* زر الإنهاء */
-.segmentControls .endBtn,
-.endBtn{
-  background:linear-gradient(180deg,#FB7185,#E11D48);
-  color:#FFFFFF;
-
-  border:0;
-
-  box-shadow:
-    0 10px 20px rgba(225,29,72,.18),
-    inset 0 1px 0 rgba(255,255,255,.22);
-
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-}
-
-/* زر الإنهاء وهو مقفل */
-.segmentControls .endBtn:disabled,
-.endBtn:disabled,
-.disabledEndBtn{
-  opacity:.55;
-  cursor:not-allowed;
-  filter:saturate(.8);
-}
-
-/* هوفر بسيط */
-.segmentControls .backBtn:hover,
-.segmentControls .endBtn:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.05);
-}
-
-/* =========================================================
-   OLD TOAST STYLE
-   لون الإشعارات القديم
-========================================================= */
-
-.gameToast{
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.20), transparent 42%),
-    radial-gradient(circle at 88% 100%, rgba(244,63,94,.18), transparent 44%),
-    linear-gradient(180deg, rgba(88,28,45,.88), rgba(76,5,25,.95));
-
-  border:1px solid rgba(255,255,255,.20);
-
-  color:#FFFFFF;
-
-  box-shadow:
-    0 18px 42px rgba(76,5,25,.34),
-    0 0 0 5px rgba(136,19,55,.10),
-    inset 0 1px 0 rgba(255,255,255,.22),
-    inset 0 -1px 0 rgba(0,0,0,.18);
-
-  backdrop-filter:blur(22px) saturate(1.1);
-  -webkit-backdrop-filter:blur(22px) saturate(1.1);
-}
-
-.gameToastIcon{
-  background:rgba(255,255,255,.16);
-  border:1px solid rgba(255,255,255,.16);
-  color:#fff;
-}
-
-.gameToastText{
-  color:#fff;
-}
-/* =========================================================
-   WINNER BUTTON + WINNER OVERLAY - DISPLAY STYLE
-   زر الفائز + إعلان الفائز بنفس تصميم العرض
-========================================================= */
-
-/* منطقة زر الفائز */
-.homeWinnerArea{
-  width:min(100%,1180px);
-  margin:22px auto 0;
+.displayProCard{
+  min-width:min(620px,82vw);
+  max-width:min(860px,88vw);
+
+  padding:34px 42px;
+  border-radius:34px;
 
   display:flex;
+  flex-direction:column;
   align-items:center;
   justify-content:center;
   gap:14px;
 
-  position:relative;
-  z-index:5;
-}
-
-/* زر الفائز */
-.homeWinnerBtn,
-.winnerBtn{
-  position:relative;
-  overflow:hidden;
-
-  min-width:230px;
-  min-height:60px;
-  padding:0 34px;
-
-  border:1px solid rgba(255,255,255,.34);
-  border-radius:24px;
-
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.26), transparent 42%),
-    linear-gradient(180deg, rgba(15, 38, 47, 0.95), rgba(36, 99, 122, 0.9));
-
-  color:#FFFFFF;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.35rem;
-  line-height:1;
-
-  cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.82));
+  border:1px solid rgba(255,255,255,.45);
 
   box-shadow:
-    0 18px 34px rgba(42, 100, 133, 0.26),
-    0 0 0 5px rgba(38, 97, 131, 0.08),
-    inset 0 1px 0 rgba(47, 76, 113, 0.34),
-    inset 0 -1px 0 rgba(67, 106, 133, 0.1);
-
-  backdrop-filter:blur(20px) saturate(1.12);
-  -webkit-backdrop-filter:blur(20px) saturate(1.12);
-
-  transition:
-    transform .18s ease,
-    filter .18s ease,
-    box-shadow .18s ease;
-}
-
-/* دائرة زجاجية داخل الزر */
-.homeWinnerBtn::before,
-.winnerBtn::before{
-  content:"";
-  position:absolute;
-  width:78px;
-  height:78px;
-  top:-36px;
-  right:-22px;
-  border-radius:50%;
-
-  background:rgba(255,255,255,.16);
-  pointer-events:none;
-}
-
-/* لمعة زر الفائز */
-.homeWinnerBtn::after,
-.winnerBtn::after{
-  content:"";
-  position:absolute;
-  inset:-50%;
-
-  background:
-    linear-gradient(
-      120deg,
-      transparent 38%,
-      rgba(255,255,255,.38),
-      transparent 62%
-    );
-
-  transform:translateX(120%) rotate(8deg);
-  animation:winnerButtonShineDisplay 3s ease-in-out infinite;
-  pointer-events:none;
-}
-
-.homeWinnerBtn:hover,
-.winnerBtn:hover{
-  transform:translateY(-3px) scale(1.025);
-  filter:brightness(1.06);
-
-  box-shadow:
-    0 24px 44px rgba(38, 87, 133, 0.32),
-    0 0 0 6px rgba(48, 81, 107, 0.1),
-    inset 0 1px 0 rgba(55, 105, 141, 0.4),
-    inset 0 -1px 0 rgba(11, 52, 79, 0.1);
-}
-
-.homeWinnerBtn:active,
-.winnerBtn:active{
-  transform:scale(.96);
-}
-
-@keyframes winnerButtonShineDisplay{
-  0%,45%{
-    transform:translateX(120%) rotate(8deg);
-  }
-
-  70%,100%{
-    transform:translateX(-120%) rotate(8deg);
-  }
-}
-
-/* =========================================================
-   WINNER OVERLAY
-========================================================= */
-
-#winnerOverlay{
-  position:fixed;
-  inset:0;
-  z-index:999997;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  padding:22px;
-
-  background:
-    radial-gradient(circle at 50% 18%, rgba(255,155,81,.30), transparent 34%),
-    radial-gradient(circle at 18% 82%, rgba(103,232,249,.18), transparent 36%),
-    radial-gradient(circle at 84% 78%, rgba(251,113,133,.14), transparent 34%),
-    rgba(20,28,38,.54);
-
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-}
-
-#winnerOverlay.hidden{
-  display:none;
-}
-
-/* كرت إعلان الفائز */
-#winnerOverlayCard{
-  width:min(100%,560px);
-  position:relative;
-  z-index:3;
-  overflow:hidden;
-
-  padding:34px 28px 24px;
-  border-radius:38px;
+    0 30px 90px rgba(15,23,42,.32),
+    inset 0 1px 0 rgba(255,255,255,.90);
 
   text-align:center;
 
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255,155,81,.24), transparent 42%),
-    radial-gradient(circle at 16% 100%, rgba(103,232,249,.14), transparent 44%),
-    linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.64));
-
-  border:1px solid rgba(255,255,255,.58);
-
-  box-shadow:
-    0 34px 80px rgba(30,27,75,.25),
-    0 0 0 6px rgba(255,255,255,.10),
-    inset 0 1px 0 rgba(255,255,255,.94),
-    inset 0 -1px 0 rgba(255,255,255,.16);
-
-  backdrop-filter:blur(28px) saturate(1.1);
-  -webkit-backdrop-filter:blur(28px) saturate(1.1);
-
-  animation:winnerOverlayCardInDisplay .52s cubic-bezier(.16,1,.3,1) both;
+  animation:displayProPop .36s cubic-bezier(.2,.9,.2,1);
 }
 
-/* فقاعات داخلية */
-#winnerOverlayCard::before{
-  content:"";
-  position:absolute;
-  width:230px;
-  height:230px;
-  top:-112px;
-  right:-74px;
-  border-radius:50%;
-
-  background:rgba(255,255,255,.20);
-  pointer-events:none;
-
-  animation:winnerBubbleMoveDisplay 3.2s ease-in-out infinite;
-}
-
-#winnerOverlayCard::after{
-  content:"";
-  position:absolute;
-  width:130px;
-  height:130px;
-  bottom:-50px;
-  left:-38px;
-  border-radius:32px;
-  transform:rotate(24deg);
-
-  background:rgba(103,232,249,.10);
-  pointer-events:none;
-
-  animation:winnerCornerMoveDisplay 3.8s ease-in-out infinite;
-}
-
-#winnerOverlayTitle,
-#winnerOverlayName,
-#winnerOverlayBurst,
-.winnerOverlayActions{
-  position:relative;
-  z-index:2;
-}
-
-/* عنوان الفائز */
-#winnerOverlayTitle{
-  width:max-content;
-  margin:0 auto 14px;
-
-  padding:8px 24px;
-  border-radius:999px;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.34), transparent 42%),
-    linear-gradient(180deg, rgba(255,155,81,.32), rgba(255,255,255,.48));
-
-  border:1px solid rgba(255,155,81,.26);
-
-  color:#7A4A22;
-  font-family:"HanakaText",sans-serif;
-  font-size:1rem;
-
-  box-shadow:
-    0 10px 20px rgba(255,155,81,.12),
-    inset 0 1px 0 rgba(255,255,255,.82);
-}
-
-/* اسم الفائز */
-#winnerOverlayName{
-  width:auto;
-  max-width:100%;
-
-  padding:0;
-  margin:0 auto;
-
-  background:transparent;
-  border:0;
-  border-radius:0;
-  box-shadow:none;
-
-  color:#24185E;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(3.1rem,5.8vw,5.2rem);
+.displayProEyebrow{
+  color:#64748B;
+  font-size:1.05rem;
   line-height:1;
-
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.85),
-    0 14px 28px rgba(30,27,75,.18),
-    0 0 24px rgba(255,155,81,.28),
-    0 0 36px rgba(103,232,249,.18);
-
-  animation:winnerNamePopDisplay .68s cubic-bezier(.16,1,.3,1) both;
+  font-weight:900;
 }
 
-/* النجوم */
-#winnerOverlayBurst{
-  margin:18px 0 22px;
-
-  color:#FF9B51;
-  font-size:1.45rem;
-  letter-spacing:10px;
-
-  text-shadow:
-    0 0 16px rgba(255,155,81,.34),
-    0 8px 18px rgba(255,155,81,.12);
-
-  animation:winnerBurstGlowDisplay 1.1s ease-in-out infinite;
+.displayProTitle{
+  color:var(--main-text);
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:4rem;
+  line-height:1;
+  font-weight:400;
 }
 
-/* أزرار النافذة */
-.winnerOverlayActions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
+.displayProSubtitle{
+  color:#2F4158;
+  font-size:1.25rem;
+  line-height:1.2;
+  font-weight:900;
 }
 
-#winnerOverlayClose,
-#winnerOverlayEnd{
-  position:relative;
-  overflow:hidden;
-
-  height:54px;
-
-  border:0;
-  border-radius:18px;
-
-  color:#fff;
-
-  font-family:"HanakaText",sans-serif;
-  font-size:1rem;
-
-  cursor:pointer;
-
-  box-shadow:
-    0 12px 24px rgba(30,27,75,.13),
-    inset 0 1px 0 rgba(255,255,255,.22);
-
-  transition:
-    transform .18s ease,
-    filter .18s ease;
+.displayProLayer.correct .displayProTitle{
+  color:#15803D;
 }
 
-#winnerOverlayClose{
-  background:linear-gradient(180deg,#64748B,#334155);
+.displayProLayer.wrong .displayProTitle{
+  color:#DC2626;
 }
 
-#winnerOverlayEnd{
-  background:linear-gradient(180deg,#FB7185,#E11D48);
+.displayProLayer.winner .displayProTitle{
+  color:#F97316;
 }
 
-#winnerOverlayClose:hover,
-#winnerOverlayEnd:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.05);
+.displayProLayer.neutral .displayProTitle{
+  color:#475569;
 }
 
-/* =========================================================
-   ANIMATIONS
-========================================================= */
+.displayProLayer.winner .displayProCard{
+  background:
+    radial-gradient(circle at 50% 0%,rgba(255,155,81,.22),transparent 46%),
+    linear-gradient(180deg,rgba(255,255,255,.97),rgba(255,247,237,.90));
 
-@keyframes winnerOverlayCardInDisplay{
+  border:1px solid rgba(249,115,22,.26);
+}
+
+.displayProLayer.winner .displayProEyebrow{
+  color:#9A3412;
+}
+
+.displayProLayer.winner .displayProSubtitle{
+  color:#7C2D12;
+}
+
+.displayProLayerHide{
+  animation:displayProFadeOut .26s ease forwards;
+}
+
+@keyframes displayProPop{
   from{
     opacity:0;
-    transform:translateY(26px) scale(.92);
+    transform:translateY(22px) scale(.92);
   }
 
   to{
@@ -4246,470 +2192,241 @@ button:hover,
   }
 }
 
-@keyframes winnerNamePopDisplay{
-  0%{
+@keyframes displayProFadeOut{
+  to{
     opacity:0;
-    transform:translateY(18px) scale(.88);
+  }
+}
+
+.displaySegmentEnterFx{
+  animation:displaySegmentEnterFx .42s ease both;
+}
+
+@keyframes displaySegmentEnterFx{
+  from{
+    opacity:0;
+    transform:translateY(18px) scale(.985);
   }
 
-  70%{
-    opacity:1;
-    transform:translateY(-3px) scale(1.05);
-  }
-
-  100%{
+  to{
     opacity:1;
     transform:translateY(0) scale(1);
   }
 }
 
-@keyframes winnerBurstGlowDisplay{
-  0%,100%{
-    opacity:.72;
-    transform:scale(1);
-  }
-
-  50%{
-    opacity:1;
-    transform:scale(1.08);
-  }
-}
-
-@keyframes winnerBubbleMoveDisplay{
-  0%,100%{
-    transform:translate(0,0) scale(1);
-  }
-
-  50%{
-    transform:translate(-12px,10px) scale(1.06);
-  }
-}
-
-@keyframes winnerCornerMoveDisplay{
-  0%,100%{
-    transform:rotate(24deg) translate(0,0);
-  }
-
-  50%{
-    transform:rotate(18deg) translate(10px,-8px);
-  }
-}
-
 /* =========================================================
-   MOBILE
+   CURRENT TURN + SCORE BADGES
 ========================================================= */
 
-@media (max-width:767px){
-  .homeWinnerArea{
-    margin-top:16px;
-  }
+.displayCurrentTurnBadge,
+.displayLastScoreUpdate{
+  position:fixed;
+  left:50%;
+  z-index:999998;
 
-  .homeWinnerBtn,
-  .winnerBtn{
-    width:100%;
-    min-height:54px;
-    font-size:1.08rem;
-    border-radius:18px;
-  }
+  transform:translateX(-50%);
 
-  #winnerOverlay{
-    padding:14px;
-  }
+  min-width:280px;
+  max-width:80vw;
 
-  #winnerOverlayCard{
-    border-radius:28px;
-    padding:28px 16px 18px;
-  }
+  padding:12px 20px;
+  border-radius:999px;
 
-  #winnerOverlayName{
-    font-size:clamp(2.5rem,12vw,3.7rem);
-  }
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
 
-  #winnerOverlayBurst{
-    font-size:1.1rem;
-    letter-spacing:6px;
-  }
-
-  .winnerOverlayActions{
-    grid-template-columns:1fr;
-  }
-
-  #winnerOverlayClose,
-  #winnerOverlayEnd{
-    height:50px;
-  }
-}
-/* =========================================================
-   TEAM NAME PULSE + GLASS WINNER ACTIONS
-   نبض اسم الفريق + أزرار إغلاق/إنهاء زجاجية
-========================================================= */
-
-/* نبض اسم الفريق */
-.homeTeamName,
-.teamName{
-  animation: teamNameSoftPulse 2.6s ease-in-out infinite;
-  transform-origin:center;
-}
-
-@keyframes teamNameSoftPulse{
-  0%,100%{
-    transform:scale(1);
-    text-shadow:
-      0 1px 0 rgba(255,255,255,.55),
-      0 8px 18px rgba(31,41,55,.10);
-  }
-
-  50%{
-    transform:scale(0.990);
-    text-shadow:
-      0 1px 0 rgba(255,255,255,.70),
-      0 10px 22px rgba(31,41,55,.14),
-      0 0 16px rgba(255,155,81,.18);
-  }
-}
-
-/* الفريق المتصدر يكون نبضه أوضح */
-.leadingTeam .homeTeamName,
-.activeTeam .teamName{
-  animation: teamNameWinnerPulse 1.8s ease-in-out infinite;
-}
-
-@keyframes teamNameWinnerPulse{
-  0%,100%{
-    transform:scale(1);
-    filter:brightness(1);
-  }
-
-  50%{
-    transform:scale(1.06);
-    filter:brightness(1.08);
-  }
-}
-
-/* أزرار نافذة الفائز زجاجية */
-#winnerOverlayClose,
-#winnerOverlayEnd{
-  position:relative;
-  overflow:hidden;
-
-  height:54px;
-
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:18px;
-
-  color:#fff;
-
-  font-family:"HanakaText",sans-serif;
-  font-size:1rem;
-
-  cursor:pointer;
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(255,255,255,.55);
 
   box-shadow:
-    0 14px 28px rgba(30,27,75,.16),
-    inset 0 1px 0 rgba(255,255,255,.24),
-    inset 0 -1px 0 rgba(0,0,0,.10);
-
-  backdrop-filter:blur(24px) saturate(1.16);
-  -webkit-backdrop-filter:blur(24px) saturate(1.16);
-
-  transition:
-    transform .18s ease,
-    filter .18s ease,
-    box-shadow .18s ease;
+    0 18px 46px rgba(15,23,42,.20),
+    inset 0 1px 0 rgba(255,255,255,.90);
 }
 
-/* زر الإغلاق زجاج كحلي */
-#winnerOverlayClose{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
-    linear-gradient(180deg, rgba(100,116,139,.82), rgba(51,65,85,.84));
+.displayCurrentTurnBadge{
+  top:22px;
+  animation:displaySmallBadgeIn .28s ease both;
 }
 
-/* زر الإنهاء زجاج أحمر */
-#winnerOverlayEnd{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
-    linear-gradient(180deg, rgba(251,113,133,.86), rgba(225,29,72,.86));
+.displayLastScoreUpdate{
+  bottom:24px;
+  animation:displayScoreBadgeIn .28s ease both;
 }
 
-/* لمعة داخل أزرار النافذة */
-#winnerOverlayClose::before,
-#winnerOverlayEnd::before{
+.displayCurrentTurnBadge::before{
   content:"";
-  position:absolute;
-  width:72px;
-  height:72px;
-  top:-36px;
-  right:-20px;
-  border-radius:50%;
-  background:rgba(255,255,255,.14);
-  pointer-events:none;
+  width:12px;
+  height:12px;
+  min-width:12px;
+  border-radius:999px;
+  background:#F97316;
+  box-shadow:0 0 0 5px rgba(249,115,22,.16);
 }
 
-#winnerOverlayClose::after,
-#winnerOverlayEnd::after{
-  content:"";
-  position:absolute;
-  inset:-60%;
-
-  background:
-    linear-gradient(
-      120deg,
-      transparent 38%,
-      rgba(255,255,255,.34),
-      transparent 62%
-    );
-
-  transform:translateX(120%) rotate(8deg);
-  animation:winnerActionGlassShine 3.2s ease-in-out infinite;
-  pointer-events:none;
+.displayCurrentTurnBadge.teamB::before{
+  background:#06B6D4;
+  box-shadow:0 0 0 5px rgba(6,182,212,.16);
 }
 
-#winnerOverlayClose:hover,
-#winnerOverlayEnd:hover{
-  transform:translateY(-3px) scale(1.02);
-  filter:brightness(1.06);
-
-  box-shadow:
-    0 18px 34px rgba(30,27,75,.20),
-    inset 0 1px 0 rgba(255,255,255,.30),
-    inset 0 -1px 0 rgba(0,0,0,.10);
-}
-
-#winnerOverlayClose:active,
-#winnerOverlayEnd:active{
-  transform:scale(.96);
-}
-
-@keyframes winnerActionGlassShine{
-  0%,45%{
-    transform:translateX(120%) rotate(8deg);
-  }
-
-  70%,100%{
-    transform:translateX(-120%) rotate(8deg);
-  }
-}
-
-/* النص داخل الأزرار فوق اللمعة */
-#winnerOverlayClose,
-#winnerOverlayEnd{
-  z-index:1;
-}
-
-#winnerOverlayClose *,
-#winnerOverlayEnd *{
-  position:relative;
-  z-index:2;
-}
-/* =========================================================
-   WINNER OVERLAY NAME PULSE
-   نبض اسم الفائز داخل مربع إعلان الفائز
-========================================================= */
-
-#winnerOverlayName{
-  animation: winnerOverlayNamePulse 1.35s ease-in-out infinite;
-  transform-origin:center;
-
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.88),
-    0 14px 28px rgba(30,27,75,.20),
-    0 0 24px rgba(255,155,81,.34),
-    0 0 38px rgba(103,232,249,.22);
-}
-
-@keyframes winnerOverlayNamePulse{
-  0%,100%{
-    transform:scale(1);
-    filter:brightness(1);
-  }
-
-  45%{
-    transform:scale(1.08);
-    filter:brightness(1.12);
-  }
-
-  70%{
-    transform:scale(1.03);
-    filter:brightness(1.05);
-  }
-}
-
-/* توهج خفيف حول اسم الفائز */
-#winnerOverlayName::after{
-  content:"";
-  display:block;
-
-  width:70%;
-  height:10px;
-  margin:10px auto 0;
+.displayLastScoreUpdate::before{
+  content:"+";
+  width:30px;
+  height:30px;
+  min-width:30px;
 
   border-radius:999px;
 
-  background:
-    radial-gradient(
-      circle,
-      rgba(255,155,81,.34),
-      rgba(255,155,81,.10) 45%,
-      transparent 72%
-    );
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-  filter:blur(7px);
-  animation:winnerOverlayNameGlow 1.35s ease-in-out infinite;
+  color:#fff;
+  background:linear-gradient(180deg,#22C55E,#15803D);
+
+  font-size:1.05rem;
+  font-weight:900;
 }
 
-@keyframes winnerOverlayNameGlow{
-  0%,100%{
-    opacity:.45;
-    transform:scaleX(.88);
+.displayCurrentTurnBadge span,
+.displayLastScoreUpdate span{
+  color:#64748B;
+  font-size:.9rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.displayCurrentTurnBadge strong{
+  color:var(--main-text);
+  font-size:1.15rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.displayLastScoreUpdate strong{
+  color:#15803D;
+  font-size:1.15rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.displayCurrentTurnBadge.hide{
+  animation:displaySmallBadgeOut .26s ease forwards;
+}
+
+.displayLastScoreUpdate.hide{
+  animation:displayScoreBadgeOut .26s ease forwards;
+}
+
+@keyframes displaySmallBadgeIn{
+  from{
+    opacity:0;
+    transform:translateX(-50%) translateY(-16px) scale(.96);
   }
 
-  50%{
+  to{
     opacity:1;
-    transform:scaleX(1.08);
+    transform:translateX(-50%) translateY(0) scale(1);
   }
 }
+
+@keyframes displaySmallBadgeOut{
+  to{
+    opacity:0;
+    transform:translateX(-50%) translateY(-16px) scale(.96);
+  }
+}
+
+@keyframes displayScoreBadgeIn{
+  from{
+    opacity:0;
+    transform:translateX(-50%) translateY(16px) scale(.96);
+  }
+
+  to{
+    opacity:1;
+    transform:translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes displayScoreBadgeOut{
+  to{
+    opacity:0;
+    transform:translateX(-50%) translateY(16px) scale(.96);
+  }
+}
+
 /* =========================================================
-   HOME DISPLAY TITLE - SAME INTRO EFFECT
-   كلمة الحنكة في العرض بنفس تأثير الانترو
+   SCREEN FLASH FX
 ========================================================= */
 
-.homeTitleBox h1{
-  position:relative !important;
+.screenFlashLayer{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
 
-  margin:0 !important;
+  z-index:1000005;
 
-  color:#24185E !important;
-  -webkit-text-fill-color:#24185E !important;
+  pointer-events:none;
+  opacity:0;
 
-  background:none !important;
-  -webkit-background-clip:initial !important;
-  background-clip:initial !important;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-weight:400 !important;
-  line-height:.86 !important;
-
-  text-shadow:
-    0 3px 0 rgba(255,255,255,.88),
-    0 16px 32px rgba(30,27,75,.18),
-    0 0 18px rgba(103,232,249,.16) !important;
-
-  filter:
-    drop-shadow(0 10px 18px rgba(30,27,75,.10)) !important;
-
-  animation:homeHanakaTitleGlassPulse 3.8s ease-in-out infinite !important;
-
-  overflow:visible !important;
+  transform-origin:center;
+  mix-blend-mode:normal;
 }
 
-/* نلغي أي تأثير قديم يغير لون الكلمة */
-.homeTitleBox h1::before{
-  content:none !important;
-  display:none !important;
+.screenFlashLayer.flashCorrect{
+  background:rgba(34,197,94,.24);
+  animation:screenFlashPulseFast .46s ease both;
 }
 
-/* الخط الزجاجي تحت العنوان */
-.homeTitleBox h1::after{
-  content:"" !important;
-
-  width:170px !important;
-  height:10px !important;
-  margin:16px auto 0 !important;
-
-  display:block !important;
-
-  border-radius:999px !important;
-
+.screenFlashLayer.flashWrong,
+.screenFlashLayer.flashWrongStrong{
   background:
-    linear-gradient(
-      115deg,
-      #FF9B51 0%,
-      #FF9B51 22%,
-      #67E8F9 40%,
-      rgba(255,255,255,.88) 50%,
-      #7C3AED 62%,
-      #FF9B51 100%
-    ) !important;
-
-  background-size:260% 100% !important;
-  background-position:100% 50% !important;
-
-  box-shadow:
-    0 10px 24px rgba(249,115,22,.22),
-    0 0 18px rgba(103,232,249,.20) !important;
-
-  animation:homeHanakaLineGlassMove 3.2s ease-in-out infinite !important;
-}
-
-@keyframes homeHanakaTitleGlassPulse{
-  0%,100%{
-    transform:translateY(0) scale(1);
-
-    text-shadow:
-      0 3px 0 rgba(255,255,255,.88),
-      0 16px 32px rgba(30,27,75,.18),
-      0 0 14px rgba(103,232,249,.12);
-  }
-
-  50%{
-    transform:translateY(-2px) scale(1.01);
-
-    text-shadow:
-      0 3px 0 rgba(255,255,255,.92),
-      0 18px 36px rgba(30,27,75,.20),
-      0 0 24px rgba(103,232,249,.24);
-  }
-}
-
-@keyframes homeHanakaLineGlassMove{
-  0%{
-    background-position:100% 50%;
-    filter:brightness(1);
-    transform:scaleX(1);
-  }
-
-  45%{
-    background-position:0% 50%;
-    filter:brightness(1.18);
-    transform:scaleX(1.06);
-  }
-
-  100%{
-    background-position:0% 50%;
-    filter:brightness(1);
-    transform:scaleX(1);
-  }
-}
-
-/* الجوال */
-@media (max-width:767px){
-  .homeTitleBox h1::after{
-    width:125px !important;
-    height:8px !important;
-    margin-top:12px !important;
-  }
-}
-
-/* الفلاش الأحمر - أقوى بشوي مع نبضات */
-.screenFlashLayer.flashWrongStrong,
-.screenFlashLayer.flashWrong{
-  background:
-    radial-gradient(circle at center,
-      rgba(255,255,255,.14),
-      transparent 28%
-    ),
-    radial-gradient(circle at center,
-      rgba(239,68,68,.68),
-      rgba(220,38,38,.52) 46%,
-      rgba(127,29,29,.32) 100%
-    ) !important;
+    radial-gradient(circle at center,rgba(255,255,255,.14),transparent 28%),
+    radial-gradient(circle at center,rgba(239,68,68,.68),rgba(220,38,38,.52) 46%,rgba(127,29,29,.32) 100%) !important;
 
   box-shadow:
     inset 0 0 0 9999px rgba(220,38,38,.27),
     inset 0 0 120px rgba(127,29,29,.76) !important;
 
   animation:screenFlashWrongPulse .84s ease-out forwards !important;
+}
+
+.screenFlashLayer.flashCorrectPro{
+  background:
+    linear-gradient(180deg,rgba(34,197,94,.82),rgba(22,163,74,.68));
+
+  animation:fullStrongCorrectPulse .86s ease-out;
+}
+
+.screenFlashLayer.flashWrongPro{
+  background:
+    linear-gradient(180deg,rgba(239,68,68,.88),rgba(185,28,28,.72));
+
+  animation:fullStrongWrongPulse .86s ease-out;
+}
+
+.screenFlashLayer.flashTimeoutPro{
+  background:
+    linear-gradient(180deg,rgba(245,158,11,.82),rgba(249,115,22,.68));
+
+  animation:timerTimeoutPulse .9s ease-out;
+}
+
+@keyframes screenFlashPulseFast{
+  0%{
+    opacity:0;
+  }
+
+  24%{
+    opacity:1;
+  }
+
+  100%{
+    opacity:0;
+  }
 }
 
 @keyframes screenFlashWrongPulse{
@@ -4753,9 +2470,131 @@ button:hover,
     transform:scale(1.04);
   }
 }
-/* =========================
-   Media Wrong Flash + Shake
-========================= */
+
+@keyframes fullStrongCorrectPulse{
+  0%{
+    opacity:0;
+    transform:scale(.96);
+  }
+
+  9%{
+    opacity:1;
+    transform:scale(1.02);
+  }
+
+  20%{
+    opacity:.40;
+    transform:scale(.99);
+  }
+
+  32%{
+    opacity:.95;
+    transform:scale(1.025);
+  }
+
+  46%{
+    opacity:.38;
+    transform:scale(1);
+  }
+
+  60%{
+    opacity:.78;
+    transform:scale(1.03);
+  }
+
+  78%{
+    opacity:.28;
+    transform:scale(1.01);
+  }
+
+  100%{
+    opacity:0;
+    transform:scale(1.06);
+  }
+}
+
+@keyframes fullStrongWrongPulse{
+  0%{
+    opacity:0;
+    transform:scale(.95);
+  }
+
+  8%{
+    opacity:1;
+    transform:scale(1.025);
+  }
+
+  18%{
+    opacity:.34;
+    transform:scale(.985);
+  }
+
+  28%{
+    opacity:1;
+    transform:scale(1.03);
+  }
+
+  40%{
+    opacity:.36;
+    transform:scale(.995);
+  }
+
+  52%{
+    opacity:.90;
+    transform:scale(1.035);
+  }
+
+  68%{
+    opacity:.32;
+    transform:scale(1.01);
+  }
+
+  100%{
+    opacity:0;
+    transform:scale(1.07);
+  }
+}
+
+@keyframes timerTimeoutPulse{
+  0%{
+    opacity:0;
+    transform:scale(.96);
+  }
+
+  9%{
+    opacity:1;
+    transform:scale(1.025);
+  }
+
+  22%{
+    opacity:.36;
+    transform:scale(.99);
+  }
+
+  36%{
+    opacity:.92;
+    transform:scale(1.03);
+  }
+
+  54%{
+    opacity:.34;
+    transform:scale(1);
+  }
+
+  72%{
+    opacity:.70;
+    transform:scale(1.035);
+  }
+
+  100%{
+    opacity:0;
+    transform:scale(1.07);
+  }
+}
+
+/* =========================================================
+   MEDIA WRONG FLASH + SHAKE
+========================================================= */
 
 .auctionZoomFlashLayer,
 .finalRound1ZoomFlashLayer{
@@ -4766,15 +2605,8 @@ button:hover,
   opacity:0;
 
   background:
-    radial-gradient(circle at center,
-      rgba(255,255,255,.14),
-      transparent 28%
-    ),
-    radial-gradient(circle at center,
-      rgba(239,68,68,.66),
-      rgba(220,38,38,.50) 46%,
-      rgba(127,29,29,.30) 100%
-    ) !important;
+    radial-gradient(circle at center,rgba(255,255,255,.14),transparent 28%),
+    radial-gradient(circle at center,rgba(239,68,68,.66),rgba(220,38,38,.50) 46%,rgba(127,29,29,.30) 100%) !important;
 
   box-shadow:
     inset 0 0 0 9999px rgba(220,38,38,.25),
@@ -4828,7 +2660,7 @@ button:hover,
 }
 
 @keyframes mediaWrongShakeFx{
-  0%{
+  0%,100%{
     transform:translateX(0) scale(1);
   }
 
@@ -4851,554 +2683,11 @@ button:hover,
   80%{
     transform:translateX(-4px) scale(1.006);
   }
-
-  100%{
-    transform:translateX(0) scale(1);
-  }
-}
-/* =========================
-   DISPLAY PRO FLOW FX
-========================= */
-
-.displayProLayer{
-  position:fixed;
-  inset:0;
-  z-index:999999;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:rgba(9, 14, 24, .42);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-
-  pointer-events:none;
 }
 
-.displayProLayer.hidden{
-  display:none;
-}
-
-.displayProCard{
-  min-width:min(620px, 82vw);
-  max-width:min(860px, 88vw);
-
-  padding:34px 42px;
-  border-radius:34px;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-
-  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.82));
-  border:1px solid rgba(255,255,255,.45);
-
-  box-shadow:
-    0 30px 90px rgba(15,23,42,.32),
-    inset 0 1px 0 rgba(255,255,255,.90);
-
-  text-align:center;
-
-  animation:displayProPop .36s cubic-bezier(.2,.9,.2,1);
-}
-
-.displayProEyebrow{
-  color:#64748B;
-  font-size:1.05rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.displayProTitle{
-  color:#24185E;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:4rem;
-  line-height:1;
-  font-weight:400;
-}
-
-.displayProSubtitle{
-  color:#2F4158;
-  font-size:1.25rem;
-  line-height:1.2;
-  font-weight:900;
-}
-
-.displayProLayer.correct .displayProTitle{
-  color:#15803D;
-}
-
-.displayProLayer.wrong .displayProTitle{
-  color:#DC2626;
-}
-
-.displayProLayer.winner .displayProTitle{
-  color:#F97316;
-}
-
-.displayProLayerHide{
-  animation:displayProFadeOut .26s ease forwards;
-}
-
-@keyframes displayProPop{
-  from{
-    opacity:0;
-    transform:translateY(22px) scale(.92);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-@keyframes displayProFadeOut{
-  to{
-    opacity:0;
-  }
-}
-
-.displaySegmentEnterFx{
-  animation:displaySegmentEnterFx .42s ease both;
-}
-
-@keyframes displaySegmentEnterFx{
-  from{
-    opacity:0;
-    transform:translateY(18px) scale(.985);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-.displayCurrentTurnBadge,
-.displayLastScoreUpdate{
-  position:fixed;
-  top:22px;
-  left:50%;
-  z-index:999998;
-
-  transform:translateX(-50%);
-
-  min-width:260px;
-  padding:12px 18px;
-  border-radius:999px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-
-  background:rgba(255,255,255,.92);
-  border:1px solid rgba(255,255,255,.45);
-
-  box-shadow:
-    0 18px 46px rgba(15,23,42,.20),
-    inset 0 1px 0 rgba(255,255,255,.90);
-
-  animation:displaySmallBadgeIn .28s ease both;
-}
-
-.displayLastScoreUpdate{
-  top:auto;
-  bottom:24px;
-}
-
-.displayCurrentTurnBadge span,
-.displayLastScoreUpdate span{
-  color:#64748B;
-  font-size:.9rem;
-  font-weight:900;
-}
-
-.displayCurrentTurnBadge strong,
-.displayLastScoreUpdate strong{
-  color:#24185E;
-  font-size:1.05rem;
-  font-weight:900;
-}
-
-.displayCurrentTurnBadge.hide,
-.displayLastScoreUpdate.hide{
-  animation:displaySmallBadgeOut .26s ease forwards;
-}
-
-@keyframes displaySmallBadgeIn{
-  from{
-    opacity:0;
-    transform:translateX(-50%) translateY(-14px);
-  }
-  to{
-    opacity:1;
-    transform:translateX(-50%) translateY(0);
-  }
-}
-
-@keyframes displaySmallBadgeOut{
-  to{
-    opacity:0;
-    transform:translateX(-50%) translateY(-14px);
-  }
-}
-/* =========================
-   FULL SCREEN STRONG PULSE FLASH
-   فلاش يغطي الشاشة كاملة بنبضات قوية
-========================= */
-
-.screenFlashLayer{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100vh;
-
-  z-index:1000005;
-
-  pointer-events:none;
-  opacity:0;
-
-  transform-origin:center;
-  mix-blend-mode:normal;
-}
-
-/* صح - أخضر واضح يغطي كامل الشاشة */
-.screenFlashLayer.flashCorrectPro{
-  background:
-    linear-gradient(
-      180deg,
-      rgba(34,197,94,.82),
-      rgba(22,163,74,.68)
-    );
-
-  animation:fullStrongCorrectPulse .86s ease-out;
-}
-
-.screenFlashLayer.flashWrongPro{
-  background:
-    linear-gradient(
-      180deg,
-      rgba(239,68,68,.88),
-      rgba(185,28,28,.72)
-    );
-
-  animation:fullStrongWrongPulse .86s ease-out;
-}
-
-/* نبضات الصح */
-@keyframes fullStrongCorrectPulse{
-  0%{
-    opacity:0;
-    transform:scale(.96);
-  }
-
-  9%{
-    opacity:1;
-    transform:scale(1.02);
-  }
-
-  20%{
-    opacity:.40;
-    transform:scale(.99);
-  }
-
-  32%{
-    opacity:.95;
-    transform:scale(1.025);
-  }
-
-  46%{
-    opacity:.38;
-    transform:scale(1);
-  }
-
-  60%{
-    opacity:.78;
-    transform:scale(1.03);
-  }
-
-  78%{
-    opacity:.28;
-    transform:scale(1.01);
-  }
-
-  100%{
-    opacity:0;
-    transform:scale(1.06);
-  }
-}
-
-/* نبضات الخطأ أقوى وأسرع */
-@keyframes fullStrongWrongPulse{
-  0%{
-    opacity:0;
-    transform:scale(.95);
-  }
-
-  8%{
-    opacity:1;
-    transform:scale(1.025);
-  }
-
-  18%{
-    opacity:.34;
-    transform:scale(.985);
-  }
-
-  28%{
-    opacity:1;
-    transform:scale(1.03);
-  }
-
-  40%{
-    opacity:.36;
-    transform:scale(.995);
-  }
-
-  52%{
-    opacity:.90;
-    transform:scale(1.035);
-  }
-
-  68%{
-    opacity:.32;
-    transform:scale(1.01);
-  }
-
-  100%{
-    opacity:0;
-    transform:scale(1.07);
-  }
-}
-/* =========================
-   DISPLAY PHASE 2
-   Current Turn + Score Update
-========================= */
-
-.displayCurrentTurnBadge{
-  position:fixed;
-  top:22px;
-  left:50%;
-  z-index:999998;
-
-  transform:translateX(-50%);
-
-  min-width:290px;
-  max-width:80vw;
-
-  padding:12px 20px;
-  border-radius:999px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-
-  background:rgba(255,255,255,.94);
-  border:1px solid rgba(255,255,255,.55);
-
-  box-shadow:
-    0 18px 46px rgba(15,23,42,.20),
-    inset 0 1px 0 rgba(255,255,255,.90);
-
-  animation:displaySmallBadgeIn .28s ease both;
-}
-
-.displayCurrentTurnBadge::before{
-  content:"";
-  width:12px;
-  height:12px;
-  min-width:12px;
-
-  border-radius:999px;
-
-  background:#F97316;
-  box-shadow:0 0 0 5px rgba(249,115,22,.16);
-}
-
-.displayCurrentTurnBadge.teamA::before{
-  background:#F97316;
-  box-shadow:0 0 0 5px rgba(249,115,22,.16);
-}
-
-.displayCurrentTurnBadge.teamB::before{
-  background:#06B6D4;
-  box-shadow:0 0 0 5px rgba(6,182,212,.16);
-}
-
-.displayCurrentTurnBadge span{
-  color:#64748B;
-  font-size:.92rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.displayCurrentTurnBadge strong{
-  color:#24185E;
-  font-size:1.15rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.displayCurrentTurnBadge.hide{
-  animation:displaySmallBadgeOut .26s ease forwards;
-}
-
-.displayLastScoreUpdate{
-  position:fixed;
-  bottom:24px;
-  left:50%;
-  z-index:999998;
-
-  transform:translateX(-50%);
-
-  min-width:280px;
-  max-width:80vw;
-
-  padding:12px 20px;
-  border-radius:999px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-
-  background:rgba(255,255,255,.94);
-  border:1px solid rgba(255,255,255,.55);
-
-  box-shadow:
-    0 18px 46px rgba(15,23,42,.20),
-    inset 0 1px 0 rgba(255,255,255,.90);
-
-  animation:displayScoreBadgeIn .28s ease both;
-}
-
-.displayLastScoreUpdate::before{
-  content:"+";
-  width:30px;
-  height:30px;
-  min-width:30px;
-
-  border-radius:999px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#fff;
-  background:linear-gradient(180deg,#22C55E,#15803D);
-
-  font-size:1.05rem;
-  font-weight:900;
-}
-
-.displayLastScoreUpdate span{
-  color:#64748B;
-  font-size:.9rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.displayLastScoreUpdate strong{
-  color:#15803D;
-  font-size:1.15rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.displayLastScoreUpdate.hide{
-  animation:displayScoreBadgeOut .26s ease forwards;
-}
-
-@keyframes displaySmallBadgeIn{
-  from{
-    opacity:0;
-    transform:translateX(-50%) translateY(-16px) scale(.96);
-  }
-  to{
-    opacity:1;
-    transform:translateX(-50%) translateY(0) scale(1);
-  }
-}
-
-@keyframes displaySmallBadgeOut{
-  to{
-    opacity:0;
-    transform:translateX(-50%) translateY(-16px) scale(.96);
-  }
-}
-
-@keyframes displayScoreBadgeIn{
-  from{
-    opacity:0;
-    transform:translateX(-50%) translateY(16px) scale(.96);
-  }
-  to{
-    opacity:1;
-    transform:translateX(-50%) translateY(0) scale(1);
-  }
-}
-
-@keyframes displayScoreBadgeOut{
-  to{
-    opacity:0;
-    transform:translateX(-50%) translateY(16px) scale(.96);
-  }
-}
-
-/* =========================
-   TIMER TIMEOUT PRO FX
-========================= */
-
-.screenFlashLayer.flashTimeoutPro{
-  background:
-    linear-gradient(
-      180deg,
-      rgba(245,158,11,.82),
-      rgba(249,115,22,.68)
-    );
-
-  animation:timerTimeoutPulse .9s ease-out;
-}
-
-@keyframes timerTimeoutPulse{
-  0%{
-    opacity:0;
-    transform:scale(.96);
-  }
-
-  9%{
-    opacity:1;
-    transform:scale(1.025);
-  }
-
-  22%{
-    opacity:.36;
-    transform:scale(.99);
-  }
-
-  36%{
-    opacity:.92;
-    transform:scale(1.03);
-  }
-
-  54%{
-    opacity:.34;
-    transform:scale(1);
-  }
-
-  72%{
-    opacity:.70;
-    transform:scale(1.035);
-  }
-
-  100%{
-    opacity:0;
-    transform:scale(1.07);
-  }
-}
+/* =========================================================
+   TIMER FX
+========================================================= */
 
 .timerDanger{
   animation:timerDangerPulse .55s ease-in-out infinite;
@@ -5444,40 +2733,9 @@ button:hover,
   }
 }
 
-/* =========================
-   SEGMENT END PRO CARD
-========================= */
-
-.displayProLayer.winner .displayProCard{
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255,155,81,.22), transparent 46%),
-    linear-gradient(180deg, rgba(255,255,255,.97), rgba(255,247,237,.90));
-
-  border:1px solid rgba(249,115,22,.26);
-}
-
-.displayProLayer.winner .displayProEyebrow{
-  color:#9A3412;
-}
-
-.displayProLayer.winner .displayProTitle{
-  color:#F97316;
-  text-shadow:
-    0 3px 0 rgba(255,255,255,.85),
-    0 18px 34px rgba(249,115,22,.20);
-}
-
-.displayProLayer.winner .displayProSubtitle{
-  color:#7C2D12;
-}
-
-.displayProLayer.neutral .displayProTitle{
-  color:#475569;
-}
-
-/* =========================
+/* =========================================================
    DISPLAY MEDIA FAILSAFE
-========================= */
+========================================================= */
 
 .displayMediaErrorBox{
   width:100%;
@@ -5489,8 +2747,8 @@ button:hover,
   justify-content:center;
 
   background:
-    radial-gradient(circle at 50% 0%, rgba(239,68,68,.12), transparent 44%),
-    linear-gradient(180deg, #0F172A, #111827);
+    radial-gradient(circle at 50% 0%,rgba(239,68,68,.12),transparent 44%),
+    linear-gradient(180deg,#0F172A,#111827);
 
   border-radius:inherit;
   overflow:hidden;
@@ -5565,9 +2823,10 @@ button:hover,
     transform:scale(1);
   }
 }
-/* =========================
-   DISPLAY LOADING STATE
-========================= */
+
+/* =========================================================
+   DISPLAY LOADING
+========================================================= */
 
 .displayLoadingLayer{
   position:fixed;
@@ -5621,7 +2880,7 @@ button:hover,
 }
 
 .displayLoadingText{
-  color:#24185E;
+  color:var(--main-text);
   font-size:1.05rem;
   line-height:1;
   font-weight:900;
@@ -5632,185 +2891,34 @@ button:hover,
     transform:rotate(360deg);
   }
 }
-/* =========================
-   DISPLAY JOIN CODE NOTICE - FINAL CLEAN
-========================= */
 
-#homeModelPopupArea{
-  position:fixed !important;
-  top:18px !important;
-  left:50% !important;
-  right:auto !important;
-  bottom:auto !important;
-  z-index:999980 !important;
+/* =========================================================
+   EXTRA DISPLAY FEATURES - BUTTONS
+========================================================= */
 
-  width:auto !important;
-  max-width:calc(100vw - 32px) !important;
+.bigScreenModeBtn,
+.showDetailedResultsBtn{
+  border:0 !important;
+  min-height:46px !important;
+  padding:0 18px !important;
+  border-radius:999px !important;
 
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  padding:0 !important;
-  margin:0 !important;
-
-  background:transparent !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-
-  opacity:0 !important;
-  pointer-events:none !important;
-
-  transform:translate(-50%,-12px) scale(.98) !important;
-
-  transition:
-    opacity .18s ease,
-    transform .18s cubic-bezier(.2,.85,.2,1.05) !important;
-}
-
-#homeModelPopupArea.hidden{
-  display:none !important;
-}
-
-#homeModelPopupArea.show{
-  opacity:1 !important;
-  pointer-events:auto !important;
-  transform:translate(-50%,0) scale(1) !important;
-}
-
-.homeModelNotifyBox{
-  height:56px !important;
-  min-height:56px !important;
-
-  padding:7px !important;
-
-  display:flex !important;
+  display:inline-flex !important;
   align-items:center !important;
   justify-content:center !important;
   gap:8px !important;
-
-  direction:ltr !important;
-
-  border-radius:20px !important;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.78)) !important;
-
-  border:1px solid rgba(255,255,255,.72) !important;
-
-  box-shadow:
-    0 16px 36px rgba(30,27,75,.14),
-    0 0 0 4px rgba(103,232,249,.06),
-    inset 0 1px 0 rgba(255,255,255,.96) !important;
-
-  backdrop-filter:blur(14px) !important;
-  -webkit-backdrop-filter:blur(14px) !important;
-}
-
-/* زر الإغلاق */
-.homeModelNotifyClose{
-  width:38px !important;
-  height:38px !important;
-  min-width:38px !important;
-
-  padding:0 !important;
-
-  border:0 !important;
-  border-radius:14px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  cursor:pointer !important;
-
-  background:rgba(36,24,94,.08) !important;
-  color:#24185E !important;
-
-  font-family:Arial,sans-serif !important;
-  font-size:1.35rem !important;
-  font-weight:700 !important;
-  line-height:1 !important;
-
-  box-shadow:none !important;
-
-  transition:
-    transform .15s ease,
-    background .15s ease,
-    color .15s ease !important;
-}
-
-/* زر إخفاء التحكم */
-.homeModelNotifyControl,
-.homeModelClassicControl{
-  height:40px !important;
-  min-width:116px !important;
-
-  padding:0 14px !important;
-
-  border:0 !important;
-  border-radius:15px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  cursor:pointer !important;
 
   font-family:"HanakaText",sans-serif !important;
-  font-size:.78rem !important;
-  line-height:1 !important;
+  font-size:.92rem !important;
   font-weight:900 !important;
-
-  box-shadow:
-    0 10px 22px rgba(30,27,75,.14),
-    inset 0 1px 0 rgba(255,255,255,.18) !important;
-
-  transition:
-    transform .15s ease,
-    filter .15s ease !important;
-}
-
-.homeModelNotifyControl.hideControlsMode,
-.homeModelClassicControl.hideControlsMode{
-  color:#FFFFFF !important;
-  background:
-    linear-gradient(180deg,#312E81,#24185E) !important;
-}
-
-.homeModelNotifyControl.showControlsMode,
-.homeModelClassicControl.showControlsMode{
-  color:#FFFFFF !important;
-  background:
-    linear-gradient(180deg,#16A34A,#15803D) !important;
-}
-
-/* كود المقدم */
-.homeModelNotifyCode{
-  height:40px !important;
-  min-width:150px !important;
-
-  padding:0 13px !important;
-
-  border-radius:15px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:8px !important;
+  line-height:1 !important;
 
   cursor:pointer !important;
-
-  direction:rtl !important;
-
-  background:
-    linear-gradient(180deg, rgba(236,254,255,.94), rgba(255,255,255,.80)) !important;
-
-  border:1px solid rgba(103,232,249,.32) !important;
+  white-space:nowrap !important;
 
   box-shadow:
-    0 8px 18px rgba(8,145,178,.08),
-    inset 0 1px 0 rgba(255,255,255,.92) !important;
+    0 12px 28px rgba(15,23,42,.16),
+    inset 0 1px 0 rgba(255,255,255,.22) !important;
 
   transition:
     transform .15s ease,
@@ -5818,116 +2926,265 @@ button:hover,
     box-shadow .15s ease !important;
 }
 
-.homeModelNotifyCode span{
-  color:#0F4C5C !important;
-
-  font-family:"HanakaText",sans-serif !important;
-  font-size:.68rem !important;
-  line-height:1 !important;
-  font-weight:900 !important;
-
-  white-space:nowrap !important;
+.bigScreenModeBtn,
+#bigScreenModeBtn,
+.homeModelClassicControl.bigScreenModeBtn{
+  color:#fff !important;
+  background:
+    linear-gradient(135deg,#24185E 0%,#4032A8 58%,#4F46E5 100%) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
 }
 
-.homeModelNotifyCode strong{
-  color:#24185E !important;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:1.3rem !important;
-  line-height:1 !important;
-  font-weight:400 !important;
-  letter-spacing:1.4px !important;
-
-  white-space:nowrap !important;
+.bigScreenModeBtn.activeBigScreen,
+#bigScreenModeBtn.activeBigScreen,
+.homeModelClassicControl.bigScreenModeBtn.activeBigScreen{
+  color:var(--main-text) !important;
+  background:
+    linear-gradient(135deg,#FFF4E6 0%,#FFD7A8 52%,#FFB86B 100%) !important;
+  border:1px solid rgba(255,155,81,.42) !important;
+  box-shadow:
+    0 12px 28px rgba(255,155,81,.30),
+    inset 0 1px 0 rgba(255,255,255,.80) !important;
 }
 
-.homeModelNotifyClose:hover,
-.homeModelNotifyControl:hover,
-.homeModelNotifyCode:hover{
+.bigScreenModeBtn.activeBigScreen::before,
+#bigScreenModeBtn.activeBigScreen::before{
+  content:"✓ " !important;
+}
+
+.showDetailedResultsBtn{
+  color:#fff !important;
+  background:
+    linear-gradient(135deg,#FF9B51 0%,#F97316 52%,#24185E 100%) !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+}
+
+.bigScreenModeBtn:hover,
+.showDetailedResultsBtn:hover{
   transform:translateY(-1px) !important;
-  filter:brightness(1.04) !important;
+  filter:brightness(1.05) saturate(1.05) !important;
 }
 
-.homeModelNotifyClose:hover{
-  background:rgba(239,68,68,.10) !important;
-  color:#B91C1C !important;
-}
-
-.homeModelNotifyClose:active,
-.homeModelNotifyControl:active,
-.homeModelNotifyCode:active{
+.bigScreenModeBtn:active,
+.showDetailedResultsBtn:active{
   transform:scale(.97) !important;
 }
 
-/* إخفاء أزرار التحكم فقط بدون إخفاء الهيدر العلوي */
-body.presenterHideDisplayControls .displayControls,
-body.presenterHideDisplayControls .controlsBar,
-body.presenterHideDisplayControls .finalControlsBar,
-body.presenterHideDisplayControls #finalControlsBar,
-body.presenterHideDisplayControls .auctionControls,
-body.presenterHideDisplayControls .top10Controls,
-body.presenterHideDisplayControls .warmupControls,
-body.presenterHideDisplayControls .whoControls,
-body.presenterHideDisplayControls .archiveControls{
-  display:none !important;
+/* =========================================================
+   BIG SCREEN MODE
+========================================================= */
+
+body.bigScreenMode{
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
 }
 
-/* Tablet */
-@media (max-width:1180px){
+body.bigScreenMode img,
+body.bigScreenMode video,
+body.bigScreenMode .finalRound3Image,
+body.bigScreenMode .finalTeamMediaImage,
+body.bigScreenMode .finalRound1BigImage,
+body.bigScreenMode .whoImage,
+body.bigScreenMode .archiveImage{
+  opacity:1 !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+  image-rendering:auto !important;
+  transform:translateZ(0) !important;
+  backface-visibility:hidden !important;
+}
+
+body.bigScreenMode video,
+body.bigScreenMode .finalTeamMediaVideo,
+body.bigScreenMode .finalRound3TeamMediaOverlayVideo{
+  width:100% !important;
+  max-width:96vw !important;
+  max-height:82vh !important;
+  object-fit:contain !important;
+  background:#000 !important;
+}
+
+body.bigScreenMode .segmentTitle,
+body.bigScreenMode .homeTeamName,
+body.bigScreenMode .teamName{
+  font-size:clamp(2rem,3.6vw,4rem) !important;
+  line-height:1.1 !important;
+}
+
+body.bigScreenMode .homeTeamScore,
+body.bigScreenMode .teamScore{
+  font-size:clamp(2.4rem,4.2vw,5rem) !important;
+  line-height:1 !important;
+}
+
+body.bigScreenMode .finalRound1Card,
+body.bigScreenMode .finalRound2Card,
+body.bigScreenMode .finalRound3Card,
+body.bigScreenMode .whoNumberBtn,
+body.bigScreenMode .warmupNumberBtn,
+body.bigScreenMode .top10NumberBtn{
+  min-height:92px !important;
+  font-size:clamp(2.2rem,4vw,4.6rem) !important;
+}
+
+body.bigScreenMode .used{
+  opacity:.55 !important;
+  filter:grayscale(.2) !important;
+}
+
+body.bigScreenMode .used img,
+body.bigScreenMode .used video{
+  opacity:1 !important;
+  filter:none !important;
+}
+
+/* =========================================================
+   RESPONSIVE - IPAD / TABLET
+========================================================= */
+
+@media (min-width:768px) and (max-width:1180px){
+  .homeShowPage{
+    padding:18px;
+  }
+
+  .homeHero{
+    width:calc(100% - 28px);
+    grid-template-columns:minmax(0,1fr) 230px minmax(0,1fr);
+    gap:12px;
+    margin-bottom:20px;
+  }
+
+  .homeTeamA,
+  .homeTeamB{
+    max-width:360px;
+  }
+
+  .homeTeamCard{
+    min-height:74px;
+    padding:8px;
+    gap:8px;
+  }
+
+  .homeTeamText{
+    min-height:46px;
+    padding:8px 10px;
+    border-radius:15px;
+  }
+
+  .homeTeamName{
+    font-size:1.3rem;
+  }
+
+  .homeTeamScore{
+    width:52px;
+    height:42px;
+    border-radius:14px;
+    font-size:1.45rem;
+  }
+
+  .homeTitleBox{
+    width:230px;
+    height:84px;
+    min-height:84px;
+  }
+
+  .homeTitleBox h1{
+    font-size:3rem;
+  }
+
+  .homeTitleBox h1::after{
+    width:125px !important;
+    height:8px !important;
+    margin-top:12px !important;
+  }
+
+  #modelNameDisplay{
+    max-width:220px;
+    font-size:1.2rem;
+  }
+
+  .homeSegmentsShowcase{
+    gap:12px;
+  }
+
+  .homeSegmentItem{
+    min-height:116px;
+    padding:14px;
+  }
+
+  .homeSegmentItem span{
+    min-height:62px;
+    font-size:1.45rem;
+  }
+
+  .segmentControls{
+    grid-template-columns:100px 1fr 100px;
+    margin:14px auto 12px;
+  }
+
+  .segmentTitle{
+    font-size:1.8rem;
+  }
+
+  .homeModelPopupArea,
   #homeModelPopupArea{
-    top:12px !important;
+    top:16px !important;
     max-width:calc(100vw - 22px) !important;
   }
 
-  .homeModelNotifyBox{
-    height:50px !important;
-    min-height:50px !important;
-    padding:6px !important;
-    gap:6px !important;
-    border-radius:18px !important;
+  .homeModelNotifyBox,
+  .homeModelClassicBox{
+    min-height:62px !important;
+    padding:9px !important;
+    gap:9px !important;
+    border-radius:22px !important;
   }
 
-  .homeModelNotifyClose{
-    width:34px !important;
-    height:34px !important;
-    min-width:34px !important;
-    border-radius:12px !important;
-    font-size:1.18rem !important;
-  }
-
-  .homeModelNotifyControl,
-  .homeModelClassicControl{
-    height:36px !important;
-    min-width:100px !important;
-    padding:0 10px !important;
-    border-radius:13px !important;
-    font-size:.68rem !important;
-  }
-
+  .homeModelClassicBody,
   .homeModelNotifyCode{
-    height:36px !important;
-    min-width:132px !important;
-    padding:0 10px !important;
-    border-radius:13px !important;
-    gap:6px !important;
+    height:48px !important;
+    min-width:185px !important;
+    padding:0 15px !important;
+    border-radius:16px !important;
+    gap:10px !important;
   }
 
+  .homeModelClassicCodeLabel,
   .homeModelNotifyCode span{
-    font-size:.6rem !important;
+    font-size:.75rem !important;
   }
 
+  .homeModelClassicCode,
   .homeModelNotifyCode strong{
-    font-size:1.08rem !important;
+    font-size:1.5rem !important;
+    letter-spacing:1.8px !important;
+  }
+
+  .homeModelClassicControl,
+  #displayControlsEyeBtn,
+  .homeModelNotifyControl{
+    height:48px !important;
+    min-width:132px !important;
+    padding:0 16px !important;
+    border-radius:16px !important;
+    font-size:.85rem !important;
+  }
+
+  .homeModelClassicClose,
+  .homeModelNotifyClose{
+    width:38px !important;
+    height:38px !important;
+    min-width:38px !important;
+    border-radius:14px !important;
+    font-size:1.3rem !important;
   }
 }
 
 /* =========================================================
-   DISPLAY PAGE - IPAD AIR LANDSCAPE FINAL FIT
-   مناسب iPad Air للعرض
+   IPAD AIR LANDSCAPE FINAL FIT
 ========================================================= */
 
 @media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
-
   html,
   body{
     width:100%;
@@ -5954,17 +3211,6 @@ body.presenterHideDisplayControls .archiveControls{
     overflow:hidden !important;
   }
 
-  .hidden{
-    display:none !important;
-  }
-}
-
-/* =========================================================
-   IPAD AIR - HOME DISPLAY
-========================================================= */
-
-@media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
-
   .homePageShell,
   .homeShowShell,
   .homeShell{
@@ -5981,43 +3227,6 @@ body.presenterHideDisplayControls .archiveControls{
     overflow:hidden !important;
   }
 
-  .homeHero,
-  .homeTitleBox,
-  .mainTitleBox{
-    width:min(100%,680px) !important;
-    height:112px !important;
-    min-height:112px !important;
-    max-height:112px !important;
-
-    margin:0 auto !important;
-    padding:10px 18px !important;
-
-    border-radius:30px !important;
-
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:center !important;
-    justify-content:center !important;
-  }
-
-  .homeHero h1,
-  .mainTitle,
-  .displayTitle{
-    font-size:clamp(4rem,7vw,5.4rem) !important;
-    line-height:.82 !important;
-    margin:0 !important;
-  }
-
-  #modelNameDisplay,
-  .modelNameDisplay{
-    min-height:34px !important;
-    padding:5px 16px !important;
-    border-radius:999px !important;
-
-    font-size:1rem !important;
-    line-height:1 !important;
-  }
-
   .teamsShowRow,
   .homeTeamsRow,
   .scoreBoard,
@@ -6029,45 +3238,6 @@ body.presenterHideDisplayControls .archiveControls{
     grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr) !important;
     align-items:center !important;
     gap:18px !important;
-  }
-
-  .teamBox,
-  .homeTeamCard,
-  .mainTeamCard{
-    height:100px !important;
-    min-height:100px !important;
-    max-height:100px !important;
-
-    padding:14px 18px !important;
-    border-radius:30px !important;
-
-    overflow:hidden !important;
-  }
-
-  .teamName,
-  .mainTeamName,
-  #mainTeamNameA,
-  #mainTeamNameB{
-    font-size:clamp(1.45rem,2.7vw,2.1rem) !important;
-    line-height:1.1 !important;
-
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-  }
-
-  .teamScore,
-  .mainScore,
-  #mainScoreA,
-  #mainScoreB{
-    width:60px !important;
-    min-width:60px !important;
-    height:50px !important;
-
-    border-radius:18px !important;
-
-    font-size:2rem !important;
-    line-height:1 !important;
   }
 
   .segmentsGrid,
@@ -6085,52 +3255,6 @@ body.presenterHideDisplayControls .archiveControls{
     align-items:stretch !important;
     overflow:hidden !important;
   }
-
-  .segmentCard,
-  .homeSegmentItem{
-    min-height:112px !important;
-    max-height:140px !important;
-
-    padding:14px !important;
-    border-radius:30px !important;
-
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-
-    overflow:hidden !important;
-  }
-
-  .homeSegmentContent{
-    width:100% !important;
-    height:100% !important;
-
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:center !important;
-    justify-content:center !important;
-    gap:8px !important;
-  }
-
-  .homeSegmentContent span,
-  .segmentCard span{
-    font-size:clamp(1.45rem,2.8vw,2.15rem) !important;
-    line-height:1.05 !important;
-    text-align:center !important;
-  }
-
-  .segmentWinner,
-  .homeSegmentWinner{
-    min-height:24px !important;
-    font-size:.82rem !important;
-    line-height:1.1 !important;
-  }
-}
-/* =========================================================
-   IPAD AIR - SEGMENT PAGE
-========================================================= */
-
-@media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
 
   #segmentArea{
     width:100% !important;
@@ -6184,9 +3308,7 @@ body.presenterHideDisplayControls .archiveControls{
   #endRoundBtn{
     width:100% !important;
     height:60px !important;
-
     border-radius:20px !important;
-
     font-size:1rem !important;
     font-weight:900 !important;
   }
@@ -6200,17 +3322,6 @@ body.presenterHideDisplayControls .archiveControls{
 
     overflow:hidden !important;
   }
-
-  body.presenterHideDisplayControls .segmentControls{
-    display:grid !important;
-  }
-}
-
-/* =========================================================
-   IPAD AIR - CONTROL BUTTONS
-========================================================= */
-
-@media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
 
   .displayControls,
   .controlsBar,
@@ -6258,31 +3369,6 @@ body.presenterHideDisplayControls .archiveControls{
     white-space:nowrap !important;
   }
 
-  .teamSelect,
-  .teamsSelector,
-  .segmentTeams,
-  .questionTeams{
-    display:grid !important;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    gap:10px !important;
-  }
-
-  .teamSelect button,
-  .teamsSelector button,
-  .segmentTeams button,
-  .questionTeams button{
-    height:52px !important;
-    border-radius:18px !important;
-    font-size:.95rem !important;
-  }
-}
-
-/* =========================================================
-   IPAD AIR - SEGMENT GRIDS
-========================================================= */
-
-@media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
-
   .warmupGrid,
   .warmupCategoriesGrid{
     width:min(100%,960px) !important;
@@ -6301,7 +3387,6 @@ body.presenterHideDisplayControls .archiveControls{
     min-height:0 !important;
     padding:12px !important;
     border-radius:24px !important;
-
     overflow:hidden !important;
   }
 
@@ -6338,7 +3423,6 @@ body.presenterHideDisplayControls .archiveControls{
   .finalRound2Grid,
   .finalRound3Grid{
     width:min(100%,900px) !important;
-
     margin:0 auto !important;
 
     display:grid !important;
@@ -6370,13 +3454,6 @@ body.presenterHideDisplayControls .archiveControls{
     font-size:1.8rem !important;
     line-height:1 !important;
   }
-}
-
-/* =========================================================
-   IPAD AIR - TEXT BOXES
-========================================================= */
-
-@media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
 
   .questionBox,
   .answerBox,
@@ -6446,67 +3523,1023 @@ body.presenterHideDisplayControls .archiveControls{
     line-height:1 !important;
   }
 }
+
 /* =========================================================
-   IPAD AIR - JOIN CODE NOTICE
+   MOBILE
+========================================================= */
+
+@media (max-width:767px){
+  .homeShowPage{
+    padding:12px;
+  }
+
+  .homeHero{
+    width:100%;
+    grid-template-columns:1fr;
+    gap:10px;
+    margin-bottom:16px;
+  }
+
+  .homeTitleBox{
+    grid-column:auto;
+    order:-1;
+
+    width:100%;
+    height:88px;
+    min-height:88px;
+  }
+
+  .homeTeamA,
+  .homeTeamB{
+    grid-column:auto;
+    justify-self:stretch;
+
+    width:100%;
+    max-width:none;
+  }
+
+  .homeTeamCard{
+    min-height:72px;
+    border-radius:20px;
+  }
+
+  .homeTeamText{
+    min-height:48px;
+  }
+
+  .homeTeamName{
+    font-size:1.2rem;
+  }
+
+  .homeTeamScore{
+    width:52px;
+    height:42px;
+    font-size:1.42rem;
+  }
+
+  .homeTitleBox h1{
+    font-size:3.15rem;
+  }
+
+  #modelNameDisplay{
+    font-size:1.2rem;
+  }
+
+  .homeSegmentsShowcase{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .homeSegmentItem,
+  .homeSegmentItem:nth-child(even){
+    min-height:96px;
+    padding:12px;
+    border-radius:22px;
+  }
+
+  .homeSegmentItem::before,
+  .homeSegmentItem:nth-child(even)::before{
+    inset:8px;
+    border-radius:17px;
+  }
+
+  .homeSegmentItem span{
+    min-height:58px;
+    width:calc(100% - 20px);
+    border-radius:17px;
+    font-size:1.38rem;
+  }
+
+  .homeSegmentItem.segmentLocked::after,
+  .homeSegmentItem.segmentDone::after,
+  .homeSegmentItem.hasWinner::after{
+    width:88px;
+    height:30px;
+    border-radius:0 0 15px 0;
+    font-size:.68rem;
+  }
+
+  .homeSegmentItem.segmentLocked .homeSegmentWinner,
+  .homeSegmentItem.segmentDone .homeSegmentWinner,
+  .homeSegmentItem.hasWinner .homeSegmentWinner{
+    min-height:36px;
+    padding:7px 16px;
+    font-size:.95rem;
+  }
+
+  .homeWinnerArea{
+    flex-direction:column;
+    margin-top:16px;
+  }
+
+  .homeWinnerBtn,
+  .winnerBtn{
+    width:100%;
+    min-height:54px;
+    font-size:1.08rem;
+    border-radius:18px;
+  }
+
+  .segmentControls{
+    width:calc(100% - 20px);
+    grid-template-columns:1fr;
+    gap:8px;
+    margin:12px auto 10px;
+  }
+
+  .segmentTitle{
+    order:-1;
+    font-size:1.65rem;
+  }
+
+  .backBtn,
+  .endBtn{
+    height:44px;
+  }
+
+  .gameToast{
+    top:14px;
+    left:12px;
+    right:12px;
+
+    min-width:0;
+    max-width:none;
+
+    transform:translateY(-18px) scale(.96);
+  }
+
+  .gameToast.show{
+    transform:translateY(0) scale(1);
+  }
+
+  #winnerOverlay{
+    padding:14px;
+  }
+
+  #winnerOverlayCard{
+    border-radius:28px;
+    padding:28px 16px 18px;
+  }
+
+  #winnerOverlayName{
+    font-size:clamp(2.5rem,12vw,3.7rem);
+  }
+
+  #winnerOverlayBurst{
+    font-size:1.1rem;
+    letter-spacing:6px;
+  }
+
+  .winnerOverlayActions{
+    grid-template-columns:1fr;
+  }
+
+  #winnerOverlayClose,
+  #winnerOverlayEnd{
+    height:50px;
+  }
+
+  body.presenterHideDisplayControls .archiveInputsInline,
+  body.presenterHideDisplayControls .archiveInputsWrap,
+  body.presenterHideDisplayControls .archiveInputsBox,
+  body.presenterHideDisplayControls .archiveManualInputs{
+    transform:translateY(-26px) !important;
+  }
+}
+/* =========================================================
+   FINAL RESULTS - CLEAN FINAL VERSION
+   يعتمد على HTML الجديد بدون الكأس وبدون finalScoreStrip
+========================================================= */
+
+.finalResultsOverlay{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:2147483600 !important;
+
+  width:100vw !important;
+  height:100vh !important;
+  padding:22px 28px !important;
+
+  direction:rtl !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  overflow:hidden !important;
+
+  background:
+    radial-gradient(circle at 16% 18%, rgba(111,231,255,.24), transparent 35%),
+    radial-gradient(circle at 82% 15%, rgba(255,155,81,.18), transparent 34%),
+    linear-gradient(135deg,#EAF1F4 0%,#DCE8EC 48%,#F1EEE8 100%) !important;
+}
+
+.finalResultsOverlay.hidden{
+  display:none !important;
+}
+
+/* =========================================================
+   BOARD
+========================================================= */
+
+.finalResultsBoard{
+  position:relative !important;
+
+  width:min(100%,1120px) !important;
+  height:min(100vh - 54px,680px) !important;
+
+  display:grid !important;
+  grid-template-rows:96px minmax(0,1fr) 58px !important;
+  gap:8px !important;
+
+  padding:8px 10px !important;
+
+  border-radius:38px !important;
+  border:2px solid rgba(255,255,255,.34) !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.34), transparent 38%),
+    radial-gradient(circle at 88% 100%, rgba(255,155,81,.10), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,.13)) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(36,24,94,.045),
+    0 18px 38px rgba(31,41,55,.085),
+    inset 0 1px 0 rgba(255,255,255,.46) !important;
+
+  backdrop-filter:blur(22px) saturate(1.12) !important;
+  -webkit-backdrop-filter:blur(22px) saturate(1.12) !important;
+
+  overflow:hidden !important;
+}
+
+/* زر الإغلاق */
+.finalResultsClose{
+  position:absolute !important;
+  top:8px !important;
+  left:8px !important;
+  z-index:20 !important;
+
+  width:46px !important;
+  height:46px !important;
+
+  border:0 !important;
+  border-radius:16px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:linear-gradient(180deg,#64748B,#334155) !important;
+  color:#fff !important;
+
+  font-family:Arial,sans-serif !important;
+  font-size:1.65rem !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+
+  cursor:pointer !important;
+
+  box-shadow:
+    0 14px 28px rgba(30,27,75,.16),
+    inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+
+/* =========================================================
+   TOP HEADER
+   فريق - الفائز - فريق
+========================================================= */
+
+.finalResultsTop{
+  width:100% !important;
+  height:96px !important;
+  min-height:96px !important;
+
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 240px minmax(0,1fr) !important;
+  gap:10px !important;
+  align-items:center !important;
+
+  margin:0 !important;
+  padding:0 !important;
+
+  overflow:visible !important;
+}
+
+/* إلغاء أي بقايا قديمة */
+.finalScoreStrip,
+.finalScoreCup{
+  display:none !important;
+}
+
+/* =========================================================
+   WINNER CENTER
+========================================================= */
+
+.finalWinnerBlock{
+  grid-column:2 !important;
+  justify-self:center !important;
+
+  width:240px !important;
+  height:96px !important;
+  min-height:96px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+}
+
+.finalWinnerLabel{
+  min-height:24px !important;
+  padding:5px 16px !important;
+  margin-bottom:4px !important;
+
+  border-radius:999px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:rgba(255,255,255,.20) !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.7rem !important;
+  line-height:1 !important;
+}
+
+.finalWinnerName{
+  max-width:240px !important;
+
+  color:var(--main-text) !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(2.55rem,4vw,4.25rem) !important;
+  font-weight:400 !important;
+  line-height:.86 !important;
+
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+
+  text-shadow:
+    0 3px 0 rgba(255,255,255,.88),
+    0 16px 32px rgba(30,27,75,.18),
+    0 0 18px rgba(103,232,249,.16) !important;
+}
+
+.finalWinnerName::after{
+  content:"" !important;
+
+  width:125px !important;
+  height:7px !important;
+  margin:9px auto 0 !important;
+
+  display:block !important;
+  border-radius:999px !important;
+
+  background:
+    linear-gradient(
+      115deg,
+      #FF9B51 0%,
+      #FF9B51 22%,
+      #67E8F9 40%,
+      rgba(255,255,255,.88) 50%,
+      #7C3AED 62%,
+      #FF9B51 100%
+    ) !important;
+
+  background-size:260% 100% !important;
+
+  box-shadow:
+    0 10px 24px rgba(249,115,22,.22),
+    0 0 18px rgba(103,232,249,.20) !important;
+}
+
+.finalResultsOverlay.teamA .finalWinnerName,
+.finalResultsOverlay.teamB .finalWinnerName{
+  color:#166534 !important;
+}
+
+.finalResultsOverlay.draw .finalWinnerName{
+  color:#475569 !important;
+}
+
+.finalWinnerSub{
+  margin-top:3px !important;
+
+  color:#000 !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.88rem !important;
+  line-height:1 !important;
+}
+
+/* =========================================================
+   TOP TEAM CARDS
+========================================================= */
+
+.finalScoreTeam{
+  min-height:76px !important;
+  padding:8px 10px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+
+  overflow:hidden !important;
+  isolation:isolate !important;
+
+  border-radius:32px 18px 32px 18px !important;
+  border:1px solid var(--glass-border) !important;
+
+  background:var(--glass-score) !important;
+
+  box-shadow:
+    0 18px 42px rgba(31,41,55,.12),
+    inset 0 1px 0 var(--glass-highlight) !important;
+
+  backdrop-filter:blur(28px) saturate(1.18) !important;
+  -webkit-backdrop-filter:blur(28px) saturate(1.18) !important;
+}
+
+.finalScoreTeam.teamA{
+  grid-column:1 !important;
+  justify-self:end !important;
+
+  width:100% !important;
+  max-width:390px !important;
+}
+
+.finalScoreTeam.teamB{
+  grid-column:3 !important;
+  justify-self:start !important;
+
+  width:100% !important;
+  max-width:390px !important;
+
+  flex-direction:row-reverse !important;
+  border-radius:18px 32px 18px 32px !important;
+}
+
+.finalScoreTeam span{
+  flex:1 !important;
+  min-width:0 !important;
+  min-height:48px !important;
+
+  padding:8px 12px !important;
+  border-radius:16px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  overflow:hidden !important;
+
+  background:rgba(255,255,255,.05) !important;
+  border:1px solid var(--glass-border) !important;
+
+  color:var(--main-text) !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.25rem,2vw,1.9rem) !important;
+  line-height:1.15 !important;
+  font-weight:400 !important;
+
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+}
+
+.finalScoreTeam strong{
+  flex-shrink:0 !important;
+
+  width:56px !important;
+  height:46px !important;
+  border-radius:16px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.66)) !important;
+
+  border:1px solid rgba(255,255,255,.52) !important;
+
+  color:#1E1B4B !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.8rem !important;
+  line-height:1 !important;
+}
+
+.finalScoreTeam.winner{
+  border-color:rgba(255,255,255,.70) !important;
+
+  box-shadow:
+    0 0 0 5px rgba(255,255,255,.12),
+    0 24px 48px rgba(30,27,75,.16),
+    inset 0 1px 0 rgba(255,255,255,.82) !important;
+}
+
+.finalScoreTeam.winner strong{
+  color:#166534 !important;
+}
+
+/* =========================================================
+   RESULT CARDS
+========================================================= */
+
+.finalResultsList{
+  width:min(100%,980px) !important;
+  height:100% !important;
+  margin:0 auto !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  grid-auto-rows:minmax(128px,1fr) !important;
+  gap:14px !important;
+
+  align-content:center !important;
+  justify-content:center !important;
+
+  overflow:hidden !important;
+}
+
+.finalResultMatch{
+  position:relative !important;
+  min-height:128px !important;
+  padding:14px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  overflow:hidden !important;
+  cursor:default !important;
+  isolation:isolate !important;
+
+  border-radius:34px 20px 34px 20px !important;
+  border:2px solid rgba(255,255,255,.30) !important;
+
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,.28), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.075)) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(36,24,94,.045),
+    0 10px 22px rgba(31,41,55,.055),
+    inset 0 1px 0 rgba(255,255,255,.42) !important;
+
+  backdrop-filter:blur(28px) saturate(1.18) !important;
+  -webkit-backdrop-filter:blur(28px) saturate(1.18) !important;
+
+  transform:translateZ(0) !important;
+}
+
+.finalResultMatch:nth-child(even){
+  border-radius:20px 34px 20px 34px !important;
+}
+
+.finalResultMatch::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:8px !important;
+  z-index:1 !important;
+
+  border-radius:26px 15px 26px 15px !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+
+  background:rgba(255,255,255,.035) !important;
+  pointer-events:none !important;
+}
+
+.finalResultMatch:nth-child(even)::before{
+  border-radius:15px 26px 15px 26px !important;
+}
+
+.finalResultMatch::after{
+  content:"" !important;
+  position:absolute !important;
+  top:12px !important;
+  right:18% !important;
+  left:18% !important;
+  height:1px !important;
+  z-index:2 !important;
+
+  background:
+    linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent) !important;
+
+  opacity:.85 !important;
+  pointer-events:none !important;
+}
+
+/* عنوان الكرت */
+.finalResultMatch h3{
+  position:relative !important;
+  z-index:3 !important;
+
+  width:calc(100% - 28px) !important;
+  min-height:66px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  margin:0 !important;
+  padding:10px 16px !important;
+  border-radius:22px !important;
+
+  background:rgba(255,255,255,.13) !important;
+  border:1px solid rgba(255,255,255,.24) !important;
+
+  color:var(--main-text) !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(1.55rem,2.35vw,2.35rem) !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+
+  text-align:center !important;
+  letter-spacing:-.3px !important;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.45),
+    0 8px 18px rgba(31,41,55,.12) !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.32) !important;
+
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+}
+
+.finalResultMatch h3::before{
+  content:"" !important;
+  position:absolute !important;
+  top:12px !important;
+  right:14px !important;
+
+  width:8px !important;
+  height:8px !important;
+  border-radius:50% !important;
+
+  background:rgba(255,155,81,.55) !important;
+  box-shadow:0 0 14px rgba(255,155,81,.35) !important;
+}
+
+.finalResultMatch h3::after{
+  content:"" !important;
+  position:absolute !important;
+  bottom:10px !important;
+  left:14px !important;
+
+  width:34px !important;
+  height:4px !important;
+  border-radius:999px !important;
+
+  background:
+    linear-gradient(90deg,rgba(255,155,81,.55),rgba(255,255,255,.12)) !important;
+}
+
+/* رقم الفقرة */
+.finalMatchNo{
+  position:absolute !important;
+  top:14px !important;
+  right:14px !important;
+  z-index:5 !important;
+
+  width:32px !important;
+  height:32px !important;
+  border-radius:12px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:rgba(255,255,255,.34) !important;
+  border:1px solid rgba(255,255,255,.34) !important;
+
+  color:#64748B !important;
+  font-size:.72rem !important;
+  font-weight:900 !important;
+
+  box-shadow:none !important;
+}
+
+/* النتيجة */
+.finalMatchScore{
+  position:absolute !important;
+  left:14px !important;
+  bottom:14px !important;
+  z-index:6 !important;
+
+  width:116px !important;
+  height:38px !important;
+  padding:0 7px !important;
+
+  border-radius:999px !important;
+
+  display:grid !important;
+  grid-template-columns:1fr 14px 1fr !important;
+  align-items:center !important;
+  gap:3px !important;
+
+  background:rgba(255,255,255,.34) !important;
+  border:1px solid rgba(255,255,255,.34) !important;
+
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+
+  overflow:hidden !important;
+}
+
+.finalMatchScore strong{
+  height:26px !important;
+  border-radius:999px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:rgba(255,255,255,.52) !important;
+
+  color:#1E1B4B !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.1rem !important;
+  line-height:1 !important;
+
+  box-shadow:none !important;
+}
+
+.finalMatchScore span{
+  color:#64748B !important;
+  font-size:.58rem !important;
+  font-weight:900 !important;
+  text-align:center !important;
+}
+
+/* الفائز */
+.finalMatchWinner{
+  position:absolute !important;
+  right:14px !important;
+  bottom:14px !important;
+  z-index:6 !important;
+
+  max-width:calc(100% - 150px) !important;
+  min-height:38px !important;
+  padding:7px 18px !important;
+  border-radius:999px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  background:rgba(255,255,255,.34) !important;
+  border:1px solid rgba(255,255,255,.34) !important;
+
+  color:#0F4C5C !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.8rem !important;
+  line-height:1.2 !important;
+
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+.finalMatchWinner:empty{
+  display:none !important;
+}
+
+.finalResultMatch.teamA .finalMatchWinner,
+.finalResultMatch.teamB .finalMatchWinner{
+  color:#166534 !important;
+}
+
+.finalResultMatch.teamA .finalMatchScore strong:first-child,
+.finalResultMatch.teamB .finalMatchScore strong:last-child{
+  color:#166534 !important;
+}
+
+.finalResultMatch.teamA .finalMatchScore strong:last-child,
+.finalResultMatch.teamB .finalMatchScore strong:first-child{
+  color:#991B1B !important;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.finalResultsFooter{
+  width:100% !important;
+  margin:0 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.finalResultsFooter button{
+  position:relative !important;
+  overflow:hidden !important;
+
+  min-width:230px !important;
+  min-height:56px !important;
+  padding:0 34px !important;
+
+  border:1px solid rgba(255,255,255,.34) !important;
+  border-radius:22px !important;
+
+  background:
+    radial-gradient(circle at 18% 0%,rgba(255,255,255,.26),transparent 42%),
+    linear-gradient(180deg,rgba(15,38,47,.95),rgba(36,99,122,.90)) !important;
+
+  color:#fff !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.25rem !important;
+  line-height:1 !important;
+
+  cursor:pointer !important;
+
+  box-shadow:
+    0 18px 34px rgba(42,100,133,.26),
+    0 0 0 5px rgba(38,97,131,.08),
+    inset 0 1px 0 rgba(47,76,113,.34) !important;
+
+  backdrop-filter:blur(20px) saturate(1.12) !important;
+  -webkit-backdrop-filter:blur(20px) saturate(1.12) !important;
+}
+
+.hiddenFinalResultCard{
+  display:none !important;
+}
+
+/* =========================================================
+   FINAL RESULTS - TABLET LANDSCAPE
 ========================================================= */
 
 @media (min-width:800px) and (max-width:1180px) and (orientation:landscape){
-
-  .homeModelPopupArea,
-  #homeModelPopupArea{
-    top:14px !important;
-    max-width:calc(100vw - 28px) !important;
+  .finalResultsOverlay{
+    padding:16px 22px !important;
   }
 
-  .homeModelClassicBox,
-  .homeModelNotifyBox{
-    min-height:58px !important;
-    padding:8px !important;
-    gap:9px !important;
-    border-radius:20px !important;
+  .finalResultsBoard{
+    width:100% !important;
+    height:100% !important;
+
+    grid-template-rows:88px minmax(0,1fr) 54px !important;
+    gap:7px !important;
+
+    padding:6px 8px !important;
+
+    border-radius:32px !important;
   }
 
-  .homeModelClassicBody,
-  .homeModelNotifyCode{
+  .finalResultsTop{
+    height:88px !important;
+    min-height:88px !important;
+
+    grid-template-columns:minmax(0,1fr) 210px minmax(0,1fr) !important;
+    gap:8px !important;
+  }
+
+  .finalResultsClose{
+    top:7px !important;
+    left:7px !important;
+    width:44px !important;
     height:44px !important;
-    min-width:175px !important;
-
-    padding:0 15px !important;
-    border-radius:16px !important;
-    gap:10px !important;
+    border-radius:15px !important;
   }
 
-  .homeModelClassicCodeLabel,
-  .homeModelNotifyCode span{
-    font-size:.72rem !important;
+  .finalWinnerBlock{
+    width:210px !important;
+    height:88px !important;
+    min-height:88px !important;
   }
 
-  .homeModelClassicCode,
-  .homeModelNotifyCode strong{
+  .finalWinnerLabel{
+    min-height:22px !important;
+    padding:4px 14px !important;
+    font-size:.64rem !important;
+  }
+
+  .finalWinnerName{
+    max-width:210px !important;
+    font-size:2.65rem !important;
+  }
+
+  .finalWinnerName::after{
+    width:112px !important;
+    height:6px !important;
+    margin-top:8px !important;
+  }
+
+  .finalWinnerSub{
+    font-size:.82rem !important;
+  }
+
+  .finalScoreTeam{
+    min-height:70px !important;
+    padding:7px 8px !important;
+    gap:8px !important;
+  }
+
+  .finalScoreTeam.teamA,
+  .finalScoreTeam.teamB{
+    max-width:330px !important;
+  }
+
+  .finalScoreTeam span{
+    min-height:42px !important;
+    padding:7px 10px !important;
+    border-radius:14px !important;
+    font-size:1.2rem !important;
+  }
+
+  .finalScoreTeam strong{
+    width:50px !important;
+    height:40px !important;
+    border-radius:14px !important;
     font-size:1.45rem !important;
-    letter-spacing:1.7px !important;
   }
 
-  .homeModelClassicControl,
-  #displayControlsEyeBtn,
-  .homeModelNotifyControl{
-    height:44px !important;
-    min-width:126px !important;
+  .finalResultsList{
+    width:min(100%,930px) !important;
+    height:100% !important;
 
-    padding:0 15px !important;
-    border-radius:16px !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    grid-auto-rows:minmax(112px,1fr) !important;
+    gap:12px !important;
 
-    font-size:.8rem !important;
+    align-items:stretch !important;
+    align-content:center !important;
+    overflow:hidden !important;
   }
 
-  .homeModelClassicClose,
-  .homeModelNotifyClose{
-    width:36px !important;
-    height:36px !important;
-    min-width:36px !important;
+  .finalResultMatch{
+    min-height:112px !important;
+    padding:12px !important;
+  }
 
-    border-radius:13px !important;
-    font-size:1.25rem !important;
+  .finalResultMatch h3{
+    min-height:58px !important;
+    font-size:1.36rem !important;
+  }
+
+  .finalMatchNo{
+    width:26px !important;
+    height:26px !important;
+    top:10px !important;
+    right:10px !important;
+    font-size:.58rem !important;
+  }
+
+  .finalMatchScore{
+    left:10px !important;
+    bottom:10px !important;
+    width:92px !important;
+    height:30px !important;
+  }
+
+  .finalMatchScore strong{
+    height:20px !important;
+    font-size:.82rem !important;
+  }
+
+  .finalMatchWinner{
+    right:10px !important;
+    bottom:10px !important;
+    max-width:calc(100% - 115px) !important;
+    min-height:30px !important;
+    padding:5px 12px !important;
+    font-size:.58rem !important;
+  }
+
+  .finalMatchWinner:empty{
+    display:none !important;
+  }
+
+  .finalResultsFooter button{
+    min-height:50px !important;
+    font-size:1rem !important;
+    border-radius:18px !important;
   }
 }
-

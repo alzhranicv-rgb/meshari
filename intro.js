@@ -3,6 +3,27 @@ let introStarting = false
 let gameToastTimer = null
 let presenterStartWatchTimer = null
 
+const INTRO_MIN_SEGMENTS_COUNT = 6
+const INTRO_MAX_SEGMENTS_COUNT = 10
+
+const INTRO_ALL_GAME_SEGMENTS = [
+  { key: "warmup", title: "التسخين", sort: 1 },
+  { key: "top10", title: "Top 10", sort: 2 },
+  { key: "auction", title: "فتبلة", sort: 3 },
+  { key: "who", title: "من هو", sort: 4 },
+  { key: "explain", title: "اشرح الكلمة", sort: 5 },
+
+  { key: "finalRound1", title: "من بدون نقط", sort: 6 },
+  { key: "finalRound2", title: "صح صحلي", sort: 7 },
+  { key: "finalRound3", title: "التركيز", sort: 8 },
+  { key: "finalRound4", title: "اشرح الصورة", sort: 9 },
+
+  { key: "archive", title: "الأرشيف", sort: 10 }
+]
+
+let introVisibleSegmentsClickOrder = []
+let introVisibleSegmentsReady = false
+
 document.addEventListener("DOMContentLoaded", async () => {
   await endOldIntroSessionIfExists()
 
@@ -17,9 +38,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   setIntroStartLoading(false, "بدء اللعبة", true)
 
   await loadIntroModels()
+
   fillSavedIntroValues()
   bindIntroEnterSubmit()
   bindIntroInputCleanup()
+  bindIntroModelSegmentsLoader()
 })
 
 /* =========================
@@ -102,6 +125,14 @@ function setIntroFormDisabled(isDisabled) {
   if (teamAInput) teamAInput.disabled = !!isDisabled
   if (teamBInput) teamBInput.disabled = !!isDisabled
   if (modelSelect) modelSelect.disabled = !!isDisabled
+
+  setIntroSegmentsDisabled(isDisabled)
+}
+
+function setIntroSegmentsDisabled(isDisabled) {
+  document.querySelectorAll(".introSegmentPickBtn").forEach(btn => {
+    btn.disabled = !!isDisabled
+  })
 }
 
 function getSelectedModelName() {
@@ -308,6 +339,19 @@ function validateIntroForm() {
   if (teamAInput) teamAInput.value = teamA
   if (teamBInput) teamBInput.value = teamB
 
+  if (!introVisibleSegmentsReady) {
+    showGameToast("انتظر تحميل الفقرات")
+    return false
+  }
+
+  if (
+    introVisibleSegmentsClickOrder.length < INTRO_MIN_SEGMENTS_COUNT ||
+    introVisibleSegmentsClickOrder.length > INTRO_MAX_SEGMENTS_COUNT
+  ) {
+    showGameToast(`اختر من ${INTRO_MIN_SEGMENTS_COUNT} إلى ${INTRO_MAX_SEGMENTS_COUNT} فقرات للعرض`)
+    return false
+  }
+
   return true
 }
 
@@ -356,7 +400,7 @@ async function endOldIntroSessionIfExists() {
    Reset
 ========================= */
 
-function resetIntroPageState() {
+function clearGameLocalState() {
   localStorage.removeItem("main_score_a")
   localStorage.removeItem("main_score_b")
   localStorage.removeItem("active_segment")
@@ -382,30 +426,12 @@ function resetIntroPageState() {
   localStorage.removeItem("presenter_join_code_temp")
 }
 
+function resetIntroPageState() {
+  clearGameLocalState()
+}
+
 function resetGameStateBeforeStart() {
-  localStorage.removeItem("main_score_a")
-  localStorage.removeItem("main_score_b")
-  localStorage.removeItem("active_segment")
-  localStorage.removeItem("segment_status_v1")
-
-  localStorage.removeItem("warmup_state_v1")
-  localStorage.removeItem("top10_state_v1")
-  localStorage.removeItem("auction_state_v1")
-  localStorage.removeItem("auction_state_v2")
-  localStorage.removeItem("who_state_v1")
-  localStorage.removeItem("explain_state_v1")
-  localStorage.removeItem("final_state_v2")
-  localStorage.removeItem("final_state_v3")
-  localStorage.removeItem("archive_state_v1")
-
-  localStorage.removeItem("teamAName")
-  localStorage.removeItem("teamBName")
-  localStorage.removeItem("game_model")
-  localStorage.removeItem("game_model_name")
-
-  localStorage.removeItem("game_session_id")
-  localStorage.removeItem("game_join_code")
-  localStorage.removeItem("presenter_join_code_temp")
+  clearGameLocalState()
 
   localStorage.setItem("main_score_a", "0")
   localStorage.setItem("main_score_b", "0")
@@ -418,10 +444,313 @@ function defaultIntroSegmentStatus() {
     auction: { locked: false, winner: "" },
     who: { locked: false, winner: "" },
     explain: { locked: false, winner: "" },
+
     final: { locked: false, winner: "" },
+    finalRound1: { locked: false, winner: "" },
+    finalRound2: { locked: false, winner: "" },
+    finalRound3: { locked: false, winner: "" },
+    finalRound4: { locked: false, winner: "" },
+
     archive: { locked: false, winner: "" }
   }
 }
+
+/* =========================
+   Intro Visible Segments
+========================= */
+
+function bindIntroModelSegmentsLoader() {
+  const modelSelect = document.getElementById("introModelSelect")
+  if (!modelSelect) return
+
+  modelSelect.addEventListener("change", async () => {
+    modelSelect.classList.remove("introFieldError")
+    await loadIntroVisibleSegments()
+  })
+}
+
+function getIntroDefaultVisibleSegmentsMap() {
+  const map = {}
+
+  INTRO_ALL_GAME_SEGMENTS.forEach(item => {
+    map[item.key] = {
+      is_visible: item.sort <= INTRO_MIN_SEGMENTS_COUNT,
+      sort_order: item.sort
+    }
+  })
+
+  return map
+}
+
+async function getIntroVisibleSegmentsMap(modelId) {
+  const map = getIntroDefaultVisibleSegmentsMap()
+
+  if (!modelId) return map
+
+  const { data, error } = await db
+    .from("visible_segments")
+    .select("*")
+    .eq("model", Number(modelId))
+    .order("sort_order", { ascending: true })
+
+  if (error) {
+    console.log("INTRO GET VISIBLE SEGMENTS ERROR:", error)
+    return map
+  }
+
+  ;(data || []).forEach(row => {
+    if (!map[row.segment_key]) return
+
+    map[row.segment_key] = {
+      is_visible: !!row.is_visible,
+      sort_order: Number(row.sort_order || map[row.segment_key].sort_order)
+    }
+  })
+
+  return map
+}
+
+async function ensureIntroVisibleSegmentsDefaults(modelId) {
+  if (!modelId) return false
+
+  const { data: existingRows, error: readError } = await db
+    .from("visible_segments")
+    .select("segment_key")
+    .eq("model", Number(modelId))
+
+  if (readError) {
+    console.log("INTRO READ VISIBLE SEGMENTS DEFAULTS ERROR:", readError)
+    showGameToast("تعذر قراءة فقرات العرض")
+    return false
+  }
+
+  const existingKeys = (existingRows || []).map(row => row.segment_key)
+
+  const rows = INTRO_ALL_GAME_SEGMENTS
+    .filter(item => !existingKeys.includes(item.key))
+    .map(item => ({
+      model: Number(modelId),
+      segment_key: item.key,
+      is_visible: item.sort <= INTRO_MIN_SEGMENTS_COUNT,
+      sort_order: item.sort,
+      updated_at: new Date().toISOString()
+    }))
+
+  if (!rows.length) return true
+
+  const { error } = await db
+    .from("visible_segments")
+    .insert(rows)
+
+  if (error) {
+    console.log("INTRO ENSURE VISIBLE SEGMENTS ERROR:", error)
+    showGameToast("تعذر تجهيز فقرات العرض")
+    return false
+  }
+
+  return true
+}
+
+async function loadIntroVisibleSegments() {
+  const modelSelect = document.getElementById("introModelSelect")
+  const modelId = Number(modelSelect?.value || 0)
+
+  introVisibleSegmentsReady = false
+  introVisibleSegmentsClickOrder = []
+
+  const grid = document.getElementById("introSegmentsGrid")
+  const counter = document.getElementById("introSegmentsCounter")
+  const order = document.getElementById("introSegmentsOrder")
+
+  if (counter) counter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+  if (order) order.innerHTML = ""
+
+  if (!grid) return
+
+  if (!modelId) {
+    grid.innerHTML = `<div class="introSegmentsEmpty">اختر النموذج أولاً</div>`
+    return
+  }
+
+  grid.innerHTML = `<div class="introSegmentsEmpty">جارٍ تحميل الفقرات...</div>`
+
+  await ensureIntroVisibleSegmentsDefaults(modelId)
+
+  const visibleMap = await getIntroVisibleSegmentsMap(modelId)
+
+  const sortedSegments = [...INTRO_ALL_GAME_SEGMENTS].sort((a, b) => {
+    const av = Number(visibleMap[a.key]?.sort_order || a.sort)
+    const bv = Number(visibleMap[b.key]?.sort_order || b.sort)
+    return av - bv
+  })
+
+  introVisibleSegmentsClickOrder = sortedSegments
+    .filter(item => visibleMap[item.key]?.is_visible)
+    .map(item => item.key)
+    .slice(0, INTRO_MAX_SEGMENTS_COUNT)
+
+  introVisibleSegmentsReady = true
+
+  renderIntroSegmentsPicker()
+}
+
+function renderIntroSegmentsPicker() {
+  const grid = document.getElementById("introSegmentsGrid")
+  if (!grid) return
+
+  grid.innerHTML = INTRO_ALL_GAME_SEGMENTS.map(item => {
+    const selectedIndex = introVisibleSegmentsClickOrder.indexOf(item.key)
+    const selected = selectedIndex !== -1
+
+    return `
+      <button
+        type="button"
+        class="introSegmentPickBtn ${selected ? "selected" : ""}"
+        id="introSegmentBtn_${item.key}"
+        onclick="toggleIntroVisibleSegment('${item.key}')"
+      >
+        <span class="introSegmentPickTitle">${item.title}</span>
+        <span class="introSegmentPickState">
+          ${selected ? `مختارة ${selectedIndex + 1}` : "اضغط للاختيار"}
+        </span>
+      </button>
+    `
+  }).join("")
+
+  refreshIntroSegmentsPickerUI()
+}
+
+function buildIntroSegmentsOrderPreview() {
+  if (!introVisibleSegmentsClickOrder.length) {
+    return `<div class="introSegmentsEmptyOrder">لم يتم اختيار فقرات بعد</div>`
+  }
+
+  return `
+    <div class="introSegmentsOrderTitle">ترتيب الظهور</div>
+
+    <div class="introSegmentsOrderList">
+      ${introVisibleSegmentsClickOrder.map((key, index) => {
+        const item = INTRO_ALL_GAME_SEGMENTS.find(seg => seg.key === key)
+
+        return `
+          <div class="introSegmentsOrderItem">
+            <span>${index + 1}</span>
+            <strong>${item?.title || key}</strong>
+          </div>
+        `
+      }).join("")}
+    </div>
+  `
+}
+
+function refreshIntroSegmentsPickerUI() {
+  const count = introVisibleSegmentsClickOrder.length
+  const counter = document.getElementById("introSegmentsCounter")
+  const order = document.getElementById("introSegmentsOrder")
+
+  const countOk =
+    count >= INTRO_MIN_SEGMENTS_COUNT &&
+    count <= INTRO_MAX_SEGMENTS_COUNT
+
+  if (counter) {
+    counter.innerText = `${count} / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    counter.classList.toggle("ok", countOk)
+    counter.classList.toggle("bad", !countOk)
+  }
+
+  INTRO_ALL_GAME_SEGMENTS.forEach(item => {
+    const btn = document.getElementById(`introSegmentBtn_${item.key}`)
+    if (!btn) return
+
+    const selectedIndex = introVisibleSegmentsClickOrder.indexOf(item.key)
+    const selected = selectedIndex !== -1
+    const state = btn.querySelector(".introSegmentPickState")
+
+    btn.classList.toggle("selected", selected)
+
+    if (state) {
+      state.textContent = selected ? `مختارة ${selectedIndex + 1}` : "اضغط للاختيار"
+    }
+  })
+
+  if (order) {
+    order.innerHTML = buildIntroSegmentsOrderPreview()
+  }
+}
+
+function toggleIntroVisibleSegment(key) {
+  const currentIndex = introVisibleSegmentsClickOrder.indexOf(key)
+
+  if (currentIndex !== -1) {
+    introVisibleSegmentsClickOrder.splice(currentIndex, 1)
+    refreshIntroSegmentsPickerUI()
+    return
+  }
+
+  if (introVisibleSegmentsClickOrder.length >= INTRO_MAX_SEGMENTS_COUNT) {
+    showGameToast(`مسموح اختيار ${INTRO_MAX_SEGMENTS_COUNT} فقرات كحد أقصى`)
+    return
+  }
+
+  introVisibleSegmentsClickOrder.push(key)
+  refreshIntroSegmentsPickerUI()
+}
+
+async function saveIntroVisibleSegments() {
+  const modelSelect = document.getElementById("introModelSelect")
+  const modelId = Number(modelSelect?.value || 0)
+
+  if (!modelId) {
+    showGameToast("اختر النموذج أولاً")
+    return false
+  }
+
+  if (!introVisibleSegmentsReady) {
+    showGameToast("انتظر تحميل الفقرات")
+    return false
+  }
+
+  if (
+    introVisibleSegmentsClickOrder.length < INTRO_MIN_SEGMENTS_COUNT ||
+    introVisibleSegmentsClickOrder.length > INTRO_MAX_SEGMENTS_COUNT
+  ) {
+    showGameToast(`لازم تختار من ${INTRO_MIN_SEGMENTS_COUNT} إلى ${INTRO_MAX_SEGMENTS_COUNT} فقرات`)
+    return false
+  }
+
+  const rows = INTRO_ALL_GAME_SEGMENTS.map(item => {
+    const selectedIndex = introVisibleSegmentsClickOrder.indexOf(item.key)
+    const visible = selectedIndex !== -1
+
+    return {
+      model: Number(modelId),
+      segment_key: item.key,
+      is_visible: visible,
+      sort_order: visible ? selectedIndex + 1 : 99 + item.sort,
+      updated_at: new Date().toISOString()
+    }
+  })
+
+  const { error } = await db
+    .from("visible_segments")
+    .upsert(rows, {
+      onConflict: "model,segment_key"
+    })
+
+  if (error) {
+    console.log("INTRO SAVE VISIBLE SEGMENTS ERROR:", error)
+    showGameToast("تعذر حفظ فقرات العرض")
+    return false
+  }
+
+  localStorage.setItem(
+    "intro_visible_segments_order",
+    JSON.stringify(introVisibleSegmentsClickOrder)
+  )
+
+  return true
+}
+
 /* =========================
    Start Game
 ========================= */
@@ -436,8 +765,10 @@ window.startGameFromIntro = async function () {
   if (!validateIntroForm()) return
 
   introStarting = true
+
   clearInterval(presenterStartWatchTimer)
   presenterStartWatchTimer = null
+
   setIntroStartLoading(true, "جارٍ تجهيز اللعبة...")
   setIntroFormDisabled(true)
 
@@ -448,6 +779,15 @@ window.startGameFromIntro = async function () {
 
   try {
     resetGameStateBeforeStart()
+
+    const segmentsSaved = await saveIntroVisibleSegments()
+
+    if (!segmentsSaved) {
+      introStarting = false
+      setIntroFormDisabled(false)
+      setIntroStartLoading(false, "بدء اللعبة", false)
+      return
+    }
 
     localStorage.setItem("teamAName", teamA)
     localStorage.setItem("teamBName", teamB)
@@ -462,24 +802,30 @@ window.startGameFromIntro = async function () {
     localStorage.setItem("presenter_join_code_temp", joinCode)
 
     const sessionState = {
-  mainScores: { A: 0, B: 0 },
-  currentModelName: modelText,
-  displayControlsHidden: false,
-  presenterStarted: false,
-  presenterStartedAt: null,
+      mainScores: { A: 0, B: 0 },
+      currentModelName: modelText,
+      displayControlsHidden: false,
+      presenterStarted: false,
+      presenterStartedAt: null,
 
-  segmentStatus: defaultIntroSegmentStatus(),
+      segmentStatus: defaultIntroSegmentStatus(),
 
-  warmup: null,
-  top10: null,
-  auction: null,
-  who: null,
-  explain: null,
-  final: null,
-  archive: null,
+      warmup: null,
+      top10: null,
+      auction: null,
+      who: null,
+      explain: null,
 
-  toast: null
-}
+      final: null,
+      finalRound1: null,
+      finalRound2: null,
+      finalRound3: null,
+      finalRound4: null,
+
+      archive: null,
+
+      toast: null
+    }
 
     const { error } = await db.from("game_sessions").upsert({
       id: gameSessionId,
@@ -523,6 +869,7 @@ window.startGameFromIntro = async function () {
 function getPresenterIntroUrl() {
   return new URL("presenter.html?join=1", window.location.href).href
 }
+
 function renderPresenterIntroCode(code) {
   const codeWrap = document.querySelector(".presenterIntroCodeBox")
   const finalCode = String(code || "").trim() || "----"
@@ -563,7 +910,6 @@ function openPresenterIntroModal() {
   }
 
   renderPresenterIntroCode(joinCode)
-
   bindPresenterIntroCopyActions()
 
   if (modal) {
@@ -596,7 +942,9 @@ async function copyIntroText(value, successMessage = "تم النسخ") {
     textarea.value = text
     textarea.style.position = "fixed"
     textarea.style.opacity = "0"
+
     document.body.appendChild(textarea)
+
     textarea.focus()
     textarea.select()
 
@@ -647,6 +995,7 @@ function bindPresenterIntroCopyActions() {
     }
   }
 }
+
 function startPresenterStartWatcher() {
   clearInterval(presenterStartWatchTimer)
 
@@ -698,6 +1047,7 @@ function goToDisplayFromIntro() {
 
   window.location.href = "display.html"
 }
+
 window.addEventListener("beforeunload", () => {
   clearInterval(presenterStartWatchTimer)
   presenterStartWatchTimer = null

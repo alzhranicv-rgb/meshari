@@ -517,7 +517,7 @@ function buildAuctionHTML() {
           onclick="selectAuctionTeam('A')"
           id="auctionTeamABox"
         >
-          <div class="auctionTeamName">${teamAName}</div>
+          <div class="auctionTeamName">${escapeDisplayHtml(teamAName)}</div>
           <div class="auctionTeamScore" id="auctionScoreA">${auctionState.scoreA}</div>
         </div>
 
@@ -532,7 +532,7 @@ function buildAuctionHTML() {
           onclick="selectAuctionTeam('B')"
           id="auctionTeamBBox"
         >
-          <div class="auctionTeamName">${teamBName}</div>
+          <div class="auctionTeamName">${escapeDisplayHtml(teamBName)}</div>
           <div class="auctionTeamScore" id="auctionScoreB">${auctionState.scoreB}</div>
         </div>
 
@@ -599,7 +599,7 @@ function buildAuctionContentHTML() {
       <div class="auctionVideoPreviewBox" onclick="openAuctionVideoFullscreen(event)">
         <video
           class="auctionVideoPreview"
-          src="${currentAuctionVideo}"
+          src="${escapeDisplayHtml(currentAuctionVideo)}"
           muted
           playsinline
           preload="metadata"
@@ -621,7 +621,7 @@ function buildAuctionContentHTML() {
       <div class="auctionImagePreviewBox" onclick="toggleAuctionImageOverlay()">
         <img
           class="auctionImagePreview"
-          src="${currentAuctionImage}"
+          src="${escapeDisplayHtml(currentAuctionImage)}"
           alt=""
         >
       </div>
@@ -633,7 +633,7 @@ function buildAuctionContentHTML() {
   if (currentAuctionNote) {
     html += `
       <div class="auctionTopNote">
-        ${currentAuctionNote}
+        ${escapeDisplayHtml(currentAuctionNote)}
       </div>
     `
   }
@@ -656,7 +656,7 @@ function buildAuctionResultHTML(resultType = "") {
       <div class="auctionResultVideoBox" onclick="openAuctionVideoFullscreen(event)">
         <video
           class="auctionResultVideo"
-          src="${currentAuctionVideo}"
+          src="${escapeDisplayHtml(currentAuctionVideo)}"
           muted
           playsinline
           preload="metadata"
@@ -677,7 +677,7 @@ function buildAuctionResultHTML(resultType = "") {
     mediaHTML = `
       <div class="auctionResultImageBoxClean" onclick="toggleAuctionImageOverlay()">
         <img
-          src="${currentAuctionImage}"
+          src="${escapeDisplayHtml(currentAuctionImage)}"
           class="auctionResultImageClean"
           alt=""
         >
@@ -694,12 +694,16 @@ function buildAuctionResultHTML(resultType = "") {
       </div>
 
       <div class="auctionResultAnswerBox">
-        ${currentAuctionNote ? `<div class="auctionResultNote">${currentAuctionNote}</div>` : ""}
+        ${
+          currentAuctionNote
+            ? `<div class="auctionResultNote">${escapeDisplayHtml(currentAuctionNote)}</div>`
+            : ""
+        }
 
         <div class="auctionResultAnswerLabel">الإجابة</div>
 
         <div class="auctionResultAnswerText">
-          ${currentAuctionAnswer || "لا توجد إجابة"}
+          ${escapeDisplayHtml(currentAuctionAnswer || "لا توجد إجابة")}
         </div>
       </div>
     </div>
@@ -793,9 +797,9 @@ async function loadAuctionCurrent() {
   const { data, error } = await db
     .from("auction_questions")
     .select("*")
-    .eq("model", currentModel)
-    .eq("number", number)
-    .single()
+    .eq("model", Number(currentModel))
+    .eq("number", Number(number))
+    .maybeSingle()
 
   if (error) {
     console.log(error)
@@ -803,10 +807,15 @@ async function loadAuctionCurrent() {
     return
   }
 
-  currentAuctionAnswer = data?.answer || ""
-  currentAuctionImage = data?.image || ""
-  currentAuctionVideo = data?.video || ""
-  currentAuctionNote = data?.note || ""
+  if (!data) {
+    showGameToast("لا توجد بيانات لهذا الرقم")
+    return
+  }
+
+  currentAuctionAnswer = data.answer || ""
+  currentAuctionImage = data.image || ""
+  currentAuctionVideo = data.video || ""
+  currentAuctionNote = data.note || ""
 
   renderAuctionContent()
   saveAuctionState()

@@ -23,7 +23,11 @@ let whoLastTickPlayed = null
 let whoTimerStarted = false
 let whoCompensationMode = false
 let whoScoringLocked = false
-
+let whoMaxNumber = Number(
+  window.whoMaxNumber ||
+  localStorage.getItem("who_max_number") ||
+  15
+)
 const WHO_STORAGE_KEY = "who_state_v1"
 
 /* =========================
@@ -130,6 +134,13 @@ function restoreWhoState(saved) {
 ========================= */
 
 window.renderWho = function () {
+    whoMaxNumber = Number(
+    window.whoMaxNumber ||
+    localStorage.getItem("who_max_number") ||
+    15
+  )
+
+  whoMaxNumber = Math.min(Math.max(whoMaxNumber, 10), 15)
   const saved = getWhoState()
 
   whoState = {
@@ -165,7 +176,7 @@ window.renderWho = function () {
       <div class="whoTopBar">
 
         <div class="whoTeamCard" onclick="selectWhoTeam('A')" id="whoTeamABox">
-          <div class="whoTeamName">${teamAName}</div>
+          <div class="whoTeamName">${escapeDisplayHtml(teamAName)}</div>
           <div class="whoTeamScore" id="whoScoreA">${whoState.scoreA}</div>
         </div>
 
@@ -175,7 +186,7 @@ window.renderWho = function () {
         </div>
 
         <div class="whoTeamCard" onclick="selectWhoTeam('B')" id="whoTeamBBox">
-          <div class="whoTeamName">${teamBName}</div>
+          <div class="whoTeamName">${escapeDisplayHtml(teamBName)}</div>
           <div class="whoTeamScore" id="whoScoreB">${whoState.scoreB}</div>
         </div>
 
@@ -321,11 +332,21 @@ function updateWhoDoubleButton() {
 function createWhoGrid() {
   let html = ""
 
+  const maxNumber = Number(whoMaxNumber || window.whoMaxNumber || 15)
   const used = (whoState.usedNumbers || []).map(Number)
-  const lock15 = !used.includes(15) && used.length < 14
-  const waitCompensation = !used.includes(15) && used.length === 14 && !whoCompensationMode
 
-  for (let i = 1; i <= 15; i++) {
+  const lock15 =
+    maxNumber === 15 &&
+    !used.includes(15) &&
+    used.length < 14
+
+  const waitCompensation =
+    maxNumber === 15 &&
+    !used.includes(15) &&
+    used.length === 14 &&
+    !whoCompensationMode
+
+  for (let i = 1; i <= maxNumber; i++) {
     const isUsed = used.includes(i)
     const isLocked15 = i === 15 && (lock15 || waitCompensation)
 
@@ -452,10 +473,14 @@ function switchWhoTurn() {
 
 
 function canUseWhoCompensation() {
+  const maxNumber = Number(whoMaxNumber || window.whoMaxNumber || 15)
+
+  if (maxNumber !== 15) return false
+
   const used = (whoState.usedNumbers || []).map(Number)
   const remaining = []
 
-  for (let i = 1; i <= 15; i++) {
+  for (let i = 1; i <= maxNumber; i++) {
     if (!used.includes(i)) remaining.push(i)
   }
 
@@ -540,11 +565,11 @@ async function chooseWho(num) {
   }
 
   const { data, error } = await db
-    .from("who_images")
-    .select("*")
-    .eq("model", currentModel)
-    .eq("number", num)
-    .single()
+  .from("who_images")
+  .select("*")
+  .eq("model", Number(currentModel))
+  .eq("number", Number(num))
+  .maybeSingle()
 
   if (error || !data) {
     console.log(error)
@@ -586,7 +611,7 @@ function showWhoImageFullscreen(imageUrl) {
 
   stage.innerHTML = `
     <div class="whoImageFrame" onclick="toggleWhoImageOverlay()">
-      <img src="${imageUrl}" class="whoImageFull" alt="">
+      <img src="${escapeDisplayHtml(imageUrl)}" class="whoImageFull" alt="">
     </div>
   `
 
@@ -962,7 +987,7 @@ function openWhoImageOverlay() {
     <div class="whoImageOverlayTimer" id="whoOverlayTimer">${time}</div>
 
     <div class="whoImageOverlayInner">
-      <img src="${currentWhoImage}" class="whoImageOverlayImg" alt="">
+      <img src="${escapeDisplayHtml(currentWhoImage)}" class="whoImageOverlayImg" alt="">
     </div>
   `
 

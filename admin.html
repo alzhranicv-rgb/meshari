@@ -62,7 +62,7 @@
     <!-- =========================
          TOP BAR
     ========================== -->
-    <header class="adminTopHeader">
+    <header class="adminTopHeader adminDashboardHeader">
 
       <div class="adminTopBrand">
         <div class="adminTopLogo">الحنكة</div>
@@ -143,12 +143,99 @@
     <!-- =========================
          MAIN AREA
     ========================== -->
-    <main class="adminMainNew">
+    <main class="adminMainNew adminDashboardMain">
 
-      <nav id="adminTabs" class="adminTabsNew hidden">
+      <!-- =========================
+           QUICK SETTINGS
+      ========================== -->
+      <section id="adminQuickSettings" class="adminQuickSettings hidden">
+
+        <div class="adminSectionHead">
+          <div>
+            <h2>إعدادات الفقرات</h2>
+            <p>حدد عدد الأرقام لكل فقرة قبل كتابة الأسئلة</p>
+          </div>
+
+          <button
+            type="button"
+            class="adminBtn adminBtnDark"
+            onclick="loadAdminSegmentSettings()"
+          >
+            تحديث الإعدادات
+          </button>
+        </div>
+
+        <div class="adminSettingsGrid">
+
+          <!-- من هو -->
+          <div class="adminSettingCard" data-setting-card="who">
+            <div class="adminSettingTop">
+              <strong>من هو</strong>
+              <span id="adminSettingWhoValue">15</span>
+            </div>
+
+            <div class="adminSettingOptions">
+              <button type="button" onclick="setAdminSegmentCount('who', 10)">10</button>
+              <button type="button" onclick="setAdminSegmentCount('who', 12)">12</button>
+              <button type="button" onclick="setAdminSegmentCount('who', 15)">15</button>
+            </div>
+          </div>
+
+          <!-- من بدون نقط -->
+          <div class="adminSettingCard" data-setting-card="finalRound1">
+            <div class="adminSettingTop">
+              <strong>من بدون نقط</strong>
+              <span id="adminSettingFinalRound1Value">6</span>
+            </div>
+
+            <div class="adminSettingOptions">
+              <button type="button" onclick="setAdminSegmentCount('finalRound1', 6)">6</button>
+              <button type="button" onclick="setAdminSegmentCount('finalRound1', 8)">8</button>
+            </div>
+          </div>
+
+          <!-- اشرح الكلمة -->
+          <div class="adminSettingCard" data-setting-card="explain">
+            <div class="adminSettingTop">
+              <strong>اشرح الكلمة</strong>
+              <span id="adminSettingExplainValue">4</span>
+            </div>
+
+            <div class="adminSettingOptions">
+              <button type="button" onclick="setAdminSegmentCount('explain', 4)">4</button>
+              <button type="button" onclick="setAdminSegmentCount('explain', 6)">6</button>
+              <button type="button" onclick="setAdminSegmentCount('explain', 8)">8</button>
+            </div>
+          </div>
+
+          <!-- التركيز -->
+          <div class="adminSettingCard" data-setting-card="finalRound3">
+            <div class="adminSettingTop">
+              <strong>التركيز</strong>
+              <span id="adminSettingFinalRound3Value">4</span>
+            </div>
+
+            <div class="adminSettingOptions">
+              <button type="button" onclick="setAdminSegmentCount('finalRound3', 4)">4</button>
+              <button type="button" onclick="setAdminSegmentCount('finalRound3', 6)">6</button>
+              <button type="button" onclick="setAdminSegmentCount('finalRound3', 8)">8</button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =========================
+           SEGMENT TABS
+      ========================== -->
+      <nav id="adminTabs" class="adminTabsNew adminDashboardTabs hidden">
+
         <button
           type="button"
           class="adminTabBtn"
+          data-admin-tab="warmup"
           onclick="openAdminSegment('warmup')"
         >
           التسخين
@@ -157,6 +244,7 @@
         <button
           type="button"
           class="adminTabBtn"
+          data-admin-tab="top10"
           onclick="openAdminSegment('top10')"
         >
           Top 10
@@ -165,45 +253,82 @@
         <button
           type="button"
           class="adminTabBtn"
+          data-admin-tab="auction"
           onclick="openAdminSegment('auction')"
         >
           فتبلة
         </button>
 
         <button
-  type="button"
-  class="adminTabBtn"
-  onclick="openAdminSegment('who')"
->
-  من هو
-</button>
-
-<button
-  type="button"
-  class="adminTabBtn"
-  onclick="openAdminSegment('explain')"
->
-  اشرح الكلمة
-</button>
-
-<button
-  type="button"
-  class="adminTabBtn"
-  onclick="openAdminSegment('final')"
->
-  صح صحلي
-</button>
+          type="button"
+          class="adminTabBtn"
+          data-admin-tab="who"
+          onclick="openAdminSegment('who')"
+        >
+          من هو
+        </button>
 
         <button
           type="button"
           class="adminTabBtn"
+          data-admin-tab="explain"
+          onclick="openAdminSegment('explain')"
+        >
+          اشرح الكلمة
+        </button>
+
+        <button
+          type="button"
+          class="adminTabBtn"
+          data-admin-tab="finalRound1"
+          onclick="openAdminSegment('finalRound1')"
+        >
+          من بدون نقط
+        </button>
+
+        <button
+          type="button"
+          class="adminTabBtn"
+          data-admin-tab="finalRound2"
+          onclick="openAdminSegment('finalRound2')"
+        >
+          صح صحلي
+        </button>
+
+        <button
+          type="button"
+          class="adminTabBtn"
+          data-admin-tab="finalRound3"
+          onclick="openAdminSegment('finalRound3')"
+        >
+          التركيز
+        </button>
+
+        <button
+          type="button"
+          class="adminTabBtn"
+          data-admin-tab="finalRound4"
+          onclick="openAdminSegment('finalRound4')"
+        >
+          اشرح الصورة
+        </button>
+
+        <button
+          type="button"
+          class="adminTabBtn"
+          data-admin-tab="archive"
           onclick="openAdminSegment('archive')"
         >
           الأرشيف
         </button>
+
       </nav>
 
-      <section id="adminEditor" class="adminEditor">
+
+      <!-- =========================
+           EDITOR
+      ========================== -->
+      <section id="adminEditor" class="adminEditor adminDashboardEditor">
         <div class="adminEmptyState">
           افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها
         </div>

@@ -2,12 +2,16 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
 
   <title>الحنكة - المقدمة</title>
 
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="assets/css/segments/intro.css?v=40" />
+  <link rel="stylesheet" href="styles.css?v=10000" />
+  <link rel="stylesheet" href="assets/css/segments/intro.css?v=41" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
@@ -17,13 +21,15 @@
 
   <main class="introPage">
 
+    <!-- خلفية الانترو -->
     <div class="introBgShape introBgShapeOne"></div>
     <div class="introBgShape introBgShapeTwo"></div>
     <div class="introBgShape introBgShapeThree"></div>
 
+    <!-- كرت الإعداد -->
     <section class="introCard" aria-label="إعداد اللعبة">
 
-      <div class="introCardHeader">
+      <header class="introCardHeader">
 
         <div class="introMiniBadge">
           يلاااا بيينااا
@@ -37,14 +43,17 @@
           جهّز الفرق، اختر النموذج، وابدأ التحدي
         </p>
 
-      </div>
+      </header>
 
       <div class="introFormCard">
 
+        <!-- أسماء الفرق -->
         <div class="introTeamsGrid">
 
           <div class="introFieldBox">
-            <label for="teamANameInput">الفريق الأول</label>
+            <label for="teamANameInput">
+              الفريق الأول
+            </label>
 
             <input
               id="teamANameInput"
@@ -52,11 +61,13 @@
               placeholder="اكتب اسم الفريق الأول"
               autocomplete="off"
               maxlength="18"
-            >
+            />
           </div>
 
           <div class="introFieldBox">
-            <label for="teamBNameInput">الفريق الثاني</label>
+            <label for="teamBNameInput">
+              الفريق الثاني
+            </label>
 
             <input
               id="teamBNameInput"
@@ -64,19 +75,56 @@
               placeholder="اكتب اسم الفريق الثاني"
               autocomplete="off"
               maxlength="18"
-            >
+            />
           </div>
 
         </div>
 
+        <!-- اختيار النموذج -->
         <div class="introFieldBox introModelBox">
-          <label for="introModelSelect">النموذج</label>
+          <label for="introModelSelect">
+            النموذج
+          </label>
 
           <select id="introModelSelect">
-            <option value="">جارٍ تحميل النماذج...</option>
+            <option value="">
+              جارٍ تحميل النماذج...
+            </option>
           </select>
         </div>
 
+        <!-- اختيار الفقرات -->
+        <section class="introSegmentsBox" id="introSegmentsBox">
+
+          <div class="introSegmentsHeader">
+
+            <div>
+              <div class="introSegmentsTitle">
+                اختيار الفقرات
+              </div>
+
+              <div class="introSegmentsSub">
+                اختر 6 فقرات للعرض، والترتيب حسب ضغطك
+              </div>
+            </div>
+
+            <div class="introSegmentsCounter" id="introSegmentsCounter">
+              0 / 6
+            </div>
+
+          </div>
+
+          <div class="introSegmentsGrid" id="introSegmentsGrid">
+            <div class="introSegmentsEmpty">
+              اختر النموذج أولاً
+            </div>
+          </div>
+
+          <div class="introSegmentsOrder" id="introSegmentsOrder"></div>
+
+        </section>
+
+        <!-- بدء اللعبة -->
         <button
           type="button"
           id="startGameBtn"
@@ -91,6 +139,7 @@
 
   </main>
 
+  <!-- نافذة ربط المقدم -->
   <div id="presenterIntroModal" class="introPresenterModal hidden">
 
     <div class="introPresenterModalCard">
@@ -104,7 +153,7 @@
         ×
       </button>
 
-      <div class="introPresenterModalHeader">
+      <header class="introPresenterModalHeader">
 
         <div class="introPresenterModalBadge">
           صفحة المقدم
@@ -118,17 +167,21 @@
           امسح QR من جهاز المقدم، أو أدخل الكود يدويًا
         </div>
 
-      </div>
+      </header>
 
       <div class="introPresenterContent">
 
         <div class="introPresenterQrBox">
-          <img id="presenterIntroQr" alt="QR صفحة المقدم">
+          <img
+            id="presenterIntroQr"
+            alt="QR صفحة المقدم"
+          />
         </div>
 
         <div class="introPresenterInfoBox">
 
           <div class="presenterIntroCodeBox">
+
             <div class="presenterIntroCodeLabel">
               كود الدخول
             </div>
@@ -140,9 +193,13 @@
             >
               ----
             </div>
+
           </div>
 
-          <div id="presenterIntroLink" class="introPresenterLink"></div>
+          <div
+            id="presenterIntroLink"
+            class="introPresenterLink"
+          ></div>
 
         </div>
 
@@ -172,12 +229,13 @@
 
   </div>
 
+  <!-- التوست -->
   <div id="gameToast" class="gameToast hidden">
     <div class="gameToastIcon">!</div>
     <div id="gameToastText" class="gameToastText"></div>
   </div>
 
-  <script src="intro.js"></script>
+  <script src="intro.js?v=41"></script>
 
 </body>
 </html>

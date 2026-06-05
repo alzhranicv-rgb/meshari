@@ -248,7 +248,7 @@ async function loadWarmupCategories() {
 function createWarmupCategory(num, name) {
   return `
     <div class="warmupCategoryCard">
-      <div class="warmupCategoryTitle">${name}</div>
+      <div class="warmupCategoryTitle">${escapeDisplayHtml(name)}</div>
 
       <div class="warmupNumbersRow">
         <button id="q${num}_1" onclick="openWarmupQuestion(${num},1)" class="warmupNumberBtn">1</button>
@@ -505,16 +505,6 @@ async function openWarmupQuestion(category, number) {
   saveWarmupState()
 }
 
-function showWarmupAnswer() {
-  if (!warmupQuestionLocked || !window.currentAnswer) {
-    showGameToast("اختر سؤالاً أولاً")
-    return
-  }
-
-  const box = document.getElementById("questionBox")
-  if (box) box.innerText = window.currentAnswer
-  saveWarmupState()
-}
 
 /* =========================
    Timer
@@ -585,6 +575,7 @@ function resetWarmupTimer() {
 ========================= */
 
 let warmupResultPending = false
+warmupLastTickPlayed = null
 
 function showWarmupAnswerForSeconds(callback) {
   const box = document.getElementById("questionBox")

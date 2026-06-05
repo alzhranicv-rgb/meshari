@@ -1,22 +1,36 @@
+/* =========================================================
+   ADMIN.JS - CLEAN ORDER
+   PART 1: GLOBALS + HELPERS + SETTINGS + HOME + CHECKS + MODELS + TABS
+========================================================= */
+
+/* =========================
+   1) Globals
+========================= */
+
 const BUCKET_NAME = "r3-images"
 
 let currentModel = null
 let currentModelName = ""
-let auctionAdminCount = 8
 let gameToastTimer = null
 
-let finalAdminRound = 1
+let currentAdminSegment = ""
+
+let auctionAdminCount = 8
+let whoAdminCount = 15
+let finalRound1AdminCount = 6
 let explainAdminCount = 4
+let finalRound3AdminCount = 4
+
+let finalAdminRound = 1
+
 let explainAdminDraft = {}
-let archiveAdminRound = 1
 
 let top10AdminRoundsCount = 3
 let archiveAdminRoundsCount = 4
+let archiveAdminRound = 1
 let archivePendingExtraCount = 0
 let archiveExtraTextPositions = []
 let archiveDraftState = {}
-
-let currentAdminSegment = ""
 
 const ARCHIVE_TEXT_START_POSITION = 5
 const ARCHIVE_MAX_TEXT_BOXES = 20
@@ -27,9 +41,18 @@ const ALL_GAME_SEGMENTS = [
   { key: "auction", title: "فتبلة", sort: 3 },
   { key: "who", title: "من هو", sort: 4 },
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
-  { key: "final", title: "صح صحلي", sort: 6 },
-  { key: "archive", title: "الأرشيف", sort: 7 }
+
+  { key: "finalRound1", title: "من بدون نقط", sort: 6 },
+  { key: "finalRound2", title: "صح صحلي", sort: 7 },
+  { key: "finalRound3", title: "التركيز", sort: 8 },
+  { key: "finalRound4", title: "اشرح الصورة", sort: 9 },
+
+  { key: "archive", title: "الأرشيف", sort: 10 }
 ]
+
+/* =========================
+   2) Init
+========================= */
 
 async function initAdminPanel() {
   await loadModels()
@@ -37,8 +60,9 @@ async function initAdminPanel() {
   updateAdminBrandModel()
   await renderAdminTabsUnified()
 }
+
 /* =========================
-   Toast
+   3) Toast
 ========================= */
 
 function showGameToast(message) {
@@ -55,8 +79,10 @@ function showGameToast(message) {
   })
 
   clearTimeout(gameToastTimer)
+
   gameToastTimer = setTimeout(() => {
     toast.classList.remove("show")
+
     setTimeout(() => {
       toast.classList.add("hidden")
     }, 280)
@@ -64,56 +90,7 @@ function showGameToast(message) {
 }
 
 /* =========================
-   Segment Settings
-========================= */
-
-async function getSegmentRoundCount(segment, fallback = 3, max = 4) {
-  if (!currentModel) return fallback
-
-  const { data, error } = await db
-    .from("segment_settings")
-    .select("item_count")
-    .eq("model", Number(currentModel))
-    .eq("segment", segment)
-    .maybeSingle()
-
-  if (error) {
-    console.log(error)
-    return fallback
-  }
-
-  return Math.min(Math.max(Number(data?.item_count || fallback), 1), max)
-}
-
-async function saveSegmentRoundCount(segment, count) {
-  if (!currentModel) return false
-
-  const safeCount = Math.min(Math.max(Number(count || 1), 1), 4)
-
-  const { error } = await db
-    .from("segment_settings")
-    .upsert(
-      {
-        model: Number(currentModel),
-        segment,
-        item_count: safeCount
-      },
-      {
-        onConflict: "model,segment"
-      }
-    )
-
-  if (error) {
-    console.log(error)
-    showGameToast("تعذر حفظ عدد الجولات")
-    return false
-  }
-
-  return true
-}
-
-/* =========================
-   Helpers
+   4) Basic Helpers
 ========================= */
 
 function editor() {
@@ -141,21 +118,209 @@ function clearActiveAdminTab() {
   currentAdminSegment = ""
 }
 
-/* توافق مع أي كود قديم يستدعي setActiveAdminTab */
 function setActiveAdminTab(segment) {
   currentAdminSegment = segment || ""
   renderAdminTabsUnified()
+}
+
+function getAdminSegmentTitle(segment) {
+  const item = ALL_GAME_SEGMENTS.find(x => x.key === segment)
+  return item?.title || "الفقرة"
 }
 
 function showAdminEmptyState(message = "افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها") {
   const area = editor()
   if (!area) return
 
-  area.innerHTML = `<div class="adminEmptyState">${message}</div>`
+  area.innerHTML = `<div class="adminEmptyState">${escapeHtml(message)}</div>`
+}
+
+function hasText(value) {
+  return String(value || "").trim().length > 0
+}
+
+/* هذا يلغي الشريط القديم داخل الفقرات */
+async function buildSegmentStatusGrid() {
+  return ""
 }
 
 /* =========================
-   Upload Helpers
+   5) Segment Settings
+========================= */
+
+function getAdminSettingLimit(segment) {
+  if (segment === "who") {
+    return { fallback: 15, min: 10, max: 15, allowed: [10, 12, 15] }
+  }
+
+  if (segment === "finalRound1") {
+    return { fallback: 6, min: 6, max: 8, allowed: [6, 8] }
+  }
+
+  if (segment === "explain") {
+    return { fallback: 4, min: 4, max: 8, allowed: [4, 6, 8] }
+  }
+
+  if (segment === "finalRound3") {
+    return { fallback: 4, min: 4, max: 8, allowed: [4, 6, 8] }
+  }
+
+  return { fallback: 4, min: 1, max: 8, allowed: [] }
+}
+
+function normalizeAdminSegmentCount(segment, value) {
+  const limit = getAdminSettingLimit(segment)
+  const num = Number(value || limit.fallback)
+
+  if (limit.allowed.length) {
+    return limit.allowed.includes(num) ? num : limit.fallback
+  }
+
+  return Math.min(Math.max(num, limit.min), limit.max)
+}
+
+async function getSegmentRoundCount(segment, fallback = 3, max = 4) {
+  if (!currentModel) return fallback
+
+  const { data, error } = await db
+    .from("segment_settings")
+    .select("item_count")
+    .eq("model", Number(currentModel))
+    .eq("segment", segment)
+    .maybeSingle()
+
+  if (error) {
+    console.log("GET SEGMENT ROUND COUNT ERROR:", error)
+    return fallback
+  }
+
+  return Math.min(Math.max(Number(data?.item_count || fallback), 1), max)
+}
+
+async function saveSegmentRoundCount(segment, count) {
+  if (!currentModel) return false
+
+  const safeCount = Math.min(Math.max(Number(count || 1), 1), 4)
+
+  const { error } = await db
+    .from("segment_settings")
+    .upsert(
+      {
+        model: Number(currentModel),
+        segment,
+        item_count: safeCount
+      },
+      {
+        onConflict: "model,segment"
+      }
+    )
+
+  if (error) {
+    console.log("SAVE SEGMENT ROUND COUNT ERROR:", error)
+    showGameToast("تعذر حفظ عدد الجولات")
+    return false
+  }
+
+  return true
+}
+
+async function getAdminSegmentCount(segment) {
+  if (!currentModel) {
+    return getAdminSettingLimit(segment).fallback
+  }
+
+  const limit = getAdminSettingLimit(segment)
+
+  const { data, error } = await db
+    .from("segment_settings")
+    .select("item_count")
+    .eq("model", Number(currentModel))
+    .eq("segment", segment)
+    .maybeSingle()
+
+  if (error) {
+    console.log("GET ADMIN SEGMENT COUNT ERROR:", error)
+    return limit.fallback
+  }
+
+  return normalizeAdminSegmentCount(segment, data?.item_count || limit.fallback)
+}
+
+async function saveAdminSegmentCount(segment, count) {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return false
+  }
+
+  const safeCount = normalizeAdminSegmentCount(segment, count)
+
+  const { error } = await db
+    .from("segment_settings")
+    .upsert(
+      {
+        model: Number(currentModel),
+        segment,
+        item_count: safeCount
+      },
+      {
+        onConflict: "model,segment"
+      }
+    )
+
+  if (error) {
+    console.log("SAVE ADMIN SEGMENT COUNT ERROR:", error)
+    showGameToast("تعذر حفظ إعدادات الفقرة")
+    return false
+  }
+
+  return true
+}
+
+function updateAdminQuickSettingUI(segment, count) {
+  const safeCount = normalizeAdminSegmentCount(segment, count)
+
+  if (segment === "who") whoAdminCount = safeCount
+  if (segment === "finalRound1") finalRound1AdminCount = safeCount
+  if (segment === "explain") explainAdminCount = safeCount
+  if (segment === "finalRound3") finalRound3AdminCount = safeCount
+}
+
+async function setAdminSegmentCount(segment, count) {
+  if (isAdminSaving()) return false
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return false
+  }
+
+  try {
+    setAdminSaving(true, "جارٍ حفظ الإعداد...")
+
+    const safeCount = normalizeAdminSegmentCount(segment, count)
+    const saved = await saveAdminSegmentCount(segment, safeCount)
+
+    if (!saved) return false
+
+    updateAdminQuickSettingUI(segment, safeCount)
+
+    showGameToast("تم حفظ الإعداد")
+
+    if (currentAdminSegment === segment) {
+      await openAdminSegment(segment)
+    }
+
+    return true
+  } catch (err) {
+    console.log("SET ADMIN SEGMENT COUNT ERROR:", err)
+    showGameToast("تعذر حفظ الإعداد")
+    return false
+  } finally {
+    setAdminSaving(false)
+  }
+}
+
+/* =========================
+   6) Upload Helpers
 ========================= */
 
 function makeSafeFileExt(file, fallback = "bin") {
@@ -189,18 +354,6 @@ function makeUploadPath(prefix = "file", ext = "bin") {
 
 function getFileSizeMB(file) {
   return Number((file.size / 1024 / 1024).toFixed(2))
-}
-
-function getVideoContentType(file, ext) {
-  const type = String(file?.type || "").trim()
-
-  if (type) return type
-
-  if (ext === "mov") return "video/quicktime"
-  if (ext === "webm") return "video/webm"
-  if (ext === "m4v") return "video/x-m4v"
-
-  return "video/mp4"
 }
 
 async function uploadImageFile(file, prefix = "file") {
@@ -259,13 +412,6 @@ async function uploadVideoFile(file, prefix = "video") {
   const ext = makeSafeFileExt(file, "mp4")
   const fileName = makeUploadPath(prefix, ext)
 
-  console.log("VIDEO FILE INFO:", {
-    name: file.name,
-    sizeMB: fileSizeMB.toFixed(2),
-    type: file.type,
-    fileName
-  })
-
   const { error: uploadError } = await db.storage
     .from(BUCKET_NAME)
     .upload(fileName, file, {
@@ -276,7 +422,7 @@ async function uploadVideoFile(file, prefix = "video") {
 
   if (uploadError) {
     console.log("UPLOAD VIDEO ERROR FULL:", uploadError)
-    showGameToast("فشل رفع الفيديو، غالبًا الحجم أكبر من حد Supabase")
+    showGameToast("فشل رفع الفيديو")
     throw uploadError
   }
 
@@ -287,34 +433,8 @@ async function uploadVideoFile(file, prefix = "video") {
   return data?.publicUrl || ""
 }
 
-function updateAdminBrandModel() {
-  const brandModel = document.getElementById("adminBrandCurrentModel")
-  const pill = document.getElementById("adminCurrentModelPill")
-
-  if (!brandModel) return
-
-  if (!currentModel) {
-    brandModel.innerText = "لم يتم اختيار نموذج"
-    if (pill) pill.classList.remove("hasModel")
-    return
-  }
-
-  brandModel.innerText = getCurrentModelNameSafe()
-  if (pill) pill.classList.add("hasModel")
-}
-
-document.addEventListener("click", e => {
-  const wrap = document.querySelector(".adminMoreMenuWrap")
-  const menu = document.getElementById("adminMoreMenu")
-
-  if (!wrap || !menu) return
-
-  if (!wrap.contains(e.target)) {
-    menu.classList.add("hidden")
-  }
-})
 /* =========================
-   Saving Lock
+   7) Saving Lock
 ========================= */
 
 let adminSavingLock = false
@@ -366,68 +486,40 @@ function canRunAdminDelete() {
 }
 
 /* =========================
-   UI Small Helpers
+   8) Admin Brand
 ========================= */
 
-function adminSectionHeader({ title, subtitle = "", meta = "", actions = "" }) {
-  return `
-    <div class="adminCleanSectionHeader">
-      <div class="adminCleanSectionText">
-        <h2>${escapeHtml(title)}</h2>
-        ${subtitle ? `<p>${escapeHtml(subtitle)}</p>` : ""}
-      </div>
+function updateAdminBrandModel() {
+  const brandModel = document.getElementById("adminBrandCurrentModel")
+  const pill = document.getElementById("adminCurrentModelPill")
 
-      <div class="adminCleanSectionRight">
-        ${meta ? `<div class="adminCleanMeta">${meta}</div>` : ""}
-        ${actions ? `<div class="adminCleanActions">${actions}</div>` : ""}
-      </div>
-    </div>
-  `
+  if (!brandModel) return
+
+  if (!currentModel) {
+    brandModel.innerText = "لم يتم اختيار نموذج"
+    if (pill) pill.classList.remove("hasModel")
+    return
+  }
+
+  brandModel.innerText = getCurrentModelNameSafe()
+  if (pill) pill.classList.add("hasModel")
 }
 
-function adminCollapseCard({ id, title, badge = "", body = "", open = false }) {
-  return `
-    <details class="adminCollapseCard" ${open ? "open" : ""}>
-      <summary>
-        <span class="adminCollapseTitle">${escapeHtml(title)}</span>
-        ${badge ? `<span class="adminCollapseBadge">${badge}</span>` : ""}
-      </summary>
+document.addEventListener("click", e => {
+  const wrap = document.querySelector(".adminMoreMenuWrap")
+  const menu = document.getElementById("adminMoreMenu")
 
-      <div class="adminCollapseBody">
-        ${body}
-      </div>
-    </details>
-  `
-}
+  if (!wrap || !menu) return
 
-function adminMiniActions(buttons = []) {
-  return `
-    <div class="adminMiniActions">
-      ${buttons.join("")}
-    </div>
-  `
-}
+  if (!wrap.contains(e.target)) {
+    menu.classList.add("hidden")
+  }
+})
 
-function adminSmallDeleteButton(onclick, text = "حذف") {
-  return `
-    <button
-      type="button"
-      class="adminSmallDangerBtn"
-      onclick="${onclick}"
-    >
-      ${text}
-    </button>
-  `
-}
+/* =========================
+   9) Inner Tabs Arrangement
+========================= */
 
-function adminFieldHtml({ label, input }) {
-  return `
-    <div class="adminField">
-      <label>${escapeHtml(label)}</label>
-      ${input}
-    </div>
-  `
-}
 function arrangeAdminInnerTabs() {
   const area = editor()
   if (!area) return
@@ -435,98 +527,110 @@ function arrangeAdminInnerTabs() {
   const topBar = area.querySelector(".adminEditorTopBar, .compactAdminEditorTopBar")
   if (!topBar) return
 
-  topBar.classList.add("adminSectionHeaderPro")
+  topBar.classList.add("adminSectionHeaderPro", "adminSectionHeaderInline")
 
-  let toolsRow = area.querySelector(".adminSectionToolsRow")
+  let toolsRow = topBar.querySelector(".adminSectionToolsRow")
+
   if (!toolsRow) {
     toolsRow = document.createElement("div")
-    toolsRow.className = "adminSectionToolsRow"
-    topBar.insertAdjacentElement("afterend", toolsRow)
+    toolsRow.className = "adminSectionToolsRow adminSectionToolsRowInline"
+    topBar.appendChild(toolsRow)
   }
 
   toolsRow.innerHTML = ""
 
-  function addTool(el, className = "") {
+  function moveTool(el, className = "") {
     if (!el) return
-    el.classList.add(className)
+
+    el.classList.add("adminMovedTool")
+
+    if (className) {
+      className.split(" ").forEach(c => {
+        if (c) el.classList.add(c)
+      })
+    }
+
     toolsRow.appendChild(el)
   }
 
-  const sectionTitle = topBar.querySelector(".adminSectionTitle")?.innerText?.trim() || ""
+  const sectionTitle =
+    topBar.querySelector(".adminSectionTitle")?.innerText?.trim() || ""
 
   const warmupTabs = area.querySelector(".warmupCategoryTabs")
 
   const top10Count = area.querySelector(".top10RoundCountBox")
   const top10Tabs = area.querySelector(".top10RoundTabs")
 
-  const auctionCount =
-    sectionTitle === "فتبلة"
-      ? area.querySelector(".auctionCountBox")
-      : null
+  const auctionCount = sectionTitle === "فتبلة"
+    ? area.querySelector(".auctionCountBox")
+    : null
 
-  const auctionTabs =
-    sectionTitle === "فتبلة"
-      ? area.querySelector(".auctionNumberTabs")
-      : null
+  const auctionTabs = sectionTitle === "فتبلة"
+    ? area.querySelector(".auctionNumberTabs")
+    : null
 
-  const whoTabs = area.querySelector(".whoNumberTabs")
+  const whoCount = sectionTitle === "من هو"
+    ? area.querySelector(".whoCountBox")
+    : null
 
-  const explainCount =
-    sectionTitle === "اشرح الكلمة"
-      ? area.querySelector(".explainCountBox")
-      : null
+  const whoTabs = sectionTitle === "من هو"
+    ? area.querySelector(".whoNumberTabs")
+    : null
 
-  const finalTitle = area.querySelector(".finalTopCompactTitleBox")
+  const explainCount = sectionTitle === "اشرح الكلمة"
+    ? area.querySelector(".explainCountBox")
+    : null
+
   const finalCount = area.querySelector(".finalTopCompactCountBox")
-  const finalTabs = area.querySelector(".finalAdminRoundsBar")
 
   const archiveCount = area.querySelector(".archiveRoundsControl")
   const archiveTabs = area.querySelector(".archiveAdminRoundsBar")
   const archiveActions = area.querySelector(".archiveTopActions")
 
   if (warmupTabs) {
-    toolsRow.classList.add("adminToolsWarmup")
-    addTool(warmupTabs, "adminToolTabs adminToolTabsWide")
+    topBar.dataset.toolsType = "warmup"
+    moveTool(warmupTabs, "adminToolTabs adminToolTabsText")
   }
 
-  if (top10Tabs || top10Count) {
-    toolsRow.classList.add("adminToolsTop10")
-    addTool(top10Count, "adminToolControl")
-    addTool(top10Tabs, "adminToolTabs adminToolTabsWide")
+  if (top10Count || top10Tabs) {
+    topBar.dataset.toolsType = "top10"
+    moveTool(top10Count, "adminToolControl")
+    moveTool(top10Tabs, "adminToolTabs adminToolTabsText")
   }
 
-  if (auctionTabs || auctionCount) {
-    toolsRow.classList.add("adminToolsAuction")
-    addTool(auctionCount, "adminToolControl")
-    addTool(auctionTabs, "adminToolTabs adminToolNumberTabs")
+  if (auctionCount || auctionTabs) {
+    topBar.dataset.toolsType = "auction"
+    moveTool(auctionCount, "adminToolControl")
+    moveTool(auctionTabs, "adminToolTabs adminToolNumberTabs")
   }
 
-  if (whoTabs) {
-    toolsRow.classList.add("adminToolsWho")
-    addTool(whoTabs, "adminToolTabs adminToolNumberTabs adminToolTabsWide")
+  if (whoCount || whoTabs) {
+    topBar.dataset.toolsType = "who"
+    moveTool(whoCount, "adminToolControl")
+    moveTool(whoTabs, "adminToolTabs adminToolNumberTabs")
   }
 
   if (explainCount) {
-    toolsRow.classList.add("adminToolsExplain")
-    addTool(explainCount, "adminToolControl")
+    topBar.dataset.toolsType = "explain"
+    moveTool(explainCount, "adminToolControl")
   }
 
-  if (finalTabs || finalTitle || finalCount) {
-    toolsRow.classList.add("adminToolsFinal")
-    addTool(finalTitle, "adminToolTitle")
-    addTool(finalCount, "adminToolControl adminToolSmall")
-    addTool(finalTabs, "adminToolTabs adminToolTabsWide")
+  if (finalCount) {
+    topBar.dataset.toolsType = "final"
+    moveTool(finalCount, "adminToolControl")
   }
 
-  if (archiveTabs || archiveCount || archiveActions) {
-    toolsRow.classList.add("adminToolsArchive")
-    addTool(archiveCount, "adminToolControl")
-    addTool(archiveTabs, "adminToolTabs adminToolTabsWide")
-    addTool(archiveActions, "adminToolActions")
+  if (archiveCount || archiveTabs || archiveActions) {
+    topBar.dataset.toolsType = "archive"
+    moveTool(archiveCount, "adminToolControl")
+    moveTool(archiveTabs, "adminToolTabs adminToolTabsText")
+    moveTool(archiveActions, "adminToolActions")
   }
 
   area
-    .querySelectorAll(".top10ControlPanel, .auctionControlPanel, .archiveAdminControlBar, .finalTopCompactRow")
+    .querySelectorAll(
+      ".top10ControlPanel, .auctionControlPanel, .whoControlPanel, .explainControlPanel, .archiveAdminControlBar, .finalTopCompactRow"
+    )
     .forEach(row => {
       if (!row.children.length) row.remove()
     })
@@ -539,7 +643,6 @@ function arrangeAdminInnerTabs() {
       btn.classList.contains("activeTop10RoundTab") ||
       btn.classList.contains("activeAuctionNumberTab") ||
       btn.classList.contains("activeWhoNumberTab") ||
-      btn.classList.contains("activeFinalAdminRound") ||
       btn.classList.contains("activeArchiveRoundBtn")
     ) {
       btn.classList.add("innerTabActive")
@@ -549,9 +652,43 @@ function arrangeAdminInnerTabs() {
   if (!toolsRow.children.length) {
     toolsRow.remove()
   }
+
+  normalizeAdminEditorCards()
 }
+
+function normalizeAdminEditorCards() {
+  const area = editor()
+  if (!area) return
+
+  area
+    .querySelectorAll(
+      ".adminCard, .adminQuestionCard, .finalAdminCard, .archiveMainInfoCard, .archiveImageCard"
+    )
+    .forEach(card => {
+      card.classList.add("adminEditorCleanCard")
+    })
+
+  area
+    .querySelectorAll("textarea")
+    .forEach(textarea => {
+      textarea.classList.add("adminCleanTextarea")
+    })
+
+  area
+    .querySelectorAll("input:not([type='file']), select")
+    .forEach(input => {
+      input.classList.add("adminCleanInput")
+    })
+
+  area
+    .querySelectorAll("input[type='file']")
+    .forEach(input => {
+      input.classList.add("adminCleanFile")
+    })
+}
+
 /* =========================
-   Admin Home / Status
+   10) Admin Home Counts
 ========================= */
 
 async function getAdminCompletionCounts() {
@@ -561,60 +698,156 @@ async function getAdminCompletionCounts() {
     auction: 0,
     who: 0,
     explain: 0,
-    final: 0,
+
+    finalRound1: 0,
+    finalRound2: 0,
+    finalRound3: 0,
+    finalRound4: 0,
+
     archive: 0,
 
     top10RoundsCount: 3,
     auctionCount: 8,
     archiveRoundsCount: 4,
+
+    whoCount: 15,
     finalRound1CardsCount: 6,
-    explainCount: 4
+    explainCount: 4,
+    finalRound3Count: 4
   }
 
   if (!currentModel) return result
 
   const [
-    q1,
-    q2,
-    q3,
-    q4,
+    qWarmup,
+    qTop10,
+    qAuction,
+    qWho,
     qExplain,
-    q5,
-    q6,
-    explainSetting,
+
+    qFinalRound1,
+    qFinalRound2,
+    qFinalRound3Focus,
+    qFinalRound4Images,
+    qArchive,
+
     top10Setting,
     auctionSetting,
     archiveSetting,
-    finalMeta
+    whoSetting,
+    finalRound1Setting,
+    explainSetting,
+    finalRound3Setting
   ] = await Promise.all([
-    db.from("questions").select("id", { count: "exact", head: true }).eq("model", currentModel).eq("segment", "warmup"),
-    db.from("top10_questions").select("id", { count: "exact", head: true }).eq("model", currentModel),
-    db.from("auction_questions").select("id", { count: "exact", head: true }).eq("model", currentModel),
-    db.from("who_images").select("id", { count: "exact", head: true }).eq("model", currentModel),
-    db.from("explain_words").select("id", { count: "exact", head: true }).eq("model", currentModel),
-    db.from("final_round1_items").select("id", { count: "exact", head: true }).eq("model", currentModel),
-    db.from("archive_boxes").select("id", { count: "exact", head: true }).eq("model", currentModel),
+    db.from("questions")
+      .select("id", { count: "exact", head: true })
+      .eq("model", Number(currentModel))
+      .eq("segment", "warmup"),
 
-    db.from("explain_settings").select("words_count").eq("model", currentModel).maybeSingle(),
-    db.from("segment_settings").select("item_count").eq("model", currentModel).eq("segment", "top10").maybeSingle(),
-    db.from("segment_settings").select("item_count").eq("model", currentModel).eq("segment", "auction").maybeSingle(),
-    db.from("segment_settings").select("item_count").eq("model", currentModel).eq("segment", "archive").maybeSingle(),
-    db.from("final_round_meta").select("cards_count").eq("model", currentModel).eq("round", 1).maybeSingle()
+    db.from("top10_questions")
+      .select("id", { count: "exact", head: true })
+      .eq("model", Number(currentModel)),
+
+    db.from("auction_questions")
+      .select("id", { count: "exact", head: true })
+      .eq("model", Number(currentModel)),
+
+    db.from("who_images")
+      .select("id", { count: "exact", head: true })
+      .eq("model", Number(currentModel)),
+
+    db.from("explain_words")
+      .select("id", { count: "exact", head: true })
+      .eq("model", Number(currentModel)),
+
+    db.from("final_round1_items")
+      .select("id", { count: "exact", head: true })
+      .eq("model", Number(currentModel)),
+
+    db.from("final_round2_items")
+      .select("id", { count: "exact", head: true })
+      .eq("model", Number(currentModel)),
+
+    db.from("final_round3_items")
+      .select("id", { count: "exact", head: true })
+      .eq("model", Number(currentModel))
+      .gte("number", 1)
+      .lte("number", 8)
+      .eq("image_order", 1),
+
+    db.from("final_round3_items")
+      .select("id", { count: "exact", head: true })
+      .eq("model", Number(currentModel))
+      .in("number", [101, 102]),
+
+    db.from("archive_boxes")
+      .select("id", { count: "exact", head: true })
+      .eq("model", Number(currentModel)),
+
+    db.from("segment_settings")
+      .select("item_count")
+      .eq("model", Number(currentModel))
+      .eq("segment", "top10")
+      .maybeSingle(),
+
+    db.from("segment_settings")
+      .select("item_count")
+      .eq("model", Number(currentModel))
+      .eq("segment", "auction")
+      .maybeSingle(),
+
+    db.from("segment_settings")
+      .select("item_count")
+      .eq("model", Number(currentModel))
+      .eq("segment", "archive")
+      .maybeSingle(),
+
+    db.from("segment_settings")
+      .select("item_count")
+      .eq("model", Number(currentModel))
+      .eq("segment", "who")
+      .maybeSingle(),
+
+    db.from("segment_settings")
+      .select("item_count")
+      .eq("model", Number(currentModel))
+      .eq("segment", "finalRound1")
+      .maybeSingle(),
+
+    db.from("segment_settings")
+      .select("item_count")
+      .eq("model", Number(currentModel))
+      .eq("segment", "explain")
+      .maybeSingle(),
+
+    db.from("segment_settings")
+      .select("item_count")
+      .eq("model", Number(currentModel))
+      .eq("segment", "finalRound3")
+      .maybeSingle()
   ])
 
-  result.warmup = q1.count || 0
-  result.top10 = q2.count || 0
-  result.auction = q3.count || 0
-  result.who = q4.count || 0
+  result.warmup = qWarmup.count || 0
+  result.top10 = qTop10.count || 0
+  result.auction = qAuction.count || 0
+  result.who = qWho.count || 0
   result.explain = qExplain.count || 0
-  result.final = q5.count || 0
-  result.archive = q6.count || 0
 
-  result.explainCount = Number(explainSetting.data?.words_count || 4) === 6 ? 6 : 4
+  result.finalRound1 = qFinalRound1.count || 0
+  result.finalRound2 = qFinalRound2.count || 0
+  result.finalRound3 = qFinalRound3Focus.count || 0
+  result.finalRound4 = qFinalRound4Images.count || 0
+
+  result.archive = qArchive.count || 0
+
   result.top10RoundsCount = Math.min(Math.max(Number(top10Setting.data?.item_count || 3), 1), 4)
   result.auctionCount = Math.min(Math.max(Number(auctionSetting.data?.item_count || 8), 1), 8)
   result.archiveRoundsCount = Math.min(Math.max(Number(archiveSetting.data?.item_count || 4), 1), 4)
-  result.finalRound1CardsCount = Number(finalMeta.data?.cards_count || 6)
+
+  result.whoCount = normalizeAdminSegmentCount("who", whoSetting.data?.item_count || 15)
+  result.finalRound1CardsCount = normalizeAdminSegmentCount("finalRound1", finalRound1Setting.data?.item_count || 6)
+  result.explainCount = normalizeAdminSegmentCount("explain", explainSetting.data?.item_count || 4)
+  result.finalRound3Count = normalizeAdminSegmentCount("finalRound3", finalRound3Setting.data?.item_count || 4)
 
   return result
 }
@@ -632,17 +865,29 @@ function isSegmentDone(key, count, counts = {}) {
     return count >= total
   }
 
-  if (key === "who") return count >= 15
-
-  if (key === "explain") {
-    const total = Number(counts.explainCount || 4) === 6 ? 6 : 4
+  if (key === "who") {
+    const total = normalizeAdminSegmentCount("who", counts.whoCount || 15)
     return count >= total
   }
 
-  if (key === "final") {
-    const r1Count = Number(counts.finalRound1CardsCount || 6)
-    return count >= r1Count
+  if (key === "explain") {
+    const total = normalizeAdminSegmentCount("explain", counts.explainCount || 4)
+    return count >= total
   }
+
+  if (key === "finalRound1") {
+    const total = normalizeAdminSegmentCount("finalRound1", counts.finalRound1CardsCount || 6)
+    return count >= total
+  }
+
+  if (key === "finalRound2") return count >= 24
+
+  if (key === "finalRound3") {
+    const total = normalizeAdminSegmentCount("finalRound3", counts.finalRound3Count || 4)
+    return count >= total
+  }
+
+  if (key === "finalRound4") return count >= 10
 
   if (key === "archive") {
     const rounds = Math.min(Math.max(Number(counts.archiveRoundsCount || 4), 1), 4)
@@ -652,55 +897,9 @@ function isSegmentDone(key, count, counts = {}) {
   return false
 }
 
-/* ألغينا الشريط القديم حتى لا يتكرر مع التابات */
-async function buildSegmentStatusGrid() {
-  return ""
-}
-
-async function renderAdminTabsUnified() {
-  const wrap = tabs()
-  if (!wrap) return
-
-  if (!currentModel) {
-    wrap.classList.add("hidden")
-    wrap.innerHTML = ""
-    return
-  }
-
-  const counts = await getAdminCompletionCounts()
-
-  const items = [
-    { key: "warmup", title: "التسخين", count: counts.warmup || 0 },
-    { key: "top10", title: "Top 10", count: counts.top10 || 0 },
-    { key: "auction", title: "فتبلة", count: counts.auction || 0 },
-    { key: "who", title: "من هو", count: counts.who || 0 },
-    { key: "explain", title: "اشرح الكلمة", count: counts.explain || 0 },
-    { key: "final", title: "صح صحلي", count: counts.final || 0 },
-    { key: "archive", title: "الأرشيف", count: counts.archive || 0 }
-  ]
-
-  wrap.classList.remove("hidden")
-
-  wrap.innerHTML = `
-    <div class="adminTabsUnified">
-      ${items.map(item => {
-        const done = isSegmentDone(item.key, item.count, counts)
-        const active = currentAdminSegment === item.key
-
-        return `
-          <button
-            type="button"
-            class="adminTabBtnUnified ${active ? "activeAdminTab" : ""} ${done ? "doneCard" : ""}"
-            onclick="openAdminSegment('${item.key}')"
-          >
-            <span class="adminTabBtnLabel">${item.title}</span>
-            <span class="adminTabBtnCount">${item.count}</span>
-          </button>
-        `
-      }).join("")}
-    </div>
-  `
-}
+/* =========================
+   11) Admin Home
+========================= */
 
 async function renderAdminHome() {
   if (!currentModel) {
@@ -717,61 +916,185 @@ async function renderAdminHome() {
 
   const counts = await getAdminCompletionCounts()
 
-  const segmentCards = [
-    { key: "warmup", title: "التسخين", desc: "أسئلة البداية السريعة", count: counts.warmup || 0 },
-    { key: "top10", title: "Top 10", desc: "جولات ترتيب حسب العدد المحدد", count: counts.top10 || 0 },
-    { key: "auction", title: "فتبلة", desc: "أسئلة الصور والفتبلة", count: counts.auction || 0 },
-    { key: "who", title: "من هو", desc: "تخمين الشخصية", count: counts.who || 0 },
-    { key: "explain", title: "اشرح الكلمة", desc: "كلمات للشرح مع مؤقت 45 ثانية", count: counts.explain || 0 },
-    { key: "final", title: "صح صحلي", desc: "الجولات النهائية", count: counts.final || 0 },
-    { key: "archive", title: "الأرشيف", desc: "بطولات وأرشيف", count: counts.archive || 0 }
+  const items = [
+    {
+      key: "warmup",
+      title: "التسخين",
+      desc: "4 فئات، وكل فئة فيها أسئلة 1 و 2 و 4",
+      count: counts.warmup || 0
+    },
+    {
+      key: "top10",
+      title: "Top 10",
+      desc: `عدد الجولات: ${counts.top10RoundsCount}`,
+      count: counts.top10 || 0
+    },
+    {
+      key: "auction",
+      title: "فتبلة",
+      desc: `عدد الأسئلة: ${counts.auctionCount}`,
+      count: counts.auction || 0
+    },
+    {
+      key: "who",
+      title: "من هو",
+      desc: `عدد الأرقام: ${counts.whoCount}`,
+      count: counts.who || 0
+    },
+    {
+      key: "explain",
+      title: "اشرح الكلمة",
+      desc: `عدد الكلمات: ${counts.explainCount}`,
+      count: counts.explain || 0
+    },
+    {
+      key: "finalRound1",
+      title: "من بدون نقط",
+      desc: `عدد الأرقام: ${counts.finalRound1CardsCount}`,
+      count: counts.finalRound1 || 0
+    },
+    {
+      key: "finalRound2",
+      title: "صح صحلي",
+      desc: "4 أرقام ثابتة",
+      count: counts.finalRound2 || 0
+    },
+    {
+      key: "finalRound3",
+      title: "التركيز",
+      desc: `عدد الأرقام: ${counts.finalRound3Count}`,
+      count: counts.finalRound3 || 0
+    },
+    {
+      key: "finalRound4",
+      title: "اشرح الصورة",
+      desc: "رقمين، كل رقم 5 صور",
+      count: counts.finalRound4 || 0
+    },
+    {
+      key: "archive",
+      title: "الأرشيف",
+      desc: `عدد الجولات: ${counts.archiveRoundsCount}`,
+      count: counts.archive || 0
+    }
   ]
 
-  editor().innerHTML = `
-    <div class="adminHomeShell">
+    editor().innerHTML = `
+    <div class="adminHomeShell adminDashboardShell">
+      <div class="adminDashboardGroups">
+        <section class="adminDashboardGroup">
+          <div class="adminDashboardGroupHead">
+            <h3>فقرات البداية</h3>
+          </div>
 
-      <div class="adminHomeTopActions">
-        <button class="adminSaveBtn" onclick="checkCurrentModelReady()">
-          فحص النموذج
-        </button>
+          <div class="adminSegmentPickerCompact">
+            ${items.map(item => {
+              const done = isSegmentDone(item.key, item.count, counts)
 
-        <button class="adminBtn adminBtnMango" onclick="renderVisibleSegmentsAdmin()">
-          اختيار فقرات العرض
-        </button>
+              return `
+                <button
+                  type="button"
+                  class="adminSegmentCompactCard ${done ? "doneCard" : ""}"
+                  onclick="openAdminSegment('${item.key}')"
+                >
+                  <div class="adminSegmentCompactTop">
+                    <span class="adminSegmentCompactTitle">${escapeHtml(item.title)}</span>
 
-        <button class="adminReloadBtn" onclick="renderAdminHome()">
-          تحديث
-        </button>
-      </div>
+                    <span class="adminSegmentCompactBadge ${done ? "done" : ""}">
+                      ${done ? "مكتمل" : "غير مكتمل"}
+                    </span>
+                  </div>
 
-      <div class="adminSegmentPickerCompact">
-        ${segmentCards.map(item => {
-          const done = isSegmentDone(item.key, item.count, counts)
+                  <div class="adminSegmentCompactDesc">
+                    ${escapeHtml(item.desc)}
+                  </div>
 
-          return `
-            <button class="adminSegmentCompactCard ${done ? "doneCard" : ""}" onclick="openAdminSegment('${item.key}')">
-              <div class="adminSegmentCompactTop">
-                <span class="adminSegmentCompactTitle">${item.title}</span>
-                <span class="adminSegmentCompactBadge ${done ? "done" : ""}">
-                  ${done ? "مكتمل" : "غير مكتمل"}
-                </span>
-              </div>
-
-              <div class="adminSegmentCompactDesc">${item.desc}</div>
-
-              <div class="adminSegmentCompactFooter">
-                <span class="adminSegmentCompactMetaLabel">عدد العناصر</span>
-                <span class="adminSegmentCompactMetaValue">${item.count}</span>
-              </div>
-            </button>
-          `
-        }).join("")}
+                  <div class="adminSegmentCompactFooter">
+                    <span class="adminSegmentCompactMetaLabel">المدخلات</span>
+                    <span class="adminSegmentCompactMetaValue">${item.count}</span>
+                  </div>
+                </button>
+              `
+            }).join("")}
+          </div>
+        </section>
       </div>
     </div>
   `
 }
+
 /* =========================
-   Model Readiness Check
+   12) Main Tabs
+========================= */
+
+async function renderAdminTabsUnified() {
+  const wrap = tabs()
+  if (!wrap) return
+
+  if (!currentModel) {
+    wrap.classList.add("hidden")
+    wrap.innerHTML = ""
+    return
+  }
+
+  wrap.classList.remove("hidden")
+
+  wrap.innerHTML = `
+    <div class="adminTabsUnified adminTabsDashboard adminTabsSimpleHome">
+
+      <div class="adminTabsMainSide">
+        <button
+          type="button"
+          class="adminTabBtnUnified ${!currentAdminSegment ? "activeAdminTab" : ""}"
+          onclick="goAdminHome()"
+        >
+          <span class="adminTabBtnLabel">الرئيسية</span>
+        </button>
+
+        ${
+          currentAdminSegment
+            ? `
+              <button
+                type="button"
+                class="adminTabBtnUnified activeAdminTab currentSectionMiniTab"
+                onclick="openAdminSegment('${currentAdminSegment}')"
+              >
+                <span class="adminTabBtnLabel">${escapeHtml(getAdminSegmentTitle(currentAdminSegment))}</span>
+              </button>
+            `
+            : ""
+        }
+      </div>
+
+      <div class="adminTabsActionSide">
+        <button
+          type="button"
+          class="adminHeaderCheckBtn"
+          onclick="checkCurrentModelReady()"
+        >
+          فحص النموذج
+        </button>
+
+        <button
+          type="button"
+          class="adminHeaderRefreshBtn"
+          onclick="renderAdminHome()"
+        >
+          تحديث
+        </button>
+      </div>
+
+    </div>
+  `
+}
+
+async function goAdminHome() {
+  clearActiveAdminTab()
+  await renderAdminHome()
+}
+
+/* =========================
+   13) Readiness Check
 ========================= */
 
 function readinessItem(title, ok, details = []) {
@@ -782,10 +1105,6 @@ function readinessItem(title, ok, details = []) {
   }
 }
 
-function hasText(value) {
-  return String(value || "").trim().length > 0
-}
-
 function closeModelCheckModal() {
   document.getElementById("modelCheckModal")?.remove()
 }
@@ -793,8 +1112,7 @@ function closeModelCheckModal() {
 function renderModelCheckModal(results) {
   const allOk = results.every(item => item.ok)
 
-  const oldModal = document.getElementById("modelCheckModal")
-  if (oldModal) oldModal.remove()
+  document.getElementById("modelCheckModal")?.remove()
 
   document.body.insertAdjacentHTML("beforeend", `
     <div class="adminModalOverlay" id="modelCheckModal">
@@ -836,6 +1154,7 @@ function renderModelCheckModal(results) {
   `)
 
   const modal = document.getElementById("modelCheckModal")
+
   if (modal) {
     modal.addEventListener("click", e => {
       if (e.target === modal) closeModelCheckModal()
@@ -852,36 +1171,18 @@ async function checkCurrentModelReady() {
   showGameToast("جارٍ فحص النموذج...")
 
   try {
-    await ensureVisibleSegmentsDefaults()
-
-    const visibleMap = await getVisibleSegmentsMap()
-
-    const visibleKeys = ALL_GAME_SEGMENTS
-      .filter(item => visibleMap[item.key]?.is_visible)
-      .sort((a, b) => {
-        const av = Number(visibleMap[a.key]?.sort_order || a.sort)
-        const bv = Number(visibleMap[b.key]?.sort_order || b.sort)
-        return av - bv
-      })
-      .map(item => item.key)
-
-    if (visibleKeys.length !== 6) {
-      showGameToast("لازم تختار 6 فقرات للعرض أولاً")
-      await renderVisibleSegmentsAdmin()
-      return
-    }
-
     const results = []
 
-    for (const key of visibleKeys) {
-      if (key === "warmup") results.push(await checkWarmupReady())
-      if (key === "top10") results.push(await checkTop10Ready())
-      if (key === "auction") results.push(await checkAuctionReady())
-      if (key === "who") results.push(await checkWhoReady())
-      if (key === "explain") results.push(await checkExplainReady())
-      if (key === "final") results.push(await checkFinalReady())
-      if (key === "archive") results.push(await checkArchiveReady())
-    }
+    results.push(await checkWarmupReady())
+    results.push(await checkTop10Ready())
+    results.push(await checkAuctionReady())
+    results.push(await checkWhoReady())
+    results.push(await checkExplainReady())
+    results.push(await checkFinalRoundReady(1))
+    results.push(await checkFinalRoundReady(2))
+    results.push(await checkFinalRoundReady(3))
+    results.push(await checkFinalRoundReady(4))
+    results.push(await checkArchiveReady())
 
     renderModelCheckModal(results)
   } catch (err) {
@@ -891,7 +1192,7 @@ async function checkCurrentModelReady() {
 }
 
 /* =========================
-   Ready Checks
+   14) Ready Checks
 ========================= */
 
 async function checkWarmupReady() {
@@ -907,6 +1208,7 @@ async function checkWarmupReady() {
   }
 
   const map = {}
+
   ;(data || []).forEach(row => {
     map[`${Number(row.category)}_${Number(row.number)}`] = row
   })
@@ -950,6 +1252,7 @@ async function checkTop10Ready() {
   }
 
   const map = {}
+
   ;(data || []).forEach(row => {
     map[`${Number(row.round)}_${Number(row.position)}`] = row
   })
@@ -992,6 +1295,7 @@ async function checkAuctionReady() {
   }
 
   const map = {}
+
   ;(data || []).forEach(row => {
     map[Number(row.number)] = row
   })
@@ -1008,9 +1312,10 @@ async function checkAuctionReady() {
 
     if (!hasText(row.question)) missing.push(`السؤال ${i}: نص السؤال فارغ`)
     if (!hasText(row.answer)) missing.push(`السؤال ${i}: الإجابة فارغة`)
+
     if (!hasText(row.image) && !hasText(row.video)) {
-  missing.push(`السؤال ${i}: الصورة أو الفيديو غير موجود`)
-}
+      missing.push(`السؤال ${i}: الصورة أو الفيديو غير موجود`)
+    }
   }
 
   return readinessItem(
@@ -1021,6 +1326,8 @@ async function checkAuctionReady() {
 }
 
 async function checkWhoReady() {
+  const requiredCount = await getAdminSegmentCount("who")
+
   const { data, error } = await db
     .from("who_images")
     .select("*")
@@ -1033,13 +1340,14 @@ async function checkWhoReady() {
   }
 
   const map = {}
+
   ;(data || []).forEach(row => {
     map[Number(row.number)] = row
   })
 
   const missing = []
 
-  for (let i = 1; i <= 15; i++) {
+  for (let i = 1; i <= requiredCount; i++) {
     const row = map[i]
 
     if (!row) {
@@ -1054,33 +1362,27 @@ async function checkWhoReady() {
   return readinessItem(
     "من هو",
     missing.length === 0,
-    missing.length ? missing : ["15 عنصر مكتملة"]
+    missing.length ? missing : [`من هو مكتملة بعدد ${requiredCount} عنصر`]
   )
 }
+
 async function checkExplainReady() {
-  const [settingsRes, wordsRes] = await Promise.all([
-    db
-      .from("explain_settings")
-      .select("words_count")
-      .eq("model", Number(currentModel))
-      .maybeSingle(),
+  const count = await getAdminSegmentCount("explain")
 
-    db
-      .from("explain_words")
-      .select("*")
-      .eq("model", Number(currentModel))
-      .order("number", { ascending: true })
-  ])
+  const { data, error } = await db
+    .from("explain_words")
+    .select("*")
+    .eq("model", Number(currentModel))
+    .order("number", { ascending: true })
 
-  if (settingsRes.error || wordsRes.error) {
-    console.log(settingsRes.error || wordsRes.error)
+  if (error) {
+    console.log(error)
     return readinessItem("اشرح الكلمة", false, ["تعذر قراءة بيانات اشرح الكلمة"])
   }
 
-  const count = Number(settingsRes.data?.words_count || 4) === 6 ? 6 : 4
-
   const map = {}
-  ;(wordsRes.data || []).forEach(row => {
+
+  ;(data || []).forEach(row => {
     map[Number(row.number)] = row
   })
 
@@ -1105,154 +1407,192 @@ async function checkExplainReady() {
     missing.length ? missing : [`مكتملة بعدد ${count} كلمات`]
   )
 }
-async function checkFinalReady() {
-  const [metaRes, r1Res, r2Res, r3Res] = await Promise.all([
-    db.from("final_round_meta").select("*").eq("model", Number(currentModel)),
+
+function getFinalRound1NoDotsCount(cardsCount) {
+  return Number(cardsCount) === 8 ? 4 : 3
+}
+
+async function checkFinalRoundReady(round) {
+  const [r1Res, r2Res, r3Res] = await Promise.all([
     db.from("final_round1_items").select("*").eq("model", Number(currentModel)),
     db.from("final_round2_items").select("*").eq("model", Number(currentModel)),
     db.from("final_round3_items").select("*").eq("model", Number(currentModel))
   ])
 
-  if (metaRes.error || r1Res.error || r2Res.error || r3Res.error) {
-    console.log(metaRes.error || r1Res.error || r2Res.error || r3Res.error)
-    return readinessItem("صح صحلي", false, ["تعذر قراءة بيانات صح صحلي "])
+  if (r1Res.error || r2Res.error || r3Res.error) {
+    console.log(r1Res.error || r2Res.error || r3Res.error)
+    return readinessItem(`الجولة ${round}`, false, ["تعذر قراءة بيانات الجولة"])
   }
 
   const missing = []
 
-  const metaMap = {}
-  ;(metaRes.data || []).forEach(row => {
-    metaMap[Number(row.round)] = row
-  })
+  if (round === 1) {
+    const r1CardsCount = await getAdminSegmentCount("finalRound1")
+    const textCardsCount = getFinalRound1NoDotsCount(r1CardsCount)
 
-  const r1CardsCount = Number(metaMap[1]?.cards_count || 6)
+    const r1Map = {}
 
-  const r1Map = {}
-  ;(r1Res.data || []).forEach(row => {
-    r1Map[Number(row.number)] = row
-  })
+    ;(r1Res.data || []).forEach(row => {
+      r1Map[Number(row.number)] = row
+    })
 
-  for (let i = 1; i <= r1CardsCount; i++) {
-    const row = r1Map[i]
-
-    if (!row) {
-      missing.push(`صح صحلي - الجولة 1 - رقم ${i} غير موجود`)
-      continue
-    }
-
-    if (i <= 3) {
-      if (!hasText(row.card_text) && !hasText(row.image)) {
-        missing.push(`الفاصلة - الجولة 1 - رقم ${i}: لا يوجد نص قصاصة أو صورة`)
-      }
-    }
-
-    if (i >= 4 && i <= 6) {
-      const hasAnyQuestionPart =
-        hasText(row.question_part1) ||
-        hasText(row.question_part2) ||
-        hasText(row.question_part3)
-
-      if (!hasAnyQuestionPart) {
-        missing.push(`الفاصلة - الجولة 1 - رقم ${i}: أجزاء السؤال فارغة`)
-      }
-    }
-
-    if (!hasText(row.answer)) {
-      missing.push(`الفاصلة - الجولة 1 - رقم ${i}: الإجابة فارغة`)
-    }
-  }
-
-  const r2Map = {}
-  ;(r2Res.data || []).forEach(row => {
-    r2Map[`${Number(row.number)}_${Number(row.item_order)}`] = row
-  })
-
-  for (let number = 1; number <= 4; number++) {
-    const isScramble = number === 1 || number === 3
-
-    for (let i = 1; i <= 6; i++) {
-      const row = r2Map[`${number}_${i}`]
+    for (let i = 1; i <= r1CardsCount; i++) {
+      const row = r1Map[i]
+      const isNoDotsCard = i <= textCardsCount
 
       if (!row) {
-        missing.push(`الفاصلة - الجولة 2 - رقم ${number} - العنصر ${i} غير موجود`)
+        missing.push(`من بدون نقط - رقم ${i} غير موجود`)
         continue
       }
 
-      if (!hasText(row.prompt)) {
-        missing.push(`الفاصلة - الجولة 2 - رقم ${number} - العنصر ${i}: النص فارغ`)
-      }
+      if (isNoDotsCard) {
+        if (!hasText(row.card_text)) {
+          missing.push(`من بدون نقط - رقم ${i}: نص بدون نقط فارغ`)
+        }
+      } else {
+        const hasAnyQuestionPart =
+          hasText(row.question_part1) ||
+          hasText(row.question_part2) ||
+          hasText(row.question_part3)
 
-      if (isScramble && !hasText(row.answer)) {
-        missing.push(`الفاصلة - الجولة 2 - رقم ${number} - العنصر ${i}: الإجابة فارغة`)
-      }
-    }
-  }
-
-  const round3Mode = metaMap[3]?.round3_mode || "classic"
-
-if (round3Mode === "team_media") {
-  const r3TeamMap = {}
-
-  ;(r3Res.data || []).forEach(row => {
-    r3TeamMap[Number(row.number)] = row
-  })
-
-  for (let number = 1; number <= 4; number++) {
-    const row = r3TeamMap[number]
-
-    if (!row) {
-      missing.push(`الفاصلة - الجولة 3 - التركيز - رقم ${number} غير موجود`)
-      continue
-    }
-
-    if (!hasText(row.image) && !hasText(row.video)) {
-      missing.push(`الفاصلة - الجولة 3 - التركيز - رقم ${number}: الصورة أو الفيديو غير موجود`)
-    }
-
-    if (!hasText(row.question)) {
-      missing.push(`الفاصلة - الجولة 3 - التركيز - رقم ${number}: السؤال فارغ`)
-    }
-
-    if (!hasText(row.answer)) {
-      missing.push(`الفاصلة - الجولة 3 - التركيز - رقم ${number}: الإجابة فارغة`)
-    }
-  }
-} else {
-  const r3Map = {}
-
-  ;(r3Res.data || []).forEach(row => {
-    r3Map[`${Number(row.number)}_${Number(row.image_order)}`] = row
-  })
-
-  for (let number = 1; number <= 2; number++) {
-    for (let i = 1; i <= 5; i++) {
-      const row = r3Map[`${number}_${i}`]
-
-      if (!row) {
-        missing.push(`الفاصلة - الجولة 3 - رقم ${number} - الصورة ${i} غير موجودة`)
-        continue
-      }
-
-      if (!hasText(row.image)) {
-        missing.push(`الفاصلة - الجولة 3 - رقم ${number} - الصورة ${i}: الصورة غير موجودة`)
+        if (!hasAnyQuestionPart) {
+          missing.push(`من بدون نقط - رقم ${i}: أجزاء السؤال فارغة`)
+        }
       }
 
       if (!hasText(row.answer)) {
-        missing.push(`الفاصلة - الجولة 3 - رقم ${number} - الصورة ${i}: الإجابة فارغة`)
+        missing.push(`من بدون نقط - رقم ${i}: الإجابة فارغة`)
       }
     }
-  }
-}
 
-  return readinessItem(
-    "الفاصلة",
-    missing.length === 0,
-    missing.length ? missing : ["الجولات الثلاث مكتملة"]
-  )
+    return readinessItem(
+      "من بدون نقط",
+      missing.length === 0,
+      missing.length ? missing : [`مكتملة بعدد ${r1CardsCount} أرقام`]
+    )
+  }
+
+  if (round === 2) {
+    const r2Map = {}
+
+    ;(r2Res.data || []).forEach(row => {
+      r2Map[`${Number(row.number)}_${Number(row.item_order)}`] = row
+    })
+
+    for (let number = 1; number <= 4; number++) {
+      const isScramble = number === 1 || number === 3
+
+      for (let i = 1; i <= 6; i++) {
+        const row = r2Map[`${number}_${i}`]
+
+        if (!row) {
+          missing.push(`صح صحلي - رقم ${number} - العنصر ${i} غير موجود`)
+          continue
+        }
+
+        if (!hasText(row.prompt)) {
+          missing.push(`صح صحلي - رقم ${number} - العنصر ${i}: النص فارغ`)
+        }
+
+        if (isScramble && !hasText(row.answer)) {
+          missing.push(`صح صحلي - رقم ${number} - العنصر ${i}: الإجابة فارغة`)
+        }
+      }
+    }
+
+    return readinessItem(
+      "صح صحلي",
+      missing.length === 0,
+      missing.length ? missing : ["صح صحلي مكتملة"]
+    )
+  }
+
+  if (round === 3) {
+    const requiredCount = await getAdminSegmentCount("finalRound3")
+    const r3FocusMap = {}
+
+    ;(r3Res.data || []).forEach(row => {
+      const number = Number(row.number)
+      const imageOrder = Number(row.image_order || 1)
+
+      if (number >= 1 && number <= 8 && imageOrder === 1) {
+        r3FocusMap[number] = row
+      }
+    })
+
+    for (let number = 1; number <= requiredCount; number++) {
+      const row = r3FocusMap[number]
+
+      if (!row) {
+        missing.push(`التركيز - رقم ${number} غير موجود`)
+        continue
+      }
+
+      if (!hasText(row.image) && !hasText(row.video)) {
+        missing.push(`التركيز - رقم ${number}: الصورة أو الفيديو غير موجود`)
+      }
+
+      if (!hasText(row.question)) {
+        missing.push(`التركيز - رقم ${number}: السؤال فارغ`)
+      }
+
+      if (!hasText(row.answer)) {
+        missing.push(`التركيز - رقم ${number}: الإجابة فارغة`)
+      }
+    }
+
+    return readinessItem(
+      "التركيز",
+      missing.length === 0,
+      missing.length ? missing : [`التركيز مكتملة بعدد ${requiredCount} أرقام`]
+    )
+  }
+
+  if (round === 4) {
+    const r4Map = {}
+
+    ;(r3Res.data || []).forEach(row => {
+      const number = Number(row.number)
+      const imageOrder = Number(row.image_order || 1)
+
+      if (number === 101 || number === 102) {
+        r4Map[`${number}_${imageOrder}`] = row
+      }
+    })
+
+    for (let displayNumber = 1; displayNumber <= 2; displayNumber++) {
+      const dbNumber = 100 + displayNumber
+
+      for (let i = 1; i <= 5; i++) {
+        const row = r4Map[`${dbNumber}_${i}`]
+
+        if (!row) {
+          missing.push(`اشرح الصورة - رقم ${displayNumber} - الصورة ${i} غير موجودة`)
+          continue
+        }
+
+        if (!hasText(row.image)) {
+          missing.push(`اشرح الصورة - رقم ${displayNumber} - الصورة ${i}: الصورة غير موجودة`)
+        }
+
+        if (!hasText(row.answer)) {
+          missing.push(`اشرح الصورة - رقم ${displayNumber} - الصورة ${i}: الإجابة فارغة`)
+        }
+      }
+    }
+
+    return readinessItem(
+      "اشرح الصورة",
+      missing.length === 0,
+      missing.length ? missing : ["اشرح الصورة مكتملة"]
+    )
+  }
+
+  return readinessItem("الفاصلة", false, ["رقم الجولة غير صحيح"])
 }
 
 async function checkArchiveReady() {
-  const maxRound = await getSegmentRoundCount("archive", 4, 4)
+  const rounds = await getSegmentRoundCount("archive", 4, 4)
 
   const [boxesRes, itemsRes] = await Promise.all([
     db.from("archive_boxes").select("*").eq("model", Number(currentModel)),
@@ -1264,57 +1604,55 @@ async function checkArchiveReady() {
     return readinessItem("الأرشيف", false, ["تعذر قراءة بيانات الأرشيف"])
   }
 
-  const boxMap = {}
-  ;(boxesRes.data || []).forEach(row => {
-    boxMap[Number(row.round)] = row
+  const boxesMap = {}
+
+  ;(boxesRes.data || []).forEach(box => {
+    boxesMap[Number(box.round)] = box
   })
 
   const itemsByRound = {}
-  ;(itemsRes.data || []).forEach(row => {
-    const r = Number(row.round)
+
+  ;(itemsRes.data || []).forEach(item => {
+    const r = Number(item.round)
     if (!itemsByRound[r]) itemsByRound[r] = []
-    itemsByRound[r].push(row)
+    itemsByRound[r].push(item)
   })
 
   const missing = []
 
-  for (let r = 1; r <= maxRound; r++) {
-    const box = boxMap[r]
+  for (let r = 1; r <= rounds; r++) {
+    const box = boxesMap[r]
     const items = itemsByRound[r] || []
-
-    if (!box) {
-      missing.push(`الأرشيف - الجولة ${r}: صندوق الجولة غير موجود`)
-    } else {
-      if (!hasText(box.tournament)) missing.push(`الأرشيف - الجولة ${r}: البطولة فارغة`)
-      if (!hasText(box.season)) missing.push(`الأرشيف - الجولة ${r}: الموسم فارغ`)
-      if (!hasText(box.score)) missing.push(`الأرشيف - الجولة ${r}: النتيجة فارغة`)
-    }
 
     const map = {}
     items.forEach(item => {
       map[Number(item.position)] = item
     })
 
-    for (const pos of [1, 2]) {
-      if (!map[pos] || !hasText(map[pos].text)) {
-        missing.push(`الأرشيف - الجولة ${r}: النص ${pos} فارغ`)
-      }
+    if (!box) {
+      missing.push(`الأرشيف - الجولة ${r}: بيانات الجولة غير موجودة`)
+      continue
     }
 
-    for (const pos of [3, 4]) {
-      if (!map[pos] || !hasText(map[pos].image)) {
-        missing.push(`الأرشيف - الجولة ${r}: الصورة ${pos} غير موجودة`)
-      }
-    }
+    if (!hasText(box.tournament)) missing.push(`الأرشيف - الجولة ${r}: البطولة فارغة`)
+    if (!hasText(box.season)) missing.push(`الأرشيف - الجولة ${r}: الموسم فارغ`)
+    if (!hasText(box.score)) missing.push(`الأرشيف - الجولة ${r}: النتيجة فارغة`)
+
+    if (!hasText(map[3]?.image)) missing.push(`الأرشيف - الجولة ${r}: الصورة 3 غير موجودة`)
+    if (!hasText(map[4]?.image)) missing.push(`الأرشيف - الجولة ${r}: الصورة 4 غير موجودة`)
 
     const textItems = items.filter(item => Number(item.position) >= 5)
-    const requiredItems = textItems.filter(item => String(item.label || "").trim() === "المطلوب")
 
     if (!textItems.length) {
-      missing.push(`الأرشيف - الجولة ${r}: لا توجد عناصر نصية تحت الصور`)
+      missing.push(`الأرشيف - الجولة ${r}: لا توجد عناصر نصية`)
+      continue
     }
 
-    if (!requiredItems.length) {
+    const hasRequired = textItems.some(item => {
+      return String(item.label || "").trim() === "المطلوب"
+    })
+
+    if (!hasRequired) {
       missing.push(`الأرشيف - الجولة ${r}: لا يوجد عنصر بعنوان المطلوب`)
     }
 
@@ -1328,12 +1666,12 @@ async function checkArchiveReady() {
   return readinessItem(
     "الأرشيف",
     missing.length === 0,
-    missing.length ? missing : [`مكتمل حسب عدد الجولات: ${maxRound}`]
+    missing.length ? missing : [`الأرشيف مكتمل بعدد ${rounds} جولات`]
   )
 }
 
 /* =========================
-   Model Actions
+   15) Model Actions
 ========================= */
 
 async function loadModels() {
@@ -1388,11 +1726,13 @@ async function createModel() {
   }
 
   input.value = ""
+
   await loadModels()
 
   if (data?.id) {
     currentModel = data.id
     currentModelName = data.name || name
+
     updateAdminBrandModel()
 
     const list = document.getElementById("modelsList")
@@ -1400,11 +1740,29 @@ async function createModel() {
 
     tabs()?.classList.remove("hidden")
 
-    await ensureVisibleSegmentsDefaults()
     await renderAdminHome()
   }
 
   showGameToast("تم إنشاء النموذج")
+}
+
+async function openSelectedModel() {
+  const list = document.getElementById("modelsList")
+  const id = Number(list?.value || 0)
+
+  if (!id) {
+    showGameToast("اختر النموذج")
+    return
+  }
+
+  currentModel = id
+  currentModelName = list.options[list.selectedIndex]?.textContent || `نموذج ${id}`
+
+  updateAdminBrandModel()
+  tabs()?.classList.remove("hidden")
+
+  await renderAdminHome()
+  showGameToast(`تم فتح ${currentModelName}`)
 }
 
 async function renameSelectedModel() {
@@ -1421,8 +1779,7 @@ async function renameSelectedModel() {
     list?.options?.[list.selectedIndex]?.textContent ||
     ""
 
-  const oldModal = document.getElementById("renameModelModal")
-  if (oldModal) oldModal.remove()
+  document.getElementById("renameModelModal")?.remove()
 
   document.body.insertAdjacentHTML("beforeend", `
     <div class="adminModalOverlay" id="renameModelModal">
@@ -1460,24 +1817,11 @@ async function renameSelectedModel() {
   if (input) {
     input.focus()
     input.select()
-
-    input.addEventListener("keydown", e => {
-      if (e.key === "Enter") {
-        e.preventDefault()
-        submitRenameModel(id)
-      }
-
-      if (e.key === "Escape") {
-        e.preventDefault()
-        closeRenameModelModal()
-      }
-    })
   }
 }
 
 function closeRenameModelModal() {
-  const modal = document.getElementById("renameModelModal")
-  if (modal) modal.remove()
+  document.getElementById("renameModelModal")?.remove()
 }
 
 async function submitRenameModel(id) {
@@ -1502,9 +1846,10 @@ async function submitRenameModel(id) {
 
   currentModel = id
   currentModelName = name
-  updateAdminBrandModel()
 
+  updateAdminBrandModel()
   closeRenameModelModal()
+
   await loadModels()
 
   const modelsList = document.getElementById("modelsList")
@@ -1512,26 +1857,6 @@ async function submitRenameModel(id) {
 
   await renderAdminHome()
   showGameToast("تم تعديل اسم النموذج")
-}
-
-async function openSelectedModel() {
-  const list = document.getElementById("modelsList")
-  const id = Number(list?.value || 0)
-
-  if (!id) {
-    showGameToast("اختر النموذج")
-    return
-  }
-
-  currentModel = id
-  currentModelName = list.options[list.selectedIndex]?.textContent || `نموذج ${id}`
-
-  updateAdminBrandModel()
-  tabs()?.classList.remove("hidden")
-
-  await ensureVisibleSegmentsDefaults()
-  await renderAdminHome()
-  showGameToast(`تم فتح ${currentModelName}`)
 }
 
 async function deleteSelectedModel() {
@@ -1558,25 +1883,24 @@ async function deleteSelectedModel() {
     showGameToast("جارٍ حذف النموذج...")
 
     const deleteJobs = [
-  db.from("questions").delete().eq("model", id),
-  db.from("top10_questions").delete().eq("model", id),
-  db.from("auction_questions").delete().eq("model", id),
-  db.from("who_images").delete().eq("model", id),
+      db.from("questions").delete().eq("model", id),
+      db.from("top10_questions").delete().eq("model", id),
+      db.from("auction_questions").delete().eq("model", id),
+      db.from("who_images").delete().eq("model", id),
 
-  db.from("explain_words").delete().eq("model", id),
-  db.from("explain_settings").delete().eq("model", id),
+      db.from("explain_words").delete().eq("model", id),
+      db.from("explain_settings").delete().eq("model", id),
 
-  db.from("final_round_meta").delete().eq("model", id),
-  db.from("final_round1_items").delete().eq("model", id),
-  db.from("final_round2_items").delete().eq("model", id),
-  db.from("final_round3_items").delete().eq("model", id),
+      db.from("final_round_meta").delete().eq("model", id),
+      db.from("final_round1_items").delete().eq("model", id),
+      db.from("final_round2_items").delete().eq("model", id),
+      db.from("final_round3_items").delete().eq("model", id),
 
-  db.from("archive_boxes").delete().eq("model", id),
-  db.from("archive_items").delete().eq("model", id),
+      db.from("archive_boxes").delete().eq("model", id),
+      db.from("archive_items").delete().eq("model", id),
 
-  db.from("segment_settings").delete().eq("model", id),
-db.from("visible_segments").delete().eq("model", id)
-]
+      db.from("segment_settings").delete().eq("model", id)
+    ]
 
     const results = await Promise.all(deleteJobs)
     const failed = results.find(result => result.error)
@@ -1603,6 +1927,7 @@ db.from("visible_segments").delete().eq("model", id)
       currentModelName = ""
 
       const tabsWrap = tabs()
+
       if (tabsWrap) {
         tabsWrap.classList.add("hidden")
         tabsWrap.innerHTML = ""
@@ -1626,12 +1951,17 @@ db.from("visible_segments").delete().eq("model", id)
 }
 
 /* =========================
-   Tabs
+   16) Open Segment Router
 ========================= */
 
 async function openAdminSegment(segment) {
   if (!currentModel) {
     showGameToast("افتح نموذج أولاً")
+    return
+  }
+
+  if (segment === "home") {
+    await goAdminHome()
     return
   }
 
@@ -1643,694 +1973,17 @@ async function openAdminSegment(segment) {
   if (segment === "auction") await renderAuctionAdmin()
   if (segment === "who") await renderWhoAdmin()
   if (segment === "explain") await renderExplainAdmin()
-  if (segment === "final") await renderFinalAdmin()
+
+  if (segment === "finalRound1") await renderFinalAdminRound(1)
+  if (segment === "finalRound2") await renderFinalAdminRound(2)
+  if (segment === "finalRound3") await renderFinalAdminRound(3)
+  if (segment === "finalRound4") await renderFinalAdminRound(4)
+
   if (segment === "archive") await renderArchiveAdmin()
 }
 
 /* =========================
-   Delete / Clear Helpers
-========================= */
-
-async function clearTop10Round(r) {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const ok = confirm(`هل تريد حذف الجولة ${r} من Top 10 نهائيًا؟`)
-  if (!ok) return
-
-  try {
-    const { error } = await db
-      .from("top10_questions")
-      .delete()
-      .eq("model", Number(currentModel))
-      .eq("round", Number(r))
-
-    if (error) {
-      console.log(error)
-      showGameToast("تعذر حذف الجولة")
-      return
-    }
-
-    showGameToast(`تم حذف الجولة ${r}`)
-    await renderTop10Admin()
-  } catch (err) {
-    console.log(err)
-    showGameToast("حدث خطأ أثناء حذف الجولة")
-  }
-}
-
-async function deleteTop10Segment() {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const ok = confirm("هل تريد حذف فقرة Top 10 كاملة نهائيًا؟")
-  if (!ok) return
-
-  try {
-    const { error } = await db
-      .from("top10_questions")
-      .delete()
-      .eq("model", Number(currentModel))
-
-    if (error) {
-      console.log(error)
-      showGameToast("تعذر حذف فقرة Top 10")
-      return
-    }
-
-    showGameToast("تم حذف فقرة Top 10")
-    await renderTop10Admin()
-  } catch (err) {
-    console.log(err)
-    showGameToast("حدث خطأ أثناء حذف فقرة Top 10")
-  }
-}
-
-async function clearAuctionQuestion(i) {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const ok = confirm(`هل تريد حذف سؤال فتبلة رقم ${i} نهائيًا؟`)
-  if (!ok) return
-
-  try {
-    const { error } = await db
-      .from("auction_questions")
-      .delete()
-      .eq("model", Number(currentModel))
-      .eq("number", Number(i))
-
-    if (error) {
-      console.log(error)
-      showGameToast("تعذر حذف السؤال")
-      return
-    }
-
-    showGameToast(`تم حذف السؤال ${i}`)
-    await renderAuctionAdmin()
-  } catch (err) {
-    console.log(err)
-    showGameToast("حدث خطأ أثناء حذف السؤال")
-  }
-}
-
-async function deleteAuctionSegment() {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const ok = confirm("هل تريد حذف فقرة فتبلة كاملة نهائيًا؟")
-  if (!ok) return
-
-  try {
-    const { error: rowsError } = await db
-      .from("auction_questions")
-      .delete()
-      .eq("model", Number(currentModel))
-
-    if (rowsError) {
-      console.log(rowsError)
-      showGameToast("تعذر حذف الفقرة")
-      return
-    }
-
-    const { error: settingsError } = await db
-      .from("segment_settings")
-      .delete()
-      .eq("model", Number(currentModel))
-      .eq("segment", "auction")
-
-    if (settingsError) {
-      console.log(settingsError)
-    }
-
-    auctionAdminCount = 8
-    showGameToast("تم حذف فقرة فتبلة")
-    await renderAuctionAdmin()
-  } catch (err) {
-    console.log(err)
-    showGameToast("حدث خطأ أثناء حذف الفقرة")
-  }
-}
-
-async function clearWhoItem(i) {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const ok = confirm(`هل تريد حذف العنصر رقم ${i} نهائيًا؟`)
-  if (!ok) return
-
-  try {
-    const { error } = await db
-      .from("who_images")
-      .delete()
-      .eq("model", Number(currentModel))
-      .eq("number", Number(i))
-
-    if (error) {
-      console.log(error)
-      showGameToast("تعذر حذف العنصر")
-      return
-    }
-
-    showGameToast(`تم حذف العنصر ${i}`)
-    await renderWhoAdmin()
-  } catch (err) {
-    console.log(err)
-    showGameToast("حدث خطأ أثناء حذف العنصر")
-  }
-}
-
-async function deleteWhoSegment() {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const ok = confirm("هل تريد حذف فقرة من هو كاملة نهائيًا؟")
-  if (!ok) return
-
-  try {
-    const { error } = await db
-      .from("who_images")
-      .delete()
-      .eq("model", Number(currentModel))
-
-    if (error) {
-      console.log(error)
-      showGameToast("تعذر حذف فقرة من هو")
-      return
-    }
-
-    showGameToast("تم حذف فقرة من هو")
-    await renderWhoAdmin()
-  } catch (err) {
-    console.log(err)
-    showGameToast("حدث خطأ أثناء حذف فقرة من هو")
-  }
-}
-
-async function deleteTop10Item(round, position) {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const ok = confirm(`هل تريد حذف إجابة رقم ${position} من الجولة ${round}؟`)
-  if (!ok) return
-
-  const { error } = await db
-    .from("top10_questions")
-    .delete()
-    .eq("model", Number(currentModel))
-    .eq("round", Number(round))
-    .eq("position", Number(position))
-
-  if (error) {
-    console.log(error)
-    showGameToast("تعذر حذف الإجابة")
-    return
-  }
-
-  showGameToast(`تم حذف إجابة رقم ${position}`)
-  await renderTop10Admin()
-}
-
-async function deleteArchiveItem(round, position) {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const ok = confirm(`هل تريد حذف العنصر ${position} من الجولة ${round}؟`)
-  if (!ok) return
-
-  const { error } = await db
-    .from("archive_items")
-    .delete()
-    .eq("model", Number(currentModel))
-    .eq("round", Number(round))
-    .eq("position", Number(position))
-
-  if (error) {
-    console.log(error)
-    showGameToast("تعذر حذف العنصر")
-    return
-  }
-
-  showGameToast(`تم حذف العنصر ${position}`)
-  await renderArchiveAdminRound(round)
-}
-
-async function deleteArchiveSegment(round = null) {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const hasRound = round !== null && round !== undefined
-  const safeRound = Number(round || archiveAdminRound || 1)
-
-  const ok = confirm(
-    hasRound
-      ? `هل تريد حذف الجولة ${safeRound} من الأرشيف؟`
-      : "هل تريد حذف جميع جولات الأرشيف؟"
-  )
-
-  if (!ok) return
-
-  try {
-    if (hasRound) {
-      const { error: itemsError } = await db
-        .from("archive_items")
-        .delete()
-        .eq("model", Number(currentModel))
-        .eq("round", safeRound)
-
-      if (itemsError) {
-        console.log(itemsError)
-        showGameToast("تعذر حذف عناصر الجولة")
-        return
-      }
-
-      const { error: boxError } = await db
-        .from("archive_boxes")
-        .delete()
-        .eq("model", Number(currentModel))
-        .eq("round", safeRound)
-
-      if (boxError) {
-        console.log(boxError)
-        showGameToast("تعذر حذف صندوق الجولة")
-        return
-      }
-
-      showGameToast(`تم حذف الجولة ${safeRound}`)
-      archivePendingExtraCount = 0
-      archiveDraftState = {}
-
-      await renderArchiveAdminRound(safeRound)
-      return
-    }
-
-    const { error: itemsError } = await db
-      .from("archive_items")
-      .delete()
-      .eq("model", Number(currentModel))
-
-    if (itemsError) {
-      console.log(itemsError)
-      showGameToast("تعذر حذف عناصر الأرشيف")
-      return
-    }
-
-    const { error: boxesError } = await db
-      .from("archive_boxes")
-      .delete()
-      .eq("model", Number(currentModel))
-
-    if (boxesError) {
-      console.log(boxesError)
-      showGameToast("تعذر حذف صناديق الأرشيف")
-      return
-    }
-
-    const { error: settingsError } = await db
-      .from("segment_settings")
-      .delete()
-      .eq("model", Number(currentModel))
-      .eq("segment", "archive")
-
-    if (settingsError) {
-      console.log(settingsError)
-    }
-
-    archiveAdminRoundsCount = 4
-    archiveAdminRound = 1
-    archivePendingExtraCount = 0
-    archiveDraftState = {}
-
-    showGameToast("تم حذف الأرشيف بالكامل")
-    await renderArchiveAdmin()
-  } catch (err) {
-    console.log("DELETE ARCHIVE SEGMENT ERROR:", err)
-    showGameToast("حدث خطأ أثناء حذف الأرشيف")
-  }
-}
-function isWarmupDraftComplete(category) {
-  const cat = getWarmupDraftCategory(category)
-
-  const categoryName = String(cat.category_name || "").trim()
-  const q1 = cat.questions[1] || {}
-  const q2 = cat.questions[2] || {}
-  const q4 = cat.questions[4] || {}
-
-  return (
-    categoryName &&
-    String(q1.question || "").trim() &&
-    String(q1.answer || "").trim() &&
-    String(q2.question || "").trim() &&
-    String(q2.answer || "").trim() &&
-    String(q4.question || "").trim() &&
-    String(q4.answer || "").trim()
-  )
-}
-
-function isTop10DraftComplete(roundNumber) {
-  const round = getTop10DraftRound(roundNumber)
-  const question = String(round.question || "").trim()
-
-  if (!question) return false
-
-  for (let i = 1; i <= 10; i++) {
-    if (!String(round.answers[i] || "").trim()) return false
-  }
-
-  return true
-}
-
-
-/* =========================
-   Visible Segments Admin
-========================= */
-
-let visibleSegmentsClickOrder = []
-
-async function getVisibleSegmentsMap() {
-  const map = {}
-
-  ALL_GAME_SEGMENTS.forEach(item => {
-    map[item.key] = {
-      is_visible: item.sort <= 6,
-      sort_order: item.sort
-    }
-  })
-
-  if (!currentModel) return map
-
-  const { data, error } = await db
-    .from("visible_segments")
-    .select("*")
-    .eq("model", Number(currentModel))
-    .order("sort_order", { ascending: true })
-
-  if (error) {
-    console.log("GET VISIBLE SEGMENTS ERROR:", error)
-    return map
-  }
-
-  ;(data || []).forEach(row => {
-    if (!map[row.segment_key]) return
-
-    map[row.segment_key] = {
-      is_visible: !!row.is_visible,
-      sort_order: Number(row.sort_order || map[row.segment_key].sort_order)
-    }
-  })
-
-  return map
-}
-
-async function ensureVisibleSegmentsDefaults() {
-  if (!currentModel) return false
-
-  const { data: existingRows, error: readError } = await db
-    .from("visible_segments")
-    .select("segment_key")
-    .eq("model", Number(currentModel))
-
-  if (readError) {
-    console.log("READ VISIBLE SEGMENTS DEFAULTS ERROR:", readError)
-    showGameToast("تعذر قراءة فقرات العرض")
-    return false
-  }
-
-  const existingKeys = (existingRows || []).map(row => row.segment_key)
-
-  const rows = ALL_GAME_SEGMENTS
-    .filter(item => !existingKeys.includes(item.key))
-    .map(item => ({
-      model: Number(currentModel),
-      segment_key: item.key,
-      is_visible: item.sort <= 6,
-      sort_order: item.sort,
-      updated_at: new Date().toISOString()
-    }))
-
-  if (!rows.length) return true
-
-  const { error } = await db
-    .from("visible_segments")
-    .insert(rows)
-
-  if (error) {
-    console.log("ENSURE VISIBLE SEGMENTS ERROR:", error)
-    showGameToast("تعذر تجهيز فقرات العرض")
-    return false
-  }
-
-  return true
-}
-
-async function renderVisibleSegmentsAdmin() {
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  await ensureVisibleSegmentsDefaults()
-
-  const visibleMap = await getVisibleSegmentsMap()
-
-  const sortedSegments = [...ALL_GAME_SEGMENTS].sort((a, b) => {
-    const av = Number(visibleMap[a.key]?.sort_order || a.sort)
-    const bv = Number(visibleMap[b.key]?.sort_order || b.sort)
-    return av - bv
-  })
-
-  visibleSegmentsClickOrder = sortedSegments
-    .filter(item => visibleMap[item.key]?.is_visible)
-    .map(item => item.key)
-
-  const visibleCount = visibleSegmentsClickOrder.length
-
-  editor().innerHTML = `
-    <div class="visibleSegmentsAdminShell">
-
-      <div class="adminEditorTopBar compactAdminEditorTopBar">
-        <div>
-          <h2 class="adminSectionTitle">فقرات العرض</h2>
-          <div class="adminSectionSubTitle">
-            اختر 6 فقرات فقط. الترتيب يكون حسب ضغطك على الفقرات.
-          </div>
-        </div>
-      </div>
-
-      <div class="adminCard visibleSegmentsCard">
-        <div class="visibleSegmentsHead">
-          <h3>الفقرات الظاهرة في العرض</h3>
-
-          <div class="visibleSegmentsCounter ${visibleCount === 6 ? "ok" : "bad"}">
-            المختار: ${visibleCount} / 6
-          </div>
-        </div>
-
-        <div class="visibleSegmentsGrid">
-          ${ALL_GAME_SEGMENTS.map(item => {
-            const selectedIndex = visibleSegmentsClickOrder.indexOf(item.key)
-            const visible = selectedIndex !== -1
-
-            return `
-              <button
-                type="button"
-                class="visibleSegmentPickBtn ${visible ? "selected" : ""}"
-                id="visibleSegmentBtn_${item.key}"
-                onclick="toggleVisibleSegmentPick('${item.key}')"
-              >
-                <span class="visibleSegmentPickTitle">${item.title}</span>
-
-                <span class="visibleSegmentPickState">
-                  ${visible ? `مختارة ${selectedIndex + 1}` : "اضغط للاختيار"}
-                </span>
-              </button>
-            `
-          }).join("")}
-        </div>
-
-        <div class="visibleSegmentsOrderPreview" id="visibleSegmentsOrderPreview">
-          ${buildVisibleSegmentsOrderPreview()}
-        </div>
-
-        <div class="whoSmallHint">
-          اضغط على الفقرة لإضافتها. إذا ضغطت عليها مرة ثانية تنحذف من الاختيار.
-          ترتيب العرض يكون بنفس ترتيب الضغط.
-        </div>
-      </div>
-
-      <div class="adminActionRow">
-        <button class="adminSaveBtn" onclick="saveVisibleSegmentsAdmin()">حفظ فقرات العرض</button>
-        <button class="adminReloadBtn" onclick="renderAdminHome()">رجوع</button>
-      </div>
-
-    </div>
-  `
-
-  arrangeAdminInnerTabs()
-}
-
-function buildVisibleSegmentsOrderPreview() {
-  if (!visibleSegmentsClickOrder.length) {
-    return `<div class="visibleSegmentsEmptyOrder">لم يتم اختيار فقرات بعد</div>`
-  }
-
-  return `
-    <div class="visibleSegmentsOrderTitle">ترتيب الظهور</div>
-
-    <div class="visibleSegmentsOrderList">
-      ${visibleSegmentsClickOrder.map((key, index) => {
-        const item = ALL_GAME_SEGMENTS.find(seg => seg.key === key)
-        return `
-          <div class="visibleSegmentsOrderItem">
-            <span>${index + 1}</span>
-            <strong>${item?.title || key}</strong>
-          </div>
-        `
-      }).join("")}
-    </div>
-  `
-}
-
-function refreshVisibleSegmentsPickUI() {
-  const count = visibleSegmentsClickOrder.length
-  const counter = document.querySelector(".visibleSegmentsCounter")
-  const preview = document.getElementById("visibleSegmentsOrderPreview")
-
-  if (counter) {
-    counter.textContent = `المختار: ${count} / 6`
-    counter.classList.toggle("ok", count === 6)
-    counter.classList.toggle("bad", count !== 6)
-  }
-
-  ALL_GAME_SEGMENTS.forEach(item => {
-    const btn = document.getElementById(`visibleSegmentBtn_${item.key}`)
-    if (!btn) return
-
-    const selectedIndex = visibleSegmentsClickOrder.indexOf(item.key)
-    const visible = selectedIndex !== -1
-    const state = btn.querySelector(".visibleSegmentPickState")
-
-    btn.classList.toggle("selected", visible)
-
-    if (state) {
-      state.textContent = visible ? `مختارة ${selectedIndex + 1}` : "اضغط للاختيار"
-    }
-  })
-
-  if (preview) {
-    preview.innerHTML = buildVisibleSegmentsOrderPreview()
-  }
-}
-
-function toggleVisibleSegmentPick(key) {
-  const currentIndex = visibleSegmentsClickOrder.indexOf(key)
-
-  if (currentIndex !== -1) {
-    visibleSegmentsClickOrder.splice(currentIndex, 1)
-    refreshVisibleSegmentsPickUI()
-    return
-  }
-
-  if (visibleSegmentsClickOrder.length >= 6) {
-    showGameToast("مسموح اختيار 6 فقرات فقط")
-    return
-  }
-
-  visibleSegmentsClickOrder.push(key)
-  refreshVisibleSegmentsPickUI()
-}
-
-async function saveVisibleSegmentsAdmin() {
-  if (isAdminSaving()) return false
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return false
-  }
-
-  if (visibleSegmentsClickOrder.length !== 6) {
-    showGameToast("لازم تختار 6 فقرات بالضبط")
-    return false
-  }
-
-  try {
-    setAdminSaving(true, "جارٍ حفظ الفقرات...")
-
-    const rows = ALL_GAME_SEGMENTS.map(item => {
-      const selectedIndex = visibleSegmentsClickOrder.indexOf(item.key)
-      const visible = selectedIndex !== -1
-
-      return {
-        model: Number(currentModel),
-        segment_key: item.key,
-        is_visible: visible,
-        sort_order: visible ? selectedIndex + 1 : 99 + item.sort,
-        updated_at: new Date().toISOString()
-      }
-    })
-
-    const { error } = await db
-      .from("visible_segments")
-      .upsert(rows, {
-        onConflict: "model,segment_key"
-      })
-
-    if (error) {
-      console.log("SAVE VISIBLE SEGMENTS ERROR:", error)
-      showGameToast("تعذر حفظ فقرات العرض")
-      return false
-    }
-
-    showGameToast("تم حفظ فقرات العرض")
-    await renderVisibleSegmentsAdmin()
-    return true
-
-  } catch (err) {
-    console.log("SAVE VISIBLE SEGMENTS CATCH:", err)
-    showGameToast("حدث خطأ أثناء حفظ فقرات العرض")
-    return false
-  } finally {
-    setAdminSaving(false)
-  }
-}
-/* =========================
-   Warmup - Compact Admin
+   18) Warmup - التسخين
 ========================= */
 
 let warmupAdminActiveCategory = 1
@@ -2367,118 +2020,47 @@ function collectWarmupCurrentDraft() {
   }
 }
 
+function isWarmupDraftComplete(category) {
+  const cat = getWarmupDraftCategory(category)
+
+  const categoryName = String(cat.category_name || "").trim()
+  const q1 = cat.questions[1] || {}
+  const q2 = cat.questions[2] || {}
+  const q4 = cat.questions[4] || {}
+
+  return !!(
+    categoryName &&
+    String(q1.question || "").trim() &&
+    String(q1.answer || "").trim() &&
+    String(q2.question || "").trim() &&
+    String(q2.answer || "").trim() &&
+    String(q4.question || "").trim() &&
+    String(q4.answer || "").trim()
+  )
+}
+
 function switchWarmupAdminCategory(category) {
   collectWarmupCurrentDraft()
   warmupAdminActiveCategory = Number(category || 1)
   renderWarmupAdminFromDraft()
 }
 
-async function clearWarmupQuestionById(id) {
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  if (!id) {
-    const c = Number(warmupAdminActiveCategory || 1)
-    const cat = getWarmupDraftCategory(c)
-
-    const number = Number(window.__warmupDeleteNumber || 0)
-
-    if (number && cat.questions[number]) {
-      cat.questions[number].question = ""
-      cat.questions[number].answer = ""
-      renderWarmupAdminFromDraft()
-      showGameToast("تم تفريغ السؤال")
-      return
-    }
-
-    showGameToast("لا يوجد سؤال محفوظ لحذفه")
-    return
-  }
-
-  const ok = confirm("هل تريد حذف هذا السؤال نهائيًا؟")
-  if (!ok) return
-
-  try {
-    const { data, error } = await db
-      .from("questions")
-      .delete()
-      .eq("id", Number(id))
-      .select()
-
-    if (error) {
-      console.log("DELETE WARMUP BY ID ERROR:", error)
-      showGameToast("تعذر حذف السؤال")
-      return
-    }
-
-    if (!data || !data.length) {
-      showGameToast("لم يتم العثور على السؤال لحذفه")
-      return
-    }
-
-    const c = Number(warmupAdminActiveCategory || 1)
-    const cat = getWarmupDraftCategory(c)
-
-    for (const n of [1, 2, 4]) {
-      if (Number(cat.questions[n]?.id) === Number(id)) {
-        cat.questions[n] = { id: null, question: "", answer: "" }
-      }
-    }
-
-    showGameToast("تم حذف السؤال")
-    await renderWarmupAdmin()
-  } catch (err) {
-    console.log("DELETE WARMUP BY ID CATCH:", err)
-    showGameToast("حدث خطأ أثناء حذف السؤال")
-  }
-}
-
-async function deleteWarmupSegment() {
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const ok = confirm("هل تريد حذف جميع أسئلة فقرة التسخين نهائيًا؟")
-  if (!ok) return
-
-  try {
-    const { error } = await db
-      .from("questions")
-      .delete()
-      .eq("model", Number(currentModel))
-      .eq("segment", "warmup")
-
-    if (error) {
-      console.log("DELETE WARMUP SEGMENT ERROR:", error)
-      showGameToast("تعذر حذف فقرة التسخين")
-      return
-    }
-
-    warmupAdminDraft = {}
-    warmupAdminActiveCategory = 1
-
-    showGameToast("تم حذف جميع أسئلة التسخين")
-    await renderWarmupAdmin()
-  } catch (err) {
-    console.log("DELETE WARMUP SEGMENT CATCH:", err)
-    showGameToast("حدث خطأ أثناء حذف فقرة التسخين")
-  }
-}
-
 async function renderWarmupAdmin() {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
   const { data, error } = await db
     .from("questions")
     .select("*")
-    .eq("model", currentModel)
+    .eq("model", Number(currentModel))
     .eq("segment", "warmup")
     .order("category", { ascending: true })
     .order("number", { ascending: true })
 
   if (error) {
-    console.log(error)
+    console.log("LOAD WARMUP ERROR:", error)
     showGameToast("تعذر تحميل التسخين")
     return
   }
@@ -2519,12 +2101,11 @@ async function renderWarmupAdminFromDraft() {
   const q2 = cat.questions[2] || { id: null, question: "", answer: "" }
   const q4 = cat.questions[4] || { id: null, question: "", answer: "" }
 
-  const html = `
+  editor().innerHTML = `
     <div class="warmupAdminShell compactWarmupAdminShell">
       <div class="adminEditorTopBar compactAdminEditorTopBar">
         <div>
           <h2 class="adminSectionTitle">التسخين</h2>
-          
         </div>
       </div>
 
@@ -2532,28 +2113,27 @@ async function renderWarmupAdminFromDraft() {
 
       <div class="warmupCategoryTabs">
         ${[1, 2, 3, 4].map(num => {
-  const complete = isWarmupDraftComplete(num)
+          const complete = isWarmupDraftComplete(num)
 
-  return `
-    <button
-      type="button"
-      class="warmupCategoryTab
-        ${c === num ? "activeWarmupCategoryTab" : ""}
-        ${complete ? "innerTabDone warmupCategoryDone" : ""}
-        ${c === num && complete ? "warmupCategoryActiveDone" : ""}"
-      onclick="switchWarmupAdminCategory(${num})"
-    >
-      الفئة ${num}
-    </button>
-  `
-}).join("")}
+          return `
+            <button
+              type="button"
+              class="warmupCategoryTab
+                ${c === num ? "activeWarmupCategoryTab" : ""}
+                ${complete ? "innerTabDone warmupCategoryDone" : ""}
+                ${c === num && complete ? "warmupCategoryActiveDone" : ""}"
+              onclick="switchWarmupAdminCategory(${num})"
+            >
+              الفئة ${num}
+            </button>
+          `
+        }).join("")}
       </div>
 
       <div class="adminCard warmupSingleCategoryCard">
         <div class="warmupSingleCategoryHead">
           <div>
             <h3>الفئة ${c}</h3>
-            
           </div>
 
           <div class="warmupCategoryBadge">الفئة الحالية</div>
@@ -2569,15 +2149,13 @@ async function renderWarmupAdminFromDraft() {
         </div>
 
         <div class="warmupQuestionsCompactGrid">
-
           ${buildWarmupQuestionCompactCard(c, 1, q1)}
           ${buildWarmupQuestionCompactCard(c, 2, q2)}
           ${buildWarmupQuestionCompactCard(c, 4, q4)}
-
         </div>
       </div>
 
-            <div class="adminActionRow warmupStickyActions">
+      <div class="adminActionRow warmupStickyActions">
         <button onclick="saveWarmup()" class="adminSaveBtn">حفظ التسخين</button>
         <button onclick="deleteWarmupSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
         <button onclick="renderWarmupAdmin()" class="adminReloadBtn">إعادة تحميل</button>
@@ -2585,7 +2163,6 @@ async function renderWarmupAdminFromDraft() {
     </div>
   `
 
-  editor().innerHTML = html
   arrangeAdminInnerTabs()
 }
 
@@ -2669,6 +2246,7 @@ async function saveWarmup() {
 
     if (!rows.length) {
       const ok = confirm("التسخين فارغ، هل تريد حذف جميع أسئلة التسخين؟")
+
       if (!ok) {
         showGameToast("تم إلغاء الحفظ")
         return false
@@ -2681,7 +2259,7 @@ async function saveWarmup() {
         .eq("segment", "warmup")
 
       if (clearError) {
-        console.log(clearError)
+        console.log("CLEAR WARMUP ERROR:", clearError)
         showGameToast("تعذر حذف أسئلة التسخين")
         return false
       }
@@ -2701,7 +2279,7 @@ async function saveWarmup() {
       .eq("segment", "warmup")
 
     if (oldError) {
-      console.log(oldError)
+      console.log("READ OLD WARMUP ERROR:", oldError)
       showGameToast("تعذر قراءة بيانات التسخين الحالية")
       return false
     }
@@ -2715,7 +2293,7 @@ async function saveWarmup() {
       })
 
     if (saveError) {
-      console.log(saveError)
+      console.log("SAVE WARMUP ERROR:", saveError)
       showGameToast("فشل حفظ التسخين")
       return false
     }
@@ -2730,7 +2308,7 @@ async function saveWarmup() {
           .eq("id", Number(oldRow.id))
 
         if (deleteError) {
-          console.log(deleteError)
+          console.log("DELETE OLD WARMUP ERROR:", deleteError)
           showGameToast("تم الحفظ لكن تعذر تنظيف بعض الأسئلة القديمة")
           return false
         }
@@ -2739,10 +2317,11 @@ async function saveWarmup() {
 
     showGameToast("تم حفظ التسخين")
     await renderWarmupAdmin()
+    await renderAdminTabsUnified()
     return true
 
   } catch (err) {
-    console.log("SAVE WARMUP ERROR:", err)
+    console.log("SAVE WARMUP CATCH:", err)
     showGameToast("توقف حفظ التسخين بسبب خطأ")
     return false
   } finally {
@@ -2750,8 +2329,97 @@ async function saveWarmup() {
   }
 }
 
+async function clearWarmupQuestionById(id) {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  if (!id) {
+    const c = Number(warmupAdminActiveCategory || 1)
+    const cat = getWarmupDraftCategory(c)
+
+    const number = Number(window.__warmupDeleteNumber || 0)
+
+    if (number && cat.questions[number]) {
+      cat.questions[number] = { id: null, question: "", answer: "" }
+      renderWarmupAdminFromDraft()
+      showGameToast("تم تفريغ السؤال")
+      return
+    }
+
+    showGameToast("لا يوجد سؤال محفوظ لحذفه")
+    return
+  }
+
+  const ok = confirm("هل تريد حذف هذا السؤال نهائيًا؟")
+  if (!ok) return
+
+  try {
+    const { data, error } = await db
+      .from("questions")
+      .delete()
+      .eq("id", Number(id))
+      .select()
+
+    if (error) {
+      console.log("DELETE WARMUP BY ID ERROR:", error)
+      showGameToast("تعذر حذف السؤال")
+      return
+    }
+
+    if (!data || !data.length) {
+      showGameToast("لم يتم العثور على السؤال لحذفه")
+      return
+    }
+
+    showGameToast("تم حذف السؤال")
+    await renderWarmupAdmin()
+    await renderAdminTabsUnified()
+  } catch (err) {
+    console.log("DELETE WARMUP BY ID CATCH:", err)
+    showGameToast("حدث خطأ أثناء حذف السؤال")
+  }
+}
+
+async function deleteWarmupSegment() {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm("هل تريد حذف جميع أسئلة فقرة التسخين نهائيًا؟")
+  if (!ok) return
+
+  try {
+    const { error } = await db
+      .from("questions")
+      .delete()
+      .eq("model", Number(currentModel))
+      .eq("segment", "warmup")
+
+    if (error) {
+      console.log("DELETE WARMUP SEGMENT ERROR:", error)
+      showGameToast("تعذر حذف فقرة التسخين")
+      return
+    }
+
+    warmupAdminDraft = {}
+    warmupAdminActiveCategory = 1
+
+    showGameToast("تم حذف جميع أسئلة التسخين")
+    await renderWarmupAdmin()
+    await renderAdminTabsUnified()
+  } catch (err) {
+    console.log("DELETE WARMUP SEGMENT CATCH:", err)
+    showGameToast("حدث خطأ أثناء حذف فقرة التسخين")
+  }
+}
+
 /* =========================
-   Top10 - Compact Admin
+   19) Top 10
 ========================= */
 
 let top10AdminActiveRound = 1
@@ -2785,6 +2453,19 @@ function collectTop10CurrentDraft() {
   }
 }
 
+function isTop10DraftComplete(roundNumber) {
+  const round = getTop10DraftRound(roundNumber)
+  const question = String(round.question || "").trim()
+
+  if (!question) return false
+
+  for (let i = 1; i <= 10; i++) {
+    if (!String(round.answers[i] || "").trim()) return false
+  }
+
+  return true
+}
+
 function switchTop10AdminRound(round) {
   collectTop10CurrentDraft()
 
@@ -2798,17 +2479,22 @@ function switchTop10AdminRound(round) {
 }
 
 async function renderTop10Admin() {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
   top10AdminRoundsCount = await getSegmentRoundCount("top10", 3, 4)
 
   const { data, error } = await db
     .from("top10_questions")
     .select("*")
-    .eq("model", currentModel)
+    .eq("model", Number(currentModel))
     .order("round", { ascending: true })
     .order("position", { ascending: true })
 
   if (error) {
-    console.log(error)
+    console.log("LOAD TOP10 ERROR:", error)
     showGameToast("تعذر تحميل Top 10")
     return
   }
@@ -2837,19 +2523,22 @@ async function renderTop10Admin() {
     top10AdminActiveRound = top10AdminRoundsCount
   }
 
-  renderTop10AdminFromDraft()
+  if (top10AdminActiveRound < 1) {
+    top10AdminActiveRound = 1
+  }
+
+  await renderTop10AdminFromDraft()
 }
 
 async function renderTop10AdminFromDraft() {
   const r = Number(top10AdminActiveRound || 1)
   const round = getTop10DraftRound(r)
 
-  const html = `
+  editor().innerHTML = `
     <div class="top10AdminShell compactTop10AdminShell">
       <div class="adminEditorTopBar compactAdminEditorTopBar">
         <div>
           <h2 class="adminSectionTitle">Top 10</h2>
-          
         </div>
       </div>
 
@@ -2858,7 +2547,6 @@ async function renderTop10AdminFromDraft() {
       <div class="top10ControlPanel">
         <div class="top10RoundCountBox">
           <div class="adminField compactCountField">
-            
             <div class="compactCountSelectWrap">
               <select id="top10RoundsCountInput" class="compactCountSelect">
                 <option value="1" ${top10AdminRoundsCount === 1 ? "selected" : ""}>1</option>
@@ -2876,21 +2564,21 @@ async function renderTop10AdminFromDraft() {
 
         <div class="top10RoundTabs">
           ${Array.from({ length: top10AdminRoundsCount }, (_, i) => i + 1).map(num => {
-  const complete = isTop10DraftComplete(num)
+            const complete = isTop10DraftComplete(num)
 
-  return `
-    <button
-      type="button"
-      class="top10RoundTab
-        ${r === num ? "activeTop10RoundTab" : ""}
-        ${complete ? "innerTabDone top10RoundDone" : ""}
-        ${r === num && complete ? "top10RoundActiveDone" : ""}"
-      onclick="switchTop10AdminRound(${num})"
-    >
-      الجولة ${num}
-    </button>
-  `
-}).join("")}
+            return `
+              <button
+                type="button"
+                class="top10RoundTab
+                  ${r === num ? "activeTop10RoundTab" : ""}
+                  ${complete ? "innerTabDone top10RoundDone" : ""}
+                  ${r === num && complete ? "top10RoundActiveDone" : ""}"
+                onclick="switchTop10AdminRound(${num})"
+              >
+                الجولة ${num}
+              </button>
+            `
+          }).join("")}
         </div>
       </div>
 
@@ -2898,7 +2586,6 @@ async function renderTop10AdminFromDraft() {
         <div class="top10SingleRoundHead">
           <div>
             <h3>الجولة ${r}</h3>
-            
           </div>
 
           <button class="adminDeleteBtn" onclick="clearTop10Round(${r})">
@@ -2939,7 +2626,7 @@ async function renderTop10AdminFromDraft() {
         </div>
       </div>
 
-            <div class="adminActionRow top10StickyActions">
+      <div class="adminActionRow top10StickyActions">
         <button onclick="saveTop10()" class="adminSaveBtn">حفظ Top 10</button>
         <button onclick="deleteTop10Segment()" class="adminDeleteAllBtn">حذف الفقرة</button>
         <button onclick="renderTop10Admin()" class="adminReloadBtn">إعادة تحميل</button>
@@ -2947,7 +2634,6 @@ async function renderTop10AdminFromDraft() {
     </div>
   `
 
-  editor().innerHTML = html
   arrangeAdminInnerTabs()
 }
 
@@ -2964,9 +2650,7 @@ async function applyTop10RoundsCount() {
 
     setAdminSaving(true, "جارٍ حفظ العدد...")
 
-    const count = Number(
-      document.getElementById("top10RoundsCountInput")?.value || 3
-    )
+    const count = Number(document.getElementById("top10RoundsCountInput")?.value || 3)
 
     top10AdminRoundsCount = Math.min(Math.max(count, 1), 4)
 
@@ -2979,8 +2663,8 @@ async function applyTop10RoundsCount() {
 
     showGameToast("تم حفظ عدد جولات Top 10")
     await renderTop10AdminFromDraft()
+    await renderAdminTabsUnified()
     return true
-
   } catch (err) {
     console.log("APPLY TOP10 ROUNDS COUNT ERROR:", err)
     showGameToast("تعذر حفظ عدد جولات Top 10")
@@ -3012,6 +2696,9 @@ async function saveTop10() {
 
     top10AdminRoundsCount = Math.min(Math.max(top10AdminRoundsCount, 1), 4)
 
+    const savedCount = await saveSegmentRoundCount("top10", top10AdminRoundsCount)
+    if (!savedCount) return false
+
     const rows = []
     const keepKeys = []
 
@@ -3036,11 +2723,9 @@ async function saveTop10() {
       }
     }
 
-    const savedCount = await saveSegmentRoundCount("top10", top10AdminRoundsCount)
-    if (!savedCount) return false
-
     if (!rows.length) {
       const ok = confirm("Top 10 فارغ، هل تريد حذف جميع بياناته؟")
+
       if (!ok) {
         showGameToast("تم إلغاء الحفظ")
         return false
@@ -3052,7 +2737,7 @@ async function saveTop10() {
         .eq("model", Number(currentModel))
 
       if (clearError) {
-        console.log(clearError)
+        console.log("CLEAR TOP10 ERROR:", clearError)
         showGameToast("تعذر حذف بيانات Top 10")
         return false
       }
@@ -3062,6 +2747,7 @@ async function saveTop10() {
 
       showGameToast("تم حذف جميع بيانات Top 10")
       await renderTop10Admin()
+      await renderAdminTabsUnified()
       return true
     }
 
@@ -3072,7 +2758,7 @@ async function saveTop10() {
       })
 
     if (saveError) {
-      console.log(saveError)
+      console.log("SAVE TOP10 ERROR:", saveError)
       showGameToast("فشل حفظ Top 10")
       return false
     }
@@ -3083,7 +2769,7 @@ async function saveTop10() {
       .eq("model", Number(currentModel))
 
     if (oldError) {
-      console.log(oldError)
+      console.log("READ OLD TOP10 ERROR:", oldError)
       showGameToast("تم الحفظ لكن تعذر قراءة القديم للتنظيف")
       return false
     }
@@ -3100,7 +2786,7 @@ async function saveTop10() {
           .eq("position", Number(oldRow.position))
 
         if (deleteError) {
-          console.log(deleteError)
+          console.log("DELETE OLD TOP10 ERROR:", deleteError)
           showGameToast("تم الحفظ لكن تعذر تنظيف بعض بيانات Top 10")
           return false
         }
@@ -3109,10 +2795,10 @@ async function saveTop10() {
 
     showGameToast("تم حفظ Top 10")
     await renderTop10Admin()
+    await renderAdminTabsUnified()
     return true
-
   } catch (err) {
-    console.log("SAVE TOP10 ERROR:", err)
+    console.log("SAVE TOP10 CATCH:", err)
     showGameToast("توقف حفظ Top 10 بسبب خطأ")
     return false
   } finally {
@@ -3120,8 +2806,106 @@ async function saveTop10() {
   }
 }
 
+async function clearTop10Round(r) {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm(`هل تريد حذف الجولة ${r} من Top 10 نهائيًا؟`)
+  if (!ok) return
+
+  try {
+    const { error } = await db
+      .from("top10_questions")
+      .delete()
+      .eq("model", Number(currentModel))
+      .eq("round", Number(r))
+
+    if (error) {
+      console.log("CLEAR TOP10 ROUND ERROR:", error)
+      showGameToast("تعذر حذف الجولة")
+      return
+    }
+
+    showGameToast(`تم حذف الجولة ${r}`)
+    await renderTop10Admin()
+    await renderAdminTabsUnified()
+  } catch (err) {
+    console.log("CLEAR TOP10 ROUND CATCH:", err)
+    showGameToast("حدث خطأ أثناء حذف الجولة")
+  }
+}
+
+async function deleteTop10Item(round, position) {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm(`هل تريد حذف إجابة رقم ${position} من الجولة ${round}؟`)
+  if (!ok) return
+
+  const { error } = await db
+    .from("top10_questions")
+    .delete()
+    .eq("model", Number(currentModel))
+    .eq("round", Number(round))
+    .eq("position", Number(position))
+
+  if (error) {
+    console.log("DELETE TOP10 ITEM ERROR:", error)
+    showGameToast("تعذر حذف الإجابة")
+    return
+  }
+
+  showGameToast(`تم حذف إجابة رقم ${position}`)
+  await renderTop10Admin()
+  await renderAdminTabsUnified()
+}
+
+async function deleteTop10Segment() {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm("هل تريد حذف فقرة Top 10 كاملة نهائيًا؟")
+  if (!ok) return
+
+  try {
+    const [rowsRes, settingsRes] = await Promise.all([
+      db.from("top10_questions").delete().eq("model", Number(currentModel)),
+      db.from("segment_settings").delete().eq("model", Number(currentModel)).eq("segment", "top10")
+    ])
+
+    if (rowsRes.error || settingsRes.error) {
+      console.log(rowsRes.error || settingsRes.error)
+      showGameToast("تعذر حذف فقرة Top 10")
+      return
+    }
+
+    top10AdminRoundsCount = 3
+    top10AdminActiveRound = 1
+    top10AdminDraft = {}
+
+    showGameToast("تم حذف فقرة Top 10")
+    await renderTop10Admin()
+    await renderAdminTabsUnified()
+  } catch (err) {
+    console.log("DELETE TOP10 SEGMENT CATCH:", err)
+    showGameToast("حدث خطأ أثناء حذف فقرة Top 10")
+  }
+}
+
 /* =========================
-   Auction - Compact Admin
+   20) Auction - فتبلة
 ========================= */
 
 let auctionAdminActiveNumber = 1
@@ -3158,6 +2942,17 @@ function collectAuctionCurrentDraft() {
   if (videoFile) item.videoFile = videoFile
 }
 
+function isAuctionDraftComplete(number) {
+  const item = getAuctionDraftItem(number)
+
+  const question = String(item.question || "").trim()
+  const answer = String(item.answer || "").trim()
+  const image = String(item.image || "").trim()
+  const video = String(item.video || "").trim()
+
+  return !!(question && answer && (image || video || item.file || item.videoFile))
+}
+
 function switchAuctionAdminNumber(number) {
   collectAuctionCurrentDraft()
 
@@ -3183,7 +2978,7 @@ async function renderAuctionAdmin() {
     .order("number", { ascending: true })
 
   if (error) {
-    console.log("AUCTION LOAD ERROR:", error)
+    console.log("LOAD AUCTION ERROR:", error)
     showGameToast("تعذر تحميل فتبلة")
     return
   }
@@ -3218,7 +3013,6 @@ async function renderAuctionAdmin() {
     item.answer = row.answer || ""
     item.image = row.image || ""
     item.video = row.video || ""
-
     item.file = null
     item.videoFile = null
   })
@@ -3234,28 +3028,11 @@ async function renderAuctionAdmin() {
   await renderAuctionAdminFromDraft()
 }
 
-
-function isAuctionDraftComplete(number) {
-  const item = getAuctionDraftItem(number)
-
-  const question = String(item.question || "").trim()
-  const answer = String(item.answer || "").trim()
-  const image = String(item.image || "").trim()
-  const video = String(item.video || "").trim()
-  const file = item.file
-  const videoFile = item.videoFile
-
-  return !!(question && answer && (image || video || file || videoFile))
-}
-
 async function renderAuctionAdminFromDraft() {
   const n = Number(auctionAdminActiveNumber || 1)
   const item = getAuctionDraftItem(n)
 
-  const area = editor()
-  if (!area) return
-
-  area.innerHTML = `
+  editor().innerHTML = `
     <div class="auctionAdminShell compactAuctionAdminShell">
       <div class="adminEditorTopBar compactAdminEditorTopBar">
         <div>
@@ -3272,14 +3049,11 @@ async function renderAuctionAdminFromDraft() {
 
             <div class="compactCountSelectWrap">
               <select id="auctionCountInput" class="compactCountSelect">
-                <option value="1" ${auctionAdminCount === 1 ? "selected" : ""}>1</option>
-                <option value="2" ${auctionAdminCount === 2 ? "selected" : ""}>2</option>
-                <option value="3" ${auctionAdminCount === 3 ? "selected" : ""}>3</option>
-                <option value="4" ${auctionAdminCount === 4 ? "selected" : ""}>4</option>
-                <option value="5" ${auctionAdminCount === 5 ? "selected" : ""}>5</option>
-                <option value="6" ${auctionAdminCount === 6 ? "selected" : ""}>6</option>
-                <option value="7" ${auctionAdminCount === 7 ? "selected" : ""}>7</option>
-                <option value="8" ${auctionAdminCount === 8 ? "selected" : ""}>8</option>
+                ${Array.from({ length: 8 }, (_, i) => i + 1).map(num => `
+                  <option value="${num}" ${auctionAdminCount === num ? "selected" : ""}>
+                    ${num}
+                  </option>
+                `).join("")}
               </select>
             </div>
           </div>
@@ -3298,7 +3072,7 @@ async function renderAuctionAdminFromDraft() {
                 type="button"
                 class="auctionNumberTab
                   ${n === num ? "activeAuctionNumberTab" : ""}
-                  ${complete ? "auctionNumberDone" : ""}
+                  ${complete ? "innerTabDone auctionNumberDone" : ""}
                   ${n === num && complete ? "auctionNumberActiveDone" : ""}"
                 onclick="switchAuctionAdminNumber(${num})"
               >
@@ -3313,7 +3087,6 @@ async function renderAuctionAdminFromDraft() {
         <div class="auctionSingleQuestionHead">
           <div>
             <h3>السؤال ${n}</h3>
-            
           </div>
 
           <button class="adminDeleteBtn" onclick="clearAuctionQuestion(${n})">
@@ -3326,17 +3099,21 @@ async function renderAuctionAdminFromDraft() {
             <div class="adminField">
               <label>الصورة</label>
               <input type="file" id="auctionFile${n}" accept="image/*">
-<input type="file" id="auctionVideo${n}" accept="video/*">
+            </div>
+
+            <div class="adminField">
+              <label>الفيديو</label>
+              <input type="file" id="auctionVideo${n}" accept="video/*">
             </div>
 
             <div class="auctionPreviewBox auctionPreviewLarge">
               ${
-  item.video
-    ? `<video src="${escapeHtml(item.video)}" class="previewImg" controls></video>`
-    : item.image
-      ? `<img src="${escapeHtml(item.image)}" class="previewImg">`
-      : `<div class="emptyImageHint">لا توجد صورة أو فيديو حالياً</div>`
-}
+                item.video
+                  ? `<video src="${escapeHtml(item.video)}" class="previewImg" controls></video>`
+                  : item.image
+                    ? `<img src="${escapeHtml(item.image)}" class="previewImg">`
+                    : `<div class="emptyImageHint">لا توجد صورة أو فيديو حالياً</div>`
+              }
             </div>
           </div>
 
@@ -3357,8 +3134,6 @@ async function renderAuctionAdminFromDraft() {
                 value="${escapeHtml(item.answer || "")}"
               >
             </div>
-
-          
           </div>
         </div>
       </div>
@@ -3384,7 +3159,6 @@ async function applyAuctionCount() {
 
   try {
     collectAuctionCurrentDraft()
-
     setAdminSaving(true, "جارٍ حفظ العدد...")
 
     const count = Number(document.getElementById("auctionCountInput")?.value || 8)
@@ -3404,7 +3178,7 @@ async function applyAuctionCount() {
       )
 
     if (error) {
-      console.log(error)
+      console.log("SAVE AUCTION COUNT ERROR:", error)
       showGameToast("تعذر حفظ عدد الأسئلة")
       return false
     }
@@ -3415,10 +3189,10 @@ async function applyAuctionCount() {
 
     showGameToast("تم حفظ عدد أسئلة فتبلة")
     await renderAuctionAdminFromDraft()
+    await renderAdminTabsUnified()
     return true
-
   } catch (err) {
-    console.log("APPLY AUCTION COUNT ERROR:", err)
+    console.log("APPLY AUCTION COUNT CATCH:", err)
     showGameToast("تعذر حفظ عدد أسئلة فتبلة")
     return false
   } finally {
@@ -3447,6 +3221,7 @@ async function saveAuction() {
     )
 
     const finalCount = Math.min(Math.max(count, 1), 8)
+    auctionAdminCount = finalCount
 
     const { data: oldRows, error: oldError } = await db
       .from("auction_questions")
@@ -3454,7 +3229,7 @@ async function saveAuction() {
       .eq("model", Number(currentModel))
 
     if (oldError) {
-      console.log(oldError)
+      console.log("READ OLD AUCTION ERROR:", oldError)
       showGameToast("تعذر قراءة بيانات فتبلة القديمة")
       return false
     }
@@ -3473,7 +3248,6 @@ async function saveAuction() {
 
       const question = String(item.question || "").trim()
       const answer = String(item.answer || "").trim()
-      
 
       let image = oldMap[i]?.image || item.image || ""
       let video = oldMap[i]?.video || item.video || ""
@@ -3482,26 +3256,26 @@ async function saveAuction() {
         image = await uploadImageFile(item.file, `auction_${i}`)
         item.file = null
         item.image = image
+        video = ""
       }
 
       if (item.videoFile) {
-      video = await uploadVideoFile(item.videoFile, `auction_video_${i}`)
-      item.videoFile = null
-      item.video = video
-
-      image = ""
-     }
+        video = await uploadVideoFile(item.videoFile, `auction_video_${i}`)
+        item.videoFile = null
+        item.video = video
+        image = ""
+      }
 
       if (!question && !answer && !image && !video) continue
 
       rows.push({
-      model: Number(currentModel),
-      number: Number(i),
-      question,
-      answer,
-      image,
-      video,
-      note: ""
+        model: Number(currentModel),
+        number: Number(i),
+        question,
+        answer,
+        image,
+        video,
+        note: ""
       })
 
       keepNumbers.push(Number(i))
@@ -3521,7 +3295,7 @@ async function saveAuction() {
       )
 
     if (settingsError) {
-      console.log(settingsError)
+      console.log("SAVE AUCTION SETTINGS ERROR:", settingsError)
       showGameToast("تعذر حفظ عدد أسئلة فتبلة")
       return false
     }
@@ -3534,7 +3308,7 @@ async function saveAuction() {
         })
 
       if (saveError) {
-        console.log(saveError)
+        console.log("SAVE AUCTION ERROR:", saveError)
         showGameToast("فشل حفظ فتبلة")
         return false
       }
@@ -3546,7 +3320,7 @@ async function saveAuction() {
       .eq("model", Number(currentModel))
 
     if (existingError) {
-      console.log(existingError)
+      console.log("READ EXISTING AUCTION ERROR:", existingError)
       showGameToast("تم الحفظ لكن تعذر قراءة القديم للتنظيف")
       return false
     }
@@ -3562,29 +3336,97 @@ async function saveAuction() {
           .eq("number", oldNumber)
 
         if (deleteError) {
-          console.log(deleteError)
+          console.log("DELETE OLD AUCTION ERROR:", deleteError)
           showGameToast("تم الحفظ لكن تعذر تنظيف بعض أسئلة فتبلة")
           return false
         }
       }
     }
 
-    auctionAdminCount = finalCount
-
     showGameToast(rows.length ? "تم حفظ فتبلة" : "تم حذف جميع أسئلة فتبلة")
     await renderAuctionAdmin()
+    await renderAdminTabsUnified()
     return true
-
   } catch (err) {
-    console.log("SAVE AUCTION ERROR:", err)
+    console.log("SAVE AUCTION CATCH:", err)
     showGameToast("توقف الحفظ بسبب خطأ في الرفع أو البيانات")
     return false
   } finally {
     setAdminSaving(false)
   }
 }
+
+async function clearAuctionQuestion(i) {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm(`هل تريد حذف سؤال فتبلة رقم ${i} نهائيًا؟`)
+  if (!ok) return
+
+  try {
+    const { error } = await db
+      .from("auction_questions")
+      .delete()
+      .eq("model", Number(currentModel))
+      .eq("number", Number(i))
+
+    if (error) {
+      console.log("CLEAR AUCTION QUESTION ERROR:", error)
+      showGameToast("تعذر حذف السؤال")
+      return
+    }
+
+    showGameToast(`تم حذف السؤال ${i}`)
+    await renderAuctionAdmin()
+    await renderAdminTabsUnified()
+  } catch (err) {
+    console.log("CLEAR AUCTION QUESTION CATCH:", err)
+    showGameToast("حدث خطأ أثناء حذف السؤال")
+  }
+}
+
+async function deleteAuctionSegment() {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm("هل تريد حذف فقرة فتبلة كاملة نهائيًا؟")
+  if (!ok) return
+
+  try {
+    const [rowsRes, settingsRes] = await Promise.all([
+      db.from("auction_questions").delete().eq("model", Number(currentModel)),
+      db.from("segment_settings").delete().eq("model", Number(currentModel)).eq("segment", "auction")
+    ])
+
+    if (rowsRes.error || settingsRes.error) {
+      console.log(rowsRes.error || settingsRes.error)
+      showGameToast("تعذر حذف فقرة فتبلة")
+      return
+    }
+
+    auctionAdminCount = 8
+    auctionAdminActiveNumber = 1
+    auctionAdminDraft = {}
+
+    showGameToast("تم حذف فقرة فتبلة")
+    await renderAuctionAdmin()
+    await renderAdminTabsUnified()
+  } catch (err) {
+    console.log("DELETE AUCTION SEGMENT CATCH:", err)
+    showGameToast("حدث خطأ أثناء حذف الفقرة")
+  }
+}
+
 /* =========================
-   Who - Compact Admin
+   21) Who - من هو
 ========================= */
 
 let whoAdminActiveNumber = 1
@@ -3611,9 +3453,7 @@ function collectWhoCurrentDraft() {
   item.answer = (document.getElementById(`whoAnswer${n}`)?.value || "").trim()
 
   const file = document.getElementById(`who${n}`)?.files?.[0] || null
-  if (file) {
-    item.file = file
-  }
+  if (file) item.file = file
 }
 
 function isWhoDraftComplete(number) {
@@ -3621,9 +3461,8 @@ function isWhoDraftComplete(number) {
 
   const image = String(item.image || "").trim()
   const answer = String(item.answer || "").trim()
-  const file = item.file
 
-  return !!(answer && (image || file))
+  return !!(answer && (image || item.file))
 }
 
 function switchWhoAdminNumber(number) {
@@ -3631,7 +3470,7 @@ function switchWhoAdminNumber(number) {
 
   const safeNumber = Math.min(
     Math.max(Number(number || 1), 1),
-    15
+    Number(whoAdminCount || 15)
   )
 
   whoAdminActiveNumber = safeNumber
@@ -3644,6 +3483,8 @@ async function renderWhoAdmin() {
     return
   }
 
+  whoAdminCount = await getAdminSegmentCount("who")
+
   const { data, error } = await db
     .from("who_images")
     .select("*")
@@ -3651,7 +3492,7 @@ async function renderWhoAdmin() {
     .order("number", { ascending: true })
 
   if (error) {
-    console.log(error)
+    console.log("LOAD WHO ERROR:", error)
     showGameToast("تعذر تحميل من هو")
     return
   }
@@ -3671,7 +3512,7 @@ async function renderWhoAdmin() {
     item.file = null
   })
 
-  if (whoAdminActiveNumber < 1 || whoAdminActiveNumber > 15) {
+  if (whoAdminActiveNumber < 1 || whoAdminActiveNumber > whoAdminCount) {
     whoAdminActiveNumber = 1
   }
 
@@ -3682,10 +3523,7 @@ async function renderWhoAdminFromDraft() {
   const n = Number(whoAdminActiveNumber || 1)
   const item = getWhoDraftItem(n)
 
-  const area = editor()
-  if (!area) return
-
-  area.innerHTML = `
+  editor().innerHTML = `
     <div class="whoAdminShell compactWhoAdminShell">
       <div class="adminEditorTopBar compactAdminEditorTopBar">
         <div>
@@ -3695,8 +3533,32 @@ async function renderWhoAdminFromDraft() {
 
       ${await buildSegmentStatusGrid()}
 
+      <div class="auctionControlPanel whoControlPanel">
+        <div class="auctionCountBox whoCountBox">
+          <div class="adminField compactCountField">
+            <label for="whoCountInput">عدد الأرقام</label>
+
+            <div class="compactCountSelectWrap">
+              <select
+                id="whoCountInput"
+                class="compactCountSelect"
+                onchange="changeWhoCount()"
+              >
+                <option value="10" ${whoAdminCount === 10 ? "selected" : ""}>10</option>
+                <option value="12" ${whoAdminCount === 12 ? "selected" : ""}>12</option>
+                <option value="15" ${whoAdminCount === 15 ? "selected" : ""}>15</option>
+              </select>
+            </div>
+          </div>
+
+          <button onclick="saveWhoSettingsOnly()" class="adminBtn adminBtnMango compactCountBtn">
+            حفظ العدد
+          </button>
+        </div>
+      </div>
+
       <div class="whoNumberTabs">
-        ${Array.from({ length: 15 }, (_, idx) => idx + 1).map(num => {
+        ${Array.from({ length: whoAdminCount }, (_, idx) => idx + 1).map(num => {
           const complete = isWhoDraftComplete(num)
 
           return `
@@ -3718,7 +3580,6 @@ async function renderWhoAdminFromDraft() {
         <div class="whoSingleHead">
           <div>
             <h3>العنصر ${n}</h3>
-            
           </div>
 
           <button class="adminDeleteBtn" onclick="clearWhoItem(${n})">
@@ -3753,7 +3614,7 @@ async function renderWhoAdminFromDraft() {
             </div>
 
             <div class="whoSmallHint">
-              الأفضل تكون الصورة واضحة ومقصوصة بشكل مربع أو قريب من المربع.
+              اختر عدد الأرقام 10 أو 12 أو 15. الأرقام الزائدة لا تظهر في العرض ولا تدخل في الفحص.
             </div>
           </div>
         </div>
@@ -3770,6 +3631,56 @@ async function renderWhoAdminFromDraft() {
   arrangeAdminInnerTabs()
 }
 
+function changeWhoCount() {
+  collectWhoCurrentDraft()
+
+  const count = Number(document.getElementById("whoCountInput")?.value || 15)
+  whoAdminCount = normalizeAdminSegmentCount("who", count)
+
+  if (whoAdminActiveNumber > whoAdminCount) {
+    whoAdminActiveNumber = whoAdminCount
+  }
+
+  renderWhoAdminFromDraft()
+}
+
+async function saveWhoSettingsOnly() {
+  if (isAdminSaving()) return false
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return false
+  }
+
+  try {
+    collectWhoCurrentDraft()
+    setAdminSaving(true, "جارٍ حفظ العدد...")
+
+    const count = Number(document.getElementById("whoCountInput")?.value || 15)
+    whoAdminCount = normalizeAdminSegmentCount("who", count)
+
+    const saved = await saveAdminSegmentCount("who", whoAdminCount)
+    if (!saved) return false
+
+    updateAdminQuickSettingUI("who", whoAdminCount)
+
+    if (whoAdminActiveNumber > whoAdminCount) {
+      whoAdminActiveNumber = whoAdminCount
+    }
+
+    showGameToast("تم حفظ عدد أرقام من هو")
+    await renderWhoAdminFromDraft()
+    await renderAdminTabsUnified()
+    return true
+  } catch (err) {
+    console.log("SAVE WHO SETTINGS CATCH:", err)
+    showGameToast("تعذر حفظ عدد من هو")
+    return false
+  } finally {
+    setAdminSaving(false)
+  }
+}
+
 async function saveWho() {
   if (isAdminSaving()) return false
 
@@ -3784,27 +3695,41 @@ async function saveWho() {
     setAdminSaving(true, "جارٍ حفظ من هو...")
     showGameToast("جارٍ حفظ من هو...")
 
+    const count = Number(
+      document.getElementById("whoCountInput")?.value ||
+      whoAdminCount ||
+      15
+    )
+
+    whoAdminCount = normalizeAdminSegmentCount("who", count)
+
+    const savedSetting = await saveAdminSegmentCount("who", whoAdminCount)
+    if (!savedSetting) return false
+
+    updateAdminQuickSettingUI("who", whoAdminCount)
+
     const { data: oldRows, error: oldReadError } = await db
       .from("who_images")
       .select("number, image")
       .eq("model", Number(currentModel))
 
     if (oldReadError) {
-      console.log(oldReadError)
+      console.log("READ OLD WHO ERROR:", oldReadError)
       showGameToast("تعذر قراءة بيانات من هو القديمة")
       return false
     }
 
     const oldMap = {}
+
     ;(oldRows || []).forEach(row => {
       oldMap[Number(row.number)] = row
     })
 
     const rows = []
+    const keepNumbers = []
 
-    for (let i = 1; i <= 15; i++) {
+    for (let i = 1; i <= whoAdminCount; i++) {
       const item = getWhoDraftItem(i)
-
       const answer = String(item.answer || "").trim()
       const file = item.file || document.getElementById(`who${i}`)?.files?.[0] || null
 
@@ -3830,9 +3755,9 @@ async function saveWho() {
         image,
         answer
       })
-    }
 
-    const keepNumbers = rows.map(row => Number(row.number))
+      keepNumbers.push(Number(i))
+    }
 
     const { data: existingRows, error: existingError } = await db
       .from("who_images")
@@ -3840,7 +3765,7 @@ async function saveWho() {
       .eq("model", Number(currentModel))
 
     if (existingError) {
-      console.log(existingError)
+      console.log("READ EXISTING WHO ERROR:", existingError)
       showGameToast("تعذر قراءة عناصر من هو الحالية")
       return false
     }
@@ -3856,7 +3781,7 @@ async function saveWho() {
           .eq("number", oldNumber)
 
         if (deleteError) {
-          console.log(deleteError)
+          console.log("DELETE OLD WHO ERROR:", deleteError)
           showGameToast("تعذر تنظيف عناصر من هو القديمة")
           return false
         }
@@ -3871,7 +3796,7 @@ async function saveWho() {
         })
 
       if (saveError) {
-        console.log(saveError)
+        console.log("SAVE WHO ERROR:", saveError)
         showGameToast("فشل حفظ من هو")
         return false
       }
@@ -3879,10 +3804,10 @@ async function saveWho() {
 
     showGameToast(rows.length ? "تم حفظ من هو" : "تم حذف جميع عناصر من هو")
     await renderWhoAdmin()
+    await renderAdminTabsUnified()
     return true
-
   } catch (err) {
-    console.log("SAVE WHO ERROR:", err)
+    console.log("SAVE WHO CATCH:", err)
     showGameToast("توقف حفظ من هو بسبب خطأ")
     return false
   } finally {
@@ -3890,8 +3815,79 @@ async function saveWho() {
   }
 }
 
+async function clearWhoItem(i) {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm(`هل تريد حذف العنصر رقم ${i} نهائيًا؟`)
+  if (!ok) return
+
+  try {
+    const { error } = await db
+      .from("who_images")
+      .delete()
+      .eq("model", Number(currentModel))
+      .eq("number", Number(i))
+
+    if (error) {
+      console.log("CLEAR WHO ITEM ERROR:", error)
+      showGameToast("تعذر حذف العنصر")
+      return
+    }
+
+    showGameToast(`تم حذف العنصر ${i}`)
+    await renderWhoAdmin()
+    await renderAdminTabsUnified()
+  } catch (err) {
+    console.log("CLEAR WHO ITEM CATCH:", err)
+    showGameToast("حدث خطأ أثناء حذف العنصر")
+  }
+}
+
+async function deleteWhoSegment() {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const ok = confirm("هل تريد حذف فقرة من هو كاملة نهائيًا؟")
+  if (!ok) return
+
+  try {
+    const [rowsRes, settingsRes] = await Promise.all([
+      db.from("who_images").delete().eq("model", Number(currentModel)),
+      db.from("segment_settings").delete().eq("model", Number(currentModel)).eq("segment", "who")
+    ])
+
+    if (rowsRes.error || settingsRes.error) {
+      console.log(rowsRes.error || settingsRes.error)
+      showGameToast("تعذر حذف فقرة من هو")
+      return
+    }
+
+    whoAdminCount = 15
+    whoAdminActiveNumber = 1
+    whoAdminDraft = {}
+
+    updateAdminQuickSettingUI("who", whoAdminCount)
+
+    showGameToast("تم حذف فقرة من هو")
+    await renderWhoAdmin()
+    await renderAdminTabsUnified()
+  } catch (err) {
+    console.log("DELETE WHO SEGMENT CATCH:", err)
+    showGameToast("حدث خطأ أثناء حذف فقرة من هو")
+  }
+}
+
 /* =========================
-   Explain Word - Admin
+   22) Explain - اشرح الكلمة
 ========================= */
 
 function getExplainDraftItem(number) {
@@ -3914,9 +3910,9 @@ function collectExplainDraft() {
     4
   )
 
-  explainAdminCount = count === 6 ? 6 : 4
+  explainAdminCount = normalizeAdminSegmentCount("explain", count)
 
-  for (let i = 1; i <= 6; i++) {
+  for (let i = 1; i <= 8; i++) {
     const item = getExplainDraftItem(i)
     item.word = (document.getElementById(`explainWord_${i}`)?.value || "").trim()
   }
@@ -3933,34 +3929,27 @@ async function renderExplainAdmin() {
     return
   }
 
-  const [settingsRes, wordsRes] = await Promise.all([
-    db
-      .from("explain_settings")
-      .select("*")
-      .eq("model", Number(currentModel))
-      .maybeSingle(),
+  explainAdminCount = await getAdminSegmentCount("explain")
 
-    db
-      .from("explain_words")
-      .select("*")
-      .eq("model", Number(currentModel))
-      .order("number", { ascending: true })
-  ])
+  const { data, error } = await db
+    .from("explain_words")
+    .select("*")
+    .eq("model", Number(currentModel))
+    .order("number", { ascending: true })
 
-  if (settingsRes.error || wordsRes.error) {
-    console.log(settingsRes.error || wordsRes.error)
+  if (error) {
+    console.log("LOAD EXPLAIN ERROR:", error)
     showGameToast("تعذر تحميل اشرح الكلمة")
     return
   }
 
-  explainAdminCount = Number(settingsRes.data?.words_count || 4) === 6 ? 6 : 4
   explainAdminDraft = {}
 
-  for (let i = 1; i <= 6; i++) {
+  for (let i = 1; i <= 8; i++) {
     getExplainDraftItem(i)
   }
 
-  ;(wordsRes.data || []).forEach(row => {
+  ;(data || []).forEach(row => {
     const n = Number(row.number || 1)
     const item = getExplainDraftItem(n)
 
@@ -3972,12 +3961,8 @@ async function renderExplainAdmin() {
 }
 
 async function renderExplainAdminFromDraft() {
-  const area = editor()
-  if (!area) return
-
-  area.innerHTML = `
+  editor().innerHTML = `
     <div class="explainAdminShell compactExplainAdminShell">
-
       <div class="adminEditorTopBar compactAdminEditorTopBar">
         <div>
           <h2 class="adminSectionTitle">اشرح الكلمة</h2>
@@ -3999,6 +3984,7 @@ async function renderExplainAdminFromDraft() {
               >
                 <option value="4" ${explainAdminCount === 4 ? "selected" : ""}>4</option>
                 <option value="6" ${explainAdminCount === 6 ? "selected" : ""}>6</option>
+                <option value="8" ${explainAdminCount === 8 ? "selected" : ""}>8</option>
               </select>
             </div>
           </div>
@@ -4021,7 +4007,7 @@ async function renderExplainAdminFromDraft() {
         </div>
 
         <div class="explainWordsGrid">
-          ${Array.from({ length: 6 }, (_, idx) => {
+          ${Array.from({ length: 8 }, (_, idx) => {
             const number = idx + 1
             const item = getExplainDraftItem(number)
             const disabled = number > explainAdminCount
@@ -4052,7 +4038,7 @@ async function renderExplainAdminFromDraft() {
         </div>
 
         <div class="whoSmallHint">
-          عدد الكلمات يكون 4 أو 6 فقط، وتتوزع بالتساوي بين الفريقين.
+          عدد الكلمات يكون 4 أو 6 أو 8.
         </div>
       </div>
 
@@ -4061,7 +4047,6 @@ async function renderExplainAdminFromDraft() {
         <button onclick="deleteExplainSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
         <button onclick="renderExplainAdmin()" class="adminReloadBtn">إعادة تحميل</button>
       </div>
-
     </div>
   `
 
@@ -4072,7 +4057,7 @@ function changeExplainWordsCount() {
   collectExplainDraft()
 
   const count = Number(document.getElementById("explainWordsCountInput")?.value || 4)
-  explainAdminCount = count === 6 ? 6 : 4
+  explainAdminCount = normalizeAdminSegmentCount("explain", count)
 
   renderExplainAdminFromDraft()
 }
@@ -4087,37 +4072,22 @@ async function saveExplainSettingsOnly() {
 
   try {
     collectExplainDraft()
-
     setAdminSaving(true, "جارٍ حفظ العدد...")
 
     const count = Number(document.getElementById("explainWordsCountInput")?.value || 4)
-    explainAdminCount = count === 6 ? 6 : 4
+    explainAdminCount = normalizeAdminSegmentCount("explain", count)
 
-    const { error } = await db
-      .from("explain_settings")
-      .upsert(
-        {
-          model: Number(currentModel),
-          words_count: explainAdminCount,
-          updated_at: new Date().toISOString()
-        },
-        {
-          onConflict: "model"
-        }
-      )
+    const saved = await saveAdminSegmentCount("explain", explainAdminCount)
+    if (!saved) return false
 
-    if (error) {
-      console.log(error)
-      showGameToast("تعذر حفظ عدد الكلمات")
-      return false
-    }
+    updateAdminQuickSettingUI("explain", explainAdminCount)
 
-    showGameToast("تم حفظ عدد الكلمات")
+    showGameToast("تم حفظ عدد كلمات اشرح الكلمة")
     await renderExplainAdminFromDraft()
+    await renderAdminTabsUnified()
     return true
-
   } catch (err) {
-    console.log("SAVE EXPLAIN SETTINGS ERROR:", err)
+    console.log("SAVE EXPLAIN SETTINGS CATCH:", err)
     showGameToast("تعذر حفظ عدد الكلمات")
     return false
   } finally {
@@ -4145,7 +4115,12 @@ async function saveExplain() {
       4
     )
 
-    explainAdminCount = count === 6 ? 6 : 4
+    explainAdminCount = normalizeAdminSegmentCount("explain", count)
+
+    const savedSetting = await saveAdminSegmentCount("explain", explainAdminCount)
+    if (!savedSetting) return false
+
+    updateAdminQuickSettingUI("explain", explainAdminCount)
 
     const rows = []
     const keepNumbers = []
@@ -4166,32 +4141,13 @@ async function saveExplain() {
       keepNumbers.push(Number(i))
     }
 
-    const { error: settingsError } = await db
-      .from("explain_settings")
-      .upsert(
-        {
-          model: Number(currentModel),
-          words_count: explainAdminCount,
-          updated_at: new Date().toISOString()
-        },
-        {
-          onConflict: "model"
-        }
-      )
-
-    if (settingsError) {
-      console.log(settingsError)
-      showGameToast("تعذر حفظ إعدادات اشرح الكلمة")
-      return false
-    }
-
     const { data: oldRows, error: oldError } = await db
       .from("explain_words")
       .select("number")
       .eq("model", Number(currentModel))
 
     if (oldError) {
-      console.log(oldError)
+      console.log("READ OLD EXPLAIN ERROR:", oldError)
       showGameToast("تعذر قراءة كلمات اشرح القديمة")
       return false
     }
@@ -4207,7 +4163,7 @@ async function saveExplain() {
           .eq("number", oldNumber)
 
         if (deleteError) {
-          console.log(deleteError)
+          console.log("DELETE OLD EXPLAIN ERROR:", deleteError)
           showGameToast("تعذر تنظيف بعض كلمات اشرح")
           return false
         }
@@ -4222,7 +4178,7 @@ async function saveExplain() {
         })
 
       if (saveError) {
-        console.log(saveError)
+        console.log("SAVE EXPLAIN ERROR:", saveError)
         showGameToast("فشل حفظ كلمات اشرح")
         return false
       }
@@ -4232,9 +4188,8 @@ async function saveExplain() {
     await renderExplainAdmin()
     await renderAdminTabsUnified()
     return true
-
   } catch (err) {
-    console.log("SAVE EXPLAIN ERROR:", err)
+    console.log("SAVE EXPLAIN CATCH:", err)
     showGameToast("توقف حفظ اشرح الكلمة بسبب خطأ")
     return false
   } finally {
@@ -4270,7 +4225,7 @@ async function deleteExplainSegment() {
   try {
     const [wordsRes, settingsRes] = await Promise.all([
       db.from("explain_words").delete().eq("model", Number(currentModel)),
-      db.from("explain_settings").delete().eq("model", Number(currentModel))
+      db.from("segment_settings").delete().eq("model", Number(currentModel)).eq("segment", "explain")
     ])
 
     if (wordsRes.error || settingsRes.error) {
@@ -4282,18 +4237,18 @@ async function deleteExplainSegment() {
     explainAdminCount = 4
     explainAdminDraft = {}
 
+    updateAdminQuickSettingUI("explain", explainAdminCount)
+
     showGameToast("تم حذف فقرة اشرح الكلمة")
     await renderExplainAdmin()
     await renderAdminTabsUnified()
-
   } catch (err) {
-    console.log("DELETE EXPLAIN ERROR:", err)
+    console.log("DELETE EXPLAIN CATCH:", err)
     showGameToast("حدث خطأ أثناء حذف اشرح الكلمة")
   }
 }
-
 /* =========================
-   Final - Admin كامل
+   23) Final Helpers
 ========================= */
 
 async function renderFinalAdmin() {
@@ -4301,70 +4256,78 @@ async function renderFinalAdmin() {
   await renderFinalAdminRound(1)
 }
 
+function getFinalAdminRoundTitle(round) {
+  if (round === 1) return "من بدون نقط"
+  if (round === 2) return "صح صحلي"
+  if (round === 3) return "التركيز"
+  if (round === 4) return "اشرح الصورة"
+  return "الفاصلة"
+}
+
+function getFinalRound4DbNumber(displayNumber) {
+  return 100 + Number(displayNumber || 1)
+}
+
 async function getFinalAdminDoneMap() {
   const doneMap = {
     1: false,
     2: false,
-    3: false
+    3: false,
+    4: false
   }
 
   if (!currentModel) return doneMap
 
-  const [metaRes, r1Res, r2Res, r3Res] = await Promise.all([
-    db.from("final_round_meta").select("*").eq("model", Number(currentModel)),
+  const [r1Res, r2Res, r3Res] = await Promise.all([
     db.from("final_round1_items").select("*").eq("model", Number(currentModel)),
     db.from("final_round2_items").select("*").eq("model", Number(currentModel)),
     db.from("final_round3_items").select("*").eq("model", Number(currentModel))
   ])
 
-  if (metaRes.error || r1Res.error || r2Res.error || r3Res.error) {
-    console.log(metaRes.error || r1Res.error || r2Res.error || r3Res.error)
+  if (r1Res.error || r2Res.error || r3Res.error) {
+    console.log(r1Res.error || r2Res.error || r3Res.error)
     return doneMap
   }
 
-  const metaMap = {}
-  ;(metaRes.data || []).forEach(row => {
-    metaMap[Number(row.round)] = row
-  })
-
-  /* الجولة الأولى */
-  const r1CardsCount = Number(metaMap[1]?.cards_count || 6)
-
+  /* Round 1 */
+  const r1Count = await getAdminSegmentCount("finalRound1")
+  const r1NoDotsCount = getFinalRound1NoDotsCount(r1Count)
   const r1Map = {}
+
   ;(r1Res.data || []).forEach(row => {
     r1Map[Number(row.number)] = row
   })
 
   let round1Done = true
 
-  for (let i = 1; i <= r1CardsCount; i++) {
+  for (let i = 1; i <= r1Count; i++) {
     const row = r1Map[i]
+    const isNoDotsCard = i <= r1NoDotsCount
 
     if (!row) {
       round1Done = false
       break
     }
 
-    const hasAnswer = String(row.answer || "").trim()
-    const hasImage = String(row.image || "").trim()
-    const hasCardText = String(row.card_text || "").trim()
+    const hasAnswer = hasText(row.answer)
+    const hasCardText = hasText(row.card_text)
 
     const hasQuestionPart =
-      String(row.question_part1 || "").trim() ||
-      String(row.question_part2 || "").trim() ||
-      String(row.question_part3 || "").trim()
+      hasText(row.question_part1) ||
+      hasText(row.question_part2) ||
+      hasText(row.question_part3)
 
     if (!hasAnswer) {
       round1Done = false
       break
     }
 
-    if (i <= 3 && !hasCardText && !hasImage) {
+    if (isNoDotsCard && !hasCardText) {
       round1Done = false
       break
     }
 
-    if (i >= 4 && i <= 6 && !hasQuestionPart) {
+    if (!isNoDotsCard && !hasQuestionPart) {
       round1Done = false
       break
     }
@@ -4372,8 +4335,9 @@ async function getFinalAdminDoneMap() {
 
   doneMap[1] = round1Done
 
-  /* الجولة الثانية */
+  /* Round 2 */
   const r2Map = {}
+
   ;(r2Res.data || []).forEach(row => {
     r2Map[`${Number(row.number)}_${Number(row.item_order)}`] = row
   })
@@ -4386,20 +4350,12 @@ async function getFinalAdminDoneMap() {
     for (let i = 1; i <= 6; i++) {
       const row = r2Map[`${number}_${i}`]
 
-      if (!row) {
+      if (!row || !hasText(row.prompt)) {
         round2Done = false
         break
       }
 
-      const prompt = String(row.prompt || "").trim()
-      const answer = String(row.answer || "").trim()
-
-      if (!prompt) {
-        round2Done = false
-        break
-      }
-
-      if (isScramble && !answer) {
+      if (isScramble && !hasText(row.answer)) {
         round2Done = false
         break
       }
@@ -4410,188 +4366,169 @@ async function getFinalAdminDoneMap() {
 
   doneMap[2] = round2Done
 
-  /* الجولة الثالثة */
-  const round3Mode = metaMap[3]?.round3_mode || "classic"
-
-  if (round3Mode === "team_media") {
-    const r3Map = {}
-
-    ;(r3Res.data || []).forEach(row => {
-      r3Map[Number(row.number)] = row
-    })
-
-    let round3Done = true
-
-    for (let number = 1; number <= 4; number++) {
-      const row = r3Map[number]
-
-      if (!row) {
-        round3Done = false
-        break
-      }
-
-      const image = String(row.image || "").trim()
-      const video = String(row.video || "").trim()
-      const answer = String(row.answer || "").trim()
-
-      const question = String(row.question || "").trim()
-
-if ((!image && !video) || !question || !answer) {
-  round3Done = false
-  break
-}
-    }
-
-    doneMap[3] = round3Done
-    return doneMap
-  }
-
-  const r3Map = {}
+  /* Round 3 */
+  const focusCount = await getAdminSegmentCount("finalRound3")
+  const focusMap = {}
 
   ;(r3Res.data || []).forEach(row => {
-    r3Map[`${Number(row.number)}_${Number(row.image_order)}`] = row
+    const number = Number(row.number)
+    const imageOrder = Number(row.image_order || 1)
+
+    if (number >= 1 && number <= 8 && imageOrder === 1) {
+      focusMap[number] = row
+    }
   })
 
   let round3Done = true
 
-  for (let number = 1; number <= 2; number++) {
-    for (let i = 1; i <= 5; i++) {
-      const row = r3Map[`${number}_${i}`]
+  for (let number = 1; number <= focusCount; number++) {
+    const row = focusMap[number]
 
-      if (!row) {
-        round3Done = false
-        break
-      }
-
-      const image = String(row.image || "").trim()
-      const answer = String(row.answer || "").trim()
-
-      if (!image || !answer) {
-        round3Done = false
-        break
-      }
+    if (!row) {
+      round3Done = false
+      break
     }
 
-    if (!round3Done) break
+    if (!hasText(row.image) && !hasText(row.video)) {
+      round3Done = false
+      break
+    }
+
+    if (!hasText(row.question) || !hasText(row.answer)) {
+      round3Done = false
+      break
+    }
   }
 
   doneMap[3] = round3Done
 
+  /* Round 4 */
+  const r4Map = {}
+
+  ;(r3Res.data || []).forEach(row => {
+    const number = Number(row.number)
+    const imageOrder = Number(row.image_order || 1)
+
+    if (number === 101 || number === 102) {
+      r4Map[`${number}_${imageOrder}`] = row
+    }
+  })
+
+  let round4Done = true
+
+  for (let displayNumber = 1; displayNumber <= 2; displayNumber++) {
+    const dbNumber = getFinalRound4DbNumber(displayNumber)
+
+    for (let i = 1; i <= 5; i++) {
+      const row = r4Map[`${dbNumber}_${i}`]
+
+      if (!row || !hasText(row.image) || !hasText(row.answer)) {
+        round4Done = false
+        break
+      }
+    }
+
+    if (!round4Done) break
+  }
+
+  doneMap[4] = round4Done
+
   return doneMap
 }
 
+/* =========================
+   24) Final Main Render
+========================= */
+
 async function renderFinalAdminRound(round) {
-  finalAdminRound = round
+  finalAdminRound = Number(round || 1)
 
-  const { data: metaData, error: metaError } = await db
-    .from("final_round_meta")
-    .select("*")
-    .eq("model", currentModel)
-    .eq("round", round)
-    .maybeSingle()
+  const safeRound = Math.min(Math.max(Number(round || 1), 1), 4)
+  const title = getFinalAdminRoundTitle(safeRound)
 
-  if (metaError) {
-    console.log(metaError)
-    showGameToast("تعذر تحميل بيانات الفاصلة")
-    return
-  }
+  const round1CardsCount = await getAdminSegmentCount("finalRound1")
+  const round3Count = await getAdminSegmentCount("finalRound3")
 
-  const doneMap = await getFinalAdminDoneMap()
-  const round1CardsCount = Number(metaData?.cards_count || 6)
-  const round3Mode = metaData?.round3_mode || "classic"
-
-  const round1CountBox = round === 1
+  const countBox = safeRound === 1
     ? `
       <div class="finalTopCompactBox finalTopCompactCountBox">
         <div class="adminField compactCountField">
+          <label>عدد الأرقام</label>
+
           <div class="compactCountSelectWrap">
-            <select id="finalRound1CardsCount" class="compactCountSelect">
-              <option value="4" ${round1CardsCount === 4 ? "selected" : ""}>4</option>
+            <select
+              id="finalRound1CardsCount"
+              class="compactCountSelect"
+              onchange="changeFinalRound1CardsCount()"
+            >
               <option value="6" ${round1CardsCount === 6 ? "selected" : ""}>6</option>
+              <option value="8" ${round1CardsCount === 8 ? "selected" : ""}>8</option>
             </select>
           </div>
         </div>
       </div>
     `
-    : ""
+    : safeRound === 3
+      ? `
+        <div class="finalTopCompactBox finalTopCompactCountBox">
+          <div class="adminField compactCountField">
+            <label>عدد الأرقام</label>
 
-  const round3ModeBox = round === 3
-    ? `
-      <div class="finalTopCompactBox finalTopCompactCountBox">
-        <div class="adminField compactCountField">
-          <div class="compactCountSelectWrap">
-            <select id="finalRound3Mode" class="compactCountSelect" onchange="handleFinalRound3ModeChange()">
-              <option value="classic" ${round3Mode === "classic" ? "selected" : ""}>
-                اشرح الصورة
-              </option>
-              <option value="team_media" ${round3Mode === "team_media" ? "selected" : ""}>
-                التركيز
-              </option>
-            </select>
+            <div class="compactCountSelectWrap">
+              <select
+                id="finalRound3Count"
+                class="compactCountSelect"
+                onchange="changeFinalRound3Count()"
+              >
+                <option value="4" ${round3Count === 4 ? "selected" : ""}>4</option>
+                <option value="6" ${round3Count === 6 ? "selected" : ""}>6</option>
+                <option value="8" ${round3Count === 8 ? "selected" : ""}>8</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
-    `
-    : ""
+      `
+      : ""
 
   let html = `
     <div class="finalAdminShell cleanFinalAdminShell">
       <div class="adminEditorTopBar compactAdminEditorTopBar">
         <div>
-          <h2 class="adminSectionTitle">الفاصلة</h2>
+          <h2 class="adminSectionTitle">${escapeHtml(title)}</h2>
         </div>
       </div>
 
       ${await buildSegmentStatusGrid()}
 
-      <div class="finalTopCompactRow">
-        <div class="finalTopCompactBox finalTopCompactTitleBox">
-          <div class="adminField">
-            <input
-              id="finalRoundTitle"
-              value="${escapeHtml(metaData?.title || `الجولة ${round}`)}"
-              placeholder="اسم الجولة"
-            >
-          </div>
-        </div>
-
-        <div class="finalTopCompactBox finalTopCompactTabsBox">
-          <div class="finalAdminRoundsBar cleanRoundsBar">
-            ${[1, 2, 3].map(num => {
-              const complete = !!doneMap[num]
-
-              return `
-                <button
-                  type="button"
-                  class="
-                    ${round === num ? "activeFinalAdminRound" : ""}
-                    ${complete ? "innerTabDone finalRoundDone" : ""}
-                    ${round === num && complete ? "finalRoundActiveDone" : ""}
-                  "
-                  onclick="renderFinalAdminRound(${num})"
-                >
-                  الجولة ${num}
-                </button>
-              `
-            }).join("")}
-          </div>
-        </div>
-
-        ${round1CountBox}
-        ${round3ModeBox}
-      </div>
+      ${
+        countBox
+          ? `
+            <div class="finalTopCompactRow finalSingleSettingRow">
+              ${countBox}
+            </div>
+          `
+          : ""
+      }
   `
 
-  if (round === 1) html += await buildFinalRound1Admin(metaData, true)
-  if (round === 2) html += await buildFinalRound2Admin()
-  if (round === 3) html += await buildFinalRound3Admin(round3Mode)
+  if (safeRound === 1) html += await buildFinalRound1Admin()
+  if (safeRound === 2) html += await buildFinalRound2Admin()
+  if (safeRound === 3) html += await buildFinalRound3FocusAdmin()
+  if (safeRound === 4) html += await buildFinalRound4ImageAdmin()
 
   html += `
       <div class="finalAdminActions">
-        <button onclick="saveFinalRound(${round})" class="adminSaveBtn">حفظ الجولة</button>
-        <button onclick="deleteFinalRound(${round})" class="adminDeleteBtn">حذف هذه الجولة</button>
-        <button onclick="deleteFinalSegment()" class="adminDeleteAllBtn">حذف الفقرة كاملة</button>
-        <button onclick="renderFinalAdminRound(${round})" class="adminReloadBtn">إعادة تحميل</button>
+        <button onclick="saveFinalRound(${safeRound})" class="adminSaveBtn">
+          حفظ ${escapeHtml(title)}
+        </button>
+
+        <button onclick="deleteFinalRound(${safeRound})" class="adminDeleteBtn">
+          حذف هذه الفقرة
+        </button>
+
+        <button onclick="renderFinalAdminRound(${safeRound})" class="adminReloadBtn">
+          إعادة تحميل
+        </button>
       </div>
     </div>
   `
@@ -4600,21 +4537,26 @@ async function renderFinalAdminRound(round) {
   arrangeAdminInnerTabs()
 }
 
-async function handleFinalRound3ModeChange() {
-  const select = document.getElementById("finalRound3Mode")
-  const mode = select?.value || "classic"
+async function changeFinalRound1CardsCount() {
+  const count = Number(document.getElementById("finalRound1CardsCount")?.value || 6)
+  finalRound1AdminCount = normalizeAdminSegmentCount("finalRound1", count)
 
-  const area = editor()
-  if (!area) return
+  await saveAdminSegmentCount("finalRound1", finalRound1AdminCount)
+  updateAdminQuickSettingUI("finalRound1", finalRound1AdminCount)
 
-  const oldWrap =
-    area.querySelector(".finalAdminRound3Wrap") ||
-    area.querySelector(".finalAdminRound3TeamMediaWrap")
+  await renderFinalAdminRound(1)
+  await renderAdminTabsUnified()
+}
 
-  if (!oldWrap) return
+async function changeFinalRound3Count() {
+  const count = Number(document.getElementById("finalRound3Count")?.value || 4)
+  finalRound3AdminCount = normalizeAdminSegmentCount("finalRound3", count)
 
-  const newHtml = await buildFinalRound3Admin(mode)
-  oldWrap.outerHTML = newHtml
+  await saveAdminSegmentCount("finalRound3", finalRound3AdminCount)
+  updateAdminQuickSettingUI("finalRound3", finalRound3AdminCount)
+
+  await renderFinalAdminRound(3)
+  await renderAdminTabsUnified()
 }
 
 async function saveFinalRound(round) {
@@ -4626,66 +4568,42 @@ async function saveFinalRound(round) {
   }
 
   try {
-    setAdminSaving(true, `جارٍ حفظ الجولة ${round}...`)
+    const safeRound = Number(round || 1)
+    const title = getFinalAdminRoundTitle(safeRound)
 
-    const title =
-      (document.getElementById("finalRoundTitle")?.value || "").trim() ||
-      `الجولة ${round}`
+    setAdminSaving(true, `جارٍ حفظ ${title}...`)
 
-    let cardsCount = null
-
-    if (round === 1) {
-      cardsCount = Number(
-        document.getElementById("finalRound1CardsCount")?.value || 6
-      )
-    }
-
-    const round3Mode =
-      round === 3
-        ? (document.getElementById("finalRound3Mode")?.value || "classic")
-        : null
-
-    const metaPayload = {
-      model: Number(currentModel),
-      round: Number(round),
-      title,
-      cards_count: cardsCount
-    }
-
-    if (round === 3) {
-      metaPayload.round3_mode = round3Mode
-    }
-
-    const { error: insertMetaError } = await db
+    await db
       .from("final_round_meta")
       .upsert(
-        [metaPayload],
+        [{
+          model: Number(currentModel),
+          round: Number(safeRound),
+          title,
+          cards_count: null,
+          round3_mode: safeRound === 3 ? "team_media" : null
+        }],
         {
           onConflict: "model,round"
         }
       )
 
-    if (insertMetaError) {
-      console.log(insertMetaError)
-      showGameToast("تعذر حفظ اسم الجولة")
-      return false
-    }
-
     let saved = false
 
-    if (round === 1) saved = await saveFinalRound1(cardsCount, true)
-    if (round === 2) saved = await saveFinalRound2(true)
-    if (round === 3) saved = await saveFinalRound3(round3Mode, true)
+    if (safeRound === 1) saved = await saveFinalRound1(true)
+    if (safeRound === 2) saved = await saveFinalRound2(true)
+    if (safeRound === 3) saved = await saveFinalRound3Focus(true)
+    if (safeRound === 4) saved = await saveFinalRound4Image(true)
 
     if (!saved) return false
 
-    showGameToast(`تم حفظ الجولة ${round}`)
-    await renderFinalAdminRound(round)
+    showGameToast(`تم حفظ ${title}`)
+    await renderFinalAdminRound(safeRound)
+    await renderAdminTabsUnified()
     return true
-
   } catch (err) {
     console.log("SAVE FINAL ROUND ERROR:", err)
-    showGameToast("توقف حفظ الجولة بسبب خطأ")
+    showGameToast("توقف حفظ الفقرة بسبب خطأ")
     return false
   } finally {
     setAdminSaving(false)
@@ -4693,63 +4611,100 @@ async function saveFinalRound(round) {
 }
 
 /* =========================
-   Round 1 Admin
+   25) Final Round 1 - من بدون نقط
 ========================= */
 
-async function buildFinalRound1Admin(metaData, countAlreadyShown = false) {
+async function buildFinalRound1Admin() {
   const { data, error } = await db
     .from("final_round1_items")
     .select("*")
-    .eq("model", currentModel)
+    .eq("model", Number(currentModel))
     .order("number", { ascending: true })
 
   if (error) {
-    console.log(error)
-    return `<div class="adminCard">تعذر تحميل الجولة الأولى</div>`
+    console.log("LOAD FINAL ROUND 1 ERROR:", error)
+    return `<div class="adminCard">تعذر تحميل من بدون نقط</div>`
   }
 
   const map = {}
+
   ;(data || []).forEach(row => {
-    map[row.number] = row
+    map[Number(row.number)] = row
   })
 
-  const cardsCount = Number(metaData?.cards_count || 6)
+  const cardsCount = await getAdminSegmentCount("finalRound1")
+  const noDotsCount = getFinalRound1NoDotsCount(cardsCount)
 
   let html = `
-    ${countAlreadyShown ? "" : `
-      <div class="finalAdminHeadOptions">
-        <div class="finalAdminTitleCard finalAdminSubCard">
-          <div class="adminField">
-            <label>عدد الأرقام</label>
-            <select id="finalRound1CardsCount">
-              <option value="4" ${cardsCount === 4 ? "selected" : ""}>4</option>
-              <option value="6" ${cardsCount === 6 ? "selected" : ""}>6</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    `}
-
-    <div class="finalAdminGrid finalAdminGridRound1">
+    <div class="finalRound1NoImageGrid">
   `
 
-  for (let i = 1; i <= 6; i++) {
-    const dimmed = i > cardsCount ? 'style="opacity:.38;"' : ''
-    const isTextCard = i <= 3
-    const isQuestionCard = i >= 4 && i <= 6
+  for (let i = 1; i <= 8; i++) {
+    const disabled = i > cardsCount
+    const dimmed = disabled ? 'style="opacity:.38;"' : ""
+
+    const isNoDotsCard = i <= noDotsCount
 
     html += `
-      <div class="finalAdminCard finalRound1AdminCard" ${dimmed}>
+      <div class="finalAdminCard finalRound1NoImageCard" ${dimmed}>
         <div class="finalAdminCardHead">
           <h3>رقم ${i}</h3>
-          <button class="adminDeleteBtn" onclick="clearFinalRound1Item(${i})">حذف</button>
+
+          <div class="finalAdminCardHeadActions">
+            <div class="finalAdminTypeBadge">
+              ${isNoDotsCard ? "بدون نقط" : "أجزاء السؤال"}
+            </div>
+
+            <button class="adminDeleteBtn" onclick="clearFinalRound1Item(${i})">
+              حذف
+            </button>
+          </div>
         </div>
 
-        <div class="finalAdminRowSingle finalAdminRound1Fields">
-          <div class="adminField">
-            <label>الصورة</label>
-            <input type="file" id="finalRound1File_${i}" accept="image/*">
-          </div>
+        <div class="finalRound1NoImageFields">
+          ${
+            isNoDotsCard
+              ? `
+                <div class="adminField">
+                  <label>السؤال بدون نقط</label>
+                  <textarea
+                    id="finalRound1CardText_${i}"
+                    placeholder="اكتب السؤال بدون نقط"
+                    ${disabled ? "disabled" : ""}
+                  >${escapeHtml(map[i]?.card_text || "")}</textarea>
+                </div>
+              `
+              : `
+                <div class="finalRound1PartsGrid">
+                  <div class="adminField">
+                    <label>جزء السؤال 1</label>
+                    <textarea
+                      id="finalRound1QuestionPart1_${i}"
+                      placeholder="الجزء الأول"
+                      ${disabled ? "disabled" : ""}
+                    >${escapeHtml(map[i]?.question_part1 || "")}</textarea>
+                  </div>
+
+                  <div class="adminField">
+                    <label>جزء السؤال 2</label>
+                    <textarea
+                      id="finalRound1QuestionPart2_${i}"
+                      placeholder="الجزء الثاني"
+                      ${disabled ? "disabled" : ""}
+                    >${escapeHtml(map[i]?.question_part2 || "")}</textarea>
+                  </div>
+
+                  <div class="adminField">
+                    <label>جزء السؤال 3</label>
+                    <textarea
+                      id="finalRound1QuestionPart3_${i}"
+                      placeholder="الجزء الثالث"
+                      ${disabled ? "disabled" : ""}
+                    >${escapeHtml(map[i]?.question_part3 || "")}</textarea>
+                  </div>
+                </div>
+              `
+          }
 
           <div class="adminField">
             <label>الإجابة</label>
@@ -4757,66 +4712,9 @@ async function buildFinalRound1Admin(metaData, countAlreadyShown = false) {
               id="finalRound1Answer_${i}"
               placeholder="الإجابة"
               value="${escapeHtml(map[i]?.answer || "")}"
+              ${disabled ? "disabled" : ""}
             >
           </div>
-
-          
-        </div>
-
-        ${
-          isTextCard ? `
-            <div class="finalAdminRowSingle finalAdminRowSingleText">
-              <div class="adminField finalTextCardField">
-                <label>نص القصاصة</label>
-                <textarea
-                  id="finalRound1CardText_${i}"
-                  placeholder="اكتب النص الذي سيظهر في القصاصة التاريخية"
-                  rows="4"
-                >${escapeHtml(map[i]?.card_text || "")}</textarea>
-              </div>
-            </div>
-          ` : ""
-        }
-
-        ${
-          isQuestionCard ? `
-            <div class="finalAdminRowSingle finalAdminRowSingleText">
-              <div class="adminField finalTextCardField">
-                <label>جزء السؤال 1</label>
-                <textarea
-                  id="finalRound1QuestionPart1_${i}"
-                  placeholder="اكتب الجزء الأول"
-                  rows="2"
-                >${escapeHtml(map[i]?.question_part1 || "")}</textarea>
-              </div>
-            </div>
-
-            <div class="finalAdminRowSingle finalAdminRowSingleText">
-              <div class="adminField finalTextCardField">
-                <label>جزء السؤال 2</label>
-                <textarea
-                  id="finalRound1QuestionPart2_${i}"
-                  placeholder="اكتب الجزء الثاني"
-                  rows="2"
-                >${escapeHtml(map[i]?.question_part2 || "")}</textarea>
-              </div>
-            </div>
-
-            <div class="finalAdminRowSingle finalAdminRowSingleText">
-              <div class="adminField finalTextCardField">
-                <label>جزء السؤال 3</label>
-                <textarea
-                  id="finalRound1QuestionPart3_${i}"
-                  placeholder="اكتب الجزء الثالث"
-                  rows="2"
-                >${escapeHtml(map[i]?.question_part3 || "")}</textarea>
-              </div>
-            </div>
-          ` : ""
-        }
-
-        <div class="finalAdminPreviewBox">
-          ${map[i]?.image ? `<img src="${escapeHtml(map[i].image)}" class="previewImg">` : ""}
         </div>
       </div>
     `
@@ -4826,7 +4724,7 @@ async function buildFinalRound1Admin(metaData, countAlreadyShown = false) {
   return html
 }
 
-async function saveFinalRound1(cardsCount, skipSavingLock = false) {
+async function saveFinalRound1(skipSavingLock = false) {
   if (!skipSavingLock && isAdminSaving()) return false
 
   if (!currentModel) {
@@ -4836,71 +4734,49 @@ async function saveFinalRound1(cardsCount, skipSavingLock = false) {
 
   try {
     if (!skipSavingLock) {
-      setAdminSaving(true, "جارٍ حفظ الجولة الأولى...")
+      setAdminSaving(true, "جارٍ حفظ من بدون نقط...")
     }
 
-    showGameToast("جارٍ حفظ الجولة الأولى...")
-
-    const finalCardsCount = Number(
-      cardsCount || document.getElementById("finalRound1CardsCount")?.value || 6
+    const selectedCount = Number(
+      document.getElementById("finalRound1CardsCount")?.value ||
+      finalRound1AdminCount ||
+      6
     )
 
-    const safeCardsCount = finalCardsCount === 4 ? 4 : 6
+    const safeCardsCount = normalizeAdminSegmentCount("finalRound1", selectedCount)
+    const textCardsCount = getFinalRound1NoDotsCount(safeCardsCount)
 
-    const { data: oldRows, error: oldError } = await db
-      .from("final_round1_items")
-      .select("*")
-      .eq("model", Number(currentModel))
+    finalRound1AdminCount = safeCardsCount
 
-    if (oldError) {
-      console.log(oldError)
-      showGameToast("تعذر قراءة بيانات الجولة الأولى القديمة")
-      return false
-    }
-
-    const oldMap = {}
-    ;(oldRows || []).forEach(row => {
-      oldMap[row.number] = row
-    })
+    await saveAdminSegmentCount("finalRound1", safeCardsCount)
+    updateAdminQuickSettingUI("finalRound1", safeCardsCount)
 
     const rows = []
 
     for (let i = 1; i <= safeCardsCount; i++) {
-      const file = document.getElementById(`finalRound1File_${i}`)?.files?.[0]
-      const answer = (document.getElementById(`finalRound1Answer_${i}`)?.value || "").trim()
-      const note = ""
+      const isNoDotsCard = i <= textCardsCount
 
-      const cardText = i <= 3
+      const answer =
+        (document.getElementById(`finalRound1Answer_${i}`)?.value || "").trim()
+
+      const cardText = isNoDotsCard
         ? (document.getElementById(`finalRound1CardText_${i}`)?.value || "").trim()
         : ""
 
-      const questionPart1 = i >= 4 && i <= 6
+      const questionPart1 = !isNoDotsCard
         ? (document.getElementById(`finalRound1QuestionPart1_${i}`)?.value || "").trim()
         : ""
 
-      const questionPart2 = i >= 4 && i <= 6
+      const questionPart2 = !isNoDotsCard
         ? (document.getElementById(`finalRound1QuestionPart2_${i}`)?.value || "").trim()
         : ""
 
-      const questionPart3 = i >= 4 && i <= 6
+      const questionPart3 = !isNoDotsCard
         ? (document.getElementById(`finalRound1QuestionPart3_${i}`)?.value || "").trim()
         : ""
 
-      let image = oldMap[i]?.image || ""
-
-      if (file) {
-        image = await uploadImageFile(file, `final_r1_${i}`)
-
-        if (!image) {
-          showGameToast(`تعذر رفع صورة رقم ${i}`)
-          return false
-        }
-      }
-
       if (
-        !image &&
         !answer &&
-        !note &&
         !cardText &&
         !questionPart1 &&
         !questionPart2 &&
@@ -4912,38 +4788,14 @@ async function saveFinalRound1(cardsCount, skipSavingLock = false) {
       rows.push({
         model: Number(currentModel),
         number: Number(i),
-        image,
+        image: "",
         answer,
-        note,
+        note: "",
         card_text: cardText,
         question_part1: questionPart1,
         question_part2: questionPart2,
         question_part3: questionPart3
       })
-    }
-
-    
-
-    if (!rows.length) {
-      const ok = confirm("الجولة الأولى فارغة، هل تريد حذف بياناتها؟")
-      if (!ok) {
-        showGameToast("تم إلغاء الحفظ")
-        return false
-      }
-
-      const { error: clearError } = await db
-        .from("final_round1_items")
-        .delete()
-        .eq("model", Number(currentModel))
-
-      if (clearError) {
-        console.log(clearError)
-        showGameToast("تعذر تفريغ الجولة الأولى")
-        return false
-      }
-
-      showGameToast("تم تفريغ الجولة الأولى")
-      return true
     }
 
     const keepNumbers = rows.map(row => Number(row.number))
@@ -4954,8 +4806,8 @@ async function saveFinalRound1(cardsCount, skipSavingLock = false) {
       .eq("model", Number(currentModel))
 
     if (existingError) {
-      console.log(existingError)
-      showGameToast("تعذر قراءة عناصر الجولة الأولى الحالية")
+      console.log("READ FINAL ROUND 1 EXISTING ERROR:", existingError)
+      showGameToast("تعذر قراءة عناصر من بدون نقط الحالية")
       return false
     }
 
@@ -4970,131 +4822,141 @@ async function saveFinalRound1(cardsCount, skipSavingLock = false) {
           .eq("number", oldNumber)
 
         if (deleteError) {
-          console.log(deleteError)
-          showGameToast("تعذر تنظيف عناصر الجولة الأولى")
+          console.log("DELETE FINAL ROUND 1 OLD ERROR:", deleteError)
+          showGameToast("تعذر تنظيف عناصر من بدون نقط")
           return false
         }
       }
     }
 
-    const { error: saveError } = await db
-      .from("final_round1_items")
-      .upsert(rows, {
-        onConflict: "model,number"
-      })
+    if (rows.length) {
+      const { error: saveError } = await db
+        .from("final_round1_items")
+        .upsert(rows, {
+          onConflict: "model,number"
+        })
 
-    if (saveError) {
-      console.log(saveError)
-      showGameToast("فشل حفظ الجولة الأولى")
-      return false
+      if (saveError) {
+        console.log("SAVE FINAL ROUND 1 ERROR:", saveError)
+        showGameToast("فشل حفظ من بدون نقط")
+        return false
+      }
     }
 
-    showGameToast("تم حفظ الجولة الأولى")
+    showGameToast(rows.length ? "تم حفظ من بدون نقط" : "تم حذف بيانات من بدون نقط")
     return true
-
-    } catch (err) {
-    console.log("SAVE FINAL ROUND 1 ERROR:", err)
-    showGameToast("توقف الحفظ بسبب خطأ في الرفع أو البيانات")
+  } catch (err) {
+    console.log("SAVE FINAL ROUND 1 CATCH:", err)
+    showGameToast("توقف حفظ من بدون نقط بسبب خطأ")
     return false
   } finally {
-    if (!skipSavingLock) {
-      setAdminSaving(false)
-    }
+    if (!skipSavingLock) setAdminSaving(false)
   }
 }
 
 /* =========================
-   Round 2 Admin
+   26) Final Round 2 - صح صحلي
 ========================= */
 
 async function buildFinalRound2Admin() {
   const { data, error } = await db
     .from("final_round2_items")
     .select("*")
-    .eq("model", currentModel)
+    .eq("model", Number(currentModel))
     .order("number", { ascending: true })
     .order("item_order", { ascending: true })
 
   if (error) {
-    console.log(error)
-    return `<div class="adminCard">تعذر تحميل الجولة الثانية</div>`
+    console.log("LOAD FINAL ROUND 2 ERROR:", error)
+    return `<div class="adminCard">تعذر تحميل صح صحلي</div>`
   }
 
   const grouped = { 1: [], 2: [], 3: [], 4: [] }
+
   ;(data || []).forEach(row => {
-    grouped[row.number].push(row)
+    const n = Number(row.number || 1)
+    if (!grouped[n]) grouped[n] = []
+    grouped[n].push(row)
   })
 
-  let html = `<div class="finalAdminRound2Wrap finalAdminRound2SingleColumn">`
+  let html = `<div class="finalRound2CleanWrap">`
 
   for (let number = 1; number <= 4; number++) {
     const isScramble = number === 1 || number === 3
     const rows = grouped[number] || []
 
     html += `
-      <div class="finalAdminCard finalAdminWideCard">
+      <div class="finalAdminCard finalRound2CleanCard">
         <div class="finalAdminCardHead">
           <h3>رقم ${number}</h3>
 
           <div class="finalAdminCardHeadActions">
-            <div class="finalAdminTypeBadge">${isScramble ? "كلمات مبعثرة" : "ترتيب / تسلسل"}</div>
-            <button class="adminDeleteBtn" onclick="clearFinalRound2Item(${number})">حذف</button>
+            <div class="finalAdminTypeBadge">
+              ${isScramble ? "كلمات مبعثرة" : "ترتيب / تسلسل"}
+            </div>
+
+            <button class="adminDeleteBtn" onclick="clearFinalRound2Item(${number})">
+              حذف
+            </button>
           </div>
         </div>
-
-        <div class="finalAdminRound2RowsWrap">
     `
 
-    for (let i = 1; i <= 6; i++) {
-      const row = rows.find(x => Number(x.item_order) === i) || {}
+    if (isScramble) {
+      html += `<div class="finalRound2ItemsGrid">`
 
-      if (isScramble) {
+      for (let i = 1; i <= 6; i++) {
+        const row = rows.find(x => Number(x.item_order) === i) || {}
+
         html += `
-          <div class="finalAdminWordRow finalAdminWordRowInline finalAdminRound2Inline">
-            <div class="finalAdminWordIndex">العنصر ${i}</div>
+          <div class="finalRound2ScrambleRow">
+            <div class="finalRound2Index">${i}</div>
 
-            <div class="finalAdminWordFields finalAdminWordFields3 finalAdminWordFieldsInline3">
-              <input
-                id="finalRound2Prompt_${number}_${i}"
-                placeholder="الكلمة الأساسية"
-                value="${escapeHtml(row.prompt || "")}"
-              >
+            <input
+              id="finalRound2Prompt_${number}_${i}"
+              placeholder="الكلمة"
+              value="${escapeHtml(row.prompt || "")}"
+            >
 
-              <input
-                id="finalRound2Hint_${number}_${i}"
-                placeholder="التلميحة"
-                value="${escapeHtml(row.hint || "")}"
-              >
+            <input
+              id="finalRound2Hint_${number}_${i}"
+              placeholder="التلميحة"
+              value="${escapeHtml(row.hint || "")}"
+            >
 
-              <input
-                id="finalRound2Answer_${number}_${i}"
-                placeholder="الإجابة الصحيحة"
-                value="${escapeHtml(row.answer || "")}"
-              >
-            </div>
-          </div>
-        `
-      } else {
-        html += `
-          <div class="finalAdminWordRow finalAdminWordRowInline finalAdminRound2Inline">
-            <div class="finalAdminWordIndex">العنصر ${i}</div>
-
-            <div class="finalAdminWordFields finalAdminWordFields1 finalAdminWordFieldsInline1">
-              <input
-                id="finalRound2Prompt_${number}_${i}"
-                placeholder="الكلمة / الترتيب"
-                value="${escapeHtml(row.prompt || "")}"
-              >
-            </div>
+            <input
+              id="finalRound2Answer_${number}_${i}"
+              placeholder="الإجابة"
+              value="${escapeHtml(row.answer || "")}"
+            >
           </div>
         `
       }
+
+      html += `</div>`
+    } else {
+      html += `<div class="finalRound2SequenceGrid">`
+
+      for (let i = 1; i <= 6; i++) {
+        const row = rows.find(x => Number(x.item_order) === i) || {}
+
+        html += `
+          <div class="finalRound2SequenceItem">
+            <div class="finalRound2Index">${i}</div>
+
+            <input
+              id="finalRound2Prompt_${number}_${i}"
+              placeholder="النص / الترتيب"
+              value="${escapeHtml(row.prompt || "")}"
+            >
+          </div>
+        `
+      }
+
+      html += `</div>`
     }
 
-    html += `
-        </div>
-      </div>
-    `
+    html += `</div>`
   }
 
   html += `</div>`
@@ -5110,11 +4972,7 @@ async function saveFinalRound2(skipSavingLock = false) {
   }
 
   try {
-    if (!skipSavingLock) {
-      setAdminSaving(true, "جارٍ حفظ الجولة الثانية...")
-    }
-
-    showGameToast("جارٍ حفظ الجولة الثانية...")
+    if (!skipSavingLock) setAdminSaving(true, "جارٍ حفظ صح صحلي...")
 
     const rows = []
 
@@ -5122,7 +4980,8 @@ async function saveFinalRound2(skipSavingLock = false) {
       const gameType = number === 1 || number === 3 ? "scramble" : "sequence"
 
       for (let i = 1; i <= 6; i++) {
-        const prompt = (document.getElementById(`finalRound2Prompt_${number}_${i}`)?.value || "").trim()
+        const prompt =
+          (document.getElementById(`finalRound2Prompt_${number}_${i}`)?.value || "").trim()
 
         const hint = gameType === "scramble"
           ? (document.getElementById(`finalRound2Hint_${number}_${i}`)?.value || "").trim()
@@ -5147,29 +5006,6 @@ async function saveFinalRound2(skipSavingLock = false) {
       }
     }
 
-   
-    if (!rows.length) {
-      const ok = confirm("الجولة الثانية فارغة، هل تريد حذف بياناتها؟")
-      if (!ok) {
-        showGameToast("تم إلغاء الحفظ")
-        return false
-      }
-
-      const { error: clearError } = await db
-        .from("final_round2_items")
-        .delete()
-        .eq("model", Number(currentModel))
-
-      if (clearError) {
-        console.log(clearError)
-        showGameToast("تعذر تفريغ الجولة الثانية")
-        return false
-      }
-
-      showGameToast("تم تفريغ الجولة الثانية")
-      return true
-    }
-
     const keepKeys = rows.map(row => `${Number(row.number)}_${Number(row.item_order)}`)
 
     const { data: existingRows, error: existingError } = await db
@@ -5178,8 +5014,8 @@ async function saveFinalRound2(skipSavingLock = false) {
       .eq("model", Number(currentModel))
 
     if (existingError) {
-      console.log(existingError)
-      showGameToast("تعذر قراءة الجولة الثانية الحالية")
+      console.log("READ FINAL ROUND 2 EXISTING ERROR:", existingError)
+      showGameToast("تعذر قراءة صح صحلي الحالية")
       return false
     }
 
@@ -5195,163 +5031,105 @@ async function saveFinalRound2(skipSavingLock = false) {
           .eq("item_order", Number(oldRow.item_order))
 
         if (deleteError) {
-          console.log(deleteError)
-          showGameToast("تعذر تنظيف عناصر الجولة الثانية")
+          console.log("DELETE FINAL ROUND 2 OLD ERROR:", deleteError)
+          showGameToast("تعذر تنظيف عناصر صح صحلي")
           return false
         }
       }
     }
 
-    const { error: saveError } = await db
-      .from("final_round2_items")
-      .upsert(rows, {
-        onConflict: "model,number,item_order"
-      })
+    if (rows.length) {
+      const { error: saveError } = await db
+        .from("final_round2_items")
+        .upsert(rows, {
+          onConflict: "model,number,item_order"
+        })
 
-    if (saveError) {
-      console.log(saveError)
-      showGameToast("فشل حفظ الجولة الثانية")
-      return false
+      if (saveError) {
+        console.log("SAVE FINAL ROUND 2 ERROR:", saveError)
+        showGameToast("فشل حفظ صح صحلي")
+        return false
+      }
     }
 
-    showGameToast("تم حفظ الجولة الثانية")
+    showGameToast(rows.length ? "تم حفظ صح صحلي" : "تم حذف بيانات صح صحلي")
     return true
-
-    } catch (err) {
-    console.log("SAVE FINAL ROUND 2 ERROR:", err)
-    showGameToast("توقف حفظ الجولة الثانية بسبب خطأ")
+  } catch (err) {
+    console.log("SAVE FINAL ROUND 2 CATCH:", err)
+    showGameToast("توقف حفظ صح صحلي بسبب خطأ")
     return false
   } finally {
-    if (!skipSavingLock) {
-      setAdminSaving(false)
-    }
+    if (!skipSavingLock) setAdminSaving(false)
   }
 }
 /* =========================
-   Round 3 Admin
+   27) Final Round 3 - التركيز
 ========================= */
 
-async function buildFinalRound3Admin(mode = "classic") {
+async function buildFinalRound3FocusAdmin() {
+  const count = await getAdminSegmentCount("finalRound3")
+
   const { data, error } = await db
     .from("final_round3_items")
     .select("*")
     .eq("model", Number(currentModel))
     .order("number", { ascending: true })
-    .order("image_order", { ascending: true })
 
   if (error) {
-    console.log(error)
-    return `<div class="adminCard">تعذر تحميل الجولة الثالثة</div>`
+    console.log("LOAD FINAL ROUND 3 ERROR:", error)
+    return `<div class="adminCard">تعذر تحميل التركيز</div>`
   }
 
-  if (mode === "team_media") {
-    return buildFinalRound3TeamMediaAdmin(data || [])
-  }
-
-  return buildFinalRound3ClassicAdmin(data || [])
-}
-
-/* =========================
-   Round 3 Classic Admin
-========================= */
-
-function buildFinalRound3ClassicAdmin(data = []) {
-  const grouped = { 1: [], 2: [] }
-
-  ;(data || []).forEach(row => {
-    const number = Number(row.number || 1)
-    if (!grouped[number]) grouped[number] = []
-    grouped[number].push(row)
-  })
-
-  let html = `<div class="finalAdminRound3Wrap">`
-
-  for (let number = 1; number <= 2; number++) {
-    const rows = grouped[number] || []
-
-    html += `
-      <div class="finalAdminCard finalAdminWideCard">
-        <div class="finalAdminCardHead">
-          <h3>رقم ${number}</h3>
-          <button class="adminDeleteBtn" onclick="clearFinalRound3Item(${number})">حذف</button>
-        </div>
-    `
-
-    for (let i = 1; i <= 5; i++) {
-      const row = rows.find(x => Number(x.image_order) === i) || {}
-
-      html += `
-        <div class="finalAdminImageRow">
-          <div class="finalAdminWordIndex">الصورة ${i}</div>
-
-          <div class="finalAdminImageFields">
-            <input type="file" id="finalRound3File_${number}_${i}" accept="image/*">
-
-            <input
-              id="finalRound3Answer_${number}_${i}"
-              placeholder="الإجابة"
-              value="${escapeHtml(row.answer || "")}"
-            >
-          </div>
-
-          <div class="finalAdminImagePreview">
-            ${row.image ? `<img src="${escapeHtml(row.image)}" class="previewImg">` : ""}
-          </div>
-        </div>
-      `
-    }
-
-    html += `</div>`
-  }
-
-  html += `</div>`
-  return html
-}
-
-/* =========================
-   Round 3 Team Media Admin
-========================= */
-
-function buildFinalRound3TeamMediaAdmin(data = []) {
   const map = {}
 
   ;(data || []).forEach(row => {
-    map[Number(row.number)] = row
+    const number = Number(row.number)
+    const imageOrder = Number(row.image_order || 1)
+
+    if (number >= 1 && number <= 8 && imageOrder === 1) {
+      map[number] = row
+    }
   })
 
   let html = `
     <div class="finalAdminRound3TeamMediaWrap">
-      <div class="adminCard finalRound3ModeNote">
-        <div class="adminCleanSectionText">
-          <h3>الجولة الثالثة الجديدة</h3>
-          <p>4 أرقام، كل فريق له رقمين. لكل رقم صورة أو فيديو + سؤال + إجابة.</p>
-        </div>
-      </div>
-
       <div class="finalAdminGrid finalAdminGridRound1">
   `
 
-  for (let number = 1; number <= 4; number++) {
+  for (let number = 1; number <= 8; number++) {
     const row = map[number] || {}
-    const teamName = number <= 2 ? "الفريق الأول" : "الفريق الثاني"
+    const disabled = number > count
+    const dimmed = disabled ? 'style="opacity:.38;"' : ""
 
     html += `
-      <div class="finalAdminCard finalRound1AdminCard">
+      <div class="finalAdminCard finalRound1AdminCard" ${dimmed}>
         <div class="finalAdminCardHead">
           <h3>رقم ${number}</h3>
-          <div class="finalAdminTypeBadge">${teamName}</div>
-          <button class="adminDeleteBtn" onclick="clearFinalRound3Item(${number})">حذف</button>
+
+          <button class="adminDeleteBtn" onclick="clearFinalRound3Item(${number})">
+            حذف
+          </button>
         </div>
 
         <div class="finalAdminRowSingle finalAdminRound1Fields">
           <div class="adminField">
             <label>الصورة</label>
-            <input type="file" id="finalRound3TeamImage_${number}" accept="image/*">
+            <input
+              type="file"
+              id="finalRound3TeamImage_${number}"
+              accept="image/*"
+              ${disabled ? "disabled" : ""}
+            >
           </div>
 
           <div class="adminField">
             <label>الفيديو</label>
-            <input type="file" id="finalRound3TeamVideo_${number}" accept="video/*">
+            <input
+              type="file"
+              id="finalRound3TeamVideo_${number}"
+              accept="video/*"
+              ${disabled ? "disabled" : ""}
+            >
           </div>
 
           <div class="adminField">
@@ -5360,6 +5138,7 @@ function buildFinalRound3TeamMediaAdmin(data = []) {
               id="finalRound3TeamAnswer_${number}"
               placeholder="الإجابة"
               value="${escapeHtml(row.answer || "")}"
+              ${disabled ? "disabled" : ""}
             >
           </div>
         </div>
@@ -5369,8 +5148,9 @@ function buildFinalRound3TeamMediaAdmin(data = []) {
             <label>السؤال</label>
             <textarea
               id="finalRound3TeamQuestion_${number}"
-              placeholder="اكتب السؤال الذي يظهر في العرض عند الضغط على زر إظهار السؤال"
+              placeholder="اكتب السؤال"
               rows="3"
+              ${disabled ? "disabled" : ""}
             >${escapeHtml(row.question || "")}</textarea>
           </div>
         </div>
@@ -5396,11 +5176,7 @@ function buildFinalRound3TeamMediaAdmin(data = []) {
   return html
 }
 
-/* =========================
-   Save Round 3
-========================= */
-
-async function saveFinalRound3(mode = "classic", skipSavingLock = false) {
+async function saveFinalRound3Focus(skipSavingLock = false) {
   if (!skipSavingLock && isAdminSaving()) return false
 
   if (!currentModel) {
@@ -5410,185 +5186,46 @@ async function saveFinalRound3(mode = "classic", skipSavingLock = false) {
 
   try {
     if (!skipSavingLock) {
-      setAdminSaving(true, "جارٍ حفظ الجولة الثالثة...")
+      setAdminSaving(true, "جارٍ حفظ التركيز...")
     }
 
-    showGameToast("جارٍ حفظ الجولة الثالثة...")
+    const selectedCount = Number(
+      document.getElementById("finalRound3Count")?.value ||
+      finalRound3AdminCount ||
+      4
+    )
 
-    if (mode === "team_media") {
-      return await saveFinalRound3TeamMedia(true)
-    }
+    const safeCount = normalizeAdminSegmentCount("finalRound3", selectedCount)
+    finalRound3AdminCount = safeCount
 
-    return await saveFinalRound3Classic(true)
+    await saveAdminSegmentCount("finalRound3", safeCount)
+    updateAdminQuickSettingUI("finalRound3", safeCount)
 
-  } catch (err) {
-    console.log("SAVE FINAL ROUND 3 ERROR:", err)
-    showGameToast("توقف حفظ الجولة الثالثة بسبب خطأ")
-    return false
-  } finally {
-    if (!skipSavingLock) {
-      setAdminSaving(false)
-    }
-  }
-}
-async function saveFinalRound3Classic(skipSavingLock = false) {
-  try {
     const { data: oldRows, error: oldError } = await db
       .from("final_round3_items")
       .select("*")
       .eq("model", Number(currentModel))
 
     if (oldError) {
-      console.log(oldError)
-      showGameToast("تعذر قراءة الجولة الثالثة القديمة")
+      console.log("READ OLD FINAL ROUND 3 ERROR:", oldError)
+      showGameToast("تعذر قراءة بيانات التركيز القديمة")
       return false
     }
 
     const oldMap = {}
 
     ;(oldRows || []).forEach(row => {
-      oldMap[`${Number(row.number)}_${Number(row.image_order)}`] = row
+      const number = Number(row.number)
+      const imageOrder = Number(row.image_order || 1)
+
+      if (number >= 1 && number <= 8 && imageOrder === 1) {
+        oldMap[number] = row
+      }
     })
 
     const rows = []
 
-    for (let number = 1; number <= 2; number++) {
-      for (let i = 1; i <= 5; i++) {
-        const file =
-          document.getElementById(`finalRound3File_${number}_${i}`)?.files?.[0] || null
-
-        const answer =
-          (document.getElementById(`finalRound3Answer_${number}_${i}`)?.value || "").trim()
-
-        let image = oldMap[`${number}_${i}`]?.image || ""
-
-        if (file) {
-          showGameToast(`جارٍ رفع صورة ${i} للرقم ${number}...`)
-
-          image = await uploadImageFile(file, `final_r3_${number}_${i}`)
-
-          if (!image) {
-            showGameToast(`تعذر رفع صورة ${i} للرقم ${number}`)
-            return false
-          }
-        }
-
-        if (!image && !answer) continue
-
-        rows.push({
-          model: Number(currentModel),
-          number: Number(number),
-          image_order: Number(i),
-          image,
-          video: "",
-          question: "",
-          answer
-        })
-      }
-    }
-
-    if (!rows.length) {
-      const ok = confirm("الجولة الثالثة فارغة، هل تريد حذف بياناتها؟")
-
-      if (!ok) {
-        showGameToast("تم إلغاء الحفظ")
-        return false
-      }
-
-      const { error: clearError } = await db
-        .from("final_round3_items")
-        .delete()
-        .eq("model", Number(currentModel))
-
-      if (clearError) {
-        console.log(clearError)
-        showGameToast("تعذر تفريغ الجولة الثالثة")
-        return false
-      }
-
-      showGameToast("تم تفريغ الجولة الثالثة")
-      return true
-    }
-
-    const keepKeys = rows.map(row => `${Number(row.number)}_${Number(row.image_order)}`)
-
-    const { data: existingRows, error: existingError } = await db
-      .from("final_round3_items")
-      .select("number,image_order")
-      .eq("model", Number(currentModel))
-
-    if (existingError) {
-      console.log(existingError)
-      showGameToast("تعذر قراءة الجولة الثالثة الحالية")
-      return false
-    }
-
-    for (const oldRow of existingRows || []) {
-      const key = `${Number(oldRow.number)}_${Number(oldRow.image_order)}`
-
-      if (!keepKeys.includes(key)) {
-        const { error: deleteError } = await db
-          .from("final_round3_items")
-          .delete()
-          .eq("model", Number(currentModel))
-          .eq("number", Number(oldRow.number))
-          .eq("image_order", Number(oldRow.image_order))
-
-        if (deleteError) {
-          console.log(deleteError)
-          showGameToast("تعذر تنظيف صور الجولة الثالثة")
-          return false
-        }
-      }
-    }
-
-    const { error: saveError } = await db
-      .from("final_round3_items")
-      .upsert(rows, {
-        onConflict: "model,number,image_order"
-      })
-
-    if (saveError) {
-      console.log(saveError)
-      showGameToast("فشل حفظ الجولة الثالثة")
-      return false
-    }
-
-    showGameToast("تم حفظ الجولة الثالثة")
-    return true
-
-  } catch (err) {
-    console.log("SAVE FINAL ROUND 3 CLASSIC ERROR:", err)
-    showGameToast("توقف حفظ الجولة الثالثة بسبب خطأ")
-    return false
-  }
-}
-/* =========================
-   Save Round 3 Team Media
-========================= */
-
-async function saveFinalRound3TeamMedia(skipSavingLock = false) {
-  try {
-    const { data: oldRows, error: oldError } = await db
-      .from("final_round3_items")
-      .select("*")
-      .eq("model", Number(currentModel))
-
-    if (oldError) {
-      console.log(oldError)
-      showGameToast("تعذر قراءة الجولة الثالثة القديمة")
-      return false
-    }
-
-    const oldMap = {}
-
-    ;(oldRows || []).forEach(row => {
-      oldMap[Number(row.number)] = row
-    })
-
-    const rows = []
-
-    for (let number = 1; number <= 4; number++) {
+    for (let number = 1; number <= safeCount; number++) {
       const imageFile =
         document.getElementById(`finalRound3TeamImage_${number}`)?.files?.[0] || null
 
@@ -5605,9 +5242,7 @@ async function saveFinalRound3TeamMedia(skipSavingLock = false) {
       let video = oldMap[number]?.video || ""
 
       if (imageFile) {
-        showGameToast(`جارٍ رفع صورة رقم ${number}...`)
-
-        image = await uploadImageFile(imageFile, `final_r3_team_img_${number}`)
+        image = await uploadImageFile(imageFile, `final_r3_focus_img_${number}`)
 
         if (!image) {
           showGameToast(`تعذر رفع صورة رقم ${number}`)
@@ -5618,9 +5253,7 @@ async function saveFinalRound3TeamMedia(skipSavingLock = false) {
       }
 
       if (videoFile) {
-        showGameToast(`جارٍ رفع فيديو رقم ${number}...`)
-
-        video = await uploadVideoFile(videoFile, `final_r3_team_video_${number}`)
+        video = await uploadVideoFile(videoFile, `final_r3_focus_video_${number}`)
 
         if (!video) {
           showGameToast(`تعذر رفع فيديو رقم ${number}`)
@@ -5643,29 +5276,6 @@ async function saveFinalRound3TeamMedia(skipSavingLock = false) {
       })
     }
 
-    if (!rows.length) {
-      const ok = confirm("الجولة الثالثة الجديدة فارغة، هل تريد حذف بياناتها؟")
-
-      if (!ok) {
-        showGameToast("تم إلغاء الحفظ")
-        return false
-      }
-
-      const { error: clearError } = await db
-        .from("final_round3_items")
-        .delete()
-        .eq("model", Number(currentModel))
-
-      if (clearError) {
-        console.log(clearError)
-        showGameToast("تعذر تفريغ الجولة الثالثة")
-        return false
-      }
-
-      showGameToast("تم تفريغ الجولة الثالثة")
-      return true
-    }
-
     const keepNumbers = rows.map(row => Number(row.number))
 
     const { data: existingRows, error: existingError } = await db
@@ -5674,15 +5284,15 @@ async function saveFinalRound3TeamMedia(skipSavingLock = false) {
       .eq("model", Number(currentModel))
 
     if (existingError) {
-      console.log(existingError)
-      showGameToast("تعذر قراءة الجولة الثالثة الحالية")
+      console.log("READ EXISTING FINAL ROUND 3 ERROR:", existingError)
+      showGameToast("تعذر قراءة عناصر التركيز الحالية")
       return false
     }
 
     for (const oldRow of existingRows || []) {
       const oldNumber = Number(oldRow.number)
 
-      if (!keepNumbers.includes(oldNumber)) {
+      if (oldNumber >= 1 && oldNumber <= 8 && !keepNumbers.includes(oldNumber)) {
         const { error: deleteError } = await db
           .from("final_round3_items")
           .delete()
@@ -5690,169 +5300,457 @@ async function saveFinalRound3TeamMedia(skipSavingLock = false) {
           .eq("number", oldNumber)
 
         if (deleteError) {
-          console.log(deleteError)
-          showGameToast("تعذر تنظيف الجولة الثالثة")
+          console.log("DELETE OLD FINAL ROUND 3 ERROR:", deleteError)
+          showGameToast("تعذر تنظيف التركيز")
           return false
         }
       }
     }
 
-    const { error: saveError } = await db
-      .from("final_round3_items")
-      .upsert(rows, {
-        onConflict: "model,number,image_order"
-      })
+    if (rows.length) {
+      const { error: saveError } = await db
+        .from("final_round3_items")
+        .upsert(rows, {
+          onConflict: "model,number,image_order"
+        })
 
-    if (saveError) {
-      console.log(saveError)
-      showGameToast("فشل حفظ الجولة الثالثة الجديدة")
-      return false
+      if (saveError) {
+        console.log("SAVE FINAL ROUND 3 ERROR:", saveError)
+        showGameToast("فشل حفظ التركيز")
+        return false
+      }
     }
 
-    showGameToast("تم حفظ الجولة الثالثة الجديدة")
+    showGameToast(rows.length ? "تم حفظ التركيز" : "تم حذف بيانات التركيز")
     return true
-
   } catch (err) {
-    console.log("SAVE FINAL ROUND 3 TEAM MEDIA ERROR:", err)
-
-    const msg =
-      err?.message ||
-      err?.error ||
-      err?.statusCode ||
-      "خطأ غير معروف"
-
-    showGameToast(`توقف حفظ الجولة الثالثة: ${msg}`)
+    console.log("SAVE FINAL ROUND 3 CATCH:", err)
+    showGameToast("توقف حفظ التركيز بسبب خطأ")
     return false
+  } finally {
+    if (!skipSavingLock) setAdminSaving(false)
   }
 }
 
 /* =========================
-   Delete Final
+   28) Final Round 4 - اشرح الصورة
+========================= */
+
+async function buildFinalRound4ImageAdmin() {
+  const { data, error } = await db
+    .from("final_round3_items")
+    .select("*")
+    .eq("model", Number(currentModel))
+    .order("number", { ascending: true })
+    .order("image_order", { ascending: true })
+
+  if (error) {
+    console.log("LOAD FINAL ROUND 4 ERROR:", error)
+    return `<div class="adminCard">تعذر تحميل اشرح الصورة</div>`
+  }
+
+  const grouped = {
+    101: [],
+    102: []
+  }
+
+  ;(data || []).forEach(row => {
+    const number = Number(row.number)
+
+    if (number === 101 || number === 102) {
+      grouped[number].push(row)
+    }
+  })
+
+  let html = `<div class="finalAdminRound3Wrap">`
+
+  for (let displayNumber = 1; displayNumber <= 2; displayNumber++) {
+    const dbNumber = getFinalRound4DbNumber(displayNumber)
+    const rows = grouped[dbNumber] || []
+
+    html += `
+      <div class="finalAdminCard finalAdminWideCard finalRound4CleanCard">
+        <div class="finalAdminCardHead">
+          <h3>رقم ${displayNumber}</h3>
+
+          <button class="adminDeleteBtn" onclick="clearFinalRound4Item(${displayNumber})">
+            حذف
+          </button>
+        </div>
+    `
+
+    for (let i = 1; i <= 5; i++) {
+      const row = rows.find(x => Number(x.image_order) === i) || {}
+
+      html += `
+        <div class="finalAdminImageRow">
+          <div class="finalAdminWordIndex">الصورة ${i}</div>
+
+          <div class="finalAdminImageFields">
+            <input
+              type="file"
+              id="finalRound4File_${displayNumber}_${i}"
+              accept="image/*"
+            >
+
+            <input
+              id="finalRound4Answer_${displayNumber}_${i}"
+              placeholder="الإجابة"
+              value="${escapeHtml(row.answer || "")}"
+            >
+          </div>
+
+          <div class="finalAdminImagePreview">
+            ${
+              row.image
+                ? `<img src="${escapeHtml(row.image)}" class="previewImg">`
+                : `<div class="emptyImageHint">لا توجد صورة</div>`
+            }
+          </div>
+        </div>
+      `
+    }
+
+    html += `</div>`
+  }
+
+  html += `</div>`
+  return html
+}
+
+async function saveFinalRound4Image(skipSavingLock = false) {
+  if (!skipSavingLock && isAdminSaving()) return false
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return false
+  }
+
+  try {
+    if (!skipSavingLock) {
+      setAdminSaving(true, "جارٍ حفظ اشرح الصورة...")
+    }
+
+    const { data: oldRows, error: oldError } = await db
+      .from("final_round3_items")
+      .select("*")
+      .eq("model", Number(currentModel))
+
+    if (oldError) {
+      console.log("READ OLD FINAL ROUND 4 ERROR:", oldError)
+      showGameToast("تعذر قراءة اشرح الصورة القديمة")
+      return false
+    }
+
+    const oldMap = {}
+
+    ;(oldRows || []).forEach(row => {
+      const number = Number(row.number)
+      const imageOrder = Number(row.image_order || 1)
+
+      if (number === 101 || number === 102) {
+        oldMap[`${number}_${imageOrder}`] = row
+      }
+    })
+
+    const rows = []
+
+    for (let displayNumber = 1; displayNumber <= 2; displayNumber++) {
+      const dbNumber = getFinalRound4DbNumber(displayNumber)
+
+      for (let i = 1; i <= 5; i++) {
+        const file =
+          document.getElementById(`finalRound4File_${displayNumber}_${i}`)?.files?.[0] || null
+
+        const answer =
+          (document.getElementById(`finalRound4Answer_${displayNumber}_${i}`)?.value || "").trim()
+
+        let image = oldMap[`${dbNumber}_${i}`]?.image || ""
+
+        if (file) {
+          image = await uploadImageFile(file, `final_r4_${displayNumber}_${i}`)
+
+          if (!image) {
+            showGameToast(`تعذر رفع صورة ${i} للرقم ${displayNumber}`)
+            return false
+          }
+        }
+
+        if (!image && !answer) continue
+
+        rows.push({
+          model: Number(currentModel),
+          number: Number(dbNumber),
+          image_order: Number(i),
+          image,
+          video: "",
+          question: "",
+          answer
+        })
+      }
+    }
+
+    const keepKeys = rows.map(row => `${Number(row.number)}_${Number(row.image_order)}`)
+
+    const { data: existingRows, error: existingError } = await db
+      .from("final_round3_items")
+      .select("number,image_order")
+      .eq("model", Number(currentModel))
+
+    if (existingError) {
+      console.log("READ EXISTING FINAL ROUND 4 ERROR:", existingError)
+      showGameToast("تعذر قراءة اشرح الصورة الحالية")
+      return false
+    }
+
+    for (const oldRow of existingRows || []) {
+      const oldNumber = Number(oldRow.number)
+      const key = `${oldNumber}_${Number(oldRow.image_order)}`
+
+      if ((oldNumber === 101 || oldNumber === 102) && !keepKeys.includes(key)) {
+        const { error: deleteError } = await db
+          .from("final_round3_items")
+          .delete()
+          .eq("model", Number(currentModel))
+          .eq("number", oldNumber)
+          .eq("image_order", Number(oldRow.image_order))
+
+        if (deleteError) {
+          console.log("DELETE OLD FINAL ROUND 4 ERROR:", deleteError)
+          showGameToast("تعذر تنظيف صور اشرح الصورة")
+          return false
+        }
+      }
+    }
+
+    if (rows.length) {
+      const { error: saveError } = await db
+        .from("final_round3_items")
+        .upsert(rows, {
+          onConflict: "model,number,image_order"
+        })
+
+      if (saveError) {
+        console.log("SAVE FINAL ROUND 4 ERROR:", saveError)
+        showGameToast("فشل حفظ اشرح الصورة")
+        return false
+      }
+    }
+
+    showGameToast(rows.length ? "تم حفظ اشرح الصورة" : "تم حذف بيانات اشرح الصورة")
+    return true
+  } catch (err) {
+    console.log("SAVE FINAL ROUND 4 CATCH:", err)
+    showGameToast("توقف حفظ اشرح الصورة بسبب خطأ")
+    return false
+  } finally {
+    if (!skipSavingLock) setAdminSaving(false)
+  }
+}
+
+/* =========================
+   29) Final Delete Helpers
 ========================= */
 
 async function deleteFinalRound(round) {
-  const confirmed = window.confirm(`هل تريد حذف الجولة ${round}؟`)
-  if (!confirmed) return
+  if (!canRunAdminDelete()) return
 
-  const { error: metaError } = await db
-    .from("final_round_meta")
-    .delete()
-    .eq("model", currentModel)
-    .eq("round", round)
-
-  if (metaError) console.log(metaError)
-
-  if (round === 1) {
-    const { error } = await db
-      .from("final_round1_items")
-      .delete()
-      .eq("model", currentModel)
-
-    if (error) console.log(error)
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
   }
 
-  if (round === 2) {
-    const { error } = await db
-      .from("final_round2_items")
-      .delete()
-      .eq("model", currentModel)
+  const safeRound = Number(round || 1)
+  const title = getFinalAdminRoundTitle(safeRound)
 
-    if (error) console.log(error)
-  }
-
-  if (round === 3) {
-    const { error } = await db
-      .from("final_round3_items")
-      .delete()
-      .eq("model", currentModel)
-
-    if (error) console.log(error)
-  }
-
-  showGameToast(`تم حذف الجولة ${round}`)
-  await renderFinalAdminRound(round)
-}
-
-async function deleteFinalSegment() {
-  const confirmed = window.confirm("هل تريد حذف فقرة الفاصلة كاملة؟")
+  const confirmed = window.confirm(`هل تريد حذف "${title}"؟`)
   if (!confirmed) return
 
   try {
-    await db.from("final_round_meta").delete().eq("model", currentModel)
-    await db.from("final_round1_items").delete().eq("model", currentModel)
-    await db.from("final_round2_items").delete().eq("model", currentModel)
-    await db.from("final_round3_items").delete().eq("model", currentModel)
+    await db
+      .from("final_round_meta")
+      .delete()
+      .eq("model", Number(currentModel))
+      .eq("round", safeRound)
 
-    showGameToast("تم حذف فقرة الفاصلة")
-    await renderFinalAdmin()
+    if (safeRound === 1) {
+      await db
+        .from("final_round1_items")
+        .delete()
+        .eq("model", Number(currentModel))
+
+      await db
+        .from("segment_settings")
+        .delete()
+        .eq("model", Number(currentModel))
+        .eq("segment", "finalRound1")
+
+      finalRound1AdminCount = 6
+    }
+
+    if (safeRound === 2) {
+      await db
+        .from("final_round2_items")
+        .delete()
+        .eq("model", Number(currentModel))
+    }
+
+    if (safeRound === 3) {
+      for (let number = 1; number <= 8; number++) {
+        await db
+          .from("final_round3_items")
+          .delete()
+          .eq("model", Number(currentModel))
+          .eq("number", number)
+      }
+
+      await db
+        .from("segment_settings")
+        .delete()
+        .eq("model", Number(currentModel))
+        .eq("segment", "finalRound3")
+
+      finalRound3AdminCount = 4
+    }
+
+    if (safeRound === 4) {
+      for (const dbNumber of [101, 102]) {
+        await db
+          .from("final_round3_items")
+          .delete()
+          .eq("model", Number(currentModel))
+          .eq("number", dbNumber)
+      }
+    }
+
+    showGameToast(`تم حذف ${title}`)
+    await renderFinalAdminRound(safeRound)
+    await renderAdminTabsUnified()
   } catch (err) {
-    console.log(err)
-    showGameToast("تعذر حذف فقرة الفاصلة")
+    console.log("DELETE FINAL ROUND CATCH:", err)
+    showGameToast("تعذر حذف الفقرة")
   }
 }
 
 async function clearFinalRound1Item(number) {
-  const confirmed = window.confirm(`حذف العنصر ${number} من الجولة الأولى؟`)
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const confirmed = window.confirm(`حذف رقم ${number} من من بدون نقط؟`)
   if (!confirmed) return
 
   const { error } = await db
     .from("final_round1_items")
     .delete()
-    .eq("model", currentModel)
+    .eq("model", Number(currentModel))
     .eq("number", Number(number))
 
   if (error) {
-    console.log(error)
+    console.log("CLEAR FINAL ROUND 1 ITEM ERROR:", error)
     showGameToast("تعذر حذف العنصر")
     return
   }
 
-  showGameToast(`تم حذف العنصر ${number}`)
+  showGameToast(`تم حذف رقم ${number}`)
   await renderFinalAdminRound(1)
+  await renderAdminTabsUnified()
 }
 
 async function clearFinalRound2Item(number) {
-  const confirmed = window.confirm(`حذف الرقم ${number} من الجولة الثانية؟`)
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const confirmed = window.confirm(`حذف رقم ${number} من صح صحلي؟`)
   if (!confirmed) return
 
   const { error } = await db
     .from("final_round2_items")
     .delete()
-    .eq("model", currentModel)
+    .eq("model", Number(currentModel))
     .eq("number", Number(number))
 
   if (error) {
-    console.log(error)
+    console.log("CLEAR FINAL ROUND 2 ITEM ERROR:", error)
     showGameToast("تعذر حذف الرقم")
     return
   }
 
-  showGameToast(`تم حذف الرقم ${number}`)
+  showGameToast(`تم حذف رقم ${number}`)
   await renderFinalAdminRound(2)
+  await renderAdminTabsUnified()
 }
 
 async function clearFinalRound3Item(number) {
-  const confirmed = window.confirm(`حذف الرقم ${number} من الجولة الثالثة؟`)
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const confirmed = window.confirm(`حذف رقم ${number} من التركيز؟`)
   if (!confirmed) return
 
   const { error } = await db
     .from("final_round3_items")
     .delete()
-    .eq("model", currentModel)
+    .eq("model", Number(currentModel))
     .eq("number", Number(number))
 
   if (error) {
-    console.log(error)
+    console.log("CLEAR FINAL ROUND 3 ITEM ERROR:", error)
     showGameToast("تعذر حذف الرقم")
     return
   }
 
-  showGameToast(`تم حذف الرقم ${number}`)
+  showGameToast(`تم حذف رقم ${number}`)
   await renderFinalAdminRound(3)
+  await renderAdminTabsUnified()
 }
 
+async function clearFinalRound4Item(displayNumber) {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const dbNumber = getFinalRound4DbNumber(displayNumber)
+
+  const confirmed = window.confirm(`حذف رقم ${displayNumber} من اشرح الصورة؟`)
+  if (!confirmed) return
+
+  const { error } = await db
+    .from("final_round3_items")
+    .delete()
+    .eq("model", Number(currentModel))
+    .eq("number", Number(dbNumber))
+
+  if (error) {
+    console.log("CLEAR FINAL ROUND 4 ITEM ERROR:", error)
+    showGameToast("تعذر حذف الرقم")
+    return
+  }
+
+  showGameToast(`تم حذف رقم ${displayNumber}`)
+  await renderFinalAdminRound(4)
+  await renderAdminTabsUnified()
+}
+/* =========================================================
+   PART 5: ARCHIVE
+========================================================= */
+
 /* =========================
-   Archive
+   30) Archive Draft Helpers
 ========================= */
 
 function collectArchiveDraftState() {
@@ -5894,19 +5792,111 @@ function handleArchiveParentChange() {
   renderArchiveAdminRound(archiveAdminRound)
 }
 
+function isArchiveRoundComplete(box, items = []) {
+  if (!box) return false
+
+  const tournament = String(box.tournament || "").trim()
+  const season = String(box.season || "").trim()
+  const score = String(box.score || "").trim()
+
+  if (!tournament || !season || !score) return false
+
+  const map = {}
+
+  items.forEach(item => {
+    map[Number(item.position)] = item
+  })
+
+  if (!map[3]?.image) return false
+  if (!map[4]?.image) return false
+
+  const textItems = items.filter(item => Number(item.position) >= ARCHIVE_TEXT_START_POSITION)
+
+  if (!textItems.length) return false
+
+  const hasRequired = textItems.some(item => {
+    return String(item.label || "").trim() === "المطلوب"
+  })
+
+  if (!hasRequired) return false
+
+  const hasEmptyText = textItems.some(item => {
+    return !String(item.text || "").trim()
+  })
+
+  if (hasEmptyText) return false
+
+  return true
+}
+
+async function getArchiveDoneMap() {
+  const doneMap = {}
+
+  for (let r = 1; r <= archiveAdminRoundsCount; r++) {
+    doneMap[r] = false
+  }
+
+  if (!currentModel) return doneMap
+
+  const [boxesRes, itemsRes] = await Promise.all([
+    db.from("archive_boxes").select("*").eq("model", Number(currentModel)),
+    db.from("archive_items").select("*").eq("model", Number(currentModel))
+  ])
+
+  if (boxesRes.error || itemsRes.error) {
+    console.log("ARCHIVE DONE MAP ERROR:", boxesRes.error || itemsRes.error)
+    return doneMap
+  }
+
+  const boxesMap = {}
+
+  ;(boxesRes.data || []).forEach(box => {
+    boxesMap[Number(box.round)] = box
+  })
+
+  const itemsByRound = {}
+
+  ;(itemsRes.data || []).forEach(item => {
+    const r = Number(item.round)
+
+    if (!itemsByRound[r]) {
+      itemsByRound[r] = []
+    }
+
+    itemsByRound[r].push(item)
+  })
+
+  for (let r = 1; r <= archiveAdminRoundsCount; r++) {
+    doneMap[r] = isArchiveRoundComplete(boxesMap[r], itemsByRound[r] || [])
+  }
+
+  return doneMap
+}
+
+/* =========================
+   31) Archive Render Item
+========================= */
+
 function renderArchiveAdminItem(position, item = {}) {
   const mergedItem = getArchiveDraftItem(position, item)
-  const parentPosition = Number(mergedItem.parent_position || mergedItem.column_group || 3)
+
+  const parentPosition = Number(
+    mergedItem.parent_position ||
+    mergedItem.column_group ||
+    3
+  )
+
   const promptStyle = mergedItem.prompt_style || "shoe"
-  const isRequired = String(mergedItem.label || "").trim() === "المطلوب"
-  const hasTextValue = String(mergedItem.text || "").trim() !== ""
   const labelText = String(mergedItem.label || "").trim()
+  const isRequired = labelText === "المطلوب"
+  const hasTextValue = String(mergedItem.text || "").trim() !== ""
 
   return `
     <div class="archiveAdminItem archiveAdminItemCompact ${isRequired ? "archiveAdminItemRequired" : ""}">
       <div class="archiveAdminItemHead">
         <div class="archiveAdminItemTitleWrap">
           <div class="archiveAdminItemTitle">العنصر ${position}</div>
+
           <div class="archiveAdminItemMeta">
             ${labelText ? `<span>${escapeHtml(labelText)}</span>` : `<span>بدون عنوان</span>`}
             <span>${promptStyle === "ball" ? "⚽️ الهدف" : "👟 الاسيست"}</span>
@@ -5965,104 +5955,43 @@ function renderArchiveAdminItem(position, item = {}) {
   `
 }
 
+/* =========================
+   32) Archive Main Render
+========================= */
+
 async function renderArchiveAdmin() {
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
   archiveAdminRoundsCount = await getSegmentRoundCount("archive", 4, 4)
   archiveAdminRound = 1
   archivePendingExtraCount = 0
   archiveDraftState = {}
+
   await renderArchiveAdminRound(1)
 }
-function isArchiveRoundComplete(box, items = []) {
-  if (!box) return false
 
-  const tournament = String(box.tournament || "").trim()
-  const season = String(box.season || "").trim()
-  const score = String(box.score || "").trim()
-
-  if (!tournament || !season || !score) return false
-
-  const map = {}
-  items.forEach(item => {
-    map[Number(item.position)] = item
-  })
-
-  if (!map[3]?.image) return false
-  if (!map[4]?.image) return false
-
-  const textItems = items.filter(item => Number(item.position) >= 5)
-  if (!textItems.length) return false
-
-  const hasRequired = textItems.some(item => {
-    return String(item.label || "").trim() === "المطلوب"
-  })
-
-  if (!hasRequired) return false
-
-  const hasEmptyText = textItems.some(item => {
-    return !String(item.text || "").trim()
-  })
-
-  if (hasEmptyText) return false
-
-  return true
-}
-
-async function getArchiveDoneMap() {
-  const doneMap = {}
-
-  for (let r = 1; r <= archiveAdminRoundsCount; r++) {
-    doneMap[r] = false
-  }
-
-  if (!currentModel) return doneMap
-
-  const [boxesRes, itemsRes] = await Promise.all([
-    db.from("archive_boxes").select("*").eq("model", Number(currentModel)),
-    db.from("archive_items").select("*").eq("model", Number(currentModel))
-  ])
-
-  if (boxesRes.error || itemsRes.error) {
-    console.log(boxesRes.error || itemsRes.error)
-    return doneMap
-  }
-
-  const boxesMap = {}
-  ;(boxesRes.data || []).forEach(box => {
-    boxesMap[Number(box.round)] = box
-  })
-
-  const itemsByRound = {}
-  ;(itemsRes.data || []).forEach(item => {
-    const r = Number(item.round)
-    if (!itemsByRound[r]) itemsByRound[r] = []
-    itemsByRound[r].push(item)
-  })
-
-  for (let r = 1; r <= archiveAdminRoundsCount; r++) {
-    doneMap[r] = isArchiveRoundComplete(boxesMap[r], itemsByRound[r] || [])
-  }
-
-  return doneMap
-}
 async function renderArchiveAdminRound(round) {
-  archiveAdminRound = round
+  archiveAdminRound = Number(round || 1)
 
   const { data: boxData, error: boxError } = await db
     .from("archive_boxes")
     .select("*")
-    .eq("model", currentModel)
-    .eq("round", round)
+    .eq("model", Number(currentModel))
+    .eq("round", archiveAdminRound)
     .limit(1)
 
   const { data: itemsData, error: itemsError } = await db
     .from("archive_items")
     .select("*")
-    .eq("model", currentModel)
-    .eq("round", round)
+    .eq("model", Number(currentModel))
+    .eq("round", archiveAdminRound)
     .order("position", { ascending: true })
 
   if (boxError || itemsError) {
-    console.log(boxError || itemsError)
+    console.log("LOAD ARCHIVE ERROR:", boxError || itemsError)
     showGameToast("تعذر تحميل الأرشيف")
     return
   }
@@ -6072,14 +6001,15 @@ async function renderArchiveAdminRound(round) {
   const map = {}
 
   items.forEach(item => {
-    map[item.position] = getArchiveDraftItem(item.position, item)
+    map[Number(item.position)] = getArchiveDraftItem(Number(item.position), item)
   })
 
   const savedTextPositions = items
-    .map(x => Number(x.position || 0))
+    .map(item => Number(item.position || 0))
     .filter(pos => pos >= ARCHIVE_TEXT_START_POSITION)
 
   const savedCount = Math.max(4, savedTextPositions.length || 4)
+
   const targetCount = Math.min(
     ARCHIVE_MAX_TEXT_BOXES,
     Math.max(4, savedCount + archivePendingExtraCount)
@@ -6119,24 +6049,20 @@ async function renderArchiveAdminRound(round) {
     })
     .sort((a, b) => a - b)
 
-  const totalTextItems = archiveExtraTextPositions.length
-const archiveDoneMap = await getArchiveDoneMap()
+  const archiveDoneMap = await getArchiveDoneMap()
 
   editor().innerHTML = `
     <div class="archiveAdminShell archiveAdminCleanV2">
       <div class="adminEditorTopBar archiveAdminTopBar">
         <div>
           <h2 class="adminSectionTitle">الأرشيف</h2>
-          <div class="adminSectionSubTitle">
-           
-          </div>
         </div>
 
         <div class="archiveTopActions">
           <button onclick="saveArchiveRoundNew()" class="adminSaveBtn">حفظ الجولة</button>
           <button onclick="addArchiveTextBox()" class="adminBtnMango">إضافة عنصر</button>
           <button onclick="removeArchiveTextBox()" class="adminBtnLight">حذف آخر عنصر</button>
-          <button onclick="deleteArchiveSegment(${round})" class="adminDeleteBtn">حذف الجولة</button>
+          <button onclick="deleteArchiveSegment(${archiveAdminRound})" class="adminDeleteBtn">حذف الجولة</button>
           <button onclick="deleteArchiveSegment()" class="adminDeleteAllBtn">حذف الأرشيف</button>
         </div>
       </div>
@@ -6144,47 +6070,45 @@ const archiveDoneMap = await getArchiveDoneMap()
       ${await buildSegmentStatusGrid()}
 
       <div class="archiveAdminControlBar">
-  <div class="archiveRoundsControl">
-    
+        <div class="archiveRoundsControl">
+          <div class="archiveRoundsInline">
+            <div class="compactCountSelectWrap">
+              <select id="archiveRoundsCountInput" class="compactCountSelect">
+                <option value="1" ${archiveAdminRoundsCount === 1 ? "selected" : ""}>1</option>
+                <option value="2" ${archiveAdminRoundsCount === 2 ? "selected" : ""}>2</option>
+                <option value="3" ${archiveAdminRoundsCount === 3 ? "selected" : ""}>3</option>
+                <option value="4" ${archiveAdminRoundsCount === 4 ? "selected" : ""}>4</option>
+              </select>
+            </div>
 
-    <div class="archiveRoundsInline">
-      <div class="compactCountSelectWrap">
-        <select id="archiveRoundsCountInput" class="compactCountSelect">
-          <option value="1" ${archiveAdminRoundsCount === 1 ? "selected" : ""}>1</option>
-          <option value="2" ${archiveAdminRoundsCount === 2 ? "selected" : ""}>2</option>
-          <option value="3" ${archiveAdminRoundsCount === 3 ? "selected" : ""}>3</option>
-          <option value="4" ${archiveAdminRoundsCount === 4 ? "selected" : ""}>4</option>
-        </select>
+            <button onclick="applyArchiveRoundsCount()" class="adminBtn adminBtnMango compactCountBtn">
+              حفظ
+            </button>
+          </div>
+        </div>
+
+        <div class="archiveAdminRoundsBar cleanRoundsBar">
+          ${Array.from({ length: archiveAdminRoundsCount }, (_, i) => i + 1).map(r => {
+            const complete = !!archiveDoneMap[r]
+
+            return `
+              <button
+                type="button"
+                class="
+                  ${archiveAdminRound === r ? "activeArchiveRoundBtn" : ""}
+                  ${complete ? "innerTabDone archiveRoundDone" : ""}
+                  ${archiveAdminRound === r && complete ? "archiveRoundActiveDone" : ""}
+                "
+                onclick="renderArchiveAdminRound(${r})"
+              >
+                الجولة ${r}
+              </button>
+            `
+          }).join("")}
+        </div>
       </div>
 
-      <button onclick="applyArchiveRoundsCount()" class="adminBtn adminBtnMango compactCountBtn">
-        حفظ 
-      </button>
-    </div>
-  </div>
-
-  <div class="archiveAdminRoundsBar cleanRoundsBar">
-    ${Array.from({ length: archiveAdminRoundsCount }, (_, i) => i + 1).map(r => {
-      const complete = !!archiveDoneMap[r]
-
-      return `
-        <button
-          type="button"
-          class="
-            ${round === r ? "activeArchiveRoundBtn" : ""}
-            ${complete ? "innerTabDone archiveRoundDone" : ""}
-            ${round === r && complete ? "archiveRoundActiveDone" : ""}
-          "
-          onclick="renderArchiveAdminRound(${r})"
-        >
-          الجولة ${r}
-        </button>
-      `
-    }).join("")}
-  </div>
-</div>
-
-      <div class="archiveAdminBoard archiveAdminBoardClean archiveAdminBoardV2 ${round === 4 ? "archiveAdminBoardRound4" : ""}">
+      <div class="archiveAdminBoard archiveAdminBoardClean archiveAdminBoardV2">
         <div class="archiveMainInfoCard">
           <div class="archiveMainInfoHead">
             <h3>بيانات الجولة</h3>
@@ -6232,7 +6156,7 @@ const archiveDoneMap = await getArchiveDoneMap()
               <button
                 type="button"
                 class="adminDeleteMiniBtn"
-                onclick="deleteArchiveItem(${round}, 4)"
+                onclick="deleteArchiveItem(${archiveAdminRound}, 4)"
                 ${map[4]?.image ? "" : "disabled"}
               >
                 حذف
@@ -6242,7 +6166,11 @@ const archiveDoneMap = await getArchiveDoneMap()
             <input id="archiveItemFile_4" type="file" accept="image/*">
 
             <div class="archiveImagePreviewBox">
-              ${map[4]?.image ? `<img src="${escapeHtml(map[4].image)}" class="archiveAdminPreviewImg">` : `<div class="archiveNoImage">لا توجد صورة</div>`}
+              ${
+                map[4]?.image
+                  ? `<img src="${escapeHtml(map[4].image)}" class="archiveAdminPreviewImg">`
+                  : `<div class="archiveNoImage">لا توجد صورة</div>`
+              }
             </div>
           </div>
 
@@ -6253,7 +6181,7 @@ const archiveDoneMap = await getArchiveDoneMap()
               <button
                 type="button"
                 class="adminDeleteMiniBtn"
-                onclick="deleteArchiveItem(${round}, 3)"
+                onclick="deleteArchiveItem(${archiveAdminRound}, 3)"
                 ${map[3]?.image ? "" : "disabled"}
               >
                 حذف
@@ -6263,7 +6191,11 @@ const archiveDoneMap = await getArchiveDoneMap()
             <input id="archiveItemFile_3" type="file" accept="image/*">
 
             <div class="archiveImagePreviewBox">
-              ${map[3]?.image ? `<img src="${escapeHtml(map[3].image)}" class="archiveAdminPreviewImg">` : `<div class="archiveNoImage">لا توجد صورة</div>`}
+              ${
+                map[3]?.image
+                  ? `<img src="${escapeHtml(map[3].image)}" class="archiveAdminPreviewImg">`
+                  : `<div class="archiveNoImage">لا توجد صورة</div>`
+              }
             </div>
           </div>
         </div>
@@ -6293,6 +6225,10 @@ const archiveDoneMap = await getArchiveDoneMap()
 
   arrangeAdminInnerTabs()
 }
+
+/* =========================
+   33) Archive Actions
+========================= */
 
 function addArchiveTextBox() {
   collectArchiveDraftState()
@@ -6324,6 +6260,41 @@ function removeArchiveTextBox() {
   renderArchiveAdminRound(archiveAdminRound)
 }
 
+async function applyArchiveRoundsCount() {
+  if (isAdminSaving()) return false
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return false
+  }
+
+  try {
+    setAdminSaving(true, "جارٍ حفظ العدد...")
+
+    const count = Number(document.getElementById("archiveRoundsCountInput")?.value || 4)
+
+    archiveAdminRoundsCount = Math.min(Math.max(count, 1), 4)
+
+    const saved = await saveSegmentRoundCount("archive", archiveAdminRoundsCount)
+    if (!saved) return false
+
+    if (archiveAdminRound > archiveAdminRoundsCount) {
+      archiveAdminRound = archiveAdminRoundsCount
+    }
+
+    showGameToast("تم حفظ عدد جولات الأرشيف")
+    await renderArchiveAdminRound(archiveAdminRound)
+    await renderAdminTabsUnified()
+    return true
+  } catch (err) {
+    console.log("APPLY ARCHIVE ROUNDS COUNT ERROR:", err)
+    showGameToast("تعذر حفظ عدد جولات الأرشيف")
+    return false
+  } finally {
+    setAdminSaving(false)
+  }
+}
+
 async function saveArchiveRoundNew() {
   if (isAdminSaving()) return false
 
@@ -6351,7 +6322,7 @@ async function saveArchiveRoundNew() {
       .eq("round", round)
 
     if (oldRowsError) {
-      console.log(oldRowsError)
+      console.log("READ OLD ARCHIVE ERROR:", oldRowsError)
       showGameToast("تعذر قراءة عناصر الأرشيف القديمة")
       return false
     }
@@ -6447,18 +6418,21 @@ async function saveArchiveRoundNew() {
 
     const { error: boxError } = await db
       .from("archive_boxes")
-      .upsert([{
-        model: Number(currentModel),
-        round,
-        tournament: text1,
-        season: text2,
-        score: scoreValue
-      }], {
-        onConflict: "model,round"
-      })
+      .upsert(
+        [{
+          model: Number(currentModel),
+          round,
+          tournament: text1,
+          season: text2,
+          score: scoreValue
+        }],
+        {
+          onConflict: "model,round"
+        }
+      )
 
     if (boxError) {
-      console.log(boxError)
+      console.log("SAVE ARCHIVE BOX ERROR:", boxError)
       showGameToast("فشل حفظ صندوق الأرشيف")
       return false
     }
@@ -6472,7 +6446,7 @@ async function saveArchiveRoundNew() {
       .eq("round", round)
 
     if (existingError) {
-      console.log(existingError)
+      console.log("READ EXISTING ARCHIVE ERROR:", existingError)
       showGameToast("تعذر قراءة عناصر الأرشيف الحالية")
       return false
     }
@@ -6489,7 +6463,7 @@ async function saveArchiveRoundNew() {
           .eq("position", oldPosition)
 
         if (deleteError) {
-          console.log(deleteError)
+          console.log("DELETE OLD ARCHIVE ERROR:", deleteError)
           showGameToast("فشل تنظيف عناصر الأرشيف")
           return false
         }
@@ -6503,7 +6477,7 @@ async function saveArchiveRoundNew() {
       })
 
     if (itemsError) {
-      console.log(itemsError)
+      console.log("SAVE ARCHIVE ITEMS ERROR:", itemsError)
       showGameToast("فشل حفظ عناصر الأرشيف")
       return false
     }
@@ -6513,11 +6487,10 @@ async function saveArchiveRoundNew() {
 
     showGameToast(`تم حفظ الجولة ${round}`)
     await renderArchiveAdminRound(round)
-
+    await renderAdminTabsUnified()
     return true
-
   } catch (err) {
-    console.log("SAVE ARCHIVE ROUND ERROR:", err)
+    console.log("SAVE ARCHIVE ROUND CATCH:", err)
     showGameToast("توقف حفظ الأرشيف بسبب خطأ")
     return false
   } finally {
@@ -6525,39 +6498,109 @@ async function saveArchiveRoundNew() {
   }
 }
 
-async function applyArchiveRoundsCount() {
-  if (isAdminSaving()) return false
+/* =========================
+   34) Archive Delete Helpers
+========================= */
+
+async function deleteArchiveItem(round, position) {
+  if (!canRunAdminDelete()) return
 
   if (!currentModel) {
     showGameToast("افتح النموذج أولاً")
-    return false
+    return
   }
 
+  const ok = confirm(`هل تريد حذف العنصر ${position} من الجولة ${round}؟`)
+  if (!ok) return
+
+  const { error } = await db
+    .from("archive_items")
+    .delete()
+    .eq("model", Number(currentModel))
+    .eq("round", Number(round))
+    .eq("position", Number(position))
+
+  if (error) {
+    console.log("DELETE ARCHIVE ITEM ERROR:", error)
+    showGameToast("تعذر حذف العنصر")
+    return
+  }
+
+  showGameToast(`تم حذف العنصر ${position}`)
+  await renderArchiveAdminRound(round)
+  await renderAdminTabsUnified()
+}
+
+async function deleteArchiveSegment(round = null) {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const hasRound = round !== null && round !== undefined
+  const safeRound = Number(round || archiveAdminRound || 1)
+
+  const ok = confirm(
+    hasRound
+      ? `هل تريد حذف الجولة ${safeRound} من الأرشيف؟`
+      : "هل تريد حذف جميع جولات الأرشيف؟"
+  )
+
+  if (!ok) return
+
   try {
-    setAdminSaving(true, "جارٍ حفظ العدد...")
+    if (hasRound) {
+      const [itemsRes, boxRes] = await Promise.all([
+        db.from("archive_items")
+          .delete()
+          .eq("model", Number(currentModel))
+          .eq("round", safeRound),
 
-    const count = Number(
-      document.getElementById("archiveRoundsCountInput")?.value || 4
-    )
+        db.from("archive_boxes")
+          .delete()
+          .eq("model", Number(currentModel))
+          .eq("round", safeRound)
+      ])
 
-    archiveAdminRoundsCount = Math.min(Math.max(count, 1), 4)
+      if (itemsRes.error || boxRes.error) {
+        console.log(itemsRes.error || boxRes.error)
+        showGameToast("تعذر حذف الجولة")
+        return
+      }
 
-    const saved = await saveSegmentRoundCount("archive", archiveAdminRoundsCount)
-    if (!saved) return false
+      showGameToast(`تم حذف الجولة ${safeRound}`)
+      archivePendingExtraCount = 0
+      archiveDraftState = {}
 
-    if (archiveAdminRound > archiveAdminRoundsCount) {
-      archiveAdminRound = archiveAdminRoundsCount
+      await renderArchiveAdminRound(safeRound)
+      await renderAdminTabsUnified()
+      return
     }
 
-    showGameToast("تم حفظ عدد جولات الأرشيف")
-    await renderArchiveAdminRound(archiveAdminRound)
-    return true
+    const [itemsRes, boxesRes, settingsRes] = await Promise.all([
+      db.from("archive_items").delete().eq("model", Number(currentModel)),
+      db.from("archive_boxes").delete().eq("model", Number(currentModel)),
+      db.from("segment_settings").delete().eq("model", Number(currentModel)).eq("segment", "archive")
+    ])
 
+    if (itemsRes.error || boxesRes.error || settingsRes.error) {
+      console.log(itemsRes.error || boxesRes.error || settingsRes.error)
+      showGameToast("تعذر حذف الأرشيف")
+      return
+    }
+
+    archiveAdminRoundsCount = 4
+    archiveAdminRound = 1
+    archivePendingExtraCount = 0
+    archiveDraftState = {}
+
+    showGameToast("تم حذف الأرشيف بالكامل")
+    await renderArchiveAdmin()
+    await renderAdminTabsUnified()
   } catch (err) {
-    console.log("APPLY ARCHIVE ROUNDS COUNT ERROR:", err)
-    showGameToast("تعذر حفظ عدد جولات الأرشيف")
-    return false
-  } finally {
-    setAdminSaving(false)
+    console.log("DELETE ARCHIVE SEGMENT ERROR:", err)
+    showGameToast("حدث خطأ أثناء حذف الأرشيف")
   }
 }

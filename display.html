@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="assets/css/segments/archive.css" />
 
   <!-- ملف التصميم الرئيسي أخيراً -->
-  <link rel="stylesheet" href="styles.css?v=214" />
+  <link rel="stylesheet" href="styles.css?v=9999" />
 </head>
 
 <body>
@@ -56,7 +56,7 @@
     <div class="homeSegmentsShowcase" id="segmentsGrid"></div>
 
     <div class="winnerArea homeWinnerArea" id="winnerArea">
-      <button class="winnerBtn homeWinnerBtn" onclick="announceWinner()">الفائز</button>
+      <button class="winnerBtn homeWinnerBtn" onclick="showDetailedFinalResults()">النتيجة النهائية</button>
       <div id="winnerBox" class="homeWinnerBox"></div>
     </div>
 
@@ -92,6 +92,163 @@
     </div>
   </div>
 
+  <!-- نافذة النتائج النهائية -->
+  <div id="finalResultsOverlay" class="finalResultsOverlay hidden">
+
+    <section class="finalResultsBoard">
+
+      <button
+        class="finalResultsClose"
+        type="button"
+        onclick="closeDetailedFinalResults()"
+      >
+        ×
+      </button>
+
+      <header class="finalResultsTop">
+
+  <div id="finalResultsTeamABox" class="finalScoreTeam teamA">
+    <span id="finalResultsTeamAName">الفريق الأول</span>
+    <strong id="finalResultsTotalA">0</strong>
+  </div>
+
+  <div class="finalWinnerBlock">
+    <span class="finalWinnerLabel">النتيجة النهائية</span>
+    <strong id="finalResultsWinnerName" class="finalWinnerName">—</strong>
+    <small id="finalResultsWinnerSub" class="finalWinnerSub">الفائز في المواجهة</small>
+  </div>
+
+  <div id="finalResultsTeamBBox" class="finalScoreTeam teamB">
+    <span id="finalResultsTeamBName">الفريق الثاني</span>
+    <strong id="finalResultsTotalB">0</strong>
+  </div>
+
+</header>
+
+      <main class="finalResultsList">
+
+        <article class="finalResultMatch" data-result-card="warmup">
+          <div class="finalMatchNo">1</div>
+          <h3>التسخين</h3>
+          <div class="finalMatchScore">
+            <strong id="resultWarmupA">0</strong>
+            <span>-</span>
+            <strong id="resultWarmupB">0</strong>
+          </div>
+          <div id="resultWarmupWinner" class="finalMatchWinner">تعادل</div>
+        </article>
+
+        <article class="finalResultMatch" data-result-card="top10">
+          <div class="finalMatchNo">2</div>
+          <h3>Top 10</h3>
+          <div class="finalMatchScore">
+            <strong id="resultTop10A">0</strong>
+            <span>-</span>
+            <strong id="resultTop10B">0</strong>
+          </div>
+          <div id="resultTop10Winner" class="finalMatchWinner">تعادل</div>
+        </article>
+
+        <article class="finalResultMatch" data-result-card="auction">
+          <div class="finalMatchNo">3</div>
+          <h3>فتبلة</h3>
+          <div class="finalMatchScore">
+            <strong id="resultAuctionA">0</strong>
+            <span>-</span>
+            <strong id="resultAuctionB">0</strong>
+          </div>
+          <div id="resultAuctionWinner" class="finalMatchWinner">تعادل</div>
+        </article>
+
+        <article class="finalResultMatch" data-result-card="who">
+          <div class="finalMatchNo">4</div>
+          <h3>من هو</h3>
+          <div class="finalMatchScore">
+            <strong id="resultWhoA">0</strong>
+            <span>-</span>
+            <strong id="resultWhoB">0</strong>
+          </div>
+          <div id="resultWhoWinner" class="finalMatchWinner">تعادل</div>
+        </article>
+
+        <article class="finalResultMatch" data-result-card="explain">
+          <div class="finalMatchNo">5</div>
+          <h3>اشرح الكلمة</h3>
+          <div class="finalMatchScore">
+            <strong id="resultExplainA">0</strong>
+            <span>-</span>
+            <strong id="resultExplainB">0</strong>
+          </div>
+          <div id="resultExplainWinner" class="finalMatchWinner">تعادل</div>
+        </article>
+
+        <article class="finalResultMatch" data-result-card="final1">
+          <div class="finalMatchNo">6</div>
+          <h3>من بدون نقط</h3>
+          <div class="finalMatchScore">
+            <strong id="resultFinal1A">0</strong>
+            <span>-</span>
+            <strong id="resultFinal1B">0</strong>
+          </div>
+          <div id="resultFinal1Winner" class="finalMatchWinner">تعادل</div>
+        </article>
+
+        <article class="finalResultMatch" data-result-card="final2">
+          <div class="finalMatchNo">7</div>
+          <h3>صح صحلي</h3>
+          <div class="finalMatchScore">
+            <strong id="resultFinal2A">0</strong>
+            <span>-</span>
+            <strong id="resultFinal2B">0</strong>
+          </div>
+          <div id="resultFinal2Winner" class="finalMatchWinner">تعادل</div>
+        </article>
+
+        <article class="finalResultMatch" data-result-card="final3">
+          <div class="finalMatchNo">8</div>
+          <h3>التركيز</h3>
+          <div class="finalMatchScore">
+            <strong id="resultFinal3A">0</strong>
+            <span>-</span>
+            <strong id="resultFinal3B">0</strong>
+          </div>
+          <div id="resultFinal3Winner" class="finalMatchWinner">تعادل</div>
+        </article>
+
+        <article class="finalResultMatch" data-result-card="final4">
+          <div class="finalMatchNo">9</div>
+          <h3>اشرح الصورة</h3>
+          <div class="finalMatchScore">
+            <strong id="resultFinal4A">0</strong>
+            <span>-</span>
+            <strong id="resultFinal4B">0</strong>
+          </div>
+          <div id="resultFinal4Winner" class="finalMatchWinner">تعادل</div>
+        </article>
+
+        <article class="finalResultMatch" data-result-card="archive">
+          <div class="finalMatchNo">10</div>
+          <h3>الأرشيف</h3>
+          <div class="finalMatchScore">
+            <strong id="resultArchiveA">0</strong>
+            <span>-</span>
+            <strong id="resultArchiveB">0</strong>
+          </div>
+          <div id="resultArchiveWinner" class="finalMatchWinner">تعادل</div>
+        </article>
+
+      </main>
+
+      <footer class="finalResultsFooter">
+        <button type="button" onclick="announceWinnerFromDetailedResults()">
+          إعلان الفائز
+        </button>
+      </footer>
+
+    </section>
+
+  </div>
+
   <!-- إشعار سريع يظهر 5 ثواني -->
   <div id="gameToast" class="gameToast hidden">
     <div class="gameToastIcon">!</div>
@@ -99,21 +256,21 @@
   </div>
 
   <!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script src="assets/js/supabase.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="assets/js/supabase.js"></script>
 
-<script src="assets/js/game.js"></script>
-<script src="assets/js/game-state.js"></script>
+  <script src="assets/js/game.js"></script>
+  <script src="assets/js/game-state.js"></script>
 
-<script src="assets/js/warmup.js"></script>
-<script src="assets/js/top10.js"></script>
-<script src="assets/js/auction.js"></script>
-<script src="assets/js/who.js"></script>
-<script src="assets/js/explain.js?v=10"></script>
-<script src="assets/js/final.js"></script>
-<script src="assets/js/archive.js"></script>
+  <script src="assets/js/warmup.js"></script>
+  <script src="assets/js/top10.js"></script>
+  <script src="assets/js/auction.js"></script>
+  <script src="assets/js/who.js"></script>
+  <script src="assets/js/explain.js?v=10"></script>
+  <script src="assets/js/final.js"></script>
+  <script src="assets/js/archive.js"></script>
 
-<script src="assets/js/presenter-listener.js"></script>
+  <script src="assets/js/presenter-listener.js"></script>
 
 </body>
 </html>

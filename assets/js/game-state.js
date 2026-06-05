@@ -43,7 +43,13 @@ function getUnifiedGameState() {
       auction: getSafeLocalJson("auction_state_v2", null),
       who: getSafeLocalJson("who_state_v1", null),
       explain: getSafeLocalJson("explain_state_v1", null),
+
       final: getSafeLocalJson("final_state_v3", null),
+      finalRound1: getSafeLocalJson("final_state_v3", null),
+      finalRound2: getSafeLocalJson("final_state_v3", null),
+      finalRound3: getSafeLocalJson("final_state_v3", null),
+      finalRound4: getSafeLocalJson("final_state_v3", null),
+
       archive: getSafeLocalJson("archive_state_v1", null)
     },
 

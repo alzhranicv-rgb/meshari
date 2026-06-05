@@ -562,7 +562,7 @@ function buildTop10HTML() {
             onclick="selectTop10Team('A')"
           >
             <div class="top10ScoreName top10ScoreNameLeft">
-              ${teamAName}
+              ${escapeDisplayHtml(teamAName)}
             </div>
 
             <div class="top10ScoreErrors" id="top10ErrorsA">
@@ -602,14 +602,14 @@ function buildTop10HTML() {
             </div>
 
             <div class="top10ScoreName top10ScoreNameRight">
-              ${teamBName}
+              ${escapeDisplayHtml(teamBName)}
             </div>
           </div>
 
         </div>
 
         <div class="top10QuestionBox" id="top10QuestionBox">
-          ${top10State.question[round] || "السؤال يظهر هنا"}
+          ${escapeDisplayHtml(top10State.question[round] || "السؤال يظهر هنا")}
         </div>
 
         <div class="top10ControlPanel">
@@ -674,7 +674,7 @@ function renderTop10Rect(num, opened) {
         data-num="${num}"
         disabled
       >
-        <span class="top10RectInner">${answer}</span>
+        <span class="top10RectInner">${escapeDisplayHtml(answer)}</span>
       </button>
     `
   }
@@ -786,12 +786,12 @@ async function openTop10Number(num) {
   if (top10State.opened[round].includes(num)) return
 
   const { data, error } = await db
-    .from("top10_questions")
-    .select("*")
-    .eq("model", currentModel)
-    .eq("round", round)
-    .eq("position", num)
-    .single()
+  .from("top10_questions")
+  .select("*")
+  .eq("model", Number(currentModel))
+  .eq("round", Number(round))
+  .eq("position", Number(num))
+  .maybeSingle()
 
   if (error) {
     console.log(error)

@@ -10,7 +10,7 @@ let currentPoints = 0
 let timeLeft = 0
 let homeRefreshLocked = true
 let endButtonWatcher = null
-
+let gameToastTimer = null
 let currentModel = Number(localStorage.getItem("game_model") || 0)
 window.currentModel = currentModel
 
@@ -19,6 +19,10 @@ window.currentModelName = currentModelName
 window.top10MaxRound = Number(localStorage.getItem("top10_max_round") || 3)
 window.auctionMaxNumber = Number(localStorage.getItem("auction_max_number") || 8)
 window.archiveMaxRound = Number(localStorage.getItem("archive_max_round") || 4)
+window.whoMaxNumber = Number(localStorage.getItem("who_max_number") || 15)
+window.explainWordsCount = Number(localStorage.getItem("explain_words_count") || 4)
+window.finalRound1CardsCount = Number(localStorage.getItem("final_round1_cards_count") || 6)
+window.finalRound3Count = Number(localStorage.getItem("final_round3_count") || 4)
 
 const ALL_DISPLAY_SEGMENTS = [
   { key: "warmup", title: "التسخين", sort: 1 },
@@ -26,13 +30,18 @@ const ALL_DISPLAY_SEGMENTS = [
   { key: "auction", title: "فتبلة", sort: 3 },
   { key: "who", title: "من هو", sort: 4 },
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
-  { key: "final", title: "صح صحلي", sort: 6 },
-  { key: "archive", title: "الأرشيف", sort: 7 }
+
+  { key: "finalRound1", title: "من بدون نقط", sort: 6 },
+  { key: "finalRound2", title: "صح صحلي", sort: 7 },
+  { key: "finalRound3", title: "التركيز", sort: 8 },
+  { key: "finalRound4", title: "اشرح الصورة", sort: 9 },
+
+  { key: "archive", title: "الأرشيف", sort: 10 }
 ]
 
 let visibleDisplaySegments = ALL_DISPLAY_SEGMENTS.map(item => ({
   ...item,
-  is_visible: item.sort <= 6,
+  is_visible: item.sort <= 10,
   sort_order: item.sort
 }))
 
@@ -45,34 +54,79 @@ function escapeDisplayHtml(value) {
     .replaceAll("'", "&#039;")
 }
 
+function isFinalSegmentKey(key) {
+  return (
+    key === "finalRound1" ||
+    key === "finalRound2" ||
+    key === "finalRound3" ||
+    key === "finalRound4"
+  )
+}
+
+function getFinalRoundFromSegmentKey(key) {
+  if (key === "finalRound1") return 1
+  if (key === "finalRound2") return 2
+  if (key === "finalRound3") return 3
+  if (key === "finalRound4") return 4
+
+  return null
+}
+
+function getFinalSegmentKeyFromRound(round) {
+  const r = Number(round || 1)
+
+  if (r === 1) return "finalRound1"
+  if (r === 2) return "finalRound2"
+  if (r === 3) return "finalRound3"
+  if (r === 4) return "finalRound4"
+
+  return "finalRound1"
+}
+
 const SEGMENT_STATUS_KEY = "segment_status_v1"
 
 function defaultSegmentStatus() {
+  const item = () => ({
+    locked: false,
+    winner: "",
+    scoreA: 0,
+    scoreB: 0
+  })
+
   return {
-    warmup: { locked: false, winner: "" },
-    top10: { locked: false, winner: "" },
-    auction: { locked: false, winner: "" },
-    who: { locked: false, winner: "" },
-    explain: { locked: false, winner: "" },
-    final: { locked: false, winner: "" },
-    archive: { locked: false, winner: "" }
+    warmup: item(),
+    top10: item(),
+    auction: item(),
+    who: item(),
+    explain: item(),
+
+    final: item(),
+    finalRound1: item(),
+    finalRound2: item(),
+    finalRound3: item(),
+    finalRound4: item(),
+
+    archive: item()
   }
 }
 
 function loadSegmentStatus() {
   try {
     const saved = JSON.parse(localStorage.getItem(SEGMENT_STATUS_KEY) || "null")
-    if (!saved) return defaultSegmentStatus()
+    const defaults = defaultSegmentStatus()
 
-    return {
-      warmup: { locked: !!saved?.warmup?.locked, winner: saved?.warmup?.winner || "" },
-      top10: { locked: !!saved?.top10?.locked, winner: saved?.top10?.winner || "" },
-      auction: { locked: !!saved?.auction?.locked, winner: saved?.auction?.winner || "" },
-      who: { locked: !!saved?.who?.locked, winner: saved?.who?.winner || "" },
-      explain: { locked: !!saved?.explain?.locked, winner: saved?.explain?.winner || "" },
-      final: { locked: !!saved?.final?.locked, winner: saved?.final?.winner || "" },
-      archive: { locked: !!saved?.archive?.locked, winner: saved?.archive?.winner || "" }
-    }
+    if (!saved) return defaults
+
+    Object.keys(defaults).forEach(key => {
+      defaults[key] = {
+  locked: !!saved?.[key]?.locked,
+  winner: saved?.[key]?.winner || "",
+  scoreA: Number(saved?.[key]?.scoreA || 0),
+  scoreB: Number(saved?.[key]?.scoreB || 0)
+}
+    })
+
+    return defaults
   } catch (e) {
     console.log("segment status load error:", e)
     return defaultSegmentStatus()
@@ -132,6 +186,10 @@ async function syncDisplayStateToSession() {
       },
 
       final: getSafeJson("final_state_v3"),
+      finalRound1: getSafeJson("final_state_v3"),
+      finalRound2: getSafeJson("final_state_v3"),
+      finalRound3: getSafeJson("final_state_v3"),
+      finalRound4: getSafeJson("final_state_v3"),
       archive: getSafeJson("archive_state_v1"),
       toast: window.lastDisplayToast || null
     }
@@ -466,9 +524,19 @@ async function loadDisplaySegmentCounts() {
   window.auctionMaxNumber = await getDisplaySegmentCount("auction", 8, 8)
   window.archiveMaxRound = await getDisplaySegmentCount("archive", 4, 4)
 
+  window.whoMaxNumber = await getDisplaySegmentCount("who", 15, 15)
+  window.explainWordsCount = await getDisplaySegmentCount("explain", 4, 8)
+  window.finalRound1CardsCount = await getDisplaySegmentCount("finalRound1", 6, 8)
+  window.finalRound3Count = await getDisplaySegmentCount("finalRound3", 4, 8)
+
   localStorage.setItem("top10_max_round", String(window.top10MaxRound))
   localStorage.setItem("auction_max_number", String(window.auctionMaxNumber))
   localStorage.setItem("archive_max_round", String(window.archiveMaxRound))
+
+  localStorage.setItem("who_max_number", String(window.whoMaxNumber))
+  localStorage.setItem("explain_words_count", String(window.explainWordsCount))
+  localStorage.setItem("final_round1_cards_count", String(window.finalRound1CardsCount))
+  localStorage.setItem("final_round3_count", String(window.finalRound3Count))
 }
 
 async function loadDisplayCountForSegment(segmentKey) {
@@ -486,12 +554,32 @@ async function loadDisplayCountForSegment(segmentKey) {
     window.archiveMaxRound = await getDisplaySegmentCount("archive", 4, 4)
     localStorage.setItem("archive_max_round", String(window.archiveMaxRound))
   }
+
+  if (segmentKey === "who") {
+    window.whoMaxNumber = await getDisplaySegmentCount("who", 15, 15)
+    localStorage.setItem("who_max_number", String(window.whoMaxNumber))
+  }
+
+  if (segmentKey === "explain") {
+    window.explainWordsCount = await getDisplaySegmentCount("explain", 4, 8)
+    localStorage.setItem("explain_words_count", String(window.explainWordsCount))
+  }
+
+  if (segmentKey === "finalRound1") {
+    window.finalRound1CardsCount = await getDisplaySegmentCount("finalRound1", 6, 8)
+    localStorage.setItem("final_round1_cards_count", String(window.finalRound1CardsCount))
+  }
+
+  if (segmentKey === "finalRound3") {
+    window.finalRound3Count = await getDisplaySegmentCount("finalRound3", 4, 8)
+    localStorage.setItem("final_round3_count", String(window.finalRound3Count))
+  }
 }
 
 async function loadVisibleSegmentsForDisplay() {
   visibleDisplaySegments = ALL_DISPLAY_SEGMENTS.map(item => ({
     ...item,
-    is_visible: item.sort <= 6,
+    is_visible: item.sort <= 10,
     sort_order: item.sort
   }))
 
@@ -526,7 +614,7 @@ async function loadVisibleSegmentsForDisplay() {
   ALL_DISPLAY_SEGMENTS.forEach(item => {
     map[item.key] = {
       ...item,
-      is_visible: item.sort <= 6,
+      is_visible: item.sort <= 10,
       sort_order: item.sort
     }
   })
@@ -590,9 +678,16 @@ function getSegmentWinnerLabelIds(key) {
   if (key === "auction") return ["segmentWinnerAuction", "winnerAuction"]
   if (key === "who") return ["segmentWinnerWho", "winnerWho"]
   if (key === "explain") return ["segmentWinnerExplain", "winnerExplain"]
+
+  if (key === "finalRound1") return ["segmentWinnerFinalRound1", "winner_finalRound1"]
+  if (key === "finalRound2") return ["segmentWinnerFinalRound2", "winner_finalRound2"]
+  if (key === "finalRound3") return ["segmentWinnerFinalRound3", "winner_finalRound3"]
+  if (key === "finalRound4") return ["segmentWinnerFinalRound4", "winner_finalRound4"]
+
   if (key === "final") return ["segmentWinnerFinal", "winnerFinal"]
   if (key === "archive") return ["segmentWinnerArchive", "winnerArchive"]
-  return []
+
+  return [`segmentWinner_${key}`, `winner_${key}`]
 }
 
 function getSegmentCardIds(key) {
@@ -601,9 +696,16 @@ function getSegmentCardIds(key) {
   if (key === "auction") return ["segmentCardAuction", "segmentAuction"]
   if (key === "who") return ["segmentCardWho", "segmentWho"]
   if (key === "explain") return ["segmentCardExplain", "segmentExplain"]
+
+  if (key === "finalRound1") return ["segmentCardFinalRound1", "segment_finalRound1"]
+  if (key === "finalRound2") return ["segmentCardFinalRound2", "segment_finalRound2"]
+  if (key === "finalRound3") return ["segmentCardFinalRound3", "segment_finalRound3"]
+  if (key === "finalRound4") return ["segmentCardFinalRound4", "segment_finalRound4"]
+
   if (key === "final") return ["segmentCardFinal", "segmentFinal"]
   if (key === "archive") return ["segmentCardArchive", "segmentArchive"]
-  return []
+
+  return [`segmentCard_${key}`, `segment_${key}`]
 }
 
 function playSoftEnter(selector, fast = false) {
@@ -1138,7 +1240,7 @@ function renderMainHome(force = false) {
   updateLeadingTeamStyle()
   updateModelNameDisplay()
 
-  playSoftEnter(homeScreen)
+playSoftEnter(homeScreen)
 }
 
 function updateMainScoreBoard() {
@@ -1309,7 +1411,7 @@ function getVisibleDisplaySegments() {
   return visibleDisplaySegments
     .filter(item => item.is_visible)
     .sort((a, b) => Number(a.sort_order || a.sort) - Number(b.sort_order || b.sort))
-    .slice(0, 6)
+    .slice(0, 10)
 }
 
 function isSegmentVisibleOnDisplay(segmentKey) {
@@ -1322,8 +1424,15 @@ function getDisplaySegmentDomId(key) {
   if (key === "auction") return "segmentAuction"
   if (key === "who") return "segmentWho"
   if (key === "explain") return "segmentExplain"
+
+  if (key === "finalRound1") return "segment_finalRound1"
+  if (key === "finalRound2") return "segment_finalRound2"
+  if (key === "finalRound3") return "segment_finalRound3"
+  if (key === "finalRound4") return "segment_finalRound4"
+
   if (key === "final") return "segmentFinal"
   if (key === "archive") return "segmentArchive"
+
   return `segment_${key}`
 }
 
@@ -1333,8 +1442,15 @@ function getDisplayWinnerDomId(key) {
   if (key === "auction") return "winnerAuction"
   if (key === "who") return "winnerWho"
   if (key === "explain") return "winnerExplain"
+
+  if (key === "finalRound1") return "winner_finalRound1"
+  if (key === "finalRound2") return "winner_finalRound2"
+  if (key === "finalRound3") return "winner_finalRound3"
+  if (key === "finalRound4") return "winner_finalRound4"
+
   if (key === "final") return "winnerFinal"
   if (key === "archive") return "winnerArchive"
+
   return `winner_${key}`
 }
 
@@ -1364,13 +1480,9 @@ function renderVisibleSegmentsHome() {
 }
 
 function updateSegmentCards() {
-  setSegmentWinnerLabel("warmup")
-  setSegmentWinnerLabel("top10")
-  setSegmentWinnerLabel("auction")
-  setSegmentWinnerLabel("who")
-  setSegmentWinnerLabel("explain")
-  setSegmentWinnerLabel("final")
-  setSegmentWinnerLabel("archive")
+  ALL_DISPLAY_SEGMENTS.forEach(item => {
+    setSegmentWinnerLabel(item.key)
+  })
 }
 
 function setSegmentWinnerLabel(key) {
@@ -1436,37 +1548,41 @@ async function openSegmentPage(segmentKey) {
 
     showDisplayLoading("جاري تجهيز الفقرة...")
 
-    try {
-      if (segmentKey === "warmup") await window.renderWarmup()
-      if (segmentKey === "top10") await window.renderTop10()
-      if (segmentKey === "auction") await window.renderAuction()
-      if (segmentKey === "who") await window.renderWho()
-      if (segmentKey === "explain") await window.renderExplain()
-      if (segmentKey === "final") await window.renderFinal()
-      if (segmentKey === "archive") await window.renderArchive()
+   try {
+  if (segmentKey === "warmup") await window.renderWarmup()
+  if (segmentKey === "top10") await window.renderTop10()
+  if (segmentKey === "auction") await window.renderAuction()
+  if (segmentKey === "who") await window.renderWho()
+  if (segmentKey === "explain") await window.renderExplain()
 
-      const mediaRoot = document.getElementById("segmentArea") || document
+  if (isFinalSegmentKey(segmentKey)) {
+    await window.renderFinal(getFinalRoundFromSegmentKey(segmentKey), segmentKey)
+  }
 
-      protectDisplayMedia(mediaRoot)
+  if (segmentKey === "archive") await window.renderArchive()
 
-      if (typeof enhanceDisplayMediaFrames === "function") {
-        enhanceDisplayMediaFrames(mediaRoot)
-      }
+  const mediaRoot = document.getElementById("segmentArea") || document
 
-      if (typeof preloadDisplayMediaInRoot === "function") {
-        await preloadDisplayMediaInRoot(mediaRoot)
-      }
+  protectDisplayMedia(mediaRoot)
 
-      if (typeof applyDisplayMediaRevealFx === "function") {
-        applyDisplayMediaRevealFx(mediaRoot)
-      }
+  if (typeof enhanceDisplayMediaFrames === "function") {
+    enhanceDisplayMediaFrames(mediaRoot)
+  }
 
-    } catch (e) {
-      console.log("DISPLAY SEGMENT RENDER ERROR:", e)
-      showGameToast("تعذر تجهيز الفقرة")
-    } finally {
-      hideDisplayLoading()
-    }
+  if (typeof preloadDisplayMediaInRoot === "function") {
+    await preloadDisplayMediaInRoot(mediaRoot)
+  }
+
+  if (typeof applyDisplayMediaRevealFx === "function") {
+    applyDisplayMediaRevealFx(mediaRoot)
+  }
+
+} catch (e) {
+  console.log("DISPLAY SEGMENT RENDER ERROR:", e)
+  showGameToast("تعذر تجهيز الفقرة")
+} finally {
+  hideDisplayLoading()
+}
 
     const segmentArea = document.getElementById("segmentArea")
     if (segmentArea) {
@@ -1701,7 +1817,14 @@ async function endCurrentSegment() {
 
   const winner = getWinnerFromSegmentScores()
 
-  if (winner === teamAName) {
+const fallbackSegmentScores = getRealSegmentScores(key)
+
+const finishedSegmentScores = {
+  A: Number(window.currentSegmentScores?.A ?? fallbackSegmentScores.A ?? 0),
+  B: Number(window.currentSegmentScores?.B ?? fallbackSegmentScores.B ?? 0)
+}
+
+if (winner === teamAName) {
     scoreA++
     localStorage.setItem("main_score_a", scoreA)
     updateMainScoreBoard()
@@ -1721,11 +1844,18 @@ async function endCurrentSegment() {
   syncDisplayStateToSession()
 
   if (!segmentStatus[key]) {
-    segmentStatus[key] = { locked: false, winner: "" }
+  segmentStatus[key] = {
+    locked: false,
+    winner: "",
+    scoreA: 0,
+    scoreB: 0
   }
+}
 
-  segmentStatus[key].locked = true
-  segmentStatus[key].winner = winner
+segmentStatus[key].locked = true
+segmentStatus[key].winner = winner
+segmentStatus[key].scoreA = finishedSegmentScores.A
+segmentStatus[key].scoreB = finishedSegmentScores.B
 
   saveSegmentStatus()
   updateSegmentCards()
@@ -1744,8 +1874,12 @@ async function endCurrentSegment() {
 }
 
 function getCurrentSegmentKey() {
+  const active = localStorage.getItem("active_segment")
+
+  if (active) return active
+
   const title = document.querySelector(".segmentTitle")
-  if (!title) return localStorage.getItem("active_segment") || null
+  if (!title) return null
 
   const text = title.innerText || ""
 
@@ -1754,10 +1888,16 @@ function getCurrentSegmentKey() {
   if (text.includes("فتبلة")) return "auction"
   if (text.includes("من هو")) return "who"
   if (text.includes("اشرح الكلمة")) return "explain"
+
+  if (text.includes("من بدون نقط")) return "finalRound1"
+  if (text.includes("صح صحلي")) return "finalRound2"
+  if (text.includes("التركيز")) return "finalRound3"
+  if (text.includes("اشرح الصورة")) return "finalRound4"
+
   if (text.includes("الفاصلة")) return "final"
   if (text.includes("الأرشيف")) return "archive"
 
-  return localStorage.getItem("active_segment") || null
+  return null
 }
 
 function getSafeSegmentNumber(value, fallback, max) {
@@ -1769,9 +1909,11 @@ function getSafeSegmentNumber(value, fallback, max) {
 
 function canEndSegment(segmentKey) {
   if (segmentKey === "warmup") {
-    if (!window.usedQuestions) return false
-    return Object.keys(window.usedQuestions).length >= 12
-  }
+  if (!window.usedQuestions) return false
+  if (warmupQuestionLocked) return false
+
+  return Object.keys(window.usedQuestions).length >= 12
+}
 
   if (segmentKey === "top10") {
     if (!window.top10State) return false
@@ -1804,20 +1946,104 @@ function canEndSegment(segmentKey) {
 
   if (segmentKey === "who") {
     if (!window.whoState) return false
-    return (window.whoState.usedNumbers || []).length >= 15
+
+    const maxWhoNumber = getSafeSegmentNumber(
+      window.whoMaxNumber || localStorage.getItem("who_max_number"),
+      15,
+      15
+    )
+
+    return (window.whoState.usedNumbers || []).length >= maxWhoNumber
   }
 
   if (segmentKey === "explain") {
     if (!window.explainState) return false
 
-    const total = Number(window.explainState.wordsCount || 4) === 6 ? 6 : 4
+    const total = getSafeSegmentNumber(
+      window.explainState.wordsCount ||
+      window.explainWordsCount ||
+      localStorage.getItem("explain_words_count"),
+      4,
+      8
+    )
+
     return (window.explainState.usedNumbers || []).length >= total
+  }
+
+  if (segmentKey === "finalRound1") {
+    if (!window.finalState) return false
+
+    const r1Count = getSafeSegmentNumber(
+      window.finalState.round1?.cardsCount ||
+      window.finalRound1CardsCount ||
+      localStorage.getItem("final_round1_cards_count"),
+      6,
+      8
+    )
+
+    return (window.finalState.round1?.opened || []).length >= r1Count
+  }
+
+  if (segmentKey === "finalRound2") {
+    if (!window.finalState) return false
+
+    return (
+      (window.finalState.round2?.opened || []).length >= 4 &&
+      (window.finalState.round2?.scoredNumbers || []).length >= 4
+    )
+  }
+
+  if (segmentKey === "finalRound3") {
+    if (!window.finalState) return false
+
+    const total = getSafeSegmentNumber(
+      window.finalState.round3?.teamMedia?.count ||
+      window.finalRound3Count ||
+      localStorage.getItem("final_round3_count"),
+      4,
+      8
+    )
+
+    if (window.finalState.round3?.mode === "team_media") {
+      return (
+        (window.finalState.round3?.teamMedia?.usedNumbers || []).length >= total &&
+        (window.finalState.round3?.scoredNumbers || []).length >= total
+      )
+    }
+
+    return (
+      (window.finalState.round3?.opened || []).length >= 2 &&
+      (window.finalState.round3?.scoredNumbers || []).length >= 2
+    )
+  }
+
+  if (segmentKey === "finalRound4") {
+    if (!window.finalState) return false
+
+    return (
+      (window.finalState.round4?.opened || []).length >= 2 &&
+      (window.finalState.round4?.scoredNumbers || []).length >= 2
+    )
   }
 
   if (segmentKey === "final") {
     if (!window.finalState) return false
 
-    const r1Count = Number(window.finalState.round1?.cardsCount || 6)
+    const r1Count = getSafeSegmentNumber(
+      window.finalState.round1?.cardsCount ||
+      window.finalRound1CardsCount ||
+      localStorage.getItem("final_round1_cards_count"),
+      6,
+      8
+    )
+
+    const finalR3Total = getSafeSegmentNumber(
+      window.finalState.round3?.teamMedia?.count ||
+      window.finalRound3Count ||
+      localStorage.getItem("final_round3_count"),
+      4,
+      8
+    )
 
     const r1Done =
       (window.finalState.round1?.opened || []).length >= r1Count
@@ -1826,19 +2052,15 @@ function canEndSegment(segmentKey) {
       (window.finalState.round2?.opened || []).length >= 4 &&
       (window.finalState.round2?.scoredNumbers || []).length >= 4
 
-    let r3Done = false
+    const r3Done =
+      (window.finalState.round3?.teamMedia?.usedNumbers || []).length >= finalR3Total &&
+      (window.finalState.round3?.scoredNumbers || []).length >= finalR3Total
 
-    if (window.finalState.round3?.mode === "team_media") {
-      r3Done =
-        (window.finalState.round3?.teamMedia?.usedNumbers || []).length >= 4 &&
-        (window.finalState.round3?.scoredNumbers || []).length >= 4
-    } else {
-      r3Done =
-        (window.finalState.round3?.opened || []).length >= 2 &&
-        (window.finalState.round3?.scoredNumbers || []).length >= 2
-    }
+    const r4Done =
+      (window.finalState.round4?.opened || []).length >= 2 &&
+      (window.finalState.round4?.scoredNumbers || []).length >= 2
 
-    return r1Done && r2Done && r3Done
+    return r1Done && r2Done && r3Done && r4Done
   }
 
   if (segmentKey === "archive") {
@@ -1914,8 +2136,6 @@ function getWinnerFromSegmentScores() {
 /* =========================
    Toast Notification
 ========================= */
-
-let gameToastTimer = null
 
 function showGameToast(message) {
   window.lastDisplayToast = {
@@ -2342,12 +2562,20 @@ function showJoinCodePopup() {
     <button class="homeModelClassicClose" onclick="hideJoinCodePopup()">×</button>
 
     <button
-      id="displayControlsEyeBtn"
-      class="homeModelClassicControl ${isHidden ? "showControlsMode" : "hideControlsMode"}"
-      type="button"
-    >
-      ${isHidden ? "إظهار التحكم" : "إخفاء التحكم"}
-    </button>
+  id="displayControlsEyeBtn"
+  class="homeModelClassicControl ${isHidden ? "showControlsMode" : "hideControlsMode"}"
+  type="button"
+>
+  ${isHidden ? "إظهار التحكم" : "إخفاء التحكم"}
+</button>
+
+<button
+  id="bigScreenModeBtn"
+  class="homeModelClassicControl bigScreenModeBtn ${localStorage.getItem("big_screen_mode") === "1" ? "activeBigScreen" : ""}"
+  type="button"
+>
+  ${localStorage.getItem("big_screen_mode") === "1" ? "إلغاء تحسين العرض" : "تحسين العرض"}
+</button>
 
     <button
       type="button"
@@ -2372,6 +2600,17 @@ function showJoinCodePopup() {
       return false
     }
   }
+
+  const bigBtn = box.querySelector("#bigScreenModeBtn")
+
+if (bigBtn) {
+  bigBtn.onclick = function (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    toggleBigScreenMode()
+    return false
+  }
+}
 
   box.classList.remove("hidden")
   box.classList.remove("show")
@@ -2400,3 +2639,434 @@ function hideJoinCodePopup() {
     box.innerHTML = ""
   }, 220)
 }
+
+
+/* =========================
+   1) BIG SCREEN MODE
+========================= */
+
+const BIG_SCREEN_STORAGE_KEY = "big_screen_mode"
+
+function applyBigScreenMode() {
+  const enabled = localStorage.getItem(BIG_SCREEN_STORAGE_KEY) === "1"
+
+  document.body.classList.toggle("bigScreenMode", enabled)
+
+  const btn = document.getElementById("bigScreenModeBtn")
+  if (btn) {
+    btn.innerText = enabled ? "إلغاء تحسين العرض" : "تحسين العرض"
+    btn.classList.toggle("activeBigScreen", enabled)
+  }
+}
+
+function toggleBigScreenMode() {
+  const enabled = localStorage.getItem(BIG_SCREEN_STORAGE_KEY) === "1"
+
+  localStorage.setItem(BIG_SCREEN_STORAGE_KEY, enabled ? "0" : "1")
+  applyBigScreenMode()
+}
+
+
+/* =========================
+   2) DETAILED FINAL RESULTS
+   لوحة النتائج = نفس العرض
+   الكروت = إحصائيات كل فقرة
+   الفائز = الأكثر فوزًا بالفقرات
+========================= */
+
+const FINAL_RESULTS_CONFIG = [
+  { segmentKey: "warmup", cardKey: "warmup", prefix: "Warmup", title: "التسخين" },
+  { segmentKey: "top10", cardKey: "top10", prefix: "Top10", title: "Top 10" },
+  { segmentKey: "auction", cardKey: "auction", prefix: "Auction", title: "فتبلة" },
+  { segmentKey: "who", cardKey: "who", prefix: "Who", title: "من هو" },
+  { segmentKey: "explain", cardKey: "explain", prefix: "Explain", title: "اشرح الكلمة" },
+  { segmentKey: "finalRound1", cardKey: "final1", prefix: "Final1", title: "من بدون نقط" },
+  { segmentKey: "finalRound2", cardKey: "final2", prefix: "Final2", title: "صح صحلي" },
+  { segmentKey: "finalRound3", cardKey: "final3", prefix: "Final3", title: "التركيز" },
+  { segmentKey: "finalRound4", cardKey: "final4", prefix: "Final4", title: "اشرح الصورة" },
+  { segmentKey: "archive", cardKey: "archive", prefix: "Archive", title: "الأرشيف" }
+]
+
+function readResultJson(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "null")
+  } catch {
+    return null
+  }
+}
+
+function safeResultNumber(value) {
+  const n = Number(value || 0)
+  return Number.isFinite(n) ? n : 0
+}
+
+function resultTeamName(team) {
+  if (team === "A") return teamAName || localStorage.getItem("teamAName") || "الفريق الأول"
+  if (team === "B") return teamBName || localStorage.getItem("teamBName") || "الفريق الثاني"
+  return "تعادل"
+}
+
+function setResultText(id, value) {
+  const el = document.getElementById(id)
+  if (el) el.innerText = value
+}
+
+function getResultState() {
+  return {
+    warmup: window.warmupState || readResultJson("warmup_state_v1") || {},
+    top10: window.top10State || readResultJson("top10_state_v1") || {},
+    auction:
+      window.auctionState ||
+      readResultJson("auction_state_v2") ||
+      readResultJson("auction_state_v1") ||
+      {},
+    who: window.whoState || readResultJson("who_state_v1") || {},
+    explain: window.explainState || readResultJson("explain_state_v1") || {},
+    final: window.finalState || readResultJson("final_state_v3") || {},
+    archive: window.archiveState || readResultJson("archive_state_v1") || {}
+  }
+}
+
+/* يقرأ النقاط من أي شكل مستخدم في ملفات الفقرات */
+function getResultScore(state, team) {
+  if (!state) return 0
+
+  return safeResultNumber(
+    state?.scores?.[team] ??
+    state?.score?.[team] ??
+    state?.totalScores?.[team] ??
+    state?.roundScores?.[team] ??
+    state?.teamScores?.[team] ??
+    state?.[`score${team}`] ??
+    state?.[`total${team}`] ??
+    state?.[`team${team}Score`] ??
+    0
+  )
+}
+
+function normalizeWinnerToTeam(winner) {
+  const text = String(winner || "").trim()
+
+  if (!text) return ""
+  if (text === "تعادل") return "draw"
+
+  const aName = resultTeamName("A")
+  const bName = resultTeamName("B")
+
+  if (text === aName || text.includes(aName)) return "A"
+  if (text === bName || text.includes(bName)) return "B"
+
+  return ""
+}
+
+function getVisibleFinalResultKeys() {
+  if (typeof getVisibleDisplaySegments === "function") {
+    return getVisibleDisplaySegments()
+      .map(item => item.key)
+      .filter(Boolean)
+  }
+
+  return FINAL_RESULTS_CONFIG.map(item => item.segmentKey)
+}
+
+/* هنا نجيب نقاط كل فقرة الحقيقية */
+function getRealSegmentScores(segmentKey) {
+  const s = getResultState()
+  const final = s.final || {}
+
+  let A = 0
+  let B = 0
+
+  if (segmentKey === "warmup") {
+    A = safeResultNumber(
+      window.warmupScoreA ??
+      s.warmup?.scoreA ??
+      s.warmup?.scores?.A ??
+      s.warmup?.totalA
+    )
+
+    B = safeResultNumber(
+      window.warmupScoreB ??
+      s.warmup?.scoreB ??
+      s.warmup?.scores?.B ??
+      s.warmup?.totalB
+    )
+  }
+
+  if (segmentKey === "top10") {
+    A = getResultScore(s.top10, "A")
+    B = getResultScore(s.top10, "B")
+  }
+
+  if (segmentKey === "auction") {
+    A = getResultScore(s.auction, "A")
+    B = getResultScore(s.auction, "B")
+  }
+
+  if (segmentKey === "who") {
+    A = getResultScore(s.who, "A")
+    B = getResultScore(s.who, "B")
+  }
+
+  if (segmentKey === "explain") {
+    A = getResultScore(s.explain, "A")
+    B = getResultScore(s.explain, "B")
+  }
+
+  if (segmentKey === "finalRound1") {
+    A = getResultScore(final.round1, "A")
+    B = getResultScore(final.round1, "B")
+  }
+
+  if (segmentKey === "finalRound2") {
+    A = getResultScore(final.round2, "A")
+    B = getResultScore(final.round2, "B")
+  }
+
+  if (segmentKey === "finalRound3") {
+    A = getResultScore(final.round3, "A")
+    B = getResultScore(final.round3, "B")
+  }
+
+  if (segmentKey === "finalRound4") {
+    A = getResultScore(final.round4, "A")
+    B = getResultScore(final.round4, "B")
+  }
+
+  if (segmentKey === "archive") {
+    A = getResultScore(s.archive, "A")
+    B = getResultScore(s.archive, "B")
+  }
+
+  return { A, B }
+}
+
+function getFinalResultsRows() {
+  segmentStatus = loadSegmentStatus()
+
+  const visibleKeys = getVisibleFinalResultKeys()
+
+  return FINAL_RESULTS_CONFIG
+    .filter(item => visibleKeys.includes(item.segmentKey))
+    .map(item => {
+      const status = segmentStatus?.[item.segmentKey] || {
+        locked: false,
+        winner: "",
+        scoreA: 0,
+        scoreB: 0
+      }
+
+      const fallbackScores = getRealSegmentScores(item.segmentKey)
+
+      const A = Number(status.scoreA || fallbackScores.A || 0)
+      const B = Number(status.scoreB || fallbackScores.B || 0)
+
+      let winnerTeam = ""
+
+      if (A > B) winnerTeam = "A"
+      else if (B > A) winnerTeam = "B"
+      else if (status.locked) winnerTeam = "draw"
+
+      return {
+        ...item,
+        A,
+        B,
+        locked: !!status.locked,
+        winnerText: status.winner || "",
+        winnerTeam
+      }
+    })
+}
+
+/* الإحصائية النهائية: نحسب الفائز حسب عدد الفقرات */
+function getFinalResultsStats() {
+  const rows = getFinalResultsRows()
+
+  const stats = {
+    A: 0,
+    B: 0,
+    draw: 0,
+    pending: 0,
+    selectedCount: rows.length,
+    completedCount: 0
+  }
+
+  rows.forEach(row => {
+    if (!row.locked) {
+      stats.pending += 1
+      return
+    }
+
+    stats.completedCount += 1
+
+    if (row.winnerTeam === "A") stats.A += 1
+    else if (row.winnerTeam === "B") stats.B += 1
+    else stats.draw += 1
+  })
+
+  return stats
+}
+
+function hideAllFinalResultCards() {
+  document.querySelectorAll("[data-result-card]").forEach(card => {
+    card.classList.add("hiddenFinalResultCard")
+    card.classList.remove("teamA", "teamB", "draw", "pending")
+  })
+}
+
+function updateSingleResultCard(row, index) {
+  /* هنا تظهر نقاط الفقرة الحقيقية */
+  setResultText(`result${row.prefix}A`, row.A)
+  setResultText(`result${row.prefix}B`, row.B)
+
+  let winnerText = "لم تنتهِ"
+  let winnerClass = "pending"
+
+  if (row.locked || row.winnerTeam) {
+    if (row.winnerTeam === "A") {
+      winnerText = `فاز: ${resultTeamName("A")}`
+      winnerClass = "teamA"
+    } else if (row.winnerTeam === "B") {
+      winnerText = `فاز: ${resultTeamName("B")}`
+      winnerClass = "teamB"
+    } else {
+      winnerText = "تعادل"
+      winnerClass = "draw"
+    }
+  }
+
+  setResultText(`result${row.prefix}Winner`, winnerText)
+
+  const card = document.querySelector(`[data-result-card="${row.cardKey}"]`)
+  if (!card) return
+
+  card.classList.remove("hiddenFinalResultCard", "teamA", "teamB", "draw", "pending")
+  card.classList.add(winnerClass)
+
+  const number = card.querySelector(".finalMatchNo")
+  if (number) number.innerText = index + 1
+
+  const title = card.querySelector("h3")
+  if (title) title.innerText = row.title
+}
+
+function updateFinalResultsUI() {
+  hideAllFinalResultCards()
+
+  const rows = getFinalResultsRows()
+  const stats = getFinalResultsStats()
+
+  rows.forEach((row, index) => {
+    updateSingleResultCard(row, index)
+  })
+
+  setResultText("finalResultsTeamAName", resultTeamName("A"))
+  setResultText("finalResultsTeamBName", resultTeamName("B"))
+
+  /* فوق نعرض عدد الفقرات الفائزة، وليس نقاط الفقرات */
+  setResultText("finalResultsTotalA", stats.A)
+  setResultText("finalResultsTotalB", stats.B)
+
+  const teamABox = document.getElementById("finalResultsTeamABox")
+  const teamBBox = document.getElementById("finalResultsTeamBBox")
+  const winnerName = document.getElementById("finalResultsWinnerName")
+  const winnerSub = document.getElementById("finalResultsWinnerSub")
+  const overlay = document.getElementById("finalResultsOverlay")
+  const cupText = document.querySelector(".finalScoreCup span")
+
+  if (teamABox) teamABox.classList.remove("winner")
+  if (teamBBox) teamBBox.classList.remove("winner")
+  if (overlay) overlay.classList.remove("teamA", "teamB", "draw")
+
+  if (cupText) {
+    cupText.innerText = stats.draw > 0 ? `تعادل ${stats.draw}` : "VS"
+  }
+
+  if (!rows.length) {
+    if (winnerName) winnerName.innerText = "لا توجد فقرات"
+    if (winnerSub) winnerSub.innerText = "لم يتم اختيار أي فقرة"
+    if (overlay) overlay.classList.add("draw")
+    return
+  }
+
+  if (!stats.completedCount) {
+    if (winnerName) winnerName.innerText = "لم تبدأ النتائج"
+    if (winnerSub) winnerSub.innerText = `الفقرات المختارة: ${stats.selectedCount}`
+    if (overlay) overlay.classList.add("draw")
+    return
+  }
+
+  if (stats.A > stats.B) {
+    if (winnerName) winnerName.innerText = resultTeamName("A")
+    if (winnerSub) winnerSub.innerText = `فاز في ${stats.A} من ${stats.completedCount} فقرات`
+    if (teamABox) teamABox.classList.add("winner")
+    if (overlay) overlay.classList.add("teamA")
+  } else if (stats.B > stats.A) {
+    if (winnerName) winnerName.innerText = resultTeamName("B")
+    if (winnerSub) winnerSub.innerText = `فاز في ${stats.B} من ${stats.completedCount} فقرات`
+    if (teamBBox) teamBBox.classList.add("winner")
+    if (overlay) overlay.classList.add("teamB")
+  } else {
+    if (winnerName) winnerName.innerText = "تعادل"
+    if (winnerSub) winnerSub.innerText = `تعادل في عدد الفقرات`
+    if (overlay) overlay.classList.add("draw")
+  }
+}
+
+function showDetailedFinalResults() {
+  updateFinalResultsUI()
+
+  const overlay = document.getElementById("finalResultsOverlay")
+  if (!overlay) return
+
+  overlay.classList.remove("hidden")
+  overlay.classList.remove("closing")
+}
+
+function closeDetailedFinalResults() {
+  const overlay = document.getElementById("finalResultsOverlay")
+  if (!overlay) return
+
+  overlay.classList.add("closing")
+
+  setTimeout(() => {
+    overlay.classList.add("hidden")
+    overlay.classList.remove("closing")
+  }, 180)
+}
+
+function announceWinnerFromDetailedResults() {
+  const stats = getFinalResultsStats()
+
+  let winner = "تعادل"
+
+  if (stats.A > stats.B) winner = resultTeamName("A")
+  if (stats.B > stats.A) winner = resultTeamName("B")
+
+  closeDetailedFinalResults()
+
+  setTimeout(() => {
+    if (typeof playWinnerEffects === "function") {
+      playWinnerEffects()
+    }
+
+    if (typeof showWinnerOverlay === "function") {
+      showWinnerOverlay(winner, { homeWinner: true })
+    }
+  }, 220)
+}
+
+window.showDetailedFinalResults = showDetailedFinalResults
+window.closeDetailedFinalResults = closeDetailedFinalResults
+window.announceWinnerFromDetailedResults = announceWinnerFromDetailedResults
+
+/* =========================
+   3) INIT EXTRA FEATURES
+========================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+  applyBigScreenMode()
+})
+
+window.toggleBigScreenMode = toggleBigScreenMode
+window.applyBigScreenMode = applyBigScreenMode

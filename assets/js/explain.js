@@ -155,9 +155,10 @@ async function loadExplainData() {
 
   const [settingsRes, wordsRes] = await Promise.all([
     db
-      .from("explain_settings")
-      .select("*")
+      .from("segment_settings")
+      .select("item_count")
       .eq("model", model)
+      .eq("segment", "explain")
       .maybeSingle(),
 
     db
@@ -173,7 +174,20 @@ async function loadExplainData() {
     return false
   }
 
-  const wordsCount = Number(settingsRes.data?.words_count || 4) === 6 ? 6 : 4
+  const countFromSettings = Number(
+    settingsRes.data?.item_count ||
+    window.explainWordsCount ||
+    localStorage.getItem("explain_words_count") ||
+    4
+  )
+
+  const wordsCount =
+    countFromSettings === 8 ? 8 :
+    countFromSettings === 6 ? 6 :
+    4
+
+  window.explainWordsCount = wordsCount
+  localStorage.setItem("explain_words_count", String(wordsCount))
 
   const rawWords = (wordsRes.data || [])
     .filter(row => Number(row.number) >= 1 && Number(row.number) <= wordsCount)
@@ -184,6 +198,7 @@ async function loadExplainData() {
 
   const wordPoolKey = getExplainWordPoolKey(model, wordsCount, rawWords)
   const saved = loadExplainState()
+
   const sameSavedGame =
     Number(saved?.model || 0) === Number(model) &&
     Number(saved?.wordsCount || 4) === Number(wordsCount) &&
@@ -205,8 +220,8 @@ async function loadExplainData() {
     timerVisible: sameSavedGame ? !!saved?.timerVisible : false,
     timeLeft: sameSavedGame ? Number(saved?.timeLeft || 45) : 45,
     revealLock: false,
-     answerResult: null,
-     scores: sameSavedGame ? {
+    answerResult: null,
+    scores: sameSavedGame ? {
       A: Number(saved?.scores?.A || 0),
       B: Number(saved?.scores?.B || 0)
     } : { A: 0, B: 0 },
@@ -247,7 +262,12 @@ async function renderExplain() {
 window.renderExplain = renderExplain
 
 function buildExplainHtml() {
-  const count = Number(window.explainState.wordsCount || 4) === 6 ? 6 : 4
+  const rawCount = Number(window.explainState.wordsCount || 4)
+
+const count =
+  rawCount === 8 ? 8 :
+  rawCount === 6 ? 6 :
+  4
 
   return `
     <div class="explainGameShell">
@@ -259,7 +279,7 @@ function buildExplainHtml() {
           class="explainTeamBox"
           onclick="selectExplainTeam('A')"
         >
-          <span class="explainTeamLabel">${teamAName}</span>
+          <span class="explainTeamLabel">${escapeDisplayHtml(teamAName)}</span>
           <strong id="explainScoreA">${window.explainState.scores.A}</strong>
           <small id="explainAttemptsA">0</small>
         </button>
@@ -275,7 +295,7 @@ function buildExplainHtml() {
           class="explainTeamBox"
           onclick="selectExplainTeam('B')"
         >
-          <span class="explainTeamLabel">${teamBName}</span>
+          <span class="explainTeamLabel">${escapeDisplayHtml(teamBName)}</span>
           <strong id="explainScoreB">${window.explainState.scores.B}</strong>
           <small id="explainAttemptsB">0</small>
         </button>
@@ -349,49 +369,55 @@ function buildExplainHtml() {
 function updateExplainUI() {
   const scoreAEl = document.getElementById("explainScoreA")
   const scoreBEl = document.getElementById("explainScoreB")
+  const attemptsAEl = document.getElementById("explainAttemptsA")
+  const attemptsBEl = document.getElementById("explainAttemptsB")
   const wordBox = document.getElementById("explainWordBox")
   const timerBox = document.getElementById("explainTimerBox")
 
   if (scoreAEl) scoreAEl.innerText = Number(window.explainState.scores.A || 0)
   if (scoreBEl) scoreBEl.innerText = Number(window.explainState.scores.B || 0)
 
+  if (attemptsAEl) attemptsAEl.innerText = Number(window.explainState.attempts.A || 0)
+  if (attemptsBEl) attemptsBEl.innerText = Number(window.explainState.attempts.B || 0)
+
   const teamABox = document.getElementById("teamABox")
   const teamBBox = document.getElementById("teamBBox")
 
   if (teamABox) teamABox.classList.toggle("activeTeam", selectedTeam === "A")
   if (teamBBox) teamBBox.classList.toggle("activeTeam", selectedTeam === "B")
-    const centerTitle = document.querySelector(".explainCenterTitle h3")
 
-if (centerTitle) {
-  if (selectedTeam) {
-    centerTitle.innerText = getExplainTeamName(selectedTeam)
-  } else if (window.explainState.currentTeam) {
-    centerTitle.innerText = getExplainTeamName(window.explainState.currentTeam)
-  } else {
-    centerTitle.innerText = "اختر الفريق"
+  const centerTitle = document.querySelector(".explainCenterTitle h3")
+
+  if (centerTitle) {
+    if (selectedTeam) {
+      centerTitle.innerText = getExplainTeamName(selectedTeam)
+    } else if (window.explainState.currentTeam) {
+      centerTitle.innerText = getExplainTeamName(window.explainState.currentTeam)
+    } else {
+      centerTitle.innerText = "اختر الفريق"
+    }
   }
-}
 
-if (wordBox) {
-  const hasWord = !!window.explainState.currentNumber
-  const hiddenWord = hasWord && !window.explainState.wordVisible
+  if (wordBox) {
+    const hasWord = !!window.explainState.currentNumber
+    const hiddenWord = hasWord && !window.explainState.wordVisible
 
-  wordBox.classList.toggle("hasWord", hasWord)
-  wordBox.classList.toggle("hiddenWord", hiddenWord)
-  wordBox.classList.toggle("emptyWord", !hasWord)
-  wordBox.classList.toggle("wordBoxInvisible", hiddenWord)
+    wordBox.classList.toggle("hasWord", hasWord)
+    wordBox.classList.toggle("hiddenWord", hiddenWord)
+    wordBox.classList.toggle("emptyWord", !hasWord)
+    wordBox.classList.toggle("wordBoxInvisible", hiddenWord)
 
-  wordBox.classList.toggle("answerCorrect", window.explainState.answerResult === "correct")
-  wordBox.classList.toggle("answerWrong", window.explainState.answerResult === "wrong")
+    wordBox.classList.toggle("answerCorrect", window.explainState.answerResult === "correct")
+    wordBox.classList.toggle("answerWrong", window.explainState.answerResult === "wrong")
 
-  if (!hasWord) {
-    wordBox.innerText = ""
-  } else if (hiddenWord) {
-    wordBox.innerText = ""
-  } else {
-    wordBox.innerText = window.explainState.currentWord || ""
+    if (!hasWord) {
+      wordBox.innerText = ""
+    } else if (hiddenWord) {
+      wordBox.innerText = ""
+    } else {
+      wordBox.innerText = window.explainState.currentWord || ""
+    }
   }
-}
 
   if (timerBox) {
     timerBox.innerText = Number(window.explainState.timeLeft || 45)
@@ -413,7 +439,6 @@ if (wordBox) {
 
   saveExplainState()
 }
-
 /* =========================
    Team / Number
 ========================= */
