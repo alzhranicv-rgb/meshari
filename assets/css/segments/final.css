@@ -7395,3 +7395,79 @@
     font-size:clamp(.95rem,1.6vw,1.35rem) !important;
   }
 }
+/* =========================================================
+   FINAL ROUND 2 IMAGE AUTO SHOW
+   صح صحلي رقم 3 و 6 - عرض الصور تلقائيًا
+========================================================= */
+
+.finalRound2ImageAutoOverlay{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:99999 !important;
+  background:rgba(2,6,23,.92) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:28px !important;
+  animation:finalRound2ImageAutoFade .22s ease both !important;
+}
+
+.finalRound2ImageAutoInner{
+  position:relative !important;
+  width:min(96vw,1180px) !important;
+  height:min(88vh,720px) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.finalRound2ImageAutoImg{
+  max-width:100% !important;
+  max-height:100% !important;
+  object-fit:contain !important;
+  border-radius:30px !important;
+  box-shadow:0 28px 90px rgba(0,0,0,.45) !important;
+  animation:finalRound2ImageAutoPop .32s ease both !important;
+}
+
+.finalRound2ImageAutoCounter{
+  position:absolute !important;
+  top:14px !important;
+  right:14px !important;
+  z-index:2 !important;
+  min-width:92px !important;
+  height:54px !important;
+  border-radius:18px !important;
+  background:rgba(255,255,255,.88) !important;
+  color:#24185e !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:1.45rem !important;
+  font-weight:900 !important;
+  box-shadow:0 16px 38px rgba(0,0,0,.22) !important;
+}
+
+@keyframes finalRound2ImageAutoFade{
+  from{
+    opacity:0;
+  }
+
+  to{
+    opacity:1;
+  }
+}
+
+@keyframes finalRound2ImageAutoPop{
+  from{
+    opacity:0;
+    transform:scale(.96);
+    filter:blur(4px);
+  }
+
+  to{
+    opacity:1;
+    transform:scale(1);
+    filter:blur(0);
+  }
+}

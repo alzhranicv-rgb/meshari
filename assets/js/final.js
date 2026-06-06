@@ -20,6 +20,7 @@ let currentFinalRound1Image = ""
 let currentFinalRound3Image = ""
 let finalHistory = []
 let currentFinalSegmentKey = localStorage.getItem("active_segment") || "final"
+let finalRound2ImageAutoTimer = null
 
 
 /* =========================
@@ -839,6 +840,8 @@ function getFinalRound4FocusCount() {
 }
 
 function clearFinalIntervals() {
+  stopFinalRound2ImageAutoShow()
+
   if (finalState.round2?.revealTimer) {
     clearInterval(finalState.round2.revealTimer)
     finalState.round2.revealTimer = null
@@ -1166,7 +1169,7 @@ function activateFinalDouble() {
   }
 
   if (finalState.doubleState.used[team]) {
-    showGameToast("هذا الفريق استخدم الدبل مسبقًا في صح صحلي")
+    showGameToast("هذا الفريق استخدم الدبل مسبقًا في الفاصلة")
     return
   }
 
@@ -2059,16 +2062,16 @@ function renderFinalRound2() {
     </button>
 
     <button onclick="finalRound2ShowNextImage()" class="archiveCtrlBtn btnStart" ${isImage ? "" : "disabled"}>
-      الصورة التالية
-    </button>
+  بدء عرض الصور
+</button>
 
     <button onclick="finalRound2RecordScore()" class="archiveCtrlBtn btnCorrect" ${isScramble ? "" : "disabled"}>
       تسجيل المبعثرة
     </button>
 
     <button onclick="finalRound2RecordSequenceScore()" class="archiveCtrlBtn btnCorrect" ${isSequence ? "" : "disabled"}>
-      تسجيل الترتيب
-    </button>
+  ${isSequence ? `تسجيل الترتيب (${Number(finalState.round2.countdown || 0)})` : "تسجيل الترتيب"}
+</button>
 
     <button onclick="finalRound2RecordImageScore()" class="archiveCtrlBtn btnCorrect" ${isImage ? "" : "disabled"}>
       تسجيل الصورة
@@ -2175,7 +2178,12 @@ async function openFinalRound2Card(number) {
   }
 
   saveFinalState()
-  updateEndRoundButtonState()
+updateEndRoundButtonState()
+
+setTimeout(() => {
+  updateFinalRound2SequenceScoreButtonLabel()
+}, 50)
+
 }
 
 async function loadFinalRound2ImageNumber(displayNumber, groupKey) {
@@ -2238,6 +2246,7 @@ function resetFinalRound2EmptyNumber(number, groupKey) {
   finalState.round2.imageAnswers = []
   finalState.round2.shownImageIndex = 0
   finalState.round2.imageAnswerShown = false
+  closeFinalRound2ImageAutoOverlay()
 
   if (groupKey && finalState.round2.assignedTeams?.[groupKey]) {
     delete finalState.round2.assignedTeams[groupKey][number]
@@ -2459,44 +2468,117 @@ function renderFinalRound2ImageWords(box) {
 
   currentFinalRound3Image = currentImage
 }
+function stopFinalRound2ImageAutoShow() {
+  if (finalRound2ImageAutoTimer) {
+    clearTimeout(finalRound2ImageAutoTimer)
+    finalRound2ImageAutoTimer = null
+  }
+}
 
-function finalRound2ShowNextImage() {
-  if (!finalState.round2.pendingScore || finalState.round2.currentNumber === null) {
-    showGameToast("اختر الفريق ثم الرقم أولاً")
-    return
+function closeFinalRound2ImageAutoOverlay() {
+  stopFinalRound2ImageAutoShow()
+
+  const overlay = document.getElementById("finalRound2ImageAutoOverlay")
+  if (overlay) overlay.remove()
+}
+
+function showFinalRound2ImageAutoOverlay(src, index, total) {
+  let overlay = document.getElementById("finalRound2ImageAutoOverlay")
+
+  if (!overlay) {
+    overlay = document.createElement("div")
+    overlay.id = "finalRound2ImageAutoOverlay"
+    overlay.className = "finalRound2ImageAutoOverlay"
+    document.body.appendChild(overlay)
   }
 
-  if (finalState.round2.currentType !== "image") {
-    showGameToast("هذا الزر خاص بالرقمين 3 و 6")
-    return
-  }
+  overlay.innerHTML = `
+    <div class="finalRound2ImageAutoInner">
+      <div class="finalRound2ImageAutoCounter">
+        ${index} / ${total}
+      </div>
 
-  if (finalState.round2.imageAnswerShown) {
-    showGameToast("تم عرض الإجابات")
+      <img
+        class="finalRound2ImageAutoImg"
+        src="${escapeDisplayHtml(src)}"
+        alt=""
+      >
+    </div>
+  `
+}
+
+function startFinalRound2ImageAutoShow() {
+  ensureFinalRound2State()
+
+  if (
+    !finalState.round2.pendingScore ||
+    !finalState.round2.currentNumber ||
+    finalState.round2.currentType !== "image"
+  ) {
+    showGameToast("اختر رقم الصورة أولاً")
     return
   }
 
   const images = finalState.round2.images || []
 
   if (!images.length) {
-    showGameToast("لا توجد صور")
+    showGameToast("لا توجد صور لهذا الرقم")
     return
   }
 
+  stopFinalRound2ImageAutoShow()
+
   pushFinalHistory()
 
-  finalState.round2.shownImageIndex += 1
+  finalState.round2.shownImageIndex = 0
+  finalState.round2.imageAnswerShown = false
+  finalState.round2.answerShown = false
 
-  if (finalState.round2.shownImageIndex >= images.length) {
-    finalState.round2.shownImageIndex = images.length
-    finalState.round2.imageAnswerShown = true
-    finalState.round2.answerShown = true
-    currentFinalRound3Image = ""
+  let currentIndex = 0
+
+  const showNext = () => {
+    if (currentIndex >= images.length) {
+      const overlay = document.getElementById("finalRound2ImageAutoOverlay")
+if (overlay) overlay.remove()
+
+stopFinalRound2ImageAutoShow()
+
+      finalState.round2.shownImageIndex = images.length
+      finalState.round2.imageAnswerShown = true
+      finalState.round2.answerShown = true
+      currentFinalRound3Image = ""
+
+      playGameSound("answer")
+
+      renderFinalRoundTitle()
+      renderFinalRound2Words(true)
+      updateFinalRound2SequenceScoreButtonLabel()
+      saveFinalState()
+      return
+    }
+
+    const src = images[currentIndex]
+    finalState.round2.shownImageIndex = currentIndex + 1
+    currentFinalRound3Image = src
+
+    showFinalRound2ImageAutoOverlay(src, currentIndex + 1, images.length)
+
+    playGameSound("open")
+
+    renderFinalRoundTitle()
+    renderFinalRound2Words(false)
+    saveFinalState()
+
+    currentIndex += 1
+
+    finalRound2ImageAutoTimer = setTimeout(showNext, 7000)
   }
 
-  renderFinalRoundTitle()
-  renderFinalRound2Words(false)
-  saveFinalState()
+  showNext()
+}
+
+function finalRound2ShowNextImage() {
+  startFinalRound2ImageAutoShow()
 }
 
 function toggleFinalRound2ImageCorrectSelection(index) {
@@ -2614,39 +2696,26 @@ function hideFinalRound2SequenceWord(index) {
   finalState.round2.hiddenSequence.push(index)
 
   renderFinalRound2Words(finalState.round2.answerShown)
+  updateFinalRound2SequenceScoreButtonLabel()
   saveFinalState()
 }
 
-function finalRound2DecreaseCountdown() {
-  if (!finalState.round2.pendingScore || finalState.round2.currentNumber === null) {
-    showGameToast("اختر الفريق ثم الرقم أولاً")
+function updateFinalRound2SequenceScoreButtonLabel() {
+  const btn = document.querySelector('[onclick="finalRound2RecordSequenceScore()"]')
+  if (!btn) return
+
+  const isSequence =
+    finalState?.round === 2 &&
+    finalState?.round2?.currentType === "sequence" &&
+    finalState?.round2?.pendingScore
+
+  if (!isSequence) {
+    btn.innerText = "تسجيل الترتيب"
     return
   }
 
-  if (finalState.round2.currentType !== "sequence") {
-    showGameToast("هذا الزر خاص بالرقمين 2 و 5")
-    return
-  }
-
-  pushFinalHistory()
-
-  if (finalState.round2.countdown > 0) {
-    finalState.round2.countdown -= 1
-  }
-
-  if (finalState.round2.countdown <= 0) {
-    finalState.round2.countdown = 0
-    finalState.round2.answerShown = true
-    renderFinalRoundTitle()
-    renderFinalRound2Words(true)
-    flashScreen("wrong")
-    saveFinalState()
-    return
-  }
-
-  renderFinalRoundTitle()
-  renderFinalRound2Words(false)
-  saveFinalState()
+  const countdown = Number(finalState.round2.countdown || 0)
+  btn.innerText = `تسجيل الترتيب (${countdown})`
 }
 
 function finalRound2RecordScore() {
@@ -2759,6 +2828,7 @@ function finalizeRound2Number() {
 
   const overlay = document.getElementById("finalRound2ImageOverlay")
   if (overlay) overlay.remove()
+    closeFinalRound2ImageAutoOverlay()
 
   finalState.round2.revealTimer = null
   finalState.round2.pendingScore = false
@@ -2791,6 +2861,9 @@ function finalizeRound2Number() {
   highlightFinalTeam(nextTeam)
   saveFinalState()
   updateEndRoundButtonState()
+  setTimeout(() => {
+  updateFinalRound2SequenceScoreButtonLabel()
+}, 50)
 }
 /* =========================
    13) ROUND 3 - قصة
