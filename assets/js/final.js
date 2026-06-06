@@ -2900,66 +2900,42 @@ function buildFinalRound3StoryContent() {
 
   if (!state.currentNumber) {
     return `
-      <div class="finalTeamMediaEmptyState finalStoryEmptyState">
-        اختر الفريق ثم الرقم
+      <div class="finalStoryCleanEmpty">
+        اختر رقم
       </div>
     `
   }
 
   const shownPart = Number(state.shownPart || 0)
   const parts = Array.isArray(state.currentParts) ? state.currentParts : ["", "", ""]
-  const visibleParts = parts.slice(0, shownPart)
-
-  const pointsText =
-    shownPart === 1
-      ? "3 نقاط"
-      : shownPart === 2
-        ? "نقطتين"
-        : shownPart === 3
-          ? "نقطة واحدة"
-          : "اختر جزء"
+  const currentText = parts[shownPart - 1] || ""
 
   const answerHTML =
     state.answerShown && state.currentAnswer
       ? `
-        <div class="finalTeamMediaResultBox correctResult finalStoryAnswerBox">
-          <div class="finalTeamMediaSmallLabel">الإجابة</div>
-          <div class="finalRound3TeamMediaAnswer">
-            ${escapeDisplayHtml(state.currentAnswer)}
-          </div>
+        <div class="finalStoryCleanAnswer">
+          ${escapeDisplayHtml(state.currentAnswer)}
         </div>
       `
       : ""
 
+  if (!shownPart) {
+    return `
+      <div class="finalStoryCleanEmpty">
+        اضغط إظهار الجزء
+      </div>
+    `
+  }
+
   return `
-    <div class="finalStoryContent">
-      <div class="finalStoryHeader">
-        <div class="finalStoryNumberBadge">رقم ${Number(state.currentNumber || 0)}</div>
-        <div class="finalStoryPointsBadge">${pointsText}</div>
+    <div class="finalStoryCleanContent">
+
+      <div class="finalStoryCleanPart">
+        ${escapeDisplayHtml(currentText)}
       </div>
 
-      ${
-        visibleParts.length
-          ? `
-            <div class="finalStoryPartsList">
-              ${visibleParts.map((part, idx) => `
-                <div class="finalStoryPartCard">
-                  <div class="finalStoryPartBadge">الجزء ${idx + 1}</div>
-                  <div class="finalStoryPartText">
-                    ${escapeDisplayHtml(part || "-")}
-                  </div>
-                </div>
-              `).join("")}
-            </div>
-          `
-          : `
-            <div class="finalRoundPlaceholder">
-              اضغط إظهار الجزء الأول
-            </div>
-          `
-      }
-
       ${answerHTML}
+
     </div>
   `
 }
@@ -2967,18 +2943,25 @@ function buildFinalRound3StoryContent() {
 async function openFinalRound3StoryCard(number) {
   ensureFinalRound3State()
 
-  if (finalState.round3.pendingScore) {
-    showGameToast("أنهِ الرقم الحالي أولاً")
+  const n = Number(number)
+
+  if (finalState.round3.opened.includes(n)) {
+    showGameToast("هذا الرقم مستخدم")
     return
   }
 
-  const team = setFinalAutoTeam(3)
-
-  if (finalState.round3.opened.includes(number)) return
-
   pushFinalHistory()
 
-  const dbNumber = getFinalStoryDbNumber(number)
+  finalState.round3.currentNumber = n
+  finalState.round3.currentParts = []
+  finalState.round3.currentAnswer = ""
+  finalState.round3.shownPart = 0
+  finalState.round3.currentPoints = 0
+  finalState.round3.answerShown = false
+  finalState.round3.pendingScore = true
+  finalState.round3.activeTeam = null
+
+  const dbNumber = getFinalStoryDbNumber(n)
 
   const { data, error } = await db
     .from("final_round1_items")
@@ -2989,160 +2972,133 @@ async function openFinalRound3StoryCard(number) {
 
   if (error) {
     console.log("LOAD FINAL STORY ERROR:", error)
-    showGameToast("تعذر تحميل بيانات القصة")
+    showGameToast("تعذر تحميل بيانات الرقم")
+    finalState.round3.currentNumber = null
+    saveFinalState()
+    renderFinalRound()
     return
   }
 
   if (!data) {
     showGameToast("لا توجد بيانات لهذا الرقم")
+    finalState.round3.currentNumber = null
+    saveFinalState()
+    renderFinalRound()
     return
   }
 
-  const parts = [
+  finalState.round3.currentParts = [
     data.question_part1 || "",
     data.question_part2 || "",
     data.question_part3 || ""
-  ]
+  ].filter(Boolean)
 
-  const hasParts = parts.some(part => String(part || "").trim() !== "")
-
-  if (!hasParts) {
-    showGameToast("أجزاء القصة فارغة")
-    return
-  }
-
-  finalState.round3.currentNumber = number
-  finalState.round3.currentParts = parts
   finalState.round3.currentAnswer = data.answer || ""
-  finalState.round3.shownPart = 0
-  finalState.round3.currentPoints = 0
-  finalState.round3.answerShown = false
-  finalState.round3.pendingScore = true
-  finalState.round3.activeTeam = team
-
-  if (!finalState.round3.opened.includes(number)) {
-    finalState.round3.opened.push(number)
-  }
 
   playGameSound("open")
-  renderFinalRound3()
+
+  renderFinalRound()
   saveFinalState()
-  updateEndRoundButtonState()
 }
 
 function showFinalRound3StoryPart() {
-  const state = finalState.round3
+  ensureFinalRound3State()
 
-  if (!state.pendingScore || !state.currentNumber) {
+  if (!finalState.round3.pendingScore || !finalState.round3.currentNumber) {
     showGameToast("اختر رقم أولاً")
     return
   }
 
-  if (state.answerShown) {
-    showGameToast("تم إظهار الإجابة")
-    return
-  }
+  const totalParts = finalState.round3.currentParts.length || 0
 
-  const parts = (state.currentParts || []).filter(part => String(part || "").trim() !== "")
-
-  if (!parts.length) {
-    showGameToast("لا توجد أجزاء للقصة")
-    return
-  }
-
-  if (Number(state.shownPart || 0) >= parts.length) {
-    showGameToast("تم إظهار كل الأجزاء")
+  if (finalState.round3.shownPart >= totalParts) {
+    showGameToast("ظهرت كل الأجزاء")
     return
   }
 
   pushFinalHistory()
 
-  state.shownPart += 1
+  finalState.round3.shownPart += 1
 
-  if (state.shownPart === 1) state.currentPoints = 3
-  if (state.shownPart === 2) state.currentPoints = 2
-  if (state.shownPart >= 3) state.currentPoints = 1
+  if (finalState.round3.shownPart === 1) {
+    finalState.round3.currentPoints = 3
+  } else if (finalState.round3.shownPart === 2) {
+    finalState.round3.currentPoints = 2
+  } else {
+    finalState.round3.currentPoints = 1
+  }
 
   playGameSound("answer")
+
   renderFinalRound3()
+  updateFinalTopHeaderRoundInfo()
+  renderFinalTurnBar()
+  updateFinalDoubleButton()
   saveFinalState()
 }
 
 function finalRound3StoryCorrect() {
-  const state = finalState.round3
-  const team = state.activeTeam
+  ensureFinalRound3State()
 
-  if (!state.pendingScore || !state.currentNumber) {
-    showGameToast("اختر رقم أولاً")
+  if (!finalState.round3.pendingScore || !finalState.round3.currentNumber) {
+    showGameToast("لا يوجد رقم مفتوح")
     return
   }
 
-  if (!team) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
-
-  if (Number(state.shownPart || 0) <= 0) {
+  if (!finalState.round3.shownPart) {
     showGameToast("أظهر جزء من القصة أولاً")
     return
   }
 
-  if (state.scoredNumbers.includes(state.currentNumber)) {
-    showGameToast("تم تسجيل هذا الرقم مسبقاً")
+  const team = finalState.round3.activeTeam || selectedTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق الفائز أولاً")
     return
   }
 
   pushFinalHistory()
 
-  const points = Number(state.currentPoints || 1)
+  const points = Number(finalState.round3.currentPoints || 1)
 
-  state.answerShown = true
-  state.scores[team] += getFinalScoreValue(team, points)
-  state.scoredNumbers.push(state.currentNumber)
-  state.lastTeamPlayed = team
-
-  clearFinalActiveDouble()
+  finalState.round3.activeTeam = team
+  finalState.round3.scores[team] += getFinalScoreValue(team, points)
+  finalState.round3.answerShown = true
 
   playGameSound("correct")
   flashScreen("correct")
+
   renderFinalScores()
   renderFinalRound3()
+  updateFinalTopHeaderRoundInfo()
   saveFinalState()
 
   setTimeout(() => {
-    finalizeFinalRound3StoryTurn(getOtherTeam(team))
-  }, 7000)
+    finalizeFinalRound3StoryTurn()
+  }, 900)
 }
 
 function finalRound3StoryWrong() {
-  const state = finalState.round3
-  const team = state.activeTeam || "A"
+  ensureFinalRound3State()
 
-  if (!state.pendingScore || !state.currentNumber) {
-    showGameToast("اختر رقم أولاً")
+  if (!finalState.round3.pendingScore || !finalState.round3.currentNumber) {
+    showGameToast("لا يوجد رقم مفتوح")
     return
   }
 
   pushFinalHistory()
 
-  state.answerShown = true
-
-  if (!state.scoredNumbers.includes(state.currentNumber)) {
-    state.scoredNumbers.push(state.currentNumber)
-  }
-
-  state.lastTeamPlayed = team
-
-  clearFinalActiveDouble()
+  finalState.round3.answerShown = true
 
   playGameSound("wrong")
   flashScreen("wrong")
+
   renderFinalRound3()
   saveFinalState()
 
   setTimeout(() => {
-    finalizeFinalRound3StoryTurn(getOtherTeam(team))
-  }, 7000)
+    finalizeFinalRound3StoryTurn()
+  }, 900)
 }
 
 function finalizeFinalRound3StoryTurn(nextTeam = null) {

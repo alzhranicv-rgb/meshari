@@ -6997,3 +6997,126 @@
     transform:translateX(50%) scale(1.05);
   }
 }
+
+/* =========================================================
+   FINAL ROUND 3 STORY CLEAN VIEW
+   قصة - عرض جزء واحد فقط
+========================================================= */
+
+.finalStoryStage{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  overflow:hidden !important;
+}
+
+.finalStoryCleanEmpty{
+  width:100% !important;
+  min-height:320px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  font-size:clamp(2rem,4vw,4rem) !important;
+  font-weight:900 !important;
+  color:#24185e !important;
+  opacity:.55 !important;
+}
+
+.finalStoryCleanContent{
+  width:100% !important;
+  min-height:360px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:18px !important;
+  padding:20px !important;
+}
+
+.finalStoryCleanPart{
+  width:min(100%,900px) !important;
+  min-height:260px !important;
+  border-radius:34px !important;
+  padding:28px 34px !important;
+  background:
+    radial-gradient(circle at top right, rgba(255,155,81,.20), transparent 38%),
+    linear-gradient(135deg,rgba(255,255,255,.92),rgba(255,255,255,.70)) !important;
+  border:1px solid rgba(255,255,255,.95) !important;
+  box-shadow:
+    0 24px 60px rgba(15,23,42,.16),
+    inset 0 1px 0 rgba(255,255,255,.88) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  font-size:clamp(2.2rem,4.4vw,5rem) !important;
+  line-height:1.55 !important;
+  font-weight:900 !important;
+  color:#24185e !important;
+  animation:finalStoryPartPop .34s ease both !important;
+}
+
+.finalStoryCleanAnswer{
+  width:min(100%,760px) !important;
+  min-height:82px !important;
+  border-radius:26px !important;
+  padding:16px 22px !important;
+  background:linear-gradient(135deg,#ecfdf5,#ccfbf1) !important;
+  border:1px solid rgba(20,184,166,.35) !important;
+  box-shadow:0 18px 45px rgba(15,118,110,.16) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  font-size:clamp(1.5rem,2.6vw,2.7rem) !important;
+  line-height:1.4 !important;
+  font-weight:900 !important;
+  color:#0f766e !important;
+  animation:finalStoryAnswerPop .28s ease both !important;
+}
+
+@keyframes finalStoryPartPop{
+  from{
+    opacity:0;
+    transform:translateY(16px) scale(.96);
+    filter:blur(4px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    filter:blur(0);
+  }
+}
+
+@keyframes finalStoryAnswerPop{
+  from{
+    opacity:0;
+    transform:translateY(12px) scale(.96);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@media (max-width:1180px) and (orientation:landscape){
+  .finalStoryCleanContent{
+    min-height:300px !important;
+    padding:14px !important;
+  }
+
+  .finalStoryCleanPart{
+    min-height:215px !important;
+    border-radius:28px !important;
+    padding:22px 26px !important;
+    font-size:clamp(1.7rem,3.6vw,3.8rem) !important;
+  }
+
+  .finalStoryCleanAnswer{
+    min-height:68px !important;
+    font-size:clamp(1.2rem,2.2vw,2.1rem) !important;
+  }
+}
