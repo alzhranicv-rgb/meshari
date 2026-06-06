@@ -3342,9 +3342,13 @@ function startFinalRound4ImageTimer() {
 
   state.imageHidden = false
 
+  openFinalRound4TeamMediaOverlay("image")
+
   finalRound4ImageTimer = setTimeout(() => {
     state.imageHidden = true
     finalRound4ImageTimer = null
+
+    closeFinalRound4TeamMediaOverlay()
 
     playGameSound("answer")
     renderFinalRound4TeamMedia()
@@ -3578,9 +3582,9 @@ function buildFinalRound4TeamMediaContent() {
       `
     } else if (isImage) {
       mediaHTML = `
-        <div class="finalTeamMediaFrame finalTeamMediaImageFrame">
-          <img src="${escapeDisplayHtml(state.currentMedia)}" class="finalTeamMediaImage" alt="">
-        </div>
+        <div class="finalTeamMediaFrame finalTeamMediaImageFrame" onclick="openFinalRound4TeamMediaOverlay('image')">
+  <img src="${escapeDisplayHtml(state.currentMedia)}" class="finalTeamMediaImage" alt="">
+</div>
       `
     }
   }
@@ -3748,7 +3752,9 @@ function finalRound4TeamMediaCorrect() {
   }
 
   pushFinalHistory()
+
   stopFinalRound4ImageTimer()
+  closeFinalRound4TeamMediaOverlay()
 
   state.answerShown = true
   state.resultType = "correct"
@@ -3761,7 +3767,6 @@ function finalRound4TeamMediaCorrect() {
 
   playGameSound("correct")
   flashScreen("correct")
-  closeFinalRound4TeamMediaOverlay()
 
   renderFinalScores()
   renderFinalRound4TeamMedia()
@@ -3782,7 +3787,9 @@ function finalRound4TeamMediaWrong() {
   }
 
   pushFinalHistory()
+
   stopFinalRound4ImageTimer()
+  closeFinalRound4TeamMediaOverlay()
 
   state.answerShown = true
   state.questionShown = false
@@ -3798,7 +3805,6 @@ function finalRound4TeamMediaWrong() {
   clearFinalActiveDouble()
 
   playGameSound("wrong")
-  closeFinalRound4TeamMediaOverlay()
   flashScreen("wrong")
 
   renderFinalRound4TeamMedia()
