@@ -3102,19 +3102,11 @@ function finalRound3StoryWrong() {
     return
   }
 
-  pushFinalHistory()
-
-  finalState.round3.answerShown = true
-
   playGameSound("wrong")
   flashScreen("wrong")
 
   renderFinalRound3()
   saveFinalState()
-
-  setTimeout(() => {
-    finalizeFinalRound3StoryTurn()
-  }, 900)
 }
 
 function finalizeFinalRound3StoryTurn() {

@@ -7275,3 +7275,123 @@
     font-size:clamp(1.1rem,2vw,1.9rem) !important;
   }
 }
+/* =========================================================
+   FINAL ROUND 3 STORY COMPACT STACK
+   قصة - أجزاء مرتبة ومقاس مناسب
+========================================================= */
+
+.finalStoryStackContent{
+  width:100% !important;
+  min-height:300px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+  gap:10px !important;
+  padding:12px !important;
+}
+
+.finalStoryPartsStack{
+  width:min(100%,860px) !important;
+  margin:0 auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:10px !important;
+}
+
+.finalStoryStackPart{
+  width:100% !important;
+  min-height:68px !important;
+  border-radius:20px !important;
+  padding:10px 14px !important;
+  background:
+    radial-gradient(circle at top right, rgba(255,155,81,.14), transparent 36%),
+    linear-gradient(135deg,rgba(255,255,255,.92),rgba(255,255,255,.76)) !important;
+  border:1px solid rgba(255,255,255,.95) !important;
+  box-shadow:
+    0 12px 26px rgba(15,23,42,.10),
+    inset 0 1px 0 rgba(255,255,255,.9) !important;
+  display:grid !important;
+  grid-template-columns:54px minmax(0,1fr) !important;
+  gap:12px !important;
+  align-items:center !important;
+  animation:finalStoryStackPop .26s ease both !important;
+}
+
+.finalStoryStackPoints{
+  width:46px !important;
+  height:46px !important;
+  border-radius:16px !important;
+  background:linear-gradient(135deg,#ffedd5,#fb923c) !important;
+  color:#7c2d12 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:1.55rem !important;
+  font-weight:900 !important;
+  box-shadow:0 10px 22px rgba(251,146,60,.22) !important;
+}
+
+.finalStoryStackText{
+  text-align:center !important;
+  font-size:clamp(1.05rem,2vw,1.75rem) !important;
+  line-height:1.4 !important;
+  font-weight:900 !important;
+  color:#24185e !important;
+}
+
+.finalStoryCleanAnswer{
+  width:min(100%,680px) !important;
+  min-height:58px !important;
+  margin:4px auto 0 !important;
+  border-radius:20px !important;
+  padding:10px 16px !important;
+  background:linear-gradient(135deg,#ecfdf5,#ccfbf1) !important;
+  border:1px solid rgba(20,184,166,.35) !important;
+  box-shadow:0 12px 28px rgba(15,118,110,.13) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  font-size:clamp(1rem,1.8vw,1.65rem) !important;
+  line-height:1.35 !important;
+  font-weight:900 !important;
+  color:#0f766e !important;
+}
+
+@media (max-width:1180px) and (orientation:landscape){
+  .finalStoryStackContent{
+    min-height:250px !important;
+    gap:8px !important;
+    padding:10px !important;
+  }
+
+  .finalStoryPartsStack{
+    width:min(100%,760px) !important;
+    gap:8px !important;
+  }
+
+  .finalStoryStackPart{
+    min-height:56px !important;
+    border-radius:18px !important;
+    padding:8px 12px !important;
+    grid-template-columns:48px minmax(0,1fr) !important;
+    gap:10px !important;
+  }
+
+  .finalStoryStackPoints{
+    width:40px !important;
+    height:40px !important;
+    border-radius:14px !important;
+    font-size:1.35rem !important;
+  }
+
+  .finalStoryStackText{
+    font-size:clamp(.95rem,1.8vw,1.45rem) !important;
+    line-height:1.35 !important;
+  }
+
+  .finalStoryCleanAnswer{
+    min-height:50px !important;
+    font-size:clamp(.95rem,1.6vw,1.35rem) !important;
+  }
+}
