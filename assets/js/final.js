@@ -21,6 +21,7 @@ let currentFinalRound3Image = ""
 let finalHistory = []
 let currentFinalSegmentKey = localStorage.getItem("active_segment") || "final"
 let finalRound2ImageAutoTimer = null
+let finalRound4ImageTimer = null
 
 
 /* =========================
@@ -207,20 +208,21 @@ function createDefaultFinalState() {
   lastTeamPlayed: null,
 
   teamMedia: {
-    count: 4,
-    usedNumbers: [],
-    teamNumbers: { A: [], B: [] },
-    currentNumber: null,
-    currentTeam: null,
-    currentMediaType: "",
-    currentMedia: "",
-    currentQuestion: "",
-    currentAnswer: "",
-    questionShown: false,
-    answerShown: false,
-    videoPlayed: false,
-    resultType: ""
-  }
+  count: 4,
+  usedNumbers: [],
+  teamNumbers: { A: [], B: [] },
+  currentNumber: null,
+  currentTeam: null,
+  currentMediaType: "",
+  currentMedia: "",
+  currentQuestion: "",
+  currentAnswer: "",
+  questionShown: false,
+  answerShown: false,
+  videoPlayed: false,
+  imageHidden: false,
+  resultType: ""
+}
 }
   }
 }
@@ -443,6 +445,7 @@ function ensureFinalRound4State() {
   m.questionShown = !!m.questionShown
   m.answerShown = !!m.answerShown
   m.videoPlayed = !!m.videoPlayed
+  m.imageHidden = !!m.imageHidden
   m.resultType = String(m.resultType || "")
 }
 
@@ -841,6 +844,7 @@ function getFinalRound4FocusCount() {
 
 function clearFinalIntervals() {
   stopFinalRound2ImageAutoShow()
+  stopFinalRound4ImageTimer()
 
   if (finalState.round2?.revealTimer) {
     clearInterval(finalState.round2.revealTimer)
@@ -3314,6 +3318,64 @@ async function loadFinalRound4TeamMediaItem(number) {
   return data || null
 }
 
+function stopFinalRound4ImageTimer() {
+  if (finalRound4ImageTimer) {
+    clearTimeout(finalRound4ImageTimer)
+    finalRound4ImageTimer = null
+  }
+}
+
+function startFinalRound4ImageTimer() {
+  stopFinalRound4ImageTimer()
+
+  const state = finalState.round4.teamMedia
+
+  if (
+    !state.currentNumber ||
+    state.currentMediaType !== "image" ||
+    !state.currentMedia ||
+    state.questionShown ||
+    state.answerShown
+  ) {
+    return
+  }
+
+  state.imageHidden = false
+
+  finalRound4ImageTimer = setTimeout(() => {
+    state.imageHidden = true
+    finalRound4ImageTimer = null
+
+    playGameSound("answer")
+    renderFinalRound4TeamMedia()
+    saveFinalState()
+  }, 30000)
+}
+
+function restartFinalRound4TeamMediaImage() {
+  const state = finalState.round4.teamMedia
+
+  if (!state.currentNumber || state.currentMediaType !== "image" || !state.currentMedia) {
+    showGameToast("لا توجد صورة")
+    return
+  }
+
+  if (state.questionShown || state.answerShown) {
+    showGameToast("الصورة غير متاحة بعد إظهار السؤال")
+    return
+  }
+
+  pushFinalHistory()
+
+  state.imageHidden = false
+
+  playGameSound("open")
+  renderFinalRound4TeamMedia()
+  saveFinalState()
+
+  startFinalRound4ImageTimer()
+}
+
 function renderFinalRound4TeamMedia() {
   const stage = document.getElementById("finalMainStage")
   const controls = document.getElementById("finalControlsBar")
@@ -3364,21 +3426,38 @@ function renderFinalRound4TeamMedia() {
   const questionShown = !!state.questionShown
   const answerShown = !!state.answerShown
 
+  const isVideo =
+    hasCurrent &&
+    state.currentMediaType === "video" &&
+    !!state.currentMedia
+
+  const isImage =
+    hasCurrent &&
+    state.currentMediaType === "image" &&
+    !!state.currentMedia
+
   const canShowQuestion =
     hasCurrent &&
     !!state.currentQuestion &&
     !questionShown &&
     !answerShown
 
-  const videoAvailable =
-    hasCurrent &&
+  const canPlayVideo =
+    isVideo &&
     !questionShown &&
     !answerShown &&
-    state.currentMediaType === "video" &&
-    !!state.currentMedia
+    !state.videoPlayed
 
-  const canPlayVideo = videoAvailable && !state.videoPlayed
-  const canRestartVideo = videoAvailable
+  const canRestartVideo =
+    isVideo &&
+    !questionShown &&
+    !answerShown
+
+  const canRestartImage =
+    isImage &&
+    !questionShown &&
+    !answerShown &&
+    !!state.imageHidden
 
   controls.innerHTML = `
     <button
@@ -3406,11 +3485,11 @@ function renderFinalRound4TeamMedia() {
     </button>
 
     <button
-      onclick="restartFinalRound4TeamMediaVideo()"
+      onclick="${isImage ? "restartFinalRound4TeamMediaImage()" : "restartFinalRound4TeamMediaVideo()"}"
       class="archiveCtrlBtn finalTeamMediaCtrlBtn btnStart"
-      ${canRestartVideo ? "" : "disabled"}
+      ${(canRestartVideo || canRestartImage) ? "" : "disabled"}
     >
-      إعادة تشغيل
+      إعادة
     </button>
 
     <button
@@ -3458,7 +3537,12 @@ function buildFinalRound4TeamMediaContent() {
   }
 
   const isVideo = state.currentMediaType === "video" && state.currentMedia
-  const showMedia = !state.questionShown && !state.answerShown
+  const isImage = state.currentMediaType === "image" && state.currentMedia
+
+  const showMedia =
+    !state.questionShown &&
+    !state.answerShown &&
+    !state.imageHidden
 
   const resultClass =
     state.resultType === "correct"
@@ -3467,36 +3551,47 @@ function buildFinalRound4TeamMediaContent() {
         ? "wrongResult"
         : ""
 
-  const mediaHTML =
-    showMedia && state.currentMedia
-      ? isVideo
-        ? `
-          <div class="finalTeamMediaFrame finalTeamMediaVideoFrame" onclick="openFinalRound4TeamMediaOverlay('video')">
-            <video
-              id="finalRound4TeamMediaInlineVideo"
-              src="${escapeDisplayHtml(state.currentMedia)}"
-              class="finalTeamMediaVideo"
-              playsinline
-              preload="metadata"
-              controlslist="nodownload noplaybackrate"
-              disablepictureinpicture
-            ></video>
+  let mediaHTML = ""
 
-            <button
-              type="button"
-              class="finalTeamMediaPlayBadge"
-              onclick="event.stopPropagation(); playFinalRound4TeamMediaVideo()"
-            >
-              ▶
-            </button>
-          </div>
-        `
-        : `
-          <div class="finalTeamMediaFrame finalTeamMediaImageFrame" onclick="openFinalRound4TeamMediaOverlay('image')">
-            <img src="${escapeDisplayHtml(state.currentMedia)}" class="finalTeamMediaImage" alt="">
-          </div>
-        `
-      : ""
+  if (showMedia && state.currentMedia) {
+    if (isVideo) {
+      mediaHTML = `
+        <div class="finalTeamMediaFrame finalTeamMediaVideoFrame" onclick="openFinalRound4TeamMediaOverlay('video')">
+          <video
+            id="finalRound4TeamMediaInlineVideo"
+            src="${escapeDisplayHtml(state.currentMedia)}"
+            class="finalTeamMediaVideo"
+            playsinline
+            preload="metadata"
+            controlslist="nodownload noplaybackrate"
+            disablepictureinpicture
+          ></video>
+
+          <button
+            type="button"
+            class="finalTeamMediaPlayBadge"
+            onclick="event.stopPropagation(); playFinalRound4TeamMediaVideo()"
+          >
+            ▶
+          </button>
+        </div>
+      `
+    } else if (isImage) {
+      mediaHTML = `
+        <div class="finalTeamMediaFrame finalTeamMediaImageFrame">
+          <img src="${escapeDisplayHtml(state.currentMedia)}" class="finalTeamMediaImage" alt="">
+        </div>
+      `
+    }
+  }
+
+  if (isImage && state.imageHidden && !state.questionShown && !state.answerShown) {
+    mediaHTML = `
+      <div class="finalTeamMediaEmptyState">
+        انتهى وقت الصورة
+      </div>
+    `
+  }
 
   const questionHTML =
     state.questionShown && state.currentQuestion
@@ -3574,6 +3669,8 @@ async function openFinalRound4TeamMediaCard(number) {
   state.questionShown = false
   state.videoPlayed = false
   state.resultType = ""
+  state.imageHidden = false
+  stopFinalRound4ImageTimer()
 
   if (video) {
     state.currentMediaType = "video"
@@ -3598,6 +3695,9 @@ async function openFinalRound4TeamMediaCard(number) {
   renderFinalRound4TeamMedia()
   saveFinalState()
   updateEndRoundButtonState()
+  if (state.currentMediaType === "image") {
+  startFinalRound4ImageTimer()
+}
 }
 
 function showFinalRound4TeamMediaQuestion() {
@@ -3614,6 +3714,7 @@ function showFinalRound4TeamMediaQuestion() {
   }
 
   pushFinalHistory()
+  stopFinalRound4ImageTimer()
 
   state.questionShown = true
   state.answerShown = false
@@ -3647,6 +3748,7 @@ function finalRound4TeamMediaCorrect() {
   }
 
   pushFinalHistory()
+  stopFinalRound4ImageTimer()
 
   state.answerShown = true
   state.resultType = "correct"
@@ -3680,6 +3782,7 @@ function finalRound4TeamMediaWrong() {
   }
 
   pushFinalHistory()
+  stopFinalRound4ImageTimer()
 
   state.answerShown = true
   state.questionShown = false
@@ -3707,6 +3810,8 @@ function finalRound4TeamMediaWrong() {
 }
 
 function resetFinalRound4TeamMediaCurrent(nextTeam = null) {
+  stopFinalRound4ImageTimer()
+
   const state = finalState.round4.teamMedia
 
   state.currentNumber = null
@@ -3718,6 +3823,7 @@ function resetFinalRound4TeamMediaCurrent(nextTeam = null) {
   state.answerShown = false
   state.questionShown = false
   state.videoPlayed = false
+  state.imageHidden = false
   state.resultType = ""
 
   finalState.round4.currentNumber = null
