@@ -2181,6 +2181,7 @@ async function openFinalRound2Card(number) {
 updateEndRoundButtonState()
 
 setTimeout(() => {
+  updateFinalRound2CountdownButtonLabel()
   updateFinalRound2SequenceScoreButtonLabel()
 }, 50)
 
@@ -2723,6 +2724,8 @@ function finalRound2DecreaseCountdown() {
 
     renderFinalRoundTitle()
     renderFinalRound2Words(true)
+
+    updateFinalRound2CountdownButtonLabel()
     updateFinalRound2SequenceScoreButtonLabel()
 
     flashScreen("wrong")
@@ -2732,7 +2735,10 @@ function finalRound2DecreaseCountdown() {
 
   renderFinalRoundTitle()
   renderFinalRound2Words(false)
+
+  updateFinalRound2CountdownButtonLabel()
   updateFinalRound2SequenceScoreButtonLabel()
+
   saveFinalState()
 }
 
@@ -2752,6 +2758,24 @@ function updateFinalRound2SequenceScoreButtonLabel() {
 
   const countdown = Number(finalState.round2.countdown || 0)
   btn.innerText = `تسجيل الترتيب (${countdown})`
+}
+
+function updateFinalRound2CountdownButtonLabel() {
+  const btn = document.querySelector('[onclick="finalRound2DecreaseCountdown()"]')
+  if (!btn) return
+
+  const isSequence =
+    finalState?.round === 2 &&
+    finalState?.round2?.currentType === "sequence" &&
+    finalState?.round2?.pendingScore
+
+  if (!isSequence) {
+    btn.innerText = "العداد"
+    return
+  }
+
+  const countdown = Number(finalState.round2.countdown || 0)
+  btn.innerText = countdown
 }
 
 function finalRound2RecordScore() {
@@ -2898,6 +2922,7 @@ function finalizeRound2Number() {
   saveFinalState()
   updateEndRoundButtonState()
   setTimeout(() => {
+  updateFinalRound2CountdownButtonLabel()
   updateFinalRound2SequenceScoreButtonLabel()
 }, 50)
 }
@@ -3200,7 +3225,7 @@ function finalRound3StoryCorrect() {
 
   setTimeout(() => {
     finalizeFinalRound3StoryTurn()
-  }, 900)
+  }, 5000)
 }
 
 function finalRound3StoryWrong() {
