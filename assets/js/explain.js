@@ -56,30 +56,26 @@ function getExplainWordPoolKey(model, wordsCount, words) {
   ].join("__")
 }
 
-function shuffleExplainArray(array) {
-  const copy = [...array]
 
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const temp = copy[i]
-    copy[i] = copy[j]
-    copy[j] = temp
-  }
 
-  return copy
-}
+function buildExplainWords(rawWords, wordsCount) {
+  const wordsMap = {}
 
-function buildRandomExplainWords(rawWords, wordsCount) {
-  const cleanWords = (rawWords || [])
-    .map(row => String(row.word || "").trim())
-    .filter(Boolean)
+  ;(rawWords || []).forEach(row => {
+    const number = Number(row.number || 0)
+    const word = String(row.word || "").trim()
 
-  const shuffled = shuffleExplainArray(cleanWords)
+    if (number >= 1 && number <= wordsCount) {
+      wordsMap[number] = word
+    }
+  })
 
   return Array.from({ length: wordsCount }, (_, index) => {
+    const number = index + 1
+
     return {
-      number: index + 1,
-      word: shuffled[index] || ""
+      number,
+      word: wordsMap[number] || ""
     }
   })
 }
@@ -205,8 +201,8 @@ async function loadExplainData() {
     saved?.wordPoolKey === wordPoolKey
 
   const words = sameSavedGame && Array.isArray(saved?.words)
-    ? saved.words
-    : buildRandomExplainWords(rawWords, wordsCount)
+  ? saved.words
+  : buildExplainWords(rawWords, wordsCount)
 
   window.explainState = {
     model,
