@@ -2700,6 +2700,42 @@ function hideFinalRound2SequenceWord(index) {
   saveFinalState()
 }
 
+function finalRound2DecreaseCountdown() {
+  if (!finalState.round2.pendingScore || finalState.round2.currentNumber === null) {
+    showGameToast("اختر الفريق ثم الرقم أولاً")
+    return
+  }
+
+  if (finalState.round2.currentType !== "sequence") {
+    showGameToast("هذا الزر خاص بالرقمين 2 و 5")
+    return
+  }
+
+  pushFinalHistory()
+
+  if (finalState.round2.countdown > 0) {
+    finalState.round2.countdown -= 1
+  }
+
+  if (finalState.round2.countdown <= 0) {
+    finalState.round2.countdown = 0
+    finalState.round2.answerShown = true
+
+    renderFinalRoundTitle()
+    renderFinalRound2Words(true)
+    updateFinalRound2SequenceScoreButtonLabel()
+
+    flashScreen("wrong")
+    saveFinalState()
+    return
+  }
+
+  renderFinalRoundTitle()
+  renderFinalRound2Words(false)
+  updateFinalRound2SequenceScoreButtonLabel()
+  saveFinalState()
+}
+
 function updateFinalRound2SequenceScoreButtonLabel() {
   const btn = document.querySelector('[onclick="finalRound2RecordSequenceScore()"]')
   if (!btn) return
