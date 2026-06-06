@@ -2908,7 +2908,13 @@ function buildFinalRound3StoryContent() {
 
   const shownPart = Number(state.shownPart || 0)
   const parts = Array.isArray(state.currentParts) ? state.currentParts : ["", "", ""]
-  const currentText = parts[shownPart - 1] || ""
+  const visibleParts = parts.slice(0, shownPart)
+
+  const getPartPoints = index => {
+    if (index === 0) return 3
+    if (index === 1) return 2
+    return 1
+  }
 
   const answerHTML =
     state.answerShown && state.currentAnswer
@@ -2928,10 +2934,20 @@ function buildFinalRound3StoryContent() {
   }
 
   return `
-    <div class="finalStoryCleanContent">
+    <div class="finalStoryStackContent">
 
-      <div class="finalStoryCleanPart">
-        ${escapeDisplayHtml(currentText)}
+      <div class="finalStoryPartsStack">
+        ${visibleParts.map((part, index) => `
+          <div class="finalStoryStackPart">
+            <div class="finalStoryStackPoints">
+              ${getPartPoints(index)}
+            </div>
+
+            <div class="finalStoryStackText">
+              ${escapeDisplayHtml(part || "-")}
+            </div>
+          </div>
+        `).join("")}
       </div>
 
       ${answerHTML}
@@ -3050,7 +3066,7 @@ function finalRound3StoryCorrect() {
     return
   }
 
-  const team = finalState.round3.activeTeam || selectedTeam
+  const team = selectedTeam || finalState.round3.activeTeam
 
   if (!team) {
     showGameToast("اختر الفريق الفائز أولاً")
@@ -3101,25 +3117,34 @@ function finalRound3StoryWrong() {
   }, 900)
 }
 
-function finalizeFinalRound3StoryTurn(nextTeam = null) {
-  finalState.round3.pendingScore = false
+function finalizeFinalRound3StoryTurn() {
+  ensureFinalRound3State()
+
+  const n = Number(finalState.round3.currentNumber || 0)
+
+  if (n) {
+    if (!finalState.round3.opened.includes(n)) {
+      finalState.round3.opened.push(n)
+    }
+
+    if (!finalState.round3.scoredNumbers.includes(n)) {
+      finalState.round3.scoredNumbers.push(n)
+    }
+  }
+
   finalState.round3.currentNumber = null
-  finalState.round3.currentParts = ["", "", ""]
+  finalState.round3.currentParts = []
   finalState.round3.currentAnswer = ""
   finalState.round3.shownPart = 0
   finalState.round3.currentPoints = 0
   finalState.round3.answerShown = false
+  finalState.round3.pendingScore = false
+  finalState.round3.activeTeam = null
 
-  if (nextTeam === "A" || nextTeam === "B") {
-    finalState.round3.activeTeam = nextTeam
-  } else {
-    finalState.round3.activeTeam = getOtherTeam(finalState.round3.lastTeamPlayed || "A")
-  }
+  selectedTeam = null
 
-  renderFinalRound3()
-  highlightFinalTeam(finalState.round3.activeTeam)
+  renderFinalRound()
   saveFinalState()
-  updateEndRoundButtonState()
 }
 /* =========================
    14) ROUND 4 - التركيز
