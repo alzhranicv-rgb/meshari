@@ -23,6 +23,7 @@ window.whoMaxNumber = Number(localStorage.getItem("who_max_number") || 15)
 window.explainWordsCount = Number(localStorage.getItem("explain_words_count") || 4)
 window.finalRound1CardsCount = Number(localStorage.getItem("final_round1_cards_count") || 6)
 window.finalRound3Count = Number(localStorage.getItem("final_round3_count") || 4)
+window.finalRound4Count = Number(localStorage.getItem("final_round4_count") || 4)
 
 const ALL_DISPLAY_SEGMENTS = [
   { key: "warmup", title: "التسخين", sort: 1 },
@@ -33,8 +34,8 @@ const ALL_DISPLAY_SEGMENTS = [
 
   { key: "finalRound1", title: "من بدون نقط", sort: 6 },
   { key: "finalRound2", title: "صح صحلي", sort: 7 },
-  { key: "finalRound3", title: "التركيز", sort: 8 },
-  { key: "finalRound4", title: "اشرح الصورة", sort: 9 },
+  { key: "finalRound3", title: "قصة", sort: 8 },
+  { key: "finalRound4", title: "التركيز", sort: 9 },
 
   { key: "archive", title: "الأرشيف", sort: 10 }
 ]
@@ -528,6 +529,7 @@ async function loadDisplaySegmentCounts() {
   window.explainWordsCount = await getDisplaySegmentCount("explain", 4, 8)
   window.finalRound1CardsCount = await getDisplaySegmentCount("finalRound1", 6, 8)
   window.finalRound3Count = await getDisplaySegmentCount("finalRound3", 4, 8)
+  window.finalRound4Count = await getDisplaySegmentCount("finalRound4", 4, 8)
 
   localStorage.setItem("top10_max_round", String(window.top10MaxRound))
   localStorage.setItem("auction_max_number", String(window.auctionMaxNumber))
@@ -537,6 +539,7 @@ async function loadDisplaySegmentCounts() {
   localStorage.setItem("explain_words_count", String(window.explainWordsCount))
   localStorage.setItem("final_round1_cards_count", String(window.finalRound1CardsCount))
   localStorage.setItem("final_round3_count", String(window.finalRound3Count))
+  localStorage.setItem("final_round4_count", String(window.finalRound4Count))
 }
 
 async function loadDisplayCountForSegment(segmentKey) {
@@ -573,6 +576,11 @@ async function loadDisplayCountForSegment(segmentKey) {
   if (segmentKey === "finalRound3") {
     window.finalRound3Count = await getDisplaySegmentCount("finalRound3", 4, 8)
     localStorage.setItem("final_round3_count", String(window.finalRound3Count))
+  }
+
+  if (segmentKey === "finalRound4") {
+    window.finalRound4Count = await getDisplaySegmentCount("finalRound4", 4, 8)
+    localStorage.setItem("final_round4_count", String(window.finalRound4Count))
   }
 }
 
@@ -1890,9 +1898,9 @@ function getCurrentSegmentKey() {
   if (text.includes("اشرح الكلمة")) return "explain"
 
   if (text.includes("من بدون نقط")) return "finalRound1"
-  if (text.includes("صح صحلي")) return "finalRound2"
-  if (text.includes("التركيز")) return "finalRound3"
-  if (text.includes("اشرح الصورة")) return "finalRound4"
+if (text.includes("صح صحلي")) return "finalRound2"
+if (text.includes("قصة")) return "finalRound3"
+if (text.includes("التركيز")) return "finalRound4"
 
   if (text.includes("الفاصلة")) return "final"
   if (text.includes("الأرشيف")) return "archive"
@@ -1985,83 +1993,92 @@ function canEndSegment(segmentKey) {
   }
 
   if (segmentKey === "finalRound2") {
-    if (!window.finalState) return false
+  if (!window.finalState) return false
 
-    return (
-      (window.finalState.round2?.opened || []).length >= 4 &&
-      (window.finalState.round2?.scoredNumbers || []).length >= 4
-    )
-  }
+  return (
+    (window.finalState.round2?.opened || []).length >= 6 &&
+    (window.finalState.round2?.scoredNumbers || []).length >= 6
+  )
+}
 
-  if (segmentKey === "finalRound3") {
-    if (!window.finalState) return false
+if (segmentKey === "finalRound3") {
+  if (!window.finalState) return false
 
-    const total = getSafeSegmentNumber(
-      window.finalState.round3?.teamMedia?.count ||
-      window.finalRound3Count ||
-      localStorage.getItem("final_round3_count"),
-      4,
-      8
-    )
+  const total = getSafeSegmentNumber(
+    window.finalState.round3?.cardsCount ||
+    window.finalRound3Count ||
+    localStorage.getItem("final_round3_count"),
+    4,
+    8
+  )
 
-    if (window.finalState.round3?.mode === "team_media") {
-      return (
-        (window.finalState.round3?.teamMedia?.usedNumbers || []).length >= total &&
-        (window.finalState.round3?.scoredNumbers || []).length >= total
-      )
-    }
+  return (
+    (window.finalState.round3?.opened || []).length >= total &&
+    (window.finalState.round3?.scoredNumbers || []).length >= total
+  )
+}
 
-    return (
-      (window.finalState.round3?.opened || []).length >= 2 &&
-      (window.finalState.round3?.scoredNumbers || []).length >= 2
-    )
-  }
+if (segmentKey === "finalRound4") {
+  if (!window.finalState) return false
 
-  if (segmentKey === "finalRound4") {
-    if (!window.finalState) return false
+  const total = getSafeSegmentNumber(
+    window.finalState.round4?.teamMedia?.count ||
+    window.finalRound4Count ||
+    localStorage.getItem("final_round4_count"),
+    4,
+    8
+  )
 
-    return (
-      (window.finalState.round4?.opened || []).length >= 2 &&
-      (window.finalState.round4?.scoredNumbers || []).length >= 2
-    )
-  }
+  return (
+    (window.finalState.round4?.teamMedia?.usedNumbers || []).length >= total &&
+    (window.finalState.round4?.scoredNumbers || []).length >= total
+  )
+}
 
-  if (segmentKey === "final") {
-    if (!window.finalState) return false
+if (segmentKey === "final") {
+  if (!window.finalState) return false
 
-    const r1Count = getSafeSegmentNumber(
-      window.finalState.round1?.cardsCount ||
-      window.finalRound1CardsCount ||
-      localStorage.getItem("final_round1_cards_count"),
-      6,
-      8
-    )
+  const r1Count = getSafeSegmentNumber(
+    window.finalState.round1?.cardsCount ||
+    window.finalRound1CardsCount ||
+    localStorage.getItem("final_round1_cards_count"),
+    6,
+    8
+  )
 
-    const finalR3Total = getSafeSegmentNumber(
-      window.finalState.round3?.teamMedia?.count ||
-      window.finalRound3Count ||
-      localStorage.getItem("final_round3_count"),
-      4,
-      8
-    )
+  const r3Count = getSafeSegmentNumber(
+    window.finalState.round3?.cardsCount ||
+    window.finalRound3Count ||
+    localStorage.getItem("final_round3_count"),
+    4,
+    8
+  )
 
-    const r1Done =
-      (window.finalState.round1?.opened || []).length >= r1Count
+  const r4Count = getSafeSegmentNumber(
+    window.finalState.round4?.teamMedia?.count ||
+    window.finalRound4Count ||
+    localStorage.getItem("final_round4_count"),
+    4,
+    8
+  )
 
-    const r2Done =
-      (window.finalState.round2?.opened || []).length >= 4 &&
-      (window.finalState.round2?.scoredNumbers || []).length >= 4
+  const r1Done =
+    (window.finalState.round1?.opened || []).length >= r1Count
 
-    const r3Done =
-      (window.finalState.round3?.teamMedia?.usedNumbers || []).length >= finalR3Total &&
-      (window.finalState.round3?.scoredNumbers || []).length >= finalR3Total
+  const r2Done =
+    (window.finalState.round2?.opened || []).length >= 6 &&
+    (window.finalState.round2?.scoredNumbers || []).length >= 6
 
-    const r4Done =
-      (window.finalState.round4?.opened || []).length >= 2 &&
-      (window.finalState.round4?.scoredNumbers || []).length >= 2
+  const r3Done =
+    (window.finalState.round3?.opened || []).length >= r3Count &&
+    (window.finalState.round3?.scoredNumbers || []).length >= r3Count
 
-    return r1Done && r2Done && r3Done && r4Done
-  }
+  const r4Done =
+    (window.finalState.round4?.teamMedia?.usedNumbers || []).length >= r4Count &&
+    (window.finalState.round4?.scoredNumbers || []).length >= r4Count
+
+  return r1Done && r2Done && r3Done && r4Done
+}
 
   if (segmentKey === "archive") {
     if (!window.archiveState) return false
@@ -2680,10 +2697,12 @@ const FINAL_RESULTS_CONFIG = [
   { segmentKey: "auction", cardKey: "auction", prefix: "Auction", title: "فتبلة" },
   { segmentKey: "who", cardKey: "who", prefix: "Who", title: "من هو" },
   { segmentKey: "explain", cardKey: "explain", prefix: "Explain", title: "اشرح الكلمة" },
+
   { segmentKey: "finalRound1", cardKey: "final1", prefix: "Final1", title: "من بدون نقط" },
   { segmentKey: "finalRound2", cardKey: "final2", prefix: "Final2", title: "صح صحلي" },
-  { segmentKey: "finalRound3", cardKey: "final3", prefix: "Final3", title: "التركيز" },
-  { segmentKey: "finalRound4", cardKey: "final4", prefix: "Final4", title: "اشرح الصورة" },
+  { segmentKey: "finalRound3", cardKey: "final3", prefix: "Final3", title: "قصة" },
+  { segmentKey: "finalRound4", cardKey: "final4", prefix: "Final4", title: "التركيز" },
+
   { segmentKey: "archive", cardKey: "archive", prefix: "Archive", title: "الأرشيف" }
 ]
 

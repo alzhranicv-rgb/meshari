@@ -6694,3 +6694,306 @@
     line-height:1.35 !important;
   }
 }
+/* =========================================================
+   FINAL NUMBERS LAYOUT FIX
+   4 = صف واحد
+   6 = صف واحد
+   8 = صفين
+========================================================= */
+
+/* =========================
+   عام لفقرات الفاصلة
+========================= */
+
+.finalRound1GridSingleRow,
+.finalRound2SixNumbersGrid,
+.finalStoryNumbersGrid,
+.finalTeamMediaNumbersGrid{
+  width:min(100%,980px) !important;
+  margin:0 auto !important;
+  gap:12px !important;
+  justify-content:center !important;
+  align-items:center !important;
+}
+
+/* =========================
+   من بدون نقط
+========================= */
+
+/* 4 أرقام */
+.finalRound1GridSingleRow{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+}
+
+/* 6 أرقام */
+.finalRound1GridSingleRow:has(.finalRound1Card:nth-child(6)):not(:has(.finalRound1Card:nth-child(7))){
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+}
+
+/* 8 أرقام = صفين */
+.finalRound1GridSingleRow:has(.finalRound1Card:nth-child(8)){
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  max-width:760px !important;
+}
+
+/* =========================
+   صح صحلي
+   دائمًا 6 أرقام في صف واحد
+========================= */
+
+.finalRound2SixNumbersGrid{
+  display:grid !important;
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+}
+
+/* =========================
+   قصة
+========================= */
+
+/* 4 أرقام */
+.finalStoryNumbersGrid{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+}
+
+/* 6 أرقام */
+.finalStoryNumbersGrid:has(.finalStoryNumberCard:nth-child(6)):not(:has(.finalStoryNumberCard:nth-child(7))){
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+}
+
+/* 8 أرقام = صفين */
+.finalStoryNumbersGrid:has(.finalStoryNumberCard:nth-child(8)){
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  max-width:760px !important;
+}
+
+/* =========================
+   التركيز
+========================= */
+
+/* 4 أرقام */
+.finalTeamMediaNumbersGrid{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+}
+
+/* 6 أرقام */
+.finalTeamMediaNumbersGrid:has(.finalTeamMediaNumberCard:nth-child(6)):not(:has(.finalTeamMediaNumberCard:nth-child(7))){
+  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+}
+
+/* 8 أرقام = صفين */
+.finalTeamMediaNumbersGrid:has(.finalTeamMediaNumberCard:nth-child(8)){
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  max-width:760px !important;
+}
+
+/* =========================
+   شكل الرقم نفسه
+========================= */
+
+.finalRound1Card,
+.finalRound2Card,
+.finalStoryNumberCard,
+.finalTeamMediaNumberCard{
+  min-height:72px !important;
+  border-radius:22px !important;
+  font-size:2rem !important;
+  font-weight:900 !important;
+}
+
+/* =========================
+   Galaxy Tab A11 / iPad Landscape
+========================= */
+
+@media (max-width:1180px) and (orientation:landscape){
+  .finalRound1GridSingleRow,
+  .finalRound2SixNumbersGrid,
+  .finalStoryNumbersGrid,
+  .finalTeamMediaNumbersGrid{
+    width:min(100%,900px) !important;
+    gap:10px !important;
+  }
+
+  .finalRound1GridSingleRow:has(.finalRound1Card:nth-child(8)),
+  .finalStoryNumbersGrid:has(.finalStoryNumberCard:nth-child(8)),
+  .finalTeamMediaNumbersGrid:has(.finalTeamMediaNumberCard:nth-child(8)){
+    max-width:680px !important;
+  }
+
+  .finalRound1Card,
+  .finalRound2Card,
+  .finalStoryNumberCard,
+  .finalTeamMediaNumberCard{
+    min-height:60px !important;
+    border-radius:18px !important;
+    font-size:1.7rem !important;
+  }
+}
+/* =========================================================
+   FINAL ROUND 2 SEQUENCE TIMER
+   عداد رقم 2 و 5 داخل مربع السؤال
+========================================================= */
+
+.finalSequenceStageBox{
+  position:relative !important;
+  width:100% !important;
+  min-height:320px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:96px 18px 18px !important;
+}
+
+/* مربع العداد أعلى اليمين */
+.finalSequenceTimerBadge{
+  position:absolute !important;
+  top:16px !important;
+  right:16px !important;
+  min-width:150px !important;
+  min-height:76px !important;
+  border-radius:22px !important;
+  padding:10px 16px !important;
+  background:linear-gradient(135deg,#fff7ed,#fed7aa) !important;
+  border:1px solid rgba(251,146,60,.42) !important;
+  box-shadow:0 14px 34px rgba(15,23,42,.14) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:12px !important;
+  direction:rtl !important;
+  z-index:5 !important;
+}
+
+/* كلمة المتبقي */
+.finalSequenceTimerBadge span{
+  font-size:1rem !important;
+  font-weight:900 !important;
+  color:#9a3412 !important;
+  white-space:nowrap !important;
+}
+
+/* الرقم */
+.finalSequenceTimerBadge strong{
+  min-width:58px !important;
+  height:58px !important;
+  border-radius:18px !important;
+  background:#fff !important;
+  color:#24185e !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:2.35rem !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+  box-shadow:inset 0 -3px 0 rgba(15,23,42,.08) !important;
+}
+
+/* آخر 5 ثواني */
+.finalSequenceTimerBadge.danger{
+  background:linear-gradient(135deg,#fee2e2,#fca5a5) !important;
+  border-color:rgba(239,68,68,.45) !important;
+  animation:finalSequenceTimerPulse .55s ease-in-out infinite alternate !important;
+}
+
+.finalSequenceTimerBadge.danger span{
+  color:#991b1b !important;
+}
+
+.finalSequenceTimerBadge.danger strong{
+  color:#dc2626 !important;
+}
+
+/* حركة تنبيه */
+@keyframes finalSequenceTimerPulse{
+  from{
+    transform:scale(1);
+    box-shadow:0 14px 34px rgba(239,68,68,.18);
+  }
+
+  to{
+    transform:scale(1.05);
+    box-shadow:0 18px 44px rgba(239,68,68,.34);
+  }
+}
+
+/* ترتيب كلمات الترتيب داخل المربع */
+.finalSequenceStageBox .finalSequenceWordsWrap{
+  width:100% !important;
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:14px !important;
+  align-items:center !important;
+}
+
+.finalSequenceStageBox .finalSequenceWordBtn{
+  min-height:92px !important;
+  border-radius:22px !important;
+  font-size:1.55rem !important;
+  font-weight:900 !important;
+}
+
+/* تابلت / عرض أفقي */
+@media (max-width:1180px) and (orientation:landscape){
+  .finalSequenceStageBox{
+    min-height:285px !important;
+    padding:88px 14px 14px !important;
+  }
+
+  .finalSequenceTimerBadge{
+    top:12px !important;
+    right:12px !important;
+    min-width:138px !important;
+    min-height:68px !important;
+    border-radius:20px !important;
+    padding:8px 14px !important;
+  }
+
+  .finalSequenceTimerBadge span{
+    font-size:.92rem !important;
+  }
+
+  .finalSequenceTimerBadge strong{
+    min-width:52px !important;
+    height:52px !important;
+    border-radius:16px !important;
+    font-size:2.05rem !important;
+  }
+
+  .finalSequenceStageBox .finalSequenceWordBtn{
+    min-height:78px !important;
+    font-size:1.28rem !important;
+    border-radius:18px !important;
+  }
+}
+
+/* جوال */
+@media (max-width:760px){
+  .finalSequenceStageBox{
+    padding:90px 12px 12px !important;
+  }
+
+  .finalSequenceTimerBadge{
+    right:50% !important;
+    transform:translateX(50%) !important;
+  }
+
+  .finalSequenceTimerBadge.danger{
+    animation:finalSequenceTimerPulseMobile .55s ease-in-out infinite alternate !important;
+  }
+
+  .finalSequenceStageBox .finalSequenceWordsWrap{
+    grid-template-columns:1fr !important;
+  }
+}
+
+@keyframes finalSequenceTimerPulseMobile{
+  from{
+    transform:translateX(50%) scale(1);
+  }
+
+  to{
+    transform:translateX(50%) scale(1.05);
+  }
+}

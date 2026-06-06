@@ -15,8 +15,8 @@ const INTRO_ALL_GAME_SEGMENTS = [
 
   { key: "finalRound1", title: "من بدون نقط", sort: 6 },
   { key: "finalRound2", title: "صح صحلي", sort: 7 },
-  { key: "finalRound3", title: "التركيز", sort: 8 },
-  { key: "finalRound4", title: "اشرح الصورة", sort: 9 },
+  { key: "finalRound3", title: "قصة", sort: 8 },
+  { key: "finalRound4", title: "التركيز", sort: 9 },
 
   { key: "archive", title: "الأرشيف", sort: 10 }
 ]

@@ -20,6 +20,7 @@ let whoAdminCount = 15
 let finalRound1AdminCount = 6
 let explainAdminCount = 4
 let finalRound3AdminCount = 4
+let finalRound4AdminCount = 4
 
 let finalAdminRound = 1
 
@@ -44,8 +45,8 @@ const ALL_GAME_SEGMENTS = [
 
   { key: "finalRound1", title: "من بدون نقط", sort: 6 },
   { key: "finalRound2", title: "صح صحلي", sort: 7 },
-  { key: "finalRound3", title: "التركيز", sort: 8 },
-  { key: "finalRound4", title: "اشرح الصورة", sort: 9 },
+  { key: "finalRound3", title: "قصة", sort: 8 },
+  { key: "finalRound4", title: "التركيز", sort: 9 },
 
   { key: "archive", title: "الأرشيف", sort: 10 }
 ]
@@ -154,7 +155,7 @@ function getAdminSettingLimit(segment) {
   }
 
   if (segment === "finalRound1") {
-    return { fallback: 6, min: 6, max: 8, allowed: [6, 8] }
+    return { fallback: 6, min: 4, max: 8, allowed: [4, 6, 8] }
   }
 
   if (segment === "explain") {
@@ -162,6 +163,10 @@ function getAdminSettingLimit(segment) {
   }
 
   if (segment === "finalRound3") {
+    return { fallback: 4, min: 4, max: 8, allowed: [4, 6, 8] }
+  }
+
+  if (segment === "finalRound4") {
     return { fallback: 4, min: 4, max: 8, allowed: [4, 6, 8] }
   }
 
@@ -283,6 +288,7 @@ function updateAdminQuickSettingUI(segment, count) {
   if (segment === "finalRound1") finalRound1AdminCount = safeCount
   if (segment === "explain") explainAdminCount = safeCount
   if (segment === "finalRound3") finalRound3AdminCount = safeCount
+  if (segment === "finalRound4") finalRound4AdminCount = safeCount
 }
 
 async function setAdminSegmentCount(segment, count) {
@@ -713,7 +719,8 @@ async function getAdminCompletionCounts() {
     whoCount: 15,
     finalRound1CardsCount: 6,
     explainCount: 4,
-    finalRound3Count: 4
+    finalRound3Count: 4,
+    finalRound4Count: 4
   }
 
   if (!currentModel) return result
@@ -727,8 +734,9 @@ async function getAdminCompletionCounts() {
 
     qFinalRound1,
     qFinalRound2,
-    qFinalRound3Focus,
-    qFinalRound4Images,
+    qFinalRound2Images,
+    qFinalRound3Story,
+    qFinalRound4Focus,
     qArchive,
 
     top10Setting,
@@ -737,7 +745,8 @@ async function getAdminCompletionCounts() {
     whoSetting,
     finalRound1Setting,
     explainSetting,
-    finalRound3Setting
+    finalRound3Setting,
+    finalRound4Setting
   ] = await Promise.all([
     db.from("questions")
       .select("id", { count: "exact", head: true })
@@ -762,11 +771,25 @@ async function getAdminCompletionCounts() {
 
     db.from("final_round1_items")
       .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel)),
+      .eq("model", Number(currentModel))
+      .gte("number", 1)
+      .lte("number", 8),
 
     db.from("final_round2_items")
+  .select("id", { count: "exact", head: true })
+  .eq("model", Number(currentModel))
+  .in("number", [1, 2, 4, 5]),
+
+    db.from("final_round3_items")
+       .select("id", { count: "exact", head: true })
+       .eq("model", Number(currentModel))
+       .in("number", [101, 102]),
+
+    db.from("final_round1_items")
       .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel)),
+      .eq("model", Number(currentModel))
+      .gte("number", 201)
+      .lte("number", 208),
 
     db.from("final_round3_items")
       .select("id", { count: "exact", head: true })
@@ -774,11 +797,6 @@ async function getAdminCompletionCounts() {
       .gte("number", 1)
       .lte("number", 8)
       .eq("image_order", 1),
-
-    db.from("final_round3_items")
-      .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel))
-      .in("number", [101, 102]),
 
     db.from("archive_boxes")
       .select("id", { count: "exact", head: true })
@@ -824,6 +842,12 @@ async function getAdminCompletionCounts() {
       .select("item_count")
       .eq("model", Number(currentModel))
       .eq("segment", "finalRound3")
+      .maybeSingle(),
+
+    db.from("segment_settings")
+      .select("item_count")
+      .eq("model", Number(currentModel))
+      .eq("segment", "finalRound4")
       .maybeSingle()
   ])
 
@@ -834,9 +858,9 @@ async function getAdminCompletionCounts() {
   result.explain = qExplain.count || 0
 
   result.finalRound1 = qFinalRound1.count || 0
-  result.finalRound2 = qFinalRound2.count || 0
-  result.finalRound3 = qFinalRound3Focus.count || 0
-  result.finalRound4 = qFinalRound4Images.count || 0
+  result.finalRound2 = (qFinalRound2.count || 0) + (qFinalRound2Images.count || 0)
+  result.finalRound3 = qFinalRound3Story.count || 0
+  result.finalRound4 = qFinalRound4Focus.count || 0
 
   result.archive = qArchive.count || 0
 
@@ -848,6 +872,7 @@ async function getAdminCompletionCounts() {
   result.finalRound1CardsCount = normalizeAdminSegmentCount("finalRound1", finalRound1Setting.data?.item_count || 6)
   result.explainCount = normalizeAdminSegmentCount("explain", explainSetting.data?.item_count || 4)
   result.finalRound3Count = normalizeAdminSegmentCount("finalRound3", finalRound3Setting.data?.item_count || 4)
+  result.finalRound4Count = normalizeAdminSegmentCount("finalRound4", finalRound4Setting.data?.item_count || 4)
 
   return result
 }
@@ -880,14 +905,19 @@ function isSegmentDone(key, count, counts = {}) {
     return count >= total
   }
 
-  if (key === "finalRound2") return count >= 24
+  if (key === "finalRound2") {
+  return count >= 34
+}
 
   if (key === "finalRound3") {
     const total = normalizeAdminSegmentCount("finalRound3", counts.finalRound3Count || 4)
     return count >= total
   }
 
-  if (key === "finalRound4") return count >= 10
+  if (key === "finalRound4") {
+    const total = normalizeAdminSegmentCount("finalRound4", counts.finalRound4Count || 4)
+    return count >= total
+  }
 
   if (key === "archive") {
     const rounds = Math.min(Math.max(Number(counts.archiveRoundsCount || 4), 1), 4)
@@ -948,29 +978,29 @@ async function renderAdminHome() {
       count: counts.explain || 0
     },
     {
-      key: "finalRound1",
-      title: "من بدون نقط",
-      desc: `عدد الأرقام: ${counts.finalRound1CardsCount}`,
-      count: counts.finalRound1 || 0
-    },
-    {
-      key: "finalRound2",
-      title: "صح صحلي",
-      desc: "4 أرقام ثابتة",
-      count: counts.finalRound2 || 0
-    },
-    {
-      key: "finalRound3",
-      title: "التركيز",
-      desc: `عدد الأرقام: ${counts.finalRound3Count}`,
-      count: counts.finalRound3 || 0
-    },
-    {
-      key: "finalRound4",
-      title: "اشرح الصورة",
-      desc: "رقمين، كل رقم 5 صور",
-      count: counts.finalRound4 || 0
-    },
+  key: "finalRound1",
+  title: "من بدون نقط",
+  desc: `عدد الأرقام: ${counts.finalRound1CardsCount}`,
+  count: counts.finalRound1 || 0
+},
+{
+  key: "finalRound2",
+  title: "صح صحلي",
+  desc: "6 أرقام: 1 مبعثرة، 2 ترتيب، 3 صورة، 4 مبعثرة، 5 ترتيب، 6 صورة",
+  count: counts.finalRound2 || 0
+},
+{
+  key: "finalRound3",
+  title: "قصة",
+  desc: `عدد الأرقام: ${counts.finalRound3Count}`,
+  count: counts.finalRound3 || 0
+},
+{
+  key: "finalRound4",
+  title: "التركيز",
+  desc: `عدد الأرقام: ${counts.finalRound4Count}`,
+  count: counts.finalRound4 || 0
+},
     {
       key: "archive",
       title: "الأرشيف",
@@ -1409,7 +1439,11 @@ async function checkExplainReady() {
 }
 
 function getFinalRound1NoDotsCount(cardsCount) {
-  return Number(cardsCount) === 8 ? 4 : 3
+  const count = Number(cardsCount || 6)
+
+  if (count === 4) return 4
+  if (count === 8) return 8
+  return 6
 }
 
 async function checkFinalRoundReady(round) {
@@ -1428,7 +1462,6 @@ async function checkFinalRoundReady(round) {
 
   if (round === 1) {
     const r1CardsCount = await getAdminSegmentCount("finalRound1")
-    const textCardsCount = getFinalRound1NoDotsCount(r1CardsCount)
 
     const r1Map = {}
 
@@ -1438,27 +1471,16 @@ async function checkFinalRoundReady(round) {
 
     for (let i = 1; i <= r1CardsCount; i++) {
       const row = r1Map[i]
-      const isNoDotsCard = i <= textCardsCount
+      
 
       if (!row) {
         missing.push(`من بدون نقط - رقم ${i} غير موجود`)
         continue
       }
 
-      if (isNoDotsCard) {
-        if (!hasText(row.card_text)) {
-          missing.push(`من بدون نقط - رقم ${i}: نص بدون نقط فارغ`)
-        }
-      } else {
-        const hasAnyQuestionPart =
-          hasText(row.question_part1) ||
-          hasText(row.question_part2) ||
-          hasText(row.question_part3)
-
-        if (!hasAnyQuestionPart) {
-          missing.push(`من بدون نقط - رقم ${i}: أجزاء السؤال فارغة`)
-        }
-      }
+      if (!hasText(row.card_text)) {
+  missing.push(`من بدون نقط - رقم ${i}: نص بدون نقط فارغ`)
+}
 
       if (!hasText(row.answer)) {
         missing.push(`من بدون نقط - رقم ${i}: الإجابة فارغة`)
@@ -1473,120 +1495,155 @@ async function checkFinalRoundReady(round) {
   }
 
   if (round === 2) {
-    const r2Map = {}
+  const r2Map = {}
 
-    ;(r2Res.data || []).forEach(row => {
-      r2Map[`${Number(row.number)}_${Number(row.item_order)}`] = row
-    })
+  ;(r2Res.data || []).forEach(row => {
+    r2Map[`${Number(row.number)}_${Number(row.item_order)}`] = row
+  })
 
-    for (let number = 1; number <= 4; number++) {
-      const isScramble = number === 1 || number === 3
+  for (const number of [1, 2, 4, 5]) {
+    const isScramble = isFinalRound2ScrambleNumber(number)
+    const typeName = isScramble ? "كلمات مبعثرة" : "ترتيب"
 
-      for (let i = 1; i <= 6; i++) {
-        const row = r2Map[`${number}_${i}`]
-
-        if (!row) {
-          missing.push(`صح صحلي - رقم ${number} - العنصر ${i} غير موجود`)
-          continue
-        }
-
-        if (!hasText(row.prompt)) {
-          missing.push(`صح صحلي - رقم ${number} - العنصر ${i}: النص فارغ`)
-        }
-
-        if (isScramble && !hasText(row.answer)) {
-          missing.push(`صح صحلي - رقم ${number} - العنصر ${i}: الإجابة فارغة`)
-        }
-      }
-    }
-
-    return readinessItem(
-      "صح صحلي",
-      missing.length === 0,
-      missing.length ? missing : ["صح صحلي مكتملة"]
-    )
-  }
-
-  if (round === 3) {
-    const requiredCount = await getAdminSegmentCount("finalRound3")
-    const r3FocusMap = {}
-
-    ;(r3Res.data || []).forEach(row => {
-      const number = Number(row.number)
-      const imageOrder = Number(row.image_order || 1)
-
-      if (number >= 1 && number <= 8 && imageOrder === 1) {
-        r3FocusMap[number] = row
-      }
-    })
-
-    for (let number = 1; number <= requiredCount; number++) {
-      const row = r3FocusMap[number]
+    for (let i = 1; i <= 6; i++) {
+      const row = r2Map[`${number}_${i}`]
 
       if (!row) {
-        missing.push(`التركيز - رقم ${number} غير موجود`)
+        missing.push(`صح صحلي - رقم ${number} (${typeName}) - العنصر ${i} غير موجود`)
         continue
       }
 
-      if (!hasText(row.image) && !hasText(row.video)) {
-        missing.push(`التركيز - رقم ${number}: الصورة أو الفيديو غير موجود`)
+      if (!hasText(row.prompt)) {
+        missing.push(`صح صحلي - رقم ${number} (${typeName}) - العنصر ${i}: النص فارغ`)
       }
 
-      if (!hasText(row.question)) {
-        missing.push(`التركيز - رقم ${number}: السؤال فارغ`)
+      if (isScramble && !hasText(row.answer)) {
+        missing.push(`صح صحلي - رقم ${number} (${typeName}) - العنصر ${i}: الإجابة فارغة`)
+      }
+    }
+  }
+
+  const imageMap = {}
+
+  ;(r3Res.data || []).forEach(row => {
+    const dbNumber = Number(row.number)
+    const imageOrder = Number(row.image_order || 1)
+
+    if (dbNumber === 101 || dbNumber === 102) {
+      imageMap[`${dbNumber}_${imageOrder}`] = row
+    }
+  })
+
+  for (const displayNumber of [3, 6]) {
+    const dbNumber = getFinalRound4DbNumber(displayNumber)
+
+    for (let i = 1; i <= 5; i++) {
+      const row = imageMap[`${dbNumber}_${i}`]
+
+      if (!row) {
+        missing.push(`صح صحلي - رقم ${displayNumber} (اشرح الصورة) - الصورة ${i} غير موجودة`)
+        continue
+      }
+
+      if (!hasText(row.image)) {
+        missing.push(`صح صحلي - رقم ${displayNumber} (اشرح الصورة) - الصورة ${i}: الصورة غير موجودة`)
       }
 
       if (!hasText(row.answer)) {
-        missing.push(`التركيز - رقم ${number}: الإجابة فارغة`)
+        missing.push(`صح صحلي - رقم ${displayNumber} (اشرح الصورة) - الصورة ${i}: الإجابة فارغة`)
       }
     }
-
-    return readinessItem(
-      "التركيز",
-      missing.length === 0,
-      missing.length ? missing : [`التركيز مكتملة بعدد ${requiredCount} أرقام`]
-    )
   }
+
+  return readinessItem(
+    "صح صحلي",
+    missing.length === 0,
+    missing.length ? missing : ["صح صحلي مكتملة: 1 مبعثرة، 2 ترتيب، 3 صورة، 4 مبعثرة، 5 ترتيب، 6 صورة"]
+  )
+}
+
+  if (round === 3) {
+  const requiredCount = await getAdminSegmentCount("finalRound3")
+  const storyMap = {}
+
+  ;(r1Res.data || []).forEach(row => {
+    const number = Number(row.number)
+
+    if (number >= 201 && number <= 208) {
+      storyMap[number] = row
+    }
+  })
+
+  for (let displayNumber = 1; displayNumber <= requiredCount; displayNumber++) {
+    const dbNumber = getFinalStoryDbNumber(displayNumber)
+    const row = storyMap[dbNumber]
+
+    if (!row) {
+      missing.push(`قصة - رقم ${displayNumber} غير موجود`)
+      continue
+    }
+
+    const hasAnyPart =
+      hasText(row.question_part1) ||
+      hasText(row.question_part2) ||
+      hasText(row.question_part3)
+
+    if (!hasAnyPart) {
+      missing.push(`قصة - رقم ${displayNumber}: أجزاء القصة فارغة`)
+    }
+
+    if (!hasText(row.answer)) {
+      missing.push(`قصة - رقم ${displayNumber}: الإجابة فارغة`)
+    }
+  }
+
+  return readinessItem(
+    "قصة",
+    missing.length === 0,
+    missing.length ? missing : [`قصة مكتملة بعدد ${requiredCount} أرقام`]
+  )
+}
 
   if (round === 4) {
-    const r4Map = {}
+  const requiredCount = await getAdminSegmentCount("finalRound4")
+  const focusMap = {}
 
-    ;(r3Res.data || []).forEach(row => {
-      const number = Number(row.number)
-      const imageOrder = Number(row.image_order || 1)
+  ;(r3Res.data || []).forEach(row => {
+    const number = Number(row.number)
+    const imageOrder = Number(row.image_order || 1)
 
-      if (number === 101 || number === 102) {
-        r4Map[`${number}_${imageOrder}`] = row
-      }
-    })
+    if (number >= 1 && number <= 8 && imageOrder === 1) {
+      focusMap[number] = row
+    }
+  })
 
-    for (let displayNumber = 1; displayNumber <= 2; displayNumber++) {
-      const dbNumber = 100 + displayNumber
+  for (let number = 1; number <= requiredCount; number++) {
+    const row = focusMap[number]
 
-      for (let i = 1; i <= 5; i++) {
-        const row = r4Map[`${dbNumber}_${i}`]
-
-        if (!row) {
-          missing.push(`اشرح الصورة - رقم ${displayNumber} - الصورة ${i} غير موجودة`)
-          continue
-        }
-
-        if (!hasText(row.image)) {
-          missing.push(`اشرح الصورة - رقم ${displayNumber} - الصورة ${i}: الصورة غير موجودة`)
-        }
-
-        if (!hasText(row.answer)) {
-          missing.push(`اشرح الصورة - رقم ${displayNumber} - الصورة ${i}: الإجابة فارغة`)
-        }
-      }
+    if (!row) {
+      missing.push(`التركيز - رقم ${number} غير موجود`)
+      continue
     }
 
-    return readinessItem(
-      "اشرح الصورة",
-      missing.length === 0,
-      missing.length ? missing : ["اشرح الصورة مكتملة"]
-    )
+    if (!hasText(row.image) && !hasText(row.video)) {
+      missing.push(`التركيز - رقم ${number}: الصورة أو الفيديو غير موجود`)
+    }
+
+    if (!hasText(row.question)) {
+      missing.push(`التركيز - رقم ${number}: السؤال فارغ`)
+    }
+
+    if (!hasText(row.answer)) {
+      missing.push(`التركيز - رقم ${number}: الإجابة فارغة`)
+    }
   }
+
+  return readinessItem(
+    "التركيز",
+    missing.length === 0,
+    missing.length ? missing : [`التركيز مكتملة بعدد ${requiredCount} أرقام`]
+  )
+}
 
   return readinessItem("الفاصلة", false, ["رقم الجولة غير صحيح"])
 }
@@ -4247,6 +4304,7 @@ async function deleteExplainSegment() {
     showGameToast("حدث خطأ أثناء حذف اشرح الكلمة")
   }
 }
+
 /* =========================
    23) Final Helpers
 ========================= */
@@ -4259,13 +4317,41 @@ async function renderFinalAdmin() {
 function getFinalAdminRoundTitle(round) {
   if (round === 1) return "من بدون نقط"
   if (round === 2) return "صح صحلي"
-  if (round === 3) return "التركيز"
-  if (round === 4) return "اشرح الصورة"
+  if (round === 3) return "قصة"
+  if (round === 4) return "التركيز"
+
   return "الفاصلة"
+}
+function getFinalStoryDbNumber(displayNumber) {
+  return 200 + Number(displayNumber || 1)
 }
 
 function getFinalRound4DbNumber(displayNumber) {
-  return 100 + Number(displayNumber || 1)
+  const n = Number(displayNumber || 0)
+
+  if (n === 3) return 101
+  if (n === 6) return 102
+
+  // توافق مع الكود القديم لو كان يرسل 1 و 2
+  if (n === 1) return 101
+  if (n === 2) return 102
+
+  return 0
+}
+
+function isFinalRound2ImageNumber(number) {
+  const n = Number(number || 0)
+  return n === 3 || n === 6
+}
+
+function isFinalRound2ScrambleNumber(number) {
+  const n = Number(number || 0)
+  return n === 1 || n === 4
+}
+
+function isFinalRound2SequenceNumber(number) {
+  const n = Number(number || 0)
+  return n === 2 || n === 5
 }
 
 async function getFinalAdminDoneMap() {
@@ -4289,45 +4375,29 @@ async function getFinalAdminDoneMap() {
     return doneMap
   }
 
-  /* Round 1 */
+  /* Round 1 - من بدون نقط */
   const r1Count = await getAdminSegmentCount("finalRound1")
-  const r1NoDotsCount = getFinalRound1NoDotsCount(r1Count)
   const r1Map = {}
 
   ;(r1Res.data || []).forEach(row => {
-    r1Map[Number(row.number)] = row
+    const number = Number(row.number)
+
+    if (number >= 1 && number <= 8) {
+      r1Map[number] = row
+    }
   })
 
   let round1Done = true
 
   for (let i = 1; i <= r1Count; i++) {
     const row = r1Map[i]
-    const isNoDotsCard = i <= r1NoDotsCount
 
     if (!row) {
       round1Done = false
       break
     }
 
-    const hasAnswer = hasText(row.answer)
-    const hasCardText = hasText(row.card_text)
-
-    const hasQuestionPart =
-      hasText(row.question_part1) ||
-      hasText(row.question_part2) ||
-      hasText(row.question_part3)
-
-    if (!hasAnswer) {
-      round1Done = false
-      break
-    }
-
-    if (isNoDotsCard && !hasCardText) {
-      round1Done = false
-      break
-    }
-
-    if (!isNoDotsCard && !hasQuestionPart) {
+    if (!hasText(row.card_text) || !hasText(row.answer)) {
       round1Done = false
       break
     }
@@ -4335,39 +4405,104 @@ async function getFinalAdminDoneMap() {
 
   doneMap[1] = round1Done
 
-  /* Round 2 */
-  const r2Map = {}
+/* Round 2 - صح صحلي */
+const r2Map = {}
 
-  ;(r2Res.data || []).forEach(row => {
-    r2Map[`${Number(row.number)}_${Number(row.item_order)}`] = row
-  })
+;(r2Res.data || []).forEach(row => {
+  r2Map[`${Number(row.number)}_${Number(row.item_order)}`] = row
+})
 
-  let round2Done = true
+let round2Done = true
 
-  for (let number = 1; number <= 4; number++) {
-    const isScramble = number === 1 || number === 3
+for (const number of [1, 2, 4, 5]) {
+  const isScramble = isFinalRound2ScrambleNumber(number)
 
-    for (let i = 1; i <= 6; i++) {
-      const row = r2Map[`${number}_${i}`]
+  for (let i = 1; i <= 6; i++) {
+    const row = r2Map[`${number}_${i}`]
 
-      if (!row || !hasText(row.prompt)) {
-        round2Done = false
-        break
-      }
-
-      if (isScramble && !hasText(row.answer)) {
-        round2Done = false
-        break
-      }
+    if (!row || !hasText(row.prompt)) {
+      round2Done = false
+      break
     }
 
-    if (!round2Done) break
+    if (isScramble && !hasText(row.answer)) {
+      round2Done = false
+      break
+    }
   }
 
-  doneMap[2] = round2Done
+  if (!round2Done) break
+}
 
-  /* Round 3 */
-  const focusCount = await getAdminSegmentCount("finalRound3")
+/* Round 2 image numbers - رقم 3 و 6 */
+const imageMap = {}
+
+;(r3Res.data || []).forEach(row => {
+  const dbNumber = Number(row.number)
+  const imageOrder = Number(row.image_order || 1)
+
+  if (dbNumber === 101 || dbNumber === 102) {
+    imageMap[`${dbNumber}_${imageOrder}`] = row
+  }
+})
+
+for (const displayNumber of [3, 6]) {
+  const dbNumber = getFinalRound4DbNumber(displayNumber)
+
+  for (let i = 1; i <= 5; i++) {
+    const row = imageMap[`${dbNumber}_${i}`]
+
+    if (!row || !hasText(row.image) || !hasText(row.answer)) {
+      round2Done = false
+      break
+    }
+  }
+
+  if (!round2Done) break
+}
+
+doneMap[2] = round2Done
+
+  
+
+  /* Round 3 - قصة */
+  const storyCount = await getAdminSegmentCount("finalRound3")
+  const storyMap = {}
+
+  ;(r1Res.data || []).forEach(row => {
+    const number = Number(row.number)
+
+    if (number >= 201 && number <= 208) {
+      storyMap[number] = row
+    }
+  })
+
+  let round3Done = true
+
+  for (let displayNumber = 1; displayNumber <= storyCount; displayNumber++) {
+    const dbNumber = getFinalStoryDbNumber(displayNumber)
+    const row = storyMap[dbNumber]
+
+    if (!row) {
+      round3Done = false
+      break
+    }
+
+    const hasAnyPart =
+      hasText(row.question_part1) ||
+      hasText(row.question_part2) ||
+      hasText(row.question_part3)
+
+    if (!hasAnyPart || !hasText(row.answer)) {
+      round3Done = false
+      break
+    }
+  }
+
+  doneMap[3] = round3Done
+
+  /* Round 4 - التركيز */
+  const focusCount = await getAdminSegmentCount("finalRound4")
   const focusMap = {}
 
   ;(r3Res.data || []).forEach(row => {
@@ -4379,56 +4514,25 @@ async function getFinalAdminDoneMap() {
     }
   })
 
-  let round3Done = true
+  let round4Done = true
 
   for (let number = 1; number <= focusCount; number++) {
     const row = focusMap[number]
 
     if (!row) {
-      round3Done = false
+      round4Done = false
       break
     }
 
     if (!hasText(row.image) && !hasText(row.video)) {
-      round3Done = false
+      round4Done = false
       break
     }
 
     if (!hasText(row.question) || !hasText(row.answer)) {
-      round3Done = false
+      round4Done = false
       break
     }
-  }
-
-  doneMap[3] = round3Done
-
-  /* Round 4 */
-  const r4Map = {}
-
-  ;(r3Res.data || []).forEach(row => {
-    const number = Number(row.number)
-    const imageOrder = Number(row.image_order || 1)
-
-    if (number === 101 || number === 102) {
-      r4Map[`${number}_${imageOrder}`] = row
-    }
-  })
-
-  let round4Done = true
-
-  for (let displayNumber = 1; displayNumber <= 2; displayNumber++) {
-    const dbNumber = getFinalRound4DbNumber(displayNumber)
-
-    for (let i = 1; i <= 5; i++) {
-      const row = r4Map[`${dbNumber}_${i}`]
-
-      if (!row || !hasText(row.image) || !hasText(row.answer)) {
-        round4Done = false
-        break
-      }
-    }
-
-    if (!round4Done) break
   }
 
   doneMap[4] = round4Done
@@ -4448,27 +4552,10 @@ async function renderFinalAdminRound(round) {
 
   const round1CardsCount = await getAdminSegmentCount("finalRound1")
   const round3Count = await getAdminSegmentCount("finalRound3")
+  const round4Count = await getAdminSegmentCount("finalRound4")
 
-  const countBox = safeRound === 1
-    ? `
-      <div class="finalTopCompactBox finalTopCompactCountBox">
-        <div class="adminField compactCountField">
-          <label>عدد الأرقام</label>
-
-          <div class="compactCountSelectWrap">
-            <select
-              id="finalRound1CardsCount"
-              class="compactCountSelect"
-              onchange="changeFinalRound1CardsCount()"
-            >
-              <option value="6" ${round1CardsCount === 6 ? "selected" : ""}>6</option>
-              <option value="8" ${round1CardsCount === 8 ? "selected" : ""}>8</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    `
-    : safeRound === 3
+  const countBox =
+    safeRound === 1
       ? `
         <div class="finalTopCompactBox finalTopCompactCountBox">
           <div class="adminField compactCountField">
@@ -4476,19 +4563,59 @@ async function renderFinalAdminRound(round) {
 
             <div class="compactCountSelectWrap">
               <select
-                id="finalRound3Count"
+                id="finalRound1CardsCount"
                 class="compactCountSelect"
-                onchange="changeFinalRound3Count()"
+                onchange="changeFinalRound1CardsCount()"
               >
-                <option value="4" ${round3Count === 4 ? "selected" : ""}>4</option>
-                <option value="6" ${round3Count === 6 ? "selected" : ""}>6</option>
-                <option value="8" ${round3Count === 8 ? "selected" : ""}>8</option>
+                <option value="4" ${round1CardsCount === 4 ? "selected" : ""}>4</option>
+                <option value="6" ${round1CardsCount === 6 ? "selected" : ""}>6</option>
+                <option value="8" ${round1CardsCount === 8 ? "selected" : ""}>8</option>
               </select>
             </div>
           </div>
         </div>
       `
-      : ""
+      : safeRound === 3
+        ? `
+          <div class="finalTopCompactBox finalTopCompactCountBox">
+            <div class="adminField compactCountField">
+              <label>عدد الأرقام</label>
+
+              <div class="compactCountSelectWrap">
+                <select
+                  id="finalRound3Count"
+                  class="compactCountSelect"
+                  onchange="changeFinalRound3Count()"
+                >
+                  <option value="4" ${round3Count === 4 ? "selected" : ""}>4</option>
+                  <option value="6" ${round3Count === 6 ? "selected" : ""}>6</option>
+                  <option value="8" ${round3Count === 8 ? "selected" : ""}>8</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        `
+        : safeRound === 4
+          ? `
+            <div class="finalTopCompactBox finalTopCompactCountBox">
+              <div class="adminField compactCountField">
+                <label>عدد الأرقام</label>
+
+                <div class="compactCountSelectWrap">
+                  <select
+                    id="finalRound4Count"
+                    class="compactCountSelect"
+                    onchange="changeFinalRound4Count()"
+                  >
+                    <option value="4" ${round4Count === 4 ? "selected" : ""}>4</option>
+                    <option value="6" ${round4Count === 6 ? "selected" : ""}>6</option>
+                    <option value="8" ${round4Count === 8 ? "selected" : ""}>8</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          `
+          : ""
 
   let html = `
     <div class="finalAdminShell cleanFinalAdminShell">
@@ -4513,8 +4640,8 @@ async function renderFinalAdminRound(round) {
 
   if (safeRound === 1) html += await buildFinalRound1Admin()
   if (safeRound === 2) html += await buildFinalRound2Admin()
-  if (safeRound === 3) html += await buildFinalRound3FocusAdmin()
-  if (safeRound === 4) html += await buildFinalRound4ImageAdmin()
+  if (safeRound === 3) html += await buildFinalRound3StoryAdmin()
+  if (safeRound === 4) html += await buildFinalRound3FocusAdmin()
 
   html += `
       <div class="finalAdminActions">
@@ -4559,6 +4686,17 @@ async function changeFinalRound3Count() {
   await renderAdminTabsUnified()
 }
 
+async function changeFinalRound4Count() {
+  const count = Number(document.getElementById("finalRound4Count")?.value || 4)
+  finalRound4AdminCount = normalizeAdminSegmentCount("finalRound4", count)
+
+  await saveAdminSegmentCount("finalRound4", finalRound4AdminCount)
+  updateAdminQuickSettingUI("finalRound4", finalRound4AdminCount)
+
+  await renderFinalAdminRound(4)
+  await renderAdminTabsUnified()
+}
+
 async function saveFinalRound(round) {
   if (isAdminSaving()) return false
 
@@ -4581,7 +4719,7 @@ async function saveFinalRound(round) {
           round: Number(safeRound),
           title,
           cards_count: null,
-          round3_mode: safeRound === 3 ? "team_media" : null
+          round3_mode: safeRound === 4 ? "team_media" : null
         }],
         {
           onConflict: "model,round"
@@ -4592,8 +4730,8 @@ async function saveFinalRound(round) {
 
     if (safeRound === 1) saved = await saveFinalRound1(true)
     if (safeRound === 2) saved = await saveFinalRound2(true)
-    if (safeRound === 3) saved = await saveFinalRound3Focus(true)
-    if (safeRound === 4) saved = await saveFinalRound4Image(true)
+    if (safeRound === 3) saved = await saveFinalRound3Story(true)
+    if (safeRound === 4) saved = await saveFinalRound3Focus(true)
 
     if (!saved) return false
 
@@ -4619,6 +4757,8 @@ async function buildFinalRound1Admin() {
     .from("final_round1_items")
     .select("*")
     .eq("model", Number(currentModel))
+    .gte("number", 1)
+    .lte("number", 8)
     .order("number", { ascending: true })
 
   if (error) {
@@ -4633,7 +4773,6 @@ async function buildFinalRound1Admin() {
   })
 
   const cardsCount = await getAdminSegmentCount("finalRound1")
-  const noDotsCount = getFinalRound1NoDotsCount(cardsCount)
 
   let html = `
     <div class="finalRound1NoImageGrid">
@@ -4643,17 +4782,13 @@ async function buildFinalRound1Admin() {
     const disabled = i > cardsCount
     const dimmed = disabled ? 'style="opacity:.38;"' : ""
 
-    const isNoDotsCard = i <= noDotsCount
-
     html += `
       <div class="finalAdminCard finalRound1NoImageCard" ${dimmed}>
         <div class="finalAdminCardHead">
           <h3>رقم ${i}</h3>
 
           <div class="finalAdminCardHeadActions">
-            <div class="finalAdminTypeBadge">
-              ${isNoDotsCard ? "بدون نقط" : "أجزاء السؤال"}
-            </div>
+            <div class="finalAdminTypeBadge">بدون نقط</div>
 
             <button class="adminDeleteBtn" onclick="clearFinalRound1Item(${i})">
               حذف
@@ -4662,49 +4797,14 @@ async function buildFinalRound1Admin() {
         </div>
 
         <div class="finalRound1NoImageFields">
-          ${
-            isNoDotsCard
-              ? `
-                <div class="adminField">
-                  <label>السؤال بدون نقط</label>
-                  <textarea
-                    id="finalRound1CardText_${i}"
-                    placeholder="اكتب السؤال بدون نقط"
-                    ${disabled ? "disabled" : ""}
-                  >${escapeHtml(map[i]?.card_text || "")}</textarea>
-                </div>
-              `
-              : `
-                <div class="finalRound1PartsGrid">
-                  <div class="adminField">
-                    <label>جزء السؤال 1</label>
-                    <textarea
-                      id="finalRound1QuestionPart1_${i}"
-                      placeholder="الجزء الأول"
-                      ${disabled ? "disabled" : ""}
-                    >${escapeHtml(map[i]?.question_part1 || "")}</textarea>
-                  </div>
-
-                  <div class="adminField">
-                    <label>جزء السؤال 2</label>
-                    <textarea
-                      id="finalRound1QuestionPart2_${i}"
-                      placeholder="الجزء الثاني"
-                      ${disabled ? "disabled" : ""}
-                    >${escapeHtml(map[i]?.question_part2 || "")}</textarea>
-                  </div>
-
-                  <div class="adminField">
-                    <label>جزء السؤال 3</label>
-                    <textarea
-                      id="finalRound1QuestionPart3_${i}"
-                      placeholder="الجزء الثالث"
-                      ${disabled ? "disabled" : ""}
-                    >${escapeHtml(map[i]?.question_part3 || "")}</textarea>
-                  </div>
-                </div>
-              `
-          }
+          <div class="adminField">
+            <label>السؤال بدون نقط</label>
+            <textarea
+              id="finalRound1CardText_${i}"
+              placeholder="اكتب السؤال بدون نقط"
+              ${disabled ? "disabled" : ""}
+            >${escapeHtml(map[i]?.card_text || "")}</textarea>
+          </div>
 
           <div class="adminField">
             <label>الإجابة</label>
@@ -4744,8 +4844,6 @@ async function saveFinalRound1(skipSavingLock = false) {
     )
 
     const safeCardsCount = normalizeAdminSegmentCount("finalRound1", selectedCount)
-    const textCardsCount = getFinalRound1NoDotsCount(safeCardsCount)
-
     finalRound1AdminCount = safeCardsCount
 
     await saveAdminSegmentCount("finalRound1", safeCardsCount)
@@ -4754,36 +4852,13 @@ async function saveFinalRound1(skipSavingLock = false) {
     const rows = []
 
     for (let i = 1; i <= safeCardsCount; i++) {
-      const isNoDotsCard = i <= textCardsCount
-
       const answer =
         (document.getElementById(`finalRound1Answer_${i}`)?.value || "").trim()
 
-      const cardText = isNoDotsCard
-        ? (document.getElementById(`finalRound1CardText_${i}`)?.value || "").trim()
-        : ""
+      const cardText =
+        (document.getElementById(`finalRound1CardText_${i}`)?.value || "").trim()
 
-      const questionPart1 = !isNoDotsCard
-        ? (document.getElementById(`finalRound1QuestionPart1_${i}`)?.value || "").trim()
-        : ""
-
-      const questionPart2 = !isNoDotsCard
-        ? (document.getElementById(`finalRound1QuestionPart2_${i}`)?.value || "").trim()
-        : ""
-
-      const questionPart3 = !isNoDotsCard
-        ? (document.getElementById(`finalRound1QuestionPart3_${i}`)?.value || "").trim()
-        : ""
-
-      if (
-        !answer &&
-        !cardText &&
-        !questionPart1 &&
-        !questionPart2 &&
-        !questionPart3
-      ) {
-        continue
-      }
+      if (!answer && !cardText) continue
 
       rows.push({
         model: Number(currentModel),
@@ -4792,9 +4867,9 @@ async function saveFinalRound1(skipSavingLock = false) {
         answer,
         note: "",
         card_text: cardText,
-        question_part1: questionPart1,
-        question_part2: questionPart2,
-        question_part3: questionPart3
+        question_part1: "",
+        question_part2: "",
+        question_part3: ""
       })
     }
 
@@ -4804,6 +4879,8 @@ async function saveFinalRound1(skipSavingLock = false) {
       .from("final_round1_items")
       .select("number")
       .eq("model", Number(currentModel))
+      .gte("number", 1)
+      .lte("number", 8)
 
     if (existingError) {
       console.log("READ FINAL ROUND 1 EXISTING ERROR:", existingError)
@@ -4854,36 +4931,81 @@ async function saveFinalRound1(skipSavingLock = false) {
   }
 }
 
+
 /* =========================
    26) Final Round 2 - صح صحلي
 ========================= */
-
 async function buildFinalRound2Admin() {
-  const { data, error } = await db
-    .from("final_round2_items")
-    .select("*")
-    .eq("model", Number(currentModel))
-    .order("number", { ascending: true })
-    .order("item_order", { ascending: true })
+  const [textRes, imageRes] = await Promise.all([
+    db
+      .from("final_round2_items")
+      .select("*")
+      .eq("model", Number(currentModel))
+      .order("number", { ascending: true })
+      .order("item_order", { ascending: true }),
 
-  if (error) {
-    console.log("LOAD FINAL ROUND 2 ERROR:", error)
+    db
+      .from("final_round3_items")
+      .select("*")
+      .eq("model", Number(currentModel))
+      .order("number", { ascending: true })
+      .order("image_order", { ascending: true })
+  ])
+
+  if (textRes.error) {
+    console.log("LOAD FINAL ROUND 2 ERROR:", textRes.error)
     return `<div class="adminCard">تعذر تحميل صح صحلي</div>`
   }
 
-  const grouped = { 1: [], 2: [], 3: [], 4: [] }
+  if (imageRes.error) {
+    console.log("LOAD FINAL ROUND 2 IMAGES ERROR:", imageRes.error)
+    return `<div class="adminCard">تعذر تحميل صور صح صحلي</div>`
+  }
 
-  ;(data || []).forEach(row => {
+  const grouped = {
+    1: [],
+    2: [],
+    4: [],
+    5: []
+  }
+
+  ;(textRes.data || []).forEach(row => {
     const n = Number(row.number || 1)
+
     if (!grouped[n]) grouped[n] = []
     grouped[n].push(row)
   })
 
-  let html = `<div class="finalRound2CleanWrap">`
+  const imageGrouped = {
+    3: [],
+    6: []
+  }
 
-  for (let number = 1; number <= 4; number++) {
-    const isScramble = number === 1 || number === 3
-    const rows = grouped[number] || []
+  ;(imageRes.data || []).forEach(row => {
+    const dbNumber = Number(row.number)
+
+    if (dbNumber === 101) imageGrouped[3].push(row)
+    if (dbNumber === 102) imageGrouped[6].push(row)
+  })
+
+  let html = `
+    <div class="finalRound2CleanWrap finalRound2SixGrid">
+      <div class="finalAdminSubTitleBox">
+        <h3>صح صحلي</h3>
+        <span>1 مبعثرة - 2 ترتيب - 3 اشرح الصورة - 4 مبعثرة - 5 ترتيب - 6 اشرح الصورة</span>
+      </div>
+  `
+
+  for (let number = 1; number <= 6; number++) {
+    const isScramble = isFinalRound2ScrambleNumber(number)
+    const isSequence = isFinalRound2SequenceNumber(number)
+    const isImage = isFinalRound2ImageNumber(number)
+
+    const title = isScramble
+      ? "كلمات مبعثرة"
+      : isSequence
+        ? "ترتيب / تسلسل"
+        : "اشرح الصورة"
 
     html += `
       <div class="finalAdminCard finalRound2CleanCard">
@@ -4891,11 +5013,12 @@ async function buildFinalRound2Admin() {
           <h3>رقم ${number}</h3>
 
           <div class="finalAdminCardHeadActions">
-            <div class="finalAdminTypeBadge">
-              ${isScramble ? "كلمات مبعثرة" : "ترتيب / تسلسل"}
-            </div>
+            <div class="finalAdminTypeBadge">${title}</div>
 
-            <button class="adminDeleteBtn" onclick="clearFinalRound2Item(${number})">
+            <button
+              class="adminDeleteBtn"
+              onclick="${isImage ? `clearFinalRound4Item(${number})` : `clearFinalRound2Item(${number})`}"
+            >
               حذف
             </button>
           </div>
@@ -4903,6 +5026,8 @@ async function buildFinalRound2Admin() {
     `
 
     if (isScramble) {
+      const rows = grouped[number] || []
+
       html += `<div class="finalRound2ItemsGrid">`
 
       for (let i = 1; i <= 6; i++) {
@@ -4934,7 +5059,11 @@ async function buildFinalRound2Admin() {
       }
 
       html += `</div>`
-    } else {
+    }
+
+    if (isSequence) {
+      const rows = grouped[number] || []
+
       html += `<div class="finalRound2SequenceGrid">`
 
       for (let i = 1; i <= 6; i++) {
@@ -4949,6 +5078,46 @@ async function buildFinalRound2Admin() {
               placeholder="النص / الترتيب"
               value="${escapeHtml(row.prompt || "")}"
             >
+          </div>
+        `
+      }
+
+      html += `</div>`
+    }
+
+    if (isImage) {
+      const rows = imageGrouped[number] || []
+
+      html += `<div class="finalRound2ImagesGrid">`
+
+      for (let i = 1; i <= 5; i++) {
+        const row = rows.find(x => Number(x.image_order) === i) || {}
+
+        html += `
+          <div class="finalAdminImageRow">
+            <div class="finalAdminWordIndex">الصورة ${i}</div>
+
+            <div class="finalAdminImageFields">
+              <input
+                type="file"
+                id="finalRound4File_${number}_${i}"
+                accept="image/*"
+              >
+
+              <input
+                id="finalRound4Answer_${number}_${i}"
+                placeholder="الإجابة"
+                value="${escapeHtml(row.answer || "")}"
+              >
+            </div>
+
+            <div class="finalAdminImagePreview">
+              ${
+                row.image
+                  ? `<img src="${escapeHtml(row.image)}" class="previewImg">`
+                  : `<div class="emptyImageHint">لا توجد صورة</div>`
+              }
+            </div>
           </div>
         `
       }
@@ -4976,8 +5145,8 @@ async function saveFinalRound2(skipSavingLock = false) {
 
     const rows = []
 
-    for (let number = 1; number <= 4; number++) {
-      const gameType = number === 1 || number === 3 ? "scramble" : "sequence"
+    for (const number of [1, 2, 4, 5]) {
+      const gameType = isFinalRound2ScrambleNumber(number) ? "scramble" : "sequence"
 
       for (let i = 1; i <= 6; i++) {
         const prompt =
@@ -5052,7 +5221,14 @@ async function saveFinalRound2(skipSavingLock = false) {
       }
     }
 
-    showGameToast(rows.length ? "تم حفظ صح صحلي" : "تم حذف بيانات صح صحلي")
+    const imageSaved = await saveFinalRound4Image(true)
+
+    if (!imageSaved) {
+      showGameToast("تم حفظ صح صحلي لكن تعذر حفظ صور 3 و 6")
+      return false
+    }
+
+    showGameToast("تم حفظ صح صحلي")
     return true
   } catch (err) {
     console.log("SAVE FINAL ROUND 2 CATCH:", err)
@@ -5062,12 +5238,258 @@ async function saveFinalRound2(skipSavingLock = false) {
     if (!skipSavingLock) setAdminSaving(false)
   }
 }
+
+
 /* =========================
-   27) Final Round 3 - التركيز
+   27) Final Round 3 - قصة
+========================= */
+
+async function buildFinalRound3StoryAdmin() {
+  const count = await getAdminSegmentCount("finalRound3")
+
+  const { data, error } = await db
+    .from("final_round1_items")
+    .select("*")
+    .eq("model", Number(currentModel))
+    .gte("number", 201)
+    .lte("number", 208)
+    .order("number", { ascending: true })
+
+  if (error) {
+    console.log("LOAD FINAL STORY ERROR:", error)
+    return `<div class="adminCard">تعذر تحميل قصة</div>`
+  }
+
+  const map = {}
+
+  ;(data || []).forEach(row => {
+    map[Number(row.number)] = row
+  })
+
+  let html = `
+    <div class="finalRound1NoImageGrid">
+  `
+
+  for (let i = 1; i <= 8; i++) {
+    const dbNumber = getFinalStoryDbNumber(i)
+    const row = map[dbNumber] || {}
+    const disabled = i > count
+    const dimmed = disabled ? 'style="opacity:.38;"' : ""
+
+    html += `
+      <div class="finalAdminCard finalRound1NoImageCard" ${dimmed}>
+        <div class="finalAdminCardHead">
+          <h3>رقم ${i}</h3>
+
+          <div class="finalAdminCardHeadActions">
+            <div class="finalAdminTypeBadge">قصة</div>
+
+            <button class="adminDeleteBtn" onclick="clearFinalRound3StoryItem(${i})">
+              حذف
+            </button>
+          </div>
+        </div>
+
+        <div class="finalRound1NoImageFields">
+          <div class="finalRound1PartsGrid">
+            <div class="adminField">
+              <label>جزء القصة 1</label>
+              <textarea
+                id="finalRound3StoryPart1_${i}"
+                placeholder="الجزء الأول"
+                ${disabled ? "disabled" : ""}
+              >${escapeHtml(row.question_part1 || "")}</textarea>
+            </div>
+
+            <div class="adminField">
+              <label>جزء القصة 2</label>
+              <textarea
+                id="finalRound3StoryPart2_${i}"
+                placeholder="الجزء الثاني"
+                ${disabled ? "disabled" : ""}
+              >${escapeHtml(row.question_part2 || "")}</textarea>
+            </div>
+
+            <div class="adminField">
+              <label>جزء القصة 3</label>
+              <textarea
+                id="finalRound3StoryPart3_${i}"
+                placeholder="الجزء الثالث"
+                ${disabled ? "disabled" : ""}
+              >${escapeHtml(row.question_part3 || "")}</textarea>
+            </div>
+          </div>
+
+          <div class="adminField">
+            <label>الإجابة</label>
+            <input
+              id="finalRound3StoryAnswer_${i}"
+              placeholder="الإجابة"
+              value="${escapeHtml(row.answer || "")}"
+              ${disabled ? "disabled" : ""}
+            >
+          </div>
+        </div>
+      </div>
+    `
+  }
+
+  html += `</div>`
+  return html
+}
+
+async function saveFinalRound3Story(skipSavingLock = false) {
+  if (!skipSavingLock && isAdminSaving()) return false
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return false
+  }
+
+  try {
+    if (!skipSavingLock) {
+      setAdminSaving(true, "جارٍ حفظ قصة...")
+    }
+
+    const selectedCount = Number(
+      document.getElementById("finalRound3Count")?.value ||
+      finalRound3AdminCount ||
+      4
+    )
+
+    const safeCount = normalizeAdminSegmentCount("finalRound3", selectedCount)
+    finalRound3AdminCount = safeCount
+
+    await saveAdminSegmentCount("finalRound3", safeCount)
+    updateAdminQuickSettingUI("finalRound3", safeCount)
+
+    const rows = []
+
+    for (let i = 1; i <= safeCount; i++) {
+      const dbNumber = getFinalStoryDbNumber(i)
+
+      const part1 =
+        (document.getElementById(`finalRound3StoryPart1_${i}`)?.value || "").trim()
+
+      const part2 =
+        (document.getElementById(`finalRound3StoryPart2_${i}`)?.value || "").trim()
+
+      const part3 =
+        (document.getElementById(`finalRound3StoryPart3_${i}`)?.value || "").trim()
+
+      const answer =
+        (document.getElementById(`finalRound3StoryAnswer_${i}`)?.value || "").trim()
+
+      if (!part1 && !part2 && !part3 && !answer) continue
+
+      rows.push({
+        model: Number(currentModel),
+        number: Number(dbNumber),
+        image: "",
+        answer,
+        note: "",
+        card_text: "",
+        question_part1: part1,
+        question_part2: part2,
+        question_part3: part3
+      })
+    }
+
+    const keepNumbers = rows.map(row => Number(row.number))
+
+    const { data: existingRows, error: existingError } = await db
+      .from("final_round1_items")
+      .select("number")
+      .eq("model", Number(currentModel))
+      .gte("number", 201)
+      .lte("number", 208)
+
+    if (existingError) {
+      console.log("READ FINAL STORY EXISTING ERROR:", existingError)
+      showGameToast("تعذر قراءة عناصر قصة الحالية")
+      return false
+    }
+
+    for (const oldRow of existingRows || []) {
+      const oldNumber = Number(oldRow.number)
+
+      if (!keepNumbers.includes(oldNumber)) {
+        const { error: deleteError } = await db
+          .from("final_round1_items")
+          .delete()
+          .eq("model", Number(currentModel))
+          .eq("number", oldNumber)
+
+        if (deleteError) {
+          console.log("DELETE FINAL STORY OLD ERROR:", deleteError)
+          showGameToast("تعذر تنظيف عناصر قصة")
+          return false
+        }
+      }
+    }
+
+    if (rows.length) {
+      const { error: saveError } = await db
+        .from("final_round1_items")
+        .upsert(rows, {
+          onConflict: "model,number"
+        })
+
+      if (saveError) {
+        console.log("SAVE FINAL STORY ERROR:", saveError)
+        showGameToast("فشل حفظ قصة")
+        return false
+      }
+    }
+
+    showGameToast(rows.length ? "تم حفظ قصة" : "تم حذف بيانات قصة")
+    return true
+  } catch (err) {
+    console.log("SAVE FINAL STORY CATCH:", err)
+    showGameToast("توقف حفظ قصة بسبب خطأ")
+    return false
+  } finally {
+    if (!skipSavingLock) setAdminSaving(false)
+  }
+}
+
+async function clearFinalRound3StoryItem(number) {
+  if (!canRunAdminDelete()) return
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return
+  }
+
+  const confirmed = window.confirm(`حذف رقم ${number} من قصة؟`)
+  if (!confirmed) return
+
+  const dbNumber = getFinalStoryDbNumber(number)
+
+  const { error } = await db
+    .from("final_round1_items")
+    .delete()
+    .eq("model", Number(currentModel))
+    .eq("number", Number(dbNumber))
+
+  if (error) {
+    console.log("CLEAR FINAL STORY ITEM ERROR:", error)
+    showGameToast("تعذر حذف العنصر")
+    return
+  }
+
+  showGameToast(`تم حذف رقم ${number}`)
+  await renderFinalAdminRound(3)
+  await renderAdminTabsUnified()
+}
+
+
+/* =========================
+   28) Final Round 4 - التركيز
 ========================= */
 
 async function buildFinalRound3FocusAdmin() {
-  const count = await getAdminSegmentCount("finalRound3")
+  const count = await getAdminSegmentCount("finalRound4")
 
   const { data, error } = await db
     .from("final_round3_items")
@@ -5190,16 +5612,16 @@ async function saveFinalRound3Focus(skipSavingLock = false) {
     }
 
     const selectedCount = Number(
-      document.getElementById("finalRound3Count")?.value ||
-      finalRound3AdminCount ||
-      4
-    )
+     document.getElementById("finalRound4Count")?.value ||
+     finalRound4AdminCount ||
+     4
+   )
 
-    const safeCount = normalizeAdminSegmentCount("finalRound3", selectedCount)
-    finalRound3AdminCount = safeCount
+   const safeCount = normalizeAdminSegmentCount("finalRound4", selectedCount)
+    finalRound4AdminCount = safeCount
 
-    await saveAdminSegmentCount("finalRound3", safeCount)
-    updateAdminQuickSettingUI("finalRound3", safeCount)
+      await saveAdminSegmentCount("finalRound4", safeCount)
+      updateAdminQuickSettingUI("finalRound4", safeCount)
 
     const { data: oldRows, error: oldError } = await db
       .from("final_round3_items")
@@ -5333,7 +5755,7 @@ async function saveFinalRound3Focus(skipSavingLock = false) {
 }
 
 /* =========================
-   28) Final Round 4 - اشرح الصورة
+   28.5) Final Round 2 Images - صور صح صحلي
 ========================= */
 
 async function buildFinalRound4ImageAdmin() {
@@ -5345,8 +5767,8 @@ async function buildFinalRound4ImageAdmin() {
     .order("image_order", { ascending: true })
 
   if (error) {
-    console.log("LOAD FINAL ROUND 4 ERROR:", error)
-    return `<div class="adminCard">تعذر تحميل اشرح الصورة</div>`
+    console.log("LOAD FINAL ROUND 2 IMAGE NUMBERS ERROR:", error)
+    return `<div class="adminCard">تعذر تحميل صور صح صحلي</div>`
   }
 
   const grouped = {
@@ -5364,7 +5786,7 @@ async function buildFinalRound4ImageAdmin() {
 
   let html = `<div class="finalAdminRound3Wrap">`
 
-  for (let displayNumber = 1; displayNumber <= 2; displayNumber++) {
+  for (const displayNumber of [3, 6]) {
     const dbNumber = getFinalRound4DbNumber(displayNumber)
     const rows = grouped[dbNumber] || []
 
@@ -5428,7 +5850,7 @@ async function saveFinalRound4Image(skipSavingLock = false) {
 
   try {
     if (!skipSavingLock) {
-      setAdminSaving(true, "جارٍ حفظ اشرح الصورة...")
+      setAdminSaving(true, "جارٍ حفظ صور صح صحلي...")
     }
 
     const { data: oldRows, error: oldError } = await db
@@ -5437,8 +5859,8 @@ async function saveFinalRound4Image(skipSavingLock = false) {
       .eq("model", Number(currentModel))
 
     if (oldError) {
-      console.log("READ OLD FINAL ROUND 4 ERROR:", oldError)
-      showGameToast("تعذر قراءة اشرح الصورة القديمة")
+      console.log("READ OLD FINAL ROUND 2 IMAGES ERROR:", oldError)
+      showGameToast("تعذر قراءة الصور القديمة")
       return false
     }
 
@@ -5455,7 +5877,7 @@ async function saveFinalRound4Image(skipSavingLock = false) {
 
     const rows = []
 
-    for (let displayNumber = 1; displayNumber <= 2; displayNumber++) {
+    for (const displayNumber of [3, 6]) {
       const dbNumber = getFinalRound4DbNumber(displayNumber)
 
       for (let i = 1; i <= 5; i++) {
@@ -5468,7 +5890,7 @@ async function saveFinalRound4Image(skipSavingLock = false) {
         let image = oldMap[`${dbNumber}_${i}`]?.image || ""
 
         if (file) {
-          image = await uploadImageFile(file, `final_r4_${displayNumber}_${i}`)
+          image = await uploadImageFile(file, `final_r2_image_${displayNumber}_${i}`)
 
           if (!image) {
             showGameToast(`تعذر رفع صورة ${i} للرقم ${displayNumber}`)
@@ -5498,8 +5920,8 @@ async function saveFinalRound4Image(skipSavingLock = false) {
       .eq("model", Number(currentModel))
 
     if (existingError) {
-      console.log("READ EXISTING FINAL ROUND 4 ERROR:", existingError)
-      showGameToast("تعذر قراءة اشرح الصورة الحالية")
+      console.log("READ EXISTING FINAL ROUND 2 IMAGES ERROR:", existingError)
+      showGameToast("تعذر قراءة صور صح صحلي الحالية")
       return false
     }
 
@@ -5516,8 +5938,8 @@ async function saveFinalRound4Image(skipSavingLock = false) {
           .eq("image_order", Number(oldRow.image_order))
 
         if (deleteError) {
-          console.log("DELETE OLD FINAL ROUND 4 ERROR:", deleteError)
-          showGameToast("تعذر تنظيف صور اشرح الصورة")
+          console.log("DELETE OLD FINAL ROUND 2 IMAGES ERROR:", deleteError)
+          showGameToast("تعذر تنظيف صور صح صحلي")
           return false
         }
       }
@@ -5531,17 +5953,17 @@ async function saveFinalRound4Image(skipSavingLock = false) {
         })
 
       if (saveError) {
-        console.log("SAVE FINAL ROUND 4 ERROR:", saveError)
-        showGameToast("فشل حفظ اشرح الصورة")
+        console.log("SAVE FINAL ROUND 2 IMAGES ERROR:", saveError)
+        showGameToast("فشل حفظ صور صح صحلي")
         return false
       }
     }
 
-    showGameToast(rows.length ? "تم حفظ اشرح الصورة" : "تم حذف بيانات اشرح الصورة")
+    showGameToast(rows.length ? "تم حفظ صور صح صحلي" : "تم حذف صور صح صحلي")
     return true
   } catch (err) {
-    console.log("SAVE FINAL ROUND 4 CATCH:", err)
-    showGameToast("توقف حفظ اشرح الصورة بسبب خطأ")
+    console.log("SAVE FINAL ROUND 2 IMAGES CATCH:", err)
+    showGameToast("توقف حفظ صور صح صحلي بسبب خطأ")
     return false
   } finally {
     if (!skipSavingLock) setAdminSaving(false)
@@ -5578,6 +6000,8 @@ async function deleteFinalRound(round) {
         .from("final_round1_items")
         .delete()
         .eq("model", Number(currentModel))
+        .gte("number", 1)
+        .lte("number", 8)
 
       await db
         .from("segment_settings")
@@ -5593,16 +6017,23 @@ async function deleteFinalRound(round) {
         .from("final_round2_items")
         .delete()
         .eq("model", Number(currentModel))
-    }
 
-    if (safeRound === 3) {
-      for (let number = 1; number <= 8; number++) {
+      for (const dbNumber of [101, 102]) {
         await db
           .from("final_round3_items")
           .delete()
           .eq("model", Number(currentModel))
-          .eq("number", number)
+          .eq("number", dbNumber)
       }
+    }
+
+    if (safeRound === 3) {
+      await db
+        .from("final_round1_items")
+        .delete()
+        .eq("model", Number(currentModel))
+        .gte("number", 201)
+        .lte("number", 208)
 
       await db
         .from("segment_settings")
@@ -5614,13 +6045,20 @@ async function deleteFinalRound(round) {
     }
 
     if (safeRound === 4) {
-      for (const dbNumber of [101, 102]) {
-        await db
-          .from("final_round3_items")
-          .delete()
-          .eq("model", Number(currentModel))
-          .eq("number", dbNumber)
-      }
+      await db
+        .from("final_round3_items")
+        .delete()
+        .eq("model", Number(currentModel))
+        .gte("number", 1)
+        .lte("number", 8)
+
+      await db
+        .from("segment_settings")
+        .delete()
+        .eq("model", Number(currentModel))
+        .eq("segment", "finalRound4")
+
+      finalRound4AdminCount = 4
     }
 
     showGameToast(`تم حذف ${title}`)
@@ -5712,7 +6150,7 @@ async function clearFinalRound3Item(number) {
   }
 
   showGameToast(`تم حذف رقم ${number}`)
-  await renderFinalAdminRound(3)
+  await renderFinalAdminRound(4)
   await renderAdminTabsUnified()
 }
 
@@ -5742,7 +6180,7 @@ async function clearFinalRound4Item(displayNumber) {
   }
 
   showGameToast(`تم حذف رقم ${displayNumber}`)
-  await renderFinalAdminRound(4)
+  await renderFinalAdminRound(2)
   await renderAdminTabsUnified()
 }
 /* =========================================================
