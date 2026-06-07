@@ -32,7 +32,7 @@ const ALL_DISPLAY_SEGMENTS = [
   { key: "who", title: "من هو", sort: 4 },
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
 
-  { key: "finalRound1", title: "من بدون نقط", sort: 6 },
+  { key: "finalRound1", title: "ٮدوں ٮڡاط", sort: 6 },
   { key: "finalRound2", title: "صح صحلي", sort: 7 },
   { key: "finalRound3", title: "قصة", sort: 8 },
   { key: "finalRound4", title: "التركيز", sort: 9 },
@@ -1897,7 +1897,7 @@ function getCurrentSegmentKey() {
   if (text.includes("من هو")) return "who"
   if (text.includes("اشرح الكلمة")) return "explain"
 
-  if (text.includes("من بدون نقط")) return "finalRound1"
+  if (text.includes("ٮدوں ٮڡاط")) return "finalRound1"
 if (text.includes("صح صحلي")) return "finalRound2"
 if (text.includes("قصة")) return "finalRound3"
 if (text.includes("التركيز")) return "finalRound4"
@@ -2698,7 +2698,7 @@ const FINAL_RESULTS_CONFIG = [
   { segmentKey: "who", cardKey: "who", prefix: "Who", title: "من هو" },
   { segmentKey: "explain", cardKey: "explain", prefix: "Explain", title: "اشرح الكلمة" },
 
-  { segmentKey: "finalRound1", cardKey: "final1", prefix: "Final1", title: "من بدون نقط" },
+  { segmentKey: "finalRound1", cardKey: "final1", prefix: "Final1", title: "ٮدوں ٮڡاط" },
   { segmentKey: "finalRound2", cardKey: "final2", prefix: "Final2", title: "صح صحلي" },
   { segmentKey: "finalRound3", cardKey: "final3", prefix: "Final3", title: "قصة" },
   { segmentKey: "finalRound4", cardKey: "final4", prefix: "Final4", title: "التركيز" },

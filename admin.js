@@ -43,7 +43,7 @@ const ALL_GAME_SEGMENTS = [
   { key: "who", title: "من هو", sort: 4 },
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
 
-  { key: "finalRound1", title: "من بدون نقط", sort: 6 },
+  { key: "finalRound1", title: "ٮدوں ٮڡاط", sort: 6 },
   { key: "finalRound2", title: "صح صحلي", sort: 7 },
   { key: "finalRound3", title: "قصة", sort: 8 },
   { key: "finalRound4", title: "التركيز", sort: 9 },
@@ -979,7 +979,7 @@ async function renderAdminHome() {
     },
     {
   key: "finalRound1",
-  title: "من بدون نقط",
+  title: "ٮدوں ٮڡاط",
   desc: `عدد الأرقام: ${counts.finalRound1CardsCount}`,
   count: counts.finalRound1 || 0
 },
@@ -1474,21 +1474,21 @@ async function checkFinalRoundReady(round) {
       
 
       if (!row) {
-        missing.push(`من بدون نقط - رقم ${i} غير موجود`)
+        missing.push(`ٮدوں ٮڡاط - رقم ${i} غير موجود`)
         continue
       }
 
       if (!hasText(row.card_text)) {
-  missing.push(`من بدون نقط - رقم ${i}: نص بدون نقط فارغ`)
+  missing.push(`ٮدوں ٮڡاط - رقم ${i}: نص بدون نقط فارغ`)
 }
 
       if (!hasText(row.answer)) {
-        missing.push(`من بدون نقط - رقم ${i}: الإجابة فارغة`)
+        missing.push(`ٮدوں ٮڡاط - رقم ${i}: الإجابة فارغة`)
       }
     }
 
     return readinessItem(
-      "من بدون نقط",
+      "ٮدوں ٮڡاط",
       missing.length === 0,
       missing.length ? missing : [`مكتملة بعدد ${r1CardsCount} أرقام`]
     )
@@ -4315,7 +4315,7 @@ async function renderFinalAdmin() {
 }
 
 function getFinalAdminRoundTitle(round) {
-  if (round === 1) return "من بدون نقط"
+  if (round === 1) return "ٮدوں ٮڡاط"
   if (round === 2) return "صح صحلي"
   if (round === 3) return "قصة"
   if (round === 4) return "التركيز"
@@ -4375,7 +4375,7 @@ async function getFinalAdminDoneMap() {
     return doneMap
   }
 
-  /* Round 1 - من بدون نقط */
+  /* Round 1 - ٮدوں ٮڡاط */
   const r1Count = await getAdminSegmentCount("finalRound1")
   const r1Map = {}
 
@@ -4749,7 +4749,7 @@ async function saveFinalRound(round) {
 }
 
 /* =========================
-   25) Final Round 1 - من بدون نقط
+   25) Final Round 1 - ٮدوں ٮڡاط
 ========================= */
 
 async function buildFinalRound1Admin() {
@@ -4763,7 +4763,7 @@ async function buildFinalRound1Admin() {
 
   if (error) {
     console.log("LOAD FINAL ROUND 1 ERROR:", error)
-    return `<div class="adminCard">تعذر تحميل من بدون نقط</div>`
+    return `<div class="adminCard">تعذر تحميل ٮدوں ٮڡاط</div>`
   }
 
   const map = {}
@@ -4834,7 +4834,7 @@ async function saveFinalRound1(skipSavingLock = false) {
 
   try {
     if (!skipSavingLock) {
-      setAdminSaving(true, "جارٍ حفظ من بدون نقط...")
+      setAdminSaving(true, "جارٍ حفظ ٮدوں ٮڡاط...")
     }
 
     const selectedCount = Number(
@@ -4884,7 +4884,7 @@ async function saveFinalRound1(skipSavingLock = false) {
 
     if (existingError) {
       console.log("READ FINAL ROUND 1 EXISTING ERROR:", existingError)
-      showGameToast("تعذر قراءة عناصر من بدون نقط الحالية")
+      showGameToast("تعذر قراءة عناصر ٮدوں ٮڡاط الحالية")
       return false
     }
 
@@ -4900,7 +4900,7 @@ async function saveFinalRound1(skipSavingLock = false) {
 
         if (deleteError) {
           console.log("DELETE FINAL ROUND 1 OLD ERROR:", deleteError)
-          showGameToast("تعذر تنظيف عناصر من بدون نقط")
+          showGameToast("تعذر تنظيف عناصر ٮدوں ٮڡاط")
           return false
         }
       }
@@ -4915,16 +4915,16 @@ async function saveFinalRound1(skipSavingLock = false) {
 
       if (saveError) {
         console.log("SAVE FINAL ROUND 1 ERROR:", saveError)
-        showGameToast("فشل حفظ من بدون نقط")
+        showGameToast("فشل حفظ ٮدوں ٮڡاط")
         return false
       }
     }
 
-    showGameToast(rows.length ? "تم حفظ من بدون نقط" : "تم حذف بيانات من بدون نقط")
+    showGameToast(rows.length ? "تم حفظ ٮدوں ٮڡاط" : "تم حذف بيانات ٮدوں ٮڡاط")
     return true
   } catch (err) {
     console.log("SAVE FINAL ROUND 1 CATCH:", err)
-    showGameToast("توقف حفظ من بدون نقط بسبب خطأ")
+    showGameToast("توقف حفظ ٮدوں ٮڡاط بسبب خطأ")
     return false
   } finally {
     if (!skipSavingLock) setAdminSaving(false)
@@ -6078,7 +6078,7 @@ async function clearFinalRound1Item(number) {
     return
   }
 
-  const confirmed = window.confirm(`حذف رقم ${number} من من بدون نقط؟`)
+  const confirmed = window.confirm(`حذف رقم ${number} من ٮدوں ٮڡاط؟`)
   if (!confirmed) return
 
   const { error } = await db

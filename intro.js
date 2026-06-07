@@ -13,7 +13,7 @@ const INTRO_ALL_GAME_SEGMENTS = [
   { key: "who", title: "من هو", sort: 4 },
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
 
-  { key: "finalRound1", title: "من بدون نقط", sort: 6 },
+  { key: "finalRound1", title: "ٮدوں ٮڡاط", sort: 6 },
   { key: "finalRound2", title: "صح صحلي", sort: 7 },
   { key: "finalRound3", title: "قصة", sort: 8 },
   { key: "finalRound4", title: "التركيز", sort: 9 },

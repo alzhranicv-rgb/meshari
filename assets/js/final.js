@@ -78,7 +78,7 @@ function isFinalSplitMode() {
 function getFinalDisplayTitle() {
   const key = getActiveFinalSegmentKey()
 
-  if (key === "finalRound1") return "من بدون نقط"
+  if (key === "finalRound1") return "ٮدوں ٮڡاط"
   if (key === "finalRound2") return "صح صحلي"
   if (key === "finalRound3") return "قصة"
   if (key === "finalRound4") return "التركيز"
@@ -120,7 +120,7 @@ function createDefaultFinalState() {
     },
 
     round1: {
-      title: "من بدون نقط",
+      title: "ٮدوں ٮڡاط",
       cardsCount: 6,
       opened: [],
       activeTeam: null,
@@ -552,7 +552,7 @@ function getFinalStatusDetails() {
   const teamName = getFinalStatusTeamName()
 
   if (finalState.round === 1) {
-    return `من بدون نقط  •  الفريق المختار: ${teamName}`
+    return `ٮدوں ٮڡاط  •  الفريق المختار: ${teamName}`
   }
 
   if (finalState.round === 2) {
@@ -642,7 +642,7 @@ function getFinalTurnTeamClass() {
 }
 
 function getFinalRoundTextLabel() {
-  if (finalState.round === 1) return "من بدون نقط"
+  if (finalState.round === 1) return "ٮدوں ٮڡاط"
   if (finalState.round === 2) return "صح صحلي"
   if (finalState.round === 3) return "قصة"
   if (finalState.round === 4) return "التركيز"
@@ -1327,7 +1327,7 @@ async function loadFinalRoundMeta() {
     settingsMap[row.segment] = Number(row.item_count || 0)
   })
 
-  finalState.round1.title = "من بدون نقط"
+  finalState.round1.title = "ٮدوں ٮڡاط"
   finalState.round2.title = "صح صحلي"
   finalState.round3.title = "قصة"
   finalState.round4.title = "التركيز"
@@ -1529,7 +1529,7 @@ function goToFinalRound(round) {
 }
 
 /* =========================
-   11) ROUND 1 - من بدون نقط
+   11) ROUND 1 - ٮدوں ٮڡاط
 ========================= */
 function getFinalRound1NoDotsCount() {
   const cardsCount = Number(finalState.round1.cardsCount || 6)
