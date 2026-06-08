@@ -1559,18 +1559,21 @@ function renderFinalRound1() {
   let cards = []
 
   for (let i = 1; i <= cardsCount; i++) {
-    const opened = finalState.round1.opened.includes(i)
+  const current = Number(finalState.round1.currentNumber) === i
+  const opened = finalState.round1.opened.includes(i)
+  const locked = finalState.round1.pendingScore && !current
+  const disabled = (opened && !current) || locked
 
-    cards.push(`
-      <button
-        class="finalRound1Card ${opened ? "used" : ""}"
-        ${opened ? "disabled" : ""}
-        onclick="openFinalRound1Card(${i})"
-      >
-        ${i}
-      </button>
-    `)
-  }
+  cards.push(`
+    <button
+      class="finalRound1Card ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
+      ${disabled ? "disabled" : ""}
+      onclick="openFinalRound1Card(${i})"
+    >
+      ${i}
+    </button>
+  `)
+}
 
   if (finalState.round1.currentNumber) {
     document.body.classList.add("round1-image-mode")
@@ -1598,21 +1601,29 @@ function renderFinalRound1() {
     `
   }
 
-  const currentNumber = Number(finalState.round1.currentNumber || 0)
-  const isQuestionCard = isFinalRound1QuestionCard(currentNumber)
-
   const nextRoundButton = isFinalSplitMode()
-    ? ""
-    : `<button onclick="goToFinalRound(2)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>`
+  ? ""
+  : `<button onclick="goToFinalRound(2)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>`
 
-  controls.innerHTML = `
-    <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">دبل</button>
-    <button onclick="showFinalRound1Question()" class="archiveCtrlBtn btnStart" ${isQuestionCard ? "" : "disabled"}>إظهار السؤال</button>
-    <button onclick="finalRound1Correct()" class="archiveCtrlBtn btnCorrect">إجابة صحيحة</button>
-    <button onclick="finalRound1Wrong()" class="archiveCtrlBtn btnWrong">خطأ</button>
-    <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
-    ${nextRoundButton}
-  `
+controls.innerHTML = `
+  <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">
+    دبل
+  </button>
+
+  <button onclick="finalRound1Correct()" class="archiveCtrlBtn btnCorrect">
+    إجابة صحيحة
+  </button>
+
+  <button onclick="finalRound1Wrong()" class="archiveCtrlBtn btnWrong">
+    خطأ
+  </button>
+
+  <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">
+    تراجع
+  </button>
+
+  ${nextRoundButton}
+`
 
   updateFinalDoubleButton()
 
@@ -1879,51 +1890,58 @@ function finalRound1Wrong() {
     return
   }
 
-  pushFinalHistory()
-
-  clearFinalActiveDouble()
   playGameSound("wrong")
   flashScreen("wrong")
 
-  updateFinalDoubleButton()
   saveFinalState()
 }
 
-function finalRound1Correct() {
-  const oldOverlay = document.getElementById("finalRound1Overlay")
-  if (oldOverlay) oldOverlay.remove()
+function finalRound3StoryCorrect() {
+  ensureFinalRound3State()
 
-  const answeringTeam = finalState.round1.activeTeam
-
-  if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
-    showGameToast("اختر رقمًا أولاً")
+  if (!finalState.round3.pendingScore || !finalState.round3.currentNumber) {
+    showGameToast("لا يوجد رقم مفتوح")
     return
   }
 
-  if (!answeringTeam) {
-    showGameToast("اختر الفريق أولاً")
+  if (finalState.round3.answerShown) {
+    showGameToast("تم تسجيل الإجابة")
+    return
+  }
+
+  if (!finalState.round3.shownPart) {
+    showGameToast("أظهر جزء من القصة أولاً")
+    return
+  }
+
+  const team = selectedTeam || finalState.round3.activeTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق الفائز أولاً")
     return
   }
 
   pushFinalHistory()
 
-  if (!finalState.round1.answerShown) {
-    finalState.round1.answerShown = true
-    loadFinalRound1Current()
-  }
+  const points = Number(finalState.round3.currentPoints || 1)
 
-  finalState.round1.scores[answeringTeam] += getFinalScoreValue(answeringTeam, 1)
+  finalState.round3.activeTeam = team
+  finalState.round3.scores[team] += getFinalScoreValue(team, points)
+  finalState.round3.answerShown = true
 
   clearFinalActiveDouble()
 
   playGameSound("correct")
   flashScreen("correct")
+
   renderFinalScores()
+  renderFinalRound3()
+  updateFinalTopHeaderRoundInfo()
   saveFinalState()
 
   setTimeout(() => {
-    finalizeRound1Turn()
-  }, 7000)
+    finalizeFinalRound3StoryTurn()
+  }, 10000)
 }
 
 function finalizeRound1Turn() {
@@ -2023,18 +2041,21 @@ function renderFinalRound2() {
   let grid = ""
 
   for (let i = 1; i <= 6; i++) {
-    const opened = finalState.round2.opened.includes(i)
+  const current = Number(finalState.round2.currentNumber) === i
+  const opened = finalState.round2.opened.includes(i)
+  const locked = finalState.round2.pendingScore && !current
+  const disabled = (opened && !current) || locked
 
-    grid += `
-      <button
-        class="finalRound2Card ${opened ? "used" : ""}"
-        ${opened ? "disabled" : ""}
-        onclick="openFinalRound2Card(${i})"
-      >
-        ${i}
-      </button>
-    `
-  }
+  grid += `
+    <button
+      class="finalRound2Card ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
+      ${disabled ? "disabled" : ""}
+      onclick="openFinalRound2Card(${i})"
+    >
+      ${i}
+    </button>
+  `
+}
 
   const isScramble = finalState.round2.currentType === "scramble"
   const isSequence = finalState.round2.currentType === "sequence"
@@ -2853,6 +2874,11 @@ function finalRound2RecordImageScore() {
     return
   }
 
+  if (finalState.round2.scoredNumbers.includes(finalState.round2.currentNumber)) {
+  showGameToast("تم تسجيل هذا الرقم")
+  return
+}
+
   if (finalState.round2.currentType !== "image") {
     showGameToast("هذا الزر خاص بالرقمين 3 و 6")
     return
@@ -2862,6 +2888,11 @@ function finalRound2RecordImageScore() {
     showGameToast("اعرض كل الصور أولاً")
     return
   }
+
+  if (finalState.round2.scoredNumbers.includes(finalState.round2.currentNumber)) {
+  showGameToast("تم تسجيل هذا الرقم")
+  return
+}
 
   if (!team) {
     showGameToast("اختر الفريق أولاً")
@@ -2955,18 +2986,21 @@ function renderFinalRound3() {
   let grid = ""
 
   for (let i = 1; i <= count; i++) {
-    const opened = finalState.round3.opened.includes(i)
+  const current = Number(finalState.round3.currentNumber) === i
+  const opened = finalState.round3.opened.includes(i)
+  const locked = finalState.round3.pendingScore && !current
+  const disabled = (opened && !current) || locked
 
-    grid += `
-      <button
-        class="finalRound3Card finalStoryNumberCard ${opened ? "used" : ""}"
-        ${opened ? "disabled" : ""}
-        onclick="openFinalRound3StoryCard(${i})"
-      >
-        ${i}
-      </button>
-    `
-  }
+  grid += `
+    <button
+      class="finalRound3Card finalStoryNumberCard ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
+      ${disabled ? "disabled" : ""}
+      onclick="openFinalRound3StoryCard(${i})"
+    >
+      ${i}
+    </button>
+  `
+}
 
   stage.innerHTML = `
     <div class="finalRound3Wrap finalStoryWrap">
@@ -3397,18 +3431,21 @@ function renderFinalRound4TeamMedia() {
   let grid = ""
 
   for (let i = 1; i <= totalNumbers; i++) {
-    const opened = used.includes(i)
+  const current = Number(state.currentNumber) === i
+  const opened = used.includes(i)
+  const locked = !!state.currentNumber && !current
+  const disabled = (opened && !current) || locked
 
-    grid += `
-      <button
-        class="finalRound3Card finalTeamMediaNumberCard ${opened ? "used" : ""}"
-        ${opened ? "disabled" : ""}
-        onclick="openFinalRound4TeamMediaCard(${i})"
-      >
-        ${opened ? "" : i}
-      </button>
-    `
-  }
+  grid += `
+    <button
+      class="finalRound3Card finalTeamMediaNumberCard ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
+      ${disabled ? "disabled" : ""}
+      onclick="openFinalRound4TeamMediaCard(${i})"
+    >
+      ${opened && !current ? "" : i}
+    </button>
+  `
+}
 
   stage.innerHTML = `
     <div class="finalRound3Wrap finalRound4TeamMediaWrap">
@@ -3750,6 +3787,11 @@ function finalRound4TeamMediaCorrect() {
     showGameToast("تم تسجيل هذا الرقم مسبقاً")
     return
   }
+
+  if (state.answerShown) {
+  showGameToast("تم تسجيل الإجابة")
+  return
+}
 
   pushFinalHistory()
 

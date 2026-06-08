@@ -7471,3 +7471,32 @@
     filter:blur(0);
   }
 }
+/* =========================================================
+   FINAL LOCKED NUMBERS
+   قفل باقي الأرقام مع إبقاء الرقم المفتوح فعال
+========================================================= */
+
+.finalRound1Card.locked,
+.finalRound2Card.locked,
+.finalRound3Card.locked,
+.finalStoryNumberCard.locked,
+.finalTeamMediaNumberCard.locked{
+  opacity:.34 !important;
+  filter:grayscale(1) blur(.2px) !important;
+  cursor:not-allowed !important;
+  pointer-events:none !important;
+  transform:none !important;
+}
+
+.finalRound1Card.active,
+.finalRound2Card.active,
+.finalRound3Card.active,
+.finalStoryNumberCard.active,
+.finalTeamMediaNumberCard.active{
+  opacity:1 !important;
+  filter:none !important;
+  pointer-events:auto !important;
+  cursor:pointer !important;
+  transform:scale(1.02) !important;
+  box-shadow:0 18px 44px rgba(255,155,81,.28) !important;
+}
