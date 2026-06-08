@@ -7474,6 +7474,8 @@
 /* =========================================================
    FINAL LOCKED NUMBERS
    قفل باقي الأرقام مع إبقاء الرقم المفتوح فعال
+   يطبق على كل فقرات الفاينل:
+   بدون نقط + صح صحلي + قصة + التركيز
 ========================================================= */
 
 .finalRound1Card.locked,
@@ -7486,6 +7488,7 @@
   cursor:not-allowed !important;
   pointer-events:none !important;
   transform:none !important;
+  box-shadow:none !important;
 }
 
 .finalRound1Card.active,
@@ -7498,5 +7501,29 @@
   pointer-events:auto !important;
   cursor:pointer !important;
   transform:scale(1.02) !important;
-  box-shadow:0 18px 44px rgba(255,155,81,.28) !important;
+  box-shadow:
+    0 18px 44px rgba(255,155,81,.28),
+    0 0 0 3px rgba(255,155,81,.22) !important;
+}
+
+.finalRound1Card.used:not(.active),
+.finalRound2Card.used:not(.active),
+.finalRound3Card.used:not(.active),
+.finalStoryNumberCard.used:not(.active),
+.finalTeamMediaNumberCard.used:not(.active){
+  opacity:.42 !important;
+  filter:grayscale(1) !important;
+  pointer-events:none !important;
+  cursor:not-allowed !important;
+}
+
+/* الرقم المفتوح حتى لو عليه used يبقى واضح */
+.finalRound1Card.used.active,
+.finalRound2Card.used.active,
+.finalRound3Card.used.active,
+.finalStoryNumberCard.used.active,
+.finalTeamMediaNumberCard.used.active{
+  opacity:1 !important;
+  filter:none !important;
+  pointer-events:auto !important;
 }
