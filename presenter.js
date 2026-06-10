@@ -860,7 +860,7 @@ async function openPresenterFinalCard(round) {
   presenterSegment = "final"
   presenterFinalRound = round
   presenterFinalForcedRound = round
-  presenterFinalForcedRoundUntil = Date.now() + 30000
+  presenterFinalForcedRoundUntil = Date.now() + 60000
   presenterFinalRoundOverride = round
   presenterFinalSelected = { round, number: null }
 
@@ -890,6 +890,12 @@ async function openPresenterFinalCard(round) {
   }
 
   await forcePresenterFinalRound(round)
+
+  presenterFinalRound = round
+  presenterFinalForcedRound = round
+  presenterFinalForcedRoundUntil = Date.now() + 60000
+  presenterFinalRoundOverride = round
+
   await renderFinal()
   await renderPresenterFinalRoundContent()
   refreshPresenterEnhancements()
@@ -899,14 +905,10 @@ async function openPresenterFinalCard(round) {
     round
   })
 
-  await sendCommand("setRound", {
-    round
-  })
-
   setTimeout(async () => {
     presenterFinalRound = round
     presenterFinalForcedRound = round
-    presenterFinalForcedRoundUntil = Date.now() + 30000
+    presenterFinalForcedRoundUntil = Date.now() + 60000
     presenterFinalRoundOverride = round
     presenterFinalSelected = { round, number: null }
 
@@ -926,7 +928,7 @@ async function openPresenterFinalCard(round) {
     await renderFinal()
     await renderPresenterFinalRoundContent()
     refreshPresenterEnhancements()
-  }, 300)
+  }, 500)
 }
 
 async function forcePresenterFinalRound(round) {
@@ -992,73 +994,10 @@ async function openPresenterSegment(segment) {
     return
   }
 
-  const finalCard = ALL_PRESENTER_SEGMENTS.find(item => {
-    return item.key === segment && item.finalRound
-  })
-
   const locked = !!presenterLiveState?.segmentStatus?.[segment]?.locked
 
   if (locked) {
     showToast("هذه الفقرة منتهية")
-    return
-  }
-
-  if (finalCard) {
-    const round = Number(finalCard.finalRound || 1)
-
-    presenterSelectedTeam = null
-    presenterSegment = "final"
-    presenterFinalRound = round
-    presenterFinalForcedRound = round
-    presenterFinalForcedRoundUntil = Date.now() + 15000
-    presenterFinalSelected = { round, number: null }
-
-    showPresenterSegmentPage()
-
-    const title = document.getElementById("presenterSegmentTitle")
-    if (title) {
-      title.innerText = getPresenterFinalRoundTitle(round)
-    }
-
-    const panel = document.getElementById("presenterPanel")
-    if (panel) {
-      panel.dataset.segment = "final"
-      panel.innerHTML = `
-        <section class="presenterCard">
-          <div class="presenterLabel">جارٍ تحميل ${getPresenterFinalRoundTitle(round)}...</div>
-        </section>
-      `
-    }
-
-    await renderFinal()
-
-    const sent = await sendCommand("openSegment", {
-      segment: "final",
-      round
-    })
-
-    if (!sent) {
-      showToast("تعذر فتح الفقرة في العرض")
-      return
-    }
-
-    await sendCommand("setRound", { round })
-
-    setTimeout(async () => {
-      presenterFinalRound = round
-      presenterFinalForcedRound = round
-      presenterFinalForcedRoundUntil = Date.now() + 15000
-      presenterFinalSelected = { round, number: null }
-
-      const title = document.getElementById("presenterSegmentTitle")
-      if (title) {
-        title.innerText = getPresenterFinalRoundTitle(round)
-      }
-
-      await renderPresenterFinalRoundContent()
-      refreshPresenterEnhancements()
-    }, 250)
-
     return
   }
 
@@ -1100,10 +1039,10 @@ async function openPresenterSegmentFromSync(segment) {
   const title = document.getElementById("presenterSegmentTitle")
 
   if (title) {
-    title.innerText = segment === "final"
-      ? getPresenterFinalRoundTitle(presenterFinalRound)
-      : getPresenterSegmentName(segment)
-  }
+  title.innerText = segment === "final"
+    ? getPresenterFinalRoundTitle(getPresenterFinalRound())
+    : getPresenterSegmentName(segment)
+}
 
   const currentRendered = panel.dataset.segment
   const panelText = panel.innerText || ""
