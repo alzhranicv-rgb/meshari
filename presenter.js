@@ -190,12 +190,16 @@ async function renderPresenterSegmentsGrid() {
   grid.innerHTML = presenterVisibleSegments.map(item => {
     const locked = !!presenterLiveState?.segmentStatus?.[item.key]?.locked
 
+    const clickAction = item.finalRound
+      ? `openPresenterFinalCard(${Number(item.finalRound)})`
+      : `openPresenterSegment('${item.key}')`
+
     return `
       <button
         type="button"
         class="segmentCard presenterSegmentCard ${locked ? "presenterLockedSegment" : ""}"
         data-segment="${item.key}"
-        onclick="openPresenterSegment('${item.key}')"
+        onclick="${clickAction}"
         ${locked ? "disabled" : ""}
       >
         <span>${item.title}</span>
@@ -351,7 +355,23 @@ function applyPresenterSessionData(data) {
   presenterModel = Number(data.model || 1)
   presenterTeamAName = data.team_a || "الفريق الأول"
   presenterTeamBName = data.team_b || "الفريق الثاني"
-  presenterLiveState = data.state || {}
+  let incomingState = data.state || {}
+
+if (
+  nextSegment === "final" &&
+  presenterFinalForcedRound &&
+  Date.now() < presenterFinalForcedRoundUntil
+) {
+  incomingState = {
+    ...incomingState,
+    final: {
+      ...(incomingState.final || {}),
+      round: Number(presenterFinalForcedRound)
+    }
+  }
+}
+
+presenterLiveState = incomingState
 
   updatePresenterHomeScoresOnly()
   updatePresenterLockedSegments()
@@ -831,6 +851,136 @@ async function presenterGoHome() {
   setTimeout(() => {
     presenterGoingHome = false
   }, 500)
+}
+
+async function openPresenterFinalCard(round) {
+  round = Number(round || 1)
+
+  presenterSelectedTeam = null
+  presenterSegment = "final"
+  presenterFinalRound = round
+  presenterFinalForcedRound = round
+  presenterFinalForcedRoundUntil = Date.now() + 30000
+  presenterFinalRoundOverride = round
+  presenterFinalSelected = { round, number: null }
+
+  presenterLiveState = {
+    ...(presenterLiveState || {}),
+    final: {
+      ...(presenterLiveState?.final || {}),
+      round
+    }
+  }
+
+  showPresenterSegmentPage()
+
+  const title = document.getElementById("presenterSegmentTitle")
+  if (title) {
+    title.innerText = getPresenterFinalRoundTitle(round)
+  }
+
+  const panel = document.getElementById("presenterPanel")
+  if (panel) {
+    panel.dataset.segment = "final"
+    panel.innerHTML = `
+      <section class="presenterCard">
+        <div class="presenterLabel">جارٍ تحميل ${getPresenterFinalRoundTitle(round)}...</div>
+      </section>
+    `
+  }
+
+  await forcePresenterFinalRound(round)
+  await renderFinal()
+  await renderPresenterFinalRoundContent()
+  refreshPresenterEnhancements()
+
+  await sendCommand("openSegment", {
+    segment: "final",
+    round
+  })
+
+  await sendCommand("setRound", {
+    round
+  })
+
+  setTimeout(async () => {
+    presenterFinalRound = round
+    presenterFinalForcedRound = round
+    presenterFinalForcedRoundUntil = Date.now() + 30000
+    presenterFinalRoundOverride = round
+    presenterFinalSelected = { round, number: null }
+
+    presenterLiveState = {
+      ...(presenterLiveState || {}),
+      final: {
+        ...(presenterLiveState?.final || {}),
+        round
+      }
+    }
+
+    const title = document.getElementById("presenterSegmentTitle")
+    if (title) {
+      title.innerText = getPresenterFinalRoundTitle(round)
+    }
+
+    await renderFinal()
+    await renderPresenterFinalRoundContent()
+    refreshPresenterEnhancements()
+  }, 300)
+}
+
+async function forcePresenterFinalRound(round) {
+  round = Number(round || 1)
+
+  presenterSegment = "final"
+  presenterFinalRound = round
+  presenterFinalForcedRound = round
+  presenterFinalForcedRoundUntil = Date.now() + 30000
+  presenterFinalRoundOverride = round
+  presenterFinalSelected = { round, number: null }
+
+  presenterLiveState = {
+    ...(presenterLiveState || {}),
+    final: {
+      ...(presenterLiveState?.final || {}),
+      round
+    }
+  }
+
+  const sessionId = localStorage.getItem("presenter_session_id")
+  if (!sessionId || !window.db) return
+
+  const { data, error } = await db
+    .from("game_sessions")
+    .select("state")
+    .eq("id", sessionId)
+    .maybeSingle()
+
+  if (error || !data) {
+    console.log("FORCE FINAL ROUND READ ERROR:", error)
+    return
+  }
+
+  const nextState = {
+    ...(data.state || {}),
+    final: {
+      ...(data.state?.final || {}),
+      round
+    }
+  }
+
+  const { error: updateError } = await db
+    .from("game_sessions")
+    .update({
+      active_segment: "final",
+      state: nextState,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", sessionId)
+
+  if (updateError) {
+    console.log("FORCE FINAL ROUND UPDATE ERROR:", updateError)
+  }
 }
 
 async function openPresenterSegment(segment) {
@@ -3257,13 +3407,16 @@ async function renderFinal() {
 ========================= */
 
 async function renderPresenterFinalRoundContent() {
+  const round = Number(getPresenterFinalRound() || presenterFinalRound || 1)
+  presenterFinalRound = round
+
   const numbersBox = document.getElementById("presenterFinalNumbers")
   const controlsBox = document.getElementById("presenterFinalControls")
   const previewBox = document.getElementById("presenterFinalPreview")
 
   if (!numbersBox || !controlsBox || !previewBox) return
 
-  const round = Number(getPresenterFinalRound() || presenterFinalRound || 1)
+  
 presenterFinalRound = round
   const state = getPresenterFinalRoundState(round)
 
@@ -3480,7 +3633,7 @@ presenterFinalRound = round
 async function refreshPresenterFinalFromState() {
   if (presenterSegment !== "final") return
 
-  const round = getPresenterFinalRound()
+  const round = Number(getPresenterFinalRound() || presenterFinalRound || 1)
   presenterFinalRound = round
 
   const title = document.getElementById("presenterSegmentTitle")
