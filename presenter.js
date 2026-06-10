@@ -15,6 +15,7 @@ let lastPresenterToastTime = 0
 let presenterSyncTimer = null
 let presenterGoingHome = false
 let presenterJustJoined = false
+let presenterFinalRoundOverride = null
 const ALL_PRESENTER_SEGMENTS = [
   { key: "warmup", title: "التسخين", sort: 1 },
   { key: "top10", title: "Top 10", sort: 2 },
@@ -858,12 +859,13 @@ async function openPresenterSegment(segment) {
 
   if (round) {
     presenterFinalRound = round
+    presenterFinalRoundOverride = round
+    presenterFinalSelected = { round, number: null }
   }
 
   showPresenterSegmentPage()
 
   const title = document.getElementById("presenterSegmentTitle")
-
   if (title) {
     title.innerText = round
       ? getPresenterFinalRoundTitle(round)
@@ -871,7 +873,6 @@ async function openPresenterSegment(segment) {
   }
 
   const panel = document.getElementById("presenterPanel")
-
   if (panel) {
     panel.dataset.segment = ""
     panel.innerHTML = `
@@ -893,16 +894,19 @@ async function openPresenterSegment(segment) {
   }
 
   if (round) {
-    setTimeout(() => {
+    setTimeout(async () => {
       presenterFinalRound = round
+      presenterFinalRoundOverride = round
+      presenterFinalSelected = { round, number: null }
 
       const title = document.getElementById("presenterSegmentTitle")
       if (title) {
         title.innerText = getPresenterFinalRoundTitle(round)
       }
 
-      sendCommand("setRound", { round })
-      renderPresenterFinalRoundContent()
+      await sendCommand("setRound", { round })
+      await renderPresenterFinalRoundContent()
+      refreshPresenterEnhancements()
     }, 180)
   }
 }
@@ -2966,7 +2970,8 @@ let presenterFinalSelected = { round: 1, number: null }
 let presenterFinalPreviewCache = {
   1: "",
   2: "",
-  3: ""
+  3: "",
+  4: ""
 }
 
 let presenterFinalRound1FocusMode = false
@@ -2976,6 +2981,10 @@ function getPresenterFinalState() {
 }
 
 function getPresenterFinalRound() {
+  if (presenterFinalRoundOverride) {
+    return Number(presenterFinalRoundOverride)
+  }
+
   return Number(getPresenterFinalState()?.round || presenterFinalRound || 1)
 }
 
@@ -3432,6 +3441,15 @@ async function renderPresenterFinalRoundContent() {
 
 async function refreshPresenterFinalFromState() {
   if (presenterSegment !== "final") return
+
+  const liveRound = Number(presenterLiveState?.final?.round || 0)
+
+  if (
+    presenterFinalRoundOverride &&
+    liveRound === Number(presenterFinalRoundOverride)
+  ) {
+    presenterFinalRoundOverride = null
+  }
 
   const round = getPresenterFinalRound()
   presenterFinalRound = round
