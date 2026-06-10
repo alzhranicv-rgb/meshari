@@ -839,6 +839,13 @@ async function openPresenterSegment(segment) {
     return
   }
 
+  const finalCard = ALL_PRESENTER_SEGMENTS.find(item => {
+    return item.key === segment && item.finalRound
+  })
+
+  const renderSegment = finalCard ? "final" : segment
+  const round = finalCard ? Number(finalCard.finalRound || 1) : null
+
   const locked = !!presenterLiveState?.segmentStatus?.[segment]?.locked
 
   if (locked) {
@@ -846,82 +853,99 @@ async function openPresenterSegment(segment) {
     return
   }
 
-  const finalCard = ALL_PRESENTER_SEGMENTS.find(item => {
-    return item.key === segment && item.finalRound
-  })
+  presenterSelectedTeam = null
+  presenterSegment = renderSegment
 
-  if (finalCard) {
-    presenterSelectedTeam = null
-    presenterSegment = "final"
-    presenterFinalRound = Number(finalCard.finalRound || 1)
-
-    openPresenterSegmentFromSync("final")
-
-    const sent = await sendCommand("openSegment", {
-      segment: "final",
-      round: presenterFinalRound
-    })
-
-    if (!sent) {
-      showToast("تعذر فتح الفقرة في العرض")
-      return
-    }
-
-    setTimeout(() => {
-      sendCommand("setRound", {
-        round: presenterFinalRound
-      })
-    }, 120)
-
-    return
+  if (round) {
+    presenterFinalRound = round
   }
 
-  presenterSelectedTeam = null
-  presenterSegment = segment
+  showPresenterSegmentPage()
 
-  openPresenterSegmentFromSync(segment)
+  const title = document.getElementById("presenterSegmentTitle")
 
-  const sent = await sendCommand("openSegment", { segment })
+  if (title) {
+    title.innerText = round
+      ? getPresenterFinalRoundTitle(round)
+      : getPresenterSegmentName(renderSegment)
+  }
+
+  const panel = document.getElementById("presenterPanel")
+
+  if (panel) {
+    panel.dataset.segment = ""
+    panel.innerHTML = `
+      <section class="presenterCard">
+        <div class="presenterLabel">جارٍ التحميل...</div>
+      </section>
+    `
+  }
+
+  await openPresenterSegmentFromSync(renderSegment)
+
+  const sent = await sendCommand("openSegment", {
+    segment: renderSegment
+  })
 
   if (!sent) {
     showToast("تعذر فتح الفقرة في العرض")
+    return
+  }
+
+  if (round) {
+    setTimeout(() => {
+      presenterFinalRound = round
+
+      const title = document.getElementById("presenterSegmentTitle")
+      if (title) {
+        title.innerText = getPresenterFinalRoundTitle(round)
+      }
+
+      sendCommand("setRound", { round })
+      renderPresenterFinalRoundContent()
+    }, 180)
   }
 }
 
 async function openPresenterSegmentFromSync(segment) {
   const panel = document.getElementById("presenterPanel")
-  const currentRendered = panel?.dataset.segment
+  if (!panel) return
 
-  if (currentRendered === segment) {
+  showPresenterSegmentPage()
+
+  const title = document.getElementById("presenterSegmentTitle")
+
+  if (title) {
+    title.innerText = segment === "final"
+      ? getPresenterFinalRoundTitle(presenterFinalRound)
+      : getPresenterSegmentName(segment)
+  }
+
+  const currentRendered = panel.dataset.segment
+  const panelText = panel.innerText || ""
+  const panelIsEmpty =
+    !panel.innerHTML.trim() ||
+    panelText.includes("جارٍ التحميل") ||
+    panelText.includes("حدث خطأ في تحميل الفقرة")
+
+  if (currentRendered === segment && !panelIsEmpty) {
     if (segment === "warmup") {
       refreshPresenterWarmupFromState()
-    }
-
-    if (segment === "top10") {
+    } else if (segment === "top10") {
       refreshPresenterTop10FromState()
-    }
+    } else if (segment === "auction") {
+      refreshPresenterAuctionFromState()
 
-    if (segment === "auction") {
-  refreshPresenterAuctionFromState()
-
-  if (typeof ensurePresenterAuctionVideoButton === "function") {
-    setTimeout(ensurePresenterAuctionVideoButton, 80)
-  }
-}
-
-    if (segment === "who") {
+      if (typeof ensurePresenterAuctionVideoButton === "function") {
+        setTimeout(ensurePresenterAuctionVideoButton, 80)
+      }
+    } else if (segment === "who") {
       refreshPresenterWhoFromState()
-    }
-
-    if (segment === "explain") {
-  refreshPresenterExplainFromState()
-}
-
-    if (segment === "archive") {
+    } else if (segment === "explain") {
+      refreshPresenterExplainFromState()
+    } else if (segment === "archive") {
       refreshPresenterArchiveFromState()
-    }
-
-    if (segment === "final") {
+    } else if (segment === "final") {
       refreshPresenterFinalFromState()
     }
 
@@ -932,48 +956,39 @@ async function openPresenterSegmentFromSync(segment) {
     return
   }
 
-  showPresenterSegmentPage()
+  panel.dataset.segment = segment
 
-  const title = document.getElementById("presenterSegmentTitle")
-
-  if (title) {
-  title.innerText = segment === "final"
-    ? getPresenterFinalRoundTitle(presenterFinalRound)
-    : getPresenterSegmentName(segment)
-}
-
-  if (panel) {
-    panel.dataset.segment = segment
-
-    panel.innerHTML = `
-      <section class="presenterCard">
-        <div class="presenterLabel">جارٍ التحميل...</div>
-      </section>
-    `
-  }
+  panel.innerHTML = `
+    <section class="presenterCard">
+      <div class="presenterLabel">جارٍ التحميل...</div>
+    </section>
+  `
 
   try {
-if (segment === "warmup") {
-  await renderWarmup()
-} else if (segment === "top10") {
-  await renderTop10()
-} else if (segment === "auction") {
-  await renderAuction()
+    if (segment === "warmup") {
+      await renderWarmup()
+    } else if (segment === "top10") {
+      await renderTop10()
+    } else if (segment === "auction") {
+      await renderAuction()
 
-  if (typeof ensurePresenterAuctionVideoButton === "function") {
-    setTimeout(ensurePresenterAuctionVideoButton, 120)
-  }
-} else if (segment === "who") {
-  await renderWho()
-} else if (segment === "explain") {
-  await renderExplain()
-} else if (segment === "final") {
-  await renderFinal()
-} else if (segment === "archive") {
-  await renderArchive()
-} else {
-  renderPresenterHome()
-}
+      if (typeof ensurePresenterAuctionVideoButton === "function") {
+        setTimeout(ensurePresenterAuctionVideoButton, 120)
+      }
+    } else if (segment === "who") {
+      await renderWho()
+    } else if (segment === "explain") {
+      await renderExplain()
+    } else if (segment === "archive") {
+      await renderArchive()
+    } else if (segment === "final") {
+      await renderFinal()
+    } else {
+      renderPresenterHome()
+      return
+    }
+
+    panel.dataset.segment = segment
 
     if (typeof refreshPresenterEnhancements === "function") {
       refreshPresenterEnhancements()
@@ -982,22 +997,20 @@ if (segment === "warmup") {
   } catch (e) {
     console.log("Presenter render error:", e)
 
-    if (panel) {
-      panel.innerHTML = `
-        <section class="presenterCard">
-          <div class="presenterLabel">
-            حدث خطأ في تحميل الفقرة
-          </div>
+    panel.innerHTML = `
+      <section class="presenterCard">
+        <div class="presenterLabel">
+          حدث خطأ في تحميل الفقرة
+        </div>
 
-          <button
-            class="presenterBtn gray"
-            onclick="presenterGoHome()"
-          >
-            رجوع للرئيسية
-          </button>
-        </section>
-      `
-    }
+        <button
+          class="presenterBtn gray"
+          onclick="presenterGoHome()"
+        >
+          رجوع للرئيسية
+        </button>
+      </section>
+    `
 
     if (typeof refreshPresenterEnhancements === "function") {
       refreshPresenterEnhancements()
@@ -3044,6 +3057,15 @@ async function setPresenterFinalRound(round) {
   sendCommand("setRound", { round: presenterFinalRound })
   await renderPresenterFinalRoundContent()
   refreshPresenterEnhancements()
+}
+
+function setPresenterFinalRound1FocusMode(active) {
+  presenterFinalRound1FocusMode = !!active
+
+  document.body.classList.toggle(
+    "presenterFinalRound1FocusMode",
+    presenterFinalRound1FocusMode
+  )
 }
 
 function updatePresenterFinalRound1FocusFromState() {
