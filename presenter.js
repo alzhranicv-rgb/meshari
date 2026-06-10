@@ -860,7 +860,7 @@ async function openPresenterSegment(segment) {
     presenterSegment = "final"
     presenterFinalRound = round
     presenterFinalForcedRound = round
-    presenterFinalForcedRoundUntil = Date.now() + 4000
+    presenterFinalForcedRoundUntil = Date.now() + 15000
     presenterFinalSelected = { round, number: null }
 
     showPresenterSegmentPage()
@@ -897,7 +897,7 @@ async function openPresenterSegment(segment) {
     setTimeout(async () => {
       presenterFinalRound = round
       presenterFinalForcedRound = round
-      presenterFinalForcedRoundUntil = Date.now() + 2500
+      presenterFinalForcedRoundUntil = Date.now() + 15000
       presenterFinalSelected = { round, number: null }
 
       const title = document.getElementById("presenterSegmentTitle")
@@ -3018,6 +3018,10 @@ function getPresenterFinalRound() {
     return Number(presenterFinalForcedRound)
   }
 
+  if (presenterFinalRoundOverride) {
+    return Number(presenterFinalRoundOverride)
+  }
+
   return Number(getPresenterFinalState()?.round || presenterFinalRound || 1)
 }
 
@@ -3207,7 +3211,7 @@ async function renderFinal() {
   const panel = document.getElementById("presenterPanel")
   if (!panel) return
 
-  presenterFinalRound = getPresenterFinalRound()
+  presenterFinalRound = Number(getPresenterFinalRound() || 1)
 
   const title = document.getElementById("presenterSegmentTitle")
   if (title) {
@@ -3259,7 +3263,8 @@ async function renderPresenterFinalRoundContent() {
 
   if (!numbersBox || !controlsBox || !previewBox) return
 
-  const round = Number(presenterFinalRound || 1)
+  const round = Number(getPresenterFinalRound() || presenterFinalRound || 1)
+presenterFinalRound = round
   const state = getPresenterFinalRoundState(round)
 
   const isRound3TeamMedia = round === 3 && isPresenterFinalRound3TeamMedia()
@@ -3475,16 +3480,6 @@ async function renderPresenterFinalRoundContent() {
 async function refreshPresenterFinalFromState() {
   if (presenterSegment !== "final") return
 
-  const liveRound = Number(presenterLiveState?.final?.round || 0)
-
-  if (
-    presenterFinalForcedRound &&
-    liveRound === Number(presenterFinalForcedRound)
-  ) {
-    presenterFinalForcedRound = null
-    presenterFinalForcedRoundUntil = 0
-  }
-
   const round = getPresenterFinalRound()
   presenterFinalRound = round
 
@@ -3522,6 +3517,8 @@ async function refreshPresenterFinalFromState() {
 }
 
 async function refreshPresenterFinalNumbersOnly(round) {
+    round = Number(getPresenterFinalRound() || round || 1)
+  presenterFinalRound = round
   const numbersBox = document.getElementById("presenterFinalNumbers")
   if (!numbersBox) return
 
@@ -3581,6 +3578,8 @@ async function refreshPresenterFinalNumbersOnly(round) {
 }
 
 async function refreshPresenterFinalPreviewOnly(round) {
+    round = Number(getPresenterFinalRound() || round || 1)
+  presenterFinalRound = round
   const previewBox = document.getElementById("presenterFinalPreview")
   if (!previewBox) return
 
@@ -3617,6 +3616,8 @@ async function refreshPresenterFinalPreviewOnly(round) {
 }
 
 function refreshPresenterFinalControlsOnly(round) {
+    round = Number(getPresenterFinalRound() || round || 1)
+  presenterFinalRound = round
   const controlsBox = document.getElementById("presenterFinalControls")
   if (!controlsBox) return
 
