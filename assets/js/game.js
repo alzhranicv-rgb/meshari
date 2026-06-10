@@ -1526,12 +1526,24 @@ async function openSegmentPage(segmentKey) {
 
   await loadVisibleSegmentsForDisplay()
 
-  if (!isSegmentVisibleOnDisplay(segmentKey)) {
-    showGameToast("هذه الفقرة غير مفعلة في العرض")
-    renderVisibleSegmentsHome()
-    updateSegmentCards()
-    return
-  }
+const isFinalInternalSegment = segmentKey === "final"
+
+const finalIsVisible =
+  isFinalInternalSegment &&
+  (
+    isSegmentVisibleOnDisplay("final") ||
+    isSegmentVisibleOnDisplay("final_round1") ||
+    isSegmentVisibleOnDisplay("final_round2") ||
+    isSegmentVisibleOnDisplay("final_round3") ||
+    isSegmentVisibleOnDisplay("final_round4")
+  )
+
+if (!isSegmentVisibleOnDisplay(segmentKey) && !finalIsVisible) {
+  showGameToast("هذه الفقرة غير مفعلة في العرض")
+  renderVisibleSegmentsHome()
+  updateSegmentCards()
+  return
+}
 
   if (segmentStatus[segmentKey]?.locked) return
 
@@ -1563,9 +1575,14 @@ async function openSegmentPage(segmentKey) {
   if (segmentKey === "who") await window.renderWho()
   if (segmentKey === "explain") await window.renderExplain()
 
-  if (isFinalSegmentKey(segmentKey)) {
-    await window.renderFinal(getFinalRoundFromSegmentKey(segmentKey), segmentKey)
-  }
+  if (segmentKey === "final" || isFinalSegmentKey(segmentKey)) {
+  const finalRound =
+    segmentKey === "final"
+      ? Number(window.displayFinalRound || window.currentFinalRound || 1)
+      : getFinalRoundFromSegmentKey(segmentKey)
+
+  await window.renderFinal(finalRound, segmentKey)
+}
 
   if (segmentKey === "archive") await window.renderArchive()
 
