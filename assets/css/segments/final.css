@@ -7527,3 +7527,216 @@
   filter:none !important;
   pointer-events:auto !important;
 }
+/* =========================================================
+   CENTER TEAM STATUS
+   مربع الحالة يعرض اسم الفريق فقط
+========================================================= */
+
+.finalCenterStatusText,
+#finalCenterStatusText{
+  width:100% !important;
+  min-height:74px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  padding:8px 14px !important;
+}
+
+.finalCenterTurnTeamName,
+.explainCenterTurnTeamName{
+  font-family:"HanakaDisplay","HanakaText", sans-serif !important;
+  font-size:clamp(1.35rem, 2.35vw, 2.25rem) !important;
+  font-weight:900 !important;
+  line-height:1.1 !important;
+  color:#24185e !important;
+  max-width:100% !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+.explainCenterTitle h3{
+  margin:0 !important;
+  width:100% !important;
+  min-height:74px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  padding:8px 14px !important;
+}
+
+@media (max-width:1180px) and (orientation:landscape){
+  .finalCenterStatusText,
+  #finalCenterStatusText,
+  .explainCenterTitle h3{
+    min-height:64px !important;
+    padding:6px 10px !important;
+  }
+
+  .finalCenterTurnTeamName,
+  .explainCenterTurnTeamName{
+    font-size:clamp(1.15rem, 2vw, 1.7rem) !important;
+  }
+}
+
+/* =========================================================
+   FINAL FINISHED SCREEN
+   شاشة نهاية فقرة الفاينل
+========================================================= */
+
+.finalFinishedScreen{
+  width:100% !important;
+  min-height:430px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:24px !important;
+}
+
+.finalFinishedCard{
+  width:min(100%,680px) !important;
+  min-height:330px !important;
+  border-radius:34px !important;
+  padding:28px !important;
+  background:
+    radial-gradient(circle at top right, rgba(255,155,81,.20), transparent 42%),
+    linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.78)) !important;
+  border:1px solid rgba(255,255,255,.92) !important;
+  box-shadow:
+    0 26px 70px rgba(15,23,42,.16),
+    inset 0 1px 0 rgba(255,255,255,.9) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:18px !important;
+  text-align:center !important;
+  animation:finalFinishedPop .35s ease both !important;
+}
+
+.finalFinishedBadge{
+  min-height:44px !important;
+  padding:10px 20px !important;
+  border-radius:999px !important;
+  background:linear-gradient(135deg,#ffedd5,#fdba74) !important;
+  color:#7c2d12 !important;
+  font-size:1rem !important;
+  font-weight:900 !important;
+}
+
+.finalFinishedCard h2{
+  margin:0 !important;
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:clamp(2rem,4vw,3.4rem) !important;
+  color:#24185e !important;
+  line-height:1.1 !important;
+}
+
+.finalFinishedWinner{
+  font-size:clamp(1.35rem,2.6vw,2.35rem) !important;
+  font-weight:900 !important;
+  color:#0f766e !important;
+}
+
+.finalFinishedScores{
+  width:100% !important;
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:14px !important;
+}
+
+.finalFinishedScores > div{
+  min-height:90px !important;
+  border-radius:24px !important;
+  background:rgba(255,255,255,.72) !important;
+  border:1px solid rgba(255,255,255,.85) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+}
+
+.finalFinishedScores span{
+  font-size:1rem !important;
+  font-weight:900 !important;
+  color:rgba(36,24,94,.72) !important;
+}
+
+.finalFinishedScores strong{
+  font-size:2.4rem !important;
+  font-weight:900 !important;
+  color:#24185e !important;
+  line-height:1 !important;
+}
+
+@keyframes finalFinishedPop{
+  from{
+    opacity:0;
+    transform:translateY(12px) scale(.96);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+/* =========================================================
+   FINAL SCORE TEAM CURRENT
+   تمييز آمن خاص بالفاصلة فقط
+   بدون activeTeam حتى لا تتلخبط لوحة النتائج
+========================================================= */
+
+/* تنظيف أي تأثير قديم لو بقي */
+.finalWrapNew #finalTeamABox,
+.finalWrapNew #finalTeamBBox,
+.finalWrapNew .finalScorePanel{
+  transform:none !important;
+  animation:none !important;
+}
+
+.finalWrapNew #finalTeamABox::before,
+.finalWrapNew #finalTeamBBox::before,
+.finalWrapNew .finalScorePanel::before,
+.finalWrapNew #finalTeamABox::after,
+.finalWrapNew #finalTeamBBox::after,
+.finalWrapNew .finalScorePanel::after{
+  display:none !important;
+  content:none !important;
+}
+
+/* التأثير الجديد */
+.finalWrapNew #finalTeamABox.finalScoreTeamCurrent,
+.finalWrapNew #finalTeamBBox.finalScoreTeamCurrent{
+  border-color:rgba(255,255,255,.95) !important;
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.58),
+    inset 0 0 20px rgba(255,255,255,.22),
+    0 0 18px rgba(226,245,255,.22) !important;
+  filter:brightness(1.04) !important;
+  animation:finalScoreTeamCurrentGlow 1.6s ease-in-out infinite alternate !important;
+}
+
+/* تثبيت كل عناصر اللوحة */
+.finalWrapNew #finalTeamABox *,
+.finalWrapNew #finalTeamBBox *,
+.finalWrapNew .finalScorePanel *{
+  transform:none !important;
+}
+
+@keyframes finalScoreTeamCurrentGlow{
+  from{
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.38),
+      inset 0 0 14px rgba(255,255,255,.14),
+      0 0 10px rgba(226,245,255,.12);
+  }
+
+  to{
+    box-shadow:
+      inset 0 0 0 3px rgba(255,255,255,.72),
+      inset 0 0 26px rgba(255,255,255,.30),
+      0 0 22px rgba(226,245,255,.26);
+  }
+}

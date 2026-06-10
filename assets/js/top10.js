@@ -741,24 +741,47 @@ function selectTop10Team(team) {
   top10State.activeTeam = team
   autoStartTop10Timer()
   highlightTop10TurnTeam()
-  updateTop10TurnLabel()
-  updateTop10DoubleButton()
-  saveTop10State()
+updateTop10TurnLabel()
+updateTop10DoubleButton()
+saveTop10State()
+
+setTimeout(() => {
+  highlightTop10TurnTeam()
+}, 80)
+}
+
+function getTop10TeamBox(team) {
+  const letter = team === "A" ? "A" : "B"
+
+  return (
+    document.getElementById(`top10Team${letter}Box`) ||
+    document.getElementById(`top10Team${letter}`) ||
+    document.getElementById(`top10Score${letter}Box`) ||
+    document.getElementById(`top10ScorePanel${letter}`) ||
+    document.querySelector(`[onclick="selectTop10Team('${letter}')"]`) ||
+    document.querySelector(`[onclick='selectTop10Team("${letter}")']`) ||
+    document.querySelector(`[data-team="${letter}"]`) ||
+    document.querySelector(`.top10TeamBox.team${letter}`) ||
+    document.querySelector(`.top10TeamCard.team${letter}`) ||
+    document.querySelector(`.top10ScorePanel.team${letter}`)
+  )
 }
 
 function highlightTop10TurnTeam() {
-  const a = document.getElementById("top10TeamA")
-  const b = document.getElementById("top10TeamB")
+  const team = top10State.activeTeam
 
-  if (!a || !b) return
+  document.querySelectorAll(".top10TeamCurrent").forEach(el => {
+    el.classList.remove("top10TeamCurrent")
+  })
 
-  a.classList.remove("activeTeam")
-  b.classList.remove("activeTeam")
+  const box = getTop10TeamBox(team)
 
-  if (top10State.activeTeam === "A") a.classList.add("activeTeam")
-  if (top10State.activeTeam === "B") b.classList.add("activeTeam")
-
-  updateTop10DoubleButton()
+  if (box) {
+    box.classList.remove("activeTeam", "selectedPresenterTeam")
+    box.classList.add("top10TeamCurrent")
+  } else {
+    console.log("TOP10 TEAM BOX NOT FOUND:", team)
+  }
 }
 
 function updateTop10TurnLabel() {

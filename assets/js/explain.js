@@ -271,7 +271,7 @@ const count =
       <div class="explainTopBoard">
         <button
           type="button"
-          id="teamABox"
+          id="explainTeamABox"
           class="explainTeamBox"
           onclick="selectExplainTeam('A')"
         >
@@ -287,7 +287,7 @@ const count =
  
         <button
           type="button"
-          id="teamBBox"
+          id="explainTeamBBox"
           class="explainTeamBox"
           onclick="selectExplainTeam('B')"
         >
@@ -362,6 +362,44 @@ const count =
    UI Update
 ========================= */
 
+function getExplainTeamBox(team) {
+  const letter = team === "A" ? "A" : "B"
+
+  return (
+    document.getElementById(`team${letter}Box`) ||
+    document.getElementById(`explainTeam${letter}Box`) ||
+    document.querySelector(`[onclick="selectExplainTeam('${letter}')"]`) ||
+    document.querySelector(`[onclick='selectExplainTeam("${letter}")']`) ||
+    document.querySelector(`[data-team="${letter}"]`) ||
+    document.querySelector(`.explainTeamBox.team${letter}`) ||
+    document.querySelector(`.explainTeamCard.team${letter}`)
+  )
+}
+
+function highlightExplainTeam(team) {
+  const shell = document.querySelector(".explainGameShell")
+  if (!shell) return
+
+  const a = shell.querySelector("#explainTeamABox")
+  const b = shell.querySelector("#explainTeamBBox")
+
+  if (a) {
+    a.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam", "explainTeamCurrent")
+  }
+
+  if (b) {
+    b.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam", "explainTeamCurrent")
+  }
+
+  if (team === "A" && a) {
+    a.classList.add("explainTeamCurrent")
+  }
+
+  if (team === "B" && b) {
+    b.classList.add("explainTeamCurrent")
+  }
+}
+
 function updateExplainUI() {
   const scoreAEl = document.getElementById("explainScoreA")
   const scoreBEl = document.getElementById("explainScoreB")
@@ -376,23 +414,34 @@ function updateExplainUI() {
   if (attemptsAEl) attemptsAEl.innerText = Number(window.explainState.attempts.A || 0)
   if (attemptsBEl) attemptsBEl.innerText = Number(window.explainState.attempts.B || 0)
 
-  const teamABox = document.getElementById("teamABox")
-  const teamBBox = document.getElementById("teamBBox")
+  const explainActiveTeam =
+  window.explainState.currentTeam ||
+  selectedTeam ||
+  null
 
-  if (teamABox) teamABox.classList.toggle("activeTeam", selectedTeam === "A")
-  if (teamBBox) teamBBox.classList.toggle("activeTeam", selectedTeam === "B")
+highlightExplainTeam(explainActiveTeam)
 
   const centerTitle = document.querySelector(".explainCenterTitle h3")
 
   if (centerTitle) {
-    if (selectedTeam) {
-      centerTitle.innerText = getExplainTeamName(selectedTeam)
-    } else if (window.explainState.currentTeam) {
-      centerTitle.innerText = getExplainTeamName(window.explainState.currentTeam)
-    } else {
-      centerTitle.innerText = "اختر الفريق"
-    }
-  }
+  const team =
+    window.explainState.currentTeam ||
+    selectedTeam ||
+    null
+
+  const teamName =
+    team === "A"
+      ? getExplainTeamName("A")
+      : team === "B"
+        ? getExplainTeamName("B")
+        : ""
+
+  centerTitle.innerHTML = `
+    <div class="explainCenterTurnTeamName">
+      ${teamName}
+    </div>
+  `
+}
 
   if (wordBox) {
     const hasWord = !!window.explainState.currentNumber
@@ -453,14 +502,29 @@ function selectExplainTeam(team) {
     return
   }
 
-  selectTeam(team)
+  selectedTeam = team
+  window.explainState.currentTeam = team
 
-const centerTitle = document.querySelector(".explainCenterTitle h3")
-if (centerTitle) {
-  centerTitle.innerText = getExplainTeamName(team)
-}
+  highlightExplainTeam(team)
 
-updateExplainUI()
+  const centerTitle = document.querySelector(".explainCenterTitle h3")
+  if (centerTitle) {
+    centerTitle.innerHTML = `
+      <div class="explainCenterTurnTeamName">
+        ${getExplainTeamName(team)}
+      </div>
+    `
+  }
+
+  updateExplainUI()
+  saveExplainState()
+
+  setTimeout(() => {
+    selectedTeam = team
+    window.explainState.currentTeam = team
+    highlightExplainTeam(team)
+    updateExplainUI()
+  }, 80)
 }
 
 function openExplainNumber(number) {

@@ -334,8 +334,37 @@ h3,
   text-align:left;
 }
 
-.leadingTeam .homeTeamName,
-.activeTeam .teamName{
+.leadingTeam .homeTeamName{
+  animation:teamNameWinnerPulse 1.8s ease-in-out infinite;
+}
+
+/* التسخين */
+.warmupTeamCurrent .teamName,
+.warmupTeamCurrent .warmupTeamName,
+
+/* توب 10 */
+.top10TeamCurrent .teamName,
+.top10TeamCurrent .top10TeamName,
+
+/* اشرح الكلمة */
+.explainTeamCurrent .teamName,
+.explainTeamCurrent .explainTeamLabel,
+
+/* من هو */
+.whoTeamCurrent .teamName,
+.whoTeamCurrent .whoTeamName,
+
+/* الأرشيف */
+.archiveTeamCurrent .teamName,
+.archiveTeamCurrent .archiveTeamName,
+
+/* فتبلة */
+.fatblaTeamCurrent .teamName,
+.fatblaTeamCurrent .auctionTeamName,
+
+/* الفاصلة */
+.finalScoreTeamCurrent .teamName,
+.finalScoreTeamCurrent .finalScoreTeamName{
   animation:teamNameWinnerPulse 1.8s ease-in-out infinite;
 }
 
@@ -4541,5 +4570,233 @@ body.bigScreenMode .used video{
     min-height:50px !important;
     font-size:1rem !important;
     border-radius:18px !important;
+  }
+}
+@keyframes segmentTeamGlow{
+  from{
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.38),
+      inset 0 0 14px rgba(255,255,255,.14),
+      0 0 10px rgba(226,245,255,.12);
+  }
+
+  to{
+    box-shadow:
+      inset 0 0 0 3px rgba(255,255,255,.72),
+      inset 0 0 26px rgba(255,255,255,.30),
+      0 0 22px rgba(226,245,255,.26);
+  }
+}
+/* =========================================================
+   TOP 10 TEAM CURRENT
+   تمييز الفريق الحالي في توب 10 فقط
+========================================================= */
+
+.top10TeamCurrent{
+  border-color:rgba(255,255,255,.95) !important;
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.58),
+    inset 0 0 20px rgba(255,255,255,.22),
+    0 0 18px rgba(226,245,255,.22) !important;
+  filter:brightness(1.04) !important;
+  animation:top10TeamCurrentGlow 1.6s ease-in-out infinite alternate !important;
+}
+
+.top10TeamCurrent *{
+  transform:none !important;
+}
+
+@keyframes top10TeamCurrentGlow{
+  from{
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.38),
+      inset 0 0 14px rgba(255,255,255,.14),
+      0 0 10px rgba(226,245,255,.12);
+  }
+
+  to{
+    box-shadow:
+      inset 0 0 0 3px rgba(255,255,255,.72),
+      inset 0 0 26px rgba(255,255,255,.30),
+      0 0 22px rgba(226,245,255,.26);
+  }
+}
+/* =========================================================
+   WARMUP TEAM CURRENT
+   تمييز الفريق الحالي في التسخين فقط
+========================================================= */
+
+.warmupTeamCurrent{
+  border-color:rgba(255,255,255,.95) !important;
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.58),
+    inset 0 0 20px rgba(255,255,255,.22),
+    0 0 18px rgba(226,245,255,.22) !important;
+  filter:brightness(1.04) !important;
+  animation:warmupTeamCurrentGlow 1.6s ease-in-out infinite alternate !important;
+}
+
+.warmupTeamCurrent *{
+  transform:none !important;
+}
+
+@keyframes warmupTeamCurrentGlow{
+  from{
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.38),
+      inset 0 0 14px rgba(255,255,255,.14),
+      0 0 10px rgba(226,245,255,.12);
+  }
+
+  to{
+    box-shadow:
+      inset 0 0 0 3px rgba(255,255,255,.72),
+      inset 0 0 26px rgba(255,255,255,.30),
+      0 0 22px rgba(226,245,255,.26);
+  }
+}
+/* =========================================================
+   EXPLAIN TEAM CURRENT
+   تمييز الفريق الحالي في اشرح الكلمة فقط
+========================================================= */
+
+.explainGameShell #explainTeamABox.explainTeamCurrent,
+.explainGameShell #explainTeamBBox.explainTeamCurrent,
+.explainGameShell .explainTeamBox.explainTeamCurrent{
+  border-color:rgba(255,255,255,.95) !important;
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.58),
+    inset 0 0 20px rgba(255,255,255,.22),
+    0 0 18px rgba(226,245,255,.22) !important;
+  filter:brightness(1.04) !important;
+  animation:explainTeamCurrentGlow 1.6s ease-in-out infinite alternate !important;
+}
+
+.explainGameShell #explainTeamABox.explainTeamCurrent *,
+.explainGameShell #explainTeamBBox.explainTeamCurrent *,
+.explainGameShell .explainTeamBox.explainTeamCurrent *{
+  transform:none !important;
+}
+
+@keyframes explainTeamCurrentGlow{
+  from{
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.38),
+      inset 0 0 14px rgba(255,255,255,.14),
+      0 0 10px rgba(226,245,255,.12);
+  }
+
+  to{
+    box-shadow:
+      inset 0 0 0 3px rgba(255,255,255,.72),
+      inset 0 0 26px rgba(255,255,255,.30),
+      0 0 22px rgba(226,245,255,.26);
+  }
+}
+/* =========================================================
+   WHO TEAM CURRENT
+   تمييز الفريق الحالي في من هو فقط
+========================================================= */
+
+.whoTeamCurrent{
+  border-color:rgba(255,255,255,.95) !important;
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.58),
+    inset 0 0 20px rgba(255,255,255,.22),
+    0 0 18px rgba(226,245,255,.22) !important;
+  filter:brightness(1.04) !important;
+  animation:whoTeamCurrentGlow 1.6s ease-in-out infinite alternate !important;
+}
+
+.whoTeamCurrent *{
+  transform:none !important;
+}
+
+@keyframes whoTeamCurrentGlow{
+  from{
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.38),
+      inset 0 0 14px rgba(255,255,255,.14),
+      0 0 10px rgba(226,245,255,.12);
+  }
+
+  to{
+    box-shadow:
+      inset 0 0 0 3px rgba(255,255,255,.72),
+      inset 0 0 26px rgba(255,255,255,.30),
+      0 0 22px rgba(226,245,255,.26);
+  }
+}
+
+/* =========================================================
+   ARCHIVE TEAM CURRENT
+   تمييز الفريق الحالي في الأرشيف فقط
+========================================================= */
+
+.archiveTeamCurrent{
+  border-color:rgba(255,255,255,.95) !important;
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.58),
+    inset 0 0 20px rgba(255,255,255,.22),
+    0 0 18px rgba(226,245,255,.22) !important;
+  filter:brightness(1.04) !important;
+  animation:archiveTeamCurrentGlow 1.6s ease-in-out infinite alternate !important;
+}
+
+.archiveTeamCurrent *{
+  transform:none !important;
+}
+
+@keyframes archiveTeamCurrentGlow{
+  from{
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.38),
+      inset 0 0 14px rgba(255,255,255,.14),
+      0 0 10px rgba(226,245,255,.12);
+  }
+
+  to{
+    box-shadow:
+      inset 0 0 0 3px rgba(255,255,255,.72),
+      inset 0 0 26px rgba(255,255,255,.30),
+      0 0 22px rgba(226,245,255,.26);
+  }
+}
+/* =========================================================
+   FATBLA TEAM CURRENT
+   تمييز الفريق الحالي في فتبلة فقط
+========================================================= */
+
+.auctionWrap #auctionTeamABox.fatblaTeamCurrent,
+.auctionWrap #auctionTeamBBox.fatblaTeamCurrent,
+.auctionWrap .auctionTeamCard.fatblaTeamCurrent{
+  border-color:rgba(255,255,255,.95) !important;
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.58),
+    inset 0 0 20px rgba(255,255,255,.22),
+    0 0 18px rgba(226,245,255,.22) !important;
+  filter:brightness(1.04) !important;
+  animation:fatblaTeamCurrentGlow 1.6s ease-in-out infinite alternate !important;
+}
+
+.auctionWrap #auctionTeamABox.fatblaTeamCurrent *,
+.auctionWrap #auctionTeamBBox.fatblaTeamCurrent *,
+.auctionWrap .auctionTeamCard.fatblaTeamCurrent *{
+  transform:none !important;
+}
+
+@keyframes fatblaTeamCurrentGlow{
+  from{
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.38),
+      inset 0 0 14px rgba(255,255,255,.14),
+      0 0 10px rgba(226,245,255,.12);
+  }
+
+  to{
+    box-shadow:
+      inset 0 0 0 3px rgba(255,255,255,.72),
+      inset 0 0 26px rgba(255,255,255,.30),
+      0 0 22px rgba(226,245,255,.26);
   }
 }

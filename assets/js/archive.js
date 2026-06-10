@@ -600,25 +600,63 @@ function selectArchiveTeam(team) {
   }
 
   archiveState.activeTeam = team
+  selectedTeam = team
   archiveTurnLocked = false
 
   highlightArchiveTeam()
   saveArchiveState()
+
+  setTimeout(() => {
+    highlightArchiveTeam()
+  }, 80)
+}
+
+function getArchiveTeamBox(team) {
+  const letter = team === "A" ? "A" : "B"
+
+  return (
+    document.getElementById(`archiveTeam${letter}Box`) ||
+    document.getElementById(`archiveTeam${letter}`) ||
+    document.getElementById(`archiveScore${letter}Box`) ||
+    document.getElementById(`archiveScorePanel${letter}`) ||
+    document.querySelector(`[onclick="selectArchiveTeam('${letter}')"]`) ||
+    document.querySelector(`[onclick='selectArchiveTeam("${letter}")']`) ||
+    document.querySelector(`[data-team="${letter}"]`) ||
+    document.querySelector(`.archiveTeamBox.team${letter}`) ||
+    document.querySelector(`.archiveTeamCard.team${letter}`) ||
+    document.querySelector(`.archiveScorePanel.team${letter}`)
+  )
 }
 
 function highlightArchiveTeam() {
-  const a = document.getElementById("archiveTeamA")
-  const b = document.getElementById("archiveTeamB")
+  const team = archiveState.activeTeam || null
 
-  if (!a || !b) return
+  document.querySelectorAll(".archiveTeamCurrent").forEach(el => {
+    el.classList.remove("archiveTeamCurrent")
+  })
 
-  a.classList.remove("activeTeam")
-  b.classList.remove("activeTeam")
+  const a = getArchiveTeamBox("A")
+  const b = getArchiveTeamBox("B")
 
-  if (archiveState.activeTeam === "A") a.classList.add("activeTeam")
-  if (archiveState.activeTeam === "B") b.classList.add("activeTeam")
+  if (a) {
+    a.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam")
+  }
 
-  updateArchiveDoubleButton()
+  if (b) {
+    b.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam")
+  }
+
+  if (team === "A" && a) {
+    a.classList.add("archiveTeamCurrent")
+  }
+
+  if (team === "B" && b) {
+    b.classList.add("archiveTeamCurrent")
+  }
+
+  if (!a || !b) {
+    console.log("ARCHIVE TEAM BOX NOT FOUND:", { team, a, b })
+  }
 }
 
 /* =========================

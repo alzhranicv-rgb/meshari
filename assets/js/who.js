@@ -426,6 +426,11 @@ function selectWhoTeam(team) {
     updateWhoTurnBox()
     updateWhoDoubleButton()
     saveWhoState()
+
+    setTimeout(() => {
+      highlightWhoTurnTeam()
+    }, 80)
+
     return
   }
 
@@ -442,21 +447,58 @@ function selectWhoTeam(team) {
   updateWhoTurnBox()
   updateWhoDoubleButton()
   saveWhoState()
+
+  setTimeout(() => {
+    highlightWhoTurnTeam()
+  }, 80)
+}
+
+function getWhoTeamBox(team) {
+  const letter = team === "A" ? "A" : "B"
+
+  return (
+    document.getElementById(`whoTeam${letter}Box`) ||
+    document.getElementById(`whoTeam${letter}`) ||
+    document.getElementById(`whoScore${letter}Box`) ||
+    document.getElementById(`whoScorePanel${letter}`) ||
+    document.querySelector(`[onclick="selectWhoTeam('${letter}')"]`) ||
+    document.querySelector(`[onclick='selectWhoTeam("${letter}")']`) ||
+    document.querySelector(`[data-team="${letter}"]`) ||
+    document.querySelector(`.whoTeamBox.team${letter}`) ||
+    document.querySelector(`.whoTeamCard.team${letter}`) ||
+    document.querySelector(`.whoScorePanel.team${letter}`)
+  )
 }
 
 function highlightWhoTurnTeam() {
-  const a = document.getElementById("whoTeamABox")
-  const b = document.getElementById("whoTeamBBox")
+  const team = whoState.activeTeam || selectedTeam || null
 
-  if (!a || !b) return
+  document.querySelectorAll(".whoTeamCurrent").forEach(el => {
+    el.classList.remove("whoTeamCurrent")
+  })
 
-  a.classList.remove("activeTeam")
-  b.classList.remove("activeTeam")
+  const a = getWhoTeamBox("A")
+  const b = getWhoTeamBox("B")
 
-  if (whoState.activeTeam === "A") a.classList.add("activeTeam")
-  if (whoState.activeTeam === "B") b.classList.add("activeTeam")
+  if (a) {
+    a.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam")
+  }
 
-  updateWhoDoubleButton()
+  if (b) {
+    b.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam")
+  }
+
+  if (team === "A" && a) {
+    a.classList.add("whoTeamCurrent")
+  }
+
+  if (team === "B" && b) {
+    b.classList.add("whoTeamCurrent")
+  }
+
+  if (!a || !b) {
+    console.log("WHO TEAM BOX NOT FOUND:", { team, a, b })
+  }
 }
 
 function switchWhoTurn() {

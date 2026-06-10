@@ -351,29 +351,36 @@ function updateWarmupDoubleButton() {
    Team UI
 ========================= */
 
+function getWarmupTeamBox(team) {
+  const letter = team === "A" ? "A" : "B"
+
+  return (
+    document.getElementById(`warmupTeam${letter}Box`) ||
+    document.getElementById(`warmupTeam${letter}`) ||
+    document.getElementById(`warmupScore${letter}Box`) ||
+    document.getElementById(`warmupScorePanel${letter}`) ||
+    document.querySelector(`[onclick="selectWarmupTeam('${letter}')"]`) ||
+    document.querySelector(`[onclick='selectWarmupTeam("${letter}")']`) ||
+    document.querySelector(`[data-team="${letter}"]`) ||
+    document.querySelector(`.warmupTeamBox.team${letter}`) ||
+    document.querySelector(`.warmupTeamCard.team${letter}`) ||
+    document.querySelector(`.warmupScorePanel.team${letter}`)
+  )
+}
+
 function highlightWarmupSelectedTeam(team) {
-  const a = document.getElementById("warmupTeamABox")
-  const b = document.getElementById("warmupTeamBBox")
+  document.querySelectorAll(".warmupTeamCurrent").forEach(el => {
+    el.classList.remove("warmupTeamCurrent")
+  })
 
-  if (a) {
-    a.classList.remove("activeTeam")
-    a.removeAttribute("style")
+  const box = getWarmupTeamBox(team)
+
+  if (box) {
+    box.classList.remove("activeTeam", "selectedPresenterTeam")
+    box.classList.add("warmupTeamCurrent")
+  } else {
+    console.log("WARMUP TEAM BOX NOT FOUND:", team)
   }
-
-  if (b) {
-    b.classList.remove("activeTeam")
-    b.removeAttribute("style")
-  }
-
-  if (team === "A" && a) {
-    a.classList.add("activeTeam")
-  }
-
-  if (team === "B" && b) {
-    b.classList.add("activeTeam")
-  }
-
-  updateWarmupDoubleButton()
 }
 
 function clearWarmupSelectedButton() {
@@ -409,10 +416,14 @@ function selectWarmupTeam(team) {
   }
 
   selectedTeam = team
-  warmupManualSelectionDone = true
+warmupManualSelectionDone = true
+highlightWarmupSelectedTeam(team)
+updateWarmupDoubleButton()
+saveWarmupState()
+
+setTimeout(() => {
   highlightWarmupSelectedTeam(team)
-  updateWarmupDoubleButton()
-  saveWarmupState()
+}, 80)
 }
 
 /* =========================

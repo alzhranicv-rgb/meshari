@@ -1774,3 +1774,13 @@
     font-size:1rem !important;
   }
 }
+#top10TeamABox.top10TeamCurrent,
+#top10TeamBBox.top10TeamCurrent{
+  border-color:rgba(255,255,255,.95);
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.58),
+    inset 0 0 20px rgba(255,255,255,.22),
+    0 0 18px rgba(226,245,255,.22);
+
+  animation:segmentTeamGlow 1.6s ease-in-out infinite alternate;
+}

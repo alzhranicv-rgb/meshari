@@ -513,7 +513,7 @@ function buildAuctionHTML() {
       <div class="auctionTopBar">
 
         <div
-          class="auctionTeamCard ${auctionState.activeTeam === "A" ? "activeTeam" : ""}"
+          class="auctionTeamCard ${auctionState.activeTeam === "A" ? "fatblaTeamCurrent" : ""}"
           onclick="selectAuctionTeam('A')"
           id="auctionTeamABox"
         >
@@ -528,7 +528,7 @@ function buildAuctionHTML() {
         </div>
 
         <div
-          class="auctionTeamCard ${auctionState.activeTeam === "B" ? "activeTeam" : ""}"
+          class="auctionTeamCard ${auctionState.activeTeam === "B" ? "fatblaTeamCurrent" : ""}"
           onclick="selectAuctionTeam('B')"
           id="auctionTeamBBox"
         >
@@ -825,13 +825,21 @@ function highlightAuctionActiveTeam() {
   const a = document.getElementById("auctionTeamABox")
   const b = document.getElementById("auctionTeamBBox")
 
-  if (!a || !b) return
+  if (!a || !b) {
+    console.log("FATBLA TEAM BOX NOT FOUND:", { a, b })
+    return
+  }
 
-  a.classList.remove("activeTeam")
-  b.classList.remove("activeTeam")
+  a.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam", "fatblaTeamCurrent")
+  b.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam", "fatblaTeamCurrent")
 
-  if (auctionState.activeTeam === "A") a.classList.add("activeTeam")
-  if (auctionState.activeTeam === "B") b.classList.add("activeTeam")
+  if (auctionState.activeTeam === "A") {
+    a.classList.add("fatblaTeamCurrent")
+  }
+
+  if (auctionState.activeTeam === "B") {
+    b.classList.add("fatblaTeamCurrent")
+  }
 
   updateAuctionDoubleButton()
 }

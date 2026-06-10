@@ -515,6 +515,24 @@ function updateFinalUndoButtonState() {
    7) SHARED HELPERS
 ========================= */
 
+let finalClickLock = false
+
+function withFinalClickLock(callback, delay = 450) {
+  if (finalClickLock) return
+
+  finalClickLock = true
+
+  try {
+    callback()
+  } catch (e) {
+    console.log("FINAL CLICK LOCK ERROR:", e)
+  }
+
+  setTimeout(() => {
+    finalClickLock = false
+  }, delay)
+}
+
 function getFinalCurrentRoundState() {
   if (finalState.round === 1) return finalState.round1
   if (finalState.round === 2) return finalState.round2
@@ -570,11 +588,44 @@ function getFinalStatusDetails() {
   return "الفاصلة"
 }
 
+function getFinalCenterTeamOnly() {
+  let team = null
+
+  if (finalState.round === 1) {
+    team = finalState.round1.activeTeam
+  }
+
+  if (finalState.round === 2) {
+    team = finalState.round2.activeTeam
+  }
+
+  if (finalState.round === 3) {
+    team =
+      (typeof selectedTeam !== "undefined" && selectedTeam) ||
+      finalState.round3.activeTeam
+  }
+
+  if (finalState.round === 4) {
+    team =
+      finalState.round4.teamMedia?.currentTeam ||
+      finalState.round4.activeTeam
+  }
+
+  if (team === "A") return teamAName || "الفريق الأول"
+  if (team === "B") return teamBName || "الفريق الثاني"
+
+  return ""
+}
+
 function renderFinalCenterStatus() {
   const box = document.getElementById("finalCenterStatusText")
   if (!box) return
 
-  box.innerText = getFinalStatusDetails()
+  box.innerHTML = `
+    <div class="finalCenterTurnTeamName">
+      ${getFinalCenterTeamOnly()}
+    </div>
+  `
 }
 
 function getFinalCurrentNumberText() {
@@ -896,11 +947,21 @@ function highlightFinalTeam(team) {
   const a = document.getElementById("finalTeamABox")
   const b = document.getElementById("finalTeamBBox")
 
-  if (a) a.classList.remove("activeTeam")
-  if (b) b.classList.remove("activeTeam")
+  if (a) {
+    a.classList.remove("activeTeam", "finalTurnActiveTeam", "finalScoreTeamCurrent")
+  }
 
-  if (team === "A" && a) a.classList.add("activeTeam")
-  if (team === "B" && b) b.classList.add("activeTeam")
+  if (b) {
+    b.classList.remove("activeTeam", "finalTurnActiveTeam", "finalScoreTeamCurrent")
+  }
+
+  if (team === "A" && a) {
+    a.classList.add("finalScoreTeamCurrent")
+  }
+
+  if (team === "B" && b) {
+    b.classList.add("finalScoreTeamCurrent")
+  }
 
   updateFinalDoubleButton()
   renderFinalCenterStatus()
@@ -1136,6 +1197,60 @@ function isFinalRoundFinished(round) {
   return false
 }
 
+function getFinalRoundScores(round = finalState.round) {
+  if (round === 1) return finalState.round1.scores || { A: 0, B: 0 }
+  if (round === 2) return finalState.round2.scores || { A: 0, B: 0 }
+  if (round === 3) return finalState.round3.scores || { A: 0, B: 0 }
+  if (round === 4) return finalState.round4.scores || { A: 0, B: 0 }
+
+  return { A: 0, B: 0 }
+}
+
+function getFinalRoundWinnerText(round = finalState.round) {
+  const scores = getFinalRoundScores(round)
+  const a = Number(scores.A || 0)
+  const b = Number(scores.B || 0)
+
+  if (a > b) return teamAName || "الفريق الأول"
+  if (b > a) return teamBName || "الفريق الثاني"
+
+  return "تعادل"
+}
+
+function showFinalRoundFinishedScreen() {
+  const stage = document.getElementById("finalMainStage")
+  if (!stage) return
+
+  const round = Number(finalState.round || 1)
+  const scores = getFinalRoundScores(round)
+  const winner = getFinalRoundWinnerText(round)
+
+  stage.innerHTML = `
+    <div class="finalFinishedScreen">
+      <div class="finalFinishedCard">
+        <div class="finalFinishedBadge">انتهت الفقرة</div>
+
+        <h2>${getFinalRoundTextLabel()}</h2>
+
+        <div class="finalFinishedWinner">
+          ${winner === "تعادل" ? "تعادل" : `الفائز: ${escapeDisplayHtml(winner)}`}
+        </div>
+
+        <div class="finalFinishedScores">
+          <div>
+            <span>${escapeDisplayHtml(teamAName || "الفريق الأول")}</span>
+            <strong>${Number(scores.A || 0)}</strong>
+          </div>
+
+          <div>
+            <span>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</span>
+            <strong>${Number(scores.B || 0)}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+}
 
 /* =========================
    9) DOUBLE
@@ -1421,10 +1536,19 @@ function renderFinalRound() {
   renderFinalTeamLayout()
   renderFinalTurnBar()
 
-  if (finalState.round === 1) renderFinalRound1()
-  if (finalState.round === 2) renderFinalRound2()
-  if (finalState.round === 3) renderFinalRound3()
-  if (finalState.round === 4) renderFinalRound4()
+if (isFinalRoundFinished(finalState.round)) {
+  showFinalRoundFinishedScreen()
+  updateFinalDoubleButton()
+  syncFinalGlobals()
+  saveFinalState()
+  updateFinalUndoButtonState()
+  return
+}
+
+if (finalState.round === 1) renderFinalRound1()
+if (finalState.round === 2) renderFinalRound2()
+if (finalState.round === 3) renderFinalRound3()
+if (finalState.round === 4) renderFinalRound4()
 
   updateFinalDoubleButton()
   syncFinalGlobals()
