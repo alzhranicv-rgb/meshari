@@ -4308,3 +4308,168 @@ window.playCurrentFinalVideo = playCurrentFinalVideo
 window.restartCurrentFinalVideo = restartCurrentFinalVideo
 window.stopCurrentFinalVideo = stopCurrentFinalVideo
 window.finalWrongVideoOnly = finalWrongVideoOnly
+
+/* =========================================================
+   FINAL CONTROLS FIX
+   إصلاح أزرار التحكم في الفاصلة
+   ضعه آخر شيء في ملف الفاصلة
+========================================================= */
+
+function finalRound1Correct() {
+  ensureFinalRound1State()
+
+  if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
+    showGameToast("اختر رقمًا أولاً")
+    return
+  }
+
+  const team = finalState.round1.activeTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (finalState.round1.answerShown) {
+    showGameToast("تم تسجيل الإجابة")
+    return
+  }
+
+  pushFinalHistory()
+
+  finalState.round1.scores[team] += getFinalScoreValue(team, 1)
+  finalState.round1.answerShown = true
+
+  clearFinalActiveDouble()
+
+  playGameSound("correct")
+  flashScreen("correct")
+
+  renderFinalScores()
+  loadFinalRound1Current()
+  saveFinalState()
+
+  setTimeout(() => {
+    finalizeRound1Turn()
+  }, 3500)
+}
+
+function finalRound1WrongFixed() {
+  ensureFinalRound1State()
+
+  if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
+    showGameToast("اختر رقمًا أولاً")
+    return
+  }
+
+  pushFinalHistory()
+
+  finalState.round1.answerShown = true
+
+  clearFinalActiveDouble()
+
+  playGameSound("wrong")
+  flashScreen("wrong")
+
+  loadFinalRound1Current()
+  saveFinalState()
+
+  setTimeout(() => {
+    finalizeRound1Turn()
+  }, 3500)
+}
+
+/* إصلاح اختيار الفريق في الجولة الثالثة */
+function finalRound3StoryCorrectFixed() {
+  ensureFinalRound3State()
+
+  if (!finalState.round3.pendingScore || !finalState.round3.currentNumber) {
+    showGameToast("لا يوجد رقم مفتوح")
+    return
+  }
+
+  if (!finalState.round3.shownPart) {
+    showGameToast("أظهر جزء من القصة أولاً")
+    return
+  }
+
+  const team = finalState.round3.activeTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق الفائز أولاً")
+    return
+  }
+
+  if (finalState.round3.answerShown) {
+    showGameToast("تم تسجيل الإجابة")
+    return
+  }
+
+  pushFinalHistory()
+
+  const points = Number(finalState.round3.currentPoints || 1)
+
+  finalState.round3.scores[team] += getFinalScoreValue(team, points)
+  finalState.round3.answerShown = true
+  finalState.round3.lastTeamPlayed = team
+
+  clearFinalActiveDouble()
+
+  playGameSound("correct")
+  flashScreen("correct")
+
+  renderFinalScores()
+  renderFinalRound3()
+  updateFinalTopHeaderRoundInfo()
+  saveFinalState()
+
+  setTimeout(() => {
+    finalizeFinalRound3StoryTurn()
+  }, 3500)
+}
+
+/* ربط كل أزرار الفاصلة بالنافذة */
+window.renderFinal = window.renderFinal
+
+window.selectFinalTeam = selectFinalTeam
+window.activateFinalDouble = activateFinalDouble
+window.undoFinalAction = undoFinalAction
+
+window.openFinalRound1Card = openFinalRound1Card
+window.finalRound1Correct = finalRound1Correct
+window.finalRound1Wrong = finalRound1WrongFixed
+window.showFinalRound1Answer = showFinalRound1Answer
+window.showFinalRound1Question = showFinalRound1Question
+window.toggleFinalRound1Overlay = toggleFinalRound1Overlay
+window.toggleFinalRound1ImageOverlay = toggleFinalRound1ImageOverlay
+
+window.openFinalRound2Card = openFinalRound2Card
+window.finalRound2DecreaseCountdown = finalRound2DecreaseCountdown
+window.finalRound2ShowNextImage = finalRound2ShowNextImage
+window.finalRound2RecordScore = finalRound2RecordScore
+window.finalRound2RecordSequenceScore = finalRound2RecordSequenceScore
+window.finalRound2RecordImageScore = finalRound2RecordImageScore
+window.toggleFinalRound2CorrectSelection = toggleFinalRound2CorrectSelection
+window.toggleFinalRound2ImageCorrectSelection = toggleFinalRound2ImageCorrectSelection
+window.hideFinalRound2SequenceWord = hideFinalRound2SequenceWord
+window.toggleFinalRound2ImageOverlay = toggleFinalRound2ImageOverlay
+
+window.openFinalRound3StoryCard = openFinalRound3StoryCard
+window.showFinalRound3StoryPart = showFinalRound3StoryPart
+window.finalRound3StoryCorrect = finalRound3StoryCorrectFixed
+window.finalRound3StoryWrong = finalRound3StoryWrong
+
+window.openFinalRound4TeamMediaCard = openFinalRound4TeamMediaCard
+window.showFinalRound4TeamMediaQuestion = showFinalRound4TeamMediaQuestion
+window.playFinalRound4TeamMediaVideo = playFinalRound4TeamMediaVideo
+window.restartFinalRound4TeamMediaVideo = restartFinalRound4TeamMediaVideo
+window.restartFinalRound4TeamMediaImage = restartFinalRound4TeamMediaImage
+window.finalRound4TeamMediaCorrect = finalRound4TeamMediaCorrect
+window.finalRound4TeamMediaWrong = finalRound4TeamMediaWrong
+window.openFinalRound4TeamMediaOverlay = openFinalRound4TeamMediaOverlay
+window.closeFinalRound4TeamMediaOverlay = closeFinalRound4TeamMediaOverlay
+
+window.playCurrentFinalVideo = playCurrentFinalVideo
+window.restartCurrentFinalVideo = restartCurrentFinalVideo
+window.stopCurrentFinalVideo = stopCurrentFinalVideo
+window.finalWrongVideoOnly = finalWrongVideoOnly
