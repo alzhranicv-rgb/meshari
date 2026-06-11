@@ -1460,16 +1460,18 @@ function isSegmentVisibleOnDisplay(segmentKey) {
 }
 
 function getDisplaySegmentDomId(key) {
+  key = normalizeDisplaySegmentKey(key)
+
   if (key === "warmup") return "segmentWarmup"
   if (key === "top10") return "segmentTop10"
   if (key === "auction") return "segmentAuction"
   if (key === "who") return "segmentWho"
   if (key === "explain") return "segmentExplain"
 
-  if (key === "finalRound1") return "segment_finalRound1"
-  if (key === "finalRound2") return "segment_finalRound2"
-  if (key === "finalRound3") return "segment_finalRound3"
-  if (key === "finalRound4") return "segment_finalRound4"
+  if (key === "final_round1") return "segment_finalRound1"
+  if (key === "final_round2") return "segment_finalRound2"
+  if (key === "final_round3") return "segment_finalRound3"
+  if (key === "final_round4") return "segment_finalRound4"
 
   if (key === "final") return "segmentFinal"
   if (key === "archive") return "segmentArchive"
@@ -1478,16 +1480,18 @@ function getDisplaySegmentDomId(key) {
 }
 
 function getDisplayWinnerDomId(key) {
+  key = normalizeDisplaySegmentKey(key)
+
   if (key === "warmup") return "winnerWarmup"
   if (key === "top10") return "winnerTop10"
   if (key === "auction") return "winnerAuction"
   if (key === "who") return "winnerWho"
   if (key === "explain") return "winnerExplain"
 
-  if (key === "finalRound1") return "winner_finalRound1"
-  if (key === "finalRound2") return "winner_finalRound2"
-  if (key === "finalRound3") return "winner_finalRound3"
-  if (key === "finalRound4") return "winner_finalRound4"
+  if (key === "final_round1") return "winner_finalRound1"
+  if (key === "final_round2") return "winner_finalRound2"
+  if (key === "final_round3") return "winner_finalRound3"
+  if (key === "final_round4") return "winner_finalRound4"
 
   if (key === "final") return "winnerFinal"
   if (key === "archive") return "winnerArchive"
@@ -1555,10 +1559,10 @@ async function openSegmentPage(segmentKey, forcedRound = null) {
 
   const isFinalInternalSegment = segmentKey === "final"
   const isFinalCardSegment =
-    segmentKey === "finalRound1" ||
-    segmentKey === "finalRound2" ||
-    segmentKey === "finalRound3" ||
-    segmentKey === "finalRound4"
+    segmentKey === "final_round1" ||
+    segmentKey === "final_round2" ||
+    segmentKey === "final_round3" ||
+    segmentKey === "final_round4"
 
   const isFinalAny = isFinalInternalSegment || isFinalCardSegment
 
@@ -1596,92 +1600,78 @@ async function openSegmentPage(segmentKey, forcedRound = null) {
 
   if (segmentStatus[lockKey]?.locked) return
 
-  if (displayProFxLock) return
-  displayProFxLock = true
+  displayProFxLock = false
+
+  await loadDisplayCountForSegment(lockKey)
+
+  homeRefreshLocked = true
+  localStorage.setItem("active_segment", isFinalAny ? lockKey : segmentKey)
+
+  const homeScreen = getFirstElement(["homeScreen", "homePage"])
+  const segmentScreen = getFirstElement(["segmentScreen"])
+
+  document.body.classList.add("segmentMode")
+
+  await showSegmentIntro(lockKey)
+
+  if (homeScreen) homeScreen.classList.add("hidden")
+  if (segmentScreen) segmentScreen.classList.remove("hidden")
+
+  showDisplayLoading("جاري تجهيز الفقرة...")
 
   try {
-    await loadDisplayCountForSegment(lockKey)
-
-    homeRefreshLocked = true
+    if (segmentKey === "warmup") await window.renderWarmup()
+    if (segmentKey === "top10") await window.renderTop10()
+    if (segmentKey === "auction") await window.renderAuction()
+    if (segmentKey === "who") await window.renderWho()
+    if (segmentKey === "explain") await window.renderExplain()
+    if (segmentKey === "archive") await window.renderArchive()
 
     if (isFinalAny) {
+      if (typeof window.renderFinal !== "function") {
+        showGameToast("ملف الفاصلة غير محمّل")
+        return
+      }
+
       localStorage.setItem("active_segment", lockKey)
-    } else {
-      localStorage.setItem("active_segment", segmentKey)
+      await window.renderFinal(finalRound, lockKey)
     }
 
-    const homeScreen = getFirstElement(["homeScreen", "homePage"])
-    const segmentScreen = getFirstElement(["segmentScreen"])
+    const mediaRoot = document.getElementById("segmentArea") || document
 
-    document.body.classList.add("segmentMode")
+    if (typeof protectDisplayMedia === "function") {
+      protectDisplayMedia(mediaRoot)
+    }
 
-    await showSegmentIntro(lockKey)
+    if (typeof enhanceDisplayMediaFrames === "function") {
+      enhanceDisplayMediaFrames(mediaRoot)
+    }
 
-    playSoftExit(homeScreen, async () => {
-      if (homeScreen) homeScreen.classList.add("hidden")
-      if (segmentScreen) segmentScreen.classList.remove("hidden")
+    if (typeof preloadDisplayMediaInRoot === "function") {
+      await preloadDisplayMediaInRoot(mediaRoot)
+    }
 
-      showDisplayLoading("جاري تجهيز الفقرة...")
-
-      try {
-        if (segmentKey === "warmup") await window.renderWarmup()
-        if (segmentKey === "top10") await window.renderTop10()
-        if (segmentKey === "auction") await window.renderAuction()
-        if (segmentKey === "who") await window.renderWho()
-        if (segmentKey === "explain") await window.renderExplain()
-        if (segmentKey === "archive") await window.renderArchive()
-
-        if (isFinalAny) {
-          localStorage.setItem("active_segment", lockKey)
-          await window.renderFinal(finalRound, lockKey)
-        }
-
-        const mediaRoot = document.getElementById("segmentArea") || document
-
-        if (typeof protectDisplayMedia === "function") {
-          protectDisplayMedia(mediaRoot)
-        }
-
-        if (typeof enhanceDisplayMediaFrames === "function") {
-          enhanceDisplayMediaFrames(mediaRoot)
-        }
-
-        if (typeof preloadDisplayMediaInRoot === "function") {
-          await preloadDisplayMediaInRoot(mediaRoot)
-        }
-
-        if (typeof applyDisplayMediaRevealFx === "function") {
-          applyDisplayMediaRevealFx(mediaRoot)
-        }
-
-      } catch (e) {
-        console.log("DISPLAY SEGMENT RENDER ERROR:", e)
-        showGameToast("تعذر تجهيز الفقرة")
-      } finally {
-        hideDisplayLoading()
-      }
-
-      const segmentArea = document.getElementById("segmentArea")
-      if (segmentArea) {
-        segmentArea.classList.remove("displaySegmentEnterFx")
-        void segmentArea.offsetWidth
-        segmentArea.classList.add("displaySegmentEnterFx")
-      }
-
-      if (typeof syncDisplayStateToSession === "function") {
-        syncDisplayStateToSession()
-      }
-
-      setTimeout(() => {
-        displayProFxLock = false
-      }, 350)
-    })
+    if (typeof applyDisplayMediaRevealFx === "function") {
+      applyDisplayMediaRevealFx(mediaRoot)
+    }
 
   } catch (e) {
-    console.log("OPEN SEGMENT PAGE ERROR:", e)
-    displayProFxLock = false
+    console.log("DISPLAY SEGMENT RENDER ERROR:", e)
+    showGameToast("تعذر تجهيز الفقرة")
+  } finally {
     hideDisplayLoading()
-    showGameToast("تعذر فتح الفقرة")
+    displayProFxLock = false
+  }
+
+  const segmentArea = document.getElementById("segmentArea")
+  if (segmentArea) {
+    segmentArea.classList.remove("displaySegmentEnterFx")
+    void segmentArea.offsetWidth
+    segmentArea.classList.add("displaySegmentEnterFx")
+  }
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
   }
 }
 
