@@ -55,16 +55,35 @@ function escapeDisplayHtml(value) {
     .replaceAll("'", "&#039;")
 }
 
+function normalizeDisplaySegmentKey(key) {
+  if (key === "final_round1") return "finalRound1"
+  if (key === "final_round2") return "finalRound2"
+  if (key === "final_round3") return "finalRound3"
+  if (key === "final_round4") return "finalRound4"
+
+  return key
+}
+
+function isAnyFinalVisibleOnDisplay() {
+  return true
+}
+
 function isFinalSegmentKey(key) {
   return (
     key === "finalRound1" ||
     key === "finalRound2" ||
     key === "finalRound3" ||
-    key === "finalRound4"
+    key === "finalRound4" ||
+    key === "final_round1" ||
+    key === "final_round2" ||
+    key === "final_round3" ||
+    key === "final_round4"
   )
 }
 
 function getFinalRoundFromSegmentKey(key) {
+  key = normalizeDisplaySegmentKey(key)
+
   if (key === "finalRound1") return 1
   if (key === "finalRound2") return 2
   if (key === "finalRound3") return 3
@@ -628,14 +647,16 @@ async function loadVisibleSegmentsForDisplay() {
   })
 
   data.forEach(row => {
-    if (!map[row.segment_key]) return
+  const key = normalizeDisplaySegmentKey(row.segment_key)
 
-    map[row.segment_key] = {
-      ...map[row.segment_key],
-      is_visible: !!row.is_visible,
-      sort_order: Number(row.sort_order || map[row.segment_key].sort)
-    }
-  })
+  if (!map[key]) return
+
+  map[key] = {
+    ...map[key],
+    is_visible: !!row.is_visible,
+    sort_order: Number(row.sort_order || map[key].sort)
+  }
+})
 
   visibleDisplaySegments = Object.values(map)
     .sort((a, b) => {
@@ -1423,7 +1444,15 @@ function getVisibleDisplaySegments() {
 }
 
 function isSegmentVisibleOnDisplay(segmentKey) {
-  return getVisibleDisplaySegments().some(item => item.key === segmentKey)
+  const key = normalizeDisplaySegmentKey(segmentKey)
+
+  if (key === "final") {
+    return isAnyFinalVisibleOnDisplay()
+  }
+
+  return getVisibleDisplaySegments().some(item => {
+    return normalizeDisplaySegmentKey(item.key) === key
+  })
 }
 
 function getDisplaySegmentDomId(key) {
@@ -1526,41 +1555,51 @@ async function openSegmentPage(segmentKey) {
 
   await loadVisibleSegmentsForDisplay()
 
-const isFinalInternalSegment = segmentKey === "final"
+  segmentKey = normalizeDisplaySegmentKey(segmentKey)
 
-const finalIsVisible =
-  isFinalInternalSegment &&
-  (
-    isSegmentVisibleOnDisplay("final") ||
-    isSegmentVisibleOnDisplay("final_round1") ||
-    isSegmentVisibleOnDisplay("final_round2") ||
-    isSegmentVisibleOnDisplay("final_round3") ||
-    isSegmentVisibleOnDisplay("final_round4")
-  )
+  const isFinalInternalSegment = segmentKey === "final"
+  const isFinalCardSegment = isFinalSegmentKey(segmentKey)
 
-if (!isSegmentVisibleOnDisplay(segmentKey) && !finalIsVisible) {
-  showGameToast("هذه الفقرة غير مفعلة في العرض")
-  renderVisibleSegmentsHome()
-  updateSegmentCards()
-  return
-}
+  if (!isFinalInternalSegment && !isFinalCardSegment && !isSegmentVisibleOnDisplay(segmentKey)) {
+    showGameToast("هذه الفقرة غير مفعلة في العرض")
+    renderVisibleSegmentsHome()
+    updateSegmentCards()
+    return
+  }
 
-  if (segmentStatus[segmentKey]?.locked) return
+  const finalRound =
+    isFinalInternalSegment
+      ? Number(window.displayFinalRound || window.currentFinalRound || 1)
+      : isFinalCardSegment
+        ? Number(getFinalRoundFromSegmentKey(segmentKey) || 1)
+        : 0
+
+  const lockKey =
+    isFinalInternalSegment || isFinalCardSegment
+      ? getFinalSegmentKeyFromRound(finalRound)
+      : segmentKey
+
+  if (segmentStatus[lockKey]?.locked) return
 
   if (displayProFxLock) return
   displayProFxLock = true
 
-  await loadDisplayCountForSegment(segmentKey)
+  await loadDisplayCountForSegment(lockKey)
 
   homeRefreshLocked = true
-  localStorage.setItem("active_segment", segmentKey)
+
+  if (isFinalInternalSegment || isFinalCardSegment) {
+    localStorage.setItem("active_segment", lockKey)
+  } else {
+    localStorage.setItem("active_segment", segmentKey)
+  }
 
   const homeScreen = getFirstElement(["homeScreen", "homePage"])
   const segmentScreen = getFirstElement(["segmentScreen"])
 
   document.body.classList.add("segmentMode")
 
-  await showSegmentIntro(segmentKey)
+  await showSegmentIntro(lockKey)
 
   playSoftExit(homeScreen, async () => {
     if (homeScreen) homeScreen.classList.add("hidden")
@@ -1568,46 +1607,52 @@ if (!isSegmentVisibleOnDisplay(segmentKey) && !finalIsVisible) {
 
     showDisplayLoading("جاري تجهيز الفقرة...")
 
-   try {
-  if (segmentKey === "warmup") await window.renderWarmup()
-  if (segmentKey === "top10") await window.renderTop10()
-  if (segmentKey === "auction") await window.renderAuction()
-  if (segmentKey === "who") await window.renderWho()
-  if (segmentKey === "explain") await window.renderExplain()
+    try {
+      if (segmentKey === "warmup") await window.renderWarmup()
+      if (segmentKey === "top10") await window.renderTop10()
+      if (segmentKey === "auction") await window.renderAuction()
+      if (segmentKey === "who") await window.renderWho()
+      if (segmentKey === "explain") await window.renderExplain()
+      if (segmentKey === "archive") await window.renderArchive()
 
-  if (segmentKey === "final" || isFinalSegmentKey(segmentKey)) {
-  const finalRound =
-    segmentKey === "final"
-      ? Number(window.displayFinalRound || window.currentFinalRound || 1)
-      : getFinalRoundFromSegmentKey(segmentKey)
+      if (isFinalInternalSegment || isFinalCardSegment) {
+        const round =
+          isFinalInternalSegment
+            ? Number(window.displayFinalRound || window.currentFinalRound || 1)
+            : Number(getFinalRoundFromSegmentKey(segmentKey) || 1)
 
-  await window.renderFinal(finalRound, segmentKey)
-}
+        window.displayFinalRound = round
+        window.currentFinalRound = round
 
-  if (segmentKey === "archive") await window.renderArchive()
+        const finalSegmentKey = getFinalSegmentKeyFromRound(round)
 
-  const mediaRoot = document.getElementById("segmentArea") || document
+        localStorage.setItem("active_segment", finalSegmentKey)
 
-  protectDisplayMedia(mediaRoot)
+        await window.renderFinal(round, finalSegmentKey)
+      }
 
-  if (typeof enhanceDisplayMediaFrames === "function") {
-    enhanceDisplayMediaFrames(mediaRoot)
-  }
+      const mediaRoot = document.getElementById("segmentArea") || document
 
-  if (typeof preloadDisplayMediaInRoot === "function") {
-    await preloadDisplayMediaInRoot(mediaRoot)
-  }
+      protectDisplayMedia(mediaRoot)
 
-  if (typeof applyDisplayMediaRevealFx === "function") {
-    applyDisplayMediaRevealFx(mediaRoot)
-  }
+      if (typeof enhanceDisplayMediaFrames === "function") {
+        enhanceDisplayMediaFrames(mediaRoot)
+      }
 
-} catch (e) {
-  console.log("DISPLAY SEGMENT RENDER ERROR:", e)
-  showGameToast("تعذر تجهيز الفقرة")
-} finally {
-  hideDisplayLoading()
-}
+      if (typeof preloadDisplayMediaInRoot === "function") {
+        await preloadDisplayMediaInRoot(mediaRoot)
+      }
+
+      if (typeof applyDisplayMediaRevealFx === "function") {
+        applyDisplayMediaRevealFx(mediaRoot)
+      }
+
+    } catch (e) {
+      console.log("DISPLAY SEGMENT RENDER ERROR:", e)
+      showGameToast("تعذر تجهيز الفقرة")
+    } finally {
+      hideDisplayLoading()
+    }
 
     const segmentArea = document.getElementById("segmentArea")
     if (segmentArea) {
