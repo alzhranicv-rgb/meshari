@@ -3151,3 +3151,161 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.toggleBigScreenMode = toggleBigScreenMode
 window.applyBigScreenMode = applyBigScreenMode
+
+/* =========================================================
+   FINAL DISPLAY FORCE FIX
+   يحل مشكلة: هذه الفقرة غير مفعلة في العرض
+   ضعه آخر شيء في display.js
+========================================================= */
+
+function normalizeDisplaySegmentKeyFinalFix(key) {
+  if (key === "final_round1") return "finalRound1"
+  if (key === "final_round2") return "finalRound2"
+  if (key === "final_round3") return "finalRound3"
+  if (key === "final_round4") return "finalRound4"
+  return key
+}
+
+function isFinalSegmentKeyFinalFix(key) {
+  key = normalizeDisplaySegmentKeyFinalFix(key)
+
+  return (
+    key === "final" ||
+    key === "finalRound1" ||
+    key === "finalRound2" ||
+    key === "finalRound3" ||
+    key === "finalRound4"
+  )
+}
+
+function getFinalRoundFromAnyKeyFinalFix(key) {
+  key = normalizeDisplaySegmentKeyFinalFix(key)
+
+  if (key === "finalRound1") return 1
+  if (key === "finalRound2") return 2
+  if (key === "finalRound3") return 3
+  if (key === "finalRound4") return 4
+
+  return Number(window.displayFinalRound || window.currentFinalRound || 1)
+}
+
+function getFinalKeyFromRoundFinalFix(round) {
+  const r = Number(round || 1)
+
+  if (r === 1) return "finalRound1"
+  if (r === 2) return "finalRound2"
+  if (r === 3) return "finalRound3"
+  if (r === 4) return "finalRound4"
+
+  return "finalRound1"
+}
+
+async function forceOpenFinalDisplayRound(round = 1) {
+  round = Number(round || 1)
+
+  const finalKey = getFinalKeyFromRoundFinalFix(round)
+
+  window.displayFinalRound = round
+  window.currentFinalRound = round
+
+  localStorage.setItem("active_segment", finalKey)
+
+  homeRefreshLocked = true
+
+  clearDisplayTemporaryFx()
+
+  const homeScreen = getFirstElement(["homeScreen", "homePage"])
+  const segmentScreen = getFirstElement(["segmentScreen"])
+
+  document.body.classList.add("segmentMode")
+
+  if (homeScreen) homeScreen.classList.add("hidden")
+  if (segmentScreen) segmentScreen.classList.remove("hidden")
+
+  showDisplayLoading("جاري تجهيز الفقرة...")
+
+  try {
+    await window.renderFinal(round, finalKey)
+
+    const mediaRoot = document.getElementById("segmentArea") || document
+
+    if (typeof protectDisplayMedia === "function") {
+      protectDisplayMedia(mediaRoot)
+    }
+
+    if (typeof enhanceDisplayMediaFrames === "function") {
+      enhanceDisplayMediaFrames(mediaRoot)
+    }
+
+    if (typeof preloadDisplayMediaInRoot === "function") {
+      await preloadDisplayMediaInRoot(mediaRoot)
+    }
+
+    if (typeof applyDisplayMediaRevealFx === "function") {
+      applyDisplayMediaRevealFx(mediaRoot)
+    }
+
+    if (typeof syncDisplayStateToSession === "function") {
+      syncDisplayStateToSession()
+    }
+
+  } catch (e) {
+    console.log("FORCE FINAL DISPLAY ERROR:", e)
+    showGameToast("تعذر تجهيز الفقرة")
+  } finally {
+    hideDisplayLoading()
+    displayProFxLock = false
+  }
+}
+
+const oldOpenSegmentPageFinalFix = window.openSegmentPage || openSegmentPage
+
+openSegmentPage = async function(segmentKey) {
+  const originalKey = segmentKey
+  const fixedKey = normalizeDisplaySegmentKeyFinalFix(segmentKey)
+
+  if (isFinalSegmentKeyFinalFix(fixedKey)) {
+    const round = getFinalRoundFromAnyKeyFinalFix(fixedKey)
+    await forceOpenFinalDisplayRound(round)
+    return
+  }
+
+  return oldOpenSegmentPageFinalFix(originalKey)
+}
+
+openMainSegment = function(segmentKey) {
+  return openSegmentPage(segmentKey)
+}
+
+openMaToSegment = function(segmentKey) {
+  return openSegmentPage(segmentKey)
+}
+
+/* يمنع ظهور رسالة الفاصلة غير مفعلة إذا جاءت من كود قديم */
+const oldShowGameToastFinalFix = showGameToast
+
+showGameToast = function(message) {
+  const msg = String(message || "")
+
+  if (msg.includes("هذه الفقرة غير مفعلة في العرض")) {
+    const active = localStorage.getItem("active_segment") || ""
+    const round = Number(window.displayFinalRound || window.currentFinalRound || 1)
+
+    if (
+      active === "final" ||
+      active === "finalRound1" ||
+      active === "finalRound2" ||
+      active === "finalRound3" ||
+      active === "finalRound4" ||
+      active === "final_round1" ||
+      active === "final_round2" ||
+      active === "final_round3" ||
+      active === "final_round4"
+    ) {
+      forceOpenFinalDisplayRound(round)
+      return
+    }
+  }
+
+  oldShowGameToastFinalFix(message)
+}
