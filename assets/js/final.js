@@ -28,7 +28,20 @@ let finalRound4ImageTimer = null
    2) SEGMENT KEYS / TITLES
 ========================= */
 
+function normalizeFinalSegmentKey(key) {
+  key = String(key || "")
+
+  if (key === "final_round1") return "finalRound1"
+  if (key === "final_round2") return "finalRound2"
+  if (key === "final_round3") return "finalRound3"
+  if (key === "final_round4") return "finalRound4"
+
+  return key
+}
+
 function isFinalSplitSegmentKey(key) {
+  key = normalizeFinalSegmentKey(key)
+
   return (
     key === "finalRound1" ||
     key === "finalRound2" ||
@@ -38,6 +51,8 @@ function isFinalSplitSegmentKey(key) {
 }
 
 function getFinalRoundFromSegmentKey(key) {
+  key = normalizeFinalSegmentKey(key)
+
   if (key === "finalRound1") return 1
   if (key === "finalRound2") return 2
   if (key === "finalRound3") return 3
@@ -54,25 +69,22 @@ function getFinalSegmentKeyFromRound(round) {
   if (r === 3) return "finalRound3"
   if (r === 4) return "finalRound4"
 
-  return "final"
+  return "finalRound1"
 }
 
 function getActiveFinalSegmentKey() {
-  if (isFinalSplitSegmentKey(currentFinalSegmentKey)) {
-    return currentFinalSegmentKey
-  }
+  const current = normalizeFinalSegmentKey(currentFinalSegmentKey)
+  if (isFinalSplitSegmentKey(current)) return current
 
-  const active = localStorage.getItem("active_segment")
+  const active = normalizeFinalSegmentKey(localStorage.getItem("active_segment"))
+  if (isFinalSplitSegmentKey(active)) return active
 
-  if (isFinalSplitSegmentKey(active)) {
-    return active
-  }
-
-  return "final"
+  const round = Number(window.displayFinalRound || window.currentFinalRound || finalState?.round || 1)
+  return getFinalSegmentKeyFromRound(round)
 }
 
 function isFinalSplitMode() {
-  return isFinalSplitSegmentKey(getActiveFinalSegmentKey())
+  return true
 }
 
 function getFinalDisplayTitle() {
@@ -87,14 +99,10 @@ function getFinalDisplayTitle() {
 }
 
 function getFinalForcedRoundFromArgs(forcedRound, forcedSegmentKey) {
-  const fromKey = getFinalRoundFromSegmentKey(forcedSegmentKey)
+  const fixedKey = normalizeFinalSegmentKey(forcedSegmentKey)
+  const fromKey = getFinalRoundFromSegmentKey(fixedKey)
 
   if (fromKey) return fromKey
-
-  const active = localStorage.getItem("active_segment")
-  const fromActive = getFinalRoundFromSegmentKey(active)
-
-  if (fromActive) return fromActive
 
   const numericRound = Number(forcedRound || 0)
 
@@ -102,9 +110,19 @@ function getFinalForcedRoundFromArgs(forcedRound, forcedSegmentKey) {
     return numericRound
   }
 
-  return null
-}
+  const active = normalizeFinalSegmentKey(localStorage.getItem("active_segment"))
+  const fromActive = getFinalRoundFromSegmentKey(active)
 
+  if (fromActive) return fromActive
+
+  const displayRound = Number(window.displayFinalRound || window.currentFinalRound || 0)
+
+  if ([1, 2, 3, 4].includes(displayRound)) {
+    return displayRound
+  }
+
+  return 1
+}
 
 /* =========================
    3) DEFAULT STATE
@@ -1380,16 +1398,14 @@ window.renderFinal = async function (forcedRound = null, forcedSegmentKey = null
   clearFinalIntervals()
 
   const targetRound = getFinalForcedRoundFromArgs(forcedRound, forcedSegmentKey)
+  const targetKey = getFinalSegmentKeyFromRound(targetRound)
 
-  if (forcedSegmentKey && isFinalSplitSegmentKey(forcedSegmentKey)) {
-    currentFinalSegmentKey = forcedSegmentKey
-  } else if (targetRound && isFinalSplitSegmentKey(localStorage.getItem("active_segment"))) {
-    currentFinalSegmentKey = localStorage.getItem("active_segment")
-  } else if (targetRound) {
-    currentFinalSegmentKey = getFinalSegmentKeyFromRound(targetRound)
-  } else {
-    currentFinalSegmentKey = "final"
-  }
+  currentFinalSegmentKey = targetKey
+
+  window.displayFinalRound = targetRound
+  window.currentFinalRound = targetRound
+
+  localStorage.setItem("active_segment", targetKey)
 
   if (saved) {
     restoreFinalState(saved)
@@ -1402,11 +1418,16 @@ window.renderFinal = async function (forcedRound = null, forcedSegmentKey = null
   await loadFinalRoundMeta()
   await loadFinalRound1CardTexts()
 
-  if (targetRound) {
-    finalState.round = targetRound
-  }
+  finalState.round = targetRound
+  currentFinalSegmentKey = targetKey
+
+  window.displayFinalRound = targetRound
+  window.currentFinalRound = targetRound
+
+  localStorage.setItem("active_segment", targetKey)
 
   openSegment(getFinalDisplayTitle(), buildFinalHTML())
+
   renderFinalRound()
   saveFinalState()
   updateEndRoundButtonState()
