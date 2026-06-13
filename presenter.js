@@ -26,7 +26,7 @@ const ALL_PRESENTER_SEGMENTS = [
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
   { key: "archive", title: "الأرشيف", sort: 6 },
 
-  { key: "final_round1", title: "بدون نقاط", sort: 7, finalRound: 1 },
+  { key: "final_round1", title: "ٮدوں ٮڡاط", sort: 7, finalRound: 1 },
   { key: "final_round2", title: "صح صحلي", sort: 8, finalRound: 2 },
   { key: "final_round3", title: "قصة", sort: 9, finalRound: 3 },
   { key: "final_round4", title: "التركيز", sort: 10, finalRound: 4 }
@@ -102,7 +102,7 @@ function showPresenterSegmentPage() {
 function getPresenterFinalRoundTitle(round) {
   round = Number(round || 1)
 
-  if (round === 1) return "بدون نقاط"
+  if (round === 1) return "ٮدوں ٮڡاط"
   if (round === 2) return "صح صحلي"
   if (round === 3) return "قصة"
   if (round === 4) return "التركيز"
