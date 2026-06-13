@@ -339,6 +339,47 @@ function refreshPresenterCurrentSegmentFromState() {
   }
 }
 
+function normalizePresenterSegmentFromSession(segment) {
+  const key = String(segment || "")
+
+  if (
+    key === "finalRound1" ||
+    key === "finalRound2" ||
+    key === "finalRound3" ||
+    key === "finalRound4" ||
+    key === "final_round1" ||
+    key === "final_round2" ||
+    key === "final_round3" ||
+    key === "final_round4"
+  ) {
+    return "final"
+  }
+
+  return key || null
+}
+
+function getPresenterFinalRoundFromSessionSegment(segment, fallback = 1) {
+  const key = String(segment || "")
+
+  if (key === "finalRound1" || key === "final_round1") return 1
+  if (key === "finalRound2" || key === "final_round2") return 2
+  if (key === "finalRound3" || key === "final_round3") return 3
+  if (key === "finalRound4" || key === "final_round4") return 4
+
+  return Number(fallback || 1)
+}
+
+function getPresenterFinalSessionSegmentKey(round) {
+  const r = Number(round || 1)
+
+  if (r === 1) return "finalRound1"
+  if (r === 2) return "finalRound2"
+  if (r === 3) return "finalRound3"
+  if (r === 4) return "finalRound4"
+
+  return "finalRound1"
+}
+
 function applyPresenterSessionData(data) {
   if (!data) return
 
@@ -347,7 +388,14 @@ function applyPresenterSessionData(data) {
     return
   }
 
-  const nextSegment = data.active_segment || null
+  const rawNextSegment = data.active_segment || null
+  const nextSegment = normalizePresenterSegmentFromSession(rawNextSegment)
+
+  const nextFinalRound = getPresenterFinalRoundFromSessionSegment(
+    rawNextSegment,
+    data.state?.final?.round || presenterFinalRound || 1
+  )
+
   const segmentChanged = presenterSegment !== nextSegment
   const oldSessionId = presenterSessionId
 
@@ -355,23 +403,36 @@ function applyPresenterSessionData(data) {
   presenterModel = Number(data.model || 1)
   presenterTeamAName = data.team_a || "الفريق الأول"
   presenterTeamBName = data.team_b || "الفريق الثاني"
+
   let incomingState = data.state || {}
 
-if (
-  nextSegment === "final" &&
-  presenterFinalForcedRound &&
-  Date.now() < presenterFinalForcedRoundUntil
-) {
-  incomingState = {
-    ...incomingState,
-    final: {
-      ...(incomingState.final || {}),
-      round: Number(presenterFinalForcedRound)
-    }
-  }
-}
+  if (nextSegment === "final") {
+    let roundToUse = Number(nextFinalRound || 1)
 
-presenterLiveState = incomingState
+    if (
+      presenterFinalForcedRound &&
+      Date.now() < presenterFinalForcedRoundUntil
+    ) {
+      roundToUse = Number(presenterFinalForcedRound)
+    }
+
+    presenterFinalRound = roundToUse
+    presenterFinalRoundOverride = roundToUse
+
+    incomingState = {
+      ...incomingState,
+      final: {
+        ...(incomingState.final || {}),
+        round: roundToUse
+      }
+    }
+  } else {
+    presenterFinalForcedRound = null
+    presenterFinalForcedRoundUntil = 0
+    presenterFinalRoundOverride = null
+  }
+
+  presenterLiveState = incomingState
 
   updatePresenterHomeScoresOnly()
   updatePresenterLockedSegments()
@@ -509,7 +570,7 @@ presenterChannel
     const oldLocked = JSON.stringify(presenterLiveState?.segmentStatus || {})
     const newLocked = JSON.stringify(data.state?.segmentStatus || {})
 
-    const newSegment = data.active_segment || null
+    const newSegment = normalizePresenterSegmentFromSession(data.active_segment || null)
     const currentSegment = presenterSegment || null
 
     if (
@@ -974,10 +1035,10 @@ async function forcePresenterFinalRound(round) {
   const { error: updateError } = await db
     .from("game_sessions")
     .update({
-      active_segment: "final",
-      state: nextState,
-      updated_at: new Date().toISOString()
-    })
+  active_segment: getPresenterFinalSessionSegmentKey(round),
+  state: nextState,
+  updated_at: new Date().toISOString()
+})
     .eq("id", sessionId)
 
   if (updateError) {
