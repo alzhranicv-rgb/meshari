@@ -701,6 +701,10 @@ function handleExplainPresenterAction(action, data) {
 
       if (isValidPresenterTeam(team)) {
         selectedTeam = team
+
+        if (typeof selectExplainTeam === "function") {
+          selectExplainTeam(team)
+        }
       }
 
       setTimeout(() => {
@@ -714,6 +718,27 @@ function handleExplainPresenterAction(action, data) {
         openExplainNumber(number)
         syncAfterExplainAction()
       }, 60)
+    })
+  }
+
+  if (action === "toggleWordVisible") {
+    return safeRunPresenterAction(() => {
+      if (typeof toggleExplainWordVisibility === "function") {
+        toggleExplainWordVisibility()
+        syncAfterExplainAction()
+        return
+      }
+
+      if (typeof toggleExplainWord === "function") {
+        toggleExplainWord()
+        syncAfterExplainAction()
+        return
+      }
+
+      if (typeof hideExplainWord === "function") {
+        hideExplainWord()
+        syncAfterExplainAction()
+      }
     })
   }
 
@@ -758,23 +783,7 @@ function handleExplainPresenterAction(action, data) {
   }
 }
 
-if (action === "toggleWordVisible") {
-  return safeRunPresenterAction(() => {
-    if (typeof toggleExplainWordVisibility === "function") {
-      toggleExplainWordVisibility()
-      return
-    }
 
-    if (typeof toggleExplainWord === "function") {
-      toggleExplainWord()
-      return
-    }
-
-    if (typeof hideExplainWord === "function") {
-      hideExplainWord()
-    }
-  })
-}
 /* =========================
    FINAL
    استقبال أوامر الفاصلة الجديدة
@@ -1021,57 +1030,58 @@ function handleFinalPresenterAction(action, data) {
     })
   }
 
-  if (action === "correct") {
-    return safeRunPresenterAction(() => {
-      const round = Number(window.finalState?.round || 1)
+if (action === "correct") {
+  return safeRunPresenterAction(() => {
+    const round = Number(window.finalState?.round || 1)
 
-      if (round === 1) {
-  if (typeof toggleFinalRound1Overlay === "function") {
-    toggleFinalRound1Overlay(false)
-  }
+    if (round === 1) {
+      if (typeof finalRound1Correct === "function") {
+        finalRound1Correct()
+      }
+      return
+    }
 
-  if (typeof finalRound1Correct === "function") {
-    finalRound1Correct()
-  }
+    if (round === 2) {
+      const type = window.finalState?.round2?.currentType
 
-  return
-}
-
-      if (round === 2) {
-        const type = window.finalState?.round2?.currentType
-
-        if (type === "scramble") {
+      if (type === "scramble") {
+        if (typeof finalRound2RecordScore === "function") {
           finalRound2RecordScore()
-          return
         }
+        return
+      }
 
-        if (type === "sequence") {
+      if (type === "sequence") {
+        if (typeof finalRound2RecordSequenceScore === "function") {
           finalRound2RecordSequenceScore()
-          return
         }
+        return
+      }
 
-        if (type === "image") {
+      if (type === "image") {
+        if (typeof finalRound2RecordImageScore === "function") {
           finalRound2RecordImageScore()
-          return
-        }
-
-        return
-      }
-
-      if (round === 3) {
-        if (typeof finalRound3StoryCorrect === "function") {
-          finalRound3StoryCorrect()
         }
         return
       }
 
-      if (round === 4) {
-        if (typeof finalRound4TeamMediaCorrect === "function") {
-          finalRound4TeamMediaCorrect()
-        }
+      return
+    }
+
+    if (round === 3) {
+      if (typeof finalRound3StoryCorrect === "function") {
+        finalRound3StoryCorrect()
       }
-    })
-  }
+      return
+    }
+
+    if (round === 4) {
+      if (typeof finalRound4TeamMediaCorrect === "function") {
+        finalRound4TeamMediaCorrect()
+      }
+    }
+  })
+}
 
   if (action === "wrong") {
     return safeRunPresenterAction(() => {
