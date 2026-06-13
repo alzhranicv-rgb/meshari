@@ -4516,6 +4516,43 @@ async function renderPresenterFinalRound2Preview() {
   }
 }
 
+function togglePresenterFinalRound2ImageAnswer(index) {
+  const state = getPresenterFinalRoundState(2)
+  const selected = Array.isArray(state.selectedCorrectIndexes)
+    ? [...state.selectedCorrectIndexes]
+    : []
+
+  const i = Number(index)
+
+  const nextSelected = selected.includes(i)
+    ? selected.filter(x => Number(x) !== i)
+    : [...selected, i]
+
+  presenterLiveState = {
+    ...(presenterLiveState || {}),
+    final: {
+      ...(presenterLiveState?.final || {}),
+      round: 2,
+      round2: {
+        ...(presenterLiveState?.final?.round2 || {}),
+        selectedCorrectIndexes: nextSelected
+      }
+    }
+  }
+
+  renderPresenterFinalRound2ImagePreview(
+    Number(
+      presenterLiveState?.final?.round2?.currentNumber ||
+      presenterFinalSelected?.number ||
+      0
+    )
+  )
+
+  sendCommand("toggleRound2ImageCorrect", {
+    index: i
+  })
+}
+
 async function renderPresenterFinalRound2ImagePreview(current) {
   const previewBox = document.getElementById("presenterFinalPreview")
   if (!previewBox) return
@@ -4555,7 +4592,7 @@ async function renderPresenterFinalRound2ImagePreview(current) {
               <button
                 class="presenterFinalAnswerCard ${selected.includes(idx) ? "selectedCorrect" : ""}"
                 type="button"
-                onclick="sendCommand('toggleRound2ImageCorrect',{index:${idx}})"
+                onclick="togglePresenterFinalRound2ImageAnswer(${idx})"
               >
                 <span>${presenterSafeHtml(answer || "-")}</span>
               </button>
@@ -4621,11 +4658,21 @@ async function renderPresenterFinalRound3Preview() {
   const currentPoints = Number(state.currentPoints || 0)
 
   presenterFinalPreviewCache[3] = `
-    <div class="presenterFinalStoryPreview">
+    <div class="presenterFinalStoryPreview presenterFinalStoryWidePreview">
 
-      <div class="presenterFinalPreviewBlock questionBlock">
+      <div class="presenterFinalPreviewBlock answerBlock presenterFinalStoryAnswerSide">
         <div class="presenterFinalPreviewLabel">
-          أجزاء القصة ${shownPart ? `- ظاهر ${shownPart}` : ""}
+          الإجابة ${currentPoints ? `- ${currentPoints} نقاط` : ""}
+        </div>
+
+        <div class="presenterFinalPreviewText answerText">
+          ${presenterSafeHtml(answer || "لا توجد إجابة")}
+        </div>
+      </div>
+
+      <div class="presenterFinalPreviewBlock questionBlock presenterFinalStoryPartsSide">
+        <div class="presenterFinalPreviewLabel">
+          أجزاء السؤال ${shownPart ? `- ظاهر ${shownPart}` : ""}
         </div>
 
         <div class="presenterFinalStoryParts">
@@ -4639,16 +4686,6 @@ async function renderPresenterFinalRound3Preview() {
               `).join("")
               : `<div class="presenterFinalEmptyText">لا توجد أجزاء</div>`
           }
-        </div>
-      </div>
-
-      <div class="presenterFinalPreviewBlock answerBlock">
-        <div class="presenterFinalPreviewLabel">
-          الإجابة ${currentPoints ? `- ${currentPoints} نقاط` : ""}
-        </div>
-
-        <div class="presenterFinalPreviewText answerText">
-          ${presenterSafeHtml(answer || "لا توجد إجابة")}
         </div>
       </div>
 

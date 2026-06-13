@@ -728,58 +728,47 @@ button:disabled {
 
 .presenterTop10AnswersCard {
   padding: 10px;
-  margin-top: 10px;
-}
-
-.presenterTop10AnswersCols {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  margin-top: 18px;
 }
 
 .presenterTop10AnswersCol {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
 }
 
 .presenterTop10AnswerBtn {
-  min-height: 56px;
-  height: 56px;
-  border-radius: 18px;
+  min-height: 62px;
+  height: 62px;
+  border-radius: 20px;
   background: var(--surface-2);
   border: 1px solid var(--line);
   color: var(--text);
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  gap: 9px;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 10px;
   align-items: center;
-  padding: 7px 9px;
+  padding: 8px 10px;
   text-align: right;
   box-shadow: none;
 }
 
-.presenterTop10AnswerBtn.opened {
-  background: #e5e7eb;
-  opacity: .8;
-}
-
 .presenterTop10AnswerNo {
-  width: 38px;
-  height: 38px;
-  border-radius: 14px;
+  width: 42px;
+  height: 42px;
+  border-radius: 15px;
   background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: "HanakaDisplay", "HanakaText", sans-serif;
   color: var(--text);
-  font-size: 1.15rem;
+  font-size: 1.22rem;
 }
 
 .presenterTop10AnswerText {
-  font-size: 1rem;
-  line-height: 1.22;
+  font-size: 1.08rem;
+  line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1096,14 +1085,13 @@ button:disabled {
   font-size: .82rem;
   padding: 7px 8px;
 }
-
 /* =========================
    18) FINAL
 ========================= */
 
 .presenterFinalLayout {
   display: grid;
-  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
   gap: 10px;
   align-items: start;
 }
@@ -1145,9 +1133,10 @@ button:disabled {
   min-height: 50px;
 }
 
+/* مربع المعاينة العام للفاصلة */
 .presenterFinalPreviewBox {
-  min-height: 335px;
-  max-height: 350px;
+  min-height: 365px;
+  max-height: 380px;
   border-radius: var(--radius-md);
   background: var(--surface-2);
   border: 1px solid var(--line);
@@ -1177,6 +1166,7 @@ button:disabled {
   padding: 7px 8px;
 }
 
+/* محتوى الفاصلة */
 .presenterFinalOnlyAnswerView,
 .presenterFinalQuestionAnswerOnly,
 .presenterFinalStoryPreview,
@@ -1190,32 +1180,34 @@ button:disabled {
 .presenterFinalOnlyAnswerLabel,
 .presenterFinalPreviewLabel {
   color: var(--muted);
-  font-size: .78rem;
+  font-size: .8rem;
   text-align: center;
   line-height: 1.2;
 }
 
+/* السؤال والإجابة */
 .presenterFinalOnlyAnswerText,
 .presenterFinalPreviewText {
-  border-radius: 18px;
+  border-radius: 20px;
   background: var(--surface);
   border: 1px solid var(--line);
-  padding: 14px;
+  padding: 16px;
   color: var(--text);
-  font-size: 1.18rem;
-  line-height: 1.45;
+  font-size: 1.32rem;
+  line-height: 1.5;
   text-align: center;
 }
 
 .presenterFinalOnlyAnswerText {
   font-family: "HanakaDisplay", "HanakaText", sans-serif;
-  font-size: 1.65rem;
+  font-size: 1.9rem;
   line-height: 1.35;
 }
 
 .answerText {
   color: #0f766e;
-  font-size: 1.35rem;
+  font-size: 1.55rem;
+  line-height: 1.45;
 }
 
 .presenterFinalMiniNote {
@@ -1224,25 +1216,26 @@ button:disabled {
   border: 1px solid #fed7aa;
   color: #9a3412;
   padding: 10px;
-  font-size: .9rem;
+  font-size: .92rem;
   text-align: center;
 }
 
+/* صح صحلي - الإجابات */
 .presenterFinalAnswersGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 9px;
+  gap: 10px;
 }
 
 .presenterFinalAnswerCard {
-  min-height: 66px;
-  border-radius: 17px;
+  min-height: 78px;
+  border-radius: 20px;
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--line);
-  padding: 10px;
-  font-size: 1.02rem;
-  line-height: 1.32;
+  padding: 12px;
+  font-size: 1.16rem;
+  line-height: 1.35;
   text-align: center;
 }
 
@@ -1252,31 +1245,69 @@ button:disabled {
   border-color: #86efac;
 }
 
+.presenterFinalQuestionAnswerOnly {
+  gap: 12px;
+}
+
+.presenterFinalQuestionAnswerOnly .presenterFinalPreviewText {
+  min-height: 86px;
+}
+
 .presenterFinalCountdownBox {
-  min-height: 54px;
+  min-height: 56px;
   border-radius: 16px;
   background: var(--dark);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: .96rem;
+  font-size: 1rem;
+}
+
+/* القصة - ترتيب جديد */
+.presenterFinalStoryWidePreview {
+  display: grid;
+  grid-template-columns: minmax(190px, .7fr) minmax(0, 1.3fr);
+  gap: 12px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.presenterFinalStoryAnswerSide,
+.presenterFinalStoryPartsSide {
+  min-width: 0;
+}
+
+.presenterFinalStoryAnswerSide {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.presenterFinalStoryAnswerSide .presenterFinalPreviewText {
+  min-height: 132px;
+  font-size: 1.5rem;
+  line-height: 1.45;
+}
+
+.presenterFinalStoryPartsSide {
+  padding-top: 14px;
 }
 
 .presenterFinalStoryParts {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
 }
 
 .presenterFinalStoryPart {
-  border-radius: 17px;
+  border-radius: 18px;
   background: var(--surface);
   border: 1px solid var(--line);
-  padding: 10px;
+  padding: 12px;
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 11px;
   align-items: center;
   opacity: .62;
 }
@@ -1287,8 +1318,8 @@ button:disabled {
 }
 
 .presenterFinalStoryPart span {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 14px;
   background: var(--orange);
   color: #fff;
@@ -1296,17 +1327,18 @@ button:disabled {
   align-items: center;
   justify-content: center;
   font-family: "HanakaDisplay", "HanakaText", sans-serif;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
 }
 
 .presenterFinalStoryPart strong {
   font-weight: 400;
-  font-size: 1.04rem;
-  line-height: 1.42;
+  font-size: 1.22rem;
+  line-height: 1.5;
 }
 
+/* فارغ */
 .presenterFinalEmptyText {
-  min-height: 54px;
+  min-height: 56px;
   border-radius: 16px;
   background: var(--surface);
   border: 1px solid var(--line);
@@ -1315,7 +1347,7 @@ button:disabled {
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: .9rem;
+  font-size: .95rem;
 }
 /* =========================
    19) ARCHIVE

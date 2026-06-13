@@ -1035,14 +1035,31 @@ if (action === "correct") {
     const round = Number(window.finalState?.round || 1)
 
     if (round === 1) {
+      document.getElementById("finalRound1Overlay")?.remove()
+      document.body.classList.remove("finalRound1OverlayActive")
+
       if (typeof finalRound1Correct === "function") {
         finalRound1Correct()
       }
+
       return
     }
 
     if (round === 2) {
-      const type = window.finalState?.round2?.currentType
+      const type =
+        window.finalState?.round2?.currentType ||
+        (
+          Number(window.finalState?.round2?.currentNumber || 0) === 1 ||
+          Number(window.finalState?.round2?.currentNumber || 0) === 4
+            ? "scramble"
+            : Number(window.finalState?.round2?.currentNumber || 0) === 2 ||
+              Number(window.finalState?.round2?.currentNumber || 0) === 5
+                ? "sequence"
+                : Number(window.finalState?.round2?.currentNumber || 0) === 3 ||
+                  Number(window.finalState?.round2?.currentNumber || 0) === 6
+                    ? "image"
+                    : ""
+        )
 
       if (type === "scramble") {
         if (typeof finalRound2RecordScore === "function") {
