@@ -129,12 +129,21 @@ function forceDisplayFinalRoundFromPresenter(round, afterReady = null) {
   const r = Number(round || 1)
   const key = getPresenterDisplayFinalSegmentKey(r)
 
+  const previousActive = normalizeDisplaySegmentKey(
+    localStorage.getItem("active_segment") || ""
+  )
+
+  const finalStageIsOpen = !!document.getElementById("finalMainStage")
+  const sameFinalRoundOpen =
+    finalStageIsOpen &&
+    previousActive === key &&
+    Number(window.finalState?.round || r) === r
+
   window.displayFinalRound = r
   window.currentFinalRound = r
-
   localStorage.setItem("active_segment", key)
 
-  const runCallback = () => {
+  const runAfterReady = () => {
     setTimeout(() => {
       if (typeof afterReady === "function") {
         afterReady()
@@ -142,41 +151,44 @@ function forceDisplayFinalRoundFromPresenter(round, afterReady = null) {
     }, 180)
   }
 
-  if (typeof window.renderFinal === "function") {
-    const result = window.renderFinal(r, key)
-
-    if (result && typeof result.then === "function") {
-      result.then(runCallback)
-    } else {
-      runCallback()
-    }
-
+  if (sameFinalRoundOpen) {
+    runAfterReady()
     return
   }
 
-  if (typeof renderFinal === "function") {
-    const result = renderFinal(r, key)
+  if (finalStageIsOpen && typeof window.renderFinal === "function") {
+    const result = window.renderFinal(r, key)
 
     if (result && typeof result.then === "function") {
-      result.then(runCallback)
+      result.then(runAfterReady)
     } else {
-      runCallback()
+      runAfterReady()
     }
 
     return
   }
 
   if (typeof openSegmentPage === "function") {
-    openSegmentPage("final")
-  }
+    const result = openSegmentPage(key, r)
 
-  setTimeout(() => {
-    if (typeof window.finalState) {
-      window.finalState.round = r
+    if (result && typeof result.then === "function") {
+      result.then(runAfterReady)
+    } else {
+      runAfterReady()
     }
 
-    runCallback()
-  }, 300)
+    return
+  }
+
+  if (typeof window.renderFinal === "function") {
+    const result = window.renderFinal(r, key)
+
+    if (result && typeof result.then === "function") {
+      result.then(runAfterReady)
+    } else {
+      runAfterReady()
+    }
+  }
 }
 /* =========================
    HANDLE COMMANDS
