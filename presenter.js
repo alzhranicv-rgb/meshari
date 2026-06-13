@@ -3523,8 +3523,9 @@ async function renderPresenterFinalRoundContent() {
     )
 
   const pendingScore =
-    !!state.pendingScore ||
-    !!round4MediaState.currentNumber
+  round === 4
+    ? !!round4MediaState.currentNumber
+    : !!state.pendingScore
 
   numbersBox.innerHTML = nums.map(n => {
     const opened = openedNumbers.map(Number).includes(Number(n))
@@ -3865,8 +3866,9 @@ async function refreshPresenterFinalNumbersOnly(round) {
     )
 
   const pendingScore =
-    !!state.pendingScore ||
-    !!round4MediaState.currentNumber
+  round === 4
+    ? !!round4MediaState.currentNumber
+    : !!state.pendingScore
 
   numbersBox.innerHTML = nums.map(n => {
     const opened = openedNumbers.map(Number).includes(Number(n))
@@ -4094,8 +4096,9 @@ function openPresenterFinalNumber(round, number) {
       : (state.opened || [])
 
   const hasCurrent =
-    !!state.pendingScore ||
-    !!round4MediaState.currentNumber
+  round === 4
+    ? !!round4MediaState.currentNumber
+    : !!state.pendingScore
 
   if (hasCurrent) {
     showToast("أنهِ الرقم الحالي أولاً")
