@@ -1258,7 +1258,10 @@ function getPresenterActiveTeamFromState() {
 }
 
 function teamButtons() {
-  const activeTeam = getPresenterActiveTeamFromState() || presenterSelectedTeam
+  const activeTeam =
+    presenterSegment === "final"
+      ? presenterSelectedTeam
+      : (getPresenterActiveTeamFromState() || presenterSelectedTeam)
 
   return `
     <div class="presenterTeams">
@@ -3403,6 +3406,35 @@ async function presenterRestartCurrentFinalImage() {
   showToast("تمت إعادة الصورة")
 }
 
+function resetPresenterFinalLocalChoice(round = getPresenterFinalRound()) {
+  round = Number(round || 1)
+
+  presenterSelectedTeam = null
+  presenterFinalSelected = { round, number: null }
+
+  if (round === 2) {
+    presenterFinalPreviewCache[2] = ""
+
+    presenterLiveState = {
+      ...(presenterLiveState || {}),
+      final: {
+        ...(presenterLiveState?.final || {}),
+        round: 2,
+        round2: {
+          ...(presenterLiveState?.final?.round2 || {}),
+          currentNumber: null,
+          selectedCorrectIndexes: [],
+          hiddenSequence: [],
+          imageAnswerShown: false
+        }
+      }
+    }
+  }
+
+  document.getElementById("teamA")?.classList.remove("selectedPresenterTeam", "activeTeam")
+  document.getElementById("teamB")?.classList.remove("selectedPresenterTeam", "activeTeam")
+}
+
 async function presenterFinalCorrect() {
   const round = getPresenterFinalRound()
 
@@ -3413,6 +3445,8 @@ async function presenterFinalCorrect() {
 
   await sendCommand("stopCurrentFinalVideo")
   await sendCommand("correct")
+
+  resetPresenterFinalLocalChoice(round)
 
   setTimeout(() => {
     refreshPresenterEnhancements()
@@ -3428,6 +3462,8 @@ async function presenterFinalWrong() {
   }
 
   await sendCommand("wrong")
+
+  resetPresenterFinalLocalChoice(round)
 
   setTimeout(() => {
     refreshPresenterEnhancements()
@@ -3487,6 +3523,27 @@ async function renderFinal() {
 /* =========================
    ROUND CONTENT
 ========================= */
+
+async function presenterRecordFinalRound2Score(type) {
+  if (type === "scramble") {
+    await sendCommand("recordScrambleScore")
+  }
+
+  if (type === "sequence") {
+    await sendCommand("recordSequenceScore")
+  }
+
+  if (type === "image") {
+    await sendCommand("recordImageScore")
+  }
+
+  resetPresenterFinalLocalChoice(2)
+  clearPresenterFinalPreview(2)
+
+  setTimeout(() => {
+    renderPresenterFinalRoundContent()
+  }, 250)
+}
 
 async function renderPresenterFinalRoundContent() {
   const round = Number(getPresenterFinalRound() || presenterFinalRound || 1)
@@ -3609,7 +3666,7 @@ async function renderPresenterFinalRoundContent() {
 
         <button
           class="presenterBtn green"
-          onclick="clearPresenterFinalPreview(2); sendCommand('recordScrambleScore')"
+          onclick="presenterRecordFinalRound2Score('scramble')"
           ${isScramble ? "" : "disabled"}
         >
           المبعثرة
@@ -3617,19 +3674,19 @@ async function renderPresenterFinalRoundContent() {
 
         <button
           class="presenterBtn green"
-          onclick="clearPresenterFinalPreview(2); sendCommand('recordSequenceScore')"
+          onclick="presenterRecordFinalRound2Score('sequence')"
           ${isSequence ? "" : "disabled"}
         >
           الترتيب
         </button>
 
         <button
-          class="presenterBtn green"
-          onclick="clearPresenterFinalPreview(2); sendCommand('recordImageScore')"
-          ${isImage && state.imageAnswerShown ? "" : "disabled"}
-        >
-          الصورة
-        </button>
+  class="presenterBtn green"
+  onclick="presenterRecordFinalRound2Score('image')"
+  ${isImage ? "" : "disabled"}
+>
+  الصورة
+</button>
 
         <button class="presenterBtn gray" onclick="sendCommand('undo')">
           تراجع
@@ -3807,7 +3864,7 @@ async function refreshPresenterFinalFromState() {
     title.innerText = getPresenterFinalRoundTitle(round)
   }
 
-  const activeTeam = getPresenterActiveTeamFromState() || presenterSelectedTeam || null
+  const activeTeam = presenterSelectedTeam || null
 
   document.getElementById("teamA")?.classList.toggle(
     "selectedPresenterTeam",
@@ -3967,17 +4024,26 @@ function refreshPresenterFinalControlsOnly(round) {
         btn.disabled = type !== "image"
       }
 
-      if (onclick.includes("recordScrambleScore")) {
-        btn.disabled = type !== "scramble"
-      }
+      if (
+  onclick.includes("recordScrambleScore") ||
+  onclick.includes("presenterRecordFinalRound2Score('scramble')")
+) {
+  btn.disabled = type !== "scramble"
+}
 
-      if (onclick.includes("recordSequenceScore")) {
-        btn.disabled = type !== "sequence"
-      }
+if (
+  onclick.includes("recordSequenceScore") ||
+  onclick.includes("presenterRecordFinalRound2Score('sequence')")
+) {
+  btn.disabled = type !== "sequence"
+}
 
-      if (onclick.includes("recordImageScore")) {
-        btn.disabled = !(type === "image" && state.imageAnswerShown)
-      }
+if (
+  onclick.includes("recordImageScore") ||
+  onclick.includes("presenterRecordFinalRound2Score('image')")
+) {
+  btn.disabled = type !== "image"
+}
     })
 
     return
@@ -4110,12 +4176,12 @@ function openPresenterFinalNumber(round, number) {
     return
   }
 
-  const activeTeam = getPresenterActiveTeamFromState() || presenterSelectedTeam || null
+  const activeTeam = presenterSelectedTeam || null
 
-  if ((round === 2 || round === 4) && !activeTeam) {
-    showToast("اختر الفريق أولاً")
-    return
-  }
+if ((round === 2 || round === 4) && !activeTeam) {
+  showToast("اختر الفريق أولاً")
+  return
+}
 
   presenterFinalSelected = { round, number }
 
