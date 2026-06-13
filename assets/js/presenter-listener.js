@@ -134,30 +134,33 @@ function forceDisplayFinalRoundFromPresenter(round, afterReady = null) {
 
   localStorage.setItem("active_segment", key)
 
-  if (window.finalState) {
-    window.finalState.round = r
-  }
-
-  const currentRound = Number(window.finalState?.round || 0)
-
-  if (currentRound === r && typeof afterReady === "function") {
-    afterReady()
-    return
+  const runCallback = () => {
+    setTimeout(() => {
+      if (typeof afterReady === "function") {
+        afterReady()
+      }
+    }, 180)
   }
 
   if (typeof window.renderFinal === "function") {
     const result = window.renderFinal(r, key)
 
     if (result && typeof result.then === "function") {
-      result.then(() => {
-        setTimeout(() => {
-          if (typeof afterReady === "function") afterReady()
-        }, 120)
-      })
+      result.then(runCallback)
     } else {
-      setTimeout(() => {
-        if (typeof afterReady === "function") afterReady()
-      }, 180)
+      runCallback()
+    }
+
+    return
+  }
+
+  if (typeof renderFinal === "function") {
+    const result = renderFinal(r, key)
+
+    if (result && typeof result.then === "function") {
+      result.then(runCallback)
+    } else {
+      runCallback()
     }
 
     return
@@ -168,10 +171,13 @@ function forceDisplayFinalRoundFromPresenter(round, afterReady = null) {
   }
 
   setTimeout(() => {
-    if (typeof afterReady === "function") afterReady()
-  }, 250)
-}
+    if (typeof window.finalState) {
+      window.finalState.round = r
+    }
 
+    runCallback()
+  }, 300)
+}
 /* =========================
    HANDLE COMMANDS
 ========================= */
@@ -231,8 +237,26 @@ function handlePresenterCommand(cmd) {
 
   if (action === "openSegment") {
   return safeRunPresenterAction(() => {
-    if (data.segment === "final") {
-      const round = Number(data.round || 1)
+    const segmentKey = String(data.segment || "")
+    const isFinalSegment =
+      segmentKey === "final" ||
+      segmentKey === "final_round1" ||
+      segmentKey === "final_round2" ||
+      segmentKey === "final_round3" ||
+      segmentKey === "final_round4" ||
+      segmentKey === "finalRound1" ||
+      segmentKey === "finalRound2" ||
+      segmentKey === "finalRound3" ||
+      segmentKey === "finalRound4"
+
+    if (isFinalSegment) {
+      const round =
+        segmentKey === "final_round1" || segmentKey === "finalRound1" ? 1 :
+        segmentKey === "final_round2" || segmentKey === "finalRound2" ? 2 :
+        segmentKey === "final_round3" || segmentKey === "finalRound3" ? 3 :
+        segmentKey === "final_round4" || segmentKey === "finalRound4" ? 4 :
+        Number(data.round || 1)
+
       forceDisplayFinalRoundFromPresenter(round)
       return
     }
@@ -321,6 +345,7 @@ function handlePresenterCommand(cmd) {
       document.getElementById("finalRound1Overlay")?.remove()
       document.getElementById("finalRound3ImageOverlay")?.remove()
       document.getElementById("finalRound3TeamMediaOverlay")?.remove()
+      document.getElementById("finalRound4TeamMediaOverlay")?.remove()
 
       document.body.classList.remove("auctionOverlayActive")
     })
