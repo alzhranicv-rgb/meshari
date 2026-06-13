@@ -1256,11 +1256,91 @@ function getPresenterActiveTeamFromState() {
 
   return presenterSelectedTeam
 }
+function getPresenterFinalTeamForRound(round = getPresenterFinalRound()) {
+  const r = Number(round || 1)
+
+  if (presenterSelectedTeam) {
+    return presenterSelectedTeam
+  }
+
+  if (r === 2) {
+    return presenterLiveState?.final?.round2?.activeTeam || null
+  }
+
+  if (r === 4) {
+    return presenterLiveState?.final?.round4?.teamMedia?.currentTeam ||
+           presenterLiveState?.final?.round4?.activeTeam ||
+           null
+  }
+
+  return null
+}
+
+function updatePresenterTeamButtonsOnly(team) {
+  document.getElementById("teamA")?.classList.toggle("selectedPresenterTeam", team === "A")
+  document.getElementById("teamB")?.classList.toggle("selectedPresenterTeam", team === "B")
+  document.getElementById("teamA")?.classList.toggle("activeTeam", team === "A")
+  document.getElementById("teamB")?.classList.toggle("activeTeam", team === "B")
+}
+
+function syncPresenterSelectedTeamLocally(team) {
+  if (team !== "A" && team !== "B") return
+
+  if (presenterSegment === "explain") {
+    presenterLiveState = {
+      ...(presenterLiveState || {}),
+      explain: {
+        ...(presenterLiveState?.explain || {}),
+        explainState: {
+          ...(presenterLiveState?.explain?.explainState || {}),
+          currentTeam: team,
+          activeTeam: team
+        }
+      }
+    }
+  }
+
+  if (presenterSegment === "final") {
+    const round = Number(getPresenterFinalRound() || 1)
+
+    if (round === 2) {
+      presenterLiveState = {
+        ...(presenterLiveState || {}),
+        final: {
+          ...(presenterLiveState?.final || {}),
+          round,
+          round2: {
+            ...(presenterLiveState?.final?.round2 || {}),
+            activeTeam: team
+          }
+        }
+      }
+    }
+
+    if (round === 4) {
+      presenterLiveState = {
+        ...(presenterLiveState || {}),
+        final: {
+          ...(presenterLiveState?.final || {}),
+          round,
+          round4: {
+            ...(presenterLiveState?.final?.round4 || {}),
+            activeTeam: team,
+            teamMedia: {
+              ...(presenterLiveState?.final?.round4?.teamMedia || {}),
+              currentTeam: team
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
 function teamButtons() {
   const activeTeam =
     presenterSegment === "final"
-      ? presenterSelectedTeam
+      ? getPresenterFinalTeamForRound()
       : (getPresenterActiveTeamFromState() || presenterSelectedTeam)
 
   return `
@@ -1288,16 +1368,13 @@ function selectTeam(team) {
   if (team !== "A" && team !== "B") return
 
   presenterSelectedTeam = team
-
-  document.getElementById("teamA")?.classList.toggle("selectedPresenterTeam", team === "A")
-  document.getElementById("teamB")?.classList.toggle("selectedPresenterTeam", team === "B")
-  document.getElementById("teamA")?.classList.toggle("activeTeam", team === "A")
-  document.getElementById("teamB")?.classList.toggle("activeTeam", team === "B")
+  syncPresenterSelectedTeamLocally(team)
+  updatePresenterTeamButtonsOnly(team)
 
   sendCommand("selectTeam", { team })
 
   if (presenterSegment === "final") {
-    renderPresenterFinalRoundContent()
+    refreshPresenterFinalFromState()
   }
 
   if (presenterSegment === "explain") {
@@ -2232,11 +2309,16 @@ function updatePresenterAuctionMediaActionButton() {
   btn.innerText = "تكبير"
 }
 
-function runPresenterAuctionMediaAction() {
+async function runPresenterAuctionMediaAction() {
   const mediaType = getPresenterAuctionCurrentMediaType()
 
   if (mediaType === "video") {
-    sendCommand("playAuctionVideo")
+    await sendCommand("zoomImage")
+
+    setTimeout(() => {
+      sendCommand("playAuctionVideo")
+    }, 220)
+
     return
   }
 
@@ -2973,33 +3055,42 @@ async function renderExplain() {
         </section>
 
         <div class="presenterExplainActions">
-          <button
-            type="button"
-            class="presenterBtn dark"
-            onclick="sendCommand('startTimer')"
-            ${!currentNumber || revealLock ? "disabled" : ""}
-          >
-            بدء المؤقت
-          </button>
+  <button
+    type="button"
+    class="presenterBtn dark"
+    onclick="sendCommand('startTimer')"
+    ${!currentNumber || revealLock ? "disabled" : ""}
+  >
+    بدء المؤقت
+  </button>
 
-          <button
-            type="button"
-            class="presenterBtn green"
-            onclick="sendCommand('correct')"
-            ${!currentNumber || revealLock ? "disabled" : ""}
-          >
-            صح
-          </button>
+  <button
+    type="button"
+    class="presenterBtn blue"
+    onclick="sendCommand('toggleWordVisible')"
+    ${!currentNumber || revealLock ? "disabled" : ""}
+  >
+    إخفاء الكلمة
+  </button>
 
-          <button
-            type="button"
-            class="presenterBtn red"
-            onclick="sendCommand('wrong')"
-            ${!currentNumber || revealLock ? "disabled" : ""}
-          >
-            خطأ
-          </button>
-        </div>
+  <button
+    type="button"
+    class="presenterBtn green"
+    onclick="sendCommand('correct')"
+    ${!currentNumber || revealLock ? "disabled" : ""}
+  >
+    صح
+  </button>
+
+  <button
+    type="button"
+    class="presenterBtn red"
+    onclick="sendCommand('wrong')"
+    ${!currentNumber || revealLock ? "disabled" : ""}
+  >
+    خطأ
+  </button>
+</div>
 
       </div>
 
@@ -3411,10 +3502,9 @@ function resetPresenterFinalLocalChoice(round = getPresenterFinalRound()) {
 
   presenterSelectedTeam = null
   presenterFinalSelected = { round, number: null }
+  presenterFinalPreviewCache[round] = ""
 
   if (round === 2) {
-    presenterFinalPreviewCache[2] = ""
-
     presenterLiveState = {
       ...(presenterLiveState || {}),
       final: {
@@ -3422,6 +3512,7 @@ function resetPresenterFinalLocalChoice(round = getPresenterFinalRound()) {
         round: 2,
         round2: {
           ...(presenterLiveState?.final?.round2 || {}),
+          activeTeam: null,
           currentNumber: null,
           selectedCorrectIndexes: [],
           hiddenSequence: [],
@@ -3431,8 +3522,28 @@ function resetPresenterFinalLocalChoice(round = getPresenterFinalRound()) {
     }
   }
 
-  document.getElementById("teamA")?.classList.remove("selectedPresenterTeam", "activeTeam")
-  document.getElementById("teamB")?.classList.remove("selectedPresenterTeam", "activeTeam")
+  if (round === 4) {
+    presenterLiveState = {
+      ...(presenterLiveState || {}),
+      final: {
+        ...(presenterLiveState?.final || {}),
+        round: 4,
+        round4: {
+          ...(presenterLiveState?.final?.round4 || {}),
+          activeTeam: null,
+          teamMedia: {
+            ...(presenterLiveState?.final?.round4?.teamMedia || {}),
+            currentTeam: null
+          }
+        }
+      }
+    }
+  }
+
+  updatePresenterTeamButtonsOnly(null)
+
+  const previewBox = document.getElementById("presenterFinalPreview")
+  if (previewBox) previewBox.innerHTML = "اختر رقمًا"
 }
 
 async function presenterFinalCorrect() {
@@ -3440,7 +3551,6 @@ async function presenterFinalCorrect() {
 
   if (round === 1) {
     setPresenterFinalRound1FocusMode(false)
-    presenterFinalSelected = { round: 1, number: null }
   }
 
   await sendCommand("stopCurrentFinalVideo")
@@ -3449,6 +3559,24 @@ async function presenterFinalCorrect() {
   resetPresenterFinalLocalChoice(round)
 
   setTimeout(() => {
+    refreshPresenterFinalFromState()
+    refreshPresenterEnhancements()
+  }, 300)
+}
+
+async function presenterFinalWrong() {
+  const round = getPresenterFinalRound()
+
+  if (round === 1) {
+    setPresenterFinalRound1FocusMode(false)
+  }
+
+  await sendCommand("wrong")
+
+  resetPresenterFinalLocalChoice(round)
+
+  setTimeout(() => {
+    refreshPresenterFinalFromState()
     refreshPresenterEnhancements()
   }, 300)
 }
@@ -3538,7 +3666,6 @@ async function presenterRecordFinalRound2Score(type) {
   }
 
   resetPresenterFinalLocalChoice(2)
-  clearPresenterFinalPreview(2)
 
   setTimeout(() => {
     renderPresenterFinalRoundContent()
@@ -4024,7 +4151,7 @@ function refreshPresenterFinalControlsOnly(round) {
         btn.disabled = type !== "image"
       }
 
-      if (
+     if (
   onclick.includes("recordScrambleScore") ||
   onclick.includes("presenterRecordFinalRound2Score('scramble')")
 ) {
@@ -4176,7 +4303,7 @@ function openPresenterFinalNumber(round, number) {
     return
   }
 
-  const activeTeam = presenterSelectedTeam || null
+  const activeTeam = getPresenterFinalTeamForRound(round)
 
 if ((round === 2 || round === 4) && !activeTeam) {
   showToast("اختر الفريق أولاً")

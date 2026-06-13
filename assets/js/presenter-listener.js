@@ -757,6 +757,24 @@ function handleExplainPresenterAction(action, data) {
     })
   }
 }
+
+if (action === "toggleWordVisible") {
+  return safeRunPresenterAction(() => {
+    if (typeof toggleExplainWordVisibility === "function") {
+      toggleExplainWordVisibility()
+      return
+    }
+
+    if (typeof toggleExplainWord === "function") {
+      toggleExplainWord()
+      return
+    }
+
+    if (typeof hideExplainWord === "function") {
+      hideExplainWord()
+    }
+  })
+}
 /* =========================
    FINAL
    استقبال أوامر الفاصلة الجديدة
@@ -1008,9 +1026,16 @@ function handleFinalPresenterAction(action, data) {
       const round = Number(window.finalState?.round || 1)
 
       if (round === 1) {
-        finalRound1Correct()
-        return
-      }
+  if (typeof toggleFinalRound1Overlay === "function") {
+    toggleFinalRound1Overlay(false)
+  }
+
+  if (typeof finalRound1Correct === "function") {
+    finalRound1Correct()
+  }
+
+  return
+}
 
       if (round === 2) {
         const type = window.finalState?.round2?.currentType
