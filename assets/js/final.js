@@ -639,9 +639,24 @@ function renderFinalCenterStatus() {
   const box = document.getElementById("finalCenterStatusText")
   if (!box) return
 
+  const teamName = getFinalCenterTeamOnly() || "بدون فريق"
+  const numberText = getFinalCurrentNumberText()
+  const label =
+    finalState.round === 1
+      ? "بدون نقاط"
+      : finalState.round === 2
+        ? "صح صحلي"
+        : finalState.round === 3
+          ? "قصة"
+          : finalState.round === 4
+            ? "التركيز"
+            : "الفاصلة"
+
   box.innerHTML = `
-    <div class="finalCenterTurnTeamName">
-      ${getFinalCenterTeamOnly()}
+    <div class="finalCenterStatusBox">
+     
+      <div class="finalCenterStatusTeam">${escapeDisplayHtml(teamName)}</div>
+      
     </div>
   `
 }
@@ -675,17 +690,14 @@ function getFinalCurrentNumberText() {
 
 function getFinalActiveTurnTeam() {
   if (finalState.round === 1) return finalState.round1.activeTeam || null
-  if (finalState.round === 2) return finalState.round2.activeTeam || "A"
-
-  if (finalState.round === 3) {
-    return finalState.round3.activeTeam || "A"
-  }
+  if (finalState.round === 2) return finalState.round2.activeTeam || null
+  if (finalState.round === 3) return finalState.round3.activeTeam || null
 
   if (finalState.round === 4) {
     return (
       finalState.round4.teamMedia?.currentTeam ||
       finalState.round4.activeTeam ||
-      "A"
+      null
     )
   }
 
@@ -720,7 +732,6 @@ function getFinalRoundTextLabel() {
 }
 
 function updateFinalTopHeaderRoundInfo() {
-  const roundNumber = Number(finalState.round || 1)
   const roundTitle = getFinalRoundTextLabel()
 
   const titleBox =
@@ -734,19 +745,10 @@ function updateFinalTopHeaderRoundInfo() {
 
   if (!titleBox) return
 
-  let badge = document.getElementById("finalTopRoundBadge")
+  const oldBadge = document.getElementById("finalTopRoundBadge")
+  if (oldBadge) oldBadge.remove()
 
-  if (!badge) {
-    badge = document.createElement("span")
-    badge.id = "finalTopRoundBadge"
-    badge.className = "finalTopRoundBadge"
-    titleBox.appendChild(badge)
-  }
-
-  badge.innerHTML = `
-    <span class="finalTopRoundNumber">${roundNumber}</span>
-    <span class="finalTopRoundName">${roundTitle}</span>
-  `
+  titleBox.textContent = roundTitle
 }
 
 function renderFinalStatusPanel() {
@@ -1518,10 +1520,10 @@ function buildFinalHTML() {
 
       <div class="finalScoreBoards" id="finalScoreBoards">
 
-        <div class="finalScorePanel finalScorePanelLeft" id="finalTeamABox" onclick="selectFinalTeam('A')">
-          <div class="finalScoreTeamNameBox finalScoreTeamNameFix">${teamAName}</div>
-          <div class="finalScoreErrorsBox" id="finalErrorsA"></div>
-          <div class="finalScoreValueBox" id="finalScoreA">0</div>
+        <div class="finalScorePanel finalScorePanelRight" id="finalTeamBBox" onclick="selectFinalTeam('B')">
+          <div class="finalScoreTeamNameBox finalScoreTeamNameFix">${teamBName}</div>
+          <div class="finalScoreErrorsBox" id="finalErrorsB"></div>
+          <div class="finalScoreValueBox" id="finalScoreB">0</div>
         </div>
 
         <div class="finalScoreCenterPanel finalCenterMiniGlass">
@@ -1530,10 +1532,10 @@ function buildFinalHTML() {
           </div>
         </div>
 
-        <div class="finalScorePanel finalScorePanelRight" id="finalTeamBBox" onclick="selectFinalTeam('B')">
-          <div class="finalScoreValueBox" id="finalScoreB">0</div>
-          <div class="finalScoreErrorsBox" id="finalErrorsB"></div>
-          <div class="finalScoreTeamNameBox finalScoreTeamNameFix">${teamBName}</div>
+        <div class="finalScorePanel finalScorePanelLeft" id="finalTeamABox" onclick="selectFinalTeam('A')">
+          <div class="finalScoreValueBox" id="finalScoreA">0</div>
+          <div class="finalScoreErrorsBox" id="finalErrorsA"></div>
+          <div class="finalScoreTeamNameBox finalScoreTeamNameFix">${teamAName}</div>
         </div>
 
       </div>
@@ -1616,9 +1618,11 @@ function renderFinalRoundTitle() {
 }
 
 function selectFinalTeam(team) {
+  ensureFinalStateShape()
+
   if (finalState.round === 1) {
     if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
-      showGameToast("اختر الرقم أولاً")
+      showGameToast("افتح الرقم أولاً")
       return
     }
 
@@ -1627,18 +1631,41 @@ function selectFinalTeam(team) {
   }
 
   if (finalState.round === 2) {
-    finalState.round2.activeTeam =
-      finalState.round2.activeTeam === team ? null : team
+    if (finalState.round2.pendingScore) {
+      showGameToast("سجل نتيجة الرقم الحالي أولاً")
+      return
+    }
+
+    if (finalState.round2.lastTeamPlayed === team) {
+      showGameToast("الدور للفريق الثاني")
+      return
+    }
+
+    finalState.round2.activeTeam = team
   }
 
   if (finalState.round === 3) {
+    if (!finalState.round3.pendingScore || !finalState.round3.currentNumber) {
+      showGameToast("افتح رقمًا أولاً")
+      return
+    }
+
     finalState.round3.activeTeam =
       finalState.round3.activeTeam === team ? null : team
   }
 
   if (finalState.round === 4) {
-    finalState.round4.activeTeam =
-      finalState.round4.activeTeam === team ? null : team
+    if (finalState.round4.teamMedia?.currentNumber) {
+      showGameToast("أنه الدور الحالي أولاً")
+      return
+    }
+
+    if (finalState.round4.lastTeamPlayed === team) {
+      showGameToast("لا يمكن نفس الفريق يلعب دورين وراء بعض")
+      return
+    }
+
+    finalState.round4.activeTeam = team
   }
 
   const current = getFinalCurrentRoundState()
@@ -1779,7 +1806,7 @@ controls.innerHTML = `
 
 async function openFinalRound1Card(number) {
   if (finalState.round1.pendingScore) {
-    showGameToast("أنهِ الدور الحالي أولاً")
+    showGameToast("أنهِ الرقم الحالي أولاً")
     return
   }
 
@@ -1790,6 +1817,8 @@ async function openFinalRound1Card(number) {
   finalState.round1.currentNumber = number
   finalState.round1.opened.push(number)
   finalState.round1.pendingScore = true
+  finalState.round1.activeTeam = null
+
   finalState.round1.currentAnswer = ""
   finalState.round1.currentImage = ""
   finalState.round1.currentNote = ""
@@ -1799,8 +1828,10 @@ async function openFinalRound1Card(number) {
   finalState.round1.errors.A = 0
   finalState.round1.errors.B = 0
 
+  highlightFinalTeam(null)
   renderFinalRound1()
   renderFinalErrors()
+  renderFinalTurnBar()
   saveFinalState()
   updateEndRoundButtonState()
 
@@ -2029,9 +2060,48 @@ function flashFinalRound1OverlayWrong() {
   return true
 }
 
+function finalRound1Correct() {
+  ensureFinalRound1State()
+
+  if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
+    showGameToast("افتح رقمًا أولاً")
+    return
+  }
+
+  const team = finalState.round1.activeTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (finalState.round1.answerShown) {
+    showGameToast("تم تسجيل الإجابة")
+    return
+  }
+
+  pushFinalHistory()
+
+  finalState.round1.scores[team] += getFinalScoreValue(team, 1)
+  finalState.round1.answerShown = true
+
+  clearFinalActiveDouble()
+
+  playGameSound("correct")
+  flashScreen("correct")
+
+  renderFinalScores()
+  loadFinalRound1Current()
+  saveFinalState()
+
+  setTimeout(() => {
+    finalizeRound1Turn()
+  }, 8000)
+}
+
 function finalRound1Wrong() {
   if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
-    showGameToast("اختر رقمًا أولاً")
+    showGameToast("افتح رقمًا أولاً")
     return
   }
 
@@ -2041,53 +2111,7 @@ function finalRound1Wrong() {
   saveFinalState()
 }
 
-function finalRound3StoryCorrect() {
-  ensureFinalRound3State()
 
-  if (!finalState.round3.pendingScore || !finalState.round3.currentNumber) {
-    showGameToast("لا يوجد رقم مفتوح")
-    return
-  }
-
-  if (finalState.round3.answerShown) {
-    showGameToast("تم تسجيل الإجابة")
-    return
-  }
-
-  if (!finalState.round3.shownPart) {
-    showGameToast("أظهر جزء من القصة أولاً")
-    return
-  }
-
-  const team = selectedTeam || finalState.round3.activeTeam
-
-  if (!team) {
-    showGameToast("اختر الفريق الفائز أولاً")
-    return
-  }
-
-  pushFinalHistory()
-
-  const points = Number(finalState.round3.currentPoints || 1)
-
-  finalState.round3.activeTeam = team
-  finalState.round3.scores[team] += getFinalScoreValue(team, points)
-  finalState.round3.answerShown = true
-
-  clearFinalActiveDouble()
-
-  playGameSound("correct")
-  flashScreen("correct")
-
-  renderFinalScores()
-  renderFinalRound3()
-  updateFinalTopHeaderRoundInfo()
-  saveFinalState()
-
-  setTimeout(() => {
-    finalizeFinalRound3StoryTurn()
-  }, 10000)
-}
 
 function finalizeRound1Turn() {
   finalState.round1.pendingScore = false
@@ -2099,10 +2123,12 @@ function finalizeRound1Turn() {
   finalState.round1.shownQuestionPartsCount = 0
   finalState.round1.answerShown = false
   finalState.round1.activeTeam = null
+
   currentFinalRound1Image = ""
 
-  resetFinalTeamSelection()
+  highlightFinalTeam(null)
   renderFinalRound()
+  renderFinalTurnBar()
   saveFinalState()
   updateEndRoundButtonState()
 }
@@ -2261,7 +2287,17 @@ async function openFinalRound2Card(number) {
     return
   }
 
-  const team = setFinalAutoTeam(2)
+  const team = finalState.round2.activeTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (finalState.round2.lastTeamPlayed === team) {
+    showGameToast("لا يمكن نفس الفريق يلعب دورين وراء بعض")
+    return
+  }
 
   if (finalState.round2.opened.includes(number)) return
 
@@ -2275,7 +2311,7 @@ async function openFinalRound2Card(number) {
   const teamValues = Object.values(finalState.round2.assignedTeams[groupKey] || {})
 
   if (teamValues.includes(team)) {
-    showGameToast("لا يمكن تكرار نفس الفريق في هذا النوع")
+    showGameToast("هذا الفريق لعب هذا النوع مسبقًا")
     return
   }
 
@@ -2348,13 +2384,12 @@ async function openFinalRound2Card(number) {
   }
 
   saveFinalState()
-updateEndRoundButtonState()
+  updateEndRoundButtonState()
 
-setTimeout(() => {
-  updateFinalRound2CountdownButtonLabel()
-  updateFinalRound2SequenceScoreButtonLabel()
-}, 50)
-
+  setTimeout(() => {
+    updateFinalRound2CountdownButtonLabel()
+    updateFinalRound2SequenceScoreButtonLabel()
+  }, 50)
 }
 
 async function loadFinalRound2ImageNumber(displayNumber, groupKey) {
@@ -2593,10 +2628,7 @@ function renderFinalRound2ImageWords(box) {
     box.innerHTML = `
       <div class="finalRound3ResultView">
         <div class="finalRound3ResultHeader">
-          <div class="finalRound3ResultTitle">اختيار الإجابات الصحيحة</div>
-          <div class="finalRound3ResultCounter">
-            ${Number(finalState.round2.correctCount || 0)} / ${answers.length}
-          </div>
+          
         </div>
 
         <div class="finalRound3AnswersList finalRound3AnswersPremium">
@@ -2619,7 +2651,7 @@ function renderFinalRound2ImageWords(box) {
   }
 
   if (shown <= 0) {
-    box.innerHTML = `<div class="finalRoundPlaceholder">اضغط الصورة التالية</div>`
+    box.innerHTML = `<div class="finalRoundPlaceholder">اضغط  بدء عرض الصور </div>`
     return
   }
 
@@ -3058,9 +3090,12 @@ function finalRound2RecordImageScore() {
 }
 
 function finalizeRound2Number() {
-  if (finalState.round2.currentNumber !== null) {
-    if (!finalState.round2.scoredNumbers.includes(finalState.round2.currentNumber)) {
-      finalState.round2.scoredNumbers.push(finalState.round2.currentNumber)
+  const currentNumber = finalState.round2.currentNumber
+  const playedTeam = finalState.round2.activeTeam || finalState.round2.lastTeamPlayed || null
+
+  if (currentNumber !== null) {
+    if (!finalState.round2.scoredNumbers.includes(currentNumber)) {
+      finalState.round2.scoredNumbers.push(currentNumber)
     }
   }
 
@@ -3068,7 +3103,8 @@ function finalizeRound2Number() {
 
   const overlay = document.getElementById("finalRound2ImageOverlay")
   if (overlay) overlay.remove()
-    closeFinalRound2ImageAutoOverlay()
+
+  closeFinalRound2ImageAutoOverlay()
 
   finalState.round2.revealTimer = null
   finalState.round2.pendingScore = false
@@ -3094,17 +3130,29 @@ function finalizeRound2Number() {
 
   currentFinalRound3Image = ""
 
-  const nextTeam = getOtherTeam(finalState.round2.lastTeamPlayed || "A")
-  finalState.round2.activeTeam = nextTeam
+  if (playedTeam === "A" || playedTeam === "B") {
+    finalState.round2.lastTeamPlayed = playedTeam
+    finalState.round2.activeTeam = getOtherTeam(playedTeam)
+  } else {
+    finalState.round2.activeTeam = null
+  }
 
   renderFinalRound()
-  highlightFinalTeam(nextTeam)
+
+  if (finalState.round2.activeTeam) {
+    highlightFinalTeam(finalState.round2.activeTeam)
+  } else {
+    highlightFinalTeam(null)
+  }
+
+  renderFinalTurnBar()
   saveFinalState()
   updateEndRoundButtonState()
+
   setTimeout(() => {
-  updateFinalRound2CountdownButtonLabel()
-  updateFinalRound2SequenceScoreButtonLabel()
-}, 50)
+    updateFinalRound2CountdownButtonLabel()
+    updateFinalRound2SequenceScoreButtonLabel()
+  }, 50)
 }
 /* =========================
    13) ROUND 3 - قصة
@@ -3383,20 +3431,29 @@ function finalRound3StoryCorrect() {
     return
   }
 
-  const team = selectedTeam || finalState.round3.activeTeam
+  const team = finalState.round3.activeTeam
 
   if (!team) {
-    showGameToast("اختر الفريق الفائز أولاً")
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (finalState.round3.answerShown) {
+    showGameToast("تم تسجيل الإجابة")
     return
   }
 
   pushFinalHistory()
 
   const points = Number(finalState.round3.currentPoints || 1)
+  const totalParts = finalState.round3.currentParts.length || 0
 
-  finalState.round3.activeTeam = team
   finalState.round3.scores[team] += getFinalScoreValue(team, points)
   finalState.round3.answerShown = true
+  finalState.round3.shownPart = totalParts
+  finalState.round3.lastTeamPlayed = team
+
+  clearFinalActiveDouble()
 
   playGameSound("correct")
   flashScreen("correct")
@@ -3422,7 +3479,6 @@ function finalRound3StoryWrong() {
   playGameSound("wrong")
   flashScreen("wrong")
 
-  renderFinalRound3()
   saveFinalState()
 }
 
@@ -3450,9 +3506,9 @@ function finalizeFinalRound3StoryTurn() {
   finalState.round3.pendingScore = false
   finalState.round3.activeTeam = null
 
-  selectedTeam = null
-
+  highlightFinalTeam(null)
   renderFinalRound()
+  renderFinalTurnBar()
   saveFinalState()
 }
 /* =========================
@@ -3819,10 +3875,20 @@ async function openFinalRound4TeamMediaCard(number) {
   ensureFinalRound4State()
 
   const state = finalState.round4.teamMedia
-  const team = setFinalAutoTeam(4)
+  const team = finalState.round4.activeTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (finalState.round4.lastTeamPlayed === team) {
+    showGameToast("لا يمكن نفس الفريق يلعب دورين وراء بعض")
+    return
+  }
 
   if (state.currentNumber) {
-    showGameToast("أغلق الرقم الحالي أولاً")
+    showGameToast("أنه الرقم الحالي أولاً")
     return
   }
 
@@ -3856,6 +3922,7 @@ async function openFinalRound4TeamMediaCard(number) {
   state.videoPlayed = false
   state.resultType = ""
   state.imageHidden = false
+
   stopFinalRound4ImageTimer()
 
   if (video) {
@@ -3881,9 +3948,10 @@ async function openFinalRound4TeamMediaCard(number) {
   renderFinalRound4TeamMedia()
   saveFinalState()
   updateEndRoundButtonState()
+
   if (state.currentMediaType === "image") {
-  startFinalRound4ImageTimer()
-}
+    startFinalRound4ImageTimer()
+  }
 }
 
 function showFinalRound4TeamMediaQuestion() {
@@ -3915,7 +3983,7 @@ function showFinalRound4TeamMediaQuestion() {
 
 function finalRound4TeamMediaCorrect() {
   const state = finalState.round4.teamMedia
-  const team = state.currentTeam
+  const team = state.currentTeam || finalState.round4.activeTeam
   const number = state.currentNumber
 
   if (!number) {
@@ -3924,7 +3992,7 @@ function finalRound4TeamMediaCorrect() {
   }
 
   if (!team) {
-    showGameToast("لا يوجد فريق محدد")
+    showGameToast("اختر الفريق أولاً")
     return
   }
 
@@ -3934,15 +4002,16 @@ function finalRound4TeamMediaCorrect() {
   }
 
   if (state.answerShown) {
-  showGameToast("تم تسجيل الإجابة")
-  return
-}
+    showGameToast("تم تسجيل الإجابة")
+    return
+  }
 
   pushFinalHistory()
 
   stopFinalRound4ImageTimer()
   closeFinalRound4TeamMediaOverlay()
 
+  state.currentTeam = team
   state.answerShown = true
   state.resultType = "correct"
 
@@ -3961,15 +4030,26 @@ function finalRound4TeamMediaCorrect() {
 
   setTimeout(() => {
     resetFinalRound4TeamMediaCurrent(getOtherTeam(team))
-  }, 7000)
+  }, 5000)
 }
 
 function finalRound4TeamMediaWrong() {
   const state = finalState.round4.teamMedia
+  const team = state.currentTeam || finalState.round4.activeTeam
   const number = state.currentNumber
 
   if (!number) {
     showGameToast("افتح رقم أولاً")
+    return
+  }
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (finalState.round4.scoredNumbers.includes(number)) {
+    showGameToast("تم تسجيل هذا الرقم مسبقاً")
     return
   }
 
@@ -3978,15 +4058,12 @@ function finalRound4TeamMediaWrong() {
   stopFinalRound4ImageTimer()
   closeFinalRound4TeamMediaOverlay()
 
+  state.currentTeam = team
   state.answerShown = true
   state.questionShown = false
   state.resultType = "wrong"
 
-  if (!finalState.round4.scoredNumbers.includes(number)) {
-    finalState.round4.scoredNumbers.push(number)
-  }
-
-  const team = state.currentTeam || finalState.round4.activeTeam || "A"
+  finalState.round4.scoredNumbers.push(number)
   finalState.round4.lastTeamPlayed = team
 
   clearFinalActiveDouble()
@@ -3999,7 +4076,7 @@ function finalRound4TeamMediaWrong() {
 
   setTimeout(() => {
     resetFinalRound4TeamMediaCurrent(getOtherTeam(team))
-  }, 7000)
+  }, 5000)
 }
 
 function resetFinalRound4TeamMediaCurrent(nextTeam = null) {
@@ -4029,6 +4106,7 @@ function resetFinalRound4TeamMediaCurrent(nextTeam = null) {
 
   renderFinalRound4TeamMedia()
   renderFinalRoundTitle()
+  renderFinalTurnBar()
   updateEndRoundButtonState()
   saveFinalState()
 }
@@ -4308,136 +4386,13 @@ window.playCurrentFinalVideo = playCurrentFinalVideo
 window.restartCurrentFinalVideo = restartCurrentFinalVideo
 window.stopCurrentFinalVideo = stopCurrentFinalVideo
 window.finalWrongVideoOnly = finalWrongVideoOnly
-
-/* =========================================================
-   FINAL CONTROLS FIX
-   إصلاح أزرار التحكم في الفاصلة
-   ضعه آخر شيء في ملف الفاصلة
-========================================================= */
-
-function finalRound1Correct() {
-  ensureFinalRound1State()
-
-  if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
-    showGameToast("اختر رقمًا أولاً")
-    return
-  }
-
-  const team = finalState.round1.activeTeam
-
-  if (!team) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
-
-  if (finalState.round1.answerShown) {
-    showGameToast("تم تسجيل الإجابة")
-    return
-  }
-
-  pushFinalHistory()
-
-  finalState.round1.scores[team] += getFinalScoreValue(team, 1)
-  finalState.round1.answerShown = true
-
-  clearFinalActiveDouble()
-
-  playGameSound("correct")
-  flashScreen("correct")
-
-  renderFinalScores()
-  loadFinalRound1Current()
-  saveFinalState()
-
-  setTimeout(() => {
-    finalizeRound1Turn()
-  }, 3500)
-}
-
-function finalRound1WrongFixed() {
-  ensureFinalRound1State()
-
-  if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
-    showGameToast("اختر رقمًا أولاً")
-    return
-  }
-
-  pushFinalHistory()
-
-  finalState.round1.answerShown = true
-
-  clearFinalActiveDouble()
-
-  playGameSound("wrong")
-  flashScreen("wrong")
-
-  loadFinalRound1Current()
-  saveFinalState()
-
-  setTimeout(() => {
-    finalizeRound1Turn()
-  }, 3500)
-}
-
-/* إصلاح اختيار الفريق في الجولة الثالثة */
-function finalRound3StoryCorrectFixed() {
-  ensureFinalRound3State()
-
-  if (!finalState.round3.pendingScore || !finalState.round3.currentNumber) {
-    showGameToast("لا يوجد رقم مفتوح")
-    return
-  }
-
-  if (!finalState.round3.shownPart) {
-    showGameToast("أظهر جزء من القصة أولاً")
-    return
-  }
-
-  const team = finalState.round3.activeTeam
-
-  if (!team) {
-    showGameToast("اختر الفريق الفائز أولاً")
-    return
-  }
-
-  if (finalState.round3.answerShown) {
-    showGameToast("تم تسجيل الإجابة")
-    return
-  }
-
-  pushFinalHistory()
-
-  const points = Number(finalState.round3.currentPoints || 1)
-
-  finalState.round3.scores[team] += getFinalScoreValue(team, points)
-  finalState.round3.answerShown = true
-  finalState.round3.lastTeamPlayed = team
-
-  clearFinalActiveDouble()
-
-  playGameSound("correct")
-  flashScreen("correct")
-
-  renderFinalScores()
-  renderFinalRound3()
-  updateFinalTopHeaderRoundInfo()
-  saveFinalState()
-
-  setTimeout(() => {
-    finalizeFinalRound3StoryTurn()
-  }, 3500)
-}
-
-/* ربط كل أزرار الفاصلة بالنافذة */
-window.renderFinal = window.renderFinal
-
 window.selectFinalTeam = selectFinalTeam
 window.activateFinalDouble = activateFinalDouble
 window.undoFinalAction = undoFinalAction
 
 window.openFinalRound1Card = openFinalRound1Card
 window.finalRound1Correct = finalRound1Correct
-window.finalRound1Wrong = finalRound1WrongFixed
+window.finalRound1Wrong = finalRound1Wrong
 window.showFinalRound1Answer = showFinalRound1Answer
 window.showFinalRound1Question = showFinalRound1Question
 window.toggleFinalRound1Overlay = toggleFinalRound1Overlay
@@ -4449,6 +4404,7 @@ window.finalRound2ShowNextImage = finalRound2ShowNextImage
 window.finalRound2RecordScore = finalRound2RecordScore
 window.finalRound2RecordSequenceScore = finalRound2RecordSequenceScore
 window.finalRound2RecordImageScore = finalRound2RecordImageScore
+window.finalRound2RecordWrong = finalRound2RecordWrong
 window.toggleFinalRound2CorrectSelection = toggleFinalRound2CorrectSelection
 window.toggleFinalRound2ImageCorrectSelection = toggleFinalRound2ImageCorrectSelection
 window.hideFinalRound2SequenceWord = hideFinalRound2SequenceWord
@@ -4456,7 +4412,7 @@ window.toggleFinalRound2ImageOverlay = toggleFinalRound2ImageOverlay
 
 window.openFinalRound3StoryCard = openFinalRound3StoryCard
 window.showFinalRound3StoryPart = showFinalRound3StoryPart
-window.finalRound3StoryCorrect = finalRound3StoryCorrectFixed
+window.finalRound3StoryCorrect = finalRound3StoryCorrect
 window.finalRound3StoryWrong = finalRound3StoryWrong
 
 window.openFinalRound4TeamMediaCard = openFinalRound4TeamMediaCard

@@ -32,10 +32,10 @@ const ALL_DISPLAY_SEGMENTS = [
   { key: "who", title: "من هو", sort: 4 },
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
 
-  { key: "final_round1", title: "ٮدوں ٮڡاط", sort: 6 },
-  { key: "final_round2", title: "صح صحلي", sort: 7 },
-  { key: "final_round3", title: "قصة", sort: 8 },
-  { key: "final_round4", title: "التركيز", sort: 9 },
+  { key: "finalRound1", title: "ٮدوں ٮڡاط", sort: 6 },
+{ key: "finalRound2", title: "صح صحلي", sort: 7 },
+{ key: "finalRound3", title: "قصة", sort: 8 },
+{ key: "finalRound4", title: "التركيز", sort: 9 },
 
   { key: "archive", title: "الأرشيف", sort: 10 }
 ]
@@ -58,10 +58,10 @@ function escapeDisplayHtml(value) {
 function normalizeDisplaySegmentKey(key) {
   key = String(key || "")
 
-  if (key === "finalRound1") return "final_round1"
-  if (key === "finalRound2") return "final_round2"
-  if (key === "finalRound3") return "final_round3"
-  if (key === "finalRound4") return "final_round4"
+  if (key === "final_round1") return "finalRound1"
+  if (key === "final_round2") return "finalRound2"
+  if (key === "final_round3") return "finalRound3"
+  if (key === "final_round4") return "finalRound4"
 
   return key
 }
@@ -71,20 +71,20 @@ function isFinalSegmentKey(key) {
 
   return (
     key === "final" ||
-    key === "final_round1" ||
-    key === "final_round2" ||
-    key === "final_round3" ||
-    key === "final_round4"
+    key === "finalRound1" ||
+    key === "finalRound2" ||
+    key === "finalRound3" ||
+    key === "finalRound4"
   )
 }
 
 function getFinalRoundFromSegmentKey(key) {
   key = normalizeDisplaySegmentKey(key)
 
-  if (key === "final_round1") return 1
-  if (key === "final_round2") return 2
-  if (key === "final_round3") return 3
-  if (key === "final_round4") return 4
+  if (key === "finalRound1") return 1
+  if (key === "finalRound2") return 2
+  if (key === "finalRound3") return 3
+  if (key === "finalRound4") return 4
 
   return Number(window.displayFinalRound || window.currentFinalRound || 1)
 }
@@ -92,12 +92,12 @@ function getFinalRoundFromSegmentKey(key) {
 function getFinalSegmentKeyFromRound(round) {
   const r = Number(round || 1)
 
-  if (r === 1) return "final_round1"
-  if (r === 2) return "final_round2"
-  if (r === 3) return "final_round3"
-  if (r === 4) return "final_round4"
+  if (r === 1) return "finalRound1"
+  if (r === 2) return "finalRound2"
+  if (r === 3) return "finalRound3"
+  if (r === 4) return "finalRound4"
 
-  return "final_round1"
+  return "finalRound1"
 }
 
 function isAnyFinalVisibleOnDisplay() {
@@ -807,7 +807,8 @@ let displayLastFxKey = ""
 let displayLastFxTime = 0
 
 function getDisplaySegmentTitle(segmentKey) {
-  const item = ALL_DISPLAY_SEGMENTS.find(x => x.key === segmentKey)
+  const key = normalizeDisplaySegmentKey(segmentKey)
+  const item = ALL_DISPLAY_SEGMENTS.find(x => normalizeDisplaySegmentKey(x.key) === key)
   return item?.title || "الفقرة"
 }
 
@@ -1468,10 +1469,10 @@ function getDisplaySegmentDomId(key) {
   if (key === "who") return "segmentWho"
   if (key === "explain") return "segmentExplain"
 
-  if (key === "final_round1") return "segment_finalRound1"
-  if (key === "final_round2") return "segment_finalRound2"
-  if (key === "final_round3") return "segment_finalRound3"
-  if (key === "final_round4") return "segment_finalRound4"
+  if (key === "finalRound1") return "segment_finalRound1"
+  if (key === "finalRound2") return "segment_finalRound2"
+  if (key === "finalRound3") return "segment_finalRound3"
+  if (key === "finalRound4") return "segment_finalRound4"
 
   if (key === "final") return "segmentFinal"
   if (key === "archive") return "segmentArchive"
@@ -1488,10 +1489,10 @@ function getDisplayWinnerDomId(key) {
   if (key === "who") return "winnerWho"
   if (key === "explain") return "winnerExplain"
 
-  if (key === "final_round1") return "winner_finalRound1"
-  if (key === "final_round2") return "winner_finalRound2"
-  if (key === "final_round3") return "winner_finalRound3"
-  if (key === "final_round4") return "winner_finalRound4"
+  if (key === "finalRound1") return "winner_finalRound1"
+  if (key === "finalRound2") return "winner_finalRound2"
+  if (key === "finalRound3") return "winner_finalRound3"
+  if (key === "finalRound4") return "winner_finalRound4"
 
   if (key === "final") return "winnerFinal"
   if (key === "archive") return "winnerArchive"
@@ -1506,14 +1507,15 @@ function renderVisibleSegmentsHome() {
   const segments = getVisibleDisplaySegments()
 
   grid.innerHTML = segments.map(item => {
-    const cardId = getDisplaySegmentDomId(item.key)
-    const winnerId = getDisplayWinnerDomId(item.key)
+    const key = normalizeDisplaySegmentKey(item.key)
+    const cardId = getDisplaySegmentDomId(key)
+    const winnerId = getDisplayWinnerDomId(key)
 
     return `
       <div
         class="segmentCard homeSegmentItem"
         id="${cardId}"
-        onclick="openMainSegment('${item.key}')"
+        onclick="openMainSegment('${key}')"
       >
         <div class="homeSegmentContent">
           <span>${escapeDisplayHtml(item.title)}</span>
@@ -1531,12 +1533,20 @@ function updateSegmentCards() {
 }
 
 function setSegmentWinnerLabel(key) {
+  key = normalizeDisplaySegmentKey(key)
+
   const labelIds = getSegmentWinnerLabelIds(key)
   const cardIds = getSegmentCardIds(key)
 
   const label = getFirstElement(labelIds)
   const card = getFirstElement(cardIds)
-  const status = segmentStatus[key] || { locked: false, winner: "" }
+
+  const status = segmentStatus[key] || {
+    locked: false,
+    winner: "",
+    scoreA: 0,
+    scoreB: 0
+  }
 
   if (label) {
     label.innerText = status.winner ? status.winner : ""
@@ -1559,10 +1569,10 @@ async function openSegmentPage(segmentKey, forcedRound = null) {
 
   const isFinalInternalSegment = segmentKey === "final"
   const isFinalCardSegment =
-    segmentKey === "final_round1" ||
-    segmentKey === "final_round2" ||
-    segmentKey === "final_round3" ||
-    segmentKey === "final_round4"
+    segmentKey === "finalRound1" ||
+    segmentKey === "finalRound2" ||
+    segmentKey === "finalRound3" ||
+    segmentKey === "finalRound4"
 
   const isFinalAny = isFinalInternalSegment || isFinalCardSegment
 
@@ -1597,6 +1607,8 @@ async function openSegmentPage(segmentKey, forcedRound = null) {
 
     lockKey = getFinalSegmentKeyFromRound(finalRound)
   }
+
+  lockKey = normalizeDisplaySegmentKey(lockKey)
 
   if (segmentStatus[lockKey]?.locked) return
 
@@ -1639,21 +1651,10 @@ async function openSegmentPage(segmentKey, forcedRound = null) {
 
     const mediaRoot = document.getElementById("segmentArea") || document
 
-    if (typeof protectDisplayMedia === "function") {
-      protectDisplayMedia(mediaRoot)
-    }
-
-    if (typeof enhanceDisplayMediaFrames === "function") {
-      enhanceDisplayMediaFrames(mediaRoot)
-    }
-
-    if (typeof preloadDisplayMediaInRoot === "function") {
-      await preloadDisplayMediaInRoot(mediaRoot)
-    }
-
-    if (typeof applyDisplayMediaRevealFx === "function") {
-      applyDisplayMediaRevealFx(mediaRoot)
-    }
+    if (typeof protectDisplayMedia === "function") protectDisplayMedia(mediaRoot)
+    if (typeof enhanceDisplayMediaFrames === "function") enhanceDisplayMediaFrames(mediaRoot)
+    if (typeof preloadDisplayMediaInRoot === "function") await preloadDisplayMediaInRoot(mediaRoot)
+    if (typeof applyDisplayMediaRevealFx === "function") applyDisplayMediaRevealFx(mediaRoot)
 
   } catch (e) {
     console.log("DISPLAY SEGMENT RENDER ERROR:", e)
@@ -1676,7 +1677,19 @@ async function openSegmentPage(segmentKey, forcedRound = null) {
 }
 
 function openMainSegment(segmentKey) {
+  segmentKey = normalizeDisplaySegmentKey(segmentKey)
+
+  if (isFinalSegmentKey(segmentKey) && segmentKey !== "final") {
+    const round = getFinalRoundFromSegmentKey(segmentKey)
+    openSegmentPage(segmentKey, round)
+    return
+  }
+
   openSegmentPage(segmentKey)
+}
+
+function openMaToSegment(segmentKey) {
+  openMainSegment(segmentKey)
 }
 
 /* حل احتياطي لو فيه مكان قديم يستدعي الاسم الغلط */
@@ -1948,9 +1961,9 @@ segmentStatus[key].scoreB = finishedSegmentScores.B
 }
 
 function getCurrentSegmentKey() {
-  const active = localStorage.getItem("active_segment")
+  const active = normalizeDisplaySegmentKey(localStorage.getItem("active_segment"))
 
-  if (active) return active
+if (active) return active
 
   const title = document.querySelector(".segmentTitle")
   if (!title) return null
@@ -1982,6 +1995,8 @@ function getSafeSegmentNumber(value, fallback, max) {
 }
 
 function canEndSegment(segmentKey) {
+    segmentKey = normalizeDisplaySegmentKey(segmentKey)
+
   if (segmentKey === "warmup") {
   if (!window.usedQuestions) return false
   if (warmupQuestionLocked) return false
@@ -2267,7 +2282,7 @@ function bumpScore(id) {
   void el.offsetWidth
   el.classList.add("score-bump")
 }
-let screenFlashLayer = null
+var screenFlashLayer = null
 
 function ensureScreenFlashLayer() {
   if (screenFlashLayer && document.body.contains(screenFlashLayer)) {
@@ -2847,7 +2862,7 @@ function normalizeWinnerToTeam(winner) {
 function getVisibleFinalResultKeys() {
   if (typeof getVisibleDisplaySegments === "function") {
     return getVisibleDisplaySegments()
-      .map(item => item.key)
+      .map(item => normalizeDisplaySegmentKey(item.key))
       .filter(Boolean)
   }
 

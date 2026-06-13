@@ -114,6 +114,64 @@ function isValidPresenterTeam(team) {
   return team === "A" || team === "B"
 }
 
+function getPresenterDisplayFinalSegmentKey(round) {
+  const r = Number(round || 1)
+
+  if (r === 1) return "finalRound1"
+  if (r === 2) return "finalRound2"
+  if (r === 3) return "finalRound3"
+  if (r === 4) return "finalRound4"
+
+  return "finalRound1"
+}
+
+function forceDisplayFinalRoundFromPresenter(round, afterReady = null) {
+  const r = Number(round || 1)
+  const key = getPresenterDisplayFinalSegmentKey(r)
+
+  window.displayFinalRound = r
+  window.currentFinalRound = r
+
+  localStorage.setItem("active_segment", key)
+
+  if (window.finalState) {
+    window.finalState.round = r
+  }
+
+  const currentRound = Number(window.finalState?.round || 0)
+
+  if (currentRound === r && typeof afterReady === "function") {
+    afterReady()
+    return
+  }
+
+  if (typeof window.renderFinal === "function") {
+    const result = window.renderFinal(r, key)
+
+    if (result && typeof result.then === "function") {
+      result.then(() => {
+        setTimeout(() => {
+          if (typeof afterReady === "function") afterReady()
+        }, 120)
+      })
+    } else {
+      setTimeout(() => {
+        if (typeof afterReady === "function") afterReady()
+      }, 180)
+    }
+
+    return
+  }
+
+  if (typeof openSegmentPage === "function") {
+    openSegmentPage("final")
+  }
+
+  setTimeout(() => {
+    if (typeof afterReady === "function") afterReady()
+  }, 250)
+}
+
 /* =========================
    HANDLE COMMANDS
 ========================= */
@@ -172,8 +230,16 @@ function handlePresenterCommand(cmd) {
   console.log("Handle presenter command:", segment, action, data)
 
   if (action === "openSegment") {
-    return safeRunPresenterAction(() => openSegmentPage(data.segment))
-  }
+  return safeRunPresenterAction(() => {
+    if (data.segment === "final") {
+      const round = Number(data.round || 1)
+      forceDisplayFinalRoundFromPresenter(round)
+      return
+    }
+
+    openSegmentPage(data.segment)
+  })
+}
 
   if (action === "hideDisplayControls") {
     return safeRunPresenterAction(hideDisplayControls)
@@ -656,18 +722,182 @@ function handleExplainPresenterAction(action, data) {
 }
 /* =========================
    FINAL
+   استقبال أوامر الفاصلة الجديدة
 ========================= */
 
 function handleFinalPresenterAction(action, data) {
   if (action === "selectTeam") {
     if (!isValidPresenterTeam(data.team)) return
-    return safeRunPresenterAction(() => selectFinalTeam(data.team))
+
+    return safeRunPresenterAction(() => {
+      selectFinalTeam(data.team)
+    })
   }
 
   if (action === "setRound") {
     return safeRunPresenterAction(() => {
       const round = Number(data.round || 1)
-      if (round !== finalState.round) goToFinalRound(round)
+      forceDisplayFinalRoundFromPresenter(round)
+    })
+  }
+
+  if (action === "openNumber") {
+    return safeRunPresenterAction(() => {
+      const round = Number(data.round || window.finalState?.round || 1)
+      const number = Number(data.number || 0)
+      const team = data.team
+
+      if (!number) return
+
+      forceDisplayFinalRoundFromPresenter(round, () => {
+        setTimeout(() => {
+          if ((round === 2 || round === 4) && isValidPresenterTeam(team)) {
+            selectFinalTeam(team)
+          }
+
+          setTimeout(() => {
+            if (round === 1) {
+              openFinalRound1Card(number)
+              return
+            }
+
+            if (round === 2) {
+              openFinalRound2Card(number)
+              return
+            }
+
+            if (round === 3) {
+              if (typeof openFinalRound3StoryCard === "function") {
+                openFinalRound3StoryCard(number)
+              }
+              return
+            }
+
+            if (round === 4) {
+              if (typeof openFinalRound4TeamMediaCard === "function") {
+                openFinalRound4TeamMediaCard(number)
+              }
+              return
+            }
+          }, 80)
+        }, 80)
+      })
+    })
+  }
+
+  if (action === "double") {
+    return safeRunPresenterAction(() => activateFinalDouble())
+  }
+
+  if (action === "showQuestion") {
+    return safeRunPresenterAction(() => {
+      if (window.finalState?.round === 1) {
+        if (typeof showFinalRound1Question === "function") {
+          showFinalRound1Question()
+        }
+        return
+      }
+
+      if (window.finalState?.round === 4) {
+        if (typeof showFinalRound4TeamMediaQuestion === "function") {
+          showFinalRound4TeamMediaQuestion()
+        }
+      }
+    })
+  }
+
+  if (action === "showStoryPart") {
+    return safeRunPresenterAction(() => {
+      if (window.finalState?.round !== 3) return
+
+      if (typeof showFinalRound3StoryPart === "function") {
+        showFinalRound3StoryPart()
+      }
+    })
+  }
+
+  if (action === "decreaseCountdown") {
+    return safeRunPresenterAction(() => {
+      if (window.finalState?.round !== 2) return
+
+      if (typeof finalRound2DecreaseCountdown === "function") {
+        finalRound2DecreaseCountdown()
+      }
+    })
+  }
+
+  if (action === "showNextImage") {
+    return safeRunPresenterAction(() => {
+      if (window.finalState?.round !== 2) return
+
+      if (typeof finalRound2ShowNextImage === "function") {
+        finalRound2ShowNextImage()
+      }
+    })
+  }
+
+  if (action === "toggleRound2Correct") {
+    return safeRunPresenterAction(() => {
+      if (window.finalState?.round !== 2) return
+
+      if (typeof finalRound2ToggleCorrectFromPresenter === "function") {
+        finalRound2ToggleCorrectFromPresenter(Number(data.index))
+        return
+      }
+
+      if (typeof toggleFinalRound2CorrectSelection === "function") {
+        toggleFinalRound2CorrectSelection(Number(data.index))
+      }
+    })
+  }
+
+  if (action === "toggleRound2ImageCorrect") {
+    return safeRunPresenterAction(() => {
+      if (window.finalState?.round !== 2) return
+
+      if (typeof toggleFinalRound2ImageCorrectSelection === "function") {
+        toggleFinalRound2ImageCorrectSelection(Number(data.index))
+      }
+    })
+  }
+
+  if (action === "hideRound2SequenceWord") {
+    return safeRunPresenterAction(() => {
+      if (window.finalState?.round !== 2) return
+
+      if (typeof hideFinalRound2SequenceWord === "function") {
+        hideFinalRound2SequenceWord(Number(data.index))
+      }
+    })
+  }
+
+  if (action === "recordScrambleScore") {
+    return safeRunPresenterAction(() => {
+      if (window.finalState?.round !== 2) return
+
+      if (typeof finalRound2RecordScore === "function") {
+        finalRound2RecordScore()
+      }
+    })
+  }
+
+  if (action === "recordSequenceScore") {
+    return safeRunPresenterAction(() => {
+      if (window.finalState?.round !== 2) return
+
+      if (typeof finalRound2RecordSequenceScore === "function") {
+        finalRound2RecordSequenceScore()
+      }
+    })
+  }
+
+  if (action === "recordImageScore") {
+    return safeRunPresenterAction(() => {
+      if (window.finalState?.round !== 2) return
+
+      if (typeof finalRound2RecordImageScore === "function") {
+        finalRound2RecordImageScore()
+      }
     })
   }
 
@@ -678,12 +908,8 @@ function handleFinalPresenterAction(action, data) {
         return
       }
 
-      if (
-        finalState.round === 3 &&
-        finalState.round3?.mode === "team_media" &&
-        finalState.round3?.teamMedia?.currentMediaType === "video"
-      ) {
-        playFinalRound3TeamMediaVideo()
+      if (typeof playFinalRound4TeamMediaVideo === "function") {
+        playFinalRound4TeamMediaVideo()
       }
     })
   }
@@ -695,12 +921,16 @@ function handleFinalPresenterAction(action, data) {
         return
       }
 
-      if (
-        finalState.round === 3 &&
-        finalState.round3?.mode === "team_media" &&
-        finalState.round3?.teamMedia?.currentMediaType === "video"
-      ) {
-        restartFinalRound3TeamMediaVideo()
+      if (typeof restartFinalRound4TeamMediaVideo === "function") {
+        restartFinalRound4TeamMediaVideo()
+      }
+    })
+  }
+
+  if (action === "restartCurrentFinalImage") {
+    return safeRunPresenterAction(() => {
+      if (typeof restartFinalRound4TeamMediaImage === "function") {
+        restartFinalRound4TeamMediaImage()
       }
     })
   }
@@ -712,8 +942,8 @@ function handleFinalPresenterAction(action, data) {
         return
       }
 
-      const overlayVideo = document.getElementById("finalRound3TeamMediaOverlayVideo")
-      const inlineVideo = document.getElementById("finalRound3TeamMediaInlineVideo")
+      const overlayVideo = document.getElementById("finalRound4TeamMediaOverlayVideo")
+      const inlineVideo = document.getElementById("finalRound4TeamMediaInlineVideo")
 
       ;[overlayVideo, inlineVideo].forEach(video => {
         if (!video) return
@@ -732,145 +962,50 @@ function handleFinalPresenterAction(action, data) {
     return safeRunPresenterAction(() => {
       if (typeof finalWrongVideoOnly === "function") {
         finalWrongVideoOnly()
-        return
-      }
-
-      const video =
-        document.getElementById("finalRound3TeamMediaOverlayVideo") ||
-        document.getElementById("finalRound3TeamMediaInlineVideo") ||
-        document.querySelector(".finalRound3TeamMediaStage video") ||
-        document.querySelector(".finalMainStage video")
-
-      if (!video) {
-        showGameToast("لا يوجد فيديو شغال")
-        return
-      }
-
-      const frame =
-        video.closest(".finalRound3TeamMediaOverlayInner") ||
-        video.closest(".finalTeamMediaVideoFrame") ||
-        video.parentElement
-
-      if (!frame) return
-
-      frame.classList.remove("finalVideoWrongFlash")
-      void frame.offsetWidth
-      frame.classList.add("finalVideoWrongFlash")
-
-      playGameSound("wrong")
-
-      setTimeout(() => {
-        frame.classList.remove("finalVideoWrongFlash")
-      }, 900)
-    })
-  }
-
-  if (action === "openNumber") {
-    return safeRunPresenterAction(() => {
-      const round = Number(data.round || finalState.round || 1)
-
-      if (round !== finalState.round) {
-        goToFinalRound(round)
-      }
-
-      setTimeout(() => {
-        if (round === 1) {
-          openFinalRound1Card(Number(data.number))
-          return
-        }
-
-        if (round === 2) {
-          openFinalRound2Card(Number(data.number))
-          return
-        }
-
-        if (round === 3) {
-          if (finalState.round3?.mode === "team_media") {
-            openFinalRound3TeamMediaCard(Number(data.number))
-          } else {
-            openFinalRound3Card(Number(data.number))
-          }
-        }
-      }, 120)
-    })
-  }
-
-  if (action === "double") {
-    return safeRunPresenterAction(() => activateFinalDouble())
-  }
-
-  if (action === "showQuestion") {
-    return safeRunPresenterAction(() => {
-      if (finalState.round === 1) {
-        showFinalRound1Question()
-        return
-      }
-
-      if (
-        finalState.round === 3 &&
-        finalState.round3?.mode === "team_media"
-      ) {
-        showFinalRound3TeamMediaQuestion()
-      }
-    })
-  }
-
-  if (action === "showAnswer") {
-    return safeRunPresenterAction(() => {
-      if (finalState.round === 1) {
-        showFinalRound1Answer()
-        return
-      }
-
-      if (finalState.round === 2 && typeof showFinalRound2Answer === "function") {
-        showFinalRound2Answer()
-        return
-      }
-
-      if (finalState.round === 3) {
-        if (finalState.round3?.mode === "team_media") {
-          const state = finalState.round3.teamMedia
-
-          if (!state.currentNumber) {
-            showGameToast("افتح رقم أولاً")
-            return
-          }
-
-          pushFinalHistory()
-          state.answerShown = true
-          renderFinalRound3TeamMedia()
-          saveFinalState()
-        } else {
-          showFinalRound3Answer()
-        }
       }
     })
   }
 
   if (action === "correct") {
     return safeRunPresenterAction(() => {
-      if (finalState.round === 1) {
+      const round = Number(window.finalState?.round || 1)
+
+      if (round === 1) {
         finalRound1Correct()
         return
       }
 
-      if (finalState.round === 2) {
-        if (finalState.round2.currentType === "scramble") {
+      if (round === 2) {
+        const type = window.finalState?.round2?.currentType
+
+        if (type === "scramble") {
           finalRound2RecordScore()
           return
         }
 
-        if (finalState.round2.currentType === "sequence") {
+        if (type === "sequence") {
           finalRound2RecordSequenceScore()
           return
         }
+
+        if (type === "image") {
+          finalRound2RecordImageScore()
+          return
+        }
+
+        return
       }
 
-      if (finalState.round === 3) {
-        if (finalState.round3?.mode === "team_media") {
-          finalRound3TeamMediaCorrect()
-        } else {
-          finalRound3RecordScore()
+      if (round === 3) {
+        if (typeof finalRound3StoryCorrect === "function") {
+          finalRound3StoryCorrect()
+        }
+        return
+      }
+
+      if (round === 4) {
+        if (typeof finalRound4TeamMediaCorrect === "function") {
+          finalRound4TeamMediaCorrect()
         }
       }
     })
@@ -878,111 +1013,43 @@ function handleFinalPresenterAction(action, data) {
 
   if (action === "wrong") {
     return safeRunPresenterAction(() => {
-      if (finalState.round === 1) {
+      const round = Number(window.finalState?.round || 1)
+
+      if (round === 1) {
         finalRound1Wrong()
         return
       }
 
-      if (
-        finalState.round === 3 &&
-        finalState.round3?.mode === "team_media"
-      ) {
-        finalRound3TeamMediaWrong()
-      }
-    })
-  }
-
-  if (action === "toggleRound2Correct") {
-    return safeRunPresenterAction(() => {
-      finalRound2ToggleCorrectFromPresenter(Number(data.index))
-    })
-  }
-
-  if (action === "hideRound2SequenceWord") {
-    return safeRunPresenterAction(() => {
-      hideFinalRound2SequenceWord(Number(data.index))
-    })
-  }
-
-  if (action === "toggleRound3Correct") {
-    return safeRunPresenterAction(() => {
-      if (finalState.round3?.mode === "team_media") return
-
-      toggleFinalRound3CorrectSelection(Number(data.index))
-    })
-  }
-
-  if (action === "decreaseCountdown") {
-    return safeRunPresenterAction(() => finalRound2DecreaseCountdown())
-  }
-
-  if (action === "recordScrambleScore") {
-    return safeRunPresenterAction(() => finalRound2RecordScore())
-  }
-
-  if (action === "recordSequenceScore") {
-    return safeRunPresenterAction(() => finalRound2RecordSequenceScore())
-  }
-
-  if (action === "startSequence") {
-    return safeRunPresenterAction(() => {
-      if (
-        finalState.round3?.mode === "team_media" &&
-        finalState.round3?.teamMedia?.currentMediaType === "video"
-      ) {
-        playFinalRound3TeamMediaVideo()
+      if (round === 3) {
+        if (typeof finalRound3StoryWrong === "function") {
+          finalRound3StoryWrong()
+        }
         return
       }
 
-      startFinalRound3Sequence()
-    })
-  }
-
-  if (action === "playTeamMediaVideo") {
-    return safeRunPresenterAction(() => {
-      if (
-        finalState.round !== 3 ||
-        finalState.round3?.mode !== "team_media" ||
-        finalState.round3?.teamMedia?.currentMediaType !== "video"
-      ) {
-        return
-      }
-
-      playFinalRound3TeamMediaVideo()
-    })
-  }
-
-  if (action === "restartTeamMediaVideo") {
-    return safeRunPresenterAction(() => {
-      if (
-        finalState.round !== 3 ||
-        finalState.round3?.mode !== "team_media" ||
-        finalState.round3?.teamMedia?.currentMediaType !== "video"
-      ) {
-        return
-      }
-
-      restartFinalRound3TeamMediaVideo()
-    })
-  }
-
-  if (action === "recordRound3Score") {
-    return safeRunPresenterAction(() => {
-      if (finalState.round3?.mode === "team_media") {
-        finalRound3TeamMediaCorrect()
-      } else {
-        finalRound3RecordScore()
+      if (round === 4) {
+        if (typeof finalRound4TeamMediaWrong === "function") {
+          finalRound4TeamMediaWrong()
+        }
       }
     })
   }
 
   if (action === "undo") {
-    return safeRunPresenterAction(() => undoFinalAction())
+    return safeRunPresenterAction(() => {
+      if (typeof undoFinalAction === "function") {
+        undoFinalAction()
+      }
+    })
   }
 
   if (action === "nextRound") {
     return safeRunPresenterAction(() => {
-      goToFinalRound(Number(finalState.round) + 1)
+      const nextRound = Number(window.finalState?.round || 1) + 1
+
+      if (nextRound > 4) return
+
+      forceDisplayFinalRoundFromPresenter(nextRound)
     })
   }
 }
