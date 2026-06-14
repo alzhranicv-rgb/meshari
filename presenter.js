@@ -4093,9 +4093,14 @@ async function refreshPresenterFinalPreviewOnly(round) {
   }
 
   if (round === 1) await renderPresenterFinalRound1Preview()
-  if (round === 2) await renderPresenterFinalRound2Preview()
-  if (round === 3) await renderPresenterFinalRound3Preview()
-  if (round === 4) await renderPresenterFinalRound4Preview()
+if (round === 2) await renderPresenterFinalRound2Preview()
+
+if (round === 3) {
+  await renderPresenterFinalRound3Preview()
+  await refreshPresenterFinalRound3AnswerControl()
+}
+
+if (round === 4) await renderPresenterFinalRound4Preview()
 }
 
 function refreshPresenterFinalControlsOnly(round) {
@@ -4311,7 +4316,17 @@ if ((round === 2 || round === 4) && !activeTeam) {
   }
 
   if (round === 2) renderPresenterFinalRound2Preview()
-  if (round === 3) renderPresenterFinalRound3Preview()
+  if (round === 3) {
+  renderPresenterFinalRound3Preview()
+
+  setTimeout(() => {
+    refreshPresenterFinalRound3AnswerControl()
+  }, 80)
+
+  setTimeout(() => {
+    refreshPresenterFinalRound3AnswerControl()
+  }, 250)
+}
   if (round === 4) renderPresenterFinalRound4Preview()
 
   sendCommand("openNumber", {
@@ -4744,7 +4759,25 @@ async function getPresenterFinalRound3AnswerBox() {
     </section>
   `
 }
+async function refreshPresenterFinalRound3AnswerControl() {
+  if (presenterSegment !== "final") return
+  if (Number(getPresenterFinalRound()) !== 3) return
 
+  const controlsBox = document.getElementById("presenterFinalControls")
+  if (!controlsBox) return
+
+  const answerHtml = await getPresenterFinalRound3AnswerBox()
+  const oldAnswerBox = controlsBox.querySelector(".presenterFinalStoryAnswerControl")
+  const controlsGrid = controlsBox.querySelector(".presenterFinalControlsGrid")
+
+  if (oldAnswerBox) {
+    oldAnswerBox.remove()
+  }
+
+  if (!answerHtml || !controlsGrid) return
+
+  controlsGrid.insertAdjacentHTML("beforebegin", answerHtml)
+}
 /* =========================
    ROUND 4 PREVIEW - التركيز
 ========================= */
