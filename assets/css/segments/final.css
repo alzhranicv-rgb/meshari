@@ -1263,18 +1263,21 @@
   }
 }
 /* =========================
-   13) IPAD AIR 11 / TAB LANDSCAPE
+   13) IPAD AIR 11 / FINAL FULL LAYOUT
 ========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+
   .finalWrapNew{
-    height:calc(100dvh - 138px);
-    max-height:calc(100dvh - 138px);
+    height:calc(100dvh - 134px);
+    max-height:calc(100dvh - 134px);
     min-height:0;
 
-    gap:8px;
-    padding:0 16px 6px;
+    display:flex;
+    flex-direction:column;
+    gap:9px;
 
+    padding:0 16px 6px;
     overflow:hidden;
   }
 
@@ -1284,12 +1287,13 @@
     overflow:hidden;
   }
 
+  /* لوحة النتائج */
   .finalScoreBoards,
   #finalScoreBoards.finalScoreBoards{
     grid-template-columns:minmax(0,1fr) 166px minmax(0,1fr);
     grid-template-areas:"teamB center teamA";
     gap:10px;
-    margin:0;
+    margin:0 0 2px;
   }
 
   .finalScorePanel,
@@ -1352,15 +1356,41 @@
     font-size:.62rem;
   }
 
+  /* كل فقرات الفاينل: أرقام فوق + محتوى يتمدد */
+  .finalRound1StartView,
+  .finalRound1PlayLayout,
+  .finalRound1StageLayout,
+  .finalRound2Wrap,
+  .finalRound3Wrap,
+  .finalStoryWrap,
+  .finalRound4TeamMediaWrap,
+  .finalTeamMediaWrap{
+    width:100%;
+    height:100%;
+    min-height:0;
+
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr);
+    gap:10px;
+
+    overflow:hidden;
+  }
+
+  /* الأرقام */
   .finalRound1GridSingleRow,
   .finalRound2SixNumbersGrid,
   .finalStoryNumbersGrid,
   .finalTeamMediaNumbersGrid,
   .finalRound2Grid,
   .finalRound3Grid{
-    margin:10px auto 4px;
-    padding:2px 4px 0;
+    width:100%;
+    margin:8px auto 0;
+    padding:0 4px;
+
+    display:grid;
     gap:11px;
+
+    overflow:visible;
   }
 
   .finalRound1Card,
@@ -1382,40 +1412,355 @@
     border-radius:20px;
   }
 
-.finalRound1ContentShell,
-.finalRound2WordsStage,
-.finalRound3ImageStageWrap,
-.finalStoryStageWrap,
-.finalTeamMediaStageWrap{
-  flex:0 0 auto;
-  width:100%;
-  height:clamp(285px,42dvh,360px);
-  min-height:0;
-  margin:4px 0 6px;
-  overflow:hidden;
-}
+  /* مساحة المحتوى لكل الفقرات */
+  .finalRound1ContentShell,
+  .finalRound2WordsStage,
+  .finalRound3ImageStageWrap,
+  .finalStoryStageWrap,
+  .finalTeamMediaStageWrap{
+    width:100%;
+    height:100%;
+    min-height:0;
+
+    margin:0;
+
+    display:flex;
+    align-items:stretch;
+    justify-content:center;
+
+    overflow:hidden;
+  }
 
   .finalRound1MainStageCard,
   .finalRound2WordsStage,
   .finalStoryStage,
   .finalRound3TeamMediaStage,
   .finalTeamMediaStage{
-    border-radius:0;
+    width:100%;
+    height:100%;
+    min-height:0;
+
     padding:0;
+    border-radius:0;
+
+    display:flex;
+    align-items:stretch;
+    justify-content:center;
+
+    overflow:hidden;
   }
 
+  /* بدون نقاط */
+  .finalRound1TextCard{
+    width:100%;
+    height:100%;
+    max-height:none;
+
+    padding:22px 38px;
+    border-radius:26px;
+  }
+
+  .finalRound1TextCardInner{
+    font-size:clamp(1.75rem,3vw,3.15rem);
+    line-height:1.42;
+  }
+
+  .finalRound1MainStageCard:has(.finalRound1ResultBox){
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(320px,.52fr);
+    gap:14px;
+    align-items:stretch;
+  }
+
+  .finalRound1MainStageCard:has(.finalRound1ResultBox) .finalRound1TextCard{
+    height:100%;
+    padding:20px 32px;
+  }
+
+  .finalRound1MainStageCard:has(.finalRound1ResultBox) .finalRound1TextCardInner{
+    font-size:clamp(1.35rem,2.25vw,2.25rem);
+    line-height:1.38;
+  }
+
+  .finalRound1BottomInfoRow,
+  .finalRound1ResultBox{
+    width:100%;
+    height:100%;
+    min-height:0;
+  }
+
+  .finalRound1ResultBox{
+    border-radius:24px;
+    padding:20px 22px;
+  }
+
+  .finalRound1ResultText,
+  .finalRound1AnswerMolhimFont,
+  .finalRound1AnswerProjectFont{
+    font-size:clamp(1.2rem,1.9vw,1.68rem);
+    line-height:1.55;
+  }
+
+  /* صح صحلي */
+  .finalRound2WordsStage{
+    align-items:stretch;
+  }
+
+  .finalHintStage{
+    width:100%;
+    height:100%;
+
+    justify-content:center;
+    gap:15px;
+  }
+
+  .finalHintText{
+    width:min(100%,940px);
+    min-height:48px;
+
+    font-size:1.16rem;
+    line-height:1.38;
+  }
+
+  .finalWordChipLarge{
+    width:min(100%,940px);
+    min-height:210px;
+
+    padding:22px 32px;
+
+    font-size:clamp(2.45rem,4.2vw,4.35rem);
+    line-height:1.22;
+  }
+
+  .finalRound2AnswerGrid{
+    width:min(100%,960px);
+    height:100%;
+
+    align-content:center;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:12px;
+  }
+
+  .finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(4)):not(:has(.finalRound2AnswerCard:nth-child(5))){
+    width:min(100%,900px);
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .finalRound2AnswerCard,
+  .finalRound2WordsStage .finalRound3AnswerCard{
+    min-height:112px;
+    border-radius:22px;
+    padding:12px 14px;
+  }
+
+  .finalRound2AnswerCorrect,
+  .finalRound2WordsStage .finalAnswerChip{
+    font-size:clamp(1.25rem,2.05vw,1.82rem);
+    line-height:1.3;
+  }
+
+  .finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(6)) .finalRound2AnswerCorrect{
+    font-size:clamp(1.08rem,1.72vw,1.5rem);
+    line-height:1.26;
+  }
+
+  .finalSequenceStageBox{
+    width:min(100%,960px);
+    height:100%;
+    min-height:0;
+
+    justify-content:center;
+    gap:15px;
+
+    padding:20px;
+    border-radius:26px;
+  }
+
+  .finalSequenceTimerBadge{
+    height:44px;
+    min-width:132px;
+  }
+
+  .finalSequenceTimerBadge span{
+    font-size:.82rem;
+  }
+
+  .finalSequenceTimerBadge strong{
+    font-size:1.55rem;
+  }
+
+  .finalSequenceWordsWrap{
+    width:100%;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:12px;
+  }
+
+  .finalSequenceWordBtn{
+    min-height:78px;
+    border-radius:20px;
+
+    font-size:1.2rem;
+    line-height:1.25;
+
+    padding:10px 12px;
+  }
+
+  .finalRound2WordsStage .finalRound3ImageFrame,
+  .finalRound2WordsStage .finalRound1RevealCard{
+    width:min(100%,920px);
+    height:100%;
+    max-height:none;
+  }
+
+  /* القصة */
+  .finalStoryStackContent{
+    width:100%;
+    height:100%;
+    min-height:0;
+  }
+
+  .finalStoryPartsStack{
+    width:100%;
+    height:100%;
+    min-height:0;
+
+    justify-content:center;
+    gap:10px;
+  }
+
+  .finalStoryStackPart{
+    flex:1 1 0;
+    min-height:0;
+    max-height:none;
+
+    grid-template-columns:54px minmax(0,1fr);
+    gap:12px;
+
+    padding:13px 16px;
+    border-radius:22px;
+  }
+
+  .finalStoryStackPoints{
+    width:48px;
+    height:48px;
+    border-radius:16px;
+    font-size:1.18rem;
+  }
+
+  .finalStoryStackText{
+    font-size:clamp(1.08rem,1.72vw,1.48rem);
+    line-height:1.38;
+  }
+
+  .finalStoryPartsStack:has(.finalStoryStackPart:nth-child(3)) .finalStoryStackPart{
+    flex:1 1 0;
+    min-height:0;
+    max-height:none;
+    padding:12px 15px;
+  }
+
+  .finalStoryPartsStack:has(.finalStoryStackPart:nth-child(3)) .finalStoryStackText{
+    font-size:clamp(1rem,1.52vw,1.28rem);
+    line-height:1.32;
+  }
+
+  .finalStoryStackContent:has(.finalStoryCleanAnswer){
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(320px,.5fr);
+    gap:14px;
+    align-items:stretch;
+  }
+
+  .finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryCleanAnswer{
+    width:100%;
+    height:100%;
+    min-height:0;
+
+    padding:44px 20px 20px;
+
+    font-size:clamp(1.08rem,1.62vw,1.42rem);
+    line-height:1.34;
+  }
+
+  /* التركيز */
+  .finalRound3TeamMediaContent{
+    width:100%;
+    height:100%;
+    min-height:0;
+
+    grid-template-columns:minmax(0,1fr) minmax(320px,.5fr);
+    gap:14px;
+    align-items:stretch;
+  }
+
+  .finalTeamMediaFrame{
+    width:100%;
+    height:100%;
+    min-height:0;
+
+    border-radius:24px;
+    padding:10px;
+  }
+
+  .finalRound3TeamMediaContent:has(.finalTeamMediaVideoFrame):not(:has(.finalTeamMediaQuestionBox)):not(:has(.finalTeamMediaResultBox)) .finalTeamMediaVideoFrame{
+    width:min(100%,960px);
+    height:100%;
+    max-height:none;
+  }
+
+  .finalRound3TeamMediaContent:has(.finalTeamMediaImageFrame):not(:has(.finalTeamMediaQuestionBox)):not(:has(.finalTeamMediaResultBox)) .finalTeamMediaImageFrame{
+    width:min(100%,920px);
+    height:100%;
+    max-height:none;
+  }
+
+  .finalTeamMediaTextRow{
+    width:100%;
+    height:100%;
+    min-height:0;
+
+    justify-content:center;
+    gap:12px;
+  }
+
+  .finalTeamMediaQuestionBox,
+  .finalTeamMediaResultBox{
+    width:100%;
+    min-height:150px;
+
+    border-radius:22px;
+    padding:20px 18px;
+  }
+
+  .finalRound3TeamMediaContent:not(:has(.finalTeamMediaFrame)) .finalTeamMediaTextRow{
+    width:min(100%,880px);
+    height:100%;
+  }
+
+  .finalRound3TeamMediaContent:not(:has(.finalTeamMediaFrame)) .finalTeamMediaQuestionBox,
+  .finalRound3TeamMediaContent:not(:has(.finalTeamMediaFrame)) .finalTeamMediaResultBox{
+    min-height:190px;
+  }
+
+  .finalTeamMediaQuestionText,
+  .finalRound3TeamMediaAnswer{
+    font-size:clamp(1.18rem,1.85vw,1.6rem);
+    line-height:1.32;
+  }
+
+  /* أزرار التحكم */
   .finalControlsBar,
   .finalRound1ControlsBar,
   .finalRound2ControlsBar,
   .finalRound3ControlsBar,
   #finalControlsBar{
     position:relative;
-    top:-8px;
+    top:0;
 
     grid-template-columns:repeat(auto-fit,minmax(124px,1fr));
     gap:9px;
 
-    margin:6px 0 -8px;
+    margin:4px 0 0;
     padding:0;
   }
 
@@ -1431,188 +1776,7 @@
     font-size:.88rem;
     padding:0 10px;
   }
-
-  .finalFinishedCard{
-    min-height:280px;
-    padding:20px;
-  }
-
-  .finalFinishedScores > div{
-    min-height:74px;
-  }
-
-  .finalFinishedScores strong{
-    font-size:1.85rem;
-  }
-  /* توسيع محتوى بدون نقاط */
-.finalRound1TextCard{
-  width:100%;
-  height:100%;
-  padding:18px 34px;
 }
-
-.finalRound1TextCardInner{
-  font-size:clamp(1.65rem,2.75vw,2.8rem);
-  line-height:1.46;
-}
-
-.finalRound1MainStageCard:has(.finalRound1ResultBox){
-  grid-template-columns:minmax(0,1fr) minmax(300px,.56fr);
-  gap:12px;
-}
-
-.finalRound1MainStageCard:has(.finalRound1ResultBox) .finalRound1TextCardInner{
-  font-size:clamp(1.28rem,2.1vw,2.05rem);
-  line-height:1.42;
-}
-
-.finalRound1ResultBox{
-  width:100%;
-  height:100%;
-  padding:18px 20px;
-}
-
-.finalRound1ResultText,
-.finalRound1AnswerMolhimFont,
-.finalRound1AnswerProjectFont{
-  font-size:clamp(1.15rem,1.75vw,1.55rem);
-  line-height:1.58;
-}
-
-/* توسيع صح صحلي */
-.finalHintStage,
-.finalRound2AnswerGrid,
-.finalRound2WordsStage .finalRound3ResultView,
-.finalRound2WordsStage .finalRound3AnswersList,
-.finalRound2WordsStage .finalRound3AnswersPremium{
-  width:100%;
-}
-
-.finalHintText{
-  width:min(100%,900px);
-  min-height:44px;
-  font-size:1.12rem;
-}
-
-.finalWordChipLarge{
-  width:min(100%,920px);
-  min-height:150px;
-  padding:18px 28px;
-  font-size:clamp(2.15rem,3.7vw,3.6rem);
-  line-height:1.25;
-}
-
-.finalRound2AnswerGrid{
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-}
-
-.finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(4)):not(:has(.finalRound2AnswerCard:nth-child(5))){
-  width:min(100%,860px);
-}
-
-.finalRound2AnswerCard,
-.finalRound2WordsStage .finalRound3AnswerCard{
-  min-height:88px;
-  padding:10px 12px;
-}
-
-.finalRound2AnswerCorrect,
-.finalRound2WordsStage .finalAnswerChip{
-  font-size:clamp(1.12rem,1.85vw,1.55rem);
-  line-height:1.32;
-}
-
-.finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(6)) .finalRound2AnswerCorrect{
-  font-size:clamp(1rem,1.6vw,1.38rem);
-  line-height:1.28;
-}
-
-.finalSequenceStageBox{
-  width:min(100%,920px);
-}
-
-.finalSequenceWordBtn{
-  min-height:58px;
-  font-size:1rem;
-  line-height:1.25;
-}
-
-/* توسيع القصة */
-.finalStoryStackContent{
-  width:100%;
-  height:100%;
-}
-
-.finalStoryPartsStack{
-  width:100%;
-  height:100%;
-  justify-content:center;
-  gap:9px;
-}
-
-.finalStoryStackPart{
-  min-height:88px;
-  max-height:125px;
-  grid-template-columns:50px minmax(0,1fr);
-  padding:12px 14px;
-}
-
-.finalStoryStackPoints{
-  width:44px;
-  height:44px;
-  border-radius:14px;
-  font-size:1.1rem;
-}
-
-.finalStoryStackText{
-  font-size:clamp(1.05rem,1.65vw,1.38rem);
-  line-height:1.38;
-}
-
-.finalStoryStackContent:has(.finalStoryCleanAnswer){
-  grid-template-columns:minmax(0,1fr) minmax(300px,.52fr);
-  gap:12px;
-}
-
-.finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryCleanAnswer{
-  font-size:clamp(1.05rem,1.58vw,1.35rem);
-  line-height:1.36;
-  padding:42px 18px 18px;
-}
-
-/* توسيع التركيز */
-.finalRound3TeamMediaContent{
-  width:100%;
-  height:100%;
-  grid-template-columns:minmax(0,1fr) minmax(300px,.5fr);
-  gap:12px;
-}
-
-.finalRound3TeamMediaContent:has(.finalTeamMediaVideoFrame):not(:has(.finalTeamMediaQuestionBox)):not(:has(.finalTeamMediaResultBox)) .finalTeamMediaVideoFrame{
-  width:min(100%,920px);
-  max-height:100%;
-}
-
-.finalRound3TeamMediaContent:has(.finalTeamMediaImageFrame):not(:has(.finalTeamMediaQuestionBox)):not(:has(.finalTeamMediaResultBox)) .finalTeamMediaImageFrame{
-  width:min(100%,880px);
-  max-height:100%;
-}
-
-.finalTeamMediaQuestionBox,
-.finalTeamMediaResultBox{
-  min-height:130px;
-  padding:18px 16px;
-}
-
-.finalTeamMediaQuestionText,
-.finalRound3TeamMediaAnswer{
-  font-size:clamp(1.12rem,1.72vw,1.48rem);
-  line-height:1.34;
-}
-
-}
-
 /* =========================
    14) MOBILE SAFE
 ========================= */
