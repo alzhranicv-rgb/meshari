@@ -59,14 +59,14 @@
 
 .finalWrapNew{
   width:100%;
-  height:calc(100dvh - 92px);
-  min-height:520px;
+  height:100dvh;
+  min-height:0;
 
   display:flex;
   flex-direction:column;
   gap:10px;
 
-  padding:0 16px 10px;
+  padding:14px 18px 14px;
   margin:0;
 
   overflow:hidden;
@@ -481,79 +481,7 @@
    iPad / Tab A11 Landscape
 ========================= */
 
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-  .finalScoreBoards,
-  #finalScoreBoards.finalScoreBoards{
-    grid-template-columns:minmax(0,1fr) 164px minmax(0,1fr);
-    grid-template-areas:"teamB center teamA";
-    gap:10px;
-  }
 
-  .finalScorePanel,
-  .finalScoreCenterPanel,
-  #finalScoreBoards .finalScoreCenterPanel.finalCenterMiniGlass{
-    height:78px;
-    min-height:78px;
-    border-radius:23px;
-  }
-
-  .finalScorePanel{
-    padding:9px 12px;
-    gap:9px;
-  }
-
-  #finalTeamBBox.finalScorePanelRight{
-    grid-template-columns:minmax(0,1fr) 56px;
-  }
-
-  #finalTeamABox.finalScorePanelLeft{
-    grid-template-columns:56px minmax(0,1fr);
-  }
-
-  .finalScoreValueBox{
-    width:56px;
-    height:42px;
-
-    border-radius:15px;
-
-    font-size:1.45rem;
-  }
-
-  .finalScoreTeamNameBox,
-  .finalScoreTeamNameFix{
-    padding:7px 10px;
-
-    border-radius:15px;
-
-    font-size:1.35rem;
-    line-height:1.05;
-  }
-
-  .finalScoreCenterPanel,
-  #finalScoreBoards .finalScoreCenterPanel.finalCenterMiniGlass{
-    width:164px;
-    min-width:164px;
-    max-width:164px;
-
-    padding:8px 9px;
-  }
-
-  .finalCenterTurnTeamName{
-    font-size:1.05rem;
-  }
-
-  .finalCenterStatusLabel{
-    font-size:.58rem;
-  }
-
-  .finalCenterStatusTeam{
-    font-size:.92rem;
-  }
-
-  .finalCenterStatusNumber{
-    font-size:.62rem;
-  }
-}
 /* =========================
    5) CONTROLS
    ألوان واضحة بدون ظل مخرب
@@ -702,30 +630,6 @@
   color:#FFFFFF;
 }
 
-/* iPad / Tab */
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-  .finalControlsBar,
-  .finalRound1ControlsBar,
-  .finalRound2ControlsBar,
-  .finalRound3ControlsBar,
-  #finalControlsBar{
-    grid-template-columns:repeat(auto-fit,minmax(108px,1fr));
-    gap:7px;
-  }
-
-  .finalControlsBar button,
-  .finalRound1ControlsBar button,
-  .finalRound2ControlsBar button,
-  .finalRound3ControlsBar button,
-  .archiveCtrlBtn,
-  .finalTeamMediaCtrlBtn{
-    height:46px;
-    min-height:46px;
-    border-radius:14px;
-    font-size:.68rem;
-    padding:0 6px;
-  }
-}
 /* =========================
    6) NUMBER GRIDS
 ========================= */
@@ -1353,67 +1257,90 @@
 }
 
 /* =========================
-   13) IPAD / TAB LANDSCAPE
+   13) IPAD AIR 11 / TAB LANDSCAPE
 ========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
   .finalWrapNew{
-    height:calc(100dvh - 84px);
-    min-height:500px;
+    height:100dvh;
+    min-height:0;
 
-    gap:8px;
-    padding:0 12px 8px;
+    gap:9px;
+    padding:12px 18px 12px;
+  }
+
+  .finalMainStage{
+    flex:1 1 auto;
+    min-height:0;
+    overflow:hidden;
   }
 
   .finalScoreBoards,
   #finalScoreBoards.finalScoreBoards{
-    grid-template-columns:minmax(0,1fr) 164px minmax(0,1fr);
-    gap:10px;
+    grid-template-columns:minmax(0,1fr) 170px minmax(0,1fr);
+    grid-template-areas:"teamB center teamA";
+    gap:12px;
+    margin:0;
   }
 
   .finalScorePanel,
   .finalScoreCenterPanel,
   #finalScoreBoards .finalScoreCenterPanel.finalCenterMiniGlass{
-    height:78px;
-    min-height:78px;
-    border-radius:23px;
+    height:82px;
+    min-height:82px;
+    border-radius:24px;
   }
 
   .finalScorePanel{
-    padding:9px 12px;
+    padding:10px 13px;
+    gap:10px;
   }
 
-  .finalScorePanelLeft{
-    grid-template-columns:minmax(0,1fr) 56px;
+  #finalTeamBBox.finalScorePanelRight{
+    grid-template-columns:minmax(0,1fr) 58px;
   }
 
-  .finalScorePanelRight{
-    grid-template-columns:56px minmax(0,1fr);
+  #finalTeamABox.finalScorePanelLeft{
+    grid-template-columns:58px minmax(0,1fr);
   }
 
   .finalScoreValueBox{
-    width:56px;
-    height:42px;
+    width:58px;
+    height:44px;
     border-radius:15px;
-    font-size:1.45rem;
+    font-size:1.5rem;
   }
 
   .finalScoreTeamNameBox,
   .finalScoreTeamNameFix{
-    font-size:1.4rem;
-    padding:7px 10px;
+    padding:7px 11px;
     border-radius:15px;
+    font-size:1.42rem;
+    line-height:1.05;
   }
 
   .finalScoreCenterPanel,
   #finalScoreBoards .finalScoreCenterPanel.finalCenterMiniGlass{
-    width:164px;
-    min-width:164px;
-    max-width:164px;
+    width:170px;
+    min-width:170px;
+    max-width:170px;
+    padding:8px 10px;
   }
 
   .finalCenterTurnTeamName{
-    font-size:1.05rem;
+    font-size:1.08rem;
+  }
+
+  .finalCenterStatusLabel{
+    font-size:.6rem;
+  }
+
+  .finalCenterStatusTeam{
+    font-size:.96rem;
+  }
+
+  .finalCenterStatusNumber{
+    font-size:.64rem;
   }
 
   .finalRound1GridSingleRow,
@@ -1431,10 +1358,10 @@
   .finalRound3Card,
   .finalStoryNumberCard,
   .finalTeamMediaNumberCard{
-    height:44px;
-    min-height:44px;
-    border-radius:14px;
-    font-size:1.35rem;
+    height:54px;
+    min-height:54px;
+    border-radius:16px;
+    font-size:1.58rem;
   }
 
   .finalRound1Card::after,
@@ -1442,7 +1369,7 @@
   .finalRound3Card::after,
   .finalStoryNumberCard::after,
   .finalTeamMediaNumberCard::after{
-    border-radius:14px;
+    border-radius:16px;
   }
 
   .finalControlsBar,
@@ -1450,8 +1377,8 @@
   .finalRound2ControlsBar,
   .finalRound3ControlsBar,
   #finalControlsBar{
-    grid-template-columns:repeat(auto-fit,minmax(108px,1fr));
-    gap:7px;
+    grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+    gap:8px;
   }
 
   .finalControlsBar button,
@@ -1460,27 +1387,26 @@
   .finalRound3ControlsBar button,
   .archiveCtrlBtn,
   .finalTeamMediaCtrlBtn{
-    height:46px;
-    min-height:46px;
-    border-radius:14px;
-    font-size:.68rem;
-    padding:0 6px;
+    height:48px;
+    min-height:48px;
+    border-radius:15px;
+    font-size:.72rem;
+    padding:0 7px;
   }
 
   .finalFinishedCard{
-    min-height:290px;
+    min-height:300px;
     padding:22px;
   }
 
   .finalFinishedScores > div{
-    min-height:76px;
+    min-height:78px;
   }
 
   .finalFinishedScores strong{
-    font-size:1.9rem;
+    font-size:1.95rem;
   }
 }
-
 /* =========================
    14) MOBILE SAFE
 ========================= */
