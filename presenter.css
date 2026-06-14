@@ -1757,3 +1757,64 @@ button:disabled {
     grid-template-columns: 96px 1fr 96px;
   }
 }
+/* =========================
+   LOCKED SEGMENT CARD
+========================= */
+
+.presenterSegmentCard.presenterLockedSegment,
+.segmentCard.presenterLockedSegment {
+  position: relative;
+  opacity: 1;
+  cursor: not-allowed;
+  filter: grayscale(.35);
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, .10), rgba(15, 23, 42, .04)),
+    var(--surface, #fff);
+  border-color: rgba(148, 163, 184, .55);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.presenterSegmentCard.presenterLockedSegment span,
+.segmentCard.presenterLockedSegment span {
+  opacity: .48;
+}
+
+.presenterSegmentCard.presenterLockedSegment::before,
+.segmentCard.presenterLockedSegment::before {
+  content: "منتهية";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, .88);
+  color: #fff;
+  font-family: "HanakaText", sans-serif;
+  font-size: .72rem;
+  line-height: 1;
+}
+
+.presenterSegmentCard.presenterLockedSegment::after,
+.segmentCard.presenterLockedSegment::after {
+  content: "✓";
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 14px;
+  background: rgba(34, 197, 94, .16);
+  border: 1px solid rgba(34, 197, 94, .35);
+  color: #15803d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.presenterSegmentCard.presenterLockedSegment:disabled,
+.segmentCard.presenterLockedSegment:disabled {
+  pointer-events: none;
+}

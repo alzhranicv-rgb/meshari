@@ -181,6 +181,44 @@ function isPresenterSegmentVisible(segment) {
   return presenterVisibleSegments.some(item => item.key === segment)
 }
 
+function getPresenterSegmentLockKeys(segmentKey) {
+  const key = String(segmentKey || "")
+
+  if (key === "final_round1" || key === "finalRound1") {
+    return ["final_round1", "finalRound1"]
+  }
+
+  if (key === "final_round2" || key === "finalRound2") {
+    return ["final_round2", "finalRound2"]
+  }
+
+  if (key === "final_round3" || key === "finalRound3") {
+    return ["final_round3", "finalRound3"]
+  }
+
+  if (key === "final_round4" || key === "finalRound4") {
+    return ["final_round4", "finalRound4"]
+  }
+
+  return [key]
+}
+
+function isPresenterSegmentLocked(segmentKey) {
+  const status = presenterLiveState?.segmentStatus || {}
+
+  return getPresenterSegmentLockKeys(segmentKey).some(key => {
+    return !!status?.[key]?.locked
+  })
+}
+
+function getPresenterCurrentLockKey() {
+  if (presenterSegment === "final") {
+    return `final_round${Number(getPresenterFinalRound() || 1)}`
+  }
+
+  return presenterSegment || ""
+}
+
 async function renderPresenterSegmentsGrid() {
   const grid = document.getElementById("presenterSegmentsGrid")
   if (!grid) return
@@ -188,7 +226,7 @@ async function renderPresenterSegmentsGrid() {
   await loadPresenterVisibleSegments()
 
   grid.innerHTML = presenterVisibleSegments.map(item => {
-    const locked = !!presenterLiveState?.segmentStatus?.[item.key]?.locked
+    const locked = isPresenterSegmentLocked(item.key)
 
     const clickAction = item.finalRound
       ? `openPresenterFinalCard(${Number(item.finalRound)})`
@@ -467,6 +505,19 @@ function applyPresenterSessionData(data) {
   presenterSegment = nextSegment
 
   if (!presenterSegment) {
+    renderPresenterHome()
+    return
+  }
+
+  const currentLockKey =
+    presenterSegment === "final"
+      ? `final_round${Number(getPresenterFinalRound() || 1)}`
+      : presenterSegment
+
+  if (isPresenterSegmentLocked(currentLockKey)) {
+    showToast("هذه الفقرة منتهية")
+    presenterSegment = null
+    presenterSelectedTeam = null
     renderPresenterHome()
     return
   }
@@ -869,15 +920,13 @@ function updatePresenterHomeScoresOnly() {
   if (scoreB) scoreB.innerText = scores.B
 }
 function updatePresenterLockedSegments() {
-  const locked = presenterLiveState?.segmentStatus || {}
-
   document
     .querySelectorAll("#presenterSegmentsGrid .segmentCard")
     .forEach(card => {
       const key = card.dataset.segment
       if (!key) return
 
-      const isLocked = !!locked?.[key]?.locked
+      const isLocked = isPresenterSegmentLocked(key)
 
       card.classList.toggle("presenterLockedSegment", isLocked)
       card.disabled = isLocked
@@ -916,6 +965,14 @@ async function presenterGoHome() {
 
 async function openPresenterFinalCard(round) {
   round = Number(round || 1)
+
+  const finalKey = `final_round${round}`
+
+if (isPresenterSegmentLocked(finalKey)) {
+  showToast("هذه الفقرة منتهية")
+  renderPresenterHome()
+  return
+}
 
   presenterSelectedTeam = null
   presenterSegment = "final"
@@ -1055,7 +1112,7 @@ async function openPresenterSegment(segment) {
     return
   }
 
-  const locked = !!presenterLiveState?.segmentStatus?.[segment]?.locked
+  const locked = isPresenterSegmentLocked(segment)
 
   if (locked) {
     showToast("هذه الفقرة منتهية")
