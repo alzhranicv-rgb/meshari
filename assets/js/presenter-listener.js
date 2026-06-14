@@ -329,14 +329,15 @@ function handlePresenterCommand(cmd) {
       }
 
       if (
-        segment === "final" &&
-        window.finalState?.round === 1 &&
-        Number(window.finalState?.round1?.currentNumber || 0) >= 1 &&
-        Number(window.finalState?.round1?.currentNumber || 0) <= 3
-      ) {
-        toggleFinalRound1Overlay()
-        return
-      }
+  segment === "final" &&
+  window.finalState?.round === 1 &&
+  Number(window.finalState?.round1?.currentNumber || 0)
+) {
+  if (typeof toggleFinalRound1Overlay === "function") {
+    toggleFinalRound1Overlay()
+  }
+  return
+}
 
       if (typeof zoomCurrentDisplayImage === "function") {
         zoomCurrentDisplayImage()
@@ -790,24 +791,41 @@ function handleExplainPresenterAction(action, data) {
 ========================= */
 
 function closePresenterFinalRound1Zoom() {
-  document.getElementById("finalRound1Overlay")?.remove()
-  document.getElementById("finalRound1ImageOverlay")?.remove()
-  document.getElementById("displayImageZoomOverlay")?.remove()
+  if (typeof closeCurrentDisplayImageZoom === "function") {
+    closeCurrentDisplayImageZoom()
+  }
+
+  if (typeof closeFinalRound1Overlay === "function") {
+    closeFinalRound1Overlay()
+  }
+
+  if (typeof closeFinalRound1ImageOverlay === "function") {
+    closeFinalRound1ImageOverlay()
+  }
 
   document
-    .querySelectorAll('[id*="finalRound1"][id*="Overlay"]')
+    .querySelectorAll(`
+      #finalRound1Overlay,
+      #finalRound1ImageOverlay,
+      #displayImageZoomOverlay,
+      .finalRound1Overlay,
+      .finalRound1ImageOverlay,
+      .displayImageZoomOverlay,
+      [id*="finalRound1"][id*="Overlay"],
+      [id*="FinalRound1"][id*="Overlay"],
+      [class*="finalRound1"][class*="Overlay"],
+      [class*="FinalRound1"][class*="Overlay"]
+    `)
     .forEach(el => el.remove())
 
   document.body.classList.remove(
     "finalRound1OverlayActive",
     "displayImageZoomActive",
     "imageZoomActive",
-    "auctionOverlayActive"
+    "auctionOverlayActive",
+    "finalImageZoomActive",
+    "finalOverlayActive"
   )
-
-  if (typeof closeCurrentDisplayImageZoom === "function") {
-    closeCurrentDisplayImageZoom()
-  }
 }
 
 function handleFinalPresenterAction(action, data) {
@@ -1071,13 +1089,21 @@ if (action === "correct") {
     if (round === 1) {
   closePresenterFinalRound1Zoom()
 
+  setTimeout(() => {
+    closePresenterFinalRound1Zoom()
+  }, 40)
+
   if (typeof finalRound1Correct === "function") {
     finalRound1Correct()
   }
 
   setTimeout(() => {
     closePresenterFinalRound1Zoom()
-  }, 120)
+  }, 160)
+
+  setTimeout(() => {
+    closePresenterFinalRound1Zoom()
+  }, 320)
 
   return
 }

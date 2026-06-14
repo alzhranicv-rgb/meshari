@@ -3557,7 +3557,23 @@ function resetPresenterFinalLocalChoice(round = getPresenterFinalRound()) {
   }
 }
 
-presenterFinalCorrect
+async function presenterFinalCorrect() {
+  const round = getPresenterFinalRound()
+
+  if (round === 1) {
+    setPresenterFinalRound1FocusMode(false)
+  }
+
+  await sendCommand("stopCurrentFinalVideo")
+  await sendCommand("correct")
+
+  resetPresenterFinalLocalChoice(round)
+
+  setTimeout(() => {
+    refreshPresenterFinalFromState()
+    refreshPresenterEnhancements()
+  }, 300)
+}
 
 async function presenterFinalWrong() {
   const round = getPresenterFinalRound()
@@ -3575,24 +3591,6 @@ async function presenterFinalWrong() {
     refreshPresenterEnhancements()
   }, 300)
 }
-
-async function presenterFinalWrong() {
-  const round = getPresenterFinalRound()
-
-  if (round === 1) {
-    setPresenterFinalRound1FocusMode(false)
-    presenterFinalSelected = { round: 1, number: null }
-  }
-
-  await sendCommand("wrong")
-
-  resetPresenterFinalLocalChoice(round)
-
-  setTimeout(() => {
-    refreshPresenterEnhancements()
-  }, 300)
-}
-
 /* =========================
    RENDER FINAL MAIN
 ========================= */
@@ -3986,7 +3984,10 @@ async function refreshPresenterFinalFromState() {
     title.innerText = getPresenterFinalRoundTitle(round)
   }
 
-  const activeTeam = presenterSelectedTeam || null
+  const activeTeam =
+  round === 2 || round === 4
+    ? getPresenterFinalTeamForRound(round)
+    : null
 
   document.getElementById("teamA")?.classList.toggle(
     "selectedPresenterTeam",
@@ -4298,7 +4299,7 @@ function openPresenterFinalNumber(round, number) {
     return
   }
 
-  const activeTeam = getPresenterFinalTeamForRound(round)
+  const activeTeam = presenterSelectedTeam || null
 
 if ((round === 2 || round === 4) && !activeTeam) {
   showToast("اختر الفريق أولاً")
@@ -4674,9 +4675,9 @@ async function renderPresenterFinalRound3Preview() {
   const currentPoints = Number(state.currentPoints || 0)
 
   presenterFinalPreviewCache[3] = `
-    <div class="presenterFinalStoryPreview presenterFinalStoryWidePreview">
+    <div class="presenterFinalStoryPreview">
 
-      <div class="presenterFinalPreviewBlock answerBlock presenterFinalStoryAnswerSide">
+      <div class="presenterFinalStoryAnswerTop">
         <div class="presenterFinalPreviewLabel">
           الإجابة ${currentPoints ? `- ${currentPoints} نقاط` : ""}
         </div>
@@ -4686,7 +4687,7 @@ async function renderPresenterFinalRound3Preview() {
         </div>
       </div>
 
-      <div class="presenterFinalPreviewBlock questionBlock presenterFinalStoryPartsSide">
+      <div class="presenterFinalStoryPartsBox">
         <div class="presenterFinalPreviewLabel">
           أجزاء السؤال ${shownPart ? `- ظاهر ${shownPart}` : ""}
         </div>

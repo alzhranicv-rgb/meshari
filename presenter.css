@@ -731,21 +731,29 @@ button:disabled {
   margin-top: 18px;
 }
 
+.presenterTop10AnswersCols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
 .presenterTop10AnswersCol {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 .presenterTop10AnswerBtn {
-  min-height: 62px;
-  height: 62px;
-  border-radius: 20px;
+  min-height: 58px;
+  height: 58px;
+  border-radius: 19px;
   background: var(--surface-2);
   border: 1px solid var(--line);
   color: var(--text);
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-columns: 42px minmax(0, 1fr);
   gap: 10px;
   align-items: center;
   padding: 8px 10px;
@@ -753,9 +761,14 @@ button:disabled {
   box-shadow: none;
 }
 
+.presenterTop10AnswerBtn.opened {
+  background: #e5e7eb;
+  opacity: .8;
+}
+
 .presenterTop10AnswerNo {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 15px;
   background: var(--surface);
   display: flex;
@@ -763,12 +776,12 @@ button:disabled {
   justify-content: center;
   font-family: "HanakaDisplay", "HanakaText", sans-serif;
   color: var(--text);
-  font-size: 1.22rem;
+  font-size: 1.18rem;
 }
 
 .presenterTop10AnswerText {
-  font-size: 1.08rem;
-  line-height: 1.25;
+  font-size: 1.04rem;
+  line-height: 1.22;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -848,7 +861,6 @@ button:disabled {
   min-height: 48px;
   font-size: .82rem;
 }
-
 /* =========================
    15) AUCTION
 ========================= */
@@ -1264,34 +1276,32 @@ button:disabled {
   font-size: 1rem;
 }
 
-/* القصة - ترتيب جديد */
-.presenterFinalStoryWidePreview {
-  display: grid;
-  grid-template-columns: minmax(190px, .7fr) minmax(0, 1.3fr);
+/* القصة - ثابتة ومرتبة */
+.presenterFinalStoryPreview {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-  align-items: stretch;
+}
+
+.presenterFinalStoryAnswerTop {
   width: 100%;
 }
 
-.presenterFinalStoryAnswerSide,
-.presenterFinalStoryPartsSide {
-  min-width: 0;
-}
-
-.presenterFinalStoryAnswerSide {
+.presenterFinalStoryAnswerTop .presenterFinalPreviewText {
+  min-height: 82px;
+  max-height: 96px;
+  padding: 12px 14px;
+  font-size: 1.35rem;
+  line-height: 1.35;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
 }
 
-.presenterFinalStoryAnswerSide .presenterFinalPreviewText {
-  min-height: 132px;
-  font-size: 1.5rem;
-  line-height: 1.45;
-}
-
-.presenterFinalStoryPartsSide {
-  padding-top: 14px;
+.presenterFinalStoryPartsBox {
+  width: 100%;
+  padding-top: 6px;
 }
 
 .presenterFinalStoryParts {
