@@ -3545,12 +3545,21 @@ function resetPresenterFinalLocalChoice(round = getPresenterFinalRound()) {
 async function presenterFinalCorrect() {
   const round = getPresenterFinalRound()
 
+  if ((round === 1 || round === 3) && !presenterSelectedTeam) {
+    showToast("اختر الفريق أولاً")
+    return
+  }
+
   if (round === 1) {
     setPresenterFinalRound1FocusMode(false)
   }
 
   await sendCommand("stopCurrentFinalVideo")
-  await sendCommand("correct")
+
+  await sendCommand("correct", {
+    round,
+    team: presenterSelectedTeam || null
+  })
 
   resetPresenterFinalLocalChoice(round)
 
@@ -3567,7 +3576,9 @@ async function presenterFinalWrong() {
     setPresenterFinalRound1FocusMode(false)
   }
 
-  await sendCommand("wrong")
+  await sendCommand("wrong", {
+    round
+  })
 
   resetPresenterFinalLocalChoice(round)
 
@@ -4287,7 +4298,7 @@ function openPresenterFinalNumber(round, number) {
 
 const activeTeam = presenterSelectedTeam || null
 
-if (!activeTeam) {
+if ((round === 2 || round === 4) && !activeTeam) {
   showToast("اختر الفريق أولاً")
   return
 }

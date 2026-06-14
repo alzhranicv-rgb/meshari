@@ -1160,6 +1160,12 @@ if (action === "correct") {
   return safeRunPresenterAction(() => {
     const round = Number(window.finalState?.round || 1)
 
+    const team = data.team || null
+
+if ((round === 1 || round === 3) && isValidPresenterTeam(team)) {
+  forceFinalTeamFromPresenter(team)
+}
+
     if (round === 1) {
   closePresenterFinalRound1Zoom()
 
