@@ -1369,6 +1369,37 @@ button:disabled {
 .presenterFinalImageStatusBlock {
   margin-bottom: 2px;
 }
+.presenterFinalStoryPartsOnly {
+  height: 100%;
+}
+
+.presenterFinalStoryPartsOnly .presenterFinalStoryPartsBox {
+  width: 100%;
+}
+
+.presenterFinalStoryAnswerControl {
+  padding: 10px;
+}
+
+.presenterFinalStoryAnswerControl .presenterFinalPreviewText {
+  min-height: 92px;
+  max-height: 116px;
+  padding: 12px 14px;
+  font-size: 1.38rem;
+  line-height: 1.35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.finalControlsRound3 {
+  gap: 10px;
+}
+
+.finalControlsRound3 .presenterFinalControlsGrid {
+  margin-top: 0;
+}
 /* =========================
    19) ARCHIVE
 ========================= */
