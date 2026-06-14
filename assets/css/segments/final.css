@@ -1509,7 +1509,8 @@
 
 .finalRound1ContentShell{
   width:100%;
-  flex:1 1 auto;
+  flex:0 0 auto;
+  height:clamp(220px,34dvh,310px);
   min-height:0;
 
   display:flex;
@@ -2100,7 +2101,7 @@
 
   display:flex;
   flex-direction:column;
-  gap:9px;
+  gap:5px;
 
   overflow:hidden;
 }
@@ -2129,7 +2130,8 @@
   position:relative;
 
   width:100%;
-  flex:1 1 auto;
+  flex:0 0 auto;
+  height:clamp(220px,34dvh,310px);
   min-height:0;
 
   padding:0;
@@ -3262,11 +3264,11 @@
   grid-template-columns:repeat(4,minmax(0,1fr));
 }
 
-/* حاوية العرض */
 .finalRound3ImageStageWrap,
 .finalStoryStageWrap{
   width:100%;
-  flex:1 1 auto;
+  flex:0 0 auto;
+  height:clamp(220px,34dvh,310px);
   min-height:0;
 
   display:flex;
@@ -3781,7 +3783,7 @@
 
   display:flex;
   flex-direction:column;
-  gap:9px;
+  gap:5px;
 
   overflow:hidden;
 }
@@ -3809,11 +3811,11 @@
   grid-template-columns:repeat(4,minmax(0,1fr));
 }
 
-/* حاوية العرض */
 .finalTeamMediaStageWrap,
 .finalRound3ImageStageWrap{
   width:100%;
-  flex:1 1 auto;
+  flex:0 0 auto;
+  height:clamp(220px,34dvh,310px);
   min-height:0;
 
   display:flex;
