@@ -5122,3 +5122,409 @@
     padding:0 12px;
   }
 }
+/* =========================================================
+   FINAL DISPLAY TRUE LAYOUT
+   جسم موحد للفاصلة: نتائج / محتوى / تحكم
+========================================================= */
+
+.finalDisplayShell{
+  width:100%;
+  height:calc(100dvh - 104px);
+  max-height:calc(100dvh - 104px);
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:12px;
+
+  padding:0 18px 10px;
+  overflow:hidden;
+}
+
+.finalDisplayBody{
+  width:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:12px;
+
+  overflow:hidden;
+}
+
+.finalDisplayBody .finalMainStage{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  overflow:hidden;
+}
+
+.finalDisplayBody .finalControlsBar{
+  width:100%;
+  margin:0;
+}
+
+/* كل جولات الفاينل نفس الهيكلة */
+.finalRound1StartView,
+.finalRound1PlayLayout,
+.finalRound1StageLayout,
+.finalRound2Wrap,
+.finalRound3Wrap,
+.finalStoryWrap,
+.finalRound4TeamMediaWrap,
+.finalTeamMediaWrap{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:14px;
+
+  overflow:hidden;
+}
+
+/* الأرقام أكبر ومتوازنة */
+.finalRound1GridSingleRow,
+.finalRound2SixNumbersGrid,
+.finalStoryNumbersGrid,
+.finalTeamMediaNumbersGrid,
+.finalRound2Grid,
+.finalRound3Grid{
+  width:100%;
+  margin:0;
+  padding:0 4px;
+
+  display:grid;
+  gap:14px;
+}
+
+.finalRound1Card,
+.finalRound2Card,
+.finalRound3Card,
+.finalStoryNumberCard,
+.finalTeamMediaNumberCard{
+  height:78px;
+  min-height:78px;
+
+  border-radius:24px;
+
+  font-size:2.35rem;
+}
+
+/* منطقة المحتوى تتمدد فعلياً */
+.finalRound1ContentShell,
+.finalRound2WordsStage,
+.finalRound3ImageStageWrap,
+.finalStoryStageWrap,
+.finalTeamMediaStageWrap{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  margin:0;
+
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+.finalRound1MainStageCard,
+.finalRound2WordsStage,
+.finalStoryStage,
+.finalRound3TeamMediaStage,
+.finalTeamMediaStage{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+/* بدون نقاط */
+.finalRound1TextCard,
+.finalRound1ImageFrame,
+.finalRound1QuestionStage,
+.finalRound1RevealCard{
+  width:100%;
+  height:100%;
+  max-height:none;
+}
+
+.finalRound1TextCard{
+  border-radius:34px;
+  padding:30px 48px;
+}
+
+.finalRound1TextCardInner{
+  font-size:clamp(2.2rem,3.8vw,4rem);
+  line-height:1.34;
+}
+
+.finalRound1StageLayout:has(.finalRound1BottomInfoRow){
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(380px,.55fr);
+  gap:18px;
+  align-items:stretch;
+}
+
+.finalRound1BottomInfoRow,
+.finalRound1ResultBox{
+  width:100%;
+  height:100%;
+  min-height:0;
+}
+
+.finalRound1ResultBox{
+  border-radius:32px;
+  padding:28px;
+}
+
+.finalRound1ResultText,
+.finalRound1AnswerMolhimFont,
+.finalRound1AnswerProjectFont{
+  font-size:clamp(1.5rem,2.35vw,2.1rem);
+  line-height:1.45;
+}
+
+/* صح صحلي */
+.finalHintStage,
+.finalSequenceStageBox,
+.finalRound2AnswerGrid,
+.finalRound2WordsStage .finalRound3ResultView{
+  width:100%;
+  height:100%;
+  min-height:0;
+}
+
+.finalHintStage{
+  justify-content:center;
+  gap:20px;
+}
+
+.finalHintText{
+  width:min(100%,1000px);
+  min-height:62px;
+
+  border-radius:22px;
+  font-size:1.38rem;
+}
+
+.finalWordChipLarge{
+  width:min(100%,1000px);
+  min-height:260px;
+
+  border-radius:34px;
+  padding:30px 44px;
+
+  font-size:clamp(3rem,5vw,5.3rem);
+  line-height:1.16;
+}
+
+.finalSequenceStageBox{
+  border-radius:34px;
+  padding:28px;
+
+  justify-content:center;
+  gap:22px;
+}
+
+.finalSequenceWordsWrap{
+  flex:1 1 auto;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-auto-rows:1fr;
+  gap:16px;
+}
+
+.finalSequenceWordBtn{
+  height:100%;
+  min-height:0;
+
+  border-radius:26px;
+
+  font-size:clamp(1.35rem,2.2vw,1.9rem);
+  line-height:1.22;
+}
+
+.finalRound2AnswerGrid,
+.finalRound2WordsStage .finalRound3AnswersList,
+.finalRound2WordsStage .finalRound3AnswersPremium{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-auto-rows:1fr;
+  gap:16px;
+}
+
+.finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(4)):not(:has(.finalRound2AnswerCard:nth-child(5))){
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.finalRound2AnswerCard,
+.finalRound2WordsStage .finalRound3AnswerCard{
+  height:100%;
+  min-height:0;
+
+  border-radius:30px;
+  padding:18px 20px;
+}
+
+.finalRound2AnswerCorrect,
+.finalRound2WordsStage .finalAnswerChip{
+  font-size:clamp(1.55rem,2.65vw,2.35rem);
+  line-height:1.24;
+}
+
+/* القصة */
+.finalStoryStackContent{
+  width:100%;
+  height:100%;
+  min-height:0;
+}
+
+.finalStoryPartsStack{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  justify-content:stretch;
+  gap:16px;
+}
+
+.finalStoryStackPart{
+  flex:1 1 0;
+  min-height:0;
+  max-height:none;
+
+  border-radius:32px;
+
+  grid-template-columns:68px minmax(0,1fr);
+  gap:18px;
+
+  padding:22px;
+}
+
+.finalStoryStackPoints{
+  width:62px;
+  height:62px;
+
+  border-radius:22px;
+
+  font-size:1.5rem;
+}
+
+.finalStoryStackText{
+  font-size:clamp(1.38rem,2.25vw,2rem);
+  line-height:1.32;
+}
+
+.finalStoryStackContent:has(.finalStoryCleanAnswer){
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(390px,.55fr);
+  gap:18px;
+}
+
+.finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryCleanAnswer{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  border-radius:32px;
+  padding:56px 28px 28px;
+
+  font-size:clamp(1.35rem,2.05vw,1.8rem);
+  line-height:1.3;
+}
+
+/* التركيز */
+.finalRound3TeamMediaContent{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(390px,.55fr);
+  gap:18px;
+}
+
+.finalTeamMediaFrame{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  border-radius:34px;
+  padding:16px;
+}
+
+.finalTeamMediaVideo,
+.finalTeamMediaImage{
+  border-radius:28px;
+}
+
+.finalTeamMediaTextRow{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  justify-content:center;
+  gap:18px;
+}
+
+.finalTeamMediaQuestionBox,
+.finalTeamMediaResultBox{
+  flex:1 1 0;
+  min-height:0;
+
+  border-radius:32px;
+  padding:28px 24px;
+}
+
+.finalTeamMediaQuestionText,
+.finalRound3TeamMediaAnswer{
+  font-size:clamp(1.45rem,2.4vw,2.1rem);
+  line-height:1.28;
+}
+
+/* الأزرار */
+.finalControlsBar,
+.finalRound1ControlsBar,
+.finalRound2ControlsBar,
+.finalRound3ControlsBar,
+#finalControlsBar{
+  grid-template-columns:repeat(auto-fit,minmax(138px,1fr));
+  gap:12px;
+}
+
+.finalControlsBar button,
+.finalRound1ControlsBar button,
+.finalRound2ControlsBar button,
+.finalRound3ControlsBar button,
+.archiveCtrlBtn,
+.finalTeamMediaCtrlBtn{
+  height:68px;
+  min-height:68px;
+
+  border-radius:22px;
+
+  font-size:1.05rem;
+  padding:0 14px;
+}
