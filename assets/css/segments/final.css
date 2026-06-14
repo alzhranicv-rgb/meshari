@@ -59,14 +59,14 @@
 
 .finalWrapNew{
   width:100%;
-  height:100dvh;
+  height:calc(100dvh - 84px);
   min-height:0;
 
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:8px;
 
-  padding:14px 18px 14px;
+  padding:0 18px 8px;
   margin:0;
 
   overflow:hidden;
@@ -1262,11 +1262,11 @@
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
   .finalWrapNew{
-    height:100dvh;
+    height:calc(100dvh - 84px);
     min-height:0;
-
-    gap:9px;
-    padding:12px 18px 12px;
+    gap:8px;
+    padding:0 18px 8px;
+    overflow:hidden;
   }
 
   .finalMainStage{
@@ -1277,70 +1277,70 @@
 
   .finalScoreBoards,
   #finalScoreBoards.finalScoreBoards{
-    grid-template-columns:minmax(0,1fr) 170px minmax(0,1fr);
+    grid-template-columns:minmax(0,1fr) 166px minmax(0,1fr);
     grid-template-areas:"teamB center teamA";
-    gap:12px;
+    gap:10px;
     margin:0;
   }
 
   .finalScorePanel,
   .finalScoreCenterPanel,
   #finalScoreBoards .finalScoreCenterPanel.finalCenterMiniGlass{
-    height:82px;
-    min-height:82px;
-    border-radius:24px;
+    height:74px;
+    min-height:74px;
+    border-radius:22px;
   }
 
   .finalScorePanel{
-    padding:10px 13px;
-    gap:10px;
+    padding:8px 12px;
+    gap:9px;
   }
 
   #finalTeamBBox.finalScorePanelRight{
-    grid-template-columns:minmax(0,1fr) 58px;
+    grid-template-columns:minmax(0,1fr) 56px;
   }
 
   #finalTeamABox.finalScorePanelLeft{
-    grid-template-columns:58px minmax(0,1fr);
+    grid-template-columns:56px minmax(0,1fr);
   }
 
   .finalScoreValueBox{
-    width:58px;
-    height:44px;
+    width:56px;
+    height:42px;
     border-radius:15px;
     font-size:1.5rem;
   }
 
   .finalScoreTeamNameBox,
   .finalScoreTeamNameFix{
-    padding:7px 11px;
+    padding:7px 10px;
     border-radius:15px;
-    font-size:1.42rem;
+    font-size:1.38rem;
     line-height:1.05;
   }
 
   .finalScoreCenterPanel,
   #finalScoreBoards .finalScoreCenterPanel.finalCenterMiniGlass{
-    width:170px;
-    min-width:170px;
-    max-width:170px;
-    padding:8px 10px;
+    width:166px;
+    min-width:166px;
+    max-width:166px;
+    padding:8px 9px;
   }
 
   .finalCenterTurnTeamName{
-    font-size:1.08rem;
+    font-size:1.06rem;
   }
 
   .finalCenterStatusLabel{
-    font-size:.6rem;
+    font-size:.58rem;
   }
 
   .finalCenterStatusTeam{
-    font-size:.96rem;
+    font-size:.94rem;
   }
 
   .finalCenterStatusNumber{
-    font-size:.64rem;
+    font-size:.62rem;
   }
 
   .finalRound1GridSingleRow,
@@ -1350,7 +1350,7 @@
   .finalRound2Grid,
   .finalRound3Grid{
     padding:3px;
-    gap:9px;
+    gap:10px;
   }
 
   .finalRound1Card,
@@ -1358,10 +1358,10 @@
   .finalRound3Card,
   .finalStoryNumberCard,
   .finalTeamMediaNumberCard{
-    height:54px;
-    min-height:54px;
-    border-radius:16px;
-    font-size:1.58rem;
+    height:64px;
+    min-height:64px;
+    border-radius:18px;
+    font-size:1.9rem;
   }
 
   .finalRound1Card::after,
@@ -1369,7 +1369,7 @@
   .finalRound3Card::after,
   .finalStoryNumberCard::after,
   .finalTeamMediaNumberCard::after{
-    border-radius:16px;
+    border-radius:18px;
   }
 
   .finalControlsBar,
@@ -1377,7 +1377,7 @@
   .finalRound2ControlsBar,
   .finalRound3ControlsBar,
   #finalControlsBar{
-    grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(118px,1fr));
     gap:8px;
   }
 
@@ -1387,24 +1387,44 @@
   .finalRound3ControlsBar button,
   .archiveCtrlBtn,
   .finalTeamMediaCtrlBtn{
-    height:48px;
-    min-height:48px;
-    border-radius:15px;
-    font-size:.72rem;
-    padding:0 7px;
+    height:54px;
+    min-height:54px;
+    border-radius:16px;
+    font-size:.82rem;
+    padding:0 8px;
+  }
+
+  .finalRound1ContentShell,
+  .finalRound2WordsStage,
+  .finalRound3ImageStageWrap,
+  .finalStoryStageWrap,
+  .finalTeamMediaStageWrap{
+    flex:0 0 auto;
+    height:clamp(300px,48dvh,380px);
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .finalRound1MainStageCard,
+  .finalRound2WordsStage,
+  .finalStoryStage,
+  .finalRound3TeamMediaStage,
+  .finalTeamMediaStage{
+    border-radius:22px;
+    padding:10px;
   }
 
   .finalFinishedCard{
-    min-height:300px;
-    padding:22px;
+    min-height:280px;
+    padding:20px;
   }
 
   .finalFinishedScores > div{
-    min-height:78px;
+    min-height:74px;
   }
 
   .finalFinishedScores strong{
-    font-size:1.95rem;
+    font-size:1.85rem;
   }
 }
 /* =========================
