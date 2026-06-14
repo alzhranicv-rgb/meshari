@@ -59,14 +59,15 @@
 
 .finalWrapNew{
   width:100%;
-  height:calc(100dvh - 84px);
+  height:calc(100dvh - 150px);
+  max-height:calc(100dvh - 150px);
   min-height:0;
 
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:6px;
 
-  padding:0 18px 8px;
+  padding:0 16px 4px;
   margin:0;
 
   overflow:hidden;
@@ -492,14 +493,21 @@
 .finalRound2ControlsBar,
 .finalRound3ControlsBar,
 #finalControlsBar{
-  position:relative;
-  top:-14px;
+  width:100%;
 
-  grid-template-columns:repeat(auto-fit,minmax(118px,1fr));
+  position:relative;
+  top:-18px;
+
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
   gap:8px;
 
-  margin:0 0 -14px;
+  margin:0 0 -18px;
   padding:0;
+
+  background:transparent;
+  border:0;
+  box-shadow:none;
 }
 
 .finalControlsBar button,
@@ -1261,12 +1269,13 @@
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
   .finalWrapNew{
-    height:calc(100dvh - 84px);
-    min-height:0;
-    gap:8px;
-    padding:0 18px 8px;
-    overflow:hidden;
-  }
+  height:calc(100dvh - 150px);
+  max-height:calc(100dvh - 150px);
+  min-height:0;
+  gap:6px;
+  padding:0 16px 4px;
+  overflow:hidden;
+}
 
   .finalMainStage{
     flex:1 1 auto;
@@ -1371,14 +1380,20 @@
     border-radius:18px;
   }
 
-  .finalControlsBar,
-  .finalRound1ControlsBar,
-  .finalRound2ControlsBar,
-  .finalRound3ControlsBar,
-  #finalControlsBar{
-    grid-template-columns:repeat(auto-fit,minmax(118px,1fr));
-    gap:8px;
-  }
+.finalControlsBar,
+.finalRound1ControlsBar,
+.finalRound2ControlsBar,
+.finalRound3ControlsBar,
+#finalControlsBar{
+  position:relative;
+  top:-22px;
+
+  grid-template-columns:repeat(auto-fit,minmax(118px,1fr));
+  gap:8px;
+
+  margin:0 0 -22px;
+  padding:0;
+}
 
   .finalControlsBar button,
   .finalRound1ControlsBar button,
@@ -1509,7 +1524,7 @@
 .finalRound1ContentShell{
   width:100%;
   flex:0 0 auto;
-  height:clamp(220px,34dvh,310px);
+  height:clamp(180px,28dvh,250px);
   min-height:0;
 
   display:flex;
@@ -2130,7 +2145,7 @@
 
   width:100%;
   flex:0 0 auto;
-  height:clamp(220px,34dvh,310px);
+  height:clamp(180px,28dvh,250px);
   min-height:0;
 
   padding:0;
@@ -3267,7 +3282,7 @@
 .finalStoryStageWrap{
   width:100%;
   flex:0 0 auto;
-  height:clamp(220px,34dvh,310px);
+  height:clamp(180px,28dvh,250px);
   min-height:0;
 
   display:flex;
@@ -3814,7 +3829,7 @@
 .finalRound3ImageStageWrap{
   width:100%;
   flex:0 0 auto;
-  height:clamp(220px,34dvh,310px);
+  height:clamp(180px,28dvh,250px);
   min-height:0;
 
   display:flex;
