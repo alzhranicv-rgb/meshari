@@ -4500,20 +4500,27 @@ async function renderPresenterFinalRound2Preview() {
 
 function togglePresenterFinalRound2ImageAnswer(index) {
   const state = getPresenterFinalRoundState(2)
+
   const currentNumber = Number(
     state.currentNumber ||
-    presenterFinalSelected?.number ||
-    0
+    (
+      presenterFinalSelected?.round === 2
+        ? presenterFinalSelected.number
+        : 0
+    )
   )
 
-  const baseSelected =
+  if (!currentNumber) return
+
+  const oldSelected =
     presenterFinalRound2ImageLocalSelection.number === currentNumber &&
     Date.now() < presenterFinalRound2ImageLocalSelection.expires
-      ? [...presenterFinalRound2ImageLocalSelection.indexes]
+      ? presenterFinalRound2ImageLocalSelection.indexes
       : Array.isArray(state.selectedCorrectIndexes)
-        ? [...state.selectedCorrectIndexes]
+        ? state.selectedCorrectIndexes
         : []
 
+  const baseSelected = oldSelected.map(Number)
   const i = Number(index)
 
   const nextSelected = baseSelected.includes(i)
@@ -4523,7 +4530,7 @@ function togglePresenterFinalRound2ImageAnswer(index) {
   presenterFinalRound2ImageLocalSelection = {
     number: currentNumber,
     indexes: nextSelected,
-    expires: Date.now() + 15000
+    expires: Date.now() + 60000
   }
 
   presenterLiveState = {
@@ -4542,7 +4549,9 @@ function togglePresenterFinalRound2ImageAnswer(index) {
   renderPresenterFinalRound2ImagePreview(currentNumber)
 
   sendCommand("toggleRound2ImageCorrect", {
-    index: i
+    index: i,
+    number: currentNumber,
+    selectedCorrectIndexes: nextSelected
   })
 }
 
@@ -4557,11 +4566,12 @@ async function renderPresenterFinalRound2ImagePreview(current) {
   if (!previewBox) return
 
   const state = getPresenterFinalRoundState(2)
-  const selected =
+  const selected = (
   presenterFinalRound2ImageLocalSelection.number === Number(current) &&
   Date.now() < presenterFinalRound2ImageLocalSelection.expires
     ? presenterFinalRound2ImageLocalSelection.indexes
     : (state.selectedCorrectIndexes || [])
+).map(Number)
 
   let answers = Array.isArray(state.imageAnswers) ? state.imageAnswers : []
 
@@ -4593,7 +4603,7 @@ async function renderPresenterFinalRound2ImagePreview(current) {
           answers.length
             ? answers.map((answer, idx) => `
               <button
-                class="presenterFinalAnswerCard ${selected.includes(idx) ? "selectedCorrect" : ""}"
+                class="presenterFinalAnswerCard ${selected.includes(Number(idx)) ? "selectedCorrect" : ""}"
                 type="button"
                 onclick="togglePresenterFinalRound2ImageAnswer(${idx})"
               >

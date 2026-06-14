@@ -828,23 +828,66 @@ function closePresenterFinalRound1Zoom() {
   )
 }
 
+function forceFinalTeamFromPresenter(team) {
+  if (!isValidPresenterTeam(team)) return
+
+  const round = Number(window.finalState?.round || 1)
+  const roundKey = `round${round}`
+
+  if (typeof selectFinalTeam === "function") {
+    selectFinalTeam(team)
+  }
+
+  if (typeof selectedTeam !== "undefined") {
+    selectedTeam = team
+  }
+
+  window.selectedTeam = team
+
+  if (window.finalState) {
+    window.finalState.activeTeam = team
+    window.finalState.selectedTeam = team
+
+    window.finalState[roundKey] = {
+      ...(window.finalState[roundKey] || {}),
+      activeTeam: team,
+      selectedTeam: team
+    }
+
+    if (round === 4) {
+      window.finalState.round4 = {
+        ...(window.finalState.round4 || {}),
+        activeTeam: team,
+        selectedTeam: team,
+        teamMedia: {
+          ...(window.finalState.round4?.teamMedia || {}),
+          currentTeam: team
+        }
+      }
+    }
+  }
+
+  document.getElementById("teamA")?.classList.toggle("selectedTeam", team === "A")
+  document.getElementById("teamB")?.classList.toggle("selectedTeam", team === "B")
+  document.getElementById("teamA")?.classList.toggle("activeTeam", team === "A")
+  document.getElementById("teamB")?.classList.toggle("activeTeam", team === "B")
+
+  if (typeof saveFinalState === "function") {
+    saveFinalState()
+    return
+  }
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
+}
+
 function handleFinalPresenterAction(action, data) {
   if (action === "selectTeam") {
   if (!isValidPresenterTeam(data.team)) return
 
   return safeRunPresenterAction(() => {
-    if (typeof selectFinalTeam === "function") {
-      selectFinalTeam(data.team)
-    }
-
-    if (typeof saveFinalState === "function") {
-      saveFinalState()
-      return
-    }
-
-    if (typeof syncDisplayStateToSession === "function") {
-      syncDisplayStateToSession()
-    }
+    forceFinalTeamFromPresenter(data.team)
   })
 }
 
@@ -866,13 +909,7 @@ function handleFinalPresenterAction(action, data) {
       forceDisplayFinalRoundFromPresenter(round, () => {
         setTimeout(() => {
           if (isValidPresenterTeam(team)) {
-  selectFinalTeam(team)
-
-  if (typeof saveFinalState === "function") {
-    saveFinalState()
-  } else if (typeof syncDisplayStateToSession === "function") {
-    syncDisplayStateToSession()
-  }
+  forceFinalTeamFromPresenter(team)
 }
 
           setTimeout(() => {
@@ -971,17 +1008,41 @@ function handleFinalPresenterAction(action, data) {
     })
   }
 
-  if (action === "toggleRound2ImageCorrect") {
+if (action === "toggleRound2ImageCorrect") {
   return safeRunPresenterAction(() => {
     if (window.finalState?.round !== 2) return
 
-    if (typeof toggleFinalRound2ImageCorrectSelection === "function") {
-      toggleFinalRound2ImageCorrectSelection(Number(data.index))
+    const index = Number(data.index)
+    if (!Number.isFinite(index)) return
+
+    const currentNumber = Number(
+      data.number ||
+      window.finalState?.round2?.currentNumber ||
+      0
+    )
+
+    const selectedFromPresenter = Array.isArray(data.selectedCorrectIndexes)
+      ? data.selectedCorrectIndexes.map(Number)
+      : null
+
+    window.finalState.round2 = {
+      ...(window.finalState.round2 || {}),
+      currentNumber,
+      selectedCorrectIndexes: selectedFromPresenter || []
+    }
+
+    if (!selectedFromPresenter) {
+      const oldSelected = Array.isArray(window.finalState.round2.selectedCorrectIndexes)
+        ? window.finalState.round2.selectedCorrectIndexes.map(Number)
+        : []
+
+      window.finalState.round2.selectedCorrectIndexes = oldSelected.includes(index)
+        ? oldSelected.filter(x => Number(x) !== index)
+        : [...oldSelected, index]
     }
 
     if (typeof saveFinalState === "function") {
       saveFinalState()
-      return
     }
 
     if (typeof syncDisplayStateToSession === "function") {
