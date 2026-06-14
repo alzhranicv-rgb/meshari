@@ -1349,6 +1349,16 @@ button:disabled {
   text-align: center;
   font-size: .95rem;
 }
+.presenterFinalImageStatusBlock .presenterFinalPreviewText {
+  min-height: 46px;
+  padding: 8px 10px;
+  font-size: .96rem;
+  line-height: 1.25;
+}
+
+.presenterFinalImageStatusBlock {
+  margin-bottom: 2px;
+}
 /* =========================
    19) ARCHIVE
 ========================= */

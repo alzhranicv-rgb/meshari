@@ -1371,7 +1371,10 @@ function selectTeam(team) {
   syncPresenterSelectedTeamLocally(team)
   updatePresenterTeamButtonsOnly(team)
 
-  sendCommand("selectTeam", { team })
+  sendCommand("selectTeam", {
+  team,
+  round: presenterSegment === "final" ? getPresenterFinalRound() : null
+})
 
   if (presenterSegment === "final") {
     refreshPresenterFinalFromState()
@@ -3505,6 +3508,12 @@ function resetPresenterFinalLocalChoice(round = getPresenterFinalRound()) {
   presenterFinalPreviewCache[round] = ""
 
   if (round === 2) {
+    presenterFinalRound2ImageLocalSelection = {
+      number: null,
+      indexes: [],
+      expires: 0
+    }
+
     presenterLiveState = {
       ...(presenterLiveState || {}),
       final: {
@@ -3543,26 +3552,12 @@ function resetPresenterFinalLocalChoice(round = getPresenterFinalRound()) {
   updatePresenterTeamButtonsOnly(null)
 
   const previewBox = document.getElementById("presenterFinalPreview")
-  if (previewBox) previewBox.innerHTML = "اختر رقمًا"
-}
-
-async function presenterFinalCorrect() {
-  const round = getPresenterFinalRound()
-
-  if (round === 1) {
-    setPresenterFinalRound1FocusMode(false)
+  if (previewBox) {
+    previewBox.innerHTML = "اختر رقمًا"
   }
-
-  await sendCommand("stopCurrentFinalVideo")
-  await sendCommand("correct")
-
-  resetPresenterFinalLocalChoice(round)
-
-  setTimeout(() => {
-    refreshPresenterFinalFromState()
-    refreshPresenterEnhancements()
-  }, 300)
 }
+
+presenterFinalCorrect
 
 async function presenterFinalWrong() {
   const round = getPresenterFinalRound()
@@ -4518,15 +4513,31 @@ async function renderPresenterFinalRound2Preview() {
 
 function togglePresenterFinalRound2ImageAnswer(index) {
   const state = getPresenterFinalRoundState(2)
-  const selected = Array.isArray(state.selectedCorrectIndexes)
-    ? [...state.selectedCorrectIndexes]
-    : []
+  const currentNumber = Number(
+    state.currentNumber ||
+    presenterFinalSelected?.number ||
+    0
+  )
+
+  const baseSelected =
+    presenterFinalRound2ImageLocalSelection.number === currentNumber &&
+    Date.now() < presenterFinalRound2ImageLocalSelection.expires
+      ? [...presenterFinalRound2ImageLocalSelection.indexes]
+      : Array.isArray(state.selectedCorrectIndexes)
+        ? [...state.selectedCorrectIndexes]
+        : []
 
   const i = Number(index)
 
-  const nextSelected = selected.includes(i)
-    ? selected.filter(x => Number(x) !== i)
-    : [...selected, i]
+  const nextSelected = baseSelected.includes(i)
+    ? baseSelected.filter(x => Number(x) !== i)
+    : [...baseSelected, i]
+
+  presenterFinalRound2ImageLocalSelection = {
+    number: currentNumber,
+    indexes: nextSelected,
+    expires: Date.now() + 15000
+  }
 
   presenterLiveState = {
     ...(presenterLiveState || {}),
@@ -4535,22 +4546,23 @@ function togglePresenterFinalRound2ImageAnswer(index) {
       round: 2,
       round2: {
         ...(presenterLiveState?.final?.round2 || {}),
+        currentNumber,
         selectedCorrectIndexes: nextSelected
       }
     }
   }
 
-  renderPresenterFinalRound2ImagePreview(
-    Number(
-      presenterLiveState?.final?.round2?.currentNumber ||
-      presenterFinalSelected?.number ||
-      0
-    )
-  )
+  renderPresenterFinalRound2ImagePreview(currentNumber)
 
   sendCommand("toggleRound2ImageCorrect", {
     index: i
   })
+}
+
+let presenterFinalRound2ImageLocalSelection = {
+  number: null,
+  indexes: [],
+  expires: 0
 }
 
 async function renderPresenterFinalRound2ImagePreview(current) {
@@ -4558,7 +4570,11 @@ async function renderPresenterFinalRound2ImagePreview(current) {
   if (!previewBox) return
 
   const state = getPresenterFinalRoundState(2)
-  const selected = state.selectedCorrectIndexes || []
+  const selected =
+  presenterFinalRound2ImageLocalSelection.number === Number(current) &&
+  Date.now() < presenterFinalRound2ImageLocalSelection.expires
+    ? presenterFinalRound2ImageLocalSelection.indexes
+    : (state.selectedCorrectIndexes || [])
 
   let answers = Array.isArray(state.imageAnswers) ? state.imageAnswers : []
 
@@ -4577,7 +4593,7 @@ async function renderPresenterFinalRound2ImagePreview(current) {
 
   presenterFinalPreviewCache[2] = `
     <div class="presenterFinalQuestionAnswerOnly">
-      <div class="presenterFinalPreviewBlock questionBlock">
+      <div class="presenterFinalPreviewBlock questionBlock presenterFinalImageStatusBlock">
         <div class="presenterFinalPreviewLabel">الصور</div>
         <div class="presenterFinalPreviewText">
           المعروض: ${Number(state.shownImageIndex || 0)}

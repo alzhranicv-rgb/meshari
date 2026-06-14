@@ -789,14 +789,39 @@ function handleExplainPresenterAction(action, data) {
    استقبال أوامر الفاصلة الجديدة
 ========================= */
 
+function closePresenterFinalRound1Zoom() {
+  document.getElementById("finalRound1Overlay")?.remove()
+  document.getElementById("finalRound1ImageOverlay")?.remove()
+  document.getElementById("displayImageZoomOverlay")?.remove()
+
+  document
+    .querySelectorAll('[id*="finalRound1"][id*="Overlay"]')
+    .forEach(el => el.remove())
+
+  document.body.classList.remove(
+    "finalRound1OverlayActive",
+    "displayImageZoomActive",
+    "imageZoomActive",
+    "auctionOverlayActive"
+  )
+
+  if (typeof closeCurrentDisplayImageZoom === "function") {
+    closeCurrentDisplayImageZoom()
+  }
+}
+
 function handleFinalPresenterAction(action, data) {
   if (action === "selectTeam") {
-    if (!isValidPresenterTeam(data.team)) return
+  if (!isValidPresenterTeam(data.team)) return
 
-    return safeRunPresenterAction(() => {
+  return safeRunPresenterAction(() => {
+    const round = Number(data.round || window.finalState?.round || 1)
+
+    if (round === 2 || round === 4) {
       selectFinalTeam(data.team)
-    })
-  }
+    }
+  })
+}
 
   if (action === "setRound") {
     return safeRunPresenterAction(() => {
@@ -916,14 +941,23 @@ function handleFinalPresenterAction(action, data) {
   }
 
   if (action === "toggleRound2ImageCorrect") {
-    return safeRunPresenterAction(() => {
-      if (window.finalState?.round !== 2) return
+  return safeRunPresenterAction(() => {
+    if (window.finalState?.round !== 2) return
 
-      if (typeof toggleFinalRound2ImageCorrectSelection === "function") {
-        toggleFinalRound2ImageCorrectSelection(Number(data.index))
-      }
-    })
-  }
+    if (typeof toggleFinalRound2ImageCorrectSelection === "function") {
+      toggleFinalRound2ImageCorrectSelection(Number(data.index))
+    }
+
+    if (typeof saveFinalState === "function") {
+      saveFinalState()
+      return
+    }
+
+    if (typeof syncDisplayStateToSession === "function") {
+      syncDisplayStateToSession()
+    }
+  })
+}
 
   if (action === "hideRound2SequenceWord") {
     return safeRunPresenterAction(() => {
@@ -1035,15 +1069,18 @@ if (action === "correct") {
     const round = Number(window.finalState?.round || 1)
 
     if (round === 1) {
-      document.getElementById("finalRound1Overlay")?.remove()
-      document.body.classList.remove("finalRound1OverlayActive")
+  closePresenterFinalRound1Zoom()
 
-      if (typeof finalRound1Correct === "function") {
-        finalRound1Correct()
-      }
+  if (typeof finalRound1Correct === "function") {
+    finalRound1Correct()
+  }
 
-      return
-    }
+  setTimeout(() => {
+    closePresenterFinalRound1Zoom()
+  }, 120)
+
+  return
+}
 
     if (round === 2) {
       const type =
