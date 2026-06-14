@@ -3973,10 +3973,7 @@ async function refreshPresenterFinalFromState() {
     title.innerText = getPresenterFinalRoundTitle(round)
   }
 
-  const activeTeam =
-  round === 2 || round === 4
-    ? getPresenterFinalTeamForRound(round)
-    : null
+  const activeTeam = presenterSelectedTeam || null
 
   document.getElementById("teamA")?.classList.toggle(
     "selectedPresenterTeam",
