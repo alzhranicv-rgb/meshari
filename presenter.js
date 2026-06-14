@@ -1257,23 +1257,7 @@ function getPresenterActiveTeamFromState() {
   return presenterSelectedTeam
 }
 function getPresenterFinalTeamForRound(round = getPresenterFinalRound()) {
-  const r = Number(round || 1)
-
-  if (presenterSelectedTeam) {
-    return presenterSelectedTeam
-  }
-
-  if (r === 2) {
-    return presenterLiveState?.final?.round2?.activeTeam || null
-  }
-
-  if (r === 4) {
-    return presenterLiveState?.final?.round4?.teamMedia?.currentTeam ||
-           presenterLiveState?.final?.round4?.activeTeam ||
-           null
-  }
-
-  return null
+  return presenterSelectedTeam || null
 }
 
 function updatePresenterTeamButtonsOnly(team) {
@@ -1302,20 +1286,7 @@ function syncPresenterSelectedTeamLocally(team) {
 
   if (presenterSegment === "final") {
     const round = Number(getPresenterFinalRound() || 1)
-
-    if (round === 2) {
-      presenterLiveState = {
-        ...(presenterLiveState || {}),
-        final: {
-          ...(presenterLiveState?.final || {}),
-          round,
-          round2: {
-            ...(presenterLiveState?.final?.round2 || {}),
-            activeTeam: team
-          }
-        }
-      }
-    }
+    const roundKey = `round${round}`
 
     if (round === 4) {
       presenterLiveState = {
@@ -1331,6 +1302,20 @@ function syncPresenterSelectedTeamLocally(team) {
               currentTeam: team
             }
           }
+        }
+      }
+
+      return
+    }
+
+    presenterLiveState = {
+      ...(presenterLiveState || {}),
+      final: {
+        ...(presenterLiveState?.final || {}),
+        round,
+        [roundKey]: {
+          ...(presenterLiveState?.final?.[roundKey] || {}),
+          activeTeam: team
         }
       }
     }
@@ -4303,9 +4288,9 @@ function openPresenterFinalNumber(round, number) {
     return
   }
 
-  const activeTeam = presenterSelectedTeam || null
+const activeTeam = presenterSelectedTeam || null
 
-if ((round === 2 || round === 4) && !activeTeam) {
+if (!activeTeam) {
   showToast("اختر الفريق أولاً")
   return
 }
@@ -4599,7 +4584,7 @@ async function renderPresenterFinalRound2ImagePreview(current) {
   presenterFinalPreviewCache[2] = `
     <div class="presenterFinalQuestionAnswerOnly">
       <div class="presenterFinalPreviewBlock questionBlock presenterFinalImageStatusBlock">
-        <div class="presenterFinalPreviewLabel">الصور</div>
+        
         <div class="presenterFinalPreviewText">
           المعروض: ${Number(state.shownImageIndex || 0)}
           ${state.imageAnswerShown ? " / ظهرت الإجابات" : ""}
@@ -4676,26 +4661,22 @@ async function renderPresenterFinalRound3Preview() {
 
   presenterFinalPreviewCache[3] = `
     <div class="presenterFinalStoryPreview presenterFinalStoryPartsOnly">
-
-      <div class="presenterFinalStoryPartsBox">
-        <div class="presenterFinalPreviewLabel">
-          أجزاء السؤال ${shownPart ? `- ظاهر ${shownPart}` : ""}
-        </div>
-
-        <div class="presenterFinalStoryParts">
-          ${
-            parts.length
-              ? parts.map((part, idx) => `
-                <div class="presenterFinalStoryPart ${idx < shownPart ? "visiblePart" : ""}">
-                  <span>${idx === 0 ? 3 : idx === 1 ? 2 : 1}</span>
-                  <strong>${presenterSafeHtml(part || "-")}</strong>
-                </div>
-              `).join("")
-              : `<div class="presenterFinalEmptyText">لا توجد أجزاء</div>`
-          }
-        </div>
+      <div class="presenterFinalPreviewLabel">
+        أجزاء السؤال ${shownPart ? `- ظاهر ${shownPart}` : ""}
       </div>
 
+      <div class="presenterFinalStoryParts">
+        ${
+          parts.length
+            ? parts.map((part, idx) => `
+              <div class="presenterFinalStoryPart ${idx < shownPart ? "visiblePart" : ""}">
+                <span>${idx === 0 ? 3 : idx === 1 ? 2 : 1}</span>
+                <strong>${presenterSafeHtml(part || "-")}</strong>
+              </div>
+            `).join("")
+            : `<div class="presenterFinalEmptyText">لا توجد أجزاء</div>`
+        }
+      </div>
     </div>
   `
 

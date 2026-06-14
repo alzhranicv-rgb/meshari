@@ -833,10 +833,17 @@ function handleFinalPresenterAction(action, data) {
   if (!isValidPresenterTeam(data.team)) return
 
   return safeRunPresenterAction(() => {
-    const round = Number(data.round || window.finalState?.round || 1)
-
-    if (round === 2 || round === 4) {
+    if (typeof selectFinalTeam === "function") {
       selectFinalTeam(data.team)
+    }
+
+    if (typeof saveFinalState === "function") {
+      saveFinalState()
+      return
+    }
+
+    if (typeof syncDisplayStateToSession === "function") {
+      syncDisplayStateToSession()
     }
   })
 }
@@ -858,9 +865,15 @@ function handleFinalPresenterAction(action, data) {
 
       forceDisplayFinalRoundFromPresenter(round, () => {
         setTimeout(() => {
-          if ((round === 2 || round === 4) && isValidPresenterTeam(team)) {
-            selectFinalTeam(team)
-          }
+          if (isValidPresenterTeam(team)) {
+  selectFinalTeam(team)
+
+  if (typeof saveFinalState === "function") {
+    saveFinalState()
+  } else if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
+}
 
           setTimeout(() => {
             if (round === 1) {

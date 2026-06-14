@@ -1400,6 +1400,64 @@ button:disabled {
 .finalControlsRound3 .presenterFinalControlsGrid {
   margin-top: 0;
 }
+
+.presenterFinalStoryPartsOnly {
+  width: 100%;
+  height: 100%;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.presenterFinalStoryPartsOnly .presenterFinalStoryParts {
+  gap: 8px;
+}
+
+.presenterFinalStoryPartsOnly .presenterFinalStoryPart {
+  min-height: 82px;
+  padding: 10px;
+  grid-template-columns: 40px minmax(0, 1fr);
+}
+
+.presenterFinalStoryPartsOnly .presenterFinalStoryPart span {
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  font-size: 1rem;
+}
+
+.presenterFinalStoryPartsOnly .presenterFinalStoryPart strong {
+  font-size: 1.05rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.presenterFinalStoryAnswerControl {
+  padding: 10px;
+}
+
+.presenterFinalStoryAnswerControl .presenterFinalPreviewText {
+  min-height: 76px;
+  max-height: 92px;
+  padding: 10px 12px;
+  font-size: 1.16rem;
+  line-height: 1.35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.finalControlsRound3 {
+  gap: 8px;
+}
+
+.finalControlsRound3 .presenterFinalControlsGrid {
+  margin-top: 0;
+}
+
 /* =========================
    19) ARCHIVE
 ========================= */
