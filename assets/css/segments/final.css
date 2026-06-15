@@ -3979,436 +3979,682 @@
     overflow:hidden;
   }
 
-  /* =========================
-     بدون نقاط
-  ========================= */
-
-  .finalRound1ContentShell{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .finalRound1StageLayout.finalRound1PremiumLayout:not(:has(.finalRound1BottomInfoRow)){
-    width:100%;
-    height:100%;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .finalRound1StageLayout.finalRound1PremiumLayout:not(:has(.finalRound1BottomInfoRow)) .finalRound1MainStageCard{
-    width:100%;
-    height:100%;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .finalRound1StageLayout.finalRound1PremiumLayout:not(:has(.finalRound1BottomInfoRow)) .finalRound1TextCard{
-    width:min(100%,1040px);
-    height:82%;
-    min-height:260px;
-    max-height:420px;
-
-    margin:auto;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .finalRound1TextCard{
-    border-radius:34px;
-    padding:30px 48px;
-  }
-
-  .finalRound1TextCardInner{
-    width:100%;
-
-    font-size:clamp(2.2rem,3.8vw,4rem);
-    line-height:1.34;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    text-align:center;
-  }
-
-  .finalRound1OverlayInner,
-  .finalRound1OverlayPaper{
-    width:min(96vw,1260px);
-    min-height:64vh;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .finalRound1OverlayText{
-    width:100%;
-    min-height:100%;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-  }
-
-  /* =========================
-     صح صحلي
-  ========================= */
-
-  .finalRound2WordsStage{
-    align-items:center;
-    justify-content:center;
-  }
-
-  .finalHintStage{
-    width:100%;
-    height:100%;
-    min-height:0;
-
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:18px;
-
-    overflow:hidden;
-  }
-
-  .finalHintText{
-    width:min(100%,980px);
-    min-height:66px;
-
-    border-radius:22px;
-    padding:12px 22px;
-
-    font-family:"HanakaText",sans-serif;
-    font-size:1.38rem;
-    line-height:1.4;
-    font-weight:900;
-
-    text-align:center;
-    overflow:hidden;
-    overflow-wrap:anywhere;
-    text-wrap:balance;
-  }
-
-  .finalWordChipLarge{
-    width:min(100%,980px);
-    min-height:230px;
-    max-height:250px;
-
-    border-radius:34px;
-    padding:28px 44px;
-
-    font-family:"HanakaText",sans-serif;
-    font-size:clamp(2.65rem,4.55vw,4.75rem);
-    line-height:1.18;
-    font-weight:900;
-
-    text-align:center;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    overflow:hidden;
-    overflow-wrap:anywhere;
-    text-wrap:balance;
-  }
-
-  .finalRound2AnswerGrid,
-  .finalRound2WordsStage .finalRound3AnswersList,
-  .finalRound2WordsStage .finalRound3AnswersPremium{
-    width:100%;
-    height:100%;
-    min-height:0;
-
-    display:grid;
-    align-content:center;
-    justify-content:center;
-
-    gap:12px;
-    overflow:hidden;
-  }
-
-  .finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(6)),
-  .finalRound2WordsStage .finalRound3AnswersList:has(.finalRound3AnswerCard:nth-child(6)),
-  .finalRound2WordsStage .finalRound3AnswersPremium:has(.finalRound3AnswerCard:nth-child(6)){
-    grid-template-columns:repeat(6,minmax(0,1fr));
-    grid-auto-rows:190px;
-  }
-
-  .finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(4)):not(:has(.finalRound2AnswerCard:nth-child(5))),
-  .finalRound2WordsStage .finalRound3AnswersList:has(.finalRound3AnswerCard:nth-child(4)):not(:has(.finalRound3AnswerCard:nth-child(5))),
-  .finalRound2WordsStage .finalRound3AnswersPremium:has(.finalRound3AnswerCard:nth-child(4)):not(:has(.finalRound3AnswerCard:nth-child(5))){
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    grid-auto-rows:200px;
-  }
-
-  .finalRound2AnswerGrid:not(:has(.finalRound2AnswerCard:nth-child(4))),
-  .finalRound2WordsStage .finalRound3AnswersList:not(:has(.finalRound3AnswerCard:nth-child(4))),
-  .finalRound2WordsStage .finalRound3AnswersPremium:not(:has(.finalRound3AnswerCard:nth-child(4))){
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    grid-auto-rows:200px;
-  }
-
-  .finalRound2AnswerCard,
-  .finalRound2WordsStage .finalRound3AnswerCard{
-    height:100%;
-    min-height:0;
-    max-height:none;
-
-    border-radius:28px;
-    padding:14px 12px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-
-    overflow:hidden;
-  }
-
-  .finalRound2AnswerScrambled{
-    font-size:.72rem;
-    line-height:1.05;
-  }
-
-  .finalRound2AnswerCorrect,
-  .finalRound2WordsStage .finalAnswerChip{
-    width:100%;
-    max-height:100%;
-
-    font-family:"HanakaText",sans-serif;
-    font-size:clamp(.96rem,1.45vw,1.34rem);
-    line-height:1.32;
-    font-weight:900;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-
-    overflow:hidden;
-    overflow-wrap:anywhere;
-    text-wrap:balance;
-  }
-
-  .finalSequenceTimerBadge{
-    height:62px;
-    min-width:185px;
-    padding:0 24px;
-  }
-
-  .finalSequenceTimerBadge span{
-    font-size:1.08rem;
-  }
-
-  .finalSequenceTimerBadge strong{
-    font-size:2.15rem;
-  }
-
-  .finalSequenceWordBtn{
-    height:78px;
-    min-height:78px;
-    max-height:78px;
-
-    border-radius:24px;
-    padding:12px 16px;
-
-    font-size:clamp(1.12rem,1.72vw,1.45rem);
-    line-height:1.25;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-
-    overflow:hidden;
-  }
-
-  /* =========================
-     قصة
-  ========================= */
-
-  .finalStoryStackContent{
-    width:100%;
-    height:100%;
-    min-height:0;
-
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
-    justify-content:center;
-    gap:14px;
-
-    overflow:hidden;
-  }
-
-  .finalStoryStackContent:has(.finalStoryCleanAnswer){
-    display:grid;
-    grid-template-columns:1fr;
-    grid-template-rows:minmax(0,1fr) 132px;
-    gap:14px;
-    align-items:stretch;
-  }
-
-  .finalStoryPartsStack{
-    width:100%;
-    min-height:0;
-
-    display:grid;
-    grid-auto-rows:auto;
-    gap:12px;
-
-    align-content:center;
-    overflow:hidden;
-  }
-
-  .finalStoryPartsStack:not(:has(.finalStoryStackPart:nth-child(2))){
-    height:100%;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .finalStoryPartsStack:not(:has(.finalStoryStackPart:nth-child(2))) .finalStoryStackPart{
-    flex:0 0 auto;
-
-    width:100%;
-    height:150px;
-    min-height:150px;
-    max-height:150px;
-  }
-
-  .finalStoryPartsStack:has(.finalStoryStackPart:nth-child(2)):not(:has(.finalStoryStackPart:nth-child(3))){
-    display:grid;
-    grid-template-rows:repeat(2,140px);
-    align-content:center;
-    gap:14px;
-  }
-
-  .finalStoryPartsStack:has(.finalStoryStackPart:nth-child(2)):not(:has(.finalStoryStackPart:nth-child(3))) .finalStoryStackPart{
-    height:140px;
-    min-height:140px;
-    max-height:140px;
-  }
-
-  .finalStoryPartsStack:has(.finalStoryStackPart:nth-child(3)){
-    display:grid;
-    grid-template-rows:repeat(3,104px);
-    align-content:center;
-    gap:10px;
-  }
-
-  .finalStoryPartsStack:has(.finalStoryStackPart:nth-child(3)) .finalStoryStackPart{
-    height:104px;
-    min-height:104px;
-    max-height:104px;
-  }
-
-  .finalStoryStackPart{
-    width:100%;
-
-    border-radius:30px;
-    padding:16px 20px;
-
-    display:grid;
-    grid-template-columns:64px minmax(0,1fr);
-    gap:18px;
-    align-items:stretch;
-
-    overflow:hidden;
-  }
-
-  .finalStoryStackPoints{
-    width:58px;
-    height:58px;
-
-    border-radius:20px;
-
-    font-size:1.4rem;
-    line-height:1;
-    font-weight:900;
-
-    align-self:center;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .finalStoryStackText{
-    width:100%;
-    height:100%;
-    min-height:0;
-
-    font-family:"HanakaText",sans-serif;
-    font-size:clamp(1.18rem,1.92vw,1.62rem);
-    line-height:1.34;
-    font-weight:900;
-
-    text-align:right;
-
-    display:flex;
-    align-items:center;
-
-    padding:4px 8px 4px 12px;
-
-    overflow-y:auto;
-    overscroll-behavior:contain;
-    overflow-wrap:anywhere;
-    text-wrap:balance;
-  }
-
-  .finalStoryPartsStack:has(.finalStoryStackPart:nth-child(3)) .finalStoryStackText{
-    font-size:clamp(1.02rem,1.55vw,1.34rem);
-    line-height:1.28;
-  }
-
-  .finalStoryCleanAnswer{
-    width:100%;
-    height:132px;
-    min-height:132px;
-    max-height:132px;
-
-    border-radius:30px;
-    padding:44px 26px 20px;
-
-    font-size:clamp(1.18rem,1.82vw,1.55rem);
-    line-height:1.34;
-    font-weight:900;
-
-    text-align:center;
-
-    overflow-y:auto;
-    overscroll-behavior:contain;
-    overflow-wrap:anywhere;
-    text-wrap:balance;
-  }
-
-  .finalStoryCleanAnswer::before{
-    top:12px;
-    right:16px;
-
-    min-height:26px;
-    padding:6px 14px;
-
-    border-radius:999px;
-
-    font-size:.72rem;
-    line-height:1;
-    font-weight:900;
-  }
-
+/* =========================
+   بدون نقاط
+   إصلاح تداخل الإجابة
+========================= */
+
+.finalRound1ContentShell{
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+}
+
+.finalRound1MainStageCard:not(:has(.finalRound1ResultBox)){
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.finalRound1MainStageCard:not(:has(.finalRound1ResultBox)) .finalRound1TextCard{
+  width:min(100%,1040px);
+  height:82%;
+  min-height:260px;
+  max-height:420px;
+  margin:auto;
+}
+
+.finalRound1TextCard{
+  border-radius:34px;
+  padding:30px 48px;
+}
+
+.finalRound1TextCardInner{
+  width:100%;
+
+  font-size:clamp(2.2rem,3.8vw,4rem);
+  line-height:1.34;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+}
+
+/* عند ظهور الإجابة */
+.finalRound1MainStageCard:has(.finalRound1ResultBox){
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,1.08fr) minmax(330px,.62fr);
+  grid-template-areas:"question answer";
+  gap:16px;
+  align-items:stretch;
+}
+
+.finalRound1MainStageCard:has(.finalRound1ResultBox) .finalRound1TextCard{
+  grid-area:question;
+
+  width:100%;
+  height:100%;
+  min-height:0;
+  max-height:none;
+
+  padding:24px 32px;
+  border-radius:32px;
+}
+
+.finalRound1MainStageCard:has(.finalRound1ResultBox) .finalRound1TextCardInner{
+  font-size:clamp(1.45rem,2.35vw,2.55rem);
+  line-height:1.38;
+}
+
+.finalRound1BottomInfoRow{
+  grid-area:answer;
+
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+
+  margin:0;
+  padding:0;
+
+  overflow:hidden;
+}
+
+.finalRound1ResultBox{
+  width:100%;
+  height:100%;
+  min-height:0;
+  max-height:none;
+
+  border-radius:32px;
+  padding:28px 24px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  overflow:hidden;
+}
+
+.finalRound1ResultLabel{
+  min-height:28px;
+  padding:6px 14px;
+  font-size:.75rem;
+}
+
+.finalRound1ResultText,
+.finalRound1AnswerMolhimFont,
+.finalRound1AnswerProjectFont{
+  width:100%;
+  max-height:100%;
+
+  font-size:clamp(1.25rem,2vw,1.85rem);
+  line-height:1.42;
+
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+
+.finalRound1NoteBox{
+  max-height:74px;
+  overflow-y:auto;
+}
+
+/* تكبير القصاصة عند الضغط */
+.finalRound1OverlayInner,
+.finalRound1OverlayPaper{
+  width:min(96vw,1260px);
+  min-height:64vh;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.finalRound1OverlayText{
+  width:100%;
+  min-height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+
+/* =========================
+   صح صحلي
+   رقم 1 و 3 / رقم 2 و 5 / رقم 3 و 6
+========================= */
+
+.finalRound2WordsStage{
+  align-items:center;
+  justify-content:center;
+}
+
+/* التلميحة */
+.finalHintStage{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+
+  overflow:hidden;
+}
+
+.finalHintText{
+  width:min(100%,980px);
+  min-height:72px;
+
+  border-radius:26px;
+  padding:14px 24px;
+
+  border:1px solid rgba(103,232,249,.42);
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.92), transparent 44%),
+    linear-gradient(180deg, rgba(248,253,255,.98), rgba(223,247,255,.72));
+
+  color:#0F4C5C;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:1.45rem;
+  line-height:1.36;
+  font-weight:900;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  overflow:hidden;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+
+  box-shadow:
+    0 10px 22px rgba(14,116,144,.08),
+    inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+/* الكلمة */
+.finalWordChipLarge{
+  width:min(100%,980px);
+  min-height:230px;
+  max-height:250px;
+
+  border-radius:34px;
+  padding:28px 44px;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(2.65rem,4.55vw,4.75rem);
+  line-height:1.18;
+  font-weight:900;
+
+  text-align:center;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+}
+
+/* رقم 1 و 3: عند ظهور الإجابات، التلميحة لو موجودة تبقى كرت واضح */
+.finalRound2WordsStage:has(.finalRound2AnswerGrid) .finalHintText,
+.finalRound2WordsStage:has(.finalRound3AnswersList) .finalHintText,
+.finalRound2WordsStage:has(.finalRound3AnswersPremium) .finalHintText{
+  width:100%;
+  min-height:64px;
+  margin-bottom:12px;
+
+  font-size:1.3rem;
+  border-radius:24px;
+}
+
+/* إجابات الكلمات */
+.finalRound2AnswerGrid{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  align-content:center;
+  justify-content:center;
+
+  gap:12px;
+  overflow:hidden;
+}
+
+.finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(6)){
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  grid-auto-rows:190px;
+}
+
+.finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(4)):not(:has(.finalRound2AnswerCard:nth-child(5))){
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-auto-rows:200px;
+}
+
+.finalRound2AnswerGrid:not(:has(.finalRound2AnswerCard:nth-child(4))){
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-auto-rows:200px;
+}
+
+.finalRound2AnswerCard{
+  height:100%;
+  min-height:0;
+  max-height:none;
+
+  border-radius:30px;
+  padding:16px 14px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  text-align:center;
+  overflow:hidden;
+}
+
+.finalRound2AnswerScrambled{
+  font-size:.76rem;
+  line-height:1.05;
+}
+
+.finalRound2AnswerCorrect{
+  width:100%;
+  max-height:100%;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1rem,1.55vw,1.42rem);
+  line-height:1.3;
+  font-weight:900;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  overflow:hidden;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+}
+
+/* رقم 2 و 5: المتبقي */
+.finalSequenceStageBox{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  border-radius:34px;
+  padding:28px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:22px;
+
+  overflow:hidden;
+}
+
+.finalSequenceTimerBadge{
+  height:76px;
+  min-width:230px;
+
+  border-radius:999px;
+  gap:14px;
+  padding:0 30px;
+}
+
+.finalSequenceTimerBadge span{
+  font-family:"HanakaText",sans-serif;
+  font-size:1.28rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.finalSequenceTimerBadge strong{
+  font-family:"HanakaText",sans-serif;
+  font-size:2.65rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.finalSequenceWordsWrap{
+  width:100%;
+
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(135px,1fr));
+  grid-auto-rows:92px;
+  gap:14px;
+
+  align-content:center;
+  overflow:hidden;
+}
+
+.finalSequenceWordBtn{
+  width:100%;
+  height:100%;
+  min-height:0;
+  max-height:none;
+
+  border-radius:26px;
+  padding:14px 16px;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.18rem,1.8vw,1.55rem);
+  line-height:1.25;
+  font-weight:900;
+
+  white-space:normal;
+  word-break:normal;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  overflow:hidden;
+}
+
+/* إذا الكلمة تنحذف أو تختفي، الباقي يتمدد تلقائي */
+.finalSequenceWordBtn[hidden],
+.finalSequenceWordBtn.hidden{
+  display:none;
+}
+
+/* رقم 3 و 6: إجابات الصور صف واحد */
+.finalRound2WordsStage .finalRound3ResultView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+.finalRound2WordsStage .finalRound3AnswersList,
+.finalRound2WordsStage .finalRound3AnswersPremium{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  align-content:center;
+  justify-content:center;
+
+  gap:12px;
+  overflow:hidden;
+  padding:0;
+}
+
+.finalRound2WordsStage .finalRound3AnswersList:has(.finalRound3AnswerCard:nth-child(6)),
+.finalRound2WordsStage .finalRound3AnswersPremium:has(.finalRound3AnswerCard:nth-child(6)){
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  grid-auto-rows:190px;
+}
+
+.finalRound2WordsStage .finalRound3AnswersList:has(.finalRound3AnswerCard:nth-child(4)):not(:has(.finalRound3AnswerCard:nth-child(5))),
+.finalRound2WordsStage .finalRound3AnswersPremium:has(.finalRound3AnswerCard:nth-child(4)):not(:has(.finalRound3AnswerCard:nth-child(5))){
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-auto-rows:200px;
+}
+
+.finalRound2WordsStage .finalRound3AnswersList:not(:has(.finalRound3AnswerCard:nth-child(4))),
+.finalRound2WordsStage .finalRound3AnswersPremium:not(:has(.finalRound3AnswerCard:nth-child(4))){
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-auto-rows:200px;
+}
+
+.finalRound2WordsStage .finalRound3AnswerCard{
+  height:100%;
+  min-height:0;
+  max-height:none;
+
+  border-radius:30px;
+  padding:16px 14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+  overflow:hidden;
+}
+
+.finalRound2WordsStage .finalAnswerChip{
+  width:100%;
+  max-height:100%;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1rem,1.55vw,1.42rem);
+  line-height:1.3;
+  font-weight:900;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  overflow:hidden;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+}
+
+
+/* =========================
+   قصة
+   النص الطويل ما يختفي
+========================= */
+
+.finalStoryStackContent{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:center;
+  gap:14px;
+
+  overflow:hidden;
+}
+
+.finalStoryStackContent:has(.finalStoryCleanAnswer){
+  display:grid;
+  grid-template-columns:1fr;
+  grid-template-rows:minmax(0,1fr) 132px;
+  gap:14px;
+  align-items:stretch;
+}
+
+.finalStoryPartsStack{
+  width:100%;
+  min-height:0;
+
+  display:grid;
+  grid-auto-rows:auto;
+  gap:12px;
+
+  align-content:center;
+  overflow:hidden;
+}
+
+/* جزء واحد */
+.finalStoryPartsStack:not(:has(.finalStoryStackPart:nth-child(2))){
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.finalStoryPartsStack:not(:has(.finalStoryStackPart:nth-child(2))) .finalStoryStackPart{
+  flex:0 0 auto;
+
+  width:100%;
+  height:170px;
+  min-height:170px;
+  max-height:170px;
+}
+
+/* جزئين */
+.finalStoryPartsStack:has(.finalStoryStackPart:nth-child(2)):not(:has(.finalStoryStackPart:nth-child(3))){
+  display:grid;
+  grid-template-rows:repeat(2,150px);
+  align-content:center;
+  gap:14px;
+}
+
+.finalStoryPartsStack:has(.finalStoryStackPart:nth-child(2)):not(:has(.finalStoryStackPart:nth-child(3))) .finalStoryStackPart{
+  height:150px;
+  min-height:150px;
+  max-height:150px;
+}
+
+/* ثلاثة أجزاء */
+.finalStoryPartsStack:has(.finalStoryStackPart:nth-child(3)){
+  display:grid;
+  grid-template-rows:repeat(3,112px);
+  align-content:center;
+  gap:10px;
+}
+
+.finalStoryPartsStack:has(.finalStoryStackPart:nth-child(3)) .finalStoryStackPart{
+  height:112px;
+  min-height:112px;
+  max-height:112px;
+}
+
+.finalStoryStackPart{
+  width:100%;
+
+  border-radius:30px;
+  padding:16px 20px;
+
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr);
+  gap:18px;
+  align-items:stretch;
+
+  overflow:hidden;
+}
+
+.finalStoryStackPoints{
+  width:58px;
+  height:58px;
+
+  border-radius:20px;
+
+  font-size:1.4rem;
+  line-height:1;
+  font-weight:900;
+
+  align-self:center;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* النص ياخذ المستطيل كامل */
+.finalStoryStackText{
+  width:100%;
+  height:100%;
+  min-height:0;
+  max-height:100%;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.12rem,1.78vw,1.52rem);
+  line-height:1.32;
+  font-weight:900;
+
+  text-align:right;
+
+  display:block;
+
+  padding:4px 8px 4px 12px;
+
+  white-space:normal;
+  word-break:normal;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+
+.finalStoryPartsStack:not(:has(.finalStoryStackPart:nth-child(2))) .finalStoryStackText{
+  font-size:clamp(1.28rem,2.05vw,1.78rem);
+  line-height:1.34;
+}
+
+.finalStoryPartsStack:has(.finalStoryStackPart:nth-child(3)) .finalStoryStackText{
+  font-size:clamp(.98rem,1.46vw,1.22rem);
+  line-height:1.26;
+}
+
+.finalStoryCleanAnswer{
+  width:100%;
+  height:132px;
+  min-height:132px;
+  max-height:132px;
+
+  border-radius:30px;
+  padding:44px 26px 20px;
+
+  font-size:clamp(1.18rem,1.82vw,1.55rem);
+  line-height:1.34;
+  font-weight:900;
+
+  text-align:center;
+
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+}
+
+.finalStoryCleanAnswer::before{
+  top:12px;
+  right:16px;
+
+  min-height:26px;
+  padding:6px 14px;
+
+  border-radius:999px;
+
+  font-size:.72rem;
+  line-height:1;
+  font-weight:900;
+}
   /* =========================
      التركيز
   ========================= */
@@ -4488,4 +4734,35 @@
     font-size:1.05rem;
     padding:0 14px;
   }
+  /* Placeholder لكل فقرات الفاصلة */
+.finalRoundPlaceholder,
+.finalRound1StartView .finalRoundPlaceholder,
+.finalRound1InfoEmpty,
+.finalRound2WordsStage .finalRoundPlaceholder,
+.finalRound2Wrap .finalRoundPlaceholder,
+.finalStoryCleanEmpty,
+.finalTeamMediaEmptyState{
+  width:min(100%,1080px);
+  height:210px;
+  min-height:210px;
+  max-height:210px;
+
+  border-radius:28px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  margin:auto;
+
+  padding:24px;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.25rem,2vw,1.75rem);
+  line-height:1.35;
+  font-weight:900;
+
+  overflow:hidden;
+}
 }
