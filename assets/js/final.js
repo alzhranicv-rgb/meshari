@@ -1046,25 +1046,25 @@ function getFinalRound1ClipStyle(text = "", zoom = false) {
   const clean = String(text || "").trim()
   const len = clean.length
 
-  let size = zoom ? "clamp(2.1rem, 2.8vw, 3rem)" : "clamp(1.7rem, 2.2vw, 2.45rem)"
-  let line = zoom ? "1.95" : "1.82"
+  let size = zoom ? "clamp(3rem, 6.3vw, 7rem)" : "clamp(1.7rem, 2.2vw, 2.45rem)"
+  let line = zoom ? "1.45" : "1.82"
 
   if (len > 90) {
-    size = zoom ? "clamp(1.8rem, 2.45vw, 2.55rem)" : "clamp(1.45rem, 1.95vw, 2rem)"
-    line = zoom ? "1.86" : "1.72"
+    size = zoom ? "clamp(2.6rem, 5.4vw, 6rem)" : "clamp(1.45rem, 1.95vw, 2rem)"
+    line = zoom ? "1.42" : "1.72"
   }
 
   if (len > 140) {
-    size = zoom ? "clamp(1.55rem, 2.1vw, 2.2rem)" : "clamp(1.22rem, 1.65vw, 1.7rem)"
-    line = zoom ? "1.75" : "1.58"
+    size = zoom ? "clamp(2.25rem, 4.7vw, 5.2rem)" : "clamp(1.22rem, 1.65vw, 1.7rem)"
+    line = zoom ? "1.38" : "1.58"
   }
 
   if (len > 190) {
-    size = zoom ? "clamp(1.35rem, 1.8vw, 1.9rem)" : "clamp(1.05rem, 1.42vw, 1.45rem)"
-    line = zoom ? "1.62" : "1.46"
+    size = zoom ? "clamp(1.9rem, 3.9vw, 4.35rem)" : "clamp(1.05rem, 1.42vw, 1.45rem)"
+    line = zoom ? "1.34" : "1.46"
   }
 
-  return `font-family:'MolhimCustom','HanakaText',sans-serif !important;font-size:${size};line-height:${line};text-wrap:balance;`
+  return `font-family:'MolhimCustom','HanakaText',sans-serif;font-size:${size};line-height:${line};text-wrap:balance;`
 }
 
 

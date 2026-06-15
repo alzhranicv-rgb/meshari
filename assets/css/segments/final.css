@@ -3015,3 +3015,595 @@
   font-size:clamp(1.28rem,2.05vw,1.78rem);
   line-height:1.3;
 }
+/* =========================================================
+   FINAL LAST FIX - صح صحلي + القصة + بدون نقاط
+   هذا آخر شيء في final.css
+========================================================= */
+
+/* =========================================================
+   1) صح صحلي رقم 1 و 4
+   الإجابات مستطيلات متناسقة + الخط أكبر + التلميح واضح
+========================================================= */
+
+/* يغطي الهيكل القديم والهيكل الجديد */
+.finalRound2ScrambleAnswerStage,
+.finalRound2WordsStage[data-round2-number="1"],
+.finalRound2WordsStage[data-round2-number="4"]{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+.finalRound2ScrambleGrid,
+.finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerGrid,
+.finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerGrid{
+  width:100%;
+  height:auto;
+  max-height:100%;
+
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,155px));
+  grid-auto-rows:178px;
+  gap:14px;
+
+  align-content:center;
+  justify-content:center;
+  place-content:center;
+
+  margin:0 auto;
+  padding:0;
+
+  overflow:hidden;
+}
+
+.finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(4)):not(:has(.finalRound2AnswerCard:nth-child(5))),
+.finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(4)):not(:has(.finalRound2AnswerCard:nth-child(5))),
+.finalRound2ScrambleGrid.finalAnswersCount4{
+  grid-template-columns:repeat(4,minmax(0,185px));
+}
+
+.finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerGrid:not(:has(.finalRound2AnswerCard:nth-child(4))),
+.finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerGrid:not(:has(.finalRound2AnswerCard:nth-child(4))),
+.finalRound2ScrambleGrid.finalAnswersCount3{
+  grid-template-columns:repeat(3,minmax(0,220px));
+}
+
+.finalRound2ScrambleGrid .finalRound2AnswerCard,
+.finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerCard,
+.finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerCard{
+  width:100%;
+  height:178px;
+  min-height:178px;
+  max-height:178px;
+
+  border-radius:28px;
+  padding:14px 12px;
+  gap:10px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+.finalRound2ScrambleGrid .finalRound2AnswerScrambled,
+.finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerScrambled,
+.finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerScrambled{
+  width:100%;
+  height:46px;
+  min-height:46px;
+  max-height:46px;
+
+  padding:8px 12px;
+  border-radius:999px;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.02rem,1.55vw,1.28rem);
+  line-height:1;
+  font-weight:900;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.finalRound2ScrambleGrid .finalRound2AnswerCorrect,
+.finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerCorrect,
+.finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerCorrect{
+  width:100%;
+  flex:1 1 auto;
+  min-height:0;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.22rem,1.85vw,1.62rem);
+  line-height:1.22;
+  font-weight:900;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  overflow:hidden;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+}
+
+
+/* =========================================================
+   2) صح صحلي رقم 3 و 6
+   إجابات الصور في النص بالضبط
+========================================================= */
+
+.finalRound2WordsStage[data-round2-number="3"],
+.finalRound2WordsStage[data-round2-number="6"]{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+.finalRound2WordsStage[data-round2-number="3"] .finalRound3ResultView,
+.finalRound2WordsStage[data-round2-number="6"] .finalRound3ResultView,
+.finalRound2ImageAnswerStage{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+.finalRound2WordsStage[data-round2-number="3"] .finalRound3AnswersList,
+.finalRound2WordsStage[data-round2-number="3"] .finalRound3AnswersPremium,
+.finalRound2WordsStage[data-round2-number="6"] .finalRound3AnswersList,
+.finalRound2WordsStage[data-round2-number="6"] .finalRound3AnswersPremium{
+  width:100%;
+  max-width:100%;
+  height:auto;
+
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,150px));
+  gap:14px;
+
+  align-content:center;
+  justify-content:center;
+  place-content:center;
+
+  margin:0 auto;
+  padding:0;
+
+  direction:rtl;
+  overflow:hidden;
+}
+
+.finalRound2WordsStage[data-round2-number="3"] .finalRound3AnswersList:has(.finalRound3AnswerCard:nth-child(4)):not(:has(.finalRound3AnswerCard:nth-child(5))),
+.finalRound2WordsStage[data-round2-number="3"] .finalRound3AnswersPremium:has(.finalRound3AnswerCard:nth-child(4)):not(:has(.finalRound3AnswerCard:nth-child(5))),
+.finalRound2WordsStage[data-round2-number="6"] .finalRound3AnswersList:has(.finalRound3AnswerCard:nth-child(4)):not(:has(.finalRound3AnswerCard:nth-child(5))),
+.finalRound2WordsStage[data-round2-number="6"] .finalRound3AnswersPremium:has(.finalRound3AnswerCard:nth-child(4)):not(:has(.finalRound3AnswerCard:nth-child(5))){
+  grid-template-columns:repeat(4,minmax(0,170px));
+}
+
+.finalRound2WordsStage[data-round2-number="3"] .finalRound3AnswersList:not(:has(.finalRound3AnswerCard:nth-child(4))),
+.finalRound2WordsStage[data-round2-number="3"] .finalRound3AnswersPremium:not(:has(.finalRound3AnswerCard:nth-child(4))),
+.finalRound2WordsStage[data-round2-number="6"] .finalRound3AnswersList:not(:has(.finalRound3AnswerCard:nth-child(4))),
+.finalRound2WordsStage[data-round2-number="6"] .finalRound3AnswersPremium:not(:has(.finalRound3AnswerCard:nth-child(4))){
+  grid-template-columns:repeat(3,minmax(0,190px));
+}
+
+.finalRound2WordsStage[data-round2-number="3"] .finalRound3AnswerCard,
+.finalRound2WordsStage[data-round2-number="6"] .finalRound3AnswerCard{
+  width:100%;
+  height:180px;
+  min-height:180px;
+  max-height:180px;
+
+  border-radius:30px;
+  padding:16px 14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+
+  overflow:hidden;
+}
+
+
+/* =========================================================
+   3) القصة
+   بدون قص عند ظهور الإجابة
+   يصغر الخط فقط وقت ظهور الإجابة
+========================================================= */
+
+.finalStoryStackContent{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+.finalStoryPartsStack{
+  width:100%;
+  height:auto;
+  max-height:100%;
+  min-height:0;
+
+  display:grid;
+  gap:12px;
+
+  align-content:center;
+  justify-content:stretch;
+
+  overflow:hidden;
+}
+
+.finalStoryPartsStack:not(:has(.finalStoryStackPart:nth-child(2))){
+  grid-template-rows:170px;
+}
+
+.finalStoryPartsStack:has(.finalStoryStackPart:nth-child(2)):not(:has(.finalStoryStackPart:nth-child(3))){
+  grid-template-rows:repeat(2,160px);
+}
+
+.finalStoryPartsStack:has(.finalStoryStackPart:nth-child(3)){
+  grid-template-rows:repeat(3,145px);
+}
+
+/* عند ظهور الإجابة: خلي كل الأجزاء تظهر فوق الإجابة */
+.finalStoryStackContent:has(.finalStoryCleanAnswer){
+  display:grid;
+  grid-template-columns:1fr;
+  grid-template-rows:minmax(0,1fr) 118px;
+  gap:12px;
+  align-items:stretch;
+
+  overflow:hidden;
+}
+
+.finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryPartsStack{
+  width:100%;
+  height:100%;
+  min-height:0;
+  max-height:100%;
+
+  display:grid;
+  gap:10px;
+  align-content:stretch;
+
+  overflow:hidden;
+}
+
+.finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryPartsStack:not(:has(.finalStoryStackPart:nth-child(2))){
+  grid-template-rows:1fr;
+}
+
+.finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryPartsStack:has(.finalStoryStackPart:nth-child(2)):not(:has(.finalStoryStackPart:nth-child(3))){
+  grid-template-rows:repeat(2,minmax(0,1fr));
+}
+
+.finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryPartsStack:has(.finalStoryStackPart:nth-child(3)){
+  grid-template-rows:repeat(3,minmax(0,1fr));
+}
+
+.finalStoryStackPart{
+  width:100%;
+  height:100%;
+  min-height:0;
+  max-height:none;
+
+  border-radius:30px;
+  padding:18px 22px;
+
+  display:grid;
+  grid-template-columns:66px minmax(0,1fr);
+  gap:18px;
+  align-items:stretch;
+
+  overflow:hidden;
+}
+
+.finalStoryStackText{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.28rem,2.05vw,1.78rem);
+  line-height:1.3;
+  font-weight:900;
+
+  text-align:right;
+
+  display:flex;
+  align-items:center;
+
+  padding:4px 8px 4px 12px;
+
+  overflow:hidden;
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+}
+
+/* التصغير فقط مع الإجابة */
+.finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryStackText{
+  font-size:clamp(.9rem,1.28vw,1.08rem);
+  line-height:1.18;
+}
+
+.finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryStackPart{
+  border-radius:24px;
+  padding:10px 16px;
+  grid-template-columns:54px minmax(0,1fr);
+  gap:12px;
+}
+
+.finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryStackPoints{
+  width:50px;
+  height:50px;
+  border-radius:17px;
+  font-size:1.16rem;
+}
+
+.finalStoryCleanAnswer{
+  width:100%;
+  height:118px;
+  min-height:118px;
+  max-height:118px;
+
+  border-radius:28px;
+  padding:40px 24px 16px;
+
+  font-size:clamp(1.05rem,1.55vw,1.34rem);
+  line-height:1.25;
+  font-weight:900;
+
+  text-align:center;
+
+  overflow:hidden;
+  overflow-wrap:anywhere;
+}
+
+
+/* =========================================================
+   4) بدون نقاط
+   تكبير خط وضع التكبير / overlay
+========================================================= */
+
+.finalRound1OverlayInner,
+.finalRound1OverlayPaper{
+  width:min(97vw,1320px);
+  min-height:66vh;
+}
+
+.finalRound1OverlayText{
+  font-size:clamp(3rem,6.3vw,7rem);
+  line-height:1.45;
+}
+/* =========================================================
+   FINAL NO SCROLL FIX
+   يرجع الفقرات داخل الشاشة
+========================================================= */
+
+@media (min-width:768px) and (orientation:landscape){
+
+  .finalWrapNew{
+    height:calc(100dvh - 104px);
+    max-height:calc(100dvh - 104px);
+
+    grid-template-rows:74px minmax(0,1fr) 58px;
+    gap:8px;
+
+    padding:0 16px 8px;
+
+    overflow:hidden;
+  }
+
+  .finalScorePanel,
+  .finalScoreCenterPanel{
+    height:74px;
+    min-height:74px;
+  }
+
+  .finalMainStage,
+  .finalDisplayBody .finalMainStage{
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .finalRound1StartView,
+  .finalRound1PlayLayout,
+  .finalRound1StageLayout,
+  .finalRound2Wrap,
+  .finalRound3Wrap,
+  .finalStoryWrap,
+  .finalRound4TeamMediaWrap,
+  .finalTeamMediaWrap{
+    height:100%;
+    min-height:0;
+    grid-template-rows:66px minmax(0,1fr);
+    gap:10px;
+    overflow:hidden;
+  }
+
+  .finalRound1Card,
+  .finalRound2Card,
+  .finalRound3Card,
+  .finalStoryNumberCard,
+  .finalTeamMediaNumberCard{
+    height:66px;
+    min-height:66px;
+    font-size:2rem;
+    border-radius:22px;
+  }
+
+  .finalControlsBar,
+  .finalRound1ControlsBar,
+  .finalRound2ControlsBar,
+  .finalRound3ControlsBar,
+  #finalControlsBar{
+    gap:8px;
+  }
+
+  .finalControlsBar button,
+  .finalRound1ControlsBar button,
+  .finalRound2ControlsBar button,
+  .finalRound3ControlsBar button,
+  .archiveCtrlBtn,
+  .finalTeamMediaCtrlBtn{
+    height:58px;
+    min-height:58px;
+    border-radius:20px;
+    font-size:.96rem;
+  }
+
+  /* صح صحلي 1 و 4 */
+  .finalRound2ScrambleGrid,
+  .finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerGrid,
+  .finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerGrid{
+    grid-auto-rows:148px;
+    gap:10px;
+  }
+
+  .finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerGrid,
+  .finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerGrid,
+  .finalRound2ScrambleGrid{
+    grid-template-columns:repeat(6,minmax(0,142px));
+  }
+
+  .finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(4)):not(:has(.finalRound2AnswerCard:nth-child(5))),
+  .finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerGrid:has(.finalRound2AnswerCard:nth-child(4)):not(:has(.finalRound2AnswerCard:nth-child(5))),
+  .finalRound2ScrambleGrid.finalAnswersCount4{
+    grid-template-columns:repeat(4,minmax(0,170px));
+  }
+
+  .finalRound2ScrambleGrid .finalRound2AnswerCard,
+  .finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerCard,
+  .finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerCard{
+    height:148px;
+    min-height:148px;
+    max-height:148px;
+    border-radius:24px;
+    padding:10px;
+  }
+
+  .finalRound2ScrambleGrid .finalRound2AnswerScrambled,
+  .finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerScrambled,
+  .finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerScrambled{
+    height:38px;
+    min-height:38px;
+    max-height:38px;
+    font-size:clamp(.92rem,1.35vw,1.08rem);
+  }
+
+  .finalRound2ScrambleGrid .finalRound2AnswerCorrect,
+  .finalRound2WordsStage[data-round2-number="1"] .finalRound2AnswerCorrect,
+  .finalRound2WordsStage[data-round2-number="4"] .finalRound2AnswerCorrect{
+    font-size:clamp(1.05rem,1.6vw,1.36rem);
+    line-height:1.18;
+  }
+
+  /* صح صحلي 3 و 6 */
+  .finalRound2WordsStage[data-round2-number="3"] .finalRound3AnswersList,
+  .finalRound2WordsStage[data-round2-number="3"] .finalRound3AnswersPremium,
+  .finalRound2WordsStage[data-round2-number="6"] .finalRound3AnswersList,
+  .finalRound2WordsStage[data-round2-number="6"] .finalRound3AnswersPremium{
+    grid-template-columns:repeat(6,minmax(0,142px));
+    gap:10px;
+    width:100%;
+    justify-content:center;
+    place-content:center;
+  }
+
+  .finalRound2WordsStage[data-round2-number="3"] .finalRound3AnswerCard,
+  .finalRound2WordsStage[data-round2-number="6"] .finalRound3AnswerCard{
+    height:150px;
+    min-height:150px;
+    max-height:150px;
+    border-radius:24px;
+    padding:12px;
+  }
+
+  /* القصة */
+  .finalStoryPartsStack:not(:has(.finalStoryStackPart:nth-child(2))){
+    grid-template-rows:145px;
+  }
+
+  .finalStoryPartsStack:has(.finalStoryStackPart:nth-child(2)):not(:has(.finalStoryStackPart:nth-child(3))){
+    grid-template-rows:repeat(2,132px);
+  }
+
+  .finalStoryPartsStack:has(.finalStoryStackPart:nth-child(3)){
+    grid-template-rows:repeat(3,116px);
+  }
+
+  .finalStoryStackContent:has(.finalStoryCleanAnswer){
+    grid-template-rows:minmax(0,1fr) 96px;
+    gap:8px;
+  }
+
+  .finalStoryCleanAnswer{
+    height:96px;
+    min-height:96px;
+    max-height:96px;
+    padding:34px 22px 12px;
+  }
+
+  .finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryStackPart{
+    padding:8px 14px;
+    grid-template-columns:48px minmax(0,1fr);
+    gap:10px;
+  }
+
+  .finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryStackPoints{
+    width:44px;
+    height:44px;
+    font-size:1.05rem;
+  }
+
+  .finalStoryStackContent:has(.finalStoryCleanAnswer) .finalStoryStackText{
+    font-size:clamp(.82rem,1.12vw,.98rem);
+    line-height:1.14;
+  }
+
+  /* بدون نقاط */
+  .finalRound1StageLayout:has(.finalRound1BottomInfoRow){
+    gap:12px;
+  }
+
+  .finalRound1StageLayout:has(.finalRound1BottomInfoRow) .finalRound1TextCard,
+  .finalRound1StageLayout:has(.finalRound1BottomInfoRow) .finalRound1ImageFrame,
+  .finalRound1StageLayout:has(.finalRound1BottomInfoRow) .finalRound1RevealCard{
+    padding:18px 26px;
+  }
+
+  .finalRound1StageLayout:has(.finalRound1BottomInfoRow) .finalRound1ResultBox{
+    padding:18px;
+  }
+}
