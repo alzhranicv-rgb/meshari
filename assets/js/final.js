@@ -1881,7 +1881,7 @@ function renderFinalRound1Content(data) {
   const number = Number(finalState.round1.currentNumber || 0)
   const fullCardText = (data?.card_text || finalState.round1.cardTexts?.[number] || "").trim()
   const isHistoricalTextCard = isFinalRound1TextCard(number) && !!fullCardText
-const isQuestionCard = isFinalRound1QuestionCard(number)
+  const isQuestionCard = isFinalRound1QuestionCard(number)
 
   currentFinalRound1Image = finalState.round1.currentImage || ""
 
@@ -1912,7 +1912,7 @@ const isQuestionCard = isFinalRound1QuestionCard(number)
             ${visibleParts.map((part, idx) => `
               <div class="finalRound1QuestionPart">
                 <span class="finalRound1PartBadge">${idx + 1}</span>
-                <span>${part}</span>
+                <span>${escapeDisplayHtml(part)}</span>
               </div>
             `).join("")}
           </div>
@@ -1922,7 +1922,7 @@ const isQuestionCard = isFinalRound1QuestionCard(number)
       mainContent = `
         <div class="finalRound1MainStageCard finalRound1PremiumStage">
           <div class="finalRound1ImageFrame finalRound1RevealCard" onclick="toggleFinalRound1ImageOverlay()">
-            <img class="finalRound1BigImage" src="${finalState.round1.currentImage}" alt="">
+            <img class="finalRound1BigImage" src="${escapeDisplayHtml(finalState.round1.currentImage)}" alt="">
           </div>
         </div>
       `
@@ -1937,7 +1937,7 @@ const isQuestionCard = isFinalRound1QuestionCard(number)
     mainContent = `
       <div class="finalRound1MainStageCard finalRound1PremiumStage">
         <div class="finalRound1ImageFrame finalRound1RevealCard" onclick="toggleFinalRound1ImageOverlay()">
-          <img class="finalRound1BigImage" src="${finalState.round1.currentImage}" alt="">
+          <img class="finalRound1BigImage" src="${escapeDisplayHtml(finalState.round1.currentImage)}" alt="">
         </div>
       </div>
     `
@@ -1954,21 +1954,25 @@ const isQuestionCard = isFinalRound1QuestionCard(number)
       <div class="finalRound1ResultBox correctResult">
         <div class="finalRound1ResultLabel">الإجابة</div>
         <div class="finalRound1ResultText ${isFinalRound1QuestionCard(number) ? "finalRound1AnswerProjectFont" : "finalRound1AnswerMolhimFont"}">
-          ${finalState.round1.currentAnswer}
+          ${escapeDisplayHtml(finalState.round1.currentAnswer)}
         </div>
       </div>
     `
   }
 
   box.innerHTML = `
-    <div class="finalRound1StageLayout finalRound1PremiumLayout">
-      ${mainContent}
+    <div class="finalRound1StageLayout finalRound1PremiumLayout ${answerContent ? "finalRound1AnswerLayout" : "finalRound1QuestionOnlyLayout"}">
+
+      <div class="finalRound1QuestionSide">
+        ${mainContent}
+      </div>
 
       ${answerContent ? `
-        <div class="finalRound1BottomInfoRow">
+        <div class="finalRound1AnswerSide finalRound1BottomInfoRow">
           ${answerContent}
         </div>
       ` : ""}
+
     </div>
   `
 }
@@ -2523,21 +2527,30 @@ function renderFinalRound2Words(showAnswers) {
 
 function renderFinalRound2ScrambleWords(box, showAnswers) {
   if (showAnswers) {
-    box.innerHTML = `
-      <div class="finalRound2AnswerGrid">
-        ${finalState.round2.scrambledWords.map((word, idx) => {
-          const selected = finalState.round2.selectedCorrectIndexes.includes(idx)
+    const count = finalState.round2.scrambledWords.length
 
-          return `
-            <button
-              class="finalRound2AnswerCard ${selected ? "selectedCorrect" : ""}"
-              onclick="toggleFinalRound2CorrectSelection(${idx})"
-            >
-              <div class="finalRound2AnswerScrambled">${escapeDisplayHtml(word)}</div>
-              <div class="finalRound2AnswerCorrect">${escapeDisplayHtml(finalState.round2.answers[idx] || "-")}</div>
-            </button>
-          `
-        }).join("")}
+    box.innerHTML = `
+      <div class="finalRound2ScrambleAnswerStage finalAnswersCount${count}">
+        <div class="finalRound2AnswerGrid finalRound2ScrambleGrid finalAnswersCount${count}">
+          ${finalState.round2.scrambledWords.map((word, idx) => {
+            const selected = finalState.round2.selectedCorrectIndexes.includes(idx)
+
+            return `
+              <button
+                class="finalRound2AnswerCard ${selected ? "selectedCorrect" : ""}"
+                onclick="toggleFinalRound2CorrectSelection(${idx})"
+              >
+                <div class="finalRound2AnswerScrambled">
+                  ${escapeDisplayHtml(word)}
+                </div>
+
+                <div class="finalRound2AnswerCorrect">
+                  ${escapeDisplayHtml(finalState.round2.answers[idx] || "-")}
+                </div>
+              </button>
+            `
+          }).join("")}
+        </div>
       </div>
     `
     return
@@ -2618,6 +2631,7 @@ function renderFinalRound2ImageWords(box) {
   const images = finalState.round2.images || []
   const answers = finalState.round2.imageAnswers || []
   const shown = Number(finalState.round2.shownImageIndex || 0)
+  const answersCount = answers.length
 
   if (!images.length) {
     box.innerHTML = `<div class="finalRoundPlaceholder">لا توجد صور</div>`
@@ -2626,12 +2640,8 @@ function renderFinalRound2ImageWords(box) {
 
   if (finalState.round2.imageAnswerShown) {
     box.innerHTML = `
-      <div class="finalRound3ResultView">
-        <div class="finalRound3ResultHeader">
-          
-        </div>
-
-        <div class="finalRound3AnswersList finalRound3AnswersPremium">
+      <div class="finalRound3ResultView finalRound2ImageAnswerStage">
+        <div class="finalRound3AnswersList finalRound3AnswersPremium finalAnswersCount${answersCount}">
           ${answers.map((answer, idx) => {
             const selected = finalState.round2.selectedCorrectIndexes.includes(idx)
 
@@ -2651,7 +2661,7 @@ function renderFinalRound2ImageWords(box) {
   }
 
   if (shown <= 0) {
-    box.innerHTML = `<div class="finalRoundPlaceholder">اضغط  بدء عرض الصور </div>`
+    box.innerHTML = `<div class="finalRoundPlaceholder">اضغط بدء عرض الصور</div>`
     return
   }
 
@@ -2671,6 +2681,7 @@ function renderFinalRound2ImageWords(box) {
 
   currentFinalRound3Image = currentImage
 }
+
 function stopFinalRound2ImageAutoShow() {
   if (finalRound2ImageAutoTimer) {
     clearTimeout(finalRound2ImageAutoTimer)
@@ -3274,6 +3285,7 @@ function buildFinalRound3StoryContent() {
   const shownPart = Number(state.shownPart || 0)
   const parts = Array.isArray(state.currentParts) ? state.currentParts : ["", "", ""]
   const visibleParts = parts.slice(0, shownPart)
+  const partsCount = visibleParts.length
 
   const getPartPoints = index => {
     if (index === 0) return 3
@@ -3299,9 +3311,9 @@ function buildFinalRound3StoryContent() {
   }
 
   return `
-    <div class="finalStoryStackContent">
+    <div class="finalStoryStackContent finalStoryPartsCount${partsCount} ${answerHTML ? "finalStoryHasAnswer" : ""}">
 
-      <div class="finalStoryPartsStack">
+      <div class="finalStoryPartsStack finalStoryPartsCount${partsCount}">
         ${visibleParts.map((part, index) => `
           <div class="finalStoryStackPart">
             <div class="finalStoryStackPoints">
@@ -3821,8 +3833,8 @@ function buildFinalRound4TeamMediaContent() {
     } else if (isImage) {
       mediaHTML = `
         <div class="finalTeamMediaFrame finalTeamMediaImageFrame" onclick="openFinalRound4TeamMediaOverlay('image')">
-  <img src="${escapeDisplayHtml(state.currentMedia)}" class="finalTeamMediaImage" alt="">
-</div>
+          <img src="${escapeDisplayHtml(state.currentMedia)}" class="finalTeamMediaImage" alt="">
+        </div>
       `
     }
   }
@@ -3859,8 +3871,15 @@ function buildFinalRound4TeamMediaContent() {
       `
       : ""
 
+  const classes = [
+    "finalRound3TeamMediaContent",
+    mediaHTML ? "finalFocusHasMedia" : "finalFocusTextOnly",
+    questionHTML ? "finalFocusHasQuestion" : "",
+    answerHTML ? "finalFocusHasAnswer" : ""
+  ].filter(Boolean).join(" ")
+
   return `
-    <div class="finalRound3TeamMediaContent">
+    <div class="${classes}">
       ${mediaHTML}
 
       <div class="finalTeamMediaTextRow">
