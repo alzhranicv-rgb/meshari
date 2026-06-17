@@ -2573,14 +2573,13 @@ function renderFinalRound2ScrambleWords(box, showAnswers) {
 
 function renderFinalRound2SequenceWords(box) {
   const countdown = Number(finalState.round2.countdown || 0)
-
-  const visibleWords = finalState.round2.allWords.filter((_, idx) => {
-    return !finalState.round2.hiddenSequence.includes(idx)
-  })
-
   const timerClass = countdown <= 5 ? "danger" : ""
 
-  if (!visibleWords.length) {
+  const words = Array.isArray(finalState.round2.allWords)
+    ? finalState.round2.allWords
+    : []
+
+  if (!words.length) {
     box.innerHTML = `
       <div class="finalSequenceStageBox">
         <div class="finalSequenceTimerBadge ${timerClass}">
@@ -2589,7 +2588,35 @@ function renderFinalRound2SequenceWords(box) {
         </div>
 
         <div class="finalRoundPlaceholder">
-          تم إخفاء جميع الكلمات
+          لا توجد كلمات
+        </div>
+      </div>
+    `
+    return
+  }
+
+  const allHidden = words.every((_, idx) => {
+    return finalState.round2.hiddenSequence.includes(idx)
+  })
+
+  if (allHidden) {
+    box.innerHTML = `
+      <div class="finalSequenceStageBox">
+        <div class="finalSequenceTimerBadge ${timerClass}">
+          <span>المتبقي</span>
+          <strong>${countdown}</strong>
+        </div>
+
+        <div class="finalSequenceWordsWrap finalSequenceWordsDone">
+          ${words.map((word, idx) => `
+            <button
+              class="finalSequenceWordBtn isHiddenWord"
+              disabled
+              type="button"
+            >
+              ${escapeDisplayHtml(word)}
+            </button>
+          `).join("")}
         </div>
       </div>
     `
@@ -2605,18 +2632,16 @@ function renderFinalRound2SequenceWords(box) {
       </div>
 
       <div class="finalSequenceWordsWrap">
-        ${visibleWords.map((word, visibleIdx) => {
-          const realIndex = finalState.round2.allWords.findIndex((_, idx) => {
-            return !finalState.round2.hiddenSequence.includes(idx) &&
-              finalState.round2.allWords[idx] === word &&
-              visibleWords.slice(0, visibleIdx).filter(x => x === word).length ===
-              finalState.round2.allWords
-                .slice(0, idx)
-                .filter((x, i) => !finalState.round2.hiddenSequence.includes(i) && x === word).length
-          })
+        ${words.map((word, idx) => {
+          const hidden = finalState.round2.hiddenSequence.includes(idx)
 
           return `
-            <button class="finalSequenceWordBtn" onclick="hideFinalRound2SequenceWord(${realIndex})">
+            <button
+              class="finalSequenceWordBtn ${hidden ? "isHiddenWord" : ""}"
+              ${hidden ? "disabled" : ""}
+              type="button"
+              onclick="${hidden ? "" : `hideFinalRound2SequenceWord(${idx})`}"
+            >
               ${escapeDisplayHtml(word)}
             </button>
           `
@@ -3792,8 +3817,10 @@ function buildFinalRound4TeamMediaContent() {
 
   const isVideo = state.currentMediaType === "video" && state.currentMedia
   const isImage = state.currentMediaType === "image" && state.currentMedia
+  const hasMedia = !!(isVideo || isImage)
 
   const showMedia =
+    hasMedia &&
     !state.questionShown &&
     !state.answerShown &&
     !state.imageHidden
@@ -3807,7 +3834,7 @@ function buildFinalRound4TeamMediaContent() {
 
   let mediaHTML = ""
 
-  if (showMedia && state.currentMedia) {
+  if (showMedia) {
     if (isVideo) {
       mediaHTML = `
         <div class="finalTeamMediaFrame finalTeamMediaVideoFrame" onclick="openFinalRound4TeamMediaOverlay('video')">
@@ -3851,7 +3878,6 @@ function buildFinalRound4TeamMediaContent() {
     state.questionShown && state.currentQuestion
       ? `
         <div class="finalTeamMediaQuestionBox finalTeamMediaQuestionOnly">
-          <div class="finalTeamMediaSmallLabel">السؤال</div>
           <div class="finalTeamMediaQuestionText">
             ${escapeDisplayHtml(state.currentQuestion)}
           </div>
@@ -3863,7 +3889,6 @@ function buildFinalRound4TeamMediaContent() {
     state.answerShown && state.currentAnswer
       ? `
         <div class="finalTeamMediaResultBox ${resultClass}">
-          <div class="finalTeamMediaSmallLabel">الإجابة</div>
           <div class="finalRound3TeamMediaAnswer">
             ${escapeDisplayHtml(state.currentAnswer)}
           </div>
@@ -3871,11 +3896,22 @@ function buildFinalRound4TeamMediaContent() {
       `
       : ""
 
+  const hasText = !!(questionHTML || answerHTML)
+
   const classes = [
     "finalRound3TeamMediaContent",
-    mediaHTML ? "finalFocusHasMedia" : "finalFocusTextOnly",
+
+    showMedia ? "finalFocusHasMedia" : "",
+    hasText ? "finalFocusHasText" : "",
+
     questionHTML ? "finalFocusHasQuestion" : "",
-    answerHTML ? "finalFocusHasAnswer" : ""
+    answerHTML ? "finalFocusHasAnswer" : "",
+
+    /* مهم: نص فقط الحقيقي يكون فقط إذا ما فيه ميديا أصلاً */
+    !hasMedia && hasText ? "finalFocusTextOnly" : "",
+
+    /* إذا فيه ميديا لكنها اختفت بعد السؤال/الإجابة */
+    hasMedia && hasText && !showMedia ? "finalFocusMediaHiddenText" : ""
   ].filter(Boolean).join(" ")
 
   return `

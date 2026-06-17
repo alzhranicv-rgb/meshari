@@ -91,6 +91,178 @@ function showGameToast(message) {
 }
 
 /* =========================
+   Admin Model PIN
+   الرقم السري للنموذج داخل الأدمن فقط
+========================= */
+
+function getAdminModelAccessKey(modelId) {
+  return `admin_model_access_${Number(modelId)}`
+}
+
+function isAdminModelUnlocked(modelId) {
+  return sessionStorage.getItem(getAdminModelAccessKey(modelId)) === "1"
+}
+
+function unlockAdminModel(modelId) {
+  sessionStorage.setItem(getAdminModelAccessKey(modelId), "1")
+}
+
+function closeAdminPinModal() {
+  document.getElementById("adminPinModal")?.remove()
+}
+
+function requestAdminPinModal({
+  title = "الرقم السري",
+  message = "اكتب الرقم السري للنموذج",
+  confirmText = "تأكيد"
+} = {}) {
+  return new Promise(resolve => {
+    closeAdminPinModal()
+
+    document.body.insertAdjacentHTML("beforeend", `
+      <div class="adminModalOverlay" id="adminPinModal">
+        <div class="adminModalCard">
+          <div class="adminModalTitle">${escapeHtml(title)}</div>
+
+          <div class="adminField">
+            <label>${escapeHtml(message)}</label>
+            <input
+              id="adminModelPinInput"
+              class="adminInput"
+              type="password"
+              inputmode="numeric"
+              placeholder="الرقم السري"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="adminModalActions">
+            <button type="button" class="adminBtn adminBtnLight" id="adminPinCancelBtn">
+              إلغاء
+            </button>
+
+            <button type="button" class="adminBtn adminBtnMango" id="adminPinConfirmBtn">
+              ${escapeHtml(confirmText)}
+            </button>
+          </div>
+        </div>
+      </div>
+    `)
+
+    const modal = document.getElementById("adminPinModal")
+    const input = document.getElementById("adminModelPinInput")
+    const cancelBtn = document.getElementById("adminPinCancelBtn")
+    const confirmBtn = document.getElementById("adminPinConfirmBtn")
+
+    function cancel() {
+      closeAdminPinModal()
+      resolve("")
+    }
+
+    function confirm() {
+      const value = (input?.value || "").trim()
+      closeAdminPinModal()
+      resolve(value)
+    }
+
+    cancelBtn.onclick = cancel
+    confirmBtn.onclick = confirm
+
+    modal.onclick = e => {
+      if (e.target === modal) cancel()
+    }
+
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") confirm()
+      if (e.key === "Escape") cancel()
+    })
+
+    setTimeout(() => {
+      input.focus()
+    }, 50)
+  })
+}
+
+async function requestAdminModelAccess(modelId, fallbackName = "") {
+  const id = Number(modelId || 0)
+
+  if (!id) {
+    showGameToast("اختر النموذج")
+    return null
+  }
+
+  if (isAdminModelUnlocked(id)) {
+    return {
+      id,
+      name: fallbackName || `نموذج ${id}`
+    }
+  }
+
+  const { data, error } = await db
+    .from("models")
+    .select("id, name, admin_pin")
+    .eq("id", id)
+    .maybeSingle()
+
+  if (error || !data) {
+    console.log("MODEL PIN READ ERROR:", error)
+    showGameToast("تعذر قراءة بيانات النموذج")
+    return null
+  }
+
+  const savedPin = String(data.admin_pin || "").trim()
+
+  /* النموذج قديم وما له رقم سري */
+  if (!savedPin) {
+    const newPin = await requestAdminPinModal({
+      title: `تأمين ${data.name || fallbackName || "النموذج"}`,
+      message: "هذا النموذج قديم وما له رقم سري، اكتب رقم سري جديد له",
+      confirmText: "حفظ الرقم"
+    })
+
+    if (!newPin) {
+      showGameToast("لازم تضيف رقم سري للنموذج")
+      return null
+    }
+
+    const { error: updateError } = await db
+      .from("models")
+      .update({
+        admin_pin: newPin
+      })
+      .eq("id", id)
+
+    if (updateError) {
+      console.log("SAVE OLD MODEL PIN ERROR:", updateError)
+      showGameToast("تعذر حفظ الرقم السري للنموذج")
+      return null
+    }
+
+    unlockAdminModel(id)
+    showGameToast("تم حفظ الرقم السري للنموذج")
+
+    return data
+  }
+
+  /* النموذج عنده رقم سري */
+  const enteredPin = await requestAdminPinModal({
+    title: `فتح ${data.name || fallbackName || "النموذج"}`,
+    message: "اكتب الرقم السري الخاص بهذا النموذج",
+    confirmText: "فتح النموذج"
+  })
+
+  if (!enteredPin) return null
+
+  if (String(enteredPin) !== savedPin) {
+    showGameToast("الرقم السري غير صحيح")
+    return null
+  }
+
+  unlockAdminModel(id)
+  return data
+}
+
+/* =========================
    4) Basic Helpers
 ========================= */
 
@@ -1770,9 +1942,23 @@ async function createModel() {
     return
   }
 
+  const adminPin = await requestAdminPinModal({
+    title: "إنشاء نموذج جديد",
+    message: "اكتب رقم سري خاص بالأدمن لهذا النموذج",
+    confirmText: "إنشاء النموذج"
+  })
+
+  if (!adminPin) {
+    showGameToast("لازم تكتب رقم سري للنموذج")
+    return
+  }
+
   const { data, error } = await db
     .from("models")
-    .insert({ name })
+    .insert({
+      name,
+      admin_pin: adminPin
+    })
     .select()
     .single()
 
@@ -1787,6 +1973,8 @@ async function createModel() {
   await loadModels()
 
   if (data?.id) {
+    unlockAdminModel(data.id)
+
     currentModel = data.id
     currentModelName = data.name || name
 
@@ -1812,8 +2000,13 @@ async function openSelectedModel() {
     return
   }
 
+  const optionName = list.options[list.selectedIndex]?.textContent || `نموذج ${id}`
+
+  const modelData = await requestAdminModelAccess(id, optionName)
+  if (!modelData) return
+
   currentModel = id
-  currentModelName = list.options[list.selectedIndex]?.textContent || `نموذج ${id}`
+  currentModelName = modelData.name || optionName
 
   updateAdminBrandModel()
   tabs()?.classList.remove("hidden")
@@ -1835,6 +2028,8 @@ async function renameSelectedModel() {
     currentModelName ||
     list?.options?.[list.selectedIndex]?.textContent ||
     ""
+    const modelData = await requestAdminModelAccess(id, currentName)
+    if (!modelData) return
 
   document.getElementById("renameModelModal")?.remove()
 
@@ -1929,6 +2124,9 @@ async function deleteSelectedModel() {
     currentModelName ||
     list?.options?.[list.selectedIndex]?.textContent ||
     `نموذج ${id}`
+
+    const modelData = await requestAdminModelAccess(id, modelName)
+    if (!modelData) return
 
   const ok = confirm(
     `هل تريد حذف "${modelName}" نهائيًا؟\n\nسيتم حذف كل بيانات النموذج من جميع الفقرات.`

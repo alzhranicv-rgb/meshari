@@ -1731,3 +1731,37 @@ body.whoOverlayActive .whoGrid{
 
   animation:segmentTeamGlow 1.6s ease-in-out infinite alternate;
 }
+/* =========================================================
+   WHO NUMBERS REMOVE SHADOW ONLY
+   شيل الظل من مربعات أرقام من هو فقط
+========================================================= */
+
+.whoBtn,
+.whoNumberBtn,
+.whoGrid button,
+.whoCardBtn{
+  box-shadow:none !important;
+}
+
+/* المستخدم */
+.whoBtn.used,
+.whoNumberBtn.used,
+.whoGrid button.used,
+.whoCardBtn.used{
+  box-shadow:none !important;
+}
+
+/* المقفل */
+.whoBtnLocked15,
+.whoBtn.whoBtnLocked15,
+.whoGrid button.whoBtnLocked15{
+  box-shadow:none !important;
+}
+
+/* Hover بدون ظل */
+.whoBtn:hover:not(.used):not(:disabled):not(.whoBtnLocked15),
+.whoNumberBtn:hover:not(.used):not(:disabled),
+.whoGrid button:hover:not(.used):not(:disabled):not(.whoBtnLocked15),
+.whoCardBtn:hover:not(.used):not(:disabled){
+  box-shadow:none !important;
+}

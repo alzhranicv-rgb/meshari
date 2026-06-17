@@ -219,6 +219,8 @@ window.renderWarmup = async function () {
   }
 
   updateWarmupDoubleButton()
+  renderWarmupFinishedIfNeeded()
+
 }
 
 async function loadWarmupCategories() {
@@ -658,6 +660,7 @@ function warmupCorrect() {
     resetWarmupTimer()
     updateWarmupDoubleButton()
     saveWarmupState()
+    renderWarmupFinishedIfNeeded()
   })
 }
 
@@ -696,5 +699,101 @@ function warmupWrong() {
     resetWarmupTimer()
     updateWarmupDoubleButton()
     saveWarmupState()
+    renderWarmupFinishedIfNeeded()
   })
+}
+/* =========================
+   Warmup Finish System
+   نفس نظام نهاية الفاصلة
+========================= */
+
+function getWarmupTotalQuestionsCount() {
+  return 12
+}
+
+function getWarmupUsedQuestionsCount() {
+  return Object.keys(usedQuestions || {}).filter(key => usedQuestions[key]).length
+}
+
+function isWarmupFinished() {
+  return (
+    getWarmupUsedQuestionsCount() >= getWarmupTotalQuestionsCount() &&
+    !warmupQuestionLocked &&
+    !warmupResultPending
+  )
+}
+
+function getWarmupWinnerText() {
+  const a = Number(warmupScoreA || 0)
+  const b = Number(warmupScoreB || 0)
+
+  if (a > b) return teamAName || "الفريق الأول"
+  if (b > a) return teamBName || "الفريق الثاني"
+
+  return "تعادل"
+}
+
+function showWarmupFinishedScreen() {
+  const wrap = document.querySelector(".warmupWrap")
+  if (!wrap) return
+
+  const questionBox = document.getElementById("questionBox")
+  const controls = document.querySelector(".warmupControlPanel")
+  const grid = document.querySelector(".warmupGrid")
+
+  if (questionBox) questionBox.remove()
+  if (controls) controls.remove()
+  if (grid) grid.remove()
+
+  if (wrap.querySelector(".warmupFinishedScreen")) return
+
+  const winner = getWarmupWinnerText()
+
+  const finished = document.createElement("div")
+  finished.className = "warmupFinishedScreen"
+
+  finished.innerHTML = `
+    <div class="warmupFinishedCard">
+      <div class="warmupFinishedBadge">انتهت الفقرة</div>
+
+      <h2>التسخين</h2>
+
+      <div class="warmupFinishedWinner">
+        ${winner === "تعادل" ? "تعادل" : `الفائز: ${escapeDisplayHtml(winner)}`}
+      </div>
+
+      <div class="warmupFinishedScores">
+        <div>
+          <span>${escapeDisplayHtml(teamAName || "الفريق الأول")}</span>
+          <strong>${Number(warmupScoreA || 0)}</strong>
+        </div>
+
+        <div>
+          <span>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</span>
+          <strong>${Number(warmupScoreB || 0)}</strong>
+        </div>
+      </div>
+    </div>
+  `
+
+  wrap.appendChild(finished)
+}
+
+function renderWarmupFinishedIfNeeded() {
+  if (!isWarmupFinished()) return false
+
+  showWarmupFinishedScreen()
+
+  window.currentSegmentScores = {
+    A: warmupScoreA,
+    B: warmupScoreB
+  }
+
+  saveWarmupState()
+
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
+  }
+
+  return true
 }

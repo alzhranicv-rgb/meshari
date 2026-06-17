@@ -795,6 +795,83 @@ function updateTop10TurnLabel() {
       ? teamBName
       : "اختر فريق"
 }
+let top10RoundAnswersCache = {}
+let top10SaveDelayTimer = null
+
+function getTop10RoundCacheKey(round = top10State?.round) {
+  return `${Number(currentModel)}_${Number(round)}`
+}
+
+async function loadTop10RoundAnswers(round = top10State.round) {
+  const key = getTop10RoundCacheKey(round)
+
+  if (top10RoundAnswersCache[key]) {
+    return top10RoundAnswersCache[key]
+  }
+
+  const { data, error } = await db
+    .from("top10_questions")
+    .select("position, answer")
+    .eq("model", Number(currentModel))
+    .eq("round", Number(round))
+    .order("position", { ascending: true })
+
+  if (error) throw error
+
+  const map = {}
+
+  ;(data || []).forEach(item => {
+    map[Number(item.position)] = {
+      position: Number(item.position),
+      answer: item.answer || ""
+    }
+  })
+
+  top10RoundAnswersCache[key] = map
+  return map
+}
+
+async function getTop10AnswerCached(round, num) {
+  const answers = await loadTop10RoundAnswers(round)
+  return answers[Number(num)] || null
+}
+
+function saveTop10StateLazy() {
+  clearTimeout(top10SaveDelayTimer)
+
+  top10SaveDelayTimer = setTimeout(() => {
+    saveTop10State()
+  }, 180)
+}
+
+function getTop10NumberElement(num) {
+  return (
+    document.querySelector(`.top10Rect[data-number="${num}"]`) ||
+    document.querySelector(`.top10Rect[data-num="${num}"]`) ||
+    document.querySelector(`#top10Number${num}`) ||
+    Array.from(document.querySelectorAll(".top10Rect")).find(el => {
+      const text = (el.textContent || "").trim()
+      return text === String(num)
+    })
+  )
+}
+
+function playTop10OpenEffect(num) {
+  requestAnimationFrame(() => {
+    const el = document.querySelector(`.top10Rect[data-num="${num}"]`)
+    if (!el) return
+
+    el.classList.remove("top10RevealFx")
+
+    requestAnimationFrame(() => {
+      el.classList.add("top10RevealFx")
+
+      setTimeout(() => {
+        el.classList.remove("top10RevealFx")
+      }, 520)
+    })
+  })
+}
 
 async function openTop10Number(num) {
   ensureTop10RoundState()
@@ -808,15 +885,11 @@ async function openTop10Number(num) {
 
   if (top10State.opened[round].includes(num)) return
 
-  const { data, error } = await db
-  .from("top10_questions")
-  .select("*")
-  .eq("model", Number(currentModel))
-  .eq("round", Number(round))
-  .eq("position", Number(num))
-  .maybeSingle()
+  let data = null
 
-  if (error) {
+  try {
+    data = await getTop10AnswerCached(round, num)
+  } catch (error) {
     console.log(error)
     showGameToast("تعذر تحميل الإجابة")
     return
@@ -843,8 +916,7 @@ async function openTop10Number(num) {
 
   clearTop10ActiveDouble()
 
-  playGameSound("correct")
-  top10AnimatingNumber = num
+  top10AnimatingNumber = null
   top10State.lastTeam = team
 
   const otherTeam = getOtherTeam(team)
@@ -857,147 +929,32 @@ async function openTop10Number(num) {
 
   syncTop10Globals()
 
-  if (top10State.activeTeam) {
-    autoStartTop10Timer()
-  } else {
-    clearInterval(timer)
-    timer = null
-    top10TimerStarted = false
-    top10LastTickPlayed = null
-
-    const timerBox = document.getElementById("timer")
-    if (timerBox) timerBox.innerText = 0
-  }
-
   updateTop10UIOnly()
-  saveTop10State()
+  playTop10OpenEffect(num)
 
-  if (typeof updateEndRoundButtonState === "function") {
-    updateEndRoundButtonState()
-  }
+  requestAnimationFrame(() => {
+    playGameSound("correct")
 
-  setTimeout(() => {
-    top10AnimatingNumber = null
-    updateTop10UIOnly()
-    saveTop10State()
+    if (top10State.activeTeam) {
+      autoStartTop10Timer()
+    } else {
+      clearInterval(timer)
+      timer = null
+      top10TimerStarted = false
+      top10LastTickPlayed = null
 
-    if (typeof updateEndRoundButtonState === "function") {
-      updateEndRoundButtonState()
+      const timerBox = document.getElementById("timer")
+      if (timerBox) timerBox.innerText = 0
     }
-  }, 1400)
-}
-
-function showTop10Answer() {
-  ensureTop10RoundState()
-
-  const round = top10State.round
-  const errorsA = Number(top10State.errors?.[round]?.A || 0)
-  const errorsB = Number(top10State.errors?.[round]?.B || 0)
-
-  if (errorsA < 3 || errorsB < 3) {
-    showGameToast("لا يمكن إظهار جميع الإجابات إلا بعد اكتمال أخطاء الفريقين")
-    return
-  }
-
-  revealAllTop10Answers()
-}
-
-async function revealAllTop10Answers() {
-  ensureTop10RoundState()
-
-  const round = top10State.round
-
-  const { data, error } = await db
-    .from("top10_questions")
-    .select("*")
-    .eq("model", currentModel)
-    .eq("round", round)
-    .order("position", { ascending: true })
-
-  if (error) {
-    console.log(error)
-    showGameToast("تعذر إظهار الإجابات")
-    return
-  }
-
-  pushTop10History()
-
-  ;(data || []).forEach(item => {
-    if (!top10State.opened[round].includes(item.position)) {
-      top10State.opened[round].push(item.position)
-    }
-
-    top10State.answers[round][item.position] = item.answer || ""
   })
 
-  top10AnimatingNumber = null
-
-  syncTop10Globals()
-  updateTop10UIOnly()
-  saveTop10State()
+  saveTop10StateLazy()
 
   if (typeof updateEndRoundButtonState === "function") {
     updateEndRoundButtonState()
   }
-}
 
-function addTop10Error() {
-  ensureTop10RoundState()
-
-  const round = top10State.round
-  const team = top10State.activeTeam
-
-  if (!team) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
-
-  const current = Number(top10State.errors?.[round]?.[team] || 0)
-
-  if (current >= 3) {
-    showGameToast("هذا الفريق أكمل أخطاءه الثلاث")
-    return
-  }
-
-  pushTop10History()
-
-  clearTop10ActiveDouble()
-
-  top10State.errors[round][team] += 1
-
-  playGameSound("wrong")
-  flashScreen("wrong")
-
-  const otherTeam = getOtherTeam(team)
-
-  if (top10State.errors[round][team] >= 3) {
-    top10State.activeTeam =
-      top10State.errors[round][otherTeam] < 3 ? otherTeam : null
-  } else {
-    top10State.activeTeam =
-      top10State.errors[round][otherTeam] < 3 ? otherTeam : team
-  }
-
-  syncTop10Globals()
-  updateTop10UIOnly()
-
-  if (top10State.activeTeam) {
-    autoStartTop10Timer()
-  } else {
-    clearInterval(timer)
-    timer = null
-    top10TimerStarted = false
-    top10LastTickPlayed = null
-
-    const timerBox = document.getElementById("timer")
-    if (timerBox) timerBox.innerText = 0
-  }
-
-  saveTop10State()
-
-  if (typeof updateEndRoundButtonState === "function") {
-    updateEndRoundButtonState()
-  }
+ 
 }
 
 /* =========================
