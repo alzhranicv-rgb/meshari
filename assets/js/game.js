@@ -1692,11 +1692,6 @@ function openMaToSegment(segmentKey) {
   openMainSegment(segmentKey)
 }
 
-/* حل احتياطي لو فيه مكان قديم يستدعي الاسم الغلط */
-function openMaToSegment(segmentKey) {
-  openMainSegment(segmentKey)
-}
-
 function openSegment(title, content) {
   const area = document.getElementById("segmentArea")
   if (!area) return
@@ -1902,7 +1897,7 @@ async function endCurrentSegment() {
   if (displayProFxLock) return
   displayProFxLock = true
 
-  const winner = getWinnerFromSegmentScores()
+  const winner = getWinnerFromSegmentScores(key)
 
 const fallbackSegmentScores = getRealSegmentScores(key)
 
@@ -1994,8 +1989,82 @@ function getSafeSegmentNumber(value, fallback, max) {
   )
 }
 
+function isDisplaySegmentBusyBeforeEnd(segmentKey) {
+  segmentKey = normalizeDisplaySegmentKey(segmentKey)
+
+  if (segmentKey === "warmup") {
+    return !!(
+      window.warmupQuestionLocked ||
+      typeof warmupQuestionLocked !== "undefined" && warmupQuestionLocked
+    )
+  }
+
+  if (segmentKey === "top10") {
+    return !!(
+      window.top10State?.pendingScore ||
+      window.top10State?.currentNumber ||
+      window.top10State?.currentQuestion
+    )
+  }
+
+  if (segmentKey === "auction") {
+    return !!(
+      window.auctionState?.pendingScore ||
+      window.auctionState?.currentNumber
+    )
+  }
+
+  if (segmentKey === "who") {
+    return !!(
+      window.whoState?.pendingScore ||
+      window.whoState?.currentNumber ||
+      window.whoQuestionLocked
+    )
+  }
+
+  if (segmentKey === "explain") {
+    return !!(
+      window.explainState?.pendingScore ||
+      window.explainState?.currentNumber ||
+      window.explainState?.activeWord
+    )
+  }
+
+  if (segmentKey === "finalRound1") {
+    return !!(
+      window.finalState?.round1?.pendingScore ||
+      window.finalState?.round1?.currentNumber
+    )
+  }
+
+  if (segmentKey === "finalRound2") {
+    return !!window.finalState?.round2?.pendingScore
+  }
+
+  if (segmentKey === "finalRound3") {
+    return !!(
+      window.finalState?.round3?.pendingScore ||
+      window.finalState?.round3?.currentNumber
+    )
+  }
+
+  if (segmentKey === "finalRound4") {
+    return !!(
+      window.finalState?.round4?.pendingScore ||
+      window.finalState?.round4?.currentNumber ||
+      window.finalState?.round4?.teamMedia?.currentNumber
+    )
+  }
+
+  return false
+}
+
 function canEndSegment(segmentKey) {
     segmentKey = normalizeDisplaySegmentKey(segmentKey)
+
+    if (isDisplaySegmentBusyBeforeEnd(segmentKey)) {
+  return false
+}
 
   if (segmentKey === "warmup") {
   if (!window.usedQuestions) return false
@@ -2216,18 +2285,16 @@ function updateLeadingTeamStyle() {
   }
 }
 
-function getWinnerFromSegmentScores() {
-  if (window.currentSegmentScores) {
-    const a = Number(window.currentSegmentScores.A || 0)
-    const b = Number(window.currentSegmentScores.B || 0)
+function getWinnerFromSegmentScores(segmentKey = null) {
+  const key = normalizeDisplaySegmentKey(segmentKey || getCurrentSegmentKey() || "")
+  const fallbackScores = key ? getRealSegmentScores(key) : { A: 0, B: 0 }
 
-    if (a > b) return teamAName
-    if (b > a) return teamBName
-    return "تعادل"
-  }
+  const a = Number(window.currentSegmentScores?.A ?? fallbackScores.A ?? 0)
+  const b = Number(window.currentSegmentScores?.B ?? fallbackScores.B ?? 0)
 
-  if (scoreA > scoreB) return teamAName
-  if (scoreB > scoreA) return teamBName
+  if (a > b) return teamAName
+  if (b > a) return teamBName
+
   return "تعادل"
 }
 
@@ -2669,10 +2736,10 @@ function showJoinCodePopup() {
 
 <button
   id="bigScreenModeBtn"
-  class="homeModelClassicControl bigScreenModeBtn ${localStorage.getItem("big_screen_mode") === "1" ? "activeBigScreen" : ""}"
+  class="homeModelClassicControl fullScreenModeBtn"
   type="button"
 >
-  ${localStorage.getItem("big_screen_mode") === "1" ? "إلغاء تحسين العرض" : "تحسين العرض"}
+  ملء الشاشة
 </button>
 
     <button
@@ -2702,10 +2769,12 @@ function showJoinCodePopup() {
   const bigBtn = box.querySelector("#bigScreenModeBtn")
 
 if (bigBtn) {
+  updateTvFullScreenButton()
+
   bigBtn.onclick = function (e) {
     e.preventDefault()
     e.stopPropagation()
-    toggleBigScreenMode()
+    toggleTvFullScreenMode()
     return false
   }
 }
@@ -2740,30 +2809,76 @@ function hideJoinCodePopup() {
 
 
 /* =========================
-   1) BIG SCREEN MODE
+   TV FULL SCREEN MODE
+   وضع ملء الشاشة للتلفزيون
 ========================= */
 
-const BIG_SCREEN_STORAGE_KEY = "big_screen_mode"
+function isTvFullScreenActive() {
+  return !!document.fullscreenElement || document.body.classList.contains("tvFullScreenMode")
+}
 
-function applyBigScreenMode() {
-  const enabled = localStorage.getItem(BIG_SCREEN_STORAGE_KEY) === "1"
+function updateTvFullScreenButton() {
+  const btn =
+    document.getElementById("bigScreenModeBtn") ||
+    document.getElementById("fullScreenModeBtn")
 
-  document.body.classList.toggle("bigScreenMode", enabled)
+  if (!btn) return
 
-  const btn = document.getElementById("bigScreenModeBtn")
-  if (btn) {
-    btn.innerText = enabled ? "إلغاء تحسين العرض" : "تحسين العرض"
-    btn.classList.toggle("activeBigScreen", enabled)
+  const active = isTvFullScreenActive()
+
+  btn.classList.toggle("activeFullScreen", active)
+  btn.innerText = active ? "الخروج من ملء الشاشة" : "ملء الشاشة"
+}
+
+async function toggleTvFullScreenMode() {
+  const root = document.documentElement
+  const active = isTvFullScreenActive()
+
+  try {
+    if (active) {
+      if (document.fullscreenElement && document.exitFullscreen) {
+        await document.exitFullscreen()
+      }
+
+      document.body.classList.remove("tvFullScreenMode")
+      updateTvFullScreenButton()
+      return
+    }
+
+    document.body.classList.add("tvFullScreenMode")
+
+    if (root.requestFullscreen) {
+      await root.requestFullscreen({ navigationUI: "hide" })
+    }
+
+    updateTvFullScreenButton()
+  } catch (error) {
+    console.log("TV FULLSCREEN ERROR:", error)
+
+    document.body.classList.add("tvFullScreenMode")
+    updateTvFullScreenButton()
+
+    if (typeof showGameToast === "function") {
+      showGameToast("تم تفعيل ملء الشاشة داخل الصفحة")
+    }
   }
 }
 
-function toggleBigScreenMode() {
-  const enabled = localStorage.getItem(BIG_SCREEN_STORAGE_KEY) === "1"
+document.addEventListener("fullscreenchange", () => {
+  if (document.fullscreenElement) {
+    document.body.classList.add("tvFullScreenMode")
+  } else {
+    document.body.classList.remove("tvFullScreenMode")
+  }
 
-  localStorage.setItem(BIG_SCREEN_STORAGE_KEY, enabled ? "0" : "1")
-  applyBigScreenMode()
-}
+  updateTvFullScreenButton()
+})
 
+window.toggleTvFullScreenMode = toggleTvFullScreenMode
+window.updateTvFullScreenButton = updateTvFullScreenButton
+
+/* احتياط لو بقي زر قديم يستدعي الاسم القديم */
+window.toggleBigScreenMode = toggleTvFullScreenMode
 
 /* =========================
    2) DETAILED FINAL RESULTS
