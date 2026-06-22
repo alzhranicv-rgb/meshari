@@ -1991,6 +1991,23 @@ segmentStatus[key].scoreB = finishedSegmentScores.B
   goHome()
 }
 
+function endSegment() {
+  return endCurrentSegment()
+}
+
+function finishSegment() {
+  return endCurrentSegment()
+}
+
+function closeSegment() {
+  return endCurrentSegment()
+}
+
+window.endCurrentSegment = endCurrentSegment
+window.endSegment = endSegment
+window.finishSegment = finishSegment
+window.closeSegment = closeSegment
+
 function getCurrentSegmentKey() {
   const active = normalizeDisplaySegmentKey(localStorage.getItem("active_segment"))
 
