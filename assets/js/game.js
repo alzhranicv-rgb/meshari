@@ -910,19 +910,127 @@ async function showSegmentIntro(segmentKey) {
   })
 }
 
-async function showSegmentEndOverlay(segmentKey, winner) {
-  const title = getDisplaySegmentTitle(segmentKey)
-  const isTie = !winner || winner === "تعادل"
+function getSegmentArabicTitle(segmentKey) {
+  segmentKey = normalizeDisplaySegmentKey(segmentKey)
 
-  await showDisplayProOverlay({
-    eyebrow: `انتهت فقرة ${title}`,
-    title: isTie ? "تعادل" : winner,
-    subtitle: isTie ? "لا يوجد فائز في هذه الفقرة" : "الفائز في الفقرة +1",
-    type: isTie ? "neutral" : "winner",
-    duration: 1800,
-    sound: isTie ? "answer" : "correct"
+  const titles = {
+    warmup: "التسخين",
+    top10: "Top 10",
+    auction: "فتبلة",
+    who: "من هو",
+    explain: "اشرح الكلمة",
+    finalRound1: "ٮدوں ٮڡاط",
+    finalRound2: "صح صحلي",
+    finalRound3: "قصة",
+    finalRound4: "التركيز",
+    archive: "الأرشيف",
+    final: "الفاصلة"
+  }
+
+  return titles[segmentKey] || "الفقرة"
+}
+
+function getSegmentEndScores(segmentKey) {
+  const fallback = typeof getRealSegmentScores === "function"
+    ? getRealSegmentScores(segmentKey)
+    : { A: 0, B: 0 }
+
+  return {
+    A: Number(window.currentSegmentScores?.A ?? fallback.A ?? 0),
+    B: Number(window.currentSegmentScores?.B ?? fallback.B ?? 0)
+  }
+}
+
+function closeSegmentEndOverlay() {
+  document.getElementById("segmentEndOverlay")?.remove()
+}
+
+function showSegmentEndOverlay(segmentKey, winner) {
+  return new Promise(resolve => {
+    closeSegmentEndOverlay()
+
+    const title = getSegmentArabicTitle(segmentKey)
+    const scores = getSegmentEndScores(segmentKey)
+
+    const isTie =
+      !winner ||
+      winner === "تعادل" ||
+      Number(scores.A) === Number(scores.B)
+
+    const winnerText = isTie ? "تعادل" : winner
+
+    const overlay = document.createElement("div")
+    overlay.id = "segmentEndOverlay"
+    overlay.className = `segmentEndOverlay ${isTie ? "segmentEndTie" : ""}`
+
+    overlay.innerHTML = `
+      <section class="segmentEndCard">
+
+        <div class="segmentEndBadge">نهاية الفقرة</div>
+
+        <h2 class="segmentEndTitle">${title}</h2>
+
+        <div class="segmentEndSub">
+          تم اعتماد نتيجة الفقرة وإغلاقها
+        </div>
+
+        <div class="segmentEndWinnerBox">
+          <div class="segmentEndWinnerLabel">
+            ${isTie ? "النتيجة" : "الفائز في الفقرة"}
+          </div>
+
+          <div class="segmentEndWinnerName">
+            ${winnerText}
+          </div>
+        </div>
+
+        <div class="segmentEndScore">
+          <div class="segmentEndTeamScore">
+            <span>${teamAName || "الفريق الأول"}</span>
+            <strong>${scores.A}</strong>
+          </div>
+
+          <div class="segmentEndVs">VS</div>
+
+          <div class="segmentEndTeamScore">
+            <span>${teamBName || "الفريق الثاني"}</span>
+            <strong>${scores.B}</strong>
+          </div>
+        </div>
+
+        <div class="segmentEndActions">
+          <button type="button" class="segmentEndBtn" id="segmentEndHomeBtn">
+            الرئيسية
+          </button>
+
+          <button type="button" class="segmentEndBtn dark" id="segmentEndCloseBtn">
+            إغلاق
+          </button>
+        </div>
+
+      </section>
+    `
+
+    document.body.appendChild(overlay)
+
+    const finish = () => {
+      closeSegmentEndOverlay()
+      resolve()
+    }
+
+    document.getElementById("segmentEndHomeBtn")?.addEventListener("click", finish)
+    document.getElementById("segmentEndCloseBtn")?.addEventListener("click", finish)
+
+    setTimeout(() => {
+      if (document.body.contains(overlay)) {
+        finish()
+      }
+    }, 4200)
   })
 }
+
+window.showSegmentEndOverlay = showSegmentEndOverlay
+window.closeSegmentEndOverlay = closeSegmentEndOverlay
 
 function showAnswerResultOverlay(type = "correct", points = "") {
   const isCorrect = type === "correct"
@@ -3254,6 +3362,14 @@ function getResultScore(state, team) {
   )
 }
 
+function unwrapResultState(state, key) {
+  if (!state) return {}
+
+  if (state[key]) return state[key]
+
+  return state
+}
+
 function normalizeWinnerToTeam(winner) {
   const text = String(winner || "").trim()
 
@@ -3373,9 +3489,7 @@ function getFinalResultsRows() {
         scoreB: 0
       }
 
-      function unwrapResultState(state, key) {
-      return state?.[key] || state || {}
-       }
+      
 
       const fallbackScores = getRealSegmentScores(item.segmentKey)
 
