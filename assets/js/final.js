@@ -4278,14 +4278,24 @@ function playFinalRound4TeamMediaVideo() {
       saveFinalState()
     }
 
-    const playPromise = video.play()
+    const tryPlay = () => {
+  const playPromise = video.play()
 
-    if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(err => {
-        console.log("FINAL ROUND 4 VIDEO PLAY ERROR:", err)
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch(err => {
+      console.log("FINAL ROUND 4 VIDEO PLAY BLOCKED:", err)
+
+      video.muted = true
+
+      video.play().catch(error => {
+        console.log("FINAL ROUND 4 VIDEO MUTED PLAY ERROR:", error)
         showGameToast("اضغط تشغيل مرة أخرى")
       })
-    }
+    })
+  }
+}
+
+setTimeout(tryPlay, 80)
 
     saveFinalState()
   }, 120)
@@ -4324,14 +4334,24 @@ function restartFinalRound4TeamMediaVideo() {
       saveFinalState()
     }
 
-    const playPromise = video.play()
+    const tryPlay = () => {
+  const playPromise = video.play()
 
-    if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(err => {
-        console.log("FINAL ROUND 4 VIDEO RESTART ERROR:", err)
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch(err => {
+      console.log("FINAL ROUND 4 VIDEO RESTART BLOCKED:", err)
+
+      video.muted = true
+
+      video.play().catch(error => {
+        console.log("FINAL ROUND 4 VIDEO MUTED RESTART ERROR:", error)
         showGameToast("اضغط إعادة تشغيل مرة أخرى")
       })
-    }
+    })
+  }
+}
+
+setTimeout(tryPlay, 80)
 
     saveFinalState()
   }, 120)

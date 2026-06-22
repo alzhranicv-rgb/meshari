@@ -900,12 +900,12 @@ function forceFinalTeamFromPresenter(team) {
 
 function handleFinalPresenterAction(action, data) {
   if (action === "selectTeam") {
-  if (!isValidPresenterTeam(data.team)) return
+    if (!isValidPresenterTeam(data.team)) return
 
-  return safeRunPresenterAction(() => {
-    forceFinalTeamFromPresenter(data.team)
-  })
-}
+    return safeRunPresenterAction(() => {
+      forceFinalTeamFromPresenter(data.team)
+    })
+  }
 
   if (action === "setRound") {
     return safeRunPresenterAction(() => {
@@ -1021,67 +1021,85 @@ if (action === "openNumber") {
     })
   }
 
-  if (action === "toggleRound2Correct") {
-    return safeRunPresenterAction(() => {
-      if (window.finalState?.round !== 2) return
+if (action === "toggleRound2Correct") {
+  return safeRunPresenterAction(() => {
+    if (window.finalState?.round !== 2) return
 
-      if (typeof finalRound2ToggleCorrectFromPresenter === "function") {
-        finalRound2ToggleCorrectFromPresenter(Number(data.index))
-        return
-      }
+    const index = Number(data.index)
+    if (!Number.isFinite(index) || index < 0) return
 
-      if (typeof toggleFinalRound2CorrectSelection === "function") {
-        toggleFinalRound2CorrectSelection(Number(data.index))
-      }
-    })
-  }
+    if (typeof finalRound2ToggleCorrectFromPresenter === "function") {
+      finalRound2ToggleCorrectFromPresenter(index)
+    } else if (typeof toggleFinalRound2CorrectSelection === "function") {
+      toggleFinalRound2CorrectSelection(index)
+    }
+
+    if (typeof renderFinalRound2Words === "function") {
+      renderFinalRound2Words(true)
+    }
+
+    if (typeof renderFinalRoundTitle === "function") {
+      renderFinalRoundTitle()
+    }
+
+    if (typeof saveFinalState === "function") {
+      saveFinalState()
+    } else if (typeof syncDisplayStateToSession === "function") {
+      syncDisplayStateToSession()
+    }
+  })
+}
 
 if (action === "toggleRound2ImageCorrect") {
   return safeRunPresenterAction(() => {
     if (window.finalState?.round !== 2) return
 
     const index = Number(data.index)
-    if (!Number.isFinite(index)) return
+    if (!Number.isFinite(index) || index < 0) return
+
+    if (!window.finalState.round2) return
 
     const currentNumber = Number(
       data.number ||
-      window.finalState?.round2?.currentNumber ||
+      window.finalState.round2.currentNumber ||
       0
     )
 
-    const selectedFromPresenter = Array.isArray(data.selectedCorrectIndexes)
-      ? data.selectedCorrectIndexes.map(Number)
-      : null
+    const oldSelected = Array.isArray(window.finalState.round2.selectedCorrectIndexes)
+      ? window.finalState.round2.selectedCorrectIndexes.map(Number)
+      : []
 
-    window.finalState.round2 = {
-      ...(window.finalState.round2 || {}),
-      currentNumber,
-      selectedCorrectIndexes: selectedFromPresenter || []
-    }
+    let nextSelected = oldSelected
 
-    if (!selectedFromPresenter) {
-      const oldSelected = Array.isArray(window.finalState.round2.selectedCorrectIndexes)
-        ? window.finalState.round2.selectedCorrectIndexes.map(Number)
-        : []
-
-      window.finalState.round2.selectedCorrectIndexes = oldSelected.includes(index)
+    if (Array.isArray(data.selectedCorrectIndexes)) {
+      nextSelected = data.selectedCorrectIndexes
+        .map(Number)
+        .filter(n => Number.isFinite(n) && n >= 0)
+    } else {
+      nextSelected = oldSelected.includes(index)
         ? oldSelected.filter(x => Number(x) !== index)
         : [...oldSelected, index]
     }
 
-    if (typeof saveFinalState === "function") {
-  saveFinalState()
-}
+    window.finalState.round2.currentNumber = currentNumber
+    window.finalState.round2.selectedCorrectIndexes = nextSelected
+    window.finalState.round2.correctCount = nextSelected.length
 
-if (typeof syncDisplayStateToSession === "function") {
-  syncDisplayStateToSession()
-}
+    if (typeof renderFinalRound2Words === "function") {
+      renderFinalRound2Words(true)
+    }
+
+    if (typeof renderFinalRoundTitle === "function") {
+      renderFinalRoundTitle()
+    }
+
+    if (typeof renderFinalScores === "function") {
+      renderFinalScores()
+    }
 
     if (typeof saveFinalState === "function") {
       saveFinalState()
-    }
-
-    if (typeof syncDisplayStateToSession === "function") {
+    } else if (typeof syncDisplayStateToSession === "function") {
       syncDisplayStateToSession()
     }
   })

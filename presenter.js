@@ -657,6 +657,13 @@ function renderPresenterEnded() {
 let presenterCommandLocks = {}
 
 function getPresenterActionLockTime(action) {
+  if (
+  action === "toggleRound2Correct" ||
+  action === "toggleRound2ImageCorrect" ||
+  action === "hideRound2SequenceWord"
+) {
+  return 80
+}
   if (action === "correct") return 1400
   if (action === "wrong") return 1400
   if (action === "undo") return 1000
@@ -2407,7 +2414,7 @@ function renderPresenterAuctionMedia(box, mediaUrl) {
     box.innerHTML = `
       <div class="presenterVideoNoPreviewBox">
         <div class="presenterVideoNoPreviewIcon">▶</div>
-        <div class="presenterVideoNoPreviewText">فيديو جاهز للتشغيل في العرض</div>
+        
       </div>
     `
     return

@@ -1123,29 +1123,41 @@ function openAuctionVideoFullscreen(e) {
 
   const video = document.getElementById("auctionFullscreenVideo")
 
-  if (video) {
-    video.loop = true
-    video.currentTime = 0
-    video.muted = false
-    video.volume = 1
+if (video) {
+  video.loop = true
+  video.currentTime = 0
+  video.playsInline = true
+  video.muted = false
+  video.volume = 1
 
-    video.onended = () => {
-      try {
-        video.currentTime = 0
-        video.play().catch(() => {})
-      } catch (e) {
-        console.log("auction video replay error:", e)
-      }
+  video.onended = () => {
+    try {
+      video.currentTime = 0
+      video.play().catch(() => {})
+    } catch (e) {
+      console.log("auction video replay error:", e)
     }
+  }
 
+  const tryPlay = () => {
     const playPromise = video.play()
 
     if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {
-        showGameToast("اضغط تشغيل مرة أخرى")
+      playPromise.catch(err => {
+        console.log("AUCTION VIDEO PLAY BLOCKED:", err)
+
+        video.muted = true
+
+        video.play().catch(error => {
+          console.log("AUCTION VIDEO MUTED PLAY ERROR:", error)
+          showGameToast("اضغط تشغيل مرة أخرى")
+        })
       })
     }
   }
+
+  setTimeout(tryPlay, 80)
+}
 }
 
 function closeAuctionVideoFullscreen(e) {
@@ -1185,7 +1197,28 @@ function playCurrentAuctionVideo() {
     return
   }
 
+  closeAuctionVideoFullscreen()
   openAuctionVideoFullscreen()
+
+  setTimeout(() => {
+    const video = document.getElementById("auctionFullscreenVideo")
+    if (!video) return
+
+    video.currentTime = 0
+    video.muted = false
+    video.volume = 1
+
+    const playPromise = video.play()
+
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        video.muted = true
+        video.play().catch(() => {
+          showGameToast("اضغط تشغيل مرة أخرى")
+        })
+      })
+    }
+  }, 180)
 }
 
 function restartCurrentAuctionVideo() {

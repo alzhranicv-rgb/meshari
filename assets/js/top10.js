@@ -873,6 +873,16 @@ function playTop10OpenEffect(num) {
   })
 }
 
+function stopTop10Timer(resetValue = 0) {
+  clearInterval(timer)
+  timer = null
+  top10TimerStarted = false
+  top10LastTickPlayed = null
+
+  const timerBox = document.getElementById("timer")
+  if (timerBox) timerBox.innerText = resetValue
+}
+
 async function openTop10Number(num) {
   ensureTop10RoundState()
 
@@ -932,21 +942,26 @@ async function openTop10Number(num) {
   updateTop10UIOnly()
   playTop10OpenEffect(num)
 
-  requestAnimationFrame(() => {
-    playGameSound("correct")
+requestAnimationFrame(() => {
+  playGameSound("correct")
 
-    if (top10State.activeTeam) {
-      autoStartTop10Timer()
-    } else {
-      clearInterval(timer)
-      timer = null
-      top10TimerStarted = false
-      top10LastTickPlayed = null
+  const allOpened = Number(top10State.opened?.[round]?.length || 0) >= 10
 
-      const timerBox = document.getElementById("timer")
-      if (timerBox) timerBox.innerText = 0
-    }
-  })
+  if (allOpened) {
+    top10State.activeTeam = null
+    stopTop10Timer(0)
+    highlightTop10TurnTeam()
+    updateTop10TurnLabel()
+    saveTop10State()
+    return
+  }
+
+  if (top10State.activeTeam) {
+    autoStartTop10Timer()
+  } else {
+    stopTop10Timer(0)
+  }
+})
 
   saveTop10StateLazy()
 
@@ -1247,25 +1262,50 @@ function switchTop10Turn() {
   updateTop10DoubleButton()
   saveTop10State()
 }
-function showTop10Answer() {
+async function showTop10Answer() {
   ensureTop10RoundState()
 
-  const round = top10State.round
+  const round = Number(top10State.round || 1)
 
-  if (!top10State.question?.[round]) {
-    showGameToast("لا يوجد سؤال")
+  let answers = null
+
+  try {
+    answers = await loadTop10RoundAnswers(round)
+  } catch (error) {
+    console.log(error)
+    showGameToast("تعذر تحميل الإجابات")
     return
   }
 
-  playGameSound("answer")
+  pushTop10History()
 
-  const box = document.getElementById("top10QuestionBox")
-  if (box) {
-    box.innerText = top10State.question[round]
+  for (let i = 1; i <= 10; i++) {
+    const item = answers?.[i]
+    if (!item) continue
+
+    if (!top10State.opened[round].includes(i)) {
+      top10State.opened[round].push(i)
+    }
+
+    top10State.answers[round][i] = item.answer || ""
   }
 
+  top10State.activeTeam = null
+  currentTop10Number = null
+  currentTop10Answer = null
+
+  stopTop10Timer(0)
+
+  playGameSound("answer")
+  updateTop10UIOnly()
   saveTop10State()
+
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
+  }
 }
+
+window.showTop10Answer = showTop10Answer
 
 function addTop10Error() {
   ensureTop10RoundState()
