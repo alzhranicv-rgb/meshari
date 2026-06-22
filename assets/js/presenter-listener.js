@@ -898,6 +898,27 @@ function forceFinalTeamFromPresenter(team) {
   }
 }
 
+function shakeFinalRound2Display() {
+  const target =
+    document.querySelector(".finalRound2Stage") ||
+    document.querySelector(".finalRound2Wrap") ||
+    document.querySelector(".finalRound2Content") ||
+    document.querySelector(".finalMainStage") ||
+    document.getElementById("finalMainStage")
+
+  if (!target) return
+
+  target.classList.remove("finalRound2ShakeFx")
+
+  void target.offsetWidth
+
+  target.classList.add("finalRound2ShakeFx")
+
+  setTimeout(() => {
+    target.classList.remove("finalRound2ShakeFx")
+  }, 420)
+}
+
 function handleFinalPresenterAction(action, data) {
   if (action === "selectTeam") {
     if (!isValidPresenterTeam(data.team)) return
@@ -1002,14 +1023,15 @@ if (action === "openNumber") {
   }
 
   if (action === "decreaseCountdown") {
-    return safeRunPresenterAction(() => {
-      if (window.finalState?.round !== 2) return
+  return safeRunPresenterAction(() => {
+    if (window.finalState?.round !== 2) return
 
-      if (typeof finalRound2DecreaseCountdown === "function") {
-        finalRound2DecreaseCountdown()
-      }
-    })
-  }
+    if (typeof finalRound2DecreaseCountdown === "function") {
+      finalRound2DecreaseCountdown()
+      shakeFinalRound2Display()
+    }
+  })
+}
 
   if (action === "showNextImage") {
     return safeRunPresenterAction(() => {
@@ -1042,21 +1064,27 @@ if (action === "toggleRound2Correct") {
       ? window.finalState.round2.selectedCorrectIndexes.map(Number)
       : []
 
-    const nextSelected = oldSelected.includes(index)
-      ? oldSelected.filter(x => Number(x) !== index)
-      : [...oldSelected, index]
+    let nextSelected = oldSelected
+
+    if (Array.isArray(data.selectedCorrectIndexes)) {
+      nextSelected = data.selectedCorrectIndexes
+        .map(Number)
+        .filter(n => Number.isFinite(n) && n >= 0)
+    } else {
+      nextSelected = oldSelected.includes(index)
+        ? oldSelected.filter(x => Number(x) !== index)
+        : [...oldSelected, index]
+    }
 
     window.finalState.round2.currentNumber = currentNumber
     window.finalState.round2.selectedCorrectIndexes = nextSelected
     window.finalState.round2.correctCount = nextSelected.length
 
-   
-
     try {
-  localStorage.setItem("final_state_v3", JSON.stringify(window.finalState))
-} catch (e) {
-  console.log("silent final round2 save error:", e)
-}
+      localStorage.setItem("final_state_v3", JSON.stringify(window.finalState))
+    } catch (e) {
+      console.log("silent final round2 save error:", e)
+    }
   })
 }
 
@@ -1108,14 +1136,15 @@ if (action === "toggleRound2ImageCorrect") {
 }
 
   if (action === "hideRound2SequenceWord") {
-    return safeRunPresenterAction(() => {
-      if (window.finalState?.round !== 2) return
+  return safeRunPresenterAction(() => {
+    if (window.finalState?.round !== 2) return
 
-      if (typeof hideFinalRound2SequenceWord === "function") {
-        hideFinalRound2SequenceWord(Number(data.index))
-      }
-    })
-  }
+    if (typeof hideFinalRound2SequenceWord === "function") {
+      hideFinalRound2SequenceWord(Number(data.index))
+      shakeFinalRound2Display()
+    }
+  })
+}
 
   if (action === "recordScrambleScore") {
     return safeRunPresenterAction(() => {

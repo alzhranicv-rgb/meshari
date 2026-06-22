@@ -3700,3 +3700,34 @@
     min-height:52px !important;
   }
 }
+/* =========================================================
+   FINAL ROUND 2 - SHAKE FX
+========================================================= */
+
+.finalRound2ShakeFx{
+  animation:finalRound2ShakeFx .38s ease both;
+}
+
+@keyframes finalRound2ShakeFx{
+  0%,100%{
+    transform:translateX(0) scale(1);
+    filter:brightness(1);
+  }
+
+  18%{
+    transform:translateX(-10px) scale(1.01);
+    filter:brightness(1.08);
+  }
+
+  36%{
+    transform:translateX(10px) scale(1.01);
+  }
+
+  54%{
+    transform:translateX(-7px) scale(1.006);
+  }
+
+  72%{
+    transform:translateX(7px) scale(1.006);
+  }
+}

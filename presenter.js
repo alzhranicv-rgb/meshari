@@ -4486,6 +4486,53 @@ async function loadPresenterFinalRound2Rows() {
   presenterFinalRound2Rows = data || []
 }
 
+function togglePresenterFinalRound2Correct(index) {
+  const state = getPresenterFinalRoundState(2)
+
+  const currentNumber = Number(
+    state.currentNumber ||
+    (
+      presenterFinalSelected?.round === 2
+        ? presenterFinalSelected.number
+        : 0
+    )
+  )
+
+  if (!currentNumber) return
+
+  const oldSelected = Array.isArray(state.selectedCorrectIndexes)
+    ? state.selectedCorrectIndexes.map(Number)
+    : []
+
+  const i = Number(index)
+
+  const nextSelected = oldSelected.includes(i)
+    ? oldSelected.filter(x => Number(x) !== i)
+    : [...oldSelected, i]
+
+  presenterLiveState = {
+    ...(presenterLiveState || {}),
+    final: {
+      ...(presenterLiveState?.final || {}),
+      round: 2,
+      round2: {
+        ...(presenterLiveState?.final?.round2 || {}),
+        currentNumber,
+        selectedCorrectIndexes: nextSelected,
+        correctCount: nextSelected.length
+      }
+    }
+  }
+
+  renderPresenterFinalRound2Preview()
+
+  sendCommand("toggleRound2Correct", {
+    index: i,
+    number: currentNumber,
+    selectedCorrectIndexes: nextSelected
+  })
+}
+
 async function renderPresenterFinalRound2Preview() {
   const previewBox = document.getElementById("presenterFinalPreview")
   if (!previewBox) return
@@ -4539,7 +4586,7 @@ async function renderPresenterFinalRound2Preview() {
           <button
             class="presenterFinalAnswerCard ${selected.includes(idx) ? "selectedCorrect" : ""}"
             type="button"
-            onclick="sendCommand('toggleRound2Correct',{index:${idx}})"
+            onclick="togglePresenterFinalRound2Correct(${idx})"
           >
             <span>${presenterSafeHtml(r.answer || r.prompt || "-")}</span>
           </button>
