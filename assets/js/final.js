@@ -2582,7 +2582,7 @@ function renderFinalRound2SequenceWords(box) {
   if (!words.length) {
     box.innerHTML = `
       <div class="finalSequenceStageBox">
-        <div class="finalSequenceTimerBadge ${timerClass}">
+        <div class="finalSequenceTimerBadge ${timerClass}" data-final-round2-countdown>
           <span>المتبقي</span>
           <strong>${countdown}</strong>
         </div>
@@ -2602,7 +2602,7 @@ function renderFinalRound2SequenceWords(box) {
   if (allHidden) {
     box.innerHTML = `
       <div class="finalSequenceStageBox">
-        <div class="finalSequenceTimerBadge ${timerClass}">
+        <div class="finalSequenceTimerBadge ${timerClass}" data-final-round2-countdown>
           <span>المتبقي</span>
           <strong>${countdown}</strong>
         </div>
@@ -2610,10 +2610,11 @@ function renderFinalRound2SequenceWords(box) {
         <div class="finalSequenceWordsWrap finalSequenceWordsDone">
           ${words.map((word, idx) => `
             <button
-              class="finalSequenceWordBtn isHiddenWord"
-              disabled
-              type="button"
-            >
+  class="finalSequenceWordBtn isHiddenWord"
+  data-round2-word-index="${idx}"
+  disabled
+  type="button"
+>
               ${escapeDisplayHtml(word)}
             </button>
           `).join("")}
@@ -2626,7 +2627,7 @@ function renderFinalRound2SequenceWords(box) {
   box.innerHTML = `
     <div class="finalSequenceStageBox">
 
-      <div class="finalSequenceTimerBadge ${timerClass}">
+      <div class="finalSequenceTimerBadge ${timerClass}" data-final-round2-countdown>
         <span>المتبقي</span>
         <strong>${countdown}</strong>
       </div>
@@ -2637,11 +2638,12 @@ function renderFinalRound2SequenceWords(box) {
 
           return `
             <button
-              class="finalSequenceWordBtn ${hidden ? "isHiddenWord" : ""}"
-              ${hidden ? "disabled" : ""}
-              type="button"
-              onclick="${hidden ? "" : `hideFinalRound2SequenceWord(${idx})`}"
-            >
+                class="finalSequenceWordBtn ${hidden ? "isHiddenWord" : ""}"
+                data-round2-word-index="${idx}"
+                ${hidden ? "disabled" : ""}
+                type="button"
+                onclick="${hidden ? "" : `hideFinalRound2SequenceWord(${idx})`}"
+                >
               ${escapeDisplayHtml(word)}
             </button>
           `
@@ -2937,6 +2939,9 @@ function hideFinalRound2SequenceWord(index) {
   renderFinalRound2Words(finalState.round2.answerShown)
   updateFinalRound2SequenceScoreButtonLabel()
   saveFinalState()
+  setTimeout(() => {
+  shakeFinalRound2HiddenWord(index)
+}, 30)
 }
 
 function finalRound2DecreaseCountdown() {
@@ -2968,17 +2973,27 @@ function finalRound2DecreaseCountdown() {
 
     flashScreen("wrong")
     saveFinalState()
+
+
+    setTimeout(() => {
+    shakeFinalRound2CountdownBox()
+      }, 30)
     return
   }
 
-  renderFinalRoundTitle()
+    renderFinalRoundTitle()
   renderFinalRound2Words(false)
 
   updateFinalRound2CountdownButtonLabel()
   updateFinalRound2SequenceScoreButtonLabel()
 
   saveFinalState()
+
+  setTimeout(() => {
+    shakeFinalRound2CountdownBox()
+  }, 30)
 }
+
 
 function updateFinalRound2SequenceScoreButtonLabel() {
   const btn = document.querySelector('[onclick="finalRound2RecordSequenceScore()"]')
@@ -4506,3 +4521,44 @@ window.playCurrentFinalVideo = playCurrentFinalVideo
 window.restartCurrentFinalVideo = restartCurrentFinalVideo
 window.stopCurrentFinalVideo = stopCurrentFinalVideo
 window.finalWrongVideoOnly = finalWrongVideoOnly
+
+/* =========================
+   FINAL ROUND 2 - TARGETED SHAKE FX
+========================= */
+
+function shakeFinalRound2CountdownBox() {
+  const target =
+    document.querySelector("[data-final-round2-countdown]") ||
+    document.querySelector(".finalSequenceTimerBadge")
+
+  if (!target) return
+
+  target.classList.remove("finalRound2MiniShakeFx")
+  void target.offsetWidth
+  target.classList.add("finalRound2MiniShakeFx")
+
+  setTimeout(() => {
+    target.classList.remove("finalRound2MiniShakeFx")
+  }, 420)
+}
+
+function shakeFinalRound2HiddenWord(index) {
+  const i = Number(index)
+
+  const target =
+    document.querySelector(`[data-round2-word-index="${i}"]`) ||
+    document.querySelectorAll(".finalSequenceWordBtn")[i]
+
+  if (!target) return
+
+  target.classList.remove("finalRound2MiniShakeFx")
+  void target.offsetWidth
+  target.classList.add("finalRound2MiniShakeFx")
+
+  setTimeout(() => {
+    target.classList.remove("finalRound2MiniShakeFx")
+  }, 420)
+}
+
+window.shakeFinalRound2CountdownBox = shakeFinalRound2CountdownBox
+window.shakeFinalRound2HiddenWord = shakeFinalRound2HiddenWord

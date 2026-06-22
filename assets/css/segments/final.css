@@ -3701,33 +3701,35 @@
   }
 }
 /* =========================================================
-   FINAL ROUND 2 - SHAKE FX
+   FINAL ROUND 2 - TARGETED MINI SHAKE
+   يهز مربع العداد أو مربع الكلمة فقط
 ========================================================= */
 
-.finalRound2ShakeFx{
-  animation:finalRound2ShakeFx .38s ease both;
+.finalRound2MiniShakeFx{
+  animation:finalRound2MiniShakeFx .38s ease both;
+  transform-origin:center;
 }
 
-@keyframes finalRound2ShakeFx{
+@keyframes finalRound2MiniShakeFx{
   0%,100%{
     transform:translateX(0) scale(1);
     filter:brightness(1);
   }
 
   18%{
-    transform:translateX(-10px) scale(1.01);
-    filter:brightness(1.08);
+    transform:translateX(-8px) scale(1.035);
+    filter:brightness(1.1);
   }
 
   36%{
-    transform:translateX(10px) scale(1.01);
+    transform:translateX(8px) scale(1.035);
   }
 
   54%{
-    transform:translateX(-7px) scale(1.006);
+    transform:translateX(-5px) scale(1.02);
   }
 
   72%{
-    transform:translateX(7px) scale(1.006);
+    transform:translateX(5px) scale(1.02);
   }
 }

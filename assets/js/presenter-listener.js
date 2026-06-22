@@ -898,24 +898,41 @@ function forceFinalTeamFromPresenter(team) {
   }
 }
 
-function shakeFinalRound2Display() {
+function shakeFinalRound2CountdownBox() {
   const target =
-    document.querySelector(".finalRound2Stage") ||
-    document.querySelector(".finalRound2Wrap") ||
-    document.querySelector(".finalRound2Content") ||
-    document.querySelector(".finalMainStage") ||
-    document.getElementById("finalMainStage")
+    document.querySelector(".finalRound2CountdownBox") ||
+    document.querySelector(".finalRound2TimerBox") ||
+    document.querySelector("#finalRound2Countdown") ||
+    document.querySelector("[data-final-round2-countdown]")
 
   if (!target) return
 
-  target.classList.remove("finalRound2ShakeFx")
-
+  target.classList.remove("finalRound2MiniShakeFx")
   void target.offsetWidth
-
-  target.classList.add("finalRound2ShakeFx")
+  target.classList.add("finalRound2MiniShakeFx")
 
   setTimeout(() => {
-    target.classList.remove("finalRound2ShakeFx")
+    target.classList.remove("finalRound2MiniShakeFx")
+  }, 420)
+}
+
+function shakeFinalRound2HiddenWord(index) {
+  const i = Number(index)
+
+  const target =
+    document.querySelector(`[data-round2-word-index="${i}"]`) ||
+    document.querySelector(`[data-index="${i}"].finalRound2Word`) ||
+    document.querySelector(`[data-index="${i}"].finalRound2WordCard`) ||
+    document.querySelectorAll(".finalRound2WordCard, .finalRound2Word, .finalRound2SequenceWord")[i]
+
+  if (!target) return
+
+  target.classList.remove("finalRound2MiniShakeFx")
+  void target.offsetWidth
+  target.classList.add("finalRound2MiniShakeFx")
+
+  setTimeout(() => {
+    target.classList.remove("finalRound2MiniShakeFx")
   }, 420)
 }
 
@@ -1028,7 +1045,6 @@ if (action === "openNumber") {
 
     if (typeof finalRound2DecreaseCountdown === "function") {
       finalRound2DecreaseCountdown()
-      shakeFinalRound2Display()
     }
   })
 }
@@ -1141,7 +1157,6 @@ if (action === "toggleRound2ImageCorrect") {
 
     if (typeof hideFinalRound2SequenceWord === "function") {
       hideFinalRound2SequenceWord(Number(data.index))
-      shakeFinalRound2Display()
     }
   })
 }
