@@ -9,7 +9,7 @@
 
 @font-face{
   font-family:"HanakaDisplay";
-  src:url("../../fonts/dima.ttf") format("truetype");
+  src:url("./fonts/dima.ttf") format("truetype");
   font-weight:400;
   font-style:normal;
   font-display:swap;
@@ -17,12 +17,19 @@
 
 @font-face{
   font-family:"HanakaText";
-  src:url("../../fonts/zain.ttf") format("truetype");
+  src:url("./fonts/zain.ttf") format("truetype");
   font-weight:400;
   font-style:normal;
   font-display:swap;
 }
 
+@font-face{
+  font-family:"MolhimCustom";
+  src:url("./fonts/Molhim.ttf") format("truetype");
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
 /* =========================================================
    2) ROOT + GLOBAL
 ========================================================= */
