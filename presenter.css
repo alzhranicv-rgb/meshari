@@ -1818,3 +1818,30 @@ button:disabled {
 .segmentCard.presenterLockedSegment:disabled {
   pointer-events: none;
 }
+
+/* =========================================================
+   PRESENTER EXPLAIN - word box below presenter info
+========================================================= */
+
+.presenterExplainLayout,
+.presenterExplainPanel,
+.explainPresenterPanel{
+  display:flex;
+  flex-direction:column;
+}
+
+.presenterExplainWordBox,
+.explainPresenterWordBox,
+#presenterExplainWordBox,
+#explainPresenterWordBox{
+  order:20;
+  width:100%;
+  margin-top:12px;
+}
+
+.presenterExplainQuestionBox,
+.explainPresenterQuestionBox,
+#presenterExplainQuestionBox,
+#explainPresenterQuestionBox{
+  order:10;
+}

@@ -2253,14 +2253,14 @@ async function renderAuction() {
         </div>
 
         <section class="presenterCard presenterAuctionPreviewCard">
-          <div class="presenterLabel">الإجابة</div>
+  <div class="presenterLabel">الإجابة</div>
 
-          <div id="presenterAuctionAnswerText" class="presenterAnswerBody">
-            —
-          </div>
+  <div id="presenterAuctionAnswerText" class="presenterAnswerBody">
+    —
+  </div>
 
-          
-        </section>
+  <div id="presenterAuctionImageBox" class="presenterImagePreviewBox hidden"></div>
+</section>
 
       </div>
 
@@ -2402,22 +2402,17 @@ function openAuctionPresenterNumber(number) {
 }
 
 function renderPresenterAuctionMedia(box, mediaUrl) {
-  if (!box || !mediaUrl) return
+  if (!box) return
 
-  box.classList.remove("hidden")
+  const safeUrl = String(mediaUrl || "")
 
-  const safeUrl = String(mediaUrl)
-
-  if (isPresenterAuctionVideo(safeUrl)) {
-    box.innerHTML = `
-      <div class="presenterVideoNoPreviewBox">
-        <div class="presenterVideoNoPreviewIcon">▶</div>
-        
-      </div>
-    `
+  if (!safeUrl || isPresenterAuctionVideo(safeUrl)) {
+    box.classList.add("hidden")
+    box.innerHTML = ""
     return
   }
 
+  box.classList.remove("hidden")
   box.innerHTML = `
     <img src="${safeUrl}" alt="">
   `
@@ -2434,16 +2429,17 @@ function showPresenterAuctionPreview(number) {
   }
 
   if (imageBox) {
-    const media = item?.video || item?.image || ""
+  const image = item?.image || ""
 
-    if (media) {
-      renderPresenterAuctionMedia(imageBox, media)
-    } else {
-      imageBox.classList.add("hidden")
-      imageBox.innerHTML = ""
-      updatePresenterAuctionMediaActionButton()
-    }
+  if (image) {
+    renderPresenterAuctionMedia(imageBox, image)
+  } else {
+    imageBox.classList.add("hidden")
+    imageBox.innerHTML = ""
   }
+
+  updatePresenterAuctionMediaActionButton()
+}
 }
 
 function refreshPresenterAuctionFromState() {
@@ -2496,8 +2492,6 @@ function refreshPresenterAuctionFromState() {
     ""
 
   const image =
-  auctionRoot.currentAuctionVideo ||
-  auctionRoot.video ||
   auctionRoot.currentAuctionImage ||
   auctionRoot.image ||
   ""
@@ -3089,20 +3083,7 @@ async function renderExplain() {
           </div>
         </section>
 
-        <section class="presenterCard presenterExplainWordCard">
-          <div class="presenterLabel">الكلمة</div>
-
-          <div
-            id="presenterExplainWordText"
-            class="presenterExplainWordBox ${explain.answerResult === "correct" ? "answerCorrect" : ""} ${explain.answerResult === "wrong" ? "answerWrong" : ""}"
-          >
-            ${
-              currentNumber
-                ? explain.currentWord || getPresenterExplainWord(currentNumber) || "—"
-                : "—"
-            }
-          </div>
-        </section>
+        
 
         <div class="presenterExplainActions">
   <button
@@ -3150,6 +3131,21 @@ async function renderExplain() {
         <div class="presenterExplainTeamsBox">
           ${teamButtons()}
         </div>
+
+        <section class="presenterCard presenterExplainWordCard">
+  <div class="presenterLabel">الكلمة</div>
+
+  <div
+    id="presenterExplainWordText"
+    class="presenterExplainWordBox ${explain.answerResult === "correct" ? "answerCorrect" : ""} ${explain.answerResult === "wrong" ? "answerWrong" : ""}"
+  >
+    ${
+      currentNumber
+        ? explain.currentWord || getPresenterExplainWord(currentNumber) || "—"
+        : "—"
+    }
+  </div>
+</section>
 
         <section class="presenterCard presenterExplainTimerCard">
           <div class="presenterLabel">المؤقت</div>

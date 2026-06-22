@@ -1028,25 +1028,35 @@ if (action === "toggleRound2Correct") {
     const index = Number(data.index)
     if (!Number.isFinite(index) || index < 0) return
 
-    if (typeof finalRound2ToggleCorrectFromPresenter === "function") {
-      finalRound2ToggleCorrectFromPresenter(index)
-    } else if (typeof toggleFinalRound2CorrectSelection === "function") {
-      toggleFinalRound2CorrectSelection(index)
+    if (!window.finalState.round2) {
+      window.finalState.round2 = {}
     }
 
-    if (typeof renderFinalRound2Words === "function") {
-      renderFinalRound2Words(true)
-    }
+    const currentNumber = Number(
+      data.number ||
+      window.finalState.round2.currentNumber ||
+      0
+    )
 
-    if (typeof renderFinalRoundTitle === "function") {
-      renderFinalRoundTitle()
-    }
+    const oldSelected = Array.isArray(window.finalState.round2.selectedCorrectIndexes)
+      ? window.finalState.round2.selectedCorrectIndexes.map(Number)
+      : []
 
-    if (typeof saveFinalState === "function") {
-      saveFinalState()
-    } else if (typeof syncDisplayStateToSession === "function") {
-      syncDisplayStateToSession()
-    }
+    const nextSelected = oldSelected.includes(index)
+      ? oldSelected.filter(x => Number(x) !== index)
+      : [...oldSelected, index]
+
+    window.finalState.round2.currentNumber = currentNumber
+    window.finalState.round2.selectedCorrectIndexes = nextSelected
+    window.finalState.round2.correctCount = nextSelected.length
+
+   
+
+    try {
+  localStorage.setItem("final_state_v3", JSON.stringify(window.finalState))
+} catch (e) {
+  console.log("silent final round2 save error:", e)
+}
   })
 }
 
@@ -1057,7 +1067,9 @@ if (action === "toggleRound2ImageCorrect") {
     const index = Number(data.index)
     if (!Number.isFinite(index) || index < 0) return
 
-    if (!window.finalState.round2) return
+    if (!window.finalState.round2) {
+      window.finalState.round2 = {}
+    }
 
     const currentNumber = Number(
       data.number ||
@@ -1085,23 +1097,13 @@ if (action === "toggleRound2ImageCorrect") {
     window.finalState.round2.selectedCorrectIndexes = nextSelected
     window.finalState.round2.correctCount = nextSelected.length
 
-    if (typeof renderFinalRound2Words === "function") {
-      renderFinalRound2Words(true)
-    }
+   
 
-    if (typeof renderFinalRoundTitle === "function") {
-      renderFinalRoundTitle()
-    }
-
-    if (typeof renderFinalScores === "function") {
-      renderFinalScores()
-    }
-
-    if (typeof saveFinalState === "function") {
-      saveFinalState()
-    } else if (typeof syncDisplayStateToSession === "function") {
-      syncDisplayStateToSession()
-    }
+    try {
+  localStorage.setItem("final_state_v3", JSON.stringify(window.finalState))
+} catch (e) {
+  console.log("silent final round2 image save error:", e)
+}
   })
 }
 
