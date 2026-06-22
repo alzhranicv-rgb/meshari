@@ -11,7 +11,7 @@
   <title>الحنكة - المقدمة</title>
 
   <link rel="stylesheet" href="styles.css?v=10000" />
-  <link rel="stylesheet" href="assets/css/segments/intro.css?v=41" />
+  <link rel="stylesheet" href="assets/css/segments/intro.css?v=43" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
@@ -80,49 +80,43 @@
 
         </div>
 
-        <!-- اختيار النموذج -->
-        <div class="introFieldBox introModelBox">
-          <label for="introModelSelect">
-            النموذج
-          </label>
+        <!-- النموذج + اختيار الفقرات -->
+        <div class="introModelSegmentsRow">
 
-          <select id="introModelSelect">
-            <option value="">
-              جارٍ تحميل النماذج...
-            </option>
-          </select>
+          <!-- اختيار النموذج -->
+          <div class="introFieldBox introModelBox">
+            <label for="introModelSelect">
+              النموذج
+            </label>
+
+            <select id="introModelSelect">
+              <option value="">
+                جارٍ تحميل النماذج...
+              </option>
+            </select>
+          </div>
+
+          <!-- اختيار الفقرات - زر يفتح نافذة -->
+          <section class="introSegmentsBox introSegmentsTriggerBox" id="introSegmentsBox">
+
+            <button
+              type="button"
+              class="introOpenSegmentsBtn"
+              onclick="openIntroSegmentsModal()"
+            >
+              <div class="introOpenSegmentsText">
+                <strong>اختيار الفقرات</strong>
+                <span id="introSegmentsTriggerSummary">اختر النموذج أولاً</span>
+              </div>
+
+              <div class="introSegmentsCounter" id="introSegmentsTriggerCounter">
+                0 / 6-10
+              </div>
+            </button>
+
+          </section>
+
         </div>
-
-        <!-- اختيار الفقرات -->
-        <section class="introSegmentsBox" id="introSegmentsBox">
-
-          <div class="introSegmentsHeader">
-
-            <div>
-              <div class="introSegmentsTitle">
-                اختيار الفقرات
-              </div>
-
-              <div class="introSegmentsSub">
-                اختر 6 فقرات للعرض، والترتيب حسب ضغطك
-              </div>
-            </div>
-
-            <div class="introSegmentsCounter" id="introSegmentsCounter">
-              0 / 6
-            </div>
-
-          </div>
-
-          <div class="introSegmentsGrid" id="introSegmentsGrid">
-            <div class="introSegmentsEmpty">
-              اختر النموذج أولاً
-            </div>
-          </div>
-
-          <div class="introSegmentsOrder" id="introSegmentsOrder"></div>
-
-        </section>
 
         <!-- بدء اللعبة -->
         <button
@@ -138,6 +132,80 @@
     </section>
 
   </main>
+
+  <!-- نافذة اختيار الفقرات -->
+  <div id="introSegmentsModal" class="introSegmentsModal hidden">
+
+    <div class="introSegmentsModalCard">
+
+      <button
+        type="button"
+        class="introSegmentsModalClose"
+        onclick="closeIntroSegmentsModal()"
+        aria-label="إغلاق"
+      >
+        ×
+      </button>
+
+      <header class="introSegmentsModalHeader">
+
+        <div class="introSegmentsModalBadge">
+          فقرات العرض
+        </div>
+
+        <div class="introSegmentsModalTitle">
+          اختيار الفقرات
+        </div>
+
+        <div class="introSegmentsModalText">
+          اختر من 6 إلى 10 فقرات، والترتيب حسب ضغطك
+        </div>
+
+      </header>
+
+      <div class="introSegmentsModalTop">
+
+        <div class="introSegmentsCounter" id="introSegmentsCounter">
+          0 / 6-10
+        </div>
+
+        <div class="introSegmentsModalHint">
+          اضغط على الفقرة لاختيارها أو إلغاء اختيارها
+        </div>
+
+      </div>
+
+      <div class="introSegmentsGrid" id="introSegmentsGrid">
+        <div class="introSegmentsEmpty">
+          اختر النموذج أولاً
+        </div>
+      </div>
+
+      <div class="introSegmentsOrder" id="introSegmentsOrder"></div>
+
+      <div class="introSegmentsModalActions">
+
+        <button
+          type="button"
+          class="introSegmentsModalBtn secondary"
+          onclick="closeIntroSegmentsModal()"
+        >
+          رجوع
+        </button>
+
+        <button
+          type="button"
+          class="introSegmentsModalBtn primary"
+          onclick="closeIntroSegmentsModal()"
+        >
+          تم
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
 
   <!-- نافذة ربط المقدم -->
   <div id="presenterIntroModal" class="introPresenterModal hidden">
@@ -235,7 +303,7 @@
     <div id="gameToastText" class="gameToastText"></div>
   </div>
 
-  <script src="intro.js?v=41"></script>
+  <script src="intro.js?v=43"></script>
 
 </body>
 </html>

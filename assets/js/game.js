@@ -31,12 +31,10 @@ const ALL_DISPLAY_SEGMENTS = [
   { key: "auction", title: "فتبلة", sort: 3 },
   { key: "who", title: "من هو", sort: 4 },
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
-
   { key: "finalRound1", title: "ٮدوں ٮڡاط", sort: 6 },
-{ key: "finalRound2", title: "صح صحلي", sort: 7 },
-{ key: "finalRound3", title: "قصة", sort: 8 },
-{ key: "finalRound4", title: "التركيز", sort: 9 },
-
+  { key: "finalRound2", title: "صح صحلي", sort: 7 },
+  { key: "finalRound3", title: "قصة", sort: 8 },
+  { key: "finalRound4", title: "التركيز", sort: 9 },
   { key: "archive", title: "الأرشيف", sort: 10 }
 ]
 
@@ -697,12 +695,34 @@ function removeClassIfFound(ids, className) {
 }
 
 function updateModelNameDisplay() {
-  const box = document.getElementById("modelNameDisplay")
-  if (!box) return
+  const modelBox = document.getElementById("modelNameDisplay")
+  const titleBox = document.querySelector(".homeTitleBox")
 
-  box.innerText = currentModelName ? currentModelName : ""
-  box.onclick = showJoinCodePopup
-  box.style.cursor = "pointer"
+  if (modelBox) {
+    modelBox.innerText = currentModelName ? currentModelName : "النموذج"
+    modelBox.onclick = showJoinCodePopup
+    modelBox.setAttribute("role", "button")
+    modelBox.setAttribute("tabindex", "0")
+    modelBox.style.cursor = "pointer"
+
+    modelBox.onkeydown = function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault()
+        showJoinCodePopup()
+      }
+    }
+  }
+
+  if (titleBox) {
+    titleBox.onclick = function (e) {
+      const clickedButton = e.target.closest("button")
+      if (clickedButton) return
+
+      showJoinCodePopup()
+    }
+
+    titleBox.style.cursor = "pointer"
+  }
 }
 
 function getSegmentWinnerLabelIds(key) {
@@ -1229,6 +1249,7 @@ function applyDisplayMediaRevealFx(root = document) {
 
 document.addEventListener("DOMContentLoaded", async () => {
   resetDisplayStatesIfNewSession()
+  applyDisplayViewportSize()
 
   initWinnerSound()
   initGameSounds()
@@ -1524,12 +1545,26 @@ function renderVisibleSegmentsHome() {
       </div>
     `
   }).join("")
+
+  applySegmentsGridCount()
+}
+
+function applySegmentsGridCount() {
+  const grid = document.getElementById("segmentsGrid")
+  if (!grid) return
+
+  const count = grid.querySelectorAll(".homeSegmentItem").length
+
+  grid.classList.toggle("segmentsMoreThan6", count > 6)
+  grid.classList.toggle("segmentsSixOrLess", count <= 6)
 }
 
 function updateSegmentCards() {
   ALL_DISPLAY_SEGMENTS.forEach(item => {
     setSegmentWinnerLabel(item.key)
   })
+
+  applySegmentsGridCount()
 }
 
 function setSegmentWinnerLabel(key) {
@@ -1674,6 +1709,7 @@ async function openSegmentPage(segmentKey, forcedRound = null) {
   if (typeof syncDisplayStateToSession === "function") {
     syncDisplayStateToSession()
   }
+  applyPresenterHideDisplayControlsState()
 }
 
 function openMainSegment(segmentKey) {
@@ -2653,22 +2689,99 @@ function updateDisplayControlsEyeButton(isHidden) {
   btn.title = isHidden ? "إظهار أزرار التحكم" : "إخفاء أزرار التحكم"
 }
 
+function applyPresenterHideDisplayControlsState() {
+  const isHidden = localStorage.getItem("presenter_hide_controls") === "1"
+
+  document.body.classList.toggle("presenterHideDisplayControls", isHidden)
+  document.documentElement.classList.toggle("presenterHideDisplayControls", isHidden)
+
+  const area = document.getElementById("segmentArea")
+  if (!area) return
+
+  const selectors = [
+    ".displayControls",
+    ".controlsBar",
+    ".controlButtons",
+    ".segmentControlButtons",
+
+    ".warmupControlPanel",
+    ".warmupControls",
+    ".warmupActions",
+    ".warmupButtons",
+
+    ".top10Controls",
+    ".top10ControlPanel",
+    ".top10Actions",
+    ".top10Buttons",
+
+    ".auctionControls",
+    ".auctionControlPanel",
+    ".auctionActions",
+    ".auctionButtons",
+    ".fatblaControls",
+    ".fatblaActions",
+
+    ".whoControlPanel",
+    ".whoControls",
+    ".whoActions",
+    ".whoButtons",
+
+    ".explainControlPanel",
+    ".explainControls",
+    ".explainActions",
+    ".explainButtons",
+    ".explainGameActions",
+    ".explainAnswerActions",
+    ".explainControlButtons",
+
+    ".finalControlsBar",
+    "#finalControlsBar",
+    ".finalRound1ControlsBar",
+    ".finalRound2ControlsBar",
+    ".finalRound3ControlsBar",
+    ".finalRound4ControlsBar",
+    ".finalActions",
+    ".finalButtons",
+
+    ".archiveControlButtons",
+    ".archiveControlPanel",
+    ".archiveControls",
+    ".archiveActions",
+    ".archiveButtons"
+  ]
+
+  area.querySelectorAll(selectors.join(",")).forEach(el => {
+    if (el.closest(".segmentControls")) return
+
+    if (isHidden) {
+      el.dataset.presenterHiddenDisplay = "1"
+      el.style.setProperty("display", "none", "important")
+    } else if (el.dataset.presenterHiddenDisplay === "1") {
+      el.style.removeProperty("display")
+      delete el.dataset.presenterHiddenDisplay
+    }
+  })
+}
+
 function toggleDisplayControlsFromScreen() {
-  const isHidden = document.body.classList.toggle("presenterHideDisplayControls")
+  const isHidden = localStorage.getItem("presenter_hide_controls") !== "1"
 
   localStorage.setItem("presenter_hide_controls", isHidden ? "1" : "0")
+
+  applyPresenterHideDisplayControlsState()
   updateDisplayControlsEyeButton(isHidden)
+
+  showGameToast(isHidden ? "تم إخفاء أزرار التحكم" : "تم إظهار أزرار التحكم")
 
   if (typeof syncDisplayStateToSession === "function") {
     syncDisplayStateToSession()
   }
-
-  hideJoinCodePopup()
 }
 
 function restoreDisplayControlsEye() {
   const isHidden = localStorage.getItem("presenter_hide_controls") === "1"
-  document.body.classList.toggle("presenterHideDisplayControls", isHidden)
+
+  applyPresenterHideDisplayControlsState()
   updateDisplayControlsEyeButton(isHidden)
 }
 
@@ -2807,14 +2920,111 @@ function hideJoinCodePopup() {
   }, 220)
 }
 
-
 /* =========================
-   TV FULL SCREEN MODE
-   وضع ملء الشاشة للتلفزيون
+   DISPLAY VIEWPORT + FULL SCREEN MODE
+   قياس الشاشة الحقيقي + وضع ملء الشاشة
 ========================= */
 
+let displayViewportResizeTimer = null
+
+function getDisplayViewportHeight() {
+  const visualHeight = window.visualViewport?.height
+  const innerHeight = window.innerHeight
+  const clientHeight = document.documentElement.clientHeight
+
+  return Math.round(
+    visualHeight ||
+    innerHeight ||
+    clientHeight ||
+    700
+  )
+}
+
+function getDisplayViewportWidth() {
+  const visualWidth = window.visualViewport?.width
+  const innerWidth = window.innerWidth
+  const clientWidth = document.documentElement.clientWidth
+
+  return Math.round(
+    visualWidth ||
+    innerWidth ||
+    clientWidth ||
+    1000
+  )
+}
+
+function applyDisplayViewportSize() {
+  const visual = window.visualViewport
+
+  const h = Math.round(
+    visual?.height ||
+    window.innerHeight ||
+    document.documentElement.clientHeight ||
+    700
+  )
+
+  const w = Math.round(
+    visual?.width ||
+    window.innerWidth ||
+    document.documentElement.clientWidth ||
+    1000
+  )
+
+  const shortest = Math.min(w, h)
+  const isLandscape = w >= h
+
+  let deviceMode = "desktop"
+
+  if (shortest <= 480) {
+    deviceMode = "phone"
+  } else if (shortest <= 850) {
+    deviceMode = "tablet"
+  }
+
+  let scale = 1
+
+  if (deviceMode === "phone") {
+    scale = isLandscape ? 0.78 : 0.72
+  }
+
+  if (deviceMode === "tablet") {
+    scale = isLandscape ? 0.92 : 0.86
+  }
+
+  document.documentElement.style.setProperty("--app-height", `${h}px`)
+  document.documentElement.style.setProperty("--app-width", `${w}px`)
+  document.documentElement.style.setProperty("--display-vh", `${h}px`)
+  document.documentElement.style.setProperty("--display-vw", `${w}px`)
+  document.documentElement.style.setProperty("--display-scale", scale)
+
+  document.body.classList.toggle("displayPhone", deviceMode === "phone")
+  document.body.classList.toggle("displayTablet", deviceMode === "tablet")
+  document.body.classList.toggle("displayDesktop", deviceMode === "desktop")
+  document.body.classList.toggle("displayLandscape", isLandscape)
+  document.body.classList.toggle("displayPortrait", !isLandscape)
+}
+
+function scheduleDisplayViewportSize() {
+  clearTimeout(displayViewportResizeTimer)
+
+  requestAnimationFrame(() => {
+    applyDisplayViewportSize()
+  })
+
+  displayViewportResizeTimer = setTimeout(() => {
+    applyDisplayViewportSize()
+  }, 120)
+}
+
+function isNativeFullScreenActive() {
+  return !!(
+    document.fullscreenElement ||
+    document.webkitFullscreenElement
+  )
+}
+
 function isTvFullScreenActive() {
-  return !!document.fullscreenElement || document.body.classList.contains("tvFullScreenMode")
+  return isNativeFullScreenActive() || document.body.classList.contains("tvFullScreenMode")
 }
 
 function updateTvFullScreenButton() {
@@ -2830,32 +3040,64 @@ function updateTvFullScreenButton() {
   btn.innerText = active ? "الخروج من ملء الشاشة" : "ملء الشاشة"
 }
 
+async function enterNativeFullScreen(root) {
+  if (root.requestFullscreen) {
+    await root.requestFullscreen({ navigationUI: "hide" })
+    return true
+  }
+
+  if (root.webkitRequestFullscreen) {
+    root.webkitRequestFullscreen()
+    return true
+  }
+
+  return false
+}
+
+async function exitNativeFullScreen() {
+  if (document.exitFullscreen && document.fullscreenElement) {
+    await document.exitFullscreen()
+    return true
+  }
+
+  if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
+    document.webkitExitFullscreen()
+    return true
+  }
+
+  return false
+}
+
 async function toggleTvFullScreenMode() {
   const root = document.documentElement
   const active = isTvFullScreenActive()
 
   try {
     if (active) {
-      if (document.fullscreenElement && document.exitFullscreen) {
-        await document.exitFullscreen()
-      }
+      await exitNativeFullScreen()
 
       document.body.classList.remove("tvFullScreenMode")
+      document.documentElement.classList.remove("tvFullScreenMode")
+
+      scheduleDisplayViewportSize()
       updateTvFullScreenButton()
       return
     }
 
     document.body.classList.add("tvFullScreenMode")
+    document.documentElement.classList.add("tvFullScreenMode")
 
-    if (root.requestFullscreen) {
-      await root.requestFullscreen({ navigationUI: "hide" })
-    }
+    await enterNativeFullScreen(root)
 
+    scheduleDisplayViewportSize()
     updateTvFullScreenButton()
   } catch (error) {
     console.log("TV FULLSCREEN ERROR:", error)
 
     document.body.classList.add("tvFullScreenMode")
+    document.documentElement.classList.add("tvFullScreenMode")
+
+    scheduleDisplayViewportSize()
     updateTvFullScreenButton()
 
     if (typeof showGameToast === "function") {
@@ -2865,21 +3107,57 @@ async function toggleTvFullScreenMode() {
 }
 
 document.addEventListener("fullscreenchange", () => {
-  if (document.fullscreenElement) {
+  if (isNativeFullScreenActive()) {
     document.body.classList.add("tvFullScreenMode")
+    document.documentElement.classList.add("tvFullScreenMode")
   } else {
     document.body.classList.remove("tvFullScreenMode")
+    document.documentElement.classList.remove("tvFullScreenMode")
   }
 
+  scheduleDisplayViewportSize()
   updateTvFullScreenButton()
 })
 
+document.addEventListener("webkitfullscreenchange", () => {
+  if (isNativeFullScreenActive()) {
+    document.body.classList.add("tvFullScreenMode")
+    document.documentElement.classList.add("tvFullScreenMode")
+  } else {
+    document.body.classList.remove("tvFullScreenMode")
+    document.documentElement.classList.remove("tvFullScreenMode")
+  }
+
+  scheduleDisplayViewportSize()
+  updateTvFullScreenButton()
+})
+
+window.addEventListener("resize", scheduleDisplayViewportSize)
+window.addEventListener("orientationchange", scheduleDisplayViewportSize)
+window.addEventListener("pageshow", scheduleDisplayViewportSize)
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", scheduleDisplayViewportSize)
+  window.visualViewport.addEventListener("scroll", scheduleDisplayViewportSize)
+}
+
+window.addEventListener("load", updateTvFullScreenButton)
+
+/* أسماء احتياطية للأزرار القديمة */
+function toggleBigScreenMode() {
+  return toggleTvFullScreenMode()
+}
+
+function applyBigScreenMode() {
+  return applyDisplayViewportSize()
+}
+
 window.toggleTvFullScreenMode = toggleTvFullScreenMode
 window.updateTvFullScreenButton = updateTvFullScreenButton
+window.applyDisplayViewportSize = applyDisplayViewportSize
 
-/* احتياط لو بقي زر قديم يستدعي الاسم القديم */
-window.toggleBigScreenMode = toggleTvFullScreenMode
-
+window.toggleBigScreenMode = toggleBigScreenMode
+window.applyBigScreenMode = applyBigScreenMode
 /* =========================
    2) DETAILED FINAL RESULTS
    لوحة النتائج = نفس العرض
@@ -3171,6 +3449,38 @@ function updateFinalResultsUI() {
   const rows = getFinalResultsRows()
   const stats = getFinalResultsStats()
 
+  const overlay = document.getElementById("finalResultsOverlay")
+  const board = document.querySelector(".finalResultsBoard")
+  const list = document.querySelector(".finalResultsList")
+
+  if (overlay) {
+    overlay.classList.remove(
+      "resultsCount1",
+      "resultsCount2",
+      "resultsCount3",
+      "resultsCount4",
+      "resultsCount5",
+      "resultsCount6",
+      "resultsCount7",
+      "resultsCount8",
+      "resultsCount9",
+      "resultsCount10",
+      "teamA",
+      "teamB",
+      "draw"
+    )
+
+    overlay.classList.add(`resultsCount${Math.max(1, Math.min(rows.length, 10))}`)
+  }
+
+  if (board) {
+    board.style.setProperty("--results-count", rows.length)
+  }
+
+  if (list) {
+    list.style.setProperty("--results-count", rows.length)
+  }
+
   rows.forEach((row, index) => {
     updateSingleResultCard(row, index)
   })
@@ -3178,7 +3488,6 @@ function updateFinalResultsUI() {
   setResultText("finalResultsTeamAName", resultTeamName("A"))
   setResultText("finalResultsTeamBName", resultTeamName("B"))
 
-  /* فوق نعرض عدد الفقرات الفائزة، وليس نقاط الفقرات */
   setResultText("finalResultsTotalA", stats.A)
   setResultText("finalResultsTotalB", stats.B)
 
@@ -3186,16 +3495,9 @@ function updateFinalResultsUI() {
   const teamBBox = document.getElementById("finalResultsTeamBBox")
   const winnerName = document.getElementById("finalResultsWinnerName")
   const winnerSub = document.getElementById("finalResultsWinnerSub")
-  const overlay = document.getElementById("finalResultsOverlay")
-  const cupText = document.querySelector(".finalScoreCup span")
 
   if (teamABox) teamABox.classList.remove("winner")
   if (teamBBox) teamBBox.classList.remove("winner")
-  if (overlay) overlay.classList.remove("teamA", "teamB", "draw")
-
-  if (cupText) {
-    cupText.innerText = stats.draw > 0 ? `تعادل ${stats.draw}` : "VS"
-  }
 
   if (!rows.length) {
     if (winnerName) winnerName.innerText = "لا توجد فقرات"
@@ -3205,7 +3507,7 @@ function updateFinalResultsUI() {
   }
 
   if (!stats.completedCount) {
-    if (winnerName) winnerName.innerText = "لم تبدأ النتائج"
+    if (winnerName) winnerName.innerText = "بانتظار النتائج"
     if (winnerSub) winnerSub.innerText = `الفقرات المختارة: ${stats.selectedCount}`
     if (overlay) overlay.classList.add("draw")
     return
@@ -3216,16 +3518,20 @@ function updateFinalResultsUI() {
     if (winnerSub) winnerSub.innerText = `فاز في ${stats.A} من ${stats.completedCount} فقرات`
     if (teamABox) teamABox.classList.add("winner")
     if (overlay) overlay.classList.add("teamA")
-  } else if (stats.B > stats.A) {
+    return
+  }
+
+  if (stats.B > stats.A) {
     if (winnerName) winnerName.innerText = resultTeamName("B")
     if (winnerSub) winnerSub.innerText = `فاز في ${stats.B} من ${stats.completedCount} فقرات`
     if (teamBBox) teamBBox.classList.add("winner")
     if (overlay) overlay.classList.add("teamB")
-  } else {
-    if (winnerName) winnerName.innerText = "تعادل"
-    if (winnerSub) winnerSub.innerText = `تعادل في عدد الفقرات`
-    if (overlay) overlay.classList.add("draw")
+    return
   }
+
+  if (winnerName) winnerName.innerText = "تعادل"
+  if (winnerSub) winnerSub.innerText = "تعادل في عدد الفقرات"
+  if (overlay) overlay.classList.add("draw")
 }
 
 function showDetailedFinalResults() {
@@ -3275,13 +3581,4 @@ window.showDetailedFinalResults = showDetailedFinalResults
 window.closeDetailedFinalResults = closeDetailedFinalResults
 window.announceWinnerFromDetailedResults = announceWinnerFromDetailedResults
 
-/* =========================
-   3) INIT EXTRA FEATURES
-========================= */
 
-document.addEventListener("DOMContentLoaded", () => {
-  applyBigScreenMode()
-})
-
-window.toggleBigScreenMode = toggleBigScreenMode
-window.applyBigScreenMode = applyBigScreenMode

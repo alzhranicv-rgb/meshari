@@ -3634,3 +3634,69 @@
 .finalStoryStackContent.finalStoryHasAnswer .finalStoryCleanAnswer{
   padding:34px 28px 14px;
 }
+/* =========================================================
+   FINAL CONTROLS REAL MOVE UP
+   رفع أزرار التحكم فعليًا في الفاصلة
+========================================================= */
+
+.finalWrapNew{
+  grid-template-rows:82px minmax(0,1fr) 80px !important;
+  padding-bottom:0 !important;
+}
+
+.finalDisplayBody{
+  grid-template-rows:minmax(0,1fr) auto !important;
+  gap:4px !important;
+}
+
+.finalControlsBar,
+.finalRound1ControlsBar,
+.finalRound2ControlsBar,
+.finalRound3ControlsBar,
+#finalControlsBar{
+  position:relative !important;
+  top:-42px !important;
+  z-index:20 !important;
+
+  align-self:start !important;
+  margin-top:0 !important;
+  margin-bottom:0 !important;
+}
+
+.finalControlsBar button,
+.finalRound1ControlsBar button,
+.finalRound2ControlsBar button,
+.finalRound3ControlsBar button,
+.archiveCtrlBtn,
+.finalTeamMediaCtrlBtn{
+  height:58px !important;
+  min-height:58px !important;
+}
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .finalWrapNew{
+    grid-template-rows:74px minmax(0,1fr) 70px !important;
+    padding-bottom:0 !important;
+  }
+
+  .finalDisplayBody{
+    gap:3px !important;
+  }
+
+  .finalControlsBar,
+  .finalRound1ControlsBar,
+  .finalRound2ControlsBar,
+  .finalRound3ControlsBar,
+  #finalControlsBar{
+    top:-22px !important;
+  }
+
+  .finalControlsBar button,
+  .finalRound1ControlsBar button,
+  .finalRound2ControlsBar button,
+  .finalRound3ControlsBar button,
+  .archiveCtrlBtn,
+  .finalTeamMediaCtrlBtn{
+    height:52px !important;
+    min-height:52px !important;
+  }
+}

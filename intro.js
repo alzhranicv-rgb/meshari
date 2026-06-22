@@ -3,6 +3,37 @@ let introStarting = false
 let gameToastTimer = null
 let presenterStartWatchTimer = null
 
+window.openIntroSegmentsModal = function () {
+  const modelSelect = document.getElementById("introModelSelect")
+  const modal = document.getElementById("introSegmentsModal")
+
+  if (!modal) return
+
+  if (!modelSelect?.value) {
+    showGameToast("اختر النموذج أولاً")
+    modelSelect?.focus()
+    return
+  }
+
+  modal.classList.remove("hidden")
+  modal.classList.remove("show")
+
+  requestAnimationFrame(() => {
+    modal.classList.add("show")
+  })
+}
+
+window.closeIntroSegmentsModal = function () {
+  const modal = document.getElementById("introSegmentsModal")
+  if (!modal) return
+
+  modal.classList.remove("show")
+
+  setTimeout(() => {
+    modal.classList.add("hidden")
+  }, 180)
+}
+
 const INTRO_MIN_SEGMENTS_COUNT = 6
 const INTRO_MAX_SEGMENTS_COUNT = 10
 
@@ -563,14 +594,41 @@ async function loadIntroVisibleSegments() {
   const order = document.getElementById("introSegmentsOrder")
 
   if (counter) counter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
-  if (order) order.innerHTML = ""
+if (order) order.innerHTML = ""
+
+const triggerCounter = document.getElementById("introSegmentsTriggerCounter")
+const triggerSummary = document.getElementById("introSegmentsTriggerSummary")
+
+if (triggerCounter) {
+  triggerCounter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+  triggerCounter.classList.remove("ok")
+  triggerCounter.classList.add("bad")
+}
+
+if (triggerSummary) {
+  triggerSummary.textContent = modelId ? "جارٍ تحميل الفقرات..." : "اختر النموذج أولاً"
+}
 
   if (!grid) return
 
   if (!modelId) {
-    grid.innerHTML = `<div class="introSegmentsEmpty">اختر النموذج أولاً</div>`
-    return
+  grid.innerHTML = `<div class="introSegmentsEmpty">اختر النموذج أولاً</div>`
+
+  const triggerCounter = document.getElementById("introSegmentsTriggerCounter")
+  const triggerSummary = document.getElementById("introSegmentsTriggerSummary")
+
+  if (triggerCounter) {
+    triggerCounter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    triggerCounter.classList.remove("ok")
+    triggerCounter.classList.add("bad")
   }
+
+  if (triggerSummary) {
+    triggerSummary.textContent = "اختر النموذج أولاً"
+  }
+
+  return
+}
 
   grid.innerHTML = `<div class="introSegmentsEmpty">جارٍ تحميل الفقرات...</div>`
 
@@ -622,23 +680,34 @@ function renderIntroSegmentsPicker() {
 
 function buildIntroSegmentsOrderPreview() {
   if (!introVisibleSegmentsClickOrder.length) {
-    return `<div class="introSegmentsEmptyOrder">لم يتم اختيار فقرات بعد</div>`
+    return `
+      <div class="introSegmentsOrderEmpty">
+        لم يتم اختيار فقرات بعد
+      </div>
+    `
   }
 
   return `
-    <div class="introSegmentsOrderTitle">ترتيب الظهور</div>
+    <div class="introSegmentsOrderBar">
 
-    <div class="introSegmentsOrderList">
-      ${introVisibleSegmentsClickOrder.map((key, index) => {
-        const item = INTRO_ALL_GAME_SEGMENTS.find(seg => seg.key === key)
+      <div class="introSegmentsOrderHead">
+        <span>ترتيب الظهور</span>
+        <strong>${introVisibleSegmentsClickOrder.length}</strong>
+      </div>
 
-        return `
-          <div class="introSegmentsOrderItem">
-            <span>${index + 1}</span>
-            <strong>${item?.title || key}</strong>
-          </div>
-        `
-      }).join("")}
+      <div class="introSegmentsOrderTrack">
+        ${introVisibleSegmentsClickOrder.map((key, index) => {
+          const item = INTRO_ALL_GAME_SEGMENTS.find(seg => seg.key === key)
+
+          return `
+            <div class="introSegmentsOrderStep">
+              <div class="introSegmentsOrderStepNo">${index + 1}</div>
+              <div class="introSegmentsOrderStepText">${item?.title || key}</div>
+            </div>
+          `
+        }).join("")}
+      </div>
+
     </div>
   `
 }
@@ -647,6 +716,9 @@ function refreshIntroSegmentsPickerUI() {
   const count = introVisibleSegmentsClickOrder.length
   const counter = document.getElementById("introSegmentsCounter")
   const order = document.getElementById("introSegmentsOrder")
+
+  const triggerCounter = document.getElementById("introSegmentsTriggerCounter")
+  const triggerSummary = document.getElementById("introSegmentsTriggerSummary")
 
   const countOk =
     count >= INTRO_MIN_SEGMENTS_COUNT &&
@@ -657,6 +729,22 @@ function refreshIntroSegmentsPickerUI() {
     counter.classList.toggle("ok", countOk)
     counter.classList.toggle("bad", !countOk)
   }
+
+  if (triggerCounter) {
+  triggerCounter.innerText = `${count} / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+  triggerCounter.classList.toggle("ok", countOk)
+  triggerCounter.classList.toggle("bad", !countOk)
+}
+
+if (triggerSummary) {
+  if (!introVisibleSegmentsReady) {
+    triggerSummary.textContent = "اختر النموذج أولاً"
+  } else if (!count) {
+    triggerSummary.textContent = "لم يتم اختيار فقرات بعد"
+  } else {
+    triggerSummary.textContent = `تم اختيار ${count} فقرات`
+  }
+}
 
   INTRO_ALL_GAME_SEGMENTS.forEach(item => {
     const btn = document.getElementById(`introSegmentBtn_${item.key}`)
