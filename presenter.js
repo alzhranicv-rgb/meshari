@@ -2259,9 +2259,7 @@ async function renderAuction() {
             —
           </div>
 
-          <div class="presenterLabel">الصورة / الفيديو</div>
-
-          <div id="presenterAuctionImageBox" class="presenterImagePreviewBox hidden"></div>
+          
         </section>
 
       </div>
