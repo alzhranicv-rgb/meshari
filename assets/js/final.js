@@ -4459,7 +4459,9 @@ window.finalRound2ShowNextImage = finalRound2ShowNextImage
 window.finalRound2RecordScore = finalRound2RecordScore
 window.finalRound2RecordSequenceScore = finalRound2RecordSequenceScore
 window.finalRound2RecordImageScore = finalRound2RecordImageScore
-window.finalRound2RecordWrong = finalRound2RecordWrong
+if (typeof finalRound2RecordWrong === "function") {
+  window.finalRound2RecordWrong = finalRound2RecordWrong
+}
 window.toggleFinalRound2CorrectSelection = toggleFinalRound2CorrectSelection
 window.toggleFinalRound2ImageCorrectSelection = toggleFinalRound2ImageCorrectSelection
 window.hideFinalRound2SequenceWord = hideFinalRound2SequenceWord

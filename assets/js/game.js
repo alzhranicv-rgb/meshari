@@ -3266,45 +3266,52 @@ function getVisibleFinalResultKeys() {
 function getRealSegmentScores(segmentKey) {
   const s = getResultState()
   const final = s.final || {}
+  const warmup = s.warmup || {}
+const top10 = unwrapResultState(s.top10, "top10State")
+const auction = unwrapResultState(s.auction, "auctionState")
+const who = unwrapResultState(s.who, "whoState")
+const explain = s.explain || {}
+const archive = unwrapResultState(s.archive, "archiveState")
 
   let A = 0
   let B = 0
 
-  if (segmentKey === "warmup") {
-    A = safeResultNumber(
-      window.warmupScoreA ??
-      s.warmup?.scoreA ??
-      s.warmup?.scores?.A ??
-      s.warmup?.totalA
-    )
+if (segmentKey === "warmup") {
+  A = safeResultNumber(
+    window.warmupScoreA ??
+    warmup.warmupScoreA ??
+    warmup.scoreA ??
+    warmup.scores?.A
+  )
 
-    B = safeResultNumber(
-      window.warmupScoreB ??
-      s.warmup?.scoreB ??
-      s.warmup?.scores?.B ??
-      s.warmup?.totalB
-    )
-  }
+  B = safeResultNumber(
+    window.warmupScoreB ??
+    warmup.warmupScoreB ??
+    warmup.scoreB ??
+    warmup.scores?.B
+  )
+}
 
-  if (segmentKey === "top10") {
-    A = getResultScore(s.top10, "A")
-    B = getResultScore(s.top10, "B")
-  }
+if (segmentKey === "top10") {
+  A = getResultScore(top10, "A")
+  B = getResultScore(top10, "B")
+}
 
-  if (segmentKey === "auction") {
-    A = getResultScore(s.auction, "A")
-    B = getResultScore(s.auction, "B")
-  }
+if (segmentKey === "auction") {
+  A = safeResultNumber(auction.scoreA ?? auction.scores?.A)
+  B = safeResultNumber(auction.scoreB ?? auction.scores?.B)
+}
 
-  if (segmentKey === "who") {
-    A = getResultScore(s.who, "A")
-    B = getResultScore(s.who, "B")
-  }
+if (segmentKey === "who") {
+  A = safeResultNumber(who.scoreA ?? who.scores?.A)
+  B = safeResultNumber(who.scoreB ?? who.scores?.B)
+}
 
-  if (segmentKey === "explain") {
-    A = getResultScore(s.explain, "A")
-    B = getResultScore(s.explain, "B")
-  }
+if (segmentKey === "explain") {
+  A = getResultScore(explain, "A")
+  B = getResultScore(explain, "B")
+}
+
 
   if (segmentKey === "finalRound1") {
     A = getResultScore(final.round1, "A")
@@ -3327,9 +3334,9 @@ function getRealSegmentScores(segmentKey) {
   }
 
   if (segmentKey === "archive") {
-    A = getResultScore(s.archive, "A")
-    B = getResultScore(s.archive, "B")
-  }
+  A = getResultScore(archive, "A")
+  B = getResultScore(archive, "B")
+}
 
   return { A, B }
 }
@@ -3348,6 +3355,10 @@ function getFinalResultsRows() {
         scoreA: 0,
         scoreB: 0
       }
+
+      function unwrapResultState(state, key) {
+      return state?.[key] || state || {}
+       }
 
       const fallbackScores = getRealSegmentScores(item.segmentKey)
 

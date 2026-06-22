@@ -1247,3 +1247,83 @@ function switchTop10Turn() {
   updateTop10DoubleButton()
   saveTop10State()
 }
+function showTop10Answer() {
+  ensureTop10RoundState()
+
+  const round = top10State.round
+
+  if (!top10State.question?.[round]) {
+    showGameToast("لا يوجد سؤال")
+    return
+  }
+
+  playGameSound("answer")
+
+  const box = document.getElementById("top10QuestionBox")
+  if (box) {
+    box.innerText = top10State.question[round]
+  }
+
+  saveTop10State()
+}
+
+function addTop10Error() {
+  ensureTop10RoundState()
+
+  const team = top10State.activeTeam
+
+  if (!team) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  const round = top10State.round
+
+  if (Number(top10State.errors[round][team] || 0) >= 3) {
+    showGameToast("اكتملت أخطاء هذا الفريق")
+    return
+  }
+
+  pushTop10History()
+
+  top10State.errors[round][team] += 1
+
+  if (top10State.errors[round][team] >= 3) {
+    const other = getOtherTeam(team)
+
+    if (Number(top10State.errors[round][other] || 0) < 3) {
+      top10State.activeTeam = other
+    } else {
+      top10State.activeTeam = null
+    }
+  } else {
+    top10State.activeTeam = getOtherTeam(team)
+  }
+
+  clearTop10ActiveDouble()
+
+  playGameSound("wrong")
+  flashScreen("wrong")
+
+  updateTop10UIOnly()
+
+  if (top10State.activeTeam) {
+    autoStartTop10Timer()
+  } else {
+    clearInterval(timer)
+    timer = null
+    top10TimerStarted = false
+
+    const timerBox = document.getElementById("timer")
+    if (timerBox) timerBox.innerText = 0
+  }
+
+  saveTop10State()
+
+  if (typeof updateEndRoundButtonState === "function") {
+    updateEndRoundButtonState()
+  }
+}
+
+window.showTop10Answer = showTop10Answer
+window.addTop10Error = addTop10Error

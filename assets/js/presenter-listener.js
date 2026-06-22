@@ -20,7 +20,12 @@ function safeRunPresenterAction(fn) {
 
 function hideDisplayControls() {
   document.body.classList.add("presenterHideDisplayControls")
+  document.documentElement.classList.add("presenterHideDisplayControls")
   localStorage.setItem("presenter_hide_controls", "1")
+
+  if (typeof applyPresenterHideDisplayControlsState === "function") {
+    applyPresenterHideDisplayControlsState()
+  }
 
   if (typeof updateDisplayControlsEyeButton === "function") {
     updateDisplayControlsEyeButton(true)
@@ -33,7 +38,12 @@ function hideDisplayControls() {
 
 function showDisplayControls() {
   document.body.classList.remove("presenterHideDisplayControls")
+  document.documentElement.classList.remove("presenterHideDisplayControls")
   localStorage.setItem("presenter_hide_controls", "0")
+
+  if (typeof applyPresenterHideDisplayControlsState === "function") {
+    applyPresenterHideDisplayControlsState()
+  }
 
   if (typeof updateDisplayControlsEyeButton === "function") {
     updateDisplayControlsEyeButton(false)
@@ -239,7 +249,7 @@ function handlePresenterCommandOnce(cmd, source = "unknown") {
 }
 
 function handlePresenterCommand(cmd) {
-  const segment = cmd.segment
+  const segment = normalizeDisplaySegmentKey(cmd.segment)
   const action = cmd.action
   const data = { ...(cmd.payload || {}) }
 
@@ -377,7 +387,13 @@ function handlePresenterCommand(cmd) {
   if (segment === "auction") return handleAuctionPresenterAction(action, data)
   if (segment === "who") return handleWhoPresenterAction(action, data)
   if (segment === "explain") return handleExplainPresenterAction(action, data)
-  if (segment === "final") return handleFinalPresenterAction(action, data)
+  if (isFinalSegmentKey(segment)) {
+  if (!data.round) {
+    data.round = getFinalRoundFromSegmentKey(segment) || window.finalState?.round || 1
+  }
+
+  return handleFinalPresenterAction(action, data)
+}
   if (segment === "archive") return handleArchivePresenterAction(action, data)
 }
 
@@ -898,49 +914,61 @@ function handleFinalPresenterAction(action, data) {
     })
   }
 
-  if (action === "openNumber") {
-    return safeRunPresenterAction(() => {
-      const round = Number(data.round || window.finalState?.round || 1)
-      const number = Number(data.number || 0)
-      const team = data.team
+if (action === "openNumber") {
+  return safeRunPresenterAction(() => {
+    const round = Number(data.round || window.finalState?.round || 1)
+    const number = Number(data.number || 0)
+    const team = data.team
 
-      if (!number) return
+    if (!number) return
 
-      forceDisplayFinalRoundFromPresenter(round, () => {
-        setTimeout(() => {
+    forceDisplayFinalRoundFromPresenter(round, () => {
+      setTimeout(() => {
+        const applyTeamAfterOpen = () => {
           if (isValidPresenterTeam(team)) {
-  forceFinalTeamFromPresenter(team)
-}
+            forceFinalTeamFromPresenter(team)
+          }
+        }
+
+        if (round === 1) {
+          openFinalRound1Card(number)
 
           setTimeout(() => {
-            if (round === 1) {
-              openFinalRound1Card(number)
-              return
-            }
+            applyTeamAfterOpen()
+          }, 220)
 
-            if (round === 2) {
-              openFinalRound2Card(number)
-              return
-            }
+          return
+        }
 
-            if (round === 3) {
-              if (typeof openFinalRound3StoryCard === "function") {
-                openFinalRound3StoryCard(number)
-              }
-              return
-            }
+        if (round === 2) {
+          applyTeamAfterOpen()
+          openFinalRound2Card(number)
+          return
+        }
 
-            if (round === 4) {
-              if (typeof openFinalRound4TeamMediaCard === "function") {
-                openFinalRound4TeamMediaCard(number)
-              }
-              return
-            }
-          }, 80)
-        }, 80)
-      })
+        if (round === 3) {
+          if (typeof openFinalRound3StoryCard === "function") {
+            openFinalRound3StoryCard(number)
+
+            setTimeout(() => {
+              applyTeamAfterOpen()
+            }, 220)
+          }
+
+          return
+        }
+
+        if (round === 4) {
+          applyTeamAfterOpen()
+
+          if (typeof openFinalRound4TeamMediaCard === "function") {
+            openFinalRound4TeamMediaCard(number)
+          }
+        }
+      }, 120)
     })
-  }
+  })
+}
 
   if (action === "double") {
     return safeRunPresenterAction(() => activateFinalDouble())
@@ -1040,6 +1068,14 @@ if (action === "toggleRound2ImageCorrect") {
         ? oldSelected.filter(x => Number(x) !== index)
         : [...oldSelected, index]
     }
+
+    if (typeof saveFinalState === "function") {
+  saveFinalState()
+}
+
+if (typeof syncDisplayStateToSession === "function") {
+  syncDisplayStateToSession()
+}
 
     if (typeof saveFinalState === "function") {
       saveFinalState()

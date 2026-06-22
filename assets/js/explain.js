@@ -234,9 +234,12 @@ async function loadExplainData() {
     B: Number(window.explainState.scores.B || 0)
   }
 
+  if (!sameSavedGame) {
   hideExplainTimer()
-  saveExplainState()
-  return true
+}
+
+saveExplainState()
+return true
 }
 
 /* =========================
