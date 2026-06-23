@@ -99,6 +99,11 @@ function restoreWhoState(saved) {
   whoLastTickPlayed = null
 
   syncWhoGlobals()
+  if (whoState.activeTeam) {
+  setWhoActiveTeam(whoState.activeTeam, { sync:false })
+} else {
+  setWhoActiveTeam(null)
+}
 
   const scoreABox = document.getElementById("whoScoreA")
   const scoreBBox = document.getElementById("whoScoreB")
@@ -232,6 +237,9 @@ window.renderWho = function () {
   } else {
     saveWhoState()
   }
+  if (whoState.activeTeam) {
+  setWhoActiveTeam(whoState.activeTeam, { sync:false })
+}
 
   updateWhoDoubleButton()
 updateWhoCompensationButton()
@@ -408,6 +416,37 @@ function getWhoTurnName() {
   return "اختر فريق"
 }
 
+function setWhoActiveTeam(team, options = {}) {
+  if (team !== "A" && team !== "B") {
+    whoState.activeTeam = null
+    selectedTeam = null
+
+    if (typeof clearGameActiveTeam === "function") {
+      clearGameActiveTeam()
+    } else {
+      delete document.body.dataset.activeTeam
+    }
+
+    highlightWhoTurnTeam()
+    updateWhoTurnBox()
+    updateWhoDoubleButton()
+    return
+  }
+
+  whoState.activeTeam = team
+  selectedTeam = team
+
+  if (typeof setGameActiveTeam === "function") {
+    setGameActiveTeam(team, options)
+  } else {
+    document.body.dataset.activeTeam = team
+  }
+
+  highlightWhoTurnTeam()
+  updateWhoTurnBox()
+  updateWhoDoubleButton()
+}
+
 function updateWhoTurnBox() {
   const inline = document.getElementById("whoTurnInline")
   if (inline) {
@@ -418,13 +457,10 @@ function updateWhoTurnBox() {
 }
 
 function selectWhoTeam(team) {
-  if (whoCompensationMode && whoQuestionLocked) {
-    whoState.activeTeam = team
-    selectedTeam = team
+  if (team !== "A" && team !== "B") return
 
-    highlightWhoTurnTeam()
-    updateWhoTurnBox()
-    updateWhoDoubleButton()
+  if (whoCompensationMode && whoQuestionLocked) {
+    setWhoActiveTeam(team)
     saveWhoState()
 
     setTimeout(() => {
@@ -434,18 +470,18 @@ function selectWhoTeam(team) {
     return
   }
 
-  if (whoState.manualStartDone) {
+  /*
+    مهم:
+    لو الفقرة بدأت قبل كذا لكن ما فيه فريق نشط،
+    نسمح بالاختيار عشان ما يعلق بدون تحديد.
+  */
+  if (whoState.manualStartDone && whoState.activeTeam) {
     showGameToast("بعد البداية الأولى ينتقل الدور تلقائيًا")
     return
   }
 
-  whoState.activeTeam = team
   whoState.manualStartDone = true
-  selectedTeam = team
-
-  highlightWhoTurnTeam()
-  updateWhoTurnBox()
-  updateWhoDoubleButton()
+  setWhoActiveTeam(team)
   saveWhoState()
 
   setTimeout(() => {
@@ -473,44 +509,60 @@ function getWhoTeamBox(team) {
 function highlightWhoTurnTeam() {
   const team = whoState.activeTeam || selectedTeam || null
 
-  document.querySelectorAll(".whoTeamCurrent").forEach(el => {
-    el.classList.remove("whoTeamCurrent")
-  })
+  const a = document.getElementById("whoTeamABox")
+  const b = document.getElementById("whoTeamBBox")
 
-  const a = getWhoTeamBox("A")
-  const b = getWhoTeamBox("B")
+  if (team === "A" || team === "B") {
+    document.body.setAttribute("data-active-team", team)
+  } else {
+    document.body.removeAttribute("data-active-team")
+  }
 
   if (a) {
-    a.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam")
+    a.classList.remove(
+      "activeTeam",
+      "selectedPresenterTeam",
+      "finalTurnActiveTeam",
+      "whoTeamCurrent"
+    )
   }
 
   if (b) {
-    b.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam")
+    b.classList.remove(
+      "activeTeam",
+      "selectedPresenterTeam",
+      "finalTurnActiveTeam",
+      "whoTeamCurrent"
+    )
   }
 
   if (team === "A" && a) {
     a.classList.add("whoTeamCurrent")
+    a.setAttribute("data-current-team", "true")
+  } else if (a) {
+    a.removeAttribute("data-current-team")
   }
 
   if (team === "B" && b) {
     b.classList.add("whoTeamCurrent")
+    b.setAttribute("data-current-team", "true")
+  } else if (b) {
+    b.removeAttribute("data-current-team")
   }
 
-  if (!a || !b) {
-    console.log("WHO TEAM BOX NOT FOUND:", { team, a, b })
-  }
+  console.log("WHO ACTIVE TEAM:", {
+    team,
+    bodyTeam: document.body.getAttribute("data-active-team"),
+    aClass: a ? a.className : null,
+    bClass: b ? b.className : null
+  })
 }
 
 function switchWhoTurn() {
   if (!whoState.activeTeam) return
 
   whoState.lastAnsweredTeam = whoState.activeTeam
-  whoState.activeTeam = getWhoOtherTeam(whoState.activeTeam)
-  selectedTeam = whoState.activeTeam
-
-  highlightWhoTurnTeam()
-  updateWhoTurnBox()
-  updateWhoDoubleButton()
+setWhoActiveTeam(getWhoOtherTeam(whoState.activeTeam))
 }
 
 
@@ -553,13 +605,9 @@ async function startWhoCompensation() {
   whoCompensationMode = true
   whoState.currentPoints = 5
 
-  whoState.activeTeam = null
-  selectedTeam = null
+  setWhoActiveTeam(null)
 
-  highlightWhoPoints()
-  highlightWhoTurnTeam()
-  updateWhoTurnBox()
-  updateWhoDoubleButton()
+highlightWhoPoints()
 
   const grid = document.querySelector(".whoGrid")
   if (grid) {

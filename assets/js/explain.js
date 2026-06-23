@@ -38,6 +38,29 @@ function getExplainOtherTeam(team) {
   return team === "A" ? "B" : "A"
 }
 
+function setExplainActiveTeam(team, options = {}) {
+  if (team !== "A" && team !== "B") {
+    selectedTeam = null
+    window.explainState.currentTeam = null
+
+    if (typeof clearGameActiveTeam === "function") {
+      clearGameActiveTeam()
+    }
+
+    highlightExplainTeam(null)
+    return
+  }
+
+  selectedTeam = team
+  window.explainState.currentTeam = team
+
+  if (typeof setGameActiveTeam === "function") {
+    setGameActiveTeam(team, options)
+  }
+
+  highlightExplainTeam(team)
+}
+
 function canExplainTeamPlay(team) {
   const other = getExplainOtherTeam(team)
 
@@ -234,6 +257,12 @@ async function loadExplainData() {
     B: Number(window.explainState.scores.B || 0)
   }
 
+  if (window.explainState.currentTeam) {
+  setExplainActiveTeam(window.explainState.currentTeam, { sync:false })
+} else {
+  setExplainActiveTeam(null, { sync:false })
+}
+
   if (!sameSavedGame) {
   hideExplainTimer()
 }
@@ -257,6 +286,9 @@ async function renderExplain() {
   openSegment("اشرح الكلمة", buildExplainHtml())
 
   updateExplainUI()
+  if (window.explainState.currentTeam) {
+  setExplainActiveTeam(window.explainState.currentTeam, { sync:false })
+}
 }
 
 window.renderExplain = renderExplain
@@ -537,10 +569,7 @@ function selectExplainTeam(team) {
     return
   }
 
-  selectedTeam = team
-  window.explainState.currentTeam = team
-
-  highlightExplainTeam(team)
+  setExplainActiveTeam(team)
 
   const centerTitle = document.querySelector(".explainCenterTitle h3")
   if (centerTitle) {
@@ -591,12 +620,13 @@ if (!canExplainTeamPlay(activeTeam)) {
   resetExplainRevealTimeout()
 
   window.explainState.currentNumber = n
-  window.explainState.currentWord = item.word
-  selectedTeam = activeTeam
-  window.explainState.currentTeam = activeTeam
-  window.explainState.wordVisible = true
-  window.explainState.timerVisible = false
-  window.explainState.timeLeft = EXPLAIN_TIMER_SECONDS
+window.explainState.currentWord = item.word
+
+setExplainActiveTeam(activeTeam)
+
+window.explainState.wordVisible = true
+window.explainState.timerVisible = false
+window.explainState.timeLeft = EXPLAIN_TIMER_SECONDS
 
   playGameSound("open")
   updateExplainUI()
@@ -727,18 +757,22 @@ function finishExplainNumber(isCorrect) {
     const nextTeam = allDone ? null : getExplainOtherTeam(activeTeam)
 
     window.explainState.currentNumber = null
-    window.explainState.currentWord = ""
-    window.explainState.currentTeam = nextTeam
-    window.explainState.wordVisible = true
-    window.explainState.timerVisible = false
-    window.explainState.timeLeft = EXPLAIN_TIMER_SECONDS
-    window.explainState.revealLock = false
-    window.explainState.answerResult = null
+window.explainState.currentWord = ""
 
-    selectedTeam = nextTeam
+if (nextTeam) {
+  setExplainActiveTeam(nextTeam)
+} else {
+  setExplainActiveTeam(null)
+}
 
-    updateExplainUI()
-    saveExplainState()
+window.explainState.wordVisible = true
+window.explainState.timerVisible = false
+window.explainState.timeLeft = EXPLAIN_TIMER_SECONDS
+window.explainState.revealLock = false
+window.explainState.answerResult = null
+
+updateExplainUI()
+saveExplainState()
   }, 5000)
 }
 function correctExplainAnswer() {

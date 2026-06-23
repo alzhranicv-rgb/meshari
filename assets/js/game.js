@@ -4,6 +4,54 @@ let teamBName = localStorage.getItem("teamBName") || "الفريق الثاني"
 let scoreA = Number(localStorage.getItem("main_score_a") || 0)
 let scoreB = Number(localStorage.getItem("main_score_b") || 0)
 
+/* =========================
+   GLOBAL ACTIVE TEAM SYSTEM
+   نظام الفريق النشط العام
+========================= */
+
+const ACTIVE_TEAM_KEY = "active_team_v1"
+
+function setGameActiveTeam(team, options = {}) {
+  const cleanTeam = team === "A" || team === "B" ? team : ""
+
+  if (cleanTeam) {
+    localStorage.setItem(ACTIVE_TEAM_KEY, cleanTeam)
+    document.body.dataset.activeTeam = cleanTeam
+  } else {
+    localStorage.removeItem(ACTIVE_TEAM_KEY)
+    delete document.body.dataset.activeTeam
+  }
+
+  if (options.sync !== false && typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
+}
+
+function getGameActiveTeam() {
+  const team = localStorage.getItem(ACTIVE_TEAM_KEY)
+  return team === "A" || team === "B" ? team : ""
+}
+
+function clearGameActiveTeam() {
+  setGameActiveTeam("", { sync:true })
+}
+
+function initGameActiveTeam() {
+  const team = getGameActiveTeam()
+
+  if (team) {
+    document.body.dataset.activeTeam = team
+  } else {
+    delete document.body.dataset.activeTeam
+  }
+}
+
+window.setGameActiveTeam = setGameActiveTeam
+window.getGameActiveTeam = getGameActiveTeam
+window.clearGameActiveTeam = clearGameActiveTeam
+
+initGameActiveTeam()
+
 let selectedTeam = null
 let timer = null
 let currentPoints = 0
@@ -189,14 +237,16 @@ async function syncDisplayStateToSession() {
       null
 
     const state = {
-      mainScores: {
-        A: Number(localStorage.getItem("main_score_a") || scoreA || 0),
-        B: Number(localStorage.getItem("main_score_b") || scoreB || 0)
-      },
+  mainScores: {
+    A: Number(localStorage.getItem("main_score_a") || scoreA || 0),
+    B: Number(localStorage.getItem("main_score_b") || scoreB || 0)
+  },
 
-      currentModelName: localStorage.getItem("game_model_name") || currentModelName || "",
-      displayControlsHidden: localStorage.getItem("presenter_hide_controls") === "1",
-      segmentStatus: getSafeJson("segment_status_v1") || defaultSegmentStatus(),
+  activeTeam: getGameActiveTeam(),
+
+  currentModelName: localStorage.getItem("game_model_name") || currentModelName || "",
+  displayControlsHidden: localStorage.getItem("presenter_hide_controls") === "1",
+  segmentStatus: getSafeJson("segment_status_v1") || defaultSegmentStatus(),
 
       warmup: getSafeJson("warmup_state_v1"),
       top10: getSafeJson("top10_state_v1"),
@@ -1474,6 +1524,29 @@ function addMainScore(team) {
 ========================= */
 
 function announceMainWinner() {
+  if (typeof showDetailedFinalResults === "function") {
+    showDetailedFinalResults()
+    return
+  }
+
+  let winner = ""
+
+  if (scoreA > scoreB) winner = teamAName
+  else if (scoreB > scoreA) winner = teamBName
+  else winner = "تعادل"
+
+  showWinnerOverlay(winner, { homeWinner: true })
+}
+
+function announceWinner() {
+  if (typeof showDetailedFinalResults === "function") {
+    showDetailedFinalResults()
+    return
+  }
+
+  playWinnerEffects()
+  homeRefreshLocked = false
+
   let winner = ""
 
   if (scoreA > scoreB) winner = teamAName
@@ -1865,6 +1938,8 @@ function goHome() {
   window.currentSegmentScores = null
 
   localStorage.removeItem("active_segment")
+  clearGameActiveTeam()
+
   homeRefreshLocked = false
 
   syncDisplayStateToSession()
@@ -1922,6 +1997,10 @@ function selectTeam(team) {
 
   if (team === "A" && a) a.classList.add("activeTeam")
   if (team === "B" && b) b.classList.add("activeTeam")
+
+  if (team === "A" || team === "B") {
+    setGameActiveTeam(team)
+  }
 
   showDisplayCurrentTurn(team)
 }
@@ -2083,8 +2162,10 @@ segmentStatus[key].winner = winner
 segmentStatus[key].scoreA = finishedSegmentScores.A
 segmentStatus[key].scoreB = finishedSegmentScores.B
 
-  saveSegmentStatus()
-  updateSegmentCards()
+clearGameActiveTeam()
+
+saveSegmentStatus()
+updateSegmentCards()
 
   clearInterval(timer)
   timer = null
@@ -3283,11 +3364,10 @@ window.applyDisplayViewportSize = applyDisplayViewportSize
 
 window.toggleBigScreenMode = toggleBigScreenMode
 window.applyBigScreenMode = applyBigScreenMode
+
 /* =========================
-   2) DETAILED FINAL RESULTS
-   لوحة النتائج = نفس العرض
-   الكروت = إحصائيات كل فقرة
-   الفائز = الأكثر فوزًا بالفقرات
+   UNIFIED FINAL RESULTS
+   شاشة واحدة للنتائج والختام
 ========================= */
 
 const FINAL_RESULTS_CONFIG = [
@@ -3345,7 +3425,6 @@ function getResultState() {
   }
 }
 
-/* يقرأ النقاط من أي شكل مستخدم في ملفات الفقرات */
 function getResultScore(state, team) {
   if (!state) return 0
 
@@ -3364,25 +3443,8 @@ function getResultScore(state, team) {
 
 function unwrapResultState(state, key) {
   if (!state) return {}
-
   if (state[key]) return state[key]
-
   return state
-}
-
-function normalizeWinnerToTeam(winner) {
-  const text = String(winner || "").trim()
-
-  if (!text) return ""
-  if (text === "تعادل") return "draw"
-
-  const aName = resultTeamName("A")
-  const bName = resultTeamName("B")
-
-  if (text === aName || text.includes(aName)) return "A"
-  if (text === bName || text.includes(bName)) return "B"
-
-  return ""
 }
 
 function getVisibleFinalResultKeys() {
@@ -3395,56 +3457,55 @@ function getVisibleFinalResultKeys() {
   return FINAL_RESULTS_CONFIG.map(item => item.segmentKey)
 }
 
-/* هنا نجيب نقاط كل فقرة الحقيقية */
 function getRealSegmentScores(segmentKey) {
   const s = getResultState()
+
   const final = s.final || {}
   const warmup = s.warmup || {}
-const top10 = unwrapResultState(s.top10, "top10State")
-const auction = unwrapResultState(s.auction, "auctionState")
-const who = unwrapResultState(s.who, "whoState")
-const explain = s.explain || {}
-const archive = unwrapResultState(s.archive, "archiveState")
+  const top10 = unwrapResultState(s.top10, "top10State")
+  const auction = unwrapResultState(s.auction, "auctionState")
+  const who = unwrapResultState(s.who, "whoState")
+  const explain = s.explain || {}
+  const archive = unwrapResultState(s.archive, "archiveState")
 
   let A = 0
   let B = 0
 
-if (segmentKey === "warmup") {
-  A = safeResultNumber(
-    window.warmupScoreA ??
-    warmup.warmupScoreA ??
-    warmup.scoreA ??
-    warmup.scores?.A
-  )
+  if (segmentKey === "warmup") {
+    A = safeResultNumber(
+      window.warmupScoreA ??
+      warmup.warmupScoreA ??
+      warmup.scoreA ??
+      warmup.scores?.A
+    )
 
-  B = safeResultNumber(
-    window.warmupScoreB ??
-    warmup.warmupScoreB ??
-    warmup.scoreB ??
-    warmup.scores?.B
-  )
-}
+    B = safeResultNumber(
+      window.warmupScoreB ??
+      warmup.warmupScoreB ??
+      warmup.scoreB ??
+      warmup.scores?.B
+    )
+  }
 
-if (segmentKey === "top10") {
-  A = getResultScore(top10, "A")
-  B = getResultScore(top10, "B")
-}
+  if (segmentKey === "top10") {
+    A = getResultScore(top10, "A")
+    B = getResultScore(top10, "B")
+  }
 
-if (segmentKey === "auction") {
-  A = safeResultNumber(auction.scoreA ?? auction.scores?.A)
-  B = safeResultNumber(auction.scoreB ?? auction.scores?.B)
-}
+  if (segmentKey === "auction") {
+    A = safeResultNumber(auction.scoreA ?? auction.scores?.A)
+    B = safeResultNumber(auction.scoreB ?? auction.scores?.B)
+  }
 
-if (segmentKey === "who") {
-  A = safeResultNumber(who.scoreA ?? who.scores?.A)
-  B = safeResultNumber(who.scoreB ?? who.scores?.B)
-}
+  if (segmentKey === "who") {
+    A = safeResultNumber(who.scoreA ?? who.scores?.A)
+    B = safeResultNumber(who.scoreB ?? who.scores?.B)
+  }
 
-if (segmentKey === "explain") {
-  A = getResultScore(explain, "A")
-  B = getResultScore(explain, "B")
-}
-
+  if (segmentKey === "explain") {
+    A = getResultScore(explain, "A")
+    B = getResultScore(explain, "B")
+  }
 
   if (segmentKey === "finalRound1") {
     A = getResultScore(final.round1, "A")
@@ -3467,9 +3528,9 @@ if (segmentKey === "explain") {
   }
 
   if (segmentKey === "archive") {
-  A = getResultScore(archive, "A")
-  B = getResultScore(archive, "B")
-}
+    A = getResultScore(archive, "A")
+    B = getResultScore(archive, "B")
+  }
 
   return { A, B }
 }
@@ -3489,18 +3550,18 @@ function getFinalResultsRows() {
         scoreB: 0
       }
 
-      
-
       const fallbackScores = getRealSegmentScores(item.segmentKey)
 
-      const A = Number(status.scoreA || fallbackScores.A || 0)
-      const B = Number(status.scoreB || fallbackScores.B || 0)
+      const A = Number(status.locked ? status.scoreA : fallbackScores.A || 0)
+      const B = Number(status.locked ? status.scoreB : fallbackScores.B || 0)
 
       let winnerTeam = ""
 
-      if (A > B) winnerTeam = "A"
-      else if (B > A) winnerTeam = "B"
-      else if (status.locked) winnerTeam = "draw"
+      if (status.locked) {
+        if (A > B) winnerTeam = "A"
+        else if (B > A) winnerTeam = "B"
+        else winnerTeam = "draw"
+      }
 
       return {
         ...item,
@@ -3513,7 +3574,6 @@ function getFinalResultsRows() {
     })
 }
 
-/* الإحصائية النهائية: نحسب الفائز حسب عدد الفقرات */
 function getFinalResultsStats() {
   const rows = getFinalResultsRows()
 
@@ -3542,6 +3602,30 @@ function getFinalResultsStats() {
   return stats
 }
 
+function getUnifiedFinalWinner(stats = getFinalResultsStats()) {
+  if (stats.A > stats.B) {
+    return {
+      team: "A",
+      name: resultTeamName("A"),
+      type: "team"
+    }
+  }
+
+  if (stats.B > stats.A) {
+    return {
+      team: "B",
+      name: resultTeamName("B"),
+      type: "team"
+    }
+  }
+
+  return {
+    team: "draw",
+    name: "تعادل",
+    type: "draw"
+  }
+}
+
 function hideAllFinalResultCards() {
   document.querySelectorAll("[data-result-card]").forEach(card => {
     card.classList.add("hiddenFinalResultCard")
@@ -3550,24 +3634,26 @@ function hideAllFinalResultCards() {
 }
 
 function updateSingleResultCard(row, index) {
-  /* هنا تظهر نقاط الفقرة الحقيقية */
-  setResultText(`result${row.prefix}A`, row.A)
-  setResultText(`result${row.prefix}B`, row.B)
-
-  let winnerText = "لم تنتهِ"
+  let winnerText = "لم تلعب"
   let winnerClass = "pending"
 
-  if (row.locked || row.winnerTeam) {
+  if (row.locked) {
+    setResultText(`result${row.prefix}A`, row.A)
+    setResultText(`result${row.prefix}B`, row.B)
+
     if (row.winnerTeam === "A") {
-      winnerText = `فاز: ${resultTeamName("A")}`
+      winnerText = resultTeamName("A")
       winnerClass = "teamA"
     } else if (row.winnerTeam === "B") {
-      winnerText = `فاز: ${resultTeamName("B")}`
+      winnerText = resultTeamName("B")
       winnerClass = "teamB"
     } else {
       winnerText = "تعادل"
       winnerClass = "draw"
     }
+  } else {
+    setResultText(`result${row.prefix}A`, "—")
+    setResultText(`result${row.prefix}B`, "—")
   }
 
   setResultText(`result${row.prefix}Winner`, winnerText)
@@ -3590,10 +3676,17 @@ function updateFinalResultsUI() {
 
   const rows = getFinalResultsRows()
   const stats = getFinalResultsStats()
+  const winner = getUnifiedFinalWinner(stats)
 
   const overlay = document.getElementById("finalResultsOverlay")
   const board = document.querySelector(".finalResultsBoard")
-  const list = document.querySelector(".finalResultsList")
+  const list =
+    document.querySelector(".finalResultsSegmentsGrid") ||
+    document.querySelector(".finalResultsTimeline") ||
+    document.querySelector(".finalResultsList")
+
+  const totalPointsA = rows.reduce((sum, row) => sum + Number(row.A || 0), 0)
+  const totalPointsB = rows.reduce((sum, row) => sum + Number(row.B || 0), 0)
 
   if (overlay) {
     overlay.classList.remove(
@@ -3613,6 +3706,10 @@ function updateFinalResultsUI() {
     )
 
     overlay.classList.add(`resultsCount${Math.max(1, Math.min(rows.length, 10))}`)
+
+    if (winner.team === "A") overlay.classList.add("teamA")
+    else if (winner.team === "B") overlay.classList.add("teamB")
+    else overlay.classList.add("draw")
   }
 
   if (board) {
@@ -3627,11 +3724,23 @@ function updateFinalResultsUI() {
     updateSingleResultCard(row, index)
   })
 
-  setResultText("finalResultsTeamAName", resultTeamName("A"))
-  setResultText("finalResultsTeamBName", resultTeamName("B"))
+  setResultText("finalTeamAStatsName", resultTeamName("A"))
+  setResultText("finalTeamBStatsName", resultTeamName("B"))
 
-  setResultText("finalResultsTotalA", stats.A)
-  setResultText("finalResultsTotalB", stats.B)
+  setResultText("finalTeamAStatsWins", stats.A)
+  setResultText("finalTeamBStatsWins", stats.B)
+
+  setResultText("finalTeamAStatsPoints", totalPointsA)
+  setResultText("finalTeamBStatsPoints", totalPointsB)
+
+  setResultText("finalTeamAStatsCompleted", stats.completedCount)
+  setResultText("finalTeamBStatsCompleted", stats.completedCount)
+
+  setResultText("finalResultsDrawTotal", stats.draw)
+
+  setResultText("finalQuickCompleted", `${stats.completedCount}/${stats.selectedCount}`)
+  setResultText("finalQuickDraws", stats.draw)
+  setResultText("finalQuickPending", stats.pending)
 
   const teamABox = document.getElementById("finalResultsTeamABox")
   const teamBBox = document.getElementById("finalResultsTeamBBox")
@@ -3644,36 +3753,37 @@ function updateFinalResultsUI() {
   if (!rows.length) {
     if (winnerName) winnerName.innerText = "لا توجد فقرات"
     if (winnerSub) winnerSub.innerText = "لم يتم اختيار أي فقرة"
-    if (overlay) overlay.classList.add("draw")
     return
   }
 
   if (!stats.completedCount) {
     if (winnerName) winnerName.innerText = "بانتظار النتائج"
     if (winnerSub) winnerSub.innerText = `الفقرات المختارة: ${stats.selectedCount}`
-    if (overlay) overlay.classList.add("draw")
     return
   }
 
-  if (stats.A > stats.B) {
-    if (winnerName) winnerName.innerText = resultTeamName("A")
-    if (winnerSub) winnerSub.innerText = `فاز في ${stats.A} من ${stats.completedCount} فقرات`
+  if (winner.team === "A") {
+    if (winnerName) winnerName.innerText = winner.name
+    if (winnerSub) {
+      winnerSub.innerText = `فاز في ${stats.A} من ${stats.completedCount} فقرات`
+    }
+
     if (teamABox) teamABox.classList.add("winner")
-    if (overlay) overlay.classList.add("teamA")
     return
   }
 
-  if (stats.B > stats.A) {
-    if (winnerName) winnerName.innerText = resultTeamName("B")
-    if (winnerSub) winnerSub.innerText = `فاز في ${stats.B} من ${stats.completedCount} فقرات`
+  if (winner.team === "B") {
+    if (winnerName) winnerName.innerText = winner.name
+    if (winnerSub) {
+      winnerSub.innerText = `فاز في ${stats.B} من ${stats.completedCount} فقرات`
+    }
+
     if (teamBBox) teamBBox.classList.add("winner")
-    if (overlay) overlay.classList.add("teamB")
     return
   }
 
   if (winnerName) winnerName.innerText = "تعادل"
-  if (winnerSub) winnerSub.innerText = "تعادل في عدد الفقرات"
-  if (overlay) overlay.classList.add("draw")
+  if (winnerSub) winnerSub.innerText = `تعادل في عدد الفقرات — ${stats.A} / ${stats.B}`
 }
 
 function showDetailedFinalResults() {
@@ -3682,8 +3792,7 @@ function showDetailedFinalResults() {
   const overlay = document.getElementById("finalResultsOverlay")
   if (!overlay) return
 
-  overlay.classList.remove("hidden")
-  overlay.classList.remove("closing")
+  overlay.classList.remove("hidden", "closing")
 }
 
 function closeDetailedFinalResults() {
@@ -3700,11 +3809,7 @@ function closeDetailedFinalResults() {
 
 function announceWinnerFromDetailedResults() {
   const stats = getFinalResultsStats()
-
-  let winner = "تعادل"
-
-  if (stats.A > stats.B) winner = resultTeamName("A")
-  if (stats.B > stats.A) winner = resultTeamName("B")
+  const winner = getUnifiedFinalWinner(stats)
 
   closeDetailedFinalResults()
 
@@ -3714,7 +3819,7 @@ function announceWinnerFromDetailedResults() {
     }
 
     if (typeof showWinnerOverlay === "function") {
-      showWinnerOverlay(winner, { homeWinner: true })
+      showWinnerOverlay(winner.name, { homeWinner: true })
     }
   }, 220)
 }
@@ -3722,5 +3827,3 @@ function announceWinnerFromDetailedResults() {
 window.showDetailedFinalResults = showDetailedFinalResults
 window.closeDetailedFinalResults = closeDetailedFinalResults
 window.announceWinnerFromDetailedResults = announceWinnerFromDetailedResults
-
-

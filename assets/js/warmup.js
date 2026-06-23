@@ -104,7 +104,9 @@ function restoreWarmupUIFromState(saved) {
   if (questionBox) questionBox.innerText = saved.questionText || "اختر رقم السؤال"
   if (timerBox) timerBox.innerText = Number(saved.timerValue || 0)
 
-  if (selectedTeam) highlightWarmupSelectedTeam(selectedTeam)
+  if (selectedTeam) {
+  setWarmupActiveTeam(selectedTeam, { sync:false })
+}
   restoreWarmupButtonStates()
   updateWarmupDoubleButton()
 
@@ -348,6 +350,18 @@ function updateWarmupDoubleButton() {
   btn.disabled = false
   btn.innerText = "دوبيلا "
 }
+function setWarmupActiveTeam(team, options = {}) {
+  if (team !== "A" && team !== "B") return
+
+  selectedTeam = team
+  highlightWarmupSelectedTeam(team)
+
+  if (typeof setGameActiveTeam === "function") {
+    setGameActiveTeam(team, options)
+  }
+
+  updateWarmupDoubleButton()
+}
 
 /* =========================
    Team UI
@@ -407,6 +421,8 @@ function getNextWarmupTeam() {
 }
 
 function selectWarmupTeam(team) {
+  if (team !== "A" && team !== "B") return
+
   if (warmupManualSelectionDone && team !== selectedTeam) {
     showGameToast("بعد البداية الأولى يتحدد الدور تلقائيًا")
     return
@@ -417,15 +433,15 @@ function selectWarmupTeam(team) {
     return
   }
 
-  selectedTeam = team
-warmupManualSelectionDone = true
-highlightWarmupSelectedTeam(team)
-updateWarmupDoubleButton()
-saveWarmupState()
+  warmupManualSelectionDone = true
 
-setTimeout(() => {
-  highlightWarmupSelectedTeam(team)
-}, 80)
+  setWarmupActiveTeam(team)
+
+  saveWarmupState()
+
+  setTimeout(() => {
+    highlightWarmupSelectedTeam(team)
+  }, 80)
 }
 
 /* =========================
@@ -451,8 +467,7 @@ async function openWarmupQuestion(category, number) {
       return
     }
 
-    selectedTeam = autoTeam
-    highlightWarmupSelectedTeam(autoTeam)
+    setWarmupActiveTeam(autoTeam)
   }
 
   const key = `${category}_${number}`
@@ -641,8 +656,11 @@ function warmupCorrect() {
     clearWarmupActiveDouble()
 
     lastAnsweredTeam = selectedTeam
-    selectedTeam = getNextWarmupTeam()
-    highlightWarmupSelectedTeam(selectedTeam)
+
+const nextTeam = getNextWarmupTeam()
+if (nextTeam) {
+  setWarmupActiveTeam(nextTeam)
+}
 
     window.currentSegmentScores = {
       A: warmupScoreA,
@@ -685,8 +703,10 @@ function warmupWrong() {
       lastAnsweredTeam = selectedTeam
     }
 
-    selectedTeam = getNextWarmupTeam()
-    highlightWarmupSelectedTeam(selectedTeam)
+    const nextTeam = getNextWarmupTeam()
+if (nextTeam) {
+  setWarmupActiveTeam(nextTeam)
+}
 
     const questionBox = document.getElementById("questionBox")
     if (questionBox) questionBox.innerText = "اختر رقم السؤال"

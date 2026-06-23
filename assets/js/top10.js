@@ -240,6 +240,9 @@ function restoreTop10State(saved) {
 
   syncTop10Globals()
   renderCurrentRoundTop10UI()
+  if (top10State.activeTeam) {
+  setTop10ActiveTeam(top10State.activeTeam, { sync:false })
+}
 
   const timerValue = Number(saved.timerValue || 0)
 
@@ -396,6 +399,11 @@ function restoreTop10Snapshot(snapshot) {
 
   syncTop10Globals()
   renderCurrentRoundTop10UI()
+  if (top10State.activeTeam) {
+  setTop10ActiveTeam(top10State.activeTeam, { sync:false })
+} else {
+  setTop10ActiveTeam(null)
+}
 
   const timerValue = Number(snapshot.timerValue || 0)
 
@@ -706,13 +714,38 @@ function renderTop10Errors(team) {
 function getOtherTeam(team) {
   return team === "A" ? "B" : "A"
 }
+function setTop10ActiveTeam(team, options = {}) {
+  if (team !== "A" && team !== "B") {
+    top10State.activeTeam = null
 
+    if (typeof clearGameActiveTeam === "function") {
+      clearGameActiveTeam()
+    }
+
+    highlightTop10TurnTeam()
+    updateTop10TurnLabel()
+    updateTop10DoubleButton()
+    return
+  }
+
+  top10State.activeTeam = team
+
+  if (typeof setGameActiveTeam === "function") {
+    setGameActiveTeam(team, options)
+  }
+
+  highlightTop10TurnTeam()
+  updateTop10TurnLabel()
+  updateTop10DoubleButton()
+}
 /* =========================
    Game Actions
 ========================= */
 
 function selectTop10Team(team) {
   ensureTop10RoundState()
+
+  if (team !== "A" && team !== "B") return
 
   const round = top10State.round
   const otherTeam = getOtherTeam(team)
@@ -738,16 +771,14 @@ function selectTop10Team(team) {
 
   pushTop10History()
 
-  top10State.activeTeam = team
-  autoStartTop10Timer()
-  highlightTop10TurnTeam()
-updateTop10TurnLabel()
-updateTop10DoubleButton()
-saveTop10State()
+  setTop10ActiveTeam(team)
 
-setTimeout(() => {
-  highlightTop10TurnTeam()
-}, 80)
+  autoStartTop10Timer()
+  saveTop10State()
+
+  setTimeout(() => {
+    highlightTop10TurnTeam()
+  }, 80)
 }
 
 function getTop10TeamBox(team) {
@@ -931,11 +962,11 @@ async function openTop10Number(num) {
 
   const otherTeam = getOtherTeam(team)
 
-  if (top10State.errors[round][otherTeam] < 3) {
-    top10State.activeTeam = otherTeam
-  } else if (top10State.errors[round][team] >= 3) {
-    top10State.activeTeam = null
-  }
+if (top10State.errors[round][otherTeam] < 3) {
+  setTop10ActiveTeam(otherTeam)
+} else if (top10State.errors[round][team] >= 3) {
+  setTop10ActiveTeam(null)
+}
 
   syncTop10Globals()
 
@@ -948,13 +979,11 @@ requestAnimationFrame(() => {
   const allOpened = Number(top10State.opened?.[round]?.length || 0) >= 10
 
   if (allOpened) {
-    top10State.activeTeam = null
-    stopTop10Timer(0)
-    highlightTop10TurnTeam()
-    updateTop10TurnLabel()
-    saveTop10State()
-    return
-  }
+  setTop10ActiveTeam(null)
+  stopTop10Timer(0)
+  saveTop10State()
+  return
+}
 
   if (top10State.activeTeam) {
     autoStartTop10Timer()
@@ -1178,7 +1207,7 @@ async function nextTop10Round() {
 
   playTop10RoundTransition(async () => {
     top10State.round += 1
-    top10State.activeTeam = null
+    setTop10ActiveTeam(null)
     top10State.lastTeam = null
     currentTop10Answer = null
     currentTop10Number = null
@@ -1214,7 +1243,7 @@ async function prevTop10Round() {
 
   playTop10RoundTransition(async () => {
     top10State.round -= 1
-    top10State.activeTeam = null
+    setTop10ActiveTeam(null)
     top10State.lastTeam = null
     currentTop10Answer = null
     currentTop10Number = null
@@ -1255,12 +1284,9 @@ function switchTop10Turn() {
 
   pushTop10History()
 
-  top10State.activeTeam = otherTeam
-  autoStartTop10Timer()
-  highlightTop10TurnTeam()
-  updateTop10TurnLabel()
-  updateTop10DoubleButton()
-  saveTop10State()
+  setTop10ActiveTeam(otherTeam)
+autoStartTop10Timer()
+saveTop10State()
 }
 async function showTop10Answer() {
   ensureTop10RoundState()
@@ -1290,9 +1316,9 @@ async function showTop10Answer() {
     top10State.answers[round][i] = item.answer || ""
   }
 
-  top10State.activeTeam = null
-  currentTop10Number = null
-  currentTop10Answer = null
+  setTop10ActiveTeam(null)
+currentTop10Number = null
+currentTop10Answer = null
 
   stopTop10Timer(0)
 
@@ -1329,16 +1355,16 @@ function addTop10Error() {
   top10State.errors[round][team] += 1
 
   if (top10State.errors[round][team] >= 3) {
-    const other = getOtherTeam(team)
+  const other = getOtherTeam(team)
 
-    if (Number(top10State.errors[round][other] || 0) < 3) {
-      top10State.activeTeam = other
-    } else {
-      top10State.activeTeam = null
-    }
+  if (Number(top10State.errors[round][other] || 0) < 3) {
+    setTop10ActiveTeam(other)
   } else {
-    top10State.activeTeam = getOtherTeam(team)
+    setTop10ActiveTeam(null)
   }
+} else {
+  setTop10ActiveTeam(getOtherTeam(team))
+}
 
   clearTop10ActiveDouble()
 

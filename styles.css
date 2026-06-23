@@ -3743,295 +3743,542 @@ body.tvFullScreenMode #segmentArea{
     min-height: 50px;
   }
 }
-
-
-
 /* =========================================================
-   FINAL RESULTS OVERLAY - CLEAN FINAL
-   نفس روح نهاية الفقرة / كل صف 4 فقرات
+   FINAL RESULTS - CLEAN TWO TEAMS DASHBOARD V2
+   الفريق الأول يمين / الفريق الثاني يسار / بدون زحمة
 ========================================================= */
 
 .finalResultsOverlay{
   position:fixed;
   inset:0;
   z-index:999990;
-  padding:24px;
+  padding:18px;
   display:flex;
   align-items:center;
   justify-content:center;
+
   background:
-    radial-gradient(circle at 20% 18%, rgba(255,178,87,.30), transparent 34%),
-    radial-gradient(circle at 82% 18%, rgba(36,24,94,.18), transparent 32%),
-    rgba(15,23,42,.58);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
+    radial-gradient(circle at 50% 5%, rgba(255,178,87,.30), transparent 30%),
+    radial-gradient(circle at 12% 18%, rgba(103,232,249,.16), transparent 32%),
+    radial-gradient(circle at 88% 18%, rgba(36,24,94,.24), transparent 34%),
+    rgba(15,23,42,.66);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
 }
 
 .finalResultsOverlay.hidden{
   display:none !important;
 }
 
+.finalResultsOverlay.closing{
+  opacity:0;
+  transition:opacity .18s ease;
+}
+
+/* =========================
+   BOARD
+========================= */
+
 .finalResultsBoard{
   position:relative;
-  width:min(100%,1080px);
-  height:min(94dvh,780px);
-  border-radius:40px;
-  padding:24px;
-  background:linear-gradient(180deg,#ffffff,#f8fafc);
-  border:1px solid rgba(255,255,255,.74);
+  width:min(100%,1160px);
+  height:min(94dvh,800px);
+
+  padding:18px;
+  border-radius:38px;
+  overflow:hidden;
+
+  background:
+    radial-gradient(circle at 50% -8%, rgba(255,178,87,.16), transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.985),rgba(248,250,252,.96));
+
+  border:1px solid rgba(255,255,255,.78);
+
   box-shadow:
-    0 34px 90px rgba(15,23,42,.26),
-    inset 0 1px 0 rgba(255,255,255,.92);
+    0 34px 90px rgba(15,23,42,.32),
+    inset 0 1px 0 rgba(255,255,255,.96);
+
   display:grid;
   grid-template-rows:auto minmax(0,1fr) auto;
-  gap:20px;
-  overflow:hidden;
+  gap:12px;
+}
+
+.finalResultsBoard::before{
+  content:"";
+  position:absolute;
+  inset:9px;
+  border-radius:30px;
+  border:1px solid rgba(255,255,255,.54);
+  pointer-events:none;
 }
 
 .finalResultsClose{
   position:absolute;
-  top:18px;
-  left:18px;
-  z-index:20;
-  width:46px;
-  height:46px;
+  top:14px;
+  left:14px;
+  z-index:40;
+
+  width:42px;
+  height:42px;
+
   border:0;
-  border-radius:18px;
-  background:#eef2f7;
-  color:#24185e;
-  font-size:1.55rem;
+  border-radius:15px;
+
+  background:rgba(225, 160, 151, 0.96);
+  color:#ef0202;
+
+  font-size:1.35rem;
   line-height:1;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   cursor:pointer;
+
+  box-shadow:
+    0 9px 20px rgba(98, 1, 1, 0.12),
+    inset 0 1px 0 rgba(215, 9, 9, 0.88);
 }
 
 /* =========================
-   TOP AREA
+   TOP WINNER HEADER
 ========================= */
 
 .finalResultsTop{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(280px,1.1fr) minmax(0,1fr);
-  gap:14px;
-  align-items:stretch;
-  padding:8px 56px 0;
-}
+  position:relative;
+  z-index:2;
 
-.finalScoreTeam{
-  min-height:100px;
-  border-radius:28px;
-  background:#f1f5f9;
-  border:1px solid #d8e1ea;
-  padding:14px;
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 68px;
-  gap:12px;
+  display:flex;
   align-items:center;
+  justify-content:center;
+
+  padding:0 48px;
 }
 
-.finalScoreTeam span{
+.finalWinnerBlock{
+  width:min(100%,520px);
+  min-height:92px;
+
+  padding:12px 20px;
+  border-radius:28px;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.75), transparent 42%),
+    linear-gradient(135deg,#fff7ed,#ffffff);
+
+  border:1px solid rgba(253, 139, 116, 0.72);
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+
+  text-align:center;
+
+  box-shadow:
+    0 16px 38px rgba(242,140,40,.13),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.finalWinnerLabel{
+  padding:6px 16px;
+  border-radius:999px;
+
+  background:rgba(242,140,40,.13);
+  color:#9a3412;
+  border:1px solid rgba(242,140,40,.24);
+
+  font-size:.72rem;
+  line-height:1;
+}
+
+.finalWinnerName{
+  max-width:100%;
+
   color:#24185e;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.22rem;
-  line-height:1.15;
+  font-size:clamp(2rem,3.7vw,3.25rem);
+  line-height:1;
+
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
-.finalScoreTeam strong{
-  width:68px;
-  height:62px;
-  border-radius:20px;
-  background:#fff;
-  color:#24185e;
-  display:flex;
+.finalWinnerSub{
+  max-width:100%;
+  color:#64748b;
+  font-size:.78rem;
+  line-height:1.2;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+
+.finalResultsCeremony{
+  position:relative;
+  z-index:2;
+
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:12px;
+
+  overflow:hidden;
+}
+
+/* =========================
+   TWO TEAMS STATS
+   الفريق الأول يمين / الفريق الثاني يسار
+========================= */
+
+.finalTeamsStatsGrid{
+  direction:rtl;
+
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  align-items:stretch;
+}
+
+/* الفريق الأول يبقى يمين */
+#finalResultsTeamABox{
+  direction:rtl;
+}
+
+/* الفريق الثاني يبقى يسار */
+#finalResultsTeamBBox{
+  direction:rtl;
+}
+
+.finalTeamStatsBox{
+  min-height:126px;
+  border-radius:28px;
+  padding:13px 15px;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.70), transparent 42%),
+    linear-gradient(135deg,#fff7ed,#ffffff);
+
+  border:1px solid rgba(253,186,116,.68);
+
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) auto minmax(0,.95fr);
+  grid-template-rows:1fr;
+  gap:14px;
   align-items:center;
-  justify-content:center;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2.1rem;
-  line-height:1;
-  box-shadow:0 8px 18px rgba(15,23,42,.08);
+
+  overflow:hidden;
+
+  box-shadow:
+    0 14px 30px rgba(15,23,42,.075),
+    inset 0 1px 0 rgba(255,255,255,.78);
 }
 
-.finalScoreTeam.winner{
-  background:linear-gradient(135deg,#fff7ed,#ffffff);
+.finalTeamStatsBox.winner{
   border-color:#fdba74;
+  box-shadow:
+    0 18px 40px rgba(242,140,40,.17),
+    inset 0 1px 0 rgba(255,255,255,.95);
 }
 
-.finalWinnerBlock{
-  min-height:110px;
-  border-radius:30px;
-  padding:16px;
-  background:linear-gradient(135deg,#fff7ed,#ffffff);
-  border:1px solid rgba(253,186,116,.65);
+.finalTeamStatsName{
+  min-width:0;
+
+  color:#24185e;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(1.55rem,2.35vw,2.25rem);
+  line-height:1.05;
+
+  text-align:center;
+
+  white-space:normal;
+  overflow:visible;
+  text-wrap:normal;
+}
+
+.finalTeamStatsMain{
+  min-width:130px;
+
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:8px;
-  text-align:center;
+  gap:6px;
 }
 
-.finalWinnerLabel{
-  padding:8px 15px;
-  border-radius:999px;
-  background:rgba(242,140,40,.13);
-  color:#9a3412;
-  border:1px solid rgba(242,140,40,.24);
-  font-size:.84rem;
-  line-height:1;
-}
+.finalTeamStatsMain strong{
+  width:74px;
+  height:66px;
 
-.finalWinnerName{
-  color:#24185e;
+  border-radius:22px;
+
+  background:linear-gradient(180deg,#ffb257,#f28c28);
+  color:#fff;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(2rem,4vw,3.2rem);
+  font-size:2.35rem;
+  line-height:1;
+
+  box-shadow:
+    0 12px 26px rgba(242,140,40,.24),
+    inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+.finalTeamStatsMain span{
+  color:#9a3412;
+  font-size:.74rem;
+  line-height:1.15;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.finalTeamStatsMiniGrid{
+  min-width:0;
+
+  display:grid;
+  grid-template-columns:1fr;
+  gap:7px;
+}
+
+.finalTeamStatsMiniGrid div{
+  min-height:42px;
+  border-radius:16px;
+
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(226,232,240,.88);
+
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:8px;
+  align-items:center;
+
+  padding:0 10px;
+}
+
+.finalTeamStatsMiniGrid b{
+  color:#24185e;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.12rem;
   line-height:1;
 }
 
-.finalWinnerSub{
+.finalTeamStatsMiniGrid small{
   color:#64748b;
-  font-size:.86rem;
-  line-height:1.25;
+  font-size:.58rem;
+  line-height:1.1;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 /* =========================
-   RESULTS GRID - 4 PER ROW
+   SEGMENT RESULTS GRID
+   4 CARDS PER ROW
 ========================= */
 
-.finalResultsList{
+.finalResultsSegmentsGrid{
+  direction:rtl;
+
   min-height:0;
   overflow:auto;
 
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:18px;
+  gap:10px;
+  align-content:stretch;
 
-  align-content:start;
-  padding:8px 2px 18px;
+  padding:2px 2px 10px;
+
+  scrollbar-width:thin;
 }
 
-.finalResultMatch{
-  min-height:148px;
-  border-radius:28px;
+.finalSegmentResultItem{
+  direction:rtl;
+  position:relative;
+
+  min-height:135px;
+  height:100%;
+
+  border-radius:22px;
+  padding:14px 12px 12px;
+
   background:#f1f5f9;
   border:1px solid #d8e1ea;
-  padding:16px;
 
   display:grid;
-  grid-template-rows:auto minmax(50px,1fr) auto;
-  gap:12px;
+  grid-template-rows:minmax(42px,auto) minmax(44px,auto) minmax(32px,auto);
+  gap:10px;
   align-items:center;
-  text-align:center;
+  justify-items:center;
 
-  position:relative;
+  text-align:center;
   overflow:hidden;
+
+  box-shadow:
+    0 10px 24px rgba(15,23,42,.055),
+    inset 0 1px 0 rgba(255,255,255,.72);
 }
 
-.finalMatchNo{
+.finalSegmentResultItem .finalMatchNo{
   position:absolute;
   top:9px;
   left:9px;
-  width:34px;
-  height:34px;
-  border-radius:13px;
+
+  width:29px;
+  height:29px;
+  min-width:29px;
+
+  border-radius:11px;
+
   background:#24185e;
   color:#fff;
+
   display:grid;
   place-items:center;
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:.9rem;
-}
-
-.finalResultMatch h3{
-  margin:4px 36px 0 0;
-  min-height:34px;
-
-  color:#24185e;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.18rem;
-  line-height:1.15;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.finalMatchScore{
-  min-height:48px;
-  border-radius:18px;
-  background:#fff;
-  border:1px solid #e2e8f0;
-  color:#24185e;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  direction:ltr;
-}
-
-.finalMatchScore strong{
-  min-width:32px;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.48rem;
+  font-size:.68rem;
   line-height:1;
 }
 
-.finalMatchScore span{
-  color:#94a3b8;
-}
+.finalSegmentResultItem h3{
+  width:100%;
+  min-height:40px;
 
-.finalMatchWinner{
-  min-height:32px;
-  padding:7px 10px;
-  border-radius:999px;
-  background:rgba(100,116,139,.10);
-  color:#64748b;
+  margin:0;
+  padding:0 28px 0 0;
 
-  font-size:.78rem;
+  color:#24185e;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(.9rem,1.45vw,1.12rem);
   line-height:1.15;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  text-wrap:normal;
 }
 
-.finalResultMatch.teamA,
-.finalResultMatch.teamB{
-  background:linear-gradient(135deg,#fff7ed,#ffffff);
-  border-color:rgba(253,186,116,.70);
+.finalSegmentScoreLine{
+  min-width:112px;
+  min-height:40px;
+
+  padding:0 12px;
+  border-radius:17px;
+
+  background:#fff;
+  border:1px solid #e2e8f0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+
+  direction:rtl;
+
+  box-shadow:0 7px 14px rgba(15,23,42,.055);
 }
 
-.finalResultMatch.teamA .finalMatchNo,
-.finalResultMatch.teamB .finalMatchNo{
+.finalSegmentScoreLine em{
+  min-width:28px;
+
+  color:#24185e;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-style:normal;
+  font-size:1.25rem;
+  line-height:1;
+}
+
+.finalSegmentScoreLine span{
+  color:#94a3b8;
+  font-size:.95rem;
+}
+
+.finalMatchWinner{
+  width:min(100%,150px);
+  min-height:30px;
+
+  padding:6px 10px;
+  border-radius:999px;
+
+  background:rgba(100,116,139,.10);
+  color:#64748b;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:.66rem;
+  line-height:1.15;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+}
+
+/* حالات الفقرات */
+.finalSegmentResultItem.teamA,
+.finalSegmentResultItem.teamB{
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.70), transparent 42%),
+    linear-gradient(135deg,#fff7ed,#ffffff);
+
+  border-color:rgba(253,186,116,.72);
+}
+
+.finalSegmentResultItem.teamA .finalMatchNo,
+.finalSegmentResultItem.teamB .finalMatchNo{
   background:#f28c28;
 }
 
-.finalResultMatch.teamA .finalMatchWinner,
-.finalResultMatch.teamB .finalMatchWinner{
+.finalSegmentResultItem.teamA .finalMatchWinner,
+.finalSegmentResultItem.teamB .finalMatchWinner{
   background:rgba(242,140,40,.14);
   color:#9a3412;
 }
 
-.finalResultMatch.draw{
+.finalSegmentResultItem.draw{
   background:linear-gradient(135deg,#f8fafc,#ffffff);
   border-color:#cbd5e1;
 }
 
-.finalResultMatch.pending{
-  opacity:.62;
+.finalSegmentResultItem.draw .finalMatchWinner{
+  background:rgba(36,24,94,.08);
+  color:#24185e;
+}
+
+.finalSegmentResultItem.pending{
+  opacity:.66;
+  filter:grayscale(.12);
+}
+
+.finalSegmentResultItem.pending .finalMatchNo{
+  background:#94a3b8;
 }
 
 .hiddenFinalResultCard{
@@ -4043,141 +4290,710 @@ body.tvFullScreenMode #segmentArea{
 ========================= */
 
 .finalResultsFooter{
+  position:relative;
+  z-index:2;
+
   display:flex;
   align-items:center;
   justify-content:center;
+  gap:12px;
 }
 
 .finalResultsFooter button{
-  min-width:190px;
-  min-height:54px;
+  min-width:172px;
+  min-height:50px;
+
   border:0;
   border-radius:20px;
-  background:linear-gradient(180deg,#ffb257,#f28c28);
-  color:#fff;
+
   font-family:"HanakaText",sans-serif;
-  font-size:1rem;
+  font-size:.92rem;
+
   cursor:pointer;
-  box-shadow:0 12px 28px rgba(242,140,40,.25);
+
+  transition:
+    transform .16s ease,
+    filter .16s ease;
 }
 
-.finalResultsOverlay.closing{
-  opacity:0;
+.finalResultsFooter button:first-child{
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(180deg,#034330,#08555b);
+
+  color:#ffffff;
+
+  box-shadow:
+    0 13px 28px rgba(40, 195, 242, 0.26),
+    inset 0 1px 0 rgba(255,255,255,.24);
+}
+
+.finalResultsFooter button:not(:first-child){
+  background:#e25050;
+  color:#ffffff;
+
+  box-shadow:
+    0 9px 20px rgba(15,23,42,.10),
+    inset 0 1px 0 rgba(255,255,255,.85);
+}
+
+.finalResultsFooter button:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.04);
+}
+
+.finalResultsFooter button:active{
+  transform:scale(.97);
 }
 
 /* =========================
-   A11 / LAPTOP SHORT HEIGHT
+   DRAW MODE
 ========================= */
+
+.finalResultsOverlay.draw .finalWinnerBlock{
+  background:linear-gradient(135deg,#f8fafc,#ffffff);
+  border-color:#cbd5e1;
+}
+
+/* =========================================================
+   A11 / iPad Landscape
+========================================================= */
 
 @media (orientation:landscape) and (max-height:760px){
   .finalResultsOverlay{
-    padding:14px;
+    padding:10px;
   }
 
   .finalResultsBoard{
-  height:calc(100dvh - 22px);
-  border-radius:32px;
-  padding:16px 20px;
-  gap:12px;
-}
+    width:min(100%,1140px);
+    height:calc(100dvh - 16px);
+    border-radius:30px;
+    padding:12px 16px;
+    gap:8px;
+  }
+
+  .finalResultsBoard::before{
+    inset:7px;
+    border-radius:24px;
+  }
+
+  .finalResultsClose{
+    top:10px;
+    left:10px;
+    width:38px;
+    height:38px;
+    border-radius:14px;
+    font-size:1.22rem;
+  }
 
   .finalResultsTop{
-    grid-template-columns:minmax(0,1fr) minmax(250px,1.08fr) minmax(0,1fr);
-    gap:10px;
-    padding:4px 52px 0;
-  }
-
-  .finalScoreTeam{
-    min-height:78px;
-    border-radius:22px;
-    padding:10px;
-    grid-template-columns:minmax(0,1fr) 58px;
-  }
-
-  .finalScoreTeam span{
-    font-size:1.02rem;
-  }
-
-  .finalScoreTeam strong{
-    width:58px;
-    height:54px;
-    border-radius:17px;
-    font-size:1.8rem;
+    padding:0 44px;
   }
 
   .finalWinnerBlock{
-    min-height:82px;
-    border-radius:24px;
-    padding:10px 14px;
-    gap:5px;
+    width:min(100%,430px);
+    min-height:72px;
+    border-radius:22px;
+    padding:8px 14px;
+    gap:3px;
   }
 
   .finalWinnerLabel{
-    padding:6px 12px;
-    font-size:.72rem;
+    padding:4px 11px;
+    font-size:.58rem;
   }
 
   .finalWinnerName{
-    font-size:2.05rem;
+    font-size:1.62rem;
   }
 
   .finalWinnerSub{
-    display:none;
+    font-size:.58rem;
   }
 
- .finalResultsList{
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:12px;
-  align-content:start;
-  padding-bottom:14px;
-}
-
-  .finalResultMatch{
-  min-height:118px;
-  border-radius:22px;
-  padding:11px;
-  gap:8px;
-}
-
-  .finalMatchNo{
-    width:30px;
-    height:30px;
-    border-radius:11px;
-    font-size:.78rem;
+  .finalResultsCeremony{
+    gap:8px;
   }
 
-  .finalResultMatch h3{
-    margin-right:28px;
-    font-size:.98rem;
+  .finalTeamsStatsGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
   }
 
-  .finalMatchScore{
-    min-height:38px;
+  .finalTeamStatsBox{
+    min-height:92px;
+    border-radius:20px;
+    padding:8px 10px;
+
+    grid-template-columns:minmax(0,1.15fr) auto minmax(0,.95fr);
+    gap:8px;
+  }
+
+  .finalTeamStatsName{
+    font-size:1.15rem;
+  }
+
+  .finalTeamStatsMain{
+    min-width:94px;
+    gap:4px;
+  }
+
+  .finalTeamStatsMain strong{
+    width:50px;
+    height:46px;
     border-radius:15px;
+    font-size:1.52rem;
   }
 
-  .finalMatchScore strong{
-    font-size:1.12rem;
+  .finalTeamStatsMain span{
+    font-size:.52rem;
+  }
+
+  .finalTeamStatsMiniGrid{
+    gap:5px;
+  }
+
+  .finalTeamStatsMiniGrid div{
+    min-height:31px;
+    border-radius:11px;
+    padding:0 7px;
+    gap:5px;
+  }
+
+  .finalTeamStatsMiniGrid b{
+    font-size:.76rem;
+  }
+
+  .finalTeamStatsMiniGrid small{
+    font-size:.43rem;
+  }
+
+  .finalResultsSegmentsGrid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:7px;
+    padding-bottom:7px;
+  }
+
+  .finalSegmentResultItem{
+    min-height:90px;
+    border-radius:16px;
+    padding:7px;
+    gap:4px;
+  }
+
+  .finalSegmentResultItem .finalMatchNo{
+    top:6px;
+    left:6px;
+    width:23px;
+    height:23px;
+    min-width:23px;
+    border-radius:8px;
+    font-size:.55rem;
+  }
+
+  .finalSegmentResultItem h3{
+    min-height:24px;
+    padding-right:24px;
+    font-size:.72rem;
+    line-height:1.12;
+  }
+
+  .finalSegmentScoreLine{
+    min-width:82px;
+    min-height:29px;
+    border-radius:12px;
+    gap:6px;
+  }
+
+  .finalSegmentScoreLine em{
+    min-width:20px;
+    font-size:.9rem;
   }
 
   .finalMatchWinner{
-    min-height:26px;
-    padding:5px 8px;
-    font-size:.66rem;
+    width:min(100%,120px);
+    min-height:22px;
+    padding:4px 7px;
+    font-size:.48rem;
+  }
+
+  .finalResultsFooter{
+    gap:9px;
   }
 
   .finalResultsFooter button{
-    min-height:46px;
+    min-width:148px;
+    min-height:40px;
+    border-radius:15px;
+    font-size:.78rem;
   }
 }
 
-@media (max-width:820px){
-  .finalResultsTop{
+/* =========================================================
+   Smaller Screens
+========================================================= */
+
+@media (max-width:920px){
+  .finalTeamsStatsGrid{
     grid-template-columns:1fr;
-    padding:54px 0 0;
   }
 
-  .finalResultsList{
+  .finalResultsSegmentsGrid{
     grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width:720px){
+  .finalResultsOverlay{
+    padding:10px;
+  }
+
+  .finalResultsBoard{
+    height:calc(100dvh - 16px);
+    border-radius:28px;
+    padding:14px;
+  }
+
+  .finalResultsTop{
+    padding:42px 0 0;
+  }
+
+  .finalWinnerBlock{
+    width:100%;
+  }
+
+  .finalTeamStatsBox{
+    grid-template-columns:1fr;
+    min-height:150px;
+  }
+
+  .finalTeamStatsMiniGrid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .finalResultsFooter{
+    flex-wrap:wrap;
+  }
+
+  .finalResultsFooter button{
+    flex:1 1 150px;
+  }
+}
+
+/* =========================================================
+   FINAL RESULTS - EXTRA POLISH
+   شريط الإحصائيات + إبراز الفائز + تخفيف غير الملعوبة + تأثيرات
+========================================================= */
+
+/* شريط الإحصائيات الصغير */
+.finalQuickStats{
+  position:relative;
+  z-index:2;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+
+  width:min(100%,620px);
+  margin:0 auto;
+
+  animation:finalQuickStatsIn .42s ease both;
+}
+
+.finalQuickStats div{
+  min-height:44px;
+  border-radius:18px;
+
+  background:rgba(241,245,249,.82);
+  border:1px solid rgba(226,232,240,.92);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+
+  box-shadow:
+    0 8px 18px rgba(15,23,42,.06),
+    inset 0 1px 0 rgba(255,255,255,.82);
+}
+
+.finalQuickStats span{
+  color:#64748b;
+  font-size:.68rem;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.finalQuickStats b{
+  color:#24185e;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.08rem;
+  line-height:1;
+}
+
+/* نخلي المحتوى بعد إضافة الشريط متوازن */
+.finalResultsBoard{
+  grid-template-rows:auto auto minmax(0,1fr) auto;
+}
+
+/* إبراز كرت الفريق الفائز */
+.finalTeamStatsBox.winner{
+  position:relative;
+  transform:translateY(-2px) scale(1.012);
+
+  border-color:#f28c28 !important;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.86), transparent 42%),
+    linear-gradient(135deg,#fff3df,#ffffff) !important;
+
+  box-shadow:
+    0 0 0 3px rgba(242,140,40,.14),
+    0 20px 46px rgba(242,140,40,.22),
+    inset 0 1px 0 rgba(255,255,255,.96) !important;
+}
+
+.finalTeamStatsBox.winner::before{
+  content:"الفائز";
+  position:absolute;
+  top:10px;
+  right:12px;
+
+  padding:6px 12px;
+  border-radius:999px;
+
+  background:linear-gradient(180deg,#ffb257,#f28c28);
+  color:#fff;
+
+  font-size:.58rem;
+  line-height:1;
+
+  box-shadow:0 8px 16px rgba(242,140,40,.22);
+}
+
+.finalTeamStatsBox.winner .finalTeamStatsName{
+  color:#9a3412;
+}
+
+.finalTeamStatsBox.winner .finalTeamStatsMain strong{
+  animation:winnerNumberPulse 1.8s ease-in-out infinite;
+}
+
+/* الفقرات غير الملعوبة أخف وأقل زحمة */
+.finalSegmentResultItem.pending{
+  opacity:1;
+  filter:none;
+
+  background:
+    linear-gradient(135deg,rgba(241,245,249,.74),rgba(248,250,252,.82));
+
+  border-color:rgba(203,213,225,.78);
+}
+
+.finalSegmentResultItem.pending h3{
+  color:#64748b;
+}
+
+.finalSegmentResultItem.pending .finalMatchNo{
+  background:#94a3b8;
+}
+
+.finalSegmentResultItem.pending .finalSegmentScoreLine{
+  opacity:.44;
+  min-height:34px;
+  transform:scale(.92);
+}
+
+.finalSegmentResultItem.pending .finalSegmentScoreLine em,
+.finalSegmentResultItem.pending .finalSegmentScoreLine span{
+  color:#94a3b8;
+}
+
+.finalSegmentResultItem.pending .finalMatchWinner{
+  width:auto;
+  min-width:86px;
+  background:rgba(148,163,184,.14);
+  color:#64748b;
+}
+
+/* تحسين كروت الفقرات المنتهية */
+.finalSegmentResultItem.teamA,
+.finalSegmentResultItem.teamB{
+  transform:translateY(-1px);
+}
+
+.finalSegmentResultItem.teamA .finalSegmentScoreLine,
+.finalSegmentResultItem.teamB .finalSegmentScoreLine{
+  border-color:rgba(253,186,116,.54);
+}
+
+.finalSegmentResultItem.draw .finalSegmentScoreLine{
+  border-color:rgba(36,24,94,.18);
+}
+
+/* تأثيرات فتح الشاشة */
+.finalResultsOverlay:not(.hidden) .finalResultsBoard{
+  animation:finalBoardIn .32s ease both;
+}
+
+.finalResultsOverlay:not(.hidden) .finalWinnerBlock{
+  animation:finalWinnerIn .42s ease .04s both;
+}
+
+.finalResultsOverlay:not(.hidden) .finalTeamStatsBox.teamA{
+  animation:finalTeamAIn .42s ease .10s both;
+}
+
+.finalResultsOverlay:not(.hidden) .finalTeamStatsBox.teamB{
+  animation:finalTeamBIn .42s ease .10s both;
+}
+
+.finalResultsOverlay:not(.hidden) .finalSegmentResultItem{
+  animation:finalCardIn .34s ease both;
+}
+
+.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(1){animation-delay:.12s}
+.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(2){animation-delay:.15s}
+.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(3){animation-delay:.18s}
+.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(4){animation-delay:.21s}
+.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(5){animation-delay:.24s}
+.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(6){animation-delay:.27s}
+.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(7){animation-delay:.30s}
+.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(8){animation-delay:.33s}
+.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(9){animation-delay:.36s}
+.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(10){animation-delay:.39s}
+
+/* Animations */
+@keyframes finalBoardIn{
+  from{
+    opacity:0;
+    transform:scale(.975) translateY(12px);
+  }
+  to{
+    opacity:1;
+    transform:scale(1) translateY(0);
+  }
+}
+
+@keyframes finalWinnerIn{
+  from{
+    opacity:0;
+    transform:translateY(-12px) scale(.98);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@keyframes finalQuickStatsIn{
+  from{
+    opacity:0;
+    transform:translateY(-8px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@keyframes finalTeamAIn{
+  from{
+    opacity:0;
+    transform:translateX(-18px);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0);
+  }
+}
+
+@keyframes finalTeamBIn{
+  from{
+    opacity:0;
+    transform:translateX(18px);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0);
+  }
+}
+
+@keyframes finalCardIn{
+  from{
+    opacity:0;
+    transform:translateY(10px) scale(.985);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@keyframes winnerNumberPulse{
+  0%,100%{
+    transform:scale(1);
+    box-shadow:
+      0 12px 26px rgba(242,140,40,.24),
+      inset 0 1px 0 rgba(255,255,255,.25);
+  }
+  50%{
+    transform:scale(1.045);
+    box-shadow:
+      0 16px 34px rgba(242,140,40,.34),
+      inset 0 1px 0 rgba(255,255,255,.28);
+  }
+}
+
+/* تخفيف الحركة لمن يفضل تقليل المؤثرات */
+@media (prefers-reduced-motion:reduce){
+  .finalResultsOverlay:not(.hidden) .finalResultsBoard,
+  .finalResultsOverlay:not(.hidden) .finalWinnerBlock,
+  .finalResultsOverlay:not(.hidden) .finalTeamStatsBox,
+  .finalResultsOverlay:not(.hidden) .finalSegmentResultItem,
+  .finalQuickStats,
+  .finalTeamStatsBox.winner .finalTeamStatsMain strong{
+    animation:none !important;
+  }
+}
+
+/* A11 Landscape */
+@media (orientation:landscape) and (max-height:760px){
+  .finalQuickStats{
+    width:min(100%,520px);
+    gap:7px;
+  }
+
+  .finalQuickStats div{
+    min-height:34px;
+    border-radius:14px;
+    gap:6px;
+  }
+
+  .finalQuickStats span{
+    font-size:.52rem;
+  }
+
+  .finalQuickStats b{
+    font-size:.86rem;
+  }
+
+  .finalTeamStatsBox.winner::before{
+    top:7px;
+    right:8px;
+    padding:4px 9px;
+    font-size:.46rem;
+  }
+
+  .finalSegmentResultItem.pending .finalSegmentScoreLine{
+    min-height:28px;
+    transform:scale(.9);
+  }
+}
+/* =========================================================
+   GLOBAL ACTIVE TEAM SYSTEM
+   تمييز الفريق النشط في كل المشروع
+========================================================= */
+
+body[data-active-team="A"] #teamABox,
+body[data-active-team="B"] #teamBBox,
+body[data-active-team="A"] .teamA.activeTeam,
+body[data-active-team="B"] .teamB.activeTeam,
+body[data-active-team="A"] .homeTeamA,
+body[data-active-team="B"] .homeTeamB{
+  position:relative;
+  z-index:5;
+  border-color:#f28c28 !important;
+  box-shadow:
+    0 0 0 4px rgba(242,140,40,.18),
+    0 18px 46px rgba(242,140,40,.26),
+    inset 0 1px 0 rgba(255,255,255,.92) !important;
+  transform:translateY(-3px) scale(1.015);
+}
+
+body[data-active-team="A"] #teamABox::after,
+body[data-active-team="B"] #teamBBox::after,
+body[data-active-team="A"] .homeTeamA::after,
+body[data-active-team="B"] .homeTeamB::after{
+  content:"الدور الآن";
+  position:absolute;
+  top:-12px;
+  right:50%;
+  transform:translateX(50%);
+  z-index:8;
+
+  padding:7px 15px;
+  border-radius:999px;
+
+  background:linear-gradient(180deg,#ffb257,#f28c28);
+  color:#fff;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:.7rem;
+  line-height:1;
+  white-space:nowrap;
+
+  box-shadow:0 10px 22px rgba(242,140,40,.30);
+}
+
+body[data-active-team="A"] #teamBBox,
+body[data-active-team="B"] #teamABox{
+  opacity:.72;
+  filter:saturate(.82);
+}
+
+body[data-active-team="A"] #teamABox .teamScore,
+body[data-active-team="B"] #teamBBox .teamScore,
+body[data-active-team="A"] #mainScoreA,
+body[data-active-team="B"] #mainScoreB{
+  animation:activeTeamScorePulse 1.8s ease-in-out infinite;
+}
+
+@keyframes activeTeamScorePulse{
+  0%,100%{
+    transform:scale(1);
+  }
+  50%{
+    transform:scale(1.07);
+  }
+}
+
+/* أزرار اختيار الفريق في شاشة المقدم */
+body[data-active-team="A"] .presenterTeamA,
+body[data-active-team="B"] .presenterTeamB,
+body[data-active-team="A"] button[data-team="A"],
+body[data-active-team="B"] button[data-team="B"]{
+  border-color:#f28c28 !important;
+  background:linear-gradient(180deg,#fff7ed,#ffffff) !important;
+  color:#9a3412 !important;
+  box-shadow:
+    0 0 0 3px rgba(242,140,40,.16),
+    0 12px 28px rgba(242,140,40,.20) !important;
+}
+
+/* حالة عدم وجود فريق نشط */
+body:not([data-active-team]) #teamABox,
+body:not([data-active-team]) #teamBBox{
+  opacity:1;
+  filter:none;
+  transform:none;
+}
+
+/* A11 / iPad Landscape */
+@media (orientation:landscape) and (max-height:760px){
+  body[data-active-team="A"] #teamABox::after,
+  body[data-active-team="B"] #teamBBox::after,
+  body[data-active-team="A"] .homeTeamA::after,
+  body[data-active-team="B"] .homeTeamB::after{
+    top:-9px;
+    padding:5px 11px;
+    font-size:.56rem;
+  }
+
+  body[data-active-team="A"] #teamABox,
+  body[data-active-team="B"] #teamBBox,
+  body[data-active-team="A"] .homeTeamA,
+  body[data-active-team="B"] .homeTeamB{
+    transform:translateY(-2px) scale(1.01);
   }
 }

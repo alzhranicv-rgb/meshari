@@ -56,7 +56,10 @@
     <div class="homeSegmentsShowcase" id="segmentsGrid"></div>
 
     <div class="winnerArea homeWinnerArea" id="winnerArea">
-      <button class="winnerBtn homeWinnerBtn" onclick="showDetailedFinalResults()">النتيجة النهائية</button>
+      <button class="winnerBtn homeWinnerBtn" onclick="showDetailedFinalResults()">
+        النتيجة النهائية
+      </button>
+
       <div id="winnerBox" class="homeWinnerBox"></div>
     </div>
 
@@ -92,7 +95,7 @@
     </div>
   </div>
 
-  <!-- نافذة النتائج النهائية -->
+  <!-- نافذة النتائج النهائية الموحدة / شاشة التتويج -->
   <div id="finalResultsOverlay" class="finalResultsOverlay hidden">
 
     <section class="finalResultsBoard">
@@ -107,141 +110,222 @@
 
       <header class="finalResultsTop">
 
-  <div id="finalResultsTeamABox" class="finalScoreTeam teamA">
-    <span id="finalResultsTeamAName">الفريق الأول</span>
-    <strong id="finalResultsTotalA">0</strong>
+        <div class="finalWinnerBlock">
+          <span class="finalWinnerLabel">النتيجة النهائية</span>
+          <strong id="finalResultsWinnerName" class="finalWinnerName">—</strong>
+          <small id="finalResultsWinnerSub" class="finalWinnerSub">بانتظار النتائج</small>
+        </div>
+
+      </header>
+
+      <section class="finalQuickStats">
+  <div>
+    <span>المكتملة</span>
+    <b id="finalQuickCompleted">0/0</b>
   </div>
 
-  <div class="finalWinnerBlock">
-    <span class="finalWinnerLabel">النتيجة النهائية</span>
-    <strong id="finalResultsWinnerName" class="finalWinnerName">—</strong>
-    <small id="finalResultsWinnerSub" class="finalWinnerSub">الفائز في المواجهة</small>
+  <div>
+    <span>التعادلات</span>
+    <b id="finalQuickDraws">0</b>
   </div>
 
-  <div id="finalResultsTeamBBox" class="finalScoreTeam teamB">
-    <span id="finalResultsTeamBName">الفريق الثاني</span>
-    <strong id="finalResultsTotalB">0</strong>
+  <div>
+    <span>المتبقي</span>
+    <b id="finalQuickPending">0</b>
   </div>
+</section>
 
-</header>
+      <main class="finalResultsCeremony">
 
-      <main class="finalResultsList">
+        <section class="finalTeamsStatsGrid">
 
-        <article class="finalResultMatch" data-result-card="warmup">
-          <div class="finalMatchNo">1</div>
-          <h3>التسخين</h3>
-          <div class="finalMatchScore">
-            <strong id="resultWarmupA">0</strong>
-            <span>-</span>
-            <strong id="resultWarmupB">0</strong>
+          <div id="finalResultsTeamABox" class="finalTeamStatsBox teamA">
+            <div class="finalTeamStatsName" id="finalTeamAStatsName">—</div>
+
+            <div class="finalTeamStatsMain">
+              <strong id="finalTeamAStatsWins">0</strong>
+              <span>فقرات فاز بها</span>
+            </div>
+
+            <div class="finalTeamStatsMiniGrid">
+              <div>
+                <b id="finalTeamAStatsPoints">0</b>
+                <small>نقاط الفقرات</small>
+              </div>
+
+              <div>
+                <b id="finalTeamAStatsCompleted">0</b>
+                <small>فقرات مكتملة</small>
+              </div>
+            </div>
           </div>
-          <div id="resultWarmupWinner" class="finalMatchWinner">تعادل</div>
-        </article>
 
-        <article class="finalResultMatch" data-result-card="top10">
-          <div class="finalMatchNo">2</div>
-          <h3>Top 10</h3>
-          <div class="finalMatchScore">
-            <strong id="resultTop10A">0</strong>
-            <span>-</span>
-            <strong id="resultTop10B">0</strong>
-          </div>
-          <div id="resultTop10Winner" class="finalMatchWinner">تعادل</div>
-        </article>
+          <div id="finalResultsTeamBBox" class="finalTeamStatsBox teamB">
+            <div class="finalTeamStatsName" id="finalTeamBStatsName">—</div>
 
-        <article class="finalResultMatch" data-result-card="auction">
-          <div class="finalMatchNo">3</div>
-          <h3>فتبلة</h3>
-          <div class="finalMatchScore">
-            <strong id="resultAuctionA">0</strong>
-            <span>-</span>
-            <strong id="resultAuctionB">0</strong>
-          </div>
-          <div id="resultAuctionWinner" class="finalMatchWinner">تعادل</div>
-        </article>
+            <div class="finalTeamStatsMain">
+              <strong id="finalTeamBStatsWins">0</strong>
+              <span>فقرات فاز بها</span>
+            </div>
 
-        <article class="finalResultMatch" data-result-card="who">
-          <div class="finalMatchNo">4</div>
-          <h3>من هو</h3>
-          <div class="finalMatchScore">
-            <strong id="resultWhoA">0</strong>
-            <span>-</span>
-            <strong id="resultWhoB">0</strong>
-          </div>
-          <div id="resultWhoWinner" class="finalMatchWinner">تعادل</div>
-        </article>
+            <div class="finalTeamStatsMiniGrid">
+              <div>
+                <b id="finalTeamBStatsPoints">0</b>
+                <small>نقاط الفقرات</small>
+              </div>
 
-        <article class="finalResultMatch" data-result-card="explain">
-          <div class="finalMatchNo">5</div>
-          <h3>اشرح الكلمة</h3>
-          <div class="finalMatchScore">
-            <strong id="resultExplainA">0</strong>
-            <span>-</span>
-            <strong id="resultExplainB">0</strong>
+              <div>
+                <b id="finalTeamBStatsCompleted">0</b>
+                <small>فقرات مكتملة</small>
+              </div>
+            </div>
           </div>
-          <div id="resultExplainWinner" class="finalMatchWinner">تعادل</div>
-        </article>
 
-        <article class="finalResultMatch" data-result-card="final1">
-          <div class="finalMatchNo">6</div>
-          <h3>ٮدوں ٮڡاط</h3>
-          <div class="finalMatchScore">
-            <strong id="resultFinal1A">0</strong>
-            <span>-</span>
-            <strong id="resultFinal1B">0</strong>
-          </div>
-          <div id="resultFinal1Winner" class="finalMatchWinner">تعادل</div>
-        </article>
+        </section>
 
-        <article class="finalResultMatch" data-result-card="final2">
-          <div class="finalMatchNo">7</div>
-          <h3>صح صحلي</h3>
-          <div class="finalMatchScore">
-            <strong id="resultFinal2A">0</strong>
-            <span>-</span>
-            <strong id="resultFinal2B">0</strong>
-          </div>
-          <div id="resultFinal2Winner" class="finalMatchWinner">تعادل</div>
-        </article>
+        <section class="finalResultsSegmentsGrid">
 
-        <article class="finalResultMatch" data-result-card="final3">
-          <div class="finalMatchNo">8</div>
-          <h3>التركيز</h3>
-          <div class="finalMatchScore">
-            <strong id="resultFinal3A">0</strong>
-            <span>-</span>
-            <strong id="resultFinal3B">0</strong>
-          </div>
-          <div id="resultFinal3Winner" class="finalMatchWinner">تعادل</div>
-        </article>
+          <div class="finalSegmentResultItem" data-result-card="warmup">
+            <b class="finalMatchNo">1</b>
+            <h3>التسخين</h3>
 
-        <article class="finalResultMatch" data-result-card="final4">
-          <div class="finalMatchNo">9</div>
-          <h3>اشرح الصورة</h3>
-          <div class="finalMatchScore">
-            <strong id="resultFinal4A">0</strong>
-            <span>-</span>
-            <strong id="resultFinal4B">0</strong>
-          </div>
-          <div id="resultFinal4Winner" class="finalMatchWinner">تعادل</div>
-        </article>
+            <div class="finalSegmentScoreLine">
+              <em id="resultWarmupA">0</em>
+              <span>-</span>
+              <em id="resultWarmupB">0</em>
+            </div>
 
-        <article class="finalResultMatch" data-result-card="archive">
-          <div class="finalMatchNo">10</div>
-          <h3>الأرشيف</h3>
-          <div class="finalMatchScore">
-            <strong id="resultArchiveA">0</strong>
-            <span>-</span>
-            <strong id="resultArchiveB">0</strong>
+            <strong id="resultWarmupWinner" class="finalMatchWinner">لم تلعب</strong>
           </div>
-          <div id="resultArchiveWinner" class="finalMatchWinner">تعادل</div>
-        </article>
+
+          <div class="finalSegmentResultItem" data-result-card="top10">
+            <b class="finalMatchNo">2</b>
+            <h3>Top 10</h3>
+
+            <div class="finalSegmentScoreLine">
+              <em id="resultTop10A">0</em>
+              <span>-</span>
+              <em id="resultTop10B">0</em>
+            </div>
+
+            <strong id="resultTop10Winner" class="finalMatchWinner">لم تلعب</strong>
+          </div>
+
+          <div class="finalSegmentResultItem" data-result-card="auction">
+            <b class="finalMatchNo">3</b>
+            <h3>فتبلة</h3>
+
+            <div class="finalSegmentScoreLine">
+              <em id="resultAuctionA">0</em>
+              <span>-</span>
+              <em id="resultAuctionB">0</em>
+            </div>
+
+            <strong id="resultAuctionWinner" class="finalMatchWinner">لم تلعب</strong>
+          </div>
+
+          <div class="finalSegmentResultItem" data-result-card="who">
+            <b class="finalMatchNo">4</b>
+            <h3>من هو</h3>
+
+            <div class="finalSegmentScoreLine">
+              <em id="resultWhoA">0</em>
+              <span>-</span>
+              <em id="resultWhoB">0</em>
+            </div>
+
+            <strong id="resultWhoWinner" class="finalMatchWinner">لم تلعب</strong>
+          </div>
+
+          <div class="finalSegmentResultItem" data-result-card="explain">
+            <b class="finalMatchNo">5</b>
+            <h3>اشرح الكلمة</h3>
+
+            <div class="finalSegmentScoreLine">
+              <em id="resultExplainA">0</em>
+              <span>-</span>
+              <em id="resultExplainB">0</em>
+            </div>
+
+            <strong id="resultExplainWinner" class="finalMatchWinner">لم تلعب</strong>
+          </div>
+
+          <div class="finalSegmentResultItem" data-result-card="final1">
+            <b class="finalMatchNo">6</b>
+            <h3>ٮدوں ٮڡاط</h3>
+
+            <div class="finalSegmentScoreLine">
+              <em id="resultFinal1A">0</em>
+              <span>-</span>
+              <em id="resultFinal1B">0</em>
+            </div>
+
+            <strong id="resultFinal1Winner" class="finalMatchWinner">لم تلعب</strong>
+          </div>
+
+          <div class="finalSegmentResultItem" data-result-card="final2">
+            <b class="finalMatchNo">7</b>
+            <h3>صح صحلي</h3>
+
+            <div class="finalSegmentScoreLine">
+              <em id="resultFinal2A">0</em>
+              <span>-</span>
+              <em id="resultFinal2B">0</em>
+            </div>
+
+            <strong id="resultFinal2Winner" class="finalMatchWinner">لم تلعب</strong>
+          </div>
+
+          <div class="finalSegmentResultItem" data-result-card="final3">
+            <b class="finalMatchNo">8</b>
+            <h3>قصة</h3>
+
+            <div class="finalSegmentScoreLine">
+              <em id="resultFinal3A">0</em>
+              <span>-</span>
+              <em id="resultFinal3B">0</em>
+            </div>
+
+            <strong id="resultFinal3Winner" class="finalMatchWinner">لم تلعب</strong>
+          </div>
+
+          <div class="finalSegmentResultItem" data-result-card="final4">
+            <b class="finalMatchNo">9</b>
+            <h3>التركيز</h3>
+
+            <div class="finalSegmentScoreLine">
+              <em id="resultFinal4A">0</em>
+              <span>-</span>
+              <em id="resultFinal4B">0</em>
+            </div>
+
+            <strong id="resultFinal4Winner" class="finalMatchWinner">لم تلعب</strong>
+          </div>
+
+          <div class="finalSegmentResultItem" data-result-card="archive">
+            <b class="finalMatchNo">10</b>
+            <h3>الأرشيف</h3>
+
+            <div class="finalSegmentScoreLine">
+              <em id="resultArchiveA">0</em>
+              <span>-</span>
+              <em id="resultArchiveB">0</em>
+            </div>
+
+            <strong id="resultArchiveWinner" class="finalMatchWinner">لم تلعب</strong>
+          </div>
+
+        </section>
 
       </main>
 
       <footer class="finalResultsFooter">
         <button type="button" onclick="announceWinnerFromDetailedResults()">
           إعلان الفائز
+        </button>
+
+        <button type="button" onclick="closeDetailedFinalResults()">
+          إغلاق
         </button>
       </footer>
 

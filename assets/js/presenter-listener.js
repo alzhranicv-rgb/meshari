@@ -124,6 +124,14 @@ function isValidPresenterTeam(team) {
   return team === "A" || team === "B"
 }
 
+function applyPresenterActiveTeam(team) {
+  if (!isValidPresenterTeam(team)) return
+
+  if (typeof setGameActiveTeam === "function") {
+    setGameActiveTeam(team)
+  }
+}
+
 function getPresenterDisplayFinalSegmentKey(round) {
   const r = Number(round || 1)
 
@@ -375,12 +383,24 @@ function handlePresenterCommand(cmd) {
   }
 
   if (action === "endSegment") {
-    return safeRunPresenterAction(() => endCurrentSegment())
-  }
+  return safeRunPresenterAction(() => {
+    if (typeof clearGameActiveTeam === "function") {
+      clearGameActiveTeam()
+    }
 
-  if (action === "goHome") {
-    return safeRunPresenterAction(() => goHome())
-  }
+    endCurrentSegment()
+  })
+}
+
+if (action === "goHome") {
+  return safeRunPresenterAction(() => {
+    if (typeof clearGameActiveTeam === "function") {
+      clearGameActiveTeam()
+    }
+
+    goHome()
+  })
+}
 
   if (segment === "warmup") return handleWarmupPresenterAction(action, data)
   if (segment === "top10") return handleTop10PresenterAction(action, data)
@@ -403,9 +423,13 @@ function handlePresenterCommand(cmd) {
 
 function handleWarmupPresenterAction(action, data) {
   if (action === "selectTeam") {
-    if (!isValidPresenterTeam(data.team)) return
-    return safeRunPresenterAction(() => selectWarmupTeam(data.team))
-  }
+  if (!isValidPresenterTeam(data.team)) return
+
+  return safeRunPresenterAction(() => {
+    applyPresenterActiveTeam(data.team)
+    selectWarmupTeam(data.team)
+  })
+}
 
   if (action === "openNumber") {
     return safeRunPresenterAction(() => {
@@ -432,9 +456,13 @@ function handleWarmupPresenterAction(action, data) {
 
 function handleTop10PresenterAction(action, data) {
   if (action === "selectTeam") {
-    if (!isValidPresenterTeam(data.team)) return
-    return safeRunPresenterAction(() => selectTop10Team(data.team))
-  }
+  if (!isValidPresenterTeam(data.team)) return
+
+  return safeRunPresenterAction(() => {
+    applyPresenterActiveTeam(data.team)
+    selectTop10Team(data.team)
+  })
+}
 
   if (action === "openNumber") {
     return safeRunPresenterAction(() => openTop10Number(Number(data.number)))
@@ -479,9 +507,13 @@ function handleTop10PresenterAction(action, data) {
 
 function handleAuctionPresenterAction(action, data) {
   if (action === "selectTeam") {
-    if (!isValidPresenterTeam(data.team)) return
-    return safeRunPresenterAction(() => selectAuctionTeam(data.team))
-  }
+  if (!isValidPresenterTeam(data.team)) return
+
+  return safeRunPresenterAction(() => {
+    applyPresenterActiveTeam(data.team)
+    selectAuctionTeam(data.team)
+  })
+}
 
   if (action === "openNumber") {
     return safeRunPresenterAction(() => openAuction(Number(data.number)))
@@ -606,9 +638,13 @@ function runDisplayWhoScoreOnce(action, data, fn) {
 
 function handleWhoPresenterAction(action, data) {
   if (action === "selectTeam") {
-    if (!isValidPresenterTeam(data.team)) return
-    return safeRunPresenterAction(() => selectWhoTeam(data.team))
-  }
+  if (!isValidPresenterTeam(data.team)) return
+
+  return safeRunPresenterAction(() => {
+    applyPresenterActiveTeam(data.team)
+    selectWhoTeam(data.team)
+  })
+}
 
   if (action === "setPoints") {
     return safeRunPresenterAction(() => setWhoPoints(Number(data.points)))
@@ -696,18 +732,19 @@ function syncAfterExplainAction() {
 
 function handleExplainPresenterAction(action, data) {
   if (action === "selectTeam") {
-    if (!isValidPresenterTeam(data.team)) return
+  if (!isValidPresenterTeam(data.team)) return
 
-    return safeRunPresenterAction(() => {
-      selectedTeam = data.team
+  return safeRunPresenterAction(() => {
+    selectedTeam = data.team
+    applyPresenterActiveTeam(data.team)
 
-      if (typeof selectExplainTeam === "function") {
-        selectExplainTeam(data.team)
-      }
+    if (typeof selectExplainTeam === "function") {
+      selectExplainTeam(data.team)
+    }
 
-      syncAfterExplainAction()
-    })
-  }
+    syncAfterExplainAction()
+  })
+}
 
   if (action === "openNumber") {
     return safeRunPresenterAction(() => {
@@ -717,12 +754,13 @@ function handleExplainPresenterAction(action, data) {
       if (!number) return
 
       if (isValidPresenterTeam(team)) {
-        selectedTeam = team
+  selectedTeam = team
+  applyPresenterActiveTeam(team)
 
-        if (typeof selectExplainTeam === "function") {
-          selectExplainTeam(team)
-        }
-      }
+  if (typeof selectExplainTeam === "function") {
+    selectExplainTeam(team)
+  }
+}
 
       setTimeout(() => {
         if (typeof openExplainNumber !== "function") {
@@ -846,6 +884,8 @@ function closePresenterFinalRound1Zoom() {
 
 function forceFinalTeamFromPresenter(team) {
   if (!isValidPresenterTeam(team)) return
+
+  applyPresenterActiveTeam(team)
 
   const round = Number(window.finalState?.round || 1)
   const roundKey = `round${round}`
