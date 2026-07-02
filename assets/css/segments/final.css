@@ -4639,3 +4639,127 @@
 
   overflow:visible !important;
 }
+/* =========================================================
+   FINAL / صح صحلي
+   رقم 1 و 4 - الكلمات المبعثرة
+   تلميحة برتقالي + خط أكبر
+========================================================= */
+
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).active) .finalHintText,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).active) .finalHintText,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).used.active) .finalHintText,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).used.active) .finalHintText{
+  background:linear-gradient(135deg,#ff9f2f,#ff7a1a) !important;
+  color:#fff !important;
+  border:2px solid rgba(255,255,255,.65) !important;
+  box-shadow:0 14px 34px rgba(255,122,26,.30) !important;
+
+  font-size:clamp(2.1rem,3vw,3.35rem) !important;
+  line-height:1.2 !important;
+  font-weight:900 !important;
+}
+/* =========================================================
+   FINAL / صح صحلي
+   رقم 1 و 4 - عند ظهور الإجابات
+   تلوين الكلمات المبعثرة بالبرتقالي + تكبير الخط
+========================================================= */
+
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).active) .finalRound2AnswerScrambled,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).active) .finalRound2AnswerScrambled,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).used.active) .finalRound2AnswerScrambled,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).used.active) .finalRound2AnswerScrambled{
+  background:linear-gradient(135deg,#ff9f2f,#ff7a1a) !important;
+  color:#fff !important;
+  border:2px solid rgba(255,255,255,.65) !important;
+  box-shadow:0 12px 28px rgba(255,122,26,.26) !important;
+
+  font-size:clamp(1.45rem,2vw,2.15rem) !important;
+  line-height:1.18 !important;
+  font-weight:900 !important;
+}
+
+/* تكبير الإجابة الصحيحة تحتها */
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).active) .finalRound2AnswerCorrect,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).active) .finalRound2AnswerCorrect,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).used.active) .finalRound2AnswerCorrect,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).used.active) .finalRound2AnswerCorrect{
+  font-size:clamp(1.35rem,1.9vw,2.05rem) !important;
+  line-height:1.18 !important;
+  font-weight:900 !important;
+}
+/* مربع المتبقي - يمين ويسار */
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).active) .finalSequenceTimerBadge,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).active) .finalSequenceTimerBadge,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).used.active) .finalSequenceTimerBadge,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).used.active) .finalSequenceTimerBadge{
+  width:260px !important;
+  height:92px !important;
+  min-width:260px !important;
+  min-height:92px !important;
+  max-width:260px !important;
+  max-height:92px !important;
+
+  margin:0 auto !important;
+
+  display:grid !important;
+  grid-template-columns:1fr 88px !important;
+  align-items:center !important;
+  gap:12px !important;
+
+  direction:rtl !important;
+
+  padding:10px 12px !important;
+
+  border-radius:28px !important;
+
+  background:linear-gradient(135deg,#ff9f2f,#ff7a1a) !important;
+  color:#fff !important;
+
+  border:2px solid rgba(255,255,255,.65) !important;
+  box-shadow:0 14px 34px rgba(255,122,26,.30) !important;
+
+  overflow:hidden !important;
+}
+
+/* كلمة المتبقي - يمين */
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).active) .finalSequenceTimerBadge span,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).active) .finalSequenceTimerBadge span,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).used.active) .finalSequenceTimerBadge span,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).used.active) .finalSequenceTimerBadge span{
+  width:100% !important;
+  height:100% !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  color:#fff !important;
+  font-size:1.35rem !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+
+  background:rgba(255,255,255,.16) !important;
+  border-radius:20px !important;
+}
+
+/* الرقم - يسار */
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).active) .finalSequenceTimerBadge strong,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).active) .finalSequenceTimerBadge strong,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).used.active) .finalSequenceTimerBadge strong,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).used.active) .finalSequenceTimerBadge strong{
+  width:88px !important;
+  height:100% !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  color:#ff7a1a !important;
+  background:#fff !important;
+
+  border-radius:20px !important;
+
+  font-size:3rem !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+}
