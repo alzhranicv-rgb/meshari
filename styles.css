@@ -1,11 +1,11 @@
 /* =========================================================
-   DISPLAY.CSS - GENERAL ONLY
-   العام فقط بدون تنسيقات الفقرات
+   STYLES.CSS - DISPLAY / CORE ONLY
+   تصميم عام فقط: الرئيسية + العرض + النوافذ + المؤثرات
 ========================================================= */
 
-/* =========================================================
+/* =========================
    1) FONTS
-========================================================= */
+========================= */
 
 @font-face{
   font-family:"HanakaDisplay";
@@ -30,41 +30,55 @@
   font-style:normal;
   font-display:swap;
 }
-/* =========================================================
-   2) ROOT + GLOBAL
-========================================================= */
+
+/* =========================
+   2) ROOT
+========================= */
 
 :root{
   --app-height:100dvh;
   --app-width:100vw;
   --display-vh:100dvh;
   --display-vw:100vw;
+  --display-scale:1;
 
   --safe-top:env(safe-area-inset-top,0px);
   --safe-right:env(safe-area-inset-right,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
   --safe-left:env(safe-area-inset-left,0px);
 
-  --main-bg:#EEF3F6;
-  --main-text:#24185E;
-  --slate:#334155;
-  --muted:#64748B;
-  --orange:#FF9B51;
-  --orange-dark:#F97316;
-  --cyan:#67E8F9;
-  --green:#16A34A;
-  --red:#E11D48;
+  --bg:#EAECF0;
+  --surface:#FFFFFF;
+  --soft:#F6F7F9;
+  --line:#D5DADF;
 
-  --glass-nav:rgba(255,255,255,.04);
-  --glass-score:rgba(255,255,255,.05);
-  --glass-segment:rgba(255,255,255,.03);
-  --glass-border:rgba(255,255,255,.10);
-  --glass-highlight:rgba(255,255,255,.18);
+  --primary:#FE7F2D;
+  --secondary:#233D4D;
+  --text:#151515;
+  --muted:#8793A0;
 
-  --glass-shadow:
-    0 18px 42px rgba(31,41,55,.12),
-    inset 0 1px 0 rgba(255,255,255,.18);
+  --btn-nav:#0A7C6E;
+  --btn-correct:#007F00;
+  --btn-wrong:#7F0000;
+  --btn-double:#00007F;
+  --btn-disabled:#D7DCE2;
+  --btn-disabled-text:#7B8792;
+
+  --radius-xl:34px;
+  --radius-lg:26px;
+  --radius-md:20px;
+  --radius-sm:14px;
+
+  --shadow-soft:0 18px 44px rgba(35,61,77,.10);
+  --shadow-card:0 22px 56px rgba(35,61,77,.13);
+  --shadow-strong:0 32px 88px rgba(35,61,77,.22);
+
+  --ease:cubic-bezier(.16,1,.3,1);
 }
+
+/* =========================
+   3) RESET
+========================= */
 
 *{
   box-sizing:border-box;
@@ -75,17 +89,51 @@ body{
   width:100%;
   min-height:100%;
   margin:0;
-  overflow-x:hidden;
+}
+
+html{
+  background:var(--bg);
+  overflow:hidden;
 }
 
 body{
+  width:100%;
   min-height:var(--app-height);
+  overflow:hidden;
+
+  direction:rtl;
   font-family:"HanakaText",sans-serif;
-  color:var(--main-text);
+  color:var(--text);
+
+  background:var(--bg);
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-2;
+
   background:
-    radial-gradient(circle at 16% 18%, rgba(111,231,255,.24), transparent 35%),
-    radial-gradient(circle at 82% 15%, rgba(255,155,81,.18), transparent 34%),
-    linear-gradient(135deg,#EAF1F4 0%,#DCE8EC 48%,#F1EEE8 100%);
+    radial-gradient(circle at 16% 18%,rgba(254,127,45,.13),transparent 32%),
+    radial-gradient(circle at 86% 14%,rgba(35,61,77,.10),transparent 34%),
+    radial-gradient(circle at 52% 92%,rgba(10,124,110,.10),transparent 34%),
+    linear-gradient(135deg,#EAECF0 0%,#F6F7F9 52%,#E2E6EA 100%);
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+
+  opacity:.55;
+  pointer-events:none;
+
+  background-image:
+    linear-gradient(rgba(35,61,77,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(35,61,77,.035) 1px,transparent 1px);
+  background-size:42px 42px;
 }
 
 button,
@@ -102,31 +150,29 @@ button{
 h1,
 h2,
 h3,
-.teamName,
-.teamScore,
 .homeTeamName,
 .homeTeamScore,
 .homeSegmentItem span,
-.segmentTitle,
 .winnerBtn,
-#winnerOverlayName{
+#winnerOverlayName,
+.finalWinnerName{
   font-family:"HanakaDisplay","HanakaText",sans-serif;
 }
 
 .hidden{
-  display:none;
+  display:none !important;
 }
 
-/* =========================================================
-   3) GENERAL ANIMATIONS
-========================================================= */
+/* =========================
+   4) GENERAL FX
+========================= */
 
 .softEnter{
-  animation:softEnter .38s cubic-bezier(.16,1,.3,1) both;
+  animation:softEnter .34s var(--ease) both;
 }
 
 .softEnterFast{
-  animation:softEnter .22s cubic-bezier(.16,1,.3,1) both;
+  animation:softEnter .2s var(--ease) both;
 }
 
 .softExit{
@@ -134,7 +180,7 @@ h3,
 }
 
 .score-bump{
-  animation:scoreBump .36s cubic-bezier(.16,1,.3,1) both;
+  animation:scoreBump .34s var(--ease) both;
 }
 
 @keyframes softEnter{
@@ -157,240 +203,237 @@ h3,
 }
 
 @keyframes scoreBump{
-  0%{
+  0%,100%{
     transform:scale(1);
   }
 
-  45%{
+  44%{
     transform:scale(1.16);
   }
-
-  100%{
-    transform:scale(1);
-  }
 }
 
-@keyframes segmentTeamGlow{
-  from{
-    box-shadow:
-      inset 0 0 0 2px rgba(255,255,255,.38),
-      inset 0 0 14px rgba(255,255,255,.14),
-      0 0 10px rgba(226,245,255,.12);
-  }
-
-  to{
-    box-shadow:
-      inset 0 0 0 3px rgba(255,255,255,.72),
-      inset 0 0 26px rgba(255,255,255,.30),
-      0 0 22px rgba(226,245,255,.26);
-  }
-}
-
-/* =========================================================
-   4) HOME PAGE BASE
-========================================================= */
+/* =========================
+   5) HOME PAGE
+========================= */
 
 .homeShowPage,
 .homePageShell,
 #homePage,
-#homeScreen,
-#segmentScreen{
-  background:
-    radial-gradient(circle at 16% 18%, rgba(111,231,255,.24), transparent 35%),
-    radial-gradient(circle at 82% 15%, rgba(255,155,81,.18), transparent 34%),
-    linear-gradient(135deg,#EAF1F4 0%,#DCE8EC 48%,#F1EEE8 100%);
-}
-
-.homeShowPage{
+#homeScreen{
   position:relative;
+
   width:100%;
   height:var(--app-height);
   min-height:var(--app-height);
   max-height:var(--app-height);
 
-  padding:
-    calc(24px + var(--safe-top))
+   padding:
+    calc(42px + var(--safe-top))
     calc(28px + var(--safe-right))
     calc(22px + var(--safe-bottom))
     calc(28px + var(--safe-left));
 
   display:grid;
   grid-template-rows:auto minmax(0,1fr) auto;
+  gap:16px;
 
   overflow:hidden;
+
+  background:transparent;
 }
 
-.homeShowPage::before,
-.homeShowPage::after,
-.homePageShell::before,
-.homePageShell::after,
-#homePage::before,
-#homePage::after,
-#homeScreen::before,
-#homeScreen::after,
-#segmentScreen::before,
-#segmentScreen::after{
-  display:none;
-  content:none;
-}
-
-.homeShowPage > *{
+.homeShowPage > *,
+.homePageShell > *{
   position:relative;
   z-index:2;
 }
 
-/* =========================================================
-   5) HOME HEADER
-========================================================= */
+/* =========================
+   6) HOME HERO
+========================= */
 
 .homeHero{
-  width:min(100%,1220px);
-  margin:0 auto 18px;
+  width:min(100%,1380px);
+  margin:0 auto;
 
   display:grid;
-  grid-template-columns:minmax(0,1fr) 300px minmax(0,1fr);
-  gap:18px;
+  grid-template-columns:minmax(0,1fr) 360px minmax(0,1fr);
+  gap:24px;
   align-items:center;
-
-  background:transparent;
-  border:0;
-  box-shadow:none;
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-
-  overflow:visible;
 }
 
-.homeHero::before,
-.homeHero::after{
-  display:none;
-  content:none;
-}
-
-/* =========================================================
-   6) TEAM CARDS
-========================================================= */
+/* =========================
+   7) TEAM CARDS / PREMIUM LIKE SEGMENT CARDS
+========================= */
 
 .homeTeamCard{
   position:relative;
-  min-height:98px;
-  padding:10px 12px;
 
-  display:flex;
+  min-height:122px;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 88px;
+  gap:14px;
   align-items:center;
-  gap:12px;
 
-  overflow:visible;
-  cursor:pointer;
-  isolation:isolate;
+  padding:18px;
 
-  border-radius:32px 18px 32px 18px;
-  border:1px solid var(--glass-border);
-
-  background:var(--glass-score);
+  background:#FFFFFF;
+  border:3px solid rgba(255,255,255,.72);
+  border-radius:34px;
 
   box-shadow:
-    0 18px 42px rgba(31,41,55,.12),
-    inset 0 1px 0 var(--glass-highlight);
+    0 20px 44px rgba(35,61,77,.13),
+    0 0 0 6px rgba(35,61,77,.05);
 
-  backdrop-filter:blur(28px) saturate(1.18);
-  -webkit-backdrop-filter:blur(28px) saturate(1.18);
+  cursor:pointer;
+  overflow:visible;
+  isolation:isolate;
 
   transition:
-    transform .18s ease,
-    filter .18s ease,
-    box-shadow .18s ease;
+    transform .2s var(--ease),
+    box-shadow .2s ease,
+    border-color .2s ease,
+    filter .2s ease;
 }
 
+/* إطار داخلي مثل كروت الفقرات */
+.homeTeamCard::before{
+  content:"";
+
+  position:absolute;
+  inset:11px;
+  z-index:1;
+
+  border:2px solid rgba(35,61,77,.08);
+  border-radius:26px;
+
+  pointer-events:none;
+}
+
+/* خط زخرفي خفيف */
+.homeTeamCard::after{
+  content:"";
+
+  position:absolute;
+  bottom:20px;
+  z-index:2;
+
+  width:54px;
+  height:7px;
+
+  background:var(--primary);
+  border-radius:999px;
+
+  opacity:.75;
+  pointer-events:none;
+
+  animation:homeTeamLinePulse 2.8s ease-in-out infinite;
+}
+
+/* الفريق الأول */
 .homeTeamA{
-  grid-column:1;
   justify-self:end;
   width:100%;
-  max-width:440px;
+  max-width:560px;
 }
 
+/* خط الفريق الأول من اليسار */
+.homeTeamA::after{
+  inset-inline-start:28px;
+  inset-inline-end:auto;
+}
+
+/* الفريق الثاني */
 .homeTeamB{
-  grid-column:3;
   justify-self:start;
   width:100%;
-  max-width:440px;
-  flex-direction:row-reverse;
-  border-radius:18px 32px 18px 32px;
+  max-width:560px;
+
+  grid-template-columns:88px minmax(0,1fr);
+}
+
+/* خط الفريق الثاني من اليمين */
+.homeTeamB::after{
+  inset-inline-start:auto;
+  inset-inline-end:28px;
+}
+
+.homeTeamB .homeTeamText{
+  grid-column:2;
+  grid-row:1;
+}
+
+.homeTeamB .homeTeamScore{
+  grid-column:1;
+  grid-row:1;
 }
 
 .homeTeamCard:hover{
-  transform:translateY(-4px);
-  filter:brightness(1.04);
+  transform:translateY(-5px);
+
+  border-color:rgba(254,127,45,.45);
+
   box-shadow:
-    0 24px 48px rgba(30,27,75,.14),
-    inset 0 1px 0 rgba(255,255,255,.78);
+    0 26px 58px rgba(35,61,77,.16),
+    0 0 0 7px rgba(254,127,45,.09);
+
+  filter:brightness(1.01);
 }
 
 .homeTeamCard.leadingTeam{
-  border-color:rgba(255,255,255,.70);
+  border-color:rgba(254,127,45,.65);
+
   box-shadow:
-    0 0 0 5px rgba(255,255,255,.12),
-    0 24px 48px rgba(30,27,75,.16),
-    inset 0 1px 0 rgba(255,255,255,.82);
+    0 26px 58px rgba(35,61,77,.16),
+    0 0 0 7px rgba(254,127,45,.14);
 }
 
 .homeTeamCard.tieTeam{
-  border-color:rgba(255,255,255,.22);
+  border-color:rgba(35,61,77,.12);
 }
 
 .homeTeamText{
   position:relative;
-  z-index:2;
-  flex:1;
-  min-width:0;
-  min-height:62px;
+  z-index:3;
 
-  padding:10px 14px;
-  border-radius:18px;
+  min-width:0;
+  min-height:78px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
+  padding:10px 16px;
+
+  background:transparent;
+  border:0;
+  box-shadow:none;
+
   overflow:visible;
-
-  background:rgba(255,255,255,.05);
-  border:1px solid var(--glass-border);
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.18),
-    0 8px 18px rgba(30,27,75,.05);
-
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
 }
 
 .homeTeamName{
   width:100%;
   min-width:0;
 
-  padding-top:6px;
+  color:var(--secondary);
 
-  color:var(--main-text);
-  font-size:clamp(1.35rem,2vw,2.1rem);
+  font-size:clamp(1.55rem,2.18vw,2.35rem);
   line-height:1.2;
   font-weight:400;
 
   white-space:normal;
   overflow:visible;
   text-overflow:clip;
+  word-break:normal;
+  overflow-wrap:break-word;
 
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  line-clamp:2;
-  -webkit-box-orient:vertical;
+  display:block;
 
   text-shadow:
-    0 1px 0 rgba(255,255,255,.62),
-    0 8px 18px rgba(30,27,75,.08);
-
-  animation:teamNameSoftPulse 2.6s ease-in-out infinite;
-  transform-origin:center;
+    0 1px 0 rgba(255,255,255,.45),
+    0 10px 18px rgba(35,61,77,.10);
 }
 
 .homeTeamA .homeTeamName{
@@ -401,303 +444,206 @@ h3,
   text-align:left;
 }
 
-.leadingTeam .homeTeamName{
-  animation:teamNameWinnerPulse 1.8s ease-in-out infinite;
-}
-
 .homeTeamScore{
   position:relative;
-  z-index:2;
-  flex-shrink:0;
+  z-index:3;
 
-  width:68px;
-  height:56px;
-  border-radius:18px;
+  width:88px;
+  height:88px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.66));
+  background:var(--secondary);
+  border-radius:26px;
 
-  border:1px solid rgba(255,255,255,.52);
+  color:#FFFFFF;
 
-  color:#1E1B4B;
-  font-size:2.05rem;
+  font-size:3rem;
   line-height:1;
+  font-weight:400;
 
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.94),
-    0 10px 20px rgba(30,27,75,.10);
+    0 14px 28px rgba(35,61,77,.18),
+    inset 0 1px 0 rgba(255,255,255,.18);
 }
 
 .homeTeamScore.maxScore{
-  box-shadow:
-    0 0 0 4px rgba(255,179,71,.16),
-    0 14px 26px rgba(255,179,71,.20),
-    inset 0 1px 0 rgba(255,255,255,.96);
+  background:var(--primary);
 }
 
-@keyframes teamNameSoftPulse{
+/* إلغاء تأثير الفريق النشط بالكامل بدون important */
+body[data-active-team="A"] .homeTeamA,
+body[data-active-team="B"] .homeTeamB,
+body[data-active-team="A"] .homeTeamB,
+body[data-active-team="B"] .homeTeamA{
+  opacity:1;
+  filter:none;
+}
+
+/* لا كلمة نشط ولا تحديد */
+body[data-active-team="A"] .homeTeamA::after,
+body[data-active-team="B"] .homeTeamB::after{
+  content:"";
+  top:auto;
+  bottom:20px;
+
+  width:54px;
+  height:7px;
+
+  padding:0;
+
+  background:var(--primary);
+  border-radius:999px;
+
+  color:transparent;
+  font-size:0;
+  line-height:0;
+
+  opacity:.75;
+  animation:homeTeamLinePulse 2.8s ease-in-out infinite;
+}
+
+/* تثبيت اتجاه الخط بعد إلغاء النشط */
+body[data-active-team="A"] .homeTeamA::after,
+body[data-active-team="B"] .homeTeamA::after{
+  inset-inline-start:28px;
+  inset-inline-end:auto;
+}
+
+body[data-active-team="A"] .homeTeamB::after,
+body[data-active-team="B"] .homeTeamB::after{
+  inset-inline-start:auto;
+  inset-inline-end:28px;
+}
+
+@keyframes homeTeamLinePulse{
   0%,100%{
-    transform:scale(1);
+    width:54px;
+    opacity:.55;
   }
 
   50%{
-    transform:scale(.99);
+    width:82px;
+    opacity:.9;
   }
 }
-
-@keyframes teamNameWinnerPulse{
-  0%,100%{
-    transform:scale(1);
-    filter:brightness(1);
-  }
-
-  50%{
-    transform:scale(1.06);
-    filter:brightness(1.08);
-  }
-}
-
-/* =========================================================
-   7) TITLE
-========================================================= */
+/* =========================
+   8) TITLE
+========================= */
 
 .homeTitleBox{
-  grid-column:2;
-  justify-self:center;
-
   position:relative;
-  width:300px;
-  height:112px;
-  min-height:112px;
-  min-width:0;
 
-  padding:6px 0 0;
-  transform:translateY(30px);
+  width:360px;
+  height:132px;
 
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
 
-  background:transparent;
-  border:0;
-  box-shadow:none;
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-
   overflow:visible;
-}
-
-.homeTitleGlow,
-.homeTitleBox::before,
-.homeTitleBox::after{
-  display:none;
-  content:none;
+  cursor:pointer;
 }
 
 .homeTitleBox h1{
   position:relative;
 
   margin:0;
-  padding:6px 0 0;
 
-  color:var(--main-text);
-  -webkit-text-fill-color:var(--main-text);
+  color:var(--secondary);
 
-  background:none;
-  -webkit-background-clip:initial;
-  background-clip:initial;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(3.45rem,4.6vw,5.2rem);
+  font-size:clamp(4.8rem,6.2vw,7rem);
+  line-height:1;
   font-weight:400;
-  line-height:1.08;
+  text-align:center;
 
-  text-shadow:
-    0 3px 0 rgba(255,255,255,.88),
-    0 16px 32px rgba(30,27,75,.18),
-    0 0 18px rgba(103,232,249,.16);
-
-  filter:drop-shadow(0 10px 18px rgba(30,27,75,.10));
-  animation:homeHanakaTitleGlassPulse 3.8s ease-in-out infinite;
-
-  transform:translateY(6px);
-  overflow:visible;
-}
-
-.homeTitleBox h1::before{
-  display:none;
-  content:none;
+  filter:drop-shadow(0 12px 24px rgba(35,61,77,.12));
+  animation:homeTitleFloat 3.8s ease-in-out infinite;
 }
 
 .homeTitleBox h1::after{
   content:"";
 
   width:170px;
-  height:10px;
-  margin:16px auto 0;
+  height:8px;
+  margin:12px auto 0;
 
   display:block;
 
+  background:var(--primary);
   border-radius:999px;
 
-  background:
-    linear-gradient(
-      115deg,
-      #FF9B51 0%,
-      #FF9B51 22%,
-      #67E8F9 40%,
-      rgba(255,255,255,.88) 50%,
-      #7C3AED 62%,
-      #FF9B51 100%
-    );
-
-  background-size:260% 100%;
-  background-position:100% 50%;
-
-  box-shadow:
-    0 10px 24px rgba(249,115,22,.22),
-    0 0 18px rgba(103,232,249,.20);
-
-  animation:homeHanakaLineGlassMove 3.2s ease-in-out infinite;
+  box-shadow:0 0 0 6px rgba(254,127,45,.10);
 }
 
 .homeModelName,
 #modelNameDisplay{
-  position:relative;
-  z-index:5;
-
-  max-width:280px;
-  min-width:0;
+  min-width:150px;
+  max-width:300px;
   min-height:36px;
-  margin-top:0px;
-  padding:7px 22px;
+
+  margin-top:4px;
+  padding:6px 20px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
+  background:var(--surface);
+  border:2px solid var(--line);
   border-radius:999px;
 
-  color:#000;
+  color:#000000;
+
   font-family:"HanakaText",sans-serif;
-  font-size:1.55rem;
-  line-height:1.15;
+  font-size:1.5rem;
+  line-height:1;
+  font-weight:900;
 
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-
-  cursor:pointer;
-
-  transition:
-    transform .18s ease,
-    filter .18s ease;
 }
 
-#modelNameDisplay:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.04);
-}
-
-@keyframes homeHanakaTitleGlassPulse{
+@keyframes homeTitleFloat{
   0%,100%{
-    transform:translateY(0) scale(1);
+    transform:translateY(0);
   }
 
   50%{
-    transform:translateY(-2px) scale(1.01);
+    transform:translateY(-4px);
   }
 }
 
-@keyframes homeHanakaLineGlassMove{
-  0%{
-    background-position:100% 50%;
-    filter:brightness(1);
-    transform:scaleX(1);
-  }
-
-  45%{
-    background-position:0% 50%;
-    filter:brightness(1.18);
-    transform:scaleX(1.06);
-  }
-
-  100%{
-    background-position:0% 50%;
-    filter:brightness(1);
-    transform:scaleX(1);
-  }
-}
-
-/* =========================================================
-   8) MODEL POPUP / JOIN CODE NOTICE
-========================================================= */
-
-/* تكبير مساحة ضغط اسم النموذج بدون تغيير الشكل */
-.homeTitleBox{
-  position:relative;
-  cursor:pointer;
-}
-
-.homeModelName,
-#modelNameDisplay{
-  position:relative;
-  z-index:5;
-  min-width:160px;
-  min-height:38px;
-  padding-inline:22px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;
-}
-
-.homeModelName::before,
-#modelNameDisplay::before{
-  content:"";
-  position:absolute;
-  inset:-14px -26px;
-  border-radius:999px;
-}
+/* =========================
+   9) MODEL POPUP
+========================= */
 
 .homeModelPopupArea,
 #homeModelPopupArea{
   position:fixed;
-  top:22px;
+  top:calc(18px + var(--safe-top));
   left:50%;
-  right:auto;
-  bottom:auto;
+  z-index:999980;
 
   width:auto;
-  max-width:calc(100vw - 32px);
-  margin:0;
-  padding:0;
-
-  z-index:999980;
+  max-width:calc(100vw - 28px);
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  background:transparent;
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-
   opacity:0;
   pointer-events:none;
 
-  transform:translate(-50%,-12px) scale(.98);
+  transform:translate(-50%,-14px) scale(.96);
 
   transition:
     opacity .18s ease,
-    transform .18s cubic-bezier(.2,.85,.2,1.05);
+    transform .18s var(--ease);
 }
 
 .homeModelPopupArea.hidden,
@@ -712,183 +658,51 @@ h3,
   transform:translate(-50%,0) scale(1);
 }
 
-.homeModelNotifyBox,
 .homeModelClassicBox{
-  width:auto;
-  min-width:0;
-  max-width:100%;
-
-  min-height:68px;
-  padding:10px;
+  min-height:66px;
 
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:12px;
+  gap:10px;
 
-  direction:ltr;
-  text-align:center;
+  padding:8px;
 
+  background:var(--surface);
+  border:2px solid var(--line);
   border-radius:24px;
-  overflow:hidden;
 
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.78));
-
-  border:1px solid rgba(255,255,255,.72);
-
-  box-shadow:
-    0 16px 36px rgba(30,27,75,.14),
-    0 0 0 4px rgba(103,232,249,.06),
-    inset 0 1px 0 rgba(255,255,255,.96);
-
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
+  box-shadow:var(--shadow-strong);
 }
 
-.homeModelClassicBox::before,
-.homeModelClassicBox::after,
-.homeModelClassicHeader,
-.homeModelClassicLabel,
-.homeModelClassicName{
-  display:none;
-}
+.homeModelClassicClose{
+  width:44px;
+  height:44px;
+  min-width:44px;
 
-.homeModelClassicBody,
-.homeModelNotifyCode{
-  height:52px;
-  min-width:210px;
-
-  padding:0 18px;
-  margin:0;
-
-  border-radius:18px;
+  border:0;
+  border-radius:15px;
 
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:12px;
+
+  background:var(--soft);
+  color:var(--secondary);
+
+  font-size:1.4rem;
+  font-weight:900;
+  line-height:1;
 
   cursor:pointer;
-  direction:rtl;
-
-  background:
-    linear-gradient(180deg,rgba(236,254,255,.94),rgba(255,255,255,.80));
-
-  border:1px solid rgba(103,232,249,.32);
-
-  box-shadow:
-    0 8px 18px rgba(8,145,178,.08),
-    inset 0 1px 0 rgba(255,255,255,.92);
-
-  transition:
-    transform .15s ease,
-    filter .15s ease;
-}
-
-.homeModelClassicCodeLabel,
-.homeModelNotifyCode span{
-  display:block;
-
-  color:#0F4C5C;
-
-  font-family:"HanakaText",sans-serif;
-  font-size:.82rem;
-  line-height:1;
-  font-weight:900;
-
-  margin:0;
-  white-space:nowrap;
-}
-
-.homeModelClassicCode,
-.homeModelNotifyCode strong{
-  direction:ltr;
-
-  width:auto;
-  min-width:auto;
-  height:auto;
-
-  margin:0;
-  padding:0;
-
-  display:block;
-
-  border-radius:0;
-  background:none;
-  box-shadow:none;
-
-  color:var(--main-text);
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.75rem;
-  line-height:1;
-  font-weight:400;
-  letter-spacing:2px;
-
-  white-space:nowrap;
 }
 
 .homeModelClassicControl,
 #displayControlsEyeBtn,
-.homeModelNotifyControl{
-  width:auto;
-  min-width:150px;
-  height:52px;
-
-  margin:0;
-  padding:0 20px;
-
-  border:0;
-  border-radius:18px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  cursor:pointer;
-
-  color:#fff;
-
-  font-family:"HanakaText",sans-serif;
-  font-size:.95rem;
-  line-height:1;
-  font-weight:900;
-
-  box-shadow:
-    0 10px 22px rgba(30,27,75,.14),
-    inset 0 1px 0 rgba(255,255,255,.18);
-
-  transition:
-    transform .15s ease,
-    filter .15s ease;
-}
-
-.homeModelClassicControl.hideControlsMode,
-#displayControlsEyeBtn.hideControlsMode,
-.homeModelNotifyControl.hideControlsMode{
-  background:linear-gradient(180deg,#e12d23,#e14242);
-}
-
-.homeModelClassicControl.showControlsMode,
-#displayControlsEyeBtn.showControlsMode,
-.homeModelNotifyControl.showControlsMode{
-  background:linear-gradient(180deg,#16A34A,#15803D);
-}
-
-.homeModelClassicClose,
-.homeModelNotifyClose{
-  position:relative;
-  top:auto;
-  left:auto;
-  right:auto;
-  bottom:auto;
-
-  width:42px;
-  height:42px;
-  min-width:42px;
-
-  padding:0;
+#bigScreenModeBtn,
+#fullScreenModeBtn{
+  min-width:142px;
+  height:50px;
 
   border:0;
   border-radius:16px;
@@ -897,204 +711,189 @@ h3,
   align-items:center;
   justify-content:center;
 
-  cursor:pointer;
+  padding:0 18px;
 
-  background:rgba(36,24,94,.08);
-  color:var(--main-text);
+  color:#fff;
 
-  font-family:Arial,sans-serif;
-  font-size:1.45rem;
-  font-weight:700;
+  font-size:.9rem;
   line-height:1;
+  font-weight:900;
 
-  box-shadow:none;
-
-  transition:
-    transform .15s ease,
-    background .15s ease,
-    color .15s ease;
+  cursor:pointer;
 }
 
-.homeModelClassicBody:hover,
-.homeModelNotifyCode:hover,
-.homeModelClassicControl:hover,
-#displayControlsEyeBtn:hover,
-.homeModelNotifyControl:hover,
-.homeModelClassicClose:hover,
-.homeModelNotifyClose:hover{
-  transform:translateY(-1px);
-  filter:brightness(1.04);
+.homeModelClassicControl.hideControlsMode,
+#displayControlsEyeBtn.hideControlsMode{
+  background:var(--btn-wrong);
 }
 
-.homeModelClassicClose:hover,
-.homeModelNotifyClose:hover{
-  background:rgba(239,68,68,.10);
-  color:#B91C1C;
+.homeModelClassicControl.showControlsMode,
+#displayControlsEyeBtn.showControlsMode{
+  background:var(--btn-correct);
 }
 
-/* =========================================================
-   9) SEGMENTS GRID
-========================================================= */
+.fullScreenModeBtn,
+#bigScreenModeBtn,
+#fullScreenModeBtn{
+  background:var(--secondary);
+}
+
+.fullScreenModeBtn.activeFullScreen,
+#bigScreenModeBtn.activeFullScreen,
+#fullScreenModeBtn.activeFullScreen{
+  background:var(--primary);
+}
+
+.homeModelClassicBody{
+  min-width:210px;
+  height:50px;
+
+  border:0;
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  padding:0 18px;
+
+  background:var(--soft);
+  color:var(--text);
+
+  cursor:pointer;
+}
+
+.homeModelClassicCodeLabel{
+  color:#000000;
+  font-size:.78rem;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.homeModelClassicCode{
+  direction:ltr;
+
+  .homeModelClassicCode{
+  color:#040404;
+}
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.75rem;
+  line-height:1;
+  font-weight:400;
+  letter-spacing:2px;
+}
+/* =========================
+   10) SEGMENTS GRID - HOME ONLY / PREMIUM ORANGE CARDS
+========================= */
+
 .homeSegmentsShowcase{
-  width:min(100%,1050px);
-  min-height:calc(100dvh - 300px);
+  width:min(100%,1380px);
+  min-height:0;
   margin:0 auto;
 
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:18px;
+  gap:22px;
 
   align-content:center;
   justify-content:center;
+
+  overflow:visible;
 }
 
-/* أكثر من 6 فقرات: توزيع فقط بدون لمس تصميم الكروت */
 .homeSegmentsShowcase.segmentsMoreThan6{
-  width:min(100%,1120px);
   grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:14px;
-}
-
-body.displayTablet .homeSegmentsShowcase.segmentsMoreThan6{
-  width:min(100%,1080px);
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:12px;
-}
-
-body.displayPhone.displayPortrait .homeSegmentsShowcase.segmentsMoreThan6{
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-}
-
-body.displayPhone.displayLandscape .homeSegmentsShowcase.segmentsMoreThan6{
-  width:min(100%,1120px);
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:8px;
+  gap:16px;
 }
 
 .homeSegmentItem{
   position:relative;
-  min-height:150px;
-  padding:18px;
+
+  min-height:184px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  overflow:hidden;
-  cursor:pointer;
-  isolation:isolate;
+  padding:18px;
 
-  border-radius:34px 20px 34px 20px;
-  border:1px solid var(--glass-border);
-
-  background:var(--glass-segment);
+  background:var(--primary);
+  border:3px solid rgba(255,255,255,.72);
+  border-radius:34px;
 
   box-shadow:
-    0 20px 42px rgba(31,41,55,.14),
-    inset 0 1px 0 var(--glass-highlight);
+    0 20px 44px rgba(35,61,77,.13),
+    0 0 0 6px rgba(254,127,45,.09);
 
-  backdrop-filter:blur(28px) saturate(1.18);
-  -webkit-backdrop-filter:blur(28px) saturate(1.18);
-
-  transform:translateZ(0);
+  cursor:pointer;
+  overflow:hidden;
+  isolation:isolate;
 
   transition:
-    transform .24s cubic-bezier(.2,.9,.25,1),
-    box-shadow .24s ease,
-    border-color .24s ease,
-    filter .24s ease,
-    opacity .22s ease;
+    transform .2s var(--ease),
+    box-shadow .2s ease,
+    border-color .2s ease,
+    filter .2s ease;
 }
 
-.homeSegmentItem:nth-child(even){
-  border-radius:20px 34px 20px 34px;
-}
-
+/* إطار داخلي */
 .homeSegmentItem::before{
   content:"";
+
   position:absolute;
-  inset:9px;
+  inset:11px;
   z-index:1;
 
-  border-radius:26px 15px 26px 15px;
-  border:1px solid rgba(255,255,255,.10);
+  border:2px solid rgba(0, 0, 0, 0.28);
+  border-radius:26px;
 
-  background:rgba(255,255,255,.025);
   pointer-events:none;
 }
 
-.homeSegmentItem:nth-child(even)::before{
-  border-radius:15px 26px 15px 26px;
-}
-
+/* خط زخرفي خفيف */
 .homeSegmentItem::after{
   content:"";
+
   position:absolute;
-  top:12px;
-  right:18%;
-  left:18%;
-  height:1px;
+  bottom:22px;
+  inset-inline-start:28px;
   z-index:2;
 
-  background:
-    linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent);
+  width:54px;
+  height:7px;
 
-  opacity:.85;
+  background:rgba(5, 3, 3, 0.58);
+  border-radius:999px;
+
   pointer-events:none;
+
+  animation:homeSegmentLinePulse 2.6s ease-in-out infinite;
 }
 
-#segmentWarmup{
-  background:
-    radial-gradient(circle at 18% 0%,rgba(249,115,22,.14),transparent 44%),
-    var(--glass-segment);
+.homeSegmentItem:hover{
+  transform:translateY(-7px) scale(1.012);
+
+  border-color:rgba(255,255,255,.92);
+
+  box-shadow:
+    0 28px 62px rgba(35,61,77,.18),
+    0 0 0 7px rgba(254,127,45,.12);
+
+  filter:brightness(1.025);
 }
 
-#segmentTop10{
-  background:
-    radial-gradient(circle at 84% 0%,rgba(124,58,237,.13),transparent 44%),
-    var(--glass-segment);
-}
-
-#segmentAuction{
-  background:
-    radial-gradient(circle at 18% 0%,rgba(34,197,94,.12),transparent 44%),
-    var(--glass-segment);
-}
-
-#segmentWho{
-  background:
-    radial-gradient(circle at 84% 0%,rgba(6,182,212,.14),transparent 44%),
-    var(--glass-segment);
-}
-
-#segmentExplain{
-  background:
-    radial-gradient(circle at 18% 0%,rgba(14,165,233,.12),transparent 44%),
-    var(--glass-segment);
-}
-
-#segment_finalRound1,
-#segment_finalRound2,
-#segment_finalRound3,
-#segment_finalRound4,
-#segmentFinal{
-  background:
-    radial-gradient(circle at 18% 0%,rgba(251,113,133,.12),transparent 44%),
-    var(--glass-segment);
-}
-
-#segmentArchive{
-  background:
-    radial-gradient(circle at 84% 0%,rgba(100,116,139,.13),transparent 44%),
-    var(--glass-segment);
+.homeSegmentItem:active{
+  transform:scale(.98);
 }
 
 .homeSegmentContent{
   position:relative;
   z-index:3;
+
   width:100%;
-  min-height:96px;
+  min-height:136px;
 
   display:flex;
   flex-direction:column;
@@ -1103,144 +902,112 @@ body.displayPhone.displayLandscape .homeSegmentsShowcase.segmentsMoreThan6{
   gap:12px;
 
   text-align:center;
+  overflow:visible;
 }
 
-.homeSegmentItem span{
-  position:relative;
-  z-index:3;
+/* شيل أرقام كروت الفقرات */
+.homeSegmentContent::before{
+  display:none;
+  content:none;
+}
 
-  width:calc(100% - 28px);
-  min-height:76px;
+/* اسم الفقرة */
+.homeSegmentItem span{
+  width:100%;
+  min-height:86px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  padding:10px 16px;
-  border-radius:22px;
+  padding:6px 12px;
 
-  background:rgba(255,255,255,.035);
-  border:1px solid rgba(255,255,255,.09);
+  background:transparent;
+  border:0;
+  box-shadow:none;
 
-  color:var(--main-text);
+  color:#FFFFFF;
 
-  font-size:clamp(1.95rem,2.8vw,2.85rem);
-  line-height:1;
+  font-size:clamp(2.2rem,2.9vw,3.15rem);
+  line-height:1.16;
   font-weight:400;
-
   text-align:center;
-  letter-spacing:-.3px;
+
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  word-break:normal;
+  overflow-wrap:break-word;
 
   text-shadow:
-    0 1px 0 rgba(255,255,255,.45),
-    0 8px 18px rgba(31,41,55,.12);
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.16),
-    0 10px 24px rgba(31,41,55,.08);
-
-  overflow:hidden;
+    0 2px 0 rgba(0,0,0,.10),
+    0 12px 22px rgba(35,61,77,.16);
 }
 
-.homeSegmentItem span::before{
-  content:"";
-  position:absolute;
-  top:12px;
-  right:14px;
-
-  width:8px;
-  height:8px;
-  border-radius:50%;
-
-  background:rgba(255,155,81,.55);
-  box-shadow:0 0 14px rgba(255,155,81,.35);
-}
-
-.homeSegmentItem span::after{
-  content:"";
-  position:absolute;
-  bottom:10px;
-  left:14px;
-
-  width:34px;
-  height:4px;
-  border-radius:999px;
-
-  background:
-    linear-gradient(90deg,rgba(255,155,81,.55),rgba(255,255,255,.12));
-}
-
+/* اسم الفائز */
 .homeSegmentWinner{
-  position:relative;
-  z-index:4;
-
-  max-width:92%;
-  min-height:34px;
-  padding:7px 18px;
-  border-radius:999px;
+  max-width:96%;
+  min-height:38px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.10);
+  padding:7px 18px;
 
-  color:#0F4C5C;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(255,255,255,.72);
+  border-radius:999px;
 
-  font-family:"HanakaText",sans-serif;
+  color:var(--secondary);
+
   font-size:.92rem;
   line-height:1.2;
+  font-weight:900;
 
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  overflow-wrap:break-word;
 
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.16),
-    0 8px 18px rgba(30,27,75,.06);
+    0 10px 22px rgba(35,61,77,.10),
+    inset 0 1px 0 rgba(255,255,255,.70);
 
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
 }
 
 .homeSegmentWinner:empty{
   display:none;
 }
 
-.homeSegmentItem:hover{
-  transform:translateY(-7px) scale(1.012);
-  border-color:rgba(255,255,255,.22);
-
-  box-shadow:
-    0 28px 56px rgba(31,41,55,.18),
-    0 0 0 1px rgba(255,255,255,.08),
-    inset 0 1px 0 rgba(255,255,255,.28);
-
-  filter:brightness(1.04) saturate(1.03);
-}
-
-.homeSegmentItem:active{
-  transform:scale(.97);
-}
-/* =========================================================
-   10) LOCKED SEGMENT
-========================================================= */
+/* =========================
+   FINISHED SEGMENT STATE
+   رمادي باهت + الفائز واضح
+========================= */
 
 .homeSegmentItem.segmentLocked,
 .homeSegmentItem.segmentDone,
 .homeSegmentItem.hasWinner{
   pointer-events:none;
   cursor:not-allowed;
-  opacity:.98;
-  filter:saturate(.82) brightness(.96);
+
+  background:#0808083c;
+  border-color:#DDE1E5;
+
   transform:none;
+  filter:saturate(.45) brightness(.96);
+
+  box-shadow:
+    0 10px 24px rgba(35,61,77,.08),
+    0 0 0 5px rgba(35,61,77,.035);
 }
 
 .homeSegmentItem.segmentLocked::before,
 .homeSegmentItem.segmentDone::before,
 .homeSegmentItem.hasWinner::before{
-  opacity:.55;
+  border-color:rgba(255,255,255,.22);
 }
 
 .homeSegmentItem.segmentLocked::after,
@@ -1249,141 +1016,129 @@ body.displayPhone.displayLandscape .homeSegmentsShowcase.segmentsMoreThan6{
   content:"منتهية";
 
   position:absolute;
-  top:0;
-  left:0;
-  right:auto;
+  top:14px;
+  inset-inline-start:14px;
   bottom:auto;
+  z-index:8;
 
-  width:96px;
+  width:auto;
   height:32px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  border-radius:0 0 16px 0;
+  padding:0 15px;
 
-  background:rgba(115,32,45,.88);
-  color:#FFF4F4;
+  background:#8E3A3A;
+  border-radius:999px;
+
+  color:#fff;
 
   font-family:"HanakaText",sans-serif;
   font-size:.74rem;
+  line-height:1;
+  font-weight:900;
 
-  box-shadow:none;
-  transform:none;
+  opacity:1;
+  animation:none;
 
-  z-index:5;
-}
-
-.homeSegmentItem.segmentLocked > *,
-.homeSegmentItem.segmentDone > *,
-.homeSegmentItem.hasWinner > *{
-  position:relative;
-  z-index:4;
-}
-
-.homeSegmentItem.segmentLocked .homeSegmentContent,
-.homeSegmentItem.segmentDone .homeSegmentContent,
-.homeSegmentItem.hasWinner .homeSegmentContent{
-  padding-top:10px;
-  gap:12px;
+  box-shadow:0 8px 18px rgba(35,61,77,.12);
 }
 
 .homeSegmentItem.segmentLocked span,
 .homeSegmentItem.segmentDone span,
 .homeSegmentItem.hasWinner span{
-  color:rgb(36,24,94);
+  color:#EEF1F4;
+  text-shadow:none;
 }
 
+/* اسم الفريق الفائز بدون بهتان */
 .homeSegmentItem.segmentLocked .homeSegmentWinner,
 .homeSegmentItem.segmentDone .homeSegmentWinner,
 .homeSegmentItem.hasWinner .homeSegmentWinner{
   display:flex;
 
-  min-height:40px;
-  max-width:92%;
-  padding:8px 22px;
-  border-radius:18px;
+  position:relative;
+  z-index:9;
 
-  background:
-    radial-gradient(circle at 18% 0%,rgba(255,255,255,.30),transparent 42%),
-    linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,.18));
+  min-height:42px;
 
-  border:1px solid rgba(255,255,255,.34);
+  background:#FFFFFF;
+  border:2px solid rgba(255,255,255,.90);
 
-  color:var(--main-text);
+  color:var(--secondary);
 
-  font-size:1.1rem;
-  line-height:1.1;
+  font-size:1rem;
+  font-weight:900;
 
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  filter:none;
+  opacity:1;
 
   box-shadow:
-    0 12px 24px rgba(30,27,75,.10),
-    inset 0 1px 0 rgba(255,255,255,.72);
-
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
+    0 12px 24px rgba(35,61,77,.18),
+    0 0 0 4px rgba(255,255,255,.24);
 }
 
 .homeSegmentItem.segmentLocked:hover,
 .homeSegmentItem.segmentDone:hover,
 .homeSegmentItem.hasWinner:hover{
   transform:none;
-  filter:saturate(.82) brightness(.96);
-  opacity:.98;
+  filter:saturate(.45) brightness(.96);
 }
 
-/* =========================================================
-   11) HOME WINNER BUTTON
-========================================================= */
+@keyframes homeSegmentLinePulse{
+  0%,100%{
+    width:54px;
+    opacity:.58;
+  }
+
+  50%{
+    width:86px;
+    opacity:.86;
+  }
+}
+/* =========================
+   11) WINNER BUTTON
+========================= */
 
 .homeWinnerArea{
-  width:min(100%,1180px);
-  margin:14px auto 0;
+  width:min(100%,1380px);
+  margin:0 auto;
 
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:14px;
-
-  position:relative;
-  z-index:5;
 }
 
 .homeWinnerBtn,
 .winnerBtn{
-  position:relative;
-  overflow:hidden;
-
   min-width:230px;
   min-height:60px;
+
+  border:0;
+  border-radius:22px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
   padding:0 34px;
 
-  border:1px solid rgba(255,255,255,.34);
-  border-radius:24px;
-
-  background:
-    radial-gradient(circle at 18% 0%,rgba(255,255,255,.26),transparent 42%),
-    linear-gradient(180deg,rgba(15,38,47,.95),rgba(36,99,122,.90));
-
+  background:var(--primary);
   color:#fff;
 
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.35rem;
+  font-size:1.45rem;
   line-height:1;
+  font-weight:400;
 
   cursor:pointer;
+  overflow:hidden;
 
   box-shadow:
-    0 18px 34px rgba(42,100,133,.26),
-    0 0 0 5px rgba(38,97,131,.08),
-    inset 0 1px 0 rgba(47,76,113,.34);
-
-  backdrop-filter:blur(20px) saturate(1.12);
-  -webkit-backdrop-filter:blur(20px) saturate(1.12);
+    0 18px 38px rgba(254,127,45,.20),
+    0 0 0 5px rgba(254,127,45,.10);
 
   transition:
     transform .18s ease,
@@ -1391,300 +1146,101 @@ body.displayPhone.displayLandscape .homeSegmentsShowcase.segmentsMoreThan6{
     box-shadow .18s ease;
 }
 
-.homeWinnerBtn::before,
-.winnerBtn::before{
-  content:"";
-  position:absolute;
-  width:78px;
-  height:78px;
-  top:-36px;
-  right:-22px;
-  border-radius:50%;
-  background:rgba(255,255,255,.16);
-  pointer-events:none;
-}
-
-.homeWinnerBtn::after,
-.winnerBtn::after{
-  content:"";
-  position:absolute;
-  inset:-50%;
-
-  background:
-    linear-gradient(120deg,transparent 38%,rgba(255,255,255,.38),transparent 62%);
-
-  transform:translateX(120%) rotate(8deg);
-  animation:winnerButtonShineDisplay 3s ease-in-out infinite;
-  pointer-events:none;
-}
-
 .homeWinnerBtn:hover,
 .winnerBtn:hover{
-  transform:translateY(-3px) scale(1.025);
-  filter:brightness(1.06);
+  transform:translateY(-3px);
+  filter:brightness(1.05);
 }
 
 .homeWinnerBtn:active,
 .winnerBtn:active{
-  transform:scale(.96);
+  transform:scale(.97);
 }
 
-@keyframes winnerButtonShineDisplay{
-  0%,45%{
-    transform:translateX(120%) rotate(8deg);
-  }
-
-  70%,100%{
-    transform:translateX(-120%) rotate(8deg);
-  }
-}
-
-/* =========================================================
-   12) SEGMENT AREA GENERAL
-========================================================= */
+/* =========================
+   12) SEGMENT AREA GENERAL ONLY
+========================= */
 
 #segmentArea{
   width:100%;
   min-height:var(--app-height);
   max-height:var(--app-height);
   overflow:hidden;
+  background:transparent;
 }
 
-.segmentMode .homeShowPage{
+.segmentMode .homeShowPage,
+.segmentMode #homePage{
   display:none;
-}
-
-.segmentControls{
-  width:min(100%,1180px);
-  margin:calc(18px + var(--safe-top)) auto 14px;
-  padding:10px;
-
-  display:grid;
-  grid-template-columns:120px 1fr 120px;
-  gap:12px;
-  align-items:center;
-
-  border-radius:26px;
-
-  background:
-    radial-gradient(circle at 16% 0%,rgba(255,255,255,.18),transparent 38%),
-    rgba(255,255,255,.04);
-
-  border:1px solid rgba(255,255,255,.10);
-
-  box-shadow:
-    0 16px 34px rgba(30,27,75,.09),
-    inset 0 1px 0 rgba(255,255,255,.16);
-
-  backdrop-filter:blur(28px) saturate(1.16);
-  -webkit-backdrop-filter:blur(28px) saturate(1.16);
-}
-
-.segmentTitle{
-  margin:0;
-  text-align:center;
-  color:var(--main-text);
-  font-size:clamp(1.8rem,2.8vw,2.6rem);
-  line-height:1;
-  font-weight:400;
-}
-
-.backBtn,
-.endBtn{
-  height:48px;
-  border:0;
-  border-radius:16px;
-  cursor:pointer;
-  color:#fff;
-  box-shadow:
-    0 10px 20px rgba(30,27,75,.16),
-    inset 0 1px 0 rgba(255,255,255,.20);
-  transition:
-    transform .16s ease,
-    filter .16s ease;
-}
-
-.backBtn{
-  background:linear-gradient(180deg,#64748B,#334155);
-}
-
-.endBtn{
-  background:linear-gradient(180deg,#FB7185,#E11D48);
-}
-
-.endBtn:disabled,
-.disabledEndBtn{
-  opacity:.55;
-  cursor:not-allowed;
-  filter:saturate(.8);
-}
-
-.segmentControls .backBtn:hover,
-.segmentControls .endBtn:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.05);
 }
 
 .segmentContentWrap{
-  width:min(100%,1180px);
-  max-height:calc(var(--app-height) - 100px - var(--safe-top) - var(--safe-bottom));
-  margin:0 auto 24px;
+  width:100%;
+  height:var(--app-height);
+  min-height:var(--app-height);
+  max-height:var(--app-height);
+
+  margin:0;
+  padding:0;
+
   overflow:hidden;
 }
 
-/* =========================================================
-   13) PRESENTER HIDE DISPLAY CONTROLS
-   العام فقط لإخفاء أزرار التحكم، والفقرات تبقى في ملفاتها
-========================================================= */
-
-body.presenterHideDisplayControls .segmentControls,
-body.presenterHideDisplayControls .segmentControls *,
-body.presenterHideDisplayControls .segmentTitle,
-body.presenterHideDisplayControls .backBtn,
-body.presenterHideDisplayControls .endBtn,
-body.presenterHideDisplayControls #endRoundBtn{
-  visibility:visible;
-  opacity:1;
-  pointer-events:auto;
+#segmentScreen{
+  width:100%;
+  min-height:var(--app-height);
+  max-height:var(--app-height);
+  overflow:hidden;
+  background:transparent;
 }
 
-body.presenterHideDisplayControls .displayControls,
-body.presenterHideDisplayControls .controlsBar,
-body.presenterHideDisplayControls .controlButtons,
-body.presenterHideDisplayControls .segmentControlButtons,
-body.presenterHideDisplayControls .warmupControlPanel,
-body.presenterHideDisplayControls .warmupControls,
-body.presenterHideDisplayControls .warmupActions,
-body.presenterHideDisplayControls .warmupButtons,
-body.presenterHideDisplayControls .top10Controls,
-body.presenterHideDisplayControls .top10ControlPanel,
-body.presenterHideDisplayControls .top10Actions,
-body.presenterHideDisplayControls .top10Buttons,
-body.presenterHideDisplayControls .auctionControls,
-body.presenterHideDisplayControls .auctionControlPanel,
-body.presenterHideDisplayControls .auctionActions,
-body.presenterHideDisplayControls .auctionButtons,
-body.presenterHideDisplayControls .fatblaControls,
-body.presenterHideDisplayControls .fatblaActions,
-body.presenterHideDisplayControls .whoControlPanel,
-body.presenterHideDisplayControls .whoControls,
-body.presenterHideDisplayControls .whoActions,
-body.presenterHideDisplayControls .whoButtons,
-body.presenterHideDisplayControls .explainControlPanel,
-body.presenterHideDisplayControls .explainControls,
-body.presenterHideDisplayControls .explainActions,
-body.presenterHideDisplayControls .explainButtons,
-body.presenterHideDisplayControls .explainGameActions,
-body.presenterHideDisplayControls .explainAnswerActions,
-body.presenterHideDisplayControls .explainControlButtons,
-body.presenterHideDisplayControls .finalControlsBar,
-body.presenterHideDisplayControls #finalControlsBar,
-body.presenterHideDisplayControls .finalRound1ControlsBar,
-body.presenterHideDisplayControls .finalRound2ControlsBar,
-body.presenterHideDisplayControls .finalRound3ControlsBar,
-body.presenterHideDisplayControls .finalRound4ControlsBar,
-body.presenterHideDisplayControls .finalActions,
-body.presenterHideDisplayControls .finalButtons,
-body.presenterHideDisplayControls .archiveControlButtons,
-body.presenterHideDisplayControls .archiveControlPanel,
-body.presenterHideDisplayControls .archiveControls,
-body.presenterHideDisplayControls .archiveActions,
-body.presenterHideDisplayControls .archiveButtons{
-  display:none;
+.displaySegmentEnterFx{
+  animation:displaySegmentEnterFx .38s var(--ease) both;
 }
 
-body.presenterHideDisplayControls .archiveSideTimerBox,
-body.presenterHideDisplayControls .archiveTimerBox,
-body.presenterHideDisplayControls .archiveTimer,
-body.presenterHideDisplayControls #archiveTimer{
-  visibility:visible;
-  opacity:1;
-  pointer-events:auto;
+@keyframes displaySegmentEnterFx{
+  from{
+    opacity:0;
+    transform:translateY(18px) scale(.985);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
 }
 
-html.presenterHideDisplayControls .displayControls,
-html.presenterHideDisplayControls .controlsBar,
-html.presenterHideDisplayControls .controlButtons,
-html.presenterHideDisplayControls .segmentControlButtons,
-html.presenterHideDisplayControls .warmupControlPanel,
-html.presenterHideDisplayControls .warmupControls,
-html.presenterHideDisplayControls .warmupActions,
-html.presenterHideDisplayControls .warmupButtons,
-html.presenterHideDisplayControls .top10Controls,
-html.presenterHideDisplayControls .top10ControlPanel,
-html.presenterHideDisplayControls .top10Actions,
-html.presenterHideDisplayControls .top10Buttons,
-html.presenterHideDisplayControls .auctionControls,
-html.presenterHideDisplayControls .auctionControlPanel,
-html.presenterHideDisplayControls .auctionActions,
-html.presenterHideDisplayControls .auctionButtons,
-html.presenterHideDisplayControls .fatblaControls,
-html.presenterHideDisplayControls .fatblaActions,
-html.presenterHideDisplayControls .whoControlPanel,
-html.presenterHideDisplayControls .whoControls,
-html.presenterHideDisplayControls .whoActions,
-html.presenterHideDisplayControls .whoButtons,
-html.presenterHideDisplayControls .explainControlPanel,
-html.presenterHideDisplayControls .explainControls,
-html.presenterHideDisplayControls .explainActions,
-html.presenterHideDisplayControls .explainButtons,
-html.presenterHideDisplayControls .explainGameActions,
-html.presenterHideDisplayControls .explainAnswerActions,
-html.presenterHideDisplayControls .explainControlButtons,
-html.presenterHideDisplayControls .finalControlsBar,
-html.presenterHideDisplayControls #finalControlsBar,
-html.presenterHideDisplayControls .finalRound1ControlsBar,
-html.presenterHideDisplayControls .finalRound2ControlsBar,
-html.presenterHideDisplayControls .finalRound3ControlsBar,
-html.presenterHideDisplayControls .finalRound4ControlsBar,
-html.presenterHideDisplayControls .finalActions,
-html.presenterHideDisplayControls .finalButtons,
-html.presenterHideDisplayControls .archiveControlButtons,
-html.presenterHideDisplayControls .archiveControlPanel,
-html.presenterHideDisplayControls .archiveControls,
-html.presenterHideDisplayControls .archiveActions,
-html.presenterHideDisplayControls .archiveButtons{
-  display:none;
-}
-
-/* =========================================================
-   14) TOAST + NOTICE
-========================================================= */
+/* =========================
+   13) TOAST
+========================= */
 
 .gameToast{
   position:fixed;
-  top:22px;
+  top:calc(18px + var(--safe-top));
   left:50%;
-  z-index:999999;
+  z-index:1000000;
 
-  min-width:min(92vw,360px);
-  max-width:min(92vw,520px);
-  min-height:58px;
+  width:auto;
+  min-width:260px;
+  max-width:min(92vw,500px);
+  min-height:54px;
 
   display:flex;
   align-items:center;
-  gap:12px;
+  justify-content:center;
+  gap:10px;
 
-  padding:12px 16px;
-  border-radius:22px;
+  padding:10px 16px;
 
-  background:
-    radial-gradient(circle at 18% 0%,rgba(255,255,255,.20),transparent 42%),
-    radial-gradient(circle at 88% 100%,rgba(244,63,94,.18),transparent 44%),
-    linear-gradient(180deg,rgba(88,28,45,.88),rgba(76,5,25,.95));
-
-  border:1px solid rgba(255,255,255,.20);
+  background:var(--secondary);
+  border:2px solid rgba(255,255,255,.42);
+  border-radius:18px;
 
   color:#fff;
 
   box-shadow:
-    0 18px 42px rgba(76,5,25,.34),
-    0 0 0 5px rgba(136,19,55,.10),
-    inset 0 1px 0 rgba(255,255,255,.22),
-    inset 0 -1px 0 rgba(0,0,0,.18);
-
-  backdrop-filter:blur(22px) saturate(1.1);
-  -webkit-backdrop-filter:blur(22px) saturate(1.1);
+    0 18px 44px rgba(35,61,77,.24),
+    0 0 0 5px rgba(254,127,45,.10);
 
   opacity:0;
   pointer-events:none;
@@ -1692,8 +1248,8 @@ html.presenterHideDisplayControls .archiveButtons{
   transform:translateX(-50%) translateY(-18px) scale(.96);
 
   transition:
-    opacity .28s ease,
-    transform .28s cubic-bezier(.16,1,.3,1);
+    opacity .22s ease,
+    transform .22s var(--ease);
 }
 
 .gameToast.hidden{
@@ -1707,125 +1263,136 @@ html.presenterHideDisplayControls .archiveButtons{
 }
 
 .gameToastIcon{
-  flex-shrink:0;
-  width:34px;
-  height:34px;
-  border-radius:14px;
+  width:30px;
+  min-width:30px;
+  height:30px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  background:rgba(255,255,255,.16);
-  border:1px solid rgba(255,255,255,.16);
+  background:var(--primary);
+  border-radius:11px;
 
   color:#fff;
+
   font-family:Arial,sans-serif;
+  font-size:.95rem;
+  line-height:1;
   font-weight:900;
 }
 
 .gameToastText{
-  flex:1;
   min-width:0;
 
-  color:#fff;
-  font-size:.98rem;
-  line-height:1.5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
+  color:#fff;
+
+  font-size:.92rem;
+  line-height:1.25;
+  font-weight:900;
   text-align:center;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  overflow:hidden;
 }
 
-.gameNotice{
+/* =========================
+   14) DISPLAY PRO OVERLAY
+========================= */
+
+.displayProLayer{
   position:fixed;
   inset:0;
-  z-index:999998;
+  z-index:999999;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  padding:18px;
+  padding:22px;
 
-  background:rgba(30,27,75,.24);
+  background:rgba(21,21,21,.32);
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
+
+  pointer-events:none;
 }
 
-.gameNotice.hidden{
+.displayProLayer.hidden{
   display:none;
 }
 
-.gameNoticeCard{
-  width:min(100%,420px);
-  position:relative;
-  overflow:hidden;
+.displayProCard{
+  min-width:min(620px,86vw);
+  max-width:min(860px,90vw);
 
-  padding:24px 20px 18px;
-  border-radius:30px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
+  padding:34px 42px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:32px;
+
+  box-shadow:var(--shadow-strong);
 
   text-align:center;
 
-  background:
-    radial-gradient(circle at 20% 0%,rgba(255,255,255,.42),transparent 44%),
-    linear-gradient(180deg,rgba(255,255,255,.86),rgba(255,255,255,.62));
-
-  border:1px solid rgba(255,255,255,.52);
-
-  box-shadow:
-    0 26px 70px rgba(30,27,75,.18),
-    inset 0 1px 0 rgba(255,255,255,.92);
-
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
-
-  animation:noticeIn .34s cubic-bezier(.16,1,.3,1) both;
+  animation:displayProPop .34s var(--ease) both;
 }
 
-.gameNoticeIcon{
-  width:54px;
-  height:54px;
-  margin:0 auto 12px;
-  border-radius:20px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:linear-gradient(180deg,#FB7185,#E11D48);
-  color:#fff;
-  font-family:Arial,sans-serif;
-  font-size:1.8rem;
+.displayProEyebrow{
+  color:var(--muted);
+  font-size:1rem;
+  line-height:1;
   font-weight:900;
 }
 
-.gameNoticeText{
-  color:var(--main-text);
-  font-size:1.1rem;
-  line-height:1.7;
-  margin-bottom:16px;
+.displayProTitle{
+  color:var(--secondary);
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:4.4rem;
+  line-height:1;
+  font-weight:400;
 }
 
-.gameNoticeBtn{
-  min-width:140px;
-  height:48px;
-  border:0;
-  border-radius:16px;
+.displayProSubtitle{
+  color:var(--text);
 
-  background:linear-gradient(180deg,#67E8F9,#06B6D4);
-  color:#12362D;
-
-  font-size:1rem;
-  cursor:pointer;
+  font-size:1.15rem;
+  line-height:1.2;
+  font-weight:900;
 }
 
-@keyframes noticeIn{
+.displayProLayer.correct .displayProTitle{
+  color:var(--btn-correct);
+}
+
+.displayProLayer.wrong .displayProTitle{
+  color:var(--btn-wrong);
+}
+
+.displayProLayer.winner .displayProTitle,
+.displayProLayer.segment .displayProTitle{
+  color:var(--primary);
+}
+
+.displayProLayerHide{
+  animation:displayProFadeOut .24s ease forwards;
+}
+
+@keyframes displayProPop{
   from{
     opacity:0;
-    transform:translateY(16px) scale(.96);
+    transform:translateY(22px) scale(.92);
   }
 
   to{
@@ -1834,9 +1401,158 @@ html.presenterHideDisplayControls .archiveButtons{
   }
 }
 
-/* =========================================================
-   15) WINNER OVERLAY
-========================================================= */
+@keyframes displayProFadeOut{
+  to{
+    opacity:0;
+  }
+}
+
+/* =========================
+   15) SMALL FLOATING BADGES
+========================= */
+
+.displayCurrentTurnBadge,
+.displayLastScoreUpdate{
+  position:fixed;
+  left:50%;
+  z-index:999998;
+
+  min-width:280px;
+  max-width:80vw;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  padding:12px 20px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:999px;
+
+  box-shadow:var(--shadow-card);
+
+  transform:translateX(-50%);
+}
+
+.displayCurrentTurnBadge{
+  top:calc(18px + var(--safe-top));
+  animation:displayBadgeInTop .24s var(--ease) both;
+}
+
+.displayLastScoreUpdate{
+  bottom:calc(22px + var(--safe-bottom));
+  animation:displayBadgeInBottom .24s var(--ease) both;
+}
+
+.displayCurrentTurnBadge::before{
+  content:"";
+
+  width:12px;
+  height:12px;
+  min-width:12px;
+
+  border-radius:50%;
+
+  background:var(--primary);
+  box-shadow:0 0 0 5px rgba(254,127,45,.14);
+}
+
+.displayLastScoreUpdate::before{
+  content:"+";
+
+  width:30px;
+  height:30px;
+  min-width:30px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--btn-correct);
+  border-radius:50%;
+
+  color:#fff;
+
+  font-size:1rem;
+  font-weight:900;
+}
+
+.displayCurrentTurnBadge span,
+.displayLastScoreUpdate span{
+  color:var(--muted);
+
+  font-size:.85rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.displayCurrentTurnBadge strong{
+  color:var(--secondary);
+
+  font-size:1.1rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.displayLastScoreUpdate strong{
+  color:var(--btn-correct);
+
+  font-size:1.1rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.displayCurrentTurnBadge.hide{
+  animation:displayBadgeOutTop .22s ease forwards;
+}
+
+.displayLastScoreUpdate.hide{
+  animation:displayBadgeOutBottom .22s ease forwards;
+}
+
+@keyframes displayBadgeInTop{
+  from{
+    opacity:0;
+    transform:translateX(-50%) translateY(-14px) scale(.96);
+  }
+
+  to{
+    opacity:1;
+    transform:translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes displayBadgeOutTop{
+  to{
+    opacity:0;
+    transform:translateX(-50%) translateY(-14px) scale(.96);
+  }
+}
+
+@keyframes displayBadgeInBottom{
+  from{
+    opacity:0;
+    transform:translateX(-50%) translateY(14px) scale(.96);
+  }
+
+  to{
+    opacity:1;
+    transform:translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes displayBadgeOutBottom{
+  to{
+    opacity:0;
+    transform:translateX(-50%) translateY(14px) scale(.96);
+  }
+}
+
+/* =========================
+   16) WINNER OVERLAY
+========================= */
 
 #winnerOverlay{
   position:fixed;
@@ -1849,12 +1565,7 @@ html.presenterHideDisplayControls .archiveButtons{
 
   padding:22px;
 
-  background:
-    radial-gradient(circle at 50% 18%,rgba(255,155,81,.30),transparent 34%),
-    radial-gradient(circle at 18% 82%,rgba(103,232,249,.18),transparent 36%),
-    radial-gradient(circle at 84% 78%,rgba(251,113,133,.14),transparent 34%),
-    rgba(20,28,38,.54);
-
+  background:rgba(21,21,21,.36);
   backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
 }
@@ -1863,148 +1574,71 @@ html.presenterHideDisplayControls .archiveButtons{
   display:none;
 }
 
-#winnerOverlay::before,
-#winnerOverlay::after{
-  display:none;
-  content:none;
-}
-
 #winnerOverlayCard{
   width:min(100%,560px);
-  position:relative;
-  z-index:3;
-  overflow:hidden;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
 
   padding:34px 28px 24px;
-  border-radius:38px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:34px;
+
+  box-shadow:var(--shadow-strong);
 
   text-align:center;
 
-  background:
-    radial-gradient(circle at 50% 0%,rgba(255,155,81,.24),transparent 42%),
-    radial-gradient(circle at 16% 100%,rgba(103,232,249,.14),transparent 44%),
-    linear-gradient(180deg,rgba(255,255,255,.90),rgba(255,255,255,.64));
-
-  border:1px solid rgba(255,255,255,.58);
-
-  box-shadow:
-    0 34px 80px rgba(30,27,75,.25),
-    0 0 0 6px rgba(255,255,255,.10),
-    inset 0 1px 0 rgba(255,255,255,.94);
-
-  backdrop-filter:blur(28px) saturate(1.1);
-  -webkit-backdrop-filter:blur(28px) saturate(1.1);
-
-  animation:winnerOverlayCardInDisplay .52s cubic-bezier(.16,1,.3,1) both;
-}
-
-#winnerOverlayCard::before{
-  content:"";
-  position:absolute;
-  width:230px;
-  height:230px;
-  top:-112px;
-  right:-74px;
-  border-radius:50%;
-  background:rgba(255,255,255,.20);
-  pointer-events:none;
-}
-
-#winnerOverlayCard::after{
-  content:"";
-  position:absolute;
-  width:130px;
-  height:130px;
-  bottom:-50px;
-  left:-38px;
-  border-radius:32px;
-  transform:rotate(24deg);
-  background:rgba(103,232,249,.10);
-  pointer-events:none;
-}
-
-#winnerOverlayTitle,
-#winnerOverlayName,
-#winnerOverlayBurst,
-.winnerOverlayActions{
-  position:relative;
-  z-index:2;
+  animation:winnerOverlayIn .42s var(--ease) both;
 }
 
 #winnerOverlayTitle{
-  width:max-content;
-  margin:0 auto 14px;
+  min-height:38px;
 
-  padding:8px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0 22px;
+
+  background:var(--soft);
+  border:2px solid var(--line);
   border-radius:999px;
 
-  background:
-    radial-gradient(circle at 20% 0%,rgba(255,255,255,.34),transparent 42%),
-    linear-gradient(180deg,rgba(255,155,81,.32),rgba(255,255,255,.48));
+  color:var(--muted);
 
-  border:1px solid rgba(255,155,81,.26);
-
-  color:#7A4A22;
-  font-family:"HanakaText",sans-serif;
-  font-size:1rem;
+  font-size:.92rem;
+  line-height:1;
+  font-weight:900;
 }
 
 #winnerOverlayName{
-  width:auto;
-  max-width:100%;
+  margin:18px 0 0;
 
-  padding:0;
-  margin:0 auto;
+  color:var(--secondary);
 
-  background:transparent;
-  border:0;
-  border-radius:0;
-  box-shadow:none;
-
-  color:var(--main-text);
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(3.1rem,5.8vw,5.2rem);
+  font-size:clamp(3.2rem,6vw,5.4rem);
   line-height:1;
+  font-weight:400;
 
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.85),
-    0 14px 28px rgba(30,27,75,.18),
-    0 0 24px rgba(255,155,81,.28),
-    0 0 36px rgba(103,232,249,.18);
-
-  animation:winnerOverlayNamePulse 1.35s ease-in-out infinite;
-  transform-origin:center;
-}
-
-#winnerOverlayName::after{
-  content:"";
-  display:block;
-
-  width:70%;
-  height:10px;
-  margin:10px auto 0;
-
-  border-radius:999px;
-
-  background:
-    radial-gradient(circle,rgba(255,155,81,.34),rgba(255,155,81,.10) 45%,transparent 72%);
-
-  filter:blur(7px);
-  animation:winnerOverlayNameGlow 1.35s ease-in-out infinite;
+  animation:winnerNamePulse 1.4s ease-in-out infinite;
 }
 
 #winnerOverlayBurst{
-  margin:18px 0 22px;
+  margin:16px 0 22px;
 
-  color:#FF9B51;
-  font-size:1.45rem;
-  letter-spacing:10px;
+  color:var(--primary);
 
-  animation:winnerBurstGlowDisplay 1.1s ease-in-out infinite;
+  font-size:1.4rem;
+  letter-spacing:8px;
 }
 
 .winnerOverlayActions{
+  width:100%;
+
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
@@ -2012,62 +1646,32 @@ html.presenterHideDisplayControls .archiveButtons{
 
 #winnerOverlayClose,
 #winnerOverlayEnd{
-  position:relative;
-  overflow:hidden;
-
   height:54px;
 
-  border:1px solid rgba(255,255,255,.16);
+  border:0;
   border-radius:18px;
 
   color:#fff;
 
-  font-family:"HanakaText",sans-serif;
   font-size:1rem;
+  line-height:1;
+  font-weight:900;
 
   cursor:pointer;
-
-  box-shadow:
-    0 14px 28px rgba(30,27,75,.16),
-    inset 0 1px 0 rgba(255,255,255,.24),
-    inset 0 -1px 0 rgba(0,0,0,.10);
-
-  backdrop-filter:blur(24px) saturate(1.16);
-  -webkit-backdrop-filter:blur(24px) saturate(1.16);
-
-  transition:
-    transform .18s ease,
-    filter .18s ease,
-    box-shadow .18s ease;
 }
 
 #winnerOverlayClose{
-  background:
-    radial-gradient(circle at 20% 0%,rgba(255,255,255,.18),transparent 42%),
-    linear-gradient(180deg,rgba(100,116,139,.82),rgba(51,65,85,.84));
+  background:var(--btn-nav);
 }
 
 #winnerOverlayEnd{
-  background:
-    radial-gradient(circle at 20% 0%,rgba(255,255,255,.18),transparent 42%),
-    linear-gradient(180deg,rgba(251,113,133,.86),rgba(225,29,72,.86));
+  background:var(--btn-wrong);
 }
 
-#winnerOverlayClose:hover,
-#winnerOverlayEnd:hover{
-  transform:translateY(-3px) scale(1.02);
-  filter:brightness(1.06);
-}
-
-#winnerOverlayClose:active,
-#winnerOverlayEnd:active{
-  transform:scale(.96);
-}
-
-@keyframes winnerOverlayCardInDisplay{
+@keyframes winnerOverlayIn{
   from{
     opacity:0;
-    transform:translateY(26px) scale(.92);
+    transform:translateY(24px) scale(.92);
   }
 
   to{
@@ -2076,55 +1680,789 @@ html.presenterHideDisplayControls .archiveButtons{
   }
 }
 
-@keyframes winnerOverlayNamePulse{
+@keyframes winnerNamePulse{
   0%,100%{
-    transform:scale(1);
-    filter:brightness(1);
-  }
-
-  45%{
-    transform:scale(1.08);
-    filter:brightness(1.12);
-  }
-
-  70%{
-    transform:scale(1.03);
-    filter:brightness(1.05);
-  }
-}
-
-@keyframes winnerOverlayNameGlow{
-  0%,100%{
-    opacity:.45;
-    transform:scaleX(.88);
-  }
-
-  50%{
-    opacity:1;
-    transform:scaleX(1.08);
-  }
-}
-
-@keyframes winnerBurstGlowDisplay{
-  0%,100%{
-    opacity:.72;
     transform:scale(1);
   }
 
   50%{
+    transform:scale(1.06);
+  }
+}
+
+/* =========================
+   17) FINAL RESULTS OVERLAY
+========================= */
+
+.finalResultsOverlay{
+  position:fixed;
+  inset:0;
+  z-index:999996;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:22px;
+
+  background:rgba(21,21,21,.36);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+.finalResultsOverlay.hidden{
+  display:none;
+}
+
+.finalResultsOverlay.closing{
+  animation:finalResultsClose .18s ease forwards;
+}
+
+.finalResultsBoard{
+  position:relative;
+
+  width:min(100%,1180px);
+  height:min(760px,calc(100dvh - 44px));
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:96px 70px minmax(0,1fr) 64px;
+  gap:12px;
+
+  padding:14px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:34px;
+
+  box-shadow:var(--shadow-strong);
+
+  overflow:hidden;
+
+  animation:finalResultsIn .34s var(--ease) both;
+}
+
+.finalResultsClose{
+  position:absolute;
+  top:16px;
+  inset-inline-start:16px;
+  z-index:5;
+
+  width:46px;
+  height:46px;
+
+  border:0;
+  border-radius:16px;
+
+  background:var(--secondary);
+  color:#fff;
+
+  font-size:1.4rem;
+  line-height:1;
+  font-weight:900;
+
+  cursor:pointer;
+}
+
+.finalResultsTop{
+  min-width:0;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0 62px;
+}
+
+.finalWinnerBlock{
+  min-width:0;
+  height:100%;
+
+  display:grid;
+  grid-template-rows:22px minmax(0,1fr) 22px;
+  align-items:center;
+  justify-items:center;
+
+  text-align:center;
+}
+
+.finalWinnerLabel{
+  color:var(--muted);
+
+  font-size:.85rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.finalWinnerName{
+  color:var(--secondary);
+
+  font-size:clamp(2.4rem,5vw,4.8rem);
+  line-height:1;
+  font-weight:400;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.finalWinnerSub{
+  color:var(--muted);
+
+  font-size:.86rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.finalQuickStats{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+
+.finalQuickStats > div{
+  min-width:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+
+  background:var(--soft);
+  border:2px solid var(--line);
+  border-radius:20px;
+
+  overflow:hidden;
+}
+
+.finalQuickStats span{
+  color:var(--muted);
+
+  font-size:.78rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.finalQuickStats b{
+  color:var(--secondary);
+
+  font-size:1.4rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.finalResultsCeremony{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:360px minmax(0,1fr);
+  gap:12px;
+
+  overflow:hidden;
+}
+
+.finalTeamsStatsGrid{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:1fr 1fr;
+  gap:12px;
+
+  overflow:hidden;
+}
+
+.finalTeamStatsBox{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:42px minmax(0,1fr) 54px;
+  gap:10px;
+
+  padding:12px;
+
+  background:var(--soft);
+  border:2px solid var(--line);
+  border-radius:24px;
+
+  overflow:hidden;
+}
+
+.finalTeamStatsBox.winner{
+  border-color:var(--primary);
+  box-shadow:0 0 0 5px rgba(254,127,45,.14);
+}
+
+.finalTeamStatsName{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--secondary);
+
+  font-size:1.12rem;
+  line-height:1;
+  font-weight:900;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.finalTeamStatsMain{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:20px;
+}
+
+.finalTeamStatsMain strong{
+  color:var(--primary);
+
+  font-size:3rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.finalTeamStatsMain span{
+  color:var(--muted);
+
+  font-size:.8rem;
+  font-weight:900;
+}
+
+.finalTeamStatsMiniGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.finalTeamStatsMiniGrid > div{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:16px;
+}
+
+.finalTeamStatsMiniGrid b{
+  color:var(--secondary);
+
+  font-size:1.1rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.finalTeamStatsMiniGrid small{
+  color:var(--muted);
+
+  font-size:.64rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.finalResultsSegmentsGrid{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+
+  overflow:auto;
+  overscroll-behavior:contain;
+  padding-inline-end:2px;
+}
+
+.finalSegmentResultItem{
+  min-width:0;
+  min-height:96px;
+
+  display:grid;
+  grid-template-columns:40px minmax(0,1fr);
+  grid-template-rows:minmax(0,1fr) 28px;
+  gap:8px;
+
+  padding:10px;
+
+  background:var(--soft);
+  border:2px solid var(--line);
+  border-radius:20px;
+
+  overflow:hidden;
+}
+
+.finalSegmentResultItem.hiddenFinalResultCard{
+  display:none;
+}
+
+.finalMatchNo{
+  grid-row:1 / 3;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--secondary);
+  border-radius:14px;
+
+  color:#fff;
+
+  font-size:1rem;
+  line-height:1;
+}
+
+.finalSegmentResultItem h3{
+  min-width:0;
+  margin:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--secondary);
+
+  font-size:1.25rem;
+  line-height:1;
+  font-weight:400;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.finalSegmentScoreLine{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  color:var(--muted);
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.finalSegmentScoreLine em{
+  font-style:normal;
+  color:var(--text);
+}
+
+.finalMatchWinner{
+  grid-column:2;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--muted);
+
+  font-size:.78rem;
+  line-height:1;
+  font-weight:900;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.finalSegmentResultItem.teamA,
+.finalSegmentResultItem.teamB{
+  border-color:var(--primary);
+}
+
+.finalSegmentResultItem.draw{
+  border-color:var(--btn-nav);
+}
+
+.finalSegmentResultItem.pending{
+  opacity:.72;
+}
+
+.finalResultsFooter{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.finalResultsFooter button{
+  border:0;
+  border-radius:18px;
+
+  color:#fff;
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:900;
+
+  cursor:pointer;
+}
+
+.finalResultsFooter button:first-child{
+  background:var(--primary);
+}
+
+.finalResultsFooter button:last-child{
+  background:var(--secondary);
+}
+
+@keyframes finalResultsIn{
+  from{
+    opacity:0;
+    transform:translateY(22px) scale(.96);
+  }
+
+  to{
     opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@keyframes finalResultsClose{
+  to{
+    opacity:0;
+    transform:scale(.97);
+  }
+}
+
+/* =========================
+   18) LOADING
+========================= */
+
+.displayLoadingLayer{
+  position:fixed;
+  inset:0;
+  z-index:999995;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(21,21,21,.22);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+
+  pointer-events:none;
+}
+
+.displayLoadingLayer.hidden{
+  display:none;
+}
+
+.displayLoadingCard{
+  min-width:280px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
+  padding:20px 26px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:24px;
+
+  box-shadow:var(--shadow-card);
+}
+
+.displayLoadingSpinner{
+  width:30px;
+  height:30px;
+
+  border:4px solid rgba(254,127,45,.20);
+  border-top-color:var(--primary);
+  border-radius:50%;
+
+  animation:displayLoadingSpin .75s linear infinite;
+}
+
+.displayLoadingText{
+  color:var(--secondary);
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:900;
+}
+
+@keyframes displayLoadingSpin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+/* =========================
+   19) SCREEN FLASH
+========================= */
+
+.screenFlashLayer{
+  position:fixed;
+  inset:0;
+  z-index:1000005;
+
+  width:100vw;
+  height:100vh;
+
+  opacity:0;
+  pointer-events:none;
+}
+
+.screenFlashLayer.flashCorrect,
+.screenFlashLayer.flashCorrectPro{
+  background:rgba(0,127,0,.72);
+  animation:screenFlashPulse .82s ease-out forwards;
+}
+
+.screenFlashLayer.flashWrong,
+.screenFlashLayer.flashWrongStrong,
+.screenFlashLayer.flashWrongPro{
+  background:rgba(127,0,0,.78);
+  animation:screenFlashPulse .82s ease-out forwards;
+}
+
+.screenFlashLayer.flashTimeoutPro{
+  background:rgba(254,127,45,.76);
+  animation:screenFlashPulse .86s ease-out forwards;
+}
+
+@keyframes screenFlashPulse{
+  0%{
+    opacity:0;
+    transform:scale(.98);
+  }
+
+  12%{
+    opacity:1;
+    transform:scale(1.02);
+  }
+
+  36%{
+    opacity:.35;
+    transform:scale(.995);
+  }
+
+  58%{
+    opacity:.75;
+    transform:scale(1.015);
+  }
+
+  100%{
+    opacity:0;
+    transform:scale(1.04);
+  }
+}
+
+/* =========================
+   20) TIMER FX ONLY
+========================= */
+
+.timerDanger{
+  animation:timerDangerPulse .55s ease-in-out infinite;
+  color:var(--btn-wrong) !important;
+}
+
+.timerTimeoutFx{
+  animation:timerTimeoutShake .65s ease both;
+  color:var(--primary) !important;
+}
+
+@keyframes timerDangerPulse{
+  0%,100%{
+    transform:scale(1);
+  }
+
+  50%{
     transform:scale(1.08);
   }
 }
 
-/* =========================================================
-   16) WINNER CONFETTI + FX
-========================================================= */
+@keyframes timerTimeoutShake{
+  0%,100%{
+    transform:translateX(0) scale(1);
+  }
+
+  20%{
+    transform:translateX(-10px) scale(1.08);
+  }
+
+  40%{
+    transform:translateX(10px) scale(1.08);
+  }
+
+  60%{
+    transform:translateX(-6px) scale(1.04);
+  }
+
+  80%{
+    transform:translateX(6px) scale(1.04);
+  }
+}
+
+/* =========================
+   21) MEDIA + ZOOM
+========================= */
+
+img,
+video,
+.displayUnifiedMedia,
+.displayImagePro{
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+}
+
+.displayImagePreparing{
+  opacity:.55;
+  filter:blur(4px);
+}
+
+.displayMediaLoaded,
+.displayMediaRevealFx{
+  animation:displayMediaLoaded .28s ease both;
+}
+
+.displayUnifiedMediaFrame{
+  overflow:hidden;
+}
+
+@keyframes displayMediaLoaded{
+  from{
+    opacity:0;
+    filter:blur(8px);
+    transform:scale(1.015);
+  }
+
+  to{
+    opacity:1;
+    filter:blur(0);
+    transform:scale(1);
+  }
+}
+
+.displayImageZoomOverlay{
+  position:fixed;
+  inset:0;
+  z-index:999995;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:22px;
+
+  background:rgba(21,21,21,.68);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+
+  cursor:zoom-out;
+}
+
+.displayImageZoomInner{
+  width:min(1180px,100%);
+  max-height:92vh;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.displayImageZoomImg{
+  max-width:100%;
+  max-height:90vh;
+
+  object-fit:contain;
+
+  background:#fff;
+  border-radius:24px;
+  box-shadow:var(--shadow-strong);
+}
+
+.displayMediaErrorBox{
+  width:100%;
+  height:100%;
+  min-height:220px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--soft);
+  border:2px solid var(--line);
+  border-radius:inherit;
+
+  overflow:hidden;
+}
+
+.displayMediaFallback{
+  width:100%;
+  min-height:220px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  padding:22px;
+
+  color:var(--secondary);
+  text-align:center;
+}
+
+.displayMediaFallbackIcon{
+  width:64px;
+  height:64px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--btn-wrong);
+  border-radius:20px;
+
+  color:#fff;
+
+  font-size:1.8rem;
+  font-weight:900;
+}
+
+.displayMediaFallbackTitle{
+  font-size:1.25rem;
+  font-weight:900;
+}
+
+.displayMediaFallbackText{
+  color:var(--muted);
+  font-size:.92rem;
+  font-weight:900;
+}
+
+/* =========================
+   22) WINNER CONFETTI
+========================= */
 
 .winnerConfettiLayer{
   position:fixed;
   inset:0;
   z-index:1000002;
+
   pointer-events:none;
   overflow:hidden;
 }
@@ -2132,8 +2470,9 @@ html.presenterHideDisplayControls .archiveButtons{
 .winnerConfettiPiece{
   position:absolute;
   display:block;
+
   opacity:.95;
-  will-change:transform,opacity;
+
   animation:winnerConfettiFall linear forwards;
 }
 
@@ -2168,7 +2507,7 @@ html.presenterHideDisplayControls .archiveButtons{
 }
 
 .winnerNameFx{
-  animation:winnerNamePop .85s cubic-bezier(.16,1,.3,1) both;
+  animation:winnerNamePop .85s var(--ease) both;
 }
 
 @keyframes winnerAnnouncePulse{
@@ -2215,901 +2554,9 @@ html.presenterHideDisplayControls .archiveButtons{
   }
 }
 
-
-/* =========================================================
-   18) IMAGE ZOOM
-========================================================= */
-
-.displayImageZoomOverlay{
-  position:fixed;
-  inset:0;
-  z-index:999995;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  padding:22px;
-
-  background:rgba(15,23,42,.72);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-
-  cursor:zoom-out;
-}
-
-.displayImageZoomInner{
-  width:min(1180px,100%);
-  max-height:92vh;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.displayImageZoomImg{
-  max-width:100%;
-  max-height:90vh;
-  object-fit:contain;
-  border-radius:24px;
-  background:#fff;
-  box-shadow:0 26px 70px rgba(0,0,0,.32);
-}
-
-/* =========================================================
-   19) DISPLAY FLOW FX
-========================================================= */
-
-.displayProLayer{
-  position:fixed;
-  inset:0;
-  z-index:999999;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:rgba(9,14,24,.42);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-
-  pointer-events:none;
-}
-
-.displayProLayer.hidden{
-  display:none;
-}
-
-.displayProCard{
-  min-width:min(620px,82vw);
-  max-width:min(860px,88vw);
-
-  padding:34px 42px;
-  border-radius:34px;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-
-  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.82));
-  border:1px solid rgba(255,255,255,.45);
-
-  box-shadow:
-    0 30px 90px rgba(15,23,42,.32),
-    inset 0 1px 0 rgba(255,255,255,.90);
-
-  text-align:center;
-
-  animation:displayProPop .36s cubic-bezier(.2,.9,.2,1);
-}
-
-.displayProEyebrow{
-  color:#64748B;
-  font-size:1.05rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.displayProTitle{
-  color:var(--main-text);
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:4rem;
-  line-height:1;
-  font-weight:400;
-}
-
-.displayProSubtitle{
-  color:#2F4158;
-  font-size:1.25rem;
-  line-height:1.2;
-  font-weight:900;
-}
-
-.displayProLayer.correct .displayProTitle{
-  color:#15803D;
-}
-
-.displayProLayer.wrong .displayProTitle{
-  color:#DC2626;
-}
-
-.displayProLayer.winner .displayProTitle{
-  color:#F97316;
-}
-
-.displayProLayer.neutral .displayProTitle{
-  color:#475569;
-}
-
-.displayProLayer.segment .displayProTitle{
-  color:var(--main-text);
-}
-
-.displayProLayer.winner .displayProCard,
-.displayProLayer.segment .displayProCard{
-  background:
-    radial-gradient(circle at 50% 0%,rgba(255,155,81,.22),transparent 46%),
-    linear-gradient(180deg,rgba(255,255,255,.97),rgba(255,247,237,.90));
-
-  border:1px solid rgba(249,115,22,.26);
-}
-
-.displayProLayer.winner .displayProEyebrow{
-  color:#9A3412;
-}
-
-.displayProLayer.winner .displayProSubtitle{
-  color:#7C2D12;
-}
-
-.displayProLayerHide{
-  animation:displayProFadeOut .26s ease forwards;
-}
-
-@keyframes displayProPop{
-  from{
-    opacity:0;
-    transform:translateY(22px) scale(.92);
-  }
-
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-@keyframes displayProFadeOut{
-  to{
-    opacity:0;
-  }
-}
-
-.displaySegmentEnterFx{
-  animation:displaySegmentEnterFx .42s ease both;
-}
-
-@keyframes displaySegmentEnterFx{
-  from{
-    opacity:0;
-    transform:translateY(18px) scale(.985);
-  }
-
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-/* =========================================================
-   20) CURRENT TURN + SCORE BADGES
-========================================================= */
-
-.displayCurrentTurnBadge,
-.displayLastScoreUpdate{
-  position:fixed;
-  left:50%;
-  z-index:999998;
-
-  transform:translateX(-50%);
-
-  min-width:280px;
-  max-width:80vw;
-
-  padding:12px 20px;
-  border-radius:999px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-
-  background:rgba(255,255,255,.94);
-  border:1px solid rgba(255,255,255,.55);
-
-  box-shadow:
-    0 18px 46px rgba(15,23,42,.20),
-    inset 0 1px 0 rgba(255,255,255,.90);
-}
-
-.displayCurrentTurnBadge{
-  top:22px;
-  animation:displaySmallBadgeIn .28s ease both;
-}
-
-.displayLastScoreUpdate{
-  bottom:24px;
-  animation:displayScoreBadgeIn .28s ease both;
-}
-
-.displayCurrentTurnBadge::before{
-  content:"";
-  width:12px;
-  height:12px;
-  min-width:12px;
-  border-radius:999px;
-  background:#F97316;
-  box-shadow:0 0 0 5px rgba(249,115,22,.16);
-}
-
-.displayCurrentTurnBadge.teamB::before{
-  background:#06B6D4;
-  box-shadow:0 0 0 5px rgba(6,182,212,.16);
-}
-
-.displayLastScoreUpdate::before{
-  content:"+";
-  width:30px;
-  height:30px;
-  min-width:30px;
-
-  border-radius:999px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#fff;
-  background:linear-gradient(180deg,#22C55E,#15803D);
-
-  font-size:1.05rem;
-  font-weight:900;
-}
-
-.displayCurrentTurnBadge span,
-.displayLastScoreUpdate span{
-  color:#64748B;
-  font-size:.9rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.displayCurrentTurnBadge strong{
-  color:var(--main-text);
-  font-size:1.15rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.displayLastScoreUpdate strong{
-  color:#15803D;
-  font-size:1.15rem;
-  line-height:1;
-  font-weight:900;
-}
-
-.displayCurrentTurnBadge.hide{
-  animation:displaySmallBadgeOut .26s ease forwards;
-}
-
-.displayLastScoreUpdate.hide{
-  animation:displayScoreBadgeOut .26s ease forwards;
-}
-
-@keyframes displaySmallBadgeIn{
-  from{
-    opacity:0;
-    transform:translateX(-50%) translateY(-16px) scale(.96);
-  }
-
-  to{
-    opacity:1;
-    transform:translateX(-50%) translateY(0) scale(1);
-  }
-}
-
-@keyframes displaySmallBadgeOut{
-  to{
-    opacity:0;
-    transform:translateX(-50%) translateY(-16px) scale(.96);
-  }
-}
-
-@keyframes displayScoreBadgeIn{
-  from{
-    opacity:0;
-    transform:translateX(-50%) translateY(16px) scale(.96);
-  }
-
-  to{
-    opacity:1;
-    transform:translateX(-50%) translateY(0) scale(1);
-  }
-}
-
-@keyframes displayScoreBadgeOut{
-  to{
-    opacity:0;
-    transform:translateX(-50%) translateY(16px) scale(.96);
-  }
-}
-
-/* =========================================================
-   21) SCREEN FLASH FX
-========================================================= */
-
-.screenFlashLayer{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100vh;
-
-  z-index:1000005;
-
-  pointer-events:none;
-  opacity:0;
-
-  transform-origin:center;
-  mix-blend-mode:normal;
-}
-
-.screenFlashLayer.flashCorrect{
-  background:rgba(34,197,94,.24);
-  animation:screenFlashPulseFast .46s ease both;
-}
-
-.screenFlashLayer.flashWrong,
-.screenFlashLayer.flashWrongStrong{
-  background:
-    radial-gradient(circle at center,rgba(255,255,255,.14),transparent 28%),
-    radial-gradient(circle at center,rgba(239,68,68,.68),rgba(220,38,38,.52) 46%,rgba(127,29,29,.32) 100%);
-
-  box-shadow:
-    inset 0 0 0 9999px rgba(220,38,38,.27),
-    inset 0 0 120px rgba(127,29,29,.76);
-
-  animation:screenFlashWrongPulse .84s ease-out forwards;
-}
-
-.screenFlashLayer.flashCorrectPro{
-  background:
-    linear-gradient(180deg,rgba(34,197,94,.82),rgba(22,163,74,.68));
-
-  animation:fullStrongCorrectPulse .86s ease-out;
-}
-
-.screenFlashLayer.flashWrongPro{
-  background:
-    linear-gradient(180deg,rgba(239,68,68,.88),rgba(185,28,28,.72));
-
-  animation:fullStrongWrongPulse .86s ease-out;
-}
-
-.screenFlashLayer.flashTimeoutPro{
-  background:
-    linear-gradient(180deg,rgba(245,158,11,.82),rgba(249,115,22,.68));
-
-  animation:timerTimeoutPulse .9s ease-out;
-}
-
-@keyframes screenFlashPulseFast{
-  0%{
-    opacity:0;
-  }
-
-  24%{
-    opacity:1;
-  }
-
-  100%{
-    opacity:0;
-  }
-}
-
-@keyframes screenFlashWrongPulse{
-  0%{
-    opacity:0;
-    transform:scale(.96);
-  }
-
-  10%{
-    opacity:1;
-    transform:scale(1.04);
-  }
-
-  22%{
-    opacity:.40;
-    transform:scale(.985);
-  }
-
-  36%{
-    opacity:.98;
-    transform:scale(1.03);
-  }
-
-  50%{
-    opacity:.34;
-    transform:scale(.995);
-  }
-
-  64%{
-    opacity:.86;
-    transform:scale(1.02);
-  }
-
-  82%{
-    opacity:.34;
-    transform:scale(1.005);
-  }
-
-  100%{
-    opacity:0;
-    transform:scale(1.04);
-  }
-}
-
-@keyframes fullStrongCorrectPulse{
-  0%{
-    opacity:0;
-    transform:scale(.96);
-  }
-
-  9%{
-    opacity:1;
-    transform:scale(1.02);
-  }
-
-  20%{
-    opacity:.40;
-    transform:scale(.99);
-  }
-
-  32%{
-    opacity:.95;
-    transform:scale(1.025);
-  }
-
-  46%{
-    opacity:.38;
-    transform:scale(1);
-  }
-
-  60%{
-    opacity:.78;
-    transform:scale(1.03);
-  }
-
-  78%{
-    opacity:.28;
-    transform:scale(1.01);
-  }
-
-  100%{
-    opacity:0;
-    transform:scale(1.06);
-  }
-}
-
-@keyframes fullStrongWrongPulse{
-  0%{
-    opacity:0;
-    transform:scale(.95);
-  }
-
-  8%{
-    opacity:1;
-    transform:scale(1.025);
-  }
-
-  18%{
-    opacity:.34;
-    transform:scale(.985);
-  }
-
-  28%{
-    opacity:1;
-    transform:scale(1.03);
-  }
-
-  40%{
-    opacity:.36;
-    transform:scale(.995);
-  }
-
-  52%{
-    opacity:.90;
-    transform:scale(1.035);
-  }
-
-  68%{
-    opacity:.32;
-    transform:scale(1.01);
-  }
-
-  100%{
-    opacity:0;
-    transform:scale(1.07);
-  }
-}
-
-@keyframes timerTimeoutPulse{
-  0%{
-    opacity:0;
-    transform:scale(.96);
-  }
-
-  9%{
-    opacity:1;
-    transform:scale(1.025);
-  }
-
-  22%{
-    opacity:.36;
-    transform:scale(.99);
-  }
-
-  36%{
-    opacity:.92;
-    transform:scale(1.03);
-  }
-
-  54%{
-    opacity:.34;
-    transform:scale(1);
-  }
-
-  72%{
-    opacity:.70;
-    transform:scale(1.035);
-  }
-
-  100%{
-    opacity:0;
-    transform:scale(1.07);
-  }
-}
-
-/* =========================================================
-   22) MEDIA WRONG FLASH + SHAKE
-========================================================= */
-
-.mediaWrongShake{
-  animation:mediaWrongShakeFx .45s ease-in-out;
-}
-
-@keyframes mediaWrongShakeFx{
-  0%,100%{
-    transform:translateX(0) scale(1);
-  }
-
-  16%{
-    transform:translateX(-12px) scale(1.015);
-  }
-
-  32%{
-    transform:translateX(12px) scale(1.015);
-  }
-
-  48%{
-    transform:translateX(-8px) scale(1.012);
-  }
-
-  64%{
-    transform:translateX(8px) scale(1.012);
-  }
-
-  80%{
-    transform:translateX(-4px) scale(1.006);
-  }
-}
-
-/* =========================================================
-   23) TIMER FX
-========================================================= */
-
-.timerDanger{
-  animation:timerDangerPulse .55s ease-in-out infinite;
-  color:#DC2626;
-}
-
-.timerTimeoutFx{
-  animation:timerTimeoutShake .65s ease both;
-  color:#F97316;
-}
-
-@keyframes timerDangerPulse{
-  0%,100%{
-    transform:scale(1);
-    filter:brightness(1);
-  }
-
-  50%{
-    transform:scale(1.08);
-    filter:brightness(1.18);
-  }
-}
-
-@keyframes timerTimeoutShake{
-  0%,100%{
-    transform:translateX(0) scale(1);
-  }
-
-  18%{
-    transform:translateX(-10px) scale(1.08);
-  }
-
-  36%{
-    transform:translateX(10px) scale(1.08);
-  }
-
-  54%{
-    transform:translateX(-6px) scale(1.04);
-  }
-
-  72%{
-    transform:translateX(6px) scale(1.04);
-  }
-}
-
-/* =========================================================
-   24) DISPLAY MEDIA FAILSAFE
-========================================================= */
-
-img,
-video,
-.displayUnifiedMedia,
-.displayImagePro{
-  max-width:100%;
-  max-height:100%;
-  object-fit:contain;
-}
-
-.displayMediaErrorBox{
-  width:100%;
-  height:100%;
-  min-height:220px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:
-    radial-gradient(circle at 50% 0%,rgba(239,68,68,.12),transparent 44%),
-    linear-gradient(180deg,#0F172A,#111827);
-
-  border-radius:inherit;
-  overflow:hidden;
-}
-
-.displayMediaFallback{
-  width:100%;
-  height:100%;
-  min-height:220px;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-
-  padding:24px;
-
-  text-align:center;
-  color:#fff;
-}
-
-.displayMediaFallbackIcon{
-  width:70px;
-  height:70px;
-
-  border-radius:50%;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:linear-gradient(180deg,#EF4444,#B91C1C);
-  color:#fff;
-
-  font-size:2rem;
-  font-weight:900;
-
-  box-shadow:
-    0 16px 34px rgba(239,68,68,.25),
-    inset 0 1px 0 rgba(255,255,255,.18);
-}
-
-.displayMediaFallbackTitle{
-  color:#fff;
-  font-size:1.35rem;
-  line-height:1.2;
-  font-weight:900;
-}
-
-.displayMediaFallbackText{
-  color:rgba(255,255,255,.72);
-  font-size:.95rem;
-  line-height:1.4;
-  font-weight:800;
-}
-
-.displayMediaLoaded{
-  animation:displayMediaLoaded .28s ease both;
-}
-
-.displayUnifiedMediaFrame{
-  overflow:hidden;
-}
-
-.displayUnifiedMedia,
-.displayImagePro{
-  object-fit:contain;
-}
-
-.displayImagePreparing{
-  opacity:.55;
-  filter:blur(4px);
-}
-
-.displayMediaRevealFx{
-  animation:displayMediaLoaded .28s ease both;
-}
-
-@keyframes displayMediaLoaded{
-  from{
-    opacity:0;
-    filter:blur(8px);
-    transform:scale(1.015);
-  }
-
-  to{
-    opacity:1;
-    filter:blur(0);
-    transform:scale(1);
-  }
-}
-
-/* =========================================================
-   25) DISPLAY LOADING
-========================================================= */
-
-.displayLoadingLayer{
-  position:fixed;
-  inset:0;
-  z-index:999995;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:rgba(15,23,42,.24);
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-
-  pointer-events:none;
-}
-
-.displayLoadingLayer.hidden{
-  display:none;
-}
-
-.displayLoadingCard{
-  min-width:280px;
-
-  padding:22px 28px;
-  border-radius:26px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-
-  background:rgba(255,255,255,.94);
-  border:1px solid rgba(255,255,255,.55);
-
-  box-shadow:
-    0 22px 58px rgba(15,23,42,.22),
-    inset 0 1px 0 rgba(255,255,255,.90);
-}
-
-.displayLoadingSpinner{
-  width:30px;
-  height:30px;
-
-  border-radius:50%;
-
-  border:4px solid rgba(249,115,22,.22);
-  border-top-color:#F97316;
-
-  animation:displayLoadingSpin .75s linear infinite;
-}
-
-.displayLoadingText{
-  color:var(--main-text);
-  font-size:1.05rem;
-  line-height:1;
-  font-weight:900;
-}
-
-@keyframes displayLoadingSpin{
-  to{
-    transform:rotate(360deg);
-  }
-}
-
-/* =========================================================
-   26) EXTRA BUTTONS + FULL SCREEN STATE
-========================================================= */
-
-.fullScreenModeBtn,
-.bigScreenModeBtn,
-.showDetailedResultsBtn{
-  border:0;
-  min-height:46px;
-  padding:0 18px;
-  border-radius:999px;
-
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-
-  font-family:"HanakaText",sans-serif;
-  font-size:.92rem;
-  font-weight:900;
-  line-height:1;
-
-  cursor:pointer;
-  white-space:nowrap;
-
-  box-shadow:
-    0 12px 28px rgba(15,23,42,.16),
-    inset 0 1px 0 rgba(255,255,255,.22);
-
-  transition:
-    transform .15s ease,
-    filter .15s ease,
-    box-shadow .15s ease;
-}
-
-.fullScreenModeBtn,
-#bigScreenModeBtn,
-#fullScreenModeBtn{
-  color:#fff;
-  background:
-    linear-gradient(135deg,#24185E 0%,#4032A8 58%,#4F46E5 100%);
-  border:1px solid rgba(255,255,255,.16);
-}
-
-.fullScreenModeBtn.activeFullScreen,
-#bigScreenModeBtn.activeFullScreen,
-#fullScreenModeBtn.activeFullScreen{
-  color:var(--main-text);
-  background:
-    linear-gradient(135deg,#FFF4E6 0%,#FFD7A8 52%,#FFB86B 100%);
-  border:1px solid rgba(255,155,81,.42);
-}
-
-.fullScreenModeBtn.activeFullScreen::before,
-#bigScreenModeBtn.activeFullScreen::before,
-#fullScreenModeBtn.activeFullScreen::before{
-  content:"✓ ";
-}
-
-/* =========================================================
-   27) FULL SCREEN MODE
-========================================================= */
+/* =========================
+   23) FULL SCREEN MODE
+========================= */
 
 html.tvFullScreenMode,
 body.tvFullScreenMode{
@@ -3119,8 +2566,16 @@ body.tvFullScreenMode{
   overflow:hidden;
 }
 
+body.tvFullScreenMode::before,
+body.tvFullScreenMode::after{
+  position:fixed;
+}
+
 body.tvFullScreenMode .homeShowPage,
-body.tvFullScreenMode #segmentArea{
+body.tvFullScreenMode #homePage,
+body.tvFullScreenMode #segmentArea,
+body.tvFullScreenMode #segmentScreen,
+body.tvFullScreenMode .segmentContentWrap{
   width:100vw;
   height:var(--app-height);
   min-height:var(--app-height);
@@ -3128,48 +2583,183 @@ body.tvFullScreenMode #segmentArea{
   overflow:hidden;
 }
 
-/* =========================================================
-   28) RESPONSIVE - TABLET
-========================================================= */
+body.tvFullScreenMode .homeShowPage{
+  padding:
+    calc(20px + var(--safe-top))
+    calc(26px + var(--safe-right))
+    calc(18px + var(--safe-bottom))
+    calc(26px + var(--safe-left));
+}
+
+/* =========================
+   24) RESPONSIVE TABLET
+========================= */
 
 @media (min-width:768px) and (max-width:1180px){
-  body.tvFullScreenMode .homeShowPage{
-    padding-top:calc(28px + var(--safe-top));
-    padding-bottom:calc(16px + var(--safe-bottom));
+  .homeShowPage,
+  .homePageShell,
+  #homePage{
+    padding:
+      calc(12px + var(--safe-top))
+      calc(12px + var(--safe-right))
+      calc(10px + var(--safe-bottom))
+      calc(12px + var(--safe-left));
+    gap:10px;
   }
 
-  body.tvFullScreenMode .homeTitleBox{
-    transform:translateY(14px);
+  .homeHero{
+    grid-template-columns:minmax(0,1fr) 260px minmax(0,1fr);
+    gap:12px;
   }
 
-  body.tvFullScreenMode .homeHero{
-    margin-bottom:14px;
+  .homeTeamCard{
+    min-height:82px;
+    grid-template-columns:minmax(0,1fr) 60px;
+    gap:8px;
+    padding:8px;
+    border-radius:22px;
   }
 
-  body.tvFullScreenMode .homeWinnerArea{
-    margin-top:10px;
+  .homeTeamB{
+    grid-template-columns:60px minmax(0,1fr);
   }
 
-  body.tvFullScreenMode .segmentContentWrap{
-    max-height:calc(var(--app-height) - 108px - var(--safe-top) - var(--safe-bottom));
+  .homeTeamText{
+    height:58px;
+    border-radius:16px;
+    padding:0 10px;
+  }
+
+  .homeTeamName{
+    font-size:1.25rem;
+  }
+
+  .homeTeamScore{
+    width:60px;
+    height:58px;
+    border-radius:16px;
+    font-size:2rem;
+  }
+
+  .homeTitleBox{
+    width:260px;
+    height:94px;
+  }
+
+  .homeTitleBox h1{
+    font-size:4.3rem;
+  }
+
+  .homeTitleBox h1::after{
+    width:125px;
+    height:6px;
+    margin-top:8px;
+  }
+
+  .homeModelName,
+  #modelNameDisplay{
+    min-height:28px;
+    max-width:220px;
+    padding:4px 14px;
+    font-size:.82rem;
+  }
+
+  .homeSegmentsShowcase{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+  }
+
+  .homeSegmentsShowcase.segmentsMoreThan6{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:8px;
+  }
+
+  .homeSegmentItem{
+    min-height:96px;
+    padding:8px;
+    border-radius:18px;
+  }
+
+  .homeSegmentContent{
+    min-height:74px;
+    gap:7px;
+  }
+
+  .homeSegmentItem span{
+    min-height:52px;
+    border-radius:14px;
+    font-size:1.05rem;
+  }
+
+  .homeSegmentWinner{
+    min-height:24px;
+    padding:4px 10px;
+    font-size:.58rem;
+  }
+
+  .homeWinnerBtn,
+  .winnerBtn{
+    min-width:180px;
+    min-height:46px;
+    border-radius:16px;
+    font-size:1rem;
+  }
+
+  .finalResultsBoard{
+    width:calc(100vw - 24px);
+    height:calc(var(--app-height) - 24px);
+    grid-template-rows:74px 54px minmax(0,1fr) 50px;
+    gap:8px;
+    padding:10px;
+    border-radius:24px;
+  }
+
+  .finalResultsCeremony{
+    grid-template-columns:280px minmax(0,1fr);
+    gap:8px;
+  }
+
+  .finalWinnerName{
+    font-size:3rem;
+  }
+
+  .finalSegmentResultItem{
+    min-height:72px;
   }
 }
 
-/* =========================================================
-   29) RESPONSIVE - PHONE PORTRAIT
-========================================================= */
+/* =========================
+   25) RESPONSIVE PHONE
+========================= */
 
 @media (max-width:767px){
-  .homeShowPage{
+  html,
+  body{
+    overflow:auto;
+  }
+
+  .homeShowPage,
+  .homePageShell,
+  #homePage{
+    height:auto;
+    min-height:100dvh;
+    max-height:none;
+
     padding:
       calc(10px + var(--safe-top))
       calc(10px + var(--safe-right))
       calc(10px + var(--safe-bottom))
       calc(10px + var(--safe-left));
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+    overflow:visible;
   }
 
   .homeHero{
-    margin-bottom:8px;
+    width:100%;
     grid-template-columns:1fr 1fr;
     grid-template-areas:
       "title title"
@@ -3177,140 +2767,132 @@ body.tvFullScreenMode #segmentArea{
     gap:8px;
   }
 
-  .homeTeamA{
-    grid-area:teamA;
-    grid-column:auto;
-    max-width:none;
-  }
-
-  .homeTeamB{
-    grid-area:teamB;
-    grid-column:auto;
-    max-width:none;
-  }
-
   .homeTitleBox{
     grid-area:title;
-    grid-column:auto;
     width:100%;
-    height:82px;
-    min-height:82px;
-    transform:none;
+    height:92px;
   }
 
   .homeTitleBox h1{
-    font-size:3rem;
+    font-size:3.4rem;
   }
 
   .homeTitleBox h1::after{
-    width:120px;
-    height:7px;
+    width:118px;
+    height:6px;
     margin-top:8px;
   }
 
   .homeModelName,
   #modelNameDisplay{
     min-height:28px;
-    margin-top:6px;
-    padding:4px 14px;
-    font-size:1rem;
+    font-size:.82rem;
   }
 
-  .homeTeamCard{
-    min-height:70px;
-    padding:7px;
-    gap:7px;
-    border-radius:20px 12px 20px 12px;
+  .homeTeamA{
+    grid-area:teamA;
+    max-width:none;
   }
 
   .homeTeamB{
-    border-radius:12px 20px 12px 20px;
+    grid-area:teamB;
+    max-width:none;
+  }
+
+  .homeTeamCard{
+    min-height:78px;
+    grid-template-columns:minmax(0,1fr) 48px;
+    gap:6px;
+    padding:6px;
+    border-radius:18px;
+  }
+
+  .homeTeamB{
+    grid-template-columns:48px minmax(0,1fr);
   }
 
   .homeTeamText{
-    min-height:48px;
-    padding:6px 8px;
+    height:54px;
+    padding:0 7px;
     border-radius:14px;
   }
 
   .homeTeamName{
-    padding-top:3px;
     font-size:1rem;
-    line-height:1.15;
+    line-height:1.1;
   }
 
   .homeTeamScore{
-    width:44px;
-    height:44px;
+    width:48px;
+    height:54px;
     border-radius:14px;
-    font-size:1.45rem;
+    font-size:1.55rem;
   }
 
+  .homeSegmentsShowcase,
+  .homeSegmentsShowcase.segmentsMoreThan6{
+    width:100%;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    overflow:visible;
+  }
+
+  .homeSegmentItem{
+    min-height:112px;
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .homeSegmentContent{
+    min-height:86px;
+    gap:7px;
+  }
+
+  .homeSegmentItem span{
+    min-height:58px;
+    border-radius:15px;
+    font-size:1.28rem;
+  }
+
+  .homeSegmentWinner{
+    min-height:26px;
+    padding:4px 10px;
+    font-size:.66rem;
+  }
 
   .homeWinnerArea{
-    margin-top:8px;
+    margin-top:0;
   }
 
   .homeWinnerBtn,
   .winnerBtn{
     min-width:170px;
     min-height:46px;
-    padding:0 22px;
-    border-radius:18px;
+    border-radius:16px;
     font-size:1rem;
   }
 
-  .segmentControls{
-    margin-top:calc(8px + var(--safe-top));
-    grid-template-columns:78px 1fr 78px;
-    gap:6px;
-    padding:7px;
-    border-radius:18px;
-  }
-
-  .segmentTitle{
-    font-size:1.25rem;
-  }
-
-  .backBtn,
-  .endBtn{
-    height:38px;
-    border-radius:12px;
-    font-size:.75rem;
-  }
-
-  .segmentContentWrap{
-    max-height:calc(var(--app-height) - 72px - var(--safe-top) - var(--safe-bottom));
-  }
-
-  .homeModelPopupArea,
-  #homeModelPopupArea{
-    top:calc(10px + var(--safe-top));
-    max-width:calc(100vw - 20px);
-  }
-
   .homeModelClassicBox{
-    min-height:auto;
-    padding:7px;
-    gap:7px;
-    border-radius:18px;
     flex-wrap:wrap;
+    gap:7px;
+    padding:7px;
+    border-radius:18px;
   }
 
   .homeModelClassicBody{
     height:42px;
     min-width:150px;
-    padding:0 12px;
     border-radius:14px;
   }
 
   .homeModelClassicControl,
-  #displayControlsEyeBtn{
-    height:42px;
+  #displayControlsEyeBtn,
+  #bigScreenModeBtn,
+  #fullScreenModeBtn{
     min-width:120px;
-    padding:0 12px;
+    height:42px;
     border-radius:14px;
-    font-size:.78rem;
+    font-size:.74rem;
   }
 
   .homeModelClassicClose{
@@ -3320,1680 +2902,451 @@ body.tvFullScreenMode #segmentArea{
     border-radius:12px;
   }
 
-  .homeModelClassicCode{
-    font-size:1.35rem;
+  .finalResultsOverlay{
+    align-items:flex-start;
+    overflow:auto;
+    padding:10px;
   }
 
-  .homeModelClassicCodeLabel{
-    font-size:.68rem;
-  }
-}
+  .finalResultsBoard{
+    width:100%;
+    height:auto;
+    min-height:calc(100dvh - 20px);
 
-/* =========================================================
-   30) RESPONSIVE - PHONE LANDSCAPE
-========================================================= */
+    display:flex;
+    flex-direction:column;
 
-@media (max-width:920px) and (orientation:landscape){
-  .homeShowPage{
-    padding:
-      calc(8px + var(--safe-top))
-      calc(12px + var(--safe-right))
-      calc(8px + var(--safe-bottom))
-      calc(12px + var(--safe-left));
+    border-radius:24px;
+    overflow:visible;
   }
 
-  .homeHero{
-    grid-template-columns:minmax(0,1fr) 210px minmax(0,1fr);
-    gap:10px;
-    margin-bottom:8px;
+  .finalResultsTop{
+    min-height:88px;
   }
 
-  .homeTitleBox{
-    width:210px;
-    height:74px;
-    min-height:74px;
-    transform:translateY(12px);
+  .finalQuickStats{
+    min-height:58px;
   }
 
-  .homeTitleBox h1{
-    font-size:2.7rem;
+  .finalResultsCeremony{
+    display:flex;
+    flex-direction:column;
+    overflow:visible;
   }
 
-  .homeTitleBox h1::after{
-    width:110px;
-    height:6px;
-    margin-top:7px;
+  .finalTeamsStatsGrid{
+    grid-template-rows:none;
+    grid-template-columns:1fr;
+    overflow:visible;
   }
 
-  .homeModelName,
-  #modelNameDisplay{
-    min-height:24px;
-    margin-top:5px;
-    padding:3px 12px;
-    font-size:.9rem;
+  .finalTeamStatsBox{
+    min-height:180px;
   }
 
-  .homeTeamCard{
-    min-height:64px;
-    padding:7px;
-    gap:7px;
+  .finalResultsSegmentsGrid{
+    grid-template-columns:1fr;
+    overflow:visible;
   }
 
-  .homeTeamText{
-    min-height:42px;
-    padding:5px 8px;
-  }
-
-  .homeTeamName{
-    font-size:1rem;
-    line-height:1.1;
-  }
-
-  .homeTeamScore{
-    width:44px;
-    height:40px;
-    font-size:1.35rem;
-  }
-
-
-
-  .homeWinnerArea{
-    margin-top:8px;
-  }
-
-  .homeWinnerBtn,
-  .winnerBtn{
-    min-width:160px;
-    min-height:40px;
-    padding:0 20px;
-    border-radius:15px;
-    font-size:.92rem;
-  }
-
-
-}
-/* =========================================================
-   DISPLAY FULLSCREEN CARDS EXPAND ONLY
-   توسيع كروت العرض عند ملء الشاشة بدون تغيير التصميم
-========================================================= */
-
-@media (min-width:1181px){
-
-  .homeShowPage{
-    padding:20px 28px !important;
-  }
-
-  .homeHero{
-    width:min(100%,1320px) !important;
-    max-width:1320px !important;
-
-    grid-template-columns:minmax(0,1fr) 320px minmax(0,1fr) !important;
-    gap:22px !important;
-  }
-
-  .showTeamCard,
-  .teamShowCard,
-  .displayTeamCard{
-    width:100% !important;
-    max-width:520px !important;
-    min-height:168px !important;
-  }
-
-  .homeSegmentsShowcase,
-  .segmentsShowcase,
-  .displaySegmentsGrid{
-    width:min(100%,1320px) !important;
-    max-width:1320px !important;
-
-    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-    gap:18px !important;
-  }
-
-  .homeSegmentCard,
-  .segmentShowCard,
-  .displaySegmentCard{
-    min-height:172px !important;
-  }
-}
-/* =========================================================
-   DISPLAY FULLSCREEN SPACING EXPAND
-   توسيع العرض عموديًا + تنزيل الهيدر + زيادة المسافات
-========================================================= */
-
-@media (min-width:1181px){
-
-  .homeShowPage{
-    padding:34px 34px 28px !important;
-  }
-
-  /* ينزل الهيدر العلوي شوي */
-  .homeHero{
-    margin-top:12px !important;
-    margin-bottom:26px !important;
-
-    width:min(100%,1380px) !important;
-    max-width:1380px !important;
-
-    grid-template-columns:minmax(0,1fr) 340px minmax(0,1fr) !important;
-    gap:34px !important;
-  }
-
-  /* توسيع كروت الفريقين للأعلى والأسفل */
-  .showTeamCard,
-  .teamShowCard,
-  .displayTeamCard{
-    max-width:560px !important;
-    min-height:205px !important;
-    padding-top:28px !important;
-    padding-bottom:28px !important;
-  }
-
-  /* توسيع مساحة العنوان بالنص لو موجود */
-  .homeTitleCard,
-  .showTitleCard,
-  .displayTitleCard{
-    min-height:135px !important;
-  }
-
-  /* شبكة الفقرات */
-  .homeSegmentsShowcase,
-  .segmentsShowcase,
-  .displaySegmentsGrid{
-    width:min(100%,1380px) !important;
-    max-width:1380px !important;
-
-    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-
-    /* مسافات أوسع بين الكروت */
-    gap:26px !important;
-
-    margin-top:20px !important;
-  }
-
-  /* كروت الفقرات: أطول وأوسع */
-  .homeSegmentCard,
-  .segmentShowCard,
-  .displaySegmentCard{
-    min-height:205px !important;
-    padding-top:28px !important;
-    padding-bottom:28px !important;
+  .winnerOverlayActions,
+  .finalResultsFooter{
+    grid-template-columns:1fr;
   }
 }
 
-/* =========================================================
-   SEGMENT END OVERLAY - نهاية الفقرة
-========================================================= */
+/* =========================
+   26) REDUCED MOTION
+========================= */
 
-.segmentEndOverlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  padding: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background:
-    radial-gradient(circle at 20% 18%, rgba(255, 178, 87, .30), transparent 34%),
-    radial-gradient(circle at 82% 18%, rgba(36, 24, 94, .18), transparent 32%),
-    rgba(15, 23, 42, .58);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  animation: segmentEndFadeIn .18s ease both;
-}
-
-.segmentEndCard {
-  width: min(100%, 760px);
-  min-height: 420px;
-  border-radius: 42px;
-  padding: 30px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(248, 250, 252, .96));
-  border: 1px solid rgba(255, 255, 255, .74);
-  box-shadow:
-    0 34px 90px rgba(15, 23, 42, .26),
-    inset 0 1px 0 rgba(255, 255, 255, .92);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  text-align: center;
-  animation: segmentEndPop .22s ease both;
-}
-
-.segmentEndBadge {
-  min-height: 42px;
-  padding: 10px 18px;
-  border-radius: 999px;
-  background: rgba(242, 140, 40, .13);
-  color: #9a3412;
-  border: 1px solid rgba(242, 140, 40, .22);
-  font-size: .9rem;
-  line-height: 1;
-}
-
-.segmentEndTitle {
-  margin: 0;
-  color: #24185e;
-  font-family: "HanakaDisplay", "HanakaText", sans-serif;
-  font-size: clamp(2.4rem, 5vw, 4.5rem);
-  line-height: 1.05;
-}
-
-.segmentEndSub {
-  color: #64748b;
-  font-size: clamp(1rem, 2vw, 1.35rem);
-  line-height: 1.35;
-}
-
-.segmentEndWinnerBox {
-  width: min(100%, 520px);
-  min-height: 118px;
-  border-radius: 30px;
-  padding: 18px;
-  background:
-    linear-gradient(135deg, rgba(255, 247, 237, .95), rgba(255, 255, 255, .95));
-  border: 1px solid rgba(253, 186, 116, .55);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-}
-
-.segmentEndWinnerLabel {
-  color: #9a3412;
-  font-size: .92rem;
-}
-
-.segmentEndWinnerName {
-  color: #24185e;
-  font-family: "HanakaDisplay", "HanakaText", sans-serif;
-  font-size: clamp(2rem, 4vw, 3.3rem);
-  line-height: 1;
-}
-
-.segmentEndScore {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr);
-  gap: 12px;
-  width: min(100%, 560px);
-  align-items: center;
-}
-
-.segmentEndTeamScore {
-  min-height: 82px;
-  border-radius: 24px;
-  background: #f1f5f9;
-  border: 1px solid #d8e1ea;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-}
-
-.segmentEndTeamScore span {
-  color: #64748b;
-  font-size: .82rem;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.segmentEndTeamScore strong {
-  color: #24185e;
-  font-family: "HanakaDisplay", "HanakaText", sans-serif;
-  font-size: 2.1rem;
-  line-height: 1;
-}
-
-.segmentEndVs {
-  width: 54px;
-  height: 54px;
-  border-radius: 20px;
-  background: #24185e;
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-family: "HanakaDisplay", "HanakaText", sans-serif;
-  font-size: 1.15rem;
-}
-
-.segmentEndActions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
-
-.segmentEndBtn {
-  min-width: 150px;
-  min-height: 56px;
-  border-radius: 20px;
-  border: 0;
-  background: linear-gradient(180deg, #ffb257, #f28c28);
-  color: #fff;
-  font-family: "HanakaText", sans-serif;
-  font-size: 1rem;
-  cursor: pointer;
-  box-shadow: 0 12px 28px rgba(242, 140, 40, .25);
-}
-
-.segmentEndBtn.dark {
-  background: #24185e;
-  box-shadow: 0 12px 28px rgba(36, 24, 94, .20);
-}
-
-.segmentEndTie .segmentEndWinnerBox {
-  background:
-    linear-gradient(135deg, rgba(241, 245, 249, .96), rgba(255, 255, 255, .96));
-  border-color: rgba(148, 163, 184, .42);
-}
-
-.segmentEndTie .segmentEndWinnerLabel {
-  color: #64748b;
-}
-
-@keyframes segmentEndFadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
+@media (prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    animation:none !important;
+    transition:none !important;
+    scroll-behavior:auto !important;
   }
 }
+/* =========================
+   SEGMENT END OVERLAY / UNIFIED
+   بطاقة نهاية الفقرة داخل الفقرات
+========================= */
 
-@keyframes segmentEndPop {
-  from {
-    opacity: 0;
-    transform: translateY(14px) scale(.97);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@media (orientation: landscape) and (max-height: 760px) {
-  .segmentEndOverlay {
-    padding: 18px;
-  }
-
-  .segmentEndCard {
-    min-height: 360px;
-    padding: 22px;
-    gap: 13px;
-    border-radius: 34px;
-  }
-
-  .segmentEndWinnerBox {
-    min-height: 94px;
-  }
-
-  .segmentEndTeamScore {
-    min-height: 70px;
-  }
-
-  .segmentEndBtn {
-    min-height: 50px;
-  }
-}
-/* =========================================================
-   FINAL RESULTS - CLEAN TWO TEAMS DASHBOARD V2
-   الفريق الأول يمين / الفريق الثاني يسار / بدون زحمة
-========================================================= */
-
-.finalResultsOverlay{
+.segmentEndOverlay{
   position:fixed;
   inset:0;
-  z-index:999990;
-  padding:18px;
+  z-index:999970;
+
   display:flex;
   align-items:center;
   justify-content:center;
 
+  padding:
+    calc(26px + var(--safe-top))
+    calc(24px + var(--safe-right))
+    calc(24px + var(--safe-bottom))
+    calc(24px + var(--safe-left));
+
   background:
-    radial-gradient(circle at 50% 5%, rgba(255,178,87,.30), transparent 30%),
-    radial-gradient(circle at 12% 18%, rgba(103,232,249,.16), transparent 32%),
-    radial-gradient(circle at 88% 18%, rgba(36,24,94,.24), transparent 34%),
-    rgba(15,23,42,.66);
+    radial-gradient(circle at 50% 42%, rgba(254,127,45,.18), transparent 34%),
+    rgba(234,236,240,.78);
 
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+
+  animation:segmentEndOverlayIn .22s var(--ease) both;
 }
 
-.finalResultsOverlay.hidden{
-  display:none !important;
-}
-
-.finalResultsOverlay.closing{
-  opacity:0;
-  transition:opacity .18s ease;
-}
-
-/* =========================
-   BOARD
-========================= */
-
-.finalResultsBoard{
+.segmentEndCard{
   position:relative;
-  width:min(100%,1160px);
-  height:min(94dvh,800px);
 
-  padding:18px;
-  border-radius:38px;
-  overflow:hidden;
+  width:min(100%,760px);
+  min-height:500px;
 
-  background:
-    radial-gradient(circle at 50% -8%, rgba(255,178,87,.16), transparent 34%),
-    linear-gradient(180deg,rgba(255,255,255,.985),rgba(248,250,252,.96));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:22px;
 
-  border:1px solid rgba(255,255,255,.78);
+  padding:34px;
+
+  background:var(--surface);
+  border:3px solid rgba(255,255,255,.76);
+  border-radius:40px;
 
   box-shadow:
-    0 34px 90px rgba(15,23,42,.32),
-    inset 0 1px 0 rgba(255,255,255,.96);
+    0 30px 90px rgba(35,61,77,.24),
+    0 0 0 7px rgba(254,127,45,.08);
 
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr) auto;
-  gap:12px;
+  overflow:hidden;
+  isolation:isolate;
+
+  animation:segmentEndCardIn .34s var(--ease) both;
 }
 
-.finalResultsBoard::before{
+.segmentEndCard::before{
   content:"";
+
   position:absolute;
-  inset:9px;
+  inset:12px;
+  z-index:1;
+
+  border:2px solid rgba(35,61,77,.08);
   border-radius:30px;
-  border:1px solid rgba(255,255,255,.54);
+
   pointer-events:none;
 }
 
-.finalResultsClose{
+.segmentEndCard::after{
+  content:"";
+
   position:absolute;
-  top:14px;
-  left:14px;
-  z-index:40;
-
-  width:42px;
-  height:42px;
-
-  border:0;
-  border-radius:15px;
-
-  background:rgba(225, 160, 151, 0.96);
-  color:#ef0202;
-
-  font-size:1.35rem;
-  line-height:1;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  cursor:pointer;
-
-  box-shadow:
-    0 9px 20px rgba(98, 1, 1, 0.12),
-    inset 0 1px 0 rgba(215, 9, 9, 0.88);
-}
-
-/* =========================
-   TOP WINNER HEADER
-========================= */
-
-.finalResultsTop{
-  position:relative;
+  bottom:26px;
+  inset-inline-start:34px;
   z-index:2;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  width:76px;
+  height:8px;
 
-  padding:0 48px;
-}
-
-.finalWinnerBlock{
-  width:min(100%,520px);
-  min-height:92px;
-
-  padding:12px 20px;
-  border-radius:28px;
-
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255,255,255,.75), transparent 42%),
-    linear-gradient(135deg,#fff7ed,#ffffff);
-
-  border:1px solid rgba(253, 139, 116, 0.72);
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-
-  text-align:center;
-
-  box-shadow:
-    0 16px 38px rgba(242,140,40,.13),
-    inset 0 1px 0 rgba(255,255,255,.95);
-}
-
-.finalWinnerLabel{
-  padding:6px 16px;
+  background:var(--primary);
   border-radius:999px;
 
-  background:rgba(242,140,40,.13);
-  color:#9a3412;
-  border:1px solid rgba(242,140,40,.24);
+  opacity:.8;
 
-  font-size:.72rem;
-  line-height:1;
+  animation:segmentEndLinePulse 2.8s ease-in-out infinite;
 }
 
-.finalWinnerName{
-  max-width:100%;
-
-  color:#24185e;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(2rem,3.7vw,3.25rem);
-  line-height:1;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.finalWinnerSub{
-  max-width:100%;
-  color:#64748b;
-  font-size:.78rem;
-  line-height:1.2;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-/* =========================
-   MAIN LAYOUT
-========================= */
-
-.finalResultsCeremony{
+.segmentEndTop,
+.segmentEndTitle,
+.segmentEndWinnerBox,
+.segmentEndScoreBoard,
+.segmentEndActions{
   position:relative;
-  z-index:2;
-
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:12px;
-
-  overflow:hidden;
+  z-index:3;
 }
 
-/* =========================
-   TWO TEAMS STATS
-   الفريق الأول يمين / الفريق الثاني يسار
-========================= */
-
-.finalTeamsStatsGrid{
-  direction:rtl;
-
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:14px;
-  align-items:stretch;
-}
-
-/* الفريق الأول يبقى يمين */
-#finalResultsTeamABox{
-  direction:rtl;
-}
-
-/* الفريق الثاني يبقى يسار */
-#finalResultsTeamBBox{
-  direction:rtl;
-}
-
-.finalTeamStatsBox{
-  min-height:126px;
-  border-radius:28px;
-  padding:13px 15px;
-
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255,255,255,.70), transparent 42%),
-    linear-gradient(135deg,#fff7ed,#ffffff);
-
-  border:1px solid rgba(253,186,116,.68);
-
-  display:grid;
-  grid-template-columns:minmax(0,1.2fr) auto minmax(0,.95fr);
-  grid-template-rows:1fr;
-  gap:14px;
+.segmentEndTop{
+  display:flex;
   align-items:center;
-
-  overflow:hidden;
-
-  box-shadow:
-    0 14px 30px rgba(15,23,42,.075),
-    inset 0 1px 0 rgba(255,255,255,.78);
+  justify-content:center;
+  gap:10px;
 }
 
-.finalTeamStatsBox.winner{
-  border-color:#fdba74;
-  box-shadow:
-    0 18px 40px rgba(242,140,40,.17),
-    inset 0 1px 0 rgba(255,255,255,.95);
+.segmentEndBadge{
+  min-height:36px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:8px 18px;
+
+  background:#8E3A3A;
+  border-radius:999px;
+
+  color:#fff;
+
+  font-size:.86rem;
+  line-height:1;
+  font-weight:900;
+
+  box-shadow:0 10px 22px rgba(142,58,58,.18);
 }
 
-.finalTeamStatsName{
-  min-width:0;
+.segmentEndMiniTitle{
+  min-height:36px;
 
-  color:#24185e;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:8px 18px;
+
+  background:var(--soft);
+  border:2px solid var(--line);
+  border-radius:999px;
+
+  color:var(--muted);
+
+  font-size:.86rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.segmentEndTitle{
+  margin:0;
+
+  color:var(--secondary);
 
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(1.55rem,2.35vw,2.25rem);
-  line-height:1.05;
-
+  font-size:clamp(3.4rem,5vw,5.8rem);
+  line-height:1;
+  font-weight:400;
   text-align:center;
-
-  white-space:normal;
-  overflow:visible;
-  text-wrap:normal;
 }
 
-.finalTeamStatsMain{
-  min-width:130px;
+.segmentEndWinnerBox{
+  width:min(100%,500px);
+  min-height:112px;
 
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:6px;
-}
-
-.finalTeamStatsMain strong{
-  width:74px;
-  height:66px;
-
-  border-radius:22px;
-
-  background:linear-gradient(180deg,#ffb257,#f28c28);
-  color:#fff;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:2.35rem;
-  line-height:1;
-
-  box-shadow:
-    0 12px 26px rgba(242,140,40,.24),
-    inset 0 1px 0 rgba(255,255,255,.25);
-}
-
-.finalTeamStatsMain span{
-  color:#9a3412;
-  font-size:.74rem;
-  line-height:1.15;
-  font-weight:900;
-  white-space:nowrap;
-}
-
-.finalTeamStatsMiniGrid{
-  min-width:0;
-
-  display:grid;
-  grid-template-columns:1fr;
-  gap:7px;
-}
-
-.finalTeamStatsMiniGrid div{
-  min-height:42px;
-  border-radius:16px;
-
-  background:rgba(255,255,255,.72);
-  border:1px solid rgba(226,232,240,.88);
-
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr);
   gap:8px;
-  align-items:center;
 
-  padding:0 10px;
-}
+  padding:18px 26px;
 
-.finalTeamStatsMiniGrid b{
-  color:#24185e;
+  background:var(--primary);
+  border:3px solid rgba(255,255,255,.72);
+  border-radius:32px;
 
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.12rem;
-  line-height:1;
-}
-
-.finalTeamStatsMiniGrid small{
-  color:#64748b;
-  font-size:.58rem;
-  line-height:1.1;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-/* =========================
-   SEGMENT RESULTS GRID
-   4 CARDS PER ROW
-========================= */
-
-.finalResultsSegmentsGrid{
-  direction:rtl;
-
-  min-height:0;
-  overflow:auto;
-
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:10px;
-  align-content:stretch;
-
-  padding:2px 2px 10px;
-
-  scrollbar-width:thin;
-}
-
-.finalSegmentResultItem{
-  direction:rtl;
-  position:relative;
-
-  min-height:135px;
-  height:100%;
-
-  border-radius:22px;
-  padding:14px 12px 12px;
-
-  background:#f1f5f9;
-  border:1px solid #d8e1ea;
-
-  display:grid;
-  grid-template-rows:minmax(42px,auto) minmax(44px,auto) minmax(32px,auto);
-  gap:10px;
-  align-items:center;
-  justify-items:center;
-
-  text-align:center;
-  overflow:hidden;
-
-  box-shadow:
-    0 10px 24px rgba(15,23,42,.055),
-    inset 0 1px 0 rgba(255,255,255,.72);
-}
-
-.finalSegmentResultItem .finalMatchNo{
-  position:absolute;
-  top:9px;
-  left:9px;
-
-  width:29px;
-  height:29px;
-  min-width:29px;
-
-  border-radius:11px;
-
-  background:#24185e;
   color:#fff;
 
-  display:grid;
-  place-items:center;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:.68rem;
-  line-height:1;
+  box-shadow:
+    0 20px 44px rgba(254,127,45,.24),
+    0 0 0 6px rgba(254,127,45,.08);
 }
 
-.finalSegmentResultItem h3{
+.segmentEndWinnerBox span{
+  font-size:.95rem;
+  line-height:1;
+  font-weight:900;
+  opacity:.9;
+}
+
+.segmentEndWinnerBox strong{
   width:100%;
-  min-height:40px;
-
-  margin:0;
-  padding:0 28px 0 0;
-
-  color:#24185e;
 
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(.9rem,1.45vw,1.12rem);
-  line-height:1.15;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  font-size:clamp(2rem,3.5vw,3.5rem);
+  line-height:1.1;
+  font-weight:400;
+  text-align:center;
 
   white-space:normal;
-  overflow:visible;
-  text-overflow:clip;
-  text-wrap:normal;
+  overflow-wrap:break-word;
 }
 
-.finalSegmentScoreLine{
-  min-width:112px;
-  min-height:40px;
+.segmentEndScoreBoard{
+  width:min(100%,620px);
 
-  padding:0 12px;
-  border-radius:17px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);
+  gap:12px;
+  align-items:center;
+}
+
+.segmentEndTeamScore{
+  min-height:84px;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 68px;
+  gap:10px;
+  align-items:center;
+
+  padding:12px;
+
+  background:var(--soft);
+  border:2px solid var(--line);
+  border-radius:24px;
+}
+
+.segmentEndTeamScore.teamB{
+  grid-template-columns:68px minmax(0,1fr);
+}
+
+.segmentEndTeamScore span{
+  min-width:0;
+
+  color:var(--secondary);
+
+  font-size:1.05rem;
+  line-height:1.2;
+  font-weight:900;
+
+  white-space:normal;
+  overflow-wrap:break-word;
+}
+
+.segmentEndTeamScore.teamA span{
+  text-align:right;
+}
+
+.segmentEndTeamScore.teamB span{
+  text-align:left;
+}
+
+.segmentEndTeamScore b{
+  width:68px;
+  height:60px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--secondary);
+  border-radius:20px;
+
+  color:#fff;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:2.15rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.segmentEndVs{
+  width:58px;
+  height:58px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
   background:#fff;
-  border:1px solid #e2e8f0;
+  border:2px solid var(--line);
+  border-radius:50%;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:9px;
+  color:var(--primary);
 
-  direction:rtl;
-
-  box-shadow:0 7px 14px rgba(15,23,42,.055);
-}
-
-.finalSegmentScoreLine em{
-  min-width:28px;
-
-  color:#24185e;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-style:normal;
-  font-size:1.25rem;
+  font-size:.9rem;
   line-height:1;
+  font-weight:900;
+
+  box-shadow:0 10px 22px rgba(35,61,77,.08);
 }
 
-.finalSegmentScoreLine span{
-  color:#94a3b8;
-  font-size:.95rem;
-}
+.segmentEndActions{
+  width:min(100%,520px);
 
-.finalMatchWinner{
-  width:min(100%,150px);
-  min-height:30px;
-
-  padding:6px 10px;
-  border-radius:999px;
-
-  background:rgba(100,116,139,.10);
-  color:#64748b;
-
-  font-family:"HanakaText",sans-serif;
-  font-size:.66rem;
-  line-height:1.15;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  white-space:normal;
-  overflow:visible;
-  text-overflow:clip;
-}
-
-/* حالات الفقرات */
-.finalSegmentResultItem.teamA,
-.finalSegmentResultItem.teamB{
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255,255,255,.70), transparent 42%),
-    linear-gradient(135deg,#fff7ed,#ffffff);
-
-  border-color:rgba(253,186,116,.72);
-}
-
-.finalSegmentResultItem.teamA .finalMatchNo,
-.finalSegmentResultItem.teamB .finalMatchNo{
-  background:#f28c28;
-}
-
-.finalSegmentResultItem.teamA .finalMatchWinner,
-.finalSegmentResultItem.teamB .finalMatchWinner{
-  background:rgba(242,140,40,.14);
-  color:#9a3412;
-}
-
-.finalSegmentResultItem.draw{
-  background:linear-gradient(135deg,#f8fafc,#ffffff);
-  border-color:#cbd5e1;
-}
-
-.finalSegmentResultItem.draw .finalMatchWinner{
-  background:rgba(36,24,94,.08);
-  color:#24185e;
-}
-
-.finalSegmentResultItem.pending{
-  opacity:.66;
-  filter:grayscale(.12);
-}
-
-.finalSegmentResultItem.pending .finalMatchNo{
-  background:#94a3b8;
-}
-
-.hiddenFinalResultCard{
-  display:none !important;
-}
-
-/* =========================
-   FOOTER
-========================= */
-
-.finalResultsFooter{
-  position:relative;
-  z-index:2;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:grid;
+  grid-template-columns:1.25fr .85fr;
   gap:12px;
 }
 
-.finalResultsFooter button{
-  min-width:172px;
-  min-height:50px;
+.segmentEndBtn{
+  min-height:58px;
 
   border:0;
   border-radius:20px;
 
-  font-family:"HanakaText",sans-serif;
-  font-size:.92rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0 20px;
+
+  color:#fff;
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:900;
 
   cursor:pointer;
 
   transition:
-    transform .16s ease,
-    filter .16s ease;
+    transform .18s var(--ease),
+    filter .18s ease;
 }
 
-.finalResultsFooter button:first-child{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
-    linear-gradient(180deg,#034330,#08555b);
-
-  color:#ffffff;
-
-  box-shadow:
-    0 13px 28px rgba(40, 195, 242, 0.26),
-    inset 0 1px 0 rgba(255,255,255,.24);
+.segmentEndBtn.primary{
+  background:var(--primary);
 }
 
-.finalResultsFooter button:not(:first-child){
-  background:#e25050;
-  color:#ffffff;
-
-  box-shadow:
-    0 9px 20px rgba(15,23,42,.10),
-    inset 0 1px 0 rgba(255,255,255,.85);
+.segmentEndBtn.secondary{
+  background:var(--secondary);
 }
 
-.finalResultsFooter button:hover{
-  transform:translateY(-2px);
+.segmentEndBtn:hover{
+  transform:translateY(-3px);
   filter:brightness(1.04);
 }
 
-.finalResultsFooter button:active{
-  transform:scale(.97);
+.segmentEndBtn:active{
+  transform:scale(.98);
 }
 
-/* =========================
-   DRAW MODE
-========================= */
-
-.finalResultsOverlay.draw .finalWinnerBlock{
-  background:linear-gradient(135deg,#f8fafc,#ffffff);
-  border-color:#cbd5e1;
-}
-
-/* =========================================================
-   A11 / iPad Landscape
-========================================================= */
-
-@media (orientation:landscape) and (max-height:760px){
-  .finalResultsOverlay{
-    padding:10px;
-  }
-
-  .finalResultsBoard{
-    width:min(100%,1140px);
-    height:calc(100dvh - 16px);
-    border-radius:30px;
-    padding:12px 16px;
-    gap:8px;
-  }
-
-  .finalResultsBoard::before{
-    inset:7px;
-    border-radius:24px;
-  }
-
-  .finalResultsClose{
-    top:10px;
-    left:10px;
-    width:38px;
-    height:38px;
-    border-radius:14px;
-    font-size:1.22rem;
-  }
-
-  .finalResultsTop{
-    padding:0 44px;
-  }
-
-  .finalWinnerBlock{
-    width:min(100%,430px);
-    min-height:72px;
-    border-radius:22px;
-    padding:8px 14px;
-    gap:3px;
-  }
-
-  .finalWinnerLabel{
-    padding:4px 11px;
-    font-size:.58rem;
-  }
-
-  .finalWinnerName{
-    font-size:1.62rem;
-  }
-
-  .finalWinnerSub{
-    font-size:.58rem;
-  }
-
-  .finalResultsCeremony{
-    gap:8px;
-  }
-
-  .finalTeamsStatsGrid{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:9px;
-  }
-
-  .finalTeamStatsBox{
-    min-height:92px;
-    border-radius:20px;
-    padding:8px 10px;
-
-    grid-template-columns:minmax(0,1.15fr) auto minmax(0,.95fr);
-    gap:8px;
-  }
-
-  .finalTeamStatsName{
-    font-size:1.15rem;
-  }
-
-  .finalTeamStatsMain{
-    min-width:94px;
-    gap:4px;
-  }
-
-  .finalTeamStatsMain strong{
-    width:50px;
-    height:46px;
-    border-radius:15px;
-    font-size:1.52rem;
-  }
-
-  .finalTeamStatsMain span{
-    font-size:.52rem;
-  }
-
-  .finalTeamStatsMiniGrid{
-    gap:5px;
-  }
-
-  .finalTeamStatsMiniGrid div{
-    min-height:31px;
-    border-radius:11px;
-    padding:0 7px;
-    gap:5px;
-  }
-
-  .finalTeamStatsMiniGrid b{
-    font-size:.76rem;
-  }
-
-  .finalTeamStatsMiniGrid small{
-    font-size:.43rem;
-  }
-
-  .finalResultsSegmentsGrid{
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:7px;
-    padding-bottom:7px;
-  }
-
-  .finalSegmentResultItem{
-    min-height:90px;
-    border-radius:16px;
-    padding:7px;
-    gap:4px;
-  }
-
-  .finalSegmentResultItem .finalMatchNo{
-    top:6px;
-    left:6px;
-    width:23px;
-    height:23px;
-    min-width:23px;
-    border-radius:8px;
-    font-size:.55rem;
-  }
-
-  .finalSegmentResultItem h3{
-    min-height:24px;
-    padding-right:24px;
-    font-size:.72rem;
-    line-height:1.12;
-  }
-
-  .finalSegmentScoreLine{
-    min-width:82px;
-    min-height:29px;
-    border-radius:12px;
-    gap:6px;
-  }
-
-  .finalSegmentScoreLine em{
-    min-width:20px;
-    font-size:.9rem;
-  }
-
-  .finalMatchWinner{
-    width:min(100%,120px);
-    min-height:22px;
-    padding:4px 7px;
-    font-size:.48rem;
-  }
-
-  .finalResultsFooter{
-    gap:9px;
-  }
-
-  .finalResultsFooter button{
-    min-width:148px;
-    min-height:40px;
-    border-radius:15px;
-    font-size:.78rem;
-  }
-}
-
-/* =========================================================
-   Smaller Screens
-========================================================= */
-
-@media (max-width:920px){
-  .finalTeamsStatsGrid{
-    grid-template-columns:1fr;
-  }
-
-  .finalResultsSegmentsGrid{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-}
-
-@media (max-width:720px){
-  .finalResultsOverlay{
-    padding:10px;
-  }
-
-  .finalResultsBoard{
-    height:calc(100dvh - 16px);
-    border-radius:28px;
-    padding:14px;
-  }
-
-  .finalResultsTop{
-    padding:42px 0 0;
-  }
-
-  .finalWinnerBlock{
-    width:100%;
-  }
-
-  .finalTeamStatsBox{
-    grid-template-columns:1fr;
-    min-height:150px;
-  }
-
-  .finalTeamStatsMiniGrid{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .finalResultsFooter{
-    flex-wrap:wrap;
-  }
-
-  .finalResultsFooter button{
-    flex:1 1 150px;
-  }
-}
-
-/* =========================================================
-   FINAL RESULTS - EXTRA POLISH
-   شريط الإحصائيات + إبراز الفائز + تخفيف غير الملعوبة + تأثيرات
-========================================================= */
-
-/* شريط الإحصائيات الصغير */
-.finalQuickStats{
-  position:relative;
-  z-index:2;
-
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-
-  width:min(100%,620px);
-  margin:0 auto;
-
-  animation:finalQuickStatsIn .42s ease both;
-}
-
-.finalQuickStats div{
-  min-height:44px;
-  border-radius:18px;
-
-  background:rgba(241,245,249,.82);
-  border:1px solid rgba(226,232,240,.92);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:9px;
+.segmentEndTie .segmentEndWinnerBox{
+  background:var(--secondary);
 
   box-shadow:
-    0 8px 18px rgba(15,23,42,.06),
-    inset 0 1px 0 rgba(255,255,255,.82);
+    0 20px 44px rgba(35,61,77,.22),
+    0 0 0 6px rgba(35,61,77,.08);
 }
 
-.finalQuickStats span{
-  color:#64748b;
-  font-size:.68rem;
-  line-height:1;
-  white-space:nowrap;
-}
-
-.finalQuickStats b{
-  color:#24185e;
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.08rem;
-  line-height:1;
-}
-
-/* نخلي المحتوى بعد إضافة الشريط متوازن */
-.finalResultsBoard{
-  grid-template-rows:auto auto minmax(0,1fr) auto;
-}
-
-/* إبراز كرت الفريق الفائز */
-.finalTeamStatsBox.winner{
-  position:relative;
-  transform:translateY(-2px) scale(1.012);
-
-  border-color:#f28c28 !important;
-
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255,255,255,.86), transparent 42%),
-    linear-gradient(135deg,#fff3df,#ffffff) !important;
-
-  box-shadow:
-    0 0 0 3px rgba(242,140,40,.14),
-    0 20px 46px rgba(242,140,40,.22),
-    inset 0 1px 0 rgba(255,255,255,.96) !important;
-}
-
-.finalTeamStatsBox.winner::before{
-  content:"الفائز";
-  position:absolute;
-  top:10px;
-  right:12px;
-
-  padding:6px 12px;
-  border-radius:999px;
-
-  background:linear-gradient(180deg,#ffb257,#f28c28);
-  color:#fff;
-
-  font-size:.58rem;
-  line-height:1;
-
-  box-shadow:0 8px 16px rgba(242,140,40,.22);
-}
-
-.finalTeamStatsBox.winner .finalTeamStatsName{
-  color:#9a3412;
-}
-
-.finalTeamStatsBox.winner .finalTeamStatsMain strong{
-  animation:winnerNumberPulse 1.8s ease-in-out infinite;
-}
-
-/* الفقرات غير الملعوبة أخف وأقل زحمة */
-.finalSegmentResultItem.pending{
-  opacity:1;
-  filter:none;
-
-  background:
-    linear-gradient(135deg,rgba(241,245,249,.74),rgba(248,250,252,.82));
-
-  border-color:rgba(203,213,225,.78);
-}
-
-.finalSegmentResultItem.pending h3{
-  color:#64748b;
-}
-
-.finalSegmentResultItem.pending .finalMatchNo{
-  background:#94a3b8;
-}
-
-.finalSegmentResultItem.pending .finalSegmentScoreLine{
-  opacity:.44;
-  min-height:34px;
-  transform:scale(.92);
-}
-
-.finalSegmentResultItem.pending .finalSegmentScoreLine em,
-.finalSegmentResultItem.pending .finalSegmentScoreLine span{
-  color:#94a3b8;
-}
-
-.finalSegmentResultItem.pending .finalMatchWinner{
-  width:auto;
-  min-width:86px;
-  background:rgba(148,163,184,.14);
-  color:#64748b;
-}
-
-/* تحسين كروت الفقرات المنتهية */
-.finalSegmentResultItem.teamA,
-.finalSegmentResultItem.teamB{
-  transform:translateY(-1px);
-}
-
-.finalSegmentResultItem.teamA .finalSegmentScoreLine,
-.finalSegmentResultItem.teamB .finalSegmentScoreLine{
-  border-color:rgba(253,186,116,.54);
-}
-
-.finalSegmentResultItem.draw .finalSegmentScoreLine{
-  border-color:rgba(36,24,94,.18);
-}
-
-/* تأثيرات فتح الشاشة */
-.finalResultsOverlay:not(.hidden) .finalResultsBoard{
-  animation:finalBoardIn .32s ease both;
-}
-
-.finalResultsOverlay:not(.hidden) .finalWinnerBlock{
-  animation:finalWinnerIn .42s ease .04s both;
-}
-
-.finalResultsOverlay:not(.hidden) .finalTeamStatsBox.teamA{
-  animation:finalTeamAIn .42s ease .10s both;
-}
-
-.finalResultsOverlay:not(.hidden) .finalTeamStatsBox.teamB{
-  animation:finalTeamBIn .42s ease .10s both;
-}
-
-.finalResultsOverlay:not(.hidden) .finalSegmentResultItem{
-  animation:finalCardIn .34s ease both;
-}
-
-.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(1){animation-delay:.12s}
-.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(2){animation-delay:.15s}
-.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(3){animation-delay:.18s}
-.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(4){animation-delay:.21s}
-.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(5){animation-delay:.24s}
-.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(6){animation-delay:.27s}
-.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(7){animation-delay:.30s}
-.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(8){animation-delay:.33s}
-.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(9){animation-delay:.36s}
-.finalResultsOverlay:not(.hidden) .finalSegmentResultItem:nth-child(10){animation-delay:.39s}
-
-/* Animations */
-@keyframes finalBoardIn{
+@keyframes segmentEndOverlayIn{
   from{
     opacity:0;
-    transform:scale(.975) translateY(12px);
   }
+
   to{
     opacity:1;
-    transform:scale(1) translateY(0);
   }
 }
 
-@keyframes finalWinnerIn{
+@keyframes segmentEndCardIn{
   from{
     opacity:0;
-    transform:translateY(-12px) scale(.98);
+    transform:translateY(18px) scale(.97);
   }
+
   to{
     opacity:1;
     transform:translateY(0) scale(1);
   }
 }
 
-@keyframes finalQuickStatsIn{
-  from{
-    opacity:0;
-    transform:translateY(-8px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-@keyframes finalTeamAIn{
-  from{
-    opacity:0;
-    transform:translateX(-18px);
-  }
-  to{
-    opacity:1;
-    transform:translateX(0);
-  }
-}
-
-@keyframes finalTeamBIn{
-  from{
-    opacity:0;
-    transform:translateX(18px);
-  }
-  to{
-    opacity:1;
-    transform:translateX(0);
-  }
-}
-
-@keyframes finalCardIn{
-  from{
-    opacity:0;
-    transform:translateY(10px) scale(.985);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-@keyframes winnerNumberPulse{
+@keyframes segmentEndLinePulse{
   0%,100%{
-    transform:scale(1);
-    box-shadow:
-      0 12px 26px rgba(242,140,40,.24),
-      inset 0 1px 0 rgba(255,255,255,.25);
+    width:76px;
+    opacity:.55;
   }
+
   50%{
-    transform:scale(1.045);
-    box-shadow:
-      0 16px 34px rgba(242,140,40,.34),
-      inset 0 1px 0 rgba(255,255,255,.28);
-  }
-}
-
-/* تخفيف الحركة لمن يفضل تقليل المؤثرات */
-@media (prefers-reduced-motion:reduce){
-  .finalResultsOverlay:not(.hidden) .finalResultsBoard,
-  .finalResultsOverlay:not(.hidden) .finalWinnerBlock,
-  .finalResultsOverlay:not(.hidden) .finalTeamStatsBox,
-  .finalResultsOverlay:not(.hidden) .finalSegmentResultItem,
-  .finalQuickStats,
-  .finalTeamStatsBox.winner .finalTeamStatsMain strong{
-    animation:none !important;
-  }
-}
-
-/* A11 Landscape */
-@media (orientation:landscape) and (max-height:760px){
-  .finalQuickStats{
-    width:min(100%,520px);
-    gap:7px;
-  }
-
-  .finalQuickStats div{
-    min-height:34px;
-    border-radius:14px;
-    gap:6px;
-  }
-
-  .finalQuickStats span{
-    font-size:.52rem;
-  }
-
-  .finalQuickStats b{
-    font-size:.86rem;
-  }
-
-  .finalTeamStatsBox.winner::before{
-    top:7px;
-    right:8px;
-    padding:4px 9px;
-    font-size:.46rem;
-  }
-
-  .finalSegmentResultItem.pending .finalSegmentScoreLine{
-    min-height:28px;
-    transform:scale(.9);
-  }
-}
-/* =========================================================
-   GLOBAL ACTIVE TEAM SYSTEM
-   تمييز الفريق النشط في كل المشروع
-========================================================= */
-
-body[data-active-team="A"] #teamABox,
-body[data-active-team="B"] #teamBBox,
-body[data-active-team="A"] .teamA.activeTeam,
-body[data-active-team="B"] .teamB.activeTeam,
-body[data-active-team="A"] .homeTeamA,
-body[data-active-team="B"] .homeTeamB{
-  position:relative;
-  z-index:5;
-  border-color:#f28c28 !important;
-  box-shadow:
-    0 0 0 4px rgba(242,140,40,.18),
-    0 18px 46px rgba(242,140,40,.26),
-    inset 0 1px 0 rgba(255,255,255,.92) !important;
-  transform:translateY(-3px) scale(1.015);
-}
-
-body[data-active-team="A"] #teamABox::after,
-body[data-active-team="B"] #teamBBox::after,
-body[data-active-team="A"] .homeTeamA::after,
-body[data-active-team="B"] .homeTeamB::after{
-  content:"الدور الآن";
-  position:absolute;
-  top:-12px;
-  right:50%;
-  transform:translateX(50%);
-  z-index:8;
-
-  padding:7px 15px;
-  border-radius:999px;
-
-  background:linear-gradient(180deg,#ffb257,#f28c28);
-  color:#fff;
-
-  font-family:"HanakaText",sans-serif;
-  font-size:.7rem;
-  line-height:1;
-  white-space:nowrap;
-
-  box-shadow:0 10px 22px rgba(242,140,40,.30);
-}
-
-body[data-active-team="A"] #teamBBox,
-body[data-active-team="B"] #teamABox{
-  opacity:.72;
-  filter:saturate(.82);
-}
-
-body[data-active-team="A"] #teamABox .teamScore,
-body[data-active-team="B"] #teamBBox .teamScore,
-body[data-active-team="A"] #mainScoreA,
-body[data-active-team="B"] #mainScoreB{
-  animation:activeTeamScorePulse 1.8s ease-in-out infinite;
-}
-
-@keyframes activeTeamScorePulse{
-  0%,100%{
-    transform:scale(1);
-  }
-  50%{
-    transform:scale(1.07);
-  }
-}
-
-/* أزرار اختيار الفريق في شاشة المقدم */
-body[data-active-team="A"] .presenterTeamA,
-body[data-active-team="B"] .presenterTeamB,
-body[data-active-team="A"] button[data-team="A"],
-body[data-active-team="B"] button[data-team="B"]{
-  border-color:#f28c28 !important;
-  background:linear-gradient(180deg,#fff7ed,#ffffff) !important;
-  color:#9a3412 !important;
-  box-shadow:
-    0 0 0 3px rgba(242,140,40,.16),
-    0 12px 28px rgba(242,140,40,.20) !important;
-}
-
-/* حالة عدم وجود فريق نشط */
-body:not([data-active-team]) #teamABox,
-body:not([data-active-team]) #teamBBox{
-  opacity:1;
-  filter:none;
-  transform:none;
-}
-
-/* A11 / iPad Landscape */
-@media (orientation:landscape) and (max-height:760px){
-  body[data-active-team="A"] #teamABox::after,
-  body[data-active-team="B"] #teamBBox::after,
-  body[data-active-team="A"] .homeTeamA::after,
-  body[data-active-team="B"] .homeTeamB::after{
-    top:-9px;
-    padding:5px 11px;
-    font-size:.56rem;
-  }
-
-  body[data-active-team="A"] #teamABox,
-  body[data-active-team="B"] #teamBBox,
-  body[data-active-team="A"] .homeTeamA,
-  body[data-active-team="B"] .homeTeamB{
-    transform:translateY(-2px) scale(1.01);
+    width:118px;
+    opacity:.9;
   }
 }

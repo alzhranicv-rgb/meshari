@@ -1016,46 +1016,36 @@ function showSegmentEndOverlay(segmentKey, winner) {
     overlay.innerHTML = `
       <section class="segmentEndCard">
 
-        <div class="segmentEndBadge">نهاية الفقرة</div>
-
-        <h2 class="segmentEndTitle">${title}</h2>
-
-        <div class="segmentEndSub">
-          تم اعتماد نتيجة الفقرة وإغلاقها
+        <div class="segmentEndTop">
+          <span class="segmentEndBadge">منتهية</span>
+          <span class="segmentEndMiniTitle">نهاية الفقرة</span>
         </div>
+
+        <h2 class="segmentEndTitle">${escapeDisplayHtml(title)}</h2>
 
         <div class="segmentEndWinnerBox">
-          <div class="segmentEndWinnerLabel">
-            ${isTie ? "النتيجة" : "الفائز في الفقرة"}
-          </div>
-
-          <div class="segmentEndWinnerName">
-            ${winnerText}
-          </div>
+          <span>${isTie ? "النتيجة" : "الفائز"}</span>
+          <strong>${escapeDisplayHtml(winnerText)}</strong>
         </div>
 
-        <div class="segmentEndScore">
-          <div class="segmentEndTeamScore">
-            <span>${teamAName || "الفريق الأول"}</span>
-            <strong>${scores.A}</strong>
+        <div class="segmentEndScoreBoard">
+
+          <div class="segmentEndTeamScore teamA">
+            <span>${escapeDisplayHtml(teamAName || "الفريق الأول")}</span>
+            <b>${Number(scores.A || 0)}</b>
           </div>
 
           <div class="segmentEndVs">VS</div>
 
-          <div class="segmentEndTeamScore">
-            <span>${teamBName || "الفريق الثاني"}</span>
-            <strong>${scores.B}</strong>
+          <div class="segmentEndTeamScore teamB">
+            <b>${Number(scores.B || 0)}</b>
+            <span>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</span>
           </div>
+
         </div>
 
         <div class="segmentEndActions">
-          <button type="button" class="segmentEndBtn" id="segmentEndHomeBtn">
-            الرئيسية
-          </button>
-
-          <button type="button" class="segmentEndBtn dark" id="segmentEndCloseBtn">
-            إغلاق
-          </button>
+          
         </div>
 
       </section>
@@ -1556,18 +1546,7 @@ function announceWinner() {
   showWinnerOverlay(winner, { homeWinner: true })
 }
 
-function announceWinner() {
-  playWinnerEffects()
-  homeRefreshLocked = false
 
-  let winner = ""
-
-  if (scoreA > scoreB) winner = teamAName
-  else if (scoreB > scoreA) winner = teamBName
-  else winner = "تعادل"
-
-  showWinnerOverlay(winner, { homeWinner: true })
-}
 
 function showWinnerOverlay(name, options = {}) {
   const overlay = document.getElementById("winnerOverlay")
@@ -1914,12 +1893,6 @@ function openSegment(title, content) {
   if (!area) return
 
   area.innerHTML = `
-    <div class="segmentControls">
-      <button onclick="goHome()" class="backBtn">رجوع</button>
-      <h2 class="segmentTitle">${title}</h2>
-      <button id="endRoundBtn" onclick="endCurrentSegment()" class="endBtn" disabled>إنهاء</button>
-    </div>
-
     <div class="segmentContentWrap">
       ${content}
     </div>
@@ -2200,26 +2173,34 @@ window.closeSegment = closeSegment
 function getCurrentSegmentKey() {
   const active = normalizeDisplaySegmentKey(localStorage.getItem("active_segment"))
 
-if (active) return active
+  if (active) return active
 
-  const title = document.querySelector(".segmentTitle")
-  if (!title) return null
+  const segmentRoot =
+    document.querySelector("[data-segment-key]") ||
+    document.querySelector(".warmupWrap") ||
+    document.querySelector(".top10Wrap") ||
+    document.querySelector(".auctionWrap") ||
+    document.querySelector(".whoWrap") ||
+    document.querySelector(".explainWrap") ||
+    document.querySelector(".finalWrapNew") ||
+    document.querySelector(".archiveWrap")
 
-  const text = title.innerText || ""
+  if (!segmentRoot) return null
 
-  if (text.includes("التسخين")) return "warmup"
-  if (text.includes("Top 10")) return "top10"
-  if (text.includes("فتبلة")) return "auction"
-  if (text.includes("من هو")) return "who"
-  if (text.includes("اشرح الكلمة")) return "explain"
+  if (segmentRoot.dataset?.segmentKey) {
+    return normalizeDisplaySegmentKey(segmentRoot.dataset.segmentKey)
+  }
 
-  if (text.includes("ٮدوں ٮڡاط")) return "finalRound1"
-if (text.includes("صح صحلي")) return "finalRound2"
-if (text.includes("قصة")) return "finalRound3"
-if (text.includes("التركيز")) return "finalRound4"
+  if (segmentRoot.classList.contains("warmupWrap")) return "warmup"
+  if (segmentRoot.classList.contains("top10Wrap")) return "top10"
+  if (segmentRoot.classList.contains("auctionWrap")) return "auction"
+  if (segmentRoot.classList.contains("whoWrap")) return "who"
+  if (segmentRoot.classList.contains("explainWrap")) return "explain"
+  if (segmentRoot.classList.contains("archiveWrap")) return "archive"
 
-  if (text.includes("الفاصلة")) return "final"
-  if (text.includes("الأرشيف")) return "archive"
+  if (segmentRoot.classList.contains("finalWrapNew")) {
+    return normalizeDisplaySegmentKey(localStorage.getItem("active_segment") || "finalRound1")
+  }
 
   return null
 }
@@ -2901,25 +2882,48 @@ function applyPresenterHideDisplayControlsState() {
   document.body.classList.toggle("presenterHideDisplayControls", isHidden)
   document.documentElement.classList.toggle("presenterHideDisplayControls", isHidden)
 
+  /* دعم أكواد CSS داخل ملفات الفقرات */
+  document.body.classList.toggle("segmentsControlsHidden", isHidden)
+  document.documentElement.classList.toggle("segmentsControlsHidden", isHidden)
+
   const area = document.getElementById("segmentArea")
   if (!area) return
 
   const selectors = [
+    /* عام داخل الفقرات فقط */
     ".displayControls",
     ".controlsBar",
     ".controlButtons",
-    ".segmentControlButtons",
+    ".actionBar",
+    ".segmentActionBar",
+    ".segmentActions",
+    ".segmentControlsBar",
 
+    /* التسخين */
+    ".warmupControlsBar",
+    "#warmupControlsBar",
+    ".warmupActionBar",
+    "#warmupActionBar",
     ".warmupControlPanel",
     ".warmupControls",
     ".warmupActions",
     ".warmupButtons",
 
+    /* Top 10 */
+    ".top10ControlsBar",
+    "#top10ControlsBar",
+    ".top10ActionBar",
+    "#top10ActionBar",
     ".top10Controls",
     ".top10ControlPanel",
     ".top10Actions",
     ".top10Buttons",
 
+    /* فتبلة */
+    ".auctionControlsBar",
+    "#auctionControlsBar",
+    ".auctionActionBar",
+    "#auctionActionBar",
     ".auctionControls",
     ".auctionControlPanel",
     ".auctionActions",
@@ -2927,11 +2931,19 @@ function applyPresenterHideDisplayControlsState() {
     ".fatblaControls",
     ".fatblaActions",
 
+    /* من هو */
+    ".whoControlsBar",
+    "#whoControlsBar",
+    ".whoActionBar",
+    "#whoActionBar",
     ".whoControlPanel",
     ".whoControls",
     ".whoActions",
     ".whoButtons",
 
+    /* اشرح الكلمة */
+    ".explainActionBar",
+    "#explainActionBar",
     ".explainControlPanel",
     ".explainControls",
     ".explainActions",
@@ -2940,6 +2952,7 @@ function applyPresenterHideDisplayControlsState() {
     ".explainAnswerActions",
     ".explainControlButtons",
 
+    /* الفاصلة */
     ".finalControlsBar",
     "#finalControlsBar",
     ".finalRound1ControlsBar",
@@ -2949,6 +2962,11 @@ function applyPresenterHideDisplayControlsState() {
     ".finalActions",
     ".finalButtons",
 
+    /* الأرشيف */
+    ".archiveControlsBar",
+    "#archiveControlsBar",
+    ".archiveActionBar",
+    "#archiveActionBar",
     ".archiveControlButtons",
     ".archiveControlPanel",
     ".archiveControls",
@@ -2957,8 +2975,6 @@ function applyPresenterHideDisplayControlsState() {
   ]
 
   area.querySelectorAll(selectors.join(",")).forEach(el => {
-    if (el.closest(".segmentControls")) return
-
     if (isHidden) {
       el.dataset.presenterHiddenDisplay = "1"
       el.style.setProperty("display", "none", "important")

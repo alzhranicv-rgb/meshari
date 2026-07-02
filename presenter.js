@@ -18,6 +18,42 @@ let presenterJustJoined = false
 let presenterFinalForcedRound = null
 let presenterFinalForcedRoundUntil = 0
 let presenterFinalRoundOverride = null
+/* =========================
+   PRESENTER MODE
+   control = تحكم
+   reader  = دليل الأسئلة فقط
+========================= */
+
+let presenterJoinMode = localStorage.getItem("presenter_join_mode") || "control"
+let presenterReaderSegment = null
+
+function setPresenterJoinMode(mode) {
+  presenterJoinMode = mode === "reader" ? "reader" : "control"
+  localStorage.setItem("presenter_join_mode", presenterJoinMode)
+
+  document.getElementById("presenterControlModeBtn")?.classList.toggle(
+    "activePresenterMode",
+    presenterJoinMode === "control"
+  )
+
+  document.getElementById("presenterReaderModeBtn")?.classList.toggle(
+    "activePresenterMode",
+    presenterJoinMode === "reader"
+  )
+
+  const status = document.getElementById("presenterJoinStatus")
+
+  if (status) {
+    status.innerText =
+      presenterJoinMode === "reader"
+        ? "وضع قراءة فقط: الأسئلة والإجابات بدون تحكم"
+        : "وضع تحكم: ربط مع العرض والتحكم باللعبة"
+  }
+}
+
+function syncPresenterJoinModeUI() {
+  setPresenterJoinMode(presenterJoinMode)
+}
 const ALL_PRESENTER_SEGMENTS = [
   { key: "warmup", title: "التسخين", sort: 1 },
   { key: "top10", title: "Top 10", sort: 2 },
@@ -74,29 +110,60 @@ if (openedFromQr) {
     return
   }
 
-  applyPresenterSessionData(data)
-  subscribeToGameSession(data.id)
+  presenterSessionId = data.id
+presenterModel = Number(data.model || 1)
+presenterTeamAName = data.team_a || "الفريق الأول"
+presenterTeamBName = data.team_b || "الفريق الثاني"
+presenterLiveState = data.state || {}
+
+if (presenterJoinMode === "reader") {
+  renderPresenterReaderHome()
+  return
+}
+
+applyPresenterSessionData(data)
+subscribeToGameSession(data.id)
 })
 /* =========================
    PAGE MODE
 ========================= */
 
-function showPresenterJoin() {
-  document.getElementById("presenterJoin")?.classList.remove("hidden")
+function hideAllPresenterPages() {
+  document.getElementById("presenterJoin")?.classList.add("hidden")
   document.getElementById("presenterHome")?.classList.add("hidden")
   document.getElementById("presenterSegmentPage")?.classList.add("hidden")
+
+  document.getElementById("presenterReaderHome")?.classList.add("hidden")
+  document.getElementById("presenterReaderSegmentPage")?.classList.add("hidden")
+}
+
+function showPresenterJoin() {
+  hideAllPresenterPages()
+  document.getElementById("presenterJoin")?.classList.remove("hidden")
+  syncPresenterJoinModeUI()
+  hidePresenterInsideModeSwitch()
 }
 
 function showPresenterHomePage() {
-  document.getElementById("presenterJoin")?.classList.add("hidden")
+  hideAllPresenterPages()
   document.getElementById("presenterHome")?.classList.remove("hidden")
-  document.getElementById("presenterSegmentPage")?.classList.add("hidden")
 }
 
 function showPresenterSegmentPage() {
-  document.getElementById("presenterJoin")?.classList.add("hidden")
-  document.getElementById("presenterHome")?.classList.add("hidden")
+  hideAllPresenterPages()
   document.getElementById("presenterSegmentPage")?.classList.remove("hidden")
+  hidePresenterInsideModeSwitch()
+}
+
+function showPresenterReaderHomePage() {
+  hideAllPresenterPages()
+  document.getElementById("presenterReaderHome")?.classList.remove("hidden")
+}
+
+function showPresenterReaderSegmentPage() {
+  hideAllPresenterPages()
+  document.getElementById("presenterReaderSegmentPage")?.classList.remove("hidden")
+  hidePresenterInsideModeSwitch()
 }
 
 function getPresenterFinalRoundTitle(round) {
@@ -315,12 +382,19 @@ async function joinGameSession() {
 
     presenterJustJoined = true
 
-    await markPresenterStartedSession(data.id)
+if (presenterJoinMode === "reader") {
+  presenterJustJoined = false
+  renderPresenterReaderHome()
+  showToast("تم الدخول إلى دليل الأسئلة")
+  return
+}
 
-    renderPresenterHome()
-    subscribeToGameSession(data.id)
+await markPresenterStartedSession(data.id)
 
-    showToast("تم الدخول للجلسة")
+renderPresenterHome()
+subscribeToGameSession(data.id)
+
+showToast("تم الدخول للجلسة")
 
   } catch (e) {
     console.log("JOIN SESSION ERROR:", e)
@@ -914,8 +988,9 @@ function renderPresenterHome() {
 
   if (panel) panel.dataset.segment = ""
 
-  renderPresenterSegmentsGrid()
-  updatePresenterLockedSegments()
+ renderPresenterSegmentsGrid()
+ updatePresenterLockedSegments()
+ ensurePresenterInsideModeSwitch()
 }
 function updatePresenterHomeScoresOnly() {
   const scores = getPresenterTotalScores()
@@ -5191,4 +5266,1031 @@ function setPresenterArchiveRound(round) {
   const safeRound = Math.min(Math.max(Number(round || 1), 1), maxRound)
 
   sendCommand("setRound", { round: safeRound })
+}
+/* =========================
+   READER MODE - دليل الأسئلة فقط
+========================= */
+
+function presenterReaderLogout() {
+  localStorage.removeItem("presenter_session_id")
+  localStorage.removeItem("presenter_join_code")
+
+  presenterSessionId = null
+  presenterReaderSegment = null
+
+  showPresenterJoin()
+}
+
+function presenterReaderGoHome() {
+  presenterReaderSegment = null
+  renderPresenterReaderHome()
+}
+
+function getPresenterReaderSegmentTitle(segment) {
+  const item = ALL_PRESENTER_SEGMENTS.find(x => x.key === segment)
+  return item?.title || "الفقرة"
+}
+
+function readerEscape(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
+}
+
+function readerId(parts = []) {
+  return parts
+    .map(x => String(x ?? "").replace(/[^a-zA-Z0-9_-]/g, "_"))
+    .join("_")
+}
+
+function getReaderReadMap() {
+  try {
+    return JSON.parse(localStorage.getItem("presenter_reader_read_map") || "{}")
+  } catch {
+    return {}
+  }
+}
+
+function saveReaderReadMap(map) {
+  localStorage.setItem("presenter_reader_read_map", JSON.stringify(map || {}))
+}
+
+function isReaderItemRead(id) {
+  const map = getReaderReadMap()
+  return !!map[id]
+}
+
+function toggleReaderRead(id, el = null) {
+  const map = getReaderReadMap()
+  map[id] = !map[id]
+  saveReaderReadMap(map)
+
+  if (el) {
+    el.classList.toggle("readerRead", !!map[id])
+  }
+}
+
+function readerEmpty(text = "لا توجد بيانات") {
+  return `
+    <section class="readerEmptyCard">
+      ${readerEscape(text)}
+    </section>
+  `
+}
+
+function readerMedia({ image = "", video = "" } = {}) {
+  if (video) {
+    return `
+      <div
+        class="readerMediaThumb readerVideoThumb"
+        onclick="event.stopPropagation(); openReaderMediaViewer({ type:'video', src:'${readerEscape(video)}' })"
+      >
+        <video
+          src="${readerEscape(video)}"
+          controls
+          muted
+          playsinline
+          preload="metadata"
+        ></video>
+
+        <div class="readerMediaHint">اضغط للتكبير / التشغيل</div>
+      </div>
+    `
+  }
+
+  if (image) {
+    return `
+      <div
+        class="readerMediaThumb readerImageThumb"
+        onclick="event.stopPropagation(); openReaderMediaViewer({ type:'image', src:'${readerEscape(image)}' })"
+      >
+        <img src="${readerEscape(image)}" alt="" loading="lazy">
+
+        <div class="readerMediaHint">اضغط للتكبير</div>
+      </div>
+    `
+  }
+
+  return `
+    <div class="readerMediaThumb readerNoMedia">
+      لا توجد صورة
+    </div>
+  `
+}
+
+function ensureReaderMediaViewer() {
+  let viewer = document.getElementById("readerMediaViewer")
+
+  if (viewer) return viewer
+
+  viewer = document.createElement("div")
+  viewer.id = "readerMediaViewer"
+  viewer.className = "readerMediaViewer hidden"
+
+  viewer.innerHTML = `
+    <div class="readerMediaViewerBackdrop" onclick="closeReaderMediaViewer()"></div>
+
+    <div class="readerMediaViewerBox">
+      <button
+        type="button"
+        class="readerMediaViewerClose"
+        onclick="closeReaderMediaViewer()"
+      >
+        إغلاق
+      </button>
+
+      <div id="readerMediaViewerContent" class="readerMediaViewerContent"></div>
+    </div>
+  `
+
+  document.body.appendChild(viewer)
+  return viewer
+}
+
+function openReaderMediaViewer({ type = "image", src = "" } = {}) {
+  const cleanSrc = String(src || "")
+  if (!cleanSrc) return
+
+  const viewer = ensureReaderMediaViewer()
+  const content = document.getElementById("readerMediaViewerContent")
+
+  if (!content) return
+
+  if (type === "video") {
+    content.innerHTML = `
+      <video
+        src="${readerEscape(cleanSrc)}"
+        controls
+        autoplay
+        playsinline
+      ></video>
+    `
+  } else {
+    content.innerHTML = `
+      <img src="${readerEscape(cleanSrc)}" alt="">
+    `
+  }
+
+  viewer.classList.remove("hidden")
+  document.body.classList.add("readerMediaViewerOpen")
+}
+
+function closeReaderMediaViewer() {
+  const viewer = document.getElementById("readerMediaViewer")
+  const content = document.getElementById("readerMediaViewerContent")
+
+  if (content) {
+    content.innerHTML = ""
+  }
+
+  if (viewer) {
+    viewer.classList.add("hidden")
+  }
+
+  document.body.classList.remove("readerMediaViewerOpen")
+}
+
+function readerReadClass(id) {
+  return isReaderItemRead(id) ? "readerRead" : ""
+}
+
+function readerMiniCard({
+  id = "",
+  number = "",
+  title = "",
+  question = "",
+  answer = "",
+  hint = "",
+  image = "",
+  video = "",
+  parts = []
+}) {
+  return `
+    <article
+      class="readerMiniCard ${readerReadClass(id)}"
+      onclick="toggleReaderRead('${readerEscape(id)}', this)"
+    >
+      <div class="readerMiniTop">
+        <strong>${readerEscape(number)}</strong>
+        <span>${readerEscape(title)}</span>
+      </div>
+
+      ${
+        image || video
+          ? readerMedia({ image, video })
+          : ""
+      }
+
+      ${
+        question
+          ? `
+            <div class="readerBlock">
+              <label>السؤال</label>
+              <p>${readerEscape(question)}</p>
+            </div>
+          `
+          : ""
+      }
+
+      ${
+        parts.length
+          ? `
+            <div class="readerPartsList">
+              ${parts.map((part, index) => `
+                <div class="readerPartItem">
+                  <span>الجزء ${index + 1}</span>
+                  <p>${readerEscape(part)}</p>
+                </div>
+              `).join("")}
+            </div>
+          `
+          : ""
+      }
+
+      ${
+        hint
+          ? `
+            <div class="readerBlock hint">
+              <label>التلميح</label>
+              <p>${readerEscape(hint)}</p>
+            </div>
+          `
+          : ""
+      }
+
+      ${
+        answer
+          ? `
+            <div class="readerBlock answer">
+              <label>الإجابة</label>
+              <p>${readerEscape(answer)}</p>
+            </div>
+          `
+          : ""
+      }
+    </article>
+  `
+}
+
+async function renderPresenterReaderHome() {
+  showPresenterReaderHomePage()
+
+  await loadPresenterVisibleSegments()
+
+  const subtitle = document.getElementById("presenterReaderSubtitle")
+
+  if (subtitle) {
+    const modelName = presenterLiveState?.currentModelName || ""
+    subtitle.innerText = modelName
+      ? `النموذج: ${modelName}`
+      : `النموذج رقم ${presenterModel}`
+  }
+
+  const grid = document.getElementById("presenterReaderSegmentsGrid")
+  if (!grid) return
+
+  grid.innerHTML = presenterVisibleSegments.map(item => {
+    return `
+      <button
+        type="button"
+        class="presenterReaderSegmentCard"
+        onclick="openPresenterReaderSegment('${item.key}')"
+      >
+        <strong>${readerEscape(item.title)}</strong>
+        <span>عرض الأسئلة والإجابات</span>
+      </button>
+    `
+  }).join("")
+  ensurePresenterInsideModeSwitch()
+}
+
+
+async function openPresenterReaderSegment(segment) {
+  presenterReaderSegment = segment
+
+  showPresenterReaderSegmentPage()
+
+  const title = document.getElementById("presenterReaderSegmentTitle")
+  const panel = document.getElementById("presenterReaderPanel")
+
+  if (title) title.innerText = getPresenterReaderSegmentTitle(segment)
+
+  if (panel) {
+    panel.innerHTML = `
+      <section class="readerLoadingCard">
+        جارٍ تحميل البيانات...
+      </section>
+    `
+  }
+
+  try {
+    if (segment === "warmup") await renderPresenterReaderWarmup()
+    if (segment === "top10") await renderPresenterReaderTop10()
+    if (segment === "auction") await renderPresenterReaderAuction()
+    if (segment === "who") await renderPresenterReaderWho()
+    if (segment === "explain") await renderPresenterReaderExplain()
+    if (segment === "archive") await renderPresenterReaderArchive()
+
+    if (segment === "final_round1") await renderPresenterReaderFinalRound1()
+    if (segment === "final_round2") await renderPresenterReaderFinalRound2()
+    if (segment === "final_round3") await renderPresenterReaderFinalRound3()
+    if (segment === "final_round4") await renderPresenterReaderFinalRound4()
+  } catch (err) {
+    console.log("READER SEGMENT ERROR:", err)
+
+    if (panel) {
+      panel.innerHTML = readerEmpty("تعذر تحميل بيانات الفقرة")
+    }
+  }
+}
+
+function reloadPresenterReaderSegment() {
+  if (!presenterReaderSegment) {
+    renderPresenterReaderHome()
+    return
+  }
+
+  openPresenterReaderSegment(presenterReaderSegment)
+}
+
+/* =========================
+   Reader: Warmup
+   كل فئة: الرقم + السؤال + الإجابة
+========================= */
+
+async function renderPresenterReaderWarmup() {
+  const panel = document.getElementById("presenterReaderPanel")
+  if (!panel) return
+
+  const { data, error } = await db
+    .from("questions")
+    .select("category, category_name, number, question, answer")
+    .eq("model", Number(presenterModel))
+    .eq("segment", "warmup")
+    .order("category", { ascending: true })
+    .order("number", { ascending: true })
+
+  if (error) throw error
+
+  const rows = data || []
+
+  if (!rows.length) {
+    panel.innerHTML = readerEmpty("لا توجد أسئلة في التسخين")
+    return
+  }
+
+  panel.innerHTML = `
+    <div class="readerWarmupGrid">
+      ${[1, 2, 3, 4].map(cat => {
+        const catRows = rows.filter(row => Number(row.category) === cat)
+        const catName = catRows[0]?.category_name || `الفئة ${cat}`
+
+        return `
+          <section class="readerCategoryBox">
+            <h2>${readerEscape(catName)}</h2>
+
+            <div class="readerCategoryQuestions">
+              ${[1, 2, 4].map(num => {
+                const row = catRows.find(x => Number(x.number) === num)
+
+                return readerMiniCard({
+                  id: readerId(["warmup", cat, num]),
+                  number: num,
+                  title: `سؤال ${num}`,
+                  question: row?.question || "",
+                  answer: row?.answer || ""
+                })
+              }).join("")}
+            </div>
+          </section>
+        `
+      }).join("")}
+    </div>
+  `
+}
+
+/* =========================
+   Reader: Top 10
+   كل جولة صفحة/قسم - السؤال فوق والإجابات مرقمة
+========================= */
+
+async function renderPresenterReaderTop10() {
+  const panel = document.getElementById("presenterReaderPanel")
+  if (!panel) return
+
+  const { data, error } = await db
+    .from("top10_questions")
+    .select("round, position, question, answer")
+    .eq("model", Number(presenterModel))
+    .order("round", { ascending: true })
+    .order("position", { ascending: true })
+
+  if (error) throw error
+
+  const rows = data || []
+
+  if (!rows.length) {
+    panel.innerHTML = readerEmpty("لا توجد بيانات في Top 10")
+    return
+  }
+
+  const rounds = [...new Set(rows.map(row => Number(row.round)))].sort((a, b) => a - b)
+
+  panel.innerHTML = `
+    <div class="readerRoundsStack">
+      ${rounds.map(round => {
+        const roundRows = rows.filter(row => Number(row.round) === round)
+        const question = roundRows[0]?.question || ""
+
+        return `
+          <section class="readerRoundPage">
+            <div class="readerRoundHead">
+              <h2>الجولة ${round}</h2>
+            </div>
+
+            <div
+              class="readerMainQuestion ${readerReadClass(readerId(["top10", round, "question"]))}"
+              onclick="toggleReaderRead('${readerId(["top10", round, "question"])}', this)"
+            >
+              <label>السؤال</label>
+              <p>${readerEscape(question || "لا يوجد سؤال رئيسي")}</p>
+            </div>
+
+            <div class="readerTop10Answers">
+              ${roundRows.map(row => `
+                <div
+                  class="readerTop10Answer ${readerReadClass(readerId(["top10", round, row.position]))}"
+                  onclick="toggleReaderRead('${readerId(["top10", round, row.position])}', this)"
+                >
+                  <strong>${readerEscape(row.position)}</strong>
+                  <span>${readerEscape(row.answer || "—")}</span>
+                </div>
+              `).join("")}
+            </div>
+          </section>
+        `
+      }).join("")}
+    </div>
+  `
+}
+
+/* =========================
+   Reader: Auction - فتبلة
+   الرقم + الصورة/الفيديو مصغر + الإجابة فقط
+========================= */
+
+async function renderPresenterReaderAuction() {
+  const panel = document.getElementById("presenterReaderPanel")
+  if (!panel) return
+
+  const { data, error } = await db
+    .from("auction_questions")
+    .select("number, answer, image, video")
+    .eq("model", Number(presenterModel))
+    .order("number", { ascending: true })
+
+  if (error) throw error
+
+  const rows = data || []
+
+  if (!rows.length) {
+    panel.innerHTML = readerEmpty("لا توجد أسئلة في فتبلة")
+    return
+  }
+
+  panel.innerHTML = `
+    <div class="readerMediaList">
+      ${rows.map(row => readerMiniCard({
+        id: readerId(["auction", row.number]),
+        number: row.number,
+        title: `رقم ${row.number}`,
+        answer: row.answer,
+        image: row.image,
+        video: row.video
+      })).join("")}
+    </div>
+  `
+}
+
+/* =========================
+   Reader: Who - من هو
+   الرقم + صورة مصغرة + الإجابة
+========================= */
+
+async function renderPresenterReaderWho() {
+  const panel = document.getElementById("presenterReaderPanel")
+  if (!panel) return
+
+  const { data, error } = await db
+    .from("who_images")
+    .select("number, answer, image")
+    .eq("model", Number(presenterModel))
+    .order("number", { ascending: true })
+
+  if (error) throw error
+
+  const rows = data || []
+
+  if (!rows.length) {
+    panel.innerHTML = readerEmpty("لا توجد بيانات في من هو")
+    return
+  }
+
+  panel.innerHTML = `
+    <div class="readerMediaList">
+      ${rows.map(row => readerMiniCard({
+        id: readerId(["who", row.number]),
+        number: row.number,
+        title: `رقم ${row.number}`,
+        answer: row.answer,
+        image: row.image
+      })).join("")}
+    </div>
+  `
+}
+
+/* =========================
+   Reader: Explain
+   الرقم + الإجابة فقط
+========================= */
+
+async function renderPresenterReaderExplain() {
+  const panel = document.getElementById("presenterReaderPanel")
+  if (!panel) return
+
+  const { data, error } = await db
+    .from("explain_words")
+    .select("number, word")
+    .eq("model", Number(presenterModel))
+    .order("number", { ascending: true })
+
+  if (error) throw error
+
+  const rows = data || []
+
+  if (!rows.length) {
+    panel.innerHTML = readerEmpty("لا توجد كلمات في اشرح الكلمة")
+    return
+  }
+
+  panel.innerHTML = `
+    <div class="readerSimpleGrid">
+      ${rows.map(row => readerMiniCard({
+        id: readerId(["explain", row.number]),
+        number: row.number,
+        title: `رقم ${row.number}`,
+        answer: row.word
+      })).join("")}
+    </div>
+  `
+}
+
+/* =========================
+   Reader: Final Round 1 - بدون نقط
+   الرقم + الإجابة فقط
+========================= */
+
+async function renderPresenterReaderFinalRound1() {
+  const panel = document.getElementById("presenterReaderPanel")
+  if (!panel) return
+
+  const { data, error } = await db
+    .from("final_round1_items")
+    .select("number, answer")
+    .eq("model", Number(presenterModel))
+    .gte("number", 1)
+    .lte("number", 8)
+    .order("number", { ascending: true })
+
+  if (error) throw error
+
+  const rows = data || []
+
+  if (!rows.length) {
+    panel.innerHTML = readerEmpty("لا توجد بيانات في بدون نقط")
+    return
+  }
+
+  panel.innerHTML = `
+    <div class="readerSimpleGrid">
+      ${rows.map(row => readerMiniCard({
+        id: readerId(["final1", row.number]),
+        number: row.number,
+        title: `رقم ${row.number}`,
+        answer: row.answer
+      })).join("")}
+    </div>
+  `
+}
+
+/* =========================
+   Reader: Final Round 2 - صح صحلي
+   1 و 4: التلميح + الإجابة
+   2 و 5: الكلمات فقط
+   3 و 6: الصورة مصغرة + الإجابة
+========================= */
+
+async function renderPresenterReaderFinalRound2() {
+  const panel = document.getElementById("presenterReaderPanel")
+  if (!panel) return
+
+  const [textRes, imageRes] = await Promise.all([
+    db
+      .from("final_round2_items")
+      .select("*")
+      .eq("model", Number(presenterModel))
+      .order("number", { ascending: true })
+      .order("item_order", { ascending: true }),
+
+    db
+      .from("final_round3_items")
+      .select("*")
+      .eq("model", Number(presenterModel))
+      .in("number", [101, 102])
+      .order("number", { ascending: true })
+      .order("image_order", { ascending: true })
+  ])
+
+  if (textRes.error) throw textRes.error
+  if (imageRes.error) throw imageRes.error
+
+  const textRows = textRes.data || []
+  const imageRows = imageRes.data || []
+
+  panel.innerHTML = `
+    <div class="readerRoundsStack">
+      ${[1, 2, 3, 4, 5, 6].map(number => {
+        const type = getPresenterFinalRound2Type(number)
+
+        if (type === "scramble") {
+          const rows = textRows.filter(row => Number(row.number) === number)
+
+          return `
+            <section class="readerRoundPage">
+              <div class="readerRoundHead">
+                <h2>رقم ${number}</h2>
+                <span>التلميح والإجابة</span>
+              </div>
+
+              <div class="readerSimpleGrid">
+                ${
+                  rows.length
+                    ? rows.map(row => readerMiniCard({
+                        id: readerId(["final2", number, row.item_order]),
+                        number: row.item_order,
+                        title: `عنصر ${row.item_order}`,
+                        hint: row.hint,
+                        answer: row.answer
+                      })).join("")
+                    : readerEmpty("لا توجد بيانات")
+                }
+              </div>
+            </section>
+          `
+        }
+
+        if (type === "sequence") {
+          const rows = textRows.filter(row => Number(row.number) === number)
+
+          return `
+            <section class="readerRoundPage">
+              <div class="readerRoundHead">
+                <h2>رقم ${number}</h2>
+                <span>الكلمات فقط</span>
+              </div>
+
+              <div class="readerWordsOnly">
+                ${
+                  rows.length
+                    ? rows.map(row => `
+                      <div
+                        class="readerWordOnly ${readerReadClass(readerId(["final2seq", number, row.item_order]))}"
+                        onclick="toggleReaderRead('${readerId(["final2seq", number, row.item_order])}', this)"
+                      >
+                        <strong>${readerEscape(row.item_order)}</strong>
+                        <span>${readerEscape(row.prompt || "—")}</span>
+                      </div>
+                    `).join("")
+                    : readerEmpty("لا توجد كلمات")
+                }
+              </div>
+            </section>
+          `
+        }
+
+        const dbNumber = getPresenterFinalRound2ImageDbNumber(number)
+        const rows = imageRows.filter(row => Number(row.number) === dbNumber)
+
+        return `
+          <section class="readerRoundPage">
+            <div class="readerRoundHead">
+              <h2>رقم ${number}</h2>
+              <span>صور مصغرة</span>
+            </div>
+
+            <div class="readerMediaList">
+              ${
+                rows.length
+                  ? rows.map(row => readerMiniCard({
+                      id: readerId(["final2img", number, row.image_order]),
+                      number: row.image_order,
+                      title: `الصورة ${row.image_order}`,
+                      answer: row.answer,
+                      image: row.image
+                    })).join("")
+                  : readerEmpty("لا توجد صور")
+              }
+            </div>
+          </section>
+        `
+      }).join("")}
+    </div>
+  `
+}
+
+/* =========================
+   Reader: Final Round 3 - قصة
+   أجزاء السؤال مقسمة + الإجابة + الرقم
+========================= */
+
+async function renderPresenterReaderFinalRound3() {
+  const panel = document.getElementById("presenterReaderPanel")
+  if (!panel) return
+
+  const { data, error } = await db
+    .from("final_round1_items")
+    .select("*")
+    .eq("model", Number(presenterModel))
+    .gte("number", 201)
+    .lte("number", 208)
+    .order("number", { ascending: true })
+
+  if (error) throw error
+
+  const rows = data || []
+
+  if (!rows.length) {
+    panel.innerHTML = readerEmpty("لا توجد بيانات في قصة")
+    return
+  }
+
+  panel.innerHTML = `
+    <div class="readerSimpleGrid">
+      ${rows.map(row => {
+        const displayNumber = Number(row.number) - 200
+
+        const parts = [
+          row.question_part1,
+          row.question_part2,
+          row.question_part3
+        ].filter(Boolean)
+
+        return readerMiniCard({
+          id: readerId(["story", displayNumber]),
+          number: displayNumber,
+          title: `رقم ${displayNumber}`,
+          parts,
+          answer: row.answer
+        })
+      }).join("")}
+    </div>
+  `
+}
+
+/* =========================
+   Reader: Final Round 4 - التركيز
+   فيديو/صورة مصغرة + السؤال + الإجابة
+========================= */
+
+async function renderPresenterReaderFinalRound4() {
+  const panel = document.getElementById("presenterReaderPanel")
+  if (!panel) return
+
+  const { data, error } = await db
+    .from("final_round3_items")
+    .select("*")
+    .eq("model", Number(presenterModel))
+    .gte("number", 1)
+    .lte("number", 8)
+    .eq("image_order", 1)
+    .order("number", { ascending: true })
+
+  if (error) throw error
+
+  const rows = data || []
+
+  if (!rows.length) {
+    panel.innerHTML = readerEmpty("لا توجد بيانات في التركيز")
+    return
+  }
+
+  panel.innerHTML = `
+    <div class="readerMediaList">
+      ${rows.map(row => readerMiniCard({
+        id: readerId(["focus", row.number]),
+        number: row.number,
+        title: `رقم ${row.number}`,
+        question: row.question,
+        answer: row.answer,
+        image: row.image,
+        video: row.video
+      })).join("")}
+    </div>
+  `
+}
+
+/* =========================
+   Reader: Archive
+========================= */
+
+async function renderPresenterReaderArchive() {
+  const panel = document.getElementById("presenterReaderPanel")
+  if (!panel) return
+
+  const [boxesRes, itemsRes] = await Promise.all([
+    db
+      .from("archive_boxes")
+      .select("*")
+      .eq("model", Number(presenterModel))
+      .order("round", { ascending: true }),
+
+    db
+      .from("archive_items")
+      .select("*")
+      .eq("model", Number(presenterModel))
+      .order("round", { ascending: true })
+      .order("position", { ascending: true })
+  ])
+
+  if (boxesRes.error) throw boxesRes.error
+  if (itemsRes.error) throw itemsRes.error
+
+  const boxes = boxesRes.data || []
+  const items = itemsRes.data || []
+
+  if (!boxes.length && !items.length) {
+    panel.innerHTML = readerEmpty("لا توجد بيانات في الأرشيف")
+    return
+  }
+
+  const rounds = [...new Set([
+    ...boxes.map(row => Number(row.round)),
+    ...items.map(row => Number(row.round))
+  ])].sort((a, b) => a - b)
+
+  panel.innerHTML = `
+    <div class="readerRoundsStack">
+      ${rounds.map(round => {
+        const box = boxes.find(row => Number(row.round) === round) || {}
+        const roundItems = items.filter(row => Number(row.round) === round)
+
+        return `
+          <section class="readerRoundPage">
+            <div class="readerRoundHead">
+              <h2>الأرشيف - الجولة ${round}</h2>
+            </div>
+
+            <div class="readerArchiveInfo">
+              <div><label>البطولة</label><strong>${readerEscape(box.tournament || "-")}</strong></div>
+              <div><label>الموسم</label><strong>${readerEscape(box.season || "-")}</strong></div>
+              <div><label>النتيجة</label><strong>${readerEscape(box.score || "-")}</strong></div>
+            </div>
+
+            <div class="readerMediaList">
+              ${roundItems.map(item => readerMiniCard({
+                id: readerId(["archive", round, item.position]),
+                number: item.position,
+                title: item.label || `العنصر ${item.position}`,
+                question: item.text,
+                answer: String(item.label || "").trim() === "المطلوب" ? item.text : "",
+                image: item.image
+              })).join("")}
+            </div>
+          </section>
+        `
+      }).join("")}
+    </div>
+  `
+}
+/* =========================
+   INSIDE MODE SWITCH
+   تغيير الوضع بعد الدخول
+========================= */
+
+function ensurePresenterInsideModeSwitch() {
+  let box = document.getElementById("presenterInsideModeSwitch")
+
+  if (box) {
+    updatePresenterInsideModeSwitch()
+    return
+  }
+
+  box = document.createElement("div")
+  box.id = "presenterInsideModeSwitch"
+  box.className = "presenterInsideModeSwitch"
+
+  box.innerHTML = `
+    <button
+      type="button"
+      id="insideControlModeBtn"
+      onclick="switchPresenterInsideMode('control')"
+    >
+      تحكم
+    </button>
+
+    <button
+      type="button"
+      id="insideReaderModeBtn"
+      onclick="switchPresenterInsideMode('reader')"
+    >
+      دليل الأسئلة
+    </button>
+  `
+
+  document.body.appendChild(box)
+  updatePresenterInsideModeSwitch()
+}
+
+function updatePresenterInsideModeSwitch() {
+  const box = document.getElementById("presenterInsideModeSwitch")
+  if (!box) return
+
+  const hasSession = !!localStorage.getItem("presenter_session_id")
+
+  box.classList.toggle("hidden", !hasSession)
+
+  document.getElementById("insideControlModeBtn")?.classList.toggle(
+    "active",
+    presenterJoinMode === "control"
+  )
+
+  document.getElementById("insideReaderModeBtn")?.classList.toggle(
+    "active",
+    presenterJoinMode === "reader"
+  )
+}
+
+async function switchPresenterInsideMode(mode) {
+  const nextMode = mode === "reader" ? "reader" : "control"
+
+  presenterJoinMode = nextMode
+  localStorage.setItem("presenter_join_mode", presenterJoinMode)
+
+  const sessionId = localStorage.getItem("presenter_session_id")
+
+  if (!sessionId) {
+    showPresenterJoin()
+    return
+  }
+
+  if (presenterJoinMode === "reader") {
+    presenterSegment = null
+    presenterSelectedTeam = null
+    presenterReaderSegment = null
+
+    if (presenterChannel) {
+      db.removeChannel(presenterChannel)
+      presenterChannel = null
+    }
+
+    if (presenterSyncTimer) {
+      clearInterval(presenterSyncTimer)
+      presenterSyncTimer = null
+    }
+
+    await renderPresenterReaderHome()
+    ensurePresenterInsideModeSwitch()
+    showToast("تم التحويل إلى دليل الأسئلة")
+    return
+  }
+
+  if (presenterJoinMode === "control") {
+    presenterReaderSegment = null
+    presenterSegment = null
+
+    const { data, error } = await db
+      .from("game_sessions")
+      .select("*")
+      .eq("id", sessionId)
+      .maybeSingle()
+
+    if (error || !data || data.status === "ended") {
+      renderPresenterEnded()
+      return
+    }
+
+    applyPresenterSessionData(data)
+    subscribeToGameSession(sessionId)
+
+    renderPresenterHome()
+    ensurePresenterInsideModeSwitch()
+    showToast("تم التحويل إلى وضع التحكم")
+  }
+}
+function hidePresenterInsideModeSwitch() {
+  const box = document.getElementById("presenterInsideModeSwitch")
+  if (box) box.classList.add("hidden")
 }

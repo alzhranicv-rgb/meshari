@@ -8,6 +8,13 @@ const EXPLAIN_TIMER_SECONDS = 60
 let explainTimerLastTick = null
 let explainRevealTimeout = null
 
+let explainDoubleState = {
+  used: { A: false, B: false },
+  activeTeam: null
+}
+
+let explainDoublePickMode = false
+
 window.explainState = {
   model: null,
   wordsCount: 4,
@@ -80,7 +87,23 @@ function getExplainWordPoolKey(model, wordsCount, words) {
   ].join("__")
 }
 
+function normalizeExplainWordsCount(value) {
+  const n = Number(value || 4)
 
+  if (n === 8) return 8
+  if (n === 6) return 6
+
+  return 4
+}
+
+function getExplainConfiguredWordsCount(settingsValue = null) {
+  return normalizeExplainWordsCount(
+    settingsValue ||
+    window.explainWordsCount ||
+    localStorage.getItem("explain_words_count") ||
+    4
+  )
+}
 
 function buildExplainWords(rawWords, wordsCount) {
   const wordsMap = {}
@@ -104,9 +127,34 @@ function buildExplainWords(rawWords, wordsCount) {
   })
 }
 
+function normalizeExplainDoubleState(state) {
+  const clean = state || {
+    used: { A: false, B: false },
+    activeTeam: null
+  }
+
+  if (!clean.used) {
+    clean.used = { A: false, B: false }
+  }
+
+  clean.used.A = !!clean.used.A
+  clean.used.B = !!clean.used.B
+
+  clean.activeTeam =
+    clean.activeTeam === "A" || clean.activeTeam === "B"
+      ? clean.activeTeam
+      : null
+
+  return clean
+}
+
 function saveExplainState() {
   try {
-    localStorage.setItem(EXPLAIN_STORAGE_KEY, JSON.stringify(window.explainState))
+    localStorage.setItem(EXPLAIN_STORAGE_KEY, JSON.stringify({
+      explainState: window.explainState,
+      explainDoubleState
+    }))
+
     localStorage.setItem("active_segment", "explain")
 
     window.currentSegmentScores = {
@@ -132,7 +180,21 @@ function saveExplainState() {
 
 function loadExplainState() {
   try {
-    return JSON.parse(localStorage.getItem(EXPLAIN_STORAGE_KEY) || "null")
+    const saved = JSON.parse(localStorage.getItem(EXPLAIN_STORAGE_KEY) || "null")
+
+    if (!saved) return null
+
+    if (saved.explainState) {
+      return saved
+    }
+
+    return {
+      explainState: saved,
+      explainDoubleState: {
+        used: { A: false, B: false },
+        activeTeam: null
+      }
+    }
   } catch {
     return null
   }
@@ -194,20 +256,17 @@ async function loadExplainData() {
     return false
   }
 
-  const countFromSettings = Number(
-    settingsRes.data?.item_count ||
-    window.explainWordsCount ||
-    localStorage.getItem("explain_words_count") ||
-    4
-  )
-
-  const wordsCount =
-    countFromSettings === 8 ? 8 :
-    countFromSettings === 6 ? 6 :
-    4
+  const wordsCount = getExplainConfiguredWordsCount(settingsRes.data?.item_count)
 
   window.explainWordsCount = wordsCount
   localStorage.setItem("explain_words_count", String(wordsCount))
+
+  console.log("EXPLAIN WORDS COUNT:", {
+    settings: settingsRes.data?.item_count,
+    windowCount: window.explainWordsCount,
+    localCount: localStorage.getItem("explain_words_count"),
+    finalCount: wordsCount
+  })
 
   const rawWords = (wordsRes.data || [])
     .filter(row => Number(row.number) >= 1 && Number(row.number) <= wordsCount)
@@ -219,38 +278,49 @@ async function loadExplainData() {
   const wordPoolKey = getExplainWordPoolKey(model, wordsCount, rawWords)
   const saved = loadExplainState()
 
-  const sameSavedGame =
-    Number(saved?.model || 0) === Number(model) &&
-    Number(saved?.wordsCount || 4) === Number(wordsCount) &&
-    saved?.wordPoolKey === wordPoolKey
+  const savedExplainState = saved?.explainState || null
+  const savedDoubleState = saved?.explainDoubleState || null
 
-  const words = sameSavedGame && Array.isArray(saved?.words)
-  ? saved.words
-  : buildExplainWords(rawWords, wordsCount)
+  const sameSavedGame =
+    Number(savedExplainState?.model || 0) === Number(model) &&
+    Number(savedExplainState?.wordsCount || 4) === Number(wordsCount) &&
+    savedExplainState?.wordPoolKey === wordPoolKey
+
+  const words = sameSavedGame && Array.isArray(savedExplainState?.words)
+    ? savedExplainState.words
+    : buildExplainWords(rawWords, wordsCount)
 
   window.explainState = {
     model,
     wordsCount,
     words,
-    usedNumbers: sameSavedGame ? (saved?.usedNumbers || []) : [],
-    currentNumber: sameSavedGame ? (saved?.currentNumber || null) : null,
-    currentWord: sameSavedGame ? (saved?.currentWord || "") : "",
-    currentTeam: sameSavedGame ? (saved?.currentTeam || null) : null,
-    wordVisible: sameSavedGame ? (saved?.wordVisible !== false) : true,
-    timerVisible: sameSavedGame ? !!saved?.timerVisible : false,
-    timeLeft: sameSavedGame ? Number(saved?.timeLeft || EXPLAIN_TIMER_SECONDS) : EXPLAIN_TIMER_SECONDS,
+    usedNumbers: sameSavedGame ? (savedExplainState?.usedNumbers || []) : [],
+    currentNumber: sameSavedGame ? (savedExplainState?.currentNumber || null) : null,
+    currentWord: sameSavedGame ? (savedExplainState?.currentWord || "") : "",
+    currentTeam: sameSavedGame ? (savedExplainState?.currentTeam || null) : null,
+    wordVisible: sameSavedGame ? (savedExplainState?.wordVisible !== false) : true,
+    timerVisible: sameSavedGame ? !!savedExplainState?.timerVisible : false,
+    timeLeft: sameSavedGame
+      ? Number(savedExplainState?.timeLeft || EXPLAIN_TIMER_SECONDS)
+      : EXPLAIN_TIMER_SECONDS,
     revealLock: false,
     answerResult: null,
     scores: sameSavedGame ? {
-      A: Number(saved?.scores?.A || 0),
-      B: Number(saved?.scores?.B || 0)
+      A: Number(savedExplainState?.scores?.A || 0),
+      B: Number(savedExplainState?.scores?.B || 0)
     } : { A: 0, B: 0 },
     attempts: sameSavedGame ? {
-      A: Number(saved?.attempts?.A || 0),
-      B: Number(saved?.attempts?.B || 0)
+      A: Number(savedExplainState?.attempts?.A || 0),
+      B: Number(savedExplainState?.attempts?.B || 0)
     } : { A: 0, B: 0 },
     wordPoolKey
   }
+
+  explainDoubleState = sameSavedGame
+    ? normalizeExplainDoubleState(savedDoubleState)
+    : normalizeExplainDoubleState(null)
+
+  explainDoublePickMode = false
 
   window.currentSegmentScores = {
     A: Number(window.explainState.scores.A || 0),
@@ -258,17 +328,17 @@ async function loadExplainData() {
   }
 
   if (window.explainState.currentTeam) {
-  setExplainActiveTeam(window.explainState.currentTeam, { sync:false })
-} else {
-  setExplainActiveTeam(null, { sync:false })
-}
+    setExplainActiveTeam(window.explainState.currentTeam, { sync:false })
+  } else {
+    setExplainActiveTeam(null, { sync:false })
+  }
 
   if (!sameSavedGame) {
-  hideExplainTimer()
-}
+    hideExplainTimer()
+  }
 
-saveExplainState()
-return true
+  saveExplainState()
+  return true
 }
 
 /* =========================
@@ -279,6 +349,7 @@ async function renderExplain() {
   selectedTeam = null
   resetExplainTimer()
   resetExplainRevealTimeout()
+  explainDoublePickMode = false
 
   const loaded = await loadExplainData()
   if (!loaded) return
@@ -286,83 +357,91 @@ async function renderExplain() {
   openSegment("اشرح الكلمة", buildExplainHtml())
 
   updateExplainUI()
+
   if (window.explainState.currentTeam) {
-  setExplainActiveTeam(window.explainState.currentTeam, { sync:false })
-}
+    setExplainActiveTeam(window.explainState.currentTeam, { sync:false })
+  }
+
+  updateExplainDoubleButton()
 }
 
 window.renderExplain = renderExplain
 
-function buildExplainHtml() {
-  const rawCount = Number(window.explainState.wordsCount || 4)
+/* =========================
+   HTML
+========================= */
 
-  const count =
-    rawCount === 8 ? 8 :
-    rawCount === 6 ? 6 :
-    4
+function buildExplainHtml() {
+  const count = normalizeExplainWordsCount(window.explainState.wordsCount)
 
   return `
-    <div class="explainGameShell">
+    <div class="explainWrap" data-segment-key="explain">
 
-      <div
-        class="explainTopBoard"
-        style="
-          direction:ltr;
-          display:grid;
-          grid-template-columns:minmax(0,1fr) 128px minmax(0,1fr);
-          grid-template-areas:'teamB center teamA';
-        "
-      >
+      <header class="explainHeader">
 
-        <button
-          type="button"
-          id="explainTeamBBox"
-          class="explainTeamBox explainTeamB"
-          data-team="B"
-          style="
-            grid-area:teamB;
-            justify-self:start;
-            direction:ltr;
-            flex-direction:row;
-          "
-          onclick="selectExplainTeam('B')"
-        >
-          <span class="explainTeamLabel">${escapeDisplayHtml(teamBName)}</span>
-          <strong id="explainScoreB">${window.explainState.scores.B}</strong>
-          <small id="explainAttemptsB">0</small>
+        <button class="explainDockBtn" type="button" onclick="goHome()">
+          رجوع
         </button>
-
-        <div
-          class="explainCenterTitle"
-          style="
-            grid-area:center;
-            justify-self:center;
-          "
-        >
-          <h3> </h3>
-        </div>
 
         <button
           type="button"
           id="explainTeamABox"
-          class="explainTeamBox explainTeamA"
+          class="explainTeamMini teamA ${window.explainState.currentTeam === "A" ? "explainTeamCurrent" : ""}"
           data-team="A"
-          style="
-            grid-area:teamA;
-            justify-self:end;
-            direction:ltr;
-            flex-direction:row-reverse;
-          "
           onclick="selectExplainTeam('A')"
         >
-          <span class="explainTeamLabel">${escapeDisplayHtml(teamAName)}</span>
-          <strong id="explainScoreA">${window.explainState.scores.A}</strong>
-          <small id="explainAttemptsA">0</small>
+          <div class="explainTeamName">
+            <strong>${escapeDisplayHtml(teamAName || "الفريق الأول")}</strong>
+          </div>
+
+          <b id="explainScoreA">${window.explainState.scores.A}</b>
         </button>
 
-      </div>
+        <div class="explainTitle">
+          <h1>اشرح الكلمة</h1>
+        </div>
 
-      <div class="explainNumbersGrid">
+        <button
+          type="button"
+          id="explainTeamBBox"
+          class="explainTeamMini teamB ${window.explainState.currentTeam === "B" ? "explainTeamCurrent" : ""}"
+          data-team="B"
+          onclick="selectExplainTeam('B')"
+        >
+          <b id="explainScoreB">${window.explainState.scores.B}</b>
+
+          <div class="explainTeamName">
+            <strong>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</strong>
+          </div>
+        </button>
+
+        <button
+          id="endRoundBtn"
+          class="explainDockBtn"
+          type="button"
+          onclick="endCurrentSegment()"
+          disabled
+        >
+          إنهاء
+        </button>
+
+      </header>
+
+      <section class="explainMainStage">
+
+        <div
+          id="explainWordBox"
+          class="explainWordBox"
+          onclick="hideExplainWord()"
+        ></div>
+
+        <div id="explainTimerBox" class="explainTimerBox hidden">
+          ${EXPLAIN_TIMER_SECONDS}
+        </div>
+
+      </section>
+
+      <section class="explainNumbersGrid">
         ${Array.from({ length: count }, (_, idx) => {
           const number = idx + 1
           const used = window.explainState.usedNumbers.includes(number)
@@ -379,24 +458,22 @@ function buildExplainHtml() {
             </button>
           `
         }).join("")}
-      </div>
+      </section>
 
-      <div class="explainMainStage">
-        <div
-          id="explainWordBox"
-          class="explainWordBox"
-          onclick="hideExplainWord()"
-        ></div>
+      <footer class="explainActionBar">
 
-        <div id="explainTimerBox" class="explainTimerBox hidden">
-  ${EXPLAIN_TIMER_SECONDS}
-</div>
-      </div>
-
-      <div class="explainControls">
         <button
           type="button"
-          class="explainControlBtn explainStartBtn"
+          id="explainDoubleBtn"
+          class="explainActionBtn explainDoubleBtn"
+          onclick="activateExplainDouble()"
+        >
+          دبل
+        </button>
+
+        <button
+          type="button"
+          class="explainActionBtn explainStartBtn"
           onclick="startExplainTimer()"
         >
           بدء المؤقت
@@ -404,7 +481,7 @@ function buildExplainHtml() {
 
         <button
           type="button"
-          class="explainControlBtn explainCorrectBtn"
+          class="explainActionBtn explainCorrectBtn"
           onclick="correctExplainAnswer()"
         >
           صح
@@ -412,12 +489,13 @@ function buildExplainHtml() {
 
         <button
           type="button"
-          class="explainControlBtn explainWrongBtn"
+          class="explainActionBtn explainWrongBtn"
           onclick="wrongExplainAnswer()"
         >
           خطأ
         </button>
-      </div>
+
+      </footer>
 
     </div>
   `
@@ -427,33 +505,29 @@ function buildExplainHtml() {
    UI Update
 ========================= */
 
-function getExplainTeamBox(team) {
-  const letter = team === "A" ? "A" : "B"
-
-  return (
-    document.getElementById(`team${letter}Box`) ||
-    document.getElementById(`explainTeam${letter}Box`) ||
-    document.querySelector(`[onclick="selectExplainTeam('${letter}')"]`) ||
-    document.querySelector(`[onclick='selectExplainTeam("${letter}")']`) ||
-    document.querySelector(`[data-team="${letter}"]`) ||
-    document.querySelector(`.explainTeamBox.team${letter}`) ||
-    document.querySelector(`.explainTeamCard.team${letter}`)
-  )
-}
-
 function highlightExplainTeam(team) {
-  const shell = document.querySelector(".explainGameShell")
+  const shell = document.querySelector(".explainWrap")
   if (!shell) return
 
   const a = shell.querySelector("#explainTeamABox")
   const b = shell.querySelector("#explainTeamBBox")
 
   if (a) {
-    a.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam", "explainTeamCurrent")
+    a.classList.remove(
+      "activeTeam",
+      "selectedPresenterTeam",
+      "finalTurnActiveTeam",
+      "explainTeamCurrent"
+    )
   }
 
   if (b) {
-    b.classList.remove("activeTeam", "selectedPresenterTeam", "finalTurnActiveTeam", "explainTeamCurrent")
+    b.classList.remove(
+      "activeTeam",
+      "selectedPresenterTeam",
+      "finalTurnActiveTeam",
+      "explainTeamCurrent"
+    )
   }
 
   if (team === "A" && a) {
@@ -468,45 +542,23 @@ function highlightExplainTeam(team) {
 function updateExplainUI() {
   const scoreAEl = document.getElementById("explainScoreA")
   const scoreBEl = document.getElementById("explainScoreB")
-  const attemptsAEl = document.getElementById("explainAttemptsA")
-  const attemptsBEl = document.getElementById("explainAttemptsB")
   const wordBox = document.getElementById("explainWordBox")
   const timerBox = document.getElementById("explainTimerBox")
 
-  if (scoreAEl) scoreAEl.innerText = Number(window.explainState.scores.A || 0)
-  if (scoreBEl) scoreBEl.innerText = Number(window.explainState.scores.B || 0)
+  if (scoreAEl) {
+    scoreAEl.innerText = Number(window.explainState.scores.A || 0)
+  }
 
-  if (attemptsAEl) attemptsAEl.innerText = Number(window.explainState.attempts.A || 0)
-  if (attemptsBEl) attemptsBEl.innerText = Number(window.explainState.attempts.B || 0)
+  if (scoreBEl) {
+    scoreBEl.innerText = Number(window.explainState.scores.B || 0)
+  }
 
   const explainActiveTeam =
-  window.explainState.currentTeam ||
-  selectedTeam ||
-  null
-
-highlightExplainTeam(explainActiveTeam)
-
-  const centerTitle = document.querySelector(".explainCenterTitle h3")
-
-  if (centerTitle) {
-  const team =
     window.explainState.currentTeam ||
     selectedTeam ||
     null
 
-  const teamName =
-    team === "A"
-      ? getExplainTeamName("A")
-      : team === "B"
-        ? getExplainTeamName("B")
-        : ""
-
-  centerTitle.innerHTML = `
-    <div class="explainCenterTurnTeamName">
-      ${teamName}
-    </div>
-  `
-}
+  highlightExplainTeam(explainActiveTeam)
 
   if (wordBox) {
     const hasWord = !!window.explainState.currentNumber
@@ -516,12 +568,20 @@ highlightExplainTeam(explainActiveTeam)
     wordBox.classList.toggle("hiddenWord", hiddenWord)
     wordBox.classList.toggle("emptyWord", !hasWord)
     wordBox.classList.toggle("wordBoxInvisible", hiddenWord)
+    wordBox.classList.toggle(
+      "danger",
+      hiddenWord &&
+      window.explainState.timerVisible &&
+      Number(window.explainState.timeLeft ?? EXPLAIN_TIMER_SECONDS) <= 5
+    )
 
     wordBox.classList.toggle("answerCorrect", window.explainState.answerResult === "correct")
     wordBox.classList.toggle("answerWrong", window.explainState.answerResult === "wrong")
 
     if (!hasWord) {
       wordBox.innerText = ""
+    } else if (hiddenWord && window.explainState.timerVisible) {
+      wordBox.innerText = Number(window.explainState.timeLeft ?? EXPLAIN_TIMER_SECONDS)
     } else if (hiddenWord) {
       wordBox.innerText = ""
     } else {
@@ -530,12 +590,14 @@ highlightExplainTeam(explainActiveTeam)
   }
 
   if (timerBox) {
-  timerBox.innerText = Number(window.explainState.timeLeft ?? EXPLAIN_TIMER_SECONDS)
-  timerBox.classList.toggle("hidden", !window.explainState.timerVisible)
-  timerBox.classList.toggle("danger", Number(window.explainState.timeLeft ?? EXPLAIN_TIMER_SECONDS) <= 5)
-}
+    const timeLeft = Number(window.explainState.timeLeft ?? EXPLAIN_TIMER_SECONDS)
 
-  for (let i = 1; i <= Number(window.explainState.wordsCount || 4); i++) {
+    timerBox.innerText = timeLeft
+    timerBox.classList.add("hidden")
+    timerBox.classList.toggle("danger", timeLeft <= 5)
+  }
+
+  for (let i = 1; i <= normalizeExplainWordsCount(window.explainState.wordsCount); i++) {
     const btn = document.getElementById(`explainNumber_${i}`)
     if (!btn) continue
 
@@ -544,24 +606,138 @@ highlightExplainTeam(explainActiveTeam)
 
     btn.classList.toggle("used", used)
     btn.classList.toggle("active", active)
-    btn.disabled = used || !!window.explainState.currentNumber || !!window.explainState.revealLock
+
+    btn.disabled =
+      used ||
+      !!window.explainState.currentNumber ||
+      !!window.explainState.revealLock
   }
 
+  updateExplainDoubleButton()
   saveExplainState()
 }
+
+/* =========================
+   Double
+   نفس نظام فتبلة القديم
+========================= */
+
+function activateExplainDouble() {
+  if (window.explainState.currentNumber || window.explainState.revealLock) {
+    showGameToast("الدبل قبل اختيار الرقم فقط")
+    return
+  }
+
+  if (explainDoubleState.used.A && explainDoubleState.used.B) {
+    showGameToast("تم استخدام الدبل من الفريقين")
+    return
+  }
+
+  explainDoublePickMode = true
+  showGameToast("اختر الفريق لتفعيل الدبل")
+  updateExplainDoubleButton()
+  saveExplainState()
+}
+
+function getExplainScoreValue(team) {
+  return explainDoubleState.activeTeam === team ? 2 : 1
+}
+
+function clearExplainActiveDouble(team) {
+  if (explainDoubleState.activeTeam === team) {
+    explainDoubleState.activeTeam = null
+  }
+
+  explainDoublePickMode = false
+}
+
+function updateExplainDoubleButton() {
+  const btn = document.getElementById("explainDoubleBtn")
+  if (!btn) return
+
+  const team = window.explainState.currentTeam
+
+  btn.classList.remove("activeDouble")
+
+  if (explainDoublePickMode) {
+    btn.disabled = false
+    btn.innerText = "اختر الفريق"
+    btn.classList.add("activeDouble")
+    return
+  }
+
+  if (window.explainState.currentNumber || window.explainState.revealLock) {
+    btn.disabled = true
+    btn.innerText = "دبل"
+    return
+  }
+
+  if (explainDoubleState.used.A && explainDoubleState.used.B) {
+    btn.disabled = true
+    btn.innerText = "الدبل مقفل"
+    return
+  }
+
+  if (team && explainDoubleState.activeTeam === team) {
+    btn.disabled = true
+    btn.innerText = "الدبل مفعّل"
+    btn.classList.add("activeDouble")
+    return
+  }
+
+  if (team && explainDoubleState.used[team]) {
+    btn.disabled = true
+    btn.innerText = "استخدم الدبل"
+    return
+  }
+
+  btn.disabled = false
+  btn.innerText = "دبل"
+}
+
 /* =========================
    Team / Number
 ========================= */
 
 function selectExplainTeam(team) {
   if (window.explainState.revealLock) return
+  if (team !== "A" && team !== "B") return
+
+  if (explainDoublePickMode) {
+    if (window.explainState.currentNumber) {
+      showGameToast("الدبل قبل اختيار الرقم فقط")
+      explainDoublePickMode = false
+      updateExplainDoubleButton()
+      saveExplainState()
+      return
+    }
+
+    if (explainDoubleState.used[team]) {
+      showGameToast("هذا الفريق استخدم الدبل مسبقًا")
+      return
+    }
+
+    setExplainActiveTeam(team)
+
+    explainDoubleState.used[team] = true
+    explainDoubleState.activeTeam = team
+    explainDoublePickMode = false
+
+    showGameToast(`تم تفعيل الدبل لفريق ${getExplainTeamName(team)}`)
+
+    updateExplainUI()
+    updateExplainDoubleButton()
+    saveExplainState()
+    return
+  }
 
   if (window.explainState.currentNumber) {
     showGameToast("أنهِ الكلمة الحالية أولاً")
     return
   }
 
-  const gameStarted = Array.isArray(window.explainState.usedNumbers) &&
+  const gameStarted =
+    Array.isArray(window.explainState.usedNumbers) &&
     window.explainState.usedNumbers.length > 0
 
   if (gameStarted) {
@@ -571,16 +747,8 @@ function selectExplainTeam(team) {
 
   setExplainActiveTeam(team)
 
-  const centerTitle = document.querySelector(".explainCenterTitle h3")
-  if (centerTitle) {
-    centerTitle.innerHTML = `
-      <div class="explainCenterTurnTeamName">
-        ${getExplainTeamName(team)}
-      </div>
-    `
-  }
-
   updateExplainUI()
+  updateExplainDoubleButton()
   saveExplainState()
 }
 
@@ -590,19 +758,18 @@ function openExplainNumber(number) {
   if (window.explainState.revealLock) return
 
   const n = Number(number || 0)
+  const activeTeam = selectedTeam || window.explainState.currentTeam
 
-const activeTeam = selectedTeam || window.explainState.currentTeam
+  if (!activeTeam) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
 
-if (!activeTeam) {
-  showGameToast("اختر الفريق أولاً")
-  return
-}
-
-if (!canExplainTeamPlay(activeTeam)) {
-  const other = getExplainOtherTeam(activeTeam)
-  showGameToast(`الدور الآن لـ ${getExplainTeamName(other)}`)
-  return
-}
+  if (!canExplainTeamPlay(activeTeam)) {
+    const other = getExplainOtherTeam(activeTeam)
+    showGameToast(`الدور الآن لـ ${getExplainTeamName(other)}`)
+    return
+  }
 
   if (window.explainState.usedNumbers.includes(n)) {
     showGameToast("هذا الرقم مستخدم")
@@ -620,13 +787,13 @@ if (!canExplainTeamPlay(activeTeam)) {
   resetExplainRevealTimeout()
 
   window.explainState.currentNumber = n
-window.explainState.currentWord = item.word
+  window.explainState.currentWord = item.word
 
-setExplainActiveTeam(activeTeam)
+  setExplainActiveTeam(activeTeam)
 
-window.explainState.wordVisible = true
-window.explainState.timerVisible = false
-window.explainState.timeLeft = EXPLAIN_TIMER_SECONDS
+  window.explainState.wordVisible = true
+  window.explainState.timerVisible = false
+  window.explainState.timeLeft = EXPLAIN_TIMER_SECONDS
 
   playGameSound("open")
   updateExplainUI()
@@ -667,7 +834,8 @@ function startExplainTimer() {
   saveExplainState()
 
   timer = setInterval(() => {
-    window.explainState.timeLeft = Number(window.explainState.timeLeft || 0) - 1
+    window.explainState.timeLeft =
+      Number(window.explainState.timeLeft || 0) - 1
 
     if (
       window.explainState.timeLeft > 0 &&
@@ -681,6 +849,7 @@ function startExplainTimer() {
     if (window.explainState.timeLeft <= 0) {
       window.explainState.timeLeft = 0
       window.explainState.timerVisible = false
+
       resetExplainTimer()
       playGameSound("timeout")
     }
@@ -727,8 +896,10 @@ function finishExplainNumber(isCorrect) {
   window.explainState.answerResult = isCorrect ? "correct" : "wrong"
 
   if (isCorrect) {
+    const points = getExplainScoreValue(activeTeam)
+
     window.explainState.scores[activeTeam] =
-      Number(window.explainState.scores[activeTeam] || 0) + 1
+      Number(window.explainState.scores[activeTeam] || 0) + points
 
     playGameSound("correct")
     flashScreen("correct")
@@ -736,6 +907,8 @@ function finishExplainNumber(isCorrect) {
     playGameSound("wrong")
     flashScreen("wrong")
   }
+
+  clearExplainActiveDouble(activeTeam)
 
   window.explainState.attempts[activeTeam] =
     Number(window.explainState.attempts[activeTeam] || 0) + 1
@@ -752,29 +925,32 @@ function finishExplainNumber(isCorrect) {
 
   explainRevealTimeout = setTimeout(() => {
     const allDone =
-      window.explainState.usedNumbers.length >= Number(window.explainState.wordsCount || 4)
+      window.explainState.usedNumbers.length >=
+      normalizeExplainWordsCount(window.explainState.wordsCount)
 
     const nextTeam = allDone ? null : getExplainOtherTeam(activeTeam)
 
     window.explainState.currentNumber = null
-window.explainState.currentWord = ""
+    window.explainState.currentWord = ""
 
-if (nextTeam) {
-  setExplainActiveTeam(nextTeam)
-} else {
-  setExplainActiveTeam(null)
-}
+    if (nextTeam) {
+      setExplainActiveTeam(nextTeam)
+    } else {
+      setExplainActiveTeam(null)
+    }
 
-window.explainState.wordVisible = true
-window.explainState.timerVisible = false
-window.explainState.timeLeft = EXPLAIN_TIMER_SECONDS
-window.explainState.revealLock = false
-window.explainState.answerResult = null
+    window.explainState.wordVisible = true
+    window.explainState.timerVisible = false
+    window.explainState.timeLeft = EXPLAIN_TIMER_SECONDS
+    window.explainState.revealLock = false
+    window.explainState.answerResult = null
 
-updateExplainUI()
-saveExplainState()
+    updateExplainUI()
+    updateExplainDoubleButton()
+    saveExplainState()
   }, 5000)
 }
+
 function correctExplainAnswer() {
   finishExplainNumber(true)
 }
@@ -782,3 +958,11 @@ function correctExplainAnswer() {
 function wrongExplainAnswer() {
   finishExplainNumber(false)
 }
+
+window.activateExplainDouble = activateExplainDouble
+window.selectExplainTeam = selectExplainTeam
+window.openExplainNumber = openExplainNumber
+window.hideExplainWord = hideExplainWord
+window.startExplainTimer = startExplainTimer
+window.correctExplainAnswer = correctExplainAnswer
+window.wrongExplainAnswer = wrongExplainAnswer

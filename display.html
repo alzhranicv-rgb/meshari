@@ -6,17 +6,19 @@
 
   <title>الحنكة</title>
 
-  <!-- ملفات الفقرات أولاً -->
-  <link rel="stylesheet" href="assets/css/segments/warmup.css" />
-  <link rel="stylesheet" href="assets/css/segments/top10.css" />
-  <link rel="stylesheet" href="assets/css/segments/auction.css" />
-  <link rel="stylesheet" href="assets/css/segments/who.css" />
-  <link rel="stylesheet" href="assets/css/segments/explain.css" />
-  <link rel="stylesheet" href="assets/css/segments/final.css" />
-  <link rel="stylesheet" href="assets/css/segments/archive.css" />
+  <!-- ملف التصميم الرئيسي أولاً -->
+  <link rel="stylesheet" href="styles.css?v=1002" />
 
-  <!-- ملف التصميم الرئيسي أخيراً -->
-  <link rel="stylesheet" href="styles.css?v=9999" />
+  <!-- ملفات الفقرات -->
+  <link rel="stylesheet" href="assets/css/segments/top10.css?v=1002" />
+  <link rel="stylesheet" href="assets/css/segments/auction.css?v=1002" />
+  <link rel="stylesheet" href="assets/css/segments/who.css?v=1002" />
+  <link rel="stylesheet" href="assets/css/segments/explain.css?v=1002" />
+  <link rel="stylesheet" href="assets/css/segments/archive.css?v=1002" />
+  <link rel="stylesheet" href="assets/css/segments/warmup.css?v=1002" />
+
+  <!-- الفاينل آخر ملف عشان تصميمه يغلب على archiveCtrlBtn -->
+  <link rel="stylesheet" href="assets/css/segments/final.css?v=1002" />
 </head>
 
 <body>
@@ -49,10 +51,8 @@
 
     </div>
 
-    <!-- مربع النموذج وكود المقدم -->
     <div id="homeModelPopupArea" class="homeModelPopupArea hidden"></div>
 
-    <!-- فقرات العرض تظهر من JavaScript حسب اختيار الأدمن -->
     <div class="homeSegmentsShowcase" id="segmentsGrid"></div>
 
     <div class="winnerArea homeWinnerArea" id="winnerArea">
@@ -119,21 +119,21 @@
       </header>
 
       <section class="finalQuickStats">
-  <div>
-    <span>المكتملة</span>
-    <b id="finalQuickCompleted">0/0</b>
-  </div>
+        <div>
+          <span>المكتملة</span>
+          <b id="finalQuickCompleted">0/0</b>
+        </div>
 
-  <div>
-    <span>التعادلات</span>
-    <b id="finalQuickDraws">0</b>
-  </div>
+        <div>
+          <span>التعادلات</span>
+          <b id="finalQuickDraws">0</b>
+        </div>
 
-  <div>
-    <span>المتبقي</span>
-    <b id="finalQuickPending">0</b>
-  </div>
-</section>
+        <div>
+          <span>المتبقي</span>
+          <b id="finalQuickPending">0</b>
+        </div>
+      </section>
 
       <main class="finalResultsCeremony">
 
@@ -343,18 +343,18 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
 
-  <script src="assets/js/game.js"></script>
-  <script src="assets/js/game-state.js"></script>
+  <script src="assets/js/game.js?v=1002"></script>
+  <script src="assets/js/game-state.js?v=1002"></script>
 
-  <script src="assets/js/warmup.js"></script>
-  <script src="assets/js/top10.js"></script>
-  <script src="assets/js/auction.js"></script>
-  <script src="assets/js/who.js"></script>
-  <script src="assets/js/explain.js?v=10"></script>
-  <script src="assets/js/final.js"></script>
-  <script src="assets/js/archive.js"></script>
+  <script src="assets/js/warmup.js?v=1002"></script>
+  <script src="assets/js/top10.js?v=1002"></script>
+  <script src="assets/js/auction.js?v=1002"></script>
+  <script src="assets/js/who.js?v=1002"></script>
+  <script src="assets/js/explain.js?v=1002"></script>
+  <script src="assets/js/final.js?v=1002"></script>
+  <script src="assets/js/archive.js?v=1002"></script>
 
-  <script src="assets/js/presenter-listener.js"></script>
+  <script src="assets/js/presenter-listener.js?v=1002"></script>
 
 </body>
 </html>

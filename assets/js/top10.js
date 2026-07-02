@@ -227,30 +227,48 @@ function restoreTop10State(saved) {
     top10MaxRound
   )
 
+  const currentRound = Number(top10State.round || 1)
+  const currentOpened = top10State.opened?.[currentRound] || []
+
+  /*
+    بداية الفقرة أو بداية الجولة:
+    إذا ما انفتح أي رقم، لا نخلي أي فريق محدد
+  */
+  if (!currentOpened.length) {
+    top10State.activeTeam = null
+    top10State.lastTeam = null
+    currentTop10Answer = null
+    currentTop10Number = null
+    top10TimerStarted = false
+  }
+
   top10DoubleState = saved.top10DoubleState || {
     used: { A: false, B: false },
     activeTeam: null
   }
 
-  currentTop10Answer = saved.currentTop10Answer || null
-  currentTop10Number = saved.currentTop10Number || null
-  top10TimerStarted = !!saved.top10TimerStarted
+  currentTop10Answer = currentTop10Answer || saved.currentTop10Answer || null
+  currentTop10Number = currentTop10Number || saved.currentTop10Number || null
+  top10TimerStarted = !!top10TimerStarted && !!saved.top10TimerStarted
   top10AnimatingNumber = null
   top10History = Array.isArray(saved.top10History) ? saved.top10History : []
 
   syncTop10Globals()
   renderCurrentRoundTop10UI()
-  if (top10State.activeTeam) {
-  setTop10ActiveTeam(top10State.activeTeam, { sync:false })
-}
+
+  if (top10State.activeTeam && currentOpened.length > 0) {
+    setTop10ActiveTeam(top10State.activeTeam, { sync:false })
+  } else {
+    setTop10ActiveTeam(null, { sync:false })
+  }
 
   const timerValue = Number(saved.timerValue || 0)
 
-  if (top10TimerStarted && timerValue > 0) {
+  if (top10TimerStarted && timerValue > 0 && currentOpened.length > 0) {
     resumeTop10Timer(timerValue)
   } else {
     const timerBox = document.getElementById("timer")
-    if (timerBox) timerBox.innerText = timerValue || 0
+    if (timerBox) timerBox.innerText = 0
   }
 
   updateTop10UndoButtonState()
@@ -261,7 +279,6 @@ function restoreTop10State(saved) {
     updateEndRoundButtonState()
   }
 }
-
 /* =========================
    Double
 ========================= */
@@ -559,112 +576,125 @@ function buildTop10HTML() {
   const leftSide = [6, 7, 8, 9, 10]
 
   return `
-    <div class="top10Wrap">
-      <div class="top10MainBoard">
+    <div class="top10Wrap" data-segment-key="top10">
 
-        <div class="top10HeaderBar">
+      <header class="top10Header">
 
-          <div
-            class="top10ScoreCard ${top10State.activeTeam === "A" ? "activeTeam" : ""}"
-            id="top10TeamA"
-            onclick="selectTop10Team('A')"
-          >
-            <div class="top10ScoreName top10ScoreNameLeft">
-              ${escapeDisplayHtml(teamAName)}
-            </div>
+        <button class="top10DockBtn" type="button" onclick="goHome()">
+          رجوع
+        </button>
 
-            <div class="top10ScoreErrors" id="top10ErrorsA">
-              ${renderTop10Errors("A")}
-            </div>
-
-            <div class="top10ScoreValue top10ScoreValueRight" id="top10ScoreA">
-              ${top10State.scores.A}
-            </div>
+        <div
+          class="top10TeamMini teamA ${top10State.activeTeam === "A" ? "top10TeamCurrent" : ""}"
+          id="top10TeamA"
+          onclick="selectTop10Team('A')"
+        >
+          <div class="top10TeamName">
+            <strong>${escapeDisplayHtml(teamAName || "الفريق الأول")}</strong>
           </div>
 
-          <div class="top10MiddleCard">
-            <div class="top10MiddleTimer" id="timer">0</div>
-
-            <div class="top10MiddleTurn" id="top10TurnLabel">
-              ${
-                top10State.activeTeam === "A"
-                  ? teamAName
-                  : top10State.activeTeam === "B"
-                  ? teamBName
-                  : "اختر فريق"
-              }
-            </div>
+          <div class="top10Errors" id="top10ErrorsA">
+            ${renderTop10Errors("A")}
           </div>
 
-          <div
-            class="top10ScoreCard ${top10State.activeTeam === "B" ? "activeTeam" : ""}"
-            id="top10TeamB"
-            onclick="selectTop10Team('B')"
-          >
-            <div class="top10ScoreValue top10ScoreValueLeft" id="top10ScoreB">
-              ${top10State.scores.B}
-            </div>
+          <b id="top10ScoreA">${top10State.scores.A}</b>
+        </div>
 
-            <div class="top10ScoreErrors" id="top10ErrorsB">
-              ${renderTop10Errors("B")}
-            </div>
+        <div class="top10Title">
+          <h1>Top 10</h1>
+          <span id="top10RoundLabel">الجولة ${round}</span>
+        </div>
 
-            <div class="top10ScoreName top10ScoreNameRight">
-              ${escapeDisplayHtml(teamBName)}
-            </div>
+        <div
+          class="top10TeamMini teamB ${top10State.activeTeam === "B" ? "top10TeamCurrent" : ""}"
+          id="top10TeamB"
+          onclick="selectTop10Team('B')"
+        >
+          <b id="top10ScoreB">${top10State.scores.B}</b>
+
+          <div class="top10Errors" id="top10ErrorsB">
+            ${renderTop10Errors("B")}
           </div>
 
-        </div>
-
-        <div class="top10QuestionBox" id="top10QuestionBox">
-          ${escapeDisplayHtml(top10State.question[round] || "السؤال يظهر هنا")}
-        </div>
-
-        <div class="top10ControlPanel">
-          <button
-            onclick="activateTop10Double()"
-            id="top10DoubleBtn"
-            class="top10DoubleBtn"
-          >
-            دوبيلا
-          </button>
-
-          <button onclick="showTop10Answer()" class="btnAnswer">
-            إظهار الإجابات
-          </button>
-
-          <button onclick="addTop10Error()" class="top10ErrorBtnSingle">
-            خطأ
-          </button>
-
-          <button onclick="undoTop10Action()" id="top10UndoBtn" class="undoBtn">
-            تراجع
-          </button>
-
-          <button onclick="switchTop10Turn()" class="roundNavBtn switchTurnBtn">
-            تبديل الدور
-          </button>
-
-          <button onclick="nextTop10Round()" class="roundNavBtn">
-            الجولة التالية
-          </button>
-        </div>
-
-        <div class="top10NumbersShell">
-          <div class="top10NumbersArea">
-
-            <div class="top10Side top10RightSide">
-              ${rightSide.map(num => renderTop10Rect(num, opened)).join("")}
-            </div>
-
-            <div class="top10Side top10LeftSide">
-              ${leftSide.map(num => renderTop10Rect(num, opened)).join("")}
-            </div>
-
+          <div class="top10TeamName">
+            <strong>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</strong>
           </div>
         </div>
 
-      </div>
+        <button
+          id="endRoundBtn"
+          class="top10DockBtn"
+          type="button"
+          onclick="endCurrentSegment()"
+          disabled
+        >
+          إنهاء
+        </button>
+
+      </header>
+
+      <section class="top10QuestionCard">
+
+        <div class="top10QuestionSide">
+          <span class="top10QuestionLabel">السؤال</span>
+
+          <div class="top10QuestionText" id="top10QuestionBox">
+            ${escapeDisplayHtml(top10State.question[round] || "السؤال يظهر هنا")}
+          </div>
+        </div>
+
+        <div class="top10TimerPill">
+  <strong id="timer">0</strong>
+</div>
+
+        
+
+      </section>
+
+      <section class="top10NumbersBoard">
+
+        <div class="top10Side top10RightSide">
+          ${rightSide.map(num => renderTop10Rect(num, opened)).join("")}
+        </div>
+
+        <div class="top10Side top10LeftSide">
+          ${leftSide.map(num => renderTop10Rect(num, opened)).join("")}
+        </div>
+
+      </section>
+
+      <footer class="top10ActionBar">
+
+        <button
+          onclick="activateTop10Double()"
+          id="top10DoubleBtn"
+          class="top10ActionBtn top10DoubleBtn"
+        >
+          دوبيلا
+        </button>
+
+        <button onclick="showTop10Answer()" class="top10ActionBtn top10AnswerBtn">
+          إظهار الإجابات
+        </button>
+
+        <button onclick="addTop10Error()" class="top10ActionBtn top10WrongBtn">
+          خطأ
+        </button>
+
+        <button onclick="undoTop10Action()" id="top10UndoBtn" class="top10ActionBtn top10UndoBtn">
+          تراجع
+        </button>
+
+        <button onclick="switchTop10Turn()" class="top10ActionBtn top10SwitchBtn">
+          تبديل الدور
+        </button>
+
+        <button onclick="nextTop10Round()" class="top10ActionBtn top10NextBtn">
+          الجولة التالية
+        </button>
+
+      </footer>
+
     </div>
   `
 }
@@ -782,7 +812,9 @@ function selectTop10Team(team) {
 }
 
 function getTop10TeamBox(team) {
-  const letter = team === "A" ? "A" : "B"
+  if (team !== "A" && team !== "B") return null
+
+  const letter = team
 
   return (
     document.getElementById(`top10Team${letter}Box`) ||
@@ -805,13 +837,15 @@ function highlightTop10TurnTeam() {
     el.classList.remove("top10TeamCurrent")
   })
 
+  if (team !== "A" && team !== "B") {
+    return
+  }
+
   const box = getTop10TeamBox(team)
 
   if (box) {
     box.classList.remove("activeTeam", "selectedPresenterTeam")
     box.classList.add("top10TeamCurrent")
-  } else {
-    console.log("TOP10 TEAM BOX NOT FOUND:", team)
   }
 }
 
@@ -911,7 +945,14 @@ function stopTop10Timer(resetValue = 0) {
   top10LastTickPlayed = null
 
   const timerBox = document.getElementById("timer")
-  if (timerBox) timerBox.innerText = resetValue
+  if (timerBox) {
+    timerBox.innerText = resetValue
+
+    const timerPill = timerBox.closest(".top10TimerPill")
+    if (timerPill) {
+      timerPill.classList.remove("timerDanger")
+    }
+  }
 }
 
 async function openTop10Number(num) {
@@ -1035,13 +1076,23 @@ function runTop10Timer(seconds) {
   timer = null
 
   let time = Number(seconds || 0)
-  top10LastTickPlayed = null
-  timerBox.innerText = time
-  saveTop10State()
+top10LastTickPlayed = null
+timerBox.innerText = time
+
+const timerPill = timerBox.closest(".top10TimerPill")
+if (timerPill) {
+  timerPill.classList.toggle("timerDanger", time > 0 && time <= 5)
+}
+
+saveTop10State()
 
   timer = setInterval(() => {
     time--
     timerBox.innerText = time
+    const timerPill = timerBox.closest(".top10TimerPill")
+if (timerPill) {
+  timerPill.classList.toggle("timerDanger", time > 0 && time <= 5)
+}
 
     if (time > 0 && time <= 5 && top10LastTickPlayed !== time) {
       top10LastTickPlayed = time

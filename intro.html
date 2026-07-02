@@ -11,7 +11,7 @@
   <title>الحنكة - المقدمة</title>
 
   <link rel="stylesheet" href="styles.css?v=10000" />
-  <link rel="stylesheet" href="assets/css/segments/intro.css?v=43" />
+  <link rel="stylesheet" href="assets/css/segments/intro.css?v=500" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="assets/js/supabase.js"></script>
@@ -21,104 +21,106 @@
 
   <main class="introPage">
 
-    <!-- خلفية الانترو -->
-    <div class="introBgShape introBgShapeOne"></div>
-    <div class="introBgShape introBgShapeTwo"></div>
-    <div class="introBgShape introBgShapeThree"></div>
+    <section id="introCard" class="introCard" aria-label="إعداد اللعبة">
 
-    <!-- كرت الإعداد -->
-    <section class="introCard" aria-label="إعداد اللعبة">
+      <!-- العنوان فقط -->
+      <div class="introTitleArea">
+  <div class="introTopBadge">يلا بينااا</div>
+  <h1 class="introTitle">الحنكة</h1>
+</div>
 
-      <header class="introCardHeader">
+      <!-- الإعدادات -->
+      <section class="introPanel">
 
-        <div class="introMiniBadge">
-          يلاااا بيينااا
-        </div>
+        <!-- أسماء الفريقين -->
+        <div class="introTeamsRow">
 
-        <h1 class="introTitle">
-          الحنكة
-        </h1>
+          <div class="introLabeledField">
+            <div class="introMiniLabel">الفريق الأول</div>
 
-        <p class="introSubtitle">
-          جهّز الفرق، اختر النموذج، وابدأ التحدي
-        </p>
-
-      </header>
-
-      <div class="introFormCard">
-
-        <!-- أسماء الفرق -->
-        <div class="introTeamsGrid">
-
-          <div class="introFieldBox">
-            <label for="teamANameInput">
-              الفريق الأول
-            </label>
-
-            <input
-              id="teamANameInput"
-              type="text"
-              placeholder="اكتب اسم الفريق الأول"
-              autocomplete="off"
-              maxlength="18"
-            />
+            <div class="introField">
+              <input
+                id="teamANameInput"
+                type="text"
+                placeholder="اسم الفريق الأول"
+                autocomplete="off"
+                maxlength="18"
+              />
+            </div>
           </div>
 
-          <div class="introFieldBox">
-            <label for="teamBNameInput">
-              الفريق الثاني
-            </label>
+          <div class="introLabeledField">
+            <div class="introMiniLabel">الفريق الثاني</div>
 
-            <input
-              id="teamBNameInput"
-              type="text"
-              placeholder="اكتب اسم الفريق الثاني"
-              autocomplete="off"
-              maxlength="18"
-            />
+            <div class="introField">
+              <input
+                id="teamBNameInput"
+                type="text"
+                placeholder="اسم الفريق الثاني"
+                autocomplete="off"
+                maxlength="18"
+              />
+            </div>
           </div>
 
         </div>
 
         <!-- النموذج + اختيار الفقرات -->
-        <div class="introModelSegmentsRow">
+        <section class="introTopSetupRow">
 
-          <!-- اختيار النموذج -->
-          <div class="introFieldBox introModelBox">
-            <label for="introModelSelect">
-              النموذج
-            </label>
+          <div class="introLabeledField introModelBox">
+            <div class="introMiniLabel">النموذج</div>
 
-            <select id="introModelSelect">
-              <option value="">
-                جارٍ تحميل النماذج...
-              </option>
-            </select>
+            <div class="introModelRow">
+              <select id="introModelSelect">
+                <option value="">جارٍ تحميل النماذج...</option>
+              </select>
+            </div>
           </div>
 
-          <!-- اختيار الفقرات - زر يفتح نافذة -->
-          <section class="introSegmentsBox introSegmentsTriggerBox" id="introSegmentsBox">
+          <div class="introSegmentsInfoRow" id="introSegmentsBox">
 
-            <button
-              type="button"
-              class="introOpenSegmentsBtn"
-              onclick="openIntroSegmentsModal()"
+            <div class="introSegmentsTitle">
+              اختيار الفقرات
+            </div>
+
+            <div
+              id="introSegmentsTriggerSummary"
+              class="introSegmentsSummary"
             >
-              <div class="introOpenSegmentsText">
-                <strong>اختيار الفقرات</strong>
-                <span id="introSegmentsTriggerSummary">اختر النموذج أولاً</span>
-              </div>
+              اختر النموذج أولاً
+            </div>
 
-              <div class="introSegmentsCounter" id="introSegmentsTriggerCounter">
-                0 / 6-10
-              </div>
-            </button>
+            <div
+              id="introSegmentsTriggerCounter"
+              class="introSegmentsCounter"
+            >
+              0 / 6-10
+            </div>
 
-          </section>
+            <div
+              id="introSegmentsCounter"
+              class="introSegmentsCounterHidden"
+            >
+              0 / 6-10
+            </div>
 
-        </div>
+          </div>
 
-        <!-- بدء اللعبة -->
+        </section>
+
+        <!-- الفقرات -->
+        <section class="introSegmentsPanel">
+
+          <div id="introSegmentsGrid" class="introSegmentsGrid">
+            <div class="introSegmentsEmpty">
+              اختر النموذج أولاً
+            </div>
+          </div>
+
+        </section>
+
+        <!-- زر البداية -->
         <button
           type="button"
           id="startGameBtn"
@@ -127,85 +129,11 @@
           بدء اللعبة
         </button>
 
-      </div>
+      </section>
 
     </section>
 
   </main>
-
-  <!-- نافذة اختيار الفقرات -->
-  <div id="introSegmentsModal" class="introSegmentsModal hidden">
-
-    <div class="introSegmentsModalCard">
-
-      <button
-        type="button"
-        class="introSegmentsModalClose"
-        onclick="closeIntroSegmentsModal()"
-        aria-label="إغلاق"
-      >
-        ×
-      </button>
-
-      <header class="introSegmentsModalHeader">
-
-        <div class="introSegmentsModalBadge">
-          فقرات العرض
-        </div>
-
-        <div class="introSegmentsModalTitle">
-          اختيار الفقرات
-        </div>
-
-        <div class="introSegmentsModalText">
-          اختر من 6 إلى 10 فقرات، والترتيب حسب ضغطك
-        </div>
-
-      </header>
-
-      <div class="introSegmentsModalTop">
-
-        <div class="introSegmentsCounter" id="introSegmentsCounter">
-          0 / 6-10
-        </div>
-
-        <div class="introSegmentsModalHint">
-          اضغط على الفقرة لاختيارها أو إلغاء اختيارها
-        </div>
-
-      </div>
-
-      <div class="introSegmentsGrid" id="introSegmentsGrid">
-        <div class="introSegmentsEmpty">
-          اختر النموذج أولاً
-        </div>
-      </div>
-
-      <div class="introSegmentsOrder" id="introSegmentsOrder"></div>
-
-      <div class="introSegmentsModalActions">
-
-        <button
-          type="button"
-          class="introSegmentsModalBtn secondary"
-          onclick="closeIntroSegmentsModal()"
-        >
-          رجوع
-        </button>
-
-        <button
-          type="button"
-          class="introSegmentsModalBtn primary"
-          onclick="closeIntroSegmentsModal()"
-        >
-          تم
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
 
   <!-- نافذة ربط المقدم -->
   <div id="presenterIntroModal" class="introPresenterModal hidden">
@@ -221,23 +149,19 @@
         ×
       </button>
 
-      <header class="introPresenterModalHeader">
+      <header class="introPresenterHeader">
 
-        <div class="introPresenterModalBadge">
-          صفحة المقدم
-        </div>
-
-        <div class="introPresenterModalTitle">
+        <div class="introPresenterTitle">
           اربط المقدم
         </div>
 
-        <div class="introPresenterModalText">
-          امسح QR من جهاز المقدم، أو أدخل الكود يدويًا
+        <div class="introPresenterText">
+          امسح QR أو أدخل الكود
         </div>
 
       </header>
 
-      <div class="introPresenterContent">
+      <section class="introPresenterContent">
 
         <div class="introPresenterQrBox">
           <img
@@ -271,9 +195,9 @@
 
         </div>
 
-      </div>
+      </section>
 
-      <div class="introPresenterModalActions">
+      <footer class="introPresenterActions">
 
         <button
           type="button"
@@ -291,19 +215,19 @@
           بدء اللعبة
         </button>
 
-      </div>
+      </footer>
 
     </div>
 
   </div>
 
-  <!-- التوست -->
+  <!-- الإشعار -->
   <div id="gameToast" class="gameToast hidden">
     <div class="gameToastIcon">!</div>
     <div id="gameToastText" class="gameToastText"></div>
   </div>
 
-  <script src="intro.js?v=43"></script>
+  <script src="intro.js?v=44"></script>
 
 </body>
 </html>

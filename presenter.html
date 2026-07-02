@@ -47,6 +47,31 @@
         onkeydown="if(event.key === 'Enter'){ event.preventDefault(); joinGameSession(); }"
       />
 
+      <!-- اختيار طريقة المقدم -->
+      <div class="presenterModeBox">
+        <div class="presenterModeLabel">طريقة الدخول</div>
+
+        <div class="presenterModeBtns">
+          <button
+            type="button"
+            id="presenterControlModeBtn"
+            class="presenterModeBtn activePresenterMode"
+            onclick="setPresenterJoinMode('control')"
+          >
+            تحكم بالعرض
+          </button>
+
+          <button
+            type="button"
+            id="presenterReaderModeBtn"
+            class="presenterModeBtn"
+            onclick="setPresenterJoinMode('reader')"
+          >
+            دليل الأسئلة
+          </button>
+        </div>
+      </div>
+
       <button
         type="button"
         id="presenterJoinBtn"
@@ -64,7 +89,7 @@
 
   </div>
 
-  <!-- الصفحة الرئيسية للمقدم -->
+  <!-- الصفحة الرئيسية للمقدم - وضع التحكم -->
   <div id="presenterHome" class="homePageShell hidden">
 
     <div class="topBoard" id="presenterScoreBoard">
@@ -103,7 +128,74 @@
 
   </div>
 
-  <!-- صفحة الفقرة -->
+  <!-- الصفحة الرئيسية للمقدم - دليل الأسئلة -->
+  <div id="presenterReaderHome" class="homePageShell presenterReaderHome hidden">
+
+    <div class="presenterReaderHeader">
+      <button
+        type="button"
+        class="presenterReaderBackBtn"
+        onclick="presenterReaderLogout()"
+      >
+        خروج
+      </button>
+
+      <div class="presenterReaderTitleBox">
+        <h1>دليل الأسئلة</h1>
+        <div id="presenterReaderSubtitle" class="modelNameDisplay">
+          عرض الأسئلة والإجابات فقط
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="presenterReaderRefreshBtn"
+        onclick="renderPresenterReaderHome()"
+      >
+        تحديث
+      </button>
+    </div>
+
+    <div class="presenterReaderNotice">
+      هذا الوضع للقراءة فقط، بدون تحكم أو ربط مباشر مع العرض.
+    </div>
+
+    <div id="presenterReaderSegmentsGrid" class="presenterReaderSegmentsGrid"></div>
+
+  </div>
+
+  <!-- صفحة دليل الأسئلة داخل فقرة -->
+  <div id="presenterReaderSegmentPage" class="homePageShell presenterReaderSegmentPage hidden">
+
+    <div class="presenterCleanHeader presenterReaderCleanHeader">
+
+      <button
+        type="button"
+        class="presenterCleanHeaderBtn presenterCleanBackBtn"
+        onclick="presenterReaderGoHome()"
+      >
+        رجوع
+      </button>
+
+      <div class="presenterCleanHeaderTitle">
+        <h1 id="presenterReaderSegmentTitle">دليل الأسئلة</h1>
+      </div>
+
+      <button
+        type="button"
+        class="presenterCleanHeaderBtn presenterCleanEndBtn"
+        onclick="reloadPresenterReaderSegment()"
+      >
+        تحديث
+      </button>
+
+    </div>
+
+    <div id="presenterReaderPanel" class="presenterReaderPanel"></div>
+
+  </div>
+
+  <!-- صفحة الفقرة - وضع التحكم -->
   <div id="presenterSegmentPage" class="homePageShell presenterSegmentPage hidden">
 
     <div class="presenterCleanHeader">

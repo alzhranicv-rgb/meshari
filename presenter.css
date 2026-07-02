@@ -1819,3 +1819,1832 @@ button:disabled {
   pointer-events: none;
 }
 
+/* =========================================================
+   READER MODE DESIGN - قراءة فقط
+========================================================= */
+
+.presenterReaderHome,
+.presenterReaderSegmentPage{
+  min-height:100dvh;
+  padding:14px;
+  overflow-y:auto;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(145,205,255,.28), transparent 34%),
+    radial-gradient(circle at 82% 18%, rgba(255,255,255,.9), transparent 34%),
+    linear-gradient(180deg,#eef7ff 0%,#f8fbff 55%,#edf5ff 100%);
+}
+
+.presenterReaderIntroCard{
+  width:min(980px,100%);
+  margin:12px auto;
+  padding:14px 18px;
+  border:1px solid rgba(130,170,210,.38);
+  border-radius:22px;
+  background:rgba(255,255,255,.58);
+  backdrop-filter:blur(18px);
+  box-shadow:0 18px 40px rgba(43,93,135,.10);
+  color:#1d3b56;
+  font-size:clamp(.9rem,1.8vw,1.05rem);
+  text-align:center;
+}
+
+.presenterReaderSegmentsGrid{
+  width:min(980px,100%);
+  margin:14px auto 30px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.presenterReaderSegmentCard{
+  min-height:92px;
+  border:1px solid rgba(120,165,205,.34);
+  border-radius:24px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.82),rgba(235,247,255,.58));
+  box-shadow:
+    0 18px 34px rgba(46,95,135,.12),
+    inset 0 1px 0 rgba(255,255,255,.9);
+  color:#18344d;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  cursor:pointer;
+  font-family:inherit;
+  transition:.18s ease;
+}
+
+.presenterReaderSegmentCard:active{
+  transform:scale(.98);
+}
+
+.presenterReaderSegmentCard strong{
+  font-size:clamp(1.05rem,2.2vw,1.35rem);
+}
+
+.presenterReaderSegmentCard span,
+.presenterReaderSegmentCard small{
+  color:#5b7891;
+  font-size:.85rem;
+}
+
+.presenterReaderPanel,
+#presenterReaderPanel{
+  width:min(1180px,100%);
+  margin:12px auto 36px;
+}
+
+.readerLoadingCard,
+.readerEmptyCard{
+  padding:28px;
+  border-radius:24px;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(125,165,205,.32);
+  box-shadow:0 18px 38px rgba(45,88,130,.12);
+  text-align:center;
+  color:#24425c;
+  font-size:1.1rem;
+}
+
+.readerWarmupGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+
+.readerCategoryBox,
+.readerRoundPage{
+  border:1px solid rgba(116,162,205,.34);
+  border-radius:26px;
+  background:rgba(255,255,255,.62);
+  backdrop-filter:blur(18px);
+  box-shadow:
+    0 18px 42px rgba(43,89,130,.11),
+    inset 0 1px 0 rgba(255,255,255,.92);
+  padding:14px;
+}
+
+.readerCategoryBox h2,
+.readerRoundHead h2{
+  margin:0 0 12px;
+  color:#163653;
+  font-size:clamp(1.05rem,2vw,1.35rem);
+  text-align:center;
+}
+
+.readerRoundHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.readerRoundHead span{
+  color:#607d95;
+  font-size:.88rem;
+}
+
+.readerCategoryQuestions,
+.readerSimpleGrid,
+.readerMediaList{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.readerRoundsStack{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.readerMiniCard{
+  border:1px solid rgba(120,166,207,.30);
+  border-radius:22px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.88),rgba(240,248,255,.66));
+  box-shadow:0 12px 28px rgba(46,91,128,.10);
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  min-height:120px;
+  cursor:pointer;
+  transition:
+    opacity .18s ease,
+    filter .18s ease,
+    transform .18s ease,
+    background .18s ease;
+}
+
+.readerMiniCard:active,
+.readerMainQuestion:active,
+.readerTop10Answer:active,
+.readerWordOnly:active{
+  transform:scale(.985);
+}
+
+.readerRead{
+  opacity:.42;
+  filter:saturate(.65);
+  background:rgba(218,230,240,.54) !important;
+}
+
+.readerMiniTop{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.readerMiniTop strong{
+  min-width:42px;
+  height:42px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(180deg,#dff1ff,#cbe7ff);
+  color:#143a5c;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+  font-size:1.15rem;
+}
+
+.readerMiniTop span{
+  color:#31506a;
+  font-size:.95rem;
+}
+
+.readerBlock{
+  border-radius:16px;
+  padding:10px 12px;
+  background:rgba(238,247,255,.68);
+  border:1px solid rgba(140,180,215,.24);
+}
+
+.readerBlock.answer{
+  background:rgba(229,247,239,.72);
+  border-color:rgba(95,180,135,.24);
+}
+
+.readerBlock.hint{
+  background:rgba(255,248,226,.75);
+  border-color:rgba(220,175,80,.25);
+}
+
+.readerBlock label{
+  display:block;
+  margin-bottom:5px;
+  color:#668097;
+  font-size:.78rem;
+}
+
+.readerBlock p{
+  margin:0;
+  color:#183854;
+  font-size:clamp(.95rem,1.8vw,1.08rem);
+  line-height:1.55;
+  white-space:pre-wrap;
+}
+
+.readerMediaThumb{
+  width:100%;
+  height:120px;
+  border-radius:18px;
+  overflow:hidden;
+  background:rgba(228,240,250,.72);
+  border:1px solid rgba(132,172,208,.28);
+  display:grid;
+  place-items:center;
+}
+
+.readerMediaThumb img,
+.readerMediaThumb video{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+.readerNoMedia{
+  color:#7b91a5;
+  font-size:.9rem;
+}
+
+.readerTop10Answers{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.readerMainQuestion{
+  padding:14px 16px;
+  border-radius:22px;
+  margin-bottom:12px;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(125,165,205,.30);
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.readerMainQuestion label{
+  color:#648096;
+  font-size:.82rem;
+}
+
+.readerMainQuestion p{
+  margin:6px 0 0;
+  color:#143653;
+  font-size:clamp(1rem,2vw,1.22rem);
+  line-height:1.55;
+}
+
+.readerTop10Answer,
+.readerWordOnly{
+  min-height:54px;
+  border-radius:18px;
+  padding:10px 12px;
+  background:rgba(255,255,255,.76);
+  border:1px solid rgba(125,165,205,.28);
+  box-shadow:0 10px 24px rgba(40,82,120,.08);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.readerTop10Answer strong,
+.readerWordOnly strong{
+  width:36px;
+  height:36px;
+  border-radius:13px;
+  display:grid;
+  place-items:center;
+  background:#dff1ff;
+  color:#163a58;
+}
+
+.readerTop10Answer span,
+.readerWordOnly span{
+  color:#173650;
+  line-height:1.45;
+}
+
+.readerWordsOnly{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+
+.readerPartsList{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.readerPartItem{
+  border-radius:16px;
+  background:rgba(241,248,255,.72);
+  border:1px solid rgba(126,170,210,.24);
+  padding:10px 12px;
+}
+
+.readerPartItem span{
+  display:block;
+  color:#658297;
+  font-size:.78rem;
+  margin-bottom:5px;
+}
+
+.readerPartItem p{
+  margin:0;
+  color:#183854;
+  line-height:1.55;
+  white-space:pre-wrap;
+}
+
+.readerArchiveInfo{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.readerArchiveInfo div{
+  border-radius:18px;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(125,165,205,.28);
+  padding:10px 12px;
+}
+
+.readerArchiveInfo label{
+  display:block;
+  color:#67839a;
+  font-size:.78rem;
+  margin-bottom:5px;
+}
+
+.readerArchiveInfo strong{
+  color:#173650;
+  font-size:1rem;
+}
+
+@media (max-width:820px){
+  .presenterReaderSegmentsGrid,
+  .readerWarmupGrid,
+  .readerCategoryQuestions,
+  .readerSimpleGrid,
+  .readerMediaList,
+  .readerTop10Answers{
+    grid-template-columns:1fr;
+  }
+
+  .readerWordsOnly{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .readerArchiveInfo{
+    grid-template-columns:1fr;
+  }
+
+  .readerMediaThumb{
+    height:105px;
+  }
+}
+
+@media (min-width:1100px){
+  .readerSimpleGrid,
+  .readerMediaList{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+
+  .readerWarmupGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+/* =========================================================
+   READER MODE - MISSING UI POLISH
+   أشياء مضافة في HTML وتحتاج تصميم
+========================================================= */
+
+/* اختيار وضع الدخول */
+.presenterModeBox,
+.presenterModeSwitch{
+  width:100%;
+  margin:12px 0 14px;
+  padding:10px;
+  border-radius:22px;
+  background:rgba(255,255,255,.54);
+  border:1px solid rgba(130,170,210,.30);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+}
+
+.presenterModeLabel{
+  margin-bottom:8px;
+  color:#5f7891;
+  font-size:.86rem;
+  text-align:center;
+}
+
+.presenterModeBtns,
+.presenterModeSwitch{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+.presenterModeBtn{
+  min-height:52px;
+  border:1px solid rgba(115,160,205,.34);
+  border-radius:18px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.86),rgba(235,247,255,.62));
+  color:#24445f;
+  font-family:inherit;
+  font-size:.96rem;
+  cursor:pointer;
+  box-shadow:0 10px 22px rgba(42,86,125,.08);
+  transition:.18s ease;
+}
+
+.presenterModeBtn:active{
+  transform:scale(.98);
+}
+
+.presenterModeBtn.activePresenterMode,
+.activePresenterMode{
+  background:
+    linear-gradient(180deg,#dff2ff,#bfe3ff);
+  border-color:rgba(64,140,210,.50);
+  color:#0d3558;
+  box-shadow:
+    0 14px 28px rgba(35,115,180,.18),
+    inset 0 1px 0 rgba(255,255,255,.90);
+}
+
+/* هيدر دليل الأسئلة */
+.presenterReaderHeader,
+.presenterReaderCleanHeader{
+  width:min(1180px,100%);
+  margin:0 auto 12px;
+  min-height:76px;
+  display:grid;
+  grid-template-columns:120px 1fr 120px;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  border-radius:26px;
+  background:rgba(255,255,255,.64);
+  border:1px solid rgba(125,165,205,.34);
+  backdrop-filter:blur(18px);
+  box-shadow:
+    0 18px 38px rgba(43,89,130,.11),
+    inset 0 1px 0 rgba(255,255,255,.90);
+}
+
+.presenterReaderTitleBox{
+  text-align:center;
+  min-width:0;
+}
+
+.presenterReaderTitleBox h1,
+.presenterReaderCleanHeader h1{
+  margin:0;
+  color:#143653;
+  font-size:clamp(1.25rem,3vw,1.8rem);
+  line-height:1.1;
+}
+
+.presenterReaderTitleBox .modelNameDisplay,
+#presenterReaderSubtitle{
+  margin-top:6px;
+  color:#607f98;
+  font-size:.88rem;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* أزرار خروج / تحديث في دليل الأسئلة */
+.presenterReaderBackBtn,
+.presenterReaderRefreshBtn,
+.presenterReaderHeader button,
+.presenterReaderCleanHeader button{
+  min-height:50px;
+  border:0;
+  border-radius:18px;
+  font-family:inherit;
+  font-size:.92rem;
+  cursor:pointer;
+  transition:.18s ease;
+  box-shadow:0 12px 24px rgba(45,87,126,.10);
+}
+
+.presenterReaderBackBtn,
+.presenterReaderHeader button:first-child{
+  background:linear-gradient(180deg,#ffffff,#edf7ff);
+  color:#25465f;
+  border:1px solid rgba(125,165,205,.34);
+}
+
+.presenterReaderRefreshBtn,
+.presenterReaderHeader button:last-child{
+  background:linear-gradient(180deg,#dff2ff,#bfe4ff);
+  color:#123a5c;
+  border:1px solid rgba(80,145,205,.36);
+}
+
+.presenterReaderBackBtn:active,
+.presenterReaderRefreshBtn:active,
+.presenterReaderHeader button:active,
+.presenterReaderCleanHeader button:active{
+  transform:scale(.98);
+}
+
+/* ملاحظة دليل الأسئلة */
+.presenterReaderNotice{
+  width:min(980px,100%);
+  margin:10px auto 14px;
+  padding:12px 16px;
+  border-radius:20px;
+  background:rgba(255,255,255,.58);
+  border:1px solid rgba(125,165,205,.30);
+  color:#345872;
+  text-align:center;
+  box-shadow:0 12px 26px rgba(40,82,120,.08);
+}
+
+/* لو باقي عندك كروت من النسخة القديمة */
+.presenterReaderLoadingCard,
+.presenterReaderEmptyCard,
+.presenterReaderQACard,
+.presenterReaderCategory,
+.presenterReaderRound{
+  border:1px solid rgba(116,162,205,.34);
+  border-radius:24px;
+  background:rgba(255,255,255,.68);
+  backdrop-filter:blur(16px);
+  box-shadow:0 16px 34px rgba(43,89,130,.10);
+  padding:14px;
+  color:#173650;
+}
+
+.presenterReaderLoadingCard,
+.presenterReaderEmptyCard{
+  text-align:center;
+  padding:28px;
+  font-size:1.05rem;
+}
+
+.presenterReaderQACard{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.presenterReaderQATop{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.presenterReaderQATop strong{
+  min-width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  background:#dff1ff;
+  color:#143a5c;
+}
+
+.presenterReaderQATop span{
+  color:#31506a;
+}
+
+.presenterReaderBlock{
+  border-radius:16px;
+  padding:10px 12px;
+  background:rgba(238,247,255,.70);
+  border:1px solid rgba(140,180,215,.24);
+}
+
+.presenterReaderBlock.answer{
+  background:rgba(229,247,239,.72);
+  border-color:rgba(95,180,135,.24);
+}
+
+.presenterReaderBlock label{
+  display:block;
+  margin-bottom:5px;
+  color:#668097;
+  font-size:.78rem;
+}
+
+.presenterReaderBlock p{
+  margin:0;
+  color:#183854;
+  line-height:1.55;
+  white-space:pre-wrap;
+}
+
+.presenterReaderMedia{
+  width:100%;
+  height:120px;
+  border-radius:18px;
+  overflow:hidden;
+  background:rgba(228,240,250,.72);
+  border:1px solid rgba(132,172,208,.28);
+  display:grid;
+  place-items:center;
+}
+
+.presenterReaderMedia img,
+.presenterReaderMedia video{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+/* تحسين صفحة الفقرة في القراءة */
+.presenterReaderSegmentPage .presenterCleanHeader{
+  width:min(1180px,100%);
+  margin:0 auto 12px;
+  border-radius:26px;
+  background:rgba(255,255,255,.64);
+  border:1px solid rgba(125,165,205,.34);
+  backdrop-filter:blur(18px);
+  box-shadow:
+    0 18px 38px rgba(43,89,130,.11),
+    inset 0 1px 0 rgba(255,255,255,.90);
+}
+
+.presenterReaderSegmentPage .presenterCleanHeaderBtn{
+  min-height:50px;
+  border-radius:18px;
+}
+
+.presenterReaderSegmentPage .presenterCleanBackBtn{
+  background:linear-gradient(180deg,#ffffff,#edf7ff);
+  color:#25465f;
+  border:1px solid rgba(125,165,205,.34);
+}
+
+.presenterReaderSegmentPage .presenterCleanEndBtn{
+  background:linear-gradient(180deg,#dff2ff,#bfe4ff);
+  color:#123a5c;
+  border:1px solid rgba(80,145,205,.36);
+}
+
+/* تحسينات للجوال */
+@media (max-width:700px){
+  .presenterReaderHeader,
+  .presenterReaderCleanHeader{
+    grid-template-columns:82px 1fr 82px;
+    min-height:68px;
+    padding:8px;
+    border-radius:22px;
+  }
+
+  .presenterReaderBackBtn,
+  .presenterReaderRefreshBtn,
+  .presenterReaderHeader button,
+  .presenterReaderCleanHeader button{
+    min-height:44px;
+    border-radius:15px;
+    font-size:.82rem;
+  }
+
+  .presenterModeBtn{
+    min-height:48px;
+    font-size:.88rem;
+  }
+
+  .presenterReaderNotice,
+  .presenterReaderIntroCard{
+    font-size:.88rem;
+    padding:11px 13px;
+  }
+}
+/* =========================================================
+   GALAXY TAB A11 - PRESENTER READER MODE
+   Portrait + Landscape
+========================================================= */
+
+/* الأساس للتابلت */
+@media (min-width:700px) and (max-width:1200px){
+
+  .presenterReaderHome,
+  .presenterReaderSegmentPage{
+    padding:12px;
+    min-height:100dvh;
+  }
+
+  .presenterReaderPanel,
+  #presenterReaderPanel{
+    width:100%;
+    max-width:1080px;
+    margin:10px auto 28px;
+  }
+
+  .presenterReaderSegmentsGrid{
+    width:100%;
+    max-width:980px;
+    gap:12px;
+  }
+
+  .presenterReaderSegmentCard{
+    min-height:86px;
+    border-radius:22px;
+  }
+
+  .presenterReaderSegmentCard strong{
+    font-size:1.18rem;
+  }
+
+  .presenterReaderSegmentCard span,
+  .presenterReaderSegmentCard small{
+    font-size:.82rem;
+  }
+
+  .readerMiniCard{
+    min-height:112px;
+    padding:11px;
+    border-radius:20px;
+    gap:9px;
+  }
+
+  .readerMiniTop strong{
+    min-width:38px;
+    height:38px;
+    border-radius:14px;
+    font-size:1.05rem;
+  }
+
+  .readerMiniTop span{
+    font-size:.9rem;
+  }
+
+  .readerBlock{
+    padding:9px 11px;
+    border-radius:15px;
+  }
+
+  .readerBlock label{
+    font-size:.74rem;
+  }
+
+  .readerBlock p{
+    font-size:.94rem;
+    line-height:1.45;
+  }
+
+  .readerMediaThumb{
+    height:105px;
+    border-radius:16px;
+  }
+
+  .readerCategoryBox,
+  .readerRoundPage{
+    padding:12px;
+    border-radius:23px;
+  }
+
+  .readerCategoryBox h2,
+  .readerRoundHead h2{
+    font-size:1.15rem;
+    margin-bottom:10px;
+  }
+
+  .readerTop10Answer,
+  .readerWordOnly{
+    min-height:50px;
+    padding:9px 10px;
+    border-radius:16px;
+  }
+
+  .readerTop10Answer strong,
+  .readerWordOnly strong{
+    width:34px;
+    height:34px;
+    border-radius:12px;
+    font-size:.95rem;
+  }
+
+  .readerTop10Answer span,
+  .readerWordOnly span{
+    font-size:.92rem;
+  }
+
+  .readerPartItem{
+    padding:9px 11px;
+    border-radius:15px;
+  }
+
+  .readerPartItem p{
+    font-size:.94rem;
+    line-height:1.45;
+  }
+}
+
+/* Galaxy Tab A11 بالطول */
+@media (min-width:700px) and (max-width:920px) and (orientation:portrait){
+
+  .presenterReaderHome,
+  .presenterReaderSegmentPage{
+    padding:12px 10px;
+  }
+
+  .presenterReaderHeader,
+  .presenterReaderCleanHeader,
+  .presenterReaderSegmentPage .presenterCleanHeader{
+    width:100%;
+    min-height:72px;
+    grid-template-columns:96px 1fr 96px;
+    padding:8px;
+    border-radius:22px;
+    margin-bottom:10px;
+  }
+
+  .presenterReaderTitleBox h1,
+  .presenterReaderCleanHeader h1,
+  .presenterReaderSegmentPage .presenterCleanHeaderTitle h1{
+    font-size:1.32rem;
+  }
+
+  #presenterReaderSubtitle,
+  .presenterReaderTitleBox .modelNameDisplay{
+    font-size:.78rem;
+  }
+
+  .presenterReaderBackBtn,
+  .presenterReaderRefreshBtn,
+  .presenterReaderHeader button,
+  .presenterReaderCleanHeader button,
+  .presenterReaderSegmentPage .presenterCleanHeaderBtn{
+    min-height:46px;
+    border-radius:15px;
+    font-size:.82rem;
+  }
+
+  .presenterReaderIntroCard,
+  .presenterReaderNotice{
+    width:100%;
+    margin:8px auto 10px;
+    padding:10px 12px;
+    border-radius:18px;
+    font-size:.84rem;
+  }
+
+  .presenterReaderSegmentsGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin-top:10px;
+  }
+
+  .presenterReaderSegmentCard{
+    min-height:78px;
+    border-radius:20px;
+    gap:5px;
+  }
+
+  .presenterReaderSegmentCard strong{
+    font-size:1.02rem;
+  }
+
+  .presenterReaderSegmentCard span,
+  .presenterReaderSegmentCard small{
+    font-size:.74rem;
+  }
+
+  .readerWarmupGrid{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .readerCategoryQuestions{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:9px;
+  }
+
+  .readerSimpleGrid,
+  .readerMediaList{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+
+  .readerTop10Answers{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+  }
+
+  .readerWordsOnly{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:9px;
+  }
+
+  .readerMiniCard{
+    min-height:104px;
+    padding:10px;
+  }
+
+  .readerMediaThumb{
+    height:96px;
+  }
+}
+
+
+
+/* Galaxy Tab A11 بالعرض */
+@media (min-width:921px) and (max-width:1200px) and (orientation:landscape){
+
+  .presenterReaderHome,
+  .presenterReaderSegmentPage{
+    padding:10px 14px;
+    overflow-y:auto;
+  }
+
+  .presenterReaderHeader,
+  .presenterReaderCleanHeader,
+  .presenterReaderSegmentPage .presenterCleanHeader{
+    width:100%;
+    max-width:1120px;
+    min-height:66px;
+    grid-template-columns:112px 1fr 112px;
+    padding:8px;
+    border-radius:22px;
+    margin-bottom:8px;
+  }
+
+  .presenterReaderTitleBox h1,
+  .presenterReaderCleanHeader h1,
+  .presenterReaderSegmentPage .presenterCleanHeaderTitle h1{
+    font-size:1.28rem;
+  }
+
+  #presenterReaderSubtitle,
+  .presenterReaderTitleBox .modelNameDisplay{
+    font-size:.76rem;
+  }
+
+  .presenterReaderBackBtn,
+  .presenterReaderRefreshBtn,
+  .presenterReaderHeader button,
+  .presenterReaderCleanHeader button,
+  .presenterReaderSegmentPage .presenterCleanHeaderBtn{
+    min-height:44px;
+    border-radius:15px;
+    font-size:.8rem;
+  }
+
+  .presenterReaderIntroCard,
+  .presenterReaderNotice{
+    max-width:1000px;
+    margin:7px auto 9px;
+    padding:9px 12px;
+    border-radius:17px;
+    font-size:.82rem;
+  }
+
+  .presenterReaderSegmentsGrid{
+    max-width:1040px;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:10px;
+    margin-top:10px;
+  }
+
+  .presenterReaderSegmentCard{
+    min-height:76px;
+    border-radius:19px;
+    gap:5px;
+  }
+
+  .presenterReaderSegmentCard strong{
+    font-size:.98rem;
+  }
+
+  .presenterReaderSegmentCard span,
+  .presenterReaderSegmentCard small{
+    font-size:.72rem;
+  }
+
+  .readerWarmupGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+
+  .readerCategoryQuestions{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:9px;
+  }
+
+  .readerSimpleGrid,
+  .readerMediaList{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+  }
+
+  .readerTop10Answers{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:8px;
+  }
+
+  .readerWordsOnly{
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:8px;
+  }
+
+  .readerRoundPage{
+    padding:11px;
+  }
+
+  .readerRoundHead{
+    margin-bottom:8px;
+  }
+
+  .readerMiniCard{
+    min-height:98px;
+    padding:9px;
+    gap:8px;
+  }
+
+  .readerMiniTop strong{
+    min-width:34px;
+    height:34px;
+    font-size:.95rem;
+  }
+
+  .readerBlock{
+    padding:8px 9px;
+  }
+
+  .readerBlock p{
+    font-size:.88rem;
+    line-height:1.38;
+  }
+
+  .readerMediaThumb{
+    height:88px;
+  }
+
+  .readerTop10Answer,
+  .readerWordOnly{
+    min-height:46px;
+    padding:8px;
+  }
+
+  .readerTop10Answer strong,
+  .readerWordOnly strong{
+    width:30px;
+    height:30px;
+    border-radius:10px;
+    font-size:.86rem;
+  }
+
+  .readerTop10Answer span,
+  .readerWordOnly span{
+    font-size:.84rem;
+  }
+}
+/* =========================================================
+   READER MEDIA VIEWER - تكبير الصور وتشغيل الفيديو
+========================================================= */
+
+.readerMediaThumb{
+  position:relative;
+  cursor:zoom-in;
+  background:
+    linear-gradient(180deg,rgba(245,251,255,.95),rgba(226,240,252,.88));
+}
+
+.readerMediaThumb img,
+.readerMediaThumb video{
+  width:100%;
+  height:100%;
+  object-fit:contain !important;
+  object-position:center;
+  background:rgba(235,246,255,.65);
+}
+
+.readerVideoThumb{
+  cursor:pointer;
+}
+
+.readerMediaHint{
+  position:absolute;
+  inset:auto 8px 8px 8px;
+  min-height:26px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:4px 9px;
+  background:rgba(13,42,68,.64);
+  color:#fff;
+  font-size:.72rem;
+  backdrop-filter:blur(10px);
+  pointer-events:none;
+  opacity:.92;
+}
+
+.readerMediaViewer{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:grid;
+  place-items:center;
+  padding:18px;
+}
+
+.readerMediaViewer.hidden{
+  display:none;
+}
+
+.readerMediaViewerBackdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(9,22,36,.72);
+  backdrop-filter:blur(14px);
+}
+
+.readerMediaViewerBox{
+  position:relative;
+  width:min(96vw,1120px);
+  height:min(86dvh,720px);
+  border-radius:28px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.92),rgba(233,245,255,.82));
+  border:1px solid rgba(255,255,255,.55);
+  box-shadow:
+    0 28px 80px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+.readerMediaViewerClose{
+  position:absolute;
+  top:12px;
+  left:12px;
+  z-index:2;
+  min-width:86px;
+  min-height:44px;
+  border:0;
+  border-radius:16px;
+  background:rgba(15,43,68,.78);
+  color:#fff;
+  font-family:inherit;
+  font-size:.9rem;
+  cursor:pointer;
+  backdrop-filter:blur(12px);
+  box-shadow:0 10px 24px rgba(0,0,0,.18);
+}
+
+.readerMediaViewerContent{
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
+  padding:58px 18px 18px;
+}
+
+.readerMediaViewerContent img,
+.readerMediaViewerContent video{
+  width:100%;
+  height:100%;
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  border-radius:18px;
+  background:#0b1826;
+}
+
+.readerMediaViewerOpen{
+  overflow:hidden;
+}
+
+/* Galaxy Tab A11 - viewer */
+@media (min-width:700px) and (max-width:1200px){
+  .readerMediaViewer{
+    padding:14px;
+  }
+
+  .readerMediaViewerBox{
+    width:96vw;
+    height:86dvh;
+    border-radius:24px;
+  }
+
+  .readerMediaViewerContent{
+    padding:54px 14px 14px;
+  }
+
+  .readerMediaViewerClose{
+    min-height:42px;
+    min-width:78px;
+    border-radius:14px;
+    font-size:.84rem;
+  }
+}
+
+/* Galaxy Tab A11 بالطول */
+@media (min-width:700px) and (max-width:920px) and (orientation:portrait){
+  .readerMediaThumb{
+    height:112px;
+  }
+
+  .readerMediaViewerBox{
+    width:96vw;
+    height:78dvh;
+  }
+}
+
+/* Galaxy Tab A11 بالعرض */
+@media (min-width:921px) and (max-width:1200px) and (orientation:landscape){
+  .readerMediaThumb{
+    height:96px;
+  }
+
+  .readerMediaViewerBox{
+    width:94vw;
+    height:84dvh;
+  }
+}
+/* =========================================================
+   FIX READER THUMBNAILS - صور وفيديوهات كاملة وواضحة
+   ضع هذا آخر presenter.css
+========================================================= */
+
+#presenterReaderPanel .readerMediaThumb,
+.presenterReaderPanel .readerMediaThumb{
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  aspect-ratio:16 / 10 !important;
+  padding:6px !important;
+  border-radius:18px !important;
+  overflow:hidden !important;
+  display:grid !important;
+  place-items:center !important;
+  background:
+    linear-gradient(180deg, rgba(245,251,255,.98), rgba(226,240,252,.92)) !important;
+  border:1px solid rgba(120,165,205,.32) !important;
+}
+
+#presenterReaderPanel .readerMediaThumb img,
+#presenterReaderPanel .readerMediaThumb video,
+.presenterReaderPanel .readerMediaThumb img,
+.presenterReaderPanel .readerMediaThumb video{
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  display:block !important;
+  border-radius:13px !important;
+  background:rgba(232,244,255,.85) !important;
+}
+
+/* كروت الصور والفيديو خليها أوسع وأوضح */
+#presenterReaderPanel .readerMiniCard:has(.readerMediaThumb),
+.presenterReaderPanel .readerMiniCard:has(.readerMediaThumb){
+  min-height:auto !important;
+}
+
+/* من هو / فتبلة / التركيز: الصور تكون أوضح */
+#presenterReaderPanel .readerMediaList .readerMediaThumb,
+.presenterReaderPanel .readerMediaList .readerMediaThumb{
+  aspect-ratio:4 / 3 !important;
+}
+
+/* الصور الطويلة ما تنقص */
+#presenterReaderPanel .readerMediaThumb img{
+  object-fit:contain !important;
+}
+
+/* الفيديو المصغر يظهر كامل */
+#presenterReaderPanel .readerMediaThumb video{
+  object-fit:contain !important;
+}
+
+/* Galaxy Tab A11 بالطول */
+@media (min-width:700px) and (max-width:920px) and (orientation:portrait){
+  #presenterReaderPanel .readerMediaThumb,
+  .presenterReaderPanel .readerMediaThumb{
+    aspect-ratio:4 / 3 !important;
+    padding:7px !important;
+  }
+
+  #presenterReaderPanel .readerMediaList,
+  .presenterReaderPanel .readerMediaList{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
+/* Galaxy Tab A11 بالعرض */
+@media (min-width:921px) and (max-width:1200px) and (orientation:landscape){
+  #presenterReaderPanel .readerMediaThumb,
+  .presenterReaderPanel .readerMediaThumb{
+    aspect-ratio:16 / 9 !important;
+    padding:6px !important;
+  }
+
+  #presenterReaderPanel .readerMediaList,
+  .presenterReaderPanel .readerMediaList{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+
+/* الجوال */
+@media (max-width:699px){
+  #presenterReaderPanel .readerMediaThumb,
+  .presenterReaderPanel .readerMediaThumb{
+    aspect-ratio:4 / 3 !important;
+    padding:6px !important;
+  }
+
+  #presenterReaderPanel .readerMediaList,
+  .presenterReaderPanel .readerMediaList{
+    grid-template-columns:1fr !important;
+  }
+}
+/* =========================================================
+   PRESENTER MODE SWITCH DESIGN
+   اختيار الوضع + التبديل الداخلي
+========================================================= */
+
+/* =========================
+   1) اختيار الوضع في صفحة الدخول
+========================= */
+
+.presenterModeBox{
+  width:100%;
+  margin:16px 0 14px;
+  padding:10px;
+  border-radius:24px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.78),rgba(232,245,255,.58));
+  border:1px solid rgba(115,165,210,.34);
+  box-shadow:
+    0 16px 36px rgba(38,85,125,.10),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  backdrop-filter:blur(18px);
+}
+
+.presenterModeLabel{
+  width:100%;
+  margin:0 0 9px;
+  text-align:center;
+  color:#55758f;
+  font-size:.86rem;
+  line-height:1.2;
+}
+
+.presenterModeBtns{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+.presenterModeBtn{
+  position:relative;
+  min-height:56px;
+  border:1px solid rgba(115,165,210,.34);
+  border-radius:19px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.92),rgba(235,247,255,.72));
+  color:#24465f;
+  font-family:"HanakaText",sans-serif;
+  font-size:.98rem;
+  font-weight:800;
+  cursor:pointer;
+  overflow:hidden;
+  box-shadow:0 10px 24px rgba(40,88,130,.08);
+  transition:
+    transform .16s ease,
+    box-shadow .16s ease,
+    background .16s ease,
+    color .16s ease;
+}
+
+.presenterModeBtn::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(255,255,255,.95),transparent 48%);
+  opacity:.65;
+  pointer-events:none;
+}
+
+.presenterModeBtn:active{
+  transform:scale(.97);
+}
+
+.presenterModeBtn.activePresenterMode{
+  color:#0d3456;
+  border-color:rgba(58,135,205,.55);
+  background:
+    linear-gradient(180deg,#e5f5ff 0%,#bfe5ff 100%);
+  box-shadow:
+    0 16px 34px rgba(40,120,190,.20),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.presenterModeBtn.activePresenterMode::after{
+  content:"";
+  position:absolute;
+  top:8px;
+  inset-inline-start:8px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#2fb7ff;
+  box-shadow:
+    0 0 0 4px rgba(47,183,255,.16),
+    0 0 16px rgba(47,183,255,.78);
+}
+
+/* تحسين كرت الدخول مع اختيار الوضع */
+.presenterJoinCard{
+  gap:12px;
+}
+
+.presenterJoinLabel{
+  margin-top:2px;
+}
+
+.presenterJoinStatus{
+  min-height:22px;
+  color:#5f7891;
+  text-align:center;
+}
+
+/* =========================
+   2) زر التبديل الداخلي بعد الدخول
+========================= */
+
+.presenterInsideModeSwitch{
+  position:fixed;
+  right:50%;
+  bottom:14px;
+  transform:translateX(50%);
+  z-index:9000;
+
+  width:min(380px,calc(100% - 28px));
+  min-height:56px;
+  padding:7px;
+
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+
+  border-radius:999px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.82),rgba(232,245,255,.70));
+  border:1px solid rgba(115,165,210,.38);
+  backdrop-filter:blur(20px);
+  box-shadow:
+    0 20px 46px rgba(25,70,112,.20),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.presenterInsideModeSwitch.hidden{
+  display:none;
+}
+
+.presenterInsideModeSwitch button{
+  min-height:42px;
+  border:0;
+  border-radius:999px;
+  background:transparent;
+  color:#31536b;
+  font-family:"HanakaText",sans-serif;
+  font-size:.9rem;
+  font-weight:900;
+  cursor:pointer;
+  transition:
+    transform .16s ease,
+    background .16s ease,
+    box-shadow .16s ease,
+    color .16s ease;
+}
+
+.presenterInsideModeSwitch button.active{
+  color:#0d3456;
+  background:
+    linear-gradient(180deg,#e3f5ff,#bfe5ff);
+  box-shadow:
+    0 10px 24px rgba(42,115,180,.18),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.presenterInsideModeSwitch button:active{
+  transform:scale(.97);
+}
+
+/* مساحة أسفل الصفحات عشان الشريط ما يغطي المحتوى */
+.presenterReaderHome,
+.presenterReaderSegmentPage,
+#presenterHome,
+#presenterSegmentPage{
+  padding-bottom:86px !important;
+}
+
+/* =========================
+   Galaxy Tab A11 - Portrait
+========================= */
+
+@media (min-width:700px) and (max-width:920px) and (orientation:portrait){
+  .presenterModeBox{
+    margin:14px 0 12px;
+    padding:9px;
+    border-radius:22px;
+  }
+
+  .presenterModeBtn{
+    min-height:54px;
+    border-radius:18px;
+    font-size:.92rem;
+  }
+
+  .presenterInsideModeSwitch{
+    bottom:12px;
+    width:340px;
+    min-height:52px;
+    padding:6px;
+  }
+
+  .presenterInsideModeSwitch button{
+    min-height:40px;
+    font-size:.84rem;
+  }
+}
+
+/* =========================
+   Galaxy Tab A11 - Landscape
+========================= */
+
+@media (min-width:921px) and (max-width:1200px) and (orientation:landscape){
+  .presenterModeBox{
+    margin:12px 0 12px;
+    padding:8px;
+    border-radius:21px;
+  }
+
+  .presenterModeLabel{
+    font-size:.78rem;
+    margin-bottom:7px;
+  }
+
+  .presenterModeBtn{
+    min-height:48px;
+    border-radius:17px;
+    font-size:.86rem;
+  }
+
+  .presenterInsideModeSwitch{
+    bottom:10px;
+    width:320px;
+    min-height:48px;
+    padding:6px;
+  }
+
+  .presenterInsideModeSwitch button{
+    min-height:36px;
+    font-size:.8rem;
+  }
+
+  .presenterReaderHome,
+  .presenterReaderSegmentPage,
+  #presenterHome,
+  #presenterSegmentPage{
+    padding-bottom:72px !important;
+  }
+}
+
+/* =========================
+   iPhone / Small Screens
+========================= */
+
+@media (max-width:699px){
+  .presenterModeBox{
+    margin:13px 0 12px;
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .presenterModeBtns{
+    gap:7px;
+  }
+
+  .presenterModeBtn{
+    min-height:50px;
+    border-radius:16px;
+    font-size:.84rem;
+  }
+
+  .presenterInsideModeSwitch{
+    bottom:10px;
+    width:calc(100% - 24px);
+    min-height:52px;
+    padding:6px;
+  }
+
+  .presenterInsideModeSwitch button{
+    min-height:40px;
+    font-size:.82rem;
+  }
+}
+/* =========================================================
+   HOME BOTTOM CONTROLS
+   زر التبديل + زر إخفاء التحكم
+========================================================= */
+
+/* زر التبديل الداخلي - يظهر فقط في الرئيسية */
+.presenterInsideModeSwitch{
+  position:fixed !important;
+  right:16px !important;
+  left:auto !important;
+  bottom:14px !important;
+  transform:none !important;
+  z-index:9000;
+
+  width:280px;
+  min-height:54px;
+  padding:6px;
+
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+
+  border-radius:999px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.84),rgba(232,245,255,.70));
+  border:1px solid rgba(115,165,210,.38);
+  backdrop-filter:blur(20px);
+  box-shadow:
+    0 18px 42px rgba(25,70,112,.18),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.presenterInsideModeSwitch.hidden{
+  display:none !important;
+}
+
+.presenterInsideModeSwitch button{
+  min-height:42px;
+  border:0;
+  border-radius:999px;
+  background:transparent;
+  color:#31536b;
+  font-family:"HanakaText",sans-serif;
+  font-size:.86rem;
+  font-weight:900;
+  cursor:pointer;
+  transition:.16s ease;
+}
+
+.presenterInsideModeSwitch button.active{
+  color:#0d3456;
+  background:linear-gradient(180deg,#e3f5ff,#bfe5ff);
+  box-shadow:
+    0 10px 24px rgba(42,115,180,.18),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.presenterInsideModeSwitch button:active{
+  transform:scale(.97);
+}
+
+/* زر إخفاء التحكم يكون منسق معه */
+#displayControlsEyeBtn.presenterDisplayControlsBtn{
+  position:fixed !important;
+  left:16px !important;
+  right:auto !important;
+  bottom:14px !important;
+  z-index:8999;
+
+  width:190px;
+  min-height:54px;
+  border-radius:999px;
+
+  border:1px solid rgba(115,165,210,.38);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.84),rgba(232,245,255,.70));
+  color:#24465f;
+  backdrop-filter:blur(20px);
+  box-shadow:
+    0 18px 42px rgba(25,70,112,.18),
+    inset 0 1px 0 rgba(255,255,255,.95);
+
+  font-family:"HanakaText",sans-serif;
+  font-size:.86rem;
+  font-weight:900;
+}
+
+/* حالة إظهار التحكم */
+#displayControlsEyeBtn.showControlsMode{
+  background:linear-gradient(180deg,#e8fff4,#c9f3dc);
+  color:#155837;
+  border-color:rgba(80,180,120,.38);
+}
+
+/* حالة إخفاء التحكم */
+#displayControlsEyeBtn.hideControlsMode{
+  background:linear-gradient(180deg,#fff7e7,#ffe3b8);
+  color:#6a4210;
+  border-color:rgba(220,155,65,.38);
+}
+
+/* مساحة أسفل الصفحة الرئيسية فقط */
+#presenterHome,
+.presenterReaderHome{
+  padding-bottom:86px !important;
+}
+
+/* داخل الفقرات لا نضيف مساحة بسبب زر التبديل */
+#presenterSegmentPage,
+.presenterReaderSegmentPage{
+  padding-bottom:12px !important;
+}
+
+/* Galaxy Tab A11 بالطول */
+@media (min-width:700px) and (max-width:920px) and (orientation:portrait){
+  .presenterInsideModeSwitch{
+    right:14px !important;
+    bottom:12px !important;
+    width:270px;
+    min-height:52px;
+  }
+
+  #displayControlsEyeBtn.presenterDisplayControlsBtn{
+    left:14px !important;
+    bottom:12px !important;
+    width:180px;
+    min-height:52px;
+  }
+
+  .presenterInsideModeSwitch button,
+  #displayControlsEyeBtn.presenterDisplayControlsBtn{
+    font-size:.82rem;
+  }
+}
+
+/* Galaxy Tab A11 بالعرض */
+@media (min-width:921px) and (max-width:1200px) and (orientation:landscape){
+  .presenterInsideModeSwitch{
+    right:12px !important;
+    bottom:10px !important;
+    width:250px;
+    min-height:48px;
+    padding:5px;
+  }
+
+  .presenterInsideModeSwitch button{
+    min-height:38px;
+    font-size:.78rem;
+  }
+
+  #displayControlsEyeBtn.presenterDisplayControlsBtn{
+    left:12px !important;
+    bottom:10px !important;
+    width:170px;
+    min-height:48px;
+    font-size:.78rem;
+  }
+
+  #presenterHome,
+  .presenterReaderHome{
+    padding-bottom:70px !important;
+  }
+}
+
+/* الجوال */
+@media (max-width:699px){
+  .presenterInsideModeSwitch{
+    right:12px !important;
+    bottom:74px !important;
+    width:calc(100% - 24px);
+  }
+
+  #displayControlsEyeBtn.presenterDisplayControlsBtn{
+    left:12px !important;
+    right:12px !important;
+    bottom:12px !important;
+    width:auto;
+  }
+
+  #presenterHome,
+  .presenterReaderHome{
+    padding-bottom:138px !important;
+  }
+}

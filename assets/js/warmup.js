@@ -148,6 +148,7 @@ window.renderWarmup = async function () {
   warmupQuestionLocked = false
   currentWarmupQuestionKey = null
   warmupLastTickPlayed = null
+  warmupResultPending = false
 
   warmupDoubleState = {
     used: { A: false, B: false },
@@ -156,58 +157,98 @@ window.renderWarmup = async function () {
 
   const categories = await loadWarmupCategories()
 
-  openSegment("التسخين", `
-    <div class="warmupWrap">
+openSegment("التسخين", `
+  <div class="warmupWrap" data-segment-key="warmup">
 
-      <div class="warmupScoreBoard">
+    <header class="megaHeader">
 
-  <div class="warmupTeamCard warmupScoreTeamCard" onclick="selectWarmupTeam('A')" id="warmupTeamABox">
-    <div class="warmupTeamMeta">
-      <div class="warmupTeamName">${teamAName}</div>
-    </div>
+      <button class="dockBtn dockBtnNav" type="button" onclick="goHome()">
+        رجوع
+      </button>
 
-    <div class="warmupTeamScoreWrap">
-      <div class="warmupTeamScore" id="roundScoreA">${warmupScoreA}</div>
-    </div>
-  </div>
+      <div
+        class="teamMini teamA"
+        onclick="selectWarmupTeam('A')"
+        id="warmupTeamABox"
+      >
+        <div class="teamNameBlock">
+          <strong>${escapeDisplayHtml(teamAName || "الفريق الأول")}</strong>
+        </div>
 
-  <div class="warmupTimerBox warmupScoreTimerBox">
-    
-    <div class="warmupTimerValue" id="timer">0</div>
-  </div>
-
-  <div class="warmupTeamCard warmupScoreTeamCard" onclick="selectWarmupTeam('B')" id="warmupTeamBBox">
-    <div class="warmupTeamMeta">
-      <div class="warmupTeamName">${teamBName}</div>
-    </div>
-
-    <div class="warmupTeamScoreWrap">
-      <div class="warmupTeamScore" id="roundScoreB">${warmupScoreB}</div>
-    </div>
-  </div>
-
-</div>
-
-
-      <div id="questionBox" class="warmupQuestionBox">
-        اختر رقم السؤال
+        <b id="roundScoreA">${warmupScoreA}</b>
       </div>
 
-      <div class="warmupControlPanel">
-  <button onclick="activateWarmupDouble()" class="warmupDoubleBtn" id="warmupDoubleBtn">دبل</button>
-  <button onclick="warmupWrong()" class="btnWrong">✕ خطأ</button>
-  <button onclick="warmupCorrect()" class="btnCorrect">✓ صح</button>
-</div>
-
-      <div class="warmupGrid">
-        ${createWarmupCategory(1, categories[1] || "الفئة 1")}
-        ${createWarmupCategory(2, categories[2] || "الفئة 2")}
-        ${createWarmupCategory(3, categories[3] || "الفئة 3")}
-        ${createWarmupCategory(4, categories[4] || "الفئة 4")}
+      <div class="segmentTitlePlain">
+        <h1>التسخين</h1>
       </div>
 
-    </div>
-  `)
+      <div
+        class="teamMini teamB"
+        onclick="selectWarmupTeam('B')"
+        id="warmupTeamBBox"
+      >
+        <b id="roundScoreB">${warmupScoreB}</b>
+
+        <div class="teamNameBlock">
+          <strong>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</strong>
+        </div>
+      </div>
+
+      <button
+        id="endRoundBtn"
+        class="dockBtn dockBtnNav"
+        type="button"
+        onclick="endCurrentSegment()"
+        disabled
+      >
+        إنهاء
+      </button>
+
+    </header>
+
+    <section class="questionUnifiedCard">
+
+      <div class="questionSide">
+        <span class="questionLabel">السؤال</span>
+
+        <div id="questionBox" class="questionTextBox">
+          اختر رقم السؤال
+        </div>
+      </div>
+
+      <div class="timerSide">
+        <div class="timerPill">
+          <small>الوقت</small>
+          <strong id="timer">0</strong>
+          <span>ثانية</span>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="categoriesGrid">
+      ${createWarmupCategory(1, categories[1] || "الفئة 1", "catBlue")}
+      ${createWarmupCategory(2, categories[2] || "الفئة 2", "catCyan")}
+      ${createWarmupCategory(3, categories[3] || "الفئة 3", "catPurple")}
+      ${createWarmupCategory(4, categories[4] || "الفئة 4", "catGreen")}
+    </section>
+
+    <footer class="actionBar">
+  <button onclick="activateWarmupDouble()" class="actionBtn btnDouble" id="warmupDoubleBtn">
+    دبل
+  </button>
+
+  <button onclick="warmupCorrect()" class="actionBtn btnCorrect">
+    ✓ صح
+  </button>
+
+  <button onclick="warmupWrong()" class="actionBtn btnWrong">
+    ✕ خطأ
+  </button>
+</footer>
+
+  </div>
+`)
 
   window.currentSegmentScores = {
     A: warmupScoreA,
@@ -249,17 +290,19 @@ async function loadWarmupCategories() {
   return categories
 }
 
-function createWarmupCategory(num, name) {
+function createWarmupCategory(num, name, colorClass = "") {
   return `
-    <div class="warmupCategoryCard">
-      <div class="warmupCategoryTitle">${escapeDisplayHtml(name)}</div>
+    <article class="categoryCard ${colorClass}">
+      <header class="categoryCardHead">
+        <h3>${escapeDisplayHtml(name)}</h3>
+      </header>
 
-      <div class="warmupNumbersRow">
+      <div class="numbers">
         <button id="q${num}_1" onclick="openWarmupQuestion(${num},1)" class="warmupNumberBtn">1</button>
         <button id="q${num}_2" onclick="openWarmupQuestion(${num},2)" class="warmupNumberBtn">2</button>
         <button id="q${num}_4" onclick="openWarmupQuestion(${num},4)" class="warmupNumberBtn">4</button>
       </div>
-    </div>
+    </article>
   `
 }
 
@@ -491,28 +534,34 @@ async function openWarmupQuestion(category, number) {
     .limit(1)
 
   if (error) {
-    console.log("openWarmupQuestion error =", error)
+  console.log("openWarmupQuestion error =", error)
 
-    if (btn) {
-      btn.disabled = false
-      btn.classList.remove("warmupUsedBtn")
-    }
-
-    const box = document.getElementById("questionBox")
-    if (box) box.innerText = "تعذر تحميل السؤال"
-    return
+  if (btn) {
+    btn.disabled = false
+    btn.classList.remove("warmupUsedBtn")
   }
+
+  clearWarmupSelectedButton()
+
+  const box = document.getElementById("questionBox")
+  if (box) box.innerText = "تعذر تحميل السؤال"
+
+  return
+}
 
   if (!data || !data.length) {
-    if (btn) {
-      btn.disabled = false
-      btn.classList.remove("warmupUsedBtn")
-    }
-
-    const box = document.getElementById("questionBox")
-    if (box) box.innerText = "لا يوجد سؤال محفوظ لهذا الرقم"
-    return
+  if (btn) {
+    btn.disabled = false
+    btn.classList.remove("warmupUsedBtn")
   }
+
+  clearWarmupSelectedButton()
+
+  const box = document.getElementById("questionBox")
+  if (box) box.innerText = "لا يوجد سؤال محفوظ لهذا الرقم"
+
+  return
+}
 
   const row = data[0]
 
@@ -603,7 +652,6 @@ function resetWarmupTimer() {
 ========================= */
 
 let warmupResultPending = false
-warmupLastTickPlayed = null
 
 function showWarmupAnswerForSeconds(callback) {
   const box = document.getElementById("questionBox")
@@ -757,11 +805,19 @@ function showWarmupFinishedScreen() {
   const wrap = document.querySelector(".warmupWrap")
   if (!wrap) return
 
-  const questionBox = document.getElementById("questionBox")
-  const controls = document.querySelector(".warmupControlPanel")
-  const grid = document.querySelector(".warmupGrid")
+  const questionCard =
+    document.querySelector(".questionCard") ||
+    document.querySelector(".warmupQuestionBox")
 
-  if (questionBox) questionBox.remove()
+  const controls =
+    document.querySelector(".actionBar") ||
+    document.querySelector(".warmupControlPanel")
+
+  const grid =
+    document.querySelector(".categoriesGrid") ||
+    document.querySelector(".warmupGrid")
+
+  if (questionCard) questionCard.remove()
   if (controls) controls.remove()
   if (grid) grid.remove()
 

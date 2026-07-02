@@ -198,17 +198,19 @@ async function loadAuctionMaxNumber() {
 
 /* =========================
    Double
+   الدوبيلا بعد فتح الرقم
 ========================= */
 
 function selectAuctionTeam(team) {
-  if (auctionDoublePickMode) {
-    if (auctionState.currentQuestionNumber || auctionState.pendingScore) {
-      showGameToast("الدوبيلا قبل اختيار الرقم فقط")
-      auctionDoublePickMode = false
-      updateAuctionDoubleButton()
-      return
-    }
+  if (team !== "A" && team !== "B") return
 
+  if (!auctionState.currentQuestionNumber || !auctionState.pendingScore) {
+    showGameToast("افتح الرقم أولاً")
+    return
+  }
+
+  /* إذا ضغط دوبيلا ثم اختار الفريق */
+  if (auctionDoublePickMode) {
     if (auctionDoubleState.used[team]) {
       showGameToast("هذا الفريق استخدم الدوبيلا مسبقًا")
       return
@@ -231,11 +233,6 @@ function selectAuctionTeam(team) {
     return
   }
 
-  if (!auctionState.currentQuestionNumber || !auctionState.pendingScore) {
-    showGameToast("اختر الرقم أولاً")
-    return
-  }
-
   pushAuctionHistory()
 
   auctionState.activeTeam = auctionState.activeTeam === team ? null : team
@@ -248,8 +245,8 @@ function selectAuctionTeam(team) {
 }
 
 function activateAuctionDouble() {
-  if (auctionState.currentQuestionNumber || auctionState.pendingScore) {
-    showGameToast("الدوبيلا قبل اختيار الرقم فقط")
+  if (!auctionState.currentQuestionNumber || !auctionState.pendingScore) {
+    showGameToast("افتح الرقم أولاً")
     return
   }
 
@@ -258,9 +255,35 @@ function activateAuctionDouble() {
     return
   }
 
-  auctionDoublePickMode = true
-  showGameToast("اختر الفريق لتفعيل الدوبيلا")
+  const team = auctionState.activeTeam
+
+  /* إذا ما اختار فريق، نخليه يضغط دوبيلا ثم يختار الفريق */
+  if (!team) {
+    auctionDoublePickMode = true
+    showGameToast("اختر الفريق لتفعيل الدوبيلا")
+    updateAuctionDoubleButton()
+    saveAuctionState()
+    return
+  }
+
+  if (auctionDoubleState.used[team]) {
+    showGameToast("هذا الفريق استخدم الدوبيلا مسبقًا")
+    return
+  }
+
+  pushAuctionHistory()
+
+  auctionDoubleState.used[team] = true
+  auctionDoubleState.activeTeam = team
+  auctionDoublePickMode = false
+
+  showGameToast(`تم تفعيل الدوبيلا لفريق ${team === "A" ? teamAName : teamBName}`)
+
+  highlightAuctionActiveTeam()
+  renderAuctionContent()
   updateAuctionDoubleButton()
+  updateAuctionUndoButtonState()
+  saveAuctionState()
 }
 
 function getAuctionScoreValue(team) {
@@ -278,19 +301,22 @@ function updateAuctionDoubleButton() {
   if (!btn) return
 
   const team = auctionState.activeTeam
+  const hasOpenNumber =
+    !!auctionState.currentQuestionNumber &&
+    !!auctionState.pendingScore
 
   btn.classList.remove("activeDouble")
+
+  if (!hasOpenNumber) {
+    btn.disabled = true
+    btn.innerText = "دوبيلا"
+    return
+  }
 
   if (auctionDoublePickMode) {
     btn.disabled = false
     btn.innerText = "اختر الفريق"
     btn.classList.add("activeDouble")
-    return
-  }
-
-  if (auctionState.currentQuestionNumber || auctionState.pendingScore) {
-    btn.disabled = true
-    btn.innerText = "دوبيلا"
     return
   }
 
@@ -300,17 +326,28 @@ function updateAuctionDoubleButton() {
     return
   }
 
-  if (team && auctionDoubleState.activeTeam === team) {
+  if (!team) {
+    btn.disabled = false
+    btn.innerText = "دوبيلا"
+    return
+  }
+
+  if (auctionDoubleState.activeTeam === team) {
     btn.disabled = true
     btn.innerText = "الدوبيلا مفعّل"
     btn.classList.add("activeDouble")
     return
   }
 
+  if (auctionDoubleState.used[team]) {
+    btn.disabled = true
+    btn.innerText = "استخدم الدوبيلا"
+    return
+  }
+
   btn.disabled = false
   btn.innerText = "دوبيلا"
 }
-
 /* =========================
    Undo
 ========================= */
@@ -508,50 +545,85 @@ function isAuctionFinished() {
 
 function buildAuctionHTML() {
   return `
-    <div class="auctionWrap">
+    <div class="auctionWrap" data-segment-key="auction">
 
-      <div class="auctionTopBar">
+      <header class="auctionHeader">
+
+        <button class="auctionDockBtn" type="button" onclick="goHome()">
+          رجوع
+        </button>
 
         <div
-          class="auctionTeamCard ${auctionState.activeTeam === "A" ? "fatblaTeamCurrent" : ""}"
+          class="auctionTeamMini teamA ${auctionState.activeTeam === "A" ? "fatblaTeamCurrent" : ""}"
           onclick="selectAuctionTeam('A')"
           id="auctionTeamABox"
         >
-          <div class="auctionTeamName">${escapeDisplayHtml(teamAName)}</div>
-          <div class="auctionTeamScore" id="auctionScoreA">${auctionState.scoreA}</div>
+          <div class="auctionTeamName">
+            <strong>${escapeDisplayHtml(teamAName || "الفريق الأول")}</strong>
+          </div>
+
+          <b id="auctionScoreA">${auctionState.scoreA}</b>
         </div>
 
-        <div class="auctionMiddleCard">
-          <div class="auctionTurnLabel" id="auctionTurnText">
-            ${auctionState.activeTeam ? getAuctionTurnName() : "بدون فريق"}
-          </div>
+        <div class="auctionTitle">
+          <h1>فتبلة</h1>
         </div>
 
         <div
-          class="auctionTeamCard ${auctionState.activeTeam === "B" ? "fatblaTeamCurrent" : ""}"
+          class="auctionTeamMini teamB ${auctionState.activeTeam === "B" ? "fatblaTeamCurrent" : ""}"
           onclick="selectAuctionTeam('B')"
           id="auctionTeamBBox"
         >
-          <div class="auctionTeamName">${escapeDisplayHtml(teamBName)}</div>
-          <div class="auctionTeamScore" id="auctionScoreB">${auctionState.scoreB}</div>
+          <b id="auctionScoreB">${auctionState.scoreB}</b>
+
+          <div class="auctionTeamName">
+            <strong>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</strong>
+          </div>
         </div>
 
-      </div>
+        <button
+          id="endRoundBtn"
+          class="auctionDockBtn"
+          type="button"
+          onclick="endCurrentSegment()"
+          disabled
+        >
+          إنهاء
+        </button>
 
-      <div class="auctionQuestionBox auctionQuestionBoxCompact auctionQuestionBoxEmpty" id="auctionQuestionBox">
+      </header>
+
+      <section class="auctionContentCard" id="auctionQuestionBox">
         ${buildAuctionContentHTML()}
-      </div>
+      </section>
 
-      <div class="auctionGrid" id="auctionGrid">
+      <section class="auctionGrid" id="auctionGrid">
         ${createAuctionGrid()}
-      </div>
+      </section>
 
-      <div class="auctionControlPanel">
-        <button onclick="activateAuctionDouble()" id="auctionDoubleBtn" class="auctionDoubleBtn">دوبيلا</button>
-        <button onclick="auctionCorrect()" class="btnCorrect">✓ إجابة صحيحة</button>
-        <button onclick="auctionWrong()" class="btnWrong">✕ خطأ</button>
-        <button onclick="undoAuctionAction()" id="auctionUndoBtn" class="undoBtn">تراجع</button>
-      </div>
+      <footer class="auctionActionBar">
+
+        <button
+          onclick="activateAuctionDouble()"
+          id="auctionDoubleBtn"
+          class="auctionActionBtn auctionDoubleBtn"
+        >
+          دوبيلا
+        </button>
+
+        <button onclick="auctionCorrect()" class="auctionActionBtn auctionCorrectBtn">
+          صح
+        </button>
+
+        <button onclick="auctionWrong()" class="auctionActionBtn auctionWrongBtn">
+          خطأ
+        </button>
+
+        <button onclick="undoAuctionAction()" id="auctionUndoBtn" class="auctionActionBtn auctionUndoBtn">
+          تراجع
+        </button>
+
+      </footer>
 
     </div>
   `

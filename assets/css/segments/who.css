@@ -1,1777 +1,426 @@
 /* =========================================================
-   WHO DISPLAY PAGE
-   Clean Candy Glass Style - Final Clean
-   استبدل ملف who.css كامل بهذا الكود
+   WHO / من هو - CLEAN FINAL
 ========================================================= */
 
 /* =========================
-   WRAP
+   BASE
 ========================= */
 
-.whoWrap{
-  width:100% !important;
-  height:100% !important;
-
-  display:flex !important;
-  flex-direction:column !important;
-  gap:12px !important;
-
-  padding:10px 0 8px !important;
-
-  overflow:hidden !important;
-}
-
-/* =========================
-   TOP BAR / SCOREBOARD
-========================= */
-
-.whoTopBar{
-  width:100%;
-
-  display:grid !important;
-  grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr) !important;
-  gap:16px !important;
-  align-items:center !important;
-
-  padding:6px 4px 2px !important;
-
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-
-  overflow:visible !important;
-  isolation:isolate;
-}
-
-.whoTeamCard,
-.whoTimerBox{
-  position:relative !important;
-
-  min-width:0;
-  max-width:100%;
-  min-height:76px !important;
-  height:76px !important;
-
-  box-sizing:border-box;
-  overflow:hidden !important;
-
-  background:
-    radial-gradient(circle at 16% 0%, rgba(255,255,255,.30), transparent 34%),
-    linear-gradient(180deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.13) 100%) !important;
-
-  border:1px solid rgba(255,255,255,.38) !important;
-
-  box-shadow:
-    0 16px 34px rgba(30,27,75,.10),
-    inset 0 1px 0 rgba(255,255,255,.68),
-    inset 0 -1px 0 rgba(255,255,255,.10) !important;
-
-  backdrop-filter:blur(22px);
-  -webkit-backdrop-filter:blur(22px);
-
-  transition:
-    transform .18s ease,
-    filter .18s ease,
-    box-shadow .18s ease,
-    border-color .18s ease;
-}
-
-.whoTeamCard{
-  padding:10px 12px !important;
-
-  cursor:pointer;
-
-  display:flex !important;
-  align-items:center !important;
-  gap:12px !important;
-}
-
-#whoTeamABox{
-  flex-direction:row !important;
-  justify-self:end !important;
-
-  width:min(100%,430px) !important;
-
-  border-radius:30px 18px 30px 18px !important;
-
-  background:
-    radial-gradient(circle at 12% 0%, rgba(124,58,237,.24), transparent 38%),
-    linear-gradient(180deg, rgba(255,255,255,.31) 0%, rgba(255,255,255,.14) 100%) !important;
-}
-
-#whoTeamBBox{
-  flex-direction:row-reverse !important;
-  justify-self:start !important;
-
-  width:min(100%,430px) !important;
-
-  border-radius:18px 30px 18px 30px !important;
-
-  background:
-    radial-gradient(circle at 88% 0%, rgba(6,182,212,.22), transparent 38%),
-    linear-gradient(180deg, rgba(255,255,255,.31) 0%, rgba(255,255,255,.14) 100%) !important;
-}
-
-.whoTeamCard:hover{
-  transform:translateY(-3px);
-  filter:brightness(1.03);
-
-  box-shadow:
-    0 20px 40px rgba(30,27,75,.14),
-    inset 0 1px 0 rgba(255,255,255,.72),
-    inset 0 -1px 0 rgba(255,255,255,.12) !important;
-}
-
-.whoTeamCard::before,
-.whoTimerBox::before{
-  content:"";
-
-  position:absolute;
-
-  width:108px;
-  height:108px;
-  top:-54px;
-
-  border-radius:50%;
-
-  background:rgba(255,255,255,.14);
-
-  pointer-events:none;
-}
-
-#whoTeamABox::before{
-  right:-24px;
-}
-
-#whoTeamBBox::before{
-  left:-24px;
-  right:auto;
-}
-
-.whoTimerBox::before{
-  left:50%;
-  right:auto;
-  transform:translateX(-50%);
-}
-
-.whoTeamCard::after,
-.whoTimerBox::after{
-  content:"";
-
-  position:absolute;
-
-  width:58px;
-  height:58px;
-  bottom:-24px;
-
-  border-radius:18px;
-  transform:rotate(24deg);
-
-  background:rgba(255,255,255,.08);
-
-  pointer-events:none;
-}
-
-#whoTeamABox::after{
-  left:-12px;
-}
-
-#whoTeamBBox::after{
-  right:-12px;
-  left:auto;
-}
-
-.whoTimerBox::after{
-  width:48px;
-  height:6px;
-  bottom:10px;
-  left:50%;
-  right:auto;
-
-  transform:translateX(-50%);
-
-  border-radius:999px;
-  background:rgba(255,255,255,.22);
-}
-
-
-
-/* =========================
-   TEAM CONTENT
-========================= */
-
-.whoTeamName{
-  position:relative;
-  z-index:3;
-
-  flex:1;
-  min-width:0;
-
-  padding:8px 12px !important;
-  border-radius:18px;
-
-  background:rgba(255,255,255,.26);
-  border:1px solid rgba(255,255,255,.24);
-
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-
-  color:#24185E !important;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:clamp(1.45rem,2.15vw,2.25rem) !important;
-  line-height:1.05 !important;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.55),
-    0 8px 18px rgba(255,255,255,.18) !important;
-}
-
-#whoTeamABox .whoTeamName{
-  text-align:right !important;
-}
-
-#whoTeamBBox .whoTeamName{
-  text-align:left !important;
-}
-
-.whoTeamScore{
-  position:relative;
-  z-index:3;
-
-  flex-shrink:0;
-
-  width:60px !important;
-  height:48px !important;
-  border-radius:18px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.90) 0%, rgba(255,255,255,.66) 100%) !important;
-
-  border:1px solid rgba(255,255,255,.50) !important;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.92),
-    0 8px 18px rgba(30,27,75,.10) !important;
-
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-
-  color:#1E1B4B !important;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:clamp(1.55rem,2vw,2.1rem) !important;
-  line-height:1 !important;
-}
-
-/* =========================
-   TIMER
-========================= */
-
-.whoTimerBox{
-  width:150px;
-  min-height:88px !important;
-  height:88px !important;
-
-  justify-self:center;
-
-  border-radius:32px !important;
-
-  padding:8px 10px;
-
-  display:flex !important;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:3px;
-
-  text-align:center;
-
-  background:
-    radial-gradient(circle at 50% 0%, rgba(103,232,249,.25), transparent 38%),
-    linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.16) 100%) !important;
-
-  border:1px solid rgba(255,255,255,.40) !important;
-}
-
-.whoTimerLabel{
-  position:relative;
-  z-index:2;
-
-  color:#0F4C5C !important;
-
-  font-family:"HanakaText",sans-serif;
-  font-size:.78rem !important;
-  line-height:1.1;
-}
-
-.whoTimerValue{
-  position:relative;
-  z-index:2;
-
-  color:#12362D !important;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(2rem,2.9vw,2.7rem) !important;
-  line-height:.92;
-
-  text-shadow:0 2px 10px rgba(255,255,255,.22);
-}
-
-/* =========================================================
-   IMAGE PREVIEW + ANSWER
-   الكود الوحيد المعتمد لصورة وإجابة من هو
-========================================================= */
-
-#whoImageStage.whoImageStage{
-  width:100% !important;
-  height:auto !important;
-  min-height:0 !important;
-  max-height:none !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  margin:0 auto !important;
-  padding:0 !important;
-
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-  overflow:visible !important;
-
-  animation:whoStageFadeIn .35s ease both;
-}
-
-#whoImageStage.whoImageStage.hidden{
-  display:none !important;
-}
-
-#whoImageStage.whoImageStage::before,
-#whoImageStage.whoImageStage::after{
-  display:none !important;
-}
-
-@keyframes whoStageFadeIn{
-  from{
-    opacity:0;
-    transform:translateY(8px) scale(.985);
-  }
-
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-/* معاينة الصورة */
-#whoImageStage .whoImageFrame{
-  position:relative !important;
-  z-index:2 !important;
-
-  width:460px !important;
-  height:215px !important;
-  min-height:215px !important;
-  max-height:215px !important;
-
-  margin:0 auto !important;
-  padding:8px !important;
-
-  border-radius:24px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.12), transparent 42%),
-    linear-gradient(180deg,#0F172A,#111827) !important;
-
-  border:1px solid rgba(255,255,255,.12) !important;
-
-  box-shadow:
-    0 16px 38px rgba(15,23,42,.18),
-    inset 0 1px 0 rgba(255,255,255,.12) !important;
-
-  overflow:hidden !important;
-  cursor:pointer !important;
-}
-
-#whoImageStage .whoImageFrame:hover{
-  filter:brightness(1.06);
-  transform:translateY(-2px);
-}
-
-#whoImageStage .whoImageFrame img,
-#whoImageStage .whoImageFull{
-  width:100% !important;
-  height:100% !important;
-
-  max-width:100% !important;
-  max-height:100% !important;
-
-  object-fit:contain !important;
-  object-position:center center !important;
-
-  display:block !important;
-
-  border-radius:17px !important;
-  background:#0F172A !important;
-
-  box-shadow:none !important;
-}
-
-/* نتيجة الإجابة */
-#whoImageStage .whoResultView{
-  width:min(100%,760px) !important;
-
-  display:grid !important;
-  grid-template-columns:250px minmax(0,1fr) !important;
-  gap:12px !important;
-  align-items:stretch !important;
-
-  margin:0 auto !important;
-
-  height:auto !important;
-  min-height:0 !important;
-  max-height:none !important;
-
-  overflow:visible !important;
-
-  animation:whoResultEnter .42s cubic-bezier(.2,.85,.2,1.05) both;
-}
-
-@keyframes whoResultEnter{
-  from{
-    opacity:0;
-    transform:translateY(12px) scale(.98);
-  }
-
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-#whoImageStage .whoResultImageBox{
-  width:250px !important;
-  height:215px !important;
-  min-height:215px !important;
-  max-height:215px !important;
-
-  margin:0 !important;
-  padding:8px !important;
-
-  border:0 !important;
-  border-radius:24px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.12), transparent 42%),
-    linear-gradient(180deg,#0F172A,#111827) !important;
-
-  box-shadow:
-    0 16px 38px rgba(15,23,42,.18),
-    inset 0 1px 0 rgba(255,255,255,.12) !important;
-
-  overflow:hidden !important;
-  cursor:pointer !important;
-}
-
-#whoImageStage .whoResultImageBox:hover{
-  filter:brightness(1.05);
-}
-
-#whoImageStage .whoResultImage{
-  width:100% !important;
-  height:100% !important;
-
-  max-width:100% !important;
-  max-height:100% !important;
-
-  object-fit:contain !important;
-  object-position:center center !important;
-
-  display:block !important;
-
-  border-radius:17px !important;
-  background:#0F172A !important;
-}
-
-/* كرت الإجابة */
-#whoImageStage .whoResultAnswerBox{
-  height:215px !important;
-  min-height:215px !important;
-  max-height:215px !important;
-
-  padding:16px 20px !important;
-  border-radius:24px !important;
-
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:10px !important;
-
-  text-align:center !important;
-
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255,255,255,.76), transparent 45%),
-    radial-gradient(circle at 0% 100%, rgba(103,232,249,.18), transparent 42%),
-    linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.78)) !important;
-
-  border:1px solid rgba(255,255,255,.76) !important;
-
-  box-shadow:
-    0 16px 38px rgba(30,27,75,.12),
-    inset 0 1px 0 rgba(255,255,255,.96) !important;
-
-  overflow:hidden !important;
-}
-
-#whoImageStage .whoResultAnswerLabel{
-  min-height:30px !important;
-  padding:7px 16px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  border-radius:999px !important;
-
-  color:#FFFFFF !important;
-  background:linear-gradient(180deg,#312E81,#24185E) !important;
-
-  font-family:"HanakaText",sans-serif !important;
-  font-size:.82rem !important;
-  line-height:1 !important;
-  font-weight:900 !important;
-
-  box-shadow:
-    0 10px 22px rgba(30,27,75,.16),
-    inset 0 1px 0 rgba(255,255,255,.20) !important;
-}
-
-#whoImageStage .whoResultView.correctResult .whoResultAnswerLabel{
-  background:linear-gradient(180deg,#16A34A,#15803D) !important;
-}
-
-#whoImageStage .whoResultView.wrongResult .whoResultAnswerLabel{
-  background:linear-gradient(180deg,#EF4444,#B91C1C) !important;
-}
-
-#whoImageStage .whoResultView.correctResult .whoResultAnswerBox{
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255,255,255,.76), transparent 45%),
-    radial-gradient(circle at 0% 100%, rgba(134,239,172,.22), transparent 42%),
-    linear-gradient(180deg,rgba(255,255,255,.96),rgba(220,252,231,.78)) !important;
-}
-
-#whoImageStage .whoResultView.wrongResult .whoResultAnswerBox{
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255,255,255,.76), transparent 45%),
-    radial-gradient(circle at 0% 100%, rgba(252,165,165,.22), transparent 42%),
-    linear-gradient(180deg,rgba(255,255,255,.96),rgba(254,226,226,.78)) !important;
-}
-
-#whoImageStage .whoResultAnswerText{
-  width:100% !important;
-  max-width:100% !important;
-
-  color:#24185E !important;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:clamp(1.45rem,3vw,2.35rem) !important;
-  line-height:1.12 !important;
-  font-weight:400 !important;
-
-  text-align:center !important;
-
-  white-space:normal !important;
-  word-break:normal !important;
-  overflow-wrap:break-word !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  overflow:visible !important;
-
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.85),
-    0 12px 24px rgba(30,27,75,.12) !important;
-}
-
-/* =========================
-   BOTTOM ROW
-========================= */
-
-.whoBottomRow{
-  display:grid !important;
-  grid-template-columns:minmax(0,1fr) 560px !important;
-  align-items:stretch !important;
-  justify-content:center !important;
-  gap:16px !important;
-}
-
-/* =========================
-   POINTS PANEL
-========================= */
-
-.whoPointsSelect{
-  min-width:0 !important;
-  min-height:72px !important;
-  border-radius:26px !important;
-  padding:10px 12px !important;
-
-  overflow:hidden !important;
-  position:relative !important;
-
-  display:grid !important;
-  grid-template-columns:190px minmax(0,1fr) !important;
-  gap:12px !important;
-  align-items:center !important;
-
-  background:
-    radial-gradient(circle at 12% 0%, rgba(255,255,255,.46), transparent 38%),
-    radial-gradient(circle at 88% 100%, rgba(103,232,249,.16), transparent 42%),
-    linear-gradient(135deg, rgba(255,255,255,.42), rgba(255,255,255,.16)) !important;
-
-  border:1px solid rgba(255,255,255,.46) !important;
-
-  box-shadow:
-    0 16px 32px rgba(30,27,75,.10),
-    inset 0 1px 0 rgba(255,255,255,.72),
-    inset 0 -1px 0 rgba(255,255,255,.12) !important;
-
-  backdrop-filter:blur(22px) saturate(1.18) !important;
-  -webkit-backdrop-filter:blur(22px) saturate(1.18) !important;
-}
-
-.whoPointsSelect::before{
-  content:"" !important;
-
-  position:absolute !important;
-
-  width:140px !important;
-  height:140px !important;
-  top:-62px !important;
-  right:-36px !important;
-
-  border-radius:50% !important;
-
-  background:rgba(255,255,255,.16) !important;
-
-  pointer-events:none !important;
-}
-
-.whoPointsSelect::after{
-  content:"" !important;
-
-  position:absolute !important;
-
-  width:70px !important;
-  height:70px !important;
-  bottom:-28px !important;
-  left:-14px !important;
-
-  border-radius:20px !important;
-  transform:rotate(24deg) !important;
-
-  background:rgba(49,46,129,.08) !important;
-
-  pointer-events:none !important;
-}
-
-.whoTurnSide{
-  position:relative !important;
-  z-index:2 !important;
-
-  min-width:0 !important;
-  height:50px !important;
-  border-radius:18px !important;
-  padding:0 14px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.48), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.50), rgba(255,255,255,.22)) !important;
-
-  border:1px solid rgba(255,255,255,.44) !important;
-
-  color:#24185E !important;
-
-  font-family:"HanakaText",sans-serif !important;
-  font-size:1.02rem !important;
-  line-height:1.15 !important;
-  text-align:center !important;
-
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-
-  box-shadow:
-    0 8px 16px rgba(30,27,75,.08),
-    inset 0 1px 0 rgba(255,255,255,.62) !important;
-
-  backdrop-filter:blur(14px) !important;
-  -webkit-backdrop-filter:blur(14px) !important;
-}
-
-.whoPointsSide{
-  position:relative !important;
-  z-index:2 !important;
-
-  min-width:0 !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:flex-end !important;
-  gap:9px !important;
-  flex-wrap:nowrap !important;
-}
-
-.whoPointsSide .whoPointsLabel{
-  color:#24185E !important;
-
-  font-family:"HanakaText",sans-serif !important;
-  font-size:1rem !important;
-  line-height:1 !important;
-
-  white-space:nowrap !important;
-  margin:0 !important;
-}
-
-.whoPointBtn{
-  position:relative !important;
-  z-index:2 !important;
-  overflow:hidden !important;
-
-  min-width:50px !important;
-  width:50px !important;
-  height:46px !important;
-
-  border:0 !important;
-  border-radius:16px !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.40), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.64) 0%, rgba(255,255,255,.28) 100%) !important;
-
-  color:#24185E !important;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:1.35rem !important;
-  line-height:1 !important;
-
-  box-shadow:
-    0 8px 16px rgba(49,46,129,.10),
-    inset 0 1px 0 rgba(255,255,255,.58) !important;
-
-  cursor:pointer !important;
-}
-
-.whoPointBtn:hover:not(:disabled){
-  transform:translateY(-2px);
-  filter:brightness(1.06);
-}
-
-.whoPointBtn.selectedWhoPoint{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-    linear-gradient(180deg, rgba(49,46,129,.78) 0%, rgba(30,27,75,.88) 100%) !important;
-
-  color:#FFFFFF !important;
-
-  border:1px solid rgba(255,255,255,.22) !important;
-
-  box-shadow:
-    0 0 0 5px rgba(255,255,255,.12),
-    0 14px 28px rgba(30,27,75,.22),
-    inset 0 1px 0 rgba(255,255,255,.24),
-    inset 0 -1px 0 rgba(0,0,0,.18) !important;
-
-  transform:translateY(-2px) !important;
-}
-
-/* =========================
-   CONTROL PANEL
-========================= */
-
-.whoControlPanel{
-  min-width:0 !important;
-  width:100% !important;
-
-  display:grid !important;
-  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-  gap:10px !important;
-  align-items:stretch !important;
-}
-
-.whoControlPanel button{
-  width:100% !important;
-  min-width:0 !important;
-  height:54px !important;
-  min-height:54px !important;
-
-  padding:0 8px !important;
-
-  border:0 !important;
-  border-radius:17px !important;
-
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-
-  font-family:"HanakaText",sans-serif !important;
-  font-size:.9rem !important;
-  font-weight:400 !important;
-  line-height:1.1 !important;
-
-  cursor:pointer;
-  color:#FFFFFF !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-    linear-gradient(180deg,#312E81 0%,#1E1B4B 100%) !important;
-
-  box-shadow:
-    0 12px 24px rgba(30,27,75,.16),
-    inset 0 1px 0 rgba(255,255,255,.16) !important;
-
-  transition:
-    transform .18s ease,
-    filter .18s ease,
-    box-shadow .18s ease !important;
-}
-
-.whoControlPanel button:hover:not(:disabled){
-  transform:translateY(-2px) !important;
-  filter:brightness(1.06) !important;
-}
-
-.whoControlPanel button:active:not(:disabled){
-  transform:scale(.96) !important;
-}
-
-.whoControlPanel .whoDoubleBtn,
-.whoControlPanel button[onclick*="activateWhoDouble"]{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.24), transparent 42%),
-    linear-gradient(180deg,#FB7185 0%,#F97316 100%) !important;
-}
-
-.whoCompensationBtn,
-.whoControlPanel button[onclick*="startWhoCompensation"]{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.26), transparent 42%),
-    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
-
-  color:#12362D !important;
-
-  box-shadow:
-    0 12px 24px rgba(6,182,212,.22),
-    inset 0 1px 0 rgba(255,255,255,.30) !important;
-}
-
-.whoControlPanel .btnCorrect,
-.whoControlPanel button[onclick*="whoCorrect"]{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
-    linear-gradient(180deg,#22C55E 0%,#15803D 100%) !important;
-}
-
-.whoControlPanel .btnWrong,
-.whoControlPanel button[onclick*="whoWrong"]{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.18), transparent 42%),
-    linear-gradient(180deg,#EF4444 0%,#DC2626 100%) !important;
-}
-
-.whoCompensationBtn.activeCompensation{
-  opacity:1 !important;
-  animation:whoCompensationGlow 1s ease-in-out infinite alternate;
-}
-
-@keyframes whoCompensationGlow{
-  from{
-    box-shadow:
-      0 0 0 rgba(6,182,212,0),
-      0 10px 20px rgba(6,182,212,.20);
-  }
-
-  to{
-    box-shadow:
-      0 0 22px rgba(6,182,212,.48),
-      0 14px 28px rgba(6,182,212,.32);
-  }
-}
-
-.whoControlPanel button:disabled,
-.whoCompensationBtn:disabled{
-  background:#DDD6FE !important;
-  color:#7C7896 !important;
-  box-shadow:none !important;
-  opacity:.82 !important;
-  cursor:not-allowed !important;
-  transform:none !important;
-  filter:none !important;
-}
-
-/* حماية أزرار تسجيل النتيجة */
-.whoScoreBtnLocked,
-.btnCorrect:disabled,
-.btnWrong:disabled{
-  opacity:.45 !important;
-  pointer-events:none !important;
-  filter:grayscale(.35) !important;
-  transform:none !important;
-  cursor:not-allowed !important;
-}
-
-/* =========================
-   NUMBER GRID
-========================= */
-
-.whoGrid{
-  display:grid !important;
-  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
-  gap:12px !important;
-}
-
-.whoBtn,
-.whoNumberBtn,
-.whoGrid button,
-.whoCardBtn{
-  position:relative !important;
-
-  width:100% !important;
-  height:56px !important;
-  min-height:56px !important;
-
-  border:0 !important;
-  border-radius:18px !important;
-  overflow:hidden !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.16), transparent 42%),
-    linear-gradient(180deg, rgba(49,46,129,.78) 0%, rgba(30,27,75,.88) 100%) !important;
-
-  color:#FFFFFF !important;
-  border:1px solid rgba(255,255,255,.22) !important;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:1.75rem !important;
-  line-height:1 !important;
-
-  cursor:pointer !important;
-
-  box-shadow:
-    0 12px 24px rgba(30,27,75,.18),
-    inset 0 1px 0 rgba(255,255,255,.24),
-    inset 0 -1px 0 rgba(0,0,0,.18) !important;
-
-  opacity:1 !important;
-  filter:none !important;
-
-  backdrop-filter:blur(18px) !important;
-  -webkit-backdrop-filter:blur(18px) !important;
-
-  transition:
-    transform .18s ease,
-    filter .18s ease,
-    box-shadow .18s ease !important;
-}
-
-.whoBtn:hover:not(.used):not(:disabled):not(.whoBtnLocked15),
-.whoNumberBtn:hover:not(.used):not(:disabled),
-.whoGrid button:hover:not(.used):not(:disabled):not(.whoBtnLocked15),
-.whoCardBtn:hover:not(.used):not(:disabled){
-  transform:translateY(-3px) scale(1.01) !important;
-  filter:brightness(1.08) !important;
-
-  box-shadow:
-    0 18px 34px rgba(30,27,75,.24),
-    0 0 0 4px rgba(255,255,255,.12),
-    inset 0 1px 0 rgba(255,255,255,.30),
-    inset 0 -1px 0 rgba(0,0,0,.18) !important;
-}
-
-.whoBtn:active,
-.whoNumberBtn:active,
-.whoGrid button:active,
-.whoCardBtn:active{
-  transform:scale(.96) !important;
-}
-
-.whoBtn::before,
-.whoNumberBtn::before,
-.whoGrid button::before,
-.whoCardBtn::before{
-  content:"" !important;
-
-  position:absolute !important;
-
-  width:52px !important;
-  height:52px !important;
-  top:-18px !important;
-  right:-10px !important;
-
-  border-radius:50% !important;
-
-  background:rgba(255,255,255,.16) !important;
-
-  pointer-events:none !important;
-}
-
-.whoBtn::after,
-.whoNumberBtn::after,
-.whoGrid button::after,
-.whoCardBtn::after{
-  content:"" !important;
-
-  position:absolute !important;
-  inset:0 !important;
-
-  border-radius:18px !important;
-
-  box-shadow:inset 0 -6px 12px rgba(255,255,255,.06) !important;
-
-  pointer-events:none !important;
-}
-
-.whoBtn.used,
-.whoNumberBtn.used,
-.whoGrid button.used,
-.whoCardBtn.used{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.46), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.56) 0%, rgba(255,255,255,.30) 100%) !important;
-
-  color:transparent !important;
-
-  border:1px solid rgba(255,255,255,.46) !important;
-
-  box-shadow:
-    0 8px 18px rgba(30,27,75,.06),
-    inset 0 1px 0 rgba(255,255,255,.82),
-    inset 0 -1px 0 rgba(255,255,255,.16) !important;
-
-  opacity:1 !important;
-  filter:saturate(.9) brightness(1.02) !important;
-  cursor:default !important;
-  transform:none !important;
-}
-
-.whoBtn.used::after,
-.whoNumberBtn.used::after,
-.whoGrid button.used::after,
-.whoCardBtn.used::after{
-  content:"✓" !important;
-
-  position:absolute !important;
-  inset:0 !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  color:#7C3AED !important;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:1.7rem !important;
-  line-height:1 !important;
-
-  background:transparent !important;
-  box-shadow:none !important;
-
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.60),
-    0 8px 18px rgba(30,27,75,.10) !important;
-}
-
-.whoBtnLocked15,
-.whoBtn.whoBtnLocked15,
-.whoGrid button.whoBtnLocked15{
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.46), transparent 42%),
-    linear-gradient(180deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.20) 100%) !important;
-
-  color:transparent !important;
-
-  border:1px solid rgba(255,255,255,.34) !important;
-
-  box-shadow:
-    0 8px 18px rgba(30,27,75,.06),
-    inset 0 1px 0 rgba(255,255,255,.70),
-    inset 0 -1px 0 rgba(255,255,255,.12) !important;
-
-  opacity:1 !important;
-  filter:saturate(.75) brightness(.96) !important;
-  cursor:not-allowed !important;
-  transform:none !important;
-}
-
-.whoBtnLocked15::after,
-.whoBtn.whoBtnLocked15::after,
-.whoGrid button.whoBtnLocked15::after{
-  content:"🔒" !important;
-
-  position:absolute !important;
-  inset:0 !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  color:#7C3AED !important;
-  font-size:1.35rem !important;
-
-  background:transparent !important;
-  box-shadow:none !important;
-}
-
-/* =========================
-   IMAGE OVERLAY
-========================= */
-
-.whoImageOverlay{
-  position:fixed !important;
-  inset:0 !important;
-  z-index:9999 !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  padding:24px !important;
-
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,.08), transparent 38%),
-    rgba(15,23,42,.92) !important;
-
-  backdrop-filter:blur(8px) !important;
-  -webkit-backdrop-filter:blur(8px) !important;
-
-  cursor:zoom-out !important;
-  animation:whoOverlayFadeIn .25s ease both;
-}
-
-@keyframes whoOverlayFadeIn{
-  from{
-    opacity:0;
-  }
-
-  to{
-    opacity:1;
-  }
-}
-
-.whoImageOverlayInner{
-  width:min(100%,1040px) !important;
-  height:min(86vh,650px) !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  border-radius:32px !important;
-  padding:16px !important;
-
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.20), transparent 38%),
-    linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06)) !important;
-
-  border:1px solid rgba(255,255,255,.24) !important;
-
-  box-shadow:
-    0 30px 80px rgba(0,0,0,.34),
-    inset 0 1px 0 rgba(255,255,255,.30) !important;
-
-  overflow:hidden !important;
-}
-
-.whoImageOverlayImg{
-  width:auto !important;
-  height:auto !important;
-
-  max-width:100% !important;
-  max-height:100% !important;
-
-  object-fit:contain !important;
-  object-position:center center !important;
-
-  border-radius:22px !important;
-  background:#0F172A !important;
-
-  display:block !important;
-
-  box-shadow:0 24px 60px rgba(0,0,0,.28) !important;
-}
-
-.whoImageOverlayTimer{
-  position:fixed !important;
-  top:50% !important;
-  right:28px !important;
-  left:auto !important;
-  transform:translateY(-50%) !important;
-  z-index:10000 !important;
-
-  width:96px !important;
-  height:96px !important;
-  border-radius:28px !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.32), transparent 42%),
-    linear-gradient(180deg,#67E8F9 0%,#06B6D4 100%) !important;
-
-  color:#12362D !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
-  font-size:2.8rem !important;
-  font-weight:900 !important;
-
-  box-shadow:0 18px 38px rgba(0,0,0,.26) !important;
-}
-
-body.whoOverlayActive .whoTopBar,
-body.whoOverlayActive .whoBottomRow,
-body.whoOverlayActive .whoGrid{
-  filter:blur(1px) brightness(.86) saturate(.9) !important;
-  transform:scale(.992) !important;
-  transition:.25s ease !important;
-}
-
-/* =========================
-   IPAD LANDSCAPE
-========================= */
-
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-
-  .whoWrap{
-    gap:9px !important;
-    padding:28px 0 4px !important;
-  }
-
-  .whoTopBar{
-    grid-template-columns:1fr 118px 1fr !important;
-    gap:10px !important;
-    padding:4px 2px !important;
-  }
-
-  .whoTeamCard{
-    min-height:62px !important;
-    height:62px !important;
-    padding:7px 8px !important;
-  }
-
-  #whoTeamABox{
-    border-radius:24px 15px 24px 15px !important;
-  }
-
-  #whoTeamBBox{
-    border-radius:15px 24px 15px 24px !important;
-  }
-
-  .whoTeamName{
-    font-size:1.35rem !important;
-    padding:6px 10px !important;
-    border-radius:15px;
-  }
-
-  .whoTeamScore{
-    width:48px !important;
-    height:38px !important;
-    border-radius:14px !important;
-    font-size:1.35rem !important;
-  }
-
-  .whoTimerBox{
-    width:118px !important;
-    min-height:72px !important;
-    height:72px !important;
-    border-radius:26px !important;
-  }
-
-  .whoTimerLabel{
-    font-size:.66rem !important;
-  }
-
-  .whoTimerValue{
-    font-size:1.85rem !important;
-  }
-
-  #whoImageStage .whoImageFrame{
-    width:420px !important;
-    height:195px !important;
-    min-height:195px !important;
-    max-height:195px !important;
-  }
-
-  #whoImageStage .whoResultView{
-    width:min(100%,720px) !important;
-    grid-template-columns:230px minmax(0,1fr) !important;
-    gap:10px !important;
-  }
-
-  #whoImageStage .whoResultImageBox{
-    width:230px !important;
-    height:195px !important;
-    min-height:195px !important;
-    max-height:195px !important;
-  }
-
-  #whoImageStage .whoResultAnswerBox{
-    height:195px !important;
-    min-height:195px !important;
-    max-height:195px !important;
-  }
-
-  #whoImageStage .whoResultAnswerLabel{
-    min-height:28px !important;
-    font-size:.74rem !important;
-  }
-
-  #whoImageStage .whoResultAnswerText{
-    font-size:clamp(1.3rem,2.7vw,2.05rem) !important;
-  }
-
-  .whoBottomRow{
-    grid-template-columns:minmax(0,1fr) 430px !important;
-    gap:10px !important;
-  }
-
-  .whoPointsSelect{
-    grid-template-columns:150px minmax(0,1fr) !important;
-    gap:8px !important;
-    min-height:58px !important;
-    padding:8px 10px !important;
-    border-radius:20px !important;
-  }
-
-  .whoTurnSide{
-    height:40px !important;
-    border-radius:14px !important;
-    font-size:.78rem !important;
-    padding:0 8px !important;
-  }
-
-  .whoPointsSide{
-    gap:6px !important;
-  }
-
-  .whoPointsSide .whoPointsLabel{
-    font-size:.78rem !important;
-  }
-
-  .whoPointBtn{
-    min-width:38px !important;
-    width:38px !important;
-    height:36px !important;
-    border-radius:12px !important;
-    font-size:1.05rem !important;
-  }
-
-  .whoControlPanel{
-    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-    gap:6px !important;
-  }
-
-  .whoControlPanel button{
-    height:42px !important;
-    min-height:42px !important;
-    font-size:.68rem !important;
-    border-radius:12px !important;
-    padding:0 4px !important;
-  }
-
-  .whoGrid{
-    gap:10px !important;
-  }
-
-  .whoBtn,
-  .whoNumberBtn,
-  .whoGrid button,
-  .whoCardBtn{
-    height:42px !important;
-    min-height:42px !important;
-    border-radius:14px !important;
-    font-size:1.35rem !important;
-  }
-
-  .whoBtn::after,
-  .whoNumberBtn::after,
-  .whoGrid button::after,
-  .whoCardBtn::after{
-    border-radius:14px !important;
-  }
-
-  .whoBtn.used::after,
-  .whoNumberBtn.used::after,
-  .whoGrid button.used::after,
-  .whoCardBtn.used::after{
-    font-size:1.35rem !important;
-  }
-
-  .whoImageOverlayInner{
-    width:min(100%,900px) !important;
-    height:min(84vh,560px) !important;
-  }
-
-  .whoImageOverlayTimer{
-    width:78px !important;
-    height:78px !important;
-    border-radius:22px !important;
-    right:18px !important;
-    font-size:2.15rem !important;
-  }
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width:767px){
-
-  .whoWrap{
-    gap:10px !important;
-    padding:10px 0 8px !important;
-  }
-
-  .whoTopBar{
-    grid-template-columns:1fr !important;
-    gap:8px !important;
-    padding:8px 0 !important;
-  }
-
-  .whoTeamCard,
-  .whoTimerBox{
-    width:100% !important;
-    justify-self:stretch !important;
-    min-height:62px !important;
-    height:62px !important;
-    border-radius:18px !important;
-  }
-
-  #whoTeamABox,
-  #whoTeamBBox{
-    width:100% !important;
-    border-radius:18px !important;
-  }
-
-  .whoTeamName{
-    font-size:1.25rem !important;
-  }
-
-  .whoTeamScore{
-    width:50px !important;
-    height:38px !important;
-    font-size:1.4rem !important;
-  }
-
-  .whoTimerValue{
-    font-size:1.8rem !important;
-  }
-
-  .whoTimerLabel{
-    font-size:.78rem !important;
-  }
-
-  #whoImageStage .whoImageFrame{
-    width:min(100%,340px) !important;
-    height:210px !important;
-    min-height:210px !important;
-    max-height:210px !important;
-  }
-
-  #whoImageStage .whoResultView{
-    width:100% !important;
-    grid-template-columns:1fr !important;
-    gap:10px !important;
-  }
-
-  #whoImageStage .whoResultImageBox{
-    width:100% !important;
-    height:200px !important;
-    min-height:200px !important;
-    max-height:200px !important;
-  }
-
-  #whoImageStage .whoResultAnswerBox{
-    height:auto !important;
-    min-height:170px !important;
-    max-height:none !important;
-  }
-
-  #whoImageStage .whoResultAnswerText{
-    font-size:1.65rem !important;
-  }
-
-  .whoBottomRow{
-    grid-template-columns:1fr !important;
-    gap:10px !important;
-  }
-
-  .whoPointsSelect{
-    grid-template-columns:1fr !important;
-    gap:8px !important;
-    padding:10px !important;
-    min-height:auto !important;
-    border-radius:18px !important;
-  }
-
-  .whoTurnSide{
-    width:100% !important;
-    height:42px !important;
-    border-radius:14px !important;
-    font-size:.9rem !important;
-  }
-
-  .whoPointsSide{
-    width:100% !important;
-    justify-content:center !important;
-    flex-wrap:wrap !important;
-    gap:7px !important;
-  }
-
-  .whoPointsSide .whoPointsLabel{
-    width:100% !important;
-    text-align:center !important;
-    font-size:.86rem !important;
-  }
-
-  .whoPointBtn{
-    min-width:42px !important;
-    width:42px !important;
-    height:38px !important;
-    border-radius:13px !important;
-    font-size:1.08rem !important;
-  }
-
-  .whoControlPanel{
-    width:100% !important;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    gap:8px !important;
-  }
-
-  .whoControlPanel button{
-    height:44px !important;
-    min-height:44px !important;
-    font-size:.78rem !important;
-    border-radius:13px !important;
-    padding:0 6px !important;
-  }
-
-  .whoGrid{
-    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-    gap:10px !important;
-  }
-
-  .whoBtn,
-  .whoNumberBtn,
-  .whoGrid button,
-  .whoCardBtn{
-    height:44px !important;
-    min-height:44px !important;
-    border-radius:14px !important;
-    font-size:1.35rem !important;
-  }
-
-  .whoImageOverlay{
-    padding:14px !important;
-  }
-
-  .whoImageOverlayInner{
-    height:min(78vh,520px) !important;
-    border-radius:24px !important;
-    padding:12px !important;
-  }
-
-  .whoImageOverlayImg{
-    border-radius:16px !important;
-  }
-
-  .whoImageOverlayTimer{
-    width:74px !important;
-    height:74px !important;
-    border-radius:20px !important;
-    right:14px !important;
-    font-size:2rem !important;
-  }
-}
-/* =========================================================
-   WHO ANSWER GLASS RESULT COLORS
-   كرت الإجابة أخضر/أحمر زجاجي
-========================================================= */
-
-/* كرت الإجابة الصحيح */
-#whoImageStage .whoResultView.correctResult .whoResultAnswerBox{
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.72), transparent 42%),
-    radial-gradient(circle at 85% 100%, rgba(34,197,94,.32), transparent 48%),
-    linear-gradient(180deg, rgba(240,253,244,.88), rgba(187,247,208,.42)) !important;
-
-  border:1px solid rgba(34,197,94,.46) !important;
-
-  box-shadow:
-    0 18px 42px rgba(22,163,74,.18),
-    0 0 0 5px rgba(34,197,94,.08),
-    inset 0 1px 0 rgba(255,255,255,.92),
-    inset 0 -1px 0 rgba(22,163,74,.10) !important;
-
-  backdrop-filter:blur(20px) saturate(1.18) !important;
-  -webkit-backdrop-filter:blur(20px) saturate(1.18) !important;
-}
-
-/* كرت الإجابة الخاطئة */
-#whoImageStage .whoResultView.wrongResult .whoResultAnswerBox{
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255,255,255,.72), transparent 42%),
-    radial-gradient(circle at 85% 100%, rgba(239,68,68,.34), transparent 48%),
-    linear-gradient(180deg, rgba(254,242,242,.90), rgba(254,202,202,.44)) !important;
-
-  border:1px solid rgba(239,68,68,.48) !important;
-
-  box-shadow:
-    0 18px 42px rgba(220,38,38,.18),
-    0 0 0 5px rgba(239,68,68,.08),
-    inset 0 1px 0 rgba(255,255,255,.92),
-    inset 0 -1px 0 rgba(220,38,38,.10) !important;
-
-  backdrop-filter:blur(20px) saturate(1.18) !important;
-  -webkit-backdrop-filter:blur(20px) saturate(1.18) !important;
-}
-
-/* شارة الصحيح */
-#whoImageStage .whoResultView.correctResult .whoResultAnswerLabel{
-  color:#FFFFFF !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.22), transparent 42%),
-    linear-gradient(180deg,#22C55E,#15803D) !important;
-
-  box-shadow:
-    0 10px 24px rgba(22,163,74,.26),
-    inset 0 1px 0 rgba(255,255,255,.22) !important;
-}
-
-/* شارة الخطأ */
-#whoImageStage .whoResultView.wrongResult .whoResultAnswerLabel{
-  color:#FFFFFF !important;
-
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,255,255,.22), transparent 42%),
-    linear-gradient(180deg,#EF4444,#B91C1C) !important;
-
-  box-shadow:
-    0 10px 24px rgba(220,38,38,.26),
-    inset 0 1px 0 rgba(255,255,255,.22) !important;
-}
-
-/* لون النص داخل الكرت */
-#whoImageStage .whoResultView.correctResult .whoResultAnswerText{
-  color:#14532D !important;
-}
-
-#whoImageStage .whoResultView.wrongResult .whoResultAnswerText{
-  color:#7F1D1D !important;
-}
-
-/* =========================================================
-   WHO NUMBERS REMOVE SHADOW ONLY
-   شيل الظل من مربعات أرقام من هو فقط
-========================================================= */
-
-.whoBtn,
-.whoNumberBtn,
-.whoGrid button,
-.whoCardBtn{
-  box-shadow:none !important;
-}
-
-/* المستخدم */
-.whoBtn.used,
-.whoNumberBtn.used,
-.whoGrid button.used,
-.whoCardBtn.used{
-  box-shadow:none !important;
-}
-
-/* المقفل */
-.whoBtnLocked15,
-.whoBtn.whoBtnLocked15,
-.whoGrid button.whoBtnLocked15{
-  box-shadow:none !important;
-}
-
-/* Hover بدون ظل */
-.whoBtn:hover:not(.used):not(:disabled):not(.whoBtnLocked15),
-.whoNumberBtn:hover:not(.used):not(:disabled),
-.whoGrid button:hover:not(.used):not(:disabled):not(.whoBtnLocked15),
-.whoCardBtn:hover:not(.used):not(:disabled){
-  box-shadow:none !important;
-}
-/* =========================================================
-   WHO / من هو - FULLSCREEN FIT
-   ترتيب القياسات والأرقام حسب العدد 10 / 12 / 15
-========================================================= */
-
-/* الأساس */
 .whoWrap,
 .whoWrap *{
   box-sizing:border-box;
 }
 
 .whoWrap{
+  --bg:#EAECF0;
+  --surface:#FFFFFF;
+  --soft:#F6F7F9;
+  --line:#D5DADF;
+
+  --primary:#FE7F2D;
+  --secondary:#233D4D;
+  --text:#151515;
+  --muted:#8793A0;
+
+  --btn-nav:#0A7C6E;
+  --btn-correct:#007F00;
+  --btn-wrong:#7F0000;
+  --btn-double:#00007F;
+  --btn-comp:#00004C;
+  --btn-disabled:#D7DCE2;
+  --btn-disabled-text:#7B8792;
+
   width:100%;
-  height:calc(100dvh - 104px);
-  max-height:calc(100dvh - 104px);
+  height:var(--app-height,100dvh);
+  min-height:var(--app-height,100dvh);
+  max-height:var(--app-height,100dvh);
+
+  padding:
+    calc(10px + env(safe-area-inset-top,0px))
+    calc(14px + env(safe-area-inset-right,0px))
+    calc(10px + env(safe-area-inset-bottom,0px))
+    calc(14px + env(safe-area-inset-left,0px));
+
+  display:grid;
+  grid-template-rows:138px 86px minmax(0,1fr) 220px 76px;
+  gap:10px;
+
+  overflow:hidden;
+  direction:rtl;
+
+  font-family:"HanakaText",sans-serif;
+  color:var(--text);
+  background:var(--bg);
+}
+
+.whoWrap button{
+  font-family:"HanakaText",sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.whoWrap h1,
+.whoWrap h2,
+.whoWrap h3{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-weight:400;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.whoHeader{
+  width:min(100%,1400px);
+  height:108px;
+  margin:30px auto 0;
+
+  display:grid;
+  grid-template-columns:92px minmax(320px,1fr) 150px minmax(320px,1fr) 92px;
+  align-items:center;
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:22px;
+}
+
+.whoDockBtn{
+  width:100%;
+  height:64px;
+  min-height:64px;
+
+  border:0;
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:var(--btn-nav);
+  color:#fff;
+
+  font-size:.9rem;
+  font-weight:900;
+  line-height:1;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease;
+}
+
+.whoDockBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.whoDockBtn:active{
+  transform:scale(.97);
+}
+
+.whoDockBtn:disabled{
+  background:#B9C3C9;
+  color:#fff;
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+/* =========================
+   TITLE + TIMER
+========================= */
+
+.whoTitle{
+  min-width:0;
+
+  position:relative;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.whoTitle h1{
+  margin:0;
+
+  color:var(--secondary);
+  font-size:clamp(1.35rem,1.8vw,1.95rem);
+  line-height:1;
+  font-weight:900;
+  text-align:center;
+}
+.whoTimerHidden{
+  position:absolute;
+  width:1px;
+  height:1px;
+  opacity:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+.whoTimerPill{
+  width:96px;
+  height:42px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:999px;
+
+  background:var(--secondary);
+  color:#fff;
+}
+
+.whoTimerPill strong{
+  color:#fff;
+  font-size:clamp(1.6rem,2.3vw,2.3rem);
+  line-height:1;
+  font-weight:900;
+}
+
+.whoTimerPill.timerDanger{
+  background:#7F0000;
+  animation:whoTimerPulse .75s ease-in-out infinite;
+}
+
+@keyframes whoTimerPulse{
+  0%,100%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.08);
+  }
+}
+
+/* =========================
+   TEAMS
+========================= */
+
+.whoTeamMini{
+  min-width:0;
+  height:84px;
+  min-height:84px;
+
+  display:grid;
+  align-items:center;
+  gap:8px;
+
+  padding:7px;
+
+  cursor:pointer;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:19px;
+
+  overflow:hidden;
+
+  transition:
+    border-color .15s ease,
+    box-shadow .15s ease,
+    transform .15s ease;
+}
+
+.whoTeamMini.teamA{
+  grid-template-columns:minmax(0,1fr) 62px;
+}
+
+.whoTeamMini.teamB{
+  grid-template-columns:62px minmax(0,1fr);
+}
+
+.whoTeamMini:hover{
+  transform:translateY(-1px);
+}
+
+.whoTeamMini.whoTeamCurrent{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(254,127,45,.14);
+}
+
+.whoTeamName{
+  min-width:0;
+  height:62px;
+  min-height:62px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:4px 8px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:14px;
+
+  overflow:visible;
+}
+
+.whoTeamName strong{
+  width:100%;
+
+  color:var(--text);
+  font-size:clamp(1.12rem,1.55vw,1.45rem);
+  line-height:1.18;
+  font-weight:900;
+  text-align:center;
+
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
+  word-break:normal;
+
+  display:block;
+}
+
+.whoTeamMini > b{
+  width:62px;
+  min-width:62px;
+  height:62px;
+  min-height:62px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:14px;
+
+  background:var(--secondary);
+  color:#fff;
+
+  font-size:1.35rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.whoTeamMini.whoTeamCurrent > b{
+  background:var(--primary);
+}
+
+/* =========================
+   POINTS CARD
+========================= */
+
+.whoPointsCard{
+  width:min(100%,920px);
+  height:86px;
+  min-height:86px;
+  margin:4px auto 0;
+
+  display:grid;
+  grid-template-columns:230px minmax(0,1fr);
+  gap:12px;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
+
+  overflow:hidden;
+}
+
+.whoTurnSide{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:8px 12px;
+
+  border-radius:22px;
+
+  background:var(--secondary);
+  color:#fff;
+
+  font-size:clamp(1rem,1.25vw,1.2rem);
+  line-height:1.2;
+  font-weight:900;
+  text-align:center;
+
+  overflow:hidden;
+}
+
+.whoPointsSide{
+  min-width:0;
   min-height:0;
 
   display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:12px;
-
-  padding:0 18px 10px;
-  overflow:hidden;
+  grid-template-columns:120px repeat(5,minmax(0,1fr));
+  gap:8px;
 }
 
-/* جسم الفقرة */
-.whoMainStage,
-.whoStage,
-.whoBody{
-  width:100%;
-  height:100%;
-  min-height:0;
-  overflow:hidden;
+.whoPointsLabel{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:18px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+
+  color:var(--secondary);
+
+  font-size:.92rem;
+  font-weight:900;
+  text-align:center;
 }
 
-/* صورة من هو */
-.whoImageFrame,
-.whoQuestionImageFrame,
-.whoImageBox{
-  width:100%;
+.whoPointBtn{
+  border:0;
+  border-radius:18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:var(--primary);
+  color:#fff;
+
+  font-size:1.75rem;
+  line-height:1;
+  font-weight:900;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
+}
+
+.whoPointBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.02);
+}
+
+.whoPointBtn:active{
+  transform:scale(.97);
+}
+
+.whoPointBtn.selectedWhoPoint{
+  background:var(--secondary);
+  color:#fff;
+}
+
+/* =========================
+   IMAGE STAGE / CONTENT
+========================= */
+
+.whoImageStage{
+  width:min(100%,1180px);
   height:100%;
   min-height:0;
+  max-height:100%;
+  margin:0 auto;
 
   display:flex;
   align-items:center;
@@ -1779,244 +428,755 @@ body.whoOverlayActive .whoGrid{
 
   padding:14px;
 
-  border-radius:34px;
-  overflow:hidden;
-}
-
-.whoImageFrame img,
-.whoQuestionImageFrame img,
-.whoImageBox img,
-.whoImage{
-  width:auto;
-  height:auto;
-
-  max-width:100%;
-  max-height:100%;
-
-  object-fit:contain !important;
-  object-position:center;
-
-  display:block;
-  border-radius:24px;
-}
-
-/* شبكة الأرقام */
-.whoNumbersGrid,
-.whoGrid,
-.whoCardsGrid{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  gap:14px;
-
-  align-content:center;
-  justify-content:center;
-
-  margin:0;
-  padding:0 4px;
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
 
   overflow:hidden;
 }
 
-/* زر الرقم */
-.whoNumberBtn,
-.whoCard,
-.whoNumberCard{
+.whoImageStage.whoImageStageEmpty{
+  background:var(--surface);
+}
+
+.whoImageStage.whoImageStageEmpty::after{
+  content:"اختر النقاط ثم اختر رقم الصورة";
+
   width:100%;
   height:100%;
-  min-height:0;
-
-  border-radius:26px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(2rem,3.4vw,3.8rem);
-  line-height:1;
+  border-radius:22px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+
+  color:var(--secondary);
+
+  font-size:clamp(1.5rem,2.2vw,2.3rem);
+  line-height:1.25;
   font-weight:900;
+  text-align:center;
+}
+
+.whoImageFrame{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:22px;
+
+  background:#111827;
+  overflow:hidden;
+
+  cursor:pointer;
+}
+
+.whoImageFull{
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+  display:block;
+}
+
+/* =========================
+   NUMBERS GRID - SAME TOP10 / WARMUP
+========================= */
+
+.whoGrid{
+  width:min(100%,1280px);
+  height:220px;
+  min-height:220px;
+  max-height:220px;
+  margin:0 auto;
+
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-rows:repeat(3,minmax(0,1fr));
+  gap:12px;
+
+  padding:12px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
 
   overflow:hidden;
 }
 
-/* =========================================================
-   حسب العدد
-========================================================= */
+.whoBtn{
+  width:100%;
+  height:100%;
+  min-height:0;
 
-/* 10 أرقام = 5 فوق و 5 تحت */
-.whoNumbersGrid:has(.whoNumberBtn:nth-child(10)):not(:has(.whoNumberBtn:nth-child(11))),
-.whoGrid:has(.whoCard:nth-child(10)):not(:has(.whoCard:nth-child(11))),
-.whoCardsGrid:has(.whoNumberCard:nth-child(10)):not(:has(.whoNumberCard:nth-child(11))){
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  grid-template-rows:repeat(2,minmax(0,1fr));
+  border:0;
+  border-radius:20px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:var(--primary);
+  color:#fff;
+
+  font-size:clamp(2rem,3vw,3.3rem);
+  line-height:1;
+  font-weight:900;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
 }
 
-/* 12 رقم = 6 فوق و 6 تحت */
-.whoNumbersGrid:has(.whoNumberBtn:nth-child(12)):not(:has(.whoNumberBtn:nth-child(13))),
-.whoGrid:has(.whoCard:nth-child(12)):not(:has(.whoCard:nth-child(13))),
-.whoCardsGrid:has(.whoNumberCard:nth-child(12)):not(:has(.whoNumberCard:nth-child(13))){
-  grid-template-columns:repeat(6,minmax(0,1fr));
-  grid-template-rows:repeat(2,minmax(0,1fr));
+.whoBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.02);
 }
 
-/* 15 رقم = 5 × 3 */
-.whoNumbersGrid:has(.whoNumberBtn:nth-child(15)),
-.whoGrid:has(.whoCard:nth-child(15)),
-.whoCardsGrid:has(.whoNumberCard:nth-child(15)){
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  grid-template-rows:repeat(3,minmax(0,1fr));
+.whoBtn:active{
+  transform:scale(.97);
 }
 
-/* =========================================================
-   FULLSCREEN / ملء الشاشة
-========================================================= */
+.whoBtn.used,
+.whoBtn:disabled{
+  background:#E1E6EB;
+  color:#A0AAB4;
 
-body.tvFullScreenMode .whoWrap{
-  height:100% !important;
-  max-height:100% !important;
-
-  padding:18px 22px 18px !important;
-  gap:16px !important;
-
-  overflow:hidden !important;
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
 }
 
-body.tvFullScreenMode .whoNumbersGrid,
-body.tvFullScreenMode .whoGrid,
-body.tvFullScreenMode .whoCardsGrid{
-  gap:18px !important;
-  padding:0 !important;
-  overflow:hidden !important;
+.whoBtnLocked15{
+  background:#DCE2E8;
+  color:var(--muted);
 }
 
-body.tvFullScreenMode .whoNumberBtn,
-body.tvFullScreenMode .whoCard,
-body.tvFullScreenMode .whoNumberCard{
-  border-radius:30px !important;
-  font-size:clamp(2.5rem,4vw,4.8rem) !important;
+/* =========================
+   RESULT VIEW
+========================= */
+
+.whoResultView{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  max-height:100%;
+
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);
+  gap:14px;
+
+  overflow:hidden;
 }
 
-/* 10 في مل الشاشة */
-body.tvFullScreenMode .whoNumbersGrid:has(.whoNumberBtn:nth-child(10)):not(:has(.whoNumberBtn:nth-child(11))),
-body.tvFullScreenMode .whoGrid:has(.whoCard:nth-child(10)):not(:has(.whoCard:nth-child(11))),
-body.tvFullScreenMode .whoCardsGrid:has(.whoNumberCard:nth-child(10)):not(:has(.whoNumberCard:nth-child(11))){
-  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
-  grid-template-rows:repeat(2,minmax(0,1fr)) !important;
+.whoResultImageBox,
+.whoResultAnswerBox{
+  min-width:0;
+  min-height:0;
+
+  border-radius:22px;
+  overflow:hidden;
 }
 
-/* 12 في مل الشاشة */
-body.tvFullScreenMode .whoNumbersGrid:has(.whoNumberBtn:nth-child(12)):not(:has(.whoNumberBtn:nth-child(13))),
-body.tvFullScreenMode .whoGrid:has(.whoCard:nth-child(12)):not(:has(.whoCard:nth-child(13))),
-body.tvFullScreenMode .whoCardsGrid:has(.whoNumberCard:nth-child(12)):not(:has(.whoNumberCard:nth-child(13))){
-  grid-template-columns:repeat(6,minmax(0,1fr)) !important;
-  grid-template-rows:repeat(2,minmax(0,1fr)) !important;
+.whoResultImageBox{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#111827;
+
+  cursor:pointer;
 }
 
-/* 15 في مل الشاشة */
-body.tvFullScreenMode .whoNumbersGrid:has(.whoNumberBtn:nth-child(15)),
-body.tvFullScreenMode .whoGrid:has(.whoCard:nth-child(15)),
-body.tvFullScreenMode .whoCardsGrid:has(.whoNumberCard:nth-child(15)){
-  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
-  grid-template-rows:repeat(3,minmax(0,1fr)) !important;
+.whoResultImage{
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+  display:block;
 }
 
-/* =========================================================
-   LAPTOP SAFE
-========================================================= */
+.whoResultAnswerBox{
+  min-width:0;
+  min-height:0;
+  max-height:100%;
 
-@media (min-width:1181px) and (max-width:1440px){
+  padding:22px;
 
-  body.tvFullScreenMode .whoWrap{
-    padding:10px 18px 12px !important;
-    gap:12px !important;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:22px;
+
+  overflow:hidden;
+}
+
+.whoResultAnswerLabel{
+  padding:8px 18px;
+
+  border-radius:999px;
+
+  background:var(--primary);
+  color:#fff;
+
+  font-size:.95rem;
+  font-weight:900;
+}
+.whoResultView.correctResult .whoResultAnswerLabel{
+  background:#007F00;
+  color:#fff;
+}
+
+.whoResultView.wrongResult .whoResultAnswerLabel{
+  background:#7F0000;
+  color:#fff;
+}
+
+.whoResultAnswerText{
+  width:100%;
+  min-height:0;
+  max-height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--text);
+
+  font-size:clamp(1.8rem,2.8vw,3rem);
+  line-height:1.35;
+  font-weight:900;
+  text-align:center;
+
+  overflow:hidden;
+  word-break:normal;
+}
+
+.whoResultView.correctResult .whoResultAnswerBox{
+  border-color:rgba(0,127,0,.35);
+}
+
+.whoResultView.wrongResult .whoResultAnswerBox{
+  border-color:rgba(127,0,0,.35);
+}
+
+/* =========================
+   ACTION BAR - FIXED BOTTOM
+========================= */
+
+.whoActionBar{
+  width:min(100%,860px);
+  height:76px;
+  min-height:76px;
+  margin:0 auto;
+
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:24px;
+
+  align-self:end;
+}
+
+.whoActionBtn{
+  width:100%;
+  height:52px;
+  min-height:52px;
+
+  border:0;
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  color:#fff;
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:900;
+  text-align:center;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    opacity .15s ease;
+}
+
+.whoActionBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.whoActionBtn:active{
+  transform:scale(.97);
+}
+
+.whoDoubleBtn{
+  background:var(--btn-double);
+}
+
+.whoDoubleBtn.activeDouble{
+  background:var(--primary);
+}
+
+.whoCompensationBtn{
+  background:var(--btn-comp);
+}
+
+.whoCompensationBtn.activeCompensation{
+  background:var(--primary);
+}
+
+.btnCorrect{
+  background:var(--btn-correct);
+}
+
+.btnWrong{
+  background:var(--btn-wrong);
+}
+
+.whoActionBtn:disabled,
+.whoScoreBtnLocked{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+/* =========================
+   IMAGE OVERLAY
+========================= */
+
+.whoImageOverlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:24px;
+
+  background:rgba(0,0,0,.9);
+}
+
+.whoImageOverlayInner{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.whoImageOverlayImg{
+  max-width:100%;
+  max-height:100%;
+
+  object-fit:contain;
+
+  border-radius:18px;
+}
+
+.whoImageOverlayTimer{
+  position:fixed;
+  top:22px;
+  right:22px;
+  z-index:10000;
+
+  width:96px;
+  height:96px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:26px;
+
+  background:#FE7F2D;
+  color:#fff;
+
+  border:3px solid rgba(255,255,255,.35);
+
+  font-size:3rem;
+  line-height:1;
+  font-weight:900;
+
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.35),
+    inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.whoImageOverlayTimer.timerDanger{
+  background:#7F0000;
+  animation:whoOverlayTimerPulse .75s ease-in-out infinite;
+}
+
+@keyframes whoOverlayTimerPulse{
+  0%{
+    transform:scale(1);
   }
 
-  body.tvFullScreenMode .whoNumbersGrid,
-  body.tvFullScreenMode .whoGrid,
-  body.tvFullScreenMode .whoCardsGrid{
-    gap:14px !important;
+  50%{
+    transform:scale(1.08);
   }
 
-  body.tvFullScreenMode .whoNumberBtn,
-  body.tvFullScreenMode .whoCard,
-  body.tvFullScreenMode .whoNumberCard{
-    border-radius:26px !important;
-    font-size:clamp(2.1rem,3.2vw,3.7rem) !important;
+  100%{
+    transform:scale(1);
   }
 }
 
-/* =========================================================
-   iPAD LANDSCAPE SAFE
-========================================================= */
+.whoZoomFlashLayer{
+  position:fixed;
+  inset:0;
+  z-index:10001;
+  pointer-events:none;
+
+  background:rgba(127,0,0,.42);
+
+  opacity:0;
+}
+
+.whoZoomFlashLayer.whoZoomFlashRun{
+  animation:whoFlashWrong .8s ease both;
+}
+
+.whoZoomImageShake{
+  animation:whoWrongShake .5s ease both;
+}
+
+@keyframes whoFlashWrong{
+  0%,100%{
+    opacity:0;
+  }
+
+  20%,60%{
+    opacity:1;
+  }
+}
+
+@keyframes whoWrongShake{
+  0%,100%{
+    transform:translateX(0);
+  }
+
+  20%{
+    transform:translateX(-10px);
+  }
+
+  40%{
+    transform:translateX(10px);
+  }
+
+  60%{
+    transform:translateX(-8px);
+  }
+
+  80%{
+    transform:translateX(8px);
+  }
+}
+
+/* =========================
+   IPAD LANDSCAPE
+========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-
   .whoWrap{
-    height:calc(100dvh - 104px);
-    max-height:calc(100dvh - 104px);
+    padding:10px;
+    grid-template-rows:90px 76px minmax(0,1fr) 170px 70px;
+    gap:8px;
+  }
 
-    padding:0 16px 8px;
+  .whoHeader{
+    height:84px;
+    margin-top:6px;
+
+    grid-template-columns:82px minmax(200px,1fr) 118px minmax(200px,1fr) 82px;
+    gap:8px;
+
+    padding:8px;
+    border-radius:19px;
+  }
+
+  .whoDockBtn{
+    height:50px;
+    min-height:50px;
+
+    border-radius:13px;
+
+    font-size:.78rem;
+  }
+
+  .whoTeamMini{
+    height:62px;
+    min-height:62px;
+
+    gap:6px;
+    padding:6px;
+
+    border-radius:16px;
+  }
+
+  .whoTeamMini.teamA{
+    grid-template-columns:minmax(0,1fr) 52px;
+  }
+
+  .whoTeamMini.teamB{
+    grid-template-columns:52px minmax(0,1fr);
+  }
+
+  .whoTeamName{
+    height:46px;
+    min-height:46px;
+
+    padding:4px 8px;
+
+    border-radius:12px;
+  }
+
+  .whoTeamName strong{
+    font-size:.82rem;
+    line-height:1.15;
+  }
+
+  .whoTeamMini > b{
+    width:52px;
+    min-width:52px;
+    height:46px;
+    min-height:46px;
+
+    border-radius:12px;
+
+    font-size:1.12rem;
+  }
+
+  .whoTitle h1{
+    font-size:1.15rem;
+  }
+
+  .whoTimerPill{
+    width:74px;
+    height:34px;
+  }
+
+  .whoTimerPill strong{
+    font-size:1.65rem;
+  }
+
+  .whoPointsCard{
+    width:min(100%,860px);
+    height:68px;
+    min-height:68px;
+    margin-top:2px;
+
+    grid-template-columns:170px minmax(0,1fr);
+    gap:8px;
+
+    padding:8px;
+    border-radius:22px;
+  }
+
+  .whoTurnSide{
+    border-radius:16px;
+    font-size:.82rem;
+  }
+
+  .whoPointsSide{
+    grid-template-columns:88px repeat(5,minmax(0,1fr));
+    gap:6px;
+  }
+
+  .whoPointsLabel{
+    border-radius:14px;
+    font-size:.72rem;
+  }
+
+  .whoPointBtn{
+    border-radius:14px;
+    font-size:1.35rem;
+  }
+
+  .whoImageStage{
+    width:min(100%,1040px);
+    height:100%;
+    margin-top:0;
+
+    padding:10px;
+    border-radius:22px;
+  }
+
+  .whoImageStage.hidden::after{
+    border-radius:16px;
+    font-size:1.25rem;
+  }
+
+  .whoGrid{
+    width:min(100%,1040px);
+    height:160px;
+    min-height:160px;
+
+    gap:8px;
+    padding:8px;
+    border-radius:22px;
+  }
+
+  .whoBtn{
+    border-radius:16px;
+    font-size:2rem;
+  }
+
+  .whoActionBar{
+    width:min(100%,760px);
+    height:70px;
+    min-height:70px;
+
+    padding:9px;
+    border-radius:22px;
+  }
+
+  .whoActionBtn{
+    height:48px;
+    min-height:48px;
+
+    border-radius:15px;
+
+    font-size:.9rem;
+  }
+
+  .whoResultView{
+    grid-template-columns:minmax(0,1fr) minmax(260px,.75fr);
     gap:10px;
   }
 
-  .whoNumbersGrid,
-  .whoGrid,
-  .whoCardsGrid{
-    gap:12px;
-  }
-
-  .whoNumberBtn,
-  .whoCard,
-  .whoNumberCard{
-    border-radius:24px;
-    font-size:clamp(1.9rem,3vw,3.2rem);
-  }
-}
-/* =========================================================
-   WHO ROW GAP BOOST
-   توسيع المسافة بين صفوف الأرقام فقط
-========================================================= */
-
-.whoNumbersGrid,
-.whoGrid,
-.whoCardsGrid{
-  row-gap:26px !important;
-  column-gap:16px !important;
-}
-
-body.tvFullScreenMode .whoNumbersGrid,
-body.tvFullScreenMode .whoGrid,
-body.tvFullScreenMode .whoCardsGrid{
-  row-gap:34px !important;
-  column-gap:18px !important;
-}
-
-/* لابتوب */
-@media (min-width:1181px) and (max-width:1440px){
-  body.tvFullScreenMode .whoNumbersGrid,
-  body.tvFullScreenMode .whoGrid,
-  body.tvFullScreenMode .whoCardsGrid{
-    row-gap:30px !important;
-    column-gap:16px !important;
+  .whoResultAnswerText{
+    font-size:1.65rem;
+    line-height:1.35;
   }
 }
 
-/* آيباد */
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-  .whoNumbersGrid,
-  .whoGrid,
-  .whoCardsGrid{
-    row-gap:24px !important;
-    column-gap:14px !important;
+/* =========================
+   PHONE
+========================= */
+
+@media (max-width:767px){
+  .whoWrap{
+    max-height:none;
+    overflow:auto;
+
+    padding:
+      calc(8px + env(safe-area-inset-top,0px))
+      calc(8px + env(safe-area-inset-right,0px))
+      calc(8px + env(safe-area-inset-bottom,0px))
+      calc(8px + env(safe-area-inset-left,0px));
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
   }
 
-  body.tvFullScreenMode .whoNumbersGrid,
-  body.tvFullScreenMode .whoGrid,
-  body.tvFullScreenMode .whoCardsGrid{
-    row-gap:28px !important;
-    column-gap:14px !important;
+  .whoHeader{
+    height:auto;
+    min-height:0;
+
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+
+    padding:8px;
+    margin-top:0;
+  }
+
+  .whoTitle{
+    grid-column:1 / -1;
+    order:-1;
+  }
+
+  .whoTeamMini.teamA,
+  .whoTeamMini.teamB{
+    grid-template-columns:minmax(0,1fr) 52px;
+  }
+
+  .whoPointsCard{
+    width:100%;
+    height:auto;
+    min-height:150px;
+    margin-top:0;
+
+    grid-template-columns:1fr;
+  }
+
+  .whoPointsSide{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    grid-template-rows:38px 62px;
+  }
+
+  .whoPointsLabel{
+    grid-column:1 / -1;
+  }
+
+  .whoImageStage{
+    height:300px;
+    margin-top:0;
+  }
+
+  .whoGrid{
+    width:100%;
+    height:260px;
+    min-height:260px;
+
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    grid-template-rows:repeat(3,minmax(0,1fr));
+  }
+
+  .whoActionBar{
+    width:100%;
+    height:auto;
+    min-height:0;
+
+    grid-template-columns:1fr;
+  }
+
+  .whoResultView{
+    grid-template-columns:1fr;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion:reduce){
+  .whoWrap *,
+  .whoWrap *::before,
+  .whoWrap *::after{
+    animation:none;
+    transition:none;
   }
 }

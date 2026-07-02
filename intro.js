@@ -1140,3 +1140,343 @@ window.addEventListener("beforeunload", () => {
   clearInterval(presenterStartWatchTimer)
   presenterStartWatchTimer = null
 })
+/* =========================
+   Intro Visible Segments
+========================= */
+
+function bindIntroModelSegmentsLoader() {
+  const modelSelect = document.getElementById("introModelSelect")
+  if (!modelSelect) return
+
+  modelSelect.addEventListener("change", async () => {
+    modelSelect.classList.remove("introFieldError")
+
+    introVisibleSegmentsReady = false
+    introVisibleSegmentsClickOrder = []
+
+    clearIntroSegmentSelectionUI()
+
+    await loadIntroVisibleSegments()
+  })
+}
+
+function clearIntroSegmentSelectionUI() {
+  const counter = document.getElementById("introSegmentsCounter")
+  const triggerCounter = document.getElementById("introSegmentsTriggerCounter")
+  const triggerSummary = document.getElementById("introSegmentsTriggerSummary")
+
+  if (counter) {
+    counter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    counter.classList.remove("ok")
+    counter.classList.add("bad")
+  }
+
+  if (triggerCounter) {
+    triggerCounter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    triggerCounter.classList.remove("ok")
+    triggerCounter.classList.add("bad")
+  }
+
+  if (triggerSummary) {
+    triggerSummary.textContent = "اختر الفقرات"
+  }
+
+  document.querySelectorAll(".introSegmentPickBtn").forEach(btn => {
+    btn.classList.remove("selected")
+    btn.removeAttribute("data-order")
+
+    const state = btn.querySelector(".introSegmentPickState")
+    if (state) state.textContent = ""
+  })
+}
+
+function getIntroDefaultVisibleSegmentsMap() {
+  const map = {}
+
+  INTRO_ALL_GAME_SEGMENTS.forEach(item => {
+    map[item.key] = {
+      is_visible: item.sort <= INTRO_MIN_SEGMENTS_COUNT,
+      sort_order: item.sort
+    }
+  })
+
+  return map
+}
+
+async function getIntroVisibleSegmentsMap(modelId) {
+  const map = getIntroDefaultVisibleSegmentsMap()
+
+  if (!modelId) return map
+
+  const { data, error } = await db
+    .from("visible_segments")
+    .select("*")
+    .eq("model", Number(modelId))
+    .order("sort_order", { ascending: true })
+
+  if (error) {
+    console.log("INTRO GET VISIBLE SEGMENTS ERROR:", error)
+    return map
+  }
+
+  ;(data || []).forEach(row => {
+    if (!map[row.segment_key]) return
+
+    map[row.segment_key] = {
+      is_visible: !!row.is_visible,
+      sort_order: Number(row.sort_order || map[row.segment_key].sort_order)
+    }
+  })
+
+  return map
+}
+
+async function ensureIntroVisibleSegmentsDefaults(modelId) {
+  if (!modelId) return false
+
+  const { data: existingRows, error: readError } = await db
+    .from("visible_segments")
+    .select("segment_key")
+    .eq("model", Number(modelId))
+
+  if (readError) {
+    console.log("INTRO READ VISIBLE SEGMENTS DEFAULTS ERROR:", readError)
+    showGameToast("تعذر قراءة فقرات العرض")
+    return false
+  }
+
+  const existingKeys = (existingRows || []).map(row => row.segment_key)
+
+  const rows = INTRO_ALL_GAME_SEGMENTS
+    .filter(item => !existingKeys.includes(item.key))
+    .map(item => ({
+      model: Number(modelId),
+      segment_key: item.key,
+      is_visible: item.sort <= INTRO_MIN_SEGMENTS_COUNT,
+      sort_order: item.sort,
+      updated_at: new Date().toISOString()
+    }))
+
+  if (!rows.length) return true
+
+  const { error } = await db
+    .from("visible_segments")
+    .insert(rows)
+
+  if (error) {
+    console.log("INTRO ENSURE VISIBLE SEGMENTS ERROR:", error)
+    showGameToast("تعذر تجهيز فقرات العرض")
+    return false
+  }
+
+  return true
+}
+
+async function loadIntroVisibleSegments() {
+  const modelSelect = document.getElementById("introModelSelect")
+  const modelId = Number(modelSelect?.value || 0)
+
+  const grid = document.getElementById("introSegmentsGrid")
+  const triggerCounter = document.getElementById("introSegmentsTriggerCounter")
+  const triggerSummary = document.getElementById("introSegmentsTriggerSummary")
+  const counter = document.getElementById("introSegmentsCounter")
+
+  introVisibleSegmentsReady = false
+  introVisibleSegmentsClickOrder = []
+
+  if (counter) {
+    counter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    counter.classList.remove("ok")
+    counter.classList.add("bad")
+  }
+
+  if (triggerCounter) {
+    triggerCounter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    triggerCounter.classList.remove("ok")
+    triggerCounter.classList.add("bad")
+  }
+
+  if (triggerSummary) {
+    triggerSummary.textContent = modelId ? "جارٍ تحميل الفقرات..." : "اختر النموذج أولاً"
+  }
+
+  if (!grid) return
+
+  if (!modelId) {
+    grid.innerHTML = `<div class="introSegmentsEmpty">اختر النموذج أولاً</div>`
+    return
+  }
+
+  grid.innerHTML = `<div class="introSegmentsEmpty">جارٍ تحميل الفقرات...</div>`
+
+  await ensureIntroVisibleSegmentsDefaults(modelId)
+
+  const visibleMap = await getIntroVisibleSegmentsMap(modelId)
+
+  const sortedSegments = [...INTRO_ALL_GAME_SEGMENTS].sort((a, b) => {
+    const av = Number(visibleMap[a.key]?.sort_order || a.sort)
+    const bv = Number(visibleMap[b.key]?.sort_order || b.sort)
+    return av - bv
+  })
+
+  /*
+    مهم:
+    هنا ما نختار أي فقرة تلقائيًا.
+    تظهر الفقرات كلها، والاختيار يبدأ من صفر.
+  */
+  introVisibleSegmentsClickOrder = []
+  introVisibleSegmentsReady = true
+
+  renderIntroSegmentsPicker(sortedSegments)
+}
+
+function renderIntroSegmentsPicker(segmentsList = INTRO_ALL_GAME_SEGMENTS) {
+  const grid = document.getElementById("introSegmentsGrid")
+  if (!grid) return
+
+  grid.innerHTML = segmentsList.map(item => {
+    const selectedIndex = introVisibleSegmentsClickOrder.indexOf(item.key)
+    const selected = selectedIndex !== -1
+
+    return `
+      <button
+        type="button"
+        class="introSegmentPickBtn ${selected ? "selected" : ""}"
+        id="introSegmentBtn_${item.key}"
+        data-order="${selected ? selectedIndex + 1 : ""}"
+        onclick="toggleIntroVisibleSegment('${item.key}')"
+      >
+        <span class="introSegmentPickTitle">${item.title}</span>
+        <span class="introSegmentPickState"></span>
+      </button>
+    `
+  }).join("")
+
+  refreshIntroSegmentsPickerUI()
+}
+
+function refreshIntroSegmentsPickerUI() {
+  const count = introVisibleSegmentsClickOrder.length
+
+  const counter = document.getElementById("introSegmentsCounter")
+  const triggerCounter = document.getElementById("introSegmentsTriggerCounter")
+  const triggerSummary = document.getElementById("introSegmentsTriggerSummary")
+
+  const countOk =
+    count >= INTRO_MIN_SEGMENTS_COUNT &&
+    count <= INTRO_MAX_SEGMENTS_COUNT
+
+  if (counter) {
+    counter.innerText = `${count} / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    counter.classList.toggle("ok", countOk)
+    counter.classList.toggle("bad", !countOk)
+  }
+
+  if (triggerCounter) {
+    triggerCounter.innerText = `${count} / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    triggerCounter.classList.toggle("ok", countOk)
+    triggerCounter.classList.toggle("bad", !countOk)
+  }
+
+  if (triggerSummary) {
+    if (!introVisibleSegmentsReady) {
+      triggerSummary.textContent = "اختر النموذج أولاً"
+    } else if (!count) {
+      triggerSummary.textContent = "اختر الفقرات"
+    } else {
+      triggerSummary.textContent = `تم اختيار ${count} فقرات`
+    }
+  }
+
+  INTRO_ALL_GAME_SEGMENTS.forEach(item => {
+    const btn = document.getElementById(`introSegmentBtn_${item.key}`)
+    if (!btn) return
+
+    const selectedIndex = introVisibleSegmentsClickOrder.indexOf(item.key)
+    const selected = selectedIndex !== -1
+
+    btn.classList.toggle("selected", selected)
+
+    if (selected) {
+      btn.dataset.order = String(selectedIndex + 1)
+    } else {
+      btn.removeAttribute("data-order")
+    }
+
+    const state = btn.querySelector(".introSegmentPickState")
+    if (state) state.textContent = ""
+  })
+}
+
+function toggleIntroVisibleSegment(key) {
+  const currentIndex = introVisibleSegmentsClickOrder.indexOf(key)
+
+  if (currentIndex !== -1) {
+    introVisibleSegmentsClickOrder.splice(currentIndex, 1)
+    refreshIntroSegmentsPickerUI()
+    return
+  }
+
+  if (introVisibleSegmentsClickOrder.length >= INTRO_MAX_SEGMENTS_COUNT) {
+    showGameToast(`مسموح اختيار ${INTRO_MAX_SEGMENTS_COUNT} فقرات كحد أقصى`)
+    return
+  }
+
+  introVisibleSegmentsClickOrder.push(key)
+  refreshIntroSegmentsPickerUI()
+}
+
+async function saveIntroVisibleSegments() {
+  const modelSelect = document.getElementById("introModelSelect")
+  const modelId = Number(modelSelect?.value || 0)
+
+  if (!modelId) {
+    showGameToast("اختر النموذج أولاً")
+    return false
+  }
+
+  if (!introVisibleSegmentsReady) {
+    showGameToast("انتظر تحميل الفقرات")
+    return false
+  }
+
+  if (
+    introVisibleSegmentsClickOrder.length < INTRO_MIN_SEGMENTS_COUNT ||
+    introVisibleSegmentsClickOrder.length > INTRO_MAX_SEGMENTS_COUNT
+  ) {
+    showGameToast(`لازم تختار من ${INTRO_MIN_SEGMENTS_COUNT} إلى ${INTRO_MAX_SEGMENTS_COUNT} فقرات`)
+    return false
+  }
+
+  const rows = INTRO_ALL_GAME_SEGMENTS.map(item => {
+    const selectedIndex = introVisibleSegmentsClickOrder.indexOf(item.key)
+    const visible = selectedIndex !== -1
+
+    return {
+      model: Number(modelId),
+      segment_key: item.key,
+      is_visible: visible,
+      sort_order: visible ? selectedIndex + 1 : 99 + item.sort,
+      updated_at: new Date().toISOString()
+    }
+  })
+
+  const { error } = await db
+    .from("visible_segments")
+    .upsert(rows, {
+      onConflict: "model,segment_key"
+    })
+
+  if (error) {
+    console.log("INTRO SAVE VISIBLE SEGMENTS ERROR:", error)
+    showGameToast("تعذر حفظ فقرات العرض")
+    return false
+  }
+
+  localStorage.setItem(
+    "intro_visible_segments_order",
+    JSON.stringify(introVisibleSegmentsClickOrder)
+  )
+
+  return true
+}

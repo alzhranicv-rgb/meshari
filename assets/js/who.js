@@ -175,62 +175,111 @@ window.renderWho = function () {
   whoTimerStarted = false
   whoCompensationMode = false
 
-  openSegment("من هو", `
-    <div class="whoWrap">
+openSegment("من هو", `
+  <div class="whoWrap" data-segment-key="who">
 
-      <div class="whoTopBar">
+    <header class="whoHeader">
 
-        <div class="whoTeamCard" onclick="selectWhoTeam('A')" id="whoTeamABox">
-          <div class="whoTeamName">${escapeDisplayHtml(teamAName)}</div>
-          <div class="whoTeamScore" id="whoScoreA">${whoState.scoreA}</div>
+      <button class="whoDockBtn" type="button" onclick="goHome()">
+        رجوع
+      </button>
+
+      <div
+        class="whoTeamMini teamA"
+        onclick="selectWhoTeam('A')"
+        id="whoTeamABox"
+      >
+        <div class="whoTeamName">
+          <strong>${escapeDisplayHtml(teamAName || "الفريق الأول")}</strong>
         </div>
 
-        <div class="whoTimerBox">
-          <div class="whoTimerLabel">المؤقت</div>
-          <div class="whoTimerValue" id="timer">0</div>
-        </div>
-
-        <div class="whoTeamCard" onclick="selectWhoTeam('B')" id="whoTeamBBox">
-          <div class="whoTeamName">${escapeDisplayHtml(teamBName)}</div>
-          <div class="whoTeamScore" id="whoScoreB">${whoState.scoreB}</div>
-        </div>
-
+        <b id="whoScoreA">${whoState.scoreA}</b>
       </div>
 
-      <div id="whoImageStage" class="whoImageStage hidden"></div>
-
-      <div class="whoBottomRow">
-
-       <div class="whoPointsSelect">
-  <div class="whoTurnSide" id="whoTurnInline">
-    الدور: ${getWhoTurnName()}
-  </div>
-
-  <div class="whoPointsSide">
-    <span class="whoPointsLabel">اختر النقاط:</span>
-    <button onclick="setWhoPoints(1)" class="whoPointBtn" id="whoPoint1">1</button>
-    <button onclick="setWhoPoints(2)" class="whoPointBtn" id="whoPoint2">2</button>
-    <button onclick="setWhoPoints(3)" class="whoPointBtn" id="whoPoint3">3</button>
-    <button onclick="setWhoPoints(4)" class="whoPointBtn" id="whoPoint4">4</button>
-    <button onclick="setWhoPoints(5)" class="whoPointBtn" id="whoPoint5">5</button>
-  </div>
+      <div class="whoTitle">
+  <h1>من هو</h1>
+  <span id="timer" class="whoTimerHidden">0</span>
 </div>
 
-        <div class="whoControlPanel">
-  <button onclick="activateWhoDouble()" class="whoDoubleBtn" id="whoDoubleBtn">دبل</button>
-  <button onclick="startWhoCompensation()" class="whoCompensationBtn" id="whoCompensationBtn" disabled>التعويض</button>
-  <button onclick="whoCorrect()" class="btnCorrect">✓ صح</button>
-  <button onclick="whoWrong()" class="btnWrong">✕ خطأ</button>
-</div>
+      <div
+        class="whoTeamMini teamB"
+        onclick="selectWhoTeam('B')"
+        id="whoTeamBBox"
+      >
+        <b id="whoScoreB">${whoState.scoreB}</b>
 
+        <div class="whoTeamName">
+          <strong>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</strong>
+        </div>
       </div>
 
-      <div class="whoGrid">
-        ${createWhoGrid()}
+      <button
+        id="endRoundBtn"
+        class="whoDockBtn"
+        type="button"
+        onclick="endCurrentSegment()"
+        disabled
+      >
+        إنهاء
+      </button>
+
+    </header>
+
+    <section class="whoPointsCard">
+
+      <div class="whoTurnSide" id="whoTurnInline">
+        الدور: ${getWhoTurnName()}
       </div>
 
-    </div>
-  `)
+      <div class="whoPointsSide">
+        <span class="whoPointsLabel">اختر النقاط</span>
+
+        <button onclick="setWhoPoints(1)" class="whoPointBtn" id="whoPoint1">1</button>
+        <button onclick="setWhoPoints(2)" class="whoPointBtn" id="whoPoint2">2</button>
+        <button onclick="setWhoPoints(3)" class="whoPointBtn" id="whoPoint3">3</button>
+        <button onclick="setWhoPoints(4)" class="whoPointBtn" id="whoPoint4">4</button>
+        <button onclick="setWhoPoints(5)" class="whoPointBtn" id="whoPoint5">5</button>
+      </div>
+
+    </section>
+
+    <section id="whoImageStage" class="whoImageStage whoImageStageEmpty"></section>
+
+    <section class="whoGrid">
+      ${createWhoGrid()}
+    </section>
+
+    <footer class="whoActionBar">
+
+      <button
+        onclick="activateWhoDouble()"
+        class="whoActionBtn whoDoubleBtn"
+        id="whoDoubleBtn"
+      >
+        دبل
+      </button>
+
+      <button
+        onclick="startWhoCompensation()"
+        class="whoActionBtn whoCompensationBtn"
+        id="whoCompensationBtn"
+        disabled
+      >
+        التعويض
+      </button>
+
+      <button onclick="whoCorrect()" class="whoActionBtn btnCorrect">
+        صح
+      </button>
+
+      <button onclick="whoWrong()" class="whoActionBtn btnWrong">
+        خطأ
+      </button>
+
+    </footer>
+
+  </div>
+`)
 
   if (saved) {
     restoreWhoState(saved)
@@ -705,7 +754,7 @@ function showWhoImageFullscreen(imageUrl) {
     </div>
   `
 
-  stage.classList.remove("hidden")
+  stage.classList.remove("whoImageStageEmpty")
 
   if (typeof protectDisplayMedia === "function") {
     protectDisplayMedia(stage)
@@ -721,7 +770,7 @@ function hideWhoImage() {
   if (!stage) return
 
   stage.innerHTML = ""
-  stage.classList.add("hidden")
+  stage.classList.add("whoImageStageEmpty")
 }
 
 function showWhoAnswer(resultType = "") {
@@ -767,7 +816,7 @@ function showWhoAnswer(resultType = "") {
     </div>
   `
 
-  stage.classList.remove("hidden")
+  stage.classList.remove("whoImageStageEmpty")
 
   if (typeof protectDisplayMedia === "function") {
     protectDisplayMedia(stage)
@@ -790,7 +839,7 @@ function clearWhoStage() {
   document.body.classList.remove("whoOverlayActive")
 
   stage.innerHTML = ""
-  stage.classList.add("hidden")
+  stage.classList.add("whoImageStageEmpty")
 
   currentWhoAnswer = null
   currentWhoImage = null
@@ -818,17 +867,37 @@ function runWhoTimer(startValue) {
   whoLastTickPlayed = null
 
   let time = Number(startValue || 0)
+
   timerBox.innerText = time
-  const overlayTimer = document.getElementById("whoOverlayTimer")
-if (overlayTimer) overlayTimer.innerText = time
-  
+
+  let overlayTimer = document.getElementById("whoOverlayTimer")
+  if (overlayTimer) {
+    overlayTimer.innerText = time
+    overlayTimer.classList.toggle("timerDanger", time > 0 && time <= 5)
+  }
+
+  const timerPill = timerBox.closest(".whoTimerPill")
+  if (timerPill) {
+    timerPill.classList.toggle("timerDanger", time > 0 && time <= 5)
+  }
+
   saveWhoState()
 
   timer = setInterval(() => {
     time--
+
     timerBox.innerText = time
-    const overlayTimer = document.getElementById("whoOverlayTimer")
-if (overlayTimer) overlayTimer.innerText = time
+
+    overlayTimer = document.getElementById("whoOverlayTimer")
+    if (overlayTimer) {
+      overlayTimer.innerText = time
+      overlayTimer.classList.toggle("timerDanger", time > 0 && time <= 5)
+    }
+
+    const currentTimerPill = timerBox.closest(".whoTimerPill")
+    if (currentTimerPill) {
+      currentTimerPill.classList.toggle("timerDanger", time > 0 && time <= 5)
+    }
 
     if (time > 0 && time <= 5 && whoLastTickPlayed !== time) {
       whoLastTickPlayed = time
@@ -840,9 +909,23 @@ if (overlayTimer) overlayTimer.innerText = time
     if (time <= 0) {
       clearInterval(timer)
       timer = null
+
       timerBox.innerText = 0
+
+      overlayTimer = document.getElementById("whoOverlayTimer")
+      if (overlayTimer) {
+        overlayTimer.innerText = 0
+        overlayTimer.classList.remove("timerDanger")
+      }
+
+      const lastTimerPill = timerBox.closest(".whoTimerPill")
+      if (lastTimerPill) {
+        lastTimerPill.classList.remove("timerDanger")
+      }
+
       whoTimerStarted = false
       whoLastTickPlayed = null
+
       playGameSound("timeout")
       saveWhoState()
     }
@@ -1068,13 +1151,14 @@ function openWhoImageOverlay() {
   document.body.classList.add("whoOverlayActive")
 
   const timerBox = document.getElementById("timer")
-  const time = timerBox ? timerBox.innerText : "0"
+  const time = timerBox ? Number(timerBox.innerText || 0) : 0
+const dangerClass = time > 0 && time <= 5 ? "timerDanger" : ""
 
   const overlay = document.createElement("div")
   overlay.id = "whoImageOverlay"
   overlay.className = "whoImageOverlay"
   overlay.innerHTML = `
-    <div class="whoImageOverlayTimer" id="whoOverlayTimer">${time}</div>
+    <div class="whoImageOverlayTimer ${dangerClass}" id="whoOverlayTimer">${time}</div>
 
     <div class="whoImageOverlayInner">
       <img src="${escapeDisplayHtml(currentWhoImage)}" class="whoImageOverlayImg" alt="">

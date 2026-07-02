@@ -314,11 +314,34 @@ function ensureFinalStateShape() {
 }
 
 function ensureFinalDoubleState() {
-  if (!finalState.doubleState) {
-    finalState.doubleState = {
-      used: { A: false, B: false },
-      activeTeam: null
+  const defaults = {
+    used: { A: false, B: false },
+    activeTeam: null
+  }
+
+  ;["round1", "round2", "round3", "round4"].forEach(key => {
+    if (!finalState[key]) return
+
+    if (!finalState[key].doubleState) {
+      finalState[key].doubleState = JSON.parse(JSON.stringify(defaults))
     }
+
+    if (!finalState[key].doubleState.used) {
+      finalState[key].doubleState.used = { A: false, B: false }
+    }
+
+    finalState[key].doubleState.used.A = !!finalState[key].doubleState.used.A
+    finalState[key].doubleState.used.B = !!finalState[key].doubleState.used.B
+
+    finalState[key].doubleState.activeTeam =
+      finalState[key].doubleState.activeTeam === "A" ||
+      finalState[key].doubleState.activeTeam === "B"
+        ? finalState[key].doubleState.activeTeam
+        : null
+  })
+
+  if (!finalState.doubleState) {
+    finalState.doubleState = JSON.parse(JSON.stringify(defaults))
   }
 
   if (!finalState.doubleState.used) {
@@ -327,6 +350,17 @@ function ensureFinalDoubleState() {
 
   finalState.doubleState.used.A = !!finalState.doubleState.used.A
   finalState.doubleState.used.B = !!finalState.doubleState.used.B
+}
+
+function getFinalCurrentDoubleState() {
+  ensureFinalDoubleState()
+
+  if (finalState.round === 1) return finalState.round1.doubleState
+  if (finalState.round === 2) return finalState.round2.doubleState
+  if (finalState.round === 3) return finalState.round3.doubleState
+  if (finalState.round === 4) return finalState.round4.doubleState
+
+  return finalState.doubleState
 }
 
 function ensureFinalRound1State() {
@@ -636,28 +670,11 @@ function getFinalCenterTeamOnly() {
 }
 
 function renderFinalCenterStatus() {
-  const box = document.getElementById("finalCenterStatusText")
-  if (!box) return
+  const titleBox = document.getElementById("finalSegmentNameBox")
+  if (!titleBox) return
 
-  const teamName = getFinalCenterTeamOnly() || "بدون فريق"
-  const numberText = getFinalCurrentNumberText()
-  const label =
-    finalState.round === 1
-      ? "بدون نقاط"
-      : finalState.round === 2
-        ? "صح صحلي"
-        : finalState.round === 3
-          ? "قصة"
-          : finalState.round === 4
-            ? "التركيز"
-            : "الفاصلة"
-
-  box.innerHTML = `
-    <div class="finalCenterStatusBox">
-     
-      <div class="finalCenterStatusTeam">${escapeDisplayHtml(teamName)}</div>
-      
-    </div>
+  titleBox.innerHTML = `
+    <h1>${escapeDisplayHtml(getFinalRoundTextLabel())}</h1>
   `
 }
 
@@ -957,8 +974,23 @@ function resetFinalTeamSelection() {
   const a = document.getElementById("finalTeamABox")
   const b = document.getElementById("finalTeamBBox")
 
-  if (a) a.classList.remove("activeTeam")
-  if (b) b.classList.remove("activeTeam")
+  if (a) {
+    a.classList.remove(
+      "activeTeam",
+      "finalTurnActiveTeam",
+      "finalScoreTeamCurrent",
+      "warmupTeamCurrent"
+    )
+  }
+
+  if (b) {
+    b.classList.remove(
+      "activeTeam",
+      "finalTurnActiveTeam",
+      "finalScoreTeamCurrent",
+      "warmupTeamCurrent"
+    )
+  }
 
   updateFinalDoubleButton()
 }
@@ -968,19 +1000,29 @@ function highlightFinalTeam(team) {
   const b = document.getElementById("finalTeamBBox")
 
   if (a) {
-    a.classList.remove("activeTeam", "finalTurnActiveTeam", "finalScoreTeamCurrent")
+    a.classList.remove(
+      "activeTeam",
+      "finalTurnActiveTeam",
+      "finalScoreTeamCurrent",
+      "warmupTeamCurrent"
+    )
   }
 
   if (b) {
-    b.classList.remove("activeTeam", "finalTurnActiveTeam", "finalScoreTeamCurrent")
+    b.classList.remove(
+      "activeTeam",
+      "finalTurnActiveTeam",
+      "finalScoreTeamCurrent",
+      "warmupTeamCurrent"
+    )
   }
 
   if (team === "A" && a) {
-    a.classList.add("finalScoreTeamCurrent")
+    a.classList.add("finalScoreTeamCurrent", "warmupTeamCurrent")
   }
 
   if (team === "B" && b) {
-    b.classList.add("finalScoreTeamCurrent")
+    b.classList.add("finalScoreTeamCurrent", "warmupTeamCurrent")
   }
 
   updateFinalDoubleButton()
@@ -1046,27 +1088,47 @@ function getFinalRound1ClipStyle(text = "", zoom = false) {
   const clean = String(text || "").trim()
   const len = clean.length
 
-  let size = zoom ? "clamp(3rem, 6.3vw, 7rem)" : "clamp(1.7rem, 2.2vw, 2.45rem)"
-  let line = zoom ? "1.45" : "1.82"
+  let size = zoom
+    ? "clamp(3.6rem, 6vw, 6.9rem)"
+    : "clamp(2.15rem, 2.85vw, 3.25rem)"
+
+  let line = zoom ? "1.48" : "1.55"
 
   if (len > 90) {
-    size = zoom ? "clamp(2.6rem, 5.4vw, 6rem)" : "clamp(1.45rem, 1.95vw, 2rem)"
-    line = zoom ? "1.42" : "1.72"
+    size = zoom
+      ? "clamp(3.05rem, 5.2vw, 5.9rem)"
+      : "clamp(1.9rem, 2.5vw, 2.75rem)"
+
+    line = zoom ? "1.44" : "1.52"
   }
 
   if (len > 140) {
-    size = zoom ? "clamp(2.25rem, 4.7vw, 5.2rem)" : "clamp(1.22rem, 1.65vw, 1.7rem)"
-    line = zoom ? "1.38" : "1.58"
+    size = zoom
+      ? "clamp(2.55rem, 4.45vw, 5rem)"
+      : "clamp(1.62rem, 2.15vw, 2.35rem)"
+
+    line = zoom ? "1.4" : "1.48"
   }
 
   if (len > 190) {
-    size = zoom ? "clamp(1.9rem, 3.9vw, 4.35rem)" : "clamp(1.05rem, 1.42vw, 1.45rem)"
-    line = zoom ? "1.34" : "1.46"
+    size = zoom
+      ? "clamp(2.15rem, 3.75vw, 4.25rem)"
+      : "clamp(1.38rem, 1.85vw, 2rem)"
+
+    line = zoom ? "1.36" : "1.45"
   }
 
-  return `font-family:'MolhimCustom','HanakaText',sans-serif;font-size:${size};line-height:${line};text-wrap:balance;`
+  return `
+    font-family:'MolhimCustom','HanakaText',sans-serif;
+    font-size:${size};
+    line-height:${line};
+    font-weight:400;
+    letter-spacing:.01em;
+    word-spacing:.08em;
+    text-align:center;
+    text-wrap:normal;
+  `
 }
-
 
 /* =========================
    8) SCORES / GLOBAL SYNC
@@ -1274,13 +1336,15 @@ function showFinalRoundFinishedScreen() {
 
 /* =========================
    9) DOUBLE
+   دبل مستقل لكل فقرة من الفاينل
 ========================= */
 
 function activateFinalDouble() {
   ensureFinalDoubleState()
 
   const roundState = getFinalCurrentRoundState()
-  const team = roundState?.activeTeam
+  const doubleState = getFinalCurrentDoubleState()
+  const team = getFinalActiveTurnTeam()
 
   if (!team) {
     showGameToast("اختر الفريق أولاً")
@@ -1289,33 +1353,56 @@ function activateFinalDouble() {
 
   if (finalState.round === 1) {
     if (!finalState.round1.pendingScore || finalState.round1.currentNumber === null) {
-      showGameToast("اختر الرقم أولاً")
+      showGameToast("افتح الرقم أولاً")
       return
     }
 
-    if (
-      finalState.round1.answerShown ||
-      Number(finalState.round1.shownQuestionPartsCount || 0) > 0
-    ) {
-      showGameToast("الدبل قبل ظهور السؤال فقط")
+    if (finalState.round1.answerShown) {
+      showGameToast("تم تسجيل الإجابة")
       return
     }
-  } else {
+  }
+
+  if (finalState.round === 2) {
     if (roundState.pendingScore || roundState.currentNumber !== null) {
       showGameToast("الدبل قبل اختيار الرقم فقط")
       return
     }
   }
 
-  if (finalState.doubleState.used[team]) {
-    showGameToast("هذا الفريق استخدم الدبل مسبقًا في الفاصلة")
+  if (finalState.round === 3) {
+    if (!finalState.round3.pendingScore || !finalState.round3.currentNumber) {
+      showGameToast("افتح الرقم أولاً")
+      return
+    }
+
+    if (!Number(finalState.round3.shownPart || 0)) {
+      showGameToast("أظهر جزء من القصة أولاً")
+      return
+    }
+
+    if (finalState.round3.answerShown) {
+      showGameToast("تم تسجيل الإجابة")
+      return
+    }
+  }
+
+  if (finalState.round === 4) {
+    if (roundState.pendingScore || roundState.currentNumber !== null) {
+      showGameToast("الدبل قبل اختيار الرقم فقط")
+      return
+    }
+  }
+
+  if (doubleState.used[team]) {
+    showGameToast("هذا الفريق استخدم الدبل مسبقًا في هذه الفقرة")
     return
   }
 
   pushFinalHistory()
 
-  finalState.doubleState.used[team] = true
-  finalState.doubleState.activeTeam = team
+  doubleState.used[team] = true
+  doubleState.activeTeam = team
 
   showGameToast(`تم تفعيل الدبل لفريق ${team === "A" ? teamAName : teamBName}`)
 
@@ -1326,13 +1413,17 @@ function activateFinalDouble() {
 function getFinalScoreValue(team, base) {
   ensureFinalDoubleState()
 
+  const doubleState = getFinalCurrentDoubleState()
   const points = Number(base || 0)
-  return finalState.doubleState.activeTeam === team ? points * 2 : points
+
+  return doubleState.activeTeam === team ? points * 2 : points
 }
 
 function clearFinalActiveDouble() {
   ensureFinalDoubleState()
-  finalState.doubleState.activeTeam = null
+
+  const doubleState = getFinalCurrentDoubleState()
+  doubleState.activeTeam = null
 }
 
 function updateFinalDoubleButton() {
@@ -1342,7 +1433,8 @@ function updateFinalDoubleButton() {
   if (!btn) return
 
   const roundState = getFinalCurrentRoundState()
-  const team = roundState?.activeTeam
+  const doubleState = getFinalCurrentDoubleState()
+  const team = getFinalActiveTurnTeam()
 
   btn.classList.remove("activeDouble")
 
@@ -1350,14 +1442,36 @@ function updateFinalDoubleButton() {
     if (
       !finalState.round1.pendingScore ||
       finalState.round1.currentNumber === null ||
-      finalState.round1.answerShown ||
-      Number(finalState.round1.shownQuestionPartsCount || 0) > 0
+      finalState.round1.answerShown
     ) {
       btn.disabled = true
       btn.innerText = "دبل"
       return
     }
-  } else {
+  }
+
+  if (finalState.round === 2) {
+    if (roundState?.pendingScore || roundState?.currentNumber !== null) {
+      btn.disabled = true
+      btn.innerText = "دبل"
+      return
+    }
+  }
+
+  if (finalState.round === 3) {
+    if (
+      !finalState.round3.pendingScore ||
+      !finalState.round3.currentNumber ||
+      !Number(finalState.round3.shownPart || 0) ||
+      finalState.round3.answerShown
+    ) {
+      btn.disabled = true
+      btn.innerText = "دبل"
+      return
+    }
+  }
+
+  if (finalState.round === 4) {
     if (roundState?.pendingScore || roundState?.currentNumber !== null) {
       btn.disabled = true
       btn.innerText = "دبل"
@@ -1366,19 +1480,19 @@ function updateFinalDoubleButton() {
   }
 
   if (!team) {
-    btn.disabled = finalState.doubleState.used.A && finalState.doubleState.used.B
+    btn.disabled = doubleState.used.A && doubleState.used.B
     btn.innerText = "دبل"
     return
   }
 
-  if (finalState.doubleState.activeTeam === team) {
+  if (doubleState.activeTeam === team) {
     btn.disabled = true
     btn.innerText = "دبل مفعّل"
     btn.classList.add("activeDouble")
     return
   }
 
-  if (finalState.doubleState.used[team]) {
+  if (doubleState.used[team]) {
     btn.disabled = true
     btn.innerText = "استخدم الدبل"
     return
@@ -1387,8 +1501,6 @@ function updateFinalDoubleButton() {
   btn.disabled = false
   btn.innerText = "دبل"
 }
-
-
 /* =========================
    10) INIT / MAIN RENDER
 ========================= */
@@ -1518,30 +1630,51 @@ function buildFinalHTML() {
   return `
     <div class="finalWrapNew">
 
-      <div class="finalScoreBoards" id="finalScoreBoards">
+      <div class="megaHeader finalScoreBoards finalMegaHeader" id="finalScoreBoards">
 
-        <div class="finalScorePanel finalScorePanelRight" id="finalTeamBBox" onclick="selectFinalTeam('B')">
-          <div class="finalScoreTeamNameBox finalScoreTeamNameFix">${teamBName}</div>
-          <div class="finalScoreErrorsBox" id="finalErrorsB"></div>
-          <div class="finalScoreValueBox" id="finalScoreB">0</div>
-        </div>
+        <button class="dockBtn finalHeaderBtn finalBackBtn" type="button" onclick="goHome()">
+          رجوع
+        </button>
 
-        <div class="finalScoreCenterPanel finalCenterMiniGlass">
-          <div class="finalCenterStatusText" id="finalCenterStatusText">
-            اختر الفريق
+        <div class="teamMini teamA finalScorePanel finalScorePanelLeft" id="finalTeamABox" onclick="selectFinalTeam('A')">
+          <div class="teamNameBlock finalScoreTeamNameBox finalScoreTeamNameFix">
+            <strong>${escapeDisplayHtml(teamAName || "الفريق الأول")}</strong>
           </div>
+
+          <b id="finalScoreA" class="finalScoreValueBox">0</b>
+
+          <div class="finalScoreErrorsBox" id="finalErrorsA"></div>
         </div>
 
-        <div class="finalScorePanel finalScorePanelLeft" id="finalTeamABox" onclick="selectFinalTeam('A')">
-          <div class="finalScoreValueBox" id="finalScoreA">0</div>
-          <div class="finalScoreErrorsBox" id="finalErrorsA"></div>
-          <div class="finalScoreTeamNameBox finalScoreTeamNameFix">${teamAName}</div>
+        <div class="segmentTitlePlain finalSegmentNameBox" id="finalSegmentNameBox">
+          <h1>${escapeDisplayHtml(getFinalDisplayTitle())}</h1>
         </div>
+
+        <div class="teamMini teamB finalScorePanel finalScorePanelRight" id="finalTeamBBox" onclick="selectFinalTeam('B')">
+          <b id="finalScoreB" class="finalScoreValueBox">0</b>
+
+          <div class="teamNameBlock finalScoreTeamNameBox finalScoreTeamNameFix">
+            <strong>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</strong>
+          </div>
+
+          <div class="finalScoreErrorsBox" id="finalErrorsB"></div>
+        </div>
+
+        <button
+          id="endRoundBtn"
+          class="dockBtn danger finalHeaderBtn finalEndBtn"
+          type="button"
+          onclick="endCurrentSegment()"
+          disabled
+        >
+          إنهاء
+        </button>
 
       </div>
 
       <div class="finalMainStage" id="finalMainStage"></div>
-      <div class="finalControlsBar" id="finalControlsBar"></div>
+
+      <div class="actionBar finalControlsBar" id="finalControlsBar"></div>
 
     </div>
   `
@@ -1559,14 +1692,7 @@ function renderFinalRound() {
   renderFinalTeamLayout()
   renderFinalTurnBar()
 
-if (isFinalRoundFinished(finalState.round)) {
-  showFinalRoundFinishedScreen()
-  updateFinalDoubleButton()
-  syncFinalGlobals()
-  saveFinalState()
-  updateFinalUndoButtonState()
-  return
-}
+
 
 if (finalState.round === 1) renderFinalRound1()
 if (finalState.round === 2) renderFinalRound2()
@@ -1731,34 +1857,36 @@ function renderFinalRound1() {
   let cards = []
 
   for (let i = 1; i <= cardsCount; i++) {
-  const current = Number(finalState.round1.currentNumber) === i
-  const opened = finalState.round1.opened.includes(i)
-  const locked = finalState.round1.pendingScore && !current
-  const disabled = (opened && !current) || locked
+    const current = Number(finalState.round1.currentNumber) === i
+    const opened = finalState.round1.opened.includes(i)
+    const locked = finalState.round1.pendingScore && !current
+    const disabled = (opened && !current) || locked
 
-  cards.push(`
-    <button
-      class="finalRound1Card ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
-      ${disabled ? "disabled" : ""}
-      onclick="openFinalRound1Card(${i})"
-    >
-      ${i}
-    </button>
-  `)
-}
+    cards.push(`
+      <button
+        class="finalRound1Card ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
+        ${disabled ? "disabled" : ""}
+        onclick="openFinalRound1Card(${i})"
+      >
+        ${i}
+      </button>
+    `)
+  }
 
   if (finalState.round1.currentNumber) {
     document.body.classList.add("round1-image-mode")
 
     stage.innerHTML = `
       <div class="finalRound1PlayLayout">
-        <div class="finalRound1TopNumbersBar">
+
+        <div class="finalRound1ContentShell" id="finalRound1ImageStage"></div>
+
+        <div class="finalRound1NumbersBar">
           <div class="finalRound1GridSingleRow">
             ${cards.join("")}
           </div>
         </div>
 
-        <div class="finalRound1ContentShell" id="finalRound1ImageStage"></div>
       </div>
     `
   } else {
@@ -1766,36 +1894,44 @@ function renderFinalRound1() {
 
     stage.innerHTML = `
       <div class="finalRound1StartView">
-        <div class="finalRound1GridSingleRow">
-          ${cards.join("")}
+
+        <div class="finalRoundPlaceholder finalStartPlaceholder">
+          اختر الرقم
         </div>
+
+        <div class="finalRound1NumbersBar">
+          <div class="finalRound1GridSingleRow">
+            ${cards.join("")}
+          </div>
+        </div>
+
       </div>
     `
   }
 
   const nextRoundButton = isFinalSplitMode()
-  ? ""
-  : `<button onclick="goToFinalRound(2)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>`
+    ? ""
+    : `<button onclick="goToFinalRound(2)" class="actionBtn roundNavBtn">الجولة التالية</button>`
 
-controls.innerHTML = `
-  <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">
-    دبل
-  </button>
+  controls.innerHTML = `
+    <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="actionBtn finalDoubleBtn">
+      دبل
+    </button>
 
-  <button onclick="finalRound1Correct()" class="archiveCtrlBtn btnCorrect">
-    إجابة صحيحة
-  </button>
+    <button onclick="finalRound1Correct()" class="actionBtn btnCorrect">
+      إجابة صحيحة
+    </button>
 
-  <button onclick="finalRound1Wrong()" class="archiveCtrlBtn btnWrong">
-    خطأ
-  </button>
+    <button onclick="finalRound1Wrong()" class="actionBtn btnWrong">
+      خطأ
+    </button>
 
-  <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">
-    تراجع
-  </button>
+    <button onclick="undoFinalAction()" class="actionBtn undoBtn finalUndoBtn">
+      تراجع
+    </button>
 
-  ${nextRoundButton}
-`
+    ${nextRoundButton}
+  `
 
   updateFinalDoubleButton()
 
@@ -1892,14 +2028,22 @@ function renderFinalRound1Content(data) {
     const clipText = removeArabicDots(fullCardText)
 
     mainContent = `
-      <div class="finalRound1MainStageCard finalRound1PremiumStage">
-        <div class="finalRound1TextCard finalRound1RevealCard" onclick="toggleFinalRound1Overlay()">
-          <div class="finalRound1TextCardInner">
-            ${clipText}
-          </div>
-        </div>
+  <div class="finalRound1MainStageCard finalRound1PremiumStage">
+
+    <div
+      class="finalRound1TextCard finalRound1RevealCard"
+      onclick="toggleFinalRound1Overlay()"
+    >
+      <div
+        class="finalRound1TextCardInner"
+        style="${getFinalRound1ClipStyle(clipText, false)}"
+      >
+        ${clipText}
       </div>
-    `
+    </div>
+
+  </div>
+`
   } else if (isQuestionCard) {
     const visibleParts = (finalState.round1.currentQuestionParts || [])
       .filter(part => String(part || "").trim() !== "")
@@ -2158,7 +2302,7 @@ function toggleFinalRound1Overlay() {
   overlay.className = "finalRound1Overlay"
   overlay.innerHTML = `
     <div class="finalRound1OverlayInner">
-      <div class="finalRound1OverlayPaper">
+      <div class="finalRound1OverlayPaper finalRound1TextCard">
         <div
           class="finalRound1OverlayText molhimClipFont"
           style="${getFinalRound1ClipStyle(clipText, true)}"
@@ -2216,21 +2360,21 @@ function renderFinalRound2() {
   let grid = ""
 
   for (let i = 1; i <= 6; i++) {
-  const current = Number(finalState.round2.currentNumber) === i
-  const opened = finalState.round2.opened.includes(i)
-  const locked = finalState.round2.pendingScore && !current
-  const disabled = (opened && !current) || locked
+    const current = Number(finalState.round2.currentNumber) === i
+    const opened = finalState.round2.opened.includes(i)
+    const locked = finalState.round2.pendingScore && !current
+    const disabled = (opened && !current) || locked
 
-  grid += `
-    <button
-      class="finalRound2Card ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
-      ${disabled ? "disabled" : ""}
-      onclick="openFinalRound2Card(${i})"
-    >
-      ${i}
-    </button>
-  `
-}
+    grid += `
+      <button
+        class="finalRound2Card ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
+        ${disabled ? "disabled" : ""}
+        onclick="openFinalRound2Card(${i})"
+      >
+        ${i}
+      </button>
+    `
+  }
 
   const isScramble = finalState.round2.currentType === "scramble"
   const isSequence = finalState.round2.currentType === "sequence"
@@ -2238,7 +2382,6 @@ function renderFinalRound2() {
 
   stage.innerHTML = `
     <div class="finalRound2Wrap">
-      <div class="finalRound2Grid finalRound2SixNumbersGrid">${grid}</div>
 
       <div
         class="finalRound2WordsStage"
@@ -2247,37 +2390,45 @@ function renderFinalRound2() {
       >
         اختر الفريق ثم الرقم
       </div>
+
+      <div class="finalRound2NumbersBar">
+        <div class="finalRound2Grid finalRound2SixNumbersGrid">
+          ${grid}
+        </div>
+      </div>
+
     </div>
   `
 
   const nextRoundButton = isFinalSplitMode()
     ? ""
-    : `<button onclick="goToFinalRound(3)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>`
+    : `<button onclick="goToFinalRound(3)" class="actionBtn roundNavBtn">الجولة التالية</button>`
 
   controls.innerHTML = `
-    <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">دبل</button>
+    <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="actionBtn finalDoubleBtn">دبل</button>
 
-    <button onclick="finalRound2DecreaseCountdown()" class="archiveCtrlBtn btnStart" ${isSequence ? "" : "disabled"}>
+    <button onclick="finalRound2DecreaseCountdown()" class="actionBtn btnStart" ${isSequence ? "" : "disabled"}>
       ${isSequence ? finalState.round2.countdown : "العداد"}
     </button>
 
-    <button onclick="finalRound2ShowNextImage()" class="archiveCtrlBtn btnStart" ${isImage ? "" : "disabled"}>
-  بدء عرض الصور
-</button>
+    <button onclick="finalRound2ShowNextImage()" class="actionBtn btnStart" ${isImage ? "" : "disabled"}>
+      بدء عرض الصور
+    </button>
 
-    <button onclick="finalRound2RecordScore()" class="archiveCtrlBtn btnCorrect" ${isScramble ? "" : "disabled"}>
+    <button onclick="finalRound2RecordScore()" class="actionBtn btnCorrect" ${isScramble ? "" : "disabled"}>
       تسجيل المبعثرة
     </button>
 
-    <button onclick="finalRound2RecordSequenceScore()" class="archiveCtrlBtn btnCorrect" ${isSequence ? "" : "disabled"}>
-  ${isSequence ? `تسجيل الترتيب (${Number(finalState.round2.countdown || 0)})` : "تسجيل الترتيب"}
-</button>
+    <button onclick="finalRound2RecordSequenceScore()" class="actionBtn btnCorrect" ${isSequence ? "" : "disabled"}>
+      ${isSequence ? `تسجيل الترتيب (${Number(finalState.round2.countdown || 0)})` : "تسجيل الترتيب"}
+    </button>
 
-    <button onclick="finalRound2RecordImageScore()" class="archiveCtrlBtn btnCorrect" ${isImage ? "" : "disabled"}>
+    <button onclick="finalRound2RecordImageScore()" class="actionBtn btnCorrect" ${isImage ? "" : "disabled"}>
       تسجيل الصورة
     </button>
 
-    <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">تراجع</button>
+    <button onclick="undoFinalAction()" class="actionBtn undoBtn finalUndoBtn">تراجع</button>
+
     ${nextRoundButton}
   `
 
@@ -3230,33 +3381,37 @@ function renderFinalRound3() {
   let grid = ""
 
   for (let i = 1; i <= count; i++) {
-  const current = Number(finalState.round3.currentNumber) === i
-  const opened = finalState.round3.opened.includes(i)
-  const locked = finalState.round3.pendingScore && !current
-  const disabled = (opened && !current) || locked
+    const current = Number(finalState.round3.currentNumber) === i
+    const opened = finalState.round3.opened.includes(i)
+    const locked = finalState.round3.pendingScore && !current
+    const disabled = (opened && !current) || locked
 
-  grid += `
-    <button
-      class="finalRound3Card finalStoryNumberCard ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
-      ${disabled ? "disabled" : ""}
-      onclick="openFinalRound3StoryCard(${i})"
-    >
-      ${i}
-    </button>
-  `
-}
+    grid += `
+      <button
+        class="finalRound3Card finalStoryNumberCard ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
+        ${disabled ? "disabled" : ""}
+        onclick="openFinalRound3StoryCard(${i})"
+      >
+        ${i}
+      </button>
+    `
+  }
 
   stage.innerHTML = `
     <div class="finalRound3Wrap finalStoryWrap">
-      <div class="finalRound3Grid finalStoryNumbersGrid">
-        ${grid}
-      </div>
 
       <div class="finalRound3ImageStageWrap finalStoryStageWrap">
         <div class="finalRound3ImageStage finalStoryStage" id="finalStoryStage">
           ${buildFinalRound3StoryContent()}
         </div>
       </div>
+
+      <div class="finalRound3NumbersBar finalStoryNumbersBar">
+        <div class="finalRound3Grid finalStoryNumbersGrid">
+          ${grid}
+        </div>
+      </div>
+
     </div>
   `
 
@@ -3276,26 +3431,26 @@ function renderFinalRound3() {
 
   const nextRoundButton = isFinalSplitMode()
     ? ""
-    : `<button onclick="goToFinalRound(4)" class="archiveCtrlBtn roundNavBtn">الجولة التالية</button>`
+    : `<button onclick="goToFinalRound(4)" class="actionBtn roundNavBtn">الجولة التالية</button>`
 
   controls.innerHTML = `
-    <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="archiveCtrlBtn finalDoubleBtn">
+    <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="actionBtn finalDoubleBtn">
       دبل
     </button>
 
-    <button onclick="showFinalRound3StoryPart()" class="archiveCtrlBtn btnStart" ${canShowPart ? "" : "disabled"}>
+    <button onclick="showFinalRound3StoryPart()" class="actionBtn btnStart" ${canShowPart ? "" : "disabled"}>
       ${nextPartText}
     </button>
 
-    <button onclick="finalRound3StoryCorrect()" class="archiveCtrlBtn btnCorrect" ${canScore ? "" : "disabled"}>
+    <button onclick="finalRound3StoryCorrect()" class="actionBtn btnCorrect" ${canScore ? "" : "disabled"}>
       إجابة صحيحة
     </button>
 
-    <button onclick="finalRound3StoryWrong()" class="archiveCtrlBtn btnWrong" ${hasCurrent ? "" : "disabled"}>
+    <button onclick="finalRound3StoryWrong()" class="actionBtn btnWrong" ${hasCurrent ? "" : "disabled"}>
       خطأ
     </button>
 
-    <button onclick="undoFinalAction()" class="archiveCtrlBtn undoBtn finalUndoBtn">
+    <button onclick="undoFinalAction()" class="actionBtn undoBtn finalUndoBtn">
       تراجع
     </button>
 
@@ -3334,13 +3489,16 @@ function buildFinalRound3StoryContent() {
   }
 
   const answerHTML =
-    state.answerShown && state.currentAnswer
-      ? `
-        <div class="finalStoryCleanAnswer">
+  state.answerShown && state.currentAnswer
+    ? `
+      <div class="finalStoryCleanAnswer">
+        <div class="finalStoryAnswerBadge">الإجابة</div>
+        <div class="finalStoryAnswerText">
           ${escapeDisplayHtml(state.currentAnswer)}
         </div>
-      `
-      : ""
+      </div>
+    `
+    : ""
 
   if (!shownPart) {
     return `
@@ -3515,9 +3673,9 @@ function finalRound3StoryCorrect() {
   updateFinalTopHeaderRoundInfo()
   saveFinalState()
 
-  setTimeout(() => {
+   setTimeout(() => {
     finalizeFinalRound3StoryTurn()
-  }, 5000)
+  }, 12000)
 }
 
 function finalRound3StoryWrong() {
@@ -3684,32 +3842,34 @@ function renderFinalRound4TeamMedia() {
   let grid = ""
 
   for (let i = 1; i <= totalNumbers; i++) {
-  const current = Number(state.currentNumber) === i
-  const opened = used.includes(i)
-  const locked = !!state.currentNumber && !current
-  const disabled = (opened && !current) || locked
+    const current = Number(state.currentNumber) === i
+    const opened = used.includes(i)
+    const locked = !!state.currentNumber && !current
+    const disabled = (opened && !current) || locked
 
-  grid += `
-    <button
-      class="finalRound3Card finalTeamMediaNumberCard ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
-      ${disabled ? "disabled" : ""}
-      onclick="openFinalRound4TeamMediaCard(${i})"
-    >
-      ${opened && !current ? "" : i}
-    </button>
-  `
-}
+    grid += `
+      <button
+        class="finalRound3Card finalTeamMediaNumberCard ${opened ? "used" : ""} ${current ? "active" : ""} ${locked ? "locked" : ""}"
+        ${disabled ? "disabled" : ""}
+        onclick="openFinalRound4TeamMediaCard(${i})"
+      >
+        ${opened && !current ? "" : i}
+      </button>
+    `
+  }
 
   stage.innerHTML = `
     <div class="finalRound3Wrap finalRound4TeamMediaWrap">
 
-      <div class="finalRound3Grid finalTeamMediaNumbersGrid">
-        ${grid}
-      </div>
-
       <div class="finalRound3ImageStageWrap finalTeamMediaStageWrap">
         <div class="finalRound3ImageStage finalRound3TeamMediaStage" id="finalRound4TeamMediaStage">
           ${buildFinalRound4TeamMediaContent()}
+        </div>
+      </div>
+
+      <div class="finalRound3NumbersBar finalTeamMediaNumbersBar">
+        <div class="finalRound3Grid finalTeamMediaNumbersGrid">
+          ${grid}
         </div>
       </div>
 
@@ -3757,14 +3917,14 @@ function renderFinalRound4TeamMedia() {
     <button
       onclick="activateFinalDouble()"
       id="finalDoubleBtn"
-      class="archiveCtrlBtn finalTeamMediaCtrlBtn finalDoubleBtn"
+      class="actionBtn finalTeamMediaCtrlBtn finalDoubleBtn"
     >
       دبل
     </button>
 
     <button
       onclick="showFinalRound4TeamMediaQuestion()"
-      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnAnswer"
+      class="actionBtn finalTeamMediaCtrlBtn btnAnswer"
       ${canShowQuestion ? "" : "disabled"}
     >
       إظهار السؤال
@@ -3772,7 +3932,7 @@ function renderFinalRound4TeamMedia() {
 
     <button
       onclick="playFinalRound4TeamMediaVideo()"
-      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnStart"
+      class="actionBtn finalTeamMediaCtrlBtn btnStart"
       ${canPlayVideo ? "" : "disabled"}
     >
       تشغيل الفيديو
@@ -3780,7 +3940,7 @@ function renderFinalRound4TeamMedia() {
 
     <button
       onclick="${isImage ? "restartFinalRound4TeamMediaImage()" : "restartFinalRound4TeamMediaVideo()"}"
-      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnStart"
+      class="actionBtn finalTeamMediaCtrlBtn btnStart"
       ${(canRestartVideo || canRestartImage) ? "" : "disabled"}
     >
       إعادة
@@ -3788,7 +3948,7 @@ function renderFinalRound4TeamMedia() {
 
     <button
       onclick="finalRound4TeamMediaCorrect()"
-      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnCorrect"
+      class="actionBtn finalTeamMediaCtrlBtn btnCorrect"
       ${hasCurrent ? "" : "disabled"}
     >
       إجابة صحيحة
@@ -3796,7 +3956,7 @@ function renderFinalRound4TeamMedia() {
 
     <button
       onclick="finalRound4TeamMediaWrong()"
-      class="archiveCtrlBtn finalTeamMediaCtrlBtn btnWrong"
+      class="actionBtn finalTeamMediaCtrlBtn btnWrong"
       ${hasCurrent ? "" : "disabled"}
     >
       خطأ
@@ -3804,7 +3964,7 @@ function renderFinalRound4TeamMedia() {
 
     <button
       onclick="undoFinalAction()"
-      class="archiveCtrlBtn finalTeamMediaCtrlBtn undoBtn finalUndoBtn"
+      class="actionBtn finalTeamMediaCtrlBtn undoBtn finalUndoBtn"
     >
       تراجع
     </button>
@@ -4130,7 +4290,7 @@ function finalRound4TeamMediaWrong() {
 
   state.currentTeam = team
   state.answerShown = true
-  state.questionShown = false
+  state.questionShown = true
   state.resultType = "wrong"
 
   finalState.round4.scoredNumbers.push(number)

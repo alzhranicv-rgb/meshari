@@ -527,7 +527,11 @@ function makeUploadPath(prefix = "file", ext = "bin") {
   const cleanPrefix = String(prefix || "file")
     .replace(/[^a-zA-Z0-9_-]/g, "_")
 
-  return `${cleanPrefix}_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
+  const modelFolder = currentModel
+    ? `model_${Number(currentModel)}`
+    : "model_unknown"
+
+  return `${modelFolder}/${cleanPrefix}_${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
 }
 
 function getFileSizeMB(file) {
@@ -2111,6 +2115,57 @@ async function submitRenameModel(id) {
   showGameToast("تم تعديل اسم النموذج")
 }
 
+async function listStorageFilesRecursive(path = "") {
+  const allFiles = []
+
+  const { data, error } = await db.storage
+    .from(BUCKET_NAME)
+    .list(path, {
+      limit: 1000,
+      offset: 0
+    })
+
+  if (error) {
+    console.log("LIST STORAGE ERROR:", error)
+    return allFiles
+  }
+
+  for (const item of data || []) {
+    const itemPath = path ? `${path}/${item.name}` : item.name
+
+    if (item.metadata) {
+      allFiles.push(itemPath)
+    } else {
+      const nested = await listStorageFilesRecursive(itemPath)
+      allFiles.push(...nested)
+    }
+  }
+
+  return allFiles
+}
+
+async function deleteModelStorageFiles(modelId) {
+  const folder = `model_${Number(modelId)}`
+
+  const files = await listStorageFilesRecursive(folder)
+
+  if (!files.length) {
+    return true
+  }
+
+  const { error } = await db.storage
+    .from(BUCKET_NAME)
+    .remove(files)
+
+  if (error) {
+    console.log("DELETE MODEL STORAGE FILES ERROR:", error)
+    showGameToast("تعذر حذف بعض ملفات الصور والفيديو")
+    return false
+  }
+
+  return true
+}
+
 async function deleteSelectedModel() {
   const list = document.getElementById("modelsList")
   const id = Number(list?.value || currentModel || 0)
@@ -2135,9 +2190,18 @@ async function deleteSelectedModel() {
   if (!ok) return
 
   try {
-    showGameToast("جارٍ حذف النموذج...")
+  showGameToast("جارٍ حذف ملفات النموذج...")
 
-    const deleteJobs = [
+const storageDeleted = await deleteModelStorageFiles(id)
+
+if (!storageDeleted) {
+  showGameToast("توقف الحذف لأن ملفات النموذج لم تُحذف")
+  return
+}
+
+showGameToast("جارٍ حذف بيانات النموذج...")
+
+  const deleteJobs = [
       db.from("questions").delete().eq("model", id),
       db.from("top10_questions").delete().eq("model", id),
       db.from("auction_questions").delete().eq("model", id),
