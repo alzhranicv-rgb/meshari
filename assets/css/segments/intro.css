@@ -1421,3 +1421,23 @@ body .gameToast{
     transition:none;
   }
 }
+/* =========================
+   INTRO - REMOVE BOLD
+========================= */
+
+.introPage,
+.introPage *,
+.introWrap,
+.introWrap *,
+.introScreen,
+.introScreen *,
+.setupScreen,
+.setupScreen *,
+.setupShell,
+.setupShell *,
+.hero,
+.hero *,
+.panel,
+.panel *{
+  font-weight:400 !important;
+}

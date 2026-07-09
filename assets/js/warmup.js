@@ -218,9 +218,9 @@ openSegment("التسخين", `
 
       <div class="timerSide">
         <div class="timerPill">
-          <small>الوقت</small>
+          
           <strong id="timer">0</strong>
-          <span>ثانية</span>
+          
         </div>
       </div>
 
@@ -612,11 +612,16 @@ function runWarmupTimer(startValue) {
   warmupLastTickPlayed = null
 
   timerBox.innerText = time
+  timerBox.classList.toggle("timerDanger", time > 0 && time <= 5)
+  timerBox.classList.remove("timerTimeoutFx")
+
   saveWarmupState()
 
   timer = setInterval(() => {
     time--
     timerBox.innerText = time
+
+    timerBox.classList.toggle("timerDanger", time > 0 && time <= 5)
 
     if (time > 0 && time <= 5 && warmupLastTickPlayed !== time) {
       warmupLastTickPlayed = time
@@ -629,6 +634,13 @@ function runWarmupTimer(startValue) {
       clearInterval(timer)
       timer = null
       timerBox.innerText = 0
+      timerBox.classList.remove("timerDanger")
+      timerBox.classList.add("timerTimeoutFx")
+
+      setTimeout(() => {
+        timerBox.classList.remove("timerTimeoutFx")
+      }, 900)
+
       warmupLastTickPlayed = null
       playGameSound("timeout")
       saveWarmupState()
@@ -642,7 +654,10 @@ function resetWarmupTimer() {
   warmupLastTickPlayed = null
 
   const timerBox = document.getElementById("timer")
-  if (timerBox) timerBox.innerText = 0
+  if (timerBox) {
+    timerBox.innerText = 0
+    timerBox.classList.remove("timerDanger", "timerTimeoutFx")
+  }
 
   saveWarmupState()
 }

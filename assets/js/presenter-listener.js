@@ -56,7 +56,9 @@ function showDisplayControls() {
 
 function restoreDisplayControlsMode() {
   const isHidden = localStorage.getItem("presenter_hide_controls") === "1"
+
   document.body.classList.toggle("presenterHideDisplayControls", isHidden)
+  document.documentElement.classList.toggle("presenterHideDisplayControls", isHidden)
 
   if (typeof updateDisplayControlsEyeButton === "function") {
     updateDisplayControlsEyeButton(isHidden)
@@ -131,6 +133,175 @@ function applyPresenterActiveTeam(team) {
     setGameActiveTeam(team)
   }
 }
+
+function getDisplayActiveSegmentForPresenterCommand(data = {}) {
+  const localSegment = normalizeDisplaySegmentKey(
+    localStorage.getItem("active_segment") || ""
+  )
+
+  if (localSegment) return localSegment
+
+  return normalizeDisplaySegmentKey(data.segment || "")
+}
+
+function syncDisplayAfterPresenterTeamSelection() {
+  const activeSegment = normalizeDisplaySegmentKey(
+    localStorage.getItem("active_segment") || ""
+  )
+
+  if (activeSegment === "warmup" && typeof saveWarmupState === "function") {
+    saveWarmupState()
+    return
+  }
+
+  if (activeSegment === "top10" && typeof saveTop10State === "function") {
+    saveTop10State()
+    return
+  }
+
+  if (activeSegment === "auction" && typeof saveAuctionState === "function") {
+    saveAuctionState()
+    return
+  }
+
+  if (activeSegment === "who" && typeof saveWhoState === "function") {
+    saveWhoState()
+    return
+  }
+
+  if (activeSegment === "explain" && typeof saveExplainState === "function") {
+    saveExplainState()
+    return
+  }
+
+  if (activeSegment === "archive" && typeof saveArchiveState === "function") {
+    saveArchiveState()
+    return
+  }
+
+  if (activeSegment === "randomChallenge" && typeof saveRandomChallengeState === "function") {
+    saveRandomChallengeState()
+    return
+  }
+
+  if (isFinalSegmentKey(activeSegment) && typeof saveFinalState === "function") {
+    saveFinalState()
+    return
+  }
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
+}
+
+function runPresenterTeamSelection(fn) {
+  if (typeof fn === "function") {
+    fn()
+  }
+
+  setTimeout(() => {
+    syncDisplayAfterPresenterTeamSelection()
+  }, 60)
+}
+
+function selectDisplayTeamByPresenter(team, data = {}) {
+  if (!isValidPresenterTeam(team)) return
+
+  const activeSegment = getDisplayActiveSegmentForPresenterCommand(data)
+
+  /*
+    العرض هو المصدر الأساسي.
+    نستدعي دالة اختيار الفريق الأصلية لكل فقرة.
+    بعدها نسوي مزامنة احتياطية عشان المقدم يتحدث بسرعة.
+  */
+
+  if (activeSegment === "warmup") {
+    if (typeof selectWarmupTeam === "function") {
+      runPresenterTeamSelection(() => selectWarmupTeam(team))
+      return
+    }
+
+    syncDisplayAfterPresenterTeamSelection()
+    return
+  }
+
+  if (activeSegment === "top10") {
+    if (typeof selectTop10Team === "function") {
+      runPresenterTeamSelection(() => selectTop10Team(team))
+      return
+    }
+
+    syncDisplayAfterPresenterTeamSelection()
+    return
+  }
+
+  if (activeSegment === "auction") {
+    if (typeof selectAuctionTeam === "function") {
+      runPresenterTeamSelection(() => selectAuctionTeam(team))
+      return
+    }
+
+    syncDisplayAfterPresenterTeamSelection()
+    return
+  }
+
+  if (activeSegment === "who") {
+    if (typeof selectWhoTeam === "function") {
+      runPresenterTeamSelection(() => selectWhoTeam(team))
+      return
+    }
+
+    syncDisplayAfterPresenterTeamSelection()
+    return
+  }
+
+  if (activeSegment === "explain") {
+    if (typeof selectExplainTeam === "function") {
+      runPresenterTeamSelection(() => selectExplainTeam(team))
+      return
+    }
+
+    syncDisplayAfterPresenterTeamSelection()
+    return
+  }
+
+  if (activeSegment === "archive") {
+    if (typeof selectArchiveTeam === "function") {
+      runPresenterTeamSelection(() => selectArchiveTeam(team))
+      return
+    }
+
+    syncDisplayAfterPresenterTeamSelection()
+    return
+  }
+
+  if (activeSegment === "randomChallenge") {
+    if (typeof selectRandomChallengeTeam === "function") {
+      runPresenterTeamSelection(() => selectRandomChallengeTeam(team))
+      return
+    }
+
+    syncDisplayAfterPresenterTeamSelection()
+    return
+  }
+
+  if (isFinalSegmentKey(activeSegment) || activeSegment === "final") {
+    if (typeof selectFinalTeam === "function") {
+      runPresenterTeamSelection(() => selectFinalTeam(team))
+      return
+    }
+
+    syncDisplayAfterPresenterTeamSelection()
+    return
+  }
+
+  /*
+    احتياط أخير فقط لو ما عرفنا الفقرة.
+  */
+  applyPresenterActiveTeam(team)
+  syncDisplayAfterPresenterTeamSelection()
+}
+
 
 function getPresenterDisplayFinalSegmentKey(round) {
   const r = Number(round || 1)
@@ -382,6 +553,13 @@ function handlePresenterCommand(cmd) {
     })
   }
 
+  if (action === "selectTeam") {
+  return safeRunPresenterAction(() => {
+    selectDisplayTeamByPresenter(data.team, data)
+  })
+}
+
+
   if (action === "endSegment") {
   return safeRunPresenterAction(() => {
     if (typeof clearGameActiveTeam === "function") {
@@ -407,7 +585,7 @@ if (action === "goHome") {
   if (segment === "auction") return handleAuctionPresenterAction(action, data)
   if (segment === "who") return handleWhoPresenterAction(action, data)
   if (segment === "explain") return handleExplainPresenterAction(action, data)
-  if (isFinalSegmentKey(segment)) {
+  if (segment === "final" || isFinalSegmentKey(segment)) {
   if (!data.round) {
     data.round = getFinalRoundFromSegmentKey(segment) || window.finalState?.round || 1
   }
@@ -415,6 +593,7 @@ if (action === "goHome") {
   return handleFinalPresenterAction(action, data)
 }
   if (segment === "archive") return handleArchivePresenterAction(action, data)
+if (segment === "randomChallenge") return handleRandomChallengePresenterAction(action, data)
 }
 
 /* =========================
@@ -454,51 +633,115 @@ function handleWarmupPresenterAction(action, data) {
    TOP 10
 ========================= */
 
-function handleTop10PresenterAction(action, data) {
-  if (action === "selectTeam") {
-  if (!isValidPresenterTeam(data.team)) return
+function syncAfterTop10PresenterAction() {
+  if (typeof saveTop10State === "function") {
+    saveTop10State()
+  } else if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
 
-  return safeRunPresenterAction(() => {
-    applyPresenterActiveTeam(data.team)
-    selectTop10Team(data.team)
-  })
+  if (typeof renderCurrentRoundTop10UI === "function") {
+    renderCurrentRoundTop10UI()
+  }
 }
 
+function handleTop10PresenterAction(action, data) {
+
+  if (action === "selectTeam") {
+    if (!isValidPresenterTeam(data.team)) return
+
+    return safeRunPresenterAction(() => {
+      if (typeof selectTop10Team === "function") {
+        selectTop10Team(data.team)
+      }
+
+      syncAfterTop10PresenterAction()
+    })
+  }
+
   if (action === "openNumber") {
-    return safeRunPresenterAction(() => openTop10Number(Number(data.number)))
+    return safeRunPresenterAction(() => {
+      if (typeof openTop10Number === "function") {
+        openTop10Number(Number(data.number))
+      }
+
+      syncAfterTop10PresenterAction()
+    })
   }
 
   if (action === "double") {
-    return safeRunPresenterAction(() => activateTop10Double())
+    return safeRunPresenterAction(() => {
+      if (typeof activateTop10Double === "function") {
+        activateTop10Double()
+      }
+
+      syncAfterTop10PresenterAction()
+    })
   }
 
   if (action === "showAnswer") {
-    return safeRunPresenterAction(() => showTop10Answer())
+    return safeRunPresenterAction(() => {
+      if (typeof showTop10Answer === "function") {
+        showTop10Answer()
+      }
+
+      syncAfterTop10PresenterAction()
+    })
   }
 
   if (action === "wrong") {
-    return safeRunPresenterAction(() => addTop10Error())
+    return safeRunPresenterAction(() => {
+      if (typeof addTop10Error === "function") {
+        addTop10Error()
+      }
+
+      syncAfterTop10PresenterAction()
+    })
   }
 
   if (action === "undo") {
-    return safeRunPresenterAction(() => undoTop10Action())
+    return safeRunPresenterAction(() => {
+      if (typeof undoTop10Action === "function") {
+        undoTop10Action()
+      }
+
+      syncAfterTop10PresenterAction()
+    })
   }
 
   if (action === "switchTurn") {
-    return safeRunPresenterAction(() => switchTop10Turn())
+    return safeRunPresenterAction(() => {
+      if (typeof switchTop10Turn === "function") {
+        switchTop10Turn()
+      }
+
+      syncAfterTop10PresenterAction()
+    })
   }
 
   if (action === "nextRound") {
-    return safeRunPresenterAction(() => nextTop10Round())
-  }
-
-  if (action === "setRound") {
     return safeRunPresenterAction(() => {
-      top10State.round = Number(data.round || 1)
-      renderCurrentRoundTop10UI()
-      saveTop10State()
+      if (typeof nextTop10Round === "function") {
+        nextTop10Round()
+      }
+
+      syncAfterTop10PresenterAction()
     })
   }
+
+if (action === "setRound") {
+  return safeRunPresenterAction(() => {
+    if (typeof top10State !== "undefined") {
+      top10State.round = Number(data.round || 1)
+    }
+
+    if (typeof renderCurrentRoundTop10UI === "function") {
+      renderCurrentRoundTop10UI()
+    }
+
+    syncAfterTop10PresenterAction()
+  })
+}
 }
 
 /* =========================
@@ -976,6 +1219,17 @@ function shakeFinalRound2HiddenWord(index) {
   }, 420)
 }
 
+function syncAfterFinalPresenterAction() {
+  if (typeof saveFinalState === "function") {
+    saveFinalState()
+    return
+  }
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
+}
+
 function handleFinalPresenterAction(action, data) {
   if (action === "selectTeam") {
     if (!isValidPresenterTeam(data.team)) return
@@ -1144,6 +1398,8 @@ if (action === "toggleRound2Correct") {
   })
 }
 
+syncAfterFinalPresenterAction()
+
 if (action === "toggleRound2ImageCorrect") {
   return safeRunPresenterAction(() => {
     if (window.finalState?.round !== 2) return
@@ -1190,6 +1446,7 @@ if (action === "toggleRound2ImageCorrect") {
 }
   })
 }
+syncAfterFinalPresenterAction()
 
   if (action === "hideRound2SequenceWord") {
   return safeRunPresenterAction(() => {
@@ -1470,6 +1727,219 @@ function handleArchivePresenterAction(action, data) {
 
   if (action === "nextRound") {
     return safeRunPresenterAction(() => nextArchiveRound())
+  }
+}
+
+/* =========================
+   RANDOM CHALLENGE
+========================= */
+
+function syncAfterRandomChallengeAction() {
+  if (typeof saveRandomChallengeState === "function") {
+    saveRandomChallengeState()
+  }
+
+  if (typeof renderRandomChallengeScores === "function") {
+    renderRandomChallengeScores()
+  }
+
+  if (typeof renderRandomChallengeStage === "function") {
+    renderRandomChallengeStage()
+  }
+
+  if (typeof renderRandomChallengeControls === "function") {
+    renderRandomChallengeControls()
+  }
+
+  if (typeof syncDisplayStateToSession === "function") {
+    syncDisplayStateToSession()
+  }
+}
+
+function forceRandomChallengeTeamFromPresenter(team) {
+  if (!isValidPresenterTeam(team)) return
+
+  if (typeof selectRandomChallengeTeam === "function") {
+    selectRandomChallengeTeam(team)
+    return
+  }
+
+  if (typeof randomChallengeState !== "undefined") {
+    randomChallengeState.activeTeam = team
+  }
+
+  if (typeof highlightRandomChallengeTeam === "function") {
+    highlightRandomChallengeTeam(team)
+  }
+
+  syncAfterRandomChallengeAction()
+}
+
+function handleRandomChallengePresenterAction(action, data) {
+  if (action === "selectTeam") {
+    if (!isValidPresenterTeam(data.team)) return
+
+    return safeRunPresenterAction(() => {
+      forceRandomChallengeTeamFromPresenter(data.team)
+    })
+  }
+
+  if (action === "randomOpenBox") {
+    return safeRunPresenterAction(() => {
+      const box = Number(data.box || 0)
+
+      if (!box) return
+
+      if (typeof openRandomChallengeBox === "function") {
+        openRandomChallengeBox(box)
+      }
+
+      syncAfterRandomChallengeAction()
+    })
+  }
+
+if (action === "randomStartBox1") {
+  return safeRunPresenterAction(() => {
+    const pool = data.pool === "world" ? "world" : "saudi"
+
+    if (typeof startRandomChallengeBox1 === "function") {
+      startRandomChallengeBox1(pool)
+    }
+
+    syncAfterRandomChallengeAction()
+  })
+}
+
+if (action === "randomSkip") {
+  return safeRunPresenterAction(() => {
+    const currentBox = Number(randomChallengeState?.currentBox || 0)
+
+    if (currentBox === 1 && typeof startRandomChallengeBox1 === "function") {
+      const pool =
+        data.pool === "world" || randomChallengeState?.box1?.pool === "world"
+          ? "world"
+          : "saudi"
+
+      startRandomChallengeBox1(pool)
+    }
+
+    syncAfterRandomChallengeAction()
+  })
+}
+
+if (action === "randomSetAuctionPoints") {
+  return safeRunPresenterAction(() => {
+    const points = Math.max(0, Number(data.points || 0))
+
+    if (typeof randomChallengeState !== "undefined") {
+      if (!randomChallengeState.box2) {
+        randomChallengeState.box2 = {}
+      }
+
+      randomChallengeState.box2.calculatedPoints = points
+      randomChallengeState.box2.points = points
+    }
+
+    syncAfterRandomChallengeAction()
+  })
+}
+
+  if (action === "randomStartBox2Timer") {
+    return safeRunPresenterAction(() => {
+      if (typeof startRandomBox2Timer === "function") {
+        startRandomBox2Timer()
+      } else if (typeof startRandomChallengeBox2Timer === "function") {
+        startRandomChallengeBox2Timer()
+      }
+
+      syncAfterRandomChallengeAction()
+    })
+  }
+
+  if (action === "correct") {
+    return safeRunPresenterAction(() => {
+      if (typeof randomChallengeCorrect === "function") {
+        randomChallengeCorrect()
+      }
+
+      syncAfterRandomChallengeAction()
+    })
+  }
+
+  if (action === "wrong") {
+    return safeRunPresenterAction(() => {
+      if (typeof randomChallengeWrong === "function") {
+        randomChallengeWrong()
+      }
+
+      syncAfterRandomChallengeAction()
+    })
+  }
+
+  if (action === "randomFinishBox") {
+    return safeRunPresenterAction(() => {
+      const currentBox = Number(randomChallengeState?.currentBox || 0)
+
+      if (typeof finishRandomChallengeCurrentBox === "function") {
+        finishRandomChallengeCurrentBox(currentBox)
+      } else if (typeof finishRandomChallengeBox === "function") {
+        finishRandomChallengeBox(currentBox)
+      }
+
+      syncAfterRandomChallengeAction()
+    })
+  }
+
+  if (action === "randomFinishRound") {
+    return safeRunPresenterAction(() => {
+      if (typeof finishRandomBox3ToPoints === "function") {
+        finishRandomBox3ToPoints()
+      }
+
+      syncAfterRandomChallengeAction()
+    })
+  }
+
+  if (action === "randomBox3Wrong") {
+    return safeRunPresenterAction(() => {
+      if (typeof randomBox3Wrong === "function") {
+        randomBox3Wrong()
+      }
+
+      syncAfterRandomChallengeAction()
+    })
+  }
+
+  if (action === "randomBox3Pass") {
+    return safeRunPresenterAction(() => {
+      if (typeof randomBox3Pass === "function") {
+        randomBox3Pass()
+      }
+
+      syncAfterRandomChallengeAction()
+    })
+  }
+
+  if (action === "randomBox3SwitchTeam") {
+    return safeRunPresenterAction(() => {
+      if (typeof switchRandomBox3Team === "function") {
+        switchRandomBox3Team()
+      }
+
+      syncAfterRandomChallengeAction()
+    })
+  }
+
+  if (action === "randomBox3ScorePoints") {
+    return safeRunPresenterAction(() => {
+      const points = Number(data.points || 0)
+
+      if (typeof scoreRandomBox3Points === "function") {
+        scoreRandomBox3Points(points)
+      }
+
+      syncAfterRandomChallengeAction()
+    })
   }
 }
 

@@ -995,7 +995,7 @@ function finishWhoAfterAnswerDelay() {
     updateWhoDoubleButton()
     updateWhoCompensationButton()
     saveWhoState()
-  }, 10000)
+  }, 5000)
 }
 
 function whoCorrect() {

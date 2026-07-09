@@ -14,6 +14,7 @@ let currentModelName = ""
 let gameToastTimer = null
 
 let currentAdminSegment = ""
+let adminNavBusy = false
 
 let auctionAdminCount = 8
 let whoAdminCount = 15
@@ -48,7 +49,8 @@ const ALL_GAME_SEGMENTS = [
   { key: "finalRound3", title: "قصة", sort: 8 },
   { key: "finalRound4", title: "التركيز", sort: 9 },
 
-  { key: "archive", title: "الأرشيف", sort: 10 }
+  { key: "archive", title: "الأرشيف", sort: 10 },
+  { key: "randomChallenge", title: "التحدي", sort: 11 }
 ]
 
 /* =========================
@@ -57,23 +59,49 @@ const ALL_GAME_SEGMENTS = [
 
 async function initAdminPanel() {
   await loadModels()
-  showAdminEmptyState()
+
+  currentModel = null
+  currentModelName = ""
+
   updateAdminBrandModel()
-  await renderAdminTabsUnified()
+  showAdminModelGate()
 }
 
 /* =========================
    3) Toast
 ========================= */
 
-function showGameToast(message) {
+function showGameToast(message, type = "info") {
   const toast = document.getElementById("gameToast")
   const text = document.getElementById("gameToastText")
 
   if (!toast || !text) return
 
+  let icon = document.getElementById("gameToastIcon")
+
+  if (!icon) {
+    text.insertAdjacentHTML("beforebegin", `
+      <span id="gameToastIcon" class="gameToastIcon"></span>
+    `)
+
+    icon = document.getElementById("gameToastIcon")
+  }
+
+  toast.classList.remove("success", "error", "warning", "info")
+  toast.classList.add(type || "info")
+
+  const icons = {
+    success: "✓",
+    error: "!",
+    warning: "!",
+    info: "●"
+  }
+
+  if (icon) icon.innerText = icons[type] || icons.info
+
   text.innerText = message
-  toast.classList.remove("hidden")
+
+  toast.classList.remove("hidden", "show")
 
   requestAnimationFrame(() => {
     toast.classList.add("show")
@@ -86,10 +114,59 @@ function showGameToast(message) {
 
     setTimeout(() => {
       toast.classList.add("hidden")
-    }, 280)
-  }, 3000)
+    }, 260)
+  }, 2400)
 }
 
+function showAdminConfirm(message, {
+  title = "تأكيد الإجراء",
+  okText = "موافق",
+  cancelText = "إلغاء",
+  danger = false
+} = {}) {
+  return new Promise(resolve => {
+    document.getElementById("adminConfirmModal")?.remove()
+
+    document.body.insertAdjacentHTML("beforeend", `
+      <div class="adminConfirmOverlay" id="adminConfirmModal">
+        <div class="adminConfirmCard ${danger ? "danger" : ""}">
+          <div class="adminConfirmIcon">${danger ? "!" : "؟"}</div>
+
+          <div class="adminConfirmContent">
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(message)}</p>
+          </div>
+
+          <div class="adminConfirmActions">
+            <button type="button" class="adminConfirmCancelBtn" id="adminConfirmCancelBtn">
+              ${escapeHtml(cancelText)}
+            </button>
+
+            <button type="button" class="adminConfirmOkBtn" id="adminConfirmOkBtn">
+              ${escapeHtml(okText)}
+            </button>
+          </div>
+        </div>
+      </div>
+    `)
+
+    const modal = document.getElementById("adminConfirmModal")
+    const cancelBtn = document.getElementById("adminConfirmCancelBtn")
+    const okBtn = document.getElementById("adminConfirmOkBtn")
+
+    function close(value) {
+      modal?.remove()
+      resolve(value)
+    }
+
+    cancelBtn.onclick = () => close(false)
+    okBtn.onclick = () => close(true)
+
+    modal.onclick = e => {
+      if (e.target === modal) close(false)
+    }
+  })
+}
 /* =========================
    Admin Model PIN
    الرقم السري للنموذج داخل الأدمن فقط
@@ -100,11 +177,10 @@ function getAdminModelAccessKey(modelId) {
 }
 
 function isAdminModelUnlocked(modelId) {
-  return sessionStorage.getItem(getAdminModelAccessKey(modelId)) === "1"
+  return false
 }
 
 function unlockAdminModel(modelId) {
-  sessionStorage.setItem(getAdminModelAccessKey(modelId), "1")
 }
 
 function closeAdminPinModal() {
@@ -239,9 +315,12 @@ async function requestAdminModelAccess(modelId, fallbackName = "") {
     }
 
     unlockAdminModel(id)
-    showGameToast("تم حفظ الرقم السري للنموذج")
+showGameToast("تم حفظ الرقم السري للنموذج")
 
-    return data
+return {
+  id,
+  name: data.name || fallbackName || `نموذج ${id}`
+}
   }
 
   /* النموذج عنده رقم سري */
@@ -259,7 +338,11 @@ async function requestAdminModelAccess(modelId, fallbackName = "") {
   }
 
   unlockAdminModel(id)
-  return data
+
+return {
+  id,
+  name: data.name || fallbackName || `نموذج ${id}`
+}
 }
 
 /* =========================
@@ -283,6 +366,32 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;")
 }
 
+function modelGate() {
+  return document.getElementById("adminModelGate")
+}
+
+function workspace() {
+  return document.getElementById("adminWorkspace")
+}
+
+function showAdminModelGate() {
+  modelGate()?.classList.remove("hidden")
+  workspace()?.classList.add("hidden")
+
+  const tabsWrap = tabs()
+  if (tabsWrap) {
+    tabsWrap.classList.add("hidden")
+    tabsWrap.innerHTML = ""
+  }
+
+  showAdminEmptyState("افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها")
+}
+
+function showAdminWorkspace() {
+  modelGate()?.classList.add("hidden")
+  workspace()?.classList.remove("hidden")
+}
+
 function getCurrentModelNameSafe() {
   return currentModelName || `نموذج ${currentModel || ""}`
 }
@@ -296,11 +405,6 @@ function setActiveAdminTab(segment) {
   renderAdminTabsUnified()
 }
 
-function getAdminSegmentTitle(segment) {
-  const item = ALL_GAME_SEGMENTS.find(x => x.key === segment)
-  return item?.title || "الفقرة"
-}
-
 function showAdminEmptyState(message = "افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها") {
   const area = editor()
   if (!area) return
@@ -308,6 +412,119 @@ function showAdminEmptyState(message = "افتح نموذجًا ثم اختر ا
   area.innerHTML = `<div class="adminEmptyState">${escapeHtml(message)}</div>`
 }
 
+function workspaceActions() {
+  return document.getElementById("adminWorkspaceActions")
+}
+
+function renderAdminHomeActions() {
+  const actions = workspaceActions()
+  if (!actions) return
+
+  actions.className = "adminWorkspaceActions adminWorkspaceActionsHome"
+
+  actions.innerHTML = `
+    <button
+      type="button"
+      class="adminWorkspaceActionBtn primary"
+      onclick="openAdminSegmentSettings()"
+    >
+      إعدادات الفقرات
+    </button>
+
+    <button
+      type="button"
+      class="adminWorkspaceActionBtn"
+      onclick="checkCurrentModelReady()"
+    >
+      فحص النموذج
+    </button>
+
+    <button
+      type="button"
+      class="adminWorkspaceActionBtn exit"
+      onclick="exitCurrentModel()"
+    >
+      خروج
+    </button>
+  `
+}
+
+function renderAdminSettingsActions() {
+  const actions = workspaceActions()
+  if (!actions) return
+
+  actions.className = "adminWorkspaceActions adminWorkspaceActionsSettings"
+
+  actions.innerHTML = `
+    <button
+      type="button"
+      class="adminWorkspaceActionBtn primary"
+      onclick="saveAdminSegmentSettingsPage()"
+    >
+      حفظ الإعدادات
+    </button>
+
+    <button
+      type="button"
+      class="adminWorkspaceActionBtn"
+      onclick="goAdminHome()"
+    >
+      رجوع للفقرات
+    </button>
+
+    <button
+      type="button"
+      class="adminWorkspaceActionBtn exit"
+      onclick="exitCurrentModel()"
+    >
+      خروج
+    </button>
+  `
+}
+
+function renderAdminSegmentActions() {
+  const actions = workspaceActions()
+  if (!actions) return
+
+  actions.className = "adminWorkspaceActions adminWorkspaceActionsSegment"
+
+  actions.innerHTML = `
+    <button
+      type="button"
+      class="adminWorkspaceActionBtn"
+      onclick="goAdminHome()"
+    >
+      رجوع للفقرات
+    </button>
+
+    <button
+      type="button"
+      class="adminWorkspaceActionBtn"
+      onclick="checkCurrentModelReady()"
+    >
+      فحص النموذج
+    </button>
+
+    <button
+      type="button"
+      class="adminWorkspaceActionBtn exit"
+      onclick="exitCurrentModel()"
+    >
+      خروج
+    </button>
+  `
+}
+/* =========================
+   Admin One Page Navigation
+========================= */
+
+function ensureAdminEditorBackButton() {
+  return
+}
+
+function toggleAdminQuickSettings() {
+  openAdminSegmentSettings()
+}
 function hasText(value) {
   return String(value || "").trim().length > 0
 }
@@ -318,10 +535,122 @@ async function buildSegmentStatusGrid() {
 }
 
 /* =========================
+   Global Segment Visibility
+   تعطيل / تفعيل الفقرات عام
+========================= */
+
+let globalSegmentVisibilityMap = {}
+
+async function loadGlobalSegmentVisibilityMap() {
+  const map = {}
+
+  ALL_GAME_SEGMENTS.forEach(segment => {
+    map[segment.key] = true
+  })
+
+  try {
+    const { data, error } = await db
+      .from("global_segment_visibility")
+      .select("segment_key,is_enabled")
+
+    if (error) {
+      console.log("LOAD GLOBAL SEGMENT VISIBILITY ERROR:", error)
+      globalSegmentVisibilityMap = map
+      return globalSegmentVisibilityMap
+    }
+
+    ;(data || []).forEach(row => {
+      map[row.segment_key] = row.is_enabled !== false
+    })
+
+    globalSegmentVisibilityMap = map
+    return globalSegmentVisibilityMap
+  } catch (err) {
+    console.log("LOAD GLOBAL SEGMENT VISIBILITY CATCH:", err)
+    globalSegmentVisibilityMap = map
+    return globalSegmentVisibilityMap
+  }
+}
+
+function isAdminSegmentGloballyEnabled(segmentKey, globalMap = null) {
+  const map = globalMap || globalSegmentVisibilityMap || {}
+  return map[segmentKey] !== false
+}
+
+function getVisibleAdminSegments(globalMap = null) {
+  const map = globalMap || globalSegmentVisibilityMap || {}
+  return ALL_GAME_SEGMENTS.filter(segment => isAdminSegmentGloballyEnabled(segment.key, map))
+}
+
+function getHiddenAdminSegments(globalMap = null) {
+  const map = globalMap || globalSegmentVisibilityMap || {}
+  return ALL_GAME_SEGMENTS.filter(segment => !isAdminSegmentGloballyEnabled(segment.key, map))
+}
+
+async function setGlobalSegmentEnabled(segmentKey, enabled) {
+  const key = String(segmentKey || "").trim()
+  if (!key) return false
+
+  const segmentTitle = getAdminSegmentTitle(key)
+
+  const ok = await showAdminConfirm(
+  enabled
+    ? `هل تريد تفعيل فقرة "${segmentTitle}" عام؟`
+    : `هل تريد تعطيل فقرة "${segmentTitle}" عام؟`,
+  {
+    title: enabled ? "تفعيل الفقرة" : "إخفاء الفقرة",
+    okText: enabled ? "تفعيل" : "إخفاء",
+    cancelText: "إلغاء",
+    danger: !enabled
+  }
+)
+
+if (!ok) return false
+
+  try {
+    const { error } = await db
+      .from("global_segment_visibility")
+      .upsert(
+        {
+          segment_key: key,
+          is_enabled: !!enabled,
+          updated_at: new Date().toISOString()
+        },
+        {
+          onConflict: "segment_key"
+        }
+      )
+
+    if (error) {
+      console.log("SAVE GLOBAL SEGMENT VISIBILITY ERROR:", error)
+      showGameToast("تعذر حفظ حالة الفقرة")
+      return false
+    }
+
+    await loadGlobalSegmentVisibilityMap()
+
+    showGameToast(enabled ? "تم تفعيل الفقرة" : "تم تعطيل الفقرة")
+    return true
+  } catch (err) {
+    console.log("SAVE GLOBAL SEGMENT VISIBILITY CATCH:", err)
+    showGameToast("حدث خطأ أثناء حفظ حالة الفقرة")
+    return false
+  }
+}
+
+async function toggleAdminSegmentVisibility(segmentKey, nextValue) {
+  return await setGlobalSegmentEnabled(segmentKey, nextValue)
+}
+/* =========================
    5) Segment Settings
 ========================= */
 
 function getAdminSettingLimit(segment) {
+
+  if (segment === "auction") {
+  return { fallback: 8, min: 4, max: 8, allowed: [4, 6, 8] }
+}
+
   if (segment === "who") {
     return { fallback: 15, min: 10, max: 15, allowed: [10, 12, 15] }
   }
@@ -355,6 +684,7 @@ function normalizeAdminSegmentCount(segment, value) {
 
   return Math.min(Math.max(num, limit.min), limit.max)
 }
+
 
 async function getSegmentRoundCount(segment, fallback = 3, max = 4) {
   if (!currentModel) return fallback
@@ -456,6 +786,7 @@ async function saveAdminSegmentCount(segment, count) {
 function updateAdminQuickSettingUI(segment, count) {
   const safeCount = normalizeAdminSegmentCount(segment, count)
 
+  if (segment === "auction") auctionAdminCount = safeCount
   if (segment === "who") whoAdminCount = safeCount
   if (segment === "finalRound1") finalRound1AdminCount = safeCount
   if (segment === "explain") explainAdminCount = safeCount
@@ -706,8 +1037,14 @@ function arrangeAdminInnerTabs() {
   const area = editor()
   if (!area) return
 
-  const topBar = area.querySelector(".adminEditorTopBar, .compactAdminEditorTopBar")
-  if (!topBar) return
+  const topBar = area.querySelector(
+    ".adminEditorTopBar, .compactAdminEditorTopBar, .archiveAdminTopBar"
+  )
+
+  if (!topBar) {
+    normalizeAdminEditorCards()
+    return
+  }
 
   topBar.classList.add("adminSectionHeaderPro", "adminSectionHeaderInline")
 
@@ -735,37 +1072,10 @@ function arrangeAdminInnerTabs() {
     toolsRow.appendChild(el)
   }
 
-  const sectionTitle =
-    topBar.querySelector(".adminSectionTitle")?.innerText?.trim() || ""
-
   const warmupTabs = area.querySelector(".warmupCategoryTabs")
-
-  const top10Count = area.querySelector(".top10RoundCountBox")
   const top10Tabs = area.querySelector(".top10RoundTabs")
-
-  const auctionCount = sectionTitle === "فتبلة"
-    ? area.querySelector(".auctionCountBox")
-    : null
-
-  const auctionTabs = sectionTitle === "فتبلة"
-    ? area.querySelector(".auctionNumberTabs")
-    : null
-
-  const whoCount = sectionTitle === "من هو"
-    ? area.querySelector(".whoCountBox")
-    : null
-
-  const whoTabs = sectionTitle === "من هو"
-    ? area.querySelector(".whoNumberTabs")
-    : null
-
-  const explainCount = sectionTitle === "اشرح الكلمة"
-    ? area.querySelector(".explainCountBox")
-    : null
-
-  const finalCount = area.querySelector(".finalTopCompactCountBox")
-
-  const archiveCount = area.querySelector(".archiveRoundsControl")
+  const auctionTabs = area.querySelector(".auctionNumberTabs")
+  const whoTabs = area.querySelector(".whoNumberTabs")
   const archiveTabs = area.querySelector(".archiveAdminRoundsBar")
   const archiveActions = area.querySelector(".archiveTopActions")
 
@@ -774,40 +1084,32 @@ function arrangeAdminInnerTabs() {
     moveTool(warmupTabs, "adminToolTabs adminToolTabsText")
   }
 
-  if (top10Count || top10Tabs) {
+  if (top10Tabs) {
     topBar.dataset.toolsType = "top10"
-    moveTool(top10Count, "adminToolControl")
     moveTool(top10Tabs, "adminToolTabs adminToolTabsText")
   }
 
-  if (auctionCount || auctionTabs) {
+  if (auctionTabs) {
     topBar.dataset.toolsType = "auction"
-    moveTool(auctionCount, "adminToolControl")
     moveTool(auctionTabs, "adminToolTabs adminToolNumberTabs")
   }
 
-  if (whoCount || whoTabs) {
+  if (whoTabs) {
     topBar.dataset.toolsType = "who"
-    moveTool(whoCount, "adminToolControl")
     moveTool(whoTabs, "adminToolTabs adminToolNumberTabs")
   }
 
-  if (explainCount) {
-    topBar.dataset.toolsType = "explain"
-    moveTool(explainCount, "adminToolControl")
-  }
-
-  if (finalCount) {
-    topBar.dataset.toolsType = "final"
-    moveTool(finalCount, "adminToolControl")
-  }
-
-  if (archiveCount || archiveTabs || archiveActions) {
+  if (archiveTabs || archiveActions) {
     topBar.dataset.toolsType = "archive"
-    moveTool(archiveCount, "adminToolControl")
     moveTool(archiveTabs, "adminToolTabs adminToolTabsText")
     moveTool(archiveActions, "adminToolActions")
   }
+
+  area
+    .querySelectorAll(
+      ".top10RoundCountBox, .auctionCountBox, .whoCountBox, .explainCountBox, .finalTopCompactCountBox, .archiveRoundsControl"
+    )
+    .forEach(el => el.remove())
 
   area
     .querySelectorAll(
@@ -887,6 +1189,7 @@ async function getAdminCompletionCounts() {
     finalRound4: 0,
 
     archive: 0,
+    randomChallenge: 0,
 
     top10RoundsCount: 3,
     auctionCount: 8,
@@ -1041,7 +1344,7 @@ async function getAdminCompletionCounts() {
   result.archive = qArchive.count || 0
 
   result.top10RoundsCount = Math.min(Math.max(Number(top10Setting.data?.item_count || 3), 1), 4)
-  result.auctionCount = Math.min(Math.max(Number(auctionSetting.data?.item_count || 8), 1), 8)
+  result.auctionCount = normalizeAdminSegmentCount("auction", auctionSetting.data?.item_count || 8)
   result.archiveRoundsCount = Math.min(Math.max(Number(archiveSetting.data?.item_count || 4), 1), 4)
 
   result.whoCount = normalizeAdminSegmentCount("who", whoSetting.data?.item_count || 15)
@@ -1062,7 +1365,7 @@ function isSegmentDone(key, count, counts = {}) {
   }
 
   if (key === "auction") {
-    const total = Math.min(Math.max(Number(counts.auctionCount || 8), 1), 8)
+    const total = normalizeAdminSegmentCount("auction", counts.auctionCount || 8)
     return count >= total
   }
 
@@ -1100,6 +1403,10 @@ function isSegmentDone(key, count, counts = {}) {
     return count >= rounds
   }
 
+  if (key === "randomChallenge") {
+  return true
+}
+
   return false
 }
 
@@ -1108,125 +1415,407 @@ function isSegmentDone(key, count, counts = {}) {
 ========================= */
 
 async function renderAdminHome() {
+  const area = editor()
+  if (!area) return
+
+  renderAdminHomeActions()
+  currentAdminSegment = "home"
+
   if (!currentModel) {
-    clearActiveAdminTab()
-    showAdminEmptyState()
-    updateAdminBrandModel()
+    area.innerHTML = `
+      <div class="adminEmptyState">
+        افتح نموذجًا أولاً ثم اختر الفقرة التي تريد تعديلها
+      </div>
+    `
+
     await renderAdminTabsUnified()
     return
   }
 
-  clearActiveAdminTab()
-  updateAdminBrandModel()
   await renderAdminTabsUnified()
 
   const counts = await getAdminCompletionCounts()
+  const visibility = await loadGlobalSegmentVisibilityMap()
+ const visibleSegments = getVisibleAdminSegments(visibility)
 
-  const items = [
-    {
-      key: "warmup",
-      title: "التسخين",
-      desc: "4 فئات، وكل فئة فيها أسئلة 1 و 2 و 4",
-      count: counts.warmup || 0
-    },
+  const readyCount = visibleSegments.filter(segment => {
+    const done = Number(counts[segment.key] || 0)
+    return isSegmentDone(segment.key, done, counts)
+  }).length
+
+  const enabledCount = visibleSegments.length
+
+  const cards = visibleSegments.map(segment => {
+    const key = segment.key
+    const title = segment.title || getAdminSegmentTitle(key)
+    const done = Number(counts[key] || 0)
+    const total = getAdminSegmentRequiredCount(key, counts)
+    const isDone = isSegmentDone(key, done, counts)
+    const isEnabled = visibility[key] !== false
+    const isComingSoon = key === "randomChallenge"
+
+    return `
+      <div class="adminHomeSegmentCard ${isDone ? "isDone" : ""} ${!isEnabled ? "isDisabled" : ""}">
+        <button
+          type="button"
+          class="adminHomeSegmentMain"
+          ${isComingSoon ? "disabled" : `onclick="openAdminSegment('${key}')"` }
+        >
+          <div class="adminHomeSegmentTop">
+  <div>
+    <div class="adminHomeSegmentTitle">${escapeHtml(title)}</div>
+  </div>
+
+  <span class="adminHomeSegmentStatus ${isDone ? "ready" : "missing"}">
+    ${isComingSoon ? "" : isDone ? "جاهزة" : "ناقصة"}
+  </span>
+</div>
+
+          <div class="adminHomeProgress">
+            <div class="adminHomeProgressInfo">
+              <strong>${total > 0 ? `${done}/${total}` : done}</strong>
+            </div>
+
+            <div class="adminHomeProgressBar">
+              <span style="width:${total > 0 ? Math.min((done / total) * 100, 100) : 0}%"></span>
+            </div>
+          </div>
+        </button>
+      </div>
+    `
+  }).join("")
+
+  area.innerHTML = `
+    <div class="adminHomePro adminHomeClean">
+
+      <section class="adminHomeStats adminHomeStatsClean">
+        <div class="adminHomeStatCard">
+          <span>الفقرات الجاهزة</span>
+          <strong>${readyCount}/${visibleSegments.length}</strong>
+        </div>
+
+        <div class="adminHomeStatCard">
+          <span>الفقرات الظاهرة</span>
+          <strong>${enabledCount}/${ALL_GAME_SEGMENTS.length}</strong>
+        </div>
+
+        <div class="adminHomeStatCard">
+          <span>حالة النموذج</span>
+          <strong>${readyCount === visibleSegments.length ? "مكتمل" : "قيد التحرير"}</strong>
+        </div>
+      </section>
+
+      <section class="adminHomeSection adminHomeSectionClean">
+        <div class="adminHomeSegmentsGrid">
+          ${cards}
+        </div>
+      </section>
+
+    </div>
+  `
+}
+
+function getAdminSegmentRequiredCount(key, counts = {}) {
+  if (key === "warmup") return 12
+
+  if (key === "top10") {
+    const rounds = Math.min(Math.max(Number(counts.top10RoundsCount || 3), 1), 4)
+    return rounds * 10
+  }
+
+  if (key === "auction") {
+    return normalizeAdminSegmentCount("auction", counts.auctionCount || 8)
+  }
+
+  if (key === "who") {
+    return normalizeAdminSegmentCount("who", counts.whoCount || 15)
+  }
+
+  if (key === "explain") {
+    return normalizeAdminSegmentCount("explain", counts.explainCount || 4)
+  }
+
+  if (key === "finalRound1") {
+    return normalizeAdminSegmentCount("finalRound1", counts.finalRound1CardsCount || 6)
+  }
+
+  if (key === "finalRound2") return 34
+
+  if (key === "finalRound3") {
+    return normalizeAdminSegmentCount("finalRound3", counts.finalRound3Count || 4)
+  }
+
+  if (key === "finalRound4") {
+    return normalizeAdminSegmentCount("finalRound4", counts.finalRound4Count || 4)
+  }
+
+  if (key === "archive") {
+    return Math.min(Math.max(Number(counts.archiveRoundsCount || 4), 1), 4)
+  }
+
+  if (key === "randomChallenge") return 1
+
+  return 0
+}
+
+
+async function openAdminSegmentSettings() {
+  if (!currentModel) {
+    showGameToast("افتح نموذج أولاً")
+    return
+  }
+
+  currentAdminSegment = "settings"
+  renderAdminSettingsActions()
+  await renderAdminTabsUnified()
+
+  const counts = await getAdminCompletionCounts()
+  const visibility = await loadGlobalSegmentVisibilityMap()
+
+  const settings = [
     {
       key: "top10",
       title: "Top 10",
-      desc: `عدد الجولات: ${counts.top10RoundsCount}`,
-      count: counts.top10 || 0
+      desc: "عدد الجولات",
+      inputId: "settingsTop10Rounds",
+      value: Math.min(Math.max(Number(counts.top10RoundsCount || 3), 1), 4),
+      options: [1, 2, 3, 4]
     },
     {
-      key: "auction",
-      title: "فتبلة",
-      desc: `عدد الأسئلة: ${counts.auctionCount}`,
-      count: counts.auction || 0
-    },
+  key: "auction",
+  title: "فتبلة",
+  desc: "عدد الأرقام",
+  inputId: "settingsAuctionCount",
+  value: normalizeAdminSegmentCount("auction", counts.auctionCount || 8),
+  options: [4, 6, 8]
+},
     {
       key: "who",
       title: "من هو",
-      desc: `عدد الأرقام: ${counts.whoCount}`,
-      count: counts.who || 0
+      desc: "عدد الأرقام",
+      inputId: "settingsWhoCount",
+      value: normalizeAdminSegmentCount("who", counts.whoCount || 15),
+      options: [10, 12, 15]
     },
     {
       key: "explain",
       title: "اشرح الكلمة",
-      desc: `عدد الكلمات: ${counts.explainCount}`,
-      count: counts.explain || 0
+      desc: "عدد الكلمات",
+      inputId: "settingsExplainCount",
+      value: normalizeAdminSegmentCount("explain", counts.explainCount || 4),
+      options: [4, 6, 8]
     },
     {
-  key: "finalRound1",
-  title: "ٮدوں ٮڡاط",
-  desc: `عدد الأرقام: ${counts.finalRound1CardsCount}`,
-  count: counts.finalRound1 || 0
-},
-{
-  key: "finalRound2",
-  title: "صح صحلي",
-  desc: "6 أرقام: 1 مبعثرة، 2 ترتيب، 3 صورة، 4 مبعثرة، 5 ترتيب، 6 صورة",
-  count: counts.finalRound2 || 0
-},
-{
-  key: "finalRound3",
-  title: "قصة",
-  desc: `عدد الأرقام: ${counts.finalRound3Count}`,
-  count: counts.finalRound3 || 0
-},
-{
-  key: "finalRound4",
-  title: "التركيز",
-  desc: `عدد الأرقام: ${counts.finalRound4Count}`,
-  count: counts.finalRound4 || 0
-},
+      key: "finalRound1",
+      title: "ٮدوں ٮڡاط",
+      desc: "عدد الأرقام",
+      inputId: "settingsFinalRound1Count",
+      value: normalizeAdminSegmentCount("finalRound1", counts.finalRound1CardsCount || 6),
+      options: [4, 6, 8]
+    },
+    {
+      key: "finalRound3",
+      title: "قصة",
+      desc: "عدد الأرقام",
+      inputId: "settingsFinalRound3Count",
+      value: normalizeAdminSegmentCount("finalRound3", counts.finalRound3Count || 4),
+      options: [4, 6, 8]
+    },
+    {
+      key: "finalRound4",
+      title: "التركيز",
+      desc: "عدد الأرقام",
+      inputId: "settingsFinalRound4Count",
+      value: normalizeAdminSegmentCount("finalRound4", counts.finalRound4Count || 4),
+      options: [4, 6, 8]
+    },
     {
       key: "archive",
       title: "الأرشيف",
-      desc: `عدد الجولات: ${counts.archiveRoundsCount}`,
-      count: counts.archive || 0
+      desc: "عدد الجولات",
+      inputId: "settingsArchiveRounds",
+      value: Math.min(Math.max(Number(counts.archiveRoundsCount || 4), 1), 4),
+      options: [1, 2, 3, 4]
     }
   ]
 
-    editor().innerHTML = `
-    <div class="adminHomeShell adminDashboardShell">
-      <div class="adminDashboardGroups">
-        <section class="adminDashboardGroup">
-          <div class="adminDashboardGroupHead">
-            <h3>فقرات البداية</h3>
-          </div>
+  const visibleSettings = settings.filter(item => {
+  return isAdminSegmentGloballyEnabled(item.key, visibility)
+})
 
-          <div class="adminSegmentPickerCompact">
-            ${items.map(item => {
-              const done = isSegmentDone(item.key, item.count, counts)
+editor().innerHTML = `
+  <div class="adminSettingsGamePage">
+    <div class="adminSettingsGameGrid">
+      ${visibleSettings.map(item => buildAdminSettingCardPro(item)).join("")}
+    </div>
+  </div>
+`
+}
 
-              return `
-                <button
-                  type="button"
-                  class="adminSegmentCompactCard ${done ? "doneCard" : ""}"
-                  onclick="openAdminSegment('${item.key}')"
-                >
-                  <div class="adminSegmentCompactTop">
-                    <span class="adminSegmentCompactTitle">${escapeHtml(item.title)}</span>
+function buildAdminSettingCardPro({ key, title, desc, inputId, value, options }) {
+  return `
+    <div class="adminSettingGameCard">
+      <div class="adminSettingGameHead">
+        <div class="adminSettingGameTitleBox">
+  <h3>
+    ${escapeHtml(title)}
+    <span>${escapeHtml(desc)}</span>
+  </h3>
+</div>
 
-                    <span class="adminSegmentCompactBadge ${done ? "done" : ""}">
-                      ${done ? "مكتمل" : "غير مكتمل"}
-                    </span>
-                  </div>
-
-                  <div class="adminSegmentCompactDesc">
-                    ${escapeHtml(item.desc)}
-                  </div>
-
-                  <div class="adminSegmentCompactFooter">
-                    <span class="adminSegmentCompactMetaLabel">المدخلات</span>
-                    <span class="adminSegmentCompactMetaValue">${item.count}</span>
-                  </div>
-                </button>
-              `
-            }).join("")}
-          </div>
-        </section>
+        <div class="adminSettingGameSelected">
+          <strong>${escapeHtml(String(value))}</strong>
+        </div>
       </div>
+
+      <div class="adminSettingGameOptions">
+        ${options.map(option => `
+          <button
+            type="button"
+            class="adminSettingGameOption ${Number(value) === Number(option) ? "selected" : ""}"
+            onclick="selectAdminSettingOption('${escapeHtml(inputId)}', ${Number(option)}, this)"
+          >
+            ${option}
+          </button>
+        `).join("")}
+      </div>
+
+      <input
+        type="hidden"
+        id="${escapeHtml(inputId)}"
+        value="${escapeHtml(String(value))}"
+        data-segment="${escapeHtml(key)}"
+      >
     </div>
   `
+}
+
+function selectAdminSettingOption(inputId, value, btn) {
+  const input = document.getElementById(inputId)
+  if (input) input.value = String(value)
+
+  const card = btn.closest(".adminSettingGameCard")
+  if (!card) return
+
+  card.querySelectorAll(".adminSettingGameOption").forEach(item => {
+    item.classList.remove("selected")
+  })
+
+  btn.classList.add("selected")
+
+  const selected = card.querySelector(".adminSettingGameSelected strong")
+  if (selected) selected.innerText = String(value)
+}
+
+
+async function saveAdminSegmentSettingsPage() {
+  if (isAdminSaving()) return false
+
+  if (!currentModel) {
+    showGameToast("افتح النموذج أولاً")
+    return false
+  }
+
+  try {
+    setAdminSaving(true, "جارٍ حفظ الإعدادات...")
+
+    const rows = [
+      {
+        model: Number(currentModel),
+        segment: "top10",
+        item_count: Math.min(Math.max(Number(document.getElementById("settingsTop10Rounds")?.value || 3), 1), 4)
+      },
+      {
+  model: Number(currentModel),
+  segment: "auction",
+  item_count: normalizeAdminSegmentCount("auction", document.getElementById("settingsAuctionCount")?.value || 8)
+},
+      {
+        model: Number(currentModel),
+        segment: "who",
+        item_count: normalizeAdminSegmentCount("who", document.getElementById("settingsWhoCount")?.value || 15)
+      },
+      {
+        model: Number(currentModel),
+        segment: "explain",
+        item_count: normalizeAdminSegmentCount("explain", document.getElementById("settingsExplainCount")?.value || 4)
+      },
+      {
+        model: Number(currentModel),
+        segment: "finalRound1",
+        item_count: normalizeAdminSegmentCount("finalRound1", document.getElementById("settingsFinalRound1Count")?.value || 6)
+      },
+      {
+        model: Number(currentModel),
+        segment: "finalRound3",
+        item_count: normalizeAdminSegmentCount("finalRound3", document.getElementById("settingsFinalRound3Count")?.value || 4)
+      },
+      {
+        model: Number(currentModel),
+        segment: "finalRound4",
+        item_count: normalizeAdminSegmentCount("finalRound4", document.getElementById("settingsFinalRound4Count")?.value || 4)
+      },
+      {
+        model: Number(currentModel),
+        segment: "archive",
+        item_count: Math.min(Math.max(Number(document.getElementById("settingsArchiveRounds")?.value || 4), 1), 4)
+      }
+    ]
+
+    const { error } = await db
+      .from("segment_settings")
+      .upsert(rows, {
+        onConflict: "model,segment"
+      })
+
+    if (error) {
+      console.log("SAVE ADMIN SEGMENT SETTINGS PAGE ERROR:", error)
+      showGameToast("تعذر حفظ إعدادات الفقرات")
+      return false
+    }
+
+    top10AdminRoundsCount = rows.find(row => row.segment === "top10")?.item_count || 3
+    auctionAdminCount = rows.find(row => row.segment === "auction")?.item_count || 8
+    whoAdminCount = rows.find(row => row.segment === "who")?.item_count || 15
+    explainAdminCount = rows.find(row => row.segment === "explain")?.item_count || 4
+    finalRound1AdminCount = rows.find(row => row.segment === "finalRound1")?.item_count || 6
+    finalRound3AdminCount = rows.find(row => row.segment === "finalRound3")?.item_count || 4
+    finalRound4AdminCount = rows.find(row => row.segment === "finalRound4")?.item_count || 4
+    archiveAdminRoundsCount = rows.find(row => row.segment === "archive")?.item_count || 4
+
+    showGameToast("تم حفظ إعدادات الفقرات")
+    await goAdminHome()
+    return true
+  } catch (err) {
+    console.log("SAVE ADMIN SEGMENT SETTINGS PAGE CATCH:", err)
+    showGameToast("حدث خطأ أثناء حفظ الإعدادات")
+    return false
+  } finally {
+    setAdminSaving(false)
+  }
+}
+
+function getAdminSegmentTitle(key) {
+  const found = ALL_GAME_SEGMENTS.find(item => item.key === key)
+  return found?.title || key
+}
+
+function getAdminSegmentDescription(key) {
+  const map = {
+    warmup: "فئات وأسئلة التسخين",
+    top10: "جولات Top 10 والإجابات",
+    auction: "أسئلة فتبلة والصور",
+    who: "صور وإجابات من هو",
+    explain: "كلمات اشرح الكلمة",
+    finalRound1: "فقرة من بدون نقط",
+    finalRound2: "فقرة صح صحلي",
+    finalRound3: "فقرة قصة",
+    finalRound4: "فقرة التركيز",
+    archive: "الأرشيف والجولات",
+    randomChallenge: "فقرة التحدي"
+  }
+
+  return map[key] || "إدارة محتوى الفقرة"
 }
 
 /* =========================
@@ -1237,68 +1826,9 @@ async function renderAdminTabsUnified() {
   const wrap = tabs()
   if (!wrap) return
 
-  if (!currentModel) {
-    wrap.classList.add("hidden")
-    wrap.innerHTML = ""
-    return
-  }
-
-  wrap.classList.remove("hidden")
-
-  wrap.innerHTML = `
-    <div class="adminTabsUnified adminTabsDashboard adminTabsSimpleHome">
-
-      <div class="adminTabsMainSide">
-        <button
-          type="button"
-          class="adminTabBtnUnified ${!currentAdminSegment ? "activeAdminTab" : ""}"
-          onclick="goAdminHome()"
-        >
-          <span class="adminTabBtnLabel">الرئيسية</span>
-        </button>
-
-        ${
-          currentAdminSegment
-            ? `
-              <button
-                type="button"
-                class="adminTabBtnUnified activeAdminTab currentSectionMiniTab"
-                onclick="openAdminSegment('${currentAdminSegment}')"
-              >
-                <span class="adminTabBtnLabel">${escapeHtml(getAdminSegmentTitle(currentAdminSegment))}</span>
-              </button>
-            `
-            : ""
-        }
-      </div>
-
-      <div class="adminTabsActionSide">
-        <button
-          type="button"
-          class="adminHeaderCheckBtn"
-          onclick="checkCurrentModelReady()"
-        >
-          فحص النموذج
-        </button>
-
-        <button
-          type="button"
-          class="adminHeaderRefreshBtn"
-          onclick="renderAdminHome()"
-        >
-          تحديث
-        </button>
-      </div>
-
-    </div>
-  `
+  wrap.classList.add("hidden")
+  wrap.innerHTML = ""
 }
-
-async function goAdminHome() {
-  clearActiveAdminTab()
-  await renderAdminHome()
-}
-
 /* =========================
    13) Readiness Check
 ========================= */
@@ -1377,18 +1907,48 @@ async function checkCurrentModelReady() {
   showGameToast("جارٍ فحص النموذج...")
 
   try {
+    const visibility = await loadGlobalSegmentVisibilityMap()
     const results = []
 
-    results.push(await checkWarmupReady())
-    results.push(await checkTop10Ready())
-    results.push(await checkAuctionReady())
-    results.push(await checkWhoReady())
-    results.push(await checkExplainReady())
-    results.push(await checkFinalRoundReady(1))
-    results.push(await checkFinalRoundReady(2))
-    results.push(await checkFinalRoundReady(3))
-    results.push(await checkFinalRoundReady(4))
-    results.push(await checkArchiveReady())
+    if (isAdminSegmentGloballyEnabled("warmup", visibility)) {
+      results.push(await checkWarmupReady())
+    }
+
+    if (isAdminSegmentGloballyEnabled("top10", visibility)) {
+      results.push(await checkTop10Ready())
+    }
+
+    if (isAdminSegmentGloballyEnabled("auction", visibility)) {
+      results.push(await checkAuctionReady())
+    }
+
+    if (isAdminSegmentGloballyEnabled("who", visibility)) {
+      results.push(await checkWhoReady())
+    }
+
+    if (isAdminSegmentGloballyEnabled("explain", visibility)) {
+      results.push(await checkExplainReady())
+    }
+
+    if (isAdminSegmentGloballyEnabled("finalRound1", visibility)) {
+      results.push(await checkFinalRoundReady(1))
+    }
+
+    if (isAdminSegmentGloballyEnabled("finalRound2", visibility)) {
+      results.push(await checkFinalRoundReady(2))
+    }
+
+    if (isAdminSegmentGloballyEnabled("finalRound3", visibility)) {
+      results.push(await checkFinalRoundReady(3))
+    }
+
+    if (isAdminSegmentGloballyEnabled("finalRound4", visibility)) {
+      results.push(await checkFinalRoundReady(4))
+    }
+
+    if (isAdminSegmentGloballyEnabled("archive", visibility)) {
+      results.push(await checkArchiveReady())
+    }
 
     renderModelCheckModal(results)
   } catch (err) {
@@ -1487,7 +2047,7 @@ async function checkTop10Ready() {
 }
 
 async function checkAuctionReady() {
-  const requiredCount = await getSegmentRoundCount("auction", 8, 8)
+  const requiredCount = await getAdminSegmentCount("auction")
 
   const { data, error } = await db
     .from("auction_questions")
@@ -1977,20 +2537,21 @@ async function createModel() {
   await loadModels()
 
   if (data?.id) {
-    unlockAdminModel(data.id)
+  unlockAdminModel(data.id)
 
-    currentModel = data.id
-    currentModelName = data.name || name
+  currentModel = data.id
+  currentModelName = data.name || name
 
-    updateAdminBrandModel()
+  updateAdminBrandModel()
 
-    const list = document.getElementById("modelsList")
-    if (list) list.value = String(data.id)
+  const list = document.getElementById("modelsList")
+  if (list) list.value = String(data.id)
 
-    tabs()?.classList.remove("hidden")
+  showAdminWorkspace()
+  renderAdminHomeActions()
 
-    await renderAdminHome()
-  }
+  await renderAdminHome()
+}
 
   showGameToast("تم إنشاء النموذج")
 }
@@ -2013,10 +2574,25 @@ async function openSelectedModel() {
   currentModelName = modelData.name || optionName
 
   updateAdminBrandModel()
-  tabs()?.classList.remove("hidden")
+  showAdminWorkspace()
+  renderAdminHomeActions()
 
   await renderAdminHome()
+
   showGameToast(`تم فتح ${currentModelName}`)
+}
+
+async function exitCurrentModel() {
+  currentModel = null
+  currentModelName = ""
+  currentAdminSegment = ""
+
+  updateAdminBrandModel()
+
+  await loadModels()
+  showAdminModelGate()
+
+  showGameToast("تم الرجوع لاختيار النموذج")
 }
 
 async function renameSelectedModel() {
@@ -2273,6 +2849,37 @@ showGameToast("جارٍ حذف بيانات النموذج...")
    16) Open Segment Router
 ========================= */
 
+async function goAdminHome() {
+  if (adminNavBusy) return
+
+  adminNavBusy = true
+
+  try {
+    currentAdminSegment = "home"
+    renderAdminHomeActions()
+    await renderAdminHome()
+  } finally {
+    adminNavBusy = false
+  }
+}
+
+function adminBackToCards() {
+  goAdminHome()
+}
+
+function showAdminHomeCards() {
+  goAdminHome()
+}
+
+function showAdminEditorPage() {
+  const area = editor()
+  if (area) area.classList.remove("hidden")
+}
+
+function openAdminSegmentCard(segmentKey) {
+  openAdminSegment(segmentKey)
+}
+
 async function openAdminSegment(segment) {
   if (!currentModel) {
     showGameToast("افتح نموذج أولاً")
@@ -2284,7 +2891,16 @@ async function openAdminSegment(segment) {
     return
   }
 
+  const visibility = await loadGlobalSegmentVisibilityMap()
+
+if (!isAdminSegmentGloballyEnabled(segment, visibility)) {
+  showGameToast("هذه الفقرة مخفية من إعدادات الفقرات")
+  await goAdminHome()
+  return
+}
+
   currentAdminSegment = segment
+  renderAdminSegmentActions()
   await renderAdminTabsUnified()
 
   if (segment === "warmup") await renderWarmupAdmin()
@@ -2299,6 +2915,67 @@ async function openAdminSegment(segment) {
   if (segment === "finalRound4") await renderFinalAdminRound(4)
 
   if (segment === "archive") await renderArchiveAdmin()
+
+
+}
+
+function addAdminBackButtonToEditor(segment) {
+  return
+}
+
+/* =========================
+   Admin One Page Edit Helpers
+========================= */
+
+function isAdminFieldFilled(value) {
+  return String(value || "").trim().length > 0
+}
+
+function getAdminMissingFieldClass(value) {
+  return isAdminFieldFilled(value) ? "" : "adminMissingField"
+}
+
+function getAdminItemStatus(completed, total) {
+  const done = Number(completed || 0)
+  const max = Number(total || 1)
+  const isDone = done >= max
+
+  return {
+    isDone,
+    className: isDone ? "isDone" : "isMissing",
+    label: isDone ? "مكتمل" : "ناقص",
+    progress: `${done}/${max}`
+  }
+}
+
+function getWarmupCategoryStatus(categoryNumber) {
+  const cat = getWarmupDraftCategory(categoryNumber)
+
+  const fields = [
+    cat.category_name,
+    cat.questions[1]?.question,
+    cat.questions[1]?.answer,
+    cat.questions[2]?.question,
+    cat.questions[2]?.answer,
+    cat.questions[4]?.question,
+    cat.questions[4]?.answer
+  ]
+
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
+}
+
+function getWarmupQuestionStatus(categoryNumber, questionNumber) {
+  const cat = getWarmupDraftCategory(categoryNumber)
+  const row = cat.questions[questionNumber] || {}
+
+  const fields = [
+    row.question,
+    row.answer
+  ]
+
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
 }
 
 /* =========================
@@ -2324,18 +3001,19 @@ function getWarmupDraftCategory(c) {
 }
 
 function collectWarmupCurrentDraft() {
-  const c = Number(warmupAdminActiveCategory || 1)
-  const cat = getWarmupDraftCategory(c)
+  for (let c = 1; c <= 4; c++) {
+    const cat = getWarmupDraftCategory(c)
 
-  cat.category_name = (document.getElementById(`cat${c}`)?.value || "").trim()
+    cat.category_name = (document.getElementById(`cat${c}`)?.value || "").trim()
 
-  for (const n of [1, 2, 4]) {
-    if (!cat.questions[n]) {
-      cat.questions[n] = { id: null, question: "", answer: "" }
+    for (const n of [1, 2, 4]) {
+      if (!cat.questions[n]) {
+        cat.questions[n] = { id: null, question: "", answer: "" }
+      }
+
+      cat.questions[n].question = (document.getElementById(`q${c}_${n}`)?.value || "").trim()
+      cat.questions[n].answer = (document.getElementById(`a${c}_${n}`)?.value || "").trim()
     }
-
-    cat.questions[n].question = (document.getElementById(`q${c}_${n}`)?.value || "").trim()
-    cat.questions[n].answer = (document.getElementById(`a${c}_${n}`)?.value || "").trim()
   }
 }
 
@@ -2413,76 +3091,124 @@ async function renderWarmupAdmin() {
 }
 
 async function renderWarmupAdminFromDraft() {
-  const c = Number(warmupAdminActiveCategory || 1)
-  const cat = getWarmupDraftCategory(c)
-
-  const q1 = cat.questions[1] || { id: null, question: "", answer: "" }
-  const q2 = cat.questions[2] || { id: null, question: "", answer: "" }
-  const q4 = cat.questions[4] || { id: null, question: "", answer: "" }
-
   editor().innerHTML = `
-    <div class="warmupAdminShell compactWarmupAdminShell">
-      <div class="adminEditorTopBar compactAdminEditorTopBar">
+    <div class="warmupAdminShell compactWarmupAdminShell adminOnePageEditor">
+
+      <div class="adminEditorTopBar compactAdminEditorTopBar adminEditorTopBarWithActions">
         <div>
           <h2 class="adminSectionTitle">التسخين</h2>
         </div>
+
+        <div class="adminInlineActions">
+          <button onclick="saveWarmup()" class="adminSaveBtn">حفظ</button>
+          <button onclick="deleteWarmupSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
+        </div>
       </div>
 
-      ${await buildSegmentStatusGrid()}
-
-      <div class="warmupCategoryTabs">
-        ${[1, 2, 3, 4].map(num => {
-          const complete = isWarmupDraftComplete(num)
-
-          return `
-            <button
-              type="button"
-              class="warmupCategoryTab
-                ${c === num ? "activeWarmupCategoryTab" : ""}
-                ${complete ? "innerTabDone warmupCategoryDone" : ""}
-                ${c === num && complete ? "warmupCategoryActiveDone" : ""}"
-              onclick="switchWarmupAdminCategory(${num})"
-            >
-              الفئة ${num}
-            </button>
-          `
-        }).join("")}
+      <div class="adminEditCardsGrid warmupOnePageGrid">
+        ${[1, 2, 3, 4].map(c => buildWarmupCategoryOnePageCard(c)).join("")}
       </div>
 
-      <div class="adminCard warmupSingleCategoryCard">
-        <div class="warmupSingleCategoryHead">
-          <div>
-            <h3>الفئة ${c}</h3>
-          </div>
+    </div>
+  `
 
-          <div class="warmupCategoryBadge">الفئة الحالية</div>
+  normalizeAdminEditorCards()
+}
+
+function buildWarmupCategoryOnePageCard(categoryNumber) {
+  const c = Number(categoryNumber || 1)
+  const cat = getWarmupDraftCategory(c)
+  const status = getWarmupCategoryStatus(c)
+
+  return `
+    <details class="adminEditItemCard warmupCategoryOnePageCard ${status.className}" ontoggle="handleAdminEditCardToggle(this)">
+      <summary>
+        <div class="adminEditItemTitle">
+          <strong>الفئة ${c}</strong>
         </div>
 
-        <div class="adminField warmupCategoryNameField">
-          <label>اسم الفئة</label>
+        <div class="adminEditItemMeta">
+          <span class="adminEditStatusPill">${status.label}</span>
+          <span class="adminEditProgressPill">${status.progress}</span>
+        </div>
+      </summary>
+
+      <div class="adminEditItemBody">
+        <div class="adminField ${getAdminMissingFieldClass(cat.category_name)}">
           <input
             id="cat${c}"
-            placeholder="مثال: رياضة، تاريخ، جغرافيا..."
+            placeholder="اسم الفئة"
             value="${escapeHtml(cat.category_name || "")}"
           >
         </div>
 
-        <div class="warmupQuestionsCompactGrid">
-          ${buildWarmupQuestionCompactCard(c, 1, q1)}
-          ${buildWarmupQuestionCompactCard(c, 2, q2)}
-          ${buildWarmupQuestionCompactCard(c, 4, q4)}
+        <div class="adminEditSubGrid warmupQuestionsOnePageGrid">
+          ${[1, 2, 4].map(n => buildWarmupQuestionOnePageCard(c, n)).join("")}
         </div>
       </div>
+    </details>
+  `
+}
 
-      <div class="adminActionRow warmupStickyActions">
-        <button onclick="saveWarmup()" class="adminSaveBtn">حفظ التسخين</button>
-        <button onclick="deleteWarmupSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
-        <button onclick="renderWarmupAdmin()" class="adminReloadBtn">إعادة تحميل</button>
+function handleAdminEditCardToggle(card) {
+  const grid = card?.closest(".adminEditCardsGrid")
+  if (!grid) return
+
+  if (card.open) {
+    grid.querySelectorAll(".adminEditItemCard").forEach(item => {
+      if (item !== card) item.open = false
+    })
+
+    grid.classList.add("hasOpenCard")
+  } else {
+    const hasOpen = !!grid.querySelector(".adminEditItemCard[open]")
+    if (!hasOpen) grid.classList.remove("hasOpenCard")
+  }
+}
+
+function buildWarmupQuestionOnePageCard(category, number) {
+  const c = Number(category || 1)
+  const n = Number(number || 1)
+
+  const cat = getWarmupDraftCategory(c)
+  const row = cat.questions[n] || { id: null, question: "", answer: "" }
+  const status = getWarmupQuestionStatus(c, n)
+
+  return `
+    <div class="adminEditSubCard warmupQuestionOnePageCard ${status.className}">
+      <div class="adminEditSubHead">
+        <strong>${n}</strong>
+        <span>${status.label} ${status.progress}</span>
       </div>
+
+      <div class="adminField ${getAdminMissingFieldClass(row.question)}">
+        <textarea
+          id="q${c}_${n}"
+          placeholder="السؤال"
+        >${escapeHtml(row.question || "")}</textarea>
+      </div>
+
+      <div class="adminField ${getAdminMissingFieldClass(row.answer)}">
+        <input
+          id="a${c}_${n}"
+          placeholder="الإجابة"
+          value="${escapeHtml(row.answer || "")}"
+        >
+      </div>
+
+      <button
+        class="adminDeleteMiniBtn"
+        type="button"
+        onclick="
+          window.__warmupDeleteNumber = ${n};
+          warmupAdminActiveCategory = ${c};
+          clearWarmupQuestionById(${row?.id ?? "null"});
+        "
+      >
+        حذف
+      </button>
     </div>
   `
-
-  arrangeAdminInnerTabs()
 }
 
 function buildWarmupQuestionCompactCard(category, number, row) {
@@ -2737,6 +3463,7 @@ async function deleteWarmupSegment() {
   }
 }
 
+
 /* =========================
    19) Top 10
 ========================= */
@@ -2762,27 +3489,37 @@ function getTop10DraftRound(round) {
 }
 
 function collectTop10CurrentDraft() {
-  const r = Number(top10AdminActiveRound || 1)
-  const round = getTop10DraftRound(r)
+  const totalRounds = Number(top10AdminRoundsCount || 3)
 
-  round.question = (document.getElementById(`topq${r}`)?.value || "").trim()
+  for (let r = 1; r <= totalRounds; r++) {
+    const round = getTop10DraftRound(r)
 
-  for (let i = 1; i <= 10; i++) {
-    round.answers[i] = (document.getElementById(`top${r}_${i}`)?.value || "").trim()
+    round.question = (document.getElementById(`topq${r}`)?.value || "").trim()
+
+    for (let i = 1; i <= 10; i++) {
+      round.answers[i] = (document.getElementById(`top${r}_${i}`)?.value || "").trim()
+    }
   }
 }
 
-function isTop10DraftComplete(roundNumber) {
+function getTop10RoundStatus(roundNumber) {
   const round = getTop10DraftRound(roundNumber)
-  const question = String(round.question || "").trim()
 
-  if (!question) return false
+  const fields = [
+    round.question,
+    ...Array.from({ length: 10 }, (_, i) => round.answers[i + 1])
+  ]
 
-  for (let i = 1; i <= 10; i++) {
-    if (!String(round.answers[i] || "").trim()) return false
-  }
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
+}
 
-  return true
+function getTop10AnswerStatus(roundNumber, answerNumber) {
+  const round = getTop10DraftRound(roundNumber)
+  const answer = round.answers[answerNumber] || ""
+
+  const completed = isAdminFieldFilled(answer) ? 1 : 0
+  return getAdminItemStatus(completed, 1)
 }
 
 function switchTop10AdminRound(round) {
@@ -2796,6 +3533,31 @@ function switchTop10AdminRound(round) {
   top10AdminActiveRound = safeRound
   renderTop10AdminFromDraft()
 }
+
+function handleTop10RoundToggle(card) {
+  if (typeof handleAdminEditCardToggle === "function") {
+    handleAdminEditCardToggle(card)
+  }
+
+  const grid = card.closest(".top10CleanRoundsGrid")
+  if (!grid) return
+
+  const cards = grid.querySelectorAll(".top10CleanRoundCard")
+
+  if (card.open) {
+    cards.forEach(item => {
+      if (item !== card) {
+        item.classList.add("top10RoundHidden")
+        item.open = false
+      }
+    })
+  } else {
+    cards.forEach(item => {
+      item.classList.remove("top10RoundHidden")
+    })
+  }
+}
+
 
 async function renderTop10Admin() {
   if (!currentModel) {
@@ -2850,110 +3612,119 @@ async function renderTop10Admin() {
 }
 
 async function renderTop10AdminFromDraft() {
-  const r = Number(top10AdminActiveRound || 1)
-  const round = getTop10DraftRound(r)
+  const totalRounds = Number(top10AdminRoundsCount || 3)
 
   editor().innerHTML = `
-    <div class="top10AdminShell compactTop10AdminShell">
-      <div class="adminEditorTopBar compactAdminEditorTopBar">
+    <div class="top10AdminShell top10CleanShell adminOnePageEditor">
+
+      <div class="adminEditorTopBar top10CleanTopBar adminEditorTopBarWithActions">
         <div>
           <h2 class="adminSectionTitle">Top 10</h2>
         </div>
-      </div>
 
-      ${await buildSegmentStatusGrid()}
-
-      <div class="top10ControlPanel">
-        <div class="top10RoundCountBox">
-          <div class="adminField compactCountField">
-            <div class="compactCountSelectWrap">
-              <select id="top10RoundsCountInput" class="compactCountSelect">
-                <option value="1" ${top10AdminRoundsCount === 1 ? "selected" : ""}>1</option>
-                <option value="2" ${top10AdminRoundsCount === 2 ? "selected" : ""}>2</option>
-                <option value="3" ${top10AdminRoundsCount === 3 ? "selected" : ""}>3</option>
-                <option value="4" ${top10AdminRoundsCount === 4 ? "selected" : ""}>4</option>
-              </select>
-            </div>
-          </div>
-
-          <button onclick="applyTop10RoundsCount()" class="adminBtn adminBtnMango compactCountBtn">
-            حفظ العدد
-          </button>
-        </div>
-
-        <div class="top10RoundTabs">
-          ${Array.from({ length: top10AdminRoundsCount }, (_, i) => i + 1).map(num => {
-            const complete = isTop10DraftComplete(num)
-
-            return `
-              <button
-                type="button"
-                class="top10RoundTab
-                  ${r === num ? "activeTop10RoundTab" : ""}
-                  ${complete ? "innerTabDone top10RoundDone" : ""}
-                  ${r === num && complete ? "top10RoundActiveDone" : ""}"
-                onclick="switchTop10AdminRound(${num})"
-              >
-                الجولة ${num}
-              </button>
-            `
-          }).join("")}
+        <div class="adminInlineActions">
+          <button onclick="saveTop10()" class="adminSaveBtn">حفظ</button>
+          <button onclick="deleteTop10Segment()" class="adminDeleteAllBtn">حذف الفقرة</button>
         </div>
       </div>
 
-      <div class="adminCard top10SingleRoundCard">
-        <div class="top10SingleRoundHead">
-          <div>
-            <h3>الجولة ${r}</h3>
-          </div>
+      <div class="top10CleanRoundsGrid">
+        ${Array.from({ length: totalRounds }, (_, i) => {
+          return buildTop10RoundOnePageCard(i + 1)
+        }).join("")}
+      </div>
 
-          <button class="adminDeleteBtn" onclick="clearTop10Round(${r})">
+    </div>
+  `
+
+  normalizeAdminEditorCards()
+}
+
+function buildTop10RoundOnePageCard(roundNumber) {
+  const r = Number(roundNumber || 1)
+  const round = getTop10DraftRound(r)
+  const status = getTop10RoundStatus(r)
+  const roundStateClass = status.isDone ? "top10Complete" : "top10Incomplete"
+
+  return `
+    <details
+      class="adminEditItemCard top10CleanRoundCard ${roundStateClass}"
+      ontoggle="handleTop10RoundToggle(this)"
+    >
+      <summary>
+        <div class="top10CleanSummaryTitle">
+          <strong>الجولة ${r}</strong>
+        </div>
+
+        <div class="adminEditItemMeta">
+          <span class="adminEditStatusPill">${status.label}</span>
+          <span class="adminEditProgressPill">${status.progress}</span>
+        </div>
+      </summary>
+
+      <div class="adminEditItemBody top10CleanBody">
+
+        <div class="top10CleanQuestionRow">
+          <input
+            id="topq${r}"
+            class="top10CleanQuestionInput ${getAdminMissingFieldClass(round.question)}"
+            placeholder="سؤال الجولة ${r}"
+            value="${escapeHtml(round.question || "")}"
+          >
+
+          <button class="adminDeleteBtn top10CleanDeleteRoundBtn" onclick="clearTop10Round(${r})">
             حذف الجولة
           </button>
         </div>
 
-        <div class="adminField top10QuestionField">
-          <label>السؤال الرئيسي</label>
-          <input
-            id="topq${r}"
-            placeholder="اكتب السؤال الرئيسي للجولة ${r}"
-            value="${escapeHtml(round.question || "")}"
-          >
+        <div class="top10CleanAnswersSplit">
+          <div class="top10CleanAnswersColumn">
+            ${[1, 2, 3, 4, 5].map(answerNumber => {
+              return buildTop10AnswerOnePageCard(r, answerNumber)
+            }).join("")}
+          </div>
+
+          <div class="top10CleanAnswersColumn">
+            ${[6, 7, 8, 9, 10].map(answerNumber => {
+              return buildTop10AnswerOnePageCard(r, answerNumber)
+            }).join("")}
+          </div>
         </div>
 
-        <div class="top10AnswersCompactGrid">
-          ${Array.from({ length: 10 }, (_, i) => i + 1).map(i => `
-            <div class="top10AnswerCompactRow">
-              <div class="top10AnswerNo">${i}</div>
-
-              <input
-                id="top${r}_${i}"
-                placeholder="إجابة ${i}"
-                value="${escapeHtml(round.answers[i] || "")}"
-              >
-
-              <button
-                type="button"
-                class="adminDeleteMiniBtn"
-                onclick="deleteTop10Item(${r}, ${i})"
-                ${round.answers[i] ? "" : "disabled"}
-              >
-                حذف
-              </button>
-            </div>
-          `).join("")}
-        </div>
       </div>
+    </details>
+  `
+}
 
-      <div class="adminActionRow top10StickyActions">
-        <button onclick="saveTop10()" class="adminSaveBtn">حفظ Top 10</button>
-        <button onclick="deleteTop10Segment()" class="adminDeleteAllBtn">حذف الفقرة</button>
-        <button onclick="renderTop10Admin()" class="adminReloadBtn">إعادة تحميل</button>
-      </div>
+function buildTop10AnswerOnePageCard(roundNumber, answerNumber) {
+  const r = Number(roundNumber || 1)
+  const i = Number(answerNumber || 1)
+
+  const round = getTop10DraftRound(r)
+  const answer = round.answers[i] || ""
+  const isDone = isAdminFieldFilled(answer)
+
+  return `
+    <div class="top10CleanAnswerCard ${isDone ? "top10Complete" : "top10Incomplete"}">
+      <div class="top10CleanAnswerNumber">${i}</div>
+
+      <input
+        id="top${r}_${i}"
+        class="top10CleanAnswerInput ${getAdminMissingFieldClass(answer)}"
+        placeholder="الإجابة"
+        value="${escapeHtml(answer)}"
+      >
+
+      <button
+        type="button"
+        class="top10CleanAnswerDelete"
+        onclick="deleteTop10Item(${r}, ${i})"
+        ${answer ? "" : "disabled"}
+      >
+        ×
+      </button>
     </div>
   `
-
-  arrangeAdminInnerTabs()
 }
 
 async function applyTop10RoundsCount() {
@@ -3007,16 +3778,8 @@ async function saveTop10() {
     setAdminSaving(true, "جارٍ حفظ Top 10...")
     showGameToast("جارٍ حفظ Top 10...")
 
-    top10AdminRoundsCount = Number(
-      document.getElementById("top10RoundsCountInput")?.value ||
-      top10AdminRoundsCount ||
-      3
-    )
-
+    top10AdminRoundsCount = Number(top10AdminRoundsCount || 3)
     top10AdminRoundsCount = Math.min(Math.max(top10AdminRoundsCount, 1), 4)
-
-    const savedCount = await saveSegmentRoundCount("top10", top10AdminRoundsCount)
-    if (!savedCount) return false
 
     const rows = []
     const keepKeys = []
@@ -3248,28 +4011,48 @@ function getAuctionDraftItem(number) {
 }
 
 function collectAuctionCurrentDraft() {
-  const n = Number(auctionAdminActiveNumber || 1)
-  const item = getAuctionDraftItem(n)
+  const total = Number(auctionAdminCount || 8)
 
-  item.question = (document.getElementById(`auction${n}`)?.value || "").trim()
-  item.answer = (document.getElementById(`auctionAnswer${n}`)?.value || "").trim()
+  for (let n = 1; n <= total; n++) {
+    const item = getAuctionDraftItem(n)
 
-  const file = document.getElementById(`auctionFile${n}`)?.files?.[0] || null
-  if (file) item.file = file
+    item.question = ""
+    item.answer = (document.getElementById(`auctionAnswer${n}`)?.value || "").trim()
 
-  const videoFile = document.getElementById(`auctionVideo${n}`)?.files?.[0] || null
-  if (videoFile) item.videoFile = videoFile
+    const file = document.getElementById(`auctionFile${n}`)?.files?.[0] || null
+    if (file) item.file = file
+
+    const videoFile = document.getElementById(`auctionVideo${n}`)?.files?.[0] || null
+    if (videoFile) item.videoFile = videoFile
+  }
 }
 
 function isAuctionDraftComplete(number) {
   const item = getAuctionDraftItem(number)
 
-  const question = String(item.question || "").trim()
   const answer = String(item.answer || "").trim()
   const image = String(item.image || "").trim()
   const video = String(item.video || "").trim()
 
-  return !!(question && answer && (image || video || item.file || item.videoFile))
+  return !!(answer && (image || video || item.file || item.videoFile))
+}
+
+function getAuctionItemStatus(number) {
+  const item = getAuctionDraftItem(number)
+
+  const hasMedia =
+    isAdminFieldFilled(item.image) ||
+    isAdminFieldFilled(item.video) ||
+    !!item.file ||
+    !!item.videoFile
+
+  const fields = [
+    item.answer,
+    hasMedia ? "media" : ""
+  ]
+
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
 }
 
 function switchAuctionAdminNumber(number) {
@@ -3313,10 +4096,7 @@ async function renderAuctionAdmin() {
     console.log("AUCTION SETTINGS ERROR:", settingsError)
   }
 
-  auctionAdminCount = Math.min(
-    Math.max(Number(settingsData?.item_count || 8), 1),
-    8
-  )
+  auctionAdminCount = normalizeAdminSegmentCount("auction", settingsData?.item_count || 8)
 
   auctionAdminDraft = {}
 
@@ -3348,82 +4128,90 @@ async function renderAuctionAdmin() {
 }
 
 async function renderAuctionAdminFromDraft() {
-  const n = Number(auctionAdminActiveNumber || 1)
-  const item = getAuctionDraftItem(n)
+  const total = Number(auctionAdminCount || 8)
 
   editor().innerHTML = `
-    <div class="auctionAdminShell compactAuctionAdminShell">
-      <div class="adminEditorTopBar compactAdminEditorTopBar">
+    <div class="auctionAdminShell compactAuctionAdminShell adminOnePageEditor">
+
+      <div class="adminEditorTopBar compactAdminEditorTopBar adminEditorTopBarWithActions">
         <div>
           <h2 class="adminSectionTitle">فتبلة</h2>
         </div>
-      </div>
 
-      ${await buildSegmentStatusGrid()}
-
-      <div class="auctionControlPanel">
-        <div class="auctionCountBox">
-          <div class="adminField compactCountField">
-            <label for="auctionCountInput">عدد الأسئلة</label>
-
-            <div class="compactCountSelectWrap">
-              <select id="auctionCountInput" class="compactCountSelect">
-                ${Array.from({ length: 8 }, (_, i) => i + 1).map(num => `
-                  <option value="${num}" ${auctionAdminCount === num ? "selected" : ""}>
-                    ${num}
-                  </option>
-                `).join("")}
-              </select>
-            </div>
-          </div>
-
-          <button onclick="applyAuctionCount()" class="adminBtn adminBtnMango compactCountBtn">
-            حفظ العدد
-          </button>
-        </div>
-
-        <div class="auctionNumberTabs">
-          ${Array.from({ length: auctionAdminCount }, (_, idx) => idx + 1).map(num => {
-            const complete = isAuctionDraftComplete(num)
-
-            return `
-              <button
-                type="button"
-                class="auctionNumberTab
-                  ${n === num ? "activeAuctionNumberTab" : ""}
-                  ${complete ? "innerTabDone auctionNumberDone" : ""}
-                  ${n === num && complete ? "auctionNumberActiveDone" : ""}"
-                onclick="switchAuctionAdminNumber(${num})"
-              >
-                ${num}
-              </button>
-            `
-          }).join("")}
+        <div class="adminInlineActions">
+          <button onclick="saveAuction()" class="adminSaveBtn">حفظ فتبلة</button>
+          <button onclick="deleteAuctionSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
         </div>
       </div>
 
-      <div class="adminCard auctionSingleQuestionCard">
-        <div class="auctionSingleQuestionHead">
-          <div>
-            <h3>السؤال ${n}</h3>
-          </div>
+      <div class="adminEditCardsGrid auctionOnePageGrid">
+        ${Array.from({ length: total }, (_, idx) => {
+          const number = idx + 1
+          return buildAuctionOnePageCard(number)
+        }).join("")}
+      </div>
 
-          <button class="adminDeleteBtn" onclick="clearAuctionQuestion(${n})">
-            حذف السؤال
-          </button>
+    </div>
+  `
+
+  normalizeAdminEditorCards()
+}
+
+function buildAuctionOnePageCard(number) {
+  const n = Number(number || 1)
+  const item = getAuctionDraftItem(n)
+  const status = getAuctionItemStatus(n)
+
+  const hasMedia =
+    isAdminFieldFilled(item.image) ||
+    isAdminFieldFilled(item.video) ||
+    !!item.file ||
+    !!item.videoFile
+
+  const missing = []
+
+  if (!isAdminFieldFilled(item.answer)) missing.push("الإجابة")
+  if (!hasMedia) missing.push("الصورة أو الفيديو")
+
+  return `
+    <details class="adminEditItemCard auctionQuestionOnePageCard ${status.className}" ontoggle="handleAdminEditCardToggle(this)">
+      <summary>
+        <div class="adminEditItemTitle">
+          <strong>السؤال ${n}</strong>
+          <span>
+            ${
+              status.isDone
+                ? "بيانات السؤال مكتملة"
+                : `ناقص: ${missing.join("، ")}`
+            }
+          </span>
         </div>
 
-        <div class="auctionSingleLayout">
-          <div class="auctionImagePanel">
-            <div class="adminField">
+        <div class="adminEditItemMeta">
+          <span class="adminEditStatusPill">${status.label}</span>
+          <span class="adminEditProgressPill">${status.progress}</span>
+        </div>
+      </summary>
+
+      <div class="adminEditItemBody">
+        <div class="auctionOnePageLayout auctionOnePageLayoutAnswerOnly">
+
+          <div class="auctionOnePageMedia">
+            <div class="adminField ${hasMedia ? "" : "adminMissingField"}">
               <label>الصورة</label>
               <input type="file" id="auctionFile${n}" accept="image/*">
             </div>
 
-            <div class="adminField">
+            <div class="adminField ${hasMedia ? "" : "adminMissingField"}">
               <label>الفيديو</label>
               <input type="file" id="auctionVideo${n}" accept="video/*">
             </div>
+
+            ${
+              !hasMedia
+                ? `<div class="adminMissingHint">الصورة أو الفيديو مطلوبة</div>`
+                : ""
+            }
 
             <div class="auctionPreviewBox auctionPreviewLarge">
               ${
@@ -3436,36 +4224,31 @@ async function renderAuctionAdminFromDraft() {
             </div>
           </div>
 
-          <div class="auctionFieldsPanel">
-            <div class="adminField">
-              <label>السؤال</label>
-              <textarea
-                id="auction${n}"
-                placeholder="اكتب نص السؤال"
-              >${escapeHtml(item.question || "")}</textarea>
-            </div>
-
-            <div class="adminField">
+          <div class="auctionOnePageFields">
+            <div class="adminField ${getAdminMissingFieldClass(item.answer)}">
               <label>الإجابة</label>
               <input
                 id="auctionAnswer${n}"
                 placeholder="الإجابة"
                 value="${escapeHtml(item.answer || "")}"
               >
+
+              ${
+                !isAdminFieldFilled(item.answer)
+                  ? `<div class="adminMissingHint">الإجابة ناقصة</div>`
+                  : ""
+              }
             </div>
+
+            <button class="adminDeleteBtn" onclick="clearAuctionQuestion(${n})">
+              حذف السؤال
+            </button>
           </div>
+
         </div>
       </div>
-
-      <div class="adminActionRow auctionStickyActions">
-        <button onclick="saveAuction()" class="adminSaveBtn">حفظ فتبلة</button>
-        <button onclick="deleteAuctionSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
-        <button onclick="renderAuctionAdmin()" class="adminReloadBtn">إعادة تحميل</button>
-      </div>
-    </div>
+    </details>
   `
-
-  arrangeAdminInnerTabs()
 }
 
 async function applyAuctionCount() {
@@ -3533,13 +4316,7 @@ async function saveAuction() {
     setAdminSaving(true, "جارٍ حفظ فتبلة...")
     showGameToast("جارٍ حفظ فتبلة...")
 
-    const count = Number(
-      document.getElementById("auctionCountInput")?.value ||
-      auctionAdminCount ||
-      8
-    )
-
-    const finalCount = Math.min(Math.max(count, 1), 8)
+    const finalCount = normalizeAdminSegmentCount("auction", auctionAdminCount || 8)
     auctionAdminCount = finalCount
 
     const { data: oldRows, error: oldError } = await db
@@ -3565,7 +4342,7 @@ async function saveAuction() {
     for (let i = 1; i <= finalCount; i++) {
       const item = getAuctionDraftItem(i)
 
-      const question = String(item.question || "").trim()
+      const question = ""
       const answer = String(item.answer || "").trim()
 
       let image = oldMap[i]?.image || item.image || ""
@@ -3585,7 +4362,7 @@ async function saveAuction() {
         image = ""
       }
 
-      if (!question && !answer && !image && !video) continue
+      if (!answer && !image && !video) continue
 
       rows.push({
         model: Number(currentModel),
@@ -3766,13 +4543,16 @@ function getWhoDraftItem(number) {
 }
 
 function collectWhoCurrentDraft() {
-  const n = Number(whoAdminActiveNumber || 1)
-  const item = getWhoDraftItem(n)
+  const total = Number(whoAdminCount || 15)
 
-  item.answer = (document.getElementById(`whoAnswer${n}`)?.value || "").trim()
+  for (let n = 1; n <= total; n++) {
+    const item = getWhoDraftItem(n)
 
-  const file = document.getElementById(`who${n}`)?.files?.[0] || null
-  if (file) item.file = file
+    item.answer = (document.getElementById(`whoAnswer${n}`)?.value || "").trim()
+
+    const file = document.getElementById(`who${n}`)?.files?.[0] || null
+    if (file) item.file = file
+  }
 }
 
 function isWhoDraftComplete(number) {
@@ -3782,6 +4562,22 @@ function isWhoDraftComplete(number) {
   const answer = String(item.answer || "").trim()
 
   return !!(answer && (image || item.file))
+}
+
+function getWhoItemStatus(number) {
+  const item = getWhoDraftItem(number)
+
+  const hasImage =
+    isAdminFieldFilled(item.image) ||
+    !!item.file
+
+  const fields = [
+    item.answer,
+    hasImage ? "image" : ""
+  ]
+
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
 }
 
 function switchWhoAdminNumber(number) {
@@ -3839,79 +4635,83 @@ async function renderWhoAdmin() {
 }
 
 async function renderWhoAdminFromDraft() {
-  const n = Number(whoAdminActiveNumber || 1)
-  const item = getWhoDraftItem(n)
+  const total = Number(whoAdminCount || 15)
 
   editor().innerHTML = `
-    <div class="whoAdminShell compactWhoAdminShell">
-      <div class="adminEditorTopBar compactAdminEditorTopBar">
+    <div class="whoAdminShell compactWhoAdminShell adminOnePageEditor">
+
+      <div class="adminEditorTopBar compactAdminEditorTopBar adminEditorTopBarWithActions">
         <div>
           <h2 class="adminSectionTitle">من هو</h2>
         </div>
-      </div>
 
-      ${await buildSegmentStatusGrid()}
-
-      <div class="auctionControlPanel whoControlPanel">
-        <div class="auctionCountBox whoCountBox">
-          <div class="adminField compactCountField">
-            <label for="whoCountInput">عدد الأرقام</label>
-
-            <div class="compactCountSelectWrap">
-              <select
-                id="whoCountInput"
-                class="compactCountSelect"
-                onchange="changeWhoCount()"
-              >
-                <option value="10" ${whoAdminCount === 10 ? "selected" : ""}>10</option>
-                <option value="12" ${whoAdminCount === 12 ? "selected" : ""}>12</option>
-                <option value="15" ${whoAdminCount === 15 ? "selected" : ""}>15</option>
-              </select>
-            </div>
-          </div>
-
-          <button onclick="saveWhoSettingsOnly()" class="adminBtn adminBtnMango compactCountBtn">
-            حفظ العدد
-          </button>
+        <div class="adminInlineActions">
+          <button onclick="saveWho()" class="adminSaveBtn">حفظ من هو</button>
+          <button onclick="deleteWhoSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
         </div>
       </div>
 
-      <div class="whoNumberTabs">
-        ${Array.from({ length: whoAdminCount }, (_, idx) => idx + 1).map(num => {
-          const complete = isWhoDraftComplete(num)
-
-          return `
-            <button
-              type="button"
-              class="whoNumberTab
-                ${n === num ? "activeWhoNumberTab" : ""}
-                ${complete ? "innerTabDone whoNumberDone" : ""}
-                ${n === num && complete ? "whoNumberActiveDone" : ""}"
-              onclick="switchWhoAdminNumber(${num})"
-            >
-              ${num}
-            </button>
-          `
+      <div class="adminEditCardsGrid whoOnePageGrid">
+        ${Array.from({ length: total }, (_, idx) => {
+          const number = idx + 1
+          return buildWhoOnePageCard(number)
         }).join("")}
       </div>
 
-      <div class="adminCard whoSingleCard">
-        <div class="whoSingleHead">
-          <div>
-            <h3>العنصر ${n}</h3>
-          </div>
+    </div>
+  `
 
-          <button class="adminDeleteBtn" onclick="clearWhoItem(${n})">
-            حذف العنصر
-          </button>
+  normalizeAdminEditorCards()
+}
+
+function buildWhoOnePageCard(number) {
+  const n = Number(number || 1)
+  const item = getWhoDraftItem(n)
+  const status = getWhoItemStatus(n)
+
+  const hasImage =
+    isAdminFieldFilled(item.image) ||
+    !!item.file
+
+  const missing = []
+
+  if (!isAdminFieldFilled(item.answer)) missing.push("الإجابة")
+  if (!hasImage) missing.push("الصورة")
+
+  return `
+    <details class="adminEditItemCard whoItemOnePageCard ${status.className}" ontoggle="handleAdminEditCardToggle(this)">
+      <summary>
+        <div class="adminEditItemTitle">
+          <strong>${n}</strong>
+          <span>
+            ${
+              status.isDone
+                ? "بيانات الصورة مكتملة"
+                : `ناقص: ${missing.join("، ")}`
+            }
+          </span>
         </div>
 
-        <div class="whoSingleLayout">
-          <div class="whoImagePanel">
-            <div class="adminField">
+        <div class="adminEditItemMeta">
+          <span class="adminEditStatusPill">${status.label}</span>
+          <span class="adminEditProgressPill">${status.progress}</span>
+        </div>
+      </summary>
+
+      <div class="adminEditItemBody">
+        <div class="whoOnePageLayout">
+
+          <div class="whoOnePageMedia">
+            <div class="adminField ${hasImage ? "" : "adminMissingField"}">
               <label>الصورة</label>
               <input type="file" id="who${n}" accept="image/*">
             </div>
+
+            ${
+              !hasImage
+                ? `<div class="adminMissingHint">الصورة مطلوبة</div>`
+                : ""
+            }
 
             <div class="whoPreviewBox whoPreviewLarge">
               ${
@@ -3922,32 +4722,31 @@ async function renderWhoAdminFromDraft() {
             </div>
           </div>
 
-          <div class="whoAnswerPanel">
-            <div class="adminField">
+          <div class="whoOnePageFields">
+            <div class="adminField ${getAdminMissingFieldClass(item.answer)}">
               <label>الإجابة</label>
               <input
                 id="whoAnswer${n}"
                 placeholder="اكتب اسم الشخصية / اللاعب / الإجابة"
                 value="${escapeHtml(item.answer || "")}"
               >
+
+              ${
+                !isAdminFieldFilled(item.answer)
+                  ? `<div class="adminMissingHint">الإجابة ناقصة</div>`
+                  : ""
+              }
             </div>
 
-            <div class="whoSmallHint">
-              اختر عدد الأرقام 10 أو 12 أو 15. الأرقام الزائدة لا تظهر في العرض ولا تدخل في الفحص.
-            </div>
+            <button class="adminDeleteBtn" onclick="clearWhoItem(${n})">
+              حذف الرقم
+            </button>
           </div>
+
         </div>
       </div>
-
-      <div class="adminActionRow whoStickyActions">
-        <button onclick="saveWho()" class="adminSaveBtn">حفظ من هو</button>
-        <button onclick="deleteWhoSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
-        <button onclick="renderWhoAdmin()" class="adminReloadBtn">إعادة تحميل</button>
-      </div>
-    </div>
+    </details>
   `
-
-  arrangeAdminInnerTabs()
 }
 
 function changeWhoCount() {
@@ -4014,18 +4813,7 @@ async function saveWho() {
     setAdminSaving(true, "جارٍ حفظ من هو...")
     showGameToast("جارٍ حفظ من هو...")
 
-    const count = Number(
-      document.getElementById("whoCountInput")?.value ||
-      whoAdminCount ||
-      15
-    )
-
-    whoAdminCount = normalizeAdminSegmentCount("who", count)
-
-    const savedSetting = await saveAdminSegmentCount("who", whoAdminCount)
-    if (!savedSetting) return false
-
-    updateAdminQuickSettingUI("who", whoAdminCount)
+    whoAdminCount = normalizeAdminSegmentCount("who", Number(whoAdminCount || 15))
 
     const { data: oldRows, error: oldReadError } = await db
       .from("who_images")
@@ -4223,15 +5011,12 @@ function getExplainDraftItem(number) {
 }
 
 function collectExplainDraft() {
-  const count = Number(
-    document.getElementById("explainWordsCountInput")?.value ||
-    explainAdminCount ||
-    4
+  explainAdminCount = normalizeAdminSegmentCount(
+    "explain",
+    Number(explainAdminCount || 4)
   )
 
-  explainAdminCount = normalizeAdminSegmentCount("explain", count)
-
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= explainAdminCount; i++) {
     const item = getExplainDraftItem(i)
     item.word = (document.getElementById(`explainWord_${i}`)?.value || "").trim()
   }
@@ -4240,6 +5025,17 @@ function collectExplainDraft() {
 function isExplainDraftComplete(number) {
   const item = getExplainDraftItem(number)
   return String(item.word || "").trim().length > 0
+}
+
+function getExplainItemStatus(number) {
+  const item = getExplainDraftItem(number)
+
+  const fields = [
+    item.word
+  ]
+
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
 }
 
 async function renderExplainAdmin() {
@@ -4280,96 +5076,95 @@ async function renderExplainAdmin() {
 }
 
 async function renderExplainAdminFromDraft() {
+  const total = Number(explainAdminCount || 4)
+
   editor().innerHTML = `
-    <div class="explainAdminShell compactExplainAdminShell">
-      <div class="adminEditorTopBar compactAdminEditorTopBar">
+    <div class="explainAdminShell compactExplainAdminShell adminOnePageEditor">
+
+      <div class="adminEditorTopBar compactAdminEditorTopBar adminEditorTopBarWithActions">
         <div>
           <h2 class="adminSectionTitle">اشرح الكلمة</h2>
         </div>
-      </div>
 
-      ${await buildSegmentStatusGrid()}
-
-      <div class="auctionControlPanel explainControlPanel">
-        <div class="auctionCountBox explainCountBox">
-          <div class="adminField compactCountField">
-            <label for="explainWordsCountInput">عدد الكلمات</label>
-
-            <div class="compactCountSelectWrap">
-              <select
-                id="explainWordsCountInput"
-                class="compactCountSelect"
-                onchange="changeExplainWordsCount()"
-              >
-                <option value="4" ${explainAdminCount === 4 ? "selected" : ""}>4</option>
-                <option value="6" ${explainAdminCount === 6 ? "selected" : ""}>6</option>
-                <option value="8" ${explainAdminCount === 8 ? "selected" : ""}>8</option>
-              </select>
-            </div>
-          </div>
-
-          <button onclick="saveExplainSettingsOnly()" class="adminBtn adminBtnMango compactCountBtn">
-            حفظ العدد
-          </button>
+        <div class="adminInlineActions">
+          <button onclick="saveExplain()" class="adminSaveBtn">حفظ اشرح الكلمة</button>
+          <button onclick="deleteExplainSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
         </div>
       </div>
 
-      <div class="adminCard explainWordsCard">
-        <div class="auctionSingleQuestionHead">
-          <div>
-            <h3>كلمات الفقرة</h3>
-          </div>
-
-          <button class="adminDeleteBtn" onclick="deleteExplainSegment()">
-            حذف الفقرة
-          </button>
-        </div>
-
-        <div class="explainWordsGrid">
-          ${Array.from({ length: 8 }, (_, idx) => {
-            const number = idx + 1
-            const item = getExplainDraftItem(number)
-            const disabled = number > explainAdminCount
-            const complete = isExplainDraftComplete(number)
-
-            return `
-              <div class="explainWordRow ${disabled ? "explainWordDisabled" : ""} ${complete ? "explainWordDone" : ""}">
-                <div class="top10AnswerNo">${number}</div>
-
-                <input
-                  id="explainWord_${number}"
-                  placeholder="اكتب الكلمة رقم ${number}"
-                  value="${escapeHtml(item.word || "")}"
-                  ${disabled ? "disabled" : ""}
-                >
-
-                <button
-                  type="button"
-                  class="adminDeleteMiniBtn"
-                  onclick="clearExplainWord(${number})"
-                  ${!item.word ? "disabled" : ""}
-                >
-                  حذف
-                </button>
-              </div>
-            `
-          }).join("")}
-        </div>
-
-        <div class="whoSmallHint">
-          عدد الكلمات يكون 4 أو 6 أو 8.
-        </div>
+      <div class="adminEditCardsGrid explainOnePageGrid">
+        ${Array.from({ length: total }, (_, idx) => {
+          const number = idx + 1
+          return buildExplainOnePageCard(number)
+        }).join("")}
       </div>
 
-      <div class="adminActionRow explainStickyActions">
-        <button onclick="saveExplain()" class="adminSaveBtn">حفظ اشرح الكلمة</button>
-        <button onclick="deleteExplainSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
-        <button onclick="renderExplainAdmin()" class="adminReloadBtn">إعادة تحميل</button>
-      </div>
     </div>
   `
 
-  arrangeAdminInnerTabs()
+  normalizeAdminEditorCards()
+}
+
+function buildExplainOnePageCard(number) {
+  const n = Number(number || 1)
+  const item = getExplainDraftItem(n)
+  const status = getExplainItemStatus(n)
+
+  const missing = []
+
+  if (!isAdminFieldFilled(item.word)) missing.push("الكلمة")
+
+  return `
+    <details class="adminEditItemCard explainItemOnePageCard ${status.className}" ontoggle="handleAdminEditCardToggle(this)">
+      <summary>
+        <div class="adminEditItemTitle">
+          <strong>الكلمة ${n}</strong>
+          <span>
+            ${
+              status.isDone
+                ? "الكلمة مكتملة"
+                : `ناقص: ${missing.join("، ")}`
+            }
+          </span>
+        </div>
+
+        <div class="adminEditItemMeta">
+          <span class="adminEditStatusPill">${status.label}</span>
+          <span class="adminEditProgressPill">${status.progress}</span>
+        </div>
+      </summary>
+
+      <div class="adminEditItemBody">
+        <div class="explainOnePageLayout">
+
+          <div class="adminField ${getAdminMissingFieldClass(item.word)}">
+            <label>الكلمة</label>
+            <input
+              id="explainWord_${n}"
+              placeholder="اكتب الكلمة رقم ${n}"
+              value="${escapeHtml(item.word || "")}"
+            >
+
+            ${
+              !isAdminFieldFilled(item.word)
+                ? `<div class="adminMissingHint">الكلمة ناقصة</div>`
+                : ""
+            }
+          </div>
+
+          <button
+            type="button"
+            class="adminDeleteBtn"
+            onclick="clearExplainWord(${n})"
+            ${!item.word ? "disabled" : ""}
+          >
+            حذف الكلمة
+          </button>
+
+        </div>
+      </div>
+    </details>
+  `
 }
 
 function changeExplainWordsCount() {
@@ -4428,18 +5223,10 @@ async function saveExplain() {
     setAdminSaving(true, "جارٍ حفظ اشرح الكلمة...")
     showGameToast("جارٍ حفظ اشرح الكلمة...")
 
-    const count = Number(
-      document.getElementById("explainWordsCountInput")?.value ||
-      explainAdminCount ||
-      4
-    )
-
-    explainAdminCount = normalizeAdminSegmentCount("explain", count)
-
-    const savedSetting = await saveAdminSegmentCount("explain", explainAdminCount)
-    if (!savedSetting) return false
-
-    updateAdminQuickSettingUI("explain", explainAdminCount)
+    explainAdminCount = normalizeAdminSegmentCount(
+  "explain",
+  Number(explainAdminCount || 4)
+)
 
     const rows = []
     const keepNumbers = []
@@ -4806,98 +5593,44 @@ doneMap[2] = round2Done
    24) Final Main Render
 ========================= */
 
+function getFinalRound1ItemStatus(row = {}) {
+  const fields = [
+    row.card_text,
+    row.answer
+  ]
+
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
+}
+
+function getFinalRound1InputStatus(number, map) {
+  const row = map[number] || {}
+  return getFinalRound1ItemStatus(row)
+}
+
 async function renderFinalAdminRound(round) {
   finalAdminRound = Number(round || 1)
 
   const safeRound = Math.min(Math.max(Number(round || 1), 1), 4)
   const title = getFinalAdminRoundTitle(safeRound)
 
-  const round1CardsCount = await getAdminSegmentCount("finalRound1")
-  const round3Count = await getAdminSegmentCount("finalRound3")
-  const round4Count = await getAdminSegmentCount("finalRound4")
-
-  const countBox =
-    safeRound === 1
-      ? `
-        <div class="finalTopCompactBox finalTopCompactCountBox">
-          <div class="adminField compactCountField">
-            <label>عدد الأرقام</label>
-
-            <div class="compactCountSelectWrap">
-              <select
-                id="finalRound1CardsCount"
-                class="compactCountSelect"
-                onchange="changeFinalRound1CardsCount()"
-              >
-                <option value="4" ${round1CardsCount === 4 ? "selected" : ""}>4</option>
-                <option value="6" ${round1CardsCount === 6 ? "selected" : ""}>6</option>
-                <option value="8" ${round1CardsCount === 8 ? "selected" : ""}>8</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      `
-      : safeRound === 3
-        ? `
-          <div class="finalTopCompactBox finalTopCompactCountBox">
-            <div class="adminField compactCountField">
-              <label>عدد الأرقام</label>
-
-              <div class="compactCountSelectWrap">
-                <select
-                  id="finalRound3Count"
-                  class="compactCountSelect"
-                  onchange="changeFinalRound3Count()"
-                >
-                  <option value="4" ${round3Count === 4 ? "selected" : ""}>4</option>
-                  <option value="6" ${round3Count === 6 ? "selected" : ""}>6</option>
-                  <option value="8" ${round3Count === 8 ? "selected" : ""}>8</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        `
-        : safeRound === 4
-          ? `
-            <div class="finalTopCompactBox finalTopCompactCountBox">
-              <div class="adminField compactCountField">
-                <label>عدد الأرقام</label>
-
-                <div class="compactCountSelectWrap">
-                  <select
-                    id="finalRound4Count"
-                    class="compactCountSelect"
-                    onchange="changeFinalRound4Count()"
-                  >
-                    <option value="4" ${round4Count === 4 ? "selected" : ""}>4</option>
-                    <option value="6" ${round4Count === 6 ? "selected" : ""}>6</option>
-                    <option value="8" ${round4Count === 8 ? "selected" : ""}>8</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          `
-          : ""
-
   let html = `
-    <div class="finalAdminShell cleanFinalAdminShell">
-      <div class="adminEditorTopBar compactAdminEditorTopBar">
+    <div class="finalAdminShell cleanFinalAdminShell adminOnePageEditor">
+      <div class="adminEditorTopBar compactAdminEditorTopBar adminEditorTopBarWithActions">
         <div>
           <h2 class="adminSectionTitle">${escapeHtml(title)}</h2>
         </div>
+
+        <div class="adminInlineActions">
+          <button onclick="saveFinalRound(${safeRound})" class="adminSaveBtn">
+            حفظ ${escapeHtml(title)}
+          </button>
+
+          <button onclick="deleteFinalRound(${safeRound})" class="adminDeleteAllBtn">
+            حذف الفقرة
+          </button>
+        </div>
       </div>
-
-      ${await buildSegmentStatusGrid()}
-
-      ${
-        countBox
-          ? `
-            <div class="finalTopCompactRow finalSingleSettingRow">
-              ${countBox}
-            </div>
-          `
-          : ""
-      }
   `
 
   if (safeRound === 1) html += await buildFinalRound1Admin()
@@ -4906,24 +5639,11 @@ async function renderFinalAdminRound(round) {
   if (safeRound === 4) html += await buildFinalRound3FocusAdmin()
 
   html += `
-      <div class="finalAdminActions">
-        <button onclick="saveFinalRound(${safeRound})" class="adminSaveBtn">
-          حفظ ${escapeHtml(title)}
-        </button>
-
-        <button onclick="deleteFinalRound(${safeRound})" class="adminDeleteBtn">
-          حذف هذه الفقرة
-        </button>
-
-        <button onclick="renderFinalAdminRound(${safeRound})" class="adminReloadBtn">
-          إعادة تحميل
-        </button>
-      </div>
     </div>
   `
 
   editor().innerHTML = html
-  arrangeAdminInnerTabs()
+  normalizeAdminEditorCards()
 }
 
 async function changeFinalRound1CardsCount() {
@@ -5036,54 +5756,89 @@ async function buildFinalRound1Admin() {
 
   const cardsCount = await getAdminSegmentCount("finalRound1")
 
-  let html = `
-    <div class="finalRound1NoImageGrid">
+  return `
+    <div class="adminEditCardsGrid finalRound1OnePageGrid">
+      ${Array.from({ length: cardsCount }, (_, idx) => {
+        const number = idx + 1
+        return buildFinalRound1OnePageCard(number, map)
+      }).join("")}
+    </div>
   `
+}
 
-  for (let i = 1; i <= 8; i++) {
-    const disabled = i > cardsCount
-    const dimmed = disabled ? 'style="opacity:.38;"' : ""
+function buildFinalRound1OnePageCard(number, map = {}) {
+  const n = Number(number || 1)
+  const row = map[n] || {}
+  const status = getFinalRound1InputStatus(n, map)
 
-    html += `
-      <div class="finalAdminCard finalRound1NoImageCard" ${dimmed}>
-        <div class="finalAdminCardHead">
-          <h3>رقم ${i}</h3>
+  const missing = []
 
-          <div class="finalAdminCardHeadActions">
-            <div class="finalAdminTypeBadge">بدون نقط</div>
+  if (!isAdminFieldFilled(row.card_text)) missing.push("السؤال بدون نقط")
+  if (!isAdminFieldFilled(row.answer)) missing.push("الإجابة")
 
-            <button class="adminDeleteBtn" onclick="clearFinalRound1Item(${i})">
-              حذف
-            </button>
-          </div>
+  return `
+    <details class="adminEditItemCard finalRound1OnePageCard ${status.className}" ontoggle="handleAdminEditCardToggle(this)">
+      <summary>
+        <div class="adminEditItemTitle">
+          <strong>رقم ${n}</strong>
+          <span>
+            ${
+              status.isDone
+                ? "بيانات الرقم مكتملة"
+                : `ناقص: ${missing.join("، ")}`
+            }
+          </span>
         </div>
 
-        <div class="finalRound1NoImageFields">
-          <div class="adminField">
+        <div class="adminEditItemMeta">
+  <span class="adminEditStatusPill">${status.label}</span>
+  <span class="adminEditProgressPill">${status.progress}</span>
+
+  <button
+    type="button"
+    class="adminDeleteBtn finalRound1SummaryDeleteBtn"
+    onclick="event.preventDefault(); event.stopPropagation(); clearFinalRound1Item(${n});"
+  >
+    حذف
+  </button>
+</div>
+      </summary>
+
+      <div class="adminEditItemBody">
+        <div class="finalRound1OnePageLayout">
+
+          <div class="adminField ${getAdminMissingFieldClass(row.card_text)}">
             <label>السؤال بدون نقط</label>
             <textarea
-              id="finalRound1CardText_${i}"
+              id="finalRound1CardText_${n}"
               placeholder="اكتب السؤال بدون نقط"
-              ${disabled ? "disabled" : ""}
-            >${escapeHtml(map[i]?.card_text || "")}</textarea>
+            >${escapeHtml(row.card_text || "")}</textarea>
+
+            ${
+              !isAdminFieldFilled(row.card_text)
+                ? `<div class="adminMissingHint">السؤال ناقص</div>`
+                : ""
+            }
           </div>
 
-          <div class="adminField">
+          <div class="adminField ${getAdminMissingFieldClass(row.answer)}">
             <label>الإجابة</label>
-            <input
-              id="finalRound1Answer_${i}"
-              placeholder="الإجابة"
-              value="${escapeHtml(map[i]?.answer || "")}"
-              ${disabled ? "disabled" : ""}
-            >
+            <textarea
+  id="finalRound1Answer_${n}"
+  placeholder="الإجابة"
+>${escapeHtml(row.answer || "")}</textarea>
+
+            ${
+              !isAdminFieldFilled(row.answer)
+                ? `<div class="adminMissingHint">الإجابة ناقصة</div>`
+                : ""
+            }
           </div>
+
         </div>
       </div>
-    `
-  }
-
-  html += `</div>`
-  return html
+    </details>
+  `
 }
 
 async function saveFinalRound1(skipSavingLock = false) {
@@ -5099,17 +5854,12 @@ async function saveFinalRound1(skipSavingLock = false) {
       setAdminSaving(true, "جارٍ حفظ ٮدوں ٮڡاط...")
     }
 
-    const selectedCount = Number(
-      document.getElementById("finalRound1CardsCount")?.value ||
-      finalRound1AdminCount ||
-      6
-    )
+    const safeCardsCount = normalizeAdminSegmentCount(
+  "finalRound1",
+  Number(finalRound1AdminCount || await getAdminSegmentCount("finalRound1"))
+)
 
-    const safeCardsCount = normalizeAdminSegmentCount("finalRound1", selectedCount)
-    finalRound1AdminCount = safeCardsCount
-
-    await saveAdminSegmentCount("finalRound1", safeCardsCount)
-    updateAdminQuickSettingUI("finalRound1", safeCardsCount)
+finalRound1AdminCount = safeCardsCount
 
     const rows = []
 
@@ -5197,6 +5947,40 @@ async function saveFinalRound1(skipSavingLock = false) {
 /* =========================
    26) Final Round 2 - صح صحلي
 ========================= */
+function getFinalRound2TextStatus(number, rows = []) {
+  const isScramble = isFinalRound2ScrambleNumber(number)
+
+  const fields = []
+
+  for (let i = 1; i <= 6; i++) {
+    const row = rows.find(x => Number(x.item_order) === i) || {}
+
+    fields.push(row.prompt)
+
+    if (isScramble) {
+      fields.push(row.hint)
+      fields.push(row.answer)
+    }
+  }
+
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
+}
+
+function getFinalRound2ImageStatus(displayNumber, rows = []) {
+  const fields = []
+
+  for (let i = 1; i <= 5; i++) {
+    const row = rows.find(x => Number(x.image_order) === i) || {}
+
+    fields.push(row.image)
+    fields.push(row.answer)
+  }
+
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
+}
+
 async function buildFinalRound2Admin() {
   const [textRes, imageRes] = await Promise.all([
     db
@@ -5224,174 +6008,252 @@ async function buildFinalRound2Admin() {
     return `<div class="adminCard">تعذر تحميل صور صح صحلي</div>`
   }
 
-  const grouped = {
-    1: [],
-    2: [],
-    4: [],
-    5: []
-  }
+  const grouped = { 1: [], 2: [], 4: [], 5: [] }
 
   ;(textRes.data || []).forEach(row => {
     const n = Number(row.number || 1)
-
     if (!grouped[n]) grouped[n] = []
     grouped[n].push(row)
   })
 
-  const imageGrouped = {
-    3: [],
-    6: []
-  }
+  const imageGrouped = { 3: [], 6: [] }
 
   ;(imageRes.data || []).forEach(row => {
     const dbNumber = Number(row.number)
-
     if (dbNumber === 101) imageGrouped[3].push(row)
     if (dbNumber === 102) imageGrouped[6].push(row)
   })
 
-  let html = `
-    <div class="finalRound2CleanWrap finalRound2SixGrid">
-      <div class="finalAdminSubTitleBox">
-        <h3>صح صحلي</h3>
-        <span>1 مبعثرة - 2 ترتيب - 3 اشرح الصورة - 4 مبعثرة - 5 ترتيب - 6 اشرح الصورة</span>
-      </div>
+  return `
+    <div class="adminEditCardsGrid finalRound2OnePageGrid">
+      ${[1, 2, 3, 4, 5, 6].map(number => {
+        if (isFinalRound2ImageNumber(number)) {
+          return buildFinalRound2ImageOnePageCard(number, imageGrouped[number] || [])
+        }
+
+        return buildFinalRound2TextOnePageCard(number, grouped[number] || [])
+      }).join("")}
+    </div>
   `
+}
 
-  for (let number = 1; number <= 6; number++) {
-    const isScramble = isFinalRound2ScrambleNumber(number)
-    const isSequence = isFinalRound2SequenceNumber(number)
-    const isImage = isFinalRound2ImageNumber(number)
+function buildFinalRound2TextOnePageCard(number, rows = []) {
+  const n = Number(number || 1)
+  const isScramble = isFinalRound2ScrambleNumber(n)
+  const title = isScramble ? "كلمات مبعثرة" : "ترتيب / تسلسل"
+  const status = getFinalRound2TextStatus(n, rows)
 
-    const title = isScramble
-      ? "كلمات مبعثرة"
-      : isSequence
-        ? "ترتيب / تسلسل"
-        : "اشرح الصورة"
+  const missing = []
 
-    html += `
-      <div class="finalAdminCard finalRound2CleanCard">
-        <div class="finalAdminCardHead">
-          <h3>رقم ${number}</h3>
+  for (let i = 1; i <= 6; i++) {
+    const row = rows.find(x => Number(x.item_order) === i) || {}
 
-          <div class="finalAdminCardHeadActions">
-            <div class="finalAdminTypeBadge">${title}</div>
-
-            <button
-              class="adminDeleteBtn"
-              onclick="${isImage ? `clearFinalRound4Item(${number})` : `clearFinalRound2Item(${number})`}"
-            >
-              حذف
-            </button>
-          </div>
-        </div>
-    `
+    if (!isAdminFieldFilled(row.prompt)) missing.push(`${i}: النص`)
 
     if (isScramble) {
-      const rows = grouped[number] || []
-
-      html += `<div class="finalRound2ItemsGrid">`
-
-      for (let i = 1; i <= 6; i++) {
-        const row = rows.find(x => Number(x.item_order) === i) || {}
-
-        html += `
-          <div class="finalRound2ScrambleRow">
-            <div class="finalRound2Index">${i}</div>
-
-            <input
-              id="finalRound2Prompt_${number}_${i}"
-              placeholder="الكلمة"
-              value="${escapeHtml(row.prompt || "")}"
-            >
-
-            <input
-              id="finalRound2Hint_${number}_${i}"
-              placeholder="التلميحة"
-              value="${escapeHtml(row.hint || "")}"
-            >
-
-            <input
-              id="finalRound2Answer_${number}_${i}"
-              placeholder="الإجابة"
-              value="${escapeHtml(row.answer || "")}"
-            >
-          </div>
-        `
-      }
-
-      html += `</div>`
+      if (!isAdminFieldFilled(row.hint)) missing.push(`${i}: التلميحة`)
+      if (!isAdminFieldFilled(row.answer)) missing.push(`${i}: الإجابة`)
     }
-
-    if (isSequence) {
-      const rows = grouped[number] || []
-
-      html += `<div class="finalRound2SequenceGrid">`
-
-      for (let i = 1; i <= 6; i++) {
-        const row = rows.find(x => Number(x.item_order) === i) || {}
-
-        html += `
-          <div class="finalRound2SequenceItem">
-            <div class="finalRound2Index">${i}</div>
-
-            <input
-              id="finalRound2Prompt_${number}_${i}"
-              placeholder="النص / الترتيب"
-              value="${escapeHtml(row.prompt || "")}"
-            >
-          </div>
-        `
-      }
-
-      html += `</div>`
-    }
-
-    if (isImage) {
-      const rows = imageGrouped[number] || []
-
-      html += `<div class="finalRound2ImagesGrid">`
-
-      for (let i = 1; i <= 5; i++) {
-        const row = rows.find(x => Number(x.image_order) === i) || {}
-
-        html += `
-          <div class="finalAdminImageRow">
-            <div class="finalAdminWordIndex">الصورة ${i}</div>
-
-            <div class="finalAdminImageFields">
-              <input
-                type="file"
-                id="finalRound4File_${number}_${i}"
-                accept="image/*"
-              >
-
-              <input
-                id="finalRound4Answer_${number}_${i}"
-                placeholder="الإجابة"
-                value="${escapeHtml(row.answer || "")}"
-              >
-            </div>
-
-            <div class="finalAdminImagePreview">
-              ${
-                row.image
-                  ? `<img src="${escapeHtml(row.image)}" class="previewImg">`
-                  : `<div class="emptyImageHint">لا توجد صورة</div>`
-              }
-            </div>
-          </div>
-        `
-      }
-
-      html += `</div>`
-    }
-
-    html += `</div>`
   }
 
-  html += `</div>`
-  return html
+  return `
+    <details class="adminEditItemCard finalRound2OnePageCard ${status.className}" ontoggle="handleAdminEditCardToggle(this)">
+      <summary>
+        <div class="adminEditItemTitle">
+          <strong>رقم ${n} - ${title}</strong>
+          <span>
+            ${
+              status.isDone
+                ? "بيانات الرقم مكتملة"
+                : `ناقص: ${missing.slice(0, 4).join("، ")}${missing.length > 4 ? "..." : ""}`
+            }
+          </span>
+        </div>
+
+        <div class="adminEditItemMeta">
+          <span class="adminEditStatusPill">${status.label}</span>
+          <span class="adminEditProgressPill">${status.progress}</span>
+
+          <button
+            type="button"
+            class="adminDeleteBtn finalRound2SummaryDeleteBtn"
+            onclick="event.preventDefault(); event.stopPropagation(); clearFinalRound2Item(${n});"
+          >
+            حذف
+          </button>
+        </div>
+      </summary>
+
+      <div class="adminEditItemBody">
+        ${
+          isScramble
+            ? buildFinalRound2ScrambleBody(n, rows)
+            : buildFinalRound2SequenceBody(n, rows)
+        }
+      </div>
+    </details>
+  `
+}
+
+function syncFinalRound2Answer(number, order) {
+  const prompt = document.getElementById(`finalRound2Prompt_${number}_${order}`)
+  const answer = document.getElementById(`finalRound2Answer_${number}_${order}`)
+
+  if (!prompt || !answer) return
+  answer.value = prompt.value
+}
+
+function buildFinalRound2ScrambleBody(number, rows = []) {
+  return `
+    <div class="finalRound2ScrambleOnePageGrid">
+      ${Array.from({ length: 6 }, (_, idx) => {
+        const i = idx + 1
+        const row = rows.find(x => Number(x.item_order) === i) || {}
+
+        return `
+          <div class="finalRound2ScrambleItemCard">
+            <div class="finalRound2CompactIndex">${i}</div>
+
+            <div class="adminField ${getAdminMissingFieldClass(row.prompt)}">
+              <label>الكلمة</label>
+              <input
+                id="finalRound2Prompt_${number}_${i}"
+                placeholder="الكلمة"
+                value="${escapeHtml(row.prompt || "")}"
+                oninput="syncFinalRound2Answer(${number}, ${i})"
+              >
+            </div>
+
+            <div class="adminField ${getAdminMissingFieldClass(row.hint)}">
+              <label>التلميحة</label>
+              <input
+                id="finalRound2Hint_${number}_${i}"
+                placeholder="التلميحة"
+                value="${escapeHtml(row.hint || "")}"
+              >
+            </div>
+
+            <input
+              type="hidden"
+              id="finalRound2Answer_${number}_${i}"
+              value="${escapeHtml(row.answer || row.prompt || "")}"
+            >
+          </div>
+        `
+      }).join("")}
+    </div>
+  `
+}
+
+function buildFinalRound2SequenceBody(number, rows = []) {
+  return `
+    <div class="finalRound2SequenceOnePageGrid">
+      ${Array.from({ length: 6 }, (_, idx) => {
+        const i = idx + 1
+        const row = rows.find(x => Number(x.item_order) === i) || {}
+
+        return `
+          <div class="finalRound2SequenceItemCard">
+            <div class="finalRound2CompactIndex">${i}</div>
+
+            <input
+              id="finalRound2Prompt_${number}_${i}"
+              placeholder="اكتب النص"
+              value="${escapeHtml(row.prompt || "")}"
+              class="${getAdminMissingFieldClass(row.prompt)}"
+            >
+          </div>
+        `
+      }).join("")}
+    </div>
+  `
+}
+
+function buildFinalRound2ImageOnePageCard(displayNumber, rows = []) {
+  const n = Number(displayNumber || 3)
+  const status = getFinalRound2ImageStatus(n, rows)
+  const missing = []
+
+  for (let i = 1; i <= 5; i++) {
+    const row = rows.find(x => Number(x.image_order) === i) || {}
+
+    if (!isAdminFieldFilled(row.image)) missing.push(`${i}: الصورة`)
+    if (!isAdminFieldFilled(row.answer)) missing.push(`${i}: الإجابة`)
+  }
+
+  return `
+    <details class="adminEditItemCard finalRound2OnePageCard ${status.className}" ontoggle="handleAdminEditCardToggle(this)">
+      <summary>
+        <div class="adminEditItemTitle">
+          <strong>رقم ${n} - اشرح الصورة</strong>
+          <span>
+            ${
+              status.isDone
+                ? "بيانات الرقم مكتملة"
+                : `ناقص: ${missing.slice(0, 4).join("، ")}${missing.length > 4 ? "..." : ""}`
+            }
+          </span>
+        </div>
+
+        <div class="adminEditItemMeta">
+          <span class="adminEditStatusPill">${status.label}</span>
+          <span class="adminEditProgressPill">${status.progress}</span>
+
+          <button
+            type="button"
+            class="adminDeleteBtn finalRound2SummaryDeleteBtn"
+            onclick="event.preventDefault(); event.stopPropagation(); clearFinalRound4Item(${n});"
+          >
+            حذف
+          </button>
+        </div>
+      </summary>
+
+      <div class="adminEditItemBody">
+        <div class="finalRound2ImageOnePageGrid">
+          ${Array.from({ length: 5 }, (_, idx) => {
+            const i = idx + 1
+            const row = rows.find(x => Number(x.image_order) === i) || {}
+
+            return `
+              <div class="finalRound2ImageItemCard">
+                <div class="finalRound2ImageLineTitle">
+  <span>الصورة</span>
+  <strong>${i}</strong>
+</div>
+
+                <div class="adminField ${getAdminMissingFieldClass(row.image)}">
+                  <label>الصورة</label>
+                  <input
+                    type="file"
+                    id="finalRound4File_${n}_${i}"
+                    accept="image/*"
+                  >
+                </div>
+
+                <div class="adminField ${getAdminMissingFieldClass(row.answer)}">
+                  <label>الإجابة</label>
+                  <input
+                    id="finalRound4Answer_${n}_${i}"
+                    placeholder="الإجابة"
+                    value="${escapeHtml(row.answer || "")}"
+                  >
+                </div>
+
+                <div class="finalAdminImagePreview">
+                  ${
+                    row.image
+                      ? `<img src="${escapeHtml(row.image)}" class="previewImg">`
+                      : `<div class="emptyImageHint">لا توجد صورة</div>`
+                  }
+                </div>
+              </div>
+            `
+          }).join("")}
+        </div>
+      </div>
+    </details>
+  `
 }
 
 async function saveFinalRound2(skipSavingLock = false) {
@@ -5419,8 +6281,12 @@ async function saveFinalRound2(skipSavingLock = false) {
           : ""
 
         const answer = gameType === "scramble"
-          ? (document.getElementById(`finalRound2Answer_${number}_${i}`)?.value || "").trim()
-          : ""
+  ? (
+      document.getElementById(`finalRound2Answer_${number}_${i}`)?.value ||
+      document.getElementById(`finalRound2Prompt_${number}_${i}`)?.value ||
+      ""
+    ).trim()
+  : ""
 
         if (!prompt && !answer && !hint) continue
 
@@ -5506,6 +6372,18 @@ async function saveFinalRound2(skipSavingLock = false) {
    27) Final Round 3 - قصة
 ========================= */
 
+function getFinalStoryItemStatus(row = {}) {
+  const fields = [
+    row.question_part1,
+    row.question_part2,
+    row.question_part3,
+    row.answer
+  ]
+
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
+}
+
 async function buildFinalRound3StoryAdmin() {
   const count = await getAdminSegmentCount("finalRound3")
 
@@ -5528,76 +6406,120 @@ async function buildFinalRound3StoryAdmin() {
     map[Number(row.number)] = row
   })
 
-  let html = `
-    <div class="finalRound1NoImageGrid">
+  return `
+    <div class="adminEditCardsGrid finalStoryOnePageGrid">
+      ${Array.from({ length: count }, (_, idx) => {
+        const number = idx + 1
+        return buildFinalStoryOnePageCard(number, map)
+      }).join("")}
+    </div>
   `
+}
 
-  for (let i = 1; i <= 8; i++) {
-    const dbNumber = getFinalStoryDbNumber(i)
-    const row = map[dbNumber] || {}
-    const disabled = i > count
-    const dimmed = disabled ? 'style="opacity:.38;"' : ""
+function buildFinalStoryOnePageCard(number, map = {}) {
+  const n = Number(number || 1)
+  const dbNumber = getFinalStoryDbNumber(n)
+  const row = map[dbNumber] || {}
+  const status = getFinalStoryItemStatus(row)
 
-    html += `
-      <div class="finalAdminCard finalRound1NoImageCard" ${dimmed}>
-        <div class="finalAdminCardHead">
-          <h3>رقم ${i}</h3>
+  const missing = []
 
-          <div class="finalAdminCardHeadActions">
-            <div class="finalAdminTypeBadge">قصة</div>
+  if (!isAdminFieldFilled(row.question_part1)) missing.push("جزء 1")
+  if (!isAdminFieldFilled(row.question_part2)) missing.push("جزء 2")
+  if (!isAdminFieldFilled(row.question_part3)) missing.push("جزء 3")
+  if (!isAdminFieldFilled(row.answer)) missing.push("الإجابة")
 
-            <button class="adminDeleteBtn" onclick="clearFinalRound3StoryItem(${i})">
-              حذف
-            </button>
-          </div>
+  return `
+    <details class="adminEditItemCard finalStoryOnePageCard ${status.className}" ontoggle="handleAdminEditCardToggle(this)">
+      <summary>
+        <div class="adminEditItemTitle">
+          <strong>رقم ${n}</strong>
+          <span>
+            ${
+              status.isDone
+                ? "بيانات القصة مكتملة"
+                : `ناقص: ${missing.join("، ")}`
+            }
+          </span>
         </div>
 
-        <div class="finalRound1NoImageFields">
-          <div class="finalRound1PartsGrid">
-            <div class="adminField">
-              <label>جزء القصة 1</label>
-              <textarea
-                id="finalRound3StoryPart1_${i}"
-                placeholder="الجزء الأول"
-                ${disabled ? "disabled" : ""}
-              >${escapeHtml(row.question_part1 || "")}</textarea>
-            </div>
+        <div class="adminEditItemMeta">
+          <span class="adminEditStatusPill">${status.label}</span>
+          <span class="adminEditProgressPill">${status.progress}</span>
 
-            <div class="adminField">
-              <label>جزء القصة 2</label>
-              <textarea
-                id="finalRound3StoryPart2_${i}"
-                placeholder="الجزء الثاني"
-                ${disabled ? "disabled" : ""}
-              >${escapeHtml(row.question_part2 || "")}</textarea>
-            </div>
+          <button
+            type="button"
+            class="adminDeleteBtn finalStorySummaryDeleteBtn"
+            onclick="event.preventDefault(); event.stopPropagation(); clearFinalRound3StoryItem(${n});"
+          >
+            حذف
+          </button>
+        </div>
+      </summary>
 
-            <div class="adminField">
-              <label>جزء القصة 3</label>
-              <textarea
-                id="finalRound3StoryPart3_${i}"
-                placeholder="الجزء الثالث"
-                ${disabled ? "disabled" : ""}
-              >${escapeHtml(row.question_part3 || "")}</textarea>
-            </div>
+      <div class="adminEditItemBody">
+        <div class="finalStoryOnePageLayout">
+
+          <div class="adminField ${getAdminMissingFieldClass(row.question_part1)}">
+            <label>جزء القصة 1</label>
+            <textarea
+              id="finalRound3StoryPart1_${n}"
+              placeholder="الجزء الأول"
+            >${escapeHtml(row.question_part1 || "")}</textarea>
+
+            ${
+              !isAdminFieldFilled(row.question_part1)
+                ? `<div class="adminMissingHint">جزء القصة 1 ناقص</div>`
+                : ""
+            }
           </div>
 
-          <div class="adminField">
+          <div class="adminField ${getAdminMissingFieldClass(row.question_part2)}">
+            <label>جزء القصة 2</label>
+            <textarea
+              id="finalRound3StoryPart2_${n}"
+              placeholder="الجزء الثاني"
+            >${escapeHtml(row.question_part2 || "")}</textarea>
+
+            ${
+              !isAdminFieldFilled(row.question_part2)
+                ? `<div class="adminMissingHint">جزء القصة 2 ناقص</div>`
+                : ""
+            }
+          </div>
+
+          <div class="adminField ${getAdminMissingFieldClass(row.question_part3)}">
+            <label>جزء القصة 3</label>
+            <textarea
+              id="finalRound3StoryPart3_${n}"
+              placeholder="الجزء الثالث"
+            >${escapeHtml(row.question_part3 || "")}</textarea>
+
+            ${
+              !isAdminFieldFilled(row.question_part3)
+                ? `<div class="adminMissingHint">جزء القصة 3 ناقص</div>`
+                : ""
+            }
+          </div>
+
+          <div class="adminField finalStoryAnswerBox ${getAdminMissingFieldClass(row.answer)}">
             <label>الإجابة</label>
-            <input
-              id="finalRound3StoryAnswer_${i}"
+            <textarea
+              id="finalRound3StoryAnswer_${n}"
               placeholder="الإجابة"
-              value="${escapeHtml(row.answer || "")}"
-              ${disabled ? "disabled" : ""}
-            >
+            >${escapeHtml(row.answer || "")}</textarea>
+
+            ${
+              !isAdminFieldFilled(row.answer)
+                ? `<div class="adminMissingHint">الإجابة ناقصة</div>`
+                : ""
+            }
           </div>
+
         </div>
       </div>
-    `
-  }
-
-  html += `</div>`
-  return html
+    </details>
+  `
 }
 
 async function saveFinalRound3Story(skipSavingLock = false) {
@@ -5613,17 +6535,12 @@ async function saveFinalRound3Story(skipSavingLock = false) {
       setAdminSaving(true, "جارٍ حفظ قصة...")
     }
 
-    const selectedCount = Number(
-      document.getElementById("finalRound3Count")?.value ||
-      finalRound3AdminCount ||
-      4
-    )
+  const safeCount = normalizeAdminSegmentCount(
+  "finalRound3",
+  Number(finalRound3AdminCount || await getAdminSegmentCount("finalRound3"))
+)
 
-    const safeCount = normalizeAdminSegmentCount("finalRound3", selectedCount)
-    finalRound3AdminCount = safeCount
-
-    await saveAdminSegmentCount("finalRound3", safeCount)
-    updateAdminQuickSettingUI("finalRound3", safeCount)
+finalRound3AdminCount = safeCount
 
     const rows = []
 
@@ -5750,6 +6667,21 @@ async function clearFinalRound3StoryItem(number) {
    28) Final Round 4 - التركيز
 ========================= */
 
+function getFinalFocusItemStatus(row = {}) {
+  const hasMedia =
+    isAdminFieldFilled(row.image) ||
+    isAdminFieldFilled(row.video)
+
+  const fields = [
+    hasMedia ? "media" : "",
+    row.question,
+    row.answer
+  ]
+
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
+}
+
 async function buildFinalRound3FocusAdmin() {
   const count = await getAdminSegmentCount("finalRound4")
 
@@ -5775,89 +6707,132 @@ async function buildFinalRound3FocusAdmin() {
     }
   })
 
-  let html = `
-    <div class="finalAdminRound3TeamMediaWrap">
-      <div class="finalAdminGrid finalAdminGridRound1">
+  return `
+    <div class="adminEditCardsGrid finalFocusOnePageGrid">
+      ${Array.from({ length: count }, (_, idx) => {
+        const number = idx + 1
+        return buildFinalFocusOnePageCard(number, map)
+      }).join("")}
+    </div>
   `
+}
 
-  for (let number = 1; number <= 8; number++) {
-    const row = map[number] || {}
-    const disabled = number > count
-    const dimmed = disabled ? 'style="opacity:.38;"' : ""
+function buildFinalFocusOnePageCard(number, map = {}) {
+  const n = Number(number || 1)
+  const row = map[n] || {}
+  const status = getFinalFocusItemStatus(row)
 
-    html += `
-      <div class="finalAdminCard finalRound1AdminCard" ${dimmed}>
-        <div class="finalAdminCardHead">
-          <h3>رقم ${number}</h3>
+  const hasMedia =
+    isAdminFieldFilled(row.image) ||
+    isAdminFieldFilled(row.video)
 
-          <button class="adminDeleteBtn" onclick="clearFinalRound3Item(${number})">
+  const missing = []
+
+  if (!hasMedia) missing.push("الصورة أو الفيديو")
+  if (!isAdminFieldFilled(row.question)) missing.push("السؤال")
+  if (!isAdminFieldFilled(row.answer)) missing.push("الإجابة")
+
+  return `
+    <details class="adminEditItemCard finalFocusOnePageCard ${status.className}" ontoggle="handleAdminEditCardToggle(this)">
+      <summary>
+        <div class="adminEditItemTitle">
+          <strong>رقم ${n}</strong>
+          <span>
+            ${
+              status.isDone
+                ? "بيانات الرقم مكتملة"
+                : `ناقص: ${missing.join("، ")}`
+            }
+          </span>
+        </div>
+
+        <div class="adminEditItemMeta">
+          <span class="adminEditStatusPill">${status.label}</span>
+          <span class="adminEditProgressPill">${status.progress}</span>
+
+          <button
+            type="button"
+            class="adminDeleteBtn finalFocusSummaryDeleteBtn"
+            onclick="event.preventDefault(); event.stopPropagation(); clearFinalRound3Item(${n});"
+          >
             حذف
           </button>
         </div>
+      </summary>
 
-        <div class="finalAdminRowSingle finalAdminRound1Fields">
-          <div class="adminField">
-            <label>الصورة</label>
-            <input
-              type="file"
-              id="finalRound3TeamImage_${number}"
-              accept="image/*"
-              ${disabled ? "disabled" : ""}
-            >
+      <div class="adminEditItemBody">
+        <div class="finalFocusOnePageLayout">
+
+          <div class="finalFocusMediaBox">
+            <div class="adminField ${hasMedia ? "" : "adminMissingField"}">
+              <label>الصورة</label>
+              <input
+                type="file"
+                id="finalRound3TeamImage_${n}"
+                accept="image/*"
+              >
+            </div>
+
+            <div class="adminField ${hasMedia ? "" : "adminMissingField"}">
+              <label>الفيديو</label>
+              <input
+                type="file"
+                id="finalRound3TeamVideo_${n}"
+                accept="video/*"
+              >
+            </div>
+
+            ${
+              !hasMedia
+                ? `<div class="adminMissingHint">الصورة أو الفيديو مطلوب</div>`
+                : ""
+            }
+
+            <div class="finalAdminPreviewBox">
+              ${
+                row.video
+                  ? `<video src="${escapeHtml(row.video)}" class="previewImg" controls></video>`
+                  : row.image
+                    ? `<img src="${escapeHtml(row.image)}" class="previewImg">`
+                    : `<div class="emptyImageHint">لا توجد صورة أو فيديو</div>`
+              }
+            </div>
           </div>
 
-          <div class="adminField">
-            <label>الفيديو</label>
-            <input
-              type="file"
-              id="finalRound3TeamVideo_${number}"
-              accept="video/*"
-              ${disabled ? "disabled" : ""}
-            >
+          <div class="finalFocusTextBox">
+            <div class="adminField ${getAdminMissingFieldClass(row.question)}">
+              <label>السؤال</label>
+              <textarea
+                id="finalRound3TeamQuestion_${n}"
+                placeholder="اكتب السؤال"
+              >${escapeHtml(row.question || "")}</textarea>
+
+              ${
+                !isAdminFieldFilled(row.question)
+                  ? `<div class="adminMissingHint">السؤال ناقص</div>`
+                  : ""
+              }
+            </div>
+
+            <div class="adminField ${getAdminMissingFieldClass(row.answer)}">
+              <label>الإجابة</label>
+              <textarea
+                id="finalRound3TeamAnswer_${n}"
+                placeholder="الإجابة"
+              >${escapeHtml(row.answer || "")}</textarea>
+
+              ${
+                !isAdminFieldFilled(row.answer)
+                  ? `<div class="adminMissingHint">الإجابة ناقصة</div>`
+                  : ""
+              }
+            </div>
           </div>
 
-          <div class="adminField">
-            <label>الإجابة</label>
-            <input
-              id="finalRound3TeamAnswer_${number}"
-              placeholder="الإجابة"
-              value="${escapeHtml(row.answer || "")}"
-              ${disabled ? "disabled" : ""}
-            >
-          </div>
-        </div>
-
-        <div class="finalAdminRowSingle finalAdminRowSingleText">
-          <div class="adminField finalTextCardField">
-            <label>السؤال</label>
-            <textarea
-              id="finalRound3TeamQuestion_${number}"
-              placeholder="اكتب السؤال"
-              rows="3"
-              ${disabled ? "disabled" : ""}
-            >${escapeHtml(row.question || "")}</textarea>
-          </div>
-        </div>
-
-        <div class="finalAdminPreviewBox">
-          ${
-            row.video
-              ? `<video src="${escapeHtml(row.video)}" class="previewImg" controls></video>`
-              : row.image
-                ? `<img src="${escapeHtml(row.image)}" class="previewImg">`
-                : `<div class="emptyImageHint">لا توجد صورة أو فيديو</div>`
-          }
         </div>
       </div>
-    `
-  }
-
-  html += `
-      </div>
-    </div>
+    </details>
   `
-
-  return html
 }
 
 async function saveFinalRound3Focus(skipSavingLock = false) {
@@ -5873,17 +6848,12 @@ async function saveFinalRound3Focus(skipSavingLock = false) {
       setAdminSaving(true, "جارٍ حفظ التركيز...")
     }
 
-    const selectedCount = Number(
-     document.getElementById("finalRound4Count")?.value ||
-     finalRound4AdminCount ||
-     4
-   )
+    const safeCount = normalizeAdminSegmentCount(
+  "finalRound4",
+  Number(finalRound4AdminCount || await getAdminSegmentCount("finalRound4"))
+)
 
-   const safeCount = normalizeAdminSegmentCount("finalRound4", selectedCount)
-    finalRound4AdminCount = safeCount
-
-      await saveAdminSegmentCount("finalRound4", safeCount)
-      updateAdminQuickSettingUI("finalRound4", safeCount)
+finalRound4AdminCount = safeCount
 
     const { data: oldRows, error: oldError } = await db
       .from("final_round3_items")
@@ -6445,9 +7415,6 @@ async function clearFinalRound4Item(displayNumber) {
   await renderFinalAdminRound(2)
   await renderAdminTabsUnified()
 }
-/* =========================================================
-   PART 5: ARCHIVE
-========================================================= */
 
 /* =========================
    30) Archive Draft Helpers
@@ -6528,6 +7495,38 @@ function isArchiveRoundComplete(box, items = []) {
 
   return true
 }
+function getArchiveRoundStatus(box, items = []) {
+  const fields = []
+
+  fields.push(box?.tournament || "")
+  fields.push(box?.season || "")
+  fields.push(box?.score || "")
+
+  const map = {}
+
+  ;(items || []).forEach(item => {
+    map[Number(item.position)] = item
+  })
+
+  fields.push(map[3]?.image || "")
+  fields.push(map[4]?.image || "")
+
+  const textItems = (items || []).filter(item => Number(item.position) >= ARCHIVE_TEXT_START_POSITION)
+
+  if (!textItems.length) {
+    fields.push("")
+  } else {
+    textItems.forEach(item => {
+      fields.push(item.text || "")
+    })
+
+    const hasRequired = textItems.some(item => String(item.label || "").trim() === "المطلوب")
+    fields.push(hasRequired ? "required" : "")
+  }
+
+  const completed = fields.filter(isAdminFieldFilled).length
+  return getAdminItemStatus(completed, fields.length)
+}
 
 async function getArchiveDoneMap() {
   const doneMap = {}
@@ -6592,7 +7591,7 @@ function renderArchiveAdminItem(position, item = {}) {
   const hasTextValue = String(mergedItem.text || "").trim() !== ""
 
   return `
-    <div class="archiveAdminItem archiveAdminItemCompact ${isRequired ? "archiveAdminItemRequired" : ""}">
+    <div class="archiveAdminItem archiveAdminItemCompact ${isRequired ? "archiveAdminItemRequired" : ""} ${hasTextValue ? "isDone" : "isMissing"}">
       <div class="archiveAdminItemHead">
         <div class="archiveAdminItemTitleWrap">
           <div class="archiveAdminItemTitle">العنصر ${position}</div>
@@ -6647,7 +7646,7 @@ function renderArchiveAdminItem(position, item = {}) {
 
         <textarea
           id="archiveItemText_${position}"
-          class="${hasTextValue ? "hasValue" : ""}"
+          class="${hasTextValue ? "hasValue" : ""} ${hasTextValue ? "" : "adminMissingField"}"
           placeholder="النص الذي سيظهر داخل البطاقة"
         >${escapeHtml(mergedItem.text || "")}</textarea>
       </div>
@@ -6673,38 +7672,165 @@ async function renderArchiveAdmin() {
   await renderArchiveAdminRound(1)
 }
 
+function openArchiveOnePageRound(round) {
+  if (Number(round) === Number(archiveAdminRound)) return
+
+  collectArchiveDraftState()
+
+  archiveAdminRound = Number(round || 1)
+  archivePendingExtraCount = 0
+  archiveDraftState = {}
+
+  renderArchiveAdminRound(archiveAdminRound)
+}
+
 async function renderArchiveAdminRound(round) {
   archiveAdminRound = Number(round || 1)
 
-  const { data: boxData, error: boxError } = await db
-    .from("archive_boxes")
-    .select("*")
-    .eq("model", Number(currentModel))
-    .eq("round", archiveAdminRound)
-    .limit(1)
+  const [boxesRes, itemsRes] = await Promise.all([
+    db
+      .from("archive_boxes")
+      .select("*")
+      .eq("model", Number(currentModel)),
 
-  const { data: itemsData, error: itemsError } = await db
-    .from("archive_items")
-    .select("*")
-    .eq("model", Number(currentModel))
-    .eq("round", archiveAdminRound)
-    .order("position", { ascending: true })
+    db
+      .from("archive_items")
+      .select("*")
+      .eq("model", Number(currentModel))
+      .order("round", { ascending: true })
+      .order("position", { ascending: true })
+  ])
 
-  if (boxError || itemsError) {
-    console.log("LOAD ARCHIVE ERROR:", boxError || itemsError)
+  if (boxesRes.error || itemsRes.error) {
+    console.log("LOAD ARCHIVE ERROR:", boxesRes.error || itemsRes.error)
     showGameToast("تعذر تحميل الأرشيف")
     return
   }
 
-  const box = boxData?.[0] || null
-  const items = itemsData || []
+  const boxesMap = {}
+  const itemsByRound = {}
+
+  ;(boxesRes.data || []).forEach(box => {
+    boxesMap[Number(box.round)] = box
+  })
+
+  ;(itemsRes.data || []).forEach(item => {
+    const r = Number(item.round)
+
+    if (!itemsByRound[r]) itemsByRound[r] = []
+    itemsByRound[r].push(item)
+  })
+
+  const activeBox = boxesMap[archiveAdminRound] || null
+  const activeItems = itemsByRound[archiveAdminRound] || []
+
+  editor().innerHTML = `
+    <div class="archiveAdminShell archiveAdminCleanV2 adminOnePageEditor">
+
+      <div class="adminEditorTopBar archiveAdminTopBar adminEditorTopBarWithActions">
+        <div>
+          <h2 class="adminSectionTitle">الأرشيف</h2>
+          <p class="adminSectionHint">افتح الجولة التي تريد تعديلها فقط.</p>
+        </div>
+
+        <div class="adminInlineActions archiveInlineActions">
+          <button onclick="saveArchiveRoundNew()" class="adminSaveBtn">حفظ الجولة</button>
+          <button onclick="addArchiveTextBox()" class="adminBtnMango">إضافة عنصر</button>
+          <button onclick="removeArchiveTextBox()" class="adminBtnLight">حذف آخر عنصر</button>
+          <button onclick="deleteArchiveSegment(archiveAdminRound)" class="adminDeleteBtn">حذف الجولة</button>
+          <button onclick="deleteArchiveSegment()" class="adminDeleteAllBtn">حذف الأرشيف</button>
+        </div>
+      </div>
+
+      <div class="adminEditCardsGrid archiveOnePageGrid">
+        ${Array.from({ length: archiveAdminRoundsCount }, (_, idx) => {
+          const r = idx + 1
+          const box = boxesMap[r] || null
+          const items = itemsByRound[r] || []
+
+          return buildArchiveRoundOnePageCard(r, box, items, r === archiveAdminRound, activeBox, activeItems)
+        }).join("")}
+      </div>
+
+    </div>
+  `
+
+  normalizeAdminEditorCards()
+
+  const grid = document.querySelector(".archiveOnePageGrid")
+  if (grid) grid.classList.add("hasOpenCard")
+}
+
+function buildArchiveRoundOnePageCard(round, box, items = [], isActive = false, activeBox = null, activeItems = []) {
+  const status = getArchiveRoundStatus(box, items)
+
+  const missing = []
+
+  if (!isAdminFieldFilled(box?.tournament)) missing.push("البطولة")
+  if (!isAdminFieldFilled(box?.season)) missing.push("الموسم")
+  if (!isAdminFieldFilled(box?.score)) missing.push("النتيجة")
+
+  const map = {}
+  ;(items || []).forEach(item => {
+    map[Number(item.position)] = item
+  })
+
+  if (!isAdminFieldFilled(map[3]?.image)) missing.push("الصورة 3")
+  if (!isAdminFieldFilled(map[4]?.image)) missing.push("الصورة 4")
+
+  const textItems = (items || []).filter(item => Number(item.position) >= ARCHIVE_TEXT_START_POSITION)
+  const hasRequired = textItems.some(item => String(item.label || "").trim() === "المطلوب")
+
+  if (!hasRequired) missing.push("المطلوب")
+
+  return `
+    <details
+      class="adminEditItemCard archiveRoundOnePageCard ${status.className}"
+      ${isActive ? "open" : ""}
+      ontoggle="${isActive ? "handleAdminEditCardToggle(this)" : `if(this.open){event.preventDefault(); openArchiveOnePageRound(${round});}`}"
+    >
+      <summary>
+        <div class="adminEditItemTitle">
+          <strong>الجولة ${round}</strong>
+          <span>
+            ${
+              status.isDone
+                ? "بيانات الجولة مكتملة"
+                : `ناقص: ${missing.slice(0, 4).join("، ")}${missing.length > 4 ? "..." : ""}`
+            }
+          </span>
+        </div>
+
+        <div class="adminEditItemMeta">
+          <span class="adminEditStatusPill">${status.label}</span>
+          <span class="adminEditProgressPill">${status.progress}</span>
+
+          <button
+            type="button"
+            class="adminDeleteBtn archiveSummaryDeleteBtn"
+            onclick="event.preventDefault(); event.stopPropagation(); deleteArchiveSegment(${round});"
+          >
+            حذف
+          </button>
+        </div>
+      </summary>
+
+      ${
+        isActive
+          ? `<div class="adminEditItemBody">${buildArchiveActiveRoundBody(activeBox, activeItems)}</div>`
+          : ""
+      }
+    </details>
+  `
+}
+function buildArchiveActiveRoundBody(box, items = []) {
   const map = {}
 
-  items.forEach(item => {
+  ;(items || []).forEach(item => {
     map[Number(item.position)] = getArchiveDraftItem(Number(item.position), item)
   })
 
-  const savedTextPositions = items
+  const savedTextPositions = (items || [])
     .map(item => Number(item.position || 0))
     .filter(pos => pos >= ARCHIVE_TEXT_START_POSITION)
 
@@ -6749,183 +7875,113 @@ async function renderArchiveAdminRound(round) {
     })
     .sort((a, b) => a - b)
 
-  const archiveDoneMap = await getArchiveDoneMap()
+  return `
+    <div class="archiveAdminBoard archiveAdminBoardClean archiveAdminBoardV2 archiveOnePageBody">
 
-  editor().innerHTML = `
-    <div class="archiveAdminShell archiveAdminCleanV2">
-      <div class="adminEditorTopBar archiveAdminTopBar">
-        <div>
-          <h2 class="adminSectionTitle">الأرشيف</h2>
-        </div>
+      <div class="archiveMainInfoCard archiveOnePageInfoCard">
+        <div class="archiveMainInfoGrid">
+          <div class="adminField ${getAdminMissingFieldClass(archiveDraftState.__top?.text1 || map[1]?.text)}">
+            <label>البطولة</label>
+            <input
+              id="archiveItemText_1"
+              type="text"
+              placeholder="مثال: دوري أبطال أوروبا"
+              value="${escapeHtml(archiveDraftState.__top?.text1 || map[1]?.text || "")}"
+            >
+          </div>
 
-        <div class="archiveTopActions">
-          <button onclick="saveArchiveRoundNew()" class="adminSaveBtn">حفظ الجولة</button>
-          <button onclick="addArchiveTextBox()" class="adminBtnMango">إضافة عنصر</button>
-          <button onclick="removeArchiveTextBox()" class="adminBtnLight">حذف آخر عنصر</button>
-          <button onclick="deleteArchiveSegment(${archiveAdminRound})" class="adminDeleteBtn">حذف الجولة</button>
-          <button onclick="deleteArchiveSegment()" class="adminDeleteAllBtn">حذف الأرشيف</button>
+          <div class="adminField ${getAdminMissingFieldClass(archiveDraftState.__top?.text2 || map[2]?.text)}">
+            <label>الموسم</label>
+            <input
+              id="archiveItemText_2"
+              type="text"
+              placeholder="مثال: 2016 / 2017"
+              value="${escapeHtml(archiveDraftState.__top?.text2 || map[2]?.text || "")}"
+            >
+          </div>
+
+          <div class="adminField ${getAdminMissingFieldClass(archiveDraftState.__top?.score || box?.score)}">
+            <label>النتيجة</label>
+            <input
+              id="archiveScore"
+              type="text"
+              placeholder="مثال: 3 - 1"
+              value="${escapeHtml(archiveDraftState.__top?.score || box?.score || "")}"
+            >
+          </div>
         </div>
       </div>
 
-      ${await buildSegmentStatusGrid()}
+      <div class="archiveImagesRow archiveOnePageImagesRow">
 
-      <div class="archiveAdminControlBar">
-        <div class="archiveRoundsControl">
-          <div class="archiveRoundsInline">
-            <div class="compactCountSelectWrap">
-              <select id="archiveRoundsCountInput" class="compactCountSelect">
-                <option value="1" ${archiveAdminRoundsCount === 1 ? "selected" : ""}>1</option>
-                <option value="2" ${archiveAdminRoundsCount === 2 ? "selected" : ""}>2</option>
-                <option value="3" ${archiveAdminRoundsCount === 3 ? "selected" : ""}>3</option>
-                <option value="4" ${archiveAdminRoundsCount === 4 ? "selected" : ""}>4</option>
-              </select>
-            </div>
+        ${buildArchiveImageOnePageCard(4, map[4])}
+        ${buildArchiveImageOnePageCard(3, map[3])}
 
-            <button onclick="applyArchiveRoundsCount()" class="adminBtn adminBtnMango compactCountBtn">
-              حفظ
-            </button>
+      </div>
+
+      <div class="archiveAdminBottomGrid archiveAdminBottomGridClean archiveTextGroupsGrid archiveOnePageTextGroups">
+        <div class="archiveAdminBottomCol archiveTextGroup">
+          <div class="archiveAdminColumnTitle">
+            <span>تحت الصورة 4</span>
+            <small>${under4Positions.length} عناصر</small>
           </div>
+
+          ${under4Positions.map(pos => renderArchiveAdminItem(pos, map[pos])).join("")}
         </div>
 
-        <div class="archiveAdminRoundsBar cleanRoundsBar">
-          ${Array.from({ length: archiveAdminRoundsCount }, (_, i) => i + 1).map(r => {
-            const complete = !!archiveDoneMap[r]
+        <div class="archiveAdminBottomCol archiveTextGroup">
+          <div class="archiveAdminColumnTitle">
+            <span>تحت الصورة 3</span>
+            <small>${under3Positions.length} عناصر</small>
+          </div>
 
-            return `
-              <button
-                type="button"
-                class="
-                  ${archiveAdminRound === r ? "activeArchiveRoundBtn" : ""}
-                  ${complete ? "innerTabDone archiveRoundDone" : ""}
-                  ${archiveAdminRound === r && complete ? "archiveRoundActiveDone" : ""}
-                "
-                onclick="renderArchiveAdminRound(${r})"
-              >
-                الجولة ${r}
-              </button>
-            `
-          }).join("")}
+          ${under3Positions.map(pos => renderArchiveAdminItem(pos, map[pos])).join("")}
         </div>
       </div>
 
-      <div class="archiveAdminBoard archiveAdminBoardClean archiveAdminBoardV2">
-        <div class="archiveMainInfoCard">
-          <div class="archiveMainInfoHead">
-            <h3>بيانات الجولة</h3>
-            <span>البطولة / الموسم / النتيجة</span>
-          </div>
+    </div>
+  `
+}
 
-          <div class="archiveMainInfoGrid">
-            <div class="adminField">
-              <label>البطولة</label>
-              <input
-                id="archiveItemText_1"
-                type="text"
-                placeholder="مثال: دوري أبطال أوروبا"
-                value="${escapeHtml(archiveDraftState.__top?.text1 || map[1]?.text || "")}"
-              >
-            </div>
+function buildArchiveImageOnePageCard(position, item = {}) {
+  const hasImage = isAdminFieldFilled(item?.image)
 
-            <div class="adminField">
-              <label>الموسم</label>
-              <input
-                id="archiveItemText_2"
-                type="text"
-                placeholder="مثال: 2016 / 2017"
-                value="${escapeHtml(archiveDraftState.__top?.text2 || map[2]?.text || "")}"
-              >
-            </div>
+  return `
+    <div class="archiveImageCard archiveOnePageImageCard ${hasImage ? "isDone" : "isMissing"}">
+      <div class="archiveImageCardHead">
+        <h3>الصورة ${position}</h3>
 
-            <div class="adminField">
-              <label>النتيجة</label>
-              <input
-                id="archiveScore"
-                type="text"
-                placeholder="مثال: 3 - 1"
-                value="${escapeHtml(archiveDraftState.__top?.score || box?.score || "")}"
-              >
-            </div>
-          </div>
-        </div>
+        <button
+          type="button"
+          class="adminDeleteMiniBtn"
+          onclick="deleteArchiveItem(${archiveAdminRound}, ${position})"
+          ${hasImage ? "" : "disabled"}
+        >
+          حذف
+        </button>
+      </div>
 
-        <div class="archiveImagesRow">
-          <div class="archiveImageCard">
-            <div class="archiveImageCardHead">
-              <h3>الصورة 4</h3>
+      <div class="adminField ${hasImage ? "" : "adminMissingField"}">
+        <label>رفع الصورة</label>
+        <input id="archiveItemFile_${position}" type="file" accept="image/*">
+      </div>
 
-              <button
-                type="button"
-                class="adminDeleteMiniBtn"
-                onclick="deleteArchiveItem(${archiveAdminRound}, 4)"
-                ${map[4]?.image ? "" : "disabled"}
-              >
-                حذف
-              </button>
-            </div>
+      ${
+        !hasImage
+          ? `<div class="adminMissingHint">الصورة ${position} ناقصة</div>`
+          : ""
+      }
 
-            <input id="archiveItemFile_4" type="file" accept="image/*">
-
-            <div class="archiveImagePreviewBox">
-              ${
-                map[4]?.image
-                  ? `<img src="${escapeHtml(map[4].image)}" class="archiveAdminPreviewImg">`
-                  : `<div class="archiveNoImage">لا توجد صورة</div>`
-              }
-            </div>
-          </div>
-
-          <div class="archiveImageCard">
-            <div class="archiveImageCardHead">
-              <h3>الصورة 3</h3>
-
-              <button
-                type="button"
-                class="adminDeleteMiniBtn"
-                onclick="deleteArchiveItem(${archiveAdminRound}, 3)"
-                ${map[3]?.image ? "" : "disabled"}
-              >
-                حذف
-              </button>
-            </div>
-
-            <input id="archiveItemFile_3" type="file" accept="image/*">
-
-            <div class="archiveImagePreviewBox">
-              ${
-                map[3]?.image
-                  ? `<img src="${escapeHtml(map[3].image)}" class="archiveAdminPreviewImg">`
-                  : `<div class="archiveNoImage">لا توجد صورة</div>`
-              }
-            </div>
-          </div>
-        </div>
-
-        <div class="archiveAdminBottomGrid archiveAdminBottomGridClean archiveTextGroupsGrid">
-          <div class="archiveAdminBottomCol archiveTextGroup">
-            <div class="archiveAdminColumnTitle">
-              <span>تحت الصورة 4</span>
-              <small>${under4Positions.length} عناصر</small>
-            </div>
-
-            ${under4Positions.map(pos => renderArchiveAdminItem(pos, map[pos])).join("")}
-          </div>
-
-          <div class="archiveAdminBottomCol archiveTextGroup">
-            <div class="archiveAdminColumnTitle">
-              <span>تحت الصورة 3</span>
-              <small>${under3Positions.length} عناصر</small>
-            </div>
-
-            ${under3Positions.map(pos => renderArchiveAdminItem(pos, map[pos])).join("")}
-          </div>
-        </div>
+      <div class="archiveImagePreviewBox">
+        ${
+          hasImage
+            ? `<img src="${escapeHtml(item.image)}" class="archiveAdminPreviewImg">`
+            : `<div class="archiveNoImage">لا توجد صورة</div>`
+        }
       </div>
     </div>
   `
-
-  arrangeAdminInnerTabs()
 }
-
 /* =========================
    33) Archive Actions
 ========================= */
@@ -7304,3 +8360,85 @@ async function deleteArchiveSegment(round = null) {
     showGameToast("حدث خطأ أثناء حذف الأرشيف")
   }
 }
+
+async function openGlobalSegmentVisibilityPanel() {
+  const overlay = document.getElementById("globalSegmentVisibilityOverlay")
+  const grid = document.getElementById("globalSegmentVisibilityGrid")
+
+  if (!overlay || !grid) return
+
+  overlay.classList.remove("hidden")
+  grid.innerHTML = `<div class="adminEmptyState">جاري تحميل إعدادات الفقرات...</div>`
+
+  if (typeof loadGlobalSegmentVisibilityMap === "function") {
+    await loadGlobalSegmentVisibilityMap()
+  }
+
+  renderGlobalSegmentVisibilityGrid()
+}
+
+function closeGlobalSegmentVisibilityPanel() {
+  const overlay = document.getElementById("globalSegmentVisibilityOverlay")
+  if (overlay) overlay.classList.add("hidden")
+}
+
+function renderGlobalSegmentVisibilityGrid() {
+  const grid = document.getElementById("globalSegmentVisibilityGrid")
+  if (!grid) return
+
+  const map = globalSegmentVisibilityMap || {}
+
+  const sortedSegments = [
+    ...ALL_GAME_SEGMENTS.filter(segment => isAdminSegmentGloballyEnabled(segment.key, map)),
+    ...ALL_GAME_SEGMENTS.filter(segment => !isAdminSegmentGloballyEnabled(segment.key, map))
+  ]
+
+  grid.innerHTML = `
+    <div class="globalSegmentCardsGrid">
+      ${sortedSegments.map(segment => {
+        const enabled = isAdminSegmentGloballyEnabled(segment.key, map)
+        return buildGlobalSegmentToggleCard(segment, enabled)
+      }).join("")}
+    </div>
+  `
+}
+
+function buildGlobalSegmentToggleCard(segment, enabled) {
+  return `
+    <button
+      type="button"
+      class="globalSegmentToggleCard ${enabled ? "isEnabled" : "isDisabled"}"
+      onclick="toggleGlobalSegmentVisibilityFromGate('${segment.key}')"
+    >
+      <span class="globalSegmentToggleTitle">
+        ${escapeHtml(segment.title)}
+      </span>
+
+      <span class="globalSegmentToggleSwitch">
+        <span></span>
+      </span>
+    </button>
+  `
+}
+
+async function toggleGlobalSegmentVisibilityFromGate(segmentKey) {
+  const current = isAdminSegmentGloballyEnabled(segmentKey)
+  const next = !current
+
+  const saved = await setGlobalSegmentEnabled(segmentKey, next)
+  if (!saved) return
+
+  renderGlobalSegmentVisibilityGrid()
+
+  if (currentModel && typeof renderAdminHome === "function") {
+    await renderAdminHome()
+  }
+}
+
+window.openGlobalSegmentVisibilityPanel = openGlobalSegmentVisibilityPanel
+window.closeGlobalSegmentVisibilityPanel = closeGlobalSegmentVisibilityPanel
+window.toggleGlobalSegmentVisibilityFromGate = toggleGlobalSegmentVisibilityFromGate
+window.loadGlobalSegmentVisibilityMap = loadGlobalSegmentVisibilityMap
+window.isAdminSegmentGloballyEnabled = isAdminSegmentGloballyEnabled
+window.toggleAdminSegmentVisibility = toggleAdminSegmentVisibility
+window.setGlobalSegmentEnabled = setGlobalSegmentEnabled

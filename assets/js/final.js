@@ -1070,6 +1070,9 @@ function shuffleArabicWord(text) {
 
 function removeArabicDots(text = "") {
   return String(text)
+    .replace(/[أإآ]/g, "ا")
+    .replace(/ة/g, "ه")
+    .replace(/ئ/g, "ى")
     .replace(/ي/g, "ى")
     .replace(/[بتث]/g, "ٮ")
     .replace(/[جخ]/g, "ح")
@@ -2378,6 +2381,7 @@ function renderFinalRound2() {
 
   const isScramble = finalState.round2.currentType === "scramble"
   const isSequence = finalState.round2.currentType === "sequence"
+  const sequenceReady = isSequence && finalState.round2.sequenceWordsVisible
   const isImage = finalState.round2.currentType === "image"
 
   stage.innerHTML = `
@@ -2407,7 +2411,7 @@ function renderFinalRound2() {
   controls.innerHTML = `
     <button onclick="activateFinalDouble()" id="finalDoubleBtn" class="actionBtn finalDoubleBtn">دبل</button>
 
-    <button onclick="finalRound2DecreaseCountdown()" class="actionBtn btnStart" ${isSequence ? "" : "disabled"}>
+    <button onclick="finalRound2DecreaseCountdown()" class="actionBtn btnStart" ${sequenceReady ? "" : "disabled"}>
       ${isSequence ? finalState.round2.countdown : "العداد"}
     </button>
 
@@ -2419,7 +2423,7 @@ function renderFinalRound2() {
       تسجيل المبعثرة
     </button>
 
-    <button onclick="finalRound2RecordSequenceScore()" class="actionBtn btnCorrect" ${isSequence ? "" : "disabled"}>
+    <button onclick="finalRound2RecordSequenceScore()" class="actionBtn btnCorrect" ${sequenceReady ? "" : "disabled"}>
       ${isSequence ? `تسجيل الترتيب (${Number(finalState.round2.countdown || 0)})` : "تسجيل الترتيب"}
     </button>
 
@@ -2480,6 +2484,7 @@ async function openFinalRound2Card(number) {
   finalState.round2.opened.push(number)
   finalState.round2.pendingScore = true
   finalState.round2.answerShown = false
+  finalState.round2.sequenceWordsVisible = false
   finalState.round2.correctCount = 0
   finalState.round2.countdown = 15
   finalState.round2.currentRevealIndex = -1
@@ -2591,6 +2596,7 @@ function resetFinalRound2EmptyNumber(number, groupKey) {
   finalState.round2.opened = finalState.round2.opened.filter(n => Number(n) !== Number(number))
   finalState.round2.pendingScore = false
   finalState.round2.answerShown = false
+  finalState.round2.sequenceWordsVisible = false
   finalState.round2.correctCount = 0
   finalState.round2.countdown = 15
   finalState.round2.currentRevealIndex = -1
@@ -2722,6 +2728,17 @@ function renderFinalRound2ScrambleWords(box, showAnswers) {
   `
 }
 
+function showFinalRound2SequenceWords() {
+  if (finalState.round2.currentType !== "sequence") return
+  if (!finalState.round2.pendingScore) return
+  if (!finalState.round2.currentNumber) return
+
+  finalState.round2.sequenceWordsVisible = true
+
+  renderFinalRound2()
+  saveFinalState()
+}
+
 function renderFinalRound2SequenceWords(box) {
   const countdown = Number(finalState.round2.countdown || 0)
   const timerClass = countdown <= 5 ? "danger" : ""
@@ -2746,6 +2763,37 @@ function renderFinalRound2SequenceWords(box) {
     return
   }
 
+  if (!finalState.round2.sequenceWordsVisible) {
+    box.innerHTML = `
+      <div class="finalSequenceStageBox">
+
+        <div
+          class="finalSequenceTimerBadge ${timerClass}"
+          data-final-round2-countdown
+          onclick="showFinalRound2SequenceWords()"
+          style="cursor:pointer"
+        >
+          <span>إظهار الكلمات </span>
+        </div>
+
+        <div class="finalSequenceWordsWrap finalSequenceWordsReveal">
+          ${words.map((word, idx) => `
+            <button
+              class="finalSequenceWordBtn isHiddenWord"
+              data-round2-word-index="${idx}"
+              disabled
+              type="button"
+            >
+              —
+            </button>
+          `).join("")}
+        </div>
+
+      </div>
+    `
+    return
+  }
+
   const allHidden = words.every((_, idx) => {
     return finalState.round2.hiddenSequence.includes(idx)
   })
@@ -2753,6 +2801,7 @@ function renderFinalRound2SequenceWords(box) {
   if (allHidden) {
     box.innerHTML = `
       <div class="finalSequenceStageBox">
+
         <div class="finalSequenceTimerBadge ${timerClass}" data-final-round2-countdown>
           <span>المتبقي</span>
           <strong>${countdown}</strong>
@@ -2761,15 +2810,16 @@ function renderFinalRound2SequenceWords(box) {
         <div class="finalSequenceWordsWrap finalSequenceWordsDone">
           ${words.map((word, idx) => `
             <button
-  class="finalSequenceWordBtn isHiddenWord"
-  data-round2-word-index="${idx}"
-  disabled
-  type="button"
->
+              class="finalSequenceWordBtn isHiddenWord"
+              data-round2-word-index="${idx}"
+              disabled
+              type="button"
+            >
               ${escapeDisplayHtml(word)}
             </button>
           `).join("")}
         </div>
+
       </div>
     `
     return
@@ -2789,12 +2839,12 @@ function renderFinalRound2SequenceWords(box) {
 
           return `
             <button
-                class="finalSequenceWordBtn ${hidden ? "isHiddenWord" : ""}"
-                data-round2-word-index="${idx}"
-                ${hidden ? "disabled" : ""}
-                type="button"
-                onclick="${hidden ? "" : `hideFinalRound2SequenceWord(${idx})`}"
-                >
+              class="finalSequenceWordBtn ${hidden ? "isHiddenWord" : ""}"
+              data-round2-word-index="${idx}"
+              ${hidden ? "disabled" : ""}
+              type="button"
+              onclick="${hidden ? "" : `hideFinalRound2SequenceWord(${idx})`}"
+            >
               ${escapeDisplayHtml(word)}
             </button>
           `
@@ -3226,7 +3276,10 @@ function finalRound2RecordSequenceScore() {
     return
   }
 
-  
+  if (!finalState.round2.sequenceWordsVisible) {
+  showGameToast("أظهر الكلمات أولاً")
+  return
+}
 
   if (!team) {
     showGameToast("اختر الفريق أولاً")
@@ -3320,9 +3373,10 @@ function finalizeRound2Number() {
   finalState.round2.currentRevealIndex = -1
 
   finalState.round2.answerShown = false
-  finalState.round2.correctCount = 0
-  finalState.round2.countdown = 15
-  finalState.round2.hiddenSequence = []
+finalState.round2.sequenceWordsVisible = false
+finalState.round2.correctCount = 0
+finalState.round2.countdown = 15
+finalState.round2.hiddenSequence = []
   finalState.round2.selectedCorrectIndexes = []
 
   finalState.round2.images = []

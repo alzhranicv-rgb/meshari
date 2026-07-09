@@ -2,7 +2,11 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
 
   <title>الحنكة - لوحة الأسئلة</title>
 
@@ -17,6 +21,7 @@
 
   <!-- =========================
        PIN SCREEN
+       الرقم السري العام للأدمن
   ========================== -->
   <div id="adminPinScreen" class="adminPinScreen">
     <div class="adminPinCard">
@@ -60,281 +65,169 @@
   <div class="adminShellNew hidden" id="adminShellNew">
 
     <!-- =========================
-         TOP BAR
+         MODEL GATE
+         صفحة اختيار النموذج
     ========================== -->
-    <header class="adminTopHeader adminDashboardHeader">
+    <section id="adminModelGate" class="adminModelGate">
 
-      <div class="adminTopBrand">
-        <div class="adminTopLogo">الحنكة</div>
-        <div class="adminTopSub">لوحة إدارة الأسئلة والنماذج</div>
-      </div>
+      <div class="adminModelGateCard">
 
-      <div id="adminCurrentModelPill" class="adminCurrentModelPill">
-        <span class="adminCurrentModelLabel">النموذج الحالي</span>
-        <strong id="adminBrandCurrentModel">لم يتم اختيار نموذج</strong>
-      </div>
-
-      <div class="adminModelControls">
-
-        <div class="adminModelField">
-          <label for="modelName">نموذج جديد</label>
-          <input
-            id="modelName"
-            class="adminInput"
-            type="text"
-            placeholder="اسم النموذج"
-          >
+        <div class="adminModelGateHero">
+          <span>لوحة الأسئلة</span>
+          <h1>الحنكة</h1>
+          <p>
+            اختر نموذجًا للبدء، أو أنشئ نموذجًا جديدًا.
+            بعد فتح النموذج ستظهر لك لوحة الفقرات والتحرير.
+          </p>
         </div>
 
-        <div class="adminModelField">
-          <label for="modelsList">النماذج</label>
-          <select id="modelsList" class="adminSelect">
-            <option value="">اختر النموذج</option>
-          </select>
-        </div>
+        <div class="adminModelGatePanel">
 
-        <div class="adminModelActions">
+          <div class="adminModelGateField">
+            <label for="modelsList">النماذج المحفوظة</label>
+
+            <select id="modelsList" class="adminSelect">
+              <option value="">اختر النموذج</option>
+            </select>
+          </div>
+
+          <div class="adminModelGateActions">
+            <button
+              type="button"
+              class="adminModelPrimaryBtn"
+              onclick="openSelectedModel()"
+            >
+              فتح النموذج
+            </button>
+
+            <button
+              type="button"
+              class="adminModelSoftBtn"
+              onclick="renameSelectedModel()"
+            >
+              تعديل الاسم
+            </button>
+
+            <button
+              type="button"
+              class="adminModelDangerBtn"
+              onclick="deleteSelectedModel()"
+            >
+              حذف النموذج
+            </button>
+
+            <button
+  type="button"
+  class="adminModelActionBtn adminSegmentSettingsEntryBtn"
+  onclick="openGlobalSegmentVisibilityPanel()"
+>
+  إعدادات الفقرات
+</button>
+          </div>
+
+          <div class="adminModelCreateBox">
+            <div class="adminModelGateField">
+              <label for="modelName">إنشاء نموذج جديد</label>
+
+              <input
+                id="modelName"
+                class="adminInput"
+                type="text"
+                placeholder="اسم النموذج الجديد"
+              />
+            </div>
+
+            <button
+              type="button"
+              class="adminModelCreateBtn"
+              onclick="createModel()"
+            >
+              إنشاء نموذج
+            </button>
+          </div>
+
           <button
             type="button"
-            class="adminBtn adminBtnMango"
-            onclick="createModel()"
-          >
-            إنشاء
-          </button>
-
-          <button
-            type="button"
-            class="adminBtn adminBtnDark"
-            onclick="openSelectedModel()"
-          >
-            فتح
-          </button>
-
-          <button
-            type="button"
-            class="adminBtn adminBtnLight"
-            onclick="renameSelectedModel()"
-          >
-            تعديل
-          </button>
-
-          <button
-            type="button"
-            class="adminBtn adminBtnDanger"
-            onclick="deleteSelectedModel()"
-          >
-            حذف
-          </button>
-
-          <button
-            type="button"
-            class="adminBtn adminLogoutBtn"
+            class="adminModelLogoutBtn"
             onclick="logoutAdminPin()"
           >
-            خروج
+            خروج من الأدمن
           </button>
+
         </div>
 
       </div>
 
-    </header>
+    </section>
 
 
     <!-- =========================
-         MAIN AREA
+         WORKSPACE
+         صفحة التحرير بعد فتح النموذج
     ========================== -->
-    <main class="adminMainNew adminDashboardMain">
+    <section id="adminWorkspace" class="adminWorkspace hidden">
 
       <!-- =========================
-           QUICK SETTINGS
+           TOP BAR
       ========================== -->
-      <section id="adminQuickSettings" class="adminQuickSettings hidden">
+      <header class="adminTopHeader adminDashboardHeader">
 
-        <div class="adminSectionHead">
-          <div>
-            <h2>إعدادات الفقرات</h2>
-            <p>حدد عدد الأرقام لكل فقرة قبل كتابة الأسئلة</p>
-          </div>
-
-          <button
-            type="button"
-            class="adminBtn adminBtnDark"
-            onclick="loadAdminSegmentSettings()"
-          >
-            تحديث الإعدادات
-          </button>
+        <div class="adminTopBrand">
+          <div class="adminTopLogo">الحنكة</div>
+          <div class="adminTopSub">لوحة إدارة الأسئلة</div>
         </div>
 
-        <div class="adminSettingsGrid">
-
-          <!-- من هو -->
-          <div class="adminSettingCard" data-setting-card="who">
-            <div class="adminSettingTop">
-              <strong>من هو</strong>
-              <span id="adminSettingWhoValue">15</span>
-            </div>
-
-            <div class="adminSettingOptions">
-              <button type="button" onclick="setAdminSegmentCount('who', 10)">10</button>
-              <button type="button" onclick="setAdminSegmentCount('who', 12)">12</button>
-              <button type="button" onclick="setAdminSegmentCount('who', 15)">15</button>
-            </div>
-          </div>
-
-          <!-- ٮدوں ٮڡاط -->
-          <div class="adminSettingCard" data-setting-card="finalRound1">
-            <div class="adminSettingTop">
-              <strong>ٮدوں ٮڡاط</strong>
-              <span id="adminSettingFinalRound1Value">6</span>
-            </div>
-
-            <div class="adminSettingOptions">
-              <button type="button" onclick="setAdminSegmentCount('finalRound1', 6)">6</button>
-              <button type="button" onclick="setAdminSegmentCount('finalRound1', 8)">8</button>
-            </div>
-          </div>
-
-          <!-- اشرح الكلمة -->
-          <div class="adminSettingCard" data-setting-card="explain">
-            <div class="adminSettingTop">
-              <strong>اشرح الكلمة</strong>
-              <span id="adminSettingExplainValue">4</span>
-            </div>
-
-            <div class="adminSettingOptions">
-              <button type="button" onclick="setAdminSegmentCount('explain', 4)">4</button>
-              <button type="button" onclick="setAdminSegmentCount('explain', 6)">6</button>
-              <button type="button" onclick="setAdminSegmentCount('explain', 8)">8</button>
-            </div>
-          </div>
-
-          <!-- التركيز -->
-          <div class="adminSettingCard" data-setting-card="finalRound3">
-            <div class="adminSettingTop">
-              <strong>التركيز</strong>
-              <span id="adminSettingFinalRound3Value">4</span>
-            </div>
-
-            <div class="adminSettingOptions">
-              <button type="button" onclick="setAdminSegmentCount('finalRound3', 4)">4</button>
-              <button type="button" onclick="setAdminSegmentCount('finalRound3', 6)">6</button>
-              <button type="button" onclick="setAdminSegmentCount('finalRound3', 8)">8</button>
-            </div>
-          </div>
-
+        <div id="adminCurrentModelPill" class="adminCurrentModelPill">
+          <span class="adminCurrentModelLabel">النموذج الحالي</span>
+          <strong id="adminBrandCurrentModel">لم يتم اختيار نموذج</strong>
         </div>
 
-      </section>
+        <div id="adminWorkspaceActions" class="adminWorkspaceActions">
+  <button
+    type="button"
+    class="adminWorkspaceActionBtn primary"
+    onclick="openAdminSegmentSettings()"
+  >
+    إعدادات الفقرات
+  </button>
+
+  <button
+    type="button"
+    class="adminWorkspaceActionBtn"
+    onclick="checkCurrentModelReady()"
+  >
+    فحص النموذج
+  </button>
+
+  <button
+    type="button"
+    class="adminWorkspaceActionBtn exit"
+    onclick="exitCurrentModel()"
+  >
+    خروج
+  </button>
+</div>
+
+      </header>
 
 
       <!-- =========================
-           SEGMENT TABS
+           MAIN AREA
       ========================== -->
-      <nav id="adminTabs" class="adminTabsNew adminDashboardTabs hidden">
+      <main class="adminMainNew adminDashboardMain">
 
-        <button
-          type="button"
-          class="adminTabBtn"
-          data-admin-tab="warmup"
-          onclick="openAdminSegment('warmup')"
-        >
-          التسخين
-        </button>
+        <!-- مهم: لا تضيف أزرار هنا -->
+        <nav id="adminTabs" class="adminTabsNew adminDashboardTabs hidden"></nav>
 
-        <button
-          type="button"
-          class="adminTabBtn"
-          data-admin-tab="top10"
-          onclick="openAdminSegment('top10')"
-        >
-          Top 10
-        </button>
+        <section id="adminEditor" class="adminEditor adminDashboardEditor">
+          <div class="adminEmptyState">
+            افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها
+          </div>
+        </section>
 
-        <button
-          type="button"
-          class="adminTabBtn"
-          data-admin-tab="auction"
-          onclick="openAdminSegment('auction')"
-        >
-          فتبلة
-        </button>
+      </main>
 
-        <button
-          type="button"
-          class="adminTabBtn"
-          data-admin-tab="who"
-          onclick="openAdminSegment('who')"
-        >
-          من هو
-        </button>
-
-        <button
-          type="button"
-          class="adminTabBtn"
-          data-admin-tab="explain"
-          onclick="openAdminSegment('explain')"
-        >
-          اشرح الكلمة
-        </button>
-
-        <button
-          type="button"
-          class="adminTabBtn"
-          data-admin-tab="finalRound1"
-          onclick="openAdminSegment('finalRound1')"
-        >
-          ٮدوں ٮڡاط
-        </button>
-
-        <button
-          type="button"
-          class="adminTabBtn"
-          data-admin-tab="finalRound2"
-          onclick="openAdminSegment('finalRound2')"
-        >
-          صح صحلي
-        </button>
-
-        <button
-          type="button"
-          class="adminTabBtn"
-          data-admin-tab="finalRound3"
-          onclick="openAdminSegment('finalRound3')"
-        >
-          التركيز
-        </button>
-
-        <button
-          type="button"
-          class="adminTabBtn"
-          data-admin-tab="finalRound4"
-          onclick="openAdminSegment('finalRound4')"
-        >
-          اشرح الصورة
-        </button>
-
-        <button
-          type="button"
-          class="adminTabBtn"
-          data-admin-tab="archive"
-          onclick="openAdminSegment('archive')"
-        >
-          الأرشيف
-        </button>
-
-      </nav>
-
-
-      <!-- =========================
-           EDITOR
-      ========================== -->
-      <section id="adminEditor" class="adminEditor adminDashboardEditor">
-        <div class="adminEmptyState">
-          افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها
-        </div>
-      </section>
-
-    </main>
+    </section>
 
   </div>
 
@@ -361,7 +254,7 @@
 
 
   <!-- =========================
-       ADMIN PIN
+       ADMIN PIN SCRIPT
   ========================== -->
   <script>
     const ADMIN_PIN = "9900"
@@ -437,6 +330,29 @@
        ADMIN JS
   ========================== -->
   <script src="admin.js"></script>
+
+  <div id="globalSegmentVisibilityOverlay" class="globalSegmentVisibilityOverlay hidden">
+  <div class="globalSegmentVisibilityPanel">
+
+    <div class="globalSegmentVisibilityHead">
+      <div>
+        <h2>إعدادات الفقرات</h2>
+        <p>إظهار أو إخفاء الفقرات من اللعبة قبل الدخول للنموذج.</p>
+      </div>
+
+      <button
+        type="button"
+        class="globalSegmentCloseBtn"
+        onclick="closeGlobalSegmentVisibilityPanel()"
+      >
+        إغلاق
+      </button>
+    </div>
+
+    <div id="globalSegmentVisibilityGrid" class="globalSegmentVisibilityGrid"></div>
+
+  </div>
+</div>
 
 </body>
 </html>

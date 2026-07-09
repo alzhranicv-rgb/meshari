@@ -3648,3 +3648,916 @@ button:disabled {
     padding-bottom:138px !important;
   }
 }
+/* =========================
+   RANDOM CHALLENGE - PRESENTER MATCH
+========================= */
+
+.presenterRandomUnifiedLayout{
+  width:100%;
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:14px;
+  align-items:start;
+}
+
+.presenterRandomLeft,
+.presenterRandomRight{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.presenterRandomBoxesGrid{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterRandomBoxesGrid .presenterNumberBtn{
+  min-height:78px;
+  font-size:1.08rem;
+  line-height:1.2;
+  white-space:normal;
+}
+
+.presenterRandomActions{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterRandomActions .presenterBtn{
+  min-height:58px;
+}
+
+.presenterRandomTeamsBox .presenterTeams{
+  margin:0;
+}
+
+.presenterRandomStatusCard{
+  min-height:180px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.presenterRandomCurrentBox{
+  width:100%;
+  min-height:72px;
+  border-radius:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:#FFF4EC;
+  border:1px solid rgba(255,155,81,.36);
+  color:var(--admin-primary-dark, #FE7F2D);
+  font-size:1.75rem;
+  line-height:1.25;
+}
+
+.presenterRandomCurrentHint{
+  margin-top:12px;
+  color:#64748B;
+  font-size:1rem;
+  text-align:center;
+}
+
+.presenterRandomErrorsCard{
+  min-height:150px;
+}
+
+.presenterRandomErrors{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.presenterRandomErrors div{
+  min-height:74px;
+  border-radius:20px;
+  background:#F8FAFC;
+  border:1px solid rgba(213,218,223,.9);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.presenterRandomErrors div.active{
+  background:#FFF4EC;
+  border-color:rgba(255,155,81,.42);
+}
+
+.presenterRandomErrors span{
+  color:#64748B;
+  font-size:.95rem;
+}
+
+.presenterRandomErrors strong{
+  color:var(--admin-secondary, #24185E);
+  font-size:1.35rem;
+  font-weight:400;
+}
+
+@media (max-width:900px){
+  .presenterRandomUnifiedLayout{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width:520px){
+  .presenterRandomBoxesGrid,
+  .presenterRandomActions,
+  .presenterRandomErrors{
+    grid-template-columns:1fr;
+  }
+}
+/* =========================
+   RANDOM CHALLENGE - PRESENTER CLEAN
+========================= */
+
+.presenterRandomUnifiedLayout{
+  width:100%;
+  display:grid;
+  grid-template-columns:1.12fr .88fr;
+  gap:14px;
+  align-items:start;
+}
+
+.presenterRandomMain,
+.presenterRandomSide{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.presenterRandomBoxesGrid{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterRandomBoxesGrid .presenterNumberBtn{
+  min-height:92px;
+  font-size:1.12rem;
+  line-height:1.25;
+  white-space:normal;
+}
+
+.presenterRandomCurrentCard{
+  min-height:120px;
+}
+
+.presenterRandomCurrentBox{
+  width:100%;
+  min-height:72px;
+  border-radius:22px;
+  background:#FFF4EC;
+  border:1px solid rgba(255,155,81,.38);
+  color:var(--admin-primary-dark,#FE7F2D);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:1.7rem;
+}
+
+.presenterRandomActions{
+  width:100%;
+  display:grid;
+  gap:10px;
+}
+
+.presenterRandomActions.compact{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.presenterRandomActions.twoRows{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.presenterRandomActions .presenterBtn{
+  min-height:58px;
+}
+
+.presenterRandomAuctionTool{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 120px;
+  gap:10px;
+  align-items:center;
+}
+
+.presenterRandomAuctionInput{
+  width:100%;
+  min-height:64px;
+  border-radius:20px;
+  border:1px solid rgba(213,218,223,.95);
+  background:#F8FAFC;
+  color:var(--admin-secondary,#24185E);
+  font-family:"HanakaText",sans-serif;
+  font-size:1.25rem;
+  text-align:center;
+  outline:none;
+}
+
+.presenterRandomAuctionPoints{
+  min-height:64px;
+  border:0;
+  border-radius:20px;
+  background:linear-gradient(135deg,#FFB36B,#FE7F2D);
+  color:#fff;
+  font-family:"HanakaText",sans-serif;
+  font-size:1.8rem;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(254,127,45,.18);
+}
+
+.presenterRandomAuctionHint{
+  margin-top:10px;
+  text-align:center;
+  color:#64748B;
+  font-size:.95rem;
+}
+
+.presenterRandomKnowBoard{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 1.2fr 1fr;
+  gap:10px;
+  align-items:stretch;
+}
+
+.presenterRandomKnowTeam,
+.presenterRandomKnowCenter{
+  min-height:110px;
+  border-radius:24px;
+  background:#F8FAFC;
+  border:1px solid rgba(213,218,223,.9);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:8px;
+}
+
+.presenterRandomKnowTeam.active{
+  background:#FFF4EC;
+  border-color:rgba(255,155,81,.42);
+}
+
+.presenterRandomKnowTeam span,
+.presenterRandomKnowCenter div{
+  color:#64748B;
+  font-size:.95rem;
+}
+
+.presenterRandomKnowTeam strong{
+  color:var(--admin-secondary,#24185E);
+  font-size:1.45rem;
+  font-weight:400;
+}
+
+.presenterRandomKnowCenter strong{
+  color:var(--admin-primary-dark,#FE7F2D);
+  font-size:1.35rem;
+  font-weight:400;
+}
+
+.presenterRandomScoreCard{
+  min-height:300px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.presenterRandomScoreTitle{
+  text-align:center;
+  color:var(--admin-secondary,#24185E);
+  font-size:1.9rem;
+  margin:8px 0 14px;
+}
+
+.presenterRandomScoreTeams{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.presenterRandomScoreTeams div{
+  min-height:58px;
+  border-radius:18px;
+  background:#F8FAFC;
+  border:1px solid rgba(213,218,223,.9);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#64748B;
+}
+
+.presenterRandomScoreTeams div.active{
+  background:#FFF4EC;
+  color:var(--admin-primary-dark,#FE7F2D);
+  border-color:rgba(255,155,81,.42);
+}
+
+.presenterRandomScoreButtons{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterRandomScoreButtons .presenterBtn{
+  min-height:70px;
+  font-size:1.35rem;
+}
+
+.presenterRandomStatusCard{
+  min-height:170px;
+}
+
+.presenterRandomStatusText{
+  min-height:66px;
+  border-radius:20px;
+  background:#F8FAFC;
+  border:1px solid rgba(213,218,223,.9);
+  color:var(--admin-secondary,#24185E);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:1.35rem;
+}
+
+.presenterRandomStatusHint{
+  margin-top:10px;
+  text-align:center;
+  color:#64748B;
+  font-size:.95rem;
+}
+
+@media (max-width:900px){
+  .presenterRandomUnifiedLayout{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width:560px){
+  .presenterRandomBoxesGrid,
+  .presenterRandomActions.compact,
+  .presenterRandomActions.twoRows,
+  .presenterRandomKnowBoard,
+  .presenterRandomScoreTeams,
+  .presenterRandomScoreButtons{
+    grid-template-columns:1fr;
+  }
+
+  .presenterRandomAuctionTool{
+    grid-template-columns:1fr;
+  }
+}
+/* =========================================================
+   PRESENTER - RANDOM CHALLENGE / التحدي
+   صفحة المقدم
+========================================================= */
+
+.presenterRandomLayout{
+  width:100%;
+  min-height:calc(100vh - 140px);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding:8px 0 12px;
+}
+
+/* =========================
+   شاشة اختيار المربعات
+========================= */
+
+.presenterRandomChooseCard{
+  width:min(100%, 980px);
+  margin:0 auto;
+  padding:18px;
+}
+
+.presenterRandomChooseGrid{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:14px;
+}
+
+.presenterRandomChooseBtn{
+  min-height:150px;
+  border:1px solid rgba(255,255,255,.72);
+  border-radius:30px;
+  padding:18px 12px;
+  cursor:pointer;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  font-family:"HanakaText", sans-serif;
+  color:#24185E;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.56)),
+    radial-gradient(circle at 50% 0%, rgba(103,232,249,.24), transparent 55%);
+
+  box-shadow:
+    0 18px 38px rgba(36,24,94,.10),
+    inset 0 1px 0 rgba(255,255,255,.85);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease,
+    opacity .18s ease;
+}
+
+.presenterRandomChooseBtn span{
+  width:54px;
+  height:54px;
+  border-radius:20px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:1.35rem;
+  font-weight:900;
+  color:#fff;
+
+  background:linear-gradient(135deg, #FF9B51, #F97316);
+  box-shadow:0 12px 24px rgba(249,115,22,.24);
+}
+
+.presenterRandomChooseBtn strong{
+  font-size:1.15rem;
+  line-height:1.35;
+  font-weight:900;
+  text-align:center;
+}
+
+.presenterRandomChooseBtn:hover:not(:disabled){
+  transform:translateY(-3px);
+  box-shadow:
+    0 24px 48px rgba(36,24,94,.14),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.presenterRandomChooseBtn:disabled{
+  cursor:not-allowed;
+  opacity:.48;
+}
+
+.presenterRandomChooseBtn.presenterOpened{
+  background:
+    linear-gradient(180deg, rgba(241,245,249,.78), rgba(226,232,240,.68));
+  color:#64748B;
+}
+
+.presenterRandomChooseBtn.presenterOpened span{
+  background:linear-gradient(135deg, #94A3B8, #64748B);
+  box-shadow:none;
+}
+
+/* =========================
+   صفحة المربع بعد الاختيار
+========================= */
+
+.presenterRandomPage{
+  width:min(100%, 1120px);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:minmax(0, 1.45fr) minmax(260px, .72fr);
+  gap:14px;
+  align-items:stretch;
+}
+
+.presenterRandomContent,
+.presenterRandomSide{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.presenterRandomTeamsBox{
+  width:100%;
+}
+
+.presenterRandomTitleCard,
+.presenterRandomBoxCard{
+  padding:16px;
+}
+
+.presenterRandomCurrentBox{
+  min-height:74px;
+  border-radius:26px;
+  padding:14px 18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+  font-size:clamp(1.55rem, 3vw, 2.45rem);
+  font-weight:900;
+  color:#24185E;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.50)),
+    radial-gradient(circle at 50% 0%, rgba(255,155,81,.20), transparent 60%);
+
+  border:1px solid rgba(255,255,255,.74);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 16px 34px rgba(36,24,94,.10);
+}
+
+.presenterRandomSimpleText{
+  min-height:110px;
+  border-radius:26px;
+  padding:18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+  font-size:1.25rem;
+  font-weight:800;
+  line-height:1.7;
+  color:#334155;
+
+  background:rgba(255,255,255,.56);
+  border:1px solid rgba(255,255,255,.72);
+}
+
+/* =========================
+   المزاد داخل التحدي
+========================= */
+
+.presenterRandomAuctionTool{
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) 116px;
+  gap:12px;
+  align-items:center;
+}
+
+.presenterRandomAuctionInput{
+  width:100%;
+  height:78px;
+  border:1px solid rgba(255,255,255,.76);
+  border-radius:26px;
+  padding:0 18px;
+
+  font-family:"HanakaText", sans-serif;
+  font-size:1.35rem;
+  font-weight:900;
+  text-align:center;
+  color:#24185E;
+
+  background:rgba(255,255,255,.70);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    0 12px 28px rgba(36,24,94,.08);
+
+  outline:none;
+}
+
+.presenterRandomAuctionInput:focus{
+  border-color:rgba(255,155,81,.72);
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.16),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.presenterRandomAuctionPoints{
+  height:78px;
+  border:0;
+  border-radius:26px;
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-family:"HanakaText", sans-serif;
+  font-size:1.7rem;
+  font-weight:900;
+  color:#fff;
+
+  background:linear-gradient(135deg, #FF9B51, #F97316);
+  box-shadow:0 16px 30px rgba(249,115,22,.26);
+
+  transition:transform .16s ease, filter .16s ease;
+}
+
+.presenterRandomAuctionPoints:active{
+  transform:scale(.96);
+  filter:brightness(.97);
+}
+
+/* =========================
+   ماذا تعرف
+========================= */
+
+.presenterRandomKnowBoard{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:12px;
+}
+
+.presenterRandomKnowTeam{
+  min-height:92px;
+  border-radius:26px;
+  padding:14px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  text-align:center;
+  color:#334155;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.46));
+
+  border:1px solid rgba(255,255,255,.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.92),
+    0 12px 26px rgba(36,24,94,.08);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+}
+
+.presenterRandomKnowTeam span{
+  max-width:100%;
+  font-size:1rem;
+  font-weight:900;
+  line-height:1.35;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.presenterRandomKnowTeam strong{
+  font-size:1.45rem;
+  font-weight:900;
+  color:#24185E;
+}
+
+.presenterRandomKnowTeam.active{
+  transform:translateY(-2px);
+  border-color:rgba(255,155,81,.74);
+  box-shadow:
+    0 0 0 4px rgba(255,155,81,.16),
+    0 18px 34px rgba(249,115,22,.18),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+/* مؤقت ماذا تعرف */
+.presenterRandomBox3Timer{
+  width:min(100%, 220px);
+  min-height:86px;
+  margin:0 auto 14px;
+  border-radius:30px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:clamp(2.1rem, 5vw, 3.5rem);
+  font-weight:900;
+  color:#24185E;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.54)),
+    radial-gradient(circle at 50% 0%, rgba(103,232,249,.24), transparent 60%);
+
+  border:1px solid rgba(255,255,255,.78);
+  box-shadow:
+    0 18px 34px rgba(36,24,94,.10),
+    inset 0 1px 0 rgba(255,255,255,.92);
+}
+
+.presenterRandomBox3Timer.danger{
+  color:#E11D48;
+  border-color:rgba(225,29,72,.32);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,241,242,.70)),
+    radial-gradient(circle at 50% 0%, rgba(225,29,72,.20), transparent 65%);
+}
+
+/* =========================
+   تسجيل نقاط ماذا تعرف
+========================= */
+
+.presenterRandomScoreButtons{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:12px;
+}
+
+.presenterRandomScoreButtons .presenterBtn{
+  min-height:74px;
+  font-size:1.4rem;
+  font-weight:900;
+}
+
+/* =========================
+   أزرار التحكم أسفل
+========================= */
+
+.presenterRandomActionsArea{
+  width:min(100%, 1120px);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+  gap:10px;
+
+  padding:10px;
+  border-radius:28px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.34));
+
+  border:1px solid rgba(255,255,255,.66);
+  box-shadow:
+    0 14px 32px rgba(36,24,94,.08),
+    inset 0 1px 0 rgba(255,255,255,.82);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+
+.presenterRandomActionsArea .presenterBtn{
+  min-height:60px;
+  border-radius:22px;
+  font-size:1rem;
+  font-weight:900;
+}
+
+/* =========================
+   توافق التابلت والآيفون
+========================= */
+
+@media (max-width: 980px){
+  .presenterRandomLayout{
+    min-height:auto;
+    gap:12px;
+  }
+
+  .presenterRandomChooseGrid{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+
+  .presenterRandomChooseBtn{
+    min-height:128px;
+    border-radius:26px;
+  }
+
+  .presenterRandomPage{
+    grid-template-columns:1fr;
+  }
+
+  .presenterRandomSide{
+    order:-1;
+  }
+
+  .presenterRandomActionsArea{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px){
+  .presenterRandomLayout{
+    padding:6px 0 10px;
+    gap:10px;
+  }
+
+  .presenterRandomChooseCard{
+    padding:12px;
+  }
+
+  .presenterRandomChooseGrid{
+    gap:10px;
+  }
+
+  .presenterRandomChooseBtn{
+    min-height:112px;
+    border-radius:24px;
+    padding:12px 8px;
+  }
+
+  .presenterRandomChooseBtn span{
+    width:44px;
+    height:44px;
+    border-radius:16px;
+    font-size:1.1rem;
+  }
+
+  .presenterRandomChooseBtn strong{
+    font-size:.95rem;
+  }
+
+  .presenterRandomTitleCard,
+  .presenterRandomBoxCard{
+    padding:12px;
+  }
+
+  .presenterRandomCurrentBox{
+    min-height:62px;
+    border-radius:22px;
+    font-size:1.35rem;
+  }
+
+  .presenterRandomAuctionTool{
+    grid-template-columns:1fr 92px;
+    gap:8px;
+  }
+
+  .presenterRandomAuctionInput,
+  .presenterRandomAuctionPoints{
+    height:64px;
+    border-radius:22px;
+  }
+
+  .presenterRandomAuctionInput{
+    font-size:1.05rem;
+  }
+
+  .presenterRandomAuctionPoints{
+    font-size:1.35rem;
+  }
+
+  .presenterRandomKnowBoard{
+    gap:8px;
+  }
+
+  .presenterRandomKnowTeam{
+    min-height:78px;
+    border-radius:22px;
+    padding:10px;
+  }
+
+  .presenterRandomKnowTeam span{
+    font-size:.88rem;
+  }
+
+  .presenterRandomKnowTeam strong{
+    font-size:1.18rem;
+  }
+
+  .presenterRandomBox3Timer{
+    min-height:72px;
+    border-radius:24px;
+    margin-bottom:10px;
+  }
+
+  .presenterRandomActionsArea{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:8px;
+    padding:8px;
+    border-radius:24px;
+  }
+
+  .presenterRandomActionsArea .presenterBtn{
+    min-height:54px;
+    border-radius:20px;
+    font-size:.9rem;
+  }
+
+  .presenterRandomScoreButtons{
+    gap:8px;
+  }
+
+  .presenterRandomScoreButtons .presenterBtn{
+    min-height:62px;
+    font-size:1.2rem;
+  }
+}

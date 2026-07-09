@@ -83,12 +83,13 @@ const ALL_DISPLAY_SEGMENTS = [
   { key: "finalRound2", title: "صح صحلي", sort: 7 },
   { key: "finalRound3", title: "قصة", sort: 8 },
   { key: "finalRound4", title: "التركيز", sort: 9 },
-  { key: "archive", title: "الأرشيف", sort: 10 }
+  { key: "archive", title: "الأرشيف", sort: 10 },
+  { key: "randomChallenge", title: "التحدي", sort: 11 }
 ]
 
 let visibleDisplaySegments = ALL_DISPLAY_SEGMENTS.map(item => ({
   ...item,
-  is_visible: item.sort <= 10,
+  is_visible: item.sort <= 11,
   sort_order: item.sort
 }))
 
@@ -176,7 +177,8 @@ function defaultSegmentStatus() {
     finalRound3: item(),
     finalRound4: item(),
 
-    archive: item()
+    archive: item(),
+    randomChallenge: item()
   }
 }
 
@@ -263,6 +265,7 @@ async function syncDisplayStateToSession() {
       finalRound3: getSafeJson("final_state_v3"),
       finalRound4: getSafeJson("final_state_v3"),
       archive: getSafeJson("archive_state_v1"),
+      randomChallenge: getSafeJson("random_challenge_state_v1"),
       toast: window.lastDisplayToast || null
     }
 
@@ -655,19 +658,57 @@ async function loadDisplayCountForSegment(segmentKey) {
   }
 }
 
-async function loadVisibleSegmentsForDisplay() {
-  visibleDisplaySegments = ALL_DISPLAY_SEGMENTS.map(item => ({
-    ...item,
-    is_visible: item.sort <= 10,
-    sort_order: item.sort
-  }))
+/* =========================
+   Global Segment Visibility - Display
+   إخفاء الفقرات المعطلة عام من العرض
+========================= */
 
+async function loadDisplayGlobalSegmentVisibilityMap() {
+  const map = {}
+
+  try {
+    const { data, error } = await db
+      .from("global_segment_visibility")
+      .select("segment_key,is_enabled")
+
+    if (error) {
+      console.log("DISPLAY GLOBAL SEGMENT VISIBILITY ERROR:", error)
+      return map
+    }
+
+    ;(data || []).forEach(row => {
+      map[normalizeDisplaySegmentKey(row.segment_key)] = row.is_enabled !== false
+    })
+
+    return map
+  } catch (err) {
+    console.log("DISPLAY GLOBAL SEGMENT VISIBILITY CATCH:", err)
+    return map
+  }
+}
+
+function isDisplaySegmentGloballyEnabled(segmentKey, globalMap = {}) {
+  const key = normalizeDisplaySegmentKey(segmentKey)
+  return globalMap[key] !== false
+}
+
+async function loadVisibleSegmentsForDisplay() {
   const modelId = Number(
     localStorage.getItem("game_model") ||
     window.currentModel ||
     currentModel ||
     0
   )
+
+  const globalMap = await loadDisplayGlobalSegmentVisibilityMap()
+
+  visibleDisplaySegments = ALL_DISPLAY_SEGMENTS
+    .filter(item => isDisplaySegmentGloballyEnabled(item.key, globalMap))
+    .map(item => ({
+      ...item,
+      is_visible: item.sort <= 11,
+      sort_order: item.sort
+    }))
 
   if (!modelId) {
     return visibleDisplaySegments
@@ -684,33 +725,35 @@ async function loadVisibleSegmentsForDisplay() {
     return visibleDisplaySegments
   }
 
-  if (!data || !data.length) {
-    return visibleDisplaySegments
-  }
-
   const map = {}
 
   ALL_DISPLAY_SEGMENTS.forEach(item => {
-    map[item.key] = {
+    const key = normalizeDisplaySegmentKey(item.key)
+
+    if (!isDisplaySegmentGloballyEnabled(key, globalMap)) return
+
+    map[key] = {
       ...item,
-      is_visible: item.sort <= 10,
+      key,
+      is_visible: item.sort <= 11,
       sort_order: item.sort
     }
   })
 
-  data.forEach(row => {
-  const key = normalizeDisplaySegmentKey(row.segment_key)
+  ;(data || []).forEach(row => {
+    const key = normalizeDisplaySegmentKey(row.segment_key)
 
-  if (!map[key]) return
+    if (!map[key]) return
 
-  map[key] = {
-    ...map[key],
-    is_visible: !!row.is_visible,
-    sort_order: Number(row.sort_order || map[key].sort)
-  }
-})
+    map[key] = {
+      ...map[key],
+      is_visible: !!row.is_visible,
+      sort_order: Number(row.sort_order || map[key].sort)
+    }
+  })
 
   visibleDisplaySegments = Object.values(map)
+    .filter(item => item.is_visible)
     .sort((a, b) => {
       return Number(a.sort_order || a.sort) - Number(b.sort_order || b.sort)
     })
@@ -789,6 +832,7 @@ function getSegmentWinnerLabelIds(key) {
 
   if (key === "final") return ["segmentWinnerFinal", "winnerFinal"]
   if (key === "archive") return ["segmentWinnerArchive", "winnerArchive"]
+  if (key === "randomChallenge") return ["segmentWinnerRandomChallenge", "winnerRandomChallenge"]
 
   return [`segmentWinner_${key}`, `winner_${key}`]
 }
@@ -807,6 +851,7 @@ function getSegmentCardIds(key) {
 
   if (key === "final") return ["segmentCardFinal", "segmentFinal"]
   if (key === "archive") return ["segmentCardArchive", "segmentArchive"]
+  if (key === "randomChallenge") return ["segmentCardRandomChallenge", "segmentRandomChallenge"]
 
   return [`segmentCard_${key}`, `segment_${key}`]
 }
@@ -974,6 +1019,7 @@ function getSegmentArabicTitle(segmentKey) {
     finalRound3: "قصة",
     finalRound4: "التركيز",
     archive: "الأرشيف",
+    randomChallenge: "التحدي",
     final: "الفاصلة"
   }
 
@@ -1171,6 +1217,7 @@ function clearAllSegmentPlayStatesForNewSession() {
   localStorage.removeItem("final_state_v3")
 
   localStorage.removeItem("archive_state_v1")
+  localStorage.removeItem("random_challenge_state_v1")
 
   segmentStatus = defaultSegmentStatus()
 
@@ -1181,6 +1228,7 @@ function clearAllSegmentPlayStatesForNewSession() {
   window.explainState = null
   window.finalState = null
   window.archiveState = null
+  window.randomChallengeState = null
 }
 
 function resetDisplayStatesIfNewSession() {
@@ -1607,6 +1655,7 @@ async function endGameAndGoIntro() {
   localStorage.removeItem("final_state_v2")
   localStorage.removeItem("final_state_v3")
   localStorage.removeItem("archive_state_v1")
+localStorage.removeItem("random_challenge_state_v1")
 
   localStorage.removeItem("game_session_id")
   localStorage.removeItem("game_join_code")
@@ -1626,7 +1675,7 @@ function getVisibleDisplaySegments() {
   return visibleDisplaySegments
     .filter(item => item.is_visible)
     .sort((a, b) => Number(a.sort_order || a.sort) - Number(b.sort_order || b.sort))
-    .slice(0, 10)
+    .slice(0, 11)
 }
 
 function isSegmentVisibleOnDisplay(segmentKey) {
@@ -1657,6 +1706,7 @@ function getDisplaySegmentDomId(key) {
 
   if (key === "final") return "segmentFinal"
   if (key === "archive") return "segmentArchive"
+    if (key === "randomChallenge") return "segmentRandomChallenge"
 
   return `segment_${key}`
 }
@@ -1677,6 +1727,7 @@ function getDisplayWinnerDomId(key) {
 
   if (key === "final") return "winnerFinal"
   if (key === "archive") return "winnerArchive"
+    if (key === "randomChallenge") return "winnerRandomChallenge"
 
   return `winner_${key}`
 }
@@ -1785,6 +1836,18 @@ async function openSegmentPage(segmentKey, forcedRound = null) {
     updateSegmentCards()
     return
   }
+  if (isFinalAny) {
+  const targetFinalKey = getFinalSegmentKeyFromRound(
+    Number(forcedRound || getFinalRoundFromSegmentKey(segmentKey) || 1)
+  )
+
+  if (!isSegmentVisibleOnDisplay(targetFinalKey)) {
+    showGameToast("هذه الفقرة غير مفعلة في العرض")
+    renderVisibleSegmentsHome()
+    updateSegmentCards()
+    return
+  }
+}
 
   let finalRound = 0
   let lockKey = segmentKey
@@ -1833,6 +1896,7 @@ async function openSegmentPage(segmentKey, forcedRound = null) {
     if (segmentKey === "who") await window.renderWho()
     if (segmentKey === "explain") await window.renderExplain()
     if (segmentKey === "archive") await window.renderArchive()
+          if (segmentKey === "randomChallenge") await window.renderRandomChallenge()
 
     if (isFinalAny) {
       if (typeof window.renderFinal !== "function") {
@@ -2183,7 +2247,8 @@ function getCurrentSegmentKey() {
     document.querySelector(".whoWrap") ||
     document.querySelector(".explainWrap") ||
     document.querySelector(".finalWrapNew") ||
-    document.querySelector(".archiveWrap")
+    document.querySelector(".archiveWrap") ||
+    document.querySelector(".randomChallengeWrap")
 
   if (!segmentRoot) return null
 
@@ -2197,6 +2262,7 @@ function getCurrentSegmentKey() {
   if (segmentRoot.classList.contains("whoWrap")) return "who"
   if (segmentRoot.classList.contains("explainWrap")) return "explain"
   if (segmentRoot.classList.contains("archiveWrap")) return "archive"
+    if (segmentRoot.classList.contains("randomChallengeWrap")) return "randomChallenge"
 
   if (segmentRoot.classList.contains("finalWrapNew")) {
     return normalizeDisplaySegmentKey(localStorage.getItem("active_segment") || "finalRound1")
@@ -2278,6 +2344,14 @@ function isDisplaySegmentBusyBeforeEnd(segmentKey) {
       window.finalState?.round4?.teamMedia?.currentNumber
     )
   }
+if (segmentKey === "randomChallenge") {
+  const state = window.randomChallengeState || getSafeJson("random_challenge_state_v1")
+
+  return !!(
+    state?.pendingScore ||
+    state?.currentBox
+  )
+}
 
   return false
 }
@@ -2477,6 +2551,22 @@ if (segmentKey === "final") {
 
     return Number(window.archiveState.round || 1) >= maxRound
   }
+if (segmentKey === "randomChallenge") {
+  const state = window.randomChallengeState || getSafeJson("random_challenge_state_v1")
+  if (!state) return false
+
+  const hasFinishedBox =
+    !!state.box1?.finished ||
+    !!state.box2?.finished ||
+    !!state.box3?.finished ||
+    !!state.box4?.finished
+
+  const hasScores =
+    Number(state.scores?.A || 0) > 0 ||
+    Number(state.scores?.B || 0) > 0
+
+  return hasFinishedBox || hasScores
+}
 
   return false
 }
@@ -3398,7 +3488,8 @@ const FINAL_RESULTS_CONFIG = [
   { segmentKey: "finalRound3", cardKey: "final3", prefix: "Final3", title: "قصة" },
   { segmentKey: "finalRound4", cardKey: "final4", prefix: "Final4", title: "التركيز" },
 
-  { segmentKey: "archive", cardKey: "archive", prefix: "Archive", title: "الأرشيف" }
+  { segmentKey: "archive", cardKey: "archive", prefix: "Archive", title: "الأرشيف" },
+  { segmentKey: "randomChallenge", cardKey: "randomChallenge", prefix: "RandomChallenge", title: "التحدي" }
 ]
 
 function readResultJson(key) {
@@ -3437,7 +3528,8 @@ function getResultState() {
     who: window.whoState || readResultJson("who_state_v1") || {},
     explain: window.explainState || readResultJson("explain_state_v1") || {},
     final: window.finalState || readResultJson("final_state_v3") || {},
-    archive: window.archiveState || readResultJson("archive_state_v1") || {}
+    archive: window.archiveState || readResultJson("archive_state_v1") || {},
+    randomChallenge: window.randomChallengeState || readResultJson("random_challenge_state_v1") || {}
   }
 }
 
@@ -3483,6 +3575,7 @@ function getRealSegmentScores(segmentKey) {
   const who = unwrapResultState(s.who, "whoState")
   const explain = s.explain || {}
   const archive = unwrapResultState(s.archive, "archiveState")
+    const randomChallenge = unwrapResultState(s.randomChallenge, "randomChallengeState")
 
   let A = 0
   let B = 0
@@ -3546,6 +3639,11 @@ function getRealSegmentScores(segmentKey) {
   if (segmentKey === "archive") {
     A = getResultScore(archive, "A")
     B = getResultScore(archive, "B")
+  }
+
+    if (segmentKey === "randomChallenge") {
+    A = getResultScore(randomChallenge, "A")
+    B = getResultScore(randomChallenge, "B")
   }
 
   return { A, B }

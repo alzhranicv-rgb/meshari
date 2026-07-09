@@ -1,0 +1,3113 @@
+/* =========================================================
+   RANDOM CHALLENGE / التحدي العشوائي
+   CLEAN FINAL - MATCH WARMUP STYLE
+========================================================= */
+
+.randomChallengeWrap,
+.randomChallengeWrap *{
+  box-sizing:border-box;
+}
+
+.randomChallengeWrap{
+  --bg:#EAECF0;
+  --surface:#FFFFFF;
+  --soft:#F6F7F9;
+  --line:#D5DADF;
+
+  --primary:#FE7F2D;
+  --secondary:#233D4D;
+  --text:#151515;
+  --muted:#8793A0;
+
+  --btn-nav:#0A7C6E;
+  --btn-correct:#007F00;
+  --btn-wrong:#7F0000;
+  --btn-double:#00007F;
+  --btn-disabled:#D7DCE2;
+  --btn-disabled-text:#7B8792;
+
+  width:100%;
+  height:var(--app-height,100dvh);
+  min-height:var(--app-height,100dvh);
+  max-height:var(--app-height,100dvh);
+
+  padding:
+    calc(10px + env(safe-area-inset-top,0px))
+    calc(14px + env(safe-area-inset-right,0px))
+    calc(10px + env(safe-area-inset-bottom,0px))
+    calc(14px + env(safe-area-inset-left,0px));
+
+  display:grid;
+  grid-template-rows:138px minmax(0,1fr) 76px;
+  gap:10px;
+
+  overflow:hidden;
+  direction:rtl;
+
+  font-family:"HanakaText",sans-serif;
+  color:var(--text);
+  background:var(--bg);
+}
+
+.randomChallengeWrap button{
+  font-family:"HanakaText",sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.randomChallengeWrap h1,
+.randomChallengeWrap h2,
+.randomChallengeWrap h3{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-weight:400;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.randomHeader{
+  width:min(100%,1320px);
+  height:108px;
+  margin:30px auto 0;
+
+  display:grid;
+  grid-template-columns:92px minmax(250px,1fr) 140px minmax(250px,1fr) 92px;
+  align-items:center;
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:22px;
+}
+
+.randomHeaderBtn{
+  width:100%;
+  height:56px;
+  min-height:56px;
+
+  border:0;
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:var(--btn-nav);
+  color:#fff;
+
+  font-size:.9rem;
+  font-weight:900;
+  line-height:1;
+}
+
+.randomHeaderBtn.danger{
+  background:var(--btn-nav);
+}
+
+.randomHeaderBtn:disabled,
+.randomHeaderBtn.disabledEndBtn{
+  background:#B9C3C9;
+  color:#fff;
+  opacity:1;
+  cursor:not-allowed;
+}
+
+/* =========================
+   TEAMS
+========================= */
+
+.randomTeamCard{
+  min-width:0;
+  height:84px;
+  min-height:84px;
+
+  display:grid;
+  align-items:center;
+  gap:8px;
+
+  padding:7px;
+
+  cursor:pointer;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:19px;
+
+  overflow:hidden;
+}
+
+.randomTeamCard.teamA{
+  grid-template-columns:minmax(0,1fr) 62px;
+}
+
+.randomTeamCard.teamB{
+  grid-template-columns:62px minmax(0,1fr);
+}
+
+.randomTeamCard strong{
+  min-width:0;
+  height:62px;
+  min-height:62px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:4px 8px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:14px;
+
+  color:var(--text);
+  font-size:clamp(1.12rem,1.55vw,1.45rem);
+  line-height:1.18;
+  font-weight:900;
+  text-align:center;
+
+  white-space:normal;
+  overflow:visible;
+}
+
+.randomTeamCard b{
+  width:62px;
+  min-width:62px;
+  height:62px;
+  min-height:62px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:14px;
+
+  background:var(--secondary);
+  color:#fff;
+
+  font-size:1.3rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.randomTeamCard.active{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(254,127,45,.14);
+}
+
+.randomTeamCard.active b{
+  background:var(--primary);
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.randomTitleBox{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.randomTitleBox span{
+  display:none;
+}
+
+.randomTitleBox h1{
+  margin:0;
+
+  color:var(--secondary);
+  font-size:clamp(1.35rem,1.7vw,1.85rem);
+  line-height:1;
+  font-weight:900;
+  text-align:center;
+}
+
+/* =========================
+   MAIN STAGE
+========================= */
+
+.randomMainStage{
+  width:min(100%,1260px);
+  height:calc(100% - 58px);
+  min-height:0;
+  margin:58px auto 0;
+
+  display:flex;
+  align-items:start;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+.randomBoxesGrid{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  align-items:start;
+}
+
+.randomMainBox{
+  height:286px;
+  min-height:286px;
+
+  display:grid;
+  grid-template-rows:80px minmax(0,1fr) 44px;
+  align-items:center;
+  justify-items:center;
+  gap:8px;
+
+  padding:10px;
+
+  border:0;
+  border-radius:22px;
+
+  cursor:pointer;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+
+  color:var(--text);
+  overflow:hidden;
+}
+
+.randomMainBox span{
+  width:76px;
+  height:76px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:18px;
+
+  background:var(--primary);
+  color:#fff;
+
+  font-size:2.4rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.randomMainBox strong{
+  width:100%;
+
+  padding:12px 14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--secondary);
+  color:#fff;
+  border-radius:18px;
+
+  font-size:clamp(1.25rem,1.7vw,1.75rem);
+  line-height:1.16;
+  font-weight:400;
+  text-align:center;
+}
+
+.randomMainBox small{
+  color:var(--muted);
+  font-size:.95rem;
+  font-weight:900;
+  text-align:center;
+}
+
+.randomMainBox.locked{
+  opacity:.65;
+}
+
+.randomMainBox.locked span{
+  background:#B9C3C9;
+}
+
+/* =========================
+   BOX VIEW
+========================= */
+
+.randomBoxView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:88px minmax(0,1fr);
+  gap:12px;
+}
+
+.randomBoxTitle{
+  height:88px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:22px;
+}
+
+.randomBoxTitle span{
+  color:var(--muted);
+  font-size:.9rem;
+  font-weight:900;
+}
+
+.randomBoxTitle h2{
+  margin:0;
+  color:var(--secondary);
+  font-size:clamp(1.35rem,1.9vw,2rem);
+  line-height:1.1;
+  font-weight:900;
+  text-align:center;
+}
+
+.randomImagesDuel{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr);
+  align-items:center;
+  gap:12px;
+}
+
+.randomImageCard{
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:12px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:22px;
+
+  overflow:hidden;
+}
+
+.randomImageCard img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+.randomImageEmpty{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:18px;
+
+  color:var(--muted);
+  font-size:1.4rem;
+  font-weight:900;
+  text-align:center;
+}
+
+.randomVs{
+  width:82px;
+  height:82px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  margin:auto;
+  border-radius:18px;
+
+  background:var(--primary);
+  color:#fff;
+
+  font-size:1.55rem;
+  font-weight:900;
+}
+
+.randomPlaceholder{
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:22px;
+
+  color:var(--muted);
+  font-size:clamp(1.5rem,2.4vw,2.8rem);
+  font-weight:900;
+  text-align:center;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+
+.randomControlsBar{
+  width:min(100%,900px);
+  height:76px;
+  min-height:76px;
+  margin:0 auto;
+
+  display:grid;
+  
+  gap:12px;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:24px;
+
+  align-self:end;
+}
+
+.randomCtrlBtn{
+  width:100%;
+  height:52px;
+  min-height:52px;
+
+  border:0;
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:var(--btn-nav);
+  color:#fff;
+
+  font-size:.95rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.randomCtrlBtn.correct{
+  background:var(--btn-correct);
+}
+
+.randomCtrlBtn.wrong{
+  background:var(--btn-wrong);
+}
+
+.randomCtrlBtn.danger{
+  background:var(--secondary);
+}
+
+.randomCtrlBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+  opacity:1;
+  cursor:not-allowed;
+}
+
+/* =========================
+   TABLET LANDSCAPE
+========================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomChallengeWrap{
+    padding:10px;
+    grid-template-rows:90px minmax(0,1fr) 70px;
+    gap:8px;
+  }
+
+  .randomHeader{
+    height:84px;
+    margin-top:6px;
+
+    grid-template-columns:82px minmax(200px,1fr) 118px minmax(200px,1fr) 82px;
+    gap:8px;
+
+    padding:8px;
+    border-radius:19px;
+  }
+
+  .randomHeaderBtn{
+    height:50px;
+    min-height:50px;
+
+    border-radius:13px;
+
+    font-size:.78rem;
+  }
+
+  .randomTeamCard{
+    height:62px;
+    min-height:62px;
+
+    gap:6px;
+    padding:6px;
+
+    border-radius:16px;
+  }
+
+  .randomTeamCard.teamA{
+    grid-template-columns:minmax(0,1fr) 52px;
+  }
+
+  .randomTeamCard.teamB{
+    grid-template-columns:52px minmax(0,1fr);
+  }
+
+  .randomTeamCard strong{
+    height:46px;
+    min-height:46px;
+
+    padding:4px 8px;
+
+    border-radius:12px;
+    font-size:.82rem;
+    line-height:1.15;
+  }
+
+  .randomTeamCard b{
+    width:52px;
+    min-width:52px;
+    height:46px;
+    min-height:46px;
+
+    border-radius:12px;
+    font-size:1.12rem;
+  }
+
+  .randomTitleBox h1{
+    font-size:1.22rem;
+  }
+
+  .randomMainStage{
+    width:min(100%,1120px);
+    height:calc(100% - 58px);
+    margin-top:58px;
+  }
+
+  .randomBoxesGrid{
+    gap:8px;
+  }
+
+  .randomMainBox{
+    height:278px;
+    min-height:278px;
+
+    grid-template-rows:72px minmax(0,1fr) 38px;
+    gap:7px;
+
+    padding:8px;
+    border-radius:18px;
+  }
+
+  .randomMainBox span{
+    width:68px;
+    height:68px;
+
+    border-radius:15px;
+    font-size:2rem;
+  }
+
+  .randomMainBox strong{
+    border-radius:15px;
+    font-size:1.16rem;
+    line-height:1.13;
+  }
+
+  .randomMainBox small{
+    font-size:.78rem;
+  }
+
+  .randomControlsBar{
+    width:min(100%,820px);
+    height:70px;
+    min-height:70px;
+
+    padding:9px;
+    border-radius:22px;
+  }
+
+  .randomCtrlBtn{
+    height:48px;
+    min-height:48px;
+
+    border-radius:15px;
+    font-size:.82rem;
+  }
+}
+
+/* =========================
+   PHONE
+========================= */
+
+@media (max-width:767px){
+  .randomChallengeWrap{
+    max-height:none;
+    overflow:auto;
+
+    padding:
+      calc(8px + env(safe-area-inset-top,0px))
+      calc(8px + env(safe-area-inset-right,0px))
+      calc(8px + env(safe-area-inset-bottom,0px))
+      calc(8px + env(safe-area-inset-left,0px));
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .randomHeader{
+    height:auto;
+    min-height:0;
+
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+
+    padding:8px;
+    margin-top:0;
+  }
+
+  .randomTitleBox{
+    grid-column:1 / -1;
+    order:-1;
+  }
+
+  .randomTeamCard.teamA,
+  .randomTeamCard.teamB{
+    grid-template-columns:minmax(0,1fr) 52px;
+  }
+
+  .randomMainStage{
+    height:auto;
+    margin-top:0;
+    overflow:visible;
+  }
+
+  .randomBoxesGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+
+  .randomMainBox{
+    height:210px;
+    min-height:210px;
+  }
+
+  .randomImagesDuel{
+    grid-template-columns:1fr;
+  }
+
+  .randomControlsBar{
+    width:100%;
+    height:auto;
+    min-height:0;
+
+    grid-template-columns:1fr;
+  }
+}
+
+/* =========================
+   LARGE TV
+========================= */
+
+@media (min-width:1400px){
+  .randomChallengeWrap{
+    padding:22px 36px;
+    grid-template-rows:140px minmax(0,1fr) 86px;
+    gap:14px;
+  }
+
+  .randomHeader{
+    height:110px;
+    max-width:1500px;
+    margin-top:30px;
+
+    grid-template-columns:110px minmax(280px,1fr) 170px minmax(280px,1fr) 110px;
+  }
+
+  .randomHeaderBtn{
+    height:66px;
+    font-size:1.05rem;
+  }
+
+  .randomTeamCard{
+    height:84px;
+  }
+
+  .randomTeamCard.teamA{
+    grid-template-columns:minmax(0,1fr) 76px;
+  }
+
+  .randomTeamCard.teamB{
+    grid-template-columns:76px minmax(0,1fr);
+  }
+
+  .randomTeamCard b{
+    width:76px;
+    min-width:76px;
+    height:62px;
+    min-height:62px;
+
+    font-size:1.6rem;
+  }
+
+  .randomTeamCard strong{
+    height:62px;
+    font-size:1.25rem;
+  }
+
+  .randomMainStage{
+    max-width:1500px;
+    height:calc(100% - 58px);
+    margin-top:58px;
+  }
+
+  .randomMainBox{
+    height:310px;
+    min-height:310px;
+  }
+
+  .randomControlsBar{
+    max-width:1040px;
+    height:86px;
+    min-height:86px;
+  }
+
+  .randomCtrlBtn{
+    height:62px;
+    min-height:62px;
+  }
+}
+.randomStartBox{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.randomStartBtn{
+  width:min(100%,360px);
+  height:92px;
+
+  border:0;
+  border-radius:24px;
+
+  background:#FE7F2D;
+  color:#fff;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:2rem;
+  font-weight:900;
+
+  cursor:pointer;
+}
+
+.randomStartBtn:active{
+  transform:scale(.97);
+}
+.randomImagesDuel{
+  animation:randomDuelPop .18s ease;
+}
+
+.randomImageCard img{
+  will-change:contents;
+}
+
+@keyframes randomDuelPop{
+  from{
+    transform:scale(.985);
+    opacity:.82;
+  }
+
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+@keyframes randomImageSpinIn{
+  from{
+    transform:scale(.96);
+    filter:blur(2px);
+    opacity:.75;
+  }
+
+  to{
+    transform:scale(1);
+    filter:blur(0);
+    opacity:1;
+  }
+}
+.randomImageCard img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  transition:none !important;
+  animation:none !important;
+}
+.randomPointsChallenge{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:220px minmax(0,1fr) 220px;
+  gap:14px;
+  align-items:stretch;
+}
+
+.randomPointsTimer,
+.randomPointsResult,
+.randomPointsInputCard{
+  min-width:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  padding:16px;
+
+  background:#FFFFFF;
+  border:2px solid var(--line);
+  border-radius:24px;
+}
+
+.randomPointsTimer{
+  background:var(--secondary);
+  color:#fff;
+}
+
+.randomPointsTimer small,
+.randomPointsResult small{
+  font-size:1rem;
+  font-weight:900;
+}
+
+.randomPointsTimer strong{
+  color:#fff;
+  font-size:5rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.randomPointsResult{
+  background:var(--primary);
+  color:#fff;
+}
+
+.randomPointsResult strong{
+  color:#fff;
+  font-size:5rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.randomPointsInputCard label{
+  color:var(--secondary);
+  font-size:1.45rem;
+  font-weight:900;
+}
+
+.randomPointsInputCard input{
+  width:min(100%,360px);
+  height:86px;
+
+  border:2px solid var(--line);
+  border-radius:22px;
+
+  background:var(--soft);
+  color:var(--text);
+
+  font-family:"HanakaText",sans-serif;
+  font-size:2.4rem;
+  font-weight:900;
+  text-align:center;
+
+  outline:none;
+}
+
+.randomPointsInputCard input:focus{
+  border-color:var(--primary);
+}
+
+.randomPointsInputCard p{
+  margin:0;
+
+  color:var(--muted);
+  font-size:1rem;
+  font-weight:900;
+}
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomPointsChallenge{
+    grid-template-columns:170px minmax(0,1fr) 170px;
+    gap:10px;
+  }
+
+  .randomPointsTimer strong,
+  .randomPointsResult strong{
+    font-size:3.4rem;
+  }
+
+  .randomPointsInputCard input{
+    height:68px;
+    font-size:2rem;
+  }
+}
+
+@media (max-width:767px){
+  .randomPointsChallenge{
+    grid-template-columns:1fr;
+  }
+}
+.randomSpeedChallenge{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 220px minmax(0,1fr);
+  gap:14px;
+  align-items:stretch;
+}
+
+.randomSpeedTeam,
+.randomSpeedCenter{
+  min-width:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
+  padding:18px;
+
+  background:#FFFFFF;
+  border:2px solid var(--line);
+  border-radius:24px;
+}
+
+.randomSpeedTeam small,
+.randomSpeedCenter small{
+  color:var(--muted);
+  font-size:1rem;
+  font-weight:900;
+}
+
+.randomSpeedTeam strong{
+  width:100%;
+
+  color:var(--secondary);
+  font-size:clamp(1.5rem,2.4vw,2.8rem);
+  line-height:1.15;
+  font-weight:900;
+  text-align:center;
+}
+
+.randomSpeedTeam.active{
+  border-color:var(--primary);
+  box-shadow:0 0 0 5px rgba(254,127,45,.16);
+}
+
+.randomSpeedCenter{
+  background:var(--secondary);
+  color:#fff;
+}
+
+.randomSpeedCenter small{
+  color:#fff;
+}
+
+.randomSpeedCenter strong{
+  color:#fff;
+  font-size:5rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.randomSpeedErrors{
+  display:flex;
+  gap:8px;
+}
+
+.randomSpeedErrors span{
+  width:44px;
+  height:44px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:14px;
+
+  background:rgba(255,255,255,.18);
+  color:#fff;
+
+  font-size:2rem;
+  font-weight:900;
+}
+
+.randomSpeedErrors span.used{
+  background:#7F0000;
+}
+
+.randomSpeedPoints{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:22px;
+
+  padding:22px;
+
+  background:#FFFFFF;
+  border:2px solid var(--line);
+  border-radius:24px;
+}
+
+.randomSpeedPoints h3{
+  margin:0;
+
+  color:var(--secondary);
+  font-size:2rem;
+  font-weight:900;
+}
+
+.randomSpeedPointsBtns{
+  width:min(100%,620px);
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+
+.randomSpeedPointsBtns button{
+  height:100px;
+
+  border:0;
+  border-radius:24px;
+
+  background:var(--primary);
+  color:#fff;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:3rem;
+  font-weight:900;
+
+  cursor:pointer;
+}
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomSpeedChallenge{
+    grid-template-columns:minmax(0,1fr) 170px minmax(0,1fr);
+    gap:10px;
+  }
+
+  .randomSpeedCenter strong{
+    font-size:3.6rem;
+  }
+
+  .randomSpeedErrors span{
+    width:36px;
+    height:36px;
+    font-size:1.55rem;
+  }
+
+  .randomSpeedPointsBtns button{
+    height:76px;
+    font-size:2.3rem;
+  }
+}
+
+@media (max-width:767px){
+  .randomSpeedChallenge{
+    grid-template-columns:1fr;
+  }
+
+  .randomSpeedPointsBtns{
+    grid-template-columns:1fr;
+  }
+}
+
+/* =========================
+   SMART CONTROL COLUMNS
+========================= */
+
+.randomControlsBar.cols4{
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+}
+
+.randomControlsBar.cols5{
+  width:min(100%,1040px) !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+}
+
+/* iPad / Tablet */
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomControlsBar.cols5{
+    width:min(100%,960px) !important;
+  }
+
+  .randomControlsBar.cols5 .randomCtrlBtn{
+    font-size:.76rem !important;
+  }
+}
+
+/* Phone */
+@media (max-width:767px){
+  .randomControlsBar.cols4,
+  .randomControlsBar.cols5{
+    grid-template-columns:1fr !important;
+    width:100% !important;
+  }
+}
+.randomTeamErrors{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+}
+
+.randomTeamErrors span{
+  width:44px;
+  height:44px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:14px;
+
+  background:#DCE2E8;
+  color:#8793A0;
+
+  font-size:2rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.randomTeamErrors span.used{
+  background:#7F0000;
+  color:#fff;
+}
+
+.randomSpeedCenter{
+  min-height:100%;
+}
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomTeamErrors span{
+    width:36px;
+    height:36px;
+    border-radius:12px;
+    font-size:1.55rem;
+  }
+}
+/* =========================
+   SPEED RESULT
+========================= */
+
+.randomSpeedResult{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto auto 1fr;
+  gap:14px;
+
+  padding:16px;
+
+  background:#FFFFFF;
+  border:2px solid var(--line);
+  border-radius:24px;
+}
+
+.randomSpeedResultWinner{
+  min-height:92px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  padding:14px;
+
+  background:var(--secondary);
+  color:#fff;
+  border-radius:20px;
+}
+
+.randomSpeedResultWinner small{
+  color:#fff;
+  font-size:1rem;
+  font-weight:900;
+}
+
+.randomSpeedResultWinner strong{
+  color:#fff;
+  font-size:clamp(1.6rem,2.4vw,2.6rem);
+  line-height:1.1;
+  font-weight:900;
+  text-align:center;
+}
+
+.randomSpeedResultErrors{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.randomSpeedResultErrors > div{
+  min-width:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+
+  padding:14px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:18px;
+}
+
+.randomSpeedResultErrors small{
+  width:100%;
+
+  color:var(--secondary);
+  font-size:1rem;
+  font-weight:900;
+  text-align:center;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.randomSpeedResultErrors strong{
+  color:#7F0000;
+  font-size:2.8rem;
+  line-height:1;
+  font-weight:900;
+}
+
+.randomSpeedResultErrors span{
+  color:var(--muted);
+  font-size:.9rem;
+  font-weight:900;
+}
+
+.randomSpeedResult .randomSpeedPointsBtns{
+  align-self:center;
+  justify-self:center;
+}
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomSpeedResult{
+    gap:10px;
+    padding:12px;
+  }
+
+  .randomSpeedResultWinner{
+    min-height:74px;
+  }
+
+  .randomSpeedResultErrors strong{
+    font-size:2.2rem;
+  }
+}
+/* =========================================================
+   RANDOM CHALLENGE - CLEAN CHOICE BOXES
+========================================================= */
+
+.randomBoxesGridClean{
+  width:min(100%,1180px);
+  height:100%;
+
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:18px;
+  align-items:center;
+}
+
+.randomChallengeChoiceBox{
+  position:relative;
+
+  height:250px;
+  min-height:250px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:22px;
+
+  border:0;
+  border-radius:30px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(246,247,249,.96));
+
+  border:2px solid rgba(213,218,223,1);
+
+  box-shadow:
+    0 18px 35px rgba(35,61,77,.10),
+    inset 0 1px 0 rgba(255,255,255,.95);
+
+  overflow:hidden;
+  cursor:pointer;
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+}
+
+.randomChallengeChoiceBox::before{
+  content:"";
+  position:absolute;
+  inset:14px;
+
+  border-radius:24px;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(254,127,45,.22), transparent 42%),
+    linear-gradient(180deg, rgba(35,61,77,.08), rgba(35,61,77,.02));
+
+  pointer-events:none;
+}
+
+.randomChallengeChoiceBox::after{
+  content:"";
+  position:absolute;
+  width:120px;
+  height:120px;
+  top:-42px;
+  inset-inline-end:-42px;
+
+  border-radius:999px;
+  background:rgba(254,127,45,.18);
+  pointer-events:none;
+}
+
+.randomChallengeChoiceBox strong{
+  position:relative;
+  z-index:2;
+
+  width:100%;
+
+  color:var(--secondary);
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(1.75rem,2.7vw,3rem);
+  line-height:1.12;
+  font-weight:900;
+  text-align:center;
+
+  white-space:normal;
+}
+
+.randomChallengeChoiceBox:hover{
+  transform:translateY(-4px);
+  border-color:var(--primary);
+
+  box-shadow:
+    0 24px 44px rgba(35,61,77,.14),
+    0 0 0 5px rgba(254,127,45,.12);
+}
+
+.randomChallengeChoiceBox:active{
+  transform:scale(.98);
+}
+
+.randomChallengeChoiceBox.locked{
+  opacity:.55;
+  cursor:not-allowed;
+  filter:grayscale(.25);
+}
+
+.randomChallengeChoiceBox.locked::before{
+  background:
+    linear-gradient(180deg, rgba(220,226,232,.55), rgba(246,247,249,.35));
+}
+
+/* title داخل المربعات */
+.randomBoxTitle.cleanTitle{
+  height:88px;
+  min-height:88px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:12px 18px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:24px;
+}
+
+.randomBoxTitle.cleanTitle span{
+  display:none;
+}
+
+.randomBoxTitle.cleanTitle h2{
+  margin:0;
+
+  color:var(--secondary);
+  font-size:clamp(1.65rem,2.2vw,2.45rem);
+  line-height:1.1;
+  font-weight:900;
+  text-align:center;
+}
+
+/* لا تظهر مساحة التحكم في صفحة اختيار المربعات */
+.randomControlsBar:empty{
+  display:none !important;
+}
+
+/* iPad / Tablet */
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomBoxesGridClean{
+    width:min(100%,1040px);
+    gap:12px;
+  }
+
+  .randomChallengeChoiceBox{
+    height:210px;
+    min-height:210px;
+    border-radius:24px;
+  }
+
+  .randomChallengeChoiceBox::before{
+    inset:10px;
+    border-radius:19px;
+  }
+
+  .randomChallengeChoiceBox strong{
+    font-size:clamp(1.35rem,2vw,2rem);
+  }
+
+  .randomBoxTitle.cleanTitle{
+    height:74px;
+    min-height:74px;
+    border-radius:20px;
+  }
+
+  .randomBoxTitle.cleanTitle h2{
+    font-size:1.55rem;
+  }
+}
+
+/* Phone */
+@media (max-width:767px){
+  .randomBoxesGridClean{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .randomChallengeChoiceBox{
+    height:130px;
+    min-height:130px;
+    border-radius:22px;
+  }
+
+  .randomChallengeChoiceBox strong{
+    font-size:1.7rem;
+  }
+}
+/* =========================
+   RANDOM CHALLENGE - NORMAL FONT WEIGHT
+========================= */
+
+.randomChallengeWrap,
+.randomChallengeWrap *{
+  font-weight:400 !important;
+}
+
+.randomChallengeWrap h1,
+.randomChallengeWrap h2,
+.randomChallengeWrap h3,
+.randomChallengeWrap strong,
+.randomChallengeWrap b,
+.randomChallengeWrap button,
+.randomChallengeWrap label,
+.randomChallengeWrap small,
+.randomChallengeWrap p,
+.randomChallengeWrap span{
+  font-weight:400 !important;
+}
+/* =========================
+   FIX RANDOM BOX NAMES
+========================= */
+
+.randomChallengeChoiceBox strong{
+  position:relative !important;
+  z-index:5 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  width:100% !important;
+  min-height:auto !important;
+  height:auto !important;
+
+  padding:0 !important;
+  margin:0 !important;
+
+  background:transparent !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+
+  color:#233D4D !important;
+  font-family:"HanakaText",sans-serif !important;
+  font-size:clamp(1.7rem,2.5vw,2.8rem) !important;
+  line-height:1.2 !important;
+  font-weight:400 !important;
+  text-align:center !important;
+
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:unset !important;
+}
+
+.randomChallengeChoiceBox{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.randomChallengeChoiceBox::before{
+  z-index:1 !important;
+}
+
+.randomChallengeChoiceBox::after{
+  z-index:1 !important;
+}
+/* =========================
+   RANDOM QUESTION HEADER
+========================= */
+
+.randomQuestionHeader{
+  width:100%;
+  min-height:118px;
+
+  display:grid;
+  grid-template-columns:220px minmax(0,1fr);
+  gap:12px;
+  align-items:stretch;
+
+  padding:10px;
+
+  background:rgba(255,255,255,.72);
+  border:2px solid var(--line);
+  border-radius:26px;
+
+  box-shadow:
+    0 14px 28px rgba(35,61,77,.07),
+    inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+.randomQuestionName{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:12px;
+
+  border-radius:20px;
+
+  background:
+    linear-gradient(180deg, rgba(254,127,45,.95), rgba(239,111,45,.95));
+
+  color:#fff;
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.25rem,1.8vw,1.85rem);
+  line-height:1.15;
+  font-weight:400;
+  text-align:center;
+}
+
+.randomQuestionInput{
+  width:100%;
+  height:100%;
+  min-height:92px;
+
+  resize:none;
+  outline:none;
+
+  padding:16px 18px;
+
+  border:0;
+  border-radius:20px;
+
+  background:#fff;
+  color:var(--text);
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.25rem,1.8vw,2rem);
+  line-height:1.35;
+  font-weight:400;
+  text-align:center;
+}
+
+.randomQuestionInput::placeholder{
+  color:rgba(35,61,77,.38);
+}
+
+.randomQuestionText{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  min-height:92px;
+  padding:16px 18px;
+
+  border-radius:20px;
+  background:#fff;
+
+  color:var(--text);
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.25rem,1.8vw,2rem);
+  line-height:1.35;
+  font-weight:400;
+  text-align:center;
+}
+
+.randomQuestionHeader.resultOnly{
+  grid-template-columns:240px minmax(0,1fr);
+}
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomQuestionHeader{
+    min-height:92px;
+    grid-template-columns:170px minmax(0,1fr);
+    gap:10px;
+    padding:8px;
+    border-radius:22px;
+  }
+
+  .randomQuestionName{
+    border-radius:17px;
+    font-size:1.25rem;
+  }
+
+  .randomQuestionInput,
+  .randomQuestionText{
+    min-height:74px;
+    padding:12px 14px;
+    border-radius:17px;
+    font-size:1.35rem;
+  }
+
+  .randomQuestionHeader.resultOnly{
+    grid-template-columns:190px minmax(0,1fr);
+  }
+}
+
+@media (max-width:767px){
+  .randomQuestionHeader,
+  .randomQuestionHeader.resultOnly{
+    grid-template-columns:1fr;
+  }
+
+  .randomQuestionName{
+    min-height:58px;
+  }
+
+  .randomQuestionInput,
+  .randomQuestionText{
+    min-height:90px;
+  }
+}
+/* =========================================================
+   RANDOM CHALLENGE - AUCTION / المزاد CLEAN FINAL
+========================================================= */
+
+/* =========================
+   1) MAIN WRAP
+========================= */
+
+.randomBox2OldClean{
+  width:min(100%,1180px);
+  margin:0 auto;
+
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.randomBox2OldClean .compactQuestionHeader{
+  min-height:92px;
+  grid-template-columns:190px minmax(0,1fr);
+  padding:8px;
+  margin-bottom:0;
+  border-radius:24px;
+  flex-shrink:0;
+}
+
+.randomBox2OldClean .compactQuestionHeader .randomQuestionName{
+  min-height:72px;
+  border-radius:18px;
+  font-size:clamp(1.15rem,1.6vw,1.55rem);
+  font-weight:400 !important;
+}
+
+.randomBox2OldClean .compactQuestionHeader .randomQuestionInput{
+  min-height:72px;
+  height:72px;
+  padding:12px 16px;
+  border-radius:18px;
+
+  font-size:clamp(1.15rem,1.6vw,1.65rem);
+  line-height:1.25;
+  font-weight:400 !important;
+}
+
+/* يمنع تداخل السؤال مع المحتوى */
+.randomBox2OldClean.randomBoxView{
+  gap:16px !important;
+}
+
+.randomBox2OldClean .randomQuestionHeader{
+  flex-shrink:0;
+}
+
+/* =========================
+   2) OLD AUCTION LAYOUT
+========================= */
+
+.oldAuctionChallenge{
+  width:100%;
+
+  display:grid;
+  grid-template-columns:220px minmax(360px,1fr) 220px;
+  gap:18px;
+  align-items:stretch;
+
+  margin-top:0 !important;
+}
+
+/* =========================
+   3) NUMBER INPUT CARD
+========================= */
+
+.oldAuctionInputCard{
+  min-height:250px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  padding:18px;
+}
+
+.oldAuctionInputCard label{
+  font-weight:400 !important;
+}
+
+.oldAuctionInputCard input{
+  width:100%;
+  height:78px;
+
+  direction:ltr;
+  text-align:center;
+
+  font-family:Arial, sans-serif !important;
+  font-size:3rem;
+  font-weight:800;
+
+  border-radius:22px;
+}
+
+.oldAuctionInputCard p{
+  margin-top:10px;
+  font-weight:400 !important;
+}
+
+/* =========================
+   4) COMPACT KEYPAD
+========================= */
+
+.oldAuctionKeypad{
+  width:100%;
+  max-width:360px;
+
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:8px;
+
+  margin-top:12px;
+  padding:10px;
+
+  border-radius:22px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(213,218,223,.9);
+
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+
+  touch-action:manipulation;
+}
+
+.oldAuctionKeypad button{
+  height:46px;
+
+  border:0;
+  border-radius:15px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(241,244,247,.96));
+
+  color:#233D4D;
+
+  font-family:Arial, sans-serif !important;
+  font-size:1.35rem;
+  font-weight:800;
+
+  box-shadow:
+    0 7px 14px rgba(35,61,77,.08),
+    inset 0 1px 0 rgba(255,255,255,.95);
+
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+
+.oldAuctionKeypad button:active{
+  transform:scale(.96);
+}
+
+.oldAuctionKeypad button.clear{
+  color:#9b1c1c;
+  background:rgba(255,232,232,.96);
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:1.05rem;
+  font-weight:400;
+}
+
+.oldAuctionKeypad button.back{
+  color:#233D4D;
+  background:rgba(235,240,244,.98);
+}
+
+/* منع التكبير بالضغط السريع */
+.randomBox2OldClean,
+.randomBox2OldClean button,
+.randomBox2OldClean input{
+  touch-action:manipulation;
+}
+
+/* =========================
+   5) TIMER MODE
+   بعد بدء المؤقت
+========================= */
+
+/* نخفي مربع كتابة الرقم ولوحة الأرقام */
+.randomBox2OldClean.box2TimerMode .oldAuctionInputCard{
+  display:none !important;
+}
+
+/* المؤقت كبير في الوسط، والنقاط يمين/يسار بنفس التصميم القديم */
+.randomBox2OldClean.box2TimerMode .oldAuctionChallenge{
+  grid-template-columns:1fr 240px;
+  gap:18px;
+  align-items:stretch;
+}
+
+.randomBox2OldClean.box2TimerMode .randomPointsTimer{
+  order:1;
+
+  height:230px !important;
+  min-height:230px !important;
+  padding:12px 18px !important;
+
+  transform:scale(1);
+  overflow:visible !important;
+
+  border-color:rgba(254,127,45,.42);
+
+  box-shadow:
+    0 20px 42px rgba(35,61,77,.12),
+    0 0 0 7px rgba(254,127,45,.08),
+    inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.randomBox2OldClean.box2TimerMode .randomPointsTimer strong{
+  font-family:Arial, sans-serif !important;
+  font-size:clamp(7.5rem,12vw,11.5rem) !important;
+  line-height:.82 !important;
+  font-weight:900 !important;
+}
+
+.randomBox2OldClean.box2TimerMode .randomPointsResult{
+  order:2;
+
+  height:230px !important;
+  min-height:230px !important;
+  padding:12px 18px !important;
+
+  transform:none !important;
+}
+
+/* =========================
+   6) LAST 5 SECONDS FX
+   نفس Top 10 لكن أخف
+========================= */
+
+.randomPointsTimer.dangerPulse{
+  background:#7F0000 !important;
+  border-color:#7F0000 !important;
+
+  animation:randomAuctionTimerPulse .75s ease-in-out infinite !important;
+  transform-origin:center center !important;
+
+  overflow:visible !important;
+}
+
+.randomPointsTimer.dangerPulse small,
+.randomPointsTimer.dangerPulse strong{
+  color:#fff !important;
+}
+
+@keyframes randomAuctionTimerPulse{
+  0%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.018);
+  }
+
+  100%{
+    transform:scale(1);
+  }
+}
+
+/* =========================
+   7) IPAD / LAPTOP LANDSCAPE
+========================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomBox2OldClean{
+    gap:10px;
+  }
+
+  .randomBox2OldClean .compactQuestionHeader{
+    min-height:72px;
+    grid-template-columns:150px minmax(0,1fr);
+    padding:7px;
+    border-radius:20px;
+  }
+
+  .randomBox2OldClean .compactQuestionHeader .randomQuestionName{
+    min-height:56px;
+    border-radius:15px;
+    font-size:1.1rem;
+  }
+
+  .randomBox2OldClean .compactQuestionHeader .randomQuestionInput{
+    min-height:56px;
+    height:56px;
+    padding:8px 12px;
+    border-radius:15px;
+    font-size:1.15rem;
+  }
+
+  .oldAuctionChallenge{
+    grid-template-columns:170px minmax(300px,1fr) 170px;
+    gap:10px;
+  }
+
+  .oldAuctionInputCard{
+    min-height:190px;
+    padding:12px;
+  }
+
+  .oldAuctionInputCard input{
+    height:58px;
+    font-size:2.3rem;
+    border-radius:16px;
+  }
+
+  .oldAuctionKeypad{
+    max-width:300px;
+    gap:6px;
+    padding:8px;
+    border-radius:18px;
+  }
+
+  .oldAuctionKeypad button{
+    height:34px;
+    border-radius:11px;
+    font-size:1rem;
+  }
+
+  .oldAuctionKeypad button.clear{
+    font-size:.9rem;
+  }
+
+  .randomBox2OldClean.box2TimerMode .oldAuctionChallenge{
+    grid-template-columns:1fr 180px;
+    gap:10px;
+  }
+
+  .randomBox2OldClean.box2TimerMode .randomPointsTimer,
+  .randomBox2OldClean.box2TimerMode .randomPointsResult{
+    height:178px !important;
+    min-height:178px !important;
+    padding:10px 14px !important;
+  }
+
+  .randomBox2OldClean.box2TimerMode .randomPointsTimer strong{
+    font-size:clamp(6rem,9vw,8rem) !important;
+    line-height:.82 !important;
+  }
+}
+
+/* =========================
+   8) PHONE
+========================= */
+
+@media (max-width:767px){
+  .randomBox2OldClean .compactQuestionHeader{
+    grid-template-columns:1fr;
+    min-height:auto;
+  }
+
+  .oldAuctionChallenge,
+  .randomBox2OldClean.box2TimerMode .oldAuctionChallenge{
+    grid-template-columns:1fr;
+  }
+
+  .randomBox2OldClean.box2TimerMode .randomPointsTimer,
+  .randomBox2OldClean.box2TimerMode .randomPointsResult{
+    height:190px !important;
+    min-height:190px !important;
+  }
+
+  .oldAuctionKeypad button{
+    height:44px;
+  }
+}
+/* =========================
+   AUCTION QUESTION - OLD LOOK CENTER TEXT
+========================= */
+
+.randomBox2OldClean .compactQuestionHeader{
+  display:grid !important;
+  grid-template-columns:190px minmax(0,1fr) !important;
+  gap:10px !important;
+  align-items:stretch !important;
+
+  min-height:92px !important;
+  height:92px !important;
+
+  padding:8px !important;
+  margin:0 !important;
+
+  border-radius:24px !important;
+}
+
+.randomBox2OldClean .compactQuestionHeader .randomQuestionName{
+  min-height:72px !important;
+  height:72px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  padding:0 14px !important;
+  margin:0 !important;
+
+  border-radius:18px !important;
+
+  font-size:clamp(1.15rem,1.6vw,1.55rem) !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+
+  text-align:center !important;
+  white-space:nowrap !important;
+}
+
+.randomBox2OldClean .compactQuestionHeader .randomQuestionInputOneLine{
+  width:100% !important;
+
+  min-height:72px !important;
+  height:72px !important;
+  max-height:72px !important;
+
+  padding:0 20px !important;
+  margin:0 !important;
+
+  border-radius:18px !important;
+
+  direction:rtl !important;
+  text-align:center !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:clamp(1.35rem,1.8vw,1.85rem) !important;
+  line-height:72px !important;
+  font-weight:400 !important;
+
+  box-sizing:border-box !important;
+
+  display:block !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+}
+
+.randomBox2OldClean .compactQuestionHeader .randomQuestionInputOneLine::placeholder{
+  color:rgba(35,61,77,.45) !important;
+  text-align:center !important;
+  line-height:72px !important;
+}
+
+/* يقلل الفراغ بين السؤال والمزاد */
+.randomBox2OldClean{
+  gap:12px !important;
+}
+
+.randomBox2OldClean .oldAuctionChallenge{
+  margin-top:0 !important;
+}
+
+/* =========================
+   IPAD / LANDSCAPE
+========================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomBox2OldClean .compactQuestionHeader{
+    grid-template-columns:150px minmax(0,1fr) !important;
+    min-height:72px !important;
+    height:72px !important;
+    padding:7px !important;
+    gap:8px !important;
+    border-radius:20px !important;
+  }
+
+  .randomBox2OldClean .compactQuestionHeader .randomQuestionName{
+    min-height:56px !important;
+    height:56px !important;
+    border-radius:15px !important;
+    font-size:1.1rem !important;
+  }
+
+  .randomBox2OldClean .compactQuestionHeader .randomQuestionInputOneLine{
+    min-height:56px !important;
+    height:56px !important;
+    max-height:56px !important;
+
+    padding:0 16px !important;
+    border-radius:15px !important;
+
+    text-align:center !important;
+
+    font-size:1.35rem !important;
+    line-height:56px !important;
+  }
+
+  .randomBox2OldClean .compactQuestionHeader .randomQuestionInputOneLine::placeholder{
+    text-align:center !important;
+    line-height:56px !important;
+  }
+
+  .randomBox2OldClean{
+    gap:9px !important;
+  }
+}
+/* =========================
+   BOX 3 QUESTION - SAME AS AUCTION
+========================= */
+
+.randomBoxView .randomBox3QuestionHeader{
+  display:grid !important;
+  grid-template-columns:190px minmax(0,1fr) !important;
+  gap:10px !important;
+  align-items:stretch !important;
+
+  min-height:92px !important;
+  height:92px !important;
+
+  padding:8px !important;
+  margin:0 !important;
+
+  border-radius:24px !important;
+}
+
+.randomBoxView .randomBox3QuestionHeader .randomQuestionName{
+  min-height:72px !important;
+  height:72px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  padding:0 14px !important;
+  margin:0 !important;
+
+  border-radius:18px !important;
+
+  font-size:clamp(1.15rem,1.6vw,1.55rem) !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+
+  text-align:center !important;
+  white-space:nowrap !important;
+}
+
+.randomBoxView .randomBox3QuestionHeader .randomQuestionInputOneLine{
+  width:100% !important;
+
+  min-height:72px !important;
+  height:72px !important;
+  max-height:72px !important;
+
+  padding:0 20px !important;
+  margin:0 !important;
+
+  border-radius:18px !important;
+
+  direction:rtl !important;
+  text-align:center !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:clamp(1.35rem,1.8vw,1.85rem) !important;
+  line-height:72px !important;
+  font-weight:400 !important;
+
+  box-sizing:border-box !important;
+
+  display:block !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+}
+
+.randomBoxView .randomBox3QuestionHeader .randomQuestionInputOneLine::placeholder{
+  color:rgba(35,61,77,.45) !important;
+  text-align:center !important;
+  line-height:72px !important;
+}
+
+/* تقليل الفراغ بين السؤال ومحتوى ماذا تعرف */
+.randomBoxView .randomBox3QuestionHeader + .randomSpeedChallenge{
+  margin-top:0 !important;
+}
+
+/* iPad / Landscape */
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomBoxView .randomBox3QuestionHeader{
+    grid-template-columns:150px minmax(0,1fr) !important;
+    min-height:72px !important;
+    height:72px !important;
+    padding:7px !important;
+    gap:8px !important;
+    border-radius:20px !important;
+  }
+
+  .randomBoxView .randomBox3QuestionHeader .randomQuestionName{
+    min-height:56px !important;
+    height:56px !important;
+    border-radius:15px !important;
+    font-size:1.1rem !important;
+  }
+
+  .randomBoxView .randomBox3QuestionHeader .randomQuestionInputOneLine{
+    min-height:56px !important;
+    height:56px !important;
+    max-height:56px !important;
+
+    padding:0 16px !important;
+    border-radius:15px !important;
+
+    text-align:center !important;
+
+    font-size:1.35rem !important;
+    line-height:56px !important;
+  }
+
+  .randomBoxView .randomBox3QuestionHeader .randomQuestionInputOneLine::placeholder{
+    text-align:center !important;
+    line-height:56px !important;
+  }
+}
+/* =========================
+   BOX 3 TEAM CARDS - PREMIUM BIG
+========================= */
+
+.randomSpeedChallenge{
+  gap:18px !important;
+  align-items:stretch !important;
+}
+
+.randomSpeedTeam{
+  position:relative !important;
+  min-height:260px !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  gap:24px !important;
+  padding:26px 22px !important;
+
+  border-radius:34px !important;
+  overflow:hidden !important;
+
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.95), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,.92), rgba(238,244,248,.82)) !important;
+
+  border:2px solid rgba(213,218,223,.95) !important;
+
+  box-shadow:
+    0 22px 44px rgba(35,61,77,.12),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+
+.randomSpeedTeam::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:10px !important;
+  border-radius:26px !important;
+  pointer-events:none !important;
+
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.60), transparent 42%),
+    radial-gradient(circle at 50% 100%, rgba(254,127,45,.10), transparent 48%) !important;
+
+  opacity:.9 !important;
+}
+
+.randomSpeedTeam.active{
+  border-color:rgba(254,127,45,.72) !important;
+  box-shadow:
+    0 26px 54px rgba(254,127,45,.18),
+    0 0 0 7px rgba(254,127,45,.10),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+
+.randomSpeedTeam small{
+  display:none !important;
+}
+
+.randomSpeedTeamName,
+.randomSpeedTeam > strong{
+  position:relative !important;
+  z-index:2 !important;
+
+  width:100% !important;
+  max-width:100% !important;
+
+  color:#233D4D !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:clamp(2.7rem,4.6vw,5.2rem) !important;
+  line-height:1.05 !important;
+  font-weight:400 !important;
+
+  text-align:center !important;
+  white-space:normal !important;
+  word-break:normal !important;
+  overflow:visible !important;
+  text-overflow:unset !important;
+
+  text-shadow:
+    0 3px 0 rgba(255,255,255,.85),
+    0 14px 26px rgba(35,61,77,.12) !important;
+}
+
+.randomSpeedTeam.active .randomSpeedTeamName,
+.randomSpeedTeam.active > strong{
+  color:#FE7F2D !important;
+}
+
+.randomTeamErrors{
+  position:relative !important;
+  z-index:2 !important;
+
+  width:100% !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:18px !important;
+
+  margin:0 !important;
+}
+
+.randomTeamErrors span{
+  width:68px !important;
+  height:68px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  border-radius:20px !important;
+
+  font-family:Arial, sans-serif !important;
+  font-size:3.6rem !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.92), rgba(233,239,243,.88)) !important;
+
+  color:rgba(35,61,77,.28) !important;
+  border:1px solid rgba(35,61,77,.14) !important;
+
+  box-shadow:
+    0 12px 22px rgba(35,61,77,.10),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+
+.randomTeamErrors span.used{
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,.20), transparent 34%),
+    linear-gradient(180deg, #9B1111, #7F0000) !important;
+
+  color:#fff !important;
+  border-color:#7F0000 !important;
+
+  box-shadow:
+    0 16px 28px rgba(127,0,0,.26),
+    0 0 0 5px rgba(127,0,0,.10),
+    inset 0 1px 0 rgba(255,255,255,.18) !important;
+}
+
+/* المؤقت في النص يكون متناسق مع الكروت */
+.randomSpeedCenter{
+  min-height:260px !important;
+  border-radius:34px !important;
+}
+
+/* iPad / Landscape */
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomSpeedChallenge{
+    gap:12px !important;
+  }
+
+  .randomSpeedTeam,
+  .randomSpeedCenter{
+    min-height:205px !important;
+    border-radius:26px !important;
+  }
+
+  .randomSpeedTeam{
+    gap:16px !important;
+    padding:18px 14px !important;
+  }
+
+  .randomSpeedTeam::before{
+    inset:8px !important;
+    border-radius:20px !important;
+  }
+
+  .randomSpeedTeamName,
+  .randomSpeedTeam > strong{
+    font-size:clamp(2rem,3.2vw,3.2rem) !important;
+  }
+
+  .randomTeamErrors{
+    gap:12px !important;
+  }
+
+  .randomTeamErrors span{
+    width:50px !important;
+    height:50px !important;
+    border-radius:15px !important;
+    font-size:2.65rem !important;
+  }
+}
+/* =========================
+   BOX 3 TEAM CARDS - CLEAN CLEAR EDGES
+========================= */
+
+/* الكرت نفسه: حواف واضحة بدون طبقة داخلية */
+.randomSpeedTeam{
+  position:relative !important;
+
+  min-height:220px !important;
+  padding:22px 20px 26px !important;
+
+  border-radius:28px !important;
+  overflow:visible !important;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.96), rgba(242,246,249,.92)) !important;
+
+  border:3px solid rgba(35,61,77,.20) !important;
+
+  box-shadow:
+    0 16px 30px rgba(35,61,77,.10) !important;
+
+  gap:18px !important;
+}
+
+/* إلغاء الطبقة الزايدة نهائيًا */
+.randomSpeedTeam::before,
+.randomSpeedTeam::after{
+  display:none !important;
+  content:none !important;
+}
+
+/* الفريق النشط: حافة برتقالية واضحة فقط */
+.randomSpeedTeam.active{
+  border-color:#FE7F2D !important;
+
+  box-shadow:
+    0 18px 34px rgba(254,127,45,.16),
+    0 0 0 5px rgba(254,127,45,.10) !important;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,247,240,.94)) !important;
+}
+
+/* اسم الفريق */
+.randomSpeedTeamName,
+.randomSpeedTeam > strong{
+  color:#233D4D !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:clamp(2.35rem,4vw,4.5rem) !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+
+  text-align:center !important;
+  margin:0 !important;
+
+  text-shadow:none !important;
+}
+
+.randomSpeedTeam.active .randomSpeedTeamName,
+.randomSpeedTeam.active > strong{
+  color:#FE7F2D !important;
+}
+
+/* الأخطاء */
+.randomTeamErrors{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  gap:15px !important;
+  margin:0 !important;
+  transform:none !important;
+}
+
+.randomTeamErrors span{
+  width:60px !important;
+  height:60px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  border-radius:17px !important;
+
+  background:#F3F6F8 !important;
+  color:rgba(35,61,77,.30) !important;
+
+  border:2px solid rgba(35,61,77,.14) !important;
+
+  font-family:Arial, sans-serif !important;
+  font-size:3.15rem !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+
+  box-shadow:none !important;
+  overflow:visible !important;
+}
+
+.randomTeamErrors span.used{
+  background:#7F0000 !important;
+  color:#fff !important;
+  border-color:#7F0000 !important;
+
+  box-shadow:
+    0 10px 18px rgba(127,0,0,.18) !important;
+}
+
+/* المؤقت بالنص نفس ارتفاع الكروت */
+.randomSpeedCenter{
+  min-height:220px !important;
+  border-radius:28px !important;
+  border:3px solid rgba(35,61,77,.20) !important;
+  box-shadow:
+    0 16px 30px rgba(35,61,77,.10) !important;
+  overflow:visible !important;
+}
+
+/* iPad / Landscape */
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomSpeedTeam,
+  .randomSpeedCenter{
+    min-height:178px !important;
+    border-radius:22px !important;
+  }
+
+  .randomSpeedTeam{
+    padding:16px 14px 20px !important;
+    gap:12px !important;
+  }
+
+  .randomSpeedTeamName,
+  .randomSpeedTeam > strong{
+    font-size:clamp(1.8rem,2.8vw,2.8rem) !important;
+  }
+
+  .randomTeamErrors{
+    gap:10px !important;
+  }
+
+  .randomTeamErrors span{
+    width:44px !important;
+    height:44px !important;
+    border-radius:12px !important;
+    font-size:2.35rem !important;
+  }
+}
+/* =========================
+   BOX 3 TEAM NAME + ERRORS SPACING
+========================= */
+
+.randomSpeedTeam{
+  justify-content:center !important;
+  gap:54px !important;
+}
+
+.randomSpeedTeamName,
+.randomSpeedTeam > strong{
+  transform:none !important;
+  margin:0 !important;
+}
+
+.randomTeamErrors{
+  margin:0 !important;
+  transform:none !important;
+}
+
+/* iPad / Landscape */
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .randomSpeedTeam{
+    gap:22px !important;
+  }
+
+  .randomSpeedTeamName,
+  .randomSpeedTeam > strong{
+    transform:none !important;
+  }
+
+  .randomTeamErrors{
+    margin:0 !important;
+    transform:none !important;
+  }
+}
+
+/* =========================
+   RANDOM BOX 1 - POOL BUTTONS
+========================= */
+
+.randomSharedPlayerStartBox{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  width:min(720px,100%);
+  margin:0 auto;
+}
+
+.randomSharedPlayerStartBox .randomStartBtn{
+  min-height:120px;
+  border-radius:30px;
+  font-size:clamp(1.5rem,3vw,2.4rem);
+}
+
+.randomSaudiBtn{
+  background:linear-gradient(135deg,#16A34A,#22C55E);
+}
+
+.randomWorldBtn{
+  background:linear-gradient(135deg,#2563EB,#67E8F9);
+}
+
+.randomBox1PoolBadge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:0 22px;
+  margin-top:8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(213,218,223,.9);
+  color:#334155;
+  font-size:1.05rem;
+}
+
+@media (max-width:640px){
+  .randomSharedPlayerStartBox{
+    grid-template-columns:1fr;
+  }
+
+  .randomSharedPlayerStartBox .randomStartBtn{
+    min-height:90px;
+  }
+}
+/* =========================================================
+   RANDOM AUCTION - PRO FINAL
+========================================================= */
+
+.randomBox2CleanPro{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:28px;
+}
+
+/* قبل بدء المؤقت */
+.randomAuctionSetupPro{
+  width:min(100%,900px);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1.42fr .78fr;
+  gap:24px;
+  align-items:stretch;
+}
+
+.randomAuctionInputPro,
+.randomAuctionPointsPro{
+  min-height:280px;
+  border-radius:36px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.72)),
+    radial-gradient(circle at 50% 0%, rgba(255,155,81,.22), transparent 62%);
+  border:1px solid rgba(255,255,255,.82);
+  box-shadow:
+    0 20px 46px rgba(15,23,42,.14),
+    inset 0 1px 0 rgba(255,255,255,.92);
+}
+
+.randomAuctionInputPro{
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:14px;
+}
+
+.randomAuctionInputPro label{
+  text-align:center;
+  font-size:1.2rem;
+  font-weight:900;
+  color:#334155;
+}
+
+.randomAuctionInputPro input{
+  width:100%;
+  height:70px;
+  border-radius:24px;
+  text-align:center;
+  font-size:2.45rem;
+  font-weight:900;
+  color:#24185e;
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(148,163,184,.34);
+  box-shadow:inset 0 2px 8px rgba(15,23,42,.06);
+}
+
+.randomAuctionKeypadPro{
+  width:min(100%,370px);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+}
+
+.randomAuctionKeypadPro button{
+  height:48px;
+  border-radius:15px;
+  font-size:1.12rem;
+  font-weight:900;
+  background:rgba(255,255,255,.82);
+  border:1px solid rgba(148,163,184,.28);
+  box-shadow:0 8px 18px rgba(15,23,42,.08);
+}
+
+.randomAuctionPointsPro{
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+
+.randomAuctionPointsPro::before{
+  content:"";
+  position:absolute;
+  width:150px;
+  height:150px;
+  border-radius:999px;
+  background:rgba(255,155,81,.16);
+  filter:blur(2px);
+}
+
+.randomAuctionPointsPro small,
+.randomAuctionPointsPro strong{
+  position:relative;
+  z-index:1;
+}
+
+.randomAuctionPointsPro small{
+  font-size:1.22rem;
+  font-weight:900;
+  color:#64748b;
+}
+
+.randomAuctionPointsPro strong{
+  font-size:6.35rem;
+  line-height:.9;
+  font-weight:900;
+  color:#24185e;
+}
+
+/* بعد بدء المؤقت */
+.randomAuctionLivePro{
+  width:min(100%,980px);
+  min-height:360px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1.45fr 1fr;
+  gap:30px;
+  align-items:center;
+  justify-items:center;
+}
+
+.randomAuctionLiveCircle{
+  position:relative;
+  overflow:hidden;
+  width:195px;
+  height:195px;
+  border-radius:999px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.72)),
+    radial-gradient(circle at 50% 0%, rgba(255,155,81,.24), transparent 64%);
+
+  border:1px solid rgba(255,255,255,.82);
+  box-shadow:
+    0 20px 46px rgba(15,23,42,.15),
+    inset 0 1px 0 rgba(255,255,255,.92);
+}
+
+.randomAuctionLiveCircle::before{
+  content:"";
+  position:absolute;
+  inset:12px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.55);
+}
+
+.randomAuctionLiveCircle small,
+.randomAuctionLiveCircle strong{
+  position:relative;
+  z-index:1;
+}
+
+.randomAuctionLiveCircle small{
+  font-size:1.08rem;
+  font-weight:900;
+  color:#64748b;
+}
+
+.randomAuctionLiveCircle strong{
+  font-size:4.65rem;
+  line-height:.86;
+  font-weight:900;
+  color:#24185e;
+}
+
+.randomAuctionLivePoints{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.74)),
+    radial-gradient(circle at 50% 0%, rgba(22,163,74,.18), transparent 64%);
+}
+
+.randomAuctionLiveCount{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.74)),
+    radial-gradient(circle at 50% 0%, rgba(255,155,81,.24), transparent 64%);
+}
+
+/* المؤقت أكبر وأفخم */
+.randomAuctionLiveTimer{
+  width:315px;
+  height:315px;
+  background:
+    radial-gradient(circle at 50% 36%, rgba(103,232,249,.24), transparent 34%),
+    linear-gradient(180deg, rgba(36,24,94,.98), rgba(51,65,85,.96));
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:
+    0 26px 60px rgba(36,24,94,.28),
+    inset 0 2px 0 rgba(255,255,255,.18);
+}
+
+.randomAuctionLiveTimer::after{
+  content:"";
+  position:absolute;
+  inset:18px;
+  border-radius:999px;
+  border:3px solid rgba(103,232,249,.34);
+  box-shadow:0 0 28px rgba(103,232,249,.18);
+}
+
+.randomAuctionLiveTimer small{
+  color:rgba(255,255,255,.74);
+  font-size:1.15rem;
+}
+
+.randomAuctionLiveTimer strong{
+  color:#fff;
+  font-size:7.6rem;
+  text-shadow:0 12px 28px rgba(0,0,0,.24);
+}
+
+.randomAuctionLiveTimer.dangerPulse{
+  background:
+    radial-gradient(circle at 50% 36%, rgba(255,255,255,.22), transparent 34%),
+    linear-gradient(180deg, rgba(225,29,72,.98), rgba(127,29,29,.96));
+  box-shadow:
+    0 28px 70px rgba(225,29,72,.34),
+    inset 0 2px 0 rgba(255,255,255,.18);
+  animation:randomAuctionDangerPulse .72s ease-in-out infinite alternate;
+}
+
+.randomAuctionLiveTimer.dangerPulse::after{
+  border-color:rgba(255,255,255,.42);
+  box-shadow:0 0 34px rgba(255,255,255,.22);
+}
+
+/* نبضة آخر خمس ثواني */
+.randomAuctionTimerBeat{
+  animation:randomAuctionTimerBeat .32s ease-out;
+}
+
+/* اهتزاز النقاط والعدد */
+.randomAuctionShake{
+  animation:randomAuctionShake .34s cubic-bezier(.25,.9,.25,1);
+}
+
+@keyframes randomAuctionDangerPulse{
+  from{
+    transform:scale(1);
+  }
+  to{
+    transform:scale(1.035);
+  }
+}
+
+@keyframes randomAuctionTimerBeat{
+  0%{ transform:scale(1); }
+  45%{ transform:scale(1.06); }
+  100%{ transform:scale(1); }
+}
+
+@keyframes randomAuctionShake{
+  0%{ transform:translateX(0) scale(1); }
+  20%{ transform:translateX(-7px) scale(1.02); }
+  40%{ transform:translateX(7px) scale(1.02); }
+  60%{ transform:translateX(-5px) scale(1.01); }
+  80%{ transform:translateX(5px) scale(1.01); }
+  100%{ transform:translateX(0) scale(1); }
+}
+
+@media (max-width:900px){
+  .randomAuctionSetupPro{
+    grid-template-columns:1.35fr .75fr;
+    gap:12px;
+  }
+
+  .randomAuctionInputPro,
+  .randomAuctionPointsPro{
+    min-height:225px;
+    border-radius:28px;
+  }
+
+  .randomAuctionPointsPro strong{
+    font-size:4.75rem;
+  }
+
+  .randomAuctionLivePro{
+    min-height:250px;
+    grid-template-columns:1fr 1.32fr 1fr;
+    gap:10px;
+  }
+
+  .randomAuctionLiveCircle{
+    width:132px;
+    height:132px;
+  }
+
+  .randomAuctionLiveTimer{
+    width:195px;
+    height:195px;
+  }
+
+  .randomAuctionLiveCircle small{
+    font-size:.9rem;
+  }
+
+  .randomAuctionLiveCircle strong{
+    font-size:3rem;
+  }
+
+  .randomAuctionLiveTimer strong{
+    font-size:4.75rem;
+  }
+}
