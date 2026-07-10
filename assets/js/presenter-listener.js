@@ -179,12 +179,18 @@ function syncDisplayAfterPresenterTeamSelection() {
     return
   }
 
-  if (activeSegment === "randomChallenge" && typeof saveRandomChallengeState === "function") {
+  if (
+    activeSegment === "randomChallenge" &&
+    typeof saveRandomChallengeState === "function"
+  ) {
     saveRandomChallengeState()
     return
   }
 
-  if (isFinalSegmentKey(activeSegment) && typeof saveFinalState === "function") {
+  if (
+    (activeSegment === "final" || isFinalSegmentKey(activeSegment)) &&
+    typeof saveFinalState === "function"
+  ) {
     saveFinalState()
     return
   }
@@ -1816,102 +1822,92 @@ function handleRandomChallengePresenterAction(action, data) {
     })
   }
 
-if (action === "randomOpenBox") {
-  return safeRunPresenterAction(() => {
-    const box = Number(data.box || 0)
-    if (!box) return
+  if (action === "randomOpenBox") {
+    return safeRunPresenterAction(() => {
+      const box = Number(data.box || 0)
+      if (!box) return
 
-    if (typeof randomChallengeState !== "undefined") {
-      randomChallengeState.currentBox = box
-      randomChallengeState.activeTeam = null
+      ensureRandomChallengeBoxState(box)
 
-      if (!randomChallengeState.box1) randomChallengeState.box1 = {}
-      if (!randomChallengeState.box2) randomChallengeState.box2 = {}
-      if (!randomChallengeState.box3) randomChallengeState.box3 = {}
-      if (!randomChallengeState.box4) randomChallengeState.box4 = {}
-
-      randomChallengeState.box1.active = box === 1
-      randomChallengeState.box2.active = box === 2
-      randomChallengeState.box3.active = box === 3
-      randomChallengeState.box4.active = box === 4
-    }
-
-    if (typeof openRandomChallengeBox === "function") {
-      openRandomChallengeBox(box)
-    }
-
-    syncAfterRandomChallengeAction()
-  })
-}
-
-if (action === "randomStartBox1") {
-  return safeRunPresenterAction(() => {
-    const pool = data.pool === "world" ? "world" : "saudi"
-
-    ensureRandomChallengeBoxState(1)
-
-    if (typeof randomChallengeState !== "undefined") {
-      if (!randomChallengeState.box1) randomChallengeState.box1 = {}
-
-      randomChallengeState.currentBox = 1
-      randomChallengeState.box1.active = true
-      randomChallengeState.box1.pool = pool
-      randomChallengeState.box1.started = true
-      randomChallengeState.box1.rolling = true
-    }
-
-    if (typeof startRandomChallengeBox1 === "function") {
-      startRandomChallengeBox1(pool)
-    }
-
-    setTimeout(() => {
-      ensureRandomChallengeBoxState(1)
-      syncAfterRandomChallengeAction()
-    }, 100)
-  })
-}
-
-if (action === "randomSkip") {
-  return safeRunPresenterAction(() => {
-    ensureRandomChallengeBoxState(1)
-
-    const pool =
-      data.pool === "world" || randomChallengeState?.box1?.pool === "world"
-        ? "world"
-        : "saudi"
-
-    if (typeof startRandomChallengeBox1 === "function") {
-      startRandomChallengeBox1(pool)
-    }
-
-    setTimeout(() => {
-      ensureRandomChallengeBoxState(1)
-      syncAfterRandomChallengeAction()
-    }, 100)
-  })
-}
-
-if (action === "randomSetAuctionPoints") {
-  return safeRunPresenterAction(() => {
-    const count = Math.max(0, Number(data.points || 0))
-
-    if (typeof randomChallengeState !== "undefined") {
-      if (!randomChallengeState.box2) {
-        randomChallengeState.box2 = {}
+      if (typeof openRandomChallengeBox === "function") {
+        openRandomChallengeBox(box)
       }
 
-      randomChallengeState.box2.numberInput = String(count || "")
-      randomChallengeState.box2.points = count
-      randomChallengeState.box2.calculatedPoints =
-        count > 0 && count < 10 ? 1 : Math.floor(count / 10)
-    }
+      setTimeout(() => {
+        ensureRandomChallengeBoxState(box)
+        syncAfterRandomChallengeAction()
+      }, 80)
+    })
+  }
 
-    syncAfterRandomChallengeAction()
-  })
-}
+  if (action === "randomStartBox1") {
+    return safeRunPresenterAction(() => {
+      const pool = data.pool === "world" ? "world" : "saudi"
+
+      ensureRandomChallengeBoxState(1)
+
+      if (typeof randomChallengeState !== "undefined") {
+        if (!randomChallengeState.box1) randomChallengeState.box1 = {}
+
+        randomChallengeState.currentBox = 1
+        randomChallengeState.box1.active = true
+        randomChallengeState.box1.pool = pool
+        randomChallengeState.box1.started = true
+        randomChallengeState.box1.rolling = true
+      }
+
+      if (typeof startRandomChallengeBox1 === "function") {
+        startRandomChallengeBox1(pool)
+      }
+
+      setTimeout(() => {
+        ensureRandomChallengeBoxState(1)
+        syncAfterRandomChallengeAction()
+      }, 120)
+    })
+  }
+
+  if (action === "randomSkip") {
+    return safeRunPresenterAction(() => {
+      ensureRandomChallengeBoxState(1)
+
+      const pool =
+        data.pool === "world" || randomChallengeState?.box1?.pool === "world"
+          ? "world"
+          : "saudi"
+
+      if (typeof startRandomChallengeBox1 === "function") {
+        startRandomChallengeBox1(pool)
+      }
+
+      setTimeout(() => {
+        ensureRandomChallengeBoxState(1)
+        syncAfterRandomChallengeAction()
+      }, 120)
+    })
+  }
+
+  if (action === "randomSetAuctionPoints") {
+    return safeRunPresenterAction(() => {
+      const count = Math.max(0, Number(data.points || 0))
+
+      if (typeof randomChallengeState !== "undefined") {
+        if (!randomChallengeState.box2) randomChallengeState.box2 = {}
+
+        randomChallengeState.box2.numberInput = String(count || "")
+        randomChallengeState.box2.points = count
+        randomChallengeState.box2.calculatedPoints =
+          count > 0 && count < 10 ? 1 : Math.floor(count / 10)
+      }
+
+      syncAfterRandomChallengeAction()
+    })
+  }
 
   if (action === "randomStartBox2Timer") {
     return safeRunPresenterAction(() => {
+      ensureRandomChallengeBoxState(2)
+
       if (typeof startRandomBox2Timer === "function") {
         startRandomBox2Timer()
       } else if (typeof startRandomChallengeBox2Timer === "function") {
@@ -1958,6 +1954,8 @@ if (action === "randomSetAuctionPoints") {
 
   if (action === "randomFinishRound") {
     return safeRunPresenterAction(() => {
+      ensureRandomChallengeBoxState(3)
+
       if (typeof finishRandomBox3ToPoints === "function") {
         finishRandomBox3ToPoints()
       }
@@ -1968,6 +1966,8 @@ if (action === "randomSetAuctionPoints") {
 
   if (action === "randomBox3Wrong") {
     return safeRunPresenterAction(() => {
+      ensureRandomChallengeBoxState(3)
+
       if (typeof randomBox3Wrong === "function") {
         randomBox3Wrong()
       }
@@ -1978,6 +1978,8 @@ if (action === "randomSetAuctionPoints") {
 
   if (action === "randomBox3Pass") {
     return safeRunPresenterAction(() => {
+      ensureRandomChallengeBoxState(3)
+
       if (typeof randomBox3Pass === "function") {
         randomBox3Pass()
       }
@@ -1988,6 +1990,8 @@ if (action === "randomSetAuctionPoints") {
 
   if (action === "randomBox3SwitchTeam") {
     return safeRunPresenterAction(() => {
+      ensureRandomChallengeBoxState(3)
+
       if (typeof switchRandomBox3Team === "function") {
         switchRandomBox3Team()
       }
@@ -1999,6 +2003,8 @@ if (action === "randomSetAuctionPoints") {
   if (action === "randomBox3ScorePoints") {
     return safeRunPresenterAction(() => {
       const points = Number(data.points || 0)
+
+      ensureRandomChallengeBoxState(3)
 
       if (typeof scoreRandomBox3Points === "function") {
         scoreRandomBox3Points(points)

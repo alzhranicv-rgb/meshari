@@ -4098,6 +4098,8 @@ function openPresenterRandomBox(box) {
         ...(oldRandom.box1 || {}),
         active: n === 1,
         started: n === 1 ? false : !!oldRandom.box1?.started,
+        rolling: n === 1 ? false : !!oldRandom.box1?.rolling,
+        flashing: n === 1 ? false : !!oldRandom.box1?.flashing,
         images: n === 1 ? [] : (oldRandom.box1?.images || [])
       },
 
@@ -4108,7 +4110,8 @@ function openPresenterRandomBox(box) {
 
       box3: {
         ...(oldRandom.box3 || {}),
-        active: n === 3
+        active: n === 3,
+        activeTeam: null
       },
 
       box4: {
@@ -4119,14 +4122,18 @@ function openPresenterRandomBox(box) {
   }
 
   presenterSelectedTeam = null
-  presenterRandomAuctionLocalPoints = Number(
-    presenterLiveState?.randomChallenge?.box2?.points ||
-    presenterLiveState?.randomChallenge?.box2?.calculatedPoints ||
-    0
-  )
 
-  markPresenterLocalSync("randomChallenge", 1000)
+  if (n === 2) {
+    presenterRandomAuctionLocalPoints = Number(
+      presenterLiveState?.randomChallenge?.box2?.points ||
+      presenterLiveState?.randomChallenge?.box2?.numberInput ||
+      0
+    )
+  } else {
+    presenterRandomAuctionLocalPoints = 0
+  }
 
+  markPresenterLocalSync("randomChallenge", 1400)
   renderPresenterRandomChallenge()
 
   sendCommand("randomOpenBox", {
@@ -4246,19 +4253,17 @@ function renderPresenterRandomChallenge() {
 
   const box1Pool = state.box1?.pool || ""
 
-  const box1Images = Array.isArray(state.box1?.images)
-    ? state.box1.images
-    : []
+  const box1Players = getPresenterRandomBox1Players(state)
 
-  const box1Started =
-    !!state.box1?.currentPlayer ||
-    !!state.box1?.started ||
-    !!state.box1?.currentName ||
-    box1Images.length > 0 ||
-    !!state.box1?.rolling
+const box1Started =
+  !!state.box1?.currentPlayer ||
+  !!state.box1?.started ||
+  !!state.box1?.currentName ||
+  box1Players.filter(Boolean).length > 0 ||
+  !!state.box1?.rolling
 
-  const box1NameA = getPresenterRandomImageName(box1Images[0])
-  const box1NameB = getPresenterRandomImageName(box1Images[1])
+const box1NameA = getPresenterRandomImageName(box1Players[0])
+const box1NameB = getPresenterRandomImageName(box1Players[1])
 
   panel.innerHTML = `
     <div class="presenterRandomLayout" data-random-mode="${uiMode}">
