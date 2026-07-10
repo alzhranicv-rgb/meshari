@@ -33,7 +33,8 @@ box1: {
   flashing: false,
   finished: false,
   pool: "",
-  images: []
+  images: [],
+  recentTeamKeys: []
 },
 
 box2: {
@@ -188,14 +189,128 @@ function getRandomBox1PoolItems(pool = "saudi") {
     : randomMediaItems
 }
 
+function getRandomBox1ImageName(item) {
+  const raw =
+    item?.image ||
+    item?.name ||
+    item?.title ||
+    ""
+
+  return String(raw)
+    .split("/")
+    .pop()
+    .split("\\")
+    .pop()
+    .replace(/\.[a-z0-9]+$/i, "")
+    .trim()
+}
+
+function randomBox1ImageNameHasNumber(item) {
+  const name = getRandomBox1ImageName(item)
+  return /[0-9٠-٩]/.test(name)
+}
+
 function isSpecialImage(item) {
-  const id = Number(item?.id || 0)
-  return id >= 1 && id <= 30
+  return randomBox1ImageNameHasNumber(item)
 }
 
 function getRandomFromList(list) {
   if (!Array.isArray(list) || !list.length) return null
   return list[Math.floor(Math.random() * list.length)] || null
+}
+
+function getRandomBox1TeamKey(item) {
+  return getRandomBox1ImageName(item)
+    .toLowerCase()
+    .replace(/[0-9٠-٩]/g, "")
+    .replace(/[()]/g, "")
+    .replace(/[_\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
+function pairHasSameRandomBox1Team(pair = []) {
+  if (!Array.isArray(pair) || pair.length < 2) return false
+
+  const key1 = getRandomBox1TeamKey(pair[0])
+  const key2 = getRandomBox1TeamKey(pair[1])
+
+  if (!key1 || !key2) return false
+
+  return key1 === key2
+}
+
+function pairHasTwoNumberedRandomBox1Images(pair = []) {
+  if (!Array.isArray(pair) || pair.length < 2) return false
+
+  return (
+    randomBox1ImageNameHasNumber(pair[0]) &&
+    randomBox1ImageNameHasNumber(pair[1])
+  )
+}
+
+function getRandomBox1RecentTeamKeys() {
+  if (!randomChallengeState.box1) {
+    randomChallengeState.box1 = {}
+  }
+
+  if (!Array.isArray(randomChallengeState.box1.recentTeamKeys)) {
+    randomChallengeState.box1.recentTeamKeys = []
+  }
+
+  return randomChallengeState.box1.recentTeamKeys
+}
+
+function rememberRandomBox1Teams(pair = []) {
+  const recent = getRandomBox1RecentTeamKeys()
+
+  pair.forEach(item => {
+    const key = getRandomBox1TeamKey(item)
+    if (!key) return
+
+    recent.unshift(key)
+  })
+
+  randomChallengeState.box1.recentTeamKeys = recent.slice(0, 4)
+}
+
+function pairHasRecentRandomBox1Team(pair = []) {
+  const recent = getRandomBox1RecentTeamKeys()
+
+  return pair.some(item => {
+    const key = getRandomBox1TeamKey(item)
+    return key && recent.includes(key)
+  })
+}
+
+function pickRandomPairWithTeamVariety(source = []) {
+  let fallback = []
+
+  for (let i = 0; i < 60; i++) {
+    const pair = pickRandomPairWithRules(source)
+
+    if (!pair.length) continue
+    if (!fallback.length) fallback = pair
+
+    if (pairHasSameRandomBox1Team(pair)) continue
+    if (pairHasTwoNumberedRandomBox1Images(pair)) continue
+    if (pairHasRecentRandomBox1Team(pair)) continue
+
+    return pair
+  }
+
+  for (let i = 0; i < 60; i++) {
+    const pair = pickRandomPairWithRules(source)
+
+    if (!pair.length) continue
+
+    if (pairHasSameRandomBox1Team(pair)) continue
+    if (pairHasTwoNumberedRandomBox1Images(pair)) continue
+
+    return pair
+  }
+
+  return fallback.length ? fallback : pickRandomPairWithRules(source)
 }
 
 function getPoolWithoutIds(source, excludedIds = []) {
@@ -1066,7 +1181,7 @@ function startRandomChallengeBox1(pool = "saudi") {
 
   clearRandomChallengeTeamSelection()
 
-  const firstPair = pickRandomPairWithRules(source)
+  const firstPair = pickRandomPairWithTeamVariety(source)
 
   if (firstPair.length < 2) {
     showGameToast("تعذر تجهيز الصورتين")
@@ -1092,7 +1207,7 @@ function startRandomChallengeBox1(pool = "saudi") {
   randomBox1RouletteTimer = setInterval(() => {
     ticks++
 
-    const pair = pickRandomPairWithRules(source)
+    const pair = pickRandomPairWithTeamVariety(source)
 
     if (pair.length >= 2) {
       updateRandomBox1RouletteImages(pair[0], pair[1])
@@ -1102,7 +1217,7 @@ function startRandomChallengeBox1(pool = "saudi") {
       clearInterval(randomBox1RouletteTimer)
       randomBox1RouletteTimer = null
 
-      const finalImages = pickRandomPairWithRules(source)
+      const finalImages = pickRandomPairWithTeamVariety(source)
 
       if (finalImages.length < 2) {
         showGameToast("تعذر اختيار الصور")
@@ -1122,6 +1237,7 @@ function startRandomChallengeBox1(pool = "saudi") {
       randomChallengeState.box1.rolling = false
       randomChallengeState.box1.flashing = false
       randomChallengeState.box1.images = finalImages
+      rememberRandomBox1Teams(finalImages)
 
       updateRandomBox1RouletteImages(finalImages[0], finalImages[1])
       renderRandomChallengeControls()

@@ -18,6 +18,17 @@ let presenterJustJoined = false
 let presenterFinalForcedRound = null
 let presenterFinalForcedRoundUntil = 0
 let presenterFinalRoundOverride = null
+let presenterLocalSyncUntil = 0
+let presenterLocalOpenedSegment = null
+
+function markPresenterLocalSync(segment = presenterSegment, ms = 1200) {
+  presenterLocalSyncUntil = Date.now() + ms
+  presenterLocalOpenedSegment = segment || presenterSegment || null
+}
+
+function isPresenterLocalSyncProtected() {
+  return Date.now() < presenterLocalSyncUntil
+}
 /* =========================
    PRESENTER MODE
    control = تحكم
@@ -171,16 +182,6 @@ function showPresenterReaderSegmentPage() {
   hidePresenterInsideModeSwitch()
 }
 
-function getPresenterFinalRoundTitle(round) {
-  round = Number(round || 1)
-
-  if (round === 1) return "ٮدوں ٮڡاط"
-  if (round === 2) return "صح صحلي"
-  if (round === 3) return "قصة"
-  if (round === 4) return "التركيز"
-
-  return "الفاصلة"
-}
 
 function normalizePresenterSegmentKey(key) {
   key = String(key || "")
@@ -202,8 +203,8 @@ function getPresenterSegmentName(segment) {
   const key = normalizePresenterSegmentKey(segment)
 
   if (key === "final") {
-    return getPresenterFinalRoundTitle(presenterFinalRound)
-  }
+  return getPresenterFinalRoundTitle(presenterFinalRound, "short")
+}
 
   const item = ALL_PRESENTER_SEGMENTS.find(x => {
     return normalizePresenterSegmentKey(x.key) === key
@@ -764,6 +765,23 @@ function applyPresenterSessionData(data) {
   const rawNextSegment = data.active_segment || null
   const nextSegment = normalizePresenterSegmentFromSession(rawNextSegment)
 
+  if (
+  isPresenterLocalSyncProtected() &&
+  presenterSegment &&
+  !nextSegment
+) {
+  return
+}
+
+if (
+  isPresenterLocalSyncProtected() &&
+  presenterLocalOpenedSegment &&
+  nextSegment &&
+  normalizePresenterSegmentFromSession(presenterLocalOpenedSegment) !== nextSegment
+) {
+  return
+}
+
   const nextFinalRound = getPresenterFinalRoundFromSessionSegment(
     rawNextSegment,
     data.state?.final?.round || presenterFinalRound || 1
@@ -1135,6 +1153,8 @@ async function openPresenterSegment(segment) {
   presenterSelectedTeam = null
   presenterSegment = normalizePresenterSegmentFromSession(segment)
 
+  markPresenterLocalSync(presenterSegment, 1400)
+
   await renderPresenterSegmentShell(presenterSegment)
   await openPresenterSegmentFromSync(presenterSegment)
 
@@ -1179,6 +1199,8 @@ async function openPresenterFinalCard(round) {
       round
     }
   }
+
+  markPresenterLocalSync("final", 1600)
 
   await renderPresenterSegmentShell("final")
   await forcePresenterFinalRound(round)
@@ -1416,11 +1438,162 @@ function teamButtons() {
   `
 }
 
+function setPresenterLocalActiveTeam(team) {
+  if (team !== "A" && team !== "B") return
+
+  const s = presenterLiveState || {}
+
+  if (presenterSegment === "warmup") {
+    presenterLiveState = {
+      ...s,
+      warmup: {
+        ...(s.warmup || {}),
+        activeTeam: team,
+        selectedTeam: team,
+        warmupState: {
+          ...(s.warmup?.warmupState || {}),
+          activeTeam: team
+        }
+      }
+    }
+    return
+  }
+
+  if (presenterSegment === "top10") {
+    presenterLiveState = {
+      ...s,
+      top10: {
+        ...(s.top10 || {}),
+        activeTeam: team,
+        top10State: {
+          ...(s.top10?.top10State || {}),
+          activeTeam: team
+        }
+      }
+    }
+    return
+  }
+
+  if (presenterSegment === "auction") {
+    presenterLiveState = {
+      ...s,
+      auction: {
+        ...(s.auction || {}),
+        activeTeam: team,
+        auctionState: {
+          ...(s.auction?.auctionState || {}),
+          activeTeam: team
+        }
+      }
+    }
+    return
+  }
+
+  if (presenterSegment === "who") {
+    presenterLiveState = {
+      ...s,
+      who: {
+        ...(s.who || {}),
+        activeTeam: team,
+        whoState: {
+          ...(s.who?.whoState || {}),
+          activeTeam: team
+        }
+      }
+    }
+    return
+  }
+
+  if (presenterSegment === "explain") {
+    presenterLiveState = {
+      ...s,
+      explain: {
+        ...(s.explain || {}),
+        activeTeam: team,
+        currentTeam: team,
+        explainState: {
+          ...(s.explain?.explainState || {}),
+          activeTeam: team,
+          currentTeam: team
+        }
+      }
+    }
+    return
+  }
+
+  if (presenterSegment === "archive") {
+    presenterLiveState = {
+      ...s,
+      archive: {
+        ...(s.archive || {}),
+        activeTeam: team,
+        archiveState: {
+          ...(s.archive?.archiveState || {}),
+          activeTeam: team
+        }
+      }
+    }
+    return
+  }
+
+  if (presenterSegment === "randomChallenge") {
+    presenterLiveState = {
+      ...s,
+      randomChallenge: {
+        ...(s.randomChallenge || {}),
+        activeTeam: team,
+        box3: {
+          ...(s.randomChallenge?.box3 || {}),
+          activeTeam:
+            Number(s.randomChallenge?.currentBox || 0) === 3
+              ? team
+              : s.randomChallenge?.box3?.activeTeam || null
+        }
+      }
+    }
+    return
+  }
+
+  if (presenterSegment === "final") {
+    const round = Number(getPresenterFinalRound() || 1)
+
+    presenterLiveState = {
+      ...s,
+      final: {
+        ...(s.final || {}),
+        activeTeam: team,
+        round,
+        [`round${round}`]: {
+          ...(s.final?.[`round${round}`] || {}),
+          activeTeam: team,
+          currentTeam: team,
+          teamMedia:
+            round === 4
+              ? {
+                  ...(s.final?.round4?.teamMedia || {}),
+                  currentTeam: team
+                }
+              : s.final?.[`round${round}`]?.teamMedia
+        }
+      }
+    }
+  }
+}
+
 async function selectTeam(team) {
   if (team !== "A" && team !== "B") return
 
   presenterSelectedTeam = team
+  setPresenterLocalActiveTeam(team)
   updatePresenterTeamButtonsOnly(team)
+  markPresenterLocalSync(presenterSegment, 900)
+
+  if (presenterSegment === "randomChallenge") {
+    document.querySelectorAll(".presenterRandomTeamName").forEach((box, index) => {
+      const boxTeam = index === 0 ? "A" : "B"
+      box.classList.toggle("active", boxTeam === team)
+    })
+  }
 
   const sent = await sendCommand("selectTeam", {
     team,
@@ -1487,27 +1660,34 @@ function getPresenterCurrentNumberForLock() {
   return ""
 }
 
+
+
 function getPresenterActionLockTime(action) {
 
     if (action === "selectTeam") return 120
  
-  const fastActions = [
-    "toggleRound2Correct",
-    "toggleRound2ImageCorrect",
-    "hideRound2SequenceWord",
-    "randomBox3ScorePoints",
-    "randomBox3SwitchTeam",
-    "randomBox3Pass",
-    "showStoryPart",
-    "showNextImage"
-  ]
+const fastActions = [
+  "toggleRound2Correct",
+  "toggleRound2ImageCorrect",
+  "hideRound2SequenceWord",
+  "randomBox3ScorePoints",
+  "randomBox3SwitchTeam",
+  "randomBox3Pass",
+  "showStoryPart",
+  "showNextImage",
+  "showAnswer",
+  "switchTurn",
+  "randomSetAuctionPoints",
+  "decreaseCountdown",
+  "showQuestion",
+  "playCurrentFinalVideo",
+  "restartCurrentFinalVideo",
+  "restartCurrentFinalImage",
+  "stopCurrentFinalVideo"
+]
 
   if (fastActions.includes(action)) return 120
 
-  /*
-    أوامر النقاط والتسجيل نحميها أكثر
-    عشان ما تتكرر النقاط بالغلط
-  */
   const scoreActions = [
     "correct",
     "wrong",
@@ -3772,15 +3952,19 @@ function getPresenterRandomChallengeState() {
       active: false,
       started: false,
       rolling: false,
-      finished: false
+      finished: false,
+      pool: "",
+      images: []
     },
 
     box2: {
       active: false,
       finished: false,
       numberInput: "",
+      points: 0,
       calculatedPoints: 0,
-      timer: 30
+      timer: 30,
+      timerRunning: false
     },
 
     box3: {
@@ -3841,6 +4025,143 @@ function getPresenterRandomUiMode() {
   if (box === 3) return "box3Play"
 
   return `box${box}`
+}
+
+function getPresenterRandomImageName(item) {
+  const raw =
+    typeof item === "string"
+      ? item
+      : item?.image ||
+        item?.src ||
+        item?.url ||
+        item?.name ||
+        item?.title ||
+        item?.team ||
+        item?.club ||
+        ""
+
+  const fileName = String(raw)
+    .split("/")
+    .pop()
+    .split("\\")
+    .pop()
+    .replace(/\.[a-z0-9]+$/i, "")
+
+  return fileName
+    .replace(/[0-9٠-٩]/g, "")
+    .replace(/[()]/g, "")
+    .replace(/[_\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
+function getPresenterRandomBox1Players(state = getPresenterRandomChallengeState()) {
+  const box1 = state?.box1 || {}
+
+  if (Array.isArray(box1.images) && box1.images.length) {
+    return box1.images
+  }
+
+  if (Array.isArray(box1.players) && box1.players.length) {
+    return box1.players
+  }
+
+  if (Array.isArray(box1.currentPlayers) && box1.currentPlayers.length) {
+    return box1.currentPlayers
+  }
+
+  if (Array.isArray(box1.selectedImages) && box1.selectedImages.length) {
+    return box1.selectedImages
+  }
+
+  return [
+    box1.currentPlayer || box1.currentName || "",
+    box1.secondPlayer || box1.secondName || ""
+  ]
+}
+
+/* فتح المربعات محليًا فورًا + إرسال للعرض */
+function openPresenterRandomBox(box) {
+  const n = Number(box || 0)
+  if (!n) return
+
+  const oldRandom = presenterLiveState?.randomChallenge || {}
+
+  presenterLiveState = {
+    ...(presenterLiveState || {}),
+    randomChallenge: {
+      ...oldRandom,
+      currentBox: n,
+      activeTeam: null,
+
+      box1: {
+        ...(oldRandom.box1 || {}),
+        active: n === 1,
+        started: n === 1 ? false : !!oldRandom.box1?.started,
+        images: n === 1 ? [] : (oldRandom.box1?.images || [])
+      },
+
+      box2: {
+        ...(oldRandom.box2 || {}),
+        active: n === 2
+      },
+
+      box3: {
+        ...(oldRandom.box3 || {}),
+        active: n === 3
+      },
+
+      box4: {
+        ...(oldRandom.box4 || {}),
+        active: n === 4
+      }
+    }
+  }
+
+  presenterSelectedTeam = null
+  presenterRandomAuctionLocalPoints = Number(
+    presenterLiveState?.randomChallenge?.box2?.points ||
+    presenterLiveState?.randomChallenge?.box2?.calculatedPoints ||
+    0
+  )
+
+  markPresenterLocalSync("randomChallenge", 1000)
+
+  renderPresenterRandomChallenge()
+
+  sendCommand("randomOpenBox", {
+    box: n
+  })
+}
+
+/* بدء اللاعب المشترك محليًا فورًا */
+function startPresenterRandomBox1(pool) {
+  const cleanPool = pool === "world" ? "world" : "saudi"
+  const oldRandom = presenterLiveState?.randomChallenge || {}
+
+  presenterLiveState = {
+    ...(presenterLiveState || {}),
+    randomChallenge: {
+      ...oldRandom,
+      currentBox: 1,
+      box1: {
+        ...(oldRandom.box1 || {}),
+        active: true,
+        pool: cleanPool,
+        started: true,
+        rolling: true,
+        images: []
+      }
+    }
+  }
+
+  markPresenterLocalSync("randomChallenge", 1200)
+
+  renderPresenterRandomChallenge()
+
+  sendCommand("randomStartBox1", {
+    pool: cleanPool
+  })
 }
 
 function setPresenterRandomAuctionPoints(value, shouldSync = true) {
@@ -3915,15 +4236,29 @@ function renderPresenterRandomChallenge() {
   const errorsA = Number(state.box3?.errors?.A || 0)
   const errorsB = Number(state.box3?.errors?.B || 0)
 
-  const auctionPoints = Number(
-    presenterRandomAuctionLocalPoints ||
-    state.box2?.calculatedPoints ||
-    state.box2?.points ||
-    0
-  )
+  const auctionCount = Number(
+  presenterRandomAuctionLocalPoints ||
+  state.box2?.points ||
+  state.box2?.numberInput ||
+  state.box2?.calculatedPoints ||
+  0
+)
 
   const box1Pool = state.box1?.pool || ""
-  const box1Started = !!state.box1?.currentPlayer || !!state.box1?.started || !!state.box1?.currentName
+
+  const box1Images = Array.isArray(state.box1?.images)
+    ? state.box1.images
+    : []
+
+  const box1Started =
+    !!state.box1?.currentPlayer ||
+    !!state.box1?.started ||
+    !!state.box1?.currentName ||
+    box1Images.length > 0 ||
+    !!state.box1?.rolling
+
+  const box1NameA = getPresenterRandomImageName(box1Images[0])
+  const box1NameB = getPresenterRandomImageName(box1Images[1])
 
   panel.innerHTML = `
     <div class="presenterRandomLayout" data-random-mode="${uiMode}">
@@ -3941,7 +4276,7 @@ function renderPresenterRandomChallenge() {
                   type="button"
                   class="presenterRandomChooseBtn ${state.box1?.finished ? "presenterOpened" : ""}"
                   ${state.box1?.finished ? "disabled" : ""}
-                  onclick="sendCommand('randomOpenBox', { box: 1 })"
+                  onclick="openPresenterRandomBox(1)"
                 >
                   <span>1</span>
                   <strong>اللاعب المشترك</strong>
@@ -3951,7 +4286,7 @@ function renderPresenterRandomChallenge() {
                   type="button"
                   class="presenterRandomChooseBtn ${state.box2?.finished ? "presenterOpened" : ""}"
                   ${state.box2?.finished ? "disabled" : ""}
-                  onclick="sendCommand('randomOpenBox', { box: 2 })"
+                  onclick="openPresenterRandomBox(2)"
                 >
                   <span>2</span>
                   <strong>المزاد</strong>
@@ -3961,7 +4296,7 @@ function renderPresenterRandomChallenge() {
                   type="button"
                   class="presenterRandomChooseBtn ${state.box3?.finished ? "presenterOpened" : ""}"
                   ${state.box3?.finished ? "disabled" : ""}
-                  onclick="sendCommand('randomOpenBox', { box: 3 })"
+                  onclick="openPresenterRandomBox(3)"
                 >
                   <span>3</span>
                   <strong>ماذا تعرف</strong>
@@ -3971,7 +4306,7 @@ function renderPresenterRandomChallenge() {
                   type="button"
                   class="presenterRandomChooseBtn ${state.box4?.finished ? "presenterOpened" : ""}"
                   ${state.box4?.finished ? "disabled" : ""}
-                  onclick="sendCommand('randomOpenBox', { box: 4 })"
+                  onclick="openPresenterRandomBox(4)"
                 >
                   <span>4</span>
                   <strong>قريبًا</strong>
@@ -3996,7 +4331,7 @@ function renderPresenterRandomChallenge() {
                           <button
                             type="button"
                             class="presenterRandomChooseBtn ${box1Pool === "saudi" ? "active" : ""}"
-                            onclick="sendCommand('randomStartBox1', { pool: 'saudi' })"
+                            onclick="startPresenterRandomBox1('saudi')"
                           >
                             <span>🇸🇦</span>
                             <strong>الدوري السعودي</strong>
@@ -4005,7 +4340,7 @@ function renderPresenterRandomChallenge() {
                           <button
                             type="button"
                             class="presenterRandomChooseBtn ${box1Pool === "world" ? "active" : ""}"
-                            onclick="sendCommand('randomStartBox1', { pool: 'world' })"
+                            onclick="startPresenterRandomBox1('world')"
                           >
                             <span>🌍</span>
                             <strong>عالمي</strong>
@@ -4020,7 +4355,24 @@ function renderPresenterRandomChallenge() {
                   currentBox === 1 && box1Started
                     ? `
                       <section class="presenterCard presenterRandomBoxCard">
-                        <div class="presenterRandomTeamsOnly">
+
+                        <div class="presenterRandomPlayerNames">
+
+                          <div class="presenterRandomPlayerNameCard">
+                            <small>الاسم الأول</small>
+                            <strong>${presenterSafeHtml(box1NameA || "—")}</strong>
+                          </div>
+
+                          <div class="presenterRandomVsText">VS</div>
+
+                          <div class="presenterRandomPlayerNameCard">
+                            <small>الاسم الثاني</small>
+                            <strong>${presenterSafeHtml(box1NameB || "—")}</strong>
+                          </div>
+
+                        </div>
+
+                        <div class="presenterRandomTeamsOnly miniTeams">
                           <div class="presenterRandomTeamName ${activeTeam === "A" ? "active" : ""}">
                             ${presenterTeamAName}
                           </div>
@@ -4029,6 +4381,7 @@ function renderPresenterRandomChallenge() {
                             ${presenterTeamBName}
                           </div>
                         </div>
+
                       </section>
                     `
                     : ""
@@ -4055,7 +4408,7 @@ function renderPresenterRandomChallenge() {
                             type="tel"
                             inputmode="numeric"
                             placeholder="العدد"
-                            value="${auctionPoints || ""}"
+                            value="${auctionCount || ""}"
                             oninput="setPresenterRandomAuctionPoints(this.value)"
                           >
 
@@ -4065,7 +4418,7 @@ function renderPresenterRandomChallenge() {
                             class="presenterRandomAuctionPoints"
                             onclick="decreasePresenterRandomAuctionPoints()"
                           >
-                            ${auctionPoints}
+                            ${auctionCount}
                           </button>
                         </div>
                       </section>
@@ -4274,6 +4627,22 @@ function refreshPresenterRandomChallengeFromState() {
       : "اختر مربع"
   }
 
+  document.querySelectorAll(".presenterRandomTeamName").forEach((box, index) => {
+    const team = index === 0 ? "A" : "B"
+    box.classList.toggle("active", activeTeam === team)
+  })
+
+const box1Players = getPresenterRandomBox1Players(state)
+const playerNameCards = document.querySelectorAll(".presenterRandomPlayerNameCard strong")
+
+if (playerNameCards?.[0]) {
+  playerNameCards[0].innerText = getPresenterRandomImageName(box1Players[0]) || "—"
+}
+
+if (playerNameCards?.[1]) {
+  playerNameCards[1].innerText = getPresenterRandomImageName(box1Players[1]) || "—"
+}
+
   const errorsA = Number(state.box3?.errors?.A || 0)
   const errorsB = Number(state.box3?.errors?.B || 0)
 
@@ -4295,39 +4664,40 @@ function refreshPresenterRandomChallengeFromState() {
 
   const box3Timer = document.getElementById("presenterRandomBox3Timer")
 
-if (box3Timer) {
-  const timer = Number(state.box3?.timer || 5)
+  if (box3Timer) {
+    const timer = Number(state.box3?.timer || 5)
 
-  box3Timer.innerText = timer
-  box3Timer.classList.toggle("danger", timer <= 2)
-  box3Timer.classList.toggle("presenterTimerDanger", timer <= 2)
-}
-
-const pointsBox = document.getElementById("presenterRandomAuctionPoints")
-const input = document.getElementById("presenterRandomAuctionInput")
-
-if (pointsBox || input) {
-  const statePoints = Number(
-    state.box2?.calculatedPoints ??
-    state.box2?.points ??
-    0
-  )
-
-  const points =
-    document.activeElement === input
-      ? Number(presenterRandomAuctionLocalPoints || statePoints || 0)
-      : statePoints
-
-  presenterRandomAuctionLocalPoints = points
-
-  if (pointsBox) {
-    pointsBox.innerText = points
+    box3Timer.innerText = timer
+    box3Timer.classList.toggle("danger", timer <= 2)
+    box3Timer.classList.toggle("presenterTimerDanger", timer <= 2)
   }
 
-  if (input && document.activeElement !== input) {
-    input.value = points || ""
+  const pointsBox = document.getElementById("presenterRandomAuctionPoints")
+  const input = document.getElementById("presenterRandomAuctionInput")
+
+  if (pointsBox || input) {
+    const statePoints = Number(
+      state.box2?.points ??
+      state.box2?.numberInput ??
+      state.box2?.calculatedPoints ??
+      0
+    )
+
+    const points =
+      document.activeElement === input
+        ? Number(presenterRandomAuctionLocalPoints || statePoints || 0)
+        : statePoints
+
+    presenterRandomAuctionLocalPoints = points
+
+    if (pointsBox) {
+      pointsBox.innerText = points
+    }
+
+    if (input && document.activeElement !== input) {
+      input.value = points || ""
+    }
   }
-}
 }
 /* =========================
    FINAL - PRESENTER CLEAN VERSION
@@ -4353,15 +4723,29 @@ let presenterFinalPreviewCache = {
 
 let presenterFinalRound1FocusMode = false
 
-function getPresenterFinalRoundTitle(round = getPresenterFinalRound()) {
+function getPresenterFinalRoundTitle(round = getPresenterFinalRound(), mode = "full") {
   round = Number(round || 1)
 
-  if (round === 1) return "الفاصلة - بدون نقاط"
-  if (round === 2) return "الفاصلة - صح صحلي"
-  if (round === 3) return "الفاصلة - قصة"
-  if (round === 4) return "الفاصلة - التركيز"
+  const titles = {
+    1: {
+      short: "ٮدوں ٮڡاط",
+      full: "الفاصلة - بدون نقاط"
+    },
+    2: {
+      short: "صح صحلي",
+      full: "الفاصلة - صح صحلي"
+    },
+    3: {
+      short: "قصة",
+      full: "الفاصلة - قصة"
+    },
+    4: {
+      short: "التركيز",
+      full: "الفاصلة - التركيز"
+    }
+  }
 
-  return "الفاصلة"
+  return titles[round]?.[mode] || titles[round]?.full || "الفاصلة"
 }
 
 function presenterSafeHtml(value = "") {
@@ -4700,14 +5084,17 @@ async function presenterFinalCorrect() {
     setPresenterFinalRound1FocusMode(false)
   }
 
-  await sendCommand("stopCurrentFinalVideo")
+  sendCommand("stopCurrentFinalVideo")
 
-  await sendCommand("correct", {
+  const sent = await sendCommand("correct", {
     round,
     team: activeTeam || null
   })
 
+  if (!sent) return
+
   resetPresenterFinalLocalChoice(round)
+  markPresenterLocalSync("final", 900)
 
   setTimeout(() => {
     refreshPresenterFinalFromState()
@@ -4722,11 +5109,14 @@ async function presenterFinalWrong() {
     setPresenterFinalRound1FocusMode(false)
   }
 
-  await sendCommand("wrong", {
+  const sent = await sendCommand("wrong", {
     round
   })
 
+  if (!sent) return
+
   resetPresenterFinalLocalChoice(round)
+  markPresenterLocalSync("final", 900)
 
   setTimeout(() => {
     refreshPresenterFinalFromState()
@@ -4788,19 +5178,24 @@ async function renderFinal() {
 ========================= */
 
 async function presenterRecordFinalRound2Score(type) {
+  let sent = false
+
   if (type === "scramble") {
-    await sendCommand("recordScrambleScore")
+    sent = await sendCommand("recordScrambleScore")
   }
 
   if (type === "sequence") {
-    await sendCommand("recordSequenceScore")
+    sent = await sendCommand("recordSequenceScore")
   }
 
   if (type === "image") {
-    await sendCommand("recordImageScore")
+    sent = await sendCommand("recordImageScore")
   }
 
+  if (!sent) return
+
   resetPresenterFinalLocalChoice(2)
+  markPresenterLocalSync("final", 900)
 
   setTimeout(() => {
     renderPresenterFinalRoundContent()

@@ -974,11 +974,15 @@ function syncAfterExplainAction() {
 }
 
 function handleExplainPresenterAction(action, data) {
-  if (action === "selectTeam") {
+if (action === "selectTeam") {
   if (!isValidPresenterTeam(data.team)) return
 
   return safeRunPresenterAction(() => {
-    selectedTeam = data.team
+    if (typeof selectedTeam !== "undefined") {
+      selectedTeam = data.team
+    }
+
+    window.selectedTeam = data.team
     applyPresenterActiveTeam(data.team)
 
     if (typeof selectExplainTeam === "function") {
@@ -996,8 +1000,12 @@ function handleExplainPresenterAction(action, data) {
 
       if (!number) return
 
-      if (isValidPresenterTeam(team)) {
-  selectedTeam = team
+if (isValidPresenterTeam(team)) {
+  if (typeof selectedTeam !== "undefined") {
+    selectedTeam = team
+  }
+
+  window.selectedTeam = team
   applyPresenterActiveTeam(team)
 
   if (typeof selectExplainTeam === "function") {
@@ -1398,7 +1406,6 @@ if (action === "toggleRound2Correct") {
   })
 }
 
-syncAfterFinalPresenterAction()
 
 if (action === "toggleRound2ImageCorrect") {
   return safeRunPresenterAction(() => {
@@ -1446,8 +1453,6 @@ if (action === "toggleRound2ImageCorrect") {
 }
   })
 }
-syncAfterFinalPresenterAction()
-
   if (action === "hideRound2SequenceWord") {
   return safeRunPresenterAction(() => {
     if (window.finalState?.round !== 2) return
@@ -1759,13 +1764,20 @@ function syncAfterRandomChallengeAction() {
 function forceRandomChallengeTeamFromPresenter(team) {
   if (!isValidPresenterTeam(team)) return
 
-  if (typeof selectRandomChallengeTeam === "function") {
-    selectRandomChallengeTeam(team)
-    return
-  }
-
   if (typeof randomChallengeState !== "undefined") {
     randomChallengeState.activeTeam = team
+
+    if (!randomChallengeState.box3) {
+      randomChallengeState.box3 = {}
+    }
+
+    if (Number(randomChallengeState.currentBox || 0) === 3) {
+      randomChallengeState.box3.activeTeam = team
+    }
+  }
+
+  if (typeof selectRandomChallengeTeam === "function") {
+    selectRandomChallengeTeam(team)
   }
 
   if (typeof highlightRandomChallengeTeam === "function") {
@@ -1773,6 +1785,26 @@ function forceRandomChallengeTeamFromPresenter(team) {
   }
 
   syncAfterRandomChallengeAction()
+}
+
+function ensureRandomChallengeBoxState(box) {
+  const n = Number(box || 0)
+  if (!n) return
+
+  if (typeof randomChallengeState === "undefined") return
+
+  randomChallengeState.currentBox = n
+  randomChallengeState.activeTeam = null
+
+  if (!randomChallengeState.box1) randomChallengeState.box1 = {}
+  if (!randomChallengeState.box2) randomChallengeState.box2 = {}
+  if (!randomChallengeState.box3) randomChallengeState.box3 = {}
+  if (!randomChallengeState.box4) randomChallengeState.box4 = {}
+
+  randomChallengeState.box1.active = n === 1
+  randomChallengeState.box2.active = n === 2
+  randomChallengeState.box3.active = n === 3
+  randomChallengeState.box4.active = n === 4
 }
 
 function handleRandomChallengePresenterAction(action, data) {
@@ -1784,60 +1816,94 @@ function handleRandomChallengePresenterAction(action, data) {
     })
   }
 
-  if (action === "randomOpenBox") {
-    return safeRunPresenterAction(() => {
-      const box = Number(data.box || 0)
+if (action === "randomOpenBox") {
+  return safeRunPresenterAction(() => {
+    const box = Number(data.box || 0)
+    if (!box) return
 
-      if (!box) return
+    if (typeof randomChallengeState !== "undefined") {
+      randomChallengeState.currentBox = box
+      randomChallengeState.activeTeam = null
 
-      if (typeof openRandomChallengeBox === "function") {
-        openRandomChallengeBox(box)
-      }
+      if (!randomChallengeState.box1) randomChallengeState.box1 = {}
+      if (!randomChallengeState.box2) randomChallengeState.box2 = {}
+      if (!randomChallengeState.box3) randomChallengeState.box3 = {}
+      if (!randomChallengeState.box4) randomChallengeState.box4 = {}
 
-      syncAfterRandomChallengeAction()
-    })
-  }
+      randomChallengeState.box1.active = box === 1
+      randomChallengeState.box2.active = box === 2
+      randomChallengeState.box3.active = box === 3
+      randomChallengeState.box4.active = box === 4
+    }
+
+    if (typeof openRandomChallengeBox === "function") {
+      openRandomChallengeBox(box)
+    }
+
+    syncAfterRandomChallengeAction()
+  })
+}
 
 if (action === "randomStartBox1") {
   return safeRunPresenterAction(() => {
     const pool = data.pool === "world" ? "world" : "saudi"
 
+    ensureRandomChallengeBoxState(1)
+
+    if (typeof randomChallengeState !== "undefined") {
+      if (!randomChallengeState.box1) randomChallengeState.box1 = {}
+
+      randomChallengeState.currentBox = 1
+      randomChallengeState.box1.active = true
+      randomChallengeState.box1.pool = pool
+      randomChallengeState.box1.started = true
+      randomChallengeState.box1.rolling = true
+    }
+
     if (typeof startRandomChallengeBox1 === "function") {
       startRandomChallengeBox1(pool)
     }
 
-    syncAfterRandomChallengeAction()
+    setTimeout(() => {
+      ensureRandomChallengeBoxState(1)
+      syncAfterRandomChallengeAction()
+    }, 100)
   })
 }
 
 if (action === "randomSkip") {
   return safeRunPresenterAction(() => {
-    const currentBox = Number(randomChallengeState?.currentBox || 0)
+    ensureRandomChallengeBoxState(1)
 
-    if (currentBox === 1 && typeof startRandomChallengeBox1 === "function") {
-      const pool =
-        data.pool === "world" || randomChallengeState?.box1?.pool === "world"
-          ? "world"
-          : "saudi"
+    const pool =
+      data.pool === "world" || randomChallengeState?.box1?.pool === "world"
+        ? "world"
+        : "saudi"
 
+    if (typeof startRandomChallengeBox1 === "function") {
       startRandomChallengeBox1(pool)
     }
 
-    syncAfterRandomChallengeAction()
+    setTimeout(() => {
+      ensureRandomChallengeBoxState(1)
+      syncAfterRandomChallengeAction()
+    }, 100)
   })
 }
 
 if (action === "randomSetAuctionPoints") {
   return safeRunPresenterAction(() => {
-    const points = Math.max(0, Number(data.points || 0))
+    const count = Math.max(0, Number(data.points || 0))
 
     if (typeof randomChallengeState !== "undefined") {
       if (!randomChallengeState.box2) {
         randomChallengeState.box2 = {}
       }
 
-      randomChallengeState.box2.calculatedPoints = points
-      randomChallengeState.box2.points = points
+      randomChallengeState.box2.numberInput = String(count || "")
+      randomChallengeState.box2.points = count
+      randomChallengeState.box2.calculatedPoints =
+        count > 0 && count < 10 ? 1 : Math.floor(count / 10)
     }
 
     syncAfterRandomChallengeAction()
