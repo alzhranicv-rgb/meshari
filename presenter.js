@@ -3929,10 +3929,8 @@ function refreshPresenterExplainFromState() {
     btn.disabled = !currentNumber || revealLock
   })
 }
-
 /* =========================
    RANDOM CHALLENGE / التحدي
-   PRESENTER CLEAN REDESIGN
 ========================= */
 
 let presenterRandomAuctionLocalCount = 0
@@ -4029,7 +4027,7 @@ function getPresenterRandomBoxTitle(box) {
   if (n === 3) return "ماذا تعرف"
   if (n === 4) return "قريبًا"
 
-  return "اختر مربع"
+  return "التحدي"
 }
 
 function getPresenterRandomUiMode() {
@@ -4126,7 +4124,6 @@ function getPresenterRandomAuctionFixedPoints(state = getPresenterRandomChalleng
   )
 }
 
-/* فتح المربعات محليًا فورًا + إرسال للعرض */
 function openPresenterRandomBox(box) {
   const n = Number(box || 0)
   if (!n) return
@@ -4171,6 +4168,7 @@ function openPresenterRandomBox(box) {
 
   if (n === 2) {
     const state = getPresenterRandomChallengeState()
+
     presenterRandomAuctionLocalCount = Number(
       state.box2?.points ||
       state.box2?.numberInput ||
@@ -4194,7 +4192,48 @@ function openPresenterRandomBox(box) {
   })
 }
 
-/* بدء اللاعب المشترك محليًا فورًا */
+function presenterRandomBackStep() {
+  const state = getPresenterRandomChallengeState()
+  const currentBox = getPresenterRandomCurrentBox()
+
+  if (!currentBox) return
+
+  if (currentBox === 1 && state.box1?.started) {
+    presenterLiveState = {
+      ...(presenterLiveState || {}),
+      randomChallenge: {
+        ...(presenterLiveState?.randomChallenge || {}),
+        currentBox: 1,
+        box1: {
+          ...(presenterLiveState?.randomChallenge?.box1 || {}),
+          active: true,
+          started: false,
+          rolling: false,
+          flashing: false,
+          images: []
+        }
+      }
+    }
+
+    markPresenterLocalSync("randomChallenge", 800)
+    renderPresenterRandomChallenge()
+    return
+  }
+
+  presenterLiveState = {
+    ...(presenterLiveState || {}),
+    randomChallenge: {
+      ...(presenterLiveState?.randomChallenge || {}),
+      currentBox: null,
+      activeTeam: null
+    }
+  }
+
+  presenterSelectedTeam = null
+  markPresenterLocalSync("randomChallenge", 800)
+  renderPresenterRandomChallenge()
+}
+
 function startPresenterRandomBox1(pool) {
   const cleanPool = pool === "world" ? "world" : "saudi"
   const oldRandom = presenterLiveState?.randomChallenge || {}
@@ -4223,7 +4262,6 @@ function startPresenterRandomBox1(pool) {
   })
 }
 
-/* إدخال العدد: يثبت النقاط حسب أول عدد */
 function setPresenterRandomAuctionPoints(value, shouldSync = true) {
   const input = document.getElementById("presenterRandomAuctionInput")
   const countBox = document.getElementById("presenterRandomAuctionCount")
@@ -4251,7 +4289,6 @@ function setPresenterRandomAuctionPoints(value, shouldSync = true) {
   }
 }
 
-/* إنقاص العدد فقط — النقاط تبقى ثابتة */
 function decreasePresenterRandomAuctionPoints() {
   const current = Number(presenterRandomAuctionLocalCount || 0)
   const fixed = Number(
@@ -4312,48 +4349,6 @@ function finishPresenterRandomBox3Round() {
   }, 180)
 }
 
-function presenterRandomBackStep() {
-  const state = getPresenterRandomChallengeState()
-  const currentBox = getPresenterRandomCurrentBox()
-
-  if (!currentBox) return
-
-  if (currentBox === 1 && state.box1?.started) {
-    presenterLiveState = {
-      ...(presenterLiveState || {}),
-      randomChallenge: {
-        ...(presenterLiveState?.randomChallenge || {}),
-        currentBox: 1,
-        box1: {
-          ...(presenterLiveState?.randomChallenge?.box1 || {}),
-          active: true,
-          started: false,
-          rolling: false,
-          flashing: false,
-          images: []
-        }
-      }
-    }
-
-    markPresenterLocalSync("randomChallenge", 800)
-    renderPresenterRandomChallenge()
-    return
-  }
-
-  presenterLiveState = {
-    ...(presenterLiveState || {}),
-    randomChallenge: {
-      ...(presenterLiveState?.randomChallenge || {}),
-      currentBox: null,
-      activeTeam: null
-    }
-  }
-
-  presenterSelectedTeam = null
-  markPresenterLocalSync("randomChallenge", 800)
-  renderPresenterRandomChallenge()
-}
-
 function renderPresenterRandomChallenge() {
   const panel = document.getElementById("presenterPanel")
   if (!panel) return
@@ -4394,11 +4389,6 @@ function renderPresenterRandomChallenge() {
         !currentBox
           ? `
             <section class="presenterRandomIntroCard">
-              <div class="presenterRandomIntroTop">
-                <span>فقرة التحدي</span>
-                <strong>اختر نوع التحدي</strong>
-              </div>
-
               <div class="presenterRandomChooseGrid">
 
                 <button
@@ -4409,7 +4399,6 @@ function renderPresenterRandomChallenge() {
                 >
                   <span>01</span>
                   <strong>اللاعب المشترك</strong>
-                  <small>اختيار لاعبين بالقرعة</small>
                 </button>
 
                 <button
@@ -4420,7 +4409,6 @@ function renderPresenterRandomChallenge() {
                 >
                   <span>02</span>
                   <strong>المزاد</strong>
-                  <small>عدد يتناقص ونقاط ثابتة</small>
                 </button>
 
                 <button
@@ -4431,7 +4419,6 @@ function renderPresenterRandomChallenge() {
                 >
                   <span>03</span>
                   <strong>ماذا تعرف</strong>
-                  <small>مؤقت وأخطاء الفريق</small>
                 </button>
 
                 <button
@@ -4442,7 +4429,6 @@ function renderPresenterRandomChallenge() {
                 >
                   <span>04</span>
                   <strong>قريبًا</strong>
-                  <small>مربع احتياطي</small>
                 </button>
 
               </div>
@@ -4450,16 +4436,23 @@ function renderPresenterRandomChallenge() {
           `
           : `
             <div class="presenterRandomHeaderLine">
-              <button type="button" class="presenterRandomBackBtn" onclick="presenterRandomBackStep()">
-                 رجوع
+              <button
+                type="button"
+                class="presenterRandomBackBtn"
+                onclick="presenterRandomBackStep()"
+              >
+                رجوع
               </button>
 
               <div>
-                <span>المربع الحالي</span>
                 <strong>${getPresenterRandomBoxTitle(currentBox)}</strong>
               </div>
 
-              <button type="button" class="presenterRandomEndBtn" onclick="sendCommand('randomFinishBox')">
+              <button
+                type="button"
+                class="presenterRandomEndBtn"
+                onclick="sendCommand('randomFinishBox')"
+              >
                 إنهاء
               </button>
             </div>
@@ -4472,11 +4465,6 @@ function renderPresenterRandomChallenge() {
                   currentBox === 1 && !box1Started
                     ? `
                       <section class="presenterRandomGlassCard">
-                        <div class="presenterRandomSectionTitle">
-                          <span>اللاعب المشترك</span>
-                          <strong>اختر مصدر القرعة</strong>
-                        </div>
-
                         <div class="presenterRandomPoolGrid">
                           <button
                             type="button"
@@ -4505,21 +4493,14 @@ function renderPresenterRandomChallenge() {
                   currentBox === 1 && box1Started
                     ? `
                       <section class="presenterRandomGlassCard">
-                        <div class="presenterRandomSectionTitle">
-                          <span>اللاعب المشترك</span>
-                          <strong>الأسماء في المقدم</strong>
-                        </div>
-
                         <div class="presenterRandomPlayerNames">
                           <div class="presenterRandomPlayerNameCard">
-                            <small>الاسم الأول</small>
                             <strong>${presenterRandomSafeHtml(box1NameA || "—")}</strong>
                           </div>
 
                           <div class="presenterRandomVsText">VS</div>
 
                           <div class="presenterRandomPlayerNameCard">
-                            <small>الاسم الثاني</small>
                             <strong>${presenterRandomSafeHtml(box1NameB || "—")}</strong>
                           </div>
                         </div>
@@ -4532,19 +4513,12 @@ function renderPresenterRandomChallenge() {
                   currentBox === 2
                     ? `
                       <section class="presenterRandomGlassCard presenterRandomAuctionCard">
-                        <div class="presenterRandomSectionTitle">
-                          <span>المزاد</span>
-                          <strong>العدد يتناقص — النقاط ثابتة</strong>
-                        </div>
-
                         <div class="presenterRandomAuctionInputWrap">
-                          <label>أدخل العدد</label>
                           <input
                             id="presenterRandomAuctionInput"
                             class="presenterRandomAuctionInput"
                             type="tel"
                             inputmode="numeric"
-                            placeholder="مثال: 35"
                             value="${auctionCount || ""}"
                             oninput="setPresenterRandomAuctionPoints(this.value)"
                           >
@@ -4556,21 +4530,15 @@ function renderPresenterRandomChallenge() {
                             class="presenterRandomMetric countMetric"
                             onclick="decreasePresenterRandomAuctionPoints()"
                           >
-                            <small>العدد المتبقي</small>
                             <strong id="presenterRandomAuctionCount">${auctionCount}</strong>
-                            <span>اضغط للإنقاص</span>
                           </button>
 
                           <div class="presenterRandomMetric timerMetric">
-                            <small>المؤقت</small>
                             <strong id="presenterRandomAuctionTimer">${auctionTimer}</strong>
-                            <span>ثانية</span>
                           </div>
 
                           <div class="presenterRandomMetric pointsMetric">
-                            <small>النقاط الثابتة</small>
                             <strong id="presenterRandomAuctionFixed">${auctionFixedPoints}</strong>
-                            <span>لا تتغير عند النقص</span>
                           </div>
                         </div>
                       </section>
@@ -4582,11 +4550,6 @@ function renderPresenterRandomChallenge() {
                   currentBox === 3 && !state.box3?.choosingPoints
                     ? `
                       <section class="presenterRandomGlassCard presenterRandomKnowCard">
-                        <div class="presenterRandomSectionTitle">
-                          <span>ماذا تعرف</span>
-                          <strong>المؤقت متزامن مع العرض</strong>
-                        </div>
-
                         <div
                           id="presenterRandomBox3Timer"
                           class="presenterRandomBox3Timer ${box3Timer <= 2 ? "danger presenterTimerDanger" : ""}"
@@ -4614,11 +4577,6 @@ function renderPresenterRandomChallenge() {
                   currentBox === 3 && state.box3?.choosingPoints
                     ? `
                       <section class="presenterRandomGlassCard">
-                        <div class="presenterRandomSectionTitle">
-                          <span>ماذا تعرف</span>
-                          <strong>تسجيل النقاط</strong>
-                        </div>
-
                         <div class="presenterRandomScoreButtons">
                           <button type="button" class="presenterBtn green" onclick="sendCommand('randomBox3ScorePoints', { points: 1 })">1</button>
                           <button type="button" class="presenterBtn green" onclick="sendCommand('randomBox3ScorePoints', { points: 2 })">2</button>
@@ -4632,12 +4590,7 @@ function renderPresenterRandomChallenge() {
                 ${
                   currentBox === 4
                     ? `
-                      <section class="presenterRandomGlassCard">
-                        <div class="presenterRandomSectionTitle">
-                          <span>قريبًا</span>
-                          <strong>هذا المربع غير مفعّل حاليًا</strong>
-                        </div>
-                      </section>
+                      <section class="presenterRandomGlassCard"></section>
                     `
                     : ""
                 }
@@ -4667,7 +4620,7 @@ function renderPresenterRandomChallenge() {
                       box1Started
                         ? `
                           <button type="button" class="presenterBtn gray" onclick="sendCommand('randomSkip')">
-                            إعادة القرعة
+                            إعادة
                           </button>
 
                           <button type="button" class="presenterBtn green" onclick="sendCommand('correct')">
@@ -4682,7 +4635,7 @@ function renderPresenterRandomChallenge() {
                     }
 
                     <button type="button" class="presenterBtn dark" onclick="sendCommand('randomFinishBox')">
-                      إنهاء المربع
+                      إنهاء
                     </button>
                   `
                   : ""
@@ -4692,7 +4645,7 @@ function renderPresenterRandomChallenge() {
                 currentBox === 2
                   ? `
                     <button type="button" class="presenterBtn dark" onclick="sendCommand('randomStartBox2Timer')">
-                      بدء المؤقت
+                      بدء
                     </button>
 
                     <button type="button" class="presenterBtn green" onclick="sendPresenterRandomAuctionScore('correct')">
@@ -4704,7 +4657,7 @@ function renderPresenterRandomChallenge() {
                     </button>
 
                     <button type="button" class="presenterBtn gray" onclick="sendCommand('randomFinishBox')">
-                      إنهاء المربع
+                      إنهاء
                     </button>
                   `
                   : ""
@@ -4726,7 +4679,7 @@ function renderPresenterRandomChallenge() {
                     </button>
 
                     <button type="button" class="presenterBtn dark" onclick="finishPresenterRandomBox3Round()">
-                      إنهاء الجولة
+                      إنهاء
                     </button>
                   `
                   : ""
@@ -4736,7 +4689,7 @@ function renderPresenterRandomChallenge() {
                 currentBox === 3 && state.box3?.choosingPoints
                   ? `
                     <button type="button" class="presenterBtn gray" onclick="sendCommand('randomFinishBox')">
-                      إنهاء المربع
+                      إنهاء
                     </button>
                   `
                   : ""
