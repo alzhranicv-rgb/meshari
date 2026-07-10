@@ -385,6 +385,46 @@ function forceDisplayFinalRoundFromPresenter(round, afterReady = null) {
     }
   }
 }
+
+/* =========================
+   RANDOM CHALLENGE TIMER SYNC WATCHER
+   مزامنة مؤقت ماذا تعرف مع المقدم
+========================= */
+
+let randomChallengeBox3TimerLastSyncKey = ""
+let randomChallengeBox3TimerSyncInterval = null
+
+function startRandomChallengeBox3TimerSessionSync() {
+  if (randomChallengeBox3TimerSyncInterval) return
+
+  randomChallengeBox3TimerSyncInterval = setInterval(() => {
+    if (typeof randomChallengeState === "undefined") return
+
+    const activeSegment = normalizeDisplaySegmentKey(
+      localStorage.getItem("active_segment") || ""
+    )
+
+    if (activeSegment !== "randomChallenge") return
+    if (Number(randomChallengeState.currentBox || 0) !== 3) return
+
+    const timer = Number(randomChallengeState.box3?.timer || 0)
+    const activeTeam = randomChallengeState.box3?.activeTeam || randomChallengeState.activeTeam || ""
+    const errorsA = Number(randomChallengeState.box3?.errors?.A || 0)
+    const errorsB = Number(randomChallengeState.box3?.errors?.B || 0)
+    const choosingPoints = randomChallengeState.box3?.choosingPoints ? "1" : "0"
+
+    const key = `${timer}_${activeTeam}_${errorsA}_${errorsB}_${choosingPoints}`
+
+    if (key === randomChallengeBox3TimerLastSyncKey) return
+
+    randomChallengeBox3TimerLastSyncKey = key
+
+    if (typeof syncDisplayStateToSession === "function") {
+      syncDisplayStateToSession()
+    }
+  }, 450)
+}
+
 /* =========================
    HANDLE COMMANDS
 ========================= */
@@ -1887,22 +1927,42 @@ function handleRandomChallengePresenterAction(action, data) {
     })
   }
 
-  if (action === "randomSetAuctionPoints") {
-    return safeRunPresenterAction(() => {
-      const count = Math.max(0, Number(data.points || 0))
+if (action === "randomSetAuctionPoints") {
+  return safeRunPresenterAction(() => {
+    const count = Math.max(
+      0,
+      Number(data.count ?? data.points ?? 0)
+    )
 
-      if (typeof randomChallengeState !== "undefined") {
-        if (!randomChallengeState.box2) randomChallengeState.box2 = {}
+    const incomingFixed = Number(data.calculatedPoints || 0)
+    const keepFixed = !!data.keepFixedPoints
 
-        randomChallengeState.box2.numberInput = String(count || "")
-        randomChallengeState.box2.points = count
-        randomChallengeState.box2.calculatedPoints =
-          count > 0 && count < 10 ? 1 : Math.floor(count / 10)
+    if (typeof randomChallengeState !== "undefined") {
+      if (!randomChallengeState.box2) {
+        randomChallengeState.box2 = {}
       }
 
-      syncAfterRandomChallengeAction()
-    })
-  }
+      const oldFixed = Number(randomChallengeState.box2.calculatedPoints || 0)
+
+      randomChallengeState.box2.numberInput = String(count || "")
+      randomChallengeState.box2.points = count
+
+      randomChallengeState.box2.calculatedPoints =
+        keepFixed
+          ? Number(incomingFixed || oldFixed || 0)
+          : Number(
+              incomingFixed ||
+              (
+                count > 0 && count < 10
+                  ? 1
+                  : Math.floor(count / 10)
+              )
+            )
+    }
+
+    syncAfterRandomChallengeAction()
+  })
+}
 
   if (action === "randomStartBox2Timer") {
     return safeRunPresenterAction(() => {
@@ -2022,4 +2082,5 @@ function handleRandomChallengePresenterAction(action, data) {
 window.addEventListener("load", () => {
   restoreDisplayControlsMode()
   listenPresenterCommands()
+  startRandomChallengeBox3TimerSessionSync()
 })

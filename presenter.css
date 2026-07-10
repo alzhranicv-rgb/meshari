@@ -4737,3 +4737,531 @@ button:disabled {
   min-height:58px;
   font-size:1.05rem;
 }
+/* =========================================================
+   PRESENTER RANDOM CHALLENGE - CLEAN GLASS REDESIGN
+========================================================= */
+
+.presenterRandomLayout,
+.presenterRandomLayout *{
+  box-sizing:border-box;
+}
+
+.presenterRandomLayout{
+  width:100%;
+  min-height:calc(100svh - 140px);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.presenterRandomIntroCard,
+.presenterRandomGlassCard{
+  width:100%;
+  border:1px solid rgba(255,255,255,.72);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.86), rgba(255,255,255,.52)),
+    radial-gradient(circle at 15% 10%, rgba(255,155,81,.18), transparent 34%),
+    radial-gradient(circle at 85% 18%, rgba(103,232,249,.18), transparent 32%);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-radius:28px;
+  box-shadow:
+    0 24px 60px rgba(15,23,42,.12),
+    inset 0 1px 0 rgba(255,255,255,.72);
+  padding:18px;
+}
+
+.presenterRandomIntroTop,
+.presenterRandomSectionTitle{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  text-align:center;
+  margin-bottom:16px;
+}
+
+.presenterRandomIntroTop span,
+.presenterRandomSectionTitle span{
+  font-size:.92rem;
+  color:#64748b;
+}
+
+.presenterRandomIntroTop strong,
+.presenterRandomSectionTitle strong{
+  font-size:clamp(1.35rem, 2.2vw, 2rem);
+  color:#24185e;
+  line-height:1.15;
+}
+
+.presenterRandomChooseGrid{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0,1fr));
+  gap:12px;
+}
+
+.presenterRandomChooseBtn{
+  min-height:150px;
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:24px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.92), rgba(241,245,249,.7));
+  box-shadow:
+    0 16px 34px rgba(15,23,42,.1),
+    inset 0 1px 0 rgba(255,255,255,.9);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  color:#24185e;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.presenterRandomChooseBtn span{
+  width:52px;
+  height:52px;
+  border-radius:18px;
+  display:grid;
+  place-items:center;
+  background:rgba(255,155,81,.16);
+  color:#f97316;
+  font-size:1.25rem;
+  font-weight:900;
+}
+
+.presenterRandomChooseBtn strong{
+  font-size:1.1rem;
+  line-height:1.2;
+}
+
+.presenterRandomChooseBtn small{
+  color:#64748b;
+  font-size:.82rem;
+}
+
+.presenterRandomChooseBtn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 22px 42px rgba(15,23,42,.14);
+}
+
+.presenterRandomChooseBtn.active,
+.presenterRandomChooseBtn:active{
+  border-color:rgba(249,115,22,.38);
+  box-shadow:
+    0 18px 42px rgba(249,115,22,.18),
+    inset 0 0 0 2px rgba(249,115,22,.12);
+}
+
+.presenterRandomChooseBtn.presenterOpened{
+  opacity:.52;
+  filter:grayscale(.2);
+}
+
+.presenterRandomHeaderLine{
+  width:100%;
+  display:grid;
+  grid-template-columns:120px 1fr 120px;
+  align-items:center;
+  gap:10px;
+  border:1px solid rgba(255,255,255,.7);
+  background:rgba(255,255,255,.66);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-radius:24px;
+  padding:10px;
+  box-shadow:0 14px 34px rgba(15,23,42,.08);
+}
+
+.presenterRandomHeaderLine > div{
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.presenterRandomHeaderLine span{
+  color:#64748b;
+  font-size:.78rem;
+}
+
+.presenterRandomHeaderLine strong{
+  color:#24185e;
+  font-size:1.25rem;
+}
+
+.presenterRandomBackBtn,
+.presenterRandomEndBtn{
+  height:48px;
+  border:0;
+  border-radius:18px;
+  font-family:inherit;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.presenterRandomBackBtn{
+  background:rgba(226,232,240,.82);
+  color:#334155;
+}
+
+.presenterRandomEndBtn{
+  background:rgba(225,29,72,.1);
+  color:#e11d48;
+}
+
+.presenterRandomPage{
+  flex:1;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 270px;
+  gap:12px;
+  align-items:stretch;
+}
+
+.presenterRandomMain{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+
+.presenterRandomSide{
+  min-width:0;
+}
+
+.presenterRandomTeamsBox .presenterTeams{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.presenterRandomTeamsBox .presenterBtn{
+  min-height:68px;
+  border-radius:22px;
+  font-size:1.05rem;
+}
+
+.presenterRandomPoolGrid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:12px;
+}
+
+.presenterRandomPoolBtn{
+  min-height:170px;
+  border:1px solid rgba(255,255,255,.76);
+  border-radius:26px;
+  background:rgba(255,255,255,.76);
+  box-shadow:0 18px 40px rgba(15,23,42,.1);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  cursor:pointer;
+  color:#24185e;
+}
+
+.presenterRandomPoolBtn span{
+  font-size:2.4rem;
+}
+
+.presenterRandomPoolBtn strong{
+  font-size:1.35rem;
+}
+
+.presenterRandomPoolBtn.active{
+  border-color:rgba(249,115,22,.4);
+  background:linear-gradient(180deg, rgba(255,247,237,.92), rgba(255,255,255,.76));
+}
+
+.presenterRandomPlayerNames{
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 76px minmax(0,1fr);
+  gap:12px;
+  align-items:center;
+}
+
+.presenterRandomPlayerNameCard{
+  min-height:180px;
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:28px;
+  background:rgba(255,255,255,.78);
+  box-shadow:0 18px 40px rgba(15,23,42,.1);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  text-align:center;
+  padding:16px;
+}
+
+.presenterRandomPlayerNameCard small{
+  color:#64748b;
+  font-size:.86rem;
+}
+
+.presenterRandomPlayerNameCard strong{
+  color:#24185e;
+  font-size:clamp(1.55rem, 4vw, 2.6rem);
+  line-height:1.1;
+  word-break:break-word;
+}
+
+.presenterRandomVsText{
+  width:76px;
+  height:76px;
+  border-radius:26px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg, #ff9b51, #f97316);
+  color:white;
+  font-size:1.2rem;
+  font-weight:900;
+  box-shadow:0 18px 34px rgba(249,115,22,.28);
+}
+
+.presenterRandomAuctionInputWrap{
+  width:min(100%, 520px);
+  margin:0 auto 16px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  text-align:center;
+}
+
+.presenterRandomAuctionInputWrap label{
+  color:#64748b;
+  font-size:.9rem;
+}
+
+.presenterRandomAuctionInput{
+  width:100%;
+  height:76px;
+  border:1px solid rgba(255,255,255,.8);
+  border-radius:24px;
+  background:rgba(255,255,255,.82);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+  text-align:center;
+  color:#24185e;
+  font-size:2rem;
+  font-weight:900;
+  outline:none;
+  font-family:inherit;
+}
+
+.presenterRandomAuctionMetrics{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:12px;
+}
+
+.presenterRandomMetric{
+  min-height:166px;
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:28px;
+  background:rgba(255,255,255,.76);
+  box-shadow:0 18px 40px rgba(15,23,42,.1);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  text-align:center;
+  color:#24185e;
+}
+
+button.presenterRandomMetric{
+  cursor:pointer;
+  font-family:inherit;
+}
+
+.presenterRandomMetric small{
+  color:#64748b;
+  font-size:.82rem;
+}
+
+.presenterRandomMetric strong{
+  font-size:clamp(2.3rem, 5vw, 4rem);
+  line-height:1;
+  color:#24185e;
+}
+
+.presenterRandomMetric span{
+  color:#94a3b8;
+  font-size:.78rem;
+}
+
+.presenterRandomMetric.pointsMetric strong{
+  color:#16a34a;
+}
+
+.presenterRandomMetric.countMetric strong{
+  color:#f97316;
+}
+
+.presenterRandomMetric.timerMetric strong{
+  color:#24185e;
+}
+
+.presenterRandomKnowCard{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.presenterRandomBox3Timer{
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  margin:4px auto 18px;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,255,255,.95), rgba(255,255,255,.58)),
+    linear-gradient(135deg, rgba(103,232,249,.24), rgba(255,155,81,.18));
+  border:1px solid rgba(255,255,255,.82);
+  box-shadow:
+    0 22px 50px rgba(15,23,42,.12),
+    inset 0 0 0 10px rgba(255,255,255,.35);
+  color:#24185e;
+  font-size:4.8rem;
+  font-weight:900;
+  line-height:1;
+}
+
+.presenterRandomBox3Timer.danger{
+  color:#e11d48;
+  animation:presenterRandomPulse .75s ease-in-out infinite alternate;
+}
+
+@keyframes presenterRandomPulse{
+  from{ transform:scale(1); }
+  to{ transform:scale(1.045); }
+}
+
+.presenterRandomKnowBoard{
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.presenterRandomKnowTeam{
+  min-height:130px;
+  border:1px solid rgba(255,255,255,.78);
+  border-radius:26px;
+  background:rgba(255,255,255,.76);
+  box-shadow:0 16px 36px rgba(15,23,42,.09);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  text-align:center;
+}
+
+.presenterRandomKnowTeam span{
+  color:#334155;
+  font-size:1rem;
+}
+
+.presenterRandomKnowTeam strong{
+  color:#24185e;
+  font-size:2.2rem;
+}
+
+.presenterRandomKnowTeam.active{
+  border-color:rgba(249,115,22,.42);
+  background:linear-gradient(180deg, rgba(255,247,237,.92), rgba(255,255,255,.76));
+  box-shadow:0 20px 42px rgba(249,115,22,.16);
+}
+
+.presenterRandomScoreButtons{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:12px;
+}
+
+.presenterRandomScoreButtons .presenterBtn{
+  min-height:120px;
+  border-radius:28px;
+  font-size:2.2rem;
+}
+
+.presenterRandomActionsArea{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterRandomActionsArea .presenterBtn{
+  min-height:62px;
+  border-radius:20px;
+  font-size:1rem;
+}
+
+@media (max-width: 980px){
+  .presenterRandomChooseGrid{
+    grid-template-columns:repeat(2, minmax(0,1fr));
+  }
+
+  .presenterRandomPage{
+    grid-template-columns:1fr;
+  }
+
+  .presenterRandomTeamsBox .presenterTeams{
+    flex-direction:row;
+  }
+
+  .presenterRandomActionsArea{
+    grid-template-columns:repeat(2, minmax(0,1fr));
+  }
+}
+
+@media (max-width: 640px){
+  .presenterRandomLayout{
+    min-height:auto;
+  }
+
+  .presenterRandomHeaderLine{
+    grid-template-columns:82px 1fr 82px;
+  }
+
+  .presenterRandomBackBtn,
+  .presenterRandomEndBtn{
+    height:44px;
+    font-size:.8rem;
+  }
+
+  .presenterRandomChooseGrid,
+  .presenterRandomPoolGrid,
+  .presenterRandomAuctionMetrics,
+  .presenterRandomKnowBoard,
+  .presenterRandomPlayerNames{
+    grid-template-columns:1fr;
+  }
+
+  .presenterRandomVsText{
+    margin:auto;
+  }
+
+  .presenterRandomChooseBtn{
+    min-height:120px;
+  }
+
+  .presenterRandomPlayerNameCard{
+    min-height:130px;
+  }
+
+  .presenterRandomBox3Timer{
+    width:138px;
+    height:138px;
+    font-size:3.8rem;
+  }
+}

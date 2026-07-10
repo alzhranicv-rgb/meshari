@@ -3932,10 +3932,29 @@ function refreshPresenterExplainFromState() {
 
 /* =========================
    RANDOM CHALLENGE / التحدي
+   PRESENTER CLEAN REDESIGN
 ========================= */
 
-let presenterRandomAuctionLocalPoints = 0
+let presenterRandomAuctionLocalCount = 0
+let presenterRandomAuctionFixedPoints = 0
 let presenterRandomLastUiMode = ""
+
+function presenterRandomSafeHtml(value = "") {
+  if (typeof presenterSafeHtml === "function") {
+    return presenterSafeHtml(value)
+  }
+
+  if (typeof escapeDisplayHtml === "function") {
+    return escapeDisplayHtml(value)
+  }
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;")
+}
 
 function getPresenterRandomChallengeRoot() {
   return presenterLiveState?.randomChallenge || {}
@@ -3952,9 +3971,11 @@ function getPresenterRandomChallengeState() {
       active: false,
       started: false,
       rolling: false,
+      flashing: false,
       finished: false,
       pool: "",
-      images: []
+      images: [],
+      recentTeamKeys: []
     },
 
     box2: {
@@ -4080,6 +4101,31 @@ function getPresenterRandomBox1Players(state = getPresenterRandomChallengeState(
   ]
 }
 
+function getPresenterRandomAuctionCount(state = getPresenterRandomChallengeState()) {
+  return Number(
+    presenterRandomAuctionLocalCount ||
+    state.box2?.points ||
+    state.box2?.numberInput ||
+    0
+  )
+}
+
+function calcPresenterRandomAuctionFixedPoints(count) {
+  const n = Number(count || 0)
+  if (!n) return 0
+  if (n > 0 && n < 10) return 1
+  return Math.floor(n / 10)
+}
+
+function getPresenterRandomAuctionFixedPoints(state = getPresenterRandomChallengeState()) {
+  return Number(
+    presenterRandomAuctionFixedPoints ||
+    state.box2?.calculatedPoints ||
+    calcPresenterRandomAuctionFixedPoints(getPresenterRandomAuctionCount(state)) ||
+    0
+  )
+}
+
 /* فتح المربعات محليًا فورًا + إرسال للعرض */
 function openPresenterRandomBox(box) {
   const n = Number(box || 0)
@@ -4124,13 +4170,20 @@ function openPresenterRandomBox(box) {
   presenterSelectedTeam = null
 
   if (n === 2) {
-    presenterRandomAuctionLocalPoints = Number(
-      presenterLiveState?.randomChallenge?.box2?.points ||
-      presenterLiveState?.randomChallenge?.box2?.numberInput ||
+    const state = getPresenterRandomChallengeState()
+    presenterRandomAuctionLocalCount = Number(
+      state.box2?.points ||
+      state.box2?.numberInput ||
       0
     )
+
+    presenterRandomAuctionFixedPoints = Number(
+      state.box2?.calculatedPoints ||
+      calcPresenterRandomAuctionFixedPoints(presenterRandomAuctionLocalCount)
+    )
   } else {
-    presenterRandomAuctionLocalPoints = 0
+    presenterRandomAuctionLocalCount = 0
+    presenterRandomAuctionFixedPoints = 0
   }
 
   markPresenterLocalSync("randomChallenge", 1400)
@@ -4163,7 +4216,6 @@ function startPresenterRandomBox1(pool) {
   }
 
   markPresenterLocalSync("randomChallenge", 1200)
-
   renderPresenterRandomChallenge()
 
   sendCommand("randomStartBox1", {
@@ -4171,39 +4223,71 @@ function startPresenterRandomBox1(pool) {
   })
 }
 
+/* إدخال العدد: يثبت النقاط حسب أول عدد */
 function setPresenterRandomAuctionPoints(value, shouldSync = true) {
   const input = document.getElementById("presenterRandomAuctionInput")
-  const pointsBox = document.getElementById("presenterRandomAuctionPoints")
+  const countBox = document.getElementById("presenterRandomAuctionCount")
+  const fixedBox = document.getElementById("presenterRandomAuctionFixed")
 
   const clean = Math.max(
     0,
     Number(String(value || "").replace(/\D/g, "") || 0)
   )
 
-  presenterRandomAuctionLocalPoints = clean
+  presenterRandomAuctionLocalCount = clean
+  presenterRandomAuctionFixedPoints = calcPresenterRandomAuctionFixedPoints(clean)
 
   if (input) input.value = clean || ""
-  if (pointsBox) pointsBox.innerText = clean
+  if (countBox) countBox.innerText = clean
+  if (fixedBox) fixedBox.innerText = presenterRandomAuctionFixedPoints
 
   if (shouldSync) {
     sendCommand("randomSetAuctionPoints", {
-      points: clean
+      points: clean,
+      count: clean,
+      calculatedPoints: presenterRandomAuctionFixedPoints,
+      keepFixedPoints: false
     })
   }
 }
 
+/* إنقاص العدد فقط — النقاط تبقى ثابتة */
 function decreasePresenterRandomAuctionPoints() {
-  const current = Number(presenterRandomAuctionLocalPoints || 0)
+  const current = Number(presenterRandomAuctionLocalCount || 0)
+  const fixed = Number(
+    presenterRandomAuctionFixedPoints ||
+    calcPresenterRandomAuctionFixedPoints(current)
+  )
+
   const next = Math.max(0, current - 1)
 
-  setPresenterRandomAuctionPoints(next, true)
+  presenterRandomAuctionLocalCount = next
+  presenterRandomAuctionFixedPoints = fixed
+
+  const input = document.getElementById("presenterRandomAuctionInput")
+  const countBox = document.getElementById("presenterRandomAuctionCount")
+  const fixedBox = document.getElementById("presenterRandomAuctionFixed")
+
+  if (input) input.value = next || ""
+  if (countBox) countBox.innerText = next
+  if (fixedBox) fixedBox.innerText = fixed
+
+  sendCommand("randomSetAuctionPoints", {
+    points: next,
+    count: next,
+    calculatedPoints: fixed,
+    keepFixedPoints: true
+  })
 }
 
 function sendPresenterRandomAuctionScore(type) {
-  const points = Number(presenterRandomAuctionLocalPoints || 0)
+  const fixedPoints = Number(presenterRandomAuctionFixedPoints || 0)
+  const count = Number(presenterRandomAuctionLocalCount || 0)
 
   sendCommand(type, {
-    points,
+    points: fixedPoints,
+    count,
+    calculatedPoints: fixedPoints,
     presenterOnlyPoints: true
   })
 }
@@ -4228,6 +4312,48 @@ function finishPresenterRandomBox3Round() {
   }, 180)
 }
 
+function presenterRandomBackStep() {
+  const state = getPresenterRandomChallengeState()
+  const currentBox = getPresenterRandomCurrentBox()
+
+  if (!currentBox) return
+
+  if (currentBox === 1 && state.box1?.started) {
+    presenterLiveState = {
+      ...(presenterLiveState || {}),
+      randomChallenge: {
+        ...(presenterLiveState?.randomChallenge || {}),
+        currentBox: 1,
+        box1: {
+          ...(presenterLiveState?.randomChallenge?.box1 || {}),
+          active: true,
+          started: false,
+          rolling: false,
+          flashing: false,
+          images: []
+        }
+      }
+    }
+
+    markPresenterLocalSync("randomChallenge", 800)
+    renderPresenterRandomChallenge()
+    return
+  }
+
+  presenterLiveState = {
+    ...(presenterLiveState || {}),
+    randomChallenge: {
+      ...(presenterLiveState?.randomChallenge || {}),
+      currentBox: null,
+      activeTeam: null
+    }
+  }
+
+  presenterSelectedTeam = null
+  markPresenterLocalSync("randomChallenge", 800)
+  renderPresenterRandomChallenge()
+}
+
 function renderPresenterRandomChallenge() {
   const panel = document.getElementById("presenterPanel")
   if (!panel) return
@@ -4243,27 +4369,23 @@ function renderPresenterRandomChallenge() {
   const errorsA = Number(state.box3?.errors?.A || 0)
   const errorsB = Number(state.box3?.errors?.B || 0)
 
-  const auctionCount = Number(
-  presenterRandomAuctionLocalPoints ||
-  state.box2?.points ||
-  state.box2?.numberInput ||
-  state.box2?.calculatedPoints ||
-  0
-)
-
   const box1Pool = state.box1?.pool || ""
-
   const box1Players = getPresenterRandomBox1Players(state)
 
-const box1Started =
-  !!state.box1?.currentPlayer ||
-  !!state.box1?.started ||
-  !!state.box1?.currentName ||
-  box1Players.filter(Boolean).length > 0 ||
-  !!state.box1?.rolling
+  const box1Started =
+    !!state.box1?.currentPlayer ||
+    !!state.box1?.started ||
+    !!state.box1?.currentName ||
+    box1Players.filter(Boolean).length > 0 ||
+    !!state.box1?.rolling
 
-const box1NameA = getPresenterRandomImageName(box1Players[0])
-const box1NameB = getPresenterRandomImageName(box1Players[1])
+  const box1NameA = getPresenterRandomImageName(box1Players[0])
+  const box1NameB = getPresenterRandomImageName(box1Players[1])
+
+  const auctionCount = getPresenterRandomAuctionCount(state)
+  const auctionFixedPoints = getPresenterRandomAuctionFixedPoints(state)
+  const auctionTimer = Number(state.box2?.timer || 30)
+  const box3Timer = Number(state.box3?.timer || 5)
 
   panel.innerHTML = `
     <div class="presenterRandomLayout" data-random-mode="${uiMode}">
@@ -4271,9 +4393,11 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
       ${
         !currentBox
           ? `
-            <section class="presenterCard presenterRandomChooseCard">
-
-              <div class="presenterLabel">اختر نوع التحدي</div>
+            <section class="presenterRandomIntroCard">
+              <div class="presenterRandomIntroTop">
+                <span>فقرة التحدي</span>
+                <strong>اختر نوع التحدي</strong>
+              </div>
 
               <div class="presenterRandomChooseGrid">
 
@@ -4283,8 +4407,9 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                   ${state.box1?.finished ? "disabled" : ""}
                   onclick="openPresenterRandomBox(1)"
                 >
-                  <span>1</span>
+                  <span>01</span>
                   <strong>اللاعب المشترك</strong>
+                  <small>اختيار لاعبين بالقرعة</small>
                 </button>
 
                 <button
@@ -4293,8 +4418,9 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                   ${state.box2?.finished ? "disabled" : ""}
                   onclick="openPresenterRandomBox(2)"
                 >
-                  <span>2</span>
+                  <span>02</span>
                   <strong>المزاد</strong>
+                  <small>عدد يتناقص ونقاط ثابتة</small>
                 </button>
 
                 <button
@@ -4303,8 +4429,9 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                   ${state.box3?.finished ? "disabled" : ""}
                   onclick="openPresenterRandomBox(3)"
                 >
-                  <span>3</span>
+                  <span>03</span>
                   <strong>ماذا تعرف</strong>
+                  <small>مؤقت وأخطاء الفريق</small>
                 </button>
 
                 <button
@@ -4313,29 +4440,47 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                   ${state.box4?.finished ? "disabled" : ""}
                   onclick="openPresenterRandomBox(4)"
                 >
-                  <span>4</span>
+                  <span>04</span>
                   <strong>قريبًا</strong>
+                  <small>مربع احتياطي</small>
                 </button>
 
               </div>
-
             </section>
           `
           : `
+            <div class="presenterRandomHeaderLine">
+              <button type="button" class="presenterRandomBackBtn" onclick="presenterRandomBackStep()">
+                 رجوع
+              </button>
+
+              <div>
+                <span>المربع الحالي</span>
+                <strong>${getPresenterRandomBoxTitle(currentBox)}</strong>
+              </div>
+
+              <button type="button" class="presenterRandomEndBtn" onclick="sendCommand('randomFinishBox')">
+                إنهاء
+              </button>
+            </div>
+
             <div class="presenterRandomPage">
 
-              <div class="presenterRandomContent">
+              <main class="presenterRandomMain">
 
                 ${
                   currentBox === 1 && !box1Started
                     ? `
-                      <section class="presenterCard presenterRandomBoxCard">
-                        <div class="presenterLabel">اللاعب المشترك</div>
+                      <section class="presenterRandomGlassCard">
+                        <div class="presenterRandomSectionTitle">
+                          <span>اللاعب المشترك</span>
+                          <strong>اختر مصدر القرعة</strong>
+                        </div>
 
-                        <div class="presenterRandomChooseGrid presenterRandomPoolGrid">
+                        <div class="presenterRandomPoolGrid">
                           <button
                             type="button"
-                            class="presenterRandomChooseBtn ${box1Pool === "saudi" ? "active" : ""}"
+                            class="presenterRandomPoolBtn ${box1Pool === "saudi" ? "active" : ""}"
                             onclick="startPresenterRandomBox1('saudi')"
                           >
                             <span>🇸🇦</span>
@@ -4344,7 +4489,7 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
 
                           <button
                             type="button"
-                            class="presenterRandomChooseBtn ${box1Pool === "world" ? "active" : ""}"
+                            class="presenterRandomPoolBtn ${box1Pool === "world" ? "active" : ""}"
                             onclick="startPresenterRandomBox1('world')"
                           >
                             <span>🌍</span>
@@ -4359,34 +4504,25 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                 ${
                   currentBox === 1 && box1Started
                     ? `
-                      <section class="presenterCard presenterRandomBoxCard">
+                      <section class="presenterRandomGlassCard">
+                        <div class="presenterRandomSectionTitle">
+                          <span>اللاعب المشترك</span>
+                          <strong>الأسماء في المقدم</strong>
+                        </div>
 
                         <div class="presenterRandomPlayerNames">
-
                           <div class="presenterRandomPlayerNameCard">
                             <small>الاسم الأول</small>
-                            <strong>${presenterSafeHtml(box1NameA || "—")}</strong>
+                            <strong>${presenterRandomSafeHtml(box1NameA || "—")}</strong>
                           </div>
 
                           <div class="presenterRandomVsText">VS</div>
 
                           <div class="presenterRandomPlayerNameCard">
                             <small>الاسم الثاني</small>
-                            <strong>${presenterSafeHtml(box1NameB || "—")}</strong>
-                          </div>
-
-                        </div>
-
-                        <div class="presenterRandomTeamsOnly miniTeams">
-                          <div class="presenterRandomTeamName ${activeTeam === "A" ? "active" : ""}">
-                            ${presenterTeamAName}
-                          </div>
-
-                          <div class="presenterRandomTeamName ${activeTeam === "B" ? "active" : ""}">
-                            ${presenterTeamBName}
+                            <strong>${presenterRandomSafeHtml(box1NameB || "—")}</strong>
                           </div>
                         </div>
-
                       </section>
                     `
                     : ""
@@ -4395,36 +4531,47 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                 ${
                   currentBox === 2
                     ? `
-                      <section class="presenterCard presenterRandomBoxCard presenterRandomAuctionCard">
-                        <div class="presenterRandomTeamsOnly">
-                          <div class="presenterRandomTeamName ${activeTeam === "A" ? "active" : ""}">
-                            ${presenterTeamAName}
-                          </div>
-
-                          <div class="presenterRandomTeamName ${activeTeam === "B" ? "active" : ""}">
-                            ${presenterTeamBName}
-                          </div>
+                      <section class="presenterRandomGlassCard presenterRandomAuctionCard">
+                        <div class="presenterRandomSectionTitle">
+                          <span>المزاد</span>
+                          <strong>العدد يتناقص — النقاط ثابتة</strong>
                         </div>
 
-                        <div class="presenterRandomAuctionTool">
+                        <div class="presenterRandomAuctionInputWrap">
+                          <label>أدخل العدد</label>
                           <input
                             id="presenterRandomAuctionInput"
                             class="presenterRandomAuctionInput"
                             type="tel"
                             inputmode="numeric"
-                            placeholder="العدد"
+                            placeholder="مثال: 35"
                             value="${auctionCount || ""}"
                             oninput="setPresenterRandomAuctionPoints(this.value)"
                           >
+                        </div>
 
+                        <div class="presenterRandomAuctionMetrics">
                           <button
-                            id="presenterRandomAuctionPoints"
                             type="button"
-                            class="presenterRandomAuctionPoints"
+                            class="presenterRandomMetric countMetric"
                             onclick="decreasePresenterRandomAuctionPoints()"
                           >
-                            ${auctionCount}
+                            <small>العدد المتبقي</small>
+                            <strong id="presenterRandomAuctionCount">${auctionCount}</strong>
+                            <span>اضغط للإنقاص</span>
                           </button>
+
+                          <div class="presenterRandomMetric timerMetric">
+                            <small>المؤقت</small>
+                            <strong id="presenterRandomAuctionTimer">${auctionTimer}</strong>
+                            <span>ثانية</span>
+                          </div>
+
+                          <div class="presenterRandomMetric pointsMetric">
+                            <small>النقاط الثابتة</small>
+                            <strong id="presenterRandomAuctionFixed">${auctionFixedPoints}</strong>
+                            <span>لا تتغير عند النقص</span>
+                          </div>
                         </div>
                       </section>
                     `
@@ -4434,13 +4581,17 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                 ${
                   currentBox === 3 && !state.box3?.choosingPoints
                     ? `
-                      <section class="presenterCard presenterRandomBoxCard presenterRandomKnowCard">
+                      <section class="presenterRandomGlassCard presenterRandomKnowCard">
+                        <div class="presenterRandomSectionTitle">
+                          <span>ماذا تعرف</span>
+                          <strong>المؤقت متزامن مع العرض</strong>
+                        </div>
 
                         <div
                           id="presenterRandomBox3Timer"
-                          class="presenterRandomBox3Timer ${Number(state.box3?.timer || 5) <= 2 ? "danger presenterTimerDanger" : ""}"
+                          class="presenterRandomBox3Timer ${box3Timer <= 2 ? "danger presenterTimerDanger" : ""}"
                         >
-                          ${Number(state.box3?.timer || 5)}
+                          ${box3Timer}
                         </div>
 
                         <div class="presenterRandomKnowBoard">
@@ -4462,8 +4613,11 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                 ${
                   currentBox === 3 && state.box3?.choosingPoints
                     ? `
-                      <section class="presenterCard presenterRandomBoxCard">
-                        <div class="presenterLabel">تسجيل النقاط</div>
+                      <section class="presenterRandomGlassCard">
+                        <div class="presenterRandomSectionTitle">
+                          <span>ماذا تعرف</span>
+                          <strong>تسجيل النقاط</strong>
+                        </div>
 
                         <div class="presenterRandomScoreButtons">
                           <button type="button" class="presenterBtn green" onclick="sendCommand('randomBox3ScorePoints', { points: 1 })">1</button>
@@ -4478,27 +4632,26 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                 ${
                   currentBox === 4
                     ? `
-                      <section class="presenterCard presenterRandomBoxCard">
-                        <div class="presenterLabel">قريبًا</div>
-
-                        <div class="presenterRandomSimpleText">
-                          هذا المربع غير مفعّل حاليًا.
+                      <section class="presenterRandomGlassCard">
+                        <div class="presenterRandomSectionTitle">
+                          <span>قريبًا</span>
+                          <strong>هذا المربع غير مفعّل حاليًا</strong>
                         </div>
                       </section>
                     `
                     : ""
                 }
 
-              </div>
+              </main>
 
               ${
                 currentBox === 1 || currentBox === 2 || currentBox === 3
                   ? `
-                    <div class="presenterRandomSide">
+                    <aside class="presenterRandomSide">
                       <div class="presenterRandomTeamsBox">
                         ${teamButtons()}
                       </div>
-                    </div>
+                    </aside>
                   `
                   : ""
               }
@@ -4514,7 +4667,7 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                       box1Started
                         ? `
                           <button type="button" class="presenterBtn gray" onclick="sendCommand('randomSkip')">
-                            إعادة
+                            إعادة القرعة
                           </button>
 
                           <button type="button" class="presenterBtn green" onclick="sendCommand('correct')">
@@ -4529,7 +4682,7 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                     }
 
                     <button type="button" class="presenterBtn dark" onclick="sendCommand('randomFinishBox')">
-                      إنهاء
+                      إنهاء المربع
                     </button>
                   `
                   : ""
@@ -4551,7 +4704,7 @@ const box1NameB = getPresenterRandomImageName(box1Players[1])
                     </button>
 
                     <button type="button" class="presenterBtn gray" onclick="sendCommand('randomFinishBox')">
-                      إنهاء
+                      إنهاء المربع
                     </button>
                   `
                   : ""
@@ -4623,30 +4776,21 @@ function refreshPresenterRandomChallengeFromState() {
   const activeTeam = getPresenterRandomActiveTeam()
   updatePresenterTeamButtonsOnly(activeTeam)
 
-  const currentBoxText = document.querySelector(".presenterRandomCurrentBox")
-  const currentBox = getPresenterRandomCurrentBox()
-
-  if (currentBoxText) {
-    currentBoxText.innerText = currentBox
-      ? getPresenterRandomBoxTitle(currentBox)
-      : "اختر مربع"
-  }
-
   document.querySelectorAll(".presenterRandomTeamName").forEach((box, index) => {
     const team = index === 0 ? "A" : "B"
     box.classList.toggle("active", activeTeam === team)
   })
 
-const box1Players = getPresenterRandomBox1Players(state)
-const playerNameCards = document.querySelectorAll(".presenterRandomPlayerNameCard strong")
+  const box1Players = getPresenterRandomBox1Players(state)
+  const playerNameCards = document.querySelectorAll(".presenterRandomPlayerNameCard strong")
 
-if (playerNameCards?.[0]) {
-  playerNameCards[0].innerText = getPresenterRandomImageName(box1Players[0]) || "—"
-}
+  if (playerNameCards?.[0]) {
+    playerNameCards[0].innerText = getPresenterRandomImageName(box1Players[0]) || "—"
+  }
 
-if (playerNameCards?.[1]) {
-  playerNameCards[1].innerText = getPresenterRandomImageName(box1Players[1]) || "—"
-}
+  if (playerNameCards?.[1]) {
+    playerNameCards[1].innerText = getPresenterRandomImageName(box1Players[1]) || "—"
+  }
 
   const errorsA = Number(state.box3?.errors?.A || 0)
   const errorsB = Number(state.box3?.errors?.B || 0)
@@ -4677,30 +4821,43 @@ if (playerNameCards?.[1]) {
     box3Timer.classList.toggle("presenterTimerDanger", timer <= 2)
   }
 
-  const pointsBox = document.getElementById("presenterRandomAuctionPoints")
+  const auctionTimer = document.getElementById("presenterRandomAuctionTimer")
+  if (auctionTimer) {
+    auctionTimer.innerText = Number(state.box2?.timer || 30)
+  }
+
+  const countBox = document.getElementById("presenterRandomAuctionCount")
+  const fixedBox = document.getElementById("presenterRandomAuctionFixed")
   const input = document.getElementById("presenterRandomAuctionInput")
 
-  if (pointsBox || input) {
-    const statePoints = Number(
+  if (countBox || fixedBox || input) {
+    const stateCount = Number(
       state.box2?.points ??
       state.box2?.numberInput ??
-      state.box2?.calculatedPoints ??
       0
     )
 
-    const points =
+    const stateFixed = Number(
+      state.box2?.calculatedPoints ??
+      calcPresenterRandomAuctionFixedPoints(stateCount)
+    )
+
+    const count =
       document.activeElement === input
-        ? Number(presenterRandomAuctionLocalPoints || statePoints || 0)
-        : statePoints
+        ? Number(presenterRandomAuctionLocalCount || stateCount || 0)
+        : stateCount
 
-    presenterRandomAuctionLocalPoints = points
+    const fixed =
+      Number(presenterRandomAuctionFixedPoints || stateFixed || 0)
 
-    if (pointsBox) {
-      pointsBox.innerText = points
-    }
+    presenterRandomAuctionLocalCount = count
+    presenterRandomAuctionFixedPoints = fixed
+
+    if (countBox) countBox.innerText = count
+    if (fixedBox) fixedBox.innerText = fixed
 
     if (input && document.activeElement !== input) {
-      input.value = points || ""
+      input.value = count || ""
     }
   }
 }
