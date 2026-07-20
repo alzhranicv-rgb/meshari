@@ -9,6 +9,14 @@ let currentWarmupButton = null
 let warmupQuestionLocked = false
 let currentWarmupQuestionKey = null
 let warmupLastTickPlayed = null
+let warmupTimer = null
+let warmupStateSyncTimer = null
+let warmupResultPending = false
+let warmupDataCache = null
+let warmupDataPromise = null
+
+const WARMUP_DATA_CACHE_TTL =
+  5 * 60 * 1000
 
 let warmupDoubleState = {
   used: { A: false, B: false },
@@ -29,36 +37,84 @@ function getWarmupState() {
   }
 }
 
-function saveWarmupState() {
+function saveWarmupState(options = {}) {
   const questionBox = document.getElementById("questionBox")
   const timerBox = document.getElementById("timer")
 
   const state = {
     usedQuestions: JSON.parse(JSON.stringify(usedQuestions || {})),
-    warmupScoreA,
-    warmupScoreB,
+    warmupScoreA: Number(warmupScoreA || 0),
+    warmupScoreB: Number(warmupScoreB || 0),
+
     lastAnsweredTeam,
-    warmupManualSelectionDone,
-    warmupQuestionLocked,
+    warmupManualSelectionDone: !!warmupManualSelectionDone,
+    warmupQuestionLocked: !!warmupQuestionLocked,
+    warmupResultPending: !!warmupResultPending,
     currentWarmupQuestionKey,
-    warmupDoubleState: JSON.parse(JSON.stringify(warmupDoubleState || {})),
-    selectedTeam,
-    currentPoints,
-    currentAnswer: window.currentAnswer || "",
-    questionText: questionBox ? questionBox.innerText : "اختر رقم السؤال",
-    timerValue: timerBox ? Number(timerBox.innerText || 0) : 0
+
+    warmupDoubleState: JSON.parse(
+      JSON.stringify(
+        warmupDoubleState || {
+          used: { A: false, B: false },
+          activeTeam: null
+        }
+      )
+    ),
+
+    selectedTeam:
+      selectedTeam === "A" || selectedTeam === "B"
+        ? selectedTeam
+        : null,
+
+    currentPoints: Number(currentPoints || 0),
+    currentAnswer: String(window.currentAnswer || ""),
+
+    questionText:
+      questionBox?.innerText ||
+      "اختر رقم السؤال",
+
+    timerValue: Number(
+      timerBox?.innerText || 0
+    )
   }
 
-  localStorage.setItem(WARMUP_STORAGE_KEY, JSON.stringify(state))
-  localStorage.setItem("active_segment", "warmup")
+  localStorage.setItem(
+    WARMUP_STORAGE_KEY,
+    JSON.stringify(state)
+  )
 
-  if (typeof saveUnifiedGameState === "function") {
+  localStorage.setItem(
+    "active_segment",
+    "warmup"
+  )
+
+  window.currentSegmentScores = {
+    A: Number(warmupScoreA || 0),
+    B: Number(warmupScoreB || 0)
+  }
+
+  if (
+    typeof saveUnifiedGameState ===
+    "function"
+  ) {
     saveUnifiedGameState()
   }
 
-  if (typeof syncDisplayStateToSession === "function") {
-    syncDisplayStateToSession()
-  }
+  clearTimeout(warmupStateSyncTimer)
+
+  const immediate =
+    options.immediate === true
+
+  warmupStateSyncTimer = setTimeout(() => {
+    if (
+      typeof syncDisplayStateToSession ===
+      "function"
+    ) {
+      syncDisplayStateToSession({
+        immediate
+      })
+    }
+  }, immediate ? 0 : 120)
 }
 
 function restoreWarmupButtonStates() {
@@ -76,53 +132,136 @@ function restoreWarmupButtonStates() {
 function restoreWarmupUIFromState(saved) {
   if (!saved) return
 
-  usedQuestions = saved.usedQuestions || {}
+  usedQuestions =
+    saved.usedQuestions &&
+    typeof saved.usedQuestions === "object"
+      ? saved.usedQuestions
+      : {}
+
   window.usedQuestions = usedQuestions
 
   warmupScoreA = Number(saved.warmupScoreA || 0)
   warmupScoreB = Number(saved.warmupScoreB || 0)
-  lastAnsweredTeam = saved.lastAnsweredTeam || null
-  warmupManualSelectionDone = !!saved.warmupManualSelectionDone
-  warmupQuestionLocked = !!saved.warmupQuestionLocked
-  currentWarmupQuestionKey = saved.currentWarmupQuestionKey || null
-  warmupDoubleState = saved.warmupDoubleState || {
-    used: { A: false, B: false },
-    activeTeam: null
+
+  lastAnsweredTeam =
+    saved.lastAnsweredTeam === "A" ||
+    saved.lastAnsweredTeam === "B"
+      ? saved.lastAnsweredTeam
+      : null
+
+  warmupManualSelectionDone =
+    !!saved.warmupManualSelectionDone
+
+  warmupQuestionLocked =
+    !!saved.warmupQuestionLocked
+
+  /*
+    عند تحديث الصفحة أثناء عرض الإجابة:
+    نوقف حالة الانتظار فقط،
+    لكن نبقي السؤال مفتوحًا حتى يستطيع المقدم
+    تسجيل النتيجة مرة أخرى.
+  */
+  warmupResultPending = false
+
+  currentWarmupQuestionKey =
+    saved.currentWarmupQuestionKey || null
+
+  warmupDoubleState = {
+    used: {
+      A: !!saved.warmupDoubleState?.used?.A,
+      B: !!saved.warmupDoubleState?.used?.B
+    },
+
+    activeTeam:
+      saved.warmupDoubleState?.activeTeam === "A" ||
+      saved.warmupDoubleState?.activeTeam === "B"
+        ? saved.warmupDoubleState.activeTeam
+        : null
   }
 
-  selectedTeam = saved.selectedTeam || null
-  currentPoints = Number(saved.currentPoints || 0)
-  window.currentAnswer = saved.currentAnswer || ""
+  selectedTeam =
+    saved.selectedTeam === "A" ||
+    saved.selectedTeam === "B"
+      ? saved.selectedTeam
+      : null
 
-  const scoreABox = document.getElementById("roundScoreA")
-  const scoreBBox = document.getElementById("roundScoreB")
-  const questionBox = document.getElementById("questionBox")
-  const timerBox = document.getElementById("timer")
+  window.selectedTeam = selectedTeam
 
-  if (scoreABox) scoreABox.innerText = warmupScoreA
-  if (scoreBBox) scoreBBox.innerText = warmupScoreB
-  if (questionBox) questionBox.innerText = saved.questionText || "اختر رقم السؤال"
-  if (timerBox) timerBox.innerText = Number(saved.timerValue || 0)
+  currentPoints =
+    Number(saved.currentPoints || 0)
+
+  window.currentAnswer =
+    String(saved.currentAnswer || "")
+
+  const scoreABox =
+    document.getElementById("roundScoreA")
+
+  const scoreBBox =
+    document.getElementById("roundScoreB")
+
+  const questionBox =
+    document.getElementById("questionBox")
+
+  const timerBox =
+    document.getElementById("timer")
+
+  if (scoreABox) {
+    scoreABox.innerText = warmupScoreA
+  }
+
+  if (scoreBBox) {
+    scoreBBox.innerText = warmupScoreB
+  }
+
+  if (questionBox) {
+    questionBox.innerText =
+      saved.questionText ||
+      "اختر رقم السؤال"
+  }
+
+  const restoredTime = Math.max(
+    0,
+    Number(saved.timerValue || 0)
+  )
+
+  if (timerBox) {
+    timerBox.innerText = restoredTime
+  }
 
   if (selectedTeam) {
-  setWarmupActiveTeam(selectedTeam, { sync:false })
-}
+    setWarmupActiveTeam(selectedTeam, {
+      sync: false,
+      save: false
+    })
+  }
+
   restoreWarmupButtonStates()
-  updateWarmupDoubleButton()
 
   if (currentWarmupQuestionKey) {
-    const [cat, num] = currentWarmupQuestionKey.split("_")
-    const btn = document.getElementById(`q${cat}_${num}`)
-    if (btn) highlightWarmupSelectedButton(btn)
+    const [cat, num] =
+      currentWarmupQuestionKey.split("_")
+
+    const btn =
+      document.getElementById(
+        `q${cat}_${num}`
+      )
+
+    if (btn) {
+      highlightWarmupSelectedButton(btn)
+    }
   }
+
+  updateWarmupDoubleButton()
 
   window.currentSegmentScores = {
     A: warmupScoreA,
     B: warmupScoreB
   }
 
-  const restoredTime = Number(saved.timerValue || 0)
-  if (warmupQuestionLocked && restoredTime > 0) {
+  if (
+    warmupQuestionLocked &&
+    restoredTime > 0
+  ) {
     resumeWarmupTimer(restoredTime)
   }
 }
@@ -132,6 +271,15 @@ function restoreWarmupUIFromState(saved) {
 ========================= */
 
 window.renderWarmup = async function () {
+  clearInterval(warmupTimer)
+  warmupTimer = null
+
+  clearTimeout(warmupStateSyncTimer)
+  warmupStateSyncTimer = null
+
+  warmupDataCache = null
+  warmupDataPromise = null
+
   const saved = getWarmupState()
 
   usedQuestions = {}
@@ -157,98 +305,106 @@ window.renderWarmup = async function () {
 
   const categories = await loadWarmupCategories()
 
-openSegment("التسخين", `
-  <div class="warmupWrap" data-segment-key="warmup">
+  openSegment("التسخين", `
+    <div class="warmupWrap" data-segment-key="warmup">
 
-    <header class="megaHeader">
+      <header class="megaHeader">
 
-      <button class="dockBtn dockBtnNav" type="button" onclick="goHome()">
-        رجوع
-      </button>
+        <button class="dockBtn dockBtnNav" type="button" onclick="goHome()">
+          رجوع
+        </button>
 
-      <div
-        class="teamMini teamA"
-        onclick="selectWarmupTeam('A')"
-        id="warmupTeamABox"
-      >
-        <div class="teamNameBlock">
-          <strong>${escapeDisplayHtml(teamAName || "الفريق الأول")}</strong>
+        <div
+          class="teamMini teamA"
+          onclick="selectWarmupTeam('A')"
+          id="warmupTeamABox"
+        >
+          <div class="teamNameBlock">
+            <strong>${escapeDisplayHtml(teamAName || "الفريق الأول")}</strong>
+          </div>
+
+          <b id="roundScoreA">${warmupScoreA}</b>
         </div>
 
-        <b id="roundScoreA">${warmupScoreA}</b>
-      </div>
-
-      <div class="segmentTitlePlain">
-        <h1>التسخين</h1>
-      </div>
-
-      <div
-        class="teamMini teamB"
-        onclick="selectWarmupTeam('B')"
-        id="warmupTeamBBox"
-      >
-        <b id="roundScoreB">${warmupScoreB}</b>
-
-        <div class="teamNameBlock">
-          <strong>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</strong>
+        <div class="segmentTitlePlain">
+          <h1>التسخين</h1>
         </div>
-      </div>
 
-      <button
-        id="endRoundBtn"
-        class="dockBtn dockBtnNav"
-        type="button"
-        onclick="endCurrentSegment()"
-        disabled
-      >
-        إنهاء
-      </button>
+        <div
+          class="teamMini teamB"
+          onclick="selectWarmupTeam('B')"
+          id="warmupTeamBBox"
+        >
+          <b id="roundScoreB">${warmupScoreB}</b>
 
-    </header>
-
-    <section class="questionUnifiedCard">
-
-      <div class="questionSide">
-        <span class="questionLabel">السؤال</span>
-
-        <div id="questionBox" class="questionTextBox">
-          اختر رقم السؤال
+          <div class="teamNameBlock">
+            <strong>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</strong>
+          </div>
         </div>
-      </div>
 
-      <div class="timerSide">
-        <div class="timerPill">
-          
-          <strong id="timer">0</strong>
-          
+        <button
+          id="endRoundBtn"
+          class="dockBtn dockBtnNav"
+          type="button"
+          onclick="endCurrentSegment()"
+          disabled
+        >
+          إنهاء
+        </button>
+
+      </header>
+
+      <section class="questionUnifiedCard">
+
+        <div class="questionSide">
+          <span class="questionLabel">السؤال</span>
+
+          <div id="questionBox" class="questionTextBox">
+            اختر رقم السؤال
+          </div>
         </div>
-      </div>
 
-    </section>
+        <div class="timerSide">
+          <div class="timerPill">
+            <strong id="timer">0</strong>
+          </div>
+        </div>
 
-    <section class="categoriesGrid">
-      ${createWarmupCategory(1, categories[1] || "الفئة 1", "catBlue")}
-      ${createWarmupCategory(2, categories[2] || "الفئة 2", "catCyan")}
-      ${createWarmupCategory(3, categories[3] || "الفئة 3", "catPurple")}
-      ${createWarmupCategory(4, categories[4] || "الفئة 4", "catGreen")}
-    </section>
+      </section>
 
-    <footer class="actionBar">
-  <button onclick="activateWarmupDouble()" class="actionBtn btnDouble" id="warmupDoubleBtn">
-    دبل
-  </button>
+      <section class="categoriesGrid">
+        ${createWarmupCategory(1, categories[1] || "الفئة 1", "catBlue")}
+        ${createWarmupCategory(2, categories[2] || "الفئة 2", "catCyan")}
+        ${createWarmupCategory(3, categories[3] || "الفئة 3", "catPurple")}
+        ${createWarmupCategory(4, categories[4] || "الفئة 4", "catGreen")}
+      </section>
 
-  <button onclick="warmupCorrect()" class="actionBtn btnCorrect">
-    ✓ صح
-  </button>
+      <footer class="actionBar">
+        <button
+          onclick="activateWarmupDouble()"
+          class="actionBtn btnDouble"
+          id="warmupDoubleBtn"
+        >
+          دوبيلا
+        </button>
 
-  <button onclick="warmupWrong()" class="actionBtn btnWrong">
-    ✕ خطأ
-  </button>
-</footer>
+        <button
+          onclick="warmupCorrect()"
+          class="actionBtn btnCorrect"
+        >
+          ✓ صح
+        </button>
 
-  </div>
-`)
+        <button
+          onclick="warmupWrong()"
+          class="actionBtn btnWrong"
+        >
+          ✕ خطأ
+        </button>
+      </footer>
+
+    </div>
+  `)
 
   window.currentSegmentScores = {
     A: warmupScoreA,
@@ -258,36 +414,254 @@ openSegment("التسخين", `
   if (saved) {
     restoreWarmupUIFromState(saved)
   } else {
-    saveWarmupState()
+    saveWarmupState({
+      immediate: true
+    })
   }
 
   updateWarmupDoubleButton()
   renderWarmupFinishedIfNeeded()
-
 }
 
-async function loadWarmupCategories() {
-  const { data, error } = await db
-    .from("questions")
-    .select("category, category_name")
-    .eq("model", Number(currentModel))
-    .eq("segment", "warmup")
-    .order("category", { ascending: true })
-
-  if (error) {
-    console.log("loadWarmupCategories error =", error)
-    return {}
-  }
-
+function buildWarmupDataMap(rows = []) {
   const categories = {}
+  const questions = {}
 
-  ;(data || []).forEach(row => {
-    if (row.category) {
-      categories[Number(row.category)] = row.category_name || `الفئة ${row.category}`
+  ;(rows || []).forEach(row => {
+    const category =
+      Number(row.category || 0)
+
+    const number =
+      Number(row.number || 0)
+
+    if (!category || !number) {
+      return
+    }
+
+    if (!categories[category]) {
+      categories[category] =
+        row.category_name ||
+        `الفئة ${category}`
+    }
+
+    questions[
+      `${category}_${number}`
+    ] = {
+      category,
+      number,
+
+      categoryName:
+        row.category_name ||
+        `الفئة ${category}`,
+
+      question:
+        String(row.question || ""),
+
+      answer:
+        String(row.answer || "")
     }
   })
 
-  return categories
+  return {
+    categories,
+    questions
+  }
+}
+
+function applyWarmupFreshData(rows = []) {
+  warmupDataCache =
+    buildWarmupDataMap(rows)
+
+  return warmupDataCache
+}
+
+async function loadWarmupData(
+  options = {}
+) {
+  const modelId =
+    Number(
+      currentModel ||
+      window.currentModel ||
+      localStorage.getItem(
+        "game_model"
+      ) ||
+      0
+    )
+
+  if (!modelId) {
+    return {
+      categories: {},
+      questions: {}
+    }
+  }
+
+  if (
+    warmupDataCache &&
+    options.forceRefresh !== true
+  ) {
+    return warmupDataCache
+  }
+
+  if (
+    warmupDataPromise &&
+    options.forceRefresh !== true
+  ) {
+    return warmupDataPromise
+  }
+
+  warmupDataPromise =
+    (async () => {
+      try {
+        let rows = []
+
+        if (
+          typeof window
+            .cachedSupabaseSelect ===
+          "function"
+        ) {
+          const result =
+            await window
+              .cachedSupabaseSelect(
+                "questions",
+                {
+                  select: `
+                    category,
+                    category_name,
+                    number,
+                    question,
+                    answer
+                  `,
+
+                  filters: {
+                    model: modelId,
+                    segment: "warmup"
+                  },
+
+                  order: [
+                    {
+                      column: "category",
+                      ascending: true
+                    },
+                    {
+                      column: "number",
+                      ascending: true
+                    }
+                  ],
+
+                  ttl:
+                    WARMUP_DATA_CACHE_TTL,
+
+                  forceRefresh:
+                    options.forceRefresh ===
+                    true,
+
+                  staleWhileRevalidate:
+                    options
+                      .staleWhileRevalidate !==
+                    false,
+
+                  onBackgroundUpdate:
+                    freshRows => {
+                      applyWarmupFreshData(
+                        freshRows || []
+                      )
+                    }
+                }
+              )
+
+          rows = result.data || []
+
+          if (
+            result.error &&
+            !rows.length
+          ) {
+            throw result.error
+          }
+        } else {
+          const {
+            data,
+            error
+          } = await db
+            .from("questions")
+            .select(`
+              category,
+              category_name,
+              number,
+              question,
+              answer
+            `)
+            .eq(
+              "model",
+              modelId
+            )
+            .eq(
+              "segment",
+              "warmup"
+            )
+            .order(
+              "category",
+              {
+                ascending: true
+              }
+            )
+            .order(
+              "number",
+              {
+                ascending: true
+              }
+            )
+
+          if (error) {
+            throw error
+          }
+
+          rows = data || []
+        }
+
+        return applyWarmupFreshData(
+          rows
+        )
+      } catch (error) {
+        console.log(
+          "LOAD WARMUP DATA ERROR:",
+          error
+        )
+
+        return (
+          warmupDataCache || {
+            categories: {},
+            questions: {}
+          }
+        )
+      } finally {
+        warmupDataPromise = null
+      }
+    })()
+
+  return warmupDataPromise
+}
+
+async function loadWarmupCategories() {
+  const data =
+    await loadWarmupData({
+      staleWhileRevalidate: true
+    })
+
+  return data.categories || {}
+}
+
+function getCachedWarmupQuestion(
+  category,
+  number
+) {
+  const key =
+    `${Number(category)}_${Number(number)}`
+
+  return (
+    warmupDataCache
+      ?.questions?.[key] ||
+    null
+  )
 }
 
 function createWarmupCategory(num, name, colorClass = "") {
@@ -352,58 +726,95 @@ function clearWarmupActiveDouble() {
 }
 
 function updateWarmupDoubleButton() {
-  const btn = document.getElementById("warmupDoubleBtn")
+  const btn =
+    document.getElementById(
+      "warmupDoubleBtn"
+    )
+
   if (!btn) return
 
   const team = selectedTeam
 
   btn.classList.remove("activeDouble")
 
-  if (warmupQuestionLocked || currentWarmupQuestionKey) {
+  if (
+    warmupQuestionLocked ||
+    currentWarmupQuestionKey
+  ) {
     btn.disabled = true
     btn.innerText = "دوبيلا"
     return
   }
 
   if (!team) {
-    btn.disabled = warmupDoubleState.used.A && warmupDoubleState.used.B
+    btn.disabled =
+      warmupDoubleState.used.A &&
+      warmupDoubleState.used.B
+
     btn.innerText = "دوبيلا"
     return
   }
 
-  if (warmupDoubleState.activeTeam === team) {
+  if (
+    warmupDoubleState.activeTeam ===
+    team
+  ) {
     btn.disabled = true
-    btn.innerText = "الدوبيلا مفعّل"
+    btn.innerText = "دوبيلا مفعّل"
     btn.classList.add("activeDouble")
     return
   }
 
   if (warmupDoubleState.used[team]) {
     btn.disabled = true
-    btn.innerText = " الدوبيلا"
+    btn.innerText = "تم استخدام دوبيلا"
     return
   }
 
-  if (warmupDoubleState.used.A && warmupDoubleState.used.B) {
+  if (
+    warmupDoubleState.used.A &&
+    warmupDoubleState.used.B
+  ) {
     btn.disabled = true
-    btn.innerText = "الدوبيلا مقفل"
+    btn.innerText = "دوبيلا مقفل"
     return
   }
 
   btn.disabled = false
-  btn.innerText = "دوبيلا "
+  btn.innerText = "دوبيلا"
 }
-function setWarmupActiveTeam(team, options = {}) {
-  if (team !== "A" && team !== "B") return
+function setWarmupActiveTeam(
+  team,
+  options = {}
+) {
+  if (team !== "A" && team !== "B") {
+    return false
+  }
 
   selectedTeam = team
+  window.selectedTeam = team
+
   highlightWarmupSelectedTeam(team)
 
-  if (typeof setGameActiveTeam === "function") {
-    setGameActiveTeam(team, options)
+  if (
+    typeof setGameActiveTeam ===
+    "function"
+  ) {
+    setGameActiveTeam(team, {
+      sync: options.sync !== false
+    })
   }
 
   updateWarmupDoubleButton()
+
+  if (options.save !== false) {
+    saveWarmupState({
+      immediate:
+        options.immediate === true
+    })
+  }
+
+  return true
 }
 
 /* =========================
@@ -463,123 +874,248 @@ function getNextWarmupTeam() {
   return null
 }
 
-function selectWarmupTeam(team) {
-  if (team !== "A" && team !== "B") return
-
-  if (warmupManualSelectionDone && team !== selectedTeam) {
-    showGameToast("بعد البداية الأولى يتحدد الدور تلقائيًا")
-    return
+function selectWarmupTeam(
+  team,
+  options = {}
+) {
+  if (team !== "A" && team !== "B") {
+    return false
   }
 
-  if (lastAnsweredTeam === team) {
-    showGameToast("لا يمكن لنفس الفريق اللعب مرتين متتاليتين")
-    return
+  const force =
+    options.force === true
+
+  if (
+    !force &&
+    warmupQuestionLocked
+  ) {
+    showGameToast(
+      "سجل نتيجة السؤال الحالي أولاً"
+    )
+
+    return false
+  }
+
+  if (
+    !force &&
+    warmupManualSelectionDone &&
+    team !== selectedTeam
+  ) {
+    showGameToast(
+      "بعد البداية الأولى يتحدد الدور تلقائيًا"
+    )
+
+    return false
+  }
+
+  if (
+    !force &&
+    lastAnsweredTeam === team
+  ) {
+    showGameToast(
+      "لا يمكن لنفس الفريق اللعب مرتين متتاليتين"
+    )
+
+    return false
   }
 
   warmupManualSelectionDone = true
 
-  setWarmupActiveTeam(team)
-
-  saveWarmupState()
+  setWarmupActiveTeam(team, {
+    immediate: true
+  })
 
   setTimeout(() => {
     highlightWarmupSelectedTeam(team)
-  }, 80)
+  }, 50)
+
+  return true
 }
+function forceWarmupTeamFromPresenter(team) {
+  return selectWarmupTeam(team, {
+    force: true
+  })
+}
+
+window.selectWarmupTeam =
+  selectWarmupTeam
+
+window.forceWarmupTeamFromPresenter =
+  forceWarmupTeamFromPresenter
+
 
 /* =========================
    Questions
 ========================= */
 
-async function openWarmupQuestion(category, number) {
+async function openWarmupQuestion(
+  category,
+  number
+) {
+  const categoryNumber =
+    Number(category || 0)
+
+  const questionNumber =
+    Number(number || 0)
+
+  if (
+    !categoryNumber ||
+    !questionNumber
+  ) {
+    return
+  }
+
   if (warmupQuestionLocked) {
-    showGameToast("سجل النتيجة أولاً")
+    showGameToast(
+      "سجل النتيجة أولاً"
+    )
+
     return
   }
 
   if (!selectedTeam) {
-    if (!warmupManualSelectionDone) {
-      showGameToast("اختر الفريق أولاً")
+    if (
+      !warmupManualSelectionDone
+    ) {
+      showGameToast(
+        "اختر الفريق أولاً"
+      )
+
       return
     }
 
-    const autoTeam = getNextWarmupTeam()
+    const autoTeam =
+      getNextWarmupTeam()
 
     if (!autoTeam) {
-      showGameToast("اختر الفريق أولاً")
+      showGameToast(
+        "اختر الفريق أولاً"
+      )
+
       return
     }
 
-    setWarmupActiveTeam(autoTeam)
+    setWarmupActiveTeam(
+      autoTeam,
+      {
+        immediate: true
+      }
+    )
   }
 
-  const key = `${category}_${number}`
+  const key =
+    `${categoryNumber}_${questionNumber}`
 
-  if (usedQuestions[key]) return
+  if (usedQuestions[key]) {
+    return
+  }
 
-  const btn = document.getElementById(`q${category}_${number}`)
+  const btn =
+    document.getElementById(
+      `q${categoryNumber}_${questionNumber}`
+    )
+
   if (btn) {
-    highlightWarmupSelectedButton(btn)
+    highlightWarmupSelectedButton(
+      btn
+    )
+
     btn.disabled = true
-    btn.classList.add("warmupUsedBtn")
+
+    btn.classList.add(
+      "warmupUsedBtn"
+    )
   }
 
-  const { data, error } = await db
-    .from("questions")
-    .select("question, answer")
-    .eq("model", Number(currentModel))
-    .eq("segment", "warmup")
-    .eq("category", Number(category))
-    .eq("number", Number(number))
-    .limit(1)
+  let row =
+    getCachedWarmupQuestion(
+      categoryNumber,
+      questionNumber
+    )
 
-  if (error) {
-  console.log("openWarmupQuestion error =", error)
+  if (!row) {
+    const questionBox =
+      document.getElementById(
+        "questionBox"
+      )
 
-  if (btn) {
-    btn.disabled = false
-    btn.classList.remove("warmupUsedBtn")
+    if (questionBox) {
+      questionBox.innerText =
+        "جارٍ تحميل السؤال..."
+    }
+
+    await loadWarmupData({
+      forceRefresh: true,
+      staleWhileRevalidate: false
+    })
+
+    row =
+      getCachedWarmupQuestion(
+        categoryNumber,
+        questionNumber
+      )
   }
 
-  clearWarmupSelectedButton()
+  if (!row) {
+    if (btn) {
+      btn.disabled = false
 
-  const box = document.getElementById("questionBox")
-  if (box) box.innerText = "تعذر تحميل السؤال"
+      btn.classList.remove(
+        "warmupUsedBtn"
+      )
+    }
 
-  return
-}
+    clearWarmupSelectedButton()
 
-  if (!data || !data.length) {
-  if (btn) {
-    btn.disabled = false
-    btn.classList.remove("warmupUsedBtn")
+    const questionBox =
+      document.getElementById(
+        "questionBox"
+      )
+
+    if (questionBox) {
+      questionBox.innerText =
+        "لا يوجد سؤال محفوظ لهذا الرقم"
+    }
+
+    return
   }
-
-  clearWarmupSelectedButton()
-
-  const box = document.getElementById("questionBox")
-  if (box) box.innerText = "لا يوجد سؤال محفوظ لهذا الرقم"
-
-  return
-}
-
-  const row = data[0]
 
   usedQuestions[key] = true
-  window.usedQuestions = usedQuestions
+  window.usedQuestions =
+    usedQuestions
+
   warmupQuestionLocked = true
-  currentWarmupQuestionKey = key
+  currentWarmupQuestionKey =
+    key
+
   warmupLastTickPlayed = null
 
-  const questionBox = document.getElementById("questionBox")
-  if (questionBox) questionBox.innerText = row.question || "لا يوجد نص سؤال"
+  const questionBox =
+    document.getElementById(
+      "questionBox"
+    )
 
-  window.currentAnswer = row.answer || ""
-  currentPoints = Number(number)
+  if (questionBox) {
+    questionBox.innerText =
+      row.question ||
+      "لا يوجد نص سؤال"
+  }
+
+  window.currentAnswer =
+    row.answer || ""
+
+  currentPoints =
+    questionNumber
 
   updateWarmupDoubleButton()
-  startWarmupTimer(number)
-  saveWarmupState()
+
+  startWarmupTimer(
+    questionNumber
+  )
+
+  saveWarmupState({
+    immediate: true
+  })
 }
 
 
@@ -604,69 +1140,115 @@ function resumeWarmupTimer(time) {
 }
 
 function runWarmupTimer(startValue) {
-  const timerBox = document.getElementById("timer")
+  const timerBox =
+    document.getElementById("timer")
+
   if (!timerBox) return
 
-  clearInterval(timer)
-  let time = Number(startValue || 0)
+  clearInterval(warmupTimer)
+  warmupTimer = null
+
+  let time = Math.max(
+    0,
+    Number(startValue || 0)
+  )
+
   warmupLastTickPlayed = null
 
   timerBox.innerText = time
-  timerBox.classList.toggle("timerDanger", time > 0 && time <= 5)
-  timerBox.classList.remove("timerTimeoutFx")
+
+  timerBox.classList.toggle(
+    "timerDanger",
+    time > 0 && time <= 5
+  )
+
+  timerBox.classList.remove(
+    "timerTimeoutFx"
+  )
 
   saveWarmupState()
 
-  timer = setInterval(() => {
-    time--
+  if (time <= 0) return
+
+  warmupTimer = setInterval(() => {
+    time = Math.max(0, time - 1)
+
     timerBox.innerText = time
 
-    timerBox.classList.toggle("timerDanger", time > 0 && time <= 5)
+    timerBox.classList.toggle(
+      "timerDanger",
+      time > 0 && time <= 5
+    )
 
-    if (time > 0 && time <= 5 && warmupLastTickPlayed !== time) {
+    if (
+      time > 0 &&
+      time <= 5 &&
+      warmupLastTickPlayed !== time
+    ) {
       warmupLastTickPlayed = time
       playGameSound("tick")
     }
 
     saveWarmupState()
 
-    if (time <= 0) {
-      clearInterval(timer)
-      timer = null
-      timerBox.innerText = 0
-      timerBox.classList.remove("timerDanger")
-      timerBox.classList.add("timerTimeoutFx")
+    if (time > 0) return
 
-      setTimeout(() => {
-        timerBox.classList.remove("timerTimeoutFx")
-      }, 900)
+    clearInterval(warmupTimer)
+    warmupTimer = null
 
-      warmupLastTickPlayed = null
-      playGameSound("timeout")
-      saveWarmupState()
-    }
+    timerBox.innerText = 0
+
+    timerBox.classList.remove(
+      "timerDanger"
+    )
+
+    timerBox.classList.add(
+      "timerTimeoutFx"
+    )
+
+    setTimeout(() => {
+      timerBox.classList.remove(
+        "timerTimeoutFx"
+      )
+    }, 900)
+
+    warmupLastTickPlayed = null
+
+    playGameSound("timeout")
+
+    saveWarmupState({
+      immediate: true
+    })
   }, 1000)
 }
 
-function resetWarmupTimer() {
-  clearInterval(timer)
-  timer = null
+function resetWarmupTimer(options = {}) {
+  clearInterval(warmupTimer)
+  warmupTimer = null
+
   warmupLastTickPlayed = null
 
-  const timerBox = document.getElementById("timer")
+  const timerBox =
+    document.getElementById("timer")
+
   if (timerBox) {
     timerBox.innerText = 0
-    timerBox.classList.remove("timerDanger", "timerTimeoutFx")
+
+    timerBox.classList.remove(
+      "timerDanger",
+      "timerTimeoutFx"
+    )
   }
 
-  saveWarmupState()
+  if (options.save !== false) {
+    saveWarmupState()
+  }
 }
 
 /* =========================
    Actions
 ========================= */
 
-let warmupResultPending = false
 
 function showWarmupAnswerForSeconds(callback) {
   const box = document.getElementById("questionBox")
@@ -694,8 +1276,15 @@ function warmupCorrect() {
     return
   }
 
-  warmupResultPending = true
-  resetWarmupTimer()
+ warmupResultPending = true
+
+resetWarmupTimer({
+  save: false
+})
+
+saveWarmupState({
+  immediate: true
+})
 
   playGameSound("correct")
   flashScreen("correct")
@@ -721,8 +1310,12 @@ function warmupCorrect() {
     lastAnsweredTeam = selectedTeam
 
 const nextTeam = getNextWarmupTeam()
+
 if (nextTeam) {
-  setWarmupActiveTeam(nextTeam)
+  setWarmupActiveTeam(nextTeam, {
+    sync: false,
+    save: false
+  })
 }
 
     window.currentSegmentScores = {
@@ -738,9 +1331,15 @@ if (nextTeam) {
     warmupQuestionLocked = false
     currentWarmupQuestionKey = null
     clearWarmupSelectedButton()
-    resetWarmupTimer()
-    updateWarmupDoubleButton()
-    saveWarmupState()
+    resetWarmupTimer({
+  save: false
+})
+
+updateWarmupDoubleButton()
+
+saveWarmupState({
+  immediate: true
+})
     renderWarmupFinishedIfNeeded()
   })
 }
@@ -753,8 +1352,15 @@ function warmupWrong() {
     return
   }
 
-  warmupResultPending = true
-  resetWarmupTimer()
+warmupResultPending = true
+
+resetWarmupTimer({
+  save: false
+})
+
+saveWarmupState({
+  immediate: true
+})
 
   playGameSound("wrong")
   flashScreen("wrong")
@@ -767,8 +1373,12 @@ function warmupWrong() {
     }
 
     const nextTeam = getNextWarmupTeam()
+
 if (nextTeam) {
-  setWarmupActiveTeam(nextTeam)
+  setWarmupActiveTeam(nextTeam, {
+    sync: false,
+    save: false
+  })
 }
 
     const questionBox = document.getElementById("questionBox")
@@ -779,16 +1389,18 @@ if (nextTeam) {
     warmupQuestionLocked = false
     currentWarmupQuestionKey = null
     clearWarmupSelectedButton()
-    resetWarmupTimer()
-    updateWarmupDoubleButton()
-    saveWarmupState()
+    resetWarmupTimer({
+  save: false
+})
+
+updateWarmupDoubleButton()
+
+saveWarmupState({
+  immediate: true
+})
     renderWarmupFinishedIfNeeded()
   })
 }
-/* =========================
-   Warmup Finish System
-   نفس نظام نهاية الفاصلة
-========================= */
 
 function getWarmupTotalQuestionsCount() {
   return 12
@@ -815,69 +1427,12 @@ function getWarmupWinnerText() {
 
   return "تعادل"
 }
-
-function showWarmupFinishedScreen() {
-  const wrap = document.querySelector(".warmupWrap")
-  if (!wrap) return
-
-  const questionCard =
-    document.querySelector(".questionCard") ||
-    document.querySelector(".warmupQuestionBox")
-
-  const controls =
-    document.querySelector(".actionBar") ||
-    document.querySelector(".warmupControlPanel")
-
-  const grid =
-    document.querySelector(".categoriesGrid") ||
-    document.querySelector(".warmupGrid")
-
-  if (questionCard) questionCard.remove()
-  if (controls) controls.remove()
-  if (grid) grid.remove()
-
-  if (wrap.querySelector(".warmupFinishedScreen")) return
-
-  const winner = getWarmupWinnerText()
-
-  const finished = document.createElement("div")
-  finished.className = "warmupFinishedScreen"
-
-  finished.innerHTML = `
-    <div class="warmupFinishedCard">
-      <div class="warmupFinishedBadge">انتهت الفقرة</div>
-
-      <h2>التسخين</h2>
-
-      <div class="warmupFinishedWinner">
-        ${winner === "تعادل" ? "تعادل" : `الفائز: ${escapeDisplayHtml(winner)}`}
-      </div>
-
-      <div class="warmupFinishedScores">
-        <div>
-          <span>${escapeDisplayHtml(teamAName || "الفريق الأول")}</span>
-          <strong>${Number(warmupScoreA || 0)}</strong>
-        </div>
-
-        <div>
-          <span>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</span>
-          <strong>${Number(warmupScoreB || 0)}</strong>
-        </div>
-      </div>
-    </div>
-  `
-
-  wrap.appendChild(finished)
-}
-
 function renderWarmupFinishedIfNeeded() {
   if (!isWarmupFinished()) return false
 
-  showWarmupFinishedScreen()
-
   window.currentSegmentScores = {
-    A: warmupScoreA,
-    B: warmupScoreB
+    A: Number(warmupScoreA || 0),
+    B: Number(warmupScoreB || 0)
   }
 
   saveWarmupState()

@@ -1,7 +1,143 @@
+/* =========================================================
+   INTRO
+   تحميل سريع + كاش محلي + علاقات Supabase + تحميل خلفي
+========================================================= */
+
 let introModelsLoaded = false
 let introStarting = false
 let gameToastTimer = null
 let presenterStartWatchTimer = null
+let presenterStartWatchBusy = false
+let introSegmentsRequestToken = 0
+
+const INTRO_MODELS_CACHE_TTL = 10 * 60 * 1000
+const INTRO_MODEL_DATA_CACHE_TTL = 5 * 60 * 1000
+const INTRO_GLOBAL_VISIBILITY_CACHE_TTL = 10 * 60 * 1000
+
+const INTRO_MIN_SEGMENTS_COUNT = 6
+const INTRO_MAX_SEGMENTS_COUNT = 11
+
+const INTRO_ALL_GAME_SEGMENTS = [
+  {
+    key: "warmup",
+    title: "التسخين",
+    sort: 1
+  },
+
+  {
+    key: "top10",
+    title: "Top 10",
+    sort: 2
+  },
+
+  {
+    key: "letterli",
+    title: "حرفلي",
+    sort: 3
+  },
+
+  {
+    key: "who",
+    title: "من هو",
+    sort: 4
+  },
+
+  {
+    key: "explain",
+    title: "اشرح الكلمة",
+    sort: 5
+  },
+
+  {
+    key: "finalRound1",
+    title: "ٮدوں ٮڡاط",
+    sort: 6
+  },
+
+  {
+    key: "finalRound2",
+    title: "صح صحلي",
+    sort: 7
+  },
+
+  {
+    key: "finalRound3",
+    title: "قصة",
+    sort: 8
+  },
+
+  {
+    key: "finalRound4",
+    title: "التركيز",
+    sort: 9
+  },
+
+  {
+    key: "archive",
+    title: "الأرشيف",
+    sort: 10
+  },
+
+  {
+    key: "randomChallenge",
+    title: "التحدي",
+    sort: 11
+  }
+]
+
+let introVisibleSegmentsClickOrder = []
+let introVisibleSegmentsReady = false
+let introAvailableSegments = []
+
+/* =========================================================
+   INIT
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", async () => {
+  ensureIntroLoadingStyles()
+
+  const oldSessionId =
+    localStorage.getItem("game_session_id")
+
+  resetIntroPageState()
+  prepareIntroInputs()
+
+  const introCard =
+    document.querySelector(".introCard")
+
+  if (introCard) {
+    introCard.classList.add("softEnter")
+  }
+
+  setIntroStartLoading(
+    false,
+    "بدء اللعبة",
+    true
+  )
+
+  /*
+    إنهاء الجلسة السابقة بالخلفية
+    بعد حفظ رقمها وقبل أن يُحذف.
+  */
+  if (oldSessionId) {
+    setTimeout(() => {
+      endOldIntroSessionIfExists(
+        oldSessionId
+      )
+    }, 0)
+  }
+
+  await loadIntroModels()
+
+  fillSavedIntroValues()
+  bindIntroEnterSubmit()
+  bindIntroInputCleanup()
+  bindIntroModelSegmentsLoader()
+})
+
+/* =========================================================
+   MODALS
+========================================================= */
 
 window.openIntroSegmentsModal = function () {
   const modelSelect = document.getElementById("introModelSelect")
@@ -25,6 +161,7 @@ window.openIntroSegmentsModal = function () {
 
 window.closeIntroSegmentsModal = function () {
   const modal = document.getElementById("introSegmentsModal")
+
   if (!modal) return
 
   modal.classList.remove("show")
@@ -34,53 +171,89 @@ window.closeIntroSegmentsModal = function () {
   }, 180)
 }
 
-const INTRO_MIN_SEGMENTS_COUNT = 6
-const INTRO_MAX_SEGMENTS_COUNT = 11
+/* =========================================================
+   LOADING UI
+========================================================= */
 
-const INTRO_ALL_GAME_SEGMENTS = [
-  { key: "warmup", title: "التسخين", sort: 1 },
-  { key: "top10", title: "Top 10", sort: 2 },
-  { key: "auction", title: "فتبلة", sort: 3 },
-  { key: "who", title: "من هو", sort: 4 },
-  { key: "explain", title: "اشرح الكلمة", sort: 5 },
+function ensureIntroLoadingStyles() {
+  if (document.getElementById("introDynamicLoadingStyles")) return
 
-  { key: "finalRound1", title: "ٮدوں ٮڡاط", sort: 6 },
-  { key: "finalRound2", title: "صح صحلي", sort: 7 },
-  { key: "finalRound3", title: "قصة", sort: 8 },
-  { key: "finalRound4", title: "التركيز", sort: 9 },
+  const style = document.createElement("style")
+  style.id = "introDynamicLoadingStyles"
 
-  { key: "archive", title: "الأرشيف", sort: 10 },
-  { key: "randomChallenge", title: "التحدي", sort: 11 }
-]
+  style.textContent = `
+    .introInlineLoading{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+    }
 
-let introVisibleSegmentsClickOrder = []
-let introVisibleSegmentsReady = false
-let introAvailableSegments = []
+    .introInlineSpinner{
+      width:18px;
+      height:18px;
+      flex:0 0 18px;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.38);
+      border-top-color:currentColor;
+      animation:introSpinnerRotation .7s linear infinite;
+    }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await endOldIntroSessionIfExists()
+    .introSegmentsLoadingState{
+      min-height:120px;
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:12px;
+      text-align:center;
+    }
 
-  resetIntroPageState()
-  prepareIntroInputs()
+    .introSegmentsLoadingState .introInlineSpinner{
+      width:24px;
+      height:24px;
+      flex-basis:24px;
+      color:#ff7a33;
+      border-color:rgba(255,122,51,.2);
+      border-top-color:#ff7a33;
+    }
 
-  const introCard = document.querySelector(".introCard")
-  if (introCard) {
-    introCard.classList.add("softEnter")
-  }
+    @keyframes introSpinnerRotation{
+      to{ transform:rotate(360deg); }
+    }
 
-  setIntroStartLoading(false, "بدء اللعبة", true)
+    @media (prefers-reduced-motion:reduce){
+      .introInlineSpinner{
+        animation-duration:1.4s;
+      }
+    }
+  `
 
-  await loadIntroModels()
+  document.head.appendChild(style)
+}
 
-  fillSavedIntroValues()
-  bindIntroEnterSubmit()
-  bindIntroInputCleanup()
-  bindIntroModelSegmentsLoader()
-})
+function getIntroLoadingMarkup(text) {
+  return `
+    <span class="introInlineLoading">
+      <span class="introInlineSpinner" aria-hidden="true"></span>
+      <span>${escapeIntroHtml(text)}</span>
+    </span>
+  `
+}
 
-/* =========================
-   Toast
-========================= */
+function getIntroSegmentsLoadingMarkup(text = "جارٍ تحميل الفقرات...") {
+  return `
+    <div class="introSegmentsLoadingState">
+      <span class="introInlineSpinner" aria-hidden="true"></span>
+      <span>${escapeIntroHtml(text)}</span>
+    </div>
+  `
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
 
 function showGameToast(message) {
   const toast = document.getElementById("gameToast")
@@ -110,9 +283,45 @@ function showGameToast(message) {
   }, 2400)
 }
 
-/* =========================
-   Helpers
-========================= */
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function escapeIntroHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
+}
+
+function normalizeIntroSegmentKey(key) {
+  const value =
+    String(key || "").trim()
+
+  if (value === "final_round1") {
+    return "finalRound1"
+  }
+
+  if (value === "final_round2") {
+    return "finalRound2"
+  }
+
+  if (value === "final_round3") {
+    return "finalRound3"
+  }
+
+  if (value === "final_round4") {
+    return "finalRound4"
+  }
+
+  if (value === "auction") {
+    return "letterli"
+  }
+
+  return value
+}
 
 function prepareIntroInputs() {
   const teamAInput = document.getElementById("teamANameInput")
@@ -141,13 +350,28 @@ function cleanTeamName(value) {
     .slice(0, 18)
 }
 
-function setIntroStartLoading(isLoading, text = "بدء اللعبة", disabledOverride = null) {
+function setIntroStartLoading(
+  isLoading,
+  text = "بدء اللعبة",
+  disabledOverride = null
+) {
   const startBtn = document.getElementById("startGameBtn")
+
   if (!startBtn) return
 
-  startBtn.disabled = disabledOverride !== null ? disabledOverride : !!isLoading
+  startBtn.disabled =
+    disabledOverride !== null
+      ? disabledOverride
+      : !!isLoading
+
   startBtn.classList.toggle("loading", !!isLoading)
-  startBtn.textContent = text
+  startBtn.setAttribute("aria-busy", isLoading ? "true" : "false")
+
+  if (isLoading) {
+    startBtn.innerHTML = getIntroLoadingMarkup(text)
+  } else {
+    startBtn.textContent = text
+  }
 }
 
 function setIntroFormDisabled(isDisabled) {
@@ -170,101 +394,215 @@ function setIntroSegmentsDisabled(isDisabled) {
 
 function getSelectedModelName() {
   const modelSelect = document.getElementById("introModelSelect")
+
   if (!modelSelect) return ""
 
   return modelSelect.options[modelSelect.selectedIndex]?.text || ""
 }
 
 function createGameSessionId() {
-  return "game_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8)
+  return (
+    "game_" +
+    Date.now() +
+    "_" +
+    Math.random().toString(36).slice(2, 8)
+  )
 }
+
+/* =========================================================
+   JOIN CODE
+   طلب واحد بدل عدة طلبات
+========================================================= */
 
 async function generateUniqueJoinCode() {
-  for (let i = 0; i < 8; i++) {
-    const code = String(Math.floor(1000 + Math.random() * 9000))
-
+  try {
     const { data, error } = await db
       .from("game_sessions")
-      .select("id")
-      .eq("join_code", code)
+      .select("join_code")
       .eq("status", "active")
-      .limit(1)
+      .not("join_code", "is", null)
 
     if (error) {
-      console.log("join code check error:", error)
-      return code
+      console.log("join code list error:", error)
+
+      return String(
+        Math.floor(1000 + Math.random() * 9000)
+      )
     }
 
-    if (!data || data.length === 0) {
-      return code
+    const usedCodes = new Set(
+      (data || [])
+        .map(row => String(row.join_code || "").trim())
+        .filter(Boolean)
+    )
+
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const code = String(
+        Math.floor(1000 + Math.random() * 9000)
+      )
+
+      if (!usedCodes.has(code)) {
+        return code
+      }
     }
+  } catch (error) {
+    console.log("generateUniqueJoinCode error:", error)
   }
 
-  return String(Math.floor(1000 + Math.random() * 9000))
+  return String(
+    Math.floor(1000 + Math.random() * 9000)
+  )
 }
 
-/* =========================
-   Models
-========================= */
+/* =========================================================
+   MODELS
+========================================================= */
 
-async function loadIntroModels() {
+function renderIntroModelOptions(rows, options = {}) {
   const select = document.getElementById("introModelSelect")
-  if (!select) return
 
-  introModelsLoaded = false
-  select.disabled = true
-  select.innerHTML = `<option value="">جارٍ تحميل النماذج...</option>`
+  if (!select) return false
 
-  if (!window.db) {
-    select.innerHTML = `<option value="">تعذر الاتصال بقاعدة البيانات</option>`
+  const preserveValue =
+    options.preserveValue !== false
+      ? String(select.value || "")
+      : ""
+
+  const models = Array.isArray(rows) ? rows : []
+
+  if (!models.length) {
+    select.innerHTML = `
+      <option value="">
+        لا توجد نماذج متاحة
+      </option>
+    `
+
     select.disabled = false
-
-    setIntroStartLoading(false, "بدء اللعبة", true)
-    showGameToast("تعذر الاتصال بقاعدة البيانات")
-    return
-  }
-
-  const { data, error } = await db
-    .from("models")
-    .select("*")
-    .order("id", { ascending: true })
-
-  if (error) {
-    console.log("loadIntroModels error:", error)
-
-    select.innerHTML = `<option value="">تعذر تحميل النماذج</option>`
-    select.disabled = false
-
-    setIntroStartLoading(false, "بدء اللعبة", true)
-    showGameToast("تعذر تحميل النماذج")
-    return
-  }
-
-  const rows = data || []
-
-  if (!rows.length) {
-    select.innerHTML = `<option value="">لا توجد نماذج متاحة</option>`
-    select.disabled = false
-
     introModelsLoaded = false
-    setIntroStartLoading(false, "بدء اللعبة", true)
-    showGameToast("لا توجد نماذج متاحة")
-    return
+
+    setIntroStartLoading(
+      false,
+      "بدء اللعبة",
+      true
+    )
+
+    return false
   }
 
-  select.innerHTML = `<option value="">اختر النموذج</option>`
+  select.innerHTML = `
+    <option value="">
+      اختر النموذج
+    </option>
+  `
 
-  rows.forEach(row => {
+  models.forEach(row => {
     const option = document.createElement("option")
-    option.value = row.id
-    option.textContent = row.name || `نموذج ${row.id}`
+
+    option.value = String(row.id)
+    option.textContent =
+      row.name || `نموذج ${row.id}`
+
     select.appendChild(option)
   })
+
+  if (
+    preserveValue &&
+    models.some(row => String(row.id) === preserveValue)
+  ) {
+    select.value = preserveValue
+  }
 
   introModelsLoaded = true
   select.disabled = false
 
-  setIntroStartLoading(false, "بدء اللعبة", false)
+  setIntroStartLoading(
+    false,
+    "بدء اللعبة",
+    false
+  )
+
+  return true
+}
+
+async function loadIntroModels() {
+  const select = document.getElementById("introModelSelect")
+
+  if (!select) return
+
+  introModelsLoaded = false
+  select.disabled = true
+
+  select.innerHTML = `
+    <option value="">
+      جارٍ تحميل النماذج...
+    </option>
+  `
+
+  if (!window.db || typeof window.cachedSupabaseSelect !== "function") {
+    select.innerHTML = `
+      <option value="">
+        تعذر الاتصال بقاعدة البيانات
+      </option>
+    `
+
+    select.disabled = false
+
+    setIntroStartLoading(
+      false,
+      "بدء اللعبة",
+      true
+    )
+
+    showGameToast("تعذر الاتصال بقاعدة البيانات")
+    return
+  }
+
+  const result = await window.cachedSupabaseSelect("models", {
+    select: "id,name",
+    order: {
+      column: "id",
+      ascending: true
+    },
+    ttl: INTRO_MODELS_CACHE_TTL,
+    staleWhileRevalidate: true,
+    onBackgroundUpdate: freshRows => {
+      renderIntroModelOptions(freshRows, {
+        preserveValue: true
+      })
+    }
+  })
+
+  if (result.error && !result.data?.length) {
+    console.log("loadIntroModels error:", result.error)
+
+    select.innerHTML = `
+      <option value="">
+        تعذر تحميل النماذج
+      </option>
+    `
+
+    select.disabled = false
+
+    setIntroStartLoading(
+      false,
+      "بدء اللعبة",
+      true
+    )
+
+    showGameToast("تعذر تحميل النماذج")
+    return
+  }
+
+  const rendered = renderIntroModelOptions(
+    result.data || [],
+    {
+      preserveValue: false
+    }
+  )
+
+  if (!rendered) {
+    showGameToast("لا توجد نماذج متاحة")
+  }
 }
 
 function fillSavedIntroValues() {
@@ -276,21 +614,13 @@ function fillSavedIntroValues() {
   if (teamBInput) teamBInput.value = ""
 
   if (modelSelect) {
-    const resetModel = () => {
-      modelSelect.value = ""
-    }
-
-    if (introModelsLoaded) {
-      resetModel()
-    } else {
-      setTimeout(resetModel, 300)
-    }
+    modelSelect.value = ""
   }
 }
 
-/* =========================
-   Events
-========================= */
+/* =========================================================
+   EVENTS
+========================================================= */
 
 function bindIntroEnterSubmit() {
   const inputs = [
@@ -302,11 +632,11 @@ function bindIntroEnterSubmit() {
   inputs.forEach(el => {
     if (!el) return
 
-    el.addEventListener("keydown", e => {
-      if (e.key === "Enter") {
-        e.preventDefault()
-        startGameFromIntro()
-      }
+    el.addEventListener("keydown", event => {
+      if (event.key !== "Enter") return
+
+      event.preventDefault()
+      startGameFromIntro()
     })
   })
 }
@@ -331,9 +661,9 @@ function bindIntroInputCleanup() {
   })
 }
 
-/* =========================
-   Validation
-========================= */
+/* =========================================================
+   VALIDATION
+========================================================= */
 
 function validateIntroForm() {
   const teamAInput = document.getElementById("teamANameInput")
@@ -350,22 +680,38 @@ function validateIntroForm() {
   }
 
   if (!teamA) {
-    showIntroFieldError(teamAInput, "اكتب اسم الفريق الأول")
+    showIntroFieldError(
+      teamAInput,
+      "اكتب اسم الفريق الأول"
+    )
+
     return false
   }
 
   if (!teamB) {
-    showIntroFieldError(teamBInput, "اكتب اسم الفريق الثاني")
+    showIntroFieldError(
+      teamBInput,
+      "اكتب اسم الفريق الثاني"
+    )
+
     return false
   }
 
   if (teamA === teamB) {
-    showIntroFieldError(teamBInput, "اكتب اسمًا مختلفًا للفريق الثاني")
+    showIntroFieldError(
+      teamBInput,
+      "اكتب اسمًا مختلفًا للفريق الثاني"
+    )
+
     return false
   }
 
   if (!model) {
-    showIntroFieldError(modelSelect, "اختر النموذج أولاً")
+    showIntroFieldError(
+      modelSelect,
+      "اختر النموذج أولاً"
+    )
+
     return false
   }
 
@@ -378,10 +724,15 @@ function validateIntroForm() {
   }
 
   if (
-    introVisibleSegmentsClickOrder.length < INTRO_MIN_SEGMENTS_COUNT ||
-    introVisibleSegmentsClickOrder.length > INTRO_MAX_SEGMENTS_COUNT
+    introVisibleSegmentsClickOrder.length <
+      INTRO_MIN_SEGMENTS_COUNT ||
+    introVisibleSegmentsClickOrder.length >
+      INTRO_MAX_SEGMENTS_COUNT
   ) {
-    showGameToast(`اختر من ${INTRO_MIN_SEGMENTS_COUNT} إلى ${INTRO_MAX_SEGMENTS_COUNT} فقرات للعرض`)
+    showGameToast(
+      `اختر من ${INTRO_MIN_SEGMENTS_COUNT} إلى ${INTRO_MAX_SEGMENTS_COUNT} فقرات للعرض`
+    )
+
     return false
   }
 
@@ -405,59 +756,100 @@ function showIntroFieldError(field, message) {
   showGameToast(message)
 }
 
-/* =========================
-   Old Session Cleanup
-========================= */
+/* =========================================================
+   OLD SESSION CLEANUP
+========================================================= */
 
-async function endOldIntroSessionIfExists() {
-  const oldSessionId = localStorage.getItem("game_session_id")
+async function endOldIntroSessionIfExists(
+  sessionId = null
+) {
+  const oldSessionId =
+    sessionId ||
+    localStorage.getItem(
+      "game_session_id"
+    )
 
-  if (!oldSessionId || !window.db) return
+  if (
+    !oldSessionId ||
+    !window.db
+  ) {
+    return false
+  }
 
   try {
-    await db
+    const now =
+      new Date().toISOString()
+
+    const { error } = await db
       .from("game_sessions")
       .update({
         status: "ended",
         active_segment: null,
-        ended_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        ended_at: now,
+        updated_at: now
       })
       .eq("id", oldSessionId)
-  } catch (e) {
-    console.log("end old intro session error:", e)
+      .eq("status", "active")
+
+    if (error) {
+      console.log(
+        "END OLD INTRO SESSION ERROR:",
+        error
+      )
+
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.log(
+      "END OLD INTRO SESSION CATCH:",
+      error
+    )
+
+    return false
   }
 }
 
-/* =========================
-   Reset
-========================= */
+/* =========================================================
+   RESET
+========================================================= */
 
 function clearGameLocalState() {
   localStorage.removeItem("main_score_a")
   localStorage.removeItem("main_score_b")
+
   localStorage.removeItem("active_segment")
+  localStorage.removeItem("active_team_v1")
   localStorage.removeItem("segment_status_v1")
 
   localStorage.removeItem("warmup_state_v1")
   localStorage.removeItem("top10_state_v1")
-  localStorage.removeItem("auction_state_v1")
-  localStorage.removeItem("auction_state_v2")
+  localStorage.removeItem("letterli_state_v1")
   localStorage.removeItem("who_state_v1")
   localStorage.removeItem("explain_state_v1")
+
+  localStorage.removeItem("final_state_v1")
   localStorage.removeItem("final_state_v2")
   localStorage.removeItem("final_state_v3")
+
   localStorage.removeItem("archive_state_v1")
-  localStorage.removeItem("random_challenge_state_v1")
+  localStorage.removeItem(
+    "random_challenge_state_v1"
+  )
 
   localStorage.removeItem("teamAName")
   localStorage.removeItem("teamBName")
+
   localStorage.removeItem("game_model")
   localStorage.removeItem("game_model_name")
 
   localStorage.removeItem("game_session_id")
   localStorage.removeItem("game_join_code")
-  localStorage.removeItem("presenter_join_code_temp")
+  localStorage.removeItem(
+    "presenter_join_code_temp"
+  )
+
 }
 
 function resetIntroPageState() {
@@ -472,33 +864,42 @@ function resetGameStateBeforeStart() {
 }
 
 function defaultIntroSegmentStatus() {
+  const createStatus = () => ({
+    locked: false,
+    winner: "",
+    scoreA: 0,
+    scoreB: 0
+  })
+
   return {
-    warmup: { locked: false, winner: "" },
-    top10: { locked: false, winner: "" },
-    auction: { locked: false, winner: "" },
-    who: { locked: false, winner: "" },
-    explain: { locked: false, winner: "" },
+    warmup: createStatus(),
+    top10: createStatus(),
+    letterli: createStatus(),
+    who: createStatus(),
+    explain: createStatus(),
 
-    final: { locked: false, winner: "" },
-    finalRound1: { locked: false, winner: "" },
-    finalRound2: { locked: false, winner: "" },
-    finalRound3: { locked: false, winner: "" },
-    finalRound4: { locked: false, winner: "" },
+    final: createStatus(),
+    finalRound1: createStatus(),
+    finalRound2: createStatus(),
+    finalRound3: createStatus(),
+    finalRound4: createStatus(),
 
-    archive: { locked: false, winner: "" },
-    randomChallenge: { locked: false, winner: "" }
+    archive: createStatus(),
+    randomChallenge: createStatus()
   }
 }
 
-/* =========================
-   Intro Visible Segments
-========================= */
+/* =========================================================
+   SEGMENTS LOADER
+========================================================= */
 
 function bindIntroModelSegmentsLoader() {
-  const modelSelect = document.getElementById("introModelSelect")
+  const modelSelect =
+    document.getElementById("introModelSelect")
+
   if (!modelSelect) return
 
-  modelSelect.addEventListener("change", async () => {
+  modelSelect.addEventListener("change", () => {
     modelSelect.classList.remove("introFieldError")
 
     introVisibleSegmentsReady = false
@@ -507,25 +908,38 @@ function bindIntroModelSegmentsLoader() {
 
     clearIntroSegmentSelectionUI()
 
-    await loadIntroVisibleSegments()
+    loadIntroVisibleSegments()
   })
 }
 
 function clearIntroSegmentSelectionUI() {
-  const counter = document.getElementById("introSegmentsCounter")
-  const triggerCounter = document.getElementById("introSegmentsTriggerCounter")
-  const triggerSummary = document.getElementById("introSegmentsTriggerSummary")
-  const order = document.getElementById("introSegmentsOrder")
-  const grid = document.getElementById("introSegmentsGrid")
+  const counter =
+    document.getElementById("introSegmentsCounter")
+
+  const triggerCounter =
+    document.getElementById("introSegmentsTriggerCounter")
+
+  const triggerSummary =
+    document.getElementById("introSegmentsTriggerSummary")
+
+  const order =
+    document.getElementById("introSegmentsOrder")
+
+  const grid =
+    document.getElementById("introSegmentsGrid")
 
   if (counter) {
-    counter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    counter.innerText =
+      `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+
     counter.classList.remove("ok")
     counter.classList.add("bad")
   }
 
   if (triggerCounter) {
-    triggerCounter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    triggerCounter.innerText =
+      `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+
     triggerCounter.classList.remove("ok")
     triggerCounter.classList.add("bad")
   }
@@ -539,7 +953,11 @@ function clearIntroSegmentSelectionUI() {
   }
 
   if (grid) {
-    grid.innerHTML = `<div class="introSegmentsEmpty">اختر النموذج أولاً</div>`
+    grid.innerHTML = `
+      <div class="introSegmentsEmpty">
+        اختر النموذج أولاً
+      </div>
+    `
   }
 }
 
@@ -548,7 +966,8 @@ function getIntroDefaultVisibleSegmentsMap() {
 
   INTRO_ALL_GAME_SEGMENTS.forEach(item => {
     map[item.key] = {
-      is_visible: item.sort <= INTRO_MIN_SEGMENTS_COUNT,
+      is_visible:
+        item.sort <= INTRO_MIN_SEGMENTS_COUNT,
       sort_order: item.sort
     }
   })
@@ -556,131 +975,509 @@ function getIntroDefaultVisibleSegmentsMap() {
   return map
 }
 
-async function getIntroVisibleSegmentsMap(modelId) {
-  const map = getIntroDefaultVisibleSegmentsMap()
+function buildIntroVisibleSegmentsMap(
+  rows = []
+) {
+  const map =
+    getIntroDefaultVisibleSegmentsMap()
 
-  if (!modelId) return map
+  ;(rows || []).forEach(row => {
+    const segmentKey =
+      normalizeIntroSegmentKey(
+        row.segment_key
+      )
 
-  const { data, error } = await db
-    .from("visible_segments")
-    .select("*")
-    .eq("model", Number(modelId))
-    .order("sort_order", { ascending: true })
+    if (!map[segmentKey]) {
+      return
+    }
 
-  if (error) {
-    console.log("INTRO GET VISIBLE SEGMENTS ERROR:", error)
-    return map
-  }
+    map[segmentKey] = {
+      is_visible:
+        !!row.is_visible,
 
-  ;(data || []).forEach(row => {
-    if (!map[row.segment_key]) return
-
-    map[row.segment_key] = {
-      is_visible: !!row.is_visible,
-      sort_order: Number(row.sort_order || map[row.segment_key].sort_order)
+      sort_order:
+        Number(
+          row.sort_order ||
+          map[segmentKey].sort_order
+        )
     }
   })
 
   return map
 }
 
-async function ensureIntroVisibleSegmentsDefaults(modelId) {
-  if (!modelId) return false
+/* =========================================================
+   GLOBAL VISIBILITY CACHE
+========================================================= */
 
-  const { data: existingRows, error: readError } = await db
-    .from("visible_segments")
-    .select("segment_key")
-    .eq("model", Number(modelId))
-
-  if (readError) {
-    console.log("INTRO READ VISIBLE SEGMENTS DEFAULTS ERROR:", readError)
-    showGameToast("تعذر قراءة فقرات العرض")
-    return false
-  }
-
-  const existingKeys = (existingRows || []).map(row => row.segment_key)
-
-  const rows = INTRO_ALL_GAME_SEGMENTS
-    .filter(item => !existingKeys.includes(item.key))
-    .map(item => ({
-      model: Number(modelId),
-      segment_key: item.key,
-      is_visible: item.sort <= INTRO_MIN_SEGMENTS_COUNT,
-      sort_order: item.sort,
-      updated_at: new Date().toISOString()
-    }))
-
-  if (!rows.length) return true
-
-  const { error } = await db
-    .from("visible_segments")
-    .insert(rows)
-
-  if (error) {
-    console.log("INTRO ENSURE VISIBLE SEGMENTS ERROR:", error)
-    showGameToast("تعذر تجهيز فقرات العرض")
-    return false
-  }
-
-  return true
-}
-
-async function loadIntroGlobalSegmentVisibilityMap() {
+async function loadIntroGlobalSegmentVisibilityMap(
+  options = {}
+) {
   const map = {}
 
-  try {
-    const { data, error } = await db
-      .from("global_segment_visibility")
-      .select("segment_key,is_enabled")
-
-    if (error) {
-      console.log("INTRO GLOBAL SEGMENT VISIBILITY ERROR:", error)
-      return map
-    }
-
-    ;(data || []).forEach(row => {
-      map[row.segment_key] = row.is_enabled !== false
-    })
-
-    return map
-  } catch (err) {
-    console.log("INTRO GLOBAL SEGMENT VISIBILITY CATCH:", err)
+  if (
+    !window.cachedSupabaseSelect ||
+    !window.db
+  ) {
     return map
   }
+
+  const result = await window.cachedSupabaseSelect(
+    "global_segment_visibility",
+    {
+      select: "segment_key,is_enabled",
+      ttl: INTRO_GLOBAL_VISIBILITY_CACHE_TTL,
+      staleWhileRevalidate:
+        options.staleWhileRevalidate !== false,
+      forceRefresh:
+        options.forceRefresh === true,
+      onBackgroundUpdate:
+        options.onBackgroundUpdate
+    }
+  )
+
+  if (result.error && !result.data?.length) {
+    console.log(
+      "INTRO GLOBAL SEGMENT VISIBILITY ERROR:",
+      result.error
+    )
+  }
+
+  ;(result.data || []).forEach(row => {
+  const segmentKey =
+    normalizeIntroSegmentKey(
+      row.segment_key
+    )
+
+  map[segmentKey] =
+    row.is_enabled !== false
+})
+
+  return map
 }
 
-function isIntroSegmentGloballyEnabled(segmentKey, globalMap = {}) {
+function isIntroSegmentGloballyEnabled(
+  segmentKey,
+  globalMap = {}
+) {
   return globalMap[segmentKey] !== false
 }
 
-async function loadIntroVisibleSegments() {
-  const modelSelect = document.getElementById("introModelSelect")
-  const modelId = Number(modelSelect?.value || 0)
+/* =========================================================
+   DEFAULT SEGMENTS
+========================================================= */
 
-  const grid = document.getElementById("introSegmentsGrid")
-  const counter = document.getElementById("introSegmentsCounter")
-  const triggerCounter = document.getElementById("introSegmentsTriggerCounter")
-  const triggerSummary = document.getElementById("introSegmentsTriggerSummary")
-  const order = document.getElementById("introSegmentsOrder")
+async function ensureIntroVisibleSegmentsDefaults(
+  modelId,
+  currentRows = []
+) {
+  if (!modelId) return false
+
+  const existingKeys = new Set(
+  (currentRows || []).map(row => {
+    return normalizeIntroSegmentKey(
+      row.segment_key
+    )
+  })
+)
+
+  const now = new Date().toISOString()
+
+  const rows = INTRO_ALL_GAME_SEGMENTS
+    .filter(item => !existingKeys.has(item.key))
+    .map(item => ({
+      model: Number(modelId),
+      segment_key: item.key,
+      is_visible:
+        item.sort <= INTRO_MIN_SEGMENTS_COUNT,
+      sort_order: item.sort,
+      updated_at: now
+    }))
+
+  if (!rows.length) {
+    return true
+  }
+
+  try {
+    let result
+
+    if (typeof window.upsertData === "function") {
+      result = await window.upsertData(
+        "visible_segments",
+        rows,
+        {
+          onConflict: "model,segment_key"
+        }
+      )
+    } else {
+      const { data, error } = await db
+        .from("visible_segments")
+        .upsert(rows, {
+          onConflict: "model,segment_key"
+        })
+        .select()
+
+      result = { data, error }
+    }
+
+    if (result?.error) {
+      console.log(
+        "INTRO ENSURE VISIBLE SEGMENTS ERROR:",
+        result.error
+      )
+
+      return false
+    }
+
+    if (typeof window.invalidateModelCache === "function") {
+      window.invalidateModelCache(modelId)
+    }
+
+    return true
+  } catch (error) {
+    console.log(
+      "INTRO ENSURE VISIBLE SEGMENTS CATCH:",
+      error
+    )
+
+    return false
+  }
+}
+
+/* =========================================================
+   RELATIONAL MODEL DATA
+========================================================= */
+
+async function loadIntroModelRelations(
+  modelId,
+  options = {}
+) {
+  const numericModelId =
+    Number(modelId || 0)
+
+  if (!numericModelId) {
+    return {
+      data: null,
+      error: new Error(
+        "رقم النموذج غير صالح"
+      ),
+      source: "validation"
+    }
+  }
+
+  /*
+    المحاولة الأولى:
+    استعلام واحد بالعلاقات.
+  */
+  if (
+    typeof window.loadModelWithRelations ===
+    "function"
+  ) {
+    const relationResult =
+      await window.loadModelWithRelations(
+        numericModelId,
+        {
+          ttl:
+            INTRO_MODEL_DATA_CACHE_TTL,
+
+          staleWhileRevalidate:
+            options
+              .staleWhileRevalidate !==
+            false,
+
+          forceRefresh:
+            options.forceRefresh === true,
+
+          onBackgroundUpdate:
+            options.onBackgroundUpdate
+        }
+      )
+
+    if (
+      relationResult?.data &&
+      !relationResult?.error
+    ) {
+      return relationResult
+    }
+
+    console.log(
+      "INTRO RELATION QUERY FAILED, USING FALLBACK:",
+      relationResult?.error
+    )
+  }
+
+  /*
+    البديل:
+    يعمل حتى لو لم توجد Foreign Keys.
+  */
+  try {
+    const modelCacheKey =
+      `intro_model_basic:${numericModelId}`
+
+    const visibleCacheKey =
+      `intro_visible_segments:${numericModelId}`
+
+    const settingsCacheKey =
+      `intro_segment_settings:${numericModelId}`
+
+    const [
+      modelResult,
+      visibleResult,
+      settingsResult
+    ] = await Promise.all([
+      window.cachedSupabaseSelect(
+        "models",
+        {
+          select: "id,name",
+
+          filters: {
+            id: numericModelId
+          },
+
+          maybeSingle: true,
+
+          ttl:
+            INTRO_MODEL_DATA_CACHE_TTL,
+
+          forceRefresh:
+            options.forceRefresh === true,
+
+          staleWhileRevalidate:
+            options
+              .staleWhileRevalidate !==
+            false,
+
+          cacheKey:
+            `${SUPABASE_CACHE_PREFIX}${modelCacheKey}`
+        }
+      ),
+
+      window.cachedSupabaseSelect(
+        "visible_segments",
+        {
+          select:
+            "segment_key,is_visible,sort_order",
+
+          filters: {
+            model: numericModelId
+          },
+
+          order: {
+            column: "sort_order",
+            ascending: true
+          },
+
+          ttl:
+            INTRO_MODEL_DATA_CACHE_TTL,
+
+          forceRefresh:
+            options.forceRefresh === true,
+
+          staleWhileRevalidate:
+            options
+              .staleWhileRevalidate !==
+            false,
+
+          cacheKey:
+            `${SUPABASE_CACHE_PREFIX}${visibleCacheKey}`
+        }
+      ),
+
+      window.cachedSupabaseSelect(
+        "segment_settings",
+        {
+          select:
+            "segment,item_count",
+
+          filters: {
+            model: numericModelId
+          },
+
+          ttl:
+            INTRO_MODEL_DATA_CACHE_TTL,
+
+          forceRefresh:
+            options.forceRefresh === true,
+
+          staleWhileRevalidate:
+            options
+              .staleWhileRevalidate !==
+            false,
+
+          cacheKey:
+            `${SUPABASE_CACHE_PREFIX}${settingsCacheKey}`
+        }
+      )
+    ])
+
+    if (
+      modelResult.error &&
+      !modelResult.data
+    ) {
+      return {
+        data: null,
+        error: modelResult.error,
+        source: "fallback-error"
+      }
+    }
+
+    const combinedData = {
+      ...(modelResult.data || {
+        id: numericModelId,
+        name: ""
+      }),
+
+      visible_segments:
+        visibleResult.data || [],
+
+      segment_settings:
+        settingsResult.data || []
+    }
+
+    return {
+      data: combinedData,
+      error:
+        modelResult.error ||
+        visibleResult.error ||
+        settingsResult.error ||
+        null,
+      source: "fallback"
+    }
+  } catch (error) {
+    console.log(
+      "INTRO MODEL FALLBACK ERROR:",
+      error
+    )
+
+    return {
+      data: null,
+      error,
+      source: "error"
+    }
+  }
+}
+
+/* =========================================================
+   APPLY SEGMENT DATA
+========================================================= */
+
+function applyIntroSegmentsData({
+  modelId,
+  visibleRows = [],
+  globalMap = {},
+  preserveSelection = false
+}) {
+  const selectedModelId = Number(
+    document.getElementById("introModelSelect")?.value || 0
+  )
+
+  if (
+    !modelId ||
+    selectedModelId !== Number(modelId)
+  ) {
+    return
+  }
+
+  const visibleMap =
+    buildIntroVisibleSegmentsMap(visibleRows)
+
+  const sortedSegments = [
+    ...INTRO_ALL_GAME_SEGMENTS
+  ]
+    .filter(item => {
+      return isIntroSegmentGloballyEnabled(
+        item.key,
+        globalMap
+      )
+    })
+    .sort((a, b) => {
+      const firstOrder = Number(
+        visibleMap[a.key]?.sort_order ||
+        a.sort
+      )
+
+      const secondOrder = Number(
+        visibleMap[b.key]?.sort_order ||
+        b.sort
+      )
+
+      return firstOrder - secondOrder
+    })
+
+  introAvailableSegments = sortedSegments
+
+  if (!preserveSelection) {
+    introVisibleSegmentsClickOrder = []
+  } else {
+    introVisibleSegmentsClickOrder =
+      introVisibleSegmentsClickOrder.filter(key => {
+        return introAvailableSegments.some(
+          item => item.key === key
+        )
+      })
+  }
+
+  introVisibleSegmentsReady = true
+
+  renderIntroSegmentsPicker(
+    introAvailableSegments
+  )
+}
+
+/* =========================================================
+   LOAD VISIBLE SEGMENTS
+========================================================= */
+
+async function loadIntroVisibleSegments() {
+  const modelSelect =
+    document.getElementById("introModelSelect")
+
+  const modelId = Number(
+    modelSelect?.value || 0
+  )
+
+  const grid =
+    document.getElementById("introSegmentsGrid")
+
+  const counter =
+    document.getElementById("introSegmentsCounter")
+
+  const triggerCounter =
+    document.getElementById("introSegmentsTriggerCounter")
+
+  const triggerSummary =
+    document.getElementById("introSegmentsTriggerSummary")
+
+  const order =
+    document.getElementById("introSegmentsOrder")
+
+  const requestToken = ++introSegmentsRequestToken
 
   introVisibleSegmentsReady = false
   introVisibleSegmentsClickOrder = []
   introAvailableSegments = []
 
   if (counter) {
-    counter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    counter.innerText =
+      `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+
     counter.classList.remove("ok")
     counter.classList.add("bad")
   }
 
   if (triggerCounter) {
-    triggerCounter.innerText = `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    triggerCounter.innerText =
+      `0 / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+
     triggerCounter.classList.remove("ok")
     triggerCounter.classList.add("bad")
   }
 
   if (triggerSummary) {
-    triggerSummary.textContent = modelId ? "جارٍ تحميل الفقرات..." : "اختر النموذج أولاً"
+    triggerSummary.textContent =
+      modelId
+        ? "جارٍ تحميل الفقرات..."
+        : "اختر النموذج أولاً"
   }
 
   if (order) {
@@ -690,36 +1487,274 @@ async function loadIntroVisibleSegments() {
   if (!grid) return
 
   if (!modelId) {
-    grid.innerHTML = `<div class="introSegmentsEmpty">اختر النموذج أولاً</div>`
+    grid.innerHTML = `
+      <div class="introSegmentsEmpty">
+        اختر النموذج أولاً
+      </div>
+    `
+
     return
   }
 
-  grid.innerHTML = `<div class="introSegmentsEmpty">جارٍ تحميل الفقرات...</div>`
+  grid.innerHTML =
+    getIntroSegmentsLoadingMarkup(
+      "جارٍ تحميل الفقرات..."
+    )
+let latestGlobalMap = {}
 
-  await ensureIntroVisibleSegmentsDefaults(modelId)
+const modelPromise =
+  loadIntroModelRelations(
+    modelId,
+    {
+      staleWhileRevalidate: true,
 
-  const visibleMap = await getIntroVisibleSegmentsMap(modelId)
-  const globalMap = await loadIntroGlobalSegmentVisibilityMap()
+      onBackgroundUpdate: freshModel => {
+        const currentModelId =
+          Number(
+            document.getElementById(
+              "introModelSelect"
+            )?.value || 0
+          )
 
-  const sortedSegments = [...INTRO_ALL_GAME_SEGMENTS]
-    .filter(item => isIntroSegmentGloballyEnabled(item.key, globalMap))
-    .sort((a, b) => {
-      const av = Number(visibleMap[a.key]?.sort_order || a.sort)
-      const bv = Number(visibleMap[b.key]?.sort_order || b.sort)
-      return av - bv
-    })
+        if (
+          currentModelId !== modelId ||
+          requestToken !==
+            introSegmentsRequestToken
+        ) {
+          return
+        }
 
-  introAvailableSegments = sortedSegments
+        applyIntroSegmentsData({
+          modelId,
 
-introVisibleSegmentsClickOrder = []
+          visibleRows:
+            freshModel
+              ?.visible_segments ||
+            [],
 
-introVisibleSegmentsReady = true
+          globalMap:
+            latestGlobalMap,
 
-renderIntroSegmentsPicker(introAvailableSegments)
+          preserveSelection: true
+        })
+      }
+    }
+  )
+
+const globalVisibilityPromise =
+  loadIntroGlobalSegmentVisibilityMap({
+    staleWhileRevalidate: true,
+
+    onBackgroundUpdate: freshRows => {
+      const freshMap = {}
+
+      ;(freshRows || []).forEach(row => {
+  const segmentKey =
+    normalizeIntroSegmentKey(
+      row.segment_key
+    )
+
+  freshMap[segmentKey] =
+    row.is_enabled !== false
+})
+
+      latestGlobalMap =
+        freshMap
+
+      const currentModelId =
+        Number(
+          document.getElementById(
+            "introModelSelect"
+          )?.value || 0
+        )
+
+      if (
+        currentModelId !== modelId ||
+        requestToken !==
+          introSegmentsRequestToken
+      ) {
+        return
+      }
+
+      modelPromise.then(
+        latestModelResult => {
+          if (
+            !latestModelResult?.data
+          ) {
+            return
+          }
+
+          applyIntroSegmentsData({
+            modelId,
+
+            visibleRows:
+              latestModelResult.data
+                .visible_segments ||
+              [],
+
+            globalMap:
+              latestGlobalMap,
+
+            preserveSelection: true
+          })
+        }
+      )
+    }
+  })
+
+const [
+  modelResult,
+  globalMap
+] = await Promise.all([
+  modelPromise,
+  globalVisibilityPromise
+])
+
+latestGlobalMap =
+  globalMap || {}
+
+if (
+  requestToken !==
+  introSegmentsRequestToken
+) {
+  return
 }
 
-function renderIntroSegmentsPicker(segmentsList = introAvailableSegments) {
-  const grid = document.getElementById("introSegmentsGrid")
+if (
+  modelResult.error &&
+  !modelResult.data
+) {
+  console.log(
+    "INTRO MODEL RELATIONS ERROR:",
+    modelResult.error
+  )
+
+  grid.innerHTML = `
+    <div class="introSegmentsEmpty">
+      تعذر تحميل الفقرات
+    </div>
+  `
+
+  if (triggerSummary) {
+    triggerSummary.textContent =
+      "تعذر تحميل الفقرات"
+  }
+
+  showGameToast(
+    "تعذر تحميل الفقرات"
+  )
+
+  return
+}
+
+const modelData =
+  modelResult.data || {}
+
+const visibleRows =
+  Array.isArray(
+    modelData.visible_segments
+  )
+    ? modelData.visible_segments
+    : []
+
+applyIntroSegmentsData({
+  modelId,
+  visibleRows,
+  globalMap: latestGlobalMap,
+  preserveSelection: false
+})
+
+/*
+  إنشاء الصفوف الناقصة بالخلفية
+  بدون تعطيل ظهور الفقرات.
+*/
+setTimeout(async () => {
+  const currentModelId =
+    Number(
+      document.getElementById(
+        "introModelSelect"
+      )?.value || 0
+    )
+
+  if (
+    currentModelId !== modelId ||
+    requestToken !==
+      introSegmentsRequestToken
+  ) {
+    return
+  }
+
+  const defaultsReady =
+    await ensureIntroVisibleSegmentsDefaults(
+      modelId,
+      visibleRows
+    )
+
+  if (!defaultsReady) {
+    return
+  }
+
+  if (
+    visibleRows.length >=
+    INTRO_ALL_GAME_SEGMENTS.length
+  ) {
+    return
+  }
+
+  const freshResult =
+    await loadIntroModelRelations(
+      modelId,
+      {
+        forceRefresh: true,
+        staleWhileRevalidate: false
+      }
+    )
+
+  const latestSelectedModelId =
+    Number(
+      document.getElementById(
+        "introModelSelect"
+      )?.value || 0
+    )
+
+  if (
+    latestSelectedModelId !== modelId ||
+    requestToken !==
+      introSegmentsRequestToken
+  ) {
+    return
+  }
+
+  if (!freshResult?.data) {
+    return
+  }
+
+  applyIntroSegmentsData({
+    modelId,
+
+    visibleRows:
+      freshResult.data
+        .visible_segments ||
+      [],
+
+    globalMap:
+      latestGlobalMap,
+
+    preserveSelection: true
+  })
+}, 0)
+}
+
+/* =========================================================
+   RENDER SEGMENTS
+========================================================= */
+
+function renderIntroSegmentsPicker(
+  segmentsList = introAvailableSegments
+) {
+  const grid =
+    document.getElementById("introSegmentsGrid")
+
   if (!grid) return
 
   const list = Array.isArray(segmentsList)
@@ -737,23 +1772,39 @@ function renderIntroSegmentsPicker(segmentsList = introAvailableSegments) {
     return
   }
 
-  grid.innerHTML = list.map(item => {
-    const selectedIndex = introVisibleSegmentsClickOrder.indexOf(item.key)
-    const selected = selectedIndex !== -1
+  grid.innerHTML = list
+    .map(item => {
+      const selectedIndex =
+        introVisibleSegmentsClickOrder.indexOf(
+          item.key
+        )
 
-    return `
-      <button
-        type="button"
-        class="introSegmentPickBtn ${selected ? "selected" : ""}"
-        id="introSegmentBtn_${item.key}"
-        data-order="${selected ? selectedIndex + 1 : ""}"
-        onclick="toggleIntroVisibleSegment('${item.key}')"
-      >
-        <span class="introSegmentPickTitle">${item.title}</span>
-        <span class="introSegmentPickState"></span>
-      </button>
-    `
-  }).join("")
+      const selected =
+        selectedIndex !== -1
+
+      return `
+        <button
+          type="button"
+          class="introSegmentPickBtn ${
+            selected ? "selected" : ""
+          }"
+          id="introSegmentBtn_${escapeIntroHtml(item.key)}"
+          data-order="${
+            selected
+              ? selectedIndex + 1
+              : ""
+          }"
+          onclick="toggleIntroVisibleSegment('${escapeIntroHtml(item.key)}')"
+        >
+          <span class="introSegmentPickTitle">
+            ${escapeIntroHtml(item.title)}
+          </span>
+
+          <span class="introSegmentPickState"></span>
+        </button>
+      `
+    })
+    .join("")
 
   refreshIntroSegmentsPickerUI()
 }
@@ -769,119 +1820,198 @@ function buildIntroSegmentsOrderPreview() {
 
   return `
     <div class="introSegmentsOrderBar">
+
       <div class="introSegmentsOrderHead">
         <span>ترتيب الظهور</span>
-        <strong>${introVisibleSegmentsClickOrder.length}</strong>
+        <strong>
+          ${introVisibleSegmentsClickOrder.length}
+        </strong>
       </div>
 
       <div class="introSegmentsOrderTrack">
-        ${introVisibleSegmentsClickOrder.map((key, index) => {
-          const item =
-            introAvailableSegments.find(seg => seg.key === key) ||
-            INTRO_ALL_GAME_SEGMENTS.find(seg => seg.key === key)
 
-          return `
-            <div class="introSegmentsOrderStep">
-              <div class="introSegmentsOrderStepNo">${index + 1}</div>
-              <div class="introSegmentsOrderStepText">${item?.title || key}</div>
-            </div>
-          `
-        }).join("")}
+        ${introVisibleSegmentsClickOrder
+          .map((key, index) => {
+            const item =
+              introAvailableSegments.find(
+                segment => segment.key === key
+              ) ||
+              INTRO_ALL_GAME_SEGMENTS.find(
+                segment => segment.key === key
+              )
+
+            return `
+              <div class="introSegmentsOrderStep">
+
+                <div class="introSegmentsOrderStepNo">
+                  ${index + 1}
+                </div>
+
+                <div class="introSegmentsOrderStepText">
+                  ${escapeIntroHtml(item?.title || key)}
+                </div>
+
+              </div>
+            `
+          })
+          .join("")}
+
       </div>
+
     </div>
   `
 }
 
 function refreshIntroSegmentsPickerUI() {
-  const count = introVisibleSegmentsClickOrder.length
+  const count =
+    introVisibleSegmentsClickOrder.length
 
-  const counter = document.getElementById("introSegmentsCounter")
-  const triggerCounter = document.getElementById("introSegmentsTriggerCounter")
-  const triggerSummary = document.getElementById("introSegmentsTriggerSummary")
-  const order = document.getElementById("introSegmentsOrder")
+  const counter =
+    document.getElementById("introSegmentsCounter")
+
+  const triggerCounter =
+    document.getElementById("introSegmentsTriggerCounter")
+
+  const triggerSummary =
+    document.getElementById("introSegmentsTriggerSummary")
+
+  const order =
+    document.getElementById("introSegmentsOrder")
 
   const countOk =
     count >= INTRO_MIN_SEGMENTS_COUNT &&
     count <= INTRO_MAX_SEGMENTS_COUNT
 
   if (counter) {
-    counter.innerText = `${count} / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    counter.innerText =
+      `${count} / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+
     counter.classList.toggle("ok", countOk)
     counter.classList.toggle("bad", !countOk)
   }
 
   if (triggerCounter) {
-    triggerCounter.innerText = `${count} / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+    triggerCounter.innerText =
+      `${count} / ${INTRO_MIN_SEGMENTS_COUNT}-${INTRO_MAX_SEGMENTS_COUNT}`
+
     triggerCounter.classList.toggle("ok", countOk)
     triggerCounter.classList.toggle("bad", !countOk)
   }
 
   if (triggerSummary) {
     if (!introVisibleSegmentsReady) {
-      triggerSummary.textContent = "اختر النموذج أولاً"
+      triggerSummary.textContent =
+        "اختر النموذج أولاً"
     } else if (!introAvailableSegments.length) {
-      triggerSummary.textContent = "لا توجد فقرات مفعلة"
+      triggerSummary.textContent =
+        "لا توجد فقرات مفعلة"
     } else if (!count) {
-      triggerSummary.textContent = "اختر الفقرات"
+      triggerSummary.textContent =
+        "اختر الفقرات"
     } else {
-      triggerSummary.textContent = `تم اختيار ${count} فقرات`
+      triggerSummary.textContent =
+        `تم اختيار ${count} فقرات`
     }
   }
 
   introAvailableSegments.forEach(item => {
-    const btn = document.getElementById(`introSegmentBtn_${item.key}`)
+    const btn = document.getElementById(
+      `introSegmentBtn_${item.key}`
+    )
+
     if (!btn) return
 
-    const selectedIndex = introVisibleSegmentsClickOrder.indexOf(item.key)
-    const selected = selectedIndex !== -1
+    const selectedIndex =
+      introVisibleSegmentsClickOrder.indexOf(
+        item.key
+      )
 
-    btn.classList.toggle("selected", selected)
+    const selected =
+      selectedIndex !== -1
+
+    btn.classList.toggle(
+      "selected",
+      selected
+    )
 
     if (selected) {
-      btn.dataset.order = String(selectedIndex + 1)
+      btn.dataset.order =
+        String(selectedIndex + 1)
     } else {
       btn.removeAttribute("data-order")
     }
 
-    const state = btn.querySelector(".introSegmentPickState")
+    const state = btn.querySelector(
+      ".introSegmentPickState"
+    )
+
     if (state) {
-      state.textContent = selected ? `مختارة ${selectedIndex + 1}` : "اضغط للاختيار"
+      state.textContent = selected
+        ? `مختارة ${selectedIndex + 1}`
+        : "اضغط للاختيار"
     }
   })
 
   if (order) {
-    order.innerHTML = buildIntroSegmentsOrderPreview()
+    order.innerHTML =
+      buildIntroSegmentsOrderPreview()
   }
 }
 
-function toggleIntroVisibleSegment(key) {
-  const exists = introAvailableSegments.some(item => item.key === key)
+window.toggleIntroVisibleSegment =
+  function (key) {
+    const exists =
+      introAvailableSegments.some(
+        item => item.key === key
+      )
 
-  if (!exists) {
-    showGameToast("هذه الفقرة معطلة من الأدمن")
-    return
-  }
+    if (!exists) {
+      showGameToast(
+        "هذه الفقرة معطلة من الأدمن"
+      )
 
-  const currentIndex = introVisibleSegmentsClickOrder.indexOf(key)
+      return
+    }
 
-  if (currentIndex !== -1) {
-    introVisibleSegmentsClickOrder.splice(currentIndex, 1)
+    const currentIndex =
+      introVisibleSegmentsClickOrder.indexOf(key)
+
+    if (currentIndex !== -1) {
+      introVisibleSegmentsClickOrder.splice(
+        currentIndex,
+        1
+      )
+
+      refreshIntroSegmentsPickerUI()
+      return
+    }
+
+    if (
+      introVisibleSegmentsClickOrder.length >=
+      INTRO_MAX_SEGMENTS_COUNT
+    ) {
+      showGameToast(
+        `مسموح اختيار ${INTRO_MAX_SEGMENTS_COUNT} فقرات كحد أقصى`
+      )
+
+      return
+    }
+
+    introVisibleSegmentsClickOrder.push(key)
     refreshIntroSegmentsPickerUI()
-    return
   }
 
-  if (introVisibleSegmentsClickOrder.length >= INTRO_MAX_SEGMENTS_COUNT) {
-    showGameToast(`مسموح اختيار ${INTRO_MAX_SEGMENTS_COUNT} فقرات كحد أقصى`)
-    return
-  }
-
-  introVisibleSegmentsClickOrder.push(key)
-  refreshIntroSegmentsPickerUI()
-}
+/* =========================================================
+   SAVE SEGMENTS
+========================================================= */
 
 async function saveIntroVisibleSegments() {
-  const modelSelect = document.getElementById("introModelSelect")
-  const modelId = Number(modelSelect?.value || 0)
+  const modelSelect =
+    document.getElementById("introModelSelect")
+
+  const modelId = Number(
+    modelSelect?.value || 0
+  )
 
   if (!modelId) {
     showGameToast("اختر النموذج أولاً")
@@ -893,24 +2023,98 @@ async function saveIntroVisibleSegments() {
     return false
   }
 
-  introVisibleSegmentsClickOrder = introVisibleSegmentsClickOrder.filter(key => {
-    return introAvailableSegments.some(item => item.key === key)
-  })
+  introVisibleSegmentsClickOrder =
+    introVisibleSegmentsClickOrder.filter(key => {
+      return introAvailableSegments.some(
+        item => item.key === key
+      )
+    })
 
-  if (
-    introVisibleSegmentsClickOrder.length < INTRO_MIN_SEGMENTS_COUNT ||
-    introVisibleSegmentsClickOrder.length > INTRO_MAX_SEGMENTS_COUNT
+  const selectedCount =
+    introVisibleSegmentsClickOrder.length
+
+    if (
+    selectedCount < INTRO_MIN_SEGMENTS_COUNT ||
+    selectedCount > INTRO_MAX_SEGMENTS_COUNT
   ) {
-    showGameToast(`لازم تختار من ${INTRO_MIN_SEGMENTS_COUNT} إلى ${INTRO_MAX_SEGMENTS_COUNT} فقرات`)
+    showGameToast(
+      `لازم تختار من ${INTRO_MIN_SEGMENTS_COUNT} إلى ${INTRO_MAX_SEGMENTS_COUNT} فقرات`
+    )
+
     return false
   }
+
+  const selectedOrderMap = {}
+
+  introVisibleSegmentsClickOrder.forEach((key, index) => {
+    selectedOrderMap[key] = index + 1
+  })
+
+  const now = new Date().toISOString()
+
+  const rows = INTRO_ALL_GAME_SEGMENTS.map(item => {
+    const selected = Object.prototype.hasOwnProperty.call(
+      selectedOrderMap,
+      item.key
+    )
+
+    return {
+      model: modelId,
+      segment_key: item.key,
+      is_visible: selected,
+      sort_order: selected
+        ? selectedOrderMap[item.key]
+        : 100 + Number(item.sort || 0),
+      updated_at: now
+    }
+  })
+
+  let result
+
+  if (typeof window.upsertData === "function") {
+    result = await window.upsertData(
+      "visible_segments",
+      rows,
+      {
+        onConflict: "model,segment_key"
+      }
+    )
+  } else {
+    const { data, error } = await db
+      .from("visible_segments")
+      .upsert(rows, {
+        onConflict: "model,segment_key"
+      })
+      .select()
+
+    result = { data, error }
+  }
+
+  if (result?.error) {
+    console.log(
+      "SAVE INTRO VISIBLE SEGMENTS ERROR:",
+      result.error
+    )
+
+    showGameToast("تعذر حفظ الفقرات المختارة")
+    return false
+  }
+
+  if (typeof window.invalidateModelCache === "function") {
+    window.invalidateModelCache(modelId)
+  }
+
+  localStorage.setItem(
+    "selected_game_segments",
+    JSON.stringify(introVisibleSegmentsClickOrder)
+  )
 
   return true
 }
 
-/* =========================
-   Start Game
-========================= */
+/* =========================================================
+   START GAME
+========================================================= */
 
 window.startGameFromIntro = async function () {
   if (introStarting) return
@@ -925,24 +2129,36 @@ window.startGameFromIntro = async function () {
 
   clearInterval(presenterStartWatchTimer)
   presenterStartWatchTimer = null
+  presenterStartWatchBusy = false
 
-  setIntroStartLoading(true, "جارٍ تجهيز اللعبة...")
+  setIntroStartLoading(
+    true,
+    "جارٍ تجهيز اللعبة..."
+  )
+
   setIntroFormDisabled(true)
 
-  const teamA = cleanTeamName(teamAInput.value)
-  const teamB = cleanTeamName(teamBInput.value)
-  const model = modelSelect.value
+  const teamA = cleanTeamName(teamAInput?.value)
+  const teamB = cleanTeamName(teamBInput?.value)
+  const model = modelSelect?.value || ""
   const modelText = getSelectedModelName()
 
   try {
     resetGameStateBeforeStart()
 
-    const segmentsSaved = await saveIntroVisibleSegments()
+    const segmentsSaved =
+      await saveIntroVisibleSegments()
 
     if (!segmentsSaved) {
       introStarting = false
       setIntroFormDisabled(false)
-      setIntroStartLoading(false, "بدء اللعبة", false)
+
+      setIntroStartLoading(
+        false,
+        "بدء اللعبة",
+        false
+      )
+
       return
     }
 
@@ -954,51 +2170,104 @@ window.startGameFromIntro = async function () {
     const gameSessionId = createGameSessionId()
     const joinCode = await generateUniqueJoinCode()
 
-    localStorage.setItem("game_session_id", gameSessionId)
-    localStorage.setItem("game_join_code", joinCode)
-    localStorage.setItem("presenter_join_code_temp", joinCode)
+    localStorage.setItem(
+      "game_session_id",
+      gameSessionId
+    )
+
+    localStorage.setItem(
+      "game_join_code",
+      joinCode
+    )
+
+    localStorage.setItem(
+      "presenter_join_code_temp",
+      joinCode
+    )
 
     const sessionState = {
-      mainScores: { A: 0, B: 0 },
-      currentModelName: modelText,
-      displayControlsHidden: false,
-      presenterStarted: false,
-      presenterStartedAt: null,
+  mainScores: {
+    A: 0,
+    B: 0
+  },
 
-      segmentStatus: defaultIntroSegmentStatus(),
+  activeTeam: "",
 
-      warmup: null,
-      top10: null,
-      auction: null,
-      who: null,
-      explain: null,
+  currentModelName:
+    modelText,
 
-      final: null,
-      finalRound1: null,
-      finalRound2: null,
-      finalRound3: null,
-      finalRound4: null,
+  displayControlsHidden:
+    false,
 
-      archive: null,
-      randomChallenge: null,
+  presenterStarted:
+    false,
 
-      toast: null
-     }
+  presenterStartedAt:
+    null,
 
-    const { error } = await db.from("game_sessions").upsert({
-      id: gameSessionId,
-      join_code: joinCode,
-      status: "active",
-      model: Number(model),
-      team_a: teamA,
-      team_b: teamB,
-      active_segment: null,
-      state: sessionState,
-      updated_at: new Date().toISOString()
-    })
+  segmentStatus:
+    defaultIntroSegmentStatus(),
+
+  warmup:
+    null,
+
+  top10:
+    null,
+
+  letterli:
+    null,
+
+  who:
+    null,
+
+  explain:
+    null,
+
+  final:
+    null,
+
+  finalRound1:
+    null,
+
+  finalRound2:
+    null,
+
+  finalRound3:
+    null,
+
+  finalRound4:
+    null,
+
+  archive:
+    null,
+
+  randomChallenge:
+    null,
+
+  toast:
+    null
+}
+
+    const { error } = await db
+      .from("game_sessions")
+      .upsert({
+        id: gameSessionId,
+        join_code: joinCode,
+        status: "active",
+        model: Number(model),
+        team_a: teamA,
+        team_b: teamB,
+        active_segment: null,
+        state: sessionState,
+        updated_at: new Date().toISOString()
+      })
 
     if (error) {
-      console.log("create session error:", error)
+      console.log(
+        "create session error:",
+        error
+      )
+
       throw error
     }
 
@@ -1007,30 +2276,51 @@ window.startGameFromIntro = async function () {
 
     openPresenterIntroModal()
 
-    setIntroStartLoading(false, "الجلسة جاهزة", true)
+    setIntroStartLoading(
+      false,
+      "الجلسة جاهزة",
+      true
+    )
+
     showGameToast("تم تجهيز صفحة المقدم")
-  } catch (e) {
-    console.log("startGameFromIntro error:", e)
+  } catch (error) {
+    console.log(
+      "startGameFromIntro error:",
+      error
+    )
 
     introStarting = false
     setIntroFormDisabled(false)
-    setIntroStartLoading(false, "بدء اللعبة", false)
+
+    setIntroStartLoading(
+      false,
+      "بدء اللعبة",
+      false
+    )
 
     showGameToast("تعذر إنشاء جلسة المقدم")
   }
 }
 
-/* =========================
-   Presenter Modal
-========================= */
+/* =========================================================
+   PRESENTER MODAL
+========================================================= */
 
 function getPresenterIntroUrl() {
-  return new URL("presenter.html?join=1", window.location.href).href
+  return new URL(
+    "presenter.html?join=1",
+    window.location.href
+  ).href
 }
 
 function renderPresenterIntroCode(code) {
-  const codeWrap = document.querySelector(".presenterIntroCodeBox")
-  const finalCode = String(code || "").trim() || "----"
+  const codeWrap =
+    document.querySelector(
+      ".presenterIntroCodeBox"
+    )
+
+  const finalCode =
+    String(code || "").trim() || "----"
 
   if (!codeWrap) return
 
@@ -1039,24 +2329,42 @@ function renderPresenterIntroCode(code) {
       كود الدخول
     </div>
 
-    <div id="presenterIntroCode" class="presenterIntroCodeValue">
-      ${finalCode}
+    <div
+      id="presenterIntroCode"
+      class="presenterIntroCodeValue"
+    >
+      ${escapeIntroHtml(finalCode)}
     </div>
   `
 }
 
 function openPresenterIntroModal() {
-  const modal = document.getElementById("presenterIntroModal")
-  const qr = document.getElementById("presenterIntroQr")
-  const linkBox = document.getElementById("presenterIntroLink")
+  const modal =
+    document.getElementById(
+      "presenterIntroModal"
+    )
+
+  const qr =
+    document.getElementById(
+      "presenterIntroQr"
+    )
+
+  const linkBox =
+    document.getElementById(
+      "presenterIntroLink"
+    )
 
   const joinCode =
     localStorage.getItem("game_join_code") ||
-    localStorage.getItem("presenter_join_code_temp") ||
+    localStorage.getItem(
+      "presenter_join_code_temp"
+    ) ||
     ""
 
   const url = getPresenterIntroUrl()
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=${encodeURIComponent(url)}`
+
+  const qrUrl =
+    `https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=${encodeURIComponent(url)}`
 
   if (qr) {
     qr.alt = "QR صفحة المقدم"
@@ -1082,7 +2390,10 @@ function openPresenterIntroModal() {
   startPresenterStartWatcher()
 }
 
-async function copyIntroText(value, successMessage = "تم النسخ") {
+async function copyIntroText(
+  value,
+  successMessage = "تم النسخ"
+) {
   const text = String(value || "").trim()
 
   if (!text || text === "----") {
@@ -1093,10 +2404,12 @@ async function copyIntroText(value, successMessage = "تم النسخ") {
   try {
     await navigator.clipboard.writeText(text)
     showGameToast(successMessage)
-  } catch (e) {
-    console.log("copy error:", e)
+  } catch (error) {
+    console.log("copy error:", error)
 
-    const textarea = document.createElement("textarea")
+    const textarea =
+      document.createElement("textarea")
+
     textarea.value = text
     textarea.style.position = "fixed"
     textarea.style.opacity = "0"
@@ -1118,22 +2431,48 @@ async function copyIntroText(value, successMessage = "تم النسخ") {
 }
 
 window.copyPresenterIntroLink = function () {
-  const linkBox = document.getElementById("presenterIntroLink")
-  const url = linkBox?.innerText || getPresenterIntroUrl()
+  const linkBox =
+    document.getElementById(
+      "presenterIntroLink"
+    )
 
-  copyIntroText(url, "تم نسخ رابط المقدم")
+  const url =
+    linkBox?.innerText ||
+    getPresenterIntroUrl()
+
+  copyIntroText(
+    url,
+    "تم نسخ رابط المقدم"
+  )
 }
 
 window.copyPresenterIntroCode = function () {
-  const codeBox = document.getElementById("presenterIntroCode")
-  const code = codeBox?.innerText || localStorage.getItem("game_join_code") || ""
+  const codeBox =
+    document.getElementById(
+      "presenterIntroCode"
+    )
 
-  copyIntroText(code, "تم نسخ كود المقدم")
+  const code =
+    codeBox?.innerText ||
+    localStorage.getItem("game_join_code") ||
+    ""
+
+  copyIntroText(
+    code,
+    "تم نسخ كود المقدم"
+  )
 }
 
 function bindPresenterIntroCopyActions() {
-  const linkBox = document.getElementById("presenterIntroLink")
-  const codeBox = document.getElementById("presenterIntroCode")
+  const linkBox =
+    document.getElementById(
+      "presenterIntroLink"
+    )
+
+  const codeBox =
+    document.getElementById(
+      "presenterIntroCode"
+    )
 
   if (linkBox) {
     linkBox.title = "اضغط لنسخ الرابط"
@@ -1154,35 +2493,72 @@ function bindPresenterIntroCopyActions() {
   }
 }
 
+/* =========================================================
+   PRESENTER START WATCHER
+========================================================= */
+
 function startPresenterStartWatcher() {
   clearInterval(presenterStartWatchTimer)
 
-  presenterStartWatchTimer = setInterval(async () => {
-    const sessionId = localStorage.getItem("game_session_id")
-    if (!sessionId || !window.db) return
+  presenterStartWatchBusy = false
 
-    const { data, error } = await db
-      .from("game_sessions")
-      .select("state")
-      .eq("id", sessionId)
-      .maybeSingle()
+  presenterStartWatchTimer =
+    setInterval(async () => {
+      if (presenterStartWatchBusy) return
 
-    if (error) {
-      console.log("presenter start watch error:", error)
-      return
-    }
+      const sessionId =
+        localStorage.getItem(
+          "game_session_id"
+        )
 
-    if (data?.state?.presenterStarted) {
-      clearInterval(presenterStartWatchTimer)
-      presenterStartWatchTimer = null
+      if (!sessionId || !window.db) return
 
-      window.location.href = "display.html"
-    }
-  }, 900)
+      presenterStartWatchBusy = true
+
+      try {
+        const { data, error } = await db
+          .from("game_sessions")
+          .select("state")
+          .eq("id", sessionId)
+          .maybeSingle()
+
+        if (error) {
+          console.log(
+            "presenter start watch error:",
+            error
+          )
+
+          return
+        }
+
+        if (data?.state?.presenterStarted) {
+          clearInterval(
+            presenterStartWatchTimer
+          )
+
+          presenterStartWatchTimer = null
+          presenterStartWatchBusy = false
+
+          window.location.href =
+            "display.html"
+        }
+      } catch (error) {
+        console.log(
+          "presenter start watcher catch:",
+          error
+        )
+      } finally {
+        presenterStartWatchBusy = false
+      }
+    }, 1800)
 }
 
 function closePresenterIntroModal() {
-  const modal = document.getElementById("presenterIntroModal")
+  const modal =
+    document.getElementById(
+      "presenterIntroModal"
+    )
+
   if (!modal) return
 
   modal.classList.remove("show")
@@ -1193,7 +2569,10 @@ function closePresenterIntroModal() {
 }
 
 function goToDisplayFromIntro() {
-  const sessionId = localStorage.getItem("game_session_id")
+  const sessionId =
+    localStorage.getItem(
+      "game_session_id"
+    )
 
   if (!sessionId) {
     showGameToast("أنشئ الجلسة أولاً")
@@ -1201,12 +2580,44 @@ function goToDisplayFromIntro() {
   }
 
   clearInterval(presenterStartWatchTimer)
+
   presenterStartWatchTimer = null
+  presenterStartWatchBusy = false
 
   window.location.href = "display.html"
 }
 
-window.addEventListener("beforeunload", () => {
-  clearInterval(presenterStartWatchTimer)
-  presenterStartWatchTimer = null
-})
+/* =========================================================
+   GLOBAL EXPORTS
+========================================================= */
+
+window.openPresenterIntroModal =
+  openPresenterIntroModal
+
+window.closePresenterIntroModal =
+  closePresenterIntroModal
+
+window.goToDisplayFromIntro =
+  goToDisplayFromIntro
+
+window.loadIntroVisibleSegments =
+  loadIntroVisibleSegments
+
+window.saveIntroVisibleSegments =
+  saveIntroVisibleSegments
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+window.addEventListener(
+  "beforeunload",
+  () => {
+    clearInterval(
+      presenterStartWatchTimer
+    )
+
+    presenterStartWatchTimer = null
+    presenterStartWatchBusy = false
+  }
+)

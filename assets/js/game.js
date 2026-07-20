@@ -32,8 +32,10 @@ function getGameActiveTeam() {
   return team === "A" || team === "B" ? team : ""
 }
 
-function clearGameActiveTeam() {
-  setGameActiveTeam("", { sync:true })
+function clearGameActiveTeam(options = {}) {
+  setGameActiveTeam("", {
+    sync: options.sync !== false
+  })
 }
 
 function initGameActiveTeam() {
@@ -64,19 +66,79 @@ window.currentModel = currentModel
 
 let currentModelName = localStorage.getItem("game_model_name") || ""
 window.currentModelName = currentModelName
-window.top10MaxRound = Number(localStorage.getItem("top10_max_round") || 3)
-window.auctionMaxNumber = Number(localStorage.getItem("auction_max_number") || 8)
-window.archiveMaxRound = Number(localStorage.getItem("archive_max_round") || 4)
-window.whoMaxNumber = Number(localStorage.getItem("who_max_number") || 15)
-window.explainWordsCount = Number(localStorage.getItem("explain_words_count") || 4)
-window.finalRound1CardsCount = Number(localStorage.getItem("final_round1_cards_count") || 6)
-window.finalRound3Count = Number(localStorage.getItem("final_round3_count") || 4)
-window.finalRound4Count = Number(localStorage.getItem("final_round4_count") || 4)
+/* =========================
+   DISPLAY DATA CACHE
+========================= */
 
+const DISPLAY_MODEL_CACHE_TTL = 5 * 60 * 1000
+const DISPLAY_GLOBAL_CACHE_TTL = 10 * 60 * 1000
+
+let displayModelDataLoaded = false
+let displayModelDataPromise = null
+let displayVisibilityLoadedAt = 0
+
+let displaySyncTimer = null
+let displaySyncInProgress = false
+let displaySyncQueued = false
+
+function getDisplayModelId() {
+  return Number(
+    localStorage.getItem("game_model") ||
+    window.currentModel ||
+    currentModel ||
+    0
+  )
+}
+
+function getDisplayDefaultSegmentCounts() {
+  return {
+    top10: 3,
+    archive: 4,
+    who: 15,
+    explain: 5,
+    finalRound1: 7,
+    finalRound3: 5,
+    finalRound4: 5
+  }
+}
+
+function clampDisplaySegmentCount(value, fallback, max) {
+  return Math.min(
+    Math.max(Number(value || fallback), 1),
+    max
+  )
+}
+window.top10MaxRound = Number(
+  localStorage.getItem("top10_max_round") || 3
+)
+
+window.archiveMaxRound = Number(
+  localStorage.getItem("archive_max_round") || 4
+)
+
+window.whoMaxNumber = Number(
+  localStorage.getItem("who_max_number") || 15
+)
+
+window.explainWordsCount = Number(
+  localStorage.getItem("explain_words_count") || 5
+)
+
+window.finalRound1CardsCount = Number(
+  localStorage.getItem("final_round1_cards_count") || 7
+)
+
+window.finalRound3Count = Number(
+  localStorage.getItem("final_round3_count") || 5
+)
+
+window.finalRound4Count = Number(
+  localStorage.getItem("final_round4_count") || 5
+)
 const ALL_DISPLAY_SEGMENTS = [
   { key: "warmup", title: "التسخين", sort: 1 },
   { key: "top10", title: "Top 10", sort: 2 },
-  { key: "auction", title: "فتبلة", sort: 3 },
+  { key: "letterli", title: "حرفلي", sort: 3 },
   { key: "who", title: "من هو", sort: 4 },
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
   { key: "finalRound1", title: "ٮدوں ٮڡاط", sort: 6 },
@@ -87,11 +149,44 @@ const ALL_DISPLAY_SEGMENTS = [
   { key: "randomChallenge", title: "التحدي", sort: 11 }
 ]
 
-let visibleDisplaySegments = ALL_DISPLAY_SEGMENTS.map(item => ({
-  ...item,
-  is_visible: item.sort <= 11,
-  sort_order: item.sort
-}))
+function getCachedSelectedDisplaySegments() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem("selected_game_segments") || "[]"
+    )
+
+    return Array.isArray(saved) ? saved : []
+  } catch {
+    return []
+  }
+}
+
+const cachedSelectedDisplaySegments =
+  getCachedSelectedDisplaySegments()
+
+let visibleDisplaySegments = cachedSelectedDisplaySegments.length
+  ? cachedSelectedDisplaySegments
+      .map((key, index) => {
+        const item = ALL_DISPLAY_SEGMENTS.find(segment => {
+          return normalizeDisplaySegmentKey(segment.key) ===
+            normalizeDisplaySegmentKey(key)
+        })
+
+        if (!item) return null
+
+        return {
+          ...item,
+          key: normalizeDisplaySegmentKey(item.key),
+          is_visible: true,
+          sort_order: index + 1
+        }
+      })
+      .filter(Boolean)
+  : ALL_DISPLAY_SEGMENTS.map(item => ({
+      ...item,
+      is_visible: true,
+      sort_order: item.sort
+    }))
 
 function escapeDisplayHtml(value) {
   return String(value ?? "")
@@ -167,7 +262,7 @@ function defaultSegmentStatus() {
   return {
     warmup: item(),
     top10: item(),
-    auction: item(),
+    letterli: item(),
     who: item(),
     explain: item(),
 
@@ -225,80 +320,278 @@ function getSafeJson(key) {
   }
 }
 
-async function syncDisplayStateToSession() {
+async function performDisplayStateSync() {
   try {
-    const sessionId = localStorage.getItem("game_session_id")
+    const sessionId =
+      localStorage.getItem(
+        "game_session_id"
+      )
+
     if (!sessionId) return
 
-    currentModelName = localStorage.getItem("game_model_name") || currentModelName || ""
-    window.currentModelName = currentModelName
+    const modelId =
+      getDisplayModelId()
+
+    if (!modelId) return
+
+    currentModelName =
+      localStorage.getItem(
+        "game_model_name"
+      ) ||
+      currentModelName ||
+      ""
+
+    window.currentModelName =
+      currentModelName
+
+    const explainLocalState =
+      getSafeJson(
+        "explain_state_v1"
+      )
 
     const explainSavedState =
       window.explainState ||
-      getSafeJson("explain_state_v1") ||
+      explainLocalState
+        ?.explainState ||
+      null
+
+    const explainSavedDoubleState =
+      window.explainDoubleState ||
+      explainLocalState
+        ?.explainDoubleState ||
       null
 
     const state = {
-  mainScores: {
-    A: Number(localStorage.getItem("main_score_a") || scoreA || 0),
-    B: Number(localStorage.getItem("main_score_b") || scoreB || 0)
-  },
+      mainScores: {
+        A: Number(
+          localStorage.getItem(
+            "main_score_a"
+          ) ||
+          scoreA ||
+          0
+        ),
 
-  activeTeam: getGameActiveTeam(),
-
-  currentModelName: localStorage.getItem("game_model_name") || currentModelName || "",
-  displayControlsHidden: localStorage.getItem("presenter_hide_controls") === "1",
-  segmentStatus: getSafeJson("segment_status_v1") || defaultSegmentStatus(),
-
-      warmup: getSafeJson("warmup_state_v1"),
-      top10: getSafeJson("top10_state_v1"),
-      auction: getSafeJson("auction_state_v2"),
-      who: getSafeJson("who_state_v1"),
-
-      explain: {
-        explainState: explainSavedState
+        B: Number(
+          localStorage.getItem(
+            "main_score_b"
+          ) ||
+          scoreB ||
+          0
+        )
       },
 
-      final: getSafeJson("final_state_v3"),
-      finalRound1: getSafeJson("final_state_v3"),
-      finalRound2: getSafeJson("final_state_v3"),
-      finalRound3: getSafeJson("final_state_v3"),
-      finalRound4: getSafeJson("final_state_v3"),
-      archive: getSafeJson("archive_state_v1"),
-      randomChallenge: getSafeJson("random_challenge_state_v1"),
-      toast: window.lastDisplayToast || null
+      activeTeam:
+        getGameActiveTeam(),
+
+      currentModelName:
+        localStorage.getItem(
+          "game_model_name"
+        ) ||
+        currentModelName ||
+        "",
+
+      displayControlsHidden:
+        localStorage.getItem(
+          "presenter_hide_controls"
+        ) === "1",
+
+      segmentStatus:
+        getSafeJson(
+          "segment_status_v1"
+        ) ||
+        defaultSegmentStatus(),
+
+      warmup:
+        getSafeJson(
+          "warmup_state_v1"
+        ),
+
+      top10:
+        getSafeJson(
+          "top10_state_v1"
+        ),
+
+      letterli:
+        getSafeJson(
+         "letterli_state_v1"
+        ),
+
+      who:
+        getSafeJson(
+          "who_state_v1"
+        ),
+
+      explain: {
+        explainState:
+          explainSavedState,
+
+        explainDoubleState:
+          explainSavedDoubleState
+      },
+
+      final:
+        getSafeJson(
+          "final_state_v3"
+        ),
+
+      finalRound1:
+        getSafeJson(
+          "final_state_v3"
+        ),
+
+      finalRound2:
+        getSafeJson(
+          "final_state_v3"
+        ),
+
+      finalRound3:
+        getSafeJson(
+          "final_state_v3"
+        ),
+
+      finalRound4:
+        getSafeJson(
+          "final_state_v3"
+        ),
+
+      archive:
+        getSafeJson(
+          "archive_state_v1"
+        ),
+
+      randomChallenge:
+        getSafeJson(
+          "random_challenge_state_v1"
+        ),
+
+      toast:
+        window.lastDisplayToast ||
+        null
     }
 
     const sessionData = {
       id: sessionId,
-      join_code: localStorage.getItem("game_join_code"),
+
+      join_code:
+        localStorage.getItem(
+          "game_join_code"
+        ),
+
       status: "active",
-      model: Number(localStorage.getItem("game_model") || currentModel || 1),
-      team_a: localStorage.getItem("teamAName") || teamAName,
-      team_b: localStorage.getItem("teamBName") || teamBName,
-      active_segment: localStorage.getItem("active_segment") || null,
+
+      model: modelId,
+
+      team_a:
+        localStorage.getItem(
+          "teamAName"
+        ) ||
+        teamAName,
+
+      team_b:
+        localStorage.getItem(
+          "teamBName"
+        ) ||
+        teamBName,
+
+      active_segment:
+        localStorage.getItem(
+          "active_segment"
+        ) ||
+        null,
+
       state,
-      updated_at: new Date().toISOString()
+
+      updated_at:
+        new Date().toISOString()
     }
 
     try {
-      if (typeof presenterCommandChannel !== "undefined" && presenterCommandChannel) {
-        presenterCommandChannel.send({
+      if (
+        typeof presenterCommandChannel !==
+          "undefined" &&
+        presenterCommandChannel
+      ) {
+        const payload = {
           type: "broadcast",
           event: "session_state",
           payload: sessionData
-        })
+        }
+
+        const channelState =
+          presenterCommandChannel.state
+
+        if (
+  channelState === "joined"
+) {
+  await presenterCommandChannel.send(payload)
+} else if (
+  typeof presenterCommandChannel.httpSend === "function"
+) {
+  await presenterCommandChannel.httpSend(
+    "session_state",
+    sessionData
+  )
+}
       }
-    } catch (e) {
-      console.log("Display session broadcast error:", e)
+    } catch (error) {
+      console.log(
+        "Display session broadcast error:",
+        error
+      )
     }
 
-    await db.from("game_sessions").upsert(sessionData)
+    const {
+      error: sessionError
+    } = await db
+      .from("game_sessions")
+      .upsert(sessionData)
 
-  } catch (e) {
-    console.log("sync session error:", e)
+    if (sessionError) {
+      throw sessionError
+    }
+  } catch (error) {
+    console.log(
+      "sync session error:",
+      error
+    )
   }
 }
+
+window.performDisplayStateSync =
+  performDisplayStateSync
+  
+function syncDisplayStateToSession(options = {}) {
+  const immediate = options.immediate === true
+  const delay = immediate ? 0 : 180
+
+  clearTimeout(displaySyncTimer)
+
+  displaySyncTimer = setTimeout(async () => {
+    if (displaySyncInProgress) {
+      displaySyncQueued = true
+      return
+    }
+
+    displaySyncInProgress = true
+
+    try {
+      await performDisplayStateSync()
+    } finally {
+      displaySyncInProgress = false
+
+      if (displaySyncQueued) {
+        displaySyncQueued = false
+        syncDisplayStateToSession({
+          immediate: true
+        })
+      }
+    }
+  }, delay)
+}
+
+window.syncDisplayStateToSession =
+  syncDisplayStateToSession
+  
 /* =========================
    Winner Sound + Effects
 ========================= */
@@ -574,191 +867,432 @@ function playGameSound(type) {
 }
 /* =========================
    Segment Counts From Admin
+   استعلام واحد بدل 8 استعلامات
 ========================= */
 
-async function getDisplaySegmentCount(segment, fallback = 3, max = 4) {
-  if (!currentModel) return fallback
+function applyDisplaySegmentSettings(rows = []) {
+  const defaults = getDisplayDefaultSegmentCounts()
+  const map = {}
 
-  const { data, error } = await db
-    .from("segment_settings")
-    .select("item_count")
-    .eq("model", Number(currentModel))
-    .eq("segment", segment)
-    .maybeSingle()
+  ;(rows || []).forEach(row => {
+    map[row.segment] = Number(row.item_count || 0)
+  })
 
-  if (error) {
-    console.log("GET DISPLAY SEGMENT COUNT ERROR:", error)
-    return fallback
-  }
+  window.top10MaxRound = clampDisplaySegmentCount(
+    map.top10,
+    defaults.top10,
+    4
+  )
 
-  return Math.min(Math.max(Number(data?.item_count || fallback), 1), max)
+  window.archiveMaxRound = clampDisplaySegmentCount(
+    map.archive,
+    defaults.archive,
+    4
+  )
+
+  window.whoMaxNumber = clampDisplaySegmentCount(
+    map.who,
+    defaults.who,
+    15
+  )
+
+  window.explainWordsCount = clampDisplaySegmentCount(
+    map.explain,
+    defaults.explain,
+    9
+  )
+
+  window.finalRound1CardsCount = clampDisplaySegmentCount(
+    map.finalRound1,
+    defaults.finalRound1,
+    9
+  )
+
+  window.finalRound3Count = clampDisplaySegmentCount(
+    map.finalRound3,
+    defaults.finalRound3,
+    9
+  )
+
+  window.finalRound4Count = clampDisplaySegmentCount(
+    map.finalRound4,
+    defaults.finalRound4,
+    9
+  )
+
+  localStorage.setItem(
+    "top10_max_round",
+    String(window.top10MaxRound)
+  )
+
+  localStorage.setItem(
+    "archive_max_round",
+    String(window.archiveMaxRound)
+  )
+
+  localStorage.setItem(
+    "who_max_number",
+    String(window.whoMaxNumber)
+  )
+
+  localStorage.setItem(
+    "explain_words_count",
+    String(window.explainWordsCount)
+  )
+
+  localStorage.setItem(
+    "final_round1_cards_count",
+    String(window.finalRound1CardsCount)
+  )
+
+  localStorage.setItem(
+    "final_round3_count",
+    String(window.finalRound3Count)
+  )
+
+  localStorage.setItem(
+    "final_round4_count",
+    String(window.finalRound4Count)
+  )
 }
 
-async function loadDisplaySegmentCounts() {
-  window.top10MaxRound = await getDisplaySegmentCount("top10", 3, 4)
-  window.auctionMaxNumber = await getDisplaySegmentCount("auction", 8, 8)
-  window.archiveMaxRound = await getDisplaySegmentCount("archive", 4, 4)
+async function loadDisplayModelData(options = {}) {
+  const modelId = getDisplayModelId()
 
-  window.whoMaxNumber = await getDisplaySegmentCount("who", 15, 15)
-  window.explainWordsCount = await getDisplaySegmentCount("explain", 4, 8)
-  window.finalRound1CardsCount = await getDisplaySegmentCount("finalRound1", 6, 8)
-  window.finalRound3Count = await getDisplaySegmentCount("finalRound3", 4, 8)
-  window.finalRound4Count = await getDisplaySegmentCount("finalRound4", 4, 8)
+  if (!modelId) {
+    return null
+  }
 
-  localStorage.setItem("top10_max_round", String(window.top10MaxRound))
-  localStorage.setItem("auction_max_number", String(window.auctionMaxNumber))
-  localStorage.setItem("archive_max_round", String(window.archiveMaxRound))
+  if (
+    displayModelDataPromise &&
+    options.forceRefresh !== true
+  ) {
+    return displayModelDataPromise
+  }
 
-  localStorage.setItem("who_max_number", String(window.whoMaxNumber))
-  localStorage.setItem("explain_words_count", String(window.explainWordsCount))
-  localStorage.setItem("final_round1_cards_count", String(window.finalRound1CardsCount))
-  localStorage.setItem("final_round3_count", String(window.finalRound3Count))
-  localStorage.setItem("final_round4_count", String(window.finalRound4Count))
+  displayModelDataPromise = (async () => {
+    try {
+      let result
+
+      if (typeof window.loadModelWithRelations === "function") {
+        result = await window.loadModelWithRelations(
+          modelId,
+          {
+            ttl: DISPLAY_MODEL_CACHE_TTL,
+            forceRefresh: options.forceRefresh === true,
+            staleWhileRevalidate:
+              options.staleWhileRevalidate !== false,
+
+            onBackgroundUpdate: freshModel => {
+              if (!freshModel) return
+
+              applyDisplaySegmentSettings(
+                freshModel.segment_settings || []
+              )
+
+              applyVisibleSegmentsForDisplay(
+                freshModel.visible_segments || [],
+                window.displayGlobalVisibilityMap || {}
+              )
+
+              renderVisibleSegmentsHome()
+              updateSegmentCards()
+            }
+          }
+        )
+      } else {
+        const { data, error } = await db
+          .from("models")
+          .select(`
+            id,
+            name,
+            segment_settings (
+              segment,
+              item_count
+            ),
+            visible_segments (
+              segment_key,
+              is_visible,
+              sort_order
+            )
+          `)
+          .eq("id", modelId)
+          .maybeSingle()
+
+        result = {
+          data,
+          error,
+          source: "network"
+        }
+      }
+
+      if (result?.error && !result?.data) {
+        console.log(
+          "LOAD DISPLAY MODEL DATA ERROR:",
+          result.error
+        )
+
+        return null
+      }
+
+      const modelData = result?.data || null
+
+      if (!modelData) {
+        return null
+      }
+
+      if (modelData.name) {
+        currentModelName = modelData.name
+        window.currentModelName = modelData.name
+
+        localStorage.setItem(
+          "game_model_name",
+          modelData.name
+        )
+      }
+
+      applyDisplaySegmentSettings(
+        modelData.segment_settings || []
+      )
+
+      displayModelDataLoaded = true
+
+      return modelData
+    } catch (error) {
+      console.log(
+        "LOAD DISPLAY MODEL DATA CATCH:",
+        error
+      )
+
+      return null
+    } finally {
+      displayModelDataPromise = null
+    }
+  })()
+
+  return displayModelDataPromise
+}
+
+async function loadDisplaySegmentCounts(options = {}) {
+  const modelData = await loadDisplayModelData(options)
+
+  if (!modelData) {
+    applyDisplaySegmentSettings([])
+  }
+
+  return modelData
 }
 
 async function loadDisplayCountForSegment(segmentKey) {
-  if (segmentKey === "top10") {
-    window.top10MaxRound = await getDisplaySegmentCount("top10", 3, 4)
-    localStorage.setItem("top10_max_round", String(window.top10MaxRound))
+  /*
+    الإعدادات جرى تحميلها كلها في طلب واحد.
+    لا نرسل طلبًا جديدًا عند فتح كل فقرة.
+  */
+
+  if (!displayModelDataLoaded) {
+    await loadDisplayModelData({
+      staleWhileRevalidate: true
+    })
   }
 
-  if (segmentKey === "auction") {
-    window.auctionMaxNumber = await getDisplaySegmentCount("auction", 8, 8)
-    localStorage.setItem("auction_max_number", String(window.auctionMaxNumber))
-  }
-
-  if (segmentKey === "archive") {
-    window.archiveMaxRound = await getDisplaySegmentCount("archive", 4, 4)
-    localStorage.setItem("archive_max_round", String(window.archiveMaxRound))
-  }
-
-  if (segmentKey === "who") {
-    window.whoMaxNumber = await getDisplaySegmentCount("who", 15, 15)
-    localStorage.setItem("who_max_number", String(window.whoMaxNumber))
-  }
-
-  if (segmentKey === "explain") {
-    window.explainWordsCount = await getDisplaySegmentCount("explain", 4, 8)
-    localStorage.setItem("explain_words_count", String(window.explainWordsCount))
-  }
-
-  if (segmentKey === "finalRound1") {
-    window.finalRound1CardsCount = await getDisplaySegmentCount("finalRound1", 6, 8)
-    localStorage.setItem("final_round1_cards_count", String(window.finalRound1CardsCount))
-  }
-
-  if (segmentKey === "finalRound3") {
-    window.finalRound3Count = await getDisplaySegmentCount("finalRound3", 4, 8)
-    localStorage.setItem("final_round3_count", String(window.finalRound3Count))
-  }
-
-  if (segmentKey === "finalRound4") {
-    window.finalRound4Count = await getDisplaySegmentCount("finalRound4", 4, 8)
-    localStorage.setItem("final_round4_count", String(window.finalRound4Count))
-  }
+  return segmentKey
 }
 
 /* =========================
    Global Segment Visibility - Display
-   إخفاء الفقرات المعطلة عام من العرض
 ========================= */
 
-async function loadDisplayGlobalSegmentVisibilityMap() {
+window.displayGlobalVisibilityMap =
+  window.displayGlobalVisibilityMap || {}
+
+async function loadDisplayGlobalSegmentVisibilityMap(
+  options = {}
+) {
   const map = {}
 
   try {
-    const { data, error } = await db
-      .from("global_segment_visibility")
-      .select("segment_key,is_enabled")
+    let rows = []
 
-    if (error) {
-      console.log("DISPLAY GLOBAL SEGMENT VISIBILITY ERROR:", error)
-      return map
+    if (typeof window.cachedSupabaseSelect === "function") {
+      const result = await window.cachedSupabaseSelect(
+        "global_segment_visibility",
+        {
+          select: "segment_key,is_enabled",
+          ttl: DISPLAY_GLOBAL_CACHE_TTL,
+          forceRefresh: options.forceRefresh === true,
+          staleWhileRevalidate:
+            options.staleWhileRevalidate !== false,
+
+          onBackgroundUpdate: freshRows => {
+            const freshMap = {}
+
+            ;(freshRows || []).forEach(row => {
+              freshMap[
+                normalizeDisplaySegmentKey(row.segment_key)
+              ] = row.is_enabled !== false
+            })
+
+            window.displayGlobalVisibilityMap = freshMap
+
+            if (window.lastDisplayVisibleRows) {
+              applyVisibleSegmentsForDisplay(
+                window.lastDisplayVisibleRows,
+                freshMap
+              )
+
+              renderVisibleSegmentsHome()
+              updateSegmentCards()
+            }
+          }
+        }
+      )
+
+      rows = result.data || []
+
+      if (result.error && !rows.length) {
+        console.log(
+          "DISPLAY GLOBAL VISIBILITY ERROR:",
+          result.error
+        )
+      }
+    } else {
+      const { data, error } = await db
+        .from("global_segment_visibility")
+        .select("segment_key,is_enabled")
+
+      if (error) {
+        console.log(
+          "DISPLAY GLOBAL VISIBILITY ERROR:",
+          error
+        )
+      }
+
+      rows = data || []
     }
 
-    ;(data || []).forEach(row => {
-      map[normalizeDisplaySegmentKey(row.segment_key)] = row.is_enabled !== false
+    rows.forEach(row => {
+      map[
+        normalizeDisplaySegmentKey(row.segment_key)
+      ] = row.is_enabled !== false
     })
 
+    window.displayGlobalVisibilityMap = map
+    displayVisibilityLoadedAt = Date.now()
+
     return map
-  } catch (err) {
-    console.log("DISPLAY GLOBAL SEGMENT VISIBILITY CATCH:", err)
+  } catch (error) {
+    console.log(
+      "DISPLAY GLOBAL VISIBILITY CATCH:",
+      error
+    )
+
     return map
   }
 }
 
-function isDisplaySegmentGloballyEnabled(segmentKey, globalMap = {}) {
-  const key = normalizeDisplaySegmentKey(segmentKey)
+function isDisplaySegmentGloballyEnabled(
+  segmentKey,
+  globalMap = {}
+) {
+  const key =
+    normalizeDisplaySegmentKey(segmentKey)
+
   return globalMap[key] !== false
 }
 
-async function loadVisibleSegmentsForDisplay() {
-  const modelId = Number(
-    localStorage.getItem("game_model") ||
-    window.currentModel ||
-    currentModel ||
-    0
-  )
-
-  const globalMap = await loadDisplayGlobalSegmentVisibilityMap()
-
-  visibleDisplaySegments = ALL_DISPLAY_SEGMENTS
-    .filter(item => isDisplaySegmentGloballyEnabled(item.key, globalMap))
-    .map(item => ({
-      ...item,
-      is_visible: item.sort <= 11,
-      sort_order: item.sort
-    }))
-
-  if (!modelId) {
-    return visibleDisplaySegments
-  }
-
-  const { data, error } = await db
-    .from("visible_segments")
-    .select("*")
-    .eq("model", modelId)
-    .order("sort_order", { ascending: true })
-
-  if (error) {
-    console.log("LOAD VISIBLE SEGMENTS ERROR:", error)
-    return visibleDisplaySegments
-  }
+function applyVisibleSegmentsForDisplay(
+  rows = [],
+  globalMap = {}
+) {
+  window.lastDisplayVisibleRows = rows || []
 
   const map = {}
 
   ALL_DISPLAY_SEGMENTS.forEach(item => {
-    const key = normalizeDisplaySegmentKey(item.key)
+    const key =
+      normalizeDisplaySegmentKey(item.key)
 
-    if (!isDisplaySegmentGloballyEnabled(key, globalMap)) return
+    if (
+      !isDisplaySegmentGloballyEnabled(
+        key,
+        globalMap
+      )
+    ) {
+      return
+    }
 
     map[key] = {
       ...item,
       key,
-      is_visible: item.sort <= 11,
+      is_visible: true,
       sort_order: item.sort
     }
   })
 
-  ;(data || []).forEach(row => {
-    const key = normalizeDisplaySegmentKey(row.segment_key)
+  ;(rows || []).forEach(row => {
+    const key =
+      normalizeDisplaySegmentKey(
+        row.segment_key
+      )
 
     if (!map[key]) return
 
     map[key] = {
       ...map[key],
       is_visible: !!row.is_visible,
-      sort_order: Number(row.sort_order || map[key].sort)
+      sort_order: Number(
+        row.sort_order ||
+        map[key].sort
+      )
     }
   })
 
-  visibleDisplaySegments = Object.values(map)
-    .filter(item => item.is_visible)
-    .sort((a, b) => {
-      return Number(a.sort_order || a.sort) - Number(b.sort_order || b.sort)
-    })
+  visibleDisplaySegments =
+    Object.values(map)
+      .filter(item => item.is_visible)
+      .sort((a, b) => {
+        return (
+          Number(a.sort_order || a.sort) -
+          Number(b.sort_order || b.sort)
+        )
+      })
 
   return visibleDisplaySegments
+}
+
+async function loadVisibleSegmentsForDisplay(
+  options = {}
+) {
+  const modelId = getDisplayModelId()
+
+  const [globalMap, modelData] =
+    await Promise.all([
+      loadDisplayGlobalSegmentVisibilityMap({
+        forceRefresh:
+          options.forceRefresh === true,
+        staleWhileRevalidate:
+          options.staleWhileRevalidate !== false
+      }),
+
+      loadDisplayModelData({
+        forceRefresh:
+          options.forceRefresh === true,
+        staleWhileRevalidate:
+          options.staleWhileRevalidate !== false
+      })
+    ])
+
+  if (!modelId || !modelData) {
+    return applyVisibleSegmentsForDisplay(
+      [],
+      globalMap
+    )
+  }
+
+  return applyVisibleSegmentsForDisplay(
+    modelData.visible_segments || [],
+    globalMap
+  )
 }
 /* =========================
    Helpers
@@ -819,41 +1353,119 @@ function updateModelNameDisplay() {
 }
 
 function getSegmentWinnerLabelIds(key) {
-  if (key === "warmup") return ["segmentWinnerWarmup", "winnerWarmup"]
-  if (key === "top10") return ["segmentWinnerTop10", "winnerTop10"]
-  if (key === "auction") return ["segmentWinnerAuction", "winnerAuction"]
-  if (key === "who") return ["segmentWinnerWho", "winnerWho"]
-  if (key === "explain") return ["segmentWinnerExplain", "winnerExplain"]
+  if (key === "warmup") {
+    return ["segmentWinnerWarmup", "winnerWarmup"]
+  }
 
-  if (key === "finalRound1") return ["segmentWinnerFinalRound1", "winner_finalRound1"]
-  if (key === "finalRound2") return ["segmentWinnerFinalRound2", "winner_finalRound2"]
-  if (key === "finalRound3") return ["segmentWinnerFinalRound3", "winner_finalRound3"]
-  if (key === "finalRound4") return ["segmentWinnerFinalRound4", "winner_finalRound4"]
+  if (key === "top10") {
+    return ["segmentWinnerTop10", "winnerTop10"]
+  }
 
-  if (key === "final") return ["segmentWinnerFinal", "winnerFinal"]
-  if (key === "archive") return ["segmentWinnerArchive", "winnerArchive"]
-  if (key === "randomChallenge") return ["segmentWinnerRandomChallenge", "winnerRandomChallenge"]
+  if (key === "letterli") {
+    return ["segmentWinnerLetterli", "winnerLetterli"]
+  }
 
-  return [`segmentWinner_${key}`, `winner_${key}`]
+  if (key === "who") {
+    return ["segmentWinnerWho", "winnerWho"]
+  }
+
+  if (key === "explain") {
+    return ["segmentWinnerExplain", "winnerExplain"]
+  }
+
+  if (key === "finalRound1") {
+    return ["segmentWinnerFinalRound1", "winner_finalRound1"]
+  }
+
+  if (key === "finalRound2") {
+    return ["segmentWinnerFinalRound2", "winner_finalRound2"]
+  }
+
+  if (key === "finalRound3") {
+    return ["segmentWinnerFinalRound3", "winner_finalRound3"]
+  }
+
+  if (key === "finalRound4") {
+    return ["segmentWinnerFinalRound4", "winner_finalRound4"]
+  }
+
+  if (key === "final") {
+    return ["segmentWinnerFinal", "winnerFinal"]
+  }
+
+  if (key === "archive") {
+    return ["segmentWinnerArchive", "winnerArchive"]
+  }
+
+  if (key === "randomChallenge") {
+    return [
+      "segmentWinnerRandomChallenge",
+      "winnerRandomChallenge"
+    ]
+  }
+
+  return [
+    `segmentWinner_${key}`,
+    `winner_${key}`
+  ]
 }
 
 function getSegmentCardIds(key) {
-  if (key === "warmup") return ["segmentCardWarmup", "segmentWarmup"]
-  if (key === "top10") return ["segmentCardTop10", "segmentTop10"]
-  if (key === "auction") return ["segmentCardAuction", "segmentAuction"]
-  if (key === "who") return ["segmentCardWho", "segmentWho"]
-  if (key === "explain") return ["segmentCardExplain", "segmentExplain"]
+  if (key === "warmup") {
+    return ["segmentCardWarmup", "segmentWarmup"]
+  }
 
-  if (key === "finalRound1") return ["segmentCardFinalRound1", "segment_finalRound1"]
-  if (key === "finalRound2") return ["segmentCardFinalRound2", "segment_finalRound2"]
-  if (key === "finalRound3") return ["segmentCardFinalRound3", "segment_finalRound3"]
-  if (key === "finalRound4") return ["segmentCardFinalRound4", "segment_finalRound4"]
+  if (key === "top10") {
+    return ["segmentCardTop10", "segmentTop10"]
+  }
 
-  if (key === "final") return ["segmentCardFinal", "segmentFinal"]
-  if (key === "archive") return ["segmentCardArchive", "segmentArchive"]
-  if (key === "randomChallenge") return ["segmentCardRandomChallenge", "segmentRandomChallenge"]
+  if (key === "letterli") {
+    return ["segmentCardLetterli", "segmentLetterli"]
+  }
 
-  return [`segmentCard_${key}`, `segment_${key}`]
+  if (key === "who") {
+    return ["segmentCardWho", "segmentWho"]
+  }
+
+  if (key === "explain") {
+    return ["segmentCardExplain", "segmentExplain"]
+  }
+
+  if (key === "finalRound1") {
+    return ["segmentCardFinalRound1", "segment_finalRound1"]
+  }
+
+  if (key === "finalRound2") {
+    return ["segmentCardFinalRound2", "segment_finalRound2"]
+  }
+
+  if (key === "finalRound3") {
+    return ["segmentCardFinalRound3", "segment_finalRound3"]
+  }
+
+  if (key === "finalRound4") {
+    return ["segmentCardFinalRound4", "segment_finalRound4"]
+  }
+
+  if (key === "final") {
+    return ["segmentCardFinal", "segmentFinal"]
+  }
+
+  if (key === "archive") {
+    return ["segmentCardArchive", "segmentArchive"]
+  }
+
+  if (key === "randomChallenge") {
+    return [
+      "segmentCardRandomChallenge",
+      "segmentRandomChallenge"
+    ]
+  }
+
+  return [
+    `segmentCard_${key}`,
+    `segment_${key}`
+  ]
 }
 
 function playSoftEnter(selector, fast = false) {
@@ -1009,19 +1621,19 @@ function getSegmentArabicTitle(segmentKey) {
   segmentKey = normalizeDisplaySegmentKey(segmentKey)
 
   const titles = {
-    warmup: "التسخين",
-    top10: "Top 10",
-    auction: "فتبلة",
-    who: "من هو",
-    explain: "اشرح الكلمة",
-    finalRound1: "ٮدوں ٮڡاط",
-    finalRound2: "صح صحلي",
-    finalRound3: "قصة",
-    finalRound4: "التركيز",
-    archive: "الأرشيف",
-    randomChallenge: "التحدي",
-    final: "الفاصلة"
-  }
+  warmup: "التسخين",
+  top10: "Top 10",
+  letterli: "حرفلي",
+  who: "من هو",
+  explain: "اشرح الكلمة",
+  finalRound1: "ٮدوں ٮڡاط",
+  finalRound2: "صح صحلي",
+  finalRound3: "قصة",
+  finalRound4: "التركيز",
+  archive: "الأرشيف",
+  randomChallenge: "التحدي",
+  final: "الفاصلة"
+}
 
   return titles[segmentKey] || "الفقرة"
 }
@@ -1205,10 +1817,7 @@ function clearAllSegmentPlayStatesForNewSession() {
 
   localStorage.removeItem("warmup_state_v1")
   localStorage.removeItem("top10_state_v1")
-
-  localStorage.removeItem("auction_state_v1")
-  localStorage.removeItem("auction_state_v2")
-
+  localStorage.removeItem("letterli_state_v1")
   localStorage.removeItem("who_state_v1")
   localStorage.removeItem("explain_state_v1")
 
@@ -1217,13 +1826,15 @@ function clearAllSegmentPlayStatesForNewSession() {
   localStorage.removeItem("final_state_v3")
 
   localStorage.removeItem("archive_state_v1")
-  localStorage.removeItem("random_challenge_state_v1")
+  localStorage.removeItem(
+    "random_challenge_state_v1"
+  )
 
   segmentStatus = defaultSegmentStatus()
 
   window.usedQuestions = {}
   window.top10State = null
-  window.auctionState = null
+  window.letterliState = null
   window.whoState = null
   window.explainState = null
   window.finalState = null
@@ -1296,9 +1907,6 @@ function enhanceDisplayMediaFrames(root = document) {
 
   const mediaSelectors = [
     ".whoImageFull",
-    ".auctionBigImage",
-    ".auctionImageFrame img",
-    ".auctionImageBox img",
     ".archiveModernBigCard img",
     ".archiveImageFrame img",
     ".finalRound1BigImage",
@@ -1454,17 +2062,34 @@ document.addEventListener("DOMContentLoaded", async () => {
   observeDisplayMedia()
   restoreDisplayControlsEye()
 
-  await loadDisplaySegmentCounts()
-  await loadVisibleSegmentsForDisplay()
 
   segmentStatus = loadSegmentStatus()
 
   renderVisibleSegmentsHome()
   updateSegmentCards()
+  updateMainScoreBoard()
+  updateLeadingTeamStyle()
+  updateModelNameDisplay()
 
   await restoreDisplayAfterRefresh()
-})
 
+  setTimeout(async () => {
+    try {
+      await loadVisibleSegmentsForDisplay({
+        staleWhileRevalidate: true
+      })
+
+      renderVisibleSegmentsHome()
+      updateSegmentCards()
+      updateModelNameDisplay()
+    } catch (error) {
+      console.log(
+        "DISPLAY BACKGROUND LOAD ERROR:",
+        error
+      )
+    }
+  }, 0)
+})
 /* =========================
    Main Home
 ========================= */
@@ -1648,8 +2273,7 @@ async function endGameAndGoIntro() {
 
   localStorage.removeItem("warmup_state_v1")
   localStorage.removeItem("top10_state_v1")
-  localStorage.removeItem("auction_state_v1")
-  localStorage.removeItem("auction_state_v2")
+  localStorage.removeItem("letterli_state_v1")
   localStorage.removeItem("who_state_v1")
   localStorage.removeItem("explain_state_v1")
   localStorage.removeItem("final_state_v2")
@@ -1695,7 +2319,7 @@ function getDisplaySegmentDomId(key) {
 
   if (key === "warmup") return "segmentWarmup"
   if (key === "top10") return "segmentTop10"
-  if (key === "auction") return "segmentAuction"
+  if (key === "letterli") return "segmentLetterli"
   if (key === "who") return "segmentWho"
   if (key === "explain") return "segmentExplain"
 
@@ -1706,7 +2330,7 @@ function getDisplaySegmentDomId(key) {
 
   if (key === "final") return "segmentFinal"
   if (key === "archive") return "segmentArchive"
-    if (key === "randomChallenge") return "segmentRandomChallenge"
+  if (key === "randomChallenge") return "segmentRandomChallenge"
 
   return `segment_${key}`
 }
@@ -1716,7 +2340,7 @@ function getDisplayWinnerDomId(key) {
 
   if (key === "warmup") return "winnerWarmup"
   if (key === "top10") return "winnerTop10"
-  if (key === "auction") return "winnerAuction"
+  if (key === "letterli") return "winnerLetterli"
   if (key === "who") return "winnerWho"
   if (key === "explain") return "winnerExplain"
 
@@ -1727,7 +2351,7 @@ function getDisplayWinnerDomId(key) {
 
   if (key === "final") return "winnerFinal"
   if (key === "archive") return "winnerArchive"
-    if (key === "randomChallenge") return "winnerRandomChallenge"
+  if (key === "randomChallenge") return "winnerRandomChallenge"
 
   return `winner_${key}`
 }
@@ -1828,7 +2452,11 @@ async function openSegmentPage(segmentKey, forcedRound = null) {
 
   clearDisplayTemporaryFx()
 
-  await loadVisibleSegmentsForDisplay()
+if (!displayModelDataLoaded) {
+  await loadVisibleSegmentsForDisplay({
+    staleWhileRevalidate: true
+  })
+}
 
   if (!isFinalAny && !isSegmentVisibleOnDisplay(segmentKey)) {
     showGameToast("هذه الفقرة غير مفعلة في العرض")
@@ -1892,7 +2520,13 @@ async function openSegmentPage(segmentKey, forcedRound = null) {
   try {
     if (segmentKey === "warmup") await window.renderWarmup()
     if (segmentKey === "top10") await window.renderTop10()
-    if (segmentKey === "auction") await window.renderAuction()
+    if (segmentKey === "letterli") {
+  if (typeof window.openLetterliSegment !== "function") {
+    throw new Error("openLetterliSegment is not loaded")
+  }
+
+  await window.openLetterliSegment()
+}
     if (segmentKey === "who") await window.renderWho()
     if (segmentKey === "explain") await window.renderExplain()
     if (segmentKey === "archive") await window.renderArchive()
@@ -1967,11 +2601,57 @@ function openSegment(title, content) {
   startEndButtonWatcher()
 }
 
+function stopAllDisplaySegmentTimers() {
+  clearInterval(timer)
+  timer = null
+
+  if (
+    typeof warmupTimer !== "undefined"
+  ) {
+    clearInterval(warmupTimer)
+    warmupTimer = null
+  }
+
+  if (
+    typeof top10Timer !== "undefined"
+  ) {
+    clearInterval(top10Timer)
+    top10Timer = null
+  }
+
+  if (
+    typeof stopLetterliCountdown ===
+    "function"
+  ) {
+    stopLetterliCountdown(false)
+  }
+
+  if (
+    typeof whoTimer !== "undefined"
+  ) {
+    clearInterval(whoTimer)
+    whoTimer = null
+  }
+
+  if (
+    typeof resetExplainTimer ===
+    "function"
+  ) {
+    resetExplainTimer()
+  }
+
+  if (
+    typeof resetWhoRevealTimeout ===
+    "function"
+  ) {
+    resetWhoRevealTimeout()
+  }
+}
+
 function goHome() {
   clearDisplayTemporaryFx()
 
-  clearInterval(timer)
-  timer = null
+  stopAllDisplaySegmentTimers()
   window.currentSegmentScores = null
 
   localStorage.removeItem("active_segment")
@@ -2204,8 +2884,7 @@ clearGameActiveTeam()
 saveSegmentStatus()
 updateSegmentCards()
 
-  clearInterval(timer)
-  timer = null
+  stopAllDisplaySegmentTimers()
 
   localStorage.removeItem("active_segment")
   syncDisplayStateToSession()
@@ -2235,37 +2914,125 @@ window.finishSegment = finishSegment
 window.closeSegment = closeSegment
 
 function getCurrentSegmentKey() {
-  const active = normalizeDisplaySegmentKey(localStorage.getItem("active_segment"))
+  const active =
+    normalizeDisplaySegmentKey(
+      localStorage.getItem(
+        "active_segment"
+      )
+    )
 
-  if (active) return active
-
-  const segmentRoot =
-    document.querySelector("[data-segment-key]") ||
-    document.querySelector(".warmupWrap") ||
-    document.querySelector(".top10Wrap") ||
-    document.querySelector(".auctionWrap") ||
-    document.querySelector(".whoWrap") ||
-    document.querySelector(".explainWrap") ||
-    document.querySelector(".finalWrapNew") ||
-    document.querySelector(".archiveWrap") ||
-    document.querySelector(".randomChallengeWrap")
-
-  if (!segmentRoot) return null
-
-  if (segmentRoot.dataset?.segmentKey) {
-    return normalizeDisplaySegmentKey(segmentRoot.dataset.segmentKey)
+  if (active) {
+    return active
   }
 
-  if (segmentRoot.classList.contains("warmupWrap")) return "warmup"
-  if (segmentRoot.classList.contains("top10Wrap")) return "top10"
-  if (segmentRoot.classList.contains("auctionWrap")) return "auction"
-  if (segmentRoot.classList.contains("whoWrap")) return "who"
-  if (segmentRoot.classList.contains("explainWrap")) return "explain"
-  if (segmentRoot.classList.contains("archiveWrap")) return "archive"
-    if (segmentRoot.classList.contains("randomChallengeWrap")) return "randomChallenge"
+  const segmentRoot =
+    document.querySelector(
+      "[data-segment-key]"
+    ) ||
+    document.querySelector(
+      ".warmupWrap"
+    ) ||
+    document.querySelector(
+      ".top10Wrap"
+    ) ||
+    document.querySelector(
+      ".letterliWrap"
+    ) ||
+    document.querySelector(
+      ".whoWrap"
+    ) ||
+    document.querySelector(
+      ".explainWrap"
+    ) ||
+    document.querySelector(
+      ".finalWrapNew"
+    ) ||
+    document.querySelector(
+      ".archiveWrap"
+    ) ||
+    document.querySelector(
+      ".randomChallengeWrap"
+    )
 
-  if (segmentRoot.classList.contains("finalWrapNew")) {
-    return normalizeDisplaySegmentKey(localStorage.getItem("active_segment") || "finalRound1")
+  if (!segmentRoot) {
+    return null
+  }
+
+  if (
+    segmentRoot.dataset?.segmentKey
+  ) {
+    return normalizeDisplaySegmentKey(
+      segmentRoot.dataset.segmentKey
+    )
+  }
+
+  if (
+    segmentRoot.classList.contains(
+      "warmupWrap"
+    )
+  ) {
+    return "warmup"
+  }
+
+  if (
+    segmentRoot.classList.contains(
+      "top10Wrap"
+    )
+  ) {
+    return "top10"
+  }
+
+  if (
+    segmentRoot.classList.contains(
+      "letterliWrap"
+    )
+  ) {
+    return "letterli"
+  }
+
+  if (
+    segmentRoot.classList.contains(
+      "whoWrap"
+    )
+  ) {
+    return "who"
+  }
+
+  if (
+    segmentRoot.classList.contains(
+      "explainWrap"
+    )
+  ) {
+    return "explain"
+  }
+
+  if (
+    segmentRoot.classList.contains(
+      "archiveWrap"
+    )
+  ) {
+    return "archive"
+  }
+
+  if (
+    segmentRoot.classList.contains(
+      "randomChallengeWrap"
+    )
+  ) {
+    return "randomChallenge"
+  }
+
+  if (
+    segmentRoot.classList.contains(
+      "finalWrapNew"
+    )
+  ) {
+    return normalizeDisplaySegmentKey(
+      localStorage.getItem(
+        "active_segment"
+      ) ||
+      "finalRound1"
+    )
   }
 
   return null
@@ -2296,6 +3063,22 @@ function isDisplaySegmentBusyBeforeEnd(segmentKey) {
     )
   }
 
+  if (segmentKey === "letterli") {
+  const state =
+    window.letterliState ||
+    getSafeJson(
+      "letterli_state_v1"
+    ) ||
+    {}
+
+  return !!(
+    state.spinning ||
+    state.timerRunning ||
+    state.currentQuestionIndex !==
+      null
+  )
+}
+
   if (segmentKey === "auction") {
     return !!(
       window.auctionState?.pendingScore ||
@@ -2304,12 +3087,21 @@ function isDisplaySegmentBusyBeforeEnd(segmentKey) {
   }
 
   if (segmentKey === "who") {
-    return !!(
-      window.whoState?.pendingScore ||
-      window.whoState?.currentNumber ||
-      window.whoQuestionLocked
+  return !!(
+    window.whoState?.pendingScore ||
+    window.whoCurrentNumber ||
+    (
+      typeof whoCurrentNumber !==
+        "undefined" &&
+      whoCurrentNumber
+    ) ||
+    (
+      typeof whoQuestionLocked !==
+        "undefined" &&
+      whoQuestionLocked
     )
-  }
+  )
+}
 
   if (segmentKey === "explain") {
     return !!(
@@ -2356,6 +3148,88 @@ if (segmentKey === "randomChallenge") {
   return false
 }
 
+function getLetterliDisplayState() {
+  return (
+    window.letterliState ||
+    getSafeJson(
+      "letterli_state_v1"
+    ) ||
+    {}
+  )
+}
+
+function getLetterliDisplayScores() {
+  const state =
+    getLetterliDisplayState()
+
+  return {
+    A: Number(
+      state.scoreA ??
+      state.scores?.A ??
+      state.teamScores?.A ??
+      0
+    ),
+
+    B: Number(
+      state.scoreB ??
+      state.scores?.B ??
+      state.teamScores?.B ??
+      0
+    )
+  }
+}
+
+function getLetterliCompletedCount() {
+  const state =
+    getLetterliDisplayState()
+
+  const possibleArrays = [
+    state.completedQuestions,
+    state.usedQuestionKeys,
+    state.usedQuestions,
+    state.answeredQuestions
+  ]
+
+  const completedArray =
+    possibleArrays.find(
+      value => Array.isArray(value)
+    )
+
+  if (completedArray) {
+    return completedArray.length
+  }
+
+  return Number(
+    state.completedCount ||
+    state.answeredCount ||
+    0
+  )
+}
+
+function canEndLetterliSegment() {
+  const state =
+    getLetterliDisplayState()
+
+  const scores =
+    getLetterliDisplayScores()
+
+  const completedCount =
+    getLetterliCompletedCount()
+
+  const hasPlayed =
+    completedCount > 0 ||
+    scores.A > 0 ||
+    scores.B > 0
+
+  return !!(
+    hasPlayed &&
+    !state.spinning &&
+    !state.timerRunning &&
+    !state.answerVisible
+  )
+}
+
+
 function canEndSegment(segmentKey) {
     segmentKey = normalizeDisplaySegmentKey(segmentKey)
 
@@ -2386,6 +3260,28 @@ function canEndSegment(segmentKey) {
 
     return Number(window.top10State.round || 1) >= maxRound
   }
+
+  if (segmentKey === "letterli") {
+  const state =
+    window.letterliState ||
+    getSafeJson(
+      "letterli_state_v1"
+    )
+
+  if (!state) {
+    return false
+  }
+
+  return (
+    Number(
+      state.completedCount || 0
+    ) > 0 &&
+    !state.spinning &&
+    !state.timerRunning &&
+    state.currentQuestionIndex ===
+      null
+  )
+}
 
   if (segmentKey === "auction") {
     if (!window.auctionState) return false
@@ -2662,16 +3558,21 @@ function bumpScore(id) {
   void el.offsetWidth
   el.classList.add("score-bump")
 }
+
 var screenFlashLayer = null
 
 function ensureScreenFlashLayer() {
-  if (screenFlashLayer && document.body.contains(screenFlashLayer)) {
+  if (
+    screenFlashLayer &&
+    document.body.contains(screenFlashLayer)
+  ) {
     document.body.appendChild(screenFlashLayer)
     return screenFlashLayer
   }
 
   screenFlashLayer = document.createElement("div")
   screenFlashLayer.className = "screenFlashLayer"
+
   document.body.appendChild(screenFlashLayer)
 
   return screenFlashLayer
@@ -2685,17 +3586,16 @@ function flashScreen(type = "correct") {
     "flashWrong",
     "flashWrongStrong",
     "flashCorrectPro",
-    "flashWrongPro"
+    "flashWrongPro",
+    "flashTimeoutPro"
   )
 
   void layer.offsetWidth
 
   if (type === "wrong") {
     layer.classList.add("flashWrongPro")
-    playGameSound("wrong")
   } else {
     layer.classList.add("flashCorrectPro")
-    playGameSound("correct")
   }
 
   setTimeout(() => {
@@ -2704,7 +3604,8 @@ function flashScreen(type = "correct") {
       "flashWrong",
       "flashWrongStrong",
       "flashCorrectPro",
-      "flashWrongPro"
+      "flashWrongPro",
+      "flashTimeoutPro"
     )
   }, 860)
 }
@@ -2729,30 +3630,43 @@ function flashTimerTimeout() {
     layer.classList.remove("flashTimeoutPro")
   }, 900)
 }
+
 function clearDisplayTemporaryFx() {
   const idsToRemove = [
-  "displayCurrentTurnBadge",
-  "displayLastScoreUpdate",
-  "displayImageZoomOverlay",
-  "auctionImageOverlay",
-  "auctionVideoFullscreenOverlay",
-  "displayReadyHint",
-  "displayLoadingLayer"
-]
+    "displayCurrentTurnBadge",
+    "displayLastScoreUpdate",
+    "displayImageZoomOverlay",
+    "auctionImageOverlay",
+    "auctionVideoFullscreenOverlay",
+    "displayReadyHint",
+    "displayLoadingLayer",
+    "whoImageOverlay",
+    "whoZoomFlashLayer"
+  ]
 
   idsToRemove.forEach(id => {
     const el = document.getElementById(id)
-    if (el) el.remove()
+
+    if (el) {
+      el.remove()
+    }
   })
 
-  const proLayer = document.getElementById("displayProLayer")
+  const proLayer =
+    document.getElementById("displayProLayer")
+
   if (proLayer) {
-    proLayer.className = "displayProLayer hidden"
+    proLayer.className =
+      "displayProLayer hidden"
+
     proLayer.innerHTML = ""
   }
 
-  const toast = document.getElementById("gameToast")
-  const toastText = document.getElementById("gameToastText")
+  const toast =
+    document.getElementById("gameToast")
+
+  const toastText =
+    document.getElementById("gameToastText")
 
   if (toast) {
     toast.classList.remove("show")
@@ -2774,15 +3688,23 @@ function clearDisplayTemporaryFx() {
     )
   }
 
-  document.body.classList.remove("auctionOverlayActive")
+  document.body.classList.remove(
+    "auctionOverlayActive",
+    "whoOverlayActive"
+  )
 
   document
-    .querySelectorAll(".timerDanger, .timerTimeoutFx, .displaySegmentEnterFx")
+    .querySelectorAll(
+      ".timerDanger, .timerTimeoutFx, .displaySegmentEnterFx"
+    )
     .forEach(el => {
-      el.classList.remove("timerDanger", "timerTimeoutFx", "displaySegmentEnterFx")
+      el.classList.remove(
+        "timerDanger",
+        "timerTimeoutFx",
+        "displaySegmentEnterFx"
+      )
     })
 }
-
 /* =========================
    DISPLAY LOADING STATE
    شاشة تحميل خفيفة عند فتح الفقرات
@@ -3008,6 +3930,16 @@ function applyPresenterHideDisplayControlsState() {
     ".top10ControlPanel",
     ".top10Actions",
     ".top10Buttons",
+
+    /* حرفلي */
+".letterliActionBar",
+"#letterliActionBar",
+".letterliControlsBar",
+"#letterliControlsBar",
+".letterliControlPanel",
+".letterliControls",
+".letterliActions",
+".letterliButtons",
 
     /* فتبلة */
     ".auctionControlsBar",
@@ -3477,19 +4409,82 @@ window.applyBigScreenMode = applyBigScreenMode
 ========================= */
 
 const FINAL_RESULTS_CONFIG = [
-  { segmentKey: "warmup", cardKey: "warmup", prefix: "Warmup", title: "التسخين" },
-  { segmentKey: "top10", cardKey: "top10", prefix: "Top10", title: "Top 10" },
-  { segmentKey: "auction", cardKey: "auction", prefix: "Auction", title: "فتبلة" },
-  { segmentKey: "who", cardKey: "who", prefix: "Who", title: "من هو" },
-  { segmentKey: "explain", cardKey: "explain", prefix: "Explain", title: "اشرح الكلمة" },
+  {
+    segmentKey: "warmup",
+    cardKey: "warmup",
+    prefix: "Warmup",
+    title: "التسخين"
+  },
 
-  { segmentKey: "finalRound1", cardKey: "final1", prefix: "Final1", title: "ٮدوں ٮڡاط" },
-  { segmentKey: "finalRound2", cardKey: "final2", prefix: "Final2", title: "صح صحلي" },
-  { segmentKey: "finalRound3", cardKey: "final3", prefix: "Final3", title: "قصة" },
-  { segmentKey: "finalRound4", cardKey: "final4", prefix: "Final4", title: "التركيز" },
+  {
+    segmentKey: "top10",
+    cardKey: "top10",
+    prefix: "Top10",
+    title: "Top 10"
+  },
 
-  { segmentKey: "archive", cardKey: "archive", prefix: "Archive", title: "الأرشيف" },
-  { segmentKey: "randomChallenge", cardKey: "randomChallenge", prefix: "RandomChallenge", title: "التحدي" }
+  {
+    segmentKey: "letterli",
+    cardKey: "letterli",
+    prefix: "Letterli",
+    title: "حرفلي"
+  },
+
+  {
+    segmentKey: "who",
+    cardKey: "who",
+    prefix: "Who",
+    title: "من هو"
+  },
+
+  {
+    segmentKey: "explain",
+    cardKey: "explain",
+    prefix: "Explain",
+    title: "اشرح الكلمة"
+  },
+
+  {
+    segmentKey: "finalRound1",
+    cardKey: "final1",
+    prefix: "Final1",
+    title: "ٮدوں ٮڡاط"
+  },
+
+  {
+    segmentKey: "finalRound2",
+    cardKey: "final2",
+    prefix: "Final2",
+    title: "صح صحلي"
+  },
+
+  {
+    segmentKey: "finalRound3",
+    cardKey: "final3",
+    prefix: "Final3",
+    title: "قصة"
+  },
+
+  {
+    segmentKey: "finalRound4",
+    cardKey: "final4",
+    prefix: "Final4",
+    title: "التركيز"
+  },
+
+  {
+    segmentKey: "archive",
+    cardKey: "archive",
+    prefix: "Archive",
+    title: "الأرشيف"
+  },
+
+  {
+    segmentKey: "randomChallenge",
+    cardKey: "randomChallenge",
+    prefix: "RandomChallenge",
+    title: "التحدي"
+  }
 ]
 
 function readResultJson(key) {
@@ -3518,18 +4513,61 @@ function setResultText(id, value) {
 
 function getResultState() {
   return {
-    warmup: window.warmupState || readResultJson("warmup_state_v1") || {},
-    top10: window.top10State || readResultJson("top10_state_v1") || {},
-    auction:
-      window.auctionState ||
-      readResultJson("auction_state_v2") ||
-      readResultJson("auction_state_v1") ||
+    warmup:
+      window.warmupState ||
+      readResultJson(
+        "warmup_state_v1"
+      ) ||
       {},
-    who: window.whoState || readResultJson("who_state_v1") || {},
-    explain: window.explainState || readResultJson("explain_state_v1") || {},
-    final: window.finalState || readResultJson("final_state_v3") || {},
-    archive: window.archiveState || readResultJson("archive_state_v1") || {},
-    randomChallenge: window.randomChallengeState || readResultJson("random_challenge_state_v1") || {}
+
+    top10:
+      window.top10State ||
+      readResultJson(
+        "top10_state_v1"
+      ) ||
+      {},
+
+    letterli:
+      window.letterliState ||
+      readResultJson(
+        "letterli_state_v1"
+      ) ||
+      {},
+
+    who:
+      window.whoState ||
+      readResultJson(
+        "who_state_v1"
+      ) ||
+      {},
+
+    explain:
+      window.explainState ||
+      readResultJson(
+        "explain_state_v1"
+      ) ||
+      {},
+
+    final:
+      window.finalState ||
+      readResultJson(
+        "final_state_v3"
+      ) ||
+      {},
+
+    archive:
+      window.archiveState ||
+      readResultJson(
+        "archive_state_v1"
+      ) ||
+      {},
+
+    randomChallenge:
+      window.randomChallengeState ||
+      readResultJson(
+        "random_challenge_state_v1"
+      ) ||
+      {}
   }
 }
 
@@ -3571,9 +4609,18 @@ function getRealSegmentScores(segmentKey) {
   const final = s.final || {}
   const warmup = s.warmup || {}
   const top10 = unwrapResultState(s.top10, "top10State")
+  const letterli =
+  unwrapResultState(
+    s.letterli,
+    "letterliState"
+  )
   const auction = unwrapResultState(s.auction, "auctionState")
   const who = unwrapResultState(s.who, "whoState")
-  const explain = s.explain || {}
+  const explain =
+  unwrapResultState(
+    s.explain,
+    "explainState"
+  )
   const archive = unwrapResultState(s.archive, "archiveState")
     const randomChallenge = unwrapResultState(s.randomChallenge, "randomChallengeState")
 
@@ -3601,10 +4648,24 @@ function getRealSegmentScores(segmentKey) {
     B = getResultScore(top10, "B")
   }
 
-  if (segmentKey === "auction") {
-    A = safeResultNumber(auction.scoreA ?? auction.scores?.A)
-    B = safeResultNumber(auction.scoreB ?? auction.scores?.B)
-  }
+  if (segmentKey === "letterli") {
+  const state =
+    window.letterliState ||
+    readResultJson(
+      "letterli_state_v1"
+    ) ||
+    {}
+
+  A = safeResultNumber(
+    state.scoreA ??
+    state.scores?.A
+  )
+
+  B = safeResultNumber(
+    state.scoreB ??
+    state.scores?.B
+  )
+}
 
   if (segmentKey === "who") {
     A = safeResultNumber(who.scoreA ?? who.scores?.A)
@@ -3814,6 +4875,7 @@ function updateFinalResultsUI() {
       "resultsCount8",
       "resultsCount9",
       "resultsCount10",
+      "resultsCount11",
       "teamA",
       "teamB",
       "draw"
@@ -3937,6 +4999,16 @@ function announceWinnerFromDetailedResults() {
     }
   }, 220)
 }
+document.addEventListener("visibilitychange", () => {
+  if (
+    document.visibilityState === "hidden" &&
+    localStorage.getItem("game_session_id")
+  ) {
+    syncDisplayStateToSession({
+      immediate: true
+    })
+  }
+})
 
 window.showDetailedFinalResults = showDetailedFinalResults
 window.closeDetailedFinalResults = closeDetailedFinalResults

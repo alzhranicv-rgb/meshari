@@ -16,12 +16,12 @@ let gameToastTimer = null
 let currentAdminSegment = ""
 let adminNavBusy = false
 
-let auctionAdminCount = 8
+
 let whoAdminCount = 15
-let finalRound1AdminCount = 6
-let explainAdminCount = 4
-let finalRound3AdminCount = 4
-let finalRound4AdminCount = 4
+let finalRound1AdminCount = 7
+let explainAdminCount = 5
+let finalRound3AdminCount = 5
+let finalRound4AdminCount = 5
 
 let finalAdminRound = 1
 
@@ -33,6 +33,8 @@ let archiveAdminRound = 1
 let archivePendingExtraCount = 0
 let archiveExtraTextPositions = []
 let archiveDraftState = {}
+let randomChallengeAdminSection = "auction"
+let randomChallengeAdminRows = []
 
 const ARCHIVE_TEXT_START_POSITION = 5
 const ARCHIVE_MAX_TEXT_BOXES = 20
@@ -40,9 +42,10 @@ const ARCHIVE_MAX_TEXT_BOXES = 20
 const ALL_GAME_SEGMENTS = [
   { key: "warmup", title: "التسخين", sort: 1 },
   { key: "top10", title: "Top 10", sort: 2 },
-  { key: "auction", title: "فتبلة", sort: 3 },
-  { key: "who", title: "من هو", sort: 4 },
-  { key: "explain", title: "اشرح الكلمة", sort: 5 },
+  { key: "who", title: "من هو", sort: 3 },
+  { key: "explain", title: "اشرح الكلمة", sort: 4 },
+
+  { key: "letterli", title: "حرفلي", sort: 5 },
 
   { key: "finalRound1", title: "ٮدوں ٮڡاط", sort: 6 },
   { key: "finalRound2", title: "صح صحلي", sort: 7 },
@@ -646,32 +649,66 @@ async function toggleAdminSegmentVisibility(segmentKey, nextValue) {
 ========================= */
 
 function getAdminSettingLimit(segment) {
-
   if (segment === "auction") {
-  return { fallback: 8, min: 4, max: 8, allowed: [4, 6, 8] }
+  return {
+    fallback: 5,
+    min: 3,
+    max: 7,
+    allowed: [3, 5, 7]
+  }
 }
 
   if (segment === "who") {
-    return { fallback: 15, min: 10, max: 15, allowed: [10, 12, 15] }
+    return {
+      fallback: 15,
+      min: 10,
+      max: 15,
+      allowed: [10, 12, 15]
+    }
   }
 
   if (segment === "finalRound1") {
-    return { fallback: 6, min: 4, max: 8, allowed: [4, 6, 8] }
+    return {
+      fallback: 7,
+      min: 5,
+      max: 9,
+      allowed: [5, 7, 9]
+    }
   }
 
   if (segment === "explain") {
-    return { fallback: 4, min: 4, max: 8, allowed: [4, 6, 8] }
+    return {
+      fallback: 5,
+      min: 5,
+      max: 9,
+      allowed: [5, 7, 9]
+    }
   }
 
   if (segment === "finalRound3") {
-    return { fallback: 4, min: 4, max: 8, allowed: [4, 6, 8] }
+    return {
+      fallback: 5,
+      min: 5,
+      max: 9,
+      allowed: [5, 7, 9]
+    }
   }
 
   if (segment === "finalRound4") {
-    return { fallback: 4, min: 4, max: 8, allowed: [4, 6, 8] }
+    return {
+      fallback: 5,
+      min: 5,
+      max: 9,
+      allowed: [5, 7, 9]
+    }
   }
 
-  return { fallback: 4, min: 1, max: 8, allowed: [] }
+  return {
+    fallback: 4,
+    min: 1,
+    max: 8,
+    allowed: []
+  }
 }
 
 function normalizeAdminSegmentCount(segment, value) {
@@ -1182,6 +1219,7 @@ async function getAdminCompletionCounts() {
     auction: 0,
     who: 0,
     explain: 0,
+    letterli: 1,
 
     finalRound1: 0,
     finalRound2: 0,
@@ -1192,17 +1230,20 @@ async function getAdminCompletionCounts() {
     randomChallenge: 0,
 
     top10RoundsCount: 3,
-    auctionCount: 8,
+    auctionCount: 5,
     archiveRoundsCount: 4,
 
     whoCount: 15,
-    finalRound1CardsCount: 6,
-    explainCount: 4,
-    finalRound3Count: 4,
-    finalRound4Count: 4
+    finalRound1CardsCount: 7,
+    explainCount: 5,
+    finalRound3Count: 5,
+    finalRound4Count: 5
+    
   }
 
-  if (!currentModel) return result
+  if (!currentModel) {
+    return result
+  }
 
   const [
     qWarmup,
@@ -1227,185 +1268,459 @@ async function getAdminCompletionCounts() {
     finalRound3Setting,
     finalRound4Setting
   ] = await Promise.all([
-    db.from("questions")
-      .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel))
-      .eq("segment", "warmup"),
+    db
+      .from("questions")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "segment",
+        "warmup"
+      ),
 
-    db.from("top10_questions")
-      .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel)),
+    db
+      .from("top10_questions")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq(
+        "model",
+        Number(currentModel)
+      ),
 
-    db.from("auction_questions")
-      .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel)),
+    db
+      .from("auction_questions")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq(
+        "model",
+        Number(currentModel)
+      ),
 
-    db.from("who_images")
-      .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel)),
+    db
+      .from("who_images")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq(
+        "model",
+        Number(currentModel)
+      ),
 
-    db.from("explain_words")
-      .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel)),
+    db
+      .from("explain_words")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq(
+        "model",
+        Number(currentModel)
+      ),
 
-    db.from("final_round1_items")
-      .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel))
+    db
+      .from("final_round1_items")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq(
+        "model",
+        Number(currentModel)
+      )
       .gte("number", 1)
-      .lte("number", 8),
+      .lte("number", 9),
 
-    db.from("final_round2_items")
-  .select("id", { count: "exact", head: true })
-  .eq("model", Number(currentModel))
-  .in("number", [1, 2, 4, 5]),
+    db
+      .from("final_round2_items")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .in(
+        "number",
+        [1, 2, 4, 5]
+      ),
 
-    db.from("final_round3_items")
-       .select("id", { count: "exact", head: true })
-       .eq("model", Number(currentModel))
-       .in("number", [101, 102]),
+    db
+      .from("final_round3_items")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .in(
+        "number",
+        [101, 102]
+      ),
 
-    db.from("final_round1_items")
-      .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel))
+    db
+      .from("final_round1_items")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq(
+        "model",
+        Number(currentModel)
+      )
       .gte("number", 201)
-      .lte("number", 208),
+      .lte("number", 209),
 
-    db.from("final_round3_items")
-      .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel))
+    db
+      .from("final_round3_items")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq(
+        "model",
+        Number(currentModel)
+      )
       .gte("number", 1)
-      .lte("number", 8)
+      .lte("number", 9)
       .eq("image_order", 1),
 
-    db.from("archive_boxes")
-      .select("id", { count: "exact", head: true })
-      .eq("model", Number(currentModel)),
+    db
+      .from("archive_boxes")
+      .select("id", {
+        count: "exact",
+        head: true
+      })
+      .eq(
+        "model",
+        Number(currentModel)
+      ),
 
-    db.from("segment_settings")
+    db
+      .from("segment_settings")
       .select("item_count")
-      .eq("model", Number(currentModel))
-      .eq("segment", "top10")
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "segment",
+        "top10"
+      )
       .maybeSingle(),
 
-    db.from("segment_settings")
+    db
+      .from("segment_settings")
       .select("item_count")
-      .eq("model", Number(currentModel))
-      .eq("segment", "auction")
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "segment",
+        "auction"
+      )
       .maybeSingle(),
 
-    db.from("segment_settings")
+    db
+      .from("segment_settings")
       .select("item_count")
-      .eq("model", Number(currentModel))
-      .eq("segment", "archive")
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "segment",
+        "archive"
+      )
       .maybeSingle(),
 
-    db.from("segment_settings")
+    db
+      .from("segment_settings")
       .select("item_count")
-      .eq("model", Number(currentModel))
-      .eq("segment", "who")
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "segment",
+        "who"
+      )
       .maybeSingle(),
 
-    db.from("segment_settings")
+    db
+      .from("segment_settings")
       .select("item_count")
-      .eq("model", Number(currentModel))
-      .eq("segment", "finalRound1")
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "segment",
+        "finalRound1"
+      )
       .maybeSingle(),
 
-    db.from("segment_settings")
+    db
+      .from("segment_settings")
       .select("item_count")
-      .eq("model", Number(currentModel))
-      .eq("segment", "explain")
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "segment",
+        "explain"
+      )
       .maybeSingle(),
 
-    db.from("segment_settings")
+    db
+      .from("segment_settings")
       .select("item_count")
-      .eq("model", Number(currentModel))
-      .eq("segment", "finalRound3")
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "segment",
+        "finalRound3"
+      )
       .maybeSingle(),
 
-    db.from("segment_settings")
+    db
+      .from("segment_settings")
       .select("item_count")
-      .eq("model", Number(currentModel))
-      .eq("segment", "finalRound4")
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "segment",
+        "finalRound4"
+      )
       .maybeSingle()
   ])
 
-  result.warmup = qWarmup.count || 0
-  result.top10 = qTop10.count || 0
-  result.auction = qAuction.count || 0
-  result.who = qWho.count || 0
-  result.explain = qExplain.count || 0
+  result.warmup =
+    qWarmup.count || 0
 
-  result.finalRound1 = qFinalRound1.count || 0
-  result.finalRound2 = (qFinalRound2.count || 0) + (qFinalRound2Images.count || 0)
-  result.finalRound3 = qFinalRound3Story.count || 0
-  result.finalRound4 = qFinalRound4Focus.count || 0
+  result.top10 =
+    qTop10.count || 0
 
-  result.archive = qArchive.count || 0
+  result.auction =
+    qAuction.count || 0
 
-  result.top10RoundsCount = Math.min(Math.max(Number(top10Setting.data?.item_count || 3), 1), 4)
-  result.auctionCount = normalizeAdminSegmentCount("auction", auctionSetting.data?.item_count || 8)
-  result.archiveRoundsCount = Math.min(Math.max(Number(archiveSetting.data?.item_count || 4), 1), 4)
+  result.who =
+    qWho.count || 0
 
-  result.whoCount = normalizeAdminSegmentCount("who", whoSetting.data?.item_count || 15)
-  result.finalRound1CardsCount = normalizeAdminSegmentCount("finalRound1", finalRound1Setting.data?.item_count || 6)
-  result.explainCount = normalizeAdminSegmentCount("explain", explainSetting.data?.item_count || 4)
-  result.finalRound3Count = normalizeAdminSegmentCount("finalRound3", finalRound3Setting.data?.item_count || 4)
-  result.finalRound4Count = normalizeAdminSegmentCount("finalRound4", finalRound4Setting.data?.item_count || 4)
+  result.explain =
+    qExplain.count || 0
+
+  result.finalRound1 =
+    qFinalRound1.count || 0
+
+  result.finalRound2 =
+    Number(
+      qFinalRound2.count || 0
+    ) +
+    Number(
+      qFinalRound2Images.count || 0
+    )
+
+  result.finalRound3 =
+    qFinalRound3Story.count || 0
+
+  result.finalRound4 =
+    qFinalRound4Focus.count || 0
+
+  result.archive =
+    qArchive.count || 0
+
+  result.top10RoundsCount =
+    Math.min(
+      Math.max(
+        Number(
+          top10Setting.data
+            ?.item_count || 3
+        ),
+        1
+      ),
+      4
+    )
+
+  result.auctionCount =
+  normalizeAdminSegmentCount(
+    "auction",
+    auctionSetting.data
+      ?.item_count || 5
+  )
+
+  result.archiveRoundsCount =
+    Math.min(
+      Math.max(
+        Number(
+          archiveSetting.data
+            ?.item_count || 4
+        ),
+        1
+      ),
+      4
+    )
+
+  result.whoCount =
+    normalizeAdminSegmentCount(
+      "who",
+      whoSetting.data
+        ?.item_count || 15
+    )
+
+  result.finalRound1CardsCount =
+    normalizeAdminSegmentCount(
+      "finalRound1",
+      finalRound1Setting.data
+        ?.item_count || 7
+    )
+
+  result.explainCount =
+    normalizeAdminSegmentCount(
+      "explain",
+      explainSetting.data
+        ?.item_count || 5
+    )
+
+  result.finalRound3Count =
+    normalizeAdminSegmentCount(
+      "finalRound3",
+      finalRound3Setting.data
+        ?.item_count || 5
+    )
+
+  result.finalRound4Count =
+    normalizeAdminSegmentCount(
+      "finalRound4",
+      finalRound4Setting.data
+        ?.item_count || 5
+    )
 
   return result
 }
 
 function isSegmentDone(key, count, counts = {}) {
-  if (key === "warmup") return count >= 12
+  if (key === "warmup") {
+    return count >= 12
+  }
 
   if (key === "top10") {
-    const rounds = Math.min(Math.max(Number(counts.top10RoundsCount || 3), 1), 4)
+    const rounds = Math.min(
+      Math.max(
+        Number(
+          counts.top10RoundsCount || 3
+        ),
+        1
+      ),
+      4
+    )
+
     return count >= rounds * 10
   }
 
   if (key === "auction") {
-    const total = normalizeAdminSegmentCount("auction", counts.auctionCount || 8)
-    return count >= total
-  }
+  const total =
+    normalizeAdminSegmentCount(
+      "auction",
+      counts.auctionCount || 5
+    )
+
+  return count >= total
+}
+
+if (key === "letterli") {
+  return true
+}
 
   if (key === "who") {
-    const total = normalizeAdminSegmentCount("who", counts.whoCount || 15)
+    const total =
+      normalizeAdminSegmentCount(
+        "who",
+        counts.whoCount || 15
+      )
+
     return count >= total
   }
 
   if (key === "explain") {
-    const total = normalizeAdminSegmentCount("explain", counts.explainCount || 4)
+    const total =
+      normalizeAdminSegmentCount(
+        "explain",
+        counts.explainCount || 5
+      )
+
     return count >= total
   }
 
   if (key === "finalRound1") {
-    const total = normalizeAdminSegmentCount("finalRound1", counts.finalRound1CardsCount || 6)
+    const total =
+      normalizeAdminSegmentCount(
+        "finalRound1",
+        counts.finalRound1CardsCount || 7
+      )
+
     return count >= total
   }
 
   if (key === "finalRound2") {
-  return count >= 34
-}
+    return count >= 34
+  }
 
   if (key === "finalRound3") {
-    const total = normalizeAdminSegmentCount("finalRound3", counts.finalRound3Count || 4)
+    const total =
+      normalizeAdminSegmentCount(
+        "finalRound3",
+        counts.finalRound3Count || 5
+      )
+
     return count >= total
   }
 
   if (key === "finalRound4") {
-    const total = normalizeAdminSegmentCount("finalRound4", counts.finalRound4Count || 4)
+    const total =
+      normalizeAdminSegmentCount(
+        "finalRound4",
+        counts.finalRound4Count || 5
+      )
+
     return count >= total
   }
 
   if (key === "archive") {
-    const rounds = Math.min(Math.max(Number(counts.archiveRoundsCount || 4), 1), 4)
+    const rounds = Math.min(
+      Math.max(
+        Number(
+          counts.archiveRoundsCount || 4
+        ),
+        1
+      ),
+      4
+    )
+
     return count >= rounds
   }
 
   if (key === "randomChallenge") {
-  return true
-}
+    return true
+  }
 
   return false
 }
@@ -1434,75 +1749,186 @@ async function renderAdminHome() {
 
   await renderAdminTabsUnified()
 
-  const counts = await getAdminCompletionCounts()
-  const visibility = await loadGlobalSegmentVisibilityMap()
- const visibleSegments = getVisibleAdminSegments(visibility)
+  const counts =
+    await getAdminCompletionCounts()
 
-  const readyCount = visibleSegments.filter(segment => {
-    const done = Number(counts[segment.key] || 0)
-    return isSegmentDone(segment.key, done, counts)
-  }).length
+  const visibility =
+    await loadGlobalSegmentVisibilityMap()
 
-  const enabledCount = visibleSegments.length
+  const visibleSegments =
+    getVisibleAdminSegments(visibility)
+      .sort((a, b) => {
+        return Number(a.sort || 0) -
+          Number(b.sort || 0)
+      })
 
-  const cards = visibleSegments.map(segment => {
-    const key = segment.key
-    const title = segment.title || getAdminSegmentTitle(key)
-    const done = Number(counts[key] || 0)
-    const total = getAdminSegmentRequiredCount(key, counts)
-    const isDone = isSegmentDone(key, done, counts)
-    const isEnabled = visibility[key] !== false
-    const isComingSoon = key === "randomChallenge"
+  const readyCount =
+    visibleSegments.filter(segment => {
+      const done =
+        Number(
+          counts[segment.key] || 0
+        )
 
-    return `
-      <div class="adminHomeSegmentCard ${isDone ? "isDone" : ""} ${!isEnabled ? "isDisabled" : ""}">
-        <button
-          type="button"
-          class="adminHomeSegmentMain"
-          ${isComingSoon ? "disabled" : `onclick="openAdminSegment('${key}')"` }
-        >
-          <div class="adminHomeSegmentTop">
-  <div>
-    <div class="adminHomeSegmentTitle">${escapeHtml(title)}</div>
-  </div>
+      return isSegmentDone(
+        segment.key,
+        done,
+        counts
+      )
+    }).length
 
-  <span class="adminHomeSegmentStatus ${isDone ? "ready" : "missing"}">
-    ${isComingSoon ? "" : isDone ? "جاهزة" : "ناقصة"}
-  </span>
-</div>
+  const enabledCount =
+    visibleSegments.length
 
-          <div class="adminHomeProgress">
-            <div class="adminHomeProgressInfo">
-              <strong>${total > 0 ? `${done}/${total}` : done}</strong>
-            </div>
+  const cards =
+    visibleSegments
+      .map(segment => {
+        const key =
+          segment.key
 
-            <div class="adminHomeProgressBar">
-              <span style="width:${total > 0 ? Math.min((done / total) * 100, 100) : 0}%"></span>
-            </div>
+        const title =
+          segment.title ||
+          getAdminSegmentTitle(key)
+
+        const rawDone =
+          Number(
+            counts[key] || 0
+          )
+
+        const total =
+          getAdminSegmentRequiredCount(
+            key,
+            counts
+          )
+
+        const done =
+          total > 0
+            ? Math.min(rawDone, total)
+            : rawDone
+
+        const isRandomChallenge =
+          key === "randomChallenge"
+
+        const isDone =
+          isRandomChallenge
+            ? true
+            : isSegmentDone(
+                key,
+                done,
+                counts
+              )
+
+        const isEnabled =
+          visibility[key] !== false
+
+        const progressText =
+          isRandomChallenge
+            ? "إدارة المحتوى"
+            : total > 0
+              ? `${done}/${total}`
+              : String(done)
+
+        const progressWidth =
+          isRandomChallenge
+            ? 100
+            : total > 0
+              ? Math.min(
+                  (done / total) * 100,
+                  100
+                )
+              : 0
+
+        const openAction =
+          isRandomChallenge
+            ? "openAdminRandomChallenge()"
+            : `openAdminSegment('${key}')`
+
+        return `
+          <div
+            class="
+              adminHomeSegmentCard
+              ${isDone ? "isDone" : ""}
+              ${!isEnabled ? "isDisabled" : ""}
+            "
+            data-segment="${escapeHtml(key)}"
+          >
+            <button
+              type="button"
+              class="adminHomeSegmentMain"
+              onclick="${openAction}"
+            >
+              <div class="adminHomeSegmentTop">
+
+                <div class="adminHomeSegmentTitleBox">
+                  <div class="adminHomeSegmentTitle">
+                    ${escapeHtml(title)}
+                  </div>
+                </div>
+
+                <span
+                  class="
+                    adminHomeSegmentStatus
+                    ${isDone ? "ready" : "missing"}
+                  "
+                >
+                  ${isDone ? "جاهزة" : "ناقصة"}
+                </span>
+
+              </div>
+
+              <div class="adminHomeProgress">
+
+                <div class="adminHomeProgressInfo">
+                  <strong>
+                    ${escapeHtml(progressText)}
+                  </strong>
+                </div>
+
+                <div class="adminHomeProgressBar">
+                  <span
+                    style="width:${progressWidth}%"
+                  ></span>
+                </div>
+
+              </div>
+            </button>
           </div>
-        </button>
-      </div>
-    `
-  }).join("")
+        `
+      })
+      .join("")
 
   area.innerHTML = `
     <div class="adminHomePro adminHomeClean">
 
       <section class="adminHomeStats adminHomeStatsClean">
+
         <div class="adminHomeStatCard">
           <span>الفقرات الجاهزة</span>
-          <strong>${readyCount}/${visibleSegments.length}</strong>
+
+          <strong>
+            ${readyCount}/${visibleSegments.length}
+          </strong>
         </div>
 
         <div class="adminHomeStatCard">
           <span>الفقرات الظاهرة</span>
-          <strong>${enabledCount}/${ALL_GAME_SEGMENTS.length}</strong>
+
+          <strong>
+            ${enabledCount}/${ALL_GAME_SEGMENTS.length}
+          </strong>
         </div>
 
         <div class="adminHomeStatCard">
           <span>حالة النموذج</span>
-          <strong>${readyCount === visibleSegments.length ? "مكتمل" : "قيد التحرير"}</strong>
+
+          <strong>
+            ${
+              readyCount === visibleSegments.length
+                ? "مكتمل"
+                : "قيد التحرير"
+            }
+          </strong>
         </div>
+
       </section>
 
       <section class="adminHomeSection adminHomeSectionClean">
@@ -1515,167 +1941,254 @@ async function renderAdminHome() {
   `
 }
 
-function getAdminSegmentRequiredCount(key, counts = {}) {
-  if (key === "warmup") return 12
+function getAdminSegmentRequiredCount(
+  key,
+  counts = {}
+) {
+  if (key === "warmup") {
+    return 12
+  }
 
   if (key === "top10") {
-    const rounds = Math.min(Math.max(Number(counts.top10RoundsCount || 3), 1), 4)
+    const rounds = Math.min(
+      Math.max(
+        Number(
+          counts.top10RoundsCount || 3
+        ),
+        1
+      ),
+      4
+    )
+
     return rounds * 10
   }
 
   if (key === "auction") {
-    return normalizeAdminSegmentCount("auction", counts.auctionCount || 8)
-  }
+  return normalizeAdminSegmentCount(
+    "auction",
+    counts.auctionCount || 5
+  )
+}
 
   if (key === "who") {
-    return normalizeAdminSegmentCount("who", counts.whoCount || 15)
+    return normalizeAdminSegmentCount(
+      "who",
+      counts.whoCount || 15
+    )
   }
 
   if (key === "explain") {
-    return normalizeAdminSegmentCount("explain", counts.explainCount || 4)
+    return normalizeAdminSegmentCount(
+      "explain",
+      counts.explainCount || 5
+    )
   }
+
+  if (key === "letterli") {
+  return 1
+}
 
   if (key === "finalRound1") {
-    return normalizeAdminSegmentCount("finalRound1", counts.finalRound1CardsCount || 6)
+    return normalizeAdminSegmentCount(
+      "finalRound1",
+      counts.finalRound1CardsCount || 7
+    )
   }
 
-  if (key === "finalRound2") return 34
+  if (key === "finalRound2") {
+    return 34
+  }
 
   if (key === "finalRound3") {
-    return normalizeAdminSegmentCount("finalRound3", counts.finalRound3Count || 4)
+    return normalizeAdminSegmentCount(
+      "finalRound3",
+      counts.finalRound3Count || 5
+    )
   }
 
   if (key === "finalRound4") {
-    return normalizeAdminSegmentCount("finalRound4", counts.finalRound4Count || 4)
+    return normalizeAdminSegmentCount(
+      "finalRound4",
+      counts.finalRound4Count || 5
+    )
   }
 
   if (key === "archive") {
-    return Math.min(Math.max(Number(counts.archiveRoundsCount || 4), 1), 4)
+    return Math.min(
+      Math.max(
+        Number(
+          counts.archiveRoundsCount || 4
+        ),
+        1
+      ),
+      4
+    )
   }
 
-  if (key === "randomChallenge") return 1
+  if (key === "randomChallenge") {
+    return 1
+  }
 
   return 0
 }
 
+function normalizeRandomChallengeAuctionCount(value) {
+  const count = Number(value || 5)
 
-async function openAdminSegmentSettings() {
-  if (!currentModel) {
-    showGameToast("افتح نموذج أولاً")
-    return
-  }
+  if (count === 3) return 3
+  if (count === 7) return 7
 
-  currentAdminSegment = "settings"
-  renderAdminSettingsActions()
-  await renderAdminTabsUnified()
-
-  const counts = await getAdminCompletionCounts()
-  const visibility = await loadGlobalSegmentVisibilityMap()
-
-  const settings = [
-    {
-      key: "top10",
-      title: "Top 10",
-      desc: "عدد الجولات",
-      inputId: "settingsTop10Rounds",
-      value: Math.min(Math.max(Number(counts.top10RoundsCount || 3), 1), 4),
-      options: [1, 2, 3, 4]
-    },
-    {
-  key: "auction",
-  title: "فتبلة",
-  desc: "عدد الأرقام",
-  inputId: "settingsAuctionCount",
-  value: normalizeAdminSegmentCount("auction", counts.auctionCount || 8),
-  options: [4, 6, 8]
-},
-    {
-      key: "who",
-      title: "من هو",
-      desc: "عدد الأرقام",
-      inputId: "settingsWhoCount",
-      value: normalizeAdminSegmentCount("who", counts.whoCount || 15),
-      options: [10, 12, 15]
-    },
-    {
-      key: "explain",
-      title: "اشرح الكلمة",
-      desc: "عدد الكلمات",
-      inputId: "settingsExplainCount",
-      value: normalizeAdminSegmentCount("explain", counts.explainCount || 4),
-      options: [4, 6, 8]
-    },
-    {
-      key: "finalRound1",
-      title: "ٮدوں ٮڡاط",
-      desc: "عدد الأرقام",
-      inputId: "settingsFinalRound1Count",
-      value: normalizeAdminSegmentCount("finalRound1", counts.finalRound1CardsCount || 6),
-      options: [4, 6, 8]
-    },
-    {
-      key: "finalRound3",
-      title: "قصة",
-      desc: "عدد الأرقام",
-      inputId: "settingsFinalRound3Count",
-      value: normalizeAdminSegmentCount("finalRound3", counts.finalRound3Count || 4),
-      options: [4, 6, 8]
-    },
-    {
-      key: "finalRound4",
-      title: "التركيز",
-      desc: "عدد الأرقام",
-      inputId: "settingsFinalRound4Count",
-      value: normalizeAdminSegmentCount("finalRound4", counts.finalRound4Count || 4),
-      options: [4, 6, 8]
-    },
-    {
-      key: "archive",
-      title: "الأرشيف",
-      desc: "عدد الجولات",
-      inputId: "settingsArchiveRounds",
-      value: Math.min(Math.max(Number(counts.archiveRoundsCount || 4), 1), 4),
-      options: [1, 2, 3, 4]
-    }
-  ]
-
-  const visibleSettings = settings.filter(item => {
-  return isAdminSegmentGloballyEnabled(item.key, visibility)
-})
-
-editor().innerHTML = `
-  <div class="adminSettingsGamePage">
-    <div class="adminSettingsGameGrid">
-      ${visibleSettings.map(item => buildAdminSettingCardPro(item)).join("")}
-    </div>
-  </div>
-`
+  return 5
 }
 
-function buildAdminSettingCardPro({ key, title, desc, inputId, value, options }) {
+function getAdminToggleValue(id, fallback = true) {
+  const input = document.getElementById(id)
+
+  if (!input) {
+    return fallback ? 1 : 0
+  }
+
+  return input.value === "1" ? 1 : 0
+}
+
+function buildAdminToggleSettingCard({
+  key,
+  title,
+  desc,
+  inputId,
+  enabled
+}) {
+  const isEnabled = enabled !== false
+
+  return `
+    <div class="adminSettingGameCard adminToggleSettingCard ${isEnabled ? "isEnabled" : "isDisabled"}">
+      <div class="adminSettingGameHead">
+        <div class="adminSettingGameTitleBox">
+          <h3>
+            ${escapeHtml(title)}
+            <span>${escapeHtml(desc)}</span>
+          </h3>
+        </div>
+
+        <button
+          type="button"
+          class="adminSettingToggleBtn ${isEnabled ? "active" : ""}"
+          onclick="toggleAdminChallengeSetting('${escapeHtml(inputId)}', this)"
+        >
+          ${isEnabled ? "مفعّل" : "معطّل"}
+        </button>
+      </div>
+
+      <input
+        type="hidden"
+        id="${escapeHtml(inputId)}"
+        value="${isEnabled ? "1" : "0"}"
+        data-segment="${escapeHtml(key)}"
+      >
+    </div>
+  `
+}
+
+function toggleAdminChallengeSetting(
+  inputId,
+  button
+) {
+  const input =
+    document.getElementById(inputId)
+
+  if (!input || !button) return
+
+  const enabled =
+    input.value !== "1"
+
+  input.value =
+    enabled ? "1" : "0"
+
+  button.classList.toggle(
+    "active",
+    enabled
+  )
+
+  button.innerText =
+    enabled ? "مفعّل" : "معطّل"
+
+  const card =
+    button.closest(
+      ".adminToggleSettingCard"
+    )
+
+  if (card) {
+    card.classList.toggle(
+      "isEnabled",
+      enabled
+    )
+
+    card.classList.toggle(
+      "isDisabled",
+      !enabled
+    )
+  }
+
+  if (
+    inputId ===
+    "settingsRandomAuctionEnabled"
+  ) {
+    const auctionCard =
+      document.getElementById(
+        "randomChallengeAuctionCard"
+      )
+
+    auctionCard
+      ?.querySelectorAll(
+        ".adminSettingGameOption"
+      )
+      .forEach(option => {
+        option.disabled = !enabled
+      })
+  }
+}
+
+function buildAdminSettingCardPro({
+  key,
+  title,
+  desc,
+  inputId,
+  value,
+  options
+}) {
   return `
     <div class="adminSettingGameCard">
       <div class="adminSettingGameHead">
+
         <div class="adminSettingGameTitleBox">
-  <h3>
-    ${escapeHtml(title)}
-    <span>${escapeHtml(desc)}</span>
-  </h3>
-</div>
+          <h3>
+            ${escapeHtml(title)}
+            <span>${escapeHtml(desc)}</span>
+          </h3>
+        </div>
 
         <div class="adminSettingGameSelected">
           <strong>${escapeHtml(String(value))}</strong>
         </div>
+
       </div>
 
       <div class="adminSettingGameOptions">
         ${options.map(option => `
           <button
             type="button"
-            class="adminSettingGameOption ${Number(value) === Number(option) ? "selected" : ""}"
-            onclick="selectAdminSettingOption('${escapeHtml(inputId)}', ${Number(option)}, this)"
+            class="adminSettingGameOption ${
+              Number(value) === Number(option)
+                ? "selected"
+                : ""
+            }"
+            onclick="selectAdminSettingOption(
+              '${escapeHtml(inputId)}',
+              ${Number(option)},
+              this
+            )"
           >
-            ${option}
+            ${Number(option)}
           </button>
         `).join("")}
       </div>
@@ -1689,6 +2202,339 @@ function buildAdminSettingCardPro({ key, title, desc, inputId, value, options })
     </div>
   `
 }
+
+async function openAdminSegmentSettings() {
+  if (!currentModel) {
+    showGameToast("افتح نموذج أولاً")
+    return
+  }
+
+  currentAdminSegment = "settings"
+  renderAdminSettingsActions()
+
+  await renderAdminTabsUnified()
+
+  const [
+    counts,
+    visibility,
+    challengeSettingsRes
+  ] = await Promise.all([
+    getAdminCompletionCounts(),
+
+    loadGlobalSegmentVisibilityMap(),
+
+    db
+      .from("segment_settings")
+      .select("segment,item_count")
+      .eq("model", Number(currentModel))
+      .in("segment", [
+        "randomChallengeBox1",
+        "randomChallengeBox2",
+        "randomChallengeBox3",
+        "randomChallengeBox4",
+        "randomChallengeAuction"
+      ])
+  ])
+
+  if (challengeSettingsRes.error) {
+    console.log(
+      "LOAD RANDOM CHALLENGE SETTINGS ERROR:",
+      challengeSettingsRes.error
+    )
+  }
+
+  const challengeMap = {}
+
+  ;(challengeSettingsRes.data || []).forEach(row => {
+    challengeMap[row.segment] =
+      Number(row.item_count || 0)
+  })
+
+  const challengeSettings = {
+    box1:
+      challengeMap.randomChallengeBox1 !== 0,
+
+    box2:
+      challengeMap.randomChallengeBox2 !== 0,
+
+    box3:
+      challengeMap.randomChallengeBox3 !== 0,
+
+    box4:
+      challengeMap.randomChallengeBox4 !== 0,
+
+    auction:
+      challengeMap.randomChallengeAuction !== 0
+  }
+
+  const settings = [
+    {
+      key: "top10",
+      title: "Top 10",
+      desc: "عدد الجولات",
+      inputId: "settingsTop10Rounds",
+      value: Math.min(
+        Math.max(
+          Number(
+            counts.top10RoundsCount || 3
+          ),
+          1
+        ),
+        4
+      ),
+      options: [1, 2, 3, 4]
+    },
+
+    {
+      key: "who",
+      title: "من هو",
+      desc: "عدد الأرقام",
+      inputId: "settingsWhoCount",
+      value: normalizeAdminSegmentCount(
+        "who",
+        counts.whoCount || 15
+      ),
+      options: [10, 12, 15]
+    },
+
+    {
+      key: "explain",
+      title: "اشرح الكلمة",
+      desc: "عدد الكلمات",
+      inputId: "settingsExplainCount",
+      value: normalizeAdminSegmentCount(
+        "explain",
+        counts.explainCount || 5
+      ),
+      options: [5, 7, 9]
+    },
+
+    {
+      key: "finalRound1",
+      title: "ٮدوں ٮڡاط",
+      desc: "عدد الأرقام",
+      inputId: "settingsFinalRound1Count",
+      value: normalizeAdminSegmentCount(
+        "finalRound1",
+        counts.finalRound1CardsCount || 7
+      ),
+      options: [5, 7, 9]
+    },
+
+    {
+      key: "finalRound3",
+      title: "قصة",
+      desc: "عدد الأرقام",
+      inputId: "settingsFinalRound3Count",
+      value: normalizeAdminSegmentCount(
+        "finalRound3",
+        counts.finalRound3Count || 5
+      ),
+      options: [5, 7, 9]
+    },
+
+    {
+      key: "finalRound4",
+      title: "التركيز",
+      desc: "عدد الأرقام",
+      inputId: "settingsFinalRound4Count",
+      value: normalizeAdminSegmentCount(
+        "finalRound4",
+        counts.finalRound4Count || 5
+      ),
+      options: [5, 7, 9]
+    },
+
+    {
+      key: "archive",
+      title: "الأرشيف",
+      desc: "عدد الجولات",
+      inputId: "settingsArchiveRounds",
+      value: Math.min(
+        Math.max(
+          Number(
+            counts.archiveRoundsCount || 4
+          ),
+          1
+        ),
+        4
+      ),
+      options: [1, 2, 3, 4]
+    }
+  ]
+
+  const visibleSettings =
+    settings.filter(item => {
+      return isAdminSegmentGloballyEnabled(
+        item.key,
+        visibility
+      )
+    })
+
+  const auctionCount =
+    normalizeRandomChallengeAuctionCount(
+      counts.auctionCount || 5
+    )
+
+editor().innerHTML = `
+  <div class="adminSettingsGamePage">
+
+    <div class="adminSettingsGameGrid">
+      ${visibleSettings
+        .map(item =>
+          buildAdminSettingCardPro(item)
+        )
+        .join("")}
+    </div>
+
+    <section class="adminChallengeSettingsSection">
+
+      <div class="adminChallengeSettingsHead">
+        <div>
+          <h2>إعدادات فقرة التحدي</h2>
+          <span>فعّل المربعات التي تريد ظهورها داخل الفقرة</span>
+        </div>
+      </div>
+
+      <div class="adminChallengeSettingsGrid">
+
+        ${buildAdminToggleSettingCard({
+          key: "randomChallengeBox1",
+          title: "اللاعب المشترك",
+          desc: "إظهار أو إخفاء المربع",
+          inputId: "settingsRandomBox1Enabled",
+          enabled: challengeSettings.box1
+        })}
+
+        ${buildAdminToggleSettingCard({
+          key: "randomChallengeBox2",
+          title: "المزاد",
+          desc: "إظهار أو إخفاء المربع",
+          inputId: "settingsRandomBox2Enabled",
+          enabled: challengeSettings.box2
+        })}
+
+        ${buildAdminToggleSettingCard({
+          key: "randomChallengeBox3",
+          title: "ماذا تعرف",
+          desc: "إظهار أو إخفاء المربع",
+          inputId: "settingsRandomBox3Enabled",
+          enabled: challengeSettings.box3
+        })}
+
+        ${buildAdminToggleSettingCard({
+          key: "randomChallengeBox4",
+          title: "المربع الرابع",
+          desc: "إظهار أو إخفاء المربع",
+          inputId: "settingsRandomBox4Enabled",
+          enabled: challengeSettings.box4
+        })}
+
+        <div
+          id="randomChallengeAuctionCard"
+          class="
+            adminSettingGameCard
+            adminToggleSettingCard
+            adminChallengeAuctionCard
+            ${
+              challengeSettings.auction
+                ? "isEnabled"
+                : "isDisabled"
+            }
+          "
+        >
+
+          <div class="adminSettingGameHead">
+
+            <div class="adminSettingGameTitleBox">
+              <h3>
+                فتبلة
+                <span>تفعيل المربع وتحديد عدد الأرقام</span>
+              </h3>
+            </div>
+
+            <button
+              type="button"
+              class="adminSettingToggleBtn ${
+                challengeSettings.auction
+                  ? "active"
+                  : ""
+              }"
+              onclick="toggleAdminChallengeSetting(
+                'settingsRandomAuctionEnabled',
+                this
+              )"
+            >
+              ${
+                challengeSettings.auction
+                  ? "مفعّل"
+                  : "معطّل"
+              }
+            </button>
+
+          </div>
+
+          <div class="adminChallengeAuctionCount">
+
+            <div class="adminChallengeAuctionCountTitle">
+              عدد الأرقام
+            </div>
+
+            <div class="adminSettingGameOptions adminChallengeAuctionOptions">
+              ${[3, 5, 7].map(option => `
+                <button
+                  type="button"
+                  class="adminSettingGameOption ${
+                    auctionCount === option
+                      ? "selected"
+                      : ""
+                  }"
+                  onclick="selectAdminSettingOption(
+                    'settingsAuctionCount',
+                    ${option},
+                    this
+                  )"
+                  ${
+                    challengeSettings.auction
+                      ? ""
+                      : "disabled"
+                  }
+                >
+                  ${option}
+                </button>
+              `).join("")}
+            </div>
+
+          </div>
+
+          <input
+            type="hidden"
+            id="settingsRandomAuctionEnabled"
+            value="${
+              challengeSettings.auction
+                ? "1"
+                : "0"
+            }"
+            data-segment="randomChallengeAuction"
+          >
+
+          <input
+            type="hidden"
+            id="settingsAuctionCount"
+            value="${auctionCount}"
+            data-segment="auction"
+          >
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+`
+}
+
 
 function selectAdminSettingOption(inputId, value, btn) {
   const input = document.getElementById(inputId)
@@ -1712,83 +2558,304 @@ async function saveAdminSegmentSettingsPage() {
   if (isAdminSaving()) return false
 
   if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
+    showGameToast(
+      "افتح النموذج أولاً"
+    )
+
     return false
   }
 
   try {
-    setAdminSaving(true, "جارٍ حفظ الإعدادات...")
+    setAdminSaving(
+      true,
+      "جارٍ حفظ الإعدادات..."
+    )
 
     const rows = [
       {
-        model: Number(currentModel),
-        segment: "top10",
-        item_count: Math.min(Math.max(Number(document.getElementById("settingsTop10Rounds")?.value || 3), 1), 4)
+        model:
+          Number(currentModel),
+
+        segment:
+          "top10",
+
+        item_count:
+          Math.min(
+            Math.max(
+              Number(
+                document
+                  .getElementById(
+                    "settingsTop10Rounds"
+                  )
+                  ?.value || 3
+              ),
+              1
+            ),
+            4
+          )
       },
+
       {
   model: Number(currentModel),
   segment: "auction",
-  item_count: normalizeAdminSegmentCount("auction", document.getElementById("settingsAuctionCount")?.value || 8)
+  item_count:
+    normalizeRandomChallengeAuctionCount(
+      document.getElementById(
+        "settingsAuctionCount"
+      )?.value || 5
+    )
 },
+
+{
+  model: Number(currentModel),
+  segment: "randomChallengeBox1",
+  item_count:
+    getAdminToggleValue(
+      "settingsRandomBox1Enabled"
+    )
+},
+
+{
+  model: Number(currentModel),
+  segment: "randomChallengeBox2",
+  item_count:
+    getAdminToggleValue(
+      "settingsRandomBox2Enabled"
+    )
+},
+
+{
+  model: Number(currentModel),
+  segment: "randomChallengeBox3",
+  item_count:
+    getAdminToggleValue(
+      "settingsRandomBox3Enabled"
+    )
+},
+
+{
+  model: Number(currentModel),
+  segment: "randomChallengeBox4",
+  item_count:
+    getAdminToggleValue(
+      "settingsRandomBox4Enabled"
+    )
+},
+
+{
+  model: Number(currentModel),
+  segment: "randomChallengeAuction",
+  item_count:
+    getAdminToggleValue(
+      "settingsRandomAuctionEnabled"
+    )
+},
+
       {
-        model: Number(currentModel),
-        segment: "who",
-        item_count: normalizeAdminSegmentCount("who", document.getElementById("settingsWhoCount")?.value || 15)
+        model:
+          Number(currentModel),
+
+        segment:
+          "who",
+
+        item_count:
+          normalizeAdminSegmentCount(
+            "who",
+            document
+              .getElementById(
+                "settingsWhoCount"
+              )
+              ?.value || 15
+          )
       },
+
       {
-        model: Number(currentModel),
-        segment: "explain",
-        item_count: normalizeAdminSegmentCount("explain", document.getElementById("settingsExplainCount")?.value || 4)
+        model:
+          Number(currentModel),
+
+        segment:
+          "explain",
+
+        item_count:
+          normalizeAdminSegmentCount(
+            "explain",
+            document
+              .getElementById(
+                "settingsExplainCount"
+              )
+              ?.value || 5
+          )
       },
+
       {
-        model: Number(currentModel),
-        segment: "finalRound1",
-        item_count: normalizeAdminSegmentCount("finalRound1", document.getElementById("settingsFinalRound1Count")?.value || 6)
+        model:
+          Number(currentModel),
+
+        segment:
+          "finalRound1",
+
+        item_count:
+          normalizeAdminSegmentCount(
+            "finalRound1",
+            document
+              .getElementById(
+                "settingsFinalRound1Count"
+              )
+              ?.value || 7
+          )
       },
+
       {
-        model: Number(currentModel),
-        segment: "finalRound3",
-        item_count: normalizeAdminSegmentCount("finalRound3", document.getElementById("settingsFinalRound3Count")?.value || 4)
+        model:
+          Number(currentModel),
+
+        segment:
+          "finalRound3",
+
+        item_count:
+          normalizeAdminSegmentCount(
+            "finalRound3",
+            document
+              .getElementById(
+                "settingsFinalRound3Count"
+              )
+              ?.value || 5
+          )
       },
+
       {
-        model: Number(currentModel),
-        segment: "finalRound4",
-        item_count: normalizeAdminSegmentCount("finalRound4", document.getElementById("settingsFinalRound4Count")?.value || 4)
+        model:
+          Number(currentModel),
+
+        segment:
+          "finalRound4",
+
+        item_count:
+          normalizeAdminSegmentCount(
+            "finalRound4",
+            document
+              .getElementById(
+                "settingsFinalRound4Count"
+              )
+              ?.value || 5
+          )
       },
+
       {
-        model: Number(currentModel),
-        segment: "archive",
-        item_count: Math.min(Math.max(Number(document.getElementById("settingsArchiveRounds")?.value || 4), 1), 4)
+        model:
+          Number(currentModel),
+
+        segment:
+          "archive",
+
+        item_count:
+          Math.min(
+            Math.max(
+              Number(
+                document
+                  .getElementById(
+                    "settingsArchiveRounds"
+                  )
+                  ?.value || 4
+              ),
+              1
+            ),
+            4
+          )
       }
     ]
 
     const { error } = await db
       .from("segment_settings")
-      .upsert(rows, {
-        onConflict: "model,segment"
-      })
+      .upsert(
+        rows,
+        {
+          onConflict:
+            "model,segment"
+        }
+      )
 
     if (error) {
-      console.log("SAVE ADMIN SEGMENT SETTINGS PAGE ERROR:", error)
-      showGameToast("تعذر حفظ إعدادات الفقرات")
+      console.log(
+        "SAVE ADMIN SEGMENT SETTINGS PAGE ERROR:",
+        error
+      )
+
+      showGameToast(
+        "تعذر حفظ إعدادات الفقرات"
+      )
+
       return false
     }
 
-    top10AdminRoundsCount = rows.find(row => row.segment === "top10")?.item_count || 3
-    auctionAdminCount = rows.find(row => row.segment === "auction")?.item_count || 8
-    whoAdminCount = rows.find(row => row.segment === "who")?.item_count || 15
-    explainAdminCount = rows.find(row => row.segment === "explain")?.item_count || 4
-    finalRound1AdminCount = rows.find(row => row.segment === "finalRound1")?.item_count || 6
-    finalRound3AdminCount = rows.find(row => row.segment === "finalRound3")?.item_count || 4
-    finalRound4AdminCount = rows.find(row => row.segment === "finalRound4")?.item_count || 4
-    archiveAdminRoundsCount = rows.find(row => row.segment === "archive")?.item_count || 4
+    top10AdminRoundsCount =
+      rows.find(
+        row =>
+          row.segment === "top10"
+      )?.item_count || 3
 
-    showGameToast("تم حفظ إعدادات الفقرات")
+    auctionAdminCount =
+      rows.find(
+        row =>
+          row.segment === "auction"
+      )?.item_count || 5
+
+    whoAdminCount =
+      rows.find(
+        row =>
+          row.segment === "who"
+      )?.item_count || 15
+
+    explainAdminCount =
+      rows.find(
+        row =>
+          row.segment === "explain"
+      )?.item_count || 5
+
+    finalRound1AdminCount =
+      rows.find(
+        row =>
+          row.segment ===
+          "finalRound1"
+      )?.item_count || 7
+
+    finalRound3AdminCount =
+      rows.find(
+        row =>
+          row.segment ===
+          "finalRound3"
+      )?.item_count || 5
+
+    finalRound4AdminCount =
+      rows.find(
+        row =>
+          row.segment ===
+          "finalRound4"
+      )?.item_count || 5
+
+    archiveAdminRoundsCount =
+      rows.find(
+        row =>
+          row.segment === "archive"
+      )?.item_count || 4
+
+    showGameToast(
+      "تم حفظ إعدادات الفقرات"
+    )
+
     await goAdminHome()
+
     return true
   } catch (err) {
-    console.log("SAVE ADMIN SEGMENT SETTINGS PAGE CATCH:", err)
-    showGameToast("حدث خطأ أثناء حفظ الإعدادات")
+    console.log(
+      "SAVE ADMIN SEGMENT SETTINGS PAGE CATCH:",
+      err
+    )
+
+    showGameToast(
+      "حدث خطأ أثناء حفظ الإعدادات"
+    )
+
     return false
   } finally {
     setAdminSaving(false)
@@ -1906,57 +2973,62 @@ async function checkCurrentModelReady() {
 
   showGameToast("جارٍ فحص النموذج...")
 
-  try {
-    const visibility = await loadGlobalSegmentVisibilityMap()
-    const results = []
+try {
+  const visibility = await loadGlobalSegmentVisibilityMap()
+  const results = []
 
-    if (isAdminSegmentGloballyEnabled("warmup", visibility)) {
-      results.push(await checkWarmupReady())
-    }
-
-    if (isAdminSegmentGloballyEnabled("top10", visibility)) {
-      results.push(await checkTop10Ready())
-    }
-
-    if (isAdminSegmentGloballyEnabled("auction", visibility)) {
-      results.push(await checkAuctionReady())
-    }
-
-    if (isAdminSegmentGloballyEnabled("who", visibility)) {
-      results.push(await checkWhoReady())
-    }
-
-    if (isAdminSegmentGloballyEnabled("explain", visibility)) {
-      results.push(await checkExplainReady())
-    }
-
-    if (isAdminSegmentGloballyEnabled("finalRound1", visibility)) {
-      results.push(await checkFinalRoundReady(1))
-    }
-
-    if (isAdminSegmentGloballyEnabled("finalRound2", visibility)) {
-      results.push(await checkFinalRoundReady(2))
-    }
-
-    if (isAdminSegmentGloballyEnabled("finalRound3", visibility)) {
-      results.push(await checkFinalRoundReady(3))
-    }
-
-    if (isAdminSegmentGloballyEnabled("finalRound4", visibility)) {
-      results.push(await checkFinalRoundReady(4))
-    }
-
-    if (isAdminSegmentGloballyEnabled("archive", visibility)) {
-      results.push(await checkArchiveReady())
-    }
-
-    renderModelCheckModal(results)
-  } catch (err) {
-    console.log("MODEL CHECK ERROR:", err)
-    showGameToast("تعذر فحص النموذج")
+  if (isAdminSegmentGloballyEnabled("warmup", visibility)) {
+    results.push(await checkWarmupReady())
   }
+
+  if (isAdminSegmentGloballyEnabled("top10", visibility)) {
+    results.push(await checkTop10Ready())
+  }
+
+  if (isAdminSegmentGloballyEnabled("who", visibility)) {
+    results.push(await checkWhoReady())
+  }
+
+  if (isAdminSegmentGloballyEnabled("explain", visibility)) {
+    results.push(await checkExplainReady())
+  }
+
+  if (isAdminSegmentGloballyEnabled("letterli", visibility)) {
+    results.push(checkLetterliReady())
+  }
+
+  if (isAdminSegmentGloballyEnabled("finalRound1", visibility)) {
+    results.push(await checkFinalRoundReady(1))
+  }
+
+  if (isAdminSegmentGloballyEnabled("finalRound2", visibility)) {
+    results.push(await checkFinalRoundReady(2))
+  }
+
+  if (isAdminSegmentGloballyEnabled("finalRound3", visibility)) {
+    results.push(await checkFinalRoundReady(3))
+  }
+
+  if (isAdminSegmentGloballyEnabled("finalRound4", visibility)) {
+    results.push(await checkFinalRoundReady(4))
+  }
+
+  if (isAdminSegmentGloballyEnabled("archive", visibility)) {
+    results.push(await checkArchiveReady())
+  }
+
+  if (isAdminSegmentGloballyEnabled("randomChallenge", visibility)) {
+    results.push(await checkRandomChallengeReady())
+  }
+
+  renderModelCheckModal(results)
+
+} catch (err) {
+  console.error("MODEL CHECK ERROR:", err)
+  showGameToast("تعذر فحص النموذج")
 }
 
+}
 /* =========================
    14) Ready Checks
 ========================= */
@@ -1999,6 +3071,14 @@ async function checkWarmupReady() {
     "التسخين",
     missing.length === 0,
     missing.length ? missing : ["12 سؤال مكتملة"]
+  )
+}
+
+function checkLetterliReady() {
+  return readinessItem(
+    "حرفلي",
+    true,
+    ["الفقرة جاهزة بأسئلة ثابتة"]
   )
 }
 
@@ -2046,48 +3126,149 @@ async function checkTop10Ready() {
   )
 }
 
-async function checkAuctionReady() {
-  const requiredCount = await getAdminSegmentCount("auction")
+async function checkRandomChallengeReady() {
+  const requiredAuctionCount =
+    await getAdminSegmentCount("auction")
 
-  const { data, error } = await db
-    .from("auction_questions")
-    .select("*")
-    .eq("model", Number(currentModel))
-    .order("number", { ascending: true })
+  const [
+    settingsRes,
+    auctionRes
+  ] = await Promise.all([
+    db
+      .from("segment_settings")
+      .select("segment,item_count")
+      .eq("model", Number(currentModel))
+      .in("segment", [
+        "randomChallengeBox1",
+        "randomChallengeBox2",
+        "randomChallengeBox3",
+        "randomChallengeBox4",
+        "randomChallengeAuction"
+      ]),
 
-  if (error) {
-    console.log(error)
-    return readinessItem("فتبلة", false, ["تعذر قراءة بيانات فتبلة"])
+    db
+      .from("auction_questions")
+      .select("*")
+      .eq("model", Number(currentModel))
+      .order("number", { ascending: true })
+  ])
+
+  if (settingsRes.error) {
+    console.log(
+      "CHECK RANDOM CHALLENGE SETTINGS ERROR:",
+      settingsRes.error
+    )
+
+    return readinessItem(
+      "التحدي",
+      false,
+      ["تعذر قراءة إعدادات فقرة التحدي"]
+    )
   }
 
-  const map = {}
+  if (auctionRes.error) {
+    console.log(
+      "CHECK RANDOM CHALLENGE AUCTION ERROR:",
+      auctionRes.error
+    )
 
-  ;(data || []).forEach(row => {
-    map[Number(row.number)] = row
+    return readinessItem(
+      "التحدي",
+      false,
+      ["تعذر قراءة بيانات فتبلة"]
+    )
+  }
+
+  const settingsMap = {}
+
+  ;(settingsRes.data || []).forEach(row => {
+    settingsMap[row.segment] =
+      Number(row.item_count || 0)
   })
+
+  const enabledBoxes = [
+    {
+      key: "randomChallengeBox1",
+      title: "اللاعب المشترك"
+    },
+    {
+      key: "randomChallengeBox2",
+      title: "المزاد"
+    },
+    {
+      key: "randomChallengeBox3",
+      title: "ماذا تعرف"
+    },
+    {
+      key: "randomChallengeBox4",
+      title: "المربع الرابع"
+    }
+  ].filter(item => {
+    return settingsMap[item.key] !== 0
+  })
+
+  const auctionEnabled =
+    settingsMap.randomChallengeAuction !== 0
 
   const missing = []
 
-  for (let i = 1; i <= requiredCount; i++) {
-    const row = map[i]
+  if (!enabledBoxes.length && !auctionEnabled) {
+    missing.push("لا يوجد أي مربع مفعّل داخل فقرة التحدي")
+  }
 
-    if (!row) {
-      missing.push(`السؤال ${i} غير موجود`)
-      continue
-    }
+  if (auctionEnabled) {
+    const auctionMap = {}
 
-    if (!hasText(row.question)) missing.push(`السؤال ${i}: نص السؤال فارغ`)
-    if (!hasText(row.answer)) missing.push(`السؤال ${i}: الإجابة فارغة`)
+    ;(auctionRes.data || []).forEach(row => {
+      auctionMap[Number(row.number)] = row
+    })
 
-    if (!hasText(row.image) && !hasText(row.video)) {
-      missing.push(`السؤال ${i}: الصورة أو الفيديو غير موجود`)
+    for (
+      let number = 1;
+      number <= requiredAuctionCount;
+      number++
+    ) {
+      const row = auctionMap[number]
+
+      if (!row) {
+        missing.push(`فتبلة - السؤال ${number} غير موجود`)
+        continue
+      }
+
+      if (!hasText(row.question)) {
+        missing.push(`فتبلة - السؤال ${number}: نص السؤال فارغ`)
+      }
+
+      if (!hasText(row.answer)) {
+        missing.push(`فتبلة - السؤال ${number}: الإجابة فارغة`)
+      }
+
+      if (
+        !hasText(row.image) &&
+        !hasText(row.video)
+      ) {
+        missing.push(
+          `فتبلة - السؤال ${number}: الصورة أو الفيديو غير موجود`
+        )
+      }
     }
   }
 
+  const enabledNames = enabledBoxes
+    .map(item => item.title)
+
+  if (auctionEnabled) {
+    enabledNames.push("فتبلة")
+  }
+
   return readinessItem(
-    "فتبلة",
+    "التحدي",
     missing.length === 0,
-    missing.length ? missing : [`مكتملة حسب عدد الأسئلة: ${requiredCount}`]
+    missing.length
+      ? missing
+      : [
+          `المربعات المفعّلة: ${enabledNames.join("، ")}`
+        ]
   )
 }
 
@@ -2175,11 +3356,12 @@ async function checkExplainReady() {
 }
 
 function getFinalRound1NoDotsCount(cardsCount) {
-  const count = Number(cardsCount || 6)
+  const count = Number(cardsCount || 7)
 
-  if (count === 4) return 4
-  if (count === 8) return 8
-  return 6
+  if (count === 5) return 5
+  if (count === 9) return 9
+
+  return 7
 }
 
 async function checkFinalRoundReady(round) {
@@ -2305,9 +3487,12 @@ async function checkFinalRoundReady(round) {
   ;(r1Res.data || []).forEach(row => {
     const number = Number(row.number)
 
-    if (number >= 201 && number <= 208) {
-      storyMap[number] = row
-    }
+    if (
+  number >= 201 &&
+  number <= 209
+) {
+  storyMap[number] = row
+}
   })
 
   for (let displayNumber = 1; displayNumber <= requiredCount; displayNumber++) {
@@ -2348,7 +3533,7 @@ async function checkFinalRoundReady(round) {
     const number = Number(row.number)
     const imageOrder = Number(row.image_order || 1)
 
-    if (number >= 1 && number <= 8 && imageOrder === 1) {
+    if (number >= 1 && number <= 9 && imageOrder === 1) {
       focusMap[number] = row
     }
   })
@@ -2905,7 +4090,6 @@ if (!isAdminSegmentGloballyEnabled(segment, visibility)) {
 
   if (segment === "warmup") await renderWarmupAdmin()
   if (segment === "top10") await renderTop10Admin()
-  if (segment === "auction") await renderAuctionAdmin()
   if (segment === "who") await renderWhoAdmin()
   if (segment === "explain") await renderExplainAdmin()
 
@@ -2976,6 +4160,2262 @@ function getWarmupQuestionStatus(categoryNumber, questionNumber) {
 
   const completed = fields.filter(isAdminFieldFilled).length
   return getAdminItemStatus(completed, fields.length)
+}
+/* =========================
+   RANDOM CHALLENGE ADMIN
+   إدارة محتوى التحدي
+========================= */
+
+/* =========================
+   1) SECTIONS
+========================= */
+
+function getRandomChallengeAdminSections() {
+  return [
+    {
+      key: "sharedPlayer",
+      title: "اللاعب المشترك"
+    },
+    {
+      key: "auction",
+      title: "المزاد"
+    },
+    {
+      key: "whatDoYouKnow",
+      title: "ماذا تعرف"
+    },
+    {
+      key: "trueFalse",
+      title: "صح أو خطأ"
+    },
+    {
+      key: "fatbla",
+      title: "فتبلة"
+    }
+  ]
+}
+
+function getRandomChallengeAdminSectionTitle(
+  sectionKey
+) {
+  const section =
+    getRandomChallengeAdminSections()
+      .find(item => {
+        return (
+          item.key === sectionKey
+        )
+      })
+
+  return section?.title || "التحدي"
+}
+
+function getRandomChallengeAdminSectionCount(
+  boxKey
+) {
+  if (boxKey === "auction") {
+    return 2
+  }
+
+  if (boxKey === "whatDoYouKnow") {
+    return 2
+  }
+
+  if (boxKey === "trueFalse") {
+    return 10
+  }
+
+  return 0
+}
+
+
+/* =========================
+   2) LOAD DATA
+========================= */
+
+async function loadRandomChallengeAdminRows() {
+  if (!currentModel) {
+    randomChallengeAdminRows = []
+    return []
+  }
+
+  const { data, error } = await db
+    .from("random_challenge_questions")
+    .select("*")
+    .eq(
+      "model",
+      Number(currentModel)
+    )
+    .order(
+      "box_key",
+      {
+        ascending: true
+      }
+    )
+    .order(
+      "number",
+      {
+        ascending: true
+      }
+    )
+
+  if (error) {
+    console.log(
+      "LOAD RANDOM CHALLENGE ADMIN ERROR:",
+      error
+    )
+
+    showGameToast(
+      "تعذر تحميل أسئلة التحدي"
+    )
+
+    randomChallengeAdminRows = []
+
+    return []
+  }
+
+  randomChallengeAdminRows =
+    Array.isArray(data)
+      ? data
+      : []
+
+  return randomChallengeAdminRows
+}
+
+
+/* =========================
+   3) DATA HELPERS
+========================= */
+
+function getRandomChallengeAdminRow(
+  boxKey,
+  number
+) {
+  return (
+    randomChallengeAdminRows.find(row => {
+      return (
+        String(row.box_key) ===
+          String(boxKey) &&
+        Number(row.number) ===
+          Number(number)
+      )
+    }) || null
+  )
+}
+
+function getRandomChallengeQuestionStatus(
+  boxKey,
+  number
+) {
+  const row =
+    getRandomChallengeAdminRow(
+      boxKey,
+      number
+    ) || {}
+
+  const requiresAnswer =
+    boxKey === "trueFalse"
+
+  const total =
+    requiresAnswer
+      ? 2
+      : 1
+
+  let completed = 0
+
+  if (
+    hasText(row.question)
+  ) {
+    completed++
+  }
+
+  if (
+    requiresAnswer &&
+    ["صح", "خطأ"].includes(
+      String(row.answer || "")
+    )
+  ) {
+    completed++
+  }
+
+  return getAdminItemStatus(
+    completed,
+    total
+  )
+}
+
+/* =========================
+   FATBLA ADMIN
+   فتبلة داخل التحدي
+========================= */
+
+function getFatblaDraftItem(number) {
+  const n = Number(number || 1)
+
+  if (!fatblaAdminDraft[n]) {
+    fatblaAdminDraft[n] = {
+      id: null,
+      question: "",
+      answer: "",
+      image: "",
+      video: "",
+      file: null,
+      videoFile: null
+    }
+  }
+
+  return fatblaAdminDraft[n]
+}
+
+function collectFatblaCurrentDraft() {
+  const total = Number(
+    fatblaAdminCount || 5
+  )
+
+  for (
+    let number = 1;
+    number <= total;
+    number++
+  ) {
+    const item =
+      getFatblaDraftItem(number)
+
+    const answerInput =
+      document.getElementById(
+        `fatblaAnswer${number}`
+      )
+
+    const imageInput =
+      document.getElementById(
+        `fatblaFile${number}`
+      )
+
+    const videoInput =
+      document.getElementById(
+        `fatblaVideo${number}`
+      )
+
+    if (answerInput) {
+      item.answer =
+        String(
+          answerInput.value || ""
+        ).trim()
+    }
+
+    const imageFile =
+      imageInput?.files?.[0] || null
+
+    const videoFile =
+      videoInput?.files?.[0] || null
+
+    if (imageFile) {
+      item.file = imageFile
+      item.videoFile = null
+    }
+
+    if (videoFile) {
+      item.videoFile = videoFile
+      item.file = null
+    }
+  }
+}
+
+function getFatblaItemStatus(number) {
+  const item =
+    getFatblaDraftItem(number)
+
+  const hasMedia =
+    hasText(item.image) ||
+    hasText(item.video) ||
+    !!item.file ||
+    !!item.videoFile
+
+  const completed = [
+    hasText(item.answer),
+    hasMedia
+  ].filter(Boolean).length
+
+  return getAdminItemStatus(
+    completed,
+    2
+  )
+}
+
+async function loadFatblaAdminDraft(
+  force = false
+) {
+  if (!currentModel) {
+    fatblaAdminDraft = {}
+    fatblaAdminLoaded = false
+    return false
+  }
+
+  if (
+    fatblaAdminLoaded &&
+    !force
+  ) {
+    return true
+  }
+
+  const [
+    rowsResult,
+    settingsResult
+  ] = await Promise.all([
+    db
+      .from("auction_questions")
+      .select("*")
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .order("number", {
+        ascending: true
+      }),
+
+    db
+      .from("segment_settings")
+      .select("item_count")
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "segment",
+        "auction"
+      )
+      .maybeSingle()
+  ])
+
+  if (rowsResult.error) {
+    console.log(
+      "LOAD FATBLA ERROR:",
+      rowsResult.error
+    )
+
+    showGameToast(
+      "تعذر تحميل فتبلة"
+    )
+
+    return false
+  }
+
+  if (settingsResult.error) {
+    console.log(
+      "LOAD FATBLA SETTINGS ERROR:",
+      settingsResult.error
+    )
+  }
+
+  fatblaAdminCount =
+    normalizeRandomChallengeAuctionCount(
+      settingsResult.data
+        ?.item_count || 5
+    )
+
+  fatblaAdminDraft = {}
+
+  for (
+    let number = 1;
+    number <= fatblaAdminCount;
+    number++
+  ) {
+    getFatblaDraftItem(number)
+  }
+
+  ;(rowsResult.data || [])
+    .forEach(row => {
+      const number =
+        Number(row.number || 0)
+
+      if (
+        number < 1 ||
+        number > fatblaAdminCount
+      ) {
+        return
+      }
+
+      const item =
+        getFatblaDraftItem(number)
+
+      item.id = row.id || null
+      item.question =
+        row.question || ""
+      item.answer =
+        row.answer || ""
+      item.image =
+        row.image || ""
+      item.video =
+        row.video || ""
+      item.file = null
+      item.videoFile = null
+    })
+
+  fatblaAdminLoaded = true
+
+  return true
+}
+
+function buildFatblaAdminContent() {
+  const total =
+    Number(fatblaAdminCount || 5)
+
+  return `
+    <div
+      class="
+        fatblaAdminShell
+        compactFatblaAdminShell
+        adminOnePageEditor
+      "
+    >
+      <div
+        class="
+          adminEditCardsGrid
+          fatblaOnePageGrid
+        "
+      >
+        ${Array.from(
+          { length: total },
+          (_, index) => {
+            return buildFatblaOnePageCard(
+              index + 1
+            )
+          }
+        ).join("")}
+      </div>
+    </div>
+  `
+}
+
+function buildFatblaOnePageCard(
+  number
+) {
+  const n =
+    Number(number || 1)
+
+  const item =
+    getFatblaDraftItem(n)
+
+  const status =
+    getFatblaItemStatus(n)
+
+  const hasMedia =
+    hasText(item.image) ||
+    hasText(item.video) ||
+    !!item.file ||
+    !!item.videoFile
+
+  const missing = []
+
+  if (!hasText(item.answer)) {
+    missing.push("الإجابة")
+  }
+
+  if (!hasMedia) {
+    missing.push("الصورة أو الفيديو")
+  }
+
+  return `
+    <details
+      class="
+        adminEditItemCard
+        fatblaQuestionOnePageCard
+        ${status.className}
+      "
+      ontoggle="
+        handleAdminEditCardToggle(this)
+      "
+    >
+      <summary>
+
+        <div class="adminEditItemTitle">
+          <strong>
+            الرقم ${n}
+          </strong>
+
+          <span>
+            ${
+              status.isDone
+                ? "مكتمل"
+                : `ناقص: ${missing.join("، ")}`
+            }
+          </span>
+        </div>
+
+        <div class="adminEditItemMeta">
+          <span class="adminEditStatusPill">
+            ${status.label}
+          </span>
+
+          <span class="adminEditProgressPill">
+            ${status.progress}
+          </span>
+        </div>
+
+      </summary>
+
+      <div class="adminEditItemBody">
+
+        <div
+          class="
+            fatblaOnePageLayout
+            fatblaOnePageLayoutAnswerOnly
+          "
+        >
+
+          <div class="fatblaOnePageMedia">
+
+            <div
+              class="
+                adminField
+                ${
+                  hasMedia
+                    ? ""
+                    : "adminMissingField"
+                }
+              "
+            >
+              <label>الصورة</label>
+
+              <input
+                type="file"
+                id="fatblaFile${n}"
+                accept="image/*"
+              >
+            </div>
+
+            <div
+              class="
+                adminField
+                ${
+                  hasMedia
+                    ? ""
+                    : "adminMissingField"
+                }
+              "
+            >
+              <label>الفيديو</label>
+
+              <input
+                type="file"
+                id="fatblaVideo${n}"
+                accept="video/*"
+              >
+            </div>
+
+            ${
+              !hasMedia
+                ? `
+                  <div class="adminMissingHint">
+                    أضف صورة أو فيديو
+                  </div>
+                `
+                : ""
+            }
+
+            <div
+              class="
+                fatblaPreviewBox
+                fatblaPreviewLarge
+              "
+            >
+              ${
+                item.video
+                  ? `
+                    <video
+                      src="${escapeHtml(item.video)}"
+                      class="previewImg"
+                      controls
+                    ></video>
+                  `
+                  : item.image
+                    ? `
+                      <img
+                        src="${escapeHtml(item.image)}"
+                        class="previewImg"
+                        alt=""
+                      >
+                    `
+                    : `
+                      <div class="emptyImageHint">
+                        لا توجد صورة أو فيديو
+                      </div>
+                    `
+              }
+            </div>
+
+          </div>
+
+          <div class="fatblaOnePageFields">
+
+            <div
+              class="
+                adminField
+                ${
+                  getAdminMissingFieldClass(
+                    item.answer
+                  )
+                }
+              "
+            >
+              <label>الإجابة</label>
+
+              <input
+                id="fatblaAnswer${n}"
+                placeholder="اكتب الإجابة"
+                value="${escapeHtml(
+                  item.answer || ""
+                )}"
+              >
+
+              ${
+                !hasText(item.answer)
+                  ? `
+                    <div class="adminMissingHint">
+                      الإجابة ناقصة
+                    </div>
+                  `
+                  : ""
+              }
+            </div>
+
+            <button
+              type="button"
+              class="adminDeleteBtn"
+              onclick="
+                clearFatblaQuestion(${n})
+              "
+            >
+              حذف الرقم
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    </details>
+  `
+}
+
+async function saveFatblaSection() {
+  if (isAdminSaving()) {
+    return false
+  }
+
+  if (!currentModel) {
+    showGameToast(
+      "افتح النموذج أولاً"
+    )
+
+    return false
+  }
+
+  try {
+    collectFatblaCurrentDraft()
+
+    setAdminSaving(
+      true,
+      "جارٍ حفظ فتبلة..."
+    )
+
+    const finalCount =
+      normalizeRandomChallengeAuctionCount(
+        fatblaAdminCount || 5
+      )
+
+    fatblaAdminCount =
+      finalCount
+
+    const {
+      data: oldRows,
+      error: oldError
+    } = await db
+      .from("auction_questions")
+      .select(
+        "id,number,image,video"
+      )
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+
+    if (oldError) {
+      console.log(
+        "READ OLD FATBLA ERROR:",
+        oldError
+      )
+
+      showGameToast(
+        "تعذر قراءة بيانات فتبلة"
+      )
+
+      return false
+    }
+
+    const oldMap = {}
+
+    ;(oldRows || []).forEach(row => {
+      oldMap[
+        Number(row.number)
+      ] = row
+    })
+
+    const rows = []
+    const keepNumbers = []
+
+    for (
+      let number = 1;
+      number <= finalCount;
+      number++
+    ) {
+      const item =
+        getFatblaDraftItem(number)
+
+      const answer =
+        String(
+          item.answer || ""
+        ).trim()
+
+      let image =
+        item.image ||
+        oldMap[number]?.image ||
+        ""
+
+      let video =
+        item.video ||
+        oldMap[number]?.video ||
+        ""
+
+      if (item.file) {
+        image =
+          await uploadImageFile(
+            item.file,
+            `fatbla_${number}`
+          )
+
+        if (!image) {
+          showGameToast(
+            `تعذر رفع صورة الرقم ${number}`
+          )
+
+          return false
+        }
+
+        video = ""
+        item.image = image
+        item.video = ""
+        item.file = null
+        item.videoFile = null
+      }
+
+      if (item.videoFile) {
+        video =
+          await uploadVideoFile(
+            item.videoFile,
+            `fatbla_video_${number}`
+          )
+
+        if (!video) {
+          showGameToast(
+            `تعذر رفع فيديو الرقم ${number}`
+          )
+
+          return false
+        }
+
+        image = ""
+        item.video = video
+        item.image = ""
+        item.videoFile = null
+        item.file = null
+      }
+
+      if (
+        !answer &&
+        !image &&
+        !video
+      ) {
+        continue
+      }
+
+      if (!answer) {
+        showGameToast(
+          `اكتب إجابة الرقم ${number}`
+        )
+
+        return false
+      }
+
+      if (!image && !video) {
+        showGameToast(
+          `أضف صورة أو فيديو للرقم ${number}`
+        )
+
+        return false
+      }
+
+      rows.push({
+        model:
+          Number(currentModel),
+
+        number:
+          Number(number),
+
+        question: "",
+
+        answer,
+
+        image,
+
+        video,
+
+        note: ""
+      })
+
+      keepNumbers.push(
+        Number(number)
+      )
+    }
+
+    const { error: settingsError } =
+      await db
+        .from("segment_settings")
+        .upsert(
+          {
+            model:
+              Number(currentModel),
+
+            segment:
+              "auction",
+
+            item_count:
+              finalCount
+          },
+          {
+            onConflict:
+              "model,segment"
+          }
+        )
+
+    if (settingsError) {
+      console.log(
+        "SAVE FATBLA SETTINGS ERROR:",
+        settingsError
+      )
+
+      showGameToast(
+        "تعذر حفظ عدد أرقام فتبلة"
+      )
+
+      return false
+    }
+
+    if (rows.length) {
+      const { error: saveError } =
+        await db
+          .from("auction_questions")
+          .upsert(
+            rows,
+            {
+              onConflict:
+                "model,number"
+            }
+          )
+
+      if (saveError) {
+        console.log(
+          "SAVE FATBLA ERROR:",
+          saveError
+        )
+
+        showGameToast(
+          "تعذر حفظ فتبلة"
+        )
+
+        return false
+      }
+    }
+
+    for (
+      const oldRow of oldRows || []
+    ) {
+      const oldNumber =
+        Number(oldRow.number)
+
+      if (
+        keepNumbers.includes(
+          oldNumber
+        )
+      ) {
+        continue
+      }
+
+      const { error: deleteError } =
+        await db
+          .from("auction_questions")
+          .delete()
+          .eq(
+            "model",
+            Number(currentModel)
+          )
+          .eq(
+            "number",
+            oldNumber
+          )
+
+      if (deleteError) {
+        console.log(
+          "DELETE OLD FATBLA ERROR:",
+          deleteError
+        )
+
+        showGameToast(
+          "تم الحفظ لكن تعذر حذف بعض البيانات القديمة"
+        )
+
+        return false
+      }
+    }
+
+    fatblaAdminLoaded = false
+
+    await loadFatblaAdminDraft(true)
+
+    showGameToast(
+      rows.length
+        ? "تم حفظ فتبلة"
+        : "تم حذف جميع أرقام فتبلة",
+      "success"
+    )
+
+    renderAdminRandomChallengePage()
+
+    return true
+  } catch (error) {
+    console.log(
+      "SAVE FATBLA CATCH:",
+      error
+    )
+
+    showGameToast(
+      "حدث خطأ أثناء حفظ فتبلة"
+    )
+
+    return false
+  } finally {
+    setAdminSaving(false)
+  }
+}
+
+async function clearFatblaQuestion(
+  number
+) {
+  if (!canRunAdminDelete()) {
+    return
+  }
+
+  if (!currentModel) {
+    showGameToast(
+      "افتح النموذج أولاً"
+    )
+
+    return
+  }
+
+  const n =
+    Number(number || 0)
+
+  if (!n) return
+
+  const ok =
+    await showAdminConfirm(
+      `هل تريد حذف رقم فتبلة ${n}؟`,
+      {
+        title: "حذف الرقم",
+        okText: "حذف",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!ok) return
+
+  const { error } = await db
+    .from("auction_questions")
+    .delete()
+    .eq(
+      "model",
+      Number(currentModel)
+    )
+    .eq(
+      "number",
+      n
+    )
+
+  if (error) {
+    console.log(
+      "DELETE FATBLA QUESTION ERROR:",
+      error
+    )
+
+    showGameToast(
+      "تعذر حذف الرقم"
+    )
+
+    return
+  }
+
+  fatblaAdminDraft[n] = {
+    id: null,
+    question: "",
+    answer: "",
+    image: "",
+    video: "",
+    file: null,
+    videoFile: null
+  }
+
+  showGameToast(
+    `تم حذف الرقم ${n}`,
+    "success"
+  )
+
+  renderAdminRandomChallengePage()
+}
+
+async function deleteFatblaSection() {
+  if (!canRunAdminDelete()) {
+    return
+  }
+
+  if (!currentModel) {
+    showGameToast(
+      "افتح النموذج أولاً"
+    )
+
+    return
+  }
+
+  const ok =
+    await showAdminConfirm(
+      "هل تريد حذف جميع بيانات فتبلة؟",
+      {
+        title: "حذف فتبلة",
+        okText: "حذف",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!ok) return
+
+  const [
+    rowsResult,
+    settingsResult
+  ] = await Promise.all([
+    db
+      .from("auction_questions")
+      .delete()
+      .eq(
+        "model",
+        Number(currentModel)
+      ),
+
+    db
+      .from("segment_settings")
+      .delete()
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "segment",
+        "auction"
+      )
+  ])
+
+  if (
+    rowsResult.error ||
+    settingsResult.error
+  ) {
+    console.log(
+      "DELETE FATBLA SECTION ERROR:",
+      rowsResult.error ||
+      settingsResult.error
+    )
+
+    showGameToast(
+      "تعذر حذف فتبلة"
+    )
+
+    return
+  }
+
+  fatblaAdminCount = 5
+  fatblaAdminDraft = {}
+  fatblaAdminLoaded = true
+
+  for (
+    let number = 1;
+    number <= fatblaAdminCount;
+    number++
+  ) {
+    getFatblaDraftItem(number)
+  }
+
+  showGameToast(
+    "تم حذف فتبلة",
+    "success"
+  )
+
+  renderAdminRandomChallengePage()
+}
+
+/* =========================
+   4) OPEN / RENDER
+========================= */
+
+async function openAdminRandomChallenge(
+  sectionKey = null
+) {
+  if (!currentModel) {
+    showGameToast(
+      "افتح نموذج أولاً"
+    )
+
+    return
+  }
+
+  if (sectionKey) {
+    const valid =
+      getRandomChallengeAdminSections()
+        .some(section => {
+          return (
+            section.key === sectionKey
+          )
+        })
+
+    if (valid) {
+      randomChallengeAdminSection =
+        sectionKey
+    }
+  }
+
+  currentAdminSegment =
+    "randomChallenge"
+
+  renderAdminSegmentActions()
+
+  await renderAdminTabsUnified()
+
+  await Promise.all([
+    loadRandomChallengeAdminRows(),
+    loadFatblaAdminDraft()
+  ])
+
+  renderAdminRandomChallengePage()
+}
+
+function renderRandomChallengeAdminTabs() {
+  return `
+    <div class="randomChallengeAdminTabs">
+
+      ${getRandomChallengeAdminSections()
+        .map(section => {
+          const active =
+            randomChallengeAdminSection ===
+            section.key
+
+          return `
+            <button
+              type="button"
+              class="
+                randomChallengeAdminTab
+                ${active ? "active" : ""}
+              "
+              onclick="
+                switchRandomChallengeAdminSection(
+                  '${section.key}'
+                )
+              "
+            >
+              ${escapeHtml(section.title)}
+            </button>
+          `
+        })
+        .join("")}
+
+    </div>
+  `
+}
+
+function renderAdminRandomChallengePage() {
+  const area = editor()
+  if (!area) return
+
+  const canSave =
+  randomChallengeAdminSection ===
+    "auction" ||
+  randomChallengeAdminSection ===
+    "whatDoYouKnow" ||
+  randomChallengeAdminSection ===
+    "trueFalse" ||
+  randomChallengeAdminSection ===
+    "fatbla"
+
+  area.innerHTML = `
+    <div
+      class="
+        randomChallengeAdminPage
+        adminOnePageEditor
+      "
+    >
+
+      <div
+        class="
+          adminEditorTopBar
+          compactAdminEditorTopBar
+          adminEditorTopBarWithActions
+          randomChallengeAdminTopBar
+        "
+      >
+
+        <div>
+          <h2 class="adminSectionTitle">
+            ${escapeHtml(
+              getRandomChallengeAdminSectionTitle(
+                randomChallengeAdminSection
+              )
+            )}
+          </h2>
+        </div>
+
+        <div class="adminInlineActions">
+
+          ${
+            canSave
+              ? `
+                <button
+                  type="button"
+                  class="adminSaveBtn"
+                  onclick="
+                    saveRandomChallengeCurrentSection()
+                  "
+                >
+                  حفظ
+                </button>
+
+                <button
+                  type="button"
+                  class="adminDeleteAllBtn"
+                  onclick="
+                    deleteRandomChallengeCurrentSection()
+                  "
+                >
+                  حذف القسم
+                </button>
+              `
+              : ""
+          }
+
+        </div>
+
+        ${renderRandomChallengeAdminTabs()}
+
+      </div>
+
+      <div
+        id="randomChallengeAdminContent"
+        class="randomChallengeAdminContent"
+      >
+        ${buildRandomChallengeAdminSection()}
+      </div>
+
+    </div>
+  `
+
+  normalizeAdminEditorCards()
+}
+
+async function switchRandomChallengeAdminSection(
+  sectionKey
+) {
+  const valid =
+    getRandomChallengeAdminSections()
+      .some(section => {
+        return (
+          section.key === sectionKey
+        )
+      })
+
+  if (!valid) return
+
+  if (
+    randomChallengeAdminSection ===
+    "fatbla"
+  ) {
+    collectFatblaCurrentDraft()
+  } else {
+    collectRandomChallengeCurrentDraft()
+  }
+
+  randomChallengeAdminSection =
+    sectionKey
+
+  if (
+    sectionKey === "fatbla"
+  ) {
+    await loadFatblaAdminDraft()
+  }
+
+  renderAdminRandomChallengePage()
+}
+/* =========================
+   5) COLLECT DRAFT
+========================= */
+
+function collectRandomChallengeCurrentDraft() {
+  const boxKey =
+    randomChallengeAdminSection
+
+  const count =
+    getRandomChallengeAdminSectionCount(
+      boxKey
+    )
+
+  if (!count) return
+
+  for (
+    let number = 1;
+    number <= count;
+    number++
+  ) {
+    const questionInput =
+      document.getElementById(
+        `randomChallengeQuestionInput_${boxKey}_${number}`
+      )
+
+    const answerInput =
+      document.getElementById(
+        `randomChallengeAnswerInput_${boxKey}_${number}`
+      )
+
+    if (!questionInput && !answerInput) {
+      continue
+    }
+
+    const question =
+      String(
+        questionInput?.value || ""
+      ).trim()
+
+    const answer =
+      boxKey === "trueFalse"
+        ? String(
+            answerInput?.value || ""
+          ).trim()
+        : ""
+
+    const existingIndex =
+      randomChallengeAdminRows
+        .findIndex(row => {
+          return (
+            String(row.box_key) ===
+              String(boxKey) &&
+            Number(row.number) ===
+              Number(number)
+          )
+        })
+
+    const oldRow =
+      existingIndex >= 0
+        ? randomChallengeAdminRows[
+            existingIndex
+          ]
+        : {}
+
+    const nextRow = {
+      ...oldRow,
+
+      model:
+        Number(currentModel),
+
+      box_key:
+        boxKey,
+
+      number:
+        Number(number),
+
+      question,
+
+      answer
+    }
+
+    if (existingIndex >= 0) {
+      randomChallengeAdminRows[
+        existingIndex
+      ] = nextRow
+    } else {
+      randomChallengeAdminRows.push(
+        nextRow
+      )
+    }
+  }
+}
+
+
+/* =========================
+   6) BUILD CARDS
+========================= */
+
+function buildRandomChallengeTrueFalseField(
+  number,
+  currentAnswer
+) {
+  const answer =
+    currentAnswer === "صح"
+      ? "صح"
+      : currentAnswer === "خطأ"
+        ? "خطأ"
+        : ""
+
+  return `
+    <div
+      class="
+        adminField
+        ${getAdminMissingFieldClass(answer)}
+      "
+    >
+
+      <div class="randomChallengeTrueFalseOptions">
+
+        <button
+          type="button"
+          class="
+            randomChallengeTrueFalseBtn
+            ${
+              answer === "صح"
+                ? "selected correct"
+                : ""
+            }
+          "
+          onclick="
+            selectRandomChallengeTrueFalseAnswer(
+              ${number},
+              'صح',
+              this
+            )
+          "
+        >
+          صح
+        </button>
+
+        <button
+          type="button"
+          class="
+            randomChallengeTrueFalseBtn
+            ${
+              answer === "خطأ"
+                ? "selected wrong"
+                : ""
+            }
+          "
+          onclick="
+            selectRandomChallengeTrueFalseAnswer(
+              ${number},
+              'خطأ',
+              this
+            )
+          "
+        >
+          خطأ
+        </button>
+
+      </div>
+
+      <input
+        type="hidden"
+        id="randomChallengeAnswerInput_trueFalse_${number}"
+        value="${escapeHtml(answer)}"
+      >
+
+    </div>
+  `
+}
+
+function buildRandomChallengeOnePageCard(
+  boxKey,
+  number
+) {
+  const row =
+    getRandomChallengeAdminRow(
+      boxKey,
+      number
+    ) || {
+      id: null,
+      question: "",
+      answer: ""
+    }
+
+  const status =
+    getRandomChallengeQuestionStatus(
+      boxKey,
+      number
+    )
+
+  const title =
+    boxKey === "trueFalse"
+      ? `العبارة ${number}`
+      : `السؤال ${number}`
+
+  const placeholder =
+    boxKey === "trueFalse"
+      ? "اكتب العبارة"
+      : "اكتب السؤال"
+
+  return `
+    <details
+      class="
+        adminEditItemCard
+        randomChallengeOnePageCard
+        ${status.className}
+      "
+      ontoggle="
+        handleAdminEditCardToggle(this)
+      "
+    >
+
+      <summary>
+
+        <div class="adminEditItemTitle">
+          <strong>
+            ${escapeHtml(title)}
+          </strong>
+        </div>
+
+        <div class="adminEditItemMeta">
+
+          <span class="adminEditStatusPill">
+            ${status.label}
+          </span>
+
+          <span class="adminEditProgressPill">
+            ${status.progress}
+          </span>
+
+        </div>
+
+      </summary>
+
+      <div class="adminEditItemBody">
+
+        <div
+          class="
+            adminField
+            ${
+              getAdminMissingFieldClass(
+                row.question
+              )
+            }
+          "
+        >
+
+          <textarea
+            id="randomChallengeQuestionInput_${boxKey}_${number}"
+            placeholder="${escapeHtml(placeholder)}"
+          >${escapeHtml(
+            row.question || ""
+          )}</textarea>
+
+        </div>
+
+        ${
+          boxKey === "trueFalse"
+            ? buildRandomChallengeTrueFalseField(
+                number,
+                row.answer || ""
+              )
+            : ""
+        }
+
+        <button
+          type="button"
+          class="adminDeleteMiniBtn"
+          onclick="
+            clearRandomChallengeAdminQuestion(
+              '${boxKey}',
+              ${number}
+            )
+          "
+        >
+          حذف
+        </button>
+
+      </div>
+
+    </details>
+  `
+}
+
+function buildRandomChallengeQuestionsOnePage(
+  boxKey,
+  count
+) {
+  return `
+    <div
+      class="
+        randomChallengeQuestionsEditor
+        adminOnePageEditor
+      "
+    >
+
+      <div
+        class="
+          adminEditCardsGrid
+          randomChallengeOnePageGrid
+        "
+      >
+
+        ${Array.from(
+          {
+            length: count
+          },
+          (_, index) => {
+            return buildRandomChallengeOnePageCard(
+              boxKey,
+              index + 1
+            )
+          }
+        ).join("")}
+
+      </div>
+
+    </div>
+  `
+}
+
+function buildRandomChallengeAdminSection() {
+  if (
+    randomChallengeAdminSection ===
+    "sharedPlayer"
+  ) {
+    return `
+      <div class="adminEmptyState">
+        اللاعب المشترك جاهز ولا يحتاج أسئلة
+      </div>
+    `
+  }
+
+  if (
+    randomChallengeAdminSection ===
+    "auction"
+  ) {
+    return buildRandomChallengeQuestionsOnePage(
+      "auction",
+      2
+    )
+  }
+
+  if (
+    randomChallengeAdminSection ===
+    "whatDoYouKnow"
+  ) {
+    return buildRandomChallengeQuestionsOnePage(
+      "whatDoYouKnow",
+      2
+    )
+  }
+
+  if (
+    randomChallengeAdminSection ===
+    "trueFalse"
+  ) {
+    return buildRandomChallengeQuestionsOnePage(
+      "trueFalse",
+      10
+    )
+  }
+
+  if (
+  randomChallengeAdminSection ===
+  "fatbla"
+) {
+  return buildFatblaAdminContent()
+}
+
+  return `
+    <div class="adminEmptyState">
+      اختر أحد أقسام التحدي
+    </div>
+  `
+}
+
+
+/* =========================
+   7) SAVE SECTION
+========================= */
+
+async function saveRandomChallengeCurrentSection() {
+
+  if (
+  randomChallengeAdminSection ===
+  "fatbla"
+) {
+  return await saveFatblaSection()
+}
+
+  if (isAdminSaving()) {
+    return false
+  }
+
+  if (!currentModel) {
+    showGameToast(
+      "افتح النموذج أولاً"
+    )
+
+    return false
+  }
+
+  const boxKey =
+    randomChallengeAdminSection
+
+  const count =
+    getRandomChallengeAdminSectionCount(
+      boxKey
+    )
+
+  if (!count) {
+    showGameToast(
+      "هذا القسم لا يحتوي أسئلة"
+    )
+
+    return false
+  }
+
+  collectRandomChallengeCurrentDraft()
+
+  const rows = []
+
+  for (
+    let number = 1;
+    number <= count;
+    number++
+  ) {
+    const row =
+      getRandomChallengeAdminRow(
+        boxKey,
+        number
+      ) || {}
+
+    const question =
+      String(
+        row.question || ""
+      ).trim()
+
+    const answer =
+      boxKey === "trueFalse"
+        ? String(
+            row.answer || ""
+          ).trim()
+        : ""
+
+    if (
+      !question &&
+      !answer
+    ) {
+      continue
+    }
+
+    if (
+      !question
+    ) {
+      showGameToast(
+        `اكتب نص ${
+          boxKey === "trueFalse"
+            ? "العبارة"
+            : "السؤال"
+        } رقم ${number}`
+      )
+
+      return false
+    }
+
+    if (
+      boxKey === "trueFalse" &&
+      !["صح", "خطأ"].includes(answer)
+    ) {
+      showGameToast(
+        `اختر إجابة العبارة ${number}`
+      )
+
+      return false
+    }
+
+    rows.push({
+      model:
+        Number(currentModel),
+
+      box_key:
+        boxKey,
+
+      number:
+        Number(number),
+
+      question,
+
+      answer,
+
+      updated_at:
+        new Date().toISOString()
+    })
+  }
+
+  if (!rows.length) {
+    showGameToast(
+      "القسم فارغ"
+    )
+
+    return false
+  }
+
+  try {
+    setAdminSaving(
+      true,
+      "جارٍ حفظ القسم..."
+    )
+
+    const {
+      data: oldRows,
+      error: oldRowsError
+    } = await db
+      .from(
+        "random_challenge_questions"
+      )
+      .select(
+        "id,number"
+      )
+      .eq(
+        "model",
+        Number(currentModel)
+      )
+      .eq(
+        "box_key",
+        boxKey
+      )
+
+    if (oldRowsError) {
+      console.log(
+        "READ RANDOM CHALLENGE OLD ROWS ERROR:",
+        oldRowsError
+      )
+
+      showGameToast(
+        "تعذر قراءة بيانات القسم"
+      )
+
+      return false
+    }
+
+    const { error: saveError } =
+      await db
+        .from(
+          "random_challenge_questions"
+        )
+        .upsert(
+          rows,
+          {
+            onConflict:
+              "model,box_key,number"
+          }
+        )
+
+    if (saveError) {
+      console.log(
+        "SAVE RANDOM CHALLENGE SECTION ERROR:",
+        saveError
+      )
+
+      showGameToast(
+        "تعذر حفظ القسم"
+      )
+
+      return false
+    }
+
+    const keepNumbers =
+      rows.map(row => {
+        return Number(row.number)
+      })
+
+    for (
+      const oldRow of oldRows || []
+    ) {
+      const oldNumber =
+        Number(oldRow.number)
+
+      if (
+        keepNumbers.includes(
+          oldNumber
+        )
+      ) {
+        continue
+      }
+
+      const { error: deleteError } =
+        await db
+          .from(
+            "random_challenge_questions"
+          )
+          .delete()
+          .eq(
+            "id",
+            Number(oldRow.id)
+          )
+
+      if (deleteError) {
+        console.log(
+          "DELETE OLD RANDOM CHALLENGE ROW ERROR:",
+          deleteError
+        )
+      }
+    }
+
+    showGameToast(
+      "تم حفظ القسم",
+      "success"
+    )
+
+    await loadRandomChallengeAdminRows()
+
+    renderAdminRandomChallengePage()
+
+    return true
+  } catch (error) {
+    console.log(
+      "SAVE RANDOM CHALLENGE SECTION CATCH:",
+      error
+    )
+
+    showGameToast(
+      "حدث خطأ أثناء الحفظ"
+    )
+
+    return false
+  } finally {
+    setAdminSaving(false)
+  }
+}
+
+
+/* =========================
+   8) DELETE ONE QUESTION
+========================= */
+
+async function clearRandomChallengeAdminQuestion(
+  boxKey,
+  number
+) {
+  if (!currentModel) {
+    showGameToast(
+      "افتح النموذج أولاً"
+    )
+
+    return
+  }
+
+  const n =
+    Number(number || 0)
+
+  if (!n) return
+
+  collectRandomChallengeCurrentDraft()
+
+  const row =
+    getRandomChallengeAdminRow(
+      boxKey,
+      n
+    )
+
+  if (!row?.id) {
+    const questionInput =
+      document.getElementById(
+        `randomChallengeQuestionInput_${boxKey}_${n}`
+      )
+
+    const answerInput =
+      document.getElementById(
+        `randomChallengeAnswerInput_${boxKey}_${n}`
+      )
+
+    if (questionInput) {
+      questionInput.value = ""
+    }
+
+    if (answerInput) {
+      answerInput.value = ""
+    }
+
+    const index =
+      randomChallengeAdminRows
+        .findIndex(item => {
+          return (
+            String(item.box_key) ===
+              String(boxKey) &&
+            Number(item.number) === n
+          )
+        })
+
+    if (index >= 0) {
+      randomChallengeAdminRows[
+        index
+      ] = {
+        ...randomChallengeAdminRows[
+          index
+        ],
+
+        question: "",
+        answer: ""
+      }
+    }
+
+    renderAdminRandomChallengePage()
+
+    showGameToast(
+      "تم تفريغ السؤال"
+    )
+
+    return
+  }
+
+  const ok =
+    await showAdminConfirm(
+      `هل تريد حذف ${
+        boxKey === "trueFalse"
+          ? "العبارة"
+          : "السؤال"
+      } رقم ${n}؟`,
+      {
+        title: "حذف السؤال",
+        okText: "حذف",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!ok) return
+
+  const { error } = await db
+    .from(
+      "random_challenge_questions"
+    )
+    .delete()
+    .eq(
+      "id",
+      Number(row.id)
+    )
+
+  if (error) {
+    console.log(
+      "DELETE RANDOM CHALLENGE QUESTION ERROR:",
+      error
+    )
+
+    showGameToast(
+      "تعذر حذف السؤال"
+    )
+
+    return
+  }
+
+  randomChallengeAdminRows =
+    randomChallengeAdminRows.filter(
+      item => {
+        return (
+          Number(item.id) !==
+          Number(row.id)
+        )
+      }
+    )
+
+  showGameToast(
+    "تم حذف السؤال",
+    "success"
+  )
+
+  renderAdminRandomChallengePage()
+}
+
+
+/* =========================
+   9) DELETE SECTION
+========================= */
+
+async function deleteRandomChallengeCurrentSection() {
+
+  if (
+  randomChallengeAdminSection ===
+  "fatbla"
+) {
+  return await deleteFatblaSection()
+}
+
+  if (!canRunAdminDelete()) {
+    return
+  }
+
+  if (!currentModel) {
+    showGameToast(
+      "افتح النموذج أولاً"
+    )
+
+    return
+  }
+
+  const boxKey =
+    randomChallengeAdminSection
+
+  const count =
+    getRandomChallengeAdminSectionCount(
+      boxKey
+    )
+
+  if (!count) {
+    showGameToast(
+      "هذا القسم لا يحتوي أسئلة"
+    )
+
+    return
+  }
+
+  const sectionTitle =
+    getRandomChallengeAdminSectionTitle(
+      boxKey
+    )
+
+  const ok =
+    await showAdminConfirm(
+      `هل تريد حذف جميع أسئلة ${sectionTitle}؟`,
+      {
+        title: "حذف القسم",
+        okText: "حذف",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!ok) return
+
+  const { error } = await db
+    .from(
+      "random_challenge_questions"
+    )
+    .delete()
+    .eq(
+      "model",
+      Number(currentModel)
+    )
+    .eq(
+      "box_key",
+      boxKey
+    )
+
+  if (error) {
+    console.log(
+      "DELETE RANDOM CHALLENGE SECTION ERROR:",
+      error
+    )
+
+    showGameToast(
+      "تعذر حذف القسم"
+    )
+
+    return
+  }
+
+  randomChallengeAdminRows =
+    randomChallengeAdminRows.filter(
+      row => {
+        return (
+          String(row.box_key) !==
+          String(boxKey)
+        )
+      }
+    )
+
+  showGameToast(
+    "تم حذف القسم",
+    "success"
+  )
+
+  renderAdminRandomChallengePage()
+}
+
+
+/* =========================
+   10) TRUE / FALSE
+========================= */
+
+function selectRandomChallengeTrueFalseAnswer(
+  number,
+  answer,
+  button
+) {
+  const safeAnswer =
+    answer === "خطأ"
+      ? "خطأ"
+      : "صح"
+
+  const input =
+    document.getElementById(
+      `randomChallengeAnswerInput_trueFalse_${number}`
+    )
+
+  if (!input || !button) {
+    return
+  }
+
+  input.value =
+    safeAnswer
+
+  const card =
+    button.closest(
+      ".randomChallengeOnePageCard"
+    )
+
+  card
+    ?.querySelectorAll(
+      ".randomChallengeTrueFalseBtn"
+    )
+    .forEach(item => {
+      item.classList.remove(
+        "selected",
+        "correct",
+        "wrong"
+      )
+    })
+
+  button.classList.add(
+    "selected",
+    safeAnswer === "صح"
+      ? "correct"
+      : "wrong"
+  )
+
+  const existingIndex =
+    randomChallengeAdminRows
+      .findIndex(row => {
+        return (
+          String(row.box_key) ===
+            "trueFalse" &&
+          Number(row.number) ===
+            Number(number)
+        )
+      })
+
+  if (existingIndex >= 0) {
+    randomChallengeAdminRows[
+      existingIndex
+    ].answer = safeAnswer
+  }
 }
 
 /* =========================
@@ -3987,541 +7427,6 @@ async function deleteTop10Segment() {
 }
 
 /* =========================
-   20) Auction - فتبلة
-========================= */
-
-let auctionAdminActiveNumber = 1
-let auctionAdminDraft = {}
-
-function getAuctionDraftItem(number) {
-  const n = Number(number || 1)
-
-  if (!auctionAdminDraft[n]) {
-    auctionAdminDraft[n] = {
-      question: "",
-      answer: "",
-      image: "",
-      video: "",
-      file: null,
-      videoFile: null
-    }
-  }
-
-  return auctionAdminDraft[n]
-}
-
-function collectAuctionCurrentDraft() {
-  const total = Number(auctionAdminCount || 8)
-
-  for (let n = 1; n <= total; n++) {
-    const item = getAuctionDraftItem(n)
-
-    item.question = ""
-    item.answer = (document.getElementById(`auctionAnswer${n}`)?.value || "").trim()
-
-    const file = document.getElementById(`auctionFile${n}`)?.files?.[0] || null
-    if (file) item.file = file
-
-    const videoFile = document.getElementById(`auctionVideo${n}`)?.files?.[0] || null
-    if (videoFile) item.videoFile = videoFile
-  }
-}
-
-function isAuctionDraftComplete(number) {
-  const item = getAuctionDraftItem(number)
-
-  const answer = String(item.answer || "").trim()
-  const image = String(item.image || "").trim()
-  const video = String(item.video || "").trim()
-
-  return !!(answer && (image || video || item.file || item.videoFile))
-}
-
-function getAuctionItemStatus(number) {
-  const item = getAuctionDraftItem(number)
-
-  const hasMedia =
-    isAdminFieldFilled(item.image) ||
-    isAdminFieldFilled(item.video) ||
-    !!item.file ||
-    !!item.videoFile
-
-  const fields = [
-    item.answer,
-    hasMedia ? "media" : ""
-  ]
-
-  const completed = fields.filter(isAdminFieldFilled).length
-  return getAdminItemStatus(completed, fields.length)
-}
-
-function switchAuctionAdminNumber(number) {
-  collectAuctionCurrentDraft()
-
-  const safeNumber = Math.min(
-    Math.max(Number(number || 1), 1),
-    Number(auctionAdminCount || 8)
-  )
-
-  auctionAdminActiveNumber = safeNumber
-  renderAuctionAdminFromDraft()
-}
-
-async function renderAuctionAdmin() {
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const { data, error } = await db
-    .from("auction_questions")
-    .select("*")
-    .eq("model", Number(currentModel))
-    .order("number", { ascending: true })
-
-  if (error) {
-    console.log("LOAD AUCTION ERROR:", error)
-    showGameToast("تعذر تحميل فتبلة")
-    return
-  }
-
-  const { data: settingsData, error: settingsError } = await db
-    .from("segment_settings")
-    .select("item_count")
-    .eq("model", Number(currentModel))
-    .eq("segment", "auction")
-    .maybeSingle()
-
-  if (settingsError) {
-    console.log("AUCTION SETTINGS ERROR:", settingsError)
-  }
-
-  auctionAdminCount = normalizeAdminSegmentCount("auction", settingsData?.item_count || 8)
-
-  auctionAdminDraft = {}
-
-  for (let i = 1; i <= 8; i++) {
-    getAuctionDraftItem(i)
-  }
-
-  ;(data || []).forEach(row => {
-    const n = Number(row.number || 1)
-    const item = getAuctionDraftItem(n)
-
-    item.question = row.question || ""
-    item.answer = row.answer || ""
-    item.image = row.image || ""
-    item.video = row.video || ""
-    item.file = null
-    item.videoFile = null
-  })
-
-  if (auctionAdminActiveNumber > auctionAdminCount) {
-    auctionAdminActiveNumber = auctionAdminCount
-  }
-
-  if (auctionAdminActiveNumber < 1) {
-    auctionAdminActiveNumber = 1
-  }
-
-  await renderAuctionAdminFromDraft()
-}
-
-async function renderAuctionAdminFromDraft() {
-  const total = Number(auctionAdminCount || 8)
-
-  editor().innerHTML = `
-    <div class="auctionAdminShell compactAuctionAdminShell adminOnePageEditor">
-
-      <div class="adminEditorTopBar compactAdminEditorTopBar adminEditorTopBarWithActions">
-        <div>
-          <h2 class="adminSectionTitle">فتبلة</h2>
-        </div>
-
-        <div class="adminInlineActions">
-          <button onclick="saveAuction()" class="adminSaveBtn">حفظ فتبلة</button>
-          <button onclick="deleteAuctionSegment()" class="adminDeleteAllBtn">حذف الفقرة</button>
-        </div>
-      </div>
-
-      <div class="adminEditCardsGrid auctionOnePageGrid">
-        ${Array.from({ length: total }, (_, idx) => {
-          const number = idx + 1
-          return buildAuctionOnePageCard(number)
-        }).join("")}
-      </div>
-
-    </div>
-  `
-
-  normalizeAdminEditorCards()
-}
-
-function buildAuctionOnePageCard(number) {
-  const n = Number(number || 1)
-  const item = getAuctionDraftItem(n)
-  const status = getAuctionItemStatus(n)
-
-  const hasMedia =
-    isAdminFieldFilled(item.image) ||
-    isAdminFieldFilled(item.video) ||
-    !!item.file ||
-    !!item.videoFile
-
-  const missing = []
-
-  if (!isAdminFieldFilled(item.answer)) missing.push("الإجابة")
-  if (!hasMedia) missing.push("الصورة أو الفيديو")
-
-  return `
-    <details class="adminEditItemCard auctionQuestionOnePageCard ${status.className}" ontoggle="handleAdminEditCardToggle(this)">
-      <summary>
-        <div class="adminEditItemTitle">
-          <strong>السؤال ${n}</strong>
-          <span>
-            ${
-              status.isDone
-                ? "بيانات السؤال مكتملة"
-                : `ناقص: ${missing.join("، ")}`
-            }
-          </span>
-        </div>
-
-        <div class="adminEditItemMeta">
-          <span class="adminEditStatusPill">${status.label}</span>
-          <span class="adminEditProgressPill">${status.progress}</span>
-        </div>
-      </summary>
-
-      <div class="adminEditItemBody">
-        <div class="auctionOnePageLayout auctionOnePageLayoutAnswerOnly">
-
-          <div class="auctionOnePageMedia">
-            <div class="adminField ${hasMedia ? "" : "adminMissingField"}">
-              <label>الصورة</label>
-              <input type="file" id="auctionFile${n}" accept="image/*">
-            </div>
-
-            <div class="adminField ${hasMedia ? "" : "adminMissingField"}">
-              <label>الفيديو</label>
-              <input type="file" id="auctionVideo${n}" accept="video/*">
-            </div>
-
-            ${
-              !hasMedia
-                ? `<div class="adminMissingHint">الصورة أو الفيديو مطلوبة</div>`
-                : ""
-            }
-
-            <div class="auctionPreviewBox auctionPreviewLarge">
-              ${
-                item.video
-                  ? `<video src="${escapeHtml(item.video)}" class="previewImg" controls></video>`
-                  : item.image
-                    ? `<img src="${escapeHtml(item.image)}" class="previewImg">`
-                    : `<div class="emptyImageHint">لا توجد صورة أو فيديو حالياً</div>`
-              }
-            </div>
-          </div>
-
-          <div class="auctionOnePageFields">
-            <div class="adminField ${getAdminMissingFieldClass(item.answer)}">
-              <label>الإجابة</label>
-              <input
-                id="auctionAnswer${n}"
-                placeholder="الإجابة"
-                value="${escapeHtml(item.answer || "")}"
-              >
-
-              ${
-                !isAdminFieldFilled(item.answer)
-                  ? `<div class="adminMissingHint">الإجابة ناقصة</div>`
-                  : ""
-              }
-            </div>
-
-            <button class="adminDeleteBtn" onclick="clearAuctionQuestion(${n})">
-              حذف السؤال
-            </button>
-          </div>
-
-        </div>
-      </div>
-    </details>
-  `
-}
-
-async function applyAuctionCount() {
-  if (isAdminSaving()) return false
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return false
-  }
-
-  try {
-    collectAuctionCurrentDraft()
-    setAdminSaving(true, "جارٍ حفظ العدد...")
-
-    const count = Number(document.getElementById("auctionCountInput")?.value || 8)
-    auctionAdminCount = Math.min(Math.max(count, 1), 8)
-
-    const { error } = await db
-      .from("segment_settings")
-      .upsert(
-        {
-          model: Number(currentModel),
-          segment: "auction",
-          item_count: auctionAdminCount
-        },
-        {
-          onConflict: "model,segment"
-        }
-      )
-
-    if (error) {
-      console.log("SAVE AUCTION COUNT ERROR:", error)
-      showGameToast("تعذر حفظ عدد الأسئلة")
-      return false
-    }
-
-    if (auctionAdminActiveNumber > auctionAdminCount) {
-      auctionAdminActiveNumber = auctionAdminCount
-    }
-
-    showGameToast("تم حفظ عدد أسئلة فتبلة")
-    await renderAuctionAdminFromDraft()
-    await renderAdminTabsUnified()
-    return true
-  } catch (err) {
-    console.log("APPLY AUCTION COUNT CATCH:", err)
-    showGameToast("تعذر حفظ عدد أسئلة فتبلة")
-    return false
-  } finally {
-    setAdminSaving(false)
-  }
-}
-
-async function saveAuction() {
-  if (isAdminSaving()) return false
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return false
-  }
-
-  try {
-    collectAuctionCurrentDraft()
-
-    setAdminSaving(true, "جارٍ حفظ فتبلة...")
-    showGameToast("جارٍ حفظ فتبلة...")
-
-    const finalCount = normalizeAdminSegmentCount("auction", auctionAdminCount || 8)
-    auctionAdminCount = finalCount
-
-    const { data: oldRows, error: oldError } = await db
-      .from("auction_questions")
-      .select("number, image, video")
-      .eq("model", Number(currentModel))
-
-    if (oldError) {
-      console.log("READ OLD AUCTION ERROR:", oldError)
-      showGameToast("تعذر قراءة بيانات فتبلة القديمة")
-      return false
-    }
-
-    const oldMap = {}
-
-    ;(oldRows || []).forEach(row => {
-      oldMap[Number(row.number)] = row
-    })
-
-    const rows = []
-    const keepNumbers = []
-
-    for (let i = 1; i <= finalCount; i++) {
-      const item = getAuctionDraftItem(i)
-
-      const question = ""
-      const answer = String(item.answer || "").trim()
-
-      let image = oldMap[i]?.image || item.image || ""
-      let video = oldMap[i]?.video || item.video || ""
-
-      if (item.file) {
-        image = await uploadImageFile(item.file, `auction_${i}`)
-        item.file = null
-        item.image = image
-        video = ""
-      }
-
-      if (item.videoFile) {
-        video = await uploadVideoFile(item.videoFile, `auction_video_${i}`)
-        item.videoFile = null
-        item.video = video
-        image = ""
-      }
-
-      if (!answer && !image && !video) continue
-
-      rows.push({
-        model: Number(currentModel),
-        number: Number(i),
-        question,
-        answer,
-        image,
-        video,
-        note: ""
-      })
-
-      keepNumbers.push(Number(i))
-    }
-
-    const { error: settingsError } = await db
-      .from("segment_settings")
-      .upsert(
-        {
-          model: Number(currentModel),
-          segment: "auction",
-          item_count: finalCount
-        },
-        {
-          onConflict: "model,segment"
-        }
-      )
-
-    if (settingsError) {
-      console.log("SAVE AUCTION SETTINGS ERROR:", settingsError)
-      showGameToast("تعذر حفظ عدد أسئلة فتبلة")
-      return false
-    }
-
-    if (rows.length) {
-      const { error: saveError } = await db
-        .from("auction_questions")
-        .upsert(rows, {
-          onConflict: "model,number"
-        })
-
-      if (saveError) {
-        console.log("SAVE AUCTION ERROR:", saveError)
-        showGameToast("فشل حفظ فتبلة")
-        return false
-      }
-    }
-
-    const { data: existingRows, error: existingError } = await db
-      .from("auction_questions")
-      .select("number")
-      .eq("model", Number(currentModel))
-
-    if (existingError) {
-      console.log("READ EXISTING AUCTION ERROR:", existingError)
-      showGameToast("تم الحفظ لكن تعذر قراءة القديم للتنظيف")
-      return false
-    }
-
-    for (const oldRow of existingRows || []) {
-      const oldNumber = Number(oldRow.number)
-
-      if (!keepNumbers.includes(oldNumber)) {
-        const { error: deleteError } = await db
-          .from("auction_questions")
-          .delete()
-          .eq("model", Number(currentModel))
-          .eq("number", oldNumber)
-
-        if (deleteError) {
-          console.log("DELETE OLD AUCTION ERROR:", deleteError)
-          showGameToast("تم الحفظ لكن تعذر تنظيف بعض أسئلة فتبلة")
-          return false
-        }
-      }
-    }
-
-    showGameToast(rows.length ? "تم حفظ فتبلة" : "تم حذف جميع أسئلة فتبلة")
-    await renderAuctionAdmin()
-    await renderAdminTabsUnified()
-    return true
-  } catch (err) {
-    console.log("SAVE AUCTION CATCH:", err)
-    showGameToast("توقف الحفظ بسبب خطأ في الرفع أو البيانات")
-    return false
-  } finally {
-    setAdminSaving(false)
-  }
-}
-
-async function clearAuctionQuestion(i) {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const ok = confirm(`هل تريد حذف سؤال فتبلة رقم ${i} نهائيًا؟`)
-  if (!ok) return
-
-  try {
-    const { error } = await db
-      .from("auction_questions")
-      .delete()
-      .eq("model", Number(currentModel))
-      .eq("number", Number(i))
-
-    if (error) {
-      console.log("CLEAR AUCTION QUESTION ERROR:", error)
-      showGameToast("تعذر حذف السؤال")
-      return
-    }
-
-    showGameToast(`تم حذف السؤال ${i}`)
-    await renderAuctionAdmin()
-    await renderAdminTabsUnified()
-  } catch (err) {
-    console.log("CLEAR AUCTION QUESTION CATCH:", err)
-    showGameToast("حدث خطأ أثناء حذف السؤال")
-  }
-}
-
-async function deleteAuctionSegment() {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
-  }
-
-  const ok = confirm("هل تريد حذف فقرة فتبلة كاملة نهائيًا؟")
-  if (!ok) return
-
-  try {
-    const [rowsRes, settingsRes] = await Promise.all([
-      db.from("auction_questions").delete().eq("model", Number(currentModel)),
-      db.from("segment_settings").delete().eq("model", Number(currentModel)).eq("segment", "auction")
-    ])
-
-    if (rowsRes.error || settingsRes.error) {
-      console.log(rowsRes.error || settingsRes.error)
-      showGameToast("تعذر حذف فقرة فتبلة")
-      return
-    }
-
-    auctionAdminCount = 8
-    auctionAdminActiveNumber = 1
-    auctionAdminDraft = {}
-
-    showGameToast("تم حذف فقرة فتبلة")
-    await renderAuctionAdmin()
-    await renderAdminTabsUnified()
-  } catch (err) {
-    console.log("DELETE AUCTION SEGMENT CATCH:", err)
-    showGameToast("حدث خطأ أثناء حذف الفقرة")
-  }
-}
-
-/* =========================
    21) Who - من هو
 ========================= */
 
@@ -5013,7 +7918,7 @@ function getExplainDraftItem(number) {
 function collectExplainDraft() {
   explainAdminCount = normalizeAdminSegmentCount(
     "explain",
-    Number(explainAdminCount || 4)
+    Number(explainAdminCount || 5)
   )
 
   for (let i = 1; i <= explainAdminCount; i++) {
@@ -5060,7 +7965,7 @@ async function renderExplainAdmin() {
 
   explainAdminDraft = {}
 
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= 9; i++) {
     getExplainDraftItem(i)
   }
 
@@ -5076,7 +7981,7 @@ async function renderExplainAdmin() {
 }
 
 async function renderExplainAdminFromDraft() {
-  const total = Number(explainAdminCount || 4)
+  const total = Number(explainAdminCount || 5)
 
   editor().innerHTML = `
     <div class="explainAdminShell compactExplainAdminShell adminOnePageEditor">
@@ -5170,7 +8075,7 @@ function buildExplainOnePageCard(number) {
 function changeExplainWordsCount() {
   collectExplainDraft()
 
-  const count = Number(document.getElementById("explainWordsCountInput")?.value || 4)
+  const count = Number(document.getElementById("explainWordsCountInput")?.value || 5)
   explainAdminCount = normalizeAdminSegmentCount("explain", count)
 
   renderExplainAdminFromDraft()
@@ -5188,7 +8093,7 @@ async function saveExplainSettingsOnly() {
     collectExplainDraft()
     setAdminSaving(true, "جارٍ حفظ العدد...")
 
-    const count = Number(document.getElementById("explainWordsCountInput")?.value || 4)
+    const count = Number(document.getElementById("explainWordsCountInput")?.value || 5)
     explainAdminCount = normalizeAdminSegmentCount("explain", count)
 
     const saved = await saveAdminSegmentCount("explain", explainAdminCount)
@@ -5225,11 +8130,37 @@ async function saveExplain() {
 
     explainAdminCount = normalizeAdminSegmentCount(
   "explain",
-  Number(explainAdminCount || 4)
+  Number(explainAdminCount || 5)
 )
 
     const rows = []
     const keepNumbers = []
+
+    const { error: settingsError } = await db
+  .from("segment_settings")
+  .upsert(
+    {
+      model: Number(currentModel),
+      segment: "explain",
+      item_count: explainAdminCount
+    },
+    {
+      onConflict: "model,segment"
+    }
+  )
+
+if (settingsError) {
+  console.log(
+    "SAVE EXPLAIN SETTINGS ERROR:",
+    settingsError
+  )
+
+  showGameToast(
+    "تعذر حفظ عدد كلمات اشرح الكلمة"
+  )
+
+  return false
+}
 
     for (let i = 1; i <= explainAdminCount; i++) {
       const item = getExplainDraftItem(i)
@@ -5340,7 +8271,7 @@ async function deleteExplainSegment() {
       return
     }
 
-    explainAdminCount = 4
+    explainAdminCount = 5
     explainAdminDraft = {}
 
     updateAdminQuickSettingUI("explain", explainAdminCount)
@@ -5431,7 +8362,10 @@ async function getFinalAdminDoneMap() {
   ;(r1Res.data || []).forEach(row => {
     const number = Number(row.number)
 
-    if (number >= 1 && number <= 8) {
+    if (
+  number >= 1 &&
+  number <= 9
+) {
       r1Map[number] = row
     }
   })
@@ -5521,7 +8455,11 @@ doneMap[2] = round2Done
   ;(r1Res.data || []).forEach(row => {
     const number = Number(row.number)
 
-    if (number >= 201 && number <= 208) {
+    if (
+  number >= 201 &&
+   number <= 209
+  )
+  {
       storyMap[number] = row
     }
   })
@@ -5550,43 +8488,69 @@ doneMap[2] = round2Done
 
   doneMap[3] = round3Done
 
-  /* Round 4 - التركيز */
-  const focusCount = await getAdminSegmentCount("finalRound4")
-  const focusMap = {}
+/* Round 4 - التركيز */
 
-  ;(r3Res.data || []).forEach(row => {
-    const number = Number(row.number)
-    const imageOrder = Number(row.image_order || 1)
+const focusCount =
+  await getAdminSegmentCount(
+    "finalRound4"
+  )
 
-    if (number >= 1 && number <= 8 && imageOrder === 1) {
-      focusMap[number] = row
-    }
-  })
+const focusMap = {}
 
-  let round4Done = true
+;(r3Res.data || []).forEach(row => {
+  const number =
+    Number(row.number)
 
-  for (let number = 1; number <= focusCount; number++) {
-    const row = focusMap[number]
+  const imageOrder =
+    Number(
+      row.image_order || 1
+    )
 
-    if (!row) {
-      round4Done = false
-      break
-    }
+  if (
+    number >= 1 &&
+    number <= focusCount &&
+    imageOrder === 1
+  ) {
+    focusMap[number] = row
+  }
+})
 
-    if (!hasText(row.image) && !hasText(row.video)) {
-      round4Done = false
-      break
-    }
+let round4Done =
+  focusCount > 0
 
-    if (!hasText(row.question) || !hasText(row.answer)) {
-      round4Done = false
-      break
-    }
+for (
+  let number = 1;
+  number <= focusCount;
+  number++
+) {
+  const row =
+    focusMap[number]
+
+  if (!row) {
+    round4Done = false
+    break
   }
 
-  doneMap[4] = round4Done
+  if (
+    !hasText(row.image) &&
+    !hasText(row.video)
+  ) {
+    round4Done = false
+    break
+  }
 
-  return doneMap
+  if (
+    !hasText(row.question) ||
+    !hasText(row.answer)
+  ) {
+    round4Done = false
+    break
+  }
+}
+
+doneMap[4] = round4Done
+
+return doneMap
 }
 
 /* =========================
@@ -5647,33 +8611,72 @@ async function renderFinalAdminRound(round) {
 }
 
 async function changeFinalRound1CardsCount() {
-  const count = Number(document.getElementById("finalRound1CardsCount")?.value || 6)
-  finalRound1AdminCount = normalizeAdminSegmentCount("finalRound1", count)
+  const count = Number(
+    document.getElementById("finalRound1CardsCount")?.value || 7
+  )
 
-  await saveAdminSegmentCount("finalRound1", finalRound1AdminCount)
-  updateAdminQuickSettingUI("finalRound1", finalRound1AdminCount)
+  finalRound1AdminCount = normalizeAdminSegmentCount(
+    "finalRound1",
+    count
+  )
+
+  await saveAdminSegmentCount(
+    "finalRound1",
+    finalRound1AdminCount
+  )
+
+  updateAdminQuickSettingUI(
+    "finalRound1",
+    finalRound1AdminCount
+  )
 
   await renderFinalAdminRound(1)
   await renderAdminTabsUnified()
 }
 
 async function changeFinalRound3Count() {
-  const count = Number(document.getElementById("finalRound3Count")?.value || 4)
-  finalRound3AdminCount = normalizeAdminSegmentCount("finalRound3", count)
+  const count = Number(
+    document.getElementById("finalRound3Count")?.value || 5
+  )
 
-  await saveAdminSegmentCount("finalRound3", finalRound3AdminCount)
-  updateAdminQuickSettingUI("finalRound3", finalRound3AdminCount)
+  finalRound3AdminCount = normalizeAdminSegmentCount(
+    "finalRound3",
+    count
+  )
+
+  await saveAdminSegmentCount(
+    "finalRound3",
+    finalRound3AdminCount
+  )
+
+  updateAdminQuickSettingUI(
+    "finalRound3",
+    finalRound3AdminCount
+  )
 
   await renderFinalAdminRound(3)
   await renderAdminTabsUnified()
 }
 
 async function changeFinalRound4Count() {
-  const count = Number(document.getElementById("finalRound4Count")?.value || 4)
-  finalRound4AdminCount = normalizeAdminSegmentCount("finalRound4", count)
+  const count = Number(
+    document.getElementById("finalRound4Count")?.value || 5
+  )
 
-  await saveAdminSegmentCount("finalRound4", finalRound4AdminCount)
-  updateAdminQuickSettingUI("finalRound4", finalRound4AdminCount)
+  finalRound4AdminCount = normalizeAdminSegmentCount(
+    "finalRound4",
+    count
+  )
+
+  await saveAdminSegmentCount(
+    "finalRound4",
+    finalRound4AdminCount
+  )
+
+  updateAdminQuickSettingUI(
+    "finalRound4",
+    finalRound4AdminCount
+  )
 
   await renderFinalAdminRound(4)
   await renderAdminTabsUnified()
@@ -5740,7 +8743,7 @@ async function buildFinalRound1Admin() {
     .select("*")
     .eq("model", Number(currentModel))
     .gte("number", 1)
-    .lte("number", 8)
+    .lte("number", 9)
     .order("number", { ascending: true })
 
   if (error) {
@@ -5861,6 +8864,15 @@ async function saveFinalRound1(skipSavingLock = false) {
 
 finalRound1AdminCount = safeCardsCount
 
+const countSaved = await saveAdminSegmentCount(
+  "finalRound1",
+  safeCardsCount
+)
+
+if (!countSaved) {
+  return false
+}
+
     const rows = []
 
     for (let i = 1; i <= safeCardsCount; i++) {
@@ -5892,7 +8904,7 @@ finalRound1AdminCount = safeCardsCount
       .select("number")
       .eq("model", Number(currentModel))
       .gte("number", 1)
-      .lte("number", 8)
+      .lte("number", 9)
 
     if (existingError) {
       console.log("READ FINAL ROUND 1 EXISTING ERROR:", existingError)
@@ -6392,7 +9404,7 @@ async function buildFinalRound3StoryAdmin() {
     .select("*")
     .eq("model", Number(currentModel))
     .gte("number", 201)
-    .lte("number", 208)
+    .lte("number", 209)
     .order("number", { ascending: true })
 
   if (error) {
@@ -6542,6 +9554,15 @@ async function saveFinalRound3Story(skipSavingLock = false) {
 
 finalRound3AdminCount = safeCount
 
+const countSaved = await saveAdminSegmentCount(
+  "finalRound3",
+  safeCount
+)
+
+if (!countSaved) {
+  return false
+}
+
     const rows = []
 
     for (let i = 1; i <= safeCount; i++) {
@@ -6581,7 +9602,7 @@ finalRound3AdminCount = safeCount
       .select("number")
       .eq("model", Number(currentModel))
       .gte("number", 201)
-      .lte("number", 208)
+      .lte("number", 209)
 
     if (existingError) {
       console.log("READ FINAL STORY EXISTING ERROR:", existingError)
@@ -6702,7 +9723,7 @@ async function buildFinalRound3FocusAdmin() {
     const number = Number(row.number)
     const imageOrder = Number(row.image_order || 1)
 
-    if (number >= 1 && number <= 8 && imageOrder === 1) {
+    if (number >= 1 && number <= 9 && imageOrder === 1) {
       map[number] = row
     }
   })
@@ -6855,6 +9876,15 @@ async function saveFinalRound3Focus(skipSavingLock = false) {
 
 finalRound4AdminCount = safeCount
 
+const countSaved = await saveAdminSegmentCount(
+  "finalRound4",
+  safeCount
+)
+
+if (!countSaved) {
+  return false
+}
+
     const { data: oldRows, error: oldError } = await db
       .from("final_round3_items")
       .select("*")
@@ -6872,7 +9902,7 @@ finalRound4AdminCount = safeCount
       const number = Number(row.number)
       const imageOrder = Number(row.image_order || 1)
 
-      if (number >= 1 && number <= 8 && imageOrder === 1) {
+      if (number >= 1 && number <= 9 && imageOrder === 1) {
         oldMap[number] = row
       }
     })
@@ -6946,7 +9976,11 @@ finalRound4AdminCount = safeCount
     for (const oldRow of existingRows || []) {
       const oldNumber = Number(oldRow.number)
 
-      if (oldNumber >= 1 && oldNumber <= 8 && !keepNumbers.includes(oldNumber)) {
+      if (
+  oldNumber >= 1 &&
+  oldNumber <= 9 &&
+  !keepNumbers.includes(oldNumber)
+) {
         const { error: deleteError } = await db
           .from("final_round3_items")
           .delete()
@@ -7233,7 +10267,7 @@ async function deleteFinalRound(round) {
         .delete()
         .eq("model", Number(currentModel))
         .gte("number", 1)
-        .lte("number", 8)
+        .lte("number", 9)
 
       await db
         .from("segment_settings")
@@ -7241,7 +10275,7 @@ async function deleteFinalRound(round) {
         .eq("model", Number(currentModel))
         .eq("segment", "finalRound1")
 
-      finalRound1AdminCount = 6
+      finalRound1AdminCount = 7
     }
 
     if (safeRound === 2) {
@@ -7265,7 +10299,7 @@ async function deleteFinalRound(round) {
         .delete()
         .eq("model", Number(currentModel))
         .gte("number", 201)
-        .lte("number", 208)
+        .lte("number", 209)
 
       await db
         .from("segment_settings")
@@ -7273,7 +10307,7 @@ async function deleteFinalRound(round) {
         .eq("model", Number(currentModel))
         .eq("segment", "finalRound3")
 
-      finalRound3AdminCount = 4
+      finalRound3AdminCount = 5
     }
 
     if (safeRound === 4) {
@@ -7282,7 +10316,7 @@ async function deleteFinalRound(round) {
         .delete()
         .eq("model", Number(currentModel))
         .gte("number", 1)
-        .lte("number", 8)
+        .lte("number", 9)
 
       await db
         .from("segment_settings")
@@ -7290,7 +10324,7 @@ async function deleteFinalRound(round) {
         .eq("model", Number(currentModel))
         .eq("segment", "finalRound4")
 
-      finalRound4AdminCount = 4
+      finalRound4AdminCount = 5
     }
 
     showGameToast(`تم حذف ${title}`)
@@ -8434,11 +11468,54 @@ async function toggleGlobalSegmentVisibilityFromGate(segmentKey) {
     await renderAdminHome()
   }
 }
+window.openGlobalSegmentVisibilityPanel =
+  openGlobalSegmentVisibilityPanel
 
-window.openGlobalSegmentVisibilityPanel = openGlobalSegmentVisibilityPanel
-window.closeGlobalSegmentVisibilityPanel = closeGlobalSegmentVisibilityPanel
-window.toggleGlobalSegmentVisibilityFromGate = toggleGlobalSegmentVisibilityFromGate
-window.loadGlobalSegmentVisibilityMap = loadGlobalSegmentVisibilityMap
-window.isAdminSegmentGloballyEnabled = isAdminSegmentGloballyEnabled
-window.toggleAdminSegmentVisibility = toggleAdminSegmentVisibility
-window.setGlobalSegmentEnabled = setGlobalSegmentEnabled
+window.closeGlobalSegmentVisibilityPanel =
+  closeGlobalSegmentVisibilityPanel
+
+window.toggleGlobalSegmentVisibilityFromGate =
+  toggleGlobalSegmentVisibilityFromGate
+
+window.loadGlobalSegmentVisibilityMap =
+  loadGlobalSegmentVisibilityMap
+
+window.isAdminSegmentGloballyEnabled =
+  isAdminSegmentGloballyEnabled
+
+window.toggleAdminSegmentVisibility =
+  toggleAdminSegmentVisibility
+
+window.setGlobalSegmentEnabled =
+  setGlobalSegmentEnabled
+
+
+/* =========================
+   RANDOM CHALLENGE EXPORTS
+========================= */
+
+window.openAdminRandomChallenge =
+  openAdminRandomChallenge
+
+window.switchRandomChallengeAdminSection =
+  switchRandomChallengeAdminSection
+
+window.saveRandomChallengeCurrentSection =
+  saveRandomChallengeCurrentSection
+
+window.clearRandomChallengeAdminQuestion =
+  clearRandomChallengeAdminQuestion
+
+window.deleteRandomChallengeCurrentSection =
+  deleteRandomChallengeCurrentSection
+
+window.selectRandomChallengeTrueFalseAnswer =
+  selectRandomChallengeTrueFalseAnswer
+  window.saveFatblaSection =
+  saveFatblaSection
+
+window.clearFatblaQuestion =
+  clearFatblaQuestion
+
+window.deleteFatblaSection =
+  deleteFatblaSection

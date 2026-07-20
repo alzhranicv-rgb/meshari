@@ -84,3 +84,175 @@ window.randomSharedPlayerMedia = {
     "assets/images/random-media/world/ويلز 13.png"
   ]
 };
+/* =========================
+   Random Shared Media Cache
+========================= */
+
+const randomSharedMediaLoaded =
+  new Set()
+
+const randomSharedMediaPromises =
+  new Map()
+
+function preloadRandomSharedImage(src) {
+  const cleanSrc =
+    String(src || "").trim()
+
+  if (!cleanSrc) {
+    return Promise.resolve(false)
+  }
+
+  if (
+    randomSharedMediaLoaded.has(
+      cleanSrc
+    )
+  ) {
+    return Promise.resolve(true)
+  }
+
+  if (
+    randomSharedMediaPromises.has(
+      cleanSrc
+    )
+  ) {
+    return randomSharedMediaPromises.get(
+      cleanSrc
+    )
+  }
+
+  const promise =
+    new Promise(resolve => {
+      const image =
+        new Image()
+
+      image.decoding = "async"
+
+      image.onload = () => {
+        randomSharedMediaLoaded.add(
+          cleanSrc
+        )
+
+        randomSharedMediaPromises.delete(
+          cleanSrc
+        )
+
+        resolve(true)
+      }
+
+      image.onerror = () => {
+        randomSharedMediaPromises.delete(
+          cleanSrc
+        )
+
+        resolve(false)
+      }
+
+      image.src = cleanSrc
+    })
+
+  randomSharedMediaPromises.set(
+    cleanSrc,
+    promise
+  )
+
+  return promise
+}
+
+async function loadRandomSharedImage(
+  src
+) {
+  const loaded =
+    await preloadRandomSharedImage(
+      src
+    )
+
+  return loaded
+    ? src
+    : ""
+}
+
+function preloadNextRandomSharedImages(
+  category,
+  currentIndex,
+  count = 2
+) {
+  const list =
+    window.randomSharedPlayerMedia?.[
+      category
+    ] || []
+
+  if (!list.length) return
+
+  const start =
+    Number(currentIndex || 0) + 1
+
+  const images = []
+
+  for (
+    let offset = 0;
+    offset < count;
+    offset++
+  ) {
+    const index =
+      (start + offset) %
+      list.length
+
+    if (list[index]) {
+      images.push(
+        list[index]
+      )
+    }
+  }
+
+  const runPreload = () => {
+    images.forEach(src => {
+      preloadRandomSharedImage(
+        src
+      )
+    })
+  }
+
+  if (
+    "requestIdleCallback" in window
+  ) {
+    requestIdleCallback(
+      runPreload,
+      {
+        timeout: 1200
+      }
+    )
+  } else {
+    setTimeout(
+      runPreload,
+      150
+    )
+  }
+}
+
+function getRandomSharedMediaList(
+  category
+) {
+  return Array.isArray(
+    window
+      .randomSharedPlayerMedia?.[
+        category
+      ]
+  )
+    ? window
+        .randomSharedPlayerMedia[
+          category
+        ]
+    : []
+}
+
+window.preloadRandomSharedImage =
+  preloadRandomSharedImage
+
+window.loadRandomSharedImage =
+  loadRandomSharedImage
+
+window.preloadNextRandomSharedImages =
+  preloadNextRandomSharedImages
+
+window.getRandomSharedMediaList =
+  getRandomSharedMediaList

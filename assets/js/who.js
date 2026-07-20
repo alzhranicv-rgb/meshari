@@ -23,6 +23,14 @@ let whoLastTickPlayed = null
 let whoTimerStarted = false
 let whoCompensationMode = false
 let whoScoringLocked = false
+let whoTimer = null
+let whoStateSyncTimer = null
+let whoFinishTimeout = null
+let whoDataCache = {}
+let whoDataPromise = null
+
+const WHO_DATA_CACHE_TTL =
+  10 * 60 * 1000
 let whoMaxNumber = Number(
   window.whoMaxNumber ||
   localStorage.getItem("who_max_number") ||
@@ -51,102 +59,496 @@ function syncWhoGlobals() {
   }
 }
 
-function saveWhoState() {
+function saveWhoState(options = {}) {
   const timerBox = document.getElementById("timer")
 
   const state = {
-    whoState: JSON.parse(JSON.stringify(whoState)),
-    whoDoubleState: JSON.parse(JSON.stringify(whoDoubleState)),
-    currentWhoAnswer,
-    currentWhoImage,
-    whoQuestionLocked,
-    whoCurrentNumber,
-    whoTimerStarted,
-    whoCompensationMode,
-    timerValue: timerBox ? Number(timerBox.innerText || 0) : 0
+    whoState: JSON.parse(
+      JSON.stringify(whoState || {})
+    ),
+
+    whoDoubleState: JSON.parse(
+      JSON.stringify(
+        whoDoubleState || {
+          used: {
+            A: false,
+            B: false
+          },
+          activeTeam: null
+        }
+      )
+    ),
+
+    currentWhoAnswer:
+      currentWhoAnswer || null,
+
+    currentWhoImage:
+      currentWhoImage || null,
+
+    whoQuestionLocked:
+      !!whoQuestionLocked,
+
+    whoCurrentNumber:
+      whoCurrentNumber !== null
+        ? Number(whoCurrentNumber)
+        : null,
+
+    whoTimerStarted:
+      !!whoTimerStarted,
+
+    whoCompensationMode:
+      !!whoCompensationMode,
+
+    timerValue:
+      Number(timerBox?.innerText || 0)
   }
 
-  localStorage.setItem(WHO_STORAGE_KEY, JSON.stringify(state))
-  localStorage.setItem("active_segment", "who")
+  localStorage.setItem(
+    WHO_STORAGE_KEY,
+    JSON.stringify(state)
+  )
+
+  localStorage.setItem(
+    "active_segment",
+    "who"
+  )
 
   syncWhoGlobals()
 
-  if (typeof saveUnifiedGameState === "function") {
+  if (
+    typeof saveUnifiedGameState ===
+    "function"
+  ) {
     saveUnifiedGameState()
   }
 
-  if (typeof syncDisplayStateToSession === "function") {
-    syncDisplayStateToSession()
-  }
+  clearTimeout(whoStateSyncTimer)
+
+  const immediate =
+    options.immediate === true
+
+  whoStateSyncTimer = setTimeout(() => {
+    if (
+      typeof syncDisplayStateToSession ===
+      "function"
+    ) {
+      syncDisplayStateToSession({
+        immediate
+      })
+    }
+  }, immediate ? 0 : 120)
 }
 
 function restoreWhoState(saved) {
   if (!saved) return
 
-  whoState = saved.whoState || whoState
+  clearInterval(whoTimer)
+  whoTimer = null
 
-  whoDoubleState = saved.whoDoubleState || {
-    used: { A: false, B: false },
-    activeTeam: null
+  clearTimeout(whoFinishTimeout)
+  whoFinishTimeout = null
+
+
+
+  whoState = saved.whoState || {
+    usedNumbers: [],
+    scoreA: 0,
+    scoreB: 0,
+    currentPoints: 0,
+    activeTeam: null,
+    manualStartDone: false,
+    lastAnsweredTeam: null
   }
 
-  currentWhoAnswer = saved.currentWhoAnswer || null
-  currentWhoImage = saved.currentWhoImage || null
-  whoQuestionLocked = !!saved.whoQuestionLocked
-  whoCurrentNumber = saved.whoCurrentNumber || null
-  whoTimerStarted = !!saved.whoTimerStarted
-  whoCompensationMode = !!saved.whoCompensationMode
+  if (!Array.isArray(whoState.usedNumbers)) {
+    whoState.usedNumbers = []
+  }
+
+  whoState.usedNumbers =
+    whoState.usedNumbers
+      .map(Number)
+      .filter(number => Number.isFinite(number))
+
+  whoState.scoreA =
+    Number(whoState.scoreA || 0)
+
+  whoState.scoreB =
+    Number(whoState.scoreB || 0)
+
+  whoState.currentPoints =
+    Number(whoState.currentPoints || 0)
+
+  whoState.activeTeam =
+    whoState.activeTeam === "A" ||
+    whoState.activeTeam === "B"
+      ? whoState.activeTeam
+      : null
+
+  whoDoubleState =
+    saved.whoDoubleState || {
+      used: {
+        A: false,
+        B: false
+      },
+      activeTeam: null
+    }
+
+  if (!whoDoubleState.used) {
+    whoDoubleState.used = {
+      A: false,
+      B: false
+    }
+  }
+
+  whoDoubleState.used.A =
+    !!whoDoubleState.used.A
+
+  whoDoubleState.used.B =
+    !!whoDoubleState.used.B
+
+  whoDoubleState.activeTeam =
+    whoDoubleState.activeTeam === "A" ||
+    whoDoubleState.activeTeam === "B"
+      ? whoDoubleState.activeTeam
+      : null
+
+  currentWhoAnswer =
+    saved.currentWhoAnswer || null
+
+  currentWhoImage =
+    saved.currentWhoImage || null
+
+  whoQuestionLocked =
+    !!saved.whoQuestionLocked
+
+  whoCurrentNumber =
+    saved.whoCurrentNumber !== null &&
+    saved.whoCurrentNumber !== undefined
+      ? Number(saved.whoCurrentNumber)
+      : null
+
+  whoTimerStarted =
+    !!saved.whoTimerStarted
+
+  whoCompensationMode =
+    !!saved.whoCompensationMode
+
   whoLastTickPlayed = null
+  whoScoringLocked = false
 
   syncWhoGlobals()
-  if (whoState.activeTeam) {
-  setWhoActiveTeam(whoState.activeTeam, { sync:false })
-} else {
-  setWhoActiveTeam(null)
-}
 
-  const scoreABox = document.getElementById("whoScoreA")
-  const scoreBBox = document.getElementById("whoScoreB")
+  setWhoActiveTeam(
+    whoState.activeTeam,
+    {
+      sync: false,
+      save: false
+    }
+  )
 
-  if (scoreABox) scoreABox.innerText = whoState.scoreA
-  if (scoreBBox) scoreBBox.innerText = whoState.scoreB
+  const scoreABox =
+    document.getElementById("whoScoreA")
+
+  const scoreBBox =
+    document.getElementById("whoScoreB")
+
+  if (scoreABox) {
+    scoreABox.innerText =
+      whoState.scoreA
+  }
+
+  if (scoreBBox) {
+    scoreBBox.innerText =
+      whoState.scoreB
+  }
 
   highlightWhoPoints()
   highlightWhoTurnTeam()
   updateWhoTurnBox()
   updateWhoDoubleButton()
 
-  const grid = document.querySelector(".whoGrid")
+  const grid =
+    document.querySelector(".whoGrid")
+
   if (grid) {
     grid.innerHTML = createWhoGrid()
   }
 
   updateWhoCompensationButton()
+  setWhoScoreButtonsLocked(false)
 
-  if (currentWhoImage) {
-    showWhoImageFullscreen(currentWhoImage)
+  if (
+    currentWhoImage &&
+    whoQuestionLocked
+  ) {
+    showWhoImageFullscreen(
+      currentWhoImage
+    )
+
+    openWhoImageOverlay()
   }
 
-  const timerValue = Number(saved.timerValue || 0)
+  const timerValue =
+    Number(saved.timerValue || 0)
 
-  if (whoTimerStarted && timerValue > 0) {
+  if (
+    whoTimerStarted &&
+    whoQuestionLocked &&
+    timerValue > 0
+  ) {
     resumeWhoTimer(timerValue)
+  } else {
+    resetWhoTimer({
+      save: false
+    })
   }
+
+  saveWhoState({
+    immediate: true
+  })
+}
+
+/* =========================
+   Data Cache
+========================= */
+
+function buildWhoDataCache(rows = []) {
+  const cache = {}
+
+  ;(rows || []).forEach(row => {
+    const number =
+      Number(row.number || 0)
+
+    if (
+      number < 1 ||
+      number > whoMaxNumber
+    ) {
+      return
+    }
+
+    cache[number] = {
+      number,
+      answer:
+        String(row.answer || ""),
+      image:
+        String(row.image || "")
+    }
+  })
+
+  whoDataCache = cache
+
+  return whoDataCache
+}
+
+async function loadWhoData(
+  options = {}
+) {
+  const modelId =
+    Number(
+      window.currentModel ||
+      currentModel ||
+      localStorage.getItem(
+        "game_model"
+      ) ||
+      0
+    )
+
+  if (!modelId) {
+    return {
+      data: [],
+      error:
+        new Error(
+          "رقم النموذج غير صالح"
+        )
+    }
+  }
+
+  if (
+    whoDataPromise &&
+    options.forceRefresh !== true
+  ) {
+    return whoDataPromise
+  }
+
+  whoDataPromise = (async () => {
+    try {
+      let result
+
+      if (
+        typeof window
+          .cachedSupabaseSelect ===
+        "function"
+      ) {
+        result =
+          await window
+            .cachedSupabaseSelect(
+              "who_images",
+              {
+                select:
+                  "number,image,answer",
+
+                filters: {
+                  model: modelId
+                },
+
+                order: {
+                  column: "number",
+                  ascending: true
+                },
+
+                ttl:
+                  WHO_DATA_CACHE_TTL,
+
+                forceRefresh:
+                  options.forceRefresh ===
+                  true,
+
+                staleWhileRevalidate:
+                  options
+                    .staleWhileRevalidate !==
+                  false,
+
+                cacheKey:
+                  `supabase_cache_v1:who_images:${modelId}`,
+
+                onBackgroundUpdate:
+                  freshRows => {
+                    buildWhoDataCache(
+                      freshRows || []
+                    )
+                  }
+              }
+            )
+      } else {
+        const {
+          data,
+          error
+        } = await db
+          .from("who_images")
+          .select(
+            "number,image,answer"
+          )
+          .eq("model", modelId)
+          .order("number", {
+            ascending: true
+          })
+
+        result = {
+          data,
+          error,
+          source: "network"
+        }
+      }
+
+      if (
+        result?.error &&
+        !result?.data?.length
+      ) {
+        throw result.error
+      }
+
+      buildWhoDataCache(
+        result?.data || []
+      )
+
+      return {
+        data:
+          result?.data || [],
+        error: null,
+        source:
+          result?.source ||
+          "network"
+      }
+    } catch (error) {
+      console.log(
+        "WHO DATA LOAD ERROR:",
+        error
+      )
+
+      return {
+        data:
+          Object.values(
+            whoDataCache
+          ),
+        error
+      }
+    } finally {
+      whoDataPromise = null
+    }
+  })()
+
+  return whoDataPromise
+}
+
+function getWhoDataByNumber(
+  number
+) {
+  return (
+    whoDataCache[
+      Number(number)
+    ] || null
+  )
 }
 
 /* =========================
    Render
 ========================= */
 
-window.renderWho = function () {
-    whoMaxNumber = Number(
+window.renderWho = async function () {
+  clearInterval(whoTimer)
+  whoTimer = null
+
+  clearTimeout(whoStateSyncTimer)
+  whoStateSyncTimer = null
+
+  clearTimeout(whoFinishTimeout)
+  whoFinishTimeout = null
+
+  whoDataCache = {}
+  whoDataPromise = null
+  whoScoringLocked = false
+
+  document
+    .getElementById("whoImageOverlay")
+    ?.remove()
+
+  document
+    .getElementById("whoZoomFlashLayer")
+    ?.remove()
+
+  document.body.classList.remove(
+    "whoOverlayActive"
+  )
+
+  whoMaxNumber = Number(
     window.whoMaxNumber ||
     localStorage.getItem("who_max_number") ||
     15
   )
 
-  whoMaxNumber = Math.min(Math.max(whoMaxNumber, 10), 15)
+    whoMaxNumber = Math.min(
+    Math.max(whoMaxNumber, 10),
+    15
+  )
+
+  const whoLoadResult =
+    await loadWhoData({
+      staleWhileRevalidate: true
+    })
+
+  if (
+    whoLoadResult.error &&
+    !whoLoadResult.data.length
+  ) {
+    showGameToast(
+      "تعذر تحميل بيانات فقرة من هو"
+    )
+
+    return
+  }
+
   const saved = getWhoState()
+
 
   whoState = {
     usedNumbers: [],
@@ -256,7 +658,7 @@ openSegment("من هو", `
         class="whoActionBtn whoDoubleBtn"
         id="whoDoubleBtn"
       >
-        دبل
+        دوبيلا
       </button>
 
       <button
@@ -299,35 +701,75 @@ updateWhoCompensationButton()
 ========================= */
 
 function activateWhoDouble() {
-  const team = whoState.activeTeam
+  const team =
+    whoState.activeTeam
 
   if (!team) {
-    showGameToast("اختر الفريق أولاً")
+    showGameToast(
+      "اختر الفريق أولاً"
+    )
+
     return
   }
 
-  if (whoQuestionLocked || whoCurrentNumber) {
-    showGameToast("الدبويلا قبل اختيار السؤال فقط")
+  if (
+    whoQuestionLocked ||
+    whoCurrentNumber
+  ) {
+    showGameToast(
+      "الدوبيلا قبل اختيار السؤال فقط"
+    )
+
     return
   }
 
-  if (whoDoubleState.used[team]) {
-    showGameToast("هذا الفريق استخدم الدوبيلا مسبقًا")
+  if (
+    whoDoubleState.activeTeam === team
+  ) {
+    showGameToast(
+      "الدوبيلا مفعّل"
+    )
+
     return
   }
 
-  if (whoDoubleState.used.A && whoDoubleState.used.B) {
-    showGameToast("تم استخدام الدوبيلا من الفريقين")
+  if (
+    whoDoubleState.used[team]
+  ) {
+    showGameToast(
+      "هذا الفريق استخدم الدوبيلا مسبقًا"
+    )
+
+    return
+  }
+
+  if (
+    whoDoubleState.used.A &&
+    whoDoubleState.used.B
+  ) {
+    showGameToast(
+      "تم استخدام الدوبيلا من الفريقين"
+    )
+
     return
   }
 
   whoDoubleState.used[team] = true
   whoDoubleState.activeTeam = team
 
-  showGameToast(`تم تفعيل الدوبيلا  لفريق ${team === "A" ? teamAName : teamBName}`)
+  showGameToast(
+    `تم تفعيل الدوبيلا لفريق ${
+      team === "A"
+        ? teamAName
+        : teamBName
+    }`
+  )
 
   updateWhoDoubleButton()
-  saveWhoState()
+
+  saveWhoState({
+    immediate: true
+  })
 }
 
 function getWhoScoreValue(team) {
@@ -340,41 +782,54 @@ function clearWhoActiveDouble() {
 }
 
 function updateWhoDoubleButton() {
-  const btn = document.getElementById("whoDoubleBtn")
+  const btn =
+    document.getElementById(
+      "whoDoubleBtn"
+    )
+
   if (!btn) return
 
-  const team = whoState.activeTeam
+  const team =
+    whoState.activeTeam
 
-  btn.classList.remove("activeDouble")
+  btn.classList.remove(
+    "activeDouble"
+  )
 
-  if (whoQuestionLocked || whoCurrentNumber) {
+  if (
+    whoQuestionLocked ||
+    whoCurrentNumber
+  ) {
     btn.disabled = true
-    btn.innerText = "دبل"
-    return
-  }
-
-  if (!team) {
-    btn.disabled = whoDoubleState.used.A && whoDoubleState.used.B
     btn.innerText = "دوبيلا"
     return
   }
 
-  if (whoDoubleState.activeTeam === team) {
+  if (!team) {
     btn.disabled = true
-    btn.innerText = "الدوبيلا مفعّل"
-    btn.classList.add("activeDouble")
+    btn.innerText = "دوبيلا"
     return
   }
 
-  if (whoDoubleState.used[team]) {
+  if (
+    whoDoubleState.activeTeam === team
+  ) {
     btn.disabled = true
-    btn.innerText = " الدوبيلا"
+    btn.innerText = "دوبيلا مفعّل"
+    btn.classList.add(
+      "activeDouble"
+    )
+
     return
   }
 
-  if (whoDoubleState.used.A && whoDoubleState.used.B) {
+  if (
+    whoDoubleState.used[team]
+  ) {
     btn.disabled = true
-    btn.innerText = "الدوبيلا مقفل"
+    btn.innerText =
+      "تم استخدام دوبيلا"
+
     return
   }
 
@@ -465,35 +920,63 @@ function getWhoTurnName() {
   return "اختر فريق"
 }
 
-function setWhoActiveTeam(team, options = {}) {
-  if (team !== "A" && team !== "B") {
-    whoState.activeTeam = null
-    selectedTeam = null
+function setWhoActiveTeam(
+  team,
+  options = {}
+) {
+  const validTeam =
+    team === "A" ||
+    team === "B"
 
-    if (typeof clearGameActiveTeam === "function") {
-      clearGameActiveTeam()
+  whoState.activeTeam =
+    validTeam ? team : null
+
+  selectedTeam =
+    validTeam ? team : null
+
+  window.selectedTeam =
+    validTeam ? team : null
+
+  if (validTeam) {
+    if (
+      typeof setGameActiveTeam ===
+      "function"
+    ) {
+      setGameActiveTeam(team, {
+        sync:
+          options.sync !== false
+      })
     } else {
-      delete document.body.dataset.activeTeam
+      document.body.dataset.activeTeam =
+        team
     }
-
-    highlightWhoTurnTeam()
-    updateWhoTurnBox()
-    updateWhoDoubleButton()
-    return
-  }
-
-  whoState.activeTeam = team
-  selectedTeam = team
-
-  if (typeof setGameActiveTeam === "function") {
-    setGameActiveTeam(team, options)
   } else {
-    document.body.dataset.activeTeam = team
+    if (
+      typeof clearGameActiveTeam ===
+      "function"
+    ) {
+      clearGameActiveTeam({
+        sync:
+          options.sync !== false
+      })
+    } else {
+      delete document.body.dataset
+        .activeTeam
+    }
   }
 
   highlightWhoTurnTeam()
   updateWhoTurnBox()
   updateWhoDoubleButton()
+
+  if (options.save === true) {
+    saveWhoState({
+      immediate:
+        options.immediate === true
+    })
+  }
+
+  return true
 }
 
 function updateWhoTurnBox() {
@@ -505,38 +988,95 @@ function updateWhoTurnBox() {
   updateWhoDoubleButton()
 }
 
-function selectWhoTeam(team) {
-  if (team !== "A" && team !== "B") return
-
-  if (whoCompensationMode && whoQuestionLocked) {
-    setWhoActiveTeam(team)
-    saveWhoState()
-
-    setTimeout(() => {
-      highlightWhoTurnTeam()
-    }, 80)
-
-    return
+function selectWhoTeam(
+  team,
+  options = {}
+) {
+  if (
+    team !== "A" &&
+    team !== "B"
+  ) {
+    return false
   }
 
-  /*
-    مهم:
-    لو الفقرة بدأت قبل كذا لكن ما فيه فريق نشط،
-    نسمح بالاختيار عشان ما يعلق بدون تحديد.
-  */
-  if (whoState.manualStartDone && whoState.activeTeam) {
-    showGameToast("بعد البداية الأولى ينتقل الدور تلقائيًا")
-    return
+  const force =
+    options.force === true
+
+  if (
+    !force &&
+    whoQuestionLocked &&
+    !whoCompensationMode
+  ) {
+    showGameToast(
+      "سجل نتيجة السؤال الحالي أولاً"
+    )
+
+    return false
+  }
+
+  if (
+    !force &&
+    whoCompensationMode &&
+    whoQuestionLocked
+  ) {
+    setWhoActiveTeam(team, {
+      sync:
+        options.sync !== false,
+      save: false
+    })
+
+    saveWhoState({
+      immediate: true
+    })
+
+    return true
+  }
+
+  if (
+    !force &&
+    whoState.manualStartDone &&
+    whoState.activeTeam
+  ) {
+    showGameToast(
+      "بعد البداية الأولى ينتقل الدور تلقائيًا"
+    )
+
+    return false
   }
 
   whoState.manualStartDone = true
-  setWhoActiveTeam(team)
-  saveWhoState()
+
+  setWhoActiveTeam(team, {
+    sync:
+      options.sync !== false,
+    save: false
+  })
+
+  saveWhoState({
+    immediate: true
+  })
 
   setTimeout(() => {
     highlightWhoTurnTeam()
-  }, 80)
+  }, 50)
+
+  return true
 }
+
+function forceWhoTeamFromPresenter(
+  team
+) {
+  return selectWhoTeam(team, {
+    force: true,
+    sync: true
+  })
+}
+
+window.selectWhoTeam =
+  selectWhoTeam
+
+window.forceWhoTeamFromPresenter =
+  forceWhoTeamFromPresenter
 
 function getWhoTeamBox(team) {
   const letter = team === "A" ? "A" : "B"
@@ -647,26 +1187,40 @@ function updateWhoCompensationButton() {
 
 async function startWhoCompensation() {
   if (!canUseWhoCompensation()) {
-    showGameToast("التعويض يتفعل فقط إذا بقي الرقم 15")
+    showGameToast(
+      "التعويض يتفعل فقط إذا بقي الرقم 15"
+    )
+
     return
   }
 
   whoCompensationMode = true
   whoState.currentPoints = 5
 
-  setWhoActiveTeam(null)
+  setWhoActiveTeam(null, {
+    sync: true,
+    save: false
+  })
 
-highlightWhoPoints()
+  highlightWhoPoints()
 
-  const grid = document.querySelector(".whoGrid")
+  const grid =
+    document.querySelector(".whoGrid")
+
   if (grid) {
-    grid.innerHTML = createWhoGrid()
+    grid.innerHTML =
+      createWhoGrid()
   }
 
   updateWhoCompensationButton()
-  saveWhoState()
 
-  showGameToast("تم تفعيل التعويض، افتح رقم 15")
+  saveWhoState({
+    immediate: true
+  })
+
+  showGameToast(
+    "تم تفعيل التعويض، افتح رقم 15 ثم اختر الفريق"
+  )
 }
 /* =========================
    Question
@@ -703,15 +1257,29 @@ async function chooseWho(num) {
     grid.innerHTML = createWhoGrid()
   }
 
-  const { data, error } = await db
-  .from("who_images")
-  .select("*")
-  .eq("model", Number(currentModel))
-  .eq("number", Number(num))
-  .maybeSingle()
+    let data =
+    getWhoDataByNumber(num)
 
-  if (error || !data) {
-    console.log(error)
+  if (!data) {
+    const loadResult =
+      await loadWhoData({
+        forceRefresh: true,
+        staleWhileRevalidate: false
+      })
+
+    if (!loadResult.error) {
+      data =
+        getWhoDataByNumber(
+          num
+        )
+    }
+  }
+
+  if (!data) {
+    console.log(
+  "WHO ITEM NOT FOUND:",
+  num
+)
 
     showGameToast("تعذر تحميل الصورة")
 
@@ -858,90 +1426,140 @@ function resumeWhoTimer(time) {
 }
 
 function runWhoTimer(startValue) {
-  const timerBox = document.getElementById("timer")
+  const timerBox =
+    document.getElementById("timer")
+
   if (!timerBox) return
 
-  clearInterval(timer)
-  timer = null
-  whoTimerStarted = true
-  whoLastTickPlayed = null
+  clearInterval(whoTimer)
+  whoTimer = null
 
-  let time = Number(startValue || 0)
+  let time = Math.max(
+    0,
+    Number(startValue || 0)
+  )
+
+  whoTimerStarted =
+    time > 0
+
+  whoLastTickPlayed = null
 
   timerBox.innerText = time
 
-  let overlayTimer = document.getElementById("whoOverlayTimer")
-  if (overlayTimer) {
-    overlayTimer.innerText = time
-    overlayTimer.classList.toggle("timerDanger", time > 0 && time <= 5)
+  const updateTimerUI = () => {
+    const overlayTimer =
+      document.getElementById(
+        "whoOverlayTimer"
+      )
+
+    if (overlayTimer) {
+      overlayTimer.innerText = time
+
+      overlayTimer.classList.toggle(
+        "timerDanger",
+        time > 0 && time <= 5
+      )
+    }
+
+    timerBox.classList.toggle(
+      "timerDanger",
+      time > 0 && time <= 5
+    )
   }
 
-  const timerPill = timerBox.closest(".whoTimerPill")
-  if (timerPill) {
-    timerPill.classList.toggle("timerDanger", time > 0 && time <= 5)
-  }
+  updateTimerUI()
 
   saveWhoState()
 
-  timer = setInterval(() => {
-    time--
+  if (time <= 0) {
+    whoTimerStarted = false
+    return
+  }
+
+  whoTimer = setInterval(() => {
+    time = Math.max(
+      0,
+      time - 1
+    )
 
     timerBox.innerText = time
+    updateTimerUI()
 
-    overlayTimer = document.getElementById("whoOverlayTimer")
-    if (overlayTimer) {
-      overlayTimer.innerText = time
-      overlayTimer.classList.toggle("timerDanger", time > 0 && time <= 5)
-    }
-
-    const currentTimerPill = timerBox.closest(".whoTimerPill")
-    if (currentTimerPill) {
-      currentTimerPill.classList.toggle("timerDanger", time > 0 && time <= 5)
-    }
-
-    if (time > 0 && time <= 5 && whoLastTickPlayed !== time) {
+    if (
+      time > 0 &&
+      time <= 5 &&
+      whoLastTickPlayed !== time
+    ) {
       whoLastTickPlayed = time
       playGameSound("tick")
     }
 
     saveWhoState()
 
-    if (time <= 0) {
-      clearInterval(timer)
-      timer = null
+    if (time > 0) return
 
-      timerBox.innerText = 0
+    clearInterval(whoTimer)
+    whoTimer = null
 
-      overlayTimer = document.getElementById("whoOverlayTimer")
-      if (overlayTimer) {
-        overlayTimer.innerText = 0
-        overlayTimer.classList.remove("timerDanger")
-      }
+    whoTimerStarted = false
+    whoLastTickPlayed = null
 
-      const lastTimerPill = timerBox.closest(".whoTimerPill")
-      if (lastTimerPill) {
-        lastTimerPill.classList.remove("timerDanger")
-      }
+    timerBox.innerText = 0
+    timerBox.classList.remove(
+      "timerDanger"
+    )
 
-      whoTimerStarted = false
-      whoLastTickPlayed = null
+    const overlayTimer =
+      document.getElementById(
+        "whoOverlayTimer"
+      )
 
-      playGameSound("timeout")
-      saveWhoState()
-    }
+    overlayTimer?.classList.remove(
+      "timerDanger"
+    )
+
+    playGameSound("timeout")
+
+    saveWhoState({
+      immediate: true
+    })
   }, 1000)
 }
 
-function resetWhoTimer() {
-  clearInterval(timer)
-  timer = null
+function resetWhoTimer(
+  options = {}
+) {
+  clearInterval(whoTimer)
+  whoTimer = null
+
   whoTimerStarted = false
   whoLastTickPlayed = null
 
-  const timerBox = document.getElementById("timer")
-  if (timerBox) timerBox.innerText = 0
+  const timerBox =
+    document.getElementById("timer")
 
-  saveWhoState()
+  if (timerBox) {
+    timerBox.innerText = 0
+    timerBox.classList.remove(
+      "timerDanger"
+    )
+  }
+
+  const overlayTimer =
+    document.getElementById(
+      "whoOverlayTimer"
+    )
+
+  if (overlayTimer) {
+    overlayTimer.innerText = 0
+    overlayTimer.classList.remove(
+      "timerDanger"
+    )
+  }
+
+  if (options.save !== false) {
+    saveWhoState()
+  }
 }
 /* =========================
    Score Buttons Guard
@@ -979,22 +1597,68 @@ function canScoreWhoNow() {
    Result
 ========================= */
 
-function finishWhoAfterAnswerDelay() {
-  resetWhoTimer()
+function finishWhoAfterAnswerDelay(
+  answeredTeam
+) {
+  resetWhoTimer({
+    save: false
+  })
 
-  setTimeout(() => {
+  clearTimeout(whoFinishTimeout)
+
+  whoFinishTimeout = setTimeout(() => {
     clearWhoStage()
-    switchWhoTurn()
+
+    whoState.lastAnsweredTeam =
+      answeredTeam || null
+
+    const allDone =
+      Number(
+        whoState.usedNumbers?.length || 0
+      ) >= Number(whoMaxNumber || 15)
+
+    if (
+      allDone ||
+      whoCompensationMode
+    ) {
+      setWhoActiveTeam(null, {
+        sync: true,
+        save: false
+      })
+    } else if (answeredTeam) {
+      setWhoActiveTeam(
+        getWhoOtherTeam(
+          answeredTeam
+        ),
+        {
+          sync: true,
+          save: false
+        }
+      )
+    }
+
     resetWhoPoints()
 
     whoQuestionLocked = false
     whoCurrentNumber = null
     whoScoringLocked = false
+    whoCompensationMode = false
 
     setWhoScoreButtonsLocked(false)
     updateWhoDoubleButton()
     updateWhoCompensationButton()
-    saveWhoState()
+
+    const grid =
+      document.querySelector(".whoGrid")
+
+    if (grid) {
+      grid.innerHTML =
+        createWhoGrid()
+    }
+
+    saveWhoState({
+      immediate: true
+    })
   }, 5000)
 }
 
@@ -1045,8 +1709,11 @@ function whoCorrect() {
   whoCompensationMode = false
   updateWhoCompensationButton()
 
-  saveWhoState()
-  finishWhoAfterAnswerDelay()
+  saveWhoState({
+  immediate: true
+})
+
+finishWhoAfterAnswerDelay(team)
 }
 
 function whoWrong() {
@@ -1097,8 +1764,11 @@ function whoWrong() {
   whoCompensationMode = false
   updateWhoCompensationButton()
 
-  saveWhoState()
-  finishWhoAfterAnswerDelay()
+  saveWhoState({
+  immediate: true
+})
+
+finishWhoAfterAnswerDelay(team)
 }
 
 function flashWhoZoomOverlayWrong() {
@@ -1184,3 +1854,37 @@ function toggleWhoImageOverlay() {
 
   openWhoImageOverlay()
 }
+window.setWhoPoints =
+  setWhoPoints
+
+window.chooseWho =
+  chooseWho
+
+window.activateWhoDouble =
+  activateWhoDouble
+
+window.startWhoCompensation =
+  startWhoCompensation
+
+window.whoCorrect =
+  whoCorrect
+
+window.whoWrong =
+  whoWrong
+
+window.toggleWhoImageOverlay =
+  toggleWhoImageOverlay
+
+window.openWhoImageOverlay =
+  openWhoImageOverlay
+
+window.resetWhoTimer =
+  resetWhoTimer
+
+window.saveWhoState =
+  saveWhoState
+  window.loadWhoData =
+  loadWhoData
+
+window.getWhoDataByNumber =
+  getWhoDataByNumber

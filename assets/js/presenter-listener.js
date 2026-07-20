@@ -1,4 +1,8 @@
 let presenterCommandChannel = null
+let presenterCommandChannelHealthy = false
+let presenterCommandReconnectTimer = null
+let presenterCommandListenerSessionId = ""
+
 let lastPresenterCommandId = 0
 let handledPresenterCommandKeys = new Set()
 
@@ -8,12 +12,21 @@ function getDisplaySessionId() {
 
 function safeRunPresenterAction(fn) {
   try {
-    if (typeof fn === "function") fn()
-  } catch (e) {
-    console.log("Presenter action error:", e)
+    if (typeof fn !== "function") return
+
+    const result = fn()
+
+    if (result && typeof result.catch === "function") {
+      result.catch(error => {
+        console.log("Presenter async action error:", error)
+      })
+    }
+
+    return result
+  } catch (error) {
+    console.log("Presenter action error:", error)
   }
 }
-
 /* =========================
    DISPLAY CONTROLS
 ========================= */
@@ -67,12 +80,39 @@ function restoreDisplayControlsMode() {
 
 /* =========================
    LISTENER
+   Broadcast سريع + Database احتياط
 ========================= */
 
-function listenPresenterCommands() {
+function schedulePresenterCommandReconnect(delay = 1000) {
+  clearTimeout(presenterCommandReconnectTimer)
+
+  presenterCommandReconnectTimer = setTimeout(() => {
+    presenterCommandReconnectTimer = null
+    listenPresenterCommands(true)
+  }, delay)
+}
+
+async function removePresenterCommandChannel() {
+  presenterCommandChannelHealthy = false
+
+  if (!presenterCommandChannel) return
+
+  const oldChannel = presenterCommandChannel
+  presenterCommandChannel = null
+
+  try {
+    if (window.db) {
+      await db.removeChannel(oldChannel)
+    }
+  } catch (error) {
+    console.log("Presenter listener remove channel error:", error)
+  }
+}
+
+async function listenPresenterCommands(forceReconnect = false) {
   if (!window.db) {
     console.log("Presenter listener: db not ready")
-    setTimeout(listenPresenterCommands, 300)
+    schedulePresenterCommandReconnect(300)
     return
   }
 
@@ -80,26 +120,58 @@ function listenPresenterCommands() {
 
   if (!sessionId) {
     console.log("Presenter listener: no session id")
-    setTimeout(listenPresenterCommands, 500)
+    schedulePresenterCommandReconnect(500)
     return
   }
 
-  if (presenterCommandChannel) {
-    db.removeChannel(presenterCommandChannel)
-    presenterCommandChannel = null
+  /*
+    لا نعيد الاشتراك إذا القناة الحالية سليمة
+    ومتصلة بنفس الجلسة.
+  */
+  if (
+    !forceReconnect &&
+    presenterCommandChannel &&
+    presenterCommandChannelHealthy &&
+    presenterCommandListenerSessionId === sessionId
+  ) {
+    return
   }
 
-  presenterCommandChannel = db.channel("game_session_" + sessionId)
+  clearTimeout(presenterCommandReconnectTimer)
+  presenterCommandReconnectTimer = null
 
-  presenterCommandChannel
+  await removePresenterCommandChannel()
+
+  presenterCommandListenerSessionId = sessionId
+
+  const channel = db.channel(
+    "game_session_" + sessionId,
+    {
+      config: {
+        broadcast: {
+          self: false,
+          ack: true
+        }
+      }
+    }
+  )
+
+  presenterCommandChannel = channel
+
+  channel
     .on(
       "broadcast",
-      { event: "presenter_command" },
+      {
+        event: "presenter_command"
+      },
       payload => {
         const cmd = payload?.payload
         if (!cmd) return
 
-        handlePresenterCommandOnce(cmd, "broadcast")
+        handlePresenterCommandOnce(
+          cmd,
+          "broadcast"
+        )
       }
     )
     .on(
@@ -111,281 +183,43 @@ function listenPresenterCommands() {
         filter: `session_id=eq.${sessionId}`
       },
       payload => {
-        const cmd = payload.new
+        const cmd = payload?.new
         if (!cmd) return
 
-        handlePresenterCommandOnce(cmd, "database")
+        handlePresenterCommandOnce(
+          cmd,
+          "database"
+        )
       }
     )
     .subscribe(status => {
-      console.log("Presenter listener status:", status)
+      console.log(
+        "Presenter listener status:",
+        status
+      )
+
+      if (
+        presenterCommandChannel !== channel ||
+        presenterCommandListenerSessionId !== sessionId
+      ) {
+        return
+      }
+
+      if (status === "SUBSCRIBED") {
+        presenterCommandChannelHealthy = true
+        return
+      }
+
+      if (
+        status === "CHANNEL_ERROR" ||
+        status === "TIMED_OUT" ||
+        status === "CLOSED"
+      ) {
+        presenterCommandChannelHealthy = false
+        schedulePresenterCommandReconnect(1000)
+      }
     })
 }
-
-function isValidPresenterTeam(team) {
-  return team === "A" || team === "B"
-}
-
-function applyPresenterActiveTeam(team) {
-  if (!isValidPresenterTeam(team)) return
-
-  if (typeof setGameActiveTeam === "function") {
-    setGameActiveTeam(team)
-  }
-}
-
-function getDisplayActiveSegmentForPresenterCommand(data = {}) {
-  const localSegment = normalizeDisplaySegmentKey(
-    localStorage.getItem("active_segment") || ""
-  )
-
-  if (localSegment) return localSegment
-
-  return normalizeDisplaySegmentKey(data.segment || "")
-}
-
-function syncDisplayAfterPresenterTeamSelection() {
-  const activeSegment = normalizeDisplaySegmentKey(
-    localStorage.getItem("active_segment") || ""
-  )
-
-  if (activeSegment === "warmup" && typeof saveWarmupState === "function") {
-    saveWarmupState()
-    return
-  }
-
-  if (activeSegment === "top10" && typeof saveTop10State === "function") {
-    saveTop10State()
-    return
-  }
-
-  if (activeSegment === "auction" && typeof saveAuctionState === "function") {
-    saveAuctionState()
-    return
-  }
-
-  if (activeSegment === "who" && typeof saveWhoState === "function") {
-    saveWhoState()
-    return
-  }
-
-  if (activeSegment === "explain" && typeof saveExplainState === "function") {
-    saveExplainState()
-    return
-  }
-
-  if (activeSegment === "archive" && typeof saveArchiveState === "function") {
-    saveArchiveState()
-    return
-  }
-
-  if (
-    activeSegment === "randomChallenge" &&
-    typeof saveRandomChallengeState === "function"
-  ) {
-    saveRandomChallengeState()
-    return
-  }
-
-  if (
-    (activeSegment === "final" || isFinalSegmentKey(activeSegment)) &&
-    typeof saveFinalState === "function"
-  ) {
-    saveFinalState()
-    return
-  }
-
-  if (typeof syncDisplayStateToSession === "function") {
-    syncDisplayStateToSession()
-  }
-}
-
-function runPresenterTeamSelection(fn) {
-  if (typeof fn === "function") {
-    fn()
-  }
-
-  setTimeout(() => {
-    syncDisplayAfterPresenterTeamSelection()
-  }, 60)
-}
-
-function selectDisplayTeamByPresenter(team, data = {}) {
-  if (!isValidPresenterTeam(team)) return
-
-  const activeSegment = getDisplayActiveSegmentForPresenterCommand(data)
-
-  /*
-    العرض هو المصدر الأساسي.
-    نستدعي دالة اختيار الفريق الأصلية لكل فقرة.
-    بعدها نسوي مزامنة احتياطية عشان المقدم يتحدث بسرعة.
-  */
-
-  if (activeSegment === "warmup") {
-    if (typeof selectWarmupTeam === "function") {
-      runPresenterTeamSelection(() => selectWarmupTeam(team))
-      return
-    }
-
-    syncDisplayAfterPresenterTeamSelection()
-    return
-  }
-
-  if (activeSegment === "top10") {
-    if (typeof selectTop10Team === "function") {
-      runPresenterTeamSelection(() => selectTop10Team(team))
-      return
-    }
-
-    syncDisplayAfterPresenterTeamSelection()
-    return
-  }
-
-  if (activeSegment === "auction") {
-    if (typeof selectAuctionTeam === "function") {
-      runPresenterTeamSelection(() => selectAuctionTeam(team))
-      return
-    }
-
-    syncDisplayAfterPresenterTeamSelection()
-    return
-  }
-
-  if (activeSegment === "who") {
-    if (typeof selectWhoTeam === "function") {
-      runPresenterTeamSelection(() => selectWhoTeam(team))
-      return
-    }
-
-    syncDisplayAfterPresenterTeamSelection()
-    return
-  }
-
-  if (activeSegment === "explain") {
-    if (typeof selectExplainTeam === "function") {
-      runPresenterTeamSelection(() => selectExplainTeam(team))
-      return
-    }
-
-    syncDisplayAfterPresenterTeamSelection()
-    return
-  }
-
-  if (activeSegment === "archive") {
-    if (typeof selectArchiveTeam === "function") {
-      runPresenterTeamSelection(() => selectArchiveTeam(team))
-      return
-    }
-
-    syncDisplayAfterPresenterTeamSelection()
-    return
-  }
-
-  if (activeSegment === "randomChallenge") {
-    if (typeof selectRandomChallengeTeam === "function") {
-      runPresenterTeamSelection(() => selectRandomChallengeTeam(team))
-      return
-    }
-
-    syncDisplayAfterPresenterTeamSelection()
-    return
-  }
-
-  if (isFinalSegmentKey(activeSegment) || activeSegment === "final") {
-    if (typeof selectFinalTeam === "function") {
-      runPresenterTeamSelection(() => selectFinalTeam(team))
-      return
-    }
-
-    syncDisplayAfterPresenterTeamSelection()
-    return
-  }
-
-  /*
-    احتياط أخير فقط لو ما عرفنا الفقرة.
-  */
-  applyPresenterActiveTeam(team)
-  syncDisplayAfterPresenterTeamSelection()
-}
-
-
-function getPresenterDisplayFinalSegmentKey(round) {
-  const r = Number(round || 1)
-
-  if (r === 1) return "finalRound1"
-  if (r === 2) return "finalRound2"
-  if (r === 3) return "finalRound3"
-  if (r === 4) return "finalRound4"
-
-  return "finalRound1"
-}
-
-function forceDisplayFinalRoundFromPresenter(round, afterReady = null) {
-  const r = Number(round || 1)
-  const key = getPresenterDisplayFinalSegmentKey(r)
-
-  const previousActive = normalizeDisplaySegmentKey(
-    localStorage.getItem("active_segment") || ""
-  )
-
-  const finalStageIsOpen = !!document.getElementById("finalMainStage")
-  const sameFinalRoundOpen =
-    finalStageIsOpen &&
-    previousActive === key &&
-    Number(window.finalState?.round || r) === r
-
-  window.displayFinalRound = r
-  window.currentFinalRound = r
-  localStorage.setItem("active_segment", key)
-
-  const runAfterReady = () => {
-    setTimeout(() => {
-      if (typeof afterReady === "function") {
-        afterReady()
-      }
-    }, 180)
-  }
-
-  if (sameFinalRoundOpen) {
-    runAfterReady()
-    return
-  }
-
-  if (finalStageIsOpen && typeof window.renderFinal === "function") {
-    const result = window.renderFinal(r, key)
-
-    if (result && typeof result.then === "function") {
-      result.then(runAfterReady)
-    } else {
-      runAfterReady()
-    }
-
-    return
-  }
-
-  if (typeof openSegmentPage === "function") {
-    const result = openSegmentPage(key, r)
-
-    if (result && typeof result.then === "function") {
-      result.then(runAfterReady)
-    } else {
-      runAfterReady()
-    }
-
-    return
-  }
-
-  if (typeof window.renderFinal === "function") {
-    const result = window.renderFinal(r, key)
-
-    if (result && typeof result.then === "function") {
-      result.then(runAfterReady)
-    } else {
-      runAfterReady()
-    }
-  }
-}
-
 /* =========================
    RANDOM CHALLENGE TIMER SYNC WATCHER
    مزامنة مؤقت ماذا تعرف مع المقدم
@@ -529,82 +363,165 @@ function handlePresenterCommand(cmd) {
       }
     })
   }
-
-  if (action === "zoomImage") {
-    return safeRunPresenterAction(() => {
-      if (segment === "auction") {
-        if (typeof zoomCurrentDisplayImage === "function") {
-          zoomCurrentDisplayImage()
-        }
-        return
-      }
-
-      if (
-        segment === "final" &&
-        window.finalState?.round === 3 &&
-        window.finalState?.round3?.mode === "team_media" &&
-        window.finalState?.round3?.teamMedia?.currentMedia
-      ) {
-        const type =
-          window.finalState.round3.teamMedia.currentMediaType === "video"
-            ? "video"
-            : "image"
-
-        openFinalRound3TeamMediaOverlay(type)
-        return
-      }
-
-      if (
-        segment === "final" &&
-        window.finalState?.round === 3 &&
-        Number(window.finalState?.round3?.currentNumber || 0)
-      ) {
-        toggleFinalRound3ImageOverlay()
-        return
-      }
-
-      if (
-  segment === "final" &&
-  window.finalState?.round === 1 &&
-  Number(window.finalState?.round1?.currentNumber || 0)
-) {
-  if (typeof toggleFinalRound1Overlay === "function") {
-    toggleFinalRound1Overlay()
-  }
-  return
-}
-
+if (action === "zoomImage") {
+  return safeRunPresenterAction(() => {
+    if (segment === "auction") {
       if (typeof zoomCurrentDisplayImage === "function") {
         zoomCurrentDisplayImage()
       }
-    })
-  }
 
-  if (action === "closeZoomImage") {
-    return safeRunPresenterAction(() => {
-      if (typeof closeCurrentDisplayImageZoom === "function") {
-        closeCurrentDisplayImageZoom()
+      return
+    }
+
+    const isFinalSegment =
+      segment === "final" ||
+      isFinalSegmentKey(segment)
+
+    if (
+      isFinalSegment &&
+      window.finalState?.round === 4 &&
+      window.finalState?.round4?.teamMedia?.currentMedia
+    ) {
+      const type =
+        window.finalState.round4.teamMedia.currentMediaType === "video"
+          ? "video"
+          : "image"
+
+      if (typeof openFinalRound4TeamMediaOverlay === "function") {
+        openFinalRound4TeamMediaOverlay(type)
       }
 
-      document.getElementById("displayImageZoomOverlay")?.remove()
-      document.getElementById("auctionImageOverlay")?.remove()
-      document.getElementById("auctionVideoFullscreenOverlay")?.remove()
-      document.getElementById("whoImageOverlay")?.remove()
-      document.getElementById("finalRound1Overlay")?.remove()
-      document.getElementById("finalRound3ImageOverlay")?.remove()
-      document.getElementById("finalRound3TeamMediaOverlay")?.remove()
-      document.getElementById("finalRound4TeamMediaOverlay")?.remove()
+      return
+    }
 
-      document.body.classList.remove("auctionOverlayActive")
-    })
-  }
+    if (
+      isFinalSegment &&
+      window.finalState?.round === 1 &&
+      Number(window.finalState?.round1?.currentNumber || 0)
+    ) {
+      if (typeof toggleFinalRound1Overlay === "function") {
+        toggleFinalRound1Overlay()
+      }
 
-  if (action === "selectTeam") {
-  return safeRunPresenterAction(() => {
-    selectDisplayTeamByPresenter(data.team, data)
+      return
+    }
+
+    if (
+      isFinalSegment &&
+      window.finalState?.round === 2 &&
+      window.finalState?.round2?.currentType === "image"
+    ) {
+      if (typeof toggleFinalRound2ImageOverlay === "function") {
+        toggleFinalRound2ImageOverlay()
+      }
+
+      return
+    }
+
+    if (typeof zoomCurrentDisplayImage === "function") {
+      zoomCurrentDisplayImage()
+    }
   })
 }
 
+if (action === "closeZoomImage") {
+  return safeRunPresenterAction(() => {
+    if (typeof closeCurrentDisplayImageZoom === "function") {
+      closeCurrentDisplayImageZoom()
+    }
+
+    if (typeof closeFinalRound2ImageAutoOverlay === "function") {
+      closeFinalRound2ImageAutoOverlay()
+    }
+
+    if (typeof closeFinalRound4TeamMediaOverlay === "function") {
+      closeFinalRound4TeamMediaOverlay()
+    }
+
+    const overlayIds = [
+      "displayImageZoomOverlay",
+      "auctionImageOverlay",
+      "auctionVideoFullscreenOverlay",
+      "whoImageOverlay",
+
+      "finalRound1Overlay",
+      "finalRound1ImageOverlay",
+
+      "finalRound2ImageOverlay",
+      "finalRound2ImageAutoOverlay",
+
+      "finalRound3ImageOverlay",
+      "finalRound3TeamMediaOverlay",
+
+      "finalRound4TeamMediaOverlay"
+    ]
+
+    overlayIds.forEach(id => {
+      document.getElementById(id)?.remove()
+    })
+
+    document.body.classList.remove(
+      "auctionOverlayActive",
+      "finalRound1OverlayActive",
+      "displayImageZoomActive",
+      "imageZoomActive",
+      "finalImageZoomActive",
+      "finalOverlayActive"
+    )
+  })
+}
+
+if (action === "selectTeam") {
+  if (!isValidPresenterTeam(data.team)) return
+
+  if (segment === "warmup") {
+    return handleWarmupPresenterAction(action, data)
+  }
+
+  if (segment === "top10") {
+    return handleTop10PresenterAction(action, data)
+  }
+
+  if (segment === "auction") {
+    return handleAuctionPresenterAction(action, data)
+  }
+
+  if (segment === "who") {
+    return handleWhoPresenterAction(action, data)
+  }
+
+  if (segment === "explain") {
+    return handleExplainPresenterAction(action, data)
+  }
+
+  if (
+    segment === "final" ||
+    isFinalSegmentKey(segment)
+  ) {
+    if (!data.round) {
+      data.round =
+        getFinalRoundFromSegmentKey(segment) ||
+        window.finalState?.round ||
+        1
+    }
+
+    return handleFinalPresenterAction(action, data)
+  }
+
+  if (segment === "archive") {
+    return handleArchivePresenterAction(action, data)
+  }
+
+  if (segment === "randomChallenge") {
+    return handleRandomChallengePresenterAction(action, data)
+  }
+
+  return safeRunPresenterAction(() => {
+    if (typeof selectDisplayTeamByPresenter === "function") {
+      selectDisplayTeamByPresenter(data.team, data)
+    }
+  })
+}
 
   if (action === "endSegment") {
   return safeRunPresenterAction(() => {
@@ -652,7 +569,18 @@ function handleWarmupPresenterAction(action, data) {
 
   return safeRunPresenterAction(() => {
     applyPresenterActiveTeam(data.team)
-    selectWarmupTeam(data.team)
+
+    if (
+      typeof forceWarmupTeamFromPresenter ===
+      "function"
+    ) {
+      forceWarmupTeamFromPresenter(data.team)
+      return
+    }
+
+    selectWarmupTeam(data.team, {
+      force: true
+    })
   })
 }
 
@@ -679,117 +607,356 @@ function handleWarmupPresenterAction(action, data) {
    TOP 10
 ========================= */
 
-function syncAfterTop10PresenterAction() {
-  if (typeof saveTop10State === "function") {
-    saveTop10State()
-  } else if (typeof syncDisplayStateToSession === "function") {
-    syncDisplayStateToSession()
+function syncAfterTop10PresenterAction(
+  options = {}
+) {
+  if (
+    typeof renderCurrentRoundTop10UI ===
+    "function"
+  ) {
+    renderCurrentRoundTop10UI()
   }
 
-  if (typeof renderCurrentRoundTop10UI === "function") {
-    renderCurrentRoundTop10UI()
+  if (
+    typeof saveTop10State ===
+    "function"
+  ) {
+    saveTop10State({
+      immediate:
+        options.immediate === true
+    })
+
+    return
+  }
+
+  if (
+    typeof syncDisplayStateToSession ===
+    "function"
+  ) {
+    syncDisplayStateToSession({
+      immediate:
+        options.immediate === true
+    })
   }
 }
 
-function handleTop10PresenterAction(action, data) {
+function forceTop10PresenterTeam(team) {
+  if (!isValidPresenterTeam(team)) {
+    return false
+  }
 
+  if (
+    typeof forceTop10TeamFromPresenter ===
+    "function"
+  ) {
+    return forceTop10TeamFromPresenter(
+      team
+    )
+  }
+
+  if (
+    typeof selectTop10Team ===
+    "function"
+  ) {
+    return selectTop10Team(team, {
+      force: true,
+      sync: true
+    })
+  }
+
+  if (
+    typeof top10State !==
+    "undefined"
+  ) {
+    top10State.activeTeam = team
+  }
+
+  window.selectedTeam = team
+
+  if (
+    typeof setGameActiveTeam ===
+    "function"
+  ) {
+    setGameActiveTeam(team)
+  }
+
+  return true
+}
+
+function handleTop10PresenterAction(
+  action,
+  data = {}
+) {
   if (action === "selectTeam") {
-    if (!isValidPresenterTeam(data.team)) return
+    if (
+      !isValidPresenterTeam(data.team)
+    ) {
+      return
+    }
 
     return safeRunPresenterAction(() => {
-      if (typeof selectTop10Team === "function") {
-        selectTop10Team(data.team)
-      }
-
-      syncAfterTop10PresenterAction()
+      forceTop10PresenterTeam(
+        data.team
+      )
     })
   }
 
   if (action === "openNumber") {
-    return safeRunPresenterAction(() => {
-      if (typeof openTop10Number === "function") {
-        openTop10Number(Number(data.number))
-      }
+    return safeRunPresenterAction(
+      async () => {
+        const number = Number(
+          data.number || 0
+        )
 
-      syncAfterTop10PresenterAction()
-    })
+        if (
+          !number ||
+          number < 1 ||
+          number > 10
+        ) {
+          return
+        }
+
+        if (
+          isValidPresenterTeam(data.team)
+        ) {
+          forceTop10PresenterTeam(
+            data.team
+          )
+        }
+
+        if (
+          typeof openTop10Number !==
+          "function"
+        ) {
+          console.log(
+            "openTop10Number not ready"
+          )
+
+          return
+        }
+
+        await openTop10Number(number)
+      }
+    )
   }
 
   if (action === "double") {
     return safeRunPresenterAction(() => {
-      if (typeof activateTop10Double === "function") {
-        activateTop10Double()
+      if (
+        typeof activateTop10Double !==
+        "function"
+      ) {
+        console.log(
+          "activateTop10Double not ready"
+        )
+
+        return
       }
 
-      syncAfterTop10PresenterAction()
+      activateTop10Double()
     })
   }
 
   if (action === "showAnswer") {
-    return safeRunPresenterAction(() => {
-      if (typeof showTop10Answer === "function") {
-        showTop10Answer()
-      }
+    return safeRunPresenterAction(
+      async () => {
+        if (
+          typeof showTop10Answer !==
+          "function"
+        ) {
+          console.log(
+            "showTop10Answer not ready"
+          )
 
-      syncAfterTop10PresenterAction()
-    })
+          return
+        }
+
+        await showTop10Answer()
+      }
+    )
   }
 
   if (action === "wrong") {
     return safeRunPresenterAction(() => {
-      if (typeof addTop10Error === "function") {
-        addTop10Error()
+      if (
+        typeof addTop10Error !==
+        "function"
+      ) {
+        console.log(
+          "addTop10Error not ready"
+        )
+
+        return
       }
 
-      syncAfterTop10PresenterAction()
+      addTop10Error()
     })
   }
 
   if (action === "undo") {
     return safeRunPresenterAction(() => {
-      if (typeof undoTop10Action === "function") {
-        undoTop10Action()
+      if (
+        typeof undoTop10Action !==
+        "function"
+      ) {
+        console.log(
+          "undoTop10Action not ready"
+        )
+
+        return
       }
 
-      syncAfterTop10PresenterAction()
+      undoTop10Action()
     })
   }
 
   if (action === "switchTurn") {
     return safeRunPresenterAction(() => {
-      if (typeof switchTop10Turn === "function") {
-        switchTop10Turn()
+      if (
+        typeof switchTop10Turn !==
+        "function"
+      ) {
+        console.log(
+          "switchTop10Turn not ready"
+        )
+
+        return
       }
 
-      syncAfterTop10PresenterAction()
+      switchTop10Turn()
     })
   }
 
   if (action === "nextRound") {
-    return safeRunPresenterAction(() => {
-      if (typeof nextTop10Round === "function") {
-        nextTop10Round()
-      }
+    return safeRunPresenterAction(
+      async () => {
+        if (
+          typeof nextTop10Round !==
+          "function"
+        ) {
+          console.log(
+            "nextTop10Round not ready"
+          )
 
-      syncAfterTop10PresenterAction()
-    })
+          return
+        }
+
+        await nextTop10Round()
+      }
+    )
   }
 
-if (action === "setRound") {
-  return safeRunPresenterAction(() => {
-    if (typeof top10State !== "undefined") {
-      top10State.round = Number(data.round || 1)
-    }
+  if (action === "setRound") {
+    return safeRunPresenterAction(
+      async () => {
+        if (
+          typeof top10State ===
+          "undefined"
+        ) {
+          return
+        }
 
-    if (typeof renderCurrentRoundTop10UI === "function") {
-      renderCurrentRoundTop10UI()
-    }
+        const maxRound = Math.min(
+          Math.max(
+            Number(
+              window.top10MaxRound || 3
+            ),
+            1
+          ),
+          4
+        )
 
-    syncAfterTop10PresenterAction()
-  })
+        const round = Math.min(
+          Math.max(
+            Number(data.round || 1),
+            1
+          ),
+          maxRound
+        )
+
+        if (
+          Number(top10State.round) ===
+          round
+        ) {
+          renderCurrentRoundTop10UI?.()
+          return
+        }
+
+        if (
+          typeof stopTop10Timer ===
+          "function"
+        ) {
+          stopTop10Timer(0, {
+            save: false
+          })
+        }
+
+        top10State.round = round
+        top10State.activeTeam = null
+        top10State.lastTeam = null
+
+        if (
+          typeof currentTop10Answer !==
+          "undefined"
+        ) {
+          currentTop10Answer = null
+        }
+
+        if (
+          typeof currentTop10Number !==
+          "undefined"
+        ) {
+          currentTop10Number = null
+        }
+
+        if (
+          typeof top10TimerStarted !==
+          "undefined"
+        ) {
+          top10TimerStarted = false
+        }
+
+        if (
+          typeof top10AnimatingNumber !==
+          "undefined"
+        ) {
+          top10AnimatingNumber = null
+        }
+
+        if (
+          typeof top10DoubleState !==
+          "undefined"
+        ) {
+          top10DoubleState.activeTeam =
+            null
+        }
+
+        if (
+          typeof setTop10ActiveTeam ===
+          "function"
+        ) {
+          setTop10ActiveTeam(null, {
+            sync: false,
+            save: false
+          })
+        }
+
+        if (
+          typeof loadTop10RoundQuestion ===
+          "function"
+        ) {
+          await loadTop10RoundQuestion(
+            round
+          )
+        }
+
+        syncAfterTop10PresenterAction({
+          immediate: true
+        })
+      }
+    )
+  }
 }
-}
-
 /* =========================
    AUCTION
 ========================= */
@@ -897,27 +1064,57 @@ function getDisplayWhoScoreKey(action, data = {}) {
     Number(window.whoCurrentNumber || 0) ||
     Number(window.whoState?.currentNumber || 0)
 
-  const points = Number(window.whoState?.currentPoints || 0)
-  const team = window.whoState?.activeTeam || ""
+  const points =
+    Number(
+      window.whoState?.currentPoints || 0
+    )
 
-  return `${number}_${team}_${points}`
+  const team =
+    window.whoState?.activeTeam || ""
+
+  return `${action}_${number}_${team}_${points}`
 }
 
-function runDisplayWhoScoreOnce(action, data, fn) {
-  const key = getDisplayWhoScoreKey(action, data)
+function runDisplayWhoScoreOnce(
+  action,
+  data,
+  fn
+) {
+  const key =
+    getDisplayWhoScoreKey(
+      action,
+      data
+    )
 
-  if (!key || key === "0__0") return
-
-  if (displayWhoHandledScoreKeys.has(key)) {
+  if (
+    !key ||
+    key === `${action}_0__0`
+  ) {
     return
   }
 
-  displayWhoHandledScoreKeys.add(key)
-
-  if (displayWhoHandledScoreKeys.size > 40) {
-    displayWhoHandledScoreKeys = new Set(
-      Array.from(displayWhoHandledScoreKeys).slice(-20)
+  if (
+    displayWhoHandledScoreKeys.has(
+      key
     )
+  ) {
+    return
+  }
+
+  displayWhoHandledScoreKeys.add(
+    key
+  )
+
+  if (
+    displayWhoHandledScoreKeys.size >
+    40
+  ) {
+    displayWhoHandledScoreKeys =
+      new Set(
+        Array.from(
+          displayWhoHandledScoreKeys
+        ).slice(-20)
+      )
   }
 
   if (typeof fn === "function") {
@@ -925,51 +1122,251 @@ function runDisplayWhoScoreOnce(action, data, fn) {
   }
 }
 
-function handleWhoPresenterAction(action, data) {
+function handleWhoPresenterAction(
+  action,
+  data = {}
+) {
   if (action === "selectTeam") {
-  if (!isValidPresenterTeam(data.team)) return
+    if (
+      !isValidPresenterTeam(
+        data.team
+      )
+    ) {
+      return
+    }
 
-  return safeRunPresenterAction(() => {
-    applyPresenterActiveTeam(data.team)
-    selectWhoTeam(data.team)
-  })
-}
+    return safeRunPresenterAction(
+      () => {
+        if (
+          typeof forceWhoTeamFromPresenter ===
+          "function"
+        ) {
+          forceWhoTeamFromPresenter(
+            data.team
+          )
+
+          return
+        }
+
+        if (
+          typeof selectWhoTeam ===
+          "function"
+        ) {
+          selectWhoTeam(
+            data.team,
+            {
+              force: true,
+              sync: true
+            }
+          )
+        }
+      }
+    )
+  }
 
   if (action === "setPoints") {
-    return safeRunPresenterAction(() => setWhoPoints(Number(data.points)))
+    return safeRunPresenterAction(
+      () => {
+        const points =
+          Number(data.points || 0)
+
+        if (
+          !Number.isFinite(points) ||
+          points < 1 ||
+          points > 5
+        ) {
+          return
+        }
+
+        if (
+          typeof setWhoPoints ===
+          "function"
+        ) {
+          setWhoPoints(points)
+        }
+      }
+    )
   }
 
   if (action === "openNumber") {
-    return safeRunPresenterAction(() => {
-      displayWhoHandledScoreKeys.clear()
-      chooseWho(Number(data.number))
-    })
+    return safeRunPresenterAction(
+      () => {
+        const number =
+          Number(data.number || 0)
+
+        if (
+          !Number.isFinite(number) ||
+          number < 1
+        ) {
+          return
+        }
+
+        displayWhoHandledScoreKeys.clear()
+
+        const openNumber = () => {
+          if (
+            typeof chooseWho ===
+            "function"
+          ) {
+            chooseWho(number)
+          }
+        }
+
+        if (
+          isValidPresenterTeam(
+            data.team
+          )
+        ) {
+          if (
+            typeof forceWhoTeamFromPresenter ===
+            "function"
+          ) {
+            forceWhoTeamFromPresenter(
+              data.team
+            )
+          } else if (
+            typeof selectWhoTeam ===
+            "function"
+          ) {
+            selectWhoTeam(
+              data.team,
+              {
+                force: true,
+                sync: true
+              }
+            )
+          }
+
+          setTimeout(
+            openNumber,
+            50
+          )
+
+          return
+        }
+
+        openNumber()
+      }
+    )
   }
 
   if (action === "double") {
-    return safeRunPresenterAction(() => activateWhoDouble())
+    return safeRunPresenterAction(
+      () => {
+        if (
+          isValidPresenterTeam(
+            data.team
+          )
+        ) {
+          if (
+            typeof forceWhoTeamFromPresenter ===
+            "function"
+          ) {
+            forceWhoTeamFromPresenter(
+              data.team
+            )
+          }
+        }
+
+        if (
+          typeof activateWhoDouble ===
+          "function"
+        ) {
+          activateWhoDouble()
+        }
+      }
+    )
   }
 
   if (action === "compensation") {
-    return safeRunPresenterAction(() => {
-      displayWhoHandledScoreKeys.clear()
-      startWhoCompensation()
-    })
+    return safeRunPresenterAction(
+      () => {
+        displayWhoHandledScoreKeys.clear()
+
+        if (
+          typeof startWhoCompensation ===
+          "function"
+        ) {
+          startWhoCompensation()
+        }
+      }
+    )
   }
 
   if (action === "correct") {
-    return safeRunPresenterAction(() => {
-      runDisplayWhoScoreOnce("correct", data, () => whoCorrect())
-    })
+    return safeRunPresenterAction(
+      () => {
+        if (
+          isValidPresenterTeam(
+            data.team
+          ) &&
+          window.whoState
+            ?.activeTeam !==
+            data.team
+        ) {
+          if (
+            typeof forceWhoTeamFromPresenter ===
+            "function"
+          ) {
+            forceWhoTeamFromPresenter(
+              data.team
+            )
+          }
+        }
+
+        runDisplayWhoScoreOnce(
+          "correct",
+          data,
+          () => {
+            if (
+              typeof whoCorrect ===
+              "function"
+            ) {
+              whoCorrect()
+            }
+          }
+        )
+      }
+    )
   }
 
   if (action === "wrong") {
-    return safeRunPresenterAction(() => {
-      runDisplayWhoScoreOnce("wrong", data, () => whoWrong())
-    })
+    return safeRunPresenterAction(
+      () => {
+        if (
+          isValidPresenterTeam(
+            data.team
+          ) &&
+          window.whoState
+            ?.activeTeam !==
+            data.team
+        ) {
+          if (
+            typeof forceWhoTeamFromPresenter ===
+            "function"
+          ) {
+            forceWhoTeamFromPresenter(
+              data.team
+            )
+          }
+        }
+
+        runDisplayWhoScoreOnce(
+          "wrong",
+          data,
+          () => {
+            if (
+              typeof whoWrong ===
+              "function"
+            ) {
+              whoWrong()
+            }
+          }
+        )
+      }
+    )
   }
 }
-
 /* =========================
    EXPLAIN WORD
 ========================= */
@@ -977,165 +1374,300 @@ function handleWhoPresenterAction(action, data) {
 let displayExplainHandledScoreKeys = new Set()
 
 function getDisplayExplainScoreKey(action) {
-  const number = Number(window.explainState?.currentNumber || 0)
-  const team = window.explainState?.currentTeam || ""
-  const word = window.explainState?.currentWord || ""
+  const number = Number(
+    window.explainState?.currentNumber || 0
+  )
+
+  const team =
+    window.explainState?.currentTeam || ""
+
+  const word =
+    window.explainState?.currentWord || ""
 
   if (!number || !team) return ""
 
   return `${action}_${number}_${team}_${word}`
 }
 
-function runDisplayExplainScoreOnce(action, fn) {
-  const key = getDisplayExplainScoreKey(action)
+function runDisplayExplainScoreOnce(
+  action,
+  fn
+) {
+  const key =
+    getDisplayExplainScoreKey(action)
 
-  if (!key) return
+  if (!key) return false
 
-  if (displayExplainHandledScoreKeys.has(key)) {
-    return
+  if (
+    displayExplainHandledScoreKeys.has(key)
+  ) {
+    return false
   }
 
   displayExplainHandledScoreKeys.add(key)
 
-  if (displayExplainHandledScoreKeys.size > 40) {
-    displayExplainHandledScoreKeys = new Set(
-      Array.from(displayExplainHandledScoreKeys).slice(-20)
-    )
+  if (
+    displayExplainHandledScoreKeys.size >
+    40
+  ) {
+    displayExplainHandledScoreKeys =
+      new Set(
+        Array.from(
+          displayExplainHandledScoreKeys
+        ).slice(-20)
+      )
   }
 
   if (typeof fn === "function") {
     fn()
   }
+
+  return true
 }
 
-function syncAfterExplainAction() {
-  if (typeof saveExplainState === "function") {
-    saveExplainState()
+function syncAfterExplainAction(
+  options = {}
+) {
+  if (
+    typeof saveExplainState ===
+    "function"
+  ) {
+    saveExplainState(options)
     return
   }
 
-  if (typeof syncDisplayStateToSession === "function") {
-    syncDisplayStateToSession()
+  if (
+    typeof syncDisplayStateToSession ===
+    "function"
+  ) {
+    syncDisplayStateToSession({
+      immediate:
+        options.immediate === true
+    })
   }
 }
 
-function handleExplainPresenterAction(action, data) {
-if (action === "selectTeam") {
-  if (!isValidPresenterTeam(data.team)) return
+function forceExplainPresenterTeam(team) {
+  if (!isValidPresenterTeam(team)) {
+    return false
+  }
 
-  return safeRunPresenterAction(() => {
-    if (typeof selectedTeam !== "undefined") {
-      selectedTeam = data.team
-    }
+  if (
+    typeof forceExplainTeamFromPresenter ===
+    "function"
+  ) {
+    return forceExplainTeamFromPresenter(
+      team
+    )
+  }
 
-    window.selectedTeam = data.team
-    applyPresenterActiveTeam(data.team)
+  if (
+    typeof selectExplainTeam ===
+    "function"
+  ) {
+    return selectExplainTeam(team, {
+      force: true,
+      sync: true
+    })
+  }
 
-    if (typeof selectExplainTeam === "function") {
-      selectExplainTeam(data.team)
-    }
-
-    syncAfterExplainAction()
-  })
-}
-
-  if (action === "openNumber") {
-    return safeRunPresenterAction(() => {
-      const number = Number(data.number || 0)
-      const team = data.team
-
-      if (!number) return
-
-if (isValidPresenterTeam(team)) {
-  if (typeof selectedTeam !== "undefined") {
-    selectedTeam = team
+  if (
+    window.explainState
+  ) {
+    window.explainState.currentTeam =
+      team
   }
 
   window.selectedTeam = team
-  applyPresenterActiveTeam(team)
 
-  if (typeof selectExplainTeam === "function") {
-    selectExplainTeam(team)
+  if (
+    typeof selectedTeam !==
+    "undefined"
+  ) {
+    selectedTeam = team
   }
+
+  if (
+    typeof setGameActiveTeam ===
+    "function"
+  ) {
+    setGameActiveTeam(team)
+  }
+
+  return true
 }
 
-      setTimeout(() => {
-        if (typeof openExplainNumber !== "function") {
-          console.log("openExplainNumber not ready")
+function handleExplainPresenterAction(
+  action,
+  data = {}
+) {
+  if (action === "selectTeam") {
+    if (
+      !isValidPresenterTeam(data.team)
+    ) {
+      return
+    }
+
+    return safeRunPresenterAction(() => {
+      forceExplainPresenterTeam(
+        data.team
+      )
+
+      syncAfterExplainAction({
+        immediate: true
+      })
+    })
+  }
+
+  if (action === "openNumber") {
+    return safeRunPresenterAction(
+      async () => {
+        const number = Number(
+          data.number || 0
+        )
+
+        const team =
+          isValidPresenterTeam(data.team)
+            ? data.team
+            : window.explainState
+                ?.currentTeam ||
+              window.selectedTeam ||
+              null
+
+        if (!number) return
+
+        if (team) {
+          forceExplainPresenterTeam(team)
+        }
+
+        if (
+          typeof openExplainNumber !==
+          "function"
+        ) {
+          console.log(
+            "openExplainNumber not ready"
+          )
+
           return
         }
 
         displayExplainHandledScoreKeys.clear()
 
         openExplainNumber(number)
-        syncAfterExplainAction()
-      }, 60)
-    })
+
+        syncAfterExplainAction({
+          immediate: true
+        })
+      }
+    )
   }
 
-  if (action === "toggleWordVisible") {
+  if (
+    action === "toggleWordVisible"
+  ) {
     return safeRunPresenterAction(() => {
-      if (typeof toggleExplainWordVisibility === "function") {
+      if (
+        typeof toggleExplainWordVisibility ===
+        "function"
+      ) {
         toggleExplainWordVisibility()
-        syncAfterExplainAction()
-        return
-      }
-
-      if (typeof toggleExplainWord === "function") {
+      } else if (
+        typeof toggleExplainWord ===
+        "function"
+      ) {
         toggleExplainWord()
-        syncAfterExplainAction()
+      } else if (
+        typeof hideExplainWord ===
+        "function"
+      ) {
+        hideExplainWord()
+      } else {
+        console.log(
+          "Explain word toggle not ready"
+        )
+
         return
       }
 
-      if (typeof hideExplainWord === "function") {
-        hideExplainWord()
-        syncAfterExplainAction()
-      }
+      syncAfterExplainAction({
+        immediate: true
+      })
     })
   }
 
   if (action === "startTimer") {
     return safeRunPresenterAction(() => {
-      if (typeof startExplainTimer !== "function") {
-        console.log("startExplainTimer not ready")
+      if (
+        typeof startExplainTimer !==
+        "function"
+      ) {
+        console.log(
+          "startExplainTimer not ready"
+        )
+
         return
       }
 
       startExplainTimer()
-      syncAfterExplainAction()
+
+      syncAfterExplainAction({
+        immediate: true
+      })
     })
   }
 
   if (action === "correct") {
     return safeRunPresenterAction(() => {
-      if (typeof correctExplainAnswer !== "function") {
-        console.log("correctExplainAnswer not ready")
+      if (
+        typeof correctExplainAnswer !==
+        "function"
+      ) {
+        console.log(
+          "correctExplainAnswer not ready"
+        )
+
         return
       }
 
-      runDisplayExplainScoreOnce("correct", () => {
-        correctExplainAnswer()
-        syncAfterExplainAction()
-      })
+      runDisplayExplainScoreOnce(
+        "correct",
+        () => {
+          correctExplainAnswer()
+
+          syncAfterExplainAction({
+            immediate: true
+          })
+        }
+      )
     })
   }
 
   if (action === "wrong") {
     return safeRunPresenterAction(() => {
-      if (typeof wrongExplainAnswer !== "function") {
-        console.log("wrongExplainAnswer not ready")
+      if (
+        typeof wrongExplainAnswer !==
+        "function"
+      ) {
+        console.log(
+          "wrongExplainAnswer not ready"
+        )
+
         return
       }
 
-      runDisplayExplainScoreOnce("wrong", () => {
-        wrongExplainAnswer()
-        syncAfterExplainAction()
-      })
+      runDisplayExplainScoreOnce(
+        "wrong",
+        () => {
+          wrongExplainAnswer()
+
+          syncAfterExplainAction({
+            immediate: true
+          })
+        }
+      )
     })
   }
 }
-
-
 /* =========================
    FINAL
    استقبال أوامر الفاصلة الجديدة
@@ -1407,96 +1939,143 @@ if (action === "openNumber") {
     })
   }
 
+
+
 if (action === "toggleRound2Correct") {
   return safeRunPresenterAction(() => {
     if (window.finalState?.round !== 2) return
 
     const index = Number(data.index)
-    if (!Number.isFinite(index) || index < 0) return
 
-    if (!window.finalState.round2) {
-      window.finalState.round2 = {}
+    if (!Number.isFinite(index) || index < 0) {
+      return
     }
 
-    const currentNumber = Number(
-      data.number ||
-      window.finalState.round2.currentNumber ||
-      0
-    )
+    if (
+      typeof finalRound2ToggleCorrectFromPresenter ===
+      "function"
+    ) {
+      finalRound2ToggleCorrectFromPresenter(index)
+      return
+    }
 
-    const oldSelected = Array.isArray(window.finalState.round2.selectedCorrectIndexes)
-      ? window.finalState.round2.selectedCorrectIndexes.map(Number)
+    const round2 = window.finalState?.round2
+    if (!round2) return
+
+    const oldSelected = Array.isArray(
+      round2.selectedCorrectIndexes
+    )
+      ? round2.selectedCorrectIndexes.map(Number)
       : []
 
-    let nextSelected = oldSelected
-
-    if (Array.isArray(data.selectedCorrectIndexes)) {
-      nextSelected = data.selectedCorrectIndexes
-        .map(Number)
-        .filter(n => Number.isFinite(n) && n >= 0)
-    } else {
-      nextSelected = oldSelected.includes(index)
-        ? oldSelected.filter(x => Number(x) !== index)
+    const nextSelected = Array.isArray(
+      data.selectedCorrectIndexes
+    )
+      ? data.selectedCorrectIndexes
+          .map(Number)
+          .filter(
+            value =>
+              Number.isFinite(value) &&
+              value >= 0
+          )
+      : oldSelected.includes(index)
+        ? oldSelected.filter(
+            value => value !== index
+          )
         : [...oldSelected, index]
+
+    round2.selectedCorrectIndexes =
+      nextSelected
+
+    round2.correctCount =
+      nextSelected.length
+
+    if (
+      typeof renderFinalRound2Words ===
+      "function"
+    ) {
+      renderFinalRound2Words(
+        !!round2.answerShown
+      )
     }
 
-    window.finalState.round2.currentNumber = currentNumber
-    window.finalState.round2.selectedCorrectIndexes = nextSelected
-    window.finalState.round2.correctCount = nextSelected.length
-
-    try {
-      localStorage.setItem("final_state_v3", JSON.stringify(window.finalState))
-    } catch (e) {
-      console.log("silent final round2 save error:", e)
+    if (
+      typeof renderFinalRoundTitle ===
+      "function"
+    ) {
+      renderFinalRoundTitle()
     }
+
+    syncAfterFinalPresenterAction()
   })
 }
-
 
 if (action === "toggleRound2ImageCorrect") {
   return safeRunPresenterAction(() => {
     if (window.finalState?.round !== 2) return
 
     const index = Number(data.index)
-    if (!Number.isFinite(index) || index < 0) return
 
-    if (!window.finalState.round2) {
-      window.finalState.round2 = {}
+    if (!Number.isFinite(index) || index < 0) {
+      return
     }
 
-    const currentNumber = Number(
-      data.number ||
-      window.finalState.round2.currentNumber ||
-      0
-    )
+    if (
+      typeof toggleFinalRound2ImageCorrectSelection ===
+      "function"
+    ) {
+      toggleFinalRound2ImageCorrectSelection(
+        index
+      )
+      return
+    }
 
-    const oldSelected = Array.isArray(window.finalState.round2.selectedCorrectIndexes)
-      ? window.finalState.round2.selectedCorrectIndexes.map(Number)
+    const round2 = window.finalState?.round2
+    if (!round2) return
+
+    const oldSelected = Array.isArray(
+      round2.selectedCorrectIndexes
+    )
+      ? round2.selectedCorrectIndexes.map(Number)
       : []
 
-    let nextSelected = oldSelected
-
-    if (Array.isArray(data.selectedCorrectIndexes)) {
-      nextSelected = data.selectedCorrectIndexes
-        .map(Number)
-        .filter(n => Number.isFinite(n) && n >= 0)
-    } else {
-      nextSelected = oldSelected.includes(index)
-        ? oldSelected.filter(x => Number(x) !== index)
+    const nextSelected = Array.isArray(
+      data.selectedCorrectIndexes
+    )
+      ? data.selectedCorrectIndexes
+          .map(Number)
+          .filter(
+            value =>
+              Number.isFinite(value) &&
+              value >= 0
+          )
+      : oldSelected.includes(index)
+        ? oldSelected.filter(
+            value => value !== index
+          )
         : [...oldSelected, index]
+
+    round2.selectedCorrectIndexes =
+      nextSelected
+
+    round2.correctCount =
+      nextSelected.length
+
+    if (
+      typeof renderFinalRound2Words ===
+      "function"
+    ) {
+      renderFinalRound2Words(false)
     }
 
-    window.finalState.round2.currentNumber = currentNumber
-    window.finalState.round2.selectedCorrectIndexes = nextSelected
-    window.finalState.round2.correctCount = nextSelected.length
+    if (
+      typeof renderFinalRoundTitle ===
+      "function"
+    ) {
+      renderFinalRoundTitle()
+    }
 
-   
-
-    try {
-  localStorage.setItem("final_state_v3", JSON.stringify(window.finalState))
-} catch (e) {
-  console.log("silent final round2 image save error:", e)
-}
+    syncAfterFinalPresenterAction()
   })
 }
   if (action === "hideRound2SequenceWord") {
@@ -2074,7 +2653,6 @@ if (action === "randomSetAuctionPoints") {
     })
   }
 }
-
 /* =========================
    INIT
 ========================= */
@@ -2083,4 +2661,35 @@ window.addEventListener("load", () => {
   restoreDisplayControlsMode()
   listenPresenterCommands()
   startRandomChallengeBox3TimerSessionSync()
+})
+
+window.addEventListener("online", () => {
+  listenPresenterCommands(true)
+})
+
+window.addEventListener("pageshow", () => {
+  listenPresenterCommands()
+})
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    listenPresenterCommands()
+  }
+})
+
+window.addEventListener("beforeunload", () => {
+  clearTimeout(presenterCommandReconnectTimer)
+  presenterCommandReconnectTimer = null
+
+  if (
+    presenterCommandChannel &&
+    window.db
+  ) {
+    db.removeChannel(
+      presenterCommandChannel
+    )
+  }
+
+  presenterCommandChannel = null
+  presenterCommandChannelHealthy = false
 })

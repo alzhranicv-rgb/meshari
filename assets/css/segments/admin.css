@@ -1141,7 +1141,7 @@ input[type="file"]::file-selector-button{
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  border-top:1px solid rgba(213,218,223,.70);
+  border-top:1px solid rgba(223, 213, 213, 0.7);
 }
 
 .adminGlobalSegmentControl span{
@@ -5668,7 +5668,7 @@ input[type="file"]::file-selector-button{
   min-height:54px;
   border-radius:18px;
   padding:0 20px;
-  border:1px solid rgba(213,218,223,.75);
+  border:1px solid rgba(223, 213, 213, 0.75);
   background:rgba(255,255,255,.78);
   color:var(--admin-secondary);
   font-weight:400;
@@ -5725,8 +5725,8 @@ input[type="file"]::file-selector-button{
   min-height:46px;
   border-radius:16px;
   padding:0 18px;
-  border:1px solid rgba(213,218,223,.78);
-  background:rgba(255,255,255,.82);
+  border:1px solid rgba(119, 0, 0, 0.78);
+  background:rgba(223, 84, 84, 0.82);
   color:var(--admin-secondary);
   font-weight:400;
   cursor:pointer;
@@ -6407,5 +6407,604 @@ input[type="file"]::file-selector-button{
 
   .adminHomeSegmentMain{
     min-height:138px !important;
+  }
+}
+.adminHomeSegmentCard button:disabled,
+.adminHomeSegmentMain:disabled{
+  opacity:1 !important;
+  filter:none !important;
+  cursor:default;
+}
+
+.adminHomeSegmentCard.isDone{
+  opacity:1 !important;
+  filter:none !important;
+}
+/* =========================
+   CHALLENGE SETTINGS - COMPACT CARDS
+========================= */
+
+.adminChallengeSettingsSection{
+  width:100%;
+  margin-top:20px;
+}
+
+.adminChallengeSettingsHead{
+  margin-bottom:12px;
+  padding:0 4px;
+}
+
+.adminChallengeSettingsHead h2{
+  margin:0 0 4px;
+  color:var(--main-text);
+  font-size:1.3rem;
+  line-height:1.2;
+  font-weight:900;
+}
+
+.adminChallengeSettingsHead span{
+  display:block;
+  color:var(--muted);
+  font-size:.9rem;
+  font-weight:700;
+}
+
+/* الخمس بطاقات بجانب بعض */
+
+.adminChallengeSettingsGrid{
+  width:100%;
+
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+  align-items:stretch;
+}
+
+/* البطاقة */
+
+.adminChallengeSettingsGrid .adminToggleSettingCard{
+  min-width:0;
+  min-height:178px;
+
+  padding:14px 12px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:space-between;
+
+  background:#fff;
+  border:2px solid #E2E8F0;
+  border-radius:20px;
+
+  box-shadow:
+    0 8px 22px rgba(15,23,42,.06);
+
+  opacity:1;
+
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    transform .18s ease;
+}
+
+.adminChallengeSettingsGrid .adminToggleSettingCard:hover{
+  transform:translateY(-1px);
+}
+
+.adminChallengeSettingsGrid .adminToggleSettingCard.isEnabled{
+  border-color:rgba(22,163,74,.38);
+
+  box-shadow:
+    0 8px 22px rgba(22,163,74,.08);
+}
+
+.adminChallengeSettingsGrid .adminToggleSettingCard.isDisabled{
+  border-color:rgba(225,29,72,.3);
+
+  box-shadow:
+    0 8px 22px rgba(225,29,72,.06);
+}
+
+/* محتوى البطاقة */
+
+.adminChallengeSettingsGrid .adminSettingGameHead{
+  width:100%;
+  flex:1;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  gap:16px;
+  text-align:center;
+}
+
+.adminChallengeSettingsGrid .adminSettingGameTitleBox{
+  width:100%;
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.adminChallengeSettingsGrid .adminSettingGameTitleBox h3{
+  margin:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  gap:8px;
+
+  color:var(--main-text);
+
+  font-size:1.2rem;
+  line-height:1.25;
+  font-weight:900;
+
+  text-align:center;
+}
+
+.adminChallengeSettingsGrid .adminSettingGameTitleBox h3 span{
+  color:var(--muted);
+
+  font-size:.9rem;
+  line-height:1.3;
+  font-weight:700;
+
+  text-align:center;
+}
+
+/* زر التفعيل */
+
+.adminChallengeSettingsGrid .adminSettingToggleBtn{
+  width:100%;
+  min-width:0;
+  height:46px;
+  min-height:46px;
+
+  padding:8px 10px;
+
+  border:0;
+  border-radius:14px;
+
+  background:#E11D48;
+  color:#fff;
+
+  font-family:inherit;
+  font-size:1rem;
+  line-height:1;
+  font-weight:900;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 6px 16px rgba(225,29,72,.16);
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
+}
+
+.adminChallengeSettingsGrid .adminSettingToggleBtn.active{
+  background:#16A34A;
+  color:#fff;
+
+  box-shadow:
+    0 6px 16px rgba(22,163,74,.18);
+}
+
+.adminChallengeSettingsGrid .adminSettingToggleBtn:hover{
+  filter:brightness(1.03);
+}
+
+.adminChallengeSettingsGrid .adminSettingToggleBtn:active{
+  transform:scale(.97);
+}
+
+/* بطاقة فتبلة */
+
+.adminChallengeAuctionCard{
+  grid-column:auto;
+  min-height:178px;
+}
+
+/* قسم الأرقام داخل فتبلة */
+
+.adminChallengeAuctionCount{
+  width:100%;
+
+  margin-top:10px;
+  padding-top:10px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  gap:8px;
+
+  border-top:1px solid #E2E8F0;
+}
+
+.adminChallengeAuctionCountTitle{
+  color:var(--muted);
+
+  font-size:.9rem;
+  line-height:1;
+  font-weight:800;
+
+  text-align:center;
+}
+
+.adminChallengeAuctionOptions{
+  width:100%;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+}
+
+.adminChallengeAuctionOptions .adminSettingGameOption{
+  width:100%;
+  min-width:0;
+
+  height:40px;
+  min-height:40px;
+
+  padding:0;
+
+  border:1px solid #DCE3EA;
+  border-radius:10px;
+
+  background:#F8FAFC;
+  color:var(--main-text);
+
+  font-family:inherit;
+  font-size:1rem;
+  line-height:1;
+  font-weight:900;
+
+  cursor:pointer;
+
+  transition:
+    transform .15s ease,
+    background .15s ease,
+    border-color .15s ease,
+    color .15s ease;
+}
+
+.adminChallengeAuctionOptions .adminSettingGameOption:hover:not(:disabled){
+  transform:translateY(-1px);
+}
+
+.adminChallengeAuctionOptions .adminSettingGameOption:active:not(:disabled){
+  transform:scale(.97);
+}
+
+.adminChallengeAuctionOptions .adminSettingGameOption.selected{
+  background:var(--primary);
+  border-color:var(--primary);
+  color:#fff;
+}
+
+.adminChallengeAuctionOptions .adminSettingGameOption:disabled{
+  opacity:.32;
+  cursor:not-allowed;
+  transform:none;
+}
+
+.adminChallengeAuctionCard.isDisabled
+.adminChallengeAuctionCount{
+  opacity:.42;
+}
+
+/* الأجهزة المتوسطة */
+
+@media (max-width:1050px){
+  .adminChallengeSettingsGrid{
+    grid-template-columns:repeat(5,minmax(145px,1fr));
+
+    overflow-x:auto;
+    padding-bottom:6px;
+
+    scrollbar-width:none;
+  }
+
+  .adminChallengeSettingsGrid::-webkit-scrollbar{
+    display:none;
+  }
+}
+
+/* الجوال */
+
+@media (max-width:650px){
+  .adminChallengeSettingsGrid{
+    grid-template-columns:repeat(5,150px);
+    justify-content:start;
+  }
+
+  .adminChallengeSettingsGrid .adminToggleSettingCard,
+  .adminChallengeAuctionCard{
+    min-height:174px;
+  }
+
+  .adminChallengeSettingsGrid .adminSettingGameTitleBox h3{
+    font-size:1.12rem;
+  }
+
+  .adminChallengeSettingsGrid .adminSettingGameTitleBox h3 span{
+    font-size:.82rem;
+  }
+}
+/* =========================
+   RANDOM CHALLENGE ADMIN
+========================= */
+
+.randomChallengeAdminPage{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.randomChallengeAdminTopBar{
+  width:100%;
+  padding:16px;
+
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+
+  background:#fff;
+  border:2px solid var(--line);
+  border-radius:22px;
+}
+
+.randomChallengeAdminHeading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.randomChallengeAdminHeading h2{
+  margin:0;
+  color:var(--main-text);
+  font-size:1.35rem;
+  font-weight:900;
+}
+
+.randomChallengeAdminHeading span{
+  color:var(--muted);
+  font-size:1rem;
+  font-weight:800;
+}
+
+.randomChallengeAdminTabs{
+  width:100%;
+
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+}
+
+.randomChallengeAdminTab{
+  min-width:0;
+  min-height:48px;
+
+  padding:8px 10px;
+
+  border:2px solid #E2E8F0;
+  border-radius:14px;
+
+  background:#F8FAFC;
+  color:var(--main-text);
+
+  font-family:inherit;
+  font-size:.95rem;
+  font-weight:900;
+
+  cursor:pointer;
+}
+
+.randomChallengeAdminTab.active{
+  background:var(--primary);
+  border-color:var(--primary);
+  color:#fff;
+}
+
+.randomChallengeAdminContent{
+  width:100%;
+}
+
+@media (max-width:760px){
+  .randomChallengeAdminTabs{
+    grid-template-columns:repeat(5,140px);
+    overflow-x:auto;
+  }
+
+  .randomChallengeAdminHeading{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+/* =========================
+   RANDOM CHALLENGE QUESTIONS
+========================= */
+
+.randomChallengeQuestionsEditor{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.randomChallengeQuestionsHeader{
+  width:100%;
+  padding:14px 16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+
+  background:#fff;
+  border:2px solid var(--line);
+  border-radius:20px;
+}
+
+.randomChallengeQuestionsHeader h3{
+  margin:0 0 4px;
+  color:var(--main-text);
+  font-size:1.25rem;
+  font-weight:900;
+}
+
+.randomChallengeQuestionsHeader span{
+  color:var(--muted);
+  font-size:.9rem;
+  font-weight:700;
+}
+
+.randomChallengeQuestionTabs{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:7px;
+}
+
+.randomChallengeQuestionTab{
+  width:42px;
+  height:42px;
+  padding:0;
+
+  border:2px solid #E2E8F0;
+  border-radius:12px;
+
+  background:#F8FAFC;
+  color:var(--main-text);
+
+  font-family:inherit;
+  font-size:1rem;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.randomChallengeQuestionTab.completed{
+  border-color:rgba(22,163,74,.4);
+  background:rgba(22,163,74,.08);
+  color:#15803D;
+}
+
+.randomChallengeQuestionTab.missing{
+  border-color:rgba(225,29,72,.25);
+}
+
+.randomChallengeQuestionsList{
+  width:100%;
+
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+
+.randomChallengeQuestionCard{
+  min-width:0;
+  padding:16px;
+
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+
+  background:#fff;
+  border:2px solid #E2E8F0;
+  border-radius:20px;
+
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+.randomChallengeQuestionNumber{
+  color:var(--main-text);
+  font-size:1.05rem;
+  font-weight:900;
+}
+
+.randomChallengeQuestionCard textarea{
+  width:100%;
+  min-height:94px;
+  resize:vertical;
+}
+
+.randomChallengeQuestionCard
+.randomChallengeAnswerInput{
+  min-height:74px;
+}
+
+.randomChallengeQuestionActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.randomChallengeTrueFalseOptions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.randomChallengeTrueFalseBtn{
+  min-height:50px;
+
+  border:2px solid #E2E8F0;
+  border-radius:14px;
+
+  background:#F8FAFC;
+  color:var(--main-text);
+
+  font-family:inherit;
+  font-size:1rem;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.randomChallengeTrueFalseBtn.selected.correct{
+  background:#16A34A;
+  border-color:#16A34A;
+  color:#fff;
+}
+
+.randomChallengeTrueFalseBtn.selected.wrong{
+  background:#E11D48;
+  border-color:#E11D48;
+  color:#fff;
+}
+
+.randomChallengeQuestionFocus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 5px rgba(249,115,22,.12);
+}
+
+@media (max-width:820px){
+  .randomChallengeQuestionsHeader{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .randomChallengeQuestionTabs{
+    width:100%;
+    justify-content:flex-start;
+  }
+
+  .randomChallengeQuestionsList{
+    grid-template-columns:1fr;
   }
 }

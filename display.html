@@ -6,21 +6,15 @@
 
   <title>الحنكة</title>
 
-  <!-- ملف التصميم الرئيسي أولاً -->
   <link rel="stylesheet" href="styles.css?v=1002" />
 
-  <!-- ملفات الفقرات -->
   <link rel="stylesheet" href="assets/css/segments/top10.css?v=1002" />
-  <link rel="stylesheet" href="assets/css/segments/auction.css?v=1002" />
   <link rel="stylesheet" href="assets/css/segments/who.css?v=1002" />
   <link rel="stylesheet" href="assets/css/segments/explain.css?v=1002" />
   <link rel="stylesheet" href="assets/css/segments/archive.css?v=1002" />
   <link rel="stylesheet" href="assets/css/segments/warmup.css?v=1002" />
-
-  <!-- الفقرة الجديدة -->
+  <link rel="stylesheet" href="assets/css/segments/letterli.css?v=1002" />
   <link rel="stylesheet" href="assets/css/segments/random-challenge.css?v=1002" />
-
-  <!-- الفاينل آخر ملف عشان تصميمه يغلب على archiveCtrlBtn -->
   <link rel="stylesheet" href="assets/css/segments/final.css?v=1002" />
 </head>
 
@@ -68,10 +62,8 @@
 
   </div>
 
-  <!-- منطقة الفقرات -->
   <div id="segmentArea"></div>
 
-  <!-- نافذة الفائز -->
   <div id="winnerOverlay" class="hidden">
     <div id="winnerOverlayCard">
       <div id="winnerOverlayTitle">الفائز</div>
@@ -98,7 +90,6 @@
     </div>
   </div>
 
-  <!-- نافذة النتائج النهائية الموحدة / شاشة التتويج -->
   <div id="finalResultsOverlay" class="finalResultsOverlay hidden">
 
     <section class="finalResultsBoard">
@@ -214,18 +205,18 @@
             <strong id="resultTop10Winner" class="finalMatchWinner">لم تلعب</strong>
           </div>
 
-          <div class="finalSegmentResultItem" data-result-card="auction">
-            <b class="finalMatchNo">3</b>
-            <h3>فتبلة</h3>
+          <div class="finalSegmentResultItem" data-result-card="letterli">
+  <b class="finalMatchNo">3</b>
+  <h3>حرفلي</h3>
 
-            <div class="finalSegmentScoreLine">
-              <em id="resultAuctionA">0</em>
-              <span>-</span>
-              <em id="resultAuctionB">0</em>
-            </div>
+  <div class="finalSegmentScoreLine">
+    <em id="resultLetterliA">0</em>
+    <span>-</span>
+    <em id="resultLetterliB">0</em>
+  </div>
 
-            <strong id="resultAuctionWinner" class="finalMatchWinner">لم تلعب</strong>
-          </div>
+  <strong id="resultLetterliWinner" class="finalMatchWinner">لم تلعب</strong>
+</div>
 
           <div class="finalSegmentResultItem" data-result-card="who">
             <b class="finalMatchNo">4</b>
@@ -349,14 +340,14 @@
 
   </div>
 
-  <!-- إشعار سريع يظهر 5 ثواني -->
   <div id="gameToast" class="gameToast hidden">
     <div class="gameToastIcon">!</div>
     <div id="gameToastText" class="gameToastText"></div>
   </div>
 
-  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
   <script src="assets/js/supabase.js"></script>
 
   <script src="assets/js/game.js?v=1002"></script>
@@ -364,18 +355,13 @@
 
   <script src="assets/js/warmup.js?v=1002"></script>
   <script src="assets/js/top10.js?v=1002"></script>
-  <script src="assets/js/auction.js?v=1002"></script>
   <script src="assets/js/who.js?v=1002"></script>
   <script src="assets/js/explain.js?v=1002"></script>
   <script src="assets/js/final.js?v=1002"></script>
   <script src="assets/js/archive.js?v=1002"></script>
-
-<!-- صور اللاعب المشترك -->
-<script src="assets/js/random-shared-player-media.js?v=1002"></script>
-
-<!-- الفقرة الجديدة -->
-<script src="assets/js/random-challenge.js?v=1002"></script>
-
+  <script src="assets/js/letterli.js?v=1002"></script>
+  <script src="assets/js/random-shared-player-media.js?v=1002"></script>
+  <script src="assets/js/random-challenge.js?v=1002"></script>
   <script src="assets/js/presenter-listener.js?v=1002"></script>
 
 </body>

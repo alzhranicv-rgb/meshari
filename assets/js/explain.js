@@ -5,8 +5,15 @@
 const EXPLAIN_STORAGE_KEY = "explain_state_v1"
 const EXPLAIN_TIMER_SECONDS = 60
 
+let explainTimer = null
 let explainTimerLastTick = null
 let explainRevealTimeout = null
+let explainStateSyncTimer = null
+let explainDataCache = {}
+let explainDataPromise = null
+
+const EXPLAIN_DATA_CACHE_TTL =
+  5 * 60 * 1000
 
 let explainDoubleState = {
   used: { A: false, B: false },
@@ -17,7 +24,7 @@ let explainDoublePickMode = false
 
 window.explainState = {
   model: null,
-  wordsCount: 4,
+  wordsCount: 5,
   words: [],
   usedNumbers: [],
   currentNumber: null,
@@ -45,27 +52,52 @@ function getExplainOtherTeam(team) {
   return team === "A" ? "B" : "A"
 }
 
-function setExplainActiveTeam(team, options = {}) {
-  if (team !== "A" && team !== "B") {
-    selectedTeam = null
-    window.explainState.currentTeam = null
+function setExplainActiveTeam(
+  team,
+  options = {}
+) {
+  const validTeam =
+    team === "A" || team === "B"
 
-    if (typeof clearGameActiveTeam === "function") {
-      clearGameActiveTeam()
+  selectedTeam =
+    validTeam ? team : null
+
+  window.selectedTeam =
+    validTeam ? team : null
+
+  window.explainState.currentTeam =
+    validTeam ? team : null
+
+  if (validTeam) {
+    if (
+      typeof setGameActiveTeam ===
+      "function"
+    ) {
+      setGameActiveTeam(team, {
+        sync: options.sync !== false
+      })
     }
-
-    highlightExplainTeam(null)
-    return
+  } else if (
+    typeof clearGameActiveTeam ===
+    "function"
+  ) {
+    clearGameActiveTeam({
+      sync: options.sync !== false
+    })
   }
 
-  selectedTeam = team
-  window.explainState.currentTeam = team
+  highlightExplainTeam(
+    validTeam ? team : null
+  )
 
-  if (typeof setGameActiveTeam === "function") {
-    setGameActiveTeam(team, options)
+  if (options.save === true) {
+    saveExplainState({
+      immediate:
+        options.immediate === true
+    })
   }
 
-  highlightExplainTeam(team)
+  return true
 }
 
 function canExplainTeamPlay(team) {
@@ -77,31 +109,42 @@ function canExplainTeamPlay(team) {
   return teamAttempts <= otherAttempts
 }
 
-function getExplainWordPoolKey(model, wordsCount, words) {
+function getExplainWordPoolKey(
+  model,
+  wordsCount,
+  words
+) {
   return [
     Number(model || 0),
-    Number(wordsCount || 4),
+    Number(wordsCount || 5),
+
     words
-      .map(item => `${Number(item.number)}:${String(item.word || "").trim()}`)
+      .map(item => {
+        return `${Number(item.number)}:${String(item.word || "").trim()}`
+      })
       .join("|")
   ].join("__")
 }
 
 function normalizeExplainWordsCount(value) {
-  const n = Number(value || 4)
+  const n = Number(value || 5)
 
-  if (n === 8) return 8
-  if (n === 6) return 6
+  if (n === 9) return 9
+  if (n === 7) return 7
 
-  return 4
+  return 5
 }
 
-function getExplainConfiguredWordsCount(settingsValue = null) {
+function getExplainConfiguredWordsCount(
+  settingsValue = null
+) {
   return normalizeExplainWordsCount(
     settingsValue ||
     window.explainWordsCount ||
-    localStorage.getItem("explain_words_count") ||
-    4
+    localStorage.getItem(
+      "explain_words_count"
+    ) ||
+    5
   )
 }
 
@@ -148,33 +191,80 @@ function normalizeExplainDoubleState(state) {
   return clean
 }
 
-function saveExplainState() {
+function saveExplainState(options = {}) {
   try {
-    localStorage.setItem(EXPLAIN_STORAGE_KEY, JSON.stringify({
-      explainState: window.explainState,
-      explainDoubleState
-    }))
+    window.explainState.usedNumbers = [
+      ...new Set(
+        (window.explainState.usedNumbers || [])
+          .map(Number)
+          .filter(number => number > 0)
+      )
+    ]
 
-    localStorage.setItem("active_segment", "explain")
+    localStorage.setItem(
+      EXPLAIN_STORAGE_KEY,
+      JSON.stringify({
+        explainState:
+          window.explainState,
+
+        explainDoubleState:
+          normalizeExplainDoubleState(
+            explainDoubleState
+          )
+      })
+    )
+
+    localStorage.setItem(
+      "active_segment",
+      "explain"
+    )
 
     window.currentSegmentScores = {
-      A: Number(window.explainState.scores?.A || 0),
-      B: Number(window.explainState.scores?.B || 0)
+      A: Number(
+        window.explainState.scores?.A || 0
+      ),
+
+      B: Number(
+        window.explainState.scores?.B || 0
+      )
     }
 
-    if (typeof saveUnifiedGameState === "function") {
+    if (
+      typeof saveUnifiedGameState ===
+      "function"
+    ) {
       saveUnifiedGameState()
     }
 
-    if (typeof syncDisplayStateToSession === "function") {
-      syncDisplayStateToSession()
-    }
+    clearTimeout(
+      explainStateSyncTimer
+    )
 
-    if (typeof updateEndRoundButtonState === "function") {
+    const immediate =
+      options.immediate === true
+
+    explainStateSyncTimer = setTimeout(() => {
+      if (
+        typeof syncDisplayStateToSession ===
+        "function"
+      ) {
+        syncDisplayStateToSession({
+          immediate
+        })
+      }
+    }, immediate ? 0 : 120)
+
+    if (
+      typeof updateEndRoundButtonState ===
+      "function"
+    ) {
       updateEndRoundButtonState()
     }
-  } catch (e) {
-    console.log("SAVE EXPLAIN STATE ERROR:", e)
+  } catch (error) {
+    console.log(
+      "SAVE EXPLAIN STATE ERROR:",
+      error
+    )
   }
 }
 
@@ -201,8 +291,8 @@ function loadExplainState() {
 }
 
 function resetExplainTimer() {
-  clearInterval(timer)
-  timer = null
+  clearInterval(explainTimer)
+  explainTimer = null
   explainTimerLastTick = null
 }
 
@@ -213,8 +303,10 @@ function resetExplainRevealTimeout() {
 
 function hideExplainTimer() {
   resetExplainTimer()
+
   window.explainState.timerVisible = false
-  window.explainState.timeLeft = EXPLAIN_TIMER_SECONDS
+  window.explainState.timeLeft =
+    EXPLAIN_TIMER_SECONDS
 }
 
 function getExplainWordByNumber(number) {
@@ -227,118 +319,426 @@ function getExplainWordByNumber(number) {
    Load From Supabase
 ========================= */
 
-async function loadExplainData() {
-  const model = Number(window.currentModel || localStorage.getItem("game_model") || 0)
-
-  if (!model) {
-    showGameToast("لم يتم اختيار نموذج")
-    return false
-  }
-
-  const [settingsRes, wordsRes] = await Promise.all([
-    db
-      .from("segment_settings")
-      .select("item_count")
-      .eq("model", model)
-      .eq("segment", "explain")
-      .maybeSingle(),
-
-    db
-      .from("explain_words")
-      .select("*")
-      .eq("model", model)
-      .order("number", { ascending: true })
-  ])
-
-  if (settingsRes.error || wordsRes.error) {
-    console.log(settingsRes.error || wordsRes.error)
-    showGameToast("تعذر تحميل فقرة اشرح الكلمة")
-    return false
-  }
-
-  const wordsCount = getExplainConfiguredWordsCount(settingsRes.data?.item_count)
-
-  window.explainWordsCount = wordsCount
-  localStorage.setItem("explain_words_count", String(wordsCount))
-
-  console.log("EXPLAIN WORDS COUNT:", {
-    settings: settingsRes.data?.item_count,
-    windowCount: window.explainWordsCount,
-    localCount: localStorage.getItem("explain_words_count"),
-    finalCount: wordsCount
-  })
-
-  const rawWords = (wordsRes.data || [])
-    .filter(row => Number(row.number) >= 1 && Number(row.number) <= wordsCount)
+function normalizeExplainRows(
+  rows,
+  wordsCount
+) {
+  return (rows || [])
     .map(row => ({
-      number: Number(row.number),
-      word: row.word || ""
+      number: Number(
+        row.number || 0
+      ),
+
+      word: String(
+        row.word || ""
+      ).trim()
     }))
+    .filter(row => {
+      return (
+        row.number >= 1 &&
+        row.number <= wordsCount
+      )
+    })
+}
 
-  const wordPoolKey = getExplainWordPoolKey(model, wordsCount, rawWords)
-  const saved = loadExplainState()
+function applyExplainLoadedData(
+  model,
+  wordsCount,
+  rawWords,
+  options = {}
+) {
+  const saved =
+    loadExplainState()
 
-  const savedExplainState = saved?.explainState || null
-  const savedDoubleState = saved?.explainDoubleState || null
+  const savedExplainState =
+    saved?.explainState || null
+
+  const savedDoubleState =
+    saved?.explainDoubleState || null
+
+  const wordPoolKey =
+    getExplainWordPoolKey(
+      model,
+      wordsCount,
+      rawWords
+    )
 
   const sameSavedGame =
-    Number(savedExplainState?.model || 0) === Number(model) &&
-    Number(savedExplainState?.wordsCount || 4) === Number(wordsCount) &&
-    savedExplainState?.wordPoolKey === wordPoolKey
+    Number(
+      savedExplainState?.model || 0
+    ) === Number(model) &&
+    Number(
+      savedExplainState
+        ?.wordsCount || 5
+    ) === Number(wordsCount) &&
+    savedExplainState
+      ?.wordPoolKey === wordPoolKey
 
-  const words = sameSavedGame && Array.isArray(savedExplainState?.words)
-    ? savedExplainState.words
-    : buildExplainWords(rawWords, wordsCount)
+  const preserveCurrentState =
+    options.preserveState ===
+      true &&
+    Number(
+      window.explainState
+        ?.model || 0
+    ) === Number(model)
+
+  const sourceState =
+    preserveCurrentState
+      ? window.explainState
+      : sameSavedGame
+        ? savedExplainState
+        : null
+
+  const words =
+    sourceState &&
+    Array.isArray(
+      sourceState.words
+    )
+      ? buildExplainWords(
+          rawWords,
+          wordsCount
+        )
+      : buildExplainWords(
+          rawWords,
+          wordsCount
+        )
 
   window.explainState = {
     model,
     wordsCount,
     words,
-    usedNumbers: sameSavedGame ? (savedExplainState?.usedNumbers || []) : [],
-    currentNumber: sameSavedGame ? (savedExplainState?.currentNumber || null) : null,
-    currentWord: sameSavedGame ? (savedExplainState?.currentWord || "") : "",
-    currentTeam: sameSavedGame ? (savedExplainState?.currentTeam || null) : null,
-    wordVisible: sameSavedGame ? (savedExplainState?.wordVisible !== false) : true,
-    timerVisible: sameSavedGame ? !!savedExplainState?.timerVisible : false,
-    timeLeft: sameSavedGame
-      ? Number(savedExplainState?.timeLeft || EXPLAIN_TIMER_SECONDS)
-      : EXPLAIN_TIMER_SECONDS,
-    revealLock: false,
-    answerResult: null,
-    scores: sameSavedGame ? {
-      A: Number(savedExplainState?.scores?.A || 0),
-      B: Number(savedExplainState?.scores?.B || 0)
-    } : { A: 0, B: 0 },
-    attempts: sameSavedGame ? {
-      A: Number(savedExplainState?.attempts?.A || 0),
-      B: Number(savedExplainState?.attempts?.B || 0)
-    } : { A: 0, B: 0 },
+
+    usedNumbers:
+      sourceState?.usedNumbers
+        ?.map(Number)
+        .filter(number => {
+          return (
+            number >= 1 &&
+            number <= wordsCount
+          )
+        }) || [],
+
+    currentNumber:
+      sourceState?.currentNumber
+        ? Number(
+            sourceState.currentNumber
+          )
+        : null,
+
+    currentWord:
+      sourceState?.currentWord ||
+      "",
+
+    currentTeam:
+      sourceState?.currentTeam ===
+        "A" ||
+      sourceState?.currentTeam ===
+        "B"
+        ? sourceState.currentTeam
+        : null,
+
+    wordVisible:
+      sourceState
+        ? sourceState
+            .wordVisible !== false
+        : true,
+
+    timerVisible:
+      sourceState
+        ? !!sourceState.timerVisible
+        : false,
+
+    timeLeft:
+      sourceState
+        ? Number(
+            sourceState.timeLeft ??
+            EXPLAIN_TIMER_SECONDS
+          )
+        : EXPLAIN_TIMER_SECONDS,
+
+    revealLock:
+      preserveCurrentState
+        ? !!sourceState
+            ?.revealLock
+        : false,
+
+    answerResult:
+      preserveCurrentState
+        ? sourceState
+            ?.answerResult ||
+          null
+        : null,
+
+    scores: {
+      A: Number(
+        sourceState
+          ?.scores?.A || 0
+      ),
+
+      B: Number(
+        sourceState
+          ?.scores?.B || 0
+      )
+    },
+
+    attempts: {
+      A: Number(
+        sourceState
+          ?.attempts?.A || 0
+      ),
+
+      B: Number(
+        sourceState
+          ?.attempts?.B || 0
+      )
+    },
+
     wordPoolKey
   }
 
-  explainDoubleState = sameSavedGame
-    ? normalizeExplainDoubleState(savedDoubleState)
-    : normalizeExplainDoubleState(null)
+  explainDoubleState =
+    sourceState
+      ? normalizeExplainDoubleState(
+          preserveCurrentState
+            ? explainDoubleState
+            : savedDoubleState
+        )
+      : normalizeExplainDoubleState(
+          null
+        )
 
-  explainDoublePickMode = false
+  explainDoublePickMode =
+    false
 
   window.currentSegmentScores = {
-    A: Number(window.explainState.scores.A || 0),
-    B: Number(window.explainState.scores.B || 0)
+    A: Number(
+      window.explainState
+        .scores.A || 0
+    ),
+
+    B: Number(
+      window.explainState
+        .scores.B || 0
+    )
+  }
+}
+
+async function loadExplainData(
+  options = {}
+) {
+  const model = Number(
+    window.currentModel ||
+    localStorage.getItem(
+      "game_model"
+    ) ||
+    0
+  )
+
+  if (!model) {
+    showGameToast(
+      "لم يتم اختيار نموذج"
+    )
+
+    return {
+      data: [],
+      error: new Error(
+        "MODEL_NOT_SELECTED"
+      )
+    }
   }
 
-  if (window.explainState.currentTeam) {
-    setExplainActiveTeam(window.explainState.currentTeam, { sync:false })
-  } else {
-    setExplainActiveTeam(null, { sync:false })
+  const wordsCount =
+    getExplainConfiguredWordsCount(
+      window.explainWordsCount ||
+      localStorage.getItem(
+        "explain_words_count"
+      ) ||
+      5
+    )
+
+  window.explainWordsCount =
+    wordsCount
+
+  localStorage.setItem(
+    "explain_words_count",
+    String(wordsCount)
+  )
+
+  const cacheKey =
+    `${model}_${wordsCount}`
+
+  if (
+    explainDataCache[cacheKey] &&
+    options.forceRefresh !== true
+  ) {
+    applyExplainLoadedData(
+      model,
+      wordsCount,
+      explainDataCache[cacheKey]
+    )
+
+    return {
+      data:
+        explainDataCache[cacheKey],
+      error: null,
+      source: "memory-cache"
+    }
   }
 
-  if (!sameSavedGame) {
-    hideExplainTimer()
+  if (
+    explainDataPromise &&
+    options.forceRefresh !== true
+  ) {
+    return explainDataPromise
   }
 
-  saveExplainState()
-  return true
+  explainDataPromise =
+    (async () => {
+      let result
+
+      if (
+        typeof window
+          .cachedSupabaseSelect ===
+        "function"
+      ) {
+        result =
+          await window
+            .cachedSupabaseSelect(
+              "explain_words",
+              {
+                select:
+                  "number,word",
+
+                filters: {
+                  model
+                },
+
+                order: {
+                  column: "number",
+                  ascending: true
+                },
+
+                ttl:
+                  EXPLAIN_DATA_CACHE_TTL,
+
+                forceRefresh:
+                  options.forceRefresh ===
+                  true,
+
+                staleWhileRevalidate:
+                  options
+                    .staleWhileRevalidate !==
+                  false,
+
+                cacheKey:
+                  `supabase_cache_v1:explain_words:${model}`,
+
+                onBackgroundUpdate:
+                  freshRows => {
+                    const cleanRows =
+                      normalizeExplainRows(
+                        freshRows,
+                        wordsCount
+                      )
+
+                    explainDataCache[
+                      cacheKey
+                    ] = cleanRows
+
+                    if (
+                      Number(
+                        window.currentModel ||
+                        localStorage.getItem(
+                          "game_model"
+                        ) ||
+                        0
+                      ) === model
+                    ) {
+                      applyExplainLoadedData(
+                        model,
+                        wordsCount,
+                        cleanRows,
+                        {
+                          preserveState:
+                            true
+                        }
+                      )
+
+                      if (
+                        document.querySelector(
+                          ".explainWrap"
+                        )
+                      ) {
+                        updateExplainUI()
+                      }
+                    }
+                  }
+              }
+            )
+      } else {
+        const {
+          data,
+          error
+        } = await db
+          .from("explain_words")
+          .select("number,word")
+          .eq("model", model)
+          .order("number", {
+            ascending: true
+          })
+
+        result = {
+          data: data || [],
+          error,
+          source: "network"
+        }
+      }
+
+      const cleanRows =
+        normalizeExplainRows(
+          result.data || [],
+          wordsCount
+        )
+
+      if (
+        result.error &&
+        !cleanRows.length
+      ) {
+        console.log(
+          "LOAD EXPLAIN DATA ERROR:",
+          result.error
+        )
+
+        return {
+          data: [],
+          error: result.error,
+          source:
+            result.source || "error"
+        }
+      }
+
+      explainDataCache[cacheKey] =
+        cleanRows
+
+      applyExplainLoadedData(
+        model,
+        wordsCount,
+        cleanRows
+      )
+
+      return {
+        data: cleanRows,
+        error: result.error || null,
+        source:
+          result.source || "network"
+      }
+    })()
+
+  try {
+    return await explainDataPromise
+  } finally {
+    explainDataPromise = null
+  }
 }
 
 /* =========================
@@ -347,22 +747,67 @@ async function loadExplainData() {
 
 async function renderExplain() {
   selectedTeam = null
+  window.selectedTeam = null
+
   resetExplainTimer()
   resetExplainRevealTimeout()
+
+  clearTimeout(
+    explainStateSyncTimer
+  )
+
+  explainStateSyncTimer = null
   explainDoublePickMode = false
+  explainDataPromise = null
 
-  const loaded = await loadExplainData()
-  if (!loaded) return
+  const explainLoadResult =
+    await loadExplainData({
+      staleWhileRevalidate: true
+    })
 
-  openSegment("اشرح الكلمة", buildExplainHtml())
+  if (
+    explainLoadResult.error &&
+    !explainLoadResult.data.length
+  ) {
+    showGameToast(
+      "تعذر تحميل بيانات فقرة اشرح الكلمة"
+    )
+
+    return
+  }
+
+  openSegment(
+    "اشرح الكلمة",
+    buildExplainHtml()
+  )
 
   updateExplainUI()
 
-  if (window.explainState.currentTeam) {
-    setExplainActiveTeam(window.explainState.currentTeam, { sync:false })
-  }
+  setExplainActiveTeam(
+    window.explainState.currentTeam,
+    {
+      sync: false,
+      save: false
+    }
+  )
 
   updateExplainDoubleButton()
+
+  if (
+    window.explainState.currentNumber &&
+    window.explainState.timerVisible &&
+    Number(
+      window.explainState.timeLeft || 0
+    ) > 0
+  ) {
+    resumeExplainTimer(
+      window.explainState.timeLeft
+    )
+  }
+
+  saveExplainState({
+    immediate: true
+  })
 }
 
 window.renderExplain = renderExplain
@@ -379,7 +824,11 @@ function buildExplainHtml() {
 
       <header class="explainHeader">
 
-        <button class="explainDockBtn" type="button" onclick="goHome()">
+        <button
+          class="explainDockBtn"
+          type="button"
+          onclick="goHome()"
+        >
           رجوع
         </button>
 
@@ -394,7 +843,9 @@ function buildExplainHtml() {
             <strong>${escapeDisplayHtml(teamAName || "الفريق الأول")}</strong>
           </div>
 
-          <b id="explainScoreA">${window.explainState.scores.A}</b>
+          <b id="explainScoreA">
+            ${window.explainState.scores.A}
+          </b>
         </button>
 
         <div class="explainTitle">
@@ -408,7 +859,9 @@ function buildExplainHtml() {
           data-team="B"
           onclick="selectExplainTeam('B')"
         >
-          <b id="explainScoreB">${window.explainState.scores.B}</b>
+          <b id="explainScoreB">
+            ${window.explainState.scores.B}
+          </b>
 
           <div class="explainTeamName">
             <strong>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</strong>
@@ -435,29 +888,43 @@ function buildExplainHtml() {
           onclick="hideExplainWord()"
         ></div>
 
-        <div id="explainTimerBox" class="explainTimerBox hidden">
+        <div
+          id="explainTimerBox"
+          class="explainTimerBox hidden"
+        >
           ${EXPLAIN_TIMER_SECONDS}
         </div>
 
       </section>
 
-      <section class="explainNumbersGrid">
-        ${Array.from({ length: count }, (_, idx) => {
-          const number = idx + 1
-          const used = window.explainState.usedNumbers.includes(number)
+      <section class="finalRound3NumbersBar finalTeamMediaNumbersBar">
 
-          return `
-            <button
-              type="button"
-              id="explainNumber_${number}"
-              class="explainNumberCard ${used ? "used" : ""}"
-              onclick="openExplainNumber(${number})"
-              ${used ? "disabled" : ""}
-            >
-              <span>${number}</span>
-            </button>
-          `
-        }).join("")}
+        <div
+          class="finalRound3Grid finalTeamMediaNumbersGrid"
+          style="grid-template-columns:repeat(${count},minmax(0,1fr));"
+        >
+
+          ${Array.from({ length: count }, (_, idx) => {
+
+            const number = idx + 1
+            const used =
+              window.explainState.usedNumbers.includes(number)
+
+            return `
+              <button
+                type="button"
+                id="explainNumber_${number}"
+                class="finalRound3Card finalTeamMediaNumberCard ${used ? "used" : ""}"
+                onclick="openExplainNumber(${number})"
+                ${used ? "disabled" : ""}
+              >
+                ${used ? "" : number}
+              </button>
+            `
+          }).join("")}
+
+        </div>
+
       </section>
 
       <footer class="explainActionBar">
@@ -468,7 +935,7 @@ function buildExplainHtml() {
           class="explainActionBtn explainDoubleBtn"
           onclick="activateExplainDouble()"
         >
-          دبل
+          دوبيلا
         </button>
 
         <button
@@ -614,37 +1081,111 @@ function updateExplainUI() {
   }
 
   updateExplainDoubleButton()
-  saveExplainState()
 }
 
 /* =========================
    Double
-   نفس نظام فتبلة القديم
 ========================= */
 
 function activateExplainDouble() {
-  if (window.explainState.currentNumber || window.explainState.revealLock) {
-    showGameToast("الدبل قبل اختيار الرقم فقط")
+  if (
+    window.explainState.currentNumber ||
+    window.explainState.revealLock
+  ) {
+    showGameToast(
+      "الدوبيلا قبل اختيار الرقم فقط"
+    )
+
     return
   }
 
-  if (explainDoubleState.used.A && explainDoubleState.used.B) {
-    showGameToast("تم استخدام الدبل من الفريقين")
+  if (
+    explainDoubleState.used.A &&
+    explainDoubleState.used.B
+  ) {
+    showGameToast(
+      "تم استخدام الدوبيلا من الفريقين"
+    )
+
+    return
+  }
+
+  const team =
+    window.explainState.currentTeam
+
+  if (team) {
+    activateExplainDoubleForTeam(team)
     return
   }
 
   explainDoublePickMode = true
-  showGameToast("اختر الفريق لتفعيل الدبل")
+
+  showGameToast(
+    "اختر الفريق لتفعيل الدوبيلا"
+  )
+
   updateExplainDoubleButton()
   saveExplainState()
 }
 
+function activateExplainDoubleForTeam(team) {
+  if (team !== "A" && team !== "B") {
+    return false
+  }
+
+  if (
+    window.explainState.currentNumber ||
+    window.explainState.revealLock
+  ) {
+    showGameToast(
+      "الدوبيلا قبل اختيار الرقم فقط"
+    )
+
+    return false
+  }
+
+  if (explainDoubleState.used[team]) {
+    showGameToast(
+      "هذا الفريق استخدم الدوبيلا مسبقًا"
+    )
+
+    return false
+  }
+
+  setExplainActiveTeam(team, {
+    sync: true,
+    save: false
+  })
+
+  explainDoubleState.used[team] = true
+  explainDoubleState.activeTeam = team
+  explainDoublePickMode = false
+
+  showGameToast(
+    `تم تفعيل الدوبيلا لفريق ${getExplainTeamName(team)}`
+  )
+
+  updateExplainUI()
+
+  saveExplainState({
+    immediate: true
+  })
+
+  return true
+}
+
 function getExplainScoreValue(team) {
-  return explainDoubleState.activeTeam === team ? 2 : 1
+  return (
+    explainDoubleState.activeTeam === team
+      ? 2
+      : 1
+  )
 }
 
 function clearExplainActiveDouble(team) {
-  if (explainDoubleState.activeTeam === team) {
+  if (
+    explainDoubleState.activeTeam === team
+  ) {
     explainDoubleState.activeTeam = null
   }
 
@@ -652,12 +1193,34 @@ function clearExplainActiveDouble(team) {
 }
 
 function updateExplainDoubleButton() {
-  const btn = document.getElementById("explainDoubleBtn")
+  const btn =
+    document.getElementById(
+      "explainDoubleBtn"
+    )
+
   if (!btn) return
 
-  const team = window.explainState.currentTeam
+  const team =
+    window.explainState.currentTeam
 
-  btn.classList.remove("activeDouble")
+  const allDone =
+    Number(
+      window.explainState
+        .usedNumbers?.length || 0
+    ) >=
+    normalizeExplainWordsCount(
+      window.explainState.wordsCount
+    )
+
+  btn.classList.remove(
+    "activeDouble"
+  )
+
+  if (allDone) {
+    btn.disabled = true
+    btn.innerText = "انتهت الفقرة"
+    return
+  }
 
   if (explainDoublePickMode) {
     btn.disabled = false
@@ -666,91 +1229,126 @@ function updateExplainDoubleButton() {
     return
   }
 
-  if (window.explainState.currentNumber || window.explainState.revealLock) {
+  if (
+    window.explainState.currentNumber ||
+    window.explainState.revealLock
+  ) {
     btn.disabled = true
-    btn.innerText = "دبل"
+    btn.innerText = "دوبيلا"
     return
   }
 
-  if (explainDoubleState.used.A && explainDoubleState.used.B) {
+  if (
+    explainDoubleState.used.A &&
+    explainDoubleState.used.B
+  ) {
     btn.disabled = true
-    btn.innerText = "الدبل مقفل"
+    btn.innerText = "دوبيلا مقفل"
     return
   }
 
-  if (team && explainDoubleState.activeTeam === team) {
+  if (
+    team &&
+    explainDoubleState.activeTeam === team
+  ) {
     btn.disabled = true
-    btn.innerText = "الدبل مفعّل"
+    btn.innerText = "دوبيلا مفعّل"
     btn.classList.add("activeDouble")
     return
   }
 
-  if (team && explainDoubleState.used[team]) {
+  if (
+    team &&
+    explainDoubleState.used[team]
+  ) {
     btn.disabled = true
-    btn.innerText = "استخدم الدبل"
+    btn.innerText = "تم استخدام دوبيلا"
     return
   }
 
   btn.disabled = false
-  btn.innerText = "دبل"
+  btn.innerText = "دوبيلا"
 }
 
 /* =========================
    Team / Number
 ========================= */
 
-function selectExplainTeam(team) {
-  if (window.explainState.revealLock) return
-  if (team !== "A" && team !== "B") return
-
-  if (explainDoublePickMode) {
-    if (window.explainState.currentNumber) {
-      showGameToast("الدبل قبل اختيار الرقم فقط")
-      explainDoublePickMode = false
-      updateExplainDoubleButton()
-      saveExplainState()
-      return
-    }
-
-    if (explainDoubleState.used[team]) {
-      showGameToast("هذا الفريق استخدم الدبل مسبقًا")
-      return
-    }
-
-    setExplainActiveTeam(team)
-
-    explainDoubleState.used[team] = true
-    explainDoubleState.activeTeam = team
-    explainDoublePickMode = false
-
-    showGameToast(`تم تفعيل الدبل لفريق ${getExplainTeamName(team)}`)
-
-    updateExplainUI()
-    updateExplainDoubleButton()
-    saveExplainState()
-    return
+function selectExplainTeam(
+  team,
+  options = {}
+) {
+  if (team !== "A" && team !== "B") {
+    return false
   }
 
-  if (window.explainState.currentNumber) {
-    showGameToast("أنهِ الكلمة الحالية أولاً")
-    return
+  const force =
+    options.force === true
+
+  if (
+    window.explainState.revealLock &&
+    !force
+  ) {
+    return false
+  }
+
+  if (explainDoublePickMode) {
+    return activateExplainDoubleForTeam(
+      team
+    )
+  }
+
+  if (
+    window.explainState.currentNumber &&
+    !force
+  ) {
+    showGameToast(
+      "أنهِ الكلمة الحالية أولاً"
+    )
+
+    return false
   }
 
   const gameStarted =
-    Array.isArray(window.explainState.usedNumbers) &&
+    Array.isArray(
+      window.explainState.usedNumbers
+    ) &&
     window.explainState.usedNumbers.length > 0
 
-  if (gameStarted) {
-    showGameToast("الدور ينتقل تلقائيًا")
-    return
+  if (gameStarted && !force) {
+    showGameToast(
+      "الدور ينتقل تلقائيًا"
+    )
+
+    return false
   }
 
-  setExplainActiveTeam(team)
+  setExplainActiveTeam(team, {
+    sync: options.sync !== false,
+    save: false
+  })
 
   updateExplainUI()
-  updateExplainDoubleButton()
-  saveExplainState()
+
+  saveExplainState({
+    immediate: true
+  })
+
+  return true
 }
+
+function forceExplainTeamFromPresenter(team) {
+  return selectExplainTeam(team, {
+    force: true,
+    sync: true
+  })
+}
+
+window.selectExplainTeam =
+  selectExplainTeam
+
+window.forceExplainTeamFromPresenter =
+  forceExplainTeamFromPresenter
 
 function openExplainNumber(number) {
   unlockAudioContext()
@@ -814,44 +1412,101 @@ function hideExplainWord() {
 ========================= */
 
 function startExplainTimer() {
-  unlockAudioContext()
+  if (
+    typeof unlockAudioContext ===
+    "function"
+  ) {
+    unlockAudioContext()
+  }
 
-  if (window.explainState.revealLock) return
+  if (
+    window.explainState.revealLock
+  ) {
+    return
+  }
 
-  if (!window.explainState.currentNumber) {
+  if (
+    !window.explainState.currentNumber
+  ) {
     showGameToast("اختر رقم أولاً")
     return
   }
 
+  runExplainTimer(
+    EXPLAIN_TIMER_SECONDS
+  )
+}
+
+function resumeExplainTimer(seconds) {
+  runExplainTimer(seconds)
+}
+
+function runExplainTimer(seconds) {
   resetExplainTimer()
 
-  window.explainState.timerVisible = true
-  window.explainState.wordVisible = false
-  window.explainState.timeLeft = EXPLAIN_TIMER_SECONDS
+  let time = Math.max(
+    0,
+    Number(seconds || 0)
+  )
+
+  window.explainState.timerVisible =
+    time > 0
+
+  window.explainState.wordVisible =
+    false
+
+  window.explainState.timeLeft =
+    time
+
   explainTimerLastTick = null
 
   updateExplainUI()
-  saveExplainState()
 
-  timer = setInterval(() => {
+  saveExplainState({
+    immediate: true
+  })
+
+  if (time <= 0) {
+    window.explainState.timerVisible =
+      false
+
+    return
+  }
+
+  explainTimer = setInterval(() => {
+    time = Math.max(
+      0,
+      time - 1
+    )
+
     window.explainState.timeLeft =
-      Number(window.explainState.timeLeft || 0) - 1
+      time
 
     if (
-      window.explainState.timeLeft > 0 &&
-      window.explainState.timeLeft <= 5 &&
-      explainTimerLastTick !== window.explainState.timeLeft
+      time > 0 &&
+      time <= 5 &&
+      explainTimerLastTick !== time
     ) {
-      explainTimerLastTick = window.explainState.timeLeft
+      explainTimerLastTick = time
       playGameSound("tick")
     }
 
-    if (window.explainState.timeLeft <= 0) {
-      window.explainState.timeLeft = 0
-      window.explainState.timerVisible = false
-
+    if (time <= 0) {
       resetExplainTimer()
+
+      window.explainState.timeLeft = 0
+      window.explainState.timerVisible =
+        false
+
       playGameSound("timeout")
+
+      updateExplainUI()
+
+      saveExplainState({
+        immediate: true
+      })
+
+      return
     }
 
     updateExplainUI()
@@ -913,7 +1568,12 @@ function finishExplainNumber(isCorrect) {
   window.explainState.attempts[activeTeam] =
     Number(window.explainState.attempts[activeTeam] || 0) + 1
 
+  if (
+  !window.explainState.usedNumbers
+    .includes(n)
+) {
   window.explainState.usedNumbers.push(n)
+}
 
   window.currentSegmentScores = {
     A: Number(window.explainState.scores.A || 0),
@@ -921,7 +1581,9 @@ function finishExplainNumber(isCorrect) {
   }
 
   updateExplainUI()
-  saveExplainState()
+  saveExplainState({
+  immediate: true
+})
 
   explainRevealTimeout = setTimeout(() => {
     const allDone =

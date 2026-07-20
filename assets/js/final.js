@@ -22,6 +22,9 @@ let finalHistory = []
 let currentFinalSegmentKey = localStorage.getItem("active_segment") || "final"
 let finalRound2ImageAutoTimer = null
 let finalRound4ImageTimer = null
+let finalRound1FinishTimer = null
+let finalRound3FinishTimer = null
+let finalRound4FinishTimer = null
 
 
 /* =========================
@@ -139,7 +142,7 @@ function createDefaultFinalState() {
 
     round1: {
       title: "ٮدوں ٮڡاط",
-      cardsCount: 6,
+      cardsCount: 7,
       opened: [],
       activeTeam: null,
       scores: { A: 0, B: 0 },
@@ -170,6 +173,7 @@ function createDefaultFinalState() {
       hints: [],
       scrambledWords: [],
       currentRevealIndex: -1,
+      sequenceWordsVisible: false,
 
       hiddenSequence: [],
       selectedCorrectIndexes: [],
@@ -197,7 +201,7 @@ function createDefaultFinalState() {
       title: "قصة",
       mode: "story",
 
-      cardsCount: 4,
+      cardsCount: 5,
       opened: [],
       scoredNumbers: [],
       activeTeam: null,
@@ -226,7 +230,7 @@ function createDefaultFinalState() {
   lastTeamPlayed: null,
 
   teamMedia: {
-  count: 4,
+  count: 5,
   usedNumbers: [],
   teamNumbers: { A: [], B: [] },
   currentNumber: null,
@@ -256,7 +260,11 @@ function getFinalState() {
   }
 }
 
-function saveFinalState() {
+let finalStateSyncTimer = null
+let finalStateSyncQueued = false
+let finalStateSyncPending = false
+
+function saveFinalState(options = {}) {
   ensureFinalStateShape()
 
   const safe = JSON.parse(JSON.stringify(finalState))
@@ -265,8 +273,15 @@ function saveFinalState() {
   if (safe.round3) safe.round3.sequenceTimer = null
   if (safe.round4) safe.round4.sequenceTimer = null
 
-  localStorage.setItem(FINAL_STORAGE_KEY, JSON.stringify(safe))
-  localStorage.setItem("active_segment", getActiveFinalSegmentKey())
+  localStorage.setItem(
+    FINAL_STORAGE_KEY,
+    JSON.stringify(safe)
+  )
+
+  localStorage.setItem(
+    "active_segment",
+    getActiveFinalSegmentKey()
+  )
 
   syncFinalGlobals()
 
@@ -274,8 +289,50 @@ function saveFinalState() {
     saveUnifiedGameState()
   }
 
-  if (typeof syncDisplayStateToSession === "function") {
-    syncDisplayStateToSession()
+const immediate = options.immediate === true
+const delay = immediate ? 0 : 80
+
+finalStateSyncPending = true
+
+clearTimeout(finalStateSyncTimer)
+
+finalStateSyncTimer = setTimeout(() => {
+  runFinalStateSync(immediate)
+}, delay)
+}
+
+async function runFinalStateSync(immediate = false) {
+  if (finalStateSyncQueued) {
+    finalStateSyncPending = true
+    return
+  }
+
+  if (
+    typeof syncDisplayStateToSession !== "function"
+  ) {
+    finalStateSyncPending = false
+    return
+  }
+
+  finalStateSyncQueued = true
+  finalStateSyncPending = false
+
+  try {
+    await Promise.resolve(
+      syncDisplayStateToSession({
+        immediate
+      })
+    )
+  } catch (error) {
+    console.log("FINAL STATE SYNC ERROR:", error)
+  } finally {
+    finalStateSyncQueued = false
+
+    if (finalStateSyncPending) {
+      finalStateSyncTimer = setTimeout(() => {
+        runFinalStateSync(true)
+      }, 60)
+    }
   }
 }
 
@@ -368,17 +425,21 @@ function ensureFinalRound1State() {
   const d = createDefaultFinalState().round1
 
   r.title = r.title || d.title
-  r.cardsCount = Number(r.cardsCount || 6)
+  r.cardsCount = Number(r.cardsCount || 7)
 
-if (![4, 6, 8].includes(r.cardsCount)) {
-  r.cardsCount = 6
-}
+  if (![5, 7, 9].includes(r.cardsCount)) {
+    r.cardsCount = 7
+  }
 
   if (!Array.isArray(r.opened)) r.opened = []
   if (!r.scores) r.scores = { A: 0, B: 0 }
   if (!r.errors) r.errors = { A: 0, B: 0 }
   if (!Array.isArray(r.currentQuestionParts)) r.currentQuestionParts = []
   if (!r.cardTexts) r.cardTexts = {}
+
+  r.opened = r.opened
+    .map(Number)
+    .filter(number => number >= 1 && number <= r.cardsCount)
 
   r.scores.A = Number(r.scores.A || 0)
   r.scores.B = Number(r.scores.B || 0)
@@ -429,6 +490,7 @@ function ensureFinalRound2State() {
   r.countdown = Number(r.countdown ?? 15)
   r.pendingScore = !!r.pendingScore
   r.answerShown = !!r.answerShown
+  r.sequenceWordsVisible = !!r.sequenceWordsVisible
 }
 
 function ensureFinalRound3State() {
@@ -437,15 +499,24 @@ function ensureFinalRound3State() {
   r.title = "قصة"
   r.mode = "story"
 
-  r.cardsCount = Number(r.cardsCount || 4)
-  if (![4, 6, 8].includes(r.cardsCount)) {
-    r.cardsCount = 4
+  r.cardsCount = Number(r.cardsCount || 5)
+
+  if (![5, 7, 9].includes(r.cardsCount)) {
+    r.cardsCount = 5
   }
 
   if (!Array.isArray(r.opened)) r.opened = []
   if (!Array.isArray(r.scoredNumbers)) r.scoredNumbers = []
   if (!r.scores) r.scores = { A: 0, B: 0 }
   if (!Array.isArray(r.currentParts)) r.currentParts = ["", "", ""]
+
+  r.opened = r.opened
+    .map(Number)
+    .filter(number => number >= 1 && number <= r.cardsCount)
+
+  r.scoredNumbers = r.scoredNumbers
+    .map(Number)
+    .filter(number => number >= 1 && number <= r.cardsCount)
 
   r.scores.A = Number(r.scores.A || 0)
   r.scores.B = Number(r.scores.B || 0)
@@ -474,19 +545,43 @@ function ensureFinalRound4State() {
   r.scores.B = Number(r.scores.B || 0)
   r.pendingScore = !!r.pendingScore
 
-  if (!r.teamMedia) r.teamMedia = d.teamMedia
+  if (!r.teamMedia) {
+    r.teamMedia = JSON.parse(
+      JSON.stringify(d.teamMedia)
+    )
+  }
 
   const m = r.teamMedia
 
-  m.count = Number(m.count || 4)
-  if (![4, 6, 8].includes(m.count)) {
-    m.count = 4
-  }
+  m.count = Math.max(
+  1,
+  Number(
+    m.count ||
+    window.finalRound4Count ||
+    5
+  )
+)
 
   if (!Array.isArray(m.usedNumbers)) m.usedNumbers = []
   if (!m.teamNumbers) m.teamNumbers = { A: [], B: [] }
   if (!Array.isArray(m.teamNumbers.A)) m.teamNumbers.A = []
   if (!Array.isArray(m.teamNumbers.B)) m.teamNumbers.B = []
+
+  m.usedNumbers = m.usedNumbers
+    .map(Number)
+    .filter(number => number >= 1 && number <= m.count)
+
+  m.teamNumbers.A = m.teamNumbers.A
+    .map(Number)
+    .filter(number => number >= 1 && number <= m.count)
+
+  m.teamNumbers.B = m.teamNumbers.B
+    .map(Number)
+    .filter(number => number >= 1 && number <= m.count)
+
+  r.scoredNumbers = r.scoredNumbers
+    .map(Number)
+    .filter(number => number >= 1 && number <= m.count)
 
   m.currentNumber = m.currentNumber ?? null
   m.currentTeam = m.currentTeam || null
@@ -915,19 +1010,33 @@ function getRound2GroupKey(number) {
 }
 
 function getFinalRound3StoryCount() {
-  const count = Number(finalState.round3?.cardsCount || 4)
+  const count = Number(
+    finalState.round3?.cardsCount ||
+    window.finalRound3Count ||
+    5
+  )
 
-  if (count === 8) return 8
-  if (count === 6) return 6
-  return 4
+  if (count === 9) return 9
+  if (count === 7) return 7
+
+  return 5
 }
 
 function getFinalRound4FocusCount() {
-  const count = Number(finalState.round4?.teamMedia?.count || 4)
+  const count = Number(
+    finalState.round4?.teamMedia?.count ||
+    window.finalRound4Count ||
+    5
+  )
 
-  if (count === 8) return 8
-  if (count === 6) return 6
-  return 4
+  return Math.max(1, count)
+}
+function getFinalRound3Count() {
+  return getFinalRound3StoryCount()
+}
+
+function getFinalRound4Count() {
+  return getFinalRound4FocusCount()
 }
 
 function clearFinalIntervals() {
@@ -948,6 +1057,20 @@ function clearFinalIntervals() {
     clearInterval(finalState.round4.sequenceTimer)
     finalState.round4.sequenceTimer = null
   }
+  if (finalRound1FinishTimer) {
+  clearTimeout(finalRound1FinishTimer)
+  finalRound1FinishTimer = null
+}
+
+if (finalRound3FinishTimer) {
+  clearTimeout(finalRound3FinishTimer)
+  finalRound3FinishTimer = null
+}
+
+if (finalRound4FinishTimer) {
+  clearTimeout(finalRound4FinishTimer)
+  finalRound4FinishTimer = null
+}
 }
 
 function setFinalControlsMode(mode) {
@@ -1256,9 +1379,17 @@ function renderFinalTeamLayout() {
 }
 
 function isFinalRoundFinished(round) {
-  if (round === 1) {
-    return finalState.round1.opened.length >= Number(finalState.round1.cardsCount || 6)
-  }
+if (round === 1) {
+  const total = Number(
+    finalState.round1.cardsCount || 7
+  )
+
+  return (
+    finalState.round1.opened.length >= total &&
+    finalState.round1.pendingScore === false &&
+    finalState.round1.currentNumber === null
+  )
+}
 
   if (round === 2) {
     return finalState.round2.opened.length >= 6 &&
@@ -1561,17 +1692,21 @@ async function loadFinalRoundMeta() {
 
     db
       .from("segment_settings")
-      .select("*")
+      .select("segment,item_count")
       .eq("model", Number(currentModel))
-      .in("segment", ["finalRound1", "finalRound3", "finalRound4"])
+      .in("segment", [
+        "finalRound1",
+        "finalRound3",
+        "finalRound4"
+      ])
   ])
 
   if (metaRes.error) {
-    console.log(metaRes.error)
+    console.log("LOAD FINAL META ERROR:", metaRes.error)
   }
 
   if (settingsRes.error) {
-    console.log(settingsRes.error)
+    console.log("LOAD FINAL SETTINGS ERROR:", settingsRes.error)
   }
 
   const settingsMap = {}
@@ -1585,21 +1720,53 @@ async function loadFinalRoundMeta() {
   finalState.round3.title = "قصة"
   finalState.round4.title = "التركيز"
 
-  finalState.round1.cardsCount = [4, 6, 8].includes(settingsMap.finalRound1)
-    ? settingsMap.finalRound1
-    : 6
+  finalState.round1.cardsCount =
+    [5, 7, 9].includes(settingsMap.finalRound1)
+      ? settingsMap.finalRound1
+      : 7
 
-  finalState.round3.cardsCount = [4, 6, 8].includes(settingsMap.finalRound3)
-    ? settingsMap.finalRound3
-    : 4
+  finalState.round3.cardsCount =
+    [5, 7, 9].includes(settingsMap.finalRound3)
+      ? settingsMap.finalRound3
+      : 5
 
   if (!finalState.round4.teamMedia) {
-    finalState.round4.teamMedia = createDefaultFinalState().round4.teamMedia
+    finalState.round4.teamMedia =
+      createDefaultFinalState().round4.teamMedia
   }
 
-  finalState.round4.teamMedia.count = [4, 6, 8].includes(settingsMap.finalRound4)
-    ? settingsMap.finalRound4
-    : 4
+  finalState.round4.teamMedia.count =
+  Math.max(
+    1,
+    Number(
+      settingsMap.finalRound4 ||
+      5
+    )
+  )
+
+  window.finalRound1CardsCount =
+    finalState.round1.cardsCount
+
+  window.finalRound3Count =
+    finalState.round3.cardsCount
+
+  window.finalRound4Count =
+    finalState.round4.teamMedia.count
+
+  localStorage.setItem(
+    "final_round1_cards_count",
+    String(finalState.round1.cardsCount)
+  )
+
+  localStorage.setItem(
+    "final_round3_count",
+    String(finalState.round3.cardsCount)
+  )
+
+  localStorage.setItem(
+    "final_round4_count",
+    String(finalState.round4.teamMedia.count)
+  )
 
   finalState.round3.mode = "story"
   finalState.round4.mode = "team_media"
@@ -1608,7 +1775,7 @@ async function loadFinalRoundMeta() {
 }
 
 async function loadFinalRound1CardTexts() {
-  const cardsCount = Number(finalState.round1.cardsCount || 6)
+  const cardsCount = Number(finalState.round1.cardsCount || 7)
   const numbers = Array.from({ length: cardsCount }, (_, i) => i + 1)
 
   const { data, error } = await db
@@ -1704,7 +1871,6 @@ if (finalState.round === 4) renderFinalRound4()
 
   updateFinalDoubleButton()
   syncFinalGlobals()
-  saveFinalState()
   updateFinalUndoButtonState()
 }
 
@@ -1803,7 +1969,7 @@ function selectFinalTeam(team) {
   renderFinalRoundTitle()
   renderFinalTurnBar()
   updateFinalDoubleButton()
-  saveFinalState()
+  saveFinalState({ immediate: true })
 }
 
 function goToFinalRound(round) {
@@ -1833,11 +1999,17 @@ function goToFinalRound(round) {
    11) ROUND 1 - ٮدوں ٮڡاط
 ========================= */
 function getFinalRound1NoDotsCount() {
-  const cardsCount = Number(finalState.round1.cardsCount || 6)
+  const cardsCount = Number(
+    finalState.round1?.cardsCount ||
+    window.finalRound1CardsCount ||
+    localStorage.getItem("final_round1_cards_count") ||
+    7
+  )
 
-  if (cardsCount === 4) return 4
-  if (cardsCount === 8) return 8
-  return 6
+  if (cardsCount === 9) return 9
+  if (cardsCount === 7) return 7
+
+  return 5
 }
 
 function isFinalRound1TextCard(number) {
@@ -1856,7 +2028,7 @@ function renderFinalRound1() {
 
   setFinalControlsMode(1)
 
-  const cardsCount = Number(finalState.round1.cardsCount || 6)
+  const cardsCount = getFinalRound1NoDotsCount()
   let cards = []
 
   for (let i = 1; i <= cardsCount; i++) {
@@ -1971,32 +2143,69 @@ async function openFinalRound1Card(number) {
   renderFinalRound1()
   renderFinalErrors()
   renderFinalTurnBar()
-  saveFinalState()
+  saveFinalState({ immediate: true })
   updateEndRoundButtonState()
 
   await loadFinalRound1Current()
+}
+
+function resetFinalRound1FailedNumber(number, message = "لا توجد بيانات لهذا الرقم") {
+  const n = Number(number)
+
+  finalState.round1.opened =
+    finalState.round1.opened.filter(item => Number(item) !== n)
+
+  finalState.round1.currentNumber = null
+  finalState.round1.currentAnswer = ""
+  finalState.round1.currentImage = ""
+  finalState.round1.currentNote = ""
+  finalState.round1.currentQuestionParts = []
+  finalState.round1.shownQuestionPartsCount = 0
+  finalState.round1.answerShown = false
+  finalState.round1.pendingScore = false
+  finalState.round1.activeTeam = null
+
+  currentFinalRound1Image = ""
+
+  highlightFinalTeam(null)
+  renderFinalRound1()
+  renderFinalTurnBar()
+  updateEndRoundButtonState()
+  saveFinalState({ immediate: true })
+
+  showGameToast(message)
 }
 
 async function loadFinalRound1Current() {
   const number = finalState.round1.currentNumber
   if (!number) return
 
-  const { data, error } = await db
-    .from("final_round1_items")
-    .select("*")
-    .eq("model", Number(currentModel))
-    .eq("number", Number(number))
-    .maybeSingle()
+const { data, error } = await db
+  .from("final_round1_items")
+  .select("*")
+  .eq("model", Number(currentModel))
+  .eq("number", Number(number))
+  .maybeSingle()
 
-    if (!data) {
-  showGameToast("لا توجد بيانات لهذا الرقم")
+if (error) {
+  console.log("LOAD FINAL ROUND 1 ERROR:", error)
+
+  resetFinalRound1FailedNumber(
+    number,
+    "تعذر تحميل بيانات الرقم"
+  )
+
   return
 }
 
-  if (error) {
-    console.log(error)
-    return
-  }
+if (!data) {
+  resetFinalRound1FailedNumber(
+    number,
+    "لا توجد بيانات لهذا الرقم"
+  )
+
+  return
+}
 
   finalState.round1.currentAnswer = data?.answer || ""
   finalState.round1.currentImage = data?.image || ""
@@ -2041,7 +2250,7 @@ function renderFinalRound1Content(data) {
         class="finalRound1TextCardInner"
         style="${getFinalRound1ClipStyle(clipText, false)}"
       >
-        ${clipText}
+        ${escapeDisplayHtml(clipText)}
       </div>
     </div>
 
@@ -2243,11 +2452,14 @@ function finalRound1Correct() {
 
   renderFinalScores()
   loadFinalRound1Current()
-  saveFinalState()
+  saveFinalState({ immediate: true })
 
-  setTimeout(() => {
-    finalizeRound1Turn()
-  }, 8000)
+  clearTimeout(finalRound1FinishTimer)
+
+finalRound1FinishTimer = setTimeout(() => {
+  finalRound1FinishTimer = null
+  finalizeRound1Turn()
+}, 8000)
 }
 
 function finalRound1Wrong() {
@@ -2259,7 +2471,7 @@ function finalRound1Wrong() {
   playGameSound("wrong")
   flashScreen("wrong")
 
-  saveFinalState()
+  saveFinalState({ immediate: true })
 }
 
 
@@ -2310,7 +2522,7 @@ function toggleFinalRound1Overlay() {
           class="finalRound1OverlayText molhimClipFont"
           style="${getFinalRound1ClipStyle(clipText, true)}"
         >
-          ${clipText}
+          ${escapeDisplayHtml(clipText)}
         </div>
       </div>
     </div>
@@ -2516,11 +2728,17 @@ async function openFinalRound2Card(number) {
     .eq("number", Number(number))
     .order("item_order", { ascending: true })
 
-  if (error) {
-    console.log(error)
-    showGameToast("تعذر تحميل بيانات الرقم")
-    return
-  }
+ if (error) {
+  console.log("LOAD FINAL ROUND 2 ERROR:", error)
+
+  resetFinalRound2FailedNumber(
+    number,
+    groupKey,
+    "تعذر تحميل بيانات الرقم"
+  )
+
+  return
+}
 
   const items = data || []
 
@@ -2543,7 +2761,7 @@ async function openFinalRound2Card(number) {
     renderFinalRound2Words(false)
   }
 
-  saveFinalState()
+  saveFinalState({ immediate: true })
   updateEndRoundButtonState()
 
   setTimeout(() => {
@@ -2562,11 +2780,17 @@ async function loadFinalRound2ImageNumber(displayNumber, groupKey) {
     .eq("number", Number(dbNumber))
     .order("image_order", { ascending: true })
 
-  if (error) {
-    console.log(error)
-    showGameToast("تعذر تحميل صور الرقم")
-    return
-  }
+if (error) {
+  console.log("LOAD FINAL ROUND 2 IMAGES ERROR:", error)
+
+  resetFinalRound2FailedNumber(
+    displayNumber,
+    groupKey,
+    "تعذر تحميل صور الرقم"
+  )
+
+  return
+}
 
   const rows = data || []
 
@@ -2586,6 +2810,56 @@ async function loadFinalRound2ImageNumber(displayNumber, groupKey) {
   renderFinalRound2Words(false)
   saveFinalState()
   updateEndRoundButtonState()
+}
+
+function resetFinalRound2FailedNumber(
+  number,
+  groupKey,
+  message = "تعذر تحميل بيانات الرقم"
+) {
+  finalState.round2.currentNumber = null
+  finalState.round2.currentType = null
+
+  finalState.round2.opened =
+    finalState.round2.opened.filter(
+      item => Number(item) !== Number(number)
+    )
+
+  finalState.round2.pendingScore = false
+  finalState.round2.answerShown = false
+  finalState.round2.sequenceWordsVisible = false
+  finalState.round2.correctCount = 0
+  finalState.round2.countdown = 15
+  finalState.round2.currentRevealIndex = -1
+
+  finalState.round2.hiddenSequence = []
+  finalState.round2.selectedCorrectIndexes = []
+
+  finalState.round2.allWords = []
+  finalState.round2.answers = []
+  finalState.round2.hints = []
+  finalState.round2.scrambledWords = []
+
+  finalState.round2.images = []
+  finalState.round2.imageAnswers = []
+  finalState.round2.shownImageIndex = 0
+  finalState.round2.imageAnswerShown = false
+
+  closeFinalRound2ImageAutoOverlay()
+
+  if (
+    groupKey &&
+    finalState.round2.assignedTeams?.[groupKey]
+  ) {
+    delete finalState.round2.assignedTeams[groupKey][number]
+  }
+
+  renderFinalRound2()
+  renderFinalTurnBar()
+  updateEndRoundButtonState()
+  saveFinalState({ immediate: true })
+
+  showGameToast(message)
 }
 
 function resetFinalRound2EmptyNumber(number, groupKey) {
@@ -3173,7 +3447,7 @@ function finalRound2DecreaseCountdown() {
     updateFinalRound2SequenceScoreButtonLabel()
 
     flashScreen("wrong")
-    saveFinalState()
+    saveFinalState({ immediate: true })
 
 
     setTimeout(() => {
@@ -3188,7 +3462,7 @@ function finalRound2DecreaseCountdown() {
   updateFinalRound2CountdownButtonLabel()
   updateFinalRound2SequenceScoreButtonLabel()
 
-  saveFinalState()
+  saveFinalState({ immediate: true })
 
   setTimeout(() => {
     shakeFinalRound2CountdownBox()
@@ -3402,7 +3676,7 @@ finalState.round2.hiddenSequence = []
   }
 
   renderFinalTurnBar()
-  saveFinalState()
+  saveFinalState({ immediate: true })
   updateEndRoundButtonState()
 
   setTimeout(() => {
@@ -3415,11 +3689,17 @@ finalState.round2.hiddenSequence = []
 ========================= */
 
 function getFinalRound3Count() {
-  const count = Number(finalState.round3?.cardsCount || 4)
+  const count = Number(
+    finalState.round3?.cardsCount ||
+    window.finalRound3Count ||
+    localStorage.getItem("final_round3_count") ||
+    5
+  )
 
-  if (count === 8) return 8
-  if (count === 6) return 6
-  return 4
+  if (count === 9) return 9
+  if (count === 7) return 7
+
+  return 5
 }
 
 
@@ -3517,7 +3797,6 @@ function renderFinalRound3() {
   updateFinalUndoButtonState()
   updateFinalDoubleButton()
   updateEndRoundButtonState()
-  saveFinalState()
 }
 
 function buildFinalRound3StoryContent() {
@@ -3585,6 +3864,27 @@ function buildFinalRound3StoryContent() {
   `
 }
 
+function resetFinalRound3FailedNumber(
+  message = "تعذر تحميل بيانات الرقم"
+) {
+  finalState.round3.currentNumber = null
+  finalState.round3.currentParts = []
+  finalState.round3.currentAnswer = ""
+  finalState.round3.shownPart = 0
+  finalState.round3.currentPoints = 0
+  finalState.round3.answerShown = false
+  finalState.round3.pendingScore = false
+  finalState.round3.activeTeam = null
+
+  highlightFinalTeam(null)
+  renderFinalRound3()
+  renderFinalTurnBar()
+  updateEndRoundButtonState()
+  saveFinalState({ immediate: true })
+
+  showGameToast(message)
+}
+
 async function openFinalRound3StoryCard(number) {
   ensureFinalRound3State()
 
@@ -3615,22 +3915,23 @@ async function openFinalRound3StoryCard(number) {
     .eq("number", Number(dbNumber))
     .maybeSingle()
 
-  if (error) {
-    console.log("LOAD FINAL STORY ERROR:", error)
-    showGameToast("تعذر تحميل بيانات الرقم")
-    finalState.round3.currentNumber = null
-    saveFinalState()
-    renderFinalRound()
-    return
-  }
+if (error) {
+  console.log("LOAD FINAL STORY ERROR:", error)
 
-  if (!data) {
-    showGameToast("لا توجد بيانات لهذا الرقم")
-    finalState.round3.currentNumber = null
-    saveFinalState()
-    renderFinalRound()
-    return
-  }
+  resetFinalRound3FailedNumber(
+    "تعذر تحميل بيانات الرقم"
+  )
+
+  return
+}
+
+if (!data) {
+  resetFinalRound3FailedNumber(
+    "لا توجد بيانات لهذا الرقم"
+  )
+
+  return
+}
 
   finalState.round3.currentParts = [
     data.question_part1 || "",
@@ -3643,7 +3944,7 @@ async function openFinalRound3StoryCard(number) {
   playGameSound("open")
 
   renderFinalRound()
-  saveFinalState()
+  saveFinalState({ immediate: true })
 }
 
 function showFinalRound3StoryPart() {
@@ -3725,11 +4026,14 @@ function finalRound3StoryCorrect() {
   renderFinalScores()
   renderFinalRound3()
   updateFinalTopHeaderRoundInfo()
-  saveFinalState()
+  saveFinalState({ immediate: true })
 
-   setTimeout(() => {
-    finalizeFinalRound3StoryTurn()
-  }, 12000)
+   clearTimeout(finalRound3FinishTimer)
+
+finalRound3FinishTimer = setTimeout(() => {
+  finalRound3FinishTimer = null
+  finalizeFinalRound3StoryTurn()
+}, 12000)
 }
 
 function finalRound3StoryWrong() {
@@ -3743,7 +4047,7 @@ function finalRound3StoryWrong() {
   playGameSound("wrong")
   flashScreen("wrong")
 
-  saveFinalState()
+  saveFinalState({ immediate: true })
 }
 
 function finalizeFinalRound3StoryTurn() {
@@ -3782,12 +4086,15 @@ function finalizeFinalRound3StoryTurn() {
 function getFinalRound4Count() {
   const count = Number(
     finalState.round4?.teamMedia?.count ||
-    4
+    window.finalRound4Count ||
+    localStorage.getItem("final_round4_count") ||
+    5
   )
 
-  if (count === 8) return 8
-  if (count === 6) return 6
-  return 4
+  if (count === 9) return 9
+  if (count === 7) return 7
+
+  return 5
 }
 
 function getFinalRound4MaxPerTeam() {
@@ -3916,19 +4223,26 @@ function renderFinalRound4TeamMedia() {
     <div class="finalRound3Wrap finalRound4TeamMediaWrap">
 
       <div class="finalRound3ImageStageWrap finalTeamMediaStageWrap">
-        <div class="finalRound3ImageStage finalRound3TeamMediaStage" id="finalRound4TeamMediaStage">
+        <div
+          class="finalRound3ImageStage finalRound3TeamMediaStage"
+          id="finalRound4TeamMediaStage"
+        >
           ${buildFinalRound4TeamMediaContent()}
         </div>
       </div>
 
       <div class="finalRound3NumbersBar finalTeamMediaNumbersBar">
-        <div class="finalRound3Grid finalTeamMediaNumbersGrid">
+        <div
+          class="finalRound3Grid finalTeamMediaNumbersGrid"
+          style="grid-template-columns:repeat(${totalNumbers},minmax(0,1fr));"
+        >
           ${grid}
         </div>
       </div>
 
     </div>
   `
+
 
   const hasCurrent = !!state.currentNumber
   const questionShown = !!state.questionShown
@@ -4030,7 +4344,6 @@ function renderFinalRound4TeamMedia() {
   updateFinalUndoButtonState()
   updateFinalDoubleButton()
   updateEndRoundButtonState()
-  saveFinalState()
 }
 
 function buildFinalRound4TeamMediaContent() {
@@ -4230,7 +4543,7 @@ async function openFinalRound4TeamMediaCard(number) {
 
   playGameSound("open")
   renderFinalRound4TeamMedia()
-  saveFinalState()
+  saveFinalState({ immediate: true })
   updateEndRoundButtonState()
 
   if (state.currentMediaType === "image") {
@@ -4310,11 +4623,16 @@ function finalRound4TeamMediaCorrect() {
 
   renderFinalScores()
   renderFinalRound4TeamMedia()
-  saveFinalState()
+  saveFinalState({ immediate: true })
 
-  setTimeout(() => {
-    resetFinalRound4TeamMediaCurrent(getOtherTeam(team))
-  }, 5000)
+  clearTimeout(finalRound4FinishTimer)
+
+finalRound4FinishTimer = setTimeout(() => {
+  finalRound4FinishTimer = null
+  resetFinalRound4TeamMediaCurrent(
+    getOtherTeam(team)
+  )
+}, 5000)
 }
 
 function finalRound4TeamMediaWrong() {
@@ -4356,11 +4674,17 @@ function finalRound4TeamMediaWrong() {
   flashScreen("wrong")
 
   renderFinalRound4TeamMedia()
-  saveFinalState()
+  saveFinalState({ immediate: true })
 
-  setTimeout(() => {
-    resetFinalRound4TeamMediaCurrent(getOtherTeam(team))
-  }, 5000)
+clearTimeout(finalRound4FinishTimer)
+
+finalRound4FinishTimer = setTimeout(() => {
+  finalRound4FinishTimer = null
+
+  resetFinalRound4TeamMediaCurrent(
+    getOtherTeam(team)
+  )
+}, 5000)
 }
 
 function resetFinalRound4TeamMediaCurrent(nextTeam = null) {
