@@ -849,6 +849,9 @@ function clearGameLocalState() {
   localStorage.removeItem(
     "presenter_join_code_temp"
   )
+  localStorage.removeItem(
+  "selected_game_segments"
+)
 
 }
 
@@ -861,6 +864,13 @@ function resetGameStateBeforeStart() {
 
   localStorage.setItem("main_score_a", "0")
   localStorage.setItem("main_score_b", "0")
+
+  localStorage.setItem(
+    "segment_status_v1",
+    JSON.stringify(
+      defaultIntroSegmentStatus()
+    )
+  )
 }
 
 function defaultIntroSegmentStatus() {
@@ -2203,6 +2213,9 @@ window.startGameFromIntro = async function () {
     false,
 
   presenterStartedAt:
+    null,
+
+  currentSegmentScores: 
     null,
 
   segmentStatus:

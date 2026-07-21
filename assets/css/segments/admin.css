@@ -7008,3 +7008,34 @@ input[type="file"]::file-selector-button{
     grid-template-columns:1fr;
   }
 }
+.adminSegmentLoading{
+  width:100%;
+  min-height:320px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
+  color:#233D4D;
+  font-size:18px;
+  font-weight:700;
+}
+
+.adminSegmentLoadingSpinner{
+  width:42px;
+  height:42px;
+
+  border:4px solid #D5DADF;
+  border-top-color:#FE7F2D;
+  border-radius:50%;
+
+  animation:adminSegmentSpin .65s linear infinite;
+}
+
+@keyframes adminSegmentSpin{
+  to{
+    transform:rotate(360deg);
+  }
+}

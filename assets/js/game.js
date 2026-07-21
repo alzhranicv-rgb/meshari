@@ -2434,48 +2434,86 @@ function setSegmentWinnerLabel(key) {
    Open Segment
 ========================= */
 
-async function openSegmentPage(segmentKey, forcedRound = null) {
-  segmentKey = normalizeDisplaySegmentKey(segmentKey)
+async function openSegmentPage(
+  segmentKey,
+  forcedRound = null
+) {
+  segmentKey =
+    normalizeDisplaySegmentKey(
+      segmentKey
+    )
 
-  const isFinalInternalSegment = segmentKey === "final"
+  const isFinalInternalSegment =
+    segmentKey === "final"
+
   const isFinalCardSegment =
     segmentKey === "finalRound1" ||
     segmentKey === "finalRound2" ||
     segmentKey === "finalRound3" ||
     segmentKey === "finalRound4"
 
-  const isFinalAny = isFinalInternalSegment || isFinalCardSegment
+  const isFinalAny =
+    isFinalInternalSegment ||
+    isFinalCardSegment
 
-  if (!canRunDisplayAction(`open_segment_${segmentKey}`, 900)) {
+  if (
+    !canRunDisplayAction(
+      `open_segment_${segmentKey}`,
+      900
+    )
+  ) {
     return
   }
 
   clearDisplayTemporaryFx()
 
-if (!displayModelDataLoaded) {
-  await loadVisibleSegmentsForDisplay({
-    staleWhileRevalidate: true
-  })
-}
+  if (!displayModelDataLoaded) {
+    await loadVisibleSegmentsForDisplay({
+      staleWhileRevalidate: true
+    })
+  }
 
-  if (!isFinalAny && !isSegmentVisibleOnDisplay(segmentKey)) {
-    showGameToast("هذه الفقرة غير مفعلة في العرض")
+  if (
+    !isFinalAny &&
+    !isSegmentVisibleOnDisplay(
+      segmentKey
+    )
+  ) {
+    showGameToast(
+      "هذه الفقرة غير مفعلة في العرض"
+    )
+
     renderVisibleSegmentsHome()
     updateSegmentCards()
     return
   }
+
   if (isFinalAny) {
-  const targetFinalKey = getFinalSegmentKeyFromRound(
-    Number(forcedRound || getFinalRoundFromSegmentKey(segmentKey) || 1)
-  )
+    const targetFinalKey =
+      getFinalSegmentKeyFromRound(
+        Number(
+          forcedRound ||
+          getFinalRoundFromSegmentKey(
+            segmentKey
+          ) ||
+          1
+        )
+      )
 
-  if (!isSegmentVisibleOnDisplay(targetFinalKey)) {
-    showGameToast("هذه الفقرة غير مفعلة في العرض")
-    renderVisibleSegmentsHome()
-    updateSegmentCards()
-    return
+    if (
+      !isSegmentVisibleOnDisplay(
+        targetFinalKey
+      )
+    ) {
+      showGameToast(
+        "هذه الفقرة غير مفعلة في العرض"
+      )
+
+      renderVisibleSegmentsHome()
+      updateSegmentCards()
+      return
+    }
   }
-}
 
   let finalRound = 0
   let lockKey = segmentKey
@@ -2483,90 +2521,341 @@ if (!displayModelDataLoaded) {
   if (isFinalAny) {
     finalRound =
       Number(forcedRound || 0) ||
-      Number(getFinalRoundFromSegmentKey(segmentKey) || 0) ||
-      Number(window.displayFinalRound || 0) ||
-      Number(window.currentFinalRound || 0) ||
+      Number(
+        getFinalRoundFromSegmentKey(
+          segmentKey
+        ) || 0
+      ) ||
+      Number(
+        window.displayFinalRound || 0
+      ) ||
+      Number(
+        window.currentFinalRound || 0
+      ) ||
       1
 
-    window.displayFinalRound = finalRound
-    window.currentFinalRound = finalRound
+    window.displayFinalRound =
+      finalRound
 
-    lockKey = getFinalSegmentKeyFromRound(finalRound)
+    window.currentFinalRound =
+      finalRound
+
+    lockKey =
+      getFinalSegmentKeyFromRound(
+        finalRound
+      )
   }
 
-  lockKey = normalizeDisplaySegmentKey(lockKey)
+  lockKey =
+    normalizeDisplaySegmentKey(
+      lockKey
+    )
 
-  if (segmentStatus[lockKey]?.locked) return
+  if (
+    segmentStatus[lockKey]?.locked
+  ) {
+    return
+  }
 
   displayProFxLock = false
 
-  await loadDisplayCountForSegment(lockKey)
+  await loadDisplayCountForSegment(
+    lockKey
+  )
 
   homeRefreshLocked = true
-  localStorage.setItem("active_segment", isFinalAny ? lockKey : segmentKey)
 
-  const homeScreen = getFirstElement(["homeScreen", "homePage"])
-  const segmentScreen = getFirstElement(["segmentScreen"])
+  localStorage.setItem(
+    "active_segment",
+    isFinalAny
+      ? lockKey
+      : segmentKey
+  )
 
-  document.body.classList.add("segmentMode")
+  const homeScreen =
+    getFirstElement([
+      "homeScreen",
+      "homePage"
+    ])
 
-  await showSegmentIntro(lockKey)
+  const segmentScreen =
+    getFirstElement([
+      "segmentScreen"
+    ])
 
-  if (homeScreen) homeScreen.classList.add("hidden")
-  if (segmentScreen) segmentScreen.classList.remove("hidden")
+  document.body.classList.add(
+    "segmentMode"
+  )
 
-  showDisplayLoading("جاري تجهيز الفقرة...")
+  let segmentOpenedSuccessfully =
+    false
 
   try {
-    if (segmentKey === "warmup") await window.renderWarmup()
-    if (segmentKey === "top10") await window.renderTop10()
-    if (segmentKey === "letterli") {
-  if (typeof window.openLetterliSegment !== "function") {
-    throw new Error("openLetterliSegment is not loaded")
-  }
+    await showSegmentIntro(
+      lockKey
+    )
 
-  await window.openLetterliSegment()
-}
-    if (segmentKey === "who") await window.renderWho()
-    if (segmentKey === "explain") await window.renderExplain()
-    if (segmentKey === "archive") await window.renderArchive()
-          if (segmentKey === "randomChallenge") await window.renderRandomChallenge()
-
-    if (isFinalAny) {
-      if (typeof window.renderFinal !== "function") {
-        showGameToast("ملف الفاصلة غير محمّل")
-        return
-      }
-
-      localStorage.setItem("active_segment", lockKey)
-      await window.renderFinal(finalRound, lockKey)
+    if (homeScreen) {
+      homeScreen.classList.add(
+        "hidden"
+      )
     }
 
-    const mediaRoot = document.getElementById("segmentArea") || document
+    if (segmentScreen) {
+      segmentScreen.classList.remove(
+        "hidden"
+      )
+    }
 
-    if (typeof protectDisplayMedia === "function") protectDisplayMedia(mediaRoot)
-    if (typeof enhanceDisplayMediaFrames === "function") enhanceDisplayMediaFrames(mediaRoot)
-    if (typeof preloadDisplayMediaInRoot === "function") await preloadDisplayMediaInRoot(mediaRoot)
-    if (typeof applyDisplayMediaRevealFx === "function") applyDisplayMediaRevealFx(mediaRoot)
+    showDisplayLoading(
+      "جاري تجهيز الفقرة..."
+    )
 
-  } catch (e) {
-    console.log("DISPLAY SEGMENT RENDER ERROR:", e)
-    showGameToast("تعذر تجهيز الفقرة")
+    if (segmentKey === "warmup") {
+      if (
+        typeof window.renderWarmup !==
+        "function"
+      ) {
+        throw new Error(
+          "renderWarmup is not loaded"
+        )
+      }
+
+      await window.renderWarmup()
+    }
+
+    if (segmentKey === "top10") {
+      if (
+        typeof window.renderTop10 !==
+        "function"
+      ) {
+        throw new Error(
+          "renderTop10 is not loaded"
+        )
+      }
+
+      await window.renderTop10()
+    }
+
+    if (segmentKey === "letterli") {
+      if (
+        typeof window
+          .openLetterliSegment !==
+        "function"
+      ) {
+        throw new Error(
+          "openLetterliSegment is not loaded"
+        )
+      }
+
+      await window.openLetterliSegment()
+    }
+
+    if (segmentKey === "who") {
+      if (
+        typeof window.renderWho !==
+        "function"
+      ) {
+        throw new Error(
+          "renderWho is not loaded"
+        )
+      }
+
+      await window.renderWho()
+    }
+
+    if (segmentKey === "explain") {
+      if (
+        typeof window.renderExplain !==
+        "function"
+      ) {
+        throw new Error(
+          "renderExplain is not loaded"
+        )
+      }
+
+      await window.renderExplain()
+    }
+
+    if (segmentKey === "archive") {
+      if (
+        typeof window.renderArchive !==
+        "function"
+      ) {
+        throw new Error(
+          "renderArchive is not loaded"
+        )
+      }
+
+      await window.renderArchive()
+    }
+
+    if (
+      segmentKey ===
+      "randomChallenge"
+    ) {
+      if (
+        typeof window
+          .renderRandomChallenge !==
+        "function"
+      ) {
+        throw new Error(
+          "renderRandomChallenge is not loaded"
+        )
+      }
+
+      await window
+        .renderRandomChallenge()
+    }
+
+    if (isFinalAny) {
+      if (
+        typeof window.renderFinal !==
+        "function"
+      ) {
+        throw new Error(
+          "renderFinal is not loaded"
+        )
+      }
+
+      localStorage.setItem(
+        "active_segment",
+        lockKey
+      )
+
+      await window.renderFinal(
+        finalRound,
+        lockKey
+      )
+    }
+
+    const segmentArea =
+      document.getElementById(
+        "segmentArea"
+      )
+
+    if (
+      !segmentArea ||
+      !segmentArea.innerHTML.trim()
+    ) {
+      throw new Error(
+        "Segment rendered empty"
+      )
+    }
+
+    const mediaRoot =
+      segmentArea ||
+      document
+
+    if (
+      typeof protectDisplayMedia ===
+      "function"
+    ) {
+      protectDisplayMedia(
+        mediaRoot
+      )
+    }
+
+    if (
+      typeof enhanceDisplayMediaFrames ===
+      "function"
+    ) {
+      enhanceDisplayMediaFrames(
+        mediaRoot
+      )
+    }
+
+    if (
+      typeof preloadDisplayMediaInRoot ===
+      "function"
+    ) {
+      await preloadDisplayMediaInRoot(
+        mediaRoot
+      )
+    }
+
+    if (
+      typeof applyDisplayMediaRevealFx ===
+      "function"
+    ) {
+      applyDisplayMediaRevealFx(
+        mediaRoot
+      )
+    }
+
+    segmentOpenedSuccessfully =
+      true
+  } catch (error) {
+    console.log(
+      "DISPLAY SEGMENT RENDER ERROR:",
+      error
+    )
+
+    showGameToast(
+      "تعذر فتح الفقرة، تم الرجوع للرئيسية"
+    )
+
+    stopAllDisplaySegmentTimers()
+
+    localStorage.removeItem(
+      "active_segment"
+    )
+
+    clearGameActiveTeam({
+      sync: false
+    })
+
+    window.currentSegmentScores =
+      null
+
+    const segmentArea =
+      document.getElementById(
+        "segmentArea"
+      )
+
+    if (segmentArea) {
+      segmentArea.innerHTML = ""
+    }
+
+    homeRefreshLocked = false
+
+    renderMainHome(true)
+
+    syncDisplayStateToSession({
+      immediate: true
+    })
+
+    return
   } finally {
     hideDisplayLoading()
     displayProFxLock = false
   }
 
-  const segmentArea = document.getElementById("segmentArea")
-  if (segmentArea) {
-    segmentArea.classList.remove("displaySegmentEnterFx")
-    void segmentArea.offsetWidth
-    segmentArea.classList.add("displaySegmentEnterFx")
+  if (
+    !segmentOpenedSuccessfully
+  ) {
+    return
   }
 
-  if (typeof syncDisplayStateToSession === "function") {
-    syncDisplayStateToSession()
+  const segmentArea =
+    document.getElementById(
+      "segmentArea"
+    )
+
+  if (segmentArea) {
+    segmentArea.classList.remove(
+      "displaySegmentEnterFx"
+    )
+
+    void segmentArea.offsetWidth
+
+    segmentArea.classList.add(
+      "displaySegmentEnterFx"
+    )
   }
+
+  syncDisplayStateToSession()
+
   applyPresenterHideDisplayControlsState()
 }
 
@@ -2645,6 +2934,13 @@ function stopAllDisplaySegmentTimers() {
     "function"
   ) {
     resetWhoRevealTimeout()
+  }
+
+  if (
+    typeof stopAllRandomChallengeTimers ===
+    "function"
+  ) {
+    stopAllRandomChallengeTimers()
   }
 }
 
@@ -2822,76 +3118,135 @@ function startQuestion(points) {
 ========================= */
 
 async function endCurrentSegment() {
-    if (!canRunDisplayAction("end_current_segment", 1600)) {
+  if (
+    !canRunDisplayAction(
+      "end_current_segment",
+      1600
+    )
+  ) {
     return
   }
-  const key = getCurrentSegmentKey()
-  if (!key) return
+
+  const key =
+    getCurrentSegmentKey()
+
+  if (!key) {
+    return
+  }
 
   if (!canEndSegment(key)) {
-    showGameToast("لا يمكن إنهاء الفقرة قبل إكمالها")
+    showGameToast(
+      "لا يمكن إنهاء الفقرة قبل إكمالها"
+    )
+
     updateEndRoundButtonState()
     return
   }
 
-  if (displayProFxLock) return
+  if (displayProFxLock) {
+    return
+  }
+
   displayProFxLock = true
 
-  const winner = getWinnerFromSegmentScores(key)
+  try {
+    const winner =
+      getWinnerFromSegmentScores(key)
 
-const fallbackSegmentScores = getRealSegmentScores(key)
+    const fallbackSegmentScores =
+      getRealSegmentScores(key)
 
-const finishedSegmentScores = {
-  A: Number(window.currentSegmentScores?.A ?? fallbackSegmentScores.A ?? 0),
-  B: Number(window.currentSegmentScores?.B ?? fallbackSegmentScores.B ?? 0)
-}
+    const finishedSegmentScores = {
+      A: Number(
+        window.currentSegmentScores?.A ??
+        fallbackSegmentScores?.A ??
+        0
+      ),
 
-if (winner === teamAName) {
-    scoreA++
-    localStorage.setItem("main_score_a", scoreA)
-    updateMainScoreBoard()
-    bumpScore("mainScoreA")
-    showLastScoreUpdate("A", 1)
+      B: Number(
+        window.currentSegmentScores?.B ??
+        fallbackSegmentScores?.B ??
+        0
+      )
+    }
+
+    if (winner === teamAName) {
+      scoreA++
+
+      localStorage.setItem(
+        "main_score_a",
+        String(scoreA)
+      )
+
+      updateMainScoreBoard()
+      bumpScore("mainScoreA")
+      showLastScoreUpdate("A", 1)
+    }
+
+    if (winner === teamBName) {
+      scoreB++
+
+      localStorage.setItem(
+        "main_score_b",
+        String(scoreB)
+      )
+
+      updateMainScoreBoard()
+      bumpScore("mainScoreB")
+      showLastScoreUpdate("B", 1)
+    }
+
+    updateLeadingTeamStyle()
+
+    if (!segmentStatus[key]) {
+      segmentStatus[key] = {
+        locked: false,
+        winner: "",
+        scoreA: 0,
+        scoreB: 0
+      }
+    }
+
+    segmentStatus[key].locked = true
+    segmentStatus[key].winner = winner
+    segmentStatus[key].scoreA =
+      finishedSegmentScores.A
+    segmentStatus[key].scoreB =
+      finishedSegmentScores.B
+
+    clearGameActiveTeam({
+      sync: false
+    })
+
+    saveSegmentStatus()
+    updateSegmentCards()
+
+    stopAllDisplaySegmentTimers()
+
+    localStorage.removeItem(
+      "active_segment"
+    )
+
+    await syncDisplayStateToSession({
+      immediate: true
+    })
+
+    await showSegmentEndOverlay(
+      key,
+      winner
+    )
+  } catch (error) {
+    console.log(
+      "END CURRENT SEGMENT ERROR:",
+      error
+    )
+
+    showGameToast(
+      "تعذر إنهاء الفقرة"
+    )
+  } finally {
+    displayProFxLock = false
   }
-
-  if (winner === teamBName) {
-    scoreB++
-    localStorage.setItem("main_score_b", scoreB)
-    updateMainScoreBoard()
-    bumpScore("mainScoreB")
-    showLastScoreUpdate("B", 1)
-  }
-
-  updateLeadingTeamStyle()
-  syncDisplayStateToSession()
-
-  if (!segmentStatus[key]) {
-  segmentStatus[key] = {
-    locked: false,
-    winner: "",
-    scoreA: 0,
-    scoreB: 0
-  }
-}
-
-segmentStatus[key].locked = true
-segmentStatus[key].winner = winner
-segmentStatus[key].scoreA = finishedSegmentScores.A
-segmentStatus[key].scoreB = finishedSegmentScores.B
-
-clearGameActiveTeam()
-
-saveSegmentStatus()
-updateSegmentCards()
-
-  stopAllDisplaySegmentTimers()
-
-  localStorage.removeItem("active_segment")
-  syncDisplayStateToSession()
-
-  await showSegmentEndOverlay(key, winner)
-
-  displayProFxLock = false
 
   goHome()
 }
@@ -2908,10 +3263,21 @@ function closeSegment() {
   return endCurrentSegment()
 }
 
-window.endCurrentSegment = endCurrentSegment
-window.endSegment = endSegment
-window.finishSegment = finishSegment
-window.closeSegment = closeSegment
+window.endCurrentSegment =
+  endCurrentSegment
+
+window.endSegment =
+  endSegment
+
+window.finishSegment =
+  finishSegment
+
+window.closeSegment =
+  closeSegment
+
+/* =========================
+   Current Segment
+========================= */
 
 function getCurrentSegmentKey() {
   const active =
@@ -3038,115 +3404,181 @@ function getCurrentSegmentKey() {
   return null
 }
 
-function getSafeSegmentNumber(value, fallback, max) {
+/* =========================
+   Segment Helpers
+========================= */
+
+function getSafeSegmentNumber(
+  value,
+  fallback,
+  max
+) {
   return Math.min(
-    Math.max(Number(value || fallback), 1),
+    Math.max(
+      Number(value || fallback),
+      1
+    ),
     max
   )
 }
 
-function isDisplaySegmentBusyBeforeEnd(segmentKey) {
-  segmentKey = normalizeDisplaySegmentKey(segmentKey)
+/* =========================
+   Segment Busy State
+========================= */
+
+function isDisplaySegmentBusyBeforeEnd(
+  segmentKey
+) {
+  segmentKey =
+    normalizeDisplaySegmentKey(
+      segmentKey
+    )
 
   if (segmentKey === "warmup") {
     return !!(
       window.warmupQuestionLocked ||
-      typeof warmupQuestionLocked !== "undefined" && warmupQuestionLocked
+      (
+        typeof warmupQuestionLocked !==
+          "undefined" &&
+        warmupQuestionLocked
+      )
     )
   }
 
   if (segmentKey === "top10") {
     return !!(
-      window.top10State?.pendingScore ||
-      window.top10State?.currentNumber ||
-      window.top10State?.currentQuestion
+      window.top10State
+        ?.pendingScore ||
+      window.top10State
+        ?.currentNumber ||
+      window.top10State
+        ?.currentQuestion
     )
   }
 
   if (segmentKey === "letterli") {
-  const state =
-    window.letterliState ||
-    getSafeJson(
-      "letterli_state_v1"
-    ) ||
-    {}
+    const state =
+      getLetterliDisplayState()
 
-  return !!(
-    state.spinning ||
-    state.timerRunning ||
-    state.currentQuestionIndex !==
-      null
-  )
-}
-
-  if (segmentKey === "auction") {
     return !!(
-      window.auctionState?.pendingScore ||
-      window.auctionState?.currentNumber
+      state.spinning ||
+      state.timerRunning ||
+      state.answerVisible ||
+      state.currentQuestionIndex !== null
     )
   }
 
   if (segmentKey === "who") {
-  return !!(
-    window.whoState?.pendingScore ||
-    window.whoCurrentNumber ||
-    (
-      typeof whoCurrentNumber !==
-        "undefined" &&
-      whoCurrentNumber
-    ) ||
-    (
-      typeof whoQuestionLocked !==
-        "undefined" &&
-      whoQuestionLocked
+    return !!(
+      window.whoState
+        ?.pendingScore ||
+      window.whoCurrentNumber ||
+      (
+        typeof whoCurrentNumber !==
+          "undefined" &&
+        whoCurrentNumber
+      ) ||
+      (
+        typeof whoQuestionLocked !==
+          "undefined" &&
+        whoQuestionLocked
+      )
     )
-  )
-}
+  }
 
   if (segmentKey === "explain") {
     return !!(
-      window.explainState?.pendingScore ||
-      window.explainState?.currentNumber ||
-      window.explainState?.activeWord
+      window.explainState
+        ?.pendingScore ||
+      window.explainState
+        ?.currentNumber ||
+      window.explainState
+        ?.activeWord
     )
   }
 
   if (segmentKey === "finalRound1") {
     return !!(
-      window.finalState?.round1?.pendingScore ||
-      window.finalState?.round1?.currentNumber
+      window.finalState
+        ?.round1
+        ?.pendingScore ||
+      window.finalState
+        ?.round1
+        ?.currentNumber
     )
   }
 
   if (segmentKey === "finalRound2") {
-    return !!window.finalState?.round2?.pendingScore
+    return !!(
+      window.finalState
+        ?.round2
+        ?.pendingScore
+    )
   }
 
   if (segmentKey === "finalRound3") {
     return !!(
-      window.finalState?.round3?.pendingScore ||
-      window.finalState?.round3?.currentNumber
+      window.finalState
+        ?.round3
+        ?.pendingScore ||
+      window.finalState
+        ?.round3
+        ?.currentNumber
     )
   }
 
   if (segmentKey === "finalRound4") {
     return !!(
-      window.finalState?.round4?.pendingScore ||
-      window.finalState?.round4?.currentNumber ||
-      window.finalState?.round4?.teamMedia?.currentNumber
+      window.finalState
+        ?.round4
+        ?.pendingScore ||
+      window.finalState
+        ?.round4
+        ?.currentNumber ||
+      window.finalState
+        ?.round4
+        ?.teamMedia
+        ?.currentNumber
     )
   }
-if (segmentKey === "randomChallenge") {
-  const state = window.randomChallengeState || getSafeJson("random_challenge_state_v1")
 
-  return !!(
-    state?.pendingScore ||
-    state?.currentBox
-  )
-}
+  if (segmentKey === "randomChallenge") {
+    const state =
+      window.randomChallengeState ||
+      getSafeJson(
+        "random_challenge_state_v1"
+      )
+
+    if (!state) {
+      return false
+    }
+
+    const currentBox =
+      Number(
+        state.currentBox || 0
+      )
+
+    const box =
+      currentBox
+        ? state[`box${currentBox}`]
+        : null
+
+    return !!(
+      box?.rolling ||
+      box?.timerRunning ||
+      box?.choosingPoints ||
+      box?.blockTimerRunning ||
+      box?.reviewMode ||
+      box?.secondTeamBreak
+    )
+  }
 
   return false
 }
+
+/* =========================
+   Letterli Helpers
+========================= */
 
 function getLetterliDisplayState() {
   return (
@@ -3191,9 +3623,9 @@ function getLetterliCompletedCount() {
   ]
 
   const completedArray =
-    possibleArrays.find(
-      value => Array.isArray(value)
-    )
+    possibleArrays.find(value => {
+      return Array.isArray(value)
+    })
 
   if (completedArray) {
     return completedArray.length
@@ -3221,248 +3653,510 @@ function canEndLetterliSegment() {
     scores.A > 0 ||
     scores.B > 0
 
+  const noCurrentQuestion =
+    state.currentQuestionIndex ===
+      null ||
+    typeof state.currentQuestionIndex ===
+      "undefined"
+
   return !!(
     hasPlayed &&
     !state.spinning &&
     !state.timerRunning &&
-    !state.answerVisible
+    !state.answerVisible &&
+    noCurrentQuestion
   )
 }
 
+/* =========================
+   Can End Segment
+========================= */
 
 function canEndSegment(segmentKey) {
-    segmentKey = normalizeDisplaySegmentKey(segmentKey)
-
-    if (isDisplaySegmentBusyBeforeEnd(segmentKey)) {
-  return false
-}
-
-  if (segmentKey === "warmup") {
-  if (!window.usedQuestions) return false
-  if (warmupQuestionLocked) return false
-
-  return Object.keys(window.usedQuestions).length >= 12
-}
-
-  if (segmentKey === "top10") {
-    if (!window.top10State) return false
-
-    const maxRound = getSafeSegmentNumber(
-      window.top10MaxRound || localStorage.getItem("top10_max_round"),
-      3,
-      4
+  segmentKey =
+    normalizeDisplaySegmentKey(
+      segmentKey
     )
 
-    for (let r = 1; r <= maxRound; r++) {
-      const opened = window.top10State.opened?.[r] || []
-      if (opened.length < 10) return false
-    }
-
-    return Number(window.top10State.round || 1) >= maxRound
-  }
-
-  if (segmentKey === "letterli") {
-  const state =
-    window.letterliState ||
-    getSafeJson(
-      "letterli_state_v1"
+  if (
+    isDisplaySegmentBusyBeforeEnd(
+      segmentKey
     )
-
-  if (!state) {
+  ) {
     return false
   }
 
-  return (
-    Number(
-      state.completedCount || 0
-    ) > 0 &&
-    !state.spinning &&
-    !state.timerRunning &&
-    state.currentQuestionIndex ===
-      null
-  )
-}
+  /* =========================
+     Warmup
+  ========================= */
 
-  if (segmentKey === "auction") {
-    if (!window.auctionState) return false
+  if (segmentKey === "warmup") {
+    const usedQuestions =
+      window.usedQuestions ||
+      {}
 
-    const maxNumber = getSafeSegmentNumber(
-      window.auctionMaxNumber || localStorage.getItem("auction_max_number"),
-      8,
-      8
+    return (
+      Object.keys(
+        usedQuestions
+      ).length >= 12
     )
-
-    return (window.auctionState.usedNumbers || []).length >= maxNumber
   }
 
-  if (segmentKey === "who") {
-    if (!window.whoState) return false
+  /* =========================
+     Top 10
+  ========================= */
 
-    const maxWhoNumber = getSafeSegmentNumber(
-      window.whoMaxNumber || localStorage.getItem("who_max_number"),
-      15,
-      15
-    )
+  if (segmentKey === "top10") {
+    const state =
+      window.top10State ||
+      getSafeJson(
+        "top10_state_v1"
+      )
 
-    return (window.whoState.usedNumbers || []).length >= maxWhoNumber
-  }
-
-  if (segmentKey === "explain") {
-    if (!window.explainState) return false
-
-    const total = getSafeSegmentNumber(
-      window.explainState.wordsCount ||
-      window.explainWordsCount ||
-      localStorage.getItem("explain_words_count"),
-      4,
-      8
-    )
-
-    return (window.explainState.usedNumbers || []).length >= total
-  }
-
-  if (segmentKey === "finalRound1") {
-    if (!window.finalState) return false
-
-    const r1Count = getSafeSegmentNumber(
-      window.finalState.round1?.cardsCount ||
-      window.finalRound1CardsCount ||
-      localStorage.getItem("final_round1_cards_count"),
-      6,
-      8
-    )
-
-    return (window.finalState.round1?.opened || []).length >= r1Count
-  }
-
-  if (segmentKey === "finalRound2") {
-  if (!window.finalState) return false
-
-  return (
-    (window.finalState.round2?.opened || []).length >= 6 &&
-    (window.finalState.round2?.scoredNumbers || []).length >= 6
-  )
-}
-
-if (segmentKey === "finalRound3") {
-  if (!window.finalState) return false
-
-  const total = getSafeSegmentNumber(
-    window.finalState.round3?.cardsCount ||
-    window.finalRound3Count ||
-    localStorage.getItem("final_round3_count"),
-    4,
-    8
-  )
-
-  return (
-    (window.finalState.round3?.opened || []).length >= total &&
-    (window.finalState.round3?.scoredNumbers || []).length >= total
-  )
-}
-
-if (segmentKey === "finalRound4") {
-  if (!window.finalState) return false
-
-  const total = getSafeSegmentNumber(
-    window.finalState.round4?.teamMedia?.count ||
-    window.finalRound4Count ||
-    localStorage.getItem("final_round4_count"),
-    4,
-    8
-  )
-
-  return (
-    (window.finalState.round4?.teamMedia?.usedNumbers || []).length >= total &&
-    (window.finalState.round4?.scoredNumbers || []).length >= total
-  )
-}
-
-if (segmentKey === "final") {
-  if (!window.finalState) return false
-
-  const r1Count = getSafeSegmentNumber(
-    window.finalState.round1?.cardsCount ||
-    window.finalRound1CardsCount ||
-    localStorage.getItem("final_round1_cards_count"),
-    6,
-    8
-  )
-
-  const r3Count = getSafeSegmentNumber(
-    window.finalState.round3?.cardsCount ||
-    window.finalRound3Count ||
-    localStorage.getItem("final_round3_count"),
-    4,
-    8
-  )
-
-  const r4Count = getSafeSegmentNumber(
-    window.finalState.round4?.teamMedia?.count ||
-    window.finalRound4Count ||
-    localStorage.getItem("final_round4_count"),
-    4,
-    8
-  )
-
-  const r1Done =
-    (window.finalState.round1?.opened || []).length >= r1Count
-
-  const r2Done =
-    (window.finalState.round2?.opened || []).length >= 6 &&
-    (window.finalState.round2?.scoredNumbers || []).length >= 6
-
-  const r3Done =
-    (window.finalState.round3?.opened || []).length >= r3Count &&
-    (window.finalState.round3?.scoredNumbers || []).length >= r3Count
-
-  const r4Done =
-    (window.finalState.round4?.teamMedia?.usedNumbers || []).length >= r4Count &&
-    (window.finalState.round4?.scoredNumbers || []).length >= r4Count
-
-  return r1Done && r2Done && r3Done && r4Done
-}
-
-  if (segmentKey === "archive") {
-    if (!window.archiveState) return false
-
-    const maxRound = getSafeSegmentNumber(
-      window.archiveMaxRound || localStorage.getItem("archive_max_round"),
-      4,
-      4
-    )
-
-    for (let r = 1; r <= maxRound; r++) {
-      const roundCache = window.archiveRoundCache?.[r]
-      const items = roundCache?.items || []
-
-      if (!items.length) return false
-
-      const finished = items.every(item => {
-        return !!window.archiveRevealState?.[r]?.[item.position]
-      })
-
-      if (!finished) return false
+    if (!state) {
+      return false
     }
 
-    return Number(window.archiveState.round || 1) >= maxRound
+    const maxRound =
+      getSafeSegmentNumber(
+        window.top10MaxRound ||
+        localStorage.getItem(
+          "top10_max_round"
+        ),
+        3,
+        4
+      )
+
+    for (
+      let round = 1;
+      round <= maxRound;
+      round++
+    ) {
+      const opened =
+        state.opened?.[round] ||
+        []
+
+      if (opened.length < 10) {
+        return false
+      }
+    }
+
+    return (
+      Number(
+        state.round || 1
+      ) >= maxRound
+    )
   }
-if (segmentKey === "randomChallenge") {
-  const state = window.randomChallengeState || getSafeJson("random_challenge_state_v1")
-  if (!state) return false
 
-  const hasFinishedBox =
-    !!state.box1?.finished ||
-    !!state.box2?.finished ||
-    !!state.box3?.finished ||
-    !!state.box4?.finished
+  /* =========================
+     Letterli
+  ========================= */
 
-  const hasScores =
-    Number(state.scores?.A || 0) > 0 ||
-    Number(state.scores?.B || 0) > 0
+  if (segmentKey === "letterli") {
+    return canEndLetterliSegment()
+  }
 
-  return hasFinishedBox || hasScores
-}
+  /* =========================
+     Who
+  ========================= */
+
+  if (segmentKey === "who") {
+    const state =
+      window.whoState ||
+      getSafeJson(
+        "who_state_v1"
+      )
+
+    if (!state) {
+      return false
+    }
+
+    const maxWhoNumber =
+      getSafeSegmentNumber(
+        window.whoMaxNumber ||
+        localStorage.getItem(
+          "who_max_number"
+        ),
+        15,
+        15
+      )
+
+    return (
+      (
+        state.usedNumbers ||
+        []
+      ).length >= maxWhoNumber
+    )
+  }
+
+  /* =========================
+     Explain
+  ========================= */
+
+  if (segmentKey === "explain") {
+    const localState =
+      getSafeJson(
+        "explain_state_v1"
+      )
+
+    const state =
+      window.explainState ||
+      localState?.explainState ||
+      localState
+
+    if (!state) {
+      return false
+    }
+
+    const total =
+      getSafeSegmentNumber(
+        state.wordsCount ||
+        window.explainWordsCount ||
+        localStorage.getItem(
+          "explain_words_count"
+        ),
+        5,
+        9
+      )
+
+    return (
+      (
+        state.usedNumbers ||
+        []
+      ).length >= total
+    )
+  }
+
+  /* =========================
+     Final Round 1
+  ========================= */
+
+  if (segmentKey === "finalRound1") {
+    const state =
+      window.finalState ||
+      getSafeJson(
+        "final_state_v3"
+      )
+
+    if (!state) {
+      return false
+    }
+
+    const total =
+      getSafeSegmentNumber(
+        state.round1?.cardsCount ||
+        window.finalRound1CardsCount ||
+        localStorage.getItem(
+          "final_round1_cards_count"
+        ),
+        7,
+        9
+      )
+
+    return (
+      (
+        state.round1?.opened ||
+        []
+      ).length >= total
+    )
+  }
+
+  /* =========================
+     Final Round 2
+  ========================= */
+
+  if (segmentKey === "finalRound2") {
+    const state =
+      window.finalState ||
+      getSafeJson(
+        "final_state_v3"
+      )
+
+    if (!state) {
+      return false
+    }
+
+    return (
+      (
+        state.round2?.opened ||
+        []
+      ).length >= 6 &&
+      (
+        state.round2
+          ?.scoredNumbers ||
+        []
+      ).length >= 6
+    )
+  }
+
+  /* =========================
+     Final Round 3
+  ========================= */
+
+  if (segmentKey === "finalRound3") {
+    const state =
+      window.finalState ||
+      getSafeJson(
+        "final_state_v3"
+      )
+
+    if (!state) {
+      return false
+    }
+
+    const total =
+      getSafeSegmentNumber(
+        state.round3?.cardsCount ||
+        window.finalRound3Count ||
+        localStorage.getItem(
+          "final_round3_count"
+        ),
+        5,
+        9
+      )
+
+    return (
+      (
+        state.round3?.opened ||
+        []
+      ).length >= total &&
+      (
+        state.round3
+          ?.scoredNumbers ||
+        []
+      ).length >= total
+    )
+  }
+
+  /* =========================
+     Final Round 4
+  ========================= */
+
+  if (segmentKey === "finalRound4") {
+    const state =
+      window.finalState ||
+      getSafeJson(
+        "final_state_v3"
+      )
+
+    if (!state) {
+      return false
+    }
+
+    const total =
+      getSafeSegmentNumber(
+        state.round4
+          ?.teamMedia
+          ?.count ||
+        window.finalRound4Count ||
+        localStorage.getItem(
+          "final_round4_count"
+        ),
+        5,
+        9
+      )
+
+    return (
+      (
+        state.round4
+          ?.teamMedia
+          ?.usedNumbers ||
+        []
+      ).length >= total &&
+      (
+        state.round4
+          ?.scoredNumbers ||
+        []
+      ).length >= total
+    )
+  }
+
+  /* =========================
+     Full Final
+  ========================= */
+
+  if (segmentKey === "final") {
+    const state =
+      window.finalState ||
+      getSafeJson(
+        "final_state_v3"
+      )
+
+    if (!state) {
+      return false
+    }
+
+    const round1Total =
+      getSafeSegmentNumber(
+        state.round1?.cardsCount ||
+        window.finalRound1CardsCount ||
+        localStorage.getItem(
+          "final_round1_cards_count"
+        ),
+        7,
+        9
+      )
+
+    const round3Total =
+      getSafeSegmentNumber(
+        state.round3?.cardsCount ||
+        window.finalRound3Count ||
+        localStorage.getItem(
+          "final_round3_count"
+        ),
+        5,
+        9
+      )
+
+    const round4Total =
+      getSafeSegmentNumber(
+        state.round4
+          ?.teamMedia
+          ?.count ||
+        window.finalRound4Count ||
+        localStorage.getItem(
+          "final_round4_count"
+        ),
+        5,
+        9
+      )
+
+    const round1Done =
+      (
+        state.round1?.opened ||
+        []
+      ).length >= round1Total
+
+    const round2Done =
+      (
+        state.round2?.opened ||
+        []
+      ).length >= 6 &&
+      (
+        state.round2
+          ?.scoredNumbers ||
+        []
+      ).length >= 6
+
+    const round3Done =
+      (
+        state.round3?.opened ||
+        []
+      ).length >= round3Total &&
+      (
+        state.round3
+          ?.scoredNumbers ||
+        []
+      ).length >= round3Total
+
+    const round4Done =
+      (
+        state.round4
+          ?.teamMedia
+          ?.usedNumbers ||
+        []
+      ).length >= round4Total &&
+      (
+        state.round4
+          ?.scoredNumbers ||
+        []
+      ).length >= round4Total
+
+    return (
+      round1Done &&
+      round2Done &&
+      round3Done &&
+      round4Done
+    )
+  }
+
+  /* =========================
+     Archive
+  ========================= */
+
+  if (segmentKey === "archive") {
+    const state =
+      window.archiveState ||
+      getSafeJson(
+        "archive_state_v1"
+      )
+
+    if (!state) {
+      return false
+    }
+
+    const maxRound =
+      getSafeSegmentNumber(
+        window.archiveMaxRound ||
+        localStorage.getItem(
+          "archive_max_round"
+        ),
+        4,
+        4
+      )
+
+    for (
+      let round = 1;
+      round <= maxRound;
+      round++
+    ) {
+      const roundCache =
+        window.archiveRoundCache?.[
+          round
+        ]
+
+      const items =
+        roundCache?.items ||
+        []
+
+      if (!items.length) {
+        return false
+      }
+
+      const finished =
+        items.every(item => {
+          return !!(
+            window.archiveRevealState
+              ?.[round]
+              ?.[item.position]
+          )
+        })
+
+      if (!finished) {
+        return false
+      }
+    }
+
+    return (
+      Number(
+        state.round || 1
+      ) >= maxRound
+    )
+  }
+
+  /* =========================
+     Random Challenge
+  ========================= */
+
+  if (
+    segmentKey ===
+    "randomChallenge"
+  ) {
+    const state =
+      window.randomChallengeState ||
+      getSafeJson(
+        "random_challenge_state_v1"
+      )
+
+    if (!state) {
+      return false
+    }
+
+    return (
+      !!state.completed &&
+      !state.currentBox
+    )
+  }
 
   return false
 }
@@ -3889,16 +4583,32 @@ function updateDisplayControlsEyeButton(isHidden) {
 }
 
 function applyPresenterHideDisplayControlsState() {
-  const isHidden = localStorage.getItem("presenter_hide_controls") === "1"
+  const isHidden =
+    localStorage.getItem("presenter_hide_controls") === "1"
 
-  document.body.classList.toggle("presenterHideDisplayControls", isHidden)
-  document.documentElement.classList.toggle("presenterHideDisplayControls", isHidden)
+  document.body.classList.toggle(
+    "presenterHideDisplayControls",
+    isHidden
+  )
+
+  document.documentElement.classList.toggle(
+    "presenterHideDisplayControls",
+    isHidden
+  )
 
   /* دعم أكواد CSS داخل ملفات الفقرات */
-  document.body.classList.toggle("segmentsControlsHidden", isHidden)
-  document.documentElement.classList.toggle("segmentsControlsHidden", isHidden)
+  document.body.classList.toggle(
+    "segmentsControlsHidden",
+    isHidden
+  )
+
+  document.documentElement.classList.toggle(
+    "segmentsControlsHidden",
+    isHidden
+  )
 
   const area = document.getElementById("segmentArea")
+
   if (!area) return
 
   const selectors = [
@@ -3932,26 +4642,14 @@ function applyPresenterHideDisplayControlsState() {
     ".top10Buttons",
 
     /* حرفلي */
-".letterliActionBar",
-"#letterliActionBar",
-".letterliControlsBar",
-"#letterliControlsBar",
-".letterliControlPanel",
-".letterliControls",
-".letterliActions",
-".letterliButtons",
-
-    /* فتبلة */
-    ".auctionControlsBar",
-    "#auctionControlsBar",
-    ".auctionActionBar",
-    "#auctionActionBar",
-    ".auctionControls",
-    ".auctionControlPanel",
-    ".auctionActions",
-    ".auctionButtons",
-    ".fatblaControls",
-    ".fatblaActions",
+    ".letterliActionBar",
+    "#letterliActionBar",
+    ".letterliControlsBar",
+    "#letterliControlsBar",
+    ".letterliControlPanel",
+    ".letterliControls",
+    ".letterliActions",
+    ".letterliButtons",
 
     /* من هو */
     ".whoControlsBar",
@@ -3993,18 +4691,40 @@ function applyPresenterHideDisplayControlsState() {
     ".archiveControlPanel",
     ".archiveControls",
     ".archiveActions",
-    ".archiveButtons"
+    ".archiveButtons",
+
+    /* التحدي وفتبلة داخل التحدي */
+    ".randomControlsBar",
+    "#randomControlsBar",
+    ".randomChallengeControls",
+    ".randomChallengeActionBar",
+    ".randomBoxControls",
+    ".randomBoxActions",
+    ".randomBoxActionBar",
+    ".randomChallengeButtons",
+    ".fatblaControls",
+    ".fatblaActions"
   ]
 
-  area.querySelectorAll(selectors.join(",")).forEach(el => {
-    if (isHidden) {
-      el.dataset.presenterHiddenDisplay = "1"
-      el.style.setProperty("display", "none", "important")
-    } else if (el.dataset.presenterHiddenDisplay === "1") {
-      el.style.removeProperty("display")
-      delete el.dataset.presenterHiddenDisplay
-    }
-  })
+  area
+    .querySelectorAll(selectors.join(","))
+    .forEach(el => {
+      if (isHidden) {
+        el.dataset.presenterHiddenDisplay = "1"
+
+        el.style.setProperty(
+          "display",
+          "none",
+          "important"
+        )
+      } else if (
+        el.dataset.presenterHiddenDisplay === "1"
+      ) {
+        el.style.removeProperty("display")
+
+        delete el.dataset.presenterHiddenDisplay
+      }
+    })
 }
 
 function toggleDisplayControlsFromScreen() {
@@ -4614,7 +5334,6 @@ function getRealSegmentScores(segmentKey) {
     s.letterli,
     "letterliState"
   )
-  const auction = unwrapResultState(s.auction, "auctionState")
   const who = unwrapResultState(s.who, "whoState")
   const explain =
   unwrapResultState(
@@ -4703,9 +5422,14 @@ function getRealSegmentScores(segmentKey) {
   }
 
     if (segmentKey === "randomChallenge") {
-    A = getResultScore(randomChallenge, "A")
-    B = getResultScore(randomChallenge, "B")
-  }
+  A = safeResultNumber(
+    randomChallenge.boxWins?.A ?? 0
+  )
+
+  B = safeResultNumber(
+    randomChallenge.boxWins?.B ?? 0
+  )
+}
 
   return { A, B }
 }
@@ -4881,7 +5605,12 @@ function updateFinalResultsUI() {
       "draw"
     )
 
-    overlay.classList.add(`resultsCount${Math.max(1, Math.min(rows.length, 10))}`)
+    overlay.classList.add(
+  `resultsCount${Math.max(
+    1,
+    Math.min(rows.length, 11)
+  )}`
+)
 
     if (winner.team === "A") overlay.classList.add("teamA")
     else if (winner.team === "B") overlay.classList.add("teamB")

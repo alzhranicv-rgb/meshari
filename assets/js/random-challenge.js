@@ -84,10 +84,7 @@ function createDefaultRandomChallengeState() {
   })
 
   return {
-    /*
-      موجودة للتوافق مع النسخ القديمة فقط.
-      نتيجة الفقرة الفعلية أصبحت عدد المربعات.
-    */
+
     scores: {
       A: 0,
       B: 0,
@@ -334,23 +331,33 @@ function calculateRandomChallengeBoxWins() {
     }
   })
 
-  randomChallengeState.boxWins = wins
+  randomChallengeState.boxWins = {
+    A: wins.A,
+    B: wins.B,
+  }
 
-  return wins
+  window.currentSegmentScores = {
+    A: wins.A,
+    B: wins.B,
+  }
+
+  return randomChallengeState.boxWins
 }
 
 function calculateRandomChallengeSegmentWinner() {
   const wins = calculateRandomChallengeBoxWins()
 
+  let winner = "draw"
+
   if (wins.A > wins.B) {
-    return "A"
+    winner = "A"
+  } else if (wins.B > wins.A) {
+    winner = "B"
   }
 
-  if (wins.B > wins.A) {
-    return "B"
-  }
+  randomChallengeState.segmentWinner = winner
 
-  return "draw"
+  return winner
 }
 
 function getRandomChallengeBoxWinnerText(number) {
@@ -1764,17 +1771,10 @@ function buildRandomChallengeHTML() {
 }
 
 function renderRandomChallengeScores() {
-  const currentBox = normalizeRandomChallengeBoxNumber(
-    randomChallengeState.currentBox,
-  )
+  const wins = calculateRandomChallengeBoxWins()
 
-  if (!currentBox) {
-    updateRandomChallengeWindowState()
-    return
-  }
-
-  const scoreA = getRandomChallengeTeamScore("A", currentBox)
-  const scoreB = getRandomChallengeTeamScore("B", currentBox)
+  const scoreA = Number(wins.A || 0)
+  const scoreB = Number(wins.B || 0)
 
   const scoreAElement = document.getElementById("randomScoreA")
   const scoreBElement = document.getElementById("randomScoreB")
@@ -5010,13 +5010,17 @@ function completeRandomBox5Number(isCorrect) {
     )
 
   const scoreA =
-    Number(box5.scoreA || 0)
+  Number(box5.scores?.A || 0)
 
-  const scoreB =
-    Number(box5.scoreB || 0)
+const scoreB =
+  Number(box5.scores?.B || 0)
 
-  const isFinalNumber =
-    currentNumber === total
+  const remainingNumbersCount =
+  total -
+  box5.openedNumbers.length
+
+const isFinalNumber =
+  remainingNumbersCount === 1
 
   const isTie =
     scoreA === scoreB
@@ -5026,13 +5030,20 @@ function completeRandomBox5Number(isCorrect) {
       ? 2
       : 1
 
-  if (selectedTeam === "A") {
-    box5.scoreA =
-      scoreA + points
-  } else {
-    box5.scoreB =
-      scoreB + points
+  if (!box5.scores || typeof box5.scores !== "object") {
+  box5.scores = {
+    A: 0,
+    B: 0,
   }
+}
+
+if (selectedTeam === "A") {
+  box5.scores.A =
+    scoreA + points
+} else {
+  box5.scores.B =
+    scoreB + points
+}
 
   if (
     !Array.isArray(box5.openedNumbers)
@@ -5709,7 +5720,8 @@ function finishRandomChallengeCurrentBox() {
   clearRandomChallengeTeamSelection()
 
   calculateRandomChallengeBoxWins()
-  checkRandomChallengeCompleted()
+calculateRandomChallengeSegmentWinner()
+checkRandomChallengeCompleted()
 
   renderRandomChallengeUI()
   saveRandomChallengeState()
@@ -6458,18 +6470,23 @@ function scoreRandomBox3Points(points) {
 }
 
 function checkRandomChallengeCompleted() {
-  const enabledCount = getRandomChallengeEnabledCount()
-  const completedCount = getRandomChallengeCompletedCount()
+  const enabledCount =
+    getRandomChallengeEnabledCount()
+
+  const completedCount =
+    getRandomChallengeCompletedCount()
 
   randomChallengeState.completed =
     enabledCount > 0 &&
-    completedCount === enabledCount
+    completedCount >= enabledCount
 
   calculateRandomChallengeBoxWins()
 
   if (randomChallengeState.completed) {
+    calculateRandomChallengeSegmentWinner()
+  } else {
     randomChallengeState.segmentWinner =
-      calculateRandomChallengeSegmentWinner()
+      null
   }
 
   return randomChallengeState.completed
