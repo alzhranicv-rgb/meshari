@@ -1,0 +1,2056 @@
+/* =========================================================
+   FINAL ADMIN / إدارة فقرات الفاصلة
+   CLEAN PROFESSIONAL DESIGN
+
+   Includes:
+   1) ٮدوں ٮڡاط
+   2) صح صحلي
+   3) قصة
+   4) التركيز
+
+   File:
+   assets/css/segments/admin/final-admin.css
+========================================================= */
+
+/* =========================
+   1) ROOT
+========================= */
+
+.finalAdminShell{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+  gap:16px;
+
+  align-content:start;
+}
+
+.cleanFinalAdminShell{
+  position:relative;
+}
+
+/* =========================
+   2) TOP BAR
+========================= */
+
+.finalAdminShell
+.adminEditorTopBar{
+  position:sticky;
+  top:112px;
+  z-index:20;
+
+  margin:0;
+
+  border-color:
+    rgba(35,61,77,.20);
+
+  background:
+    rgba(255,255,255,.97);
+
+  box-shadow:
+    0 14px 34px
+    rgba(35,61,77,.08);
+}
+
+.finalAdminShell
+.adminSectionTitle{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+
+.finalAdminShell
+.adminSectionTitle::before{
+  content:"ف";
+
+  width:46px;
+  height:46px;
+
+  flex:0 0 auto;
+
+  border-radius:15px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.4rem;
+  line-height:1;
+
+  box-shadow:
+    0 9px 20px
+    rgba(35,61,77,.22);
+}
+
+.finalAdminShell
+.adminInlineActions{
+  align-items:center;
+}
+
+.finalAdminShell
+.adminSaveBtn,
+.finalAdminShell
+.adminDeleteAllBtn{
+  min-width:145px;
+}
+
+/* =========================
+   3) SHARED FINAL GRIDS
+========================= */
+
+.finalRound1OnePageGrid,
+.finalRound2OnePageGrid,
+.finalStoryOnePageGrid,
+.finalFocusOnePageGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:14px;
+
+  align-items:start;
+}
+
+.finalRound1OnePageGrid.hasOpenCard,
+.finalRound2OnePageGrid.hasOpenCard,
+.finalStoryOnePageGrid.hasOpenCard,
+.finalFocusOnePageGrid.hasOpenCard,
+.finalRound1OnePageGrid:has(
+  .finalRound1OnePageCard[open]
+),
+.finalRound2OnePageGrid:has(
+  .finalRound2OnePageCard[open]
+),
+.finalStoryOnePageGrid:has(
+  .finalStoryOnePageCard[open]
+),
+.finalFocusOnePageGrid:has(
+  .finalFocusOnePageCard[open]
+){
+  grid-template-columns:1fr;
+}
+
+/* =========================
+   4) SHARED FINAL CARDS
+========================= */
+
+.finalRound1OnePageCard,
+.finalRound2OnePageCard,
+.finalStoryOnePageCard,
+.finalFocusOnePageCard{
+  position:relative;
+
+  min-width:0;
+
+  scroll-margin-top:220px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 10px 28px
+    rgba(35,61,77,.07);
+
+  overflow:hidden;
+
+  transition:
+    transform .18s var(--admin-ease),
+    border-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease);
+}
+
+.finalRound1OnePageCard::before,
+.finalRound2OnePageCard::before,
+.finalStoryOnePageCard::before,
+.finalFocusOnePageCard::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  z-index:2;
+
+  width:5px;
+
+  opacity:.54;
+
+  background:
+    var(--admin-primary);
+
+  transition:
+    width .18s var(--admin-ease),
+    opacity .18s var(--admin-ease);
+}
+
+.finalRound1OnePageCard:hover,
+.finalRound2OnePageCard:hover,
+.finalStoryOnePageCard:hover,
+.finalFocusOnePageCard:hover{
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(254,127,45,.34);
+
+  box-shadow:
+    0 17px 38px
+    rgba(35,61,77,.11);
+}
+
+.finalRound1OnePageCard:hover::before,
+.finalRound2OnePageCard:hover::before,
+.finalStoryOnePageCard:hover::before,
+.finalFocusOnePageCard:hover::before,
+.finalRound1OnePageCard[open]::before,
+.finalRound2OnePageCard[open]::before,
+.finalStoryOnePageCard[open]::before,
+.finalFocusOnePageCard[open]::before{
+  width:7px;
+  opacity:1;
+}
+
+.finalRound1OnePageCard.isDone,
+.finalRound2OnePageCard.isDone,
+.finalStoryOnePageCard.isDone,
+.finalFocusOnePageCard.isDone{
+  border-color:
+    rgba(0,127,0,.26);
+}
+
+.finalRound1OnePageCard.isDone::before,
+.finalRound2OnePageCard.isDone::before,
+.finalStoryOnePageCard.isDone::before,
+.finalFocusOnePageCard.isDone::before{
+  background:
+    var(--admin-green);
+}
+
+.finalRound1OnePageCard[open],
+.finalRound2OnePageCard[open],
+.finalStoryOnePageCard[open],
+.finalFocusOnePageCard[open]{
+  grid-column:1 / -1;
+
+  transform:none;
+
+  border-color:
+    rgba(254,127,45,.40);
+
+  box-shadow:
+    0 23px 54px
+    rgba(35,61,77,.13);
+}
+
+/* =========================
+   5) SHARED SUMMARY
+========================= */
+
+.finalRound1OnePageCard > summary,
+.finalRound2OnePageCard > summary,
+.finalStoryOnePageCard > summary,
+.finalFocusOnePageCard > summary{
+  min-height:96px;
+
+  list-style:none;
+  cursor:pointer;
+
+  padding:
+    15px
+    18px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    auto
+    auto;
+
+  align-items:center;
+
+  gap:12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #FAFBFC 100%
+    );
+
+  user-select:none;
+}
+
+.finalRound1OnePageCard
+> summary::-webkit-details-marker,
+.finalRound2OnePageCard
+> summary::-webkit-details-marker,
+.finalStoryOnePageCard
+> summary::-webkit-details-marker,
+.finalFocusOnePageCard
+> summary::-webkit-details-marker{
+  display:none;
+}
+
+.finalRound1OnePageCard > summary:hover,
+.finalRound2OnePageCard > summary:hover,
+.finalStoryOnePageCard > summary:hover,
+.finalFocusOnePageCard > summary:hover{
+  background:
+    var(--admin-primary-soft);
+}
+
+.finalRound1OnePageCard[open] > summary,
+.finalRound2OnePageCard[open] > summary,
+.finalStoryOnePageCard[open] > summary,
+.finalFocusOnePageCard[open] > summary{
+  border-bottom:
+    1px solid var(--admin-line);
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      var(--admin-primary-soft) 100%
+    );
+}
+
+/* =========================
+   6) SUMMARY TITLE
+========================= */
+
+.finalAdminShell
+.adminEditItemTitle{
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    48px
+    minmax(0,1fr);
+
+  align-items:center;
+
+  gap:11px;
+}
+
+.finalAdminShell
+.adminEditItemTitle::before{
+  content:"";
+
+  grid-column:1;
+  grid-row:1 / span 2;
+
+  width:48px;
+  height:48px;
+
+  border-radius:15px;
+
+  background:
+    var(--admin-secondary);
+
+  box-shadow:
+    0 8px 18px
+    rgba(35,61,77,.18);
+}
+
+.finalAdminShell
+.adminEditItemTitle::after{
+  content:"";
+
+  grid-column:1;
+  grid-row:1 / span 2;
+
+  z-index:1;
+
+  width:48px;
+  height:48px;
+
+  color:#FFFFFF;
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.2rem;
+  line-height:1;
+}
+
+.finalRound1OnePageCard
+.adminEditItemTitle::after{
+  content:"ب";
+}
+
+.finalRound2OnePageCard
+.adminEditItemTitle::after{
+  content:"ص";
+}
+
+.finalStoryOnePageCard
+.adminEditItemTitle::after{
+  content:"ق";
+}
+
+.finalFocusOnePageCard
+.adminEditItemTitle::after{
+  content:"ت";
+}
+
+.finalAdminShell
+.isDone
+.adminEditItemTitle::before{
+  background:
+    var(--admin-green);
+}
+
+.finalAdminShell
+.adminEditItemTitle strong{
+  grid-column:2;
+
+  min-width:0;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:
+    clamp(1rem,2vw,1.18rem);
+
+  line-height:1.35;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.finalAdminShell
+.adminEditItemTitle span{
+  grid-column:2;
+
+  min-width:0;
+
+  color:
+    var(--admin-muted);
+
+  font-size:.84rem;
+  line-height:1.4;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.finalAdminShell
+.isDone
+.adminEditItemTitle span{
+  color:
+    var(--admin-green);
+}
+
+.finalAdminShell
+.isMissing
+.adminEditItemTitle span{
+  color:
+    var(--admin-red);
+}
+
+/* =========================
+   7) SUMMARY META
+========================= */
+
+.finalAdminShell
+.adminEditItemMeta{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+
+  gap:7px;
+}
+
+.finalAdminShell
+.adminEditStatusPill,
+.finalAdminShell
+.adminEditProgressPill{
+  min-width:60px;
+}
+
+.finalRound1SummaryDeleteBtn,
+.finalRound2SummaryDeleteBtn,
+.finalStorySummaryDeleteBtn,
+.finalFocusSummaryDeleteBtn{
+  min-width:62px;
+  min-height:36px;
+
+  padding:
+    7px
+    11px;
+
+  border-radius:10px;
+
+  font-size:.82rem;
+}
+
+/* =========================
+   8) SUMMARY OPEN ICON
+========================= */
+
+.finalRound1OnePageCard > summary::after,
+.finalRound2OnePageCard > summary::after,
+.finalStoryOnePageCard > summary::after,
+.finalFocusOnePageCard > summary::after{
+  content:"⌄";
+
+  width:34px;
+  height:34px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:11px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-size:1.05rem;
+
+  transition:
+    transform .18s var(--admin-ease),
+    color .18s var(--admin-ease),
+    background-color .18s var(--admin-ease),
+    border-color .18s var(--admin-ease);
+}
+
+.finalRound1OnePageCard[open]
+> summary::after,
+.finalRound2OnePageCard[open]
+> summary::after,
+.finalStoryOnePageCard[open]
+> summary::after,
+.finalFocusOnePageCard[open]
+> summary::after{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-secondary);
+
+  transform:
+    rotate(180deg);
+}
+
+/* =========================
+   9) SHARED CARD BODY
+========================= */
+
+.finalAdminShell
+.adminEditItemBody{
+  padding:
+    clamp(16px,2.3vw,24px);
+
+  background:#FFFFFF;
+}
+
+.finalAdminShell
+.adminEditItemCard[open]
+.adminEditItemBody{
+  animation:
+    finalAdminOpen
+    .22s
+    var(--admin-ease);
+}
+
+@keyframes finalAdminOpen{
+  from{
+    opacity:0;
+    transform:translateY(-6px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================
+   10) SHARED FIELDS
+========================= */
+
+.finalAdminShell
+.adminField{
+  min-width:0;
+
+  display:grid;
+  gap:8px;
+}
+
+.finalAdminShell
+.adminField label{
+  color:
+    var(--admin-secondary);
+
+  font-size:.9rem;
+  line-height:1.4;
+}
+
+.finalAdminShell
+.adminField input:not([type="file"]),
+.finalAdminShell
+.adminField textarea{
+  width:100%;
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-text);
+
+  background:#FFFFFF;
+
+  padding:
+    12px
+    15px;
+
+  line-height:1.55;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.finalAdminShell
+.adminField input:not([type="file"]){
+  min-height:54px;
+}
+
+.finalAdminShell
+.adminField textarea{
+  min-height:130px;
+  max-height:360px;
+
+  resize:vertical;
+}
+
+.finalAdminShell
+.adminField input:focus,
+.finalAdminShell
+.adminField textarea:focus{
+  outline:0;
+
+  border-color:
+    var(--admin-primary);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.12);
+}
+
+.finalAdminShell
+.adminField:not(.adminMissingField)
+:is(input,textarea){
+  border-color:
+    rgba(0,127,0,.18);
+}
+
+.finalAdminShell
+.adminField.adminMissingField{
+  border-radius:
+    var(--admin-radius-sm);
+}
+
+.finalAdminShell
+.adminField.adminMissingField
+:is(input,textarea){
+  border-color:
+    rgba(127,0,0,.30);
+
+  background:#FFF9F9;
+}
+
+.finalAdminShell
+.adminMissingHint{
+  border:
+    1px solid
+    rgba(127,0,0,.12);
+
+  border-radius:10px;
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  padding:
+    7px
+    10px;
+
+  font-size:.82rem;
+  line-height:1.4;
+}
+
+/* =========================================================
+   ROUND 1 / ٮدوں ٮڡاط
+========================================================= */
+
+/* =========================
+   11) ROUND 1 LAYOUT
+========================= */
+
+.finalRound1OnePageLayout{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:14px;
+}
+
+.finalRound1OnePageLayout
+.adminField{
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:14px;
+}
+
+.finalRound1OnePageLayout
+.adminField:first-child::before{
+  content:"السؤال المعروض بدون نقط";
+
+  color:
+    var(--admin-muted);
+
+  font-size:.8rem;
+}
+
+.finalRound1OnePageLayout
+.adminField:last-child::before{
+  content:"الإجابة الصحيحة";
+
+  color:
+    var(--admin-muted);
+
+  font-size:.8rem;
+}
+
+.finalRound1OnePageLayout
+textarea{
+  min-height:180px;
+}
+
+.finalRound1OnePageCard.isDone
+.finalRound1OnePageLayout
+.adminField{
+  border-color:
+    rgba(0,127,0,.20);
+}
+
+/* =========================================================
+   ROUND 2 / صح صحلي
+========================================================= */
+
+/* =========================
+   12) ROUND 2 MAIN CARD
+========================= */
+
+.finalRound2OnePageCard
+> .adminEditItemBody{
+  padding:
+    clamp(14px,2vw,22px);
+}
+
+/* =========================
+   13) SCRAMBLE GRID
+========================= */
+
+.finalRound2ScrambleOnePageGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:12px;
+}
+
+.finalRound2ScrambleItemCard{
+  position:relative;
+
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:14px;
+
+  display:grid;
+
+  grid-template-columns:
+    46px
+    minmax(0,1fr);
+
+  gap:11px;
+
+  align-items:start;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    transform .16s var(--admin-ease);
+}
+
+.finalRound2ScrambleItemCard:hover{
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(254,127,45,.32);
+
+  box-shadow:
+    0 12px 26px
+    rgba(35,61,77,.08);
+}
+
+.finalRound2CompactIndex{
+  width:46px;
+  height:46px;
+
+  grid-row:1 / span 2;
+
+  border-radius:14px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "MolhimCustom",
+    "HanakaText",
+    sans-serif;
+
+  font-size:1.05rem;
+
+  box-shadow:
+    0 7px 16px
+    rgba(35,61,77,.17);
+}
+
+.finalRound2ScrambleItemCard
+.adminField{
+  grid-column:2;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:#FFFFFF;
+
+  padding:10px;
+}
+
+/* =========================
+   14) SEQUENCE GRID
+========================= */
+
+.finalRound2SequenceOnePageGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:11px;
+}
+
+.finalRound2SequenceItemCard{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:
+    var(--admin-soft);
+
+  padding:10px;
+
+  display:grid;
+
+  grid-template-columns:
+    46px
+    minmax(0,1fr);
+
+  gap:9px;
+
+  align-items:center;
+}
+
+.finalRound2SequenceItemCard
+.finalRound2CompactIndex{
+  grid-row:auto;
+}
+
+.finalRound2SequenceItemCard input{
+  width:100%;
+  min-width:0;
+  min-height:50px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:12px;
+
+  color:
+    var(--admin-text);
+
+  background:#FFFFFF;
+
+  padding:
+    10px
+    13px;
+}
+
+.finalRound2SequenceItemCard
+input:focus{
+  outline:0;
+
+  border-color:
+    var(--admin-primary);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.11);
+}
+
+.finalRound2SequenceItemCard
+input.adminMissingField{
+  border-color:
+    rgba(127,0,0,.30);
+
+  background:#FFF9F9;
+}
+
+/* =========================
+   15) IMAGE NUMBERS GRID
+========================= */
+
+.finalRound2ImageOnePageGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:13px;
+
+  align-items:start;
+}
+
+.finalRound2ImageItemCard{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:13px;
+
+  display:grid;
+  gap:11px;
+
+  box-shadow:
+    0 8px 20px
+    rgba(35,61,77,.05);
+}
+
+.finalRound2ImageLineTitle{
+  min-height:42px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:10px;
+
+  border-bottom:
+    1px solid var(--admin-line);
+
+  padding-bottom:10px;
+}
+
+.finalRound2ImageLineTitle span{
+  color:
+    var(--admin-muted);
+
+  font-size:.86rem;
+}
+
+.finalRound2ImageLineTitle strong{
+  width:38px;
+  height:38px;
+
+  border-radius:12px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "MolhimCustom",
+    sans-serif;
+}
+
+/* =========================
+   16) IMAGE PREVIEW
+========================= */
+
+.finalAdminImagePreview{
+  position:relative;
+
+  width:100%;
+  min-height:240px;
+  height:300px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      #F1F3F5,
+      #E7ECEF
+    );
+
+  display:grid;
+  place-items:center;
+}
+
+.finalAdminImagePreview
+.previewImg{
+  width:100%;
+  height:100%;
+
+  max-height:none;
+
+  object-fit:contain;
+  object-position:center;
+
+  background:#EEF1F3;
+}
+
+.finalAdminImagePreview
+.emptyImageHint{
+  width:100%;
+  height:100%;
+
+  display:grid;
+  place-items:center;
+
+  color:
+    var(--admin-muted);
+
+  padding:24px;
+
+  text-align:center;
+}
+
+/* =========================================================
+   ROUND 3 / قصة
+========================================================= */
+
+/* =========================
+   17) STORY LAYOUT
+========================= */
+
+.finalStoryOnePageLayout{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:13px;
+}
+
+.finalStoryOnePageLayout
+.adminField{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:14px;
+}
+
+.finalStoryOnePageLayout
+.adminField textarea{
+  min-height:160px;
+}
+
+.finalStoryAnswerBox{
+  grid-column:1 / -1;
+
+  border-color:
+    rgba(254,127,45,.28) !important;
+
+  background:
+    var(--admin-primary-soft) !important;
+}
+
+.finalStoryAnswerBox textarea{
+  min-height:130px !important;
+
+  background:#FFFFFF !important;
+}
+
+.finalStoryAnswerBox label{
+  color:
+    var(--admin-primary) !important;
+}
+
+/* =========================
+   18) STORY PART NUMBERS
+========================= */
+
+.finalStoryOnePageLayout
+.adminField:nth-child(1)::before{
+  content:"1";
+
+  color:#FFFFFF;
+  background:
+    var(--admin-secondary);
+}
+
+.finalStoryOnePageLayout
+.adminField:nth-child(2)::before{
+  content:"2";
+
+  color:#FFFFFF;
+  background:
+    var(--admin-secondary);
+}
+
+.finalStoryOnePageLayout
+.adminField:nth-child(3)::before{
+  content:"3";
+
+  color:#FFFFFF;
+  background:
+    var(--admin-secondary);
+}
+
+.finalStoryOnePageLayout
+.adminField:nth-child(-n+3)::before{
+  width:32px;
+  height:32px;
+
+  margin-bottom:3px;
+
+  border-radius:10px;
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "MolhimCustom",
+    sans-serif;
+
+  font-size:.9rem;
+}
+
+/* =========================================================
+   ROUND 4 / التركيز
+========================================================= */
+
+/* =========================
+   19) FOCUS LAYOUT
+========================= */
+
+.finalFocusOnePageLayout{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(330px,.85fr)
+    minmax(380px,1.15fr);
+
+  gap:18px;
+
+  align-items:stretch;
+}
+
+/* =========================
+   20) MEDIA BOX
+========================= */
+
+.finalFocusMediaBox{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:14px;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:11px;
+}
+
+.finalFocusMediaBox
+.adminField{
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:#FFFFFF;
+
+  padding:11px;
+}
+
+.finalFocusMediaBox
+.adminField.adminMissingField{
+  border-color:
+    rgba(127,0,0,.22);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.finalFocusMediaBox
+input[type="file"]{
+  min-height:54px;
+}
+
+.adminFieldHelp{
+  display:block;
+
+  color:
+    var(--admin-muted);
+
+  font-size:.78rem;
+  line-height:1.5;
+}
+
+/* =========================
+   21) FOCUS PREVIEW
+========================= */
+
+.finalAdminPreviewBox{
+  position:relative;
+
+  width:100%;
+
+  min-height:360px;
+  height:min(44vw,500px);
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      #F1F3F5,
+      #E6EBEE
+    );
+
+  display:grid;
+  place-items:center;
+}
+
+.finalAdminPreviewBox::before{
+  content:"معاينة الوسائط";
+
+  position:absolute;
+  z-index:2;
+
+  top:10px;
+  right:10px;
+
+  border:
+    1px solid
+    rgba(35,61,77,.14);
+
+  border-radius:999px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    rgba(255,255,255,.92);
+
+  padding:
+    6px
+    10px;
+
+  font-size:.75rem;
+
+  pointer-events:none;
+}
+
+.finalAdminPreviewBox
+.previewImg{
+  width:100%;
+  height:100%;
+
+  max-height:none;
+
+  object-fit:contain;
+  object-position:center;
+
+  background:#EEF1F3;
+}
+
+.finalAdminPreviewBox video.previewImg{
+  background:#151515;
+}
+
+.finalAdminPreviewBox
+.emptyImageHint{
+  width:100%;
+  height:100%;
+
+  display:grid;
+  place-items:center;
+
+  color:
+    var(--admin-muted);
+
+  padding:30px;
+
+  text-align:center;
+}
+
+/* =========================
+   22) FOCUS TEXT BOX
+========================= */
+
+.finalFocusTextBox{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:#FFFFFF;
+
+  padding:
+    clamp(16px,2vw,22px);
+
+  display:flex;
+  flex-direction:column;
+
+  gap:14px;
+}
+
+.finalFocusTextBox::before{
+  content:"السؤال والإجابة";
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.05rem;
+
+  padding-bottom:12px;
+
+  border-bottom:
+    1px solid #EDF0F2;
+}
+
+.finalFocusTextBox
+.adminField{
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:
+    var(--admin-soft);
+
+  padding:12px;
+}
+
+.finalFocusTextBox
+.adminField textarea{
+  min-height:170px;
+
+  background:#FFFFFF;
+}
+
+.finalFocusTextBox
+.adminField:not(.adminMissingField){
+  border-color:
+    rgba(0,127,0,.20);
+}
+
+.finalFocusTextBox
+.adminField.adminMissingField{
+  border-color:
+    rgba(127,0,0,.20);
+
+  background:
+    var(--admin-red-soft);
+}
+
+/* =========================
+   23) OLD FINAL COMPATIBILITY
+========================= */
+
+.finalAdminRound3Wrap{
+  width:100%;
+
+  display:grid;
+  gap:14px;
+}
+
+.finalAdminCard{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:#FFFFFF;
+
+  padding:16px;
+}
+
+.finalAdminWideCard{
+  width:100%;
+}
+
+.finalAdminCardHead{
+  margin-bottom:14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:12px;
+}
+
+.finalAdminCardHead h3{
+  margin:0;
+
+  color:
+    var(--admin-secondary);
+}
+
+.finalAdminImageRow{
+  border-top:
+    1px solid var(--admin-line);
+
+  padding:
+    14px 0;
+
+  display:grid;
+
+  grid-template-columns:
+    90px
+    minmax(0,1fr)
+    minmax(180px,280px);
+
+  gap:12px;
+
+  align-items:center;
+}
+
+.finalAdminWordIndex{
+  color:
+    var(--admin-secondary);
+}
+
+.finalAdminImageFields{
+  min-width:0;
+
+  display:grid;
+  gap:9px;
+}
+
+/* =========================
+   24) COMPLETE STATES
+========================= */
+
+.finalRound1OnePageCard.isDone
+.finalRound1OnePageLayout,
+.finalRound2OnePageCard.isDone
+:is(
+  .finalRound2ScrambleItemCard,
+  .finalRound2SequenceItemCard,
+  .finalRound2ImageItemCard
+),
+.finalStoryOnePageCard.isDone
+.finalStoryOnePageLayout,
+.finalFocusOnePageCard.isDone
+:is(
+  .finalFocusMediaBox,
+  .finalFocusTextBox
+){
+  border-color:
+    rgba(0,127,0,.22);
+}
+
+/* =========================
+   25) SAVING STATE
+========================= */
+
+.adminIsSaving
+.finalAdminShell{
+  pointer-events:none;
+}
+
+.adminIsSaving
+.finalAdminShell
+.adminEditorTopBar{
+  pointer-events:auto;
+}
+
+.adminIsSaving
+.finalAdminShell
+.adminEditItemCard{
+  opacity:.72;
+}
+
+/* =========================
+   26) LARGE SCREENS
+========================= */
+
+@media (min-width:1500px){
+
+  .finalRound1OnePageGrid,
+  .finalStoryOnePageGrid,
+  .finalFocusOnePageGrid{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+
+  .finalRound1OnePageGrid.hasOpenCard,
+  .finalStoryOnePageGrid.hasOpenCard,
+  .finalFocusOnePageGrid.hasOpenCard,
+  .finalRound1OnePageGrid:has(
+    .finalRound1OnePageCard[open]
+  ),
+  .finalStoryOnePageGrid:has(
+    .finalStoryOnePageCard[open]
+  ),
+  .finalFocusOnePageGrid:has(
+    .finalFocusOnePageCard[open]
+  ){
+    grid-template-columns:1fr;
+  }
+
+  .finalRound2OnePageGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .finalFocusOnePageLayout{
+    grid-template-columns:
+      minmax(420px,.8fr)
+      minmax(520px,1.2fr);
+
+    gap:22px;
+  }
+
+  .finalAdminPreviewBox{
+    height:520px;
+  }
+
+  .finalRound2ImageOnePageGrid{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+}
+
+/* =========================
+   27) LAPTOP
+========================= */
+
+@media (max-width:1180px){
+
+  .finalAdminShell
+  .adminEditorTopBar{
+    top:148px;
+  }
+
+  .finalFocusOnePageLayout{
+    grid-template-columns:
+      minmax(290px,.9fr)
+      minmax(340px,1.1fr);
+  }
+
+  .finalAdminPreviewBox{
+    min-height:320px;
+    height:420px;
+  }
+
+  .finalRound2ScrambleOnePageGrid,
+  .finalRound2SequenceOnePageGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+}
+
+/* =========================
+   28) TABLET
+========================= */
+
+@media (max-width:900px){
+
+  .finalAdminShell
+  .adminEditorTopBar{
+    position:relative;
+    top:auto;
+  }
+
+  .finalRound1OnePageGrid,
+  .finalRound2OnePageGrid,
+  .finalStoryOnePageGrid,
+  .finalFocusOnePageGrid{
+    grid-template-columns:1fr;
+  }
+
+  .finalRound1OnePageCard,
+  .finalRound2OnePageCard,
+  .finalStoryOnePageCard,
+  .finalFocusOnePageCard{
+    scroll-margin-top:24px;
+  }
+
+  .finalFocusOnePageLayout{
+    grid-template-columns:1fr;
+  }
+
+  .finalAdminPreviewBox{
+    min-height:360px;
+    height:min(62vw,500px);
+  }
+
+  .finalRound2ImageOnePageGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+}
+
+/* =========================
+   29) SMALL TABLET
+========================= */
+
+@media (max-width:760px){
+
+  .finalRound1OnePageLayout,
+  .finalStoryOnePageLayout{
+    grid-template-columns:1fr;
+  }
+
+  .finalStoryAnswerBox{
+    grid-column:auto;
+  }
+
+  .finalRound2ScrambleOnePageGrid,
+  .finalRound2SequenceOnePageGrid,
+  .finalRound2ImageOnePageGrid{
+    grid-template-columns:1fr;
+  }
+
+  .finalAdminImageRow{
+    grid-template-columns:1fr;
+  }
+
+  .finalAdminPreviewBox{
+    min-height:300px;
+    height:380px;
+  }
+}
+
+/* =========================
+   30) MOBILE
+========================= */
+
+@media (max-width:620px){
+
+  .finalAdminShell{
+    gap:10px;
+  }
+
+  .finalAdminShell
+  .adminEditorTopBar{
+    padding:12px;
+  }
+
+  .finalAdminShell
+  .adminSectionTitle{
+    width:100%;
+
+    justify-content:center;
+  }
+
+  .finalAdminShell
+  .adminInlineActions{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .finalAdminShell
+  .adminSaveBtn,
+  .finalAdminShell
+  .adminDeleteAllBtn{
+    width:100%;
+    min-width:0;
+  }
+
+  .finalRound1OnePageGrid,
+  .finalRound2OnePageGrid,
+  .finalStoryOnePageGrid,
+  .finalFocusOnePageGrid{
+    gap:10px;
+  }
+
+  .finalRound1OnePageCard > summary,
+  .finalRound2OnePageCard > summary,
+  .finalStoryOnePageCard > summary,
+  .finalFocusOnePageCard > summary{
+    min-height:90px;
+
+    padding:
+      12px
+      14px;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      auto;
+  }
+
+  .finalAdminShell
+  .adminEditItemTitle{
+    grid-template-columns:
+      42px
+      minmax(0,1fr);
+  }
+
+  .finalAdminShell
+  .adminEditItemTitle::before,
+  .finalAdminShell
+  .adminEditItemTitle::after{
+    width:42px;
+    height:42px;
+
+    border-radius:13px;
+  }
+
+  .finalAdminShell
+  .adminEditItemMeta{
+    grid-column:1 / -1;
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr auto;
+
+    order:3;
+  }
+
+  .finalAdminShell
+  .adminEditStatusPill,
+  .finalAdminShell
+  .adminEditProgressPill{
+    width:100%;
+  }
+
+  .finalRound1OnePageCard > summary::after,
+  .finalRound2OnePageCard > summary::after,
+  .finalStoryOnePageCard > summary::after,
+  .finalFocusOnePageCard > summary::after{
+    grid-column:2;
+    grid-row:1;
+
+    width:32px;
+    height:32px;
+  }
+
+  .finalAdminShell
+  .adminEditItemBody{
+    padding:12px;
+  }
+
+  .finalRound1OnePageLayout,
+  .finalStoryOnePageLayout,
+  .finalFocusOnePageLayout{
+    gap:11px;
+  }
+
+  .finalRound1OnePageLayout
+  .adminField,
+  .finalStoryOnePageLayout
+  .adminField,
+  .finalFocusMediaBox,
+  .finalFocusTextBox{
+    padding:11px;
+  }
+
+  .finalRound1OnePageLayout textarea,
+  .finalStoryOnePageLayout
+  .adminField textarea,
+  .finalFocusTextBox
+  .adminField textarea{
+    min-height:130px;
+  }
+
+  .finalRound2ScrambleItemCard{
+    grid-template-columns:
+      40px
+      minmax(0,1fr);
+
+    padding:10px;
+  }
+
+  .finalRound2SequenceItemCard{
+    grid-template-columns:
+      40px
+      minmax(0,1fr);
+  }
+
+  .finalRound2CompactIndex{
+    width:40px;
+    height:40px;
+
+    border-radius:12px;
+  }
+
+  .finalRound2ImageItemCard{
+    padding:10px;
+  }
+
+  .finalAdminImagePreview{
+    min-height:220px;
+    height:270px;
+  }
+
+  .finalAdminPreviewBox{
+    min-height:250px;
+    height:min(94vw,390px);
+  }
+}
+
+/* =========================
+   31) SMALL MOBILE
+========================= */
+
+@media (max-width:430px){
+
+  .finalAdminShell
+  .adminInlineActions{
+    grid-template-columns:1fr;
+  }
+
+  .finalAdminShell
+  .adminEditItemMeta{
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+  .finalRound1SummaryDeleteBtn,
+  .finalRound2SummaryDeleteBtn,
+  .finalStorySummaryDeleteBtn,
+  .finalFocusSummaryDeleteBtn{
+    grid-column:1 / -1;
+
+    width:100%;
+  }
+
+  .finalAdminShell
+  .adminEditItemTitle strong,
+  .finalAdminShell
+  .adminEditItemTitle span{
+    white-space:normal;
+  }
+
+  .finalAdminShell
+  .adminEditItemTitle span{
+    display:-webkit-box;
+
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    line-clamp:2;
+
+    overflow:hidden;
+  }
+
+  .finalRound2ScrambleItemCard{
+    grid-template-columns:1fr;
+  }
+
+  .finalRound2ScrambleItemCard
+  .finalRound2CompactIndex{
+    grid-row:auto;
+  }
+
+  .finalRound2ScrambleItemCard
+  .adminField{
+    grid-column:auto;
+  }
+
+  .finalRound2SequenceItemCard{
+    grid-template-columns:
+      38px
+      minmax(0,1fr);
+  }
+
+  .finalAdminPreviewBox{
+    min-height:220px;
+    height:290px;
+  }
+}
+
+/* =========================
+   32) FALLBACK
+========================= */
+
+@supports not selector(:has(*)){
+
+  .finalRound1OnePageGrid,
+  .finalRound2OnePageGrid,
+  .finalStoryOnePageGrid,
+  .finalFocusOnePageGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .finalRound1OnePageGrid.hasOpenCard,
+  .finalRound2OnePageGrid.hasOpenCard,
+  .finalStoryOnePageGrid.hasOpenCard,
+  .finalFocusOnePageGrid.hasOpenCard{
+    grid-template-columns:1fr;
+  }
+
+  .finalRound1OnePageCard[open],
+  .finalRound2OnePageCard[open],
+  .finalStoryOnePageCard[open],
+  .finalFocusOnePageCard[open]{
+    grid-column:1 / -1;
+  }
+
+  @media (max-width:900px){
+
+    .finalRound1OnePageGrid,
+    .finalRound2OnePageGrid,
+    .finalStoryOnePageGrid,
+    .finalFocusOnePageGrid{
+      grid-template-columns:1fr;
+    }
+  }
+}

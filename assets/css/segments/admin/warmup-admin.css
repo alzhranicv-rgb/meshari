@@ -1,0 +1,1029 @@
+/* =========================================================
+   WARMUP ADMIN / إدارة فقرة التسخين
+   CLEAN PROFESSIONAL DESIGN
+
+   File:
+   assets/css/segments/admin/warmup-admin.css
+========================================================= */
+
+/* =========================
+   1) WARMUP ROOT
+========================= */
+
+.warmupAdminShell{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+  gap:16px;
+}
+
+.compactWarmupAdminShell{
+  align-content:start;
+}
+
+/* =========================
+   2) TOP BAR
+========================= */
+
+.warmupAdminShell
+.adminEditorTopBar{
+  position:sticky;
+  top:112px;
+  z-index:20;
+
+  margin:0;
+
+  border-color:
+    rgba(254,127,45,.24);
+
+  background:
+    rgba(255,255,255,.97);
+
+  box-shadow:
+    0 14px 34px
+    rgba(35,61,77,.08);
+}
+
+.warmupAdminShell
+.adminSectionTitle{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+
+.warmupAdminShell
+.adminSectionTitle::before{
+  content:"";
+
+  width:12px;
+  height:38px;
+
+  flex:0 0 auto;
+
+  border-radius:999px;
+
+  background:
+    var(--admin-primary);
+
+  box-shadow:
+    0 7px 18px
+    rgba(254,127,45,.24);
+}
+
+.warmupAdminShell
+.adminInlineActions{
+  align-items:center;
+}
+
+.warmupAdminShell
+.adminSaveBtn,
+.warmupAdminShell
+.adminDeleteAllBtn{
+  min-width:120px;
+}
+
+/* =========================
+   3) CATEGORIES GRID
+========================= */
+
+.warmupOnePageGrid{
+  width:100%;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:14px;
+
+  align-items:start;
+}
+
+.warmupOnePageGrid.hasOpenCard{
+  grid-template-columns:1fr;
+}
+
+/* =========================
+   4) CATEGORY CARD
+========================= */
+
+.warmupCategoryOnePageCard{
+  position:relative;
+
+  min-width:0;
+
+  scroll-margin-top:220px;
+
+  border-color:
+    var(--admin-line);
+
+  background:
+    var(--admin-surface);
+}
+
+.warmupCategoryOnePageCard::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  width:5px;
+
+  z-index:2;
+
+  opacity:.42;
+
+  background:
+    var(--admin-primary);
+
+  transition:
+    opacity .18s var(--admin-ease),
+    width .18s var(--admin-ease);
+}
+
+.warmupCategoryOnePageCard:hover::before,
+.warmupCategoryOnePageCard[open]::before{
+  width:7px;
+  opacity:1;
+}
+
+.warmupCategoryOnePageCard.isDone::before{
+  background:
+    var(--admin-green);
+}
+
+.warmupCategoryOnePageCard.isMissing::before{
+  background:
+    var(--admin-primary);
+}
+
+.warmupCategoryOnePageCard[open]{
+  border-color:
+    rgba(254,127,45,.38);
+
+  box-shadow:
+    0 22px 50px
+    rgba(35,61,77,.12);
+}
+
+/* =========================
+   5) CATEGORY SUMMARY
+========================= */
+
+.warmupCategoryOnePageCard > summary{
+  min-height:86px;
+
+  padding:
+    15px
+    20px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #FBFCFD 100%
+    );
+}
+
+.warmupCategoryOnePageCard > summary:hover{
+  background:
+    var(--admin-primary-soft);
+}
+
+.warmupCategoryOnePageCard[open] > summary{
+  position:relative;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      var(--admin-primary-soft) 100%
+    );
+}
+
+.warmupCategoryOnePageCard
+.adminEditItemTitle{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.warmupCategoryOnePageCard
+.adminEditItemTitle::before{
+  content:"ف";
+
+  width:42px;
+  height:42px;
+
+  flex:0 0 auto;
+
+  border:
+    1px solid
+    rgba(254,127,45,.26);
+
+  border-radius:14px;
+
+  color:
+    var(--admin-primary);
+
+  background:
+    var(--admin-primary-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.3rem;
+}
+
+.warmupCategoryOnePageCard.isDone
+.adminEditItemTitle::before{
+  color:
+    var(--admin-green);
+
+  border-color:
+    rgba(0,127,0,.20);
+
+  background:
+    var(--admin-green-soft);
+}
+
+.warmupCategoryOnePageCard
+.adminEditItemTitle strong{
+  color:
+    var(--admin-secondary);
+
+  font-size:
+    clamp(1.05rem,2vw,1.25rem);
+}
+
+.warmupCategoryOnePageCard
+.adminEditItemMeta{
+  gap:8px;
+}
+
+.warmupCategoryOnePageCard
+.adminEditStatusPill,
+.warmupCategoryOnePageCard
+.adminEditProgressPill{
+  min-width:62px;
+}
+
+/* فتح وإغلاق */
+
+.warmupCategoryOnePageCard > summary::after{
+  content:"⌄";
+
+  width:34px;
+  height:34px;
+
+  flex:0 0 auto;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:11px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-size:1.05rem;
+
+  transition:
+    transform .18s var(--admin-ease),
+    background-color .18s var(--admin-ease),
+    color .18s var(--admin-ease);
+}
+
+.warmupCategoryOnePageCard[open]
+> summary::after{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-secondary);
+
+  transform:rotate(180deg);
+}
+
+/* =========================
+   6) CATEGORY BODY
+========================= */
+
+.warmupCategoryOnePageCard
+> .adminEditItemBody{
+  padding:
+    clamp(16px,2vw,22px);
+
+  display:grid;
+  gap:16px;
+
+  background:
+    #FFFFFF;
+}
+
+/* =========================
+   7) CATEGORY NAME
+========================= */
+
+.warmupCategoryOnePageCard
+> .adminEditItemBody
+> .adminField:first-child{
+  position:relative;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:14px;
+}
+
+.warmupCategoryOnePageCard
+> .adminEditItemBody
+> .adminField:first-child::before{
+  content:"اسم الفئة";
+
+  display:block;
+
+  margin-bottom:8px;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:.9rem;
+}
+
+.warmupCategoryOnePageCard
+> .adminEditItemBody
+> .adminField:first-child input{
+  min-height:58px;
+
+  border-color:
+    rgba(35,61,77,.18);
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    #FFFFFF;
+
+  font-size:1.08rem;
+}
+
+.warmupCategoryOnePageCard
+> .adminEditItemBody
+> .adminField:first-child input:focus{
+  border-color:
+    var(--admin-primary);
+}
+
+.warmupCategoryOnePageCard
+> .adminEditItemBody
+> .adminField:first-child.adminMissingField{
+  border-color:
+    rgba(127,0,0,.22);
+
+  background:
+    var(--admin-red-soft);
+}
+
+/* =========================
+   8) QUESTIONS GRID
+========================= */
+
+.warmupQuestionsOnePageGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap:12px;
+
+  align-items:stretch;
+}
+
+/* =========================
+   9) QUESTION CARD
+========================= */
+
+.warmupQuestionOnePageCard{
+  position:relative;
+
+  min-width:0;
+  min-height:100%;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 10px 24px
+    rgba(35,61,77,.06);
+
+  padding:14px;
+
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+
+  overflow:hidden;
+
+  transition:
+    transform .18s var(--admin-ease),
+    border-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease);
+}
+
+.warmupQuestionOnePageCard:hover{
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(254,127,45,.34);
+
+  box-shadow:
+    0 16px 32px
+    rgba(35,61,77,.10);
+}
+
+.warmupQuestionOnePageCard.isDone{
+  border-color:
+    rgba(0,127,0,.26);
+}
+
+.warmupQuestionOnePageCard.isMissing{
+  border-color:
+    rgba(127,0,0,.18);
+}
+
+.warmupQuestionOnePageCard::after{
+  content:"";
+
+  position:absolute;
+
+  inset-inline:0;
+  bottom:0;
+
+  height:4px;
+
+  background:
+    var(--admin-primary);
+
+  opacity:.65;
+}
+
+.warmupQuestionOnePageCard.isDone::after{
+  background:
+    var(--admin-green);
+
+  opacity:1;
+}
+
+/* =========================
+   10) QUESTION HEADER
+========================= */
+
+.warmupQuestionOnePageCard
+.adminEditSubHead{
+  min-height:44px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:10px;
+}
+
+.warmupQuestionOnePageCard
+.adminEditSubHead strong{
+  width:42px;
+  height:42px;
+
+  flex:0 0 auto;
+
+  border-radius:14px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "MolhimCustom",
+    "HanakaText",
+    sans-serif;
+
+  font-size:1.15rem;
+
+  box-shadow:
+    0 8px 18px
+    rgba(35,61,77,.18);
+}
+
+.warmupQuestionOnePageCard.isDone
+.adminEditSubHead strong{
+  background:
+    var(--admin-green);
+}
+
+.warmupQuestionOnePageCard
+.adminEditSubHead span{
+  border-radius:999px;
+
+  color:
+    var(--admin-muted);
+
+  background:
+    var(--admin-soft);
+
+  border:
+    1px solid var(--admin-line);
+
+  padding:6px 10px;
+
+  font-size:.78rem;
+
+  white-space:nowrap;
+}
+
+.warmupQuestionOnePageCard.isDone
+.adminEditSubHead span{
+  color:
+    var(--admin-green);
+
+  border-color:
+    rgba(0,127,0,.18);
+
+  background:
+    var(--admin-green-soft);
+}
+
+.warmupQuestionOnePageCard.isMissing
+.adminEditSubHead span{
+  color:
+    var(--admin-red);
+
+  border-color:
+    rgba(127,0,0,.14);
+
+  background:
+    var(--admin-red-soft);
+}
+
+/* =========================
+   11) QUESTION FIELDS
+========================= */
+
+.warmupQuestionOnePageCard
+.adminField{
+  min-width:0;
+}
+
+.warmupQuestionOnePageCard
+.adminField::before{
+  display:block;
+
+  margin-bottom:7px;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:.84rem;
+}
+
+.warmupQuestionOnePageCard
+.adminField:has(textarea)::before{
+  content:"السؤال";
+}
+
+.warmupQuestionOnePageCard
+.adminField:has(input)::before{
+  content:"الإجابة";
+}
+
+.warmupQuestionOnePageCard textarea{
+  min-height:132px;
+  max-height:260px;
+
+  resize:vertical;
+
+  line-height:1.65;
+}
+
+.warmupQuestionOnePageCard input{
+  min-height:54px;
+}
+
+.warmupQuestionOnePageCard
+.adminField.adminMissingField
+:is(input,textarea){
+  border-color:
+    rgba(127,0,0,.30);
+
+  background:
+    #FFF8F8;
+}
+
+.warmupQuestionOnePageCard
+.adminField:not(.adminMissingField)
+:is(input,textarea){
+  border-color:
+    rgba(0,127,0,.18);
+}
+
+/* =========================
+   12) DELETE QUESTION BUTTON
+========================= */
+
+.warmupQuestionOnePageCard
+.adminDeleteMiniBtn{
+  width:100%;
+  min-height:42px;
+
+  margin-top:auto;
+
+  border:
+    1px solid
+    rgba(127,0,0,.16);
+
+  border-radius:12px;
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  padding:9px 13px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:.88rem;
+}
+
+.warmupQuestionOnePageCard
+.adminDeleteMiniBtn:hover{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red);
+}
+
+/* =========================
+   13) EMPTY / LOADING STATE
+========================= */
+
+.warmupAdminShell
+.adminEmptyState{
+  min-height:260px;
+
+  border-color:
+    rgba(254,127,45,.26);
+
+  background:
+    var(--admin-primary-soft);
+}
+
+/* =========================
+   14) SAVING STATE
+========================= */
+
+.adminIsSaving
+.warmupAdminShell{
+  pointer-events:none;
+}
+
+.adminIsSaving
+.warmupAdminShell
+.adminEditorTopBar{
+  pointer-events:auto;
+}
+
+.adminIsSaving
+.warmupQuestionOnePageCard,
+.adminIsSaving
+.warmupCategoryOnePageCard{
+  opacity:.74;
+}
+
+/* =========================
+   15) LARGE SCREENS
+========================= */
+
+@media (min-width:1500px){
+
+  .warmupOnePageGrid{
+    gap:16px;
+  }
+
+  .warmupQuestionsOnePageGrid{
+    gap:14px;
+  }
+
+  .warmupQuestionOnePageCard{
+    padding:16px;
+  }
+
+  .warmupQuestionOnePageCard textarea{
+    min-height:150px;
+  }
+}
+
+/* =========================
+   16) LAPTOP
+========================= */
+
+@media (max-width:1180px){
+
+  .warmupAdminShell
+  .adminEditorTopBar{
+    top:148px;
+  }
+
+  .warmupQuestionsOnePageGrid{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+
+  .warmupQuestionOnePageCard{
+    padding:12px;
+  }
+}
+
+/* =========================
+   17) TABLET
+========================= */
+
+@media (max-width:900px){
+
+  .warmupAdminShell
+  .adminEditorTopBar{
+    position:relative;
+    top:auto;
+  }
+
+  .warmupOnePageGrid{
+    grid-template-columns:1fr;
+  }
+
+  .warmupQuestionsOnePageGrid{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+
+  .warmupCategoryOnePageCard{
+    scroll-margin-top:24px;
+  }
+}
+
+/* =========================
+   18) SMALL TABLET
+========================= */
+
+@media (max-width:760px){
+
+  .warmupQuestionsOnePageGrid{
+    grid-template-columns:1fr;
+  }
+
+  .warmupQuestionOnePageCard{
+    display:grid;
+
+    grid-template-columns:
+      minmax(0,1.35fr)
+      minmax(180px,.65fr);
+
+    align-items:start;
+  }
+
+  .warmupQuestionOnePageCard
+  .adminEditSubHead{
+    grid-column:1 / -1;
+  }
+
+  .warmupQuestionOnePageCard
+  .adminDeleteMiniBtn{
+    grid-column:1 / -1;
+  }
+
+  .warmupQuestionOnePageCard textarea{
+    min-height:110px;
+  }
+}
+
+/* =========================
+   19) MOBILE
+========================= */
+
+@media (max-width:620px){
+
+  .warmupAdminShell{
+    gap:10px;
+  }
+
+  .warmupAdminShell
+  .adminEditorTopBar{
+    margin:0;
+
+    padding:12px;
+  }
+
+  .warmupAdminShell
+  .adminSectionTitle{
+    width:100%;
+
+    justify-content:center;
+  }
+
+  .warmupAdminShell
+  .adminInlineActions{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .warmupAdminShell
+  .adminSaveBtn,
+  .warmupAdminShell
+  .adminDeleteAllBtn{
+    width:100%;
+    min-width:0;
+  }
+
+  .warmupOnePageGrid{
+    gap:10px;
+  }
+
+  .warmupCategoryOnePageCard
+  > summary{
+    min-height:78px;
+
+    padding:12px 14px;
+
+    flex-direction:row;
+    align-items:center;
+  }
+
+  .warmupCategoryOnePageCard
+  .adminEditItemTitle::before{
+    width:38px;
+    height:38px;
+
+    border-radius:12px;
+  }
+
+  .warmupCategoryOnePageCard
+  .adminEditItemMeta{
+    width:auto;
+
+    display:flex;
+  }
+
+  .warmupCategoryOnePageCard
+  > summary::after{
+    width:32px;
+    height:32px;
+  }
+
+  .warmupCategoryOnePageCard
+  > .adminEditItemBody{
+    padding:12px;
+    gap:12px;
+  }
+
+  .warmupCategoryOnePageCard
+  > .adminEditItemBody
+  > .adminField:first-child{
+    padding:11px;
+  }
+
+  .warmupQuestionOnePageCard{
+    display:flex;
+
+    padding:12px;
+  }
+
+  .warmupQuestionOnePageCard textarea{
+    min-height:118px;
+  }
+
+  .warmupQuestionOnePageCard
+  .adminDeleteMiniBtn{
+    grid-column:auto;
+  }
+}
+
+/* =========================
+   20) SMALL MOBILE
+========================= */
+
+@media (max-width:420px){
+
+  .warmupCategoryOnePageCard
+  > summary{
+    display:grid;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      auto;
+
+    gap:10px;
+  }
+
+  .warmupCategoryOnePageCard
+  .adminEditItemTitle{
+    min-width:0;
+  }
+
+  .warmupCategoryOnePageCard
+  .adminEditItemMeta{
+    grid-column:1 / -1;
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+
+    order:3;
+  }
+
+  .warmupCategoryOnePageCard
+  > summary::after{
+    grid-column:2;
+    grid-row:1;
+  }
+
+  .warmupCategoryOnePageCard
+  .adminEditStatusPill,
+  .warmupCategoryOnePageCard
+  .adminEditProgressPill{
+    width:100%;
+  }
+
+  .warmupQuestionOnePageCard
+  .adminEditSubHead{
+    align-items:center;
+  }
+}
+
+/* =========================
+   21) FALLBACK FOR :has
+========================= */
+
+@supports not selector(:has(*)){
+
+  .warmupQuestionOnePageCard
+  .adminField{
+    position:relative;
+    padding-top:24px;
+  }
+
+  .warmupQuestionOnePageCard
+  .adminField::before{
+    content:"الحقل";
+
+    position:absolute;
+    top:0;
+    right:0;
+  }
+}

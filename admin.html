@@ -1,38 +1,186 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  />
+  >
+
+  <meta name="theme-color" content="#233D4D">
 
   <title>الحنكة - لوحة الأسئلة</title>
 
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="assets/css/segments/admin.css" />
+  <!-- =========================
+       MAIN PROJECT STYLE
+  ========================== -->
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="assets/js/supabase.js"></script>
+  <!-- =========================
+       ADMIN CORE STYLE
+  ========================== -->
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/admin/admin-core.css"
+  >
+
+  <!-- =========================
+       ADMIN SEGMENT STYLES
+  ========================== -->
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/admin/warmup-admin.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/admin/top10-admin.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/admin/who-admin.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/admin/explain-admin.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/admin/final-admin.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/admin/archive-admin.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/admin/random-challenge-admin.css"
+  >
+
+  <link
+  rel="stylesheet"
+  href="assets/css/segments/admin/admin-performance.css"
+  >
+
+  <!-- =========================
+       SUPABASE
+  ========================== -->
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"
+  ></script>
+
+  <script
+    defer
+    src="assets/js/supabase.js"
+  ></script>
+
+  <!-- =========================
+       DATABASE HELPERS
+  ========================== -->
+  <script
+    defer
+    src="assets/js/database.js"
+  ></script>
+
+  <!-- =========================
+       ADMIN CORE
+  ========================== -->
+  <script
+    defer
+    src="admin.js"
+  ></script>
+
+  <!-- =========================
+       ADMIN MODULES
+  ========================== -->
+  <script
+    defer
+    src="assets/js/admin/warmup-admin.js"
+  ></script>
+
+  <script
+    defer
+    src="assets/js/admin/top10-admin.js"
+  ></script>
+
+  <script
+    defer
+    src="assets/js/admin/who-admin.js"
+  ></script>
+
+  <script
+    defer
+    src="assets/js/admin/explain-admin.js"
+  ></script>
+
+  <script
+    defer
+    src="assets/js/admin/final-admin.js"
+  ></script>
+
+  <script
+    defer
+    src="assets/js/admin/archive-admin.js"
+  ></script>
+
+  <script
+    defer
+    src="assets/js/admin/random-challenge-admin.js"
+  ></script>
+
+  <!-- =========================
+       PDF LIBRARIES
+  ========================== -->
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"
+  ></script>
+
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
+  ></script>
 </head>
 
 <body>
 
   <!-- =========================
-       PIN SCREEN
-       الرقم السري العام للأدمن
+       ADMIN PIN SCREEN
   ========================== -->
-  <div id="adminPinScreen" class="adminPinScreen">
+  <div
+    id="adminPinScreen"
+    class="adminPinScreen"
+  >
     <div class="adminPinCard">
 
       <div class="adminPinHeader">
-        <div class="adminPinLogo">لوحة الأسئلة</div>
-        <div class="adminPinTitle">الحنكة</div>
-        <div class="adminPinSub">أدخل الرقم السري للمتابعة</div>
+
+        <div class="adminPinLogo">
+          لوحة الأسئلة
+        </div>
+
+        <div class="adminPinTitle">
+          الحنكة
+        </div>
+
+        <div class="adminPinSub">
+          أدخل الرقم السري للمتابعة
+        </div>
+
       </div>
 
       <div class="adminPinForm">
+
         <input
           id="adminPinInput"
           class="adminPinInput"
@@ -42,9 +190,10 @@
           maxlength="6"
           autocomplete="one-time-code"
           placeholder="••••"
-        />
+        >
 
         <button
+          id="adminPinLoginBtn"
           type="button"
           class="adminPinBtn"
           onclick="checkAdminPinFromInput()"
@@ -52,7 +201,13 @@
           دخول
         </button>
 
-        <div id="adminPinError" class="adminPinError"></div>
+        <div
+          id="adminPinError"
+          class="adminPinError"
+          role="alert"
+          aria-live="polite"
+        ></div>
+
       </div>
 
     </div>
@@ -60,38 +215,61 @@
 
 
   <!-- =========================
-       ADMIN APP
+       ADMIN APPLICATION
   ========================== -->
-  <div class="adminShellNew hidden" id="adminShellNew">
+  <div
+    id="adminShellNew"
+    class="adminShellNew hidden"
+  >
 
     <!-- =========================
          MODEL GATE
-         صفحة اختيار النموذج
     ========================== -->
-    <section id="adminModelGate" class="adminModelGate">
+    <section
+      id="adminModelGate"
+      class="adminModelGate"
+    >
 
       <div class="adminModelGateCard">
 
         <div class="adminModelGateHero">
-          <span>لوحة الأسئلة</span>
-          <h1>الحنكة</h1>
+
+          <span>
+            لوحة الأسئلة
+          </span>
+
+          <h1>
+            الحنكة
+          </h1>
+
           <p>
             اختر نموذجًا للبدء، أو أنشئ نموذجًا جديدًا.
             بعد فتح النموذج ستظهر لك لوحة الفقرات والتحرير.
           </p>
+
         </div>
 
         <div class="adminModelGatePanel">
 
           <div class="adminModelGateField">
-            <label for="modelsList">النماذج المحفوظة</label>
 
-            <select id="modelsList" class="adminSelect">
-              <option value="">اختر النموذج</option>
+            <label for="modelsList">
+              النماذج المحفوظة
+            </label>
+
+            <select
+              id="modelsList"
+              class="adminSelect"
+            >
+              <option value="">
+                اختر النموذج
+              </option>
             </select>
+
           </div>
 
           <div class="adminModelGateActions">
+
             <button
               type="button"
               class="adminModelPrimaryBtn"
@@ -117,24 +295,32 @@
             </button>
 
             <button
-  type="button"
-  class="adminModelActionBtn adminSegmentSettingsEntryBtn"
-  onclick="openGlobalSegmentVisibilityPanel()"
->
-  إعدادات الفقرات
-</button>
+              type="button"
+              class="adminModelActionBtn adminSegmentSettingsEntryBtn"
+              onclick="openGlobalSegmentVisibilityPanel()"
+            >
+              إعدادات الفقرات
+            </button>
+
           </div>
 
           <div class="adminModelCreateBox">
+
             <div class="adminModelGateField">
-              <label for="modelName">إنشاء نموذج جديد</label>
+
+              <label for="modelName">
+                إنشاء نموذج جديد
+              </label>
 
               <input
                 id="modelName"
                 class="adminInput"
                 type="text"
+                maxlength="80"
+                autocomplete="off"
                 placeholder="اسم النموذج الجديد"
-              />
+              >
+
             </div>
 
             <button
@@ -144,6 +330,7 @@
             >
               إنشاء نموذج
             </button>
+
           </div>
 
           <button
@@ -162,67 +349,102 @@
 
 
     <!-- =========================
-         WORKSPACE
-         صفحة التحرير بعد فتح النموذج
+         ADMIN WORKSPACE
     ========================== -->
-    <section id="adminWorkspace" class="adminWorkspace hidden">
+    <section
+      id="adminWorkspace"
+      class="adminWorkspace hidden"
+    >
 
       <!-- =========================
-           TOP BAR
+           WORKSPACE HEADER
       ========================== -->
-      <header class="adminTopHeader adminDashboardHeader">
+      <header
+        class="adminTopHeader adminDashboardHeader"
+      >
 
         <div class="adminTopBrand">
-          <div class="adminTopLogo">الحنكة</div>
-          <div class="adminTopSub">لوحة إدارة الأسئلة</div>
+
+          <div class="adminTopLogo">
+            الحنكة
+          </div>
+
+          <div class="adminTopSub">
+            لوحة إدارة الأسئلة
+          </div>
+
         </div>
 
-        <div id="adminCurrentModelPill" class="adminCurrentModelPill">
-          <span class="adminCurrentModelLabel">النموذج الحالي</span>
-          <strong id="adminBrandCurrentModel">لم يتم اختيار نموذج</strong>
+        <div
+          id="adminCurrentModelPill"
+          class="adminCurrentModelPill"
+        >
+
+          <span class="adminCurrentModelLabel">
+            النموذج الحالي
+          </span>
+
+          <strong id="adminBrandCurrentModel">
+            لم يتم اختيار نموذج
+          </strong>
+
         </div>
 
-        <div id="adminWorkspaceActions" class="adminWorkspaceActions">
-  <button
-    type="button"
-    class="adminWorkspaceActionBtn primary"
-    onclick="openAdminSegmentSettings()"
-  >
-    إعدادات الفقرات
-  </button>
+        <div
+          id="adminWorkspaceActions"
+          class="adminWorkspaceActions"
+        >
 
-  <button
-    type="button"
-    class="adminWorkspaceActionBtn"
-    onclick="checkCurrentModelReady()"
-  >
-    فحص النموذج
-  </button>
+          <button
+            type="button"
+            class="adminWorkspaceActionBtn primary"
+            onclick="openAdminSegmentSettings()"
+          >
+            إعدادات الفقرات
+          </button>
 
-  <button
-    type="button"
-    class="adminWorkspaceActionBtn exit"
-    onclick="exitCurrentModel()"
-  >
-    خروج
-  </button>
-</div>
+          <button
+            type="button"
+            class="adminWorkspaceActionBtn"
+            onclick="checkCurrentModelReady()"
+          >
+            فحص النموذج
+          </button>
+
+          <button
+            type="button"
+            class="adminWorkspaceActionBtn exit"
+            onclick="exitCurrentModel()"
+          >
+            خروج
+          </button>
+
+        </div>
 
       </header>
 
 
       <!-- =========================
-           MAIN AREA
+           WORKSPACE MAIN
       ========================== -->
-      <main class="adminMainNew adminDashboardMain">
+      <main
+        class="adminMainNew adminDashboardMain"
+      >
 
-        <!-- مهم: لا تضيف أزرار هنا -->
-        <nav id="adminTabs" class="adminTabsNew adminDashboardTabs hidden"></nav>
+        <nav
+          id="adminTabs"
+          class="adminTabsNew adminDashboardTabs hidden"
+        ></nav>
 
-        <section id="adminEditor" class="adminEditor adminDashboardEditor">
+        <section
+          id="adminEditor"
+          class="adminEditor adminDashboardEditor"
+        >
+
           <div class="adminEmptyState">
             افتح نموذجًا ثم اختر الفقرة التي تريد تعديلها
           </div>
+
         </section>
 
       </main>
@@ -233,11 +455,64 @@
 
 
   <!-- =========================
+       GLOBAL SEGMENT VISIBILITY
+  ========================== -->
+  <div
+    id="globalSegmentVisibilityOverlay"
+    class="globalSegmentVisibilityOverlay hidden"
+  >
+
+    <div class="globalSegmentVisibilityPanel">
+
+      <div class="globalSegmentVisibilityHead">
+
+        <div>
+
+          <h2>
+            إعدادات الفقرات
+          </h2>
+
+          <p>
+            إظهار أو إخفاء الفقرات من اللعبة قبل الدخول للنموذج.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="globalSegmentCloseBtn"
+          onclick="closeGlobalSegmentVisibilityPanel()"
+        >
+          إغلاق
+        </button>
+
+      </div>
+
+      <div
+        id="globalSegmentVisibilityGrid"
+        class="globalSegmentVisibilityGrid"
+      ></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
        TOAST
   ========================== -->
-  <div id="gameToast" class="gameToast hidden">
-    <div id="gameToastText" class="gameToastText"></div>
-  </div>
+  <div
+  id="gameToast"
+  class="gameToast hidden"
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+>
+  <span
+    id="gameToastText"
+    class="gameToastText"
+  ></span>
+</div>
 
 
   <!-- =========================
@@ -247,117 +522,291 @@
 
 
   <!-- =========================
-       LIBRARIES
-  ========================== -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
-
-  <!-- =========================
-       ADMIN PIN SCRIPT
+       ADMIN PIN BOOTSTRAP
   ========================== -->
   <script>
     const ADMIN_PIN = "9900"
 
+    let adminPanelInitPromise = null
+    let adminPinBusy = false
+
     function unlockAdminPanel() {
-      document.getElementById("adminPinScreen")?.classList.add("hidden")
-      document.getElementById("adminShellNew")?.classList.remove("hidden")
+      document
+        .getElementById("adminPinScreen")
+        ?.classList.add("hidden")
+
+      document
+        .getElementById("adminShellNew")
+        ?.classList.remove("hidden")
+    }
+
+    function lockAdminPanel() {
+      document
+        .getElementById("adminShellNew")
+        ?.classList.add("hidden")
+
+      document
+        .getElementById("adminPinScreen")
+        ?.classList.remove("hidden")
+    }
+
+    async function initializeAdminPanelOnce() {
+      if (adminPanelInitPromise) {
+        return adminPanelInitPromise
+      }
+
+      if (
+        typeof window.initAdminPanel !==
+        "function"
+      ) {
+        console.error(
+          "Missing function: initAdminPanel"
+        )
+
+        const errorBox =
+          document.getElementById(
+            "adminPinError"
+          )
+
+        if (errorBox) {
+          errorBox.innerText =
+            "تعذر تحميل ملفات لوحة الأدمن"
+        }
+
+        return false
+      }
+
+      adminPanelInitPromise =
+        Promise.resolve()
+          .then(() => {
+            return window.initAdminPanel()
+          })
+          .then(() => true)
+          .catch(error => {
+            console.error(
+              "INIT ADMIN PANEL ERROR:",
+              error
+            )
+
+            adminPanelInitPromise = null
+
+            const errorBox =
+              document.getElementById(
+                "adminPinError"
+              )
+
+            if (errorBox) {
+              errorBox.innerText =
+                "حدث خطأ أثناء تشغيل لوحة الأدمن"
+            }
+
+            return false
+          })
+
+      return adminPanelInitPromise
+    }
+
+    function setAdminPinBusy(value) {
+      adminPinBusy =
+        Boolean(value)
+
+      const button =
+        document.getElementById(
+          "adminPinLoginBtn"
+        )
+
+      const input =
+        document.getElementById(
+          "adminPinInput"
+        )
+
+      if (button) {
+        button.disabled =
+          adminPinBusy
+
+        button.innerText =
+          adminPinBusy
+            ? "جارٍ الدخول..."
+            : "دخول"
+      }
+
+      if (input) {
+        input.disabled =
+          adminPinBusy
+      }
     }
 
     async function checkAdminPinFromInput() {
-      const input = document.getElementById("adminPinInput")
-      const error = document.getElementById("adminPinError")
-      const pin = (input?.value || "").trim()
+      if (adminPinBusy) {
+        return false
+      }
 
-      if (pin === ADMIN_PIN) {
-        localStorage.setItem("admin_pin_ok", "1")
+      const input =
+        document.getElementById(
+          "adminPinInput"
+        )
+
+      const errorBox =
+        document.getElementById(
+          "adminPinError"
+        )
+
+      const pin =
+        String(input?.value || "")
+          .trim()
+
+      if (errorBox) {
+        errorBox.innerText = ""
+      }
+
+      if (pin !== ADMIN_PIN) {
+        if (errorBox) {
+          errorBox.innerText =
+            "الرقم السري غير صحيح"
+        }
+
+        if (input) {
+          input.value = ""
+          input.focus()
+
+          input.classList.remove(
+            "adminPinShake"
+          )
+
+          void input.offsetWidth
+
+          input.classList.add(
+            "adminPinShake"
+          )
+        }
+
+        return false
+      }
+
+      try {
+        setAdminPinBusy(true)
+
+        localStorage.setItem(
+          "admin_pin_ok",
+          "1"
+        )
+
         unlockAdminPanel()
 
-        if (typeof initAdminPanel === "function") {
-          await initAdminPanel()
+        const initialized =
+          await initializeAdminPanelOnce()
+
+        if (!initialized) {
+          localStorage.removeItem(
+            "admin_pin_ok"
+          )
+
+          lockAdminPanel()
+
+          return false
         }
 
         return true
-      }
+      } catch (error) {
+        console.error(
+          "ADMIN PIN LOGIN ERROR:",
+          error
+        )
 
-      if (error) {
-        error.innerText = "الرقم السري غير صحيح"
-      }
+        localStorage.removeItem(
+          "admin_pin_ok"
+        )
 
-      if (input) {
-        input.value = ""
-        input.focus()
-        input.classList.remove("adminPinShake")
-        void input.offsetWidth
-        input.classList.add("adminPinShake")
-      }
+        lockAdminPanel()
 
-      return false
+        if (errorBox) {
+          errorBox.innerText =
+            "تعذر تشغيل لوحة الأدمن"
+        }
+
+        return false
+      } finally {
+        setAdminPinBusy(false)
+      }
     }
 
     function logoutAdminPin() {
-      localStorage.removeItem("admin_pin_ok")
+      localStorage.removeItem(
+        "admin_pin_ok"
+      )
+
       location.reload()
     }
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      const input = document.getElementById("adminPinInput")
+    document.addEventListener(
+      "DOMContentLoaded",
+      async () => {
+        const input =
+          document.getElementById(
+            "adminPinInput"
+          )
 
-      if (localStorage.getItem("admin_pin_ok") === "1") {
-        unlockAdminPanel()
+        const errorBox =
+          document.getElementById(
+            "adminPinError"
+          )
 
-        if (typeof initAdminPanel === "function") {
-          await initAdminPanel()
+        input?.addEventListener(
+          "input",
+          () => {
+            if (errorBox) {
+              errorBox.innerText = ""
+            }
+          }
+        )
+
+        input?.addEventListener(
+          "keydown",
+          event => {
+            if (event.key === "Enter") {
+              event.preventDefault()
+              checkAdminPinFromInput()
+            }
+          }
+        )
+
+        const isUnlocked =
+          localStorage.getItem(
+            "admin_pin_ok"
+          ) === "1"
+
+        if (!isUnlocked) {
+          input?.focus()
+          return
         }
 
-        return
-      }
+        unlockAdminPanel()
+        setAdminPinBusy(true)
 
-      if (input) {
-        input.focus()
+        try {
+          const initialized =
+            await initializeAdminPanelOnce()
 
-        input.addEventListener("keydown", e => {
-          if (e.key === "Enter") {
-            checkAdminPinFromInput()
+          if (!initialized) {
+            localStorage.removeItem(
+              "admin_pin_ok"
+            )
+
+            lockAdminPanel()
+            input?.focus()
           }
-        })
+        } finally {
+          setAdminPinBusy(false)
+        }
       }
-    })
+    )
+
+    window.checkAdminPinFromInput =
+      checkAdminPinFromInput
+
+    window.logoutAdminPin =
+      logoutAdminPin
   </script>
-
-
-<!-- =========================
-     DATABASE HELPERS
-========================== -->
-<script src="assets/js/database.js"></script>
-
-<!-- =========================
-     ADMIN JS
-========================== -->
-<script src="admin.js"></script>
-
-  <div id="globalSegmentVisibilityOverlay" class="globalSegmentVisibilityOverlay hidden">
-  <div class="globalSegmentVisibilityPanel">
-
-    <div class="globalSegmentVisibilityHead">
-      <div>
-        <h2>إعدادات الفقرات</h2>
-        <p>إظهار أو إخفاء الفقرات من اللعبة قبل الدخول للنموذج.</p>
-      </div>
-
-      <button
-        type="button"
-        class="globalSegmentCloseBtn"
-        onclick="closeGlobalSegmentVisibilityPanel()"
-      >
-        إغلاق
-      </button>
-    </div>
-
-    <div id="globalSegmentVisibilityGrid" class="globalSegmentVisibilityGrid"></div>
-
-  </div>
-</div>
 
 </body>
 </html>

@@ -1,0 +1,1179 @@
+/* =========================================================
+   TOP 10 ADMIN / إدارة فقرة Top 10
+   CLEAN PROFESSIONAL DESIGN
+
+   File:
+   assets/css/segments/admin/top10-admin.css
+========================================================= */
+
+/* =========================
+   1) ROOT
+========================= */
+
+.top10AdminShell{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+  gap:16px;
+}
+
+.top10CleanShell{
+  align-content:start;
+}
+
+/* =========================
+   2) TOP BAR
+========================= */
+
+.top10AdminShell
+.top10CleanTopBar{
+  position:sticky;
+  top:112px;
+  z-index:20;
+
+  margin:0;
+
+  border-color:
+    rgba(35,61,77,.20);
+
+  background:#FFFFFF;
+
+  box-shadow:
+    0 14px 34px
+    rgba(35,61,77,.08);
+}
+
+.top10AdminShell
+.adminSectionTitle{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+
+.top10AdminShell
+.adminSectionTitle::before{
+  content:"10";
+
+  width:46px;
+  height:46px;
+
+  flex:0 0 auto;
+
+  border-radius:15px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "MolhimCustom",
+    "HanakaText",
+    sans-serif;
+
+  font-size:1.05rem;
+
+  box-shadow:
+    0 9px 20px
+    rgba(35,61,77,.22);
+}
+
+.top10AdminShell
+.adminInlineActions{
+  align-items:center;
+}
+
+.top10AdminShell
+.adminSaveBtn,
+.top10AdminShell
+.adminDeleteAllBtn{
+  min-width:120px;
+}
+
+/* =========================
+   3) ROUNDS GRID
+========================= */
+
+.top10CleanRoundsGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:14px;
+
+  align-items:start;
+}
+
+.top10CleanRoundsGrid:has(
+  .top10CleanRoundCard[open]
+){
+  grid-template-columns:1fr;
+}
+
+.top10RoundHidden{
+  display:none;
+}
+
+/* =========================
+   4) ROUND CARD
+========================= */
+
+.top10CleanRoundCard{
+  position:relative;
+
+  min-width:0;
+
+  scroll-margin-top:220px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 11px 28px
+    rgba(35,61,77,.07);
+
+  overflow:hidden;
+
+  transition:
+    transform .18s var(--admin-ease),
+    border-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease);
+}
+
+.top10CleanRoundCard::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  z-index:2;
+
+  width:5px;
+
+  opacity:.52;
+
+  background:
+    var(--admin-primary);
+
+  transition:
+    width .18s var(--admin-ease),
+    opacity .18s var(--admin-ease);
+}
+
+.top10CleanRoundCard:hover{
+  transform:translateY(-2px);
+
+  border-color:
+    rgba(35,61,77,.30);
+
+  box-shadow:
+    0 17px 38px
+    rgba(35,61,77,.11);
+}
+
+.top10CleanRoundCard:hover::before,
+.top10CleanRoundCard[open]::before{
+  width:7px;
+  opacity:1;
+}
+
+.top10CleanRoundCard.top10Complete{
+  border-color:
+    rgba(0,127,0,.26);
+}
+
+.top10CleanRoundCard.top10Complete::before{
+  background:
+    var(--admin-green);
+}
+
+.top10CleanRoundCard.top10Incomplete::before{
+  background:
+    var(--admin-primary);
+}
+
+.top10CleanRoundCard[open]{
+  grid-column:1 / -1;
+
+  transform:none;
+
+  border-color:
+    rgba(254,127,45,.38);
+
+  box-shadow:
+    0 22px 52px
+    rgba(35,61,77,.13);
+}
+
+/* =========================
+   5) ROUND SUMMARY
+========================= */
+
+.top10CleanRoundCard > summary{
+  min-height:88px;
+
+  list-style:none;
+  cursor:pointer;
+
+  padding:
+    15px
+    20px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #FAFBFC 100%
+    );
+
+  user-select:none;
+}
+
+.top10CleanRoundCard
+> summary::-webkit-details-marker{
+  display:none;
+}
+
+.top10CleanRoundCard
+> summary:hover{
+  background:
+    var(--admin-primary-soft);
+}
+
+.top10CleanRoundCard[open]
+> summary{
+  border-bottom:
+    1px solid var(--admin-line);
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      var(--admin-primary-soft) 100%
+    );
+}
+
+.top10CleanSummaryTitle{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+
+  gap:12px;
+}
+
+.top10CleanSummaryTitle::before{
+  content:"ج";
+
+  width:44px;
+  height:44px;
+
+  flex:0 0 auto;
+
+  border:
+    1px solid
+    rgba(35,61,77,.18);
+
+  border-radius:14px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.25rem;
+}
+
+.top10Complete
+.top10CleanSummaryTitle::before{
+  color:
+    var(--admin-green);
+
+  border-color:
+    rgba(0,127,0,.20);
+
+  background:
+    var(--admin-green-soft);
+}
+
+.top10CleanSummaryTitle strong{
+  color:
+    var(--admin-secondary);
+
+  font-size:
+    clamp(1.08rem,2vw,1.28rem);
+
+  line-height:1.3;
+}
+
+.top10CleanRoundCard
+.adminEditItemMeta{
+  margin-inline-start:auto;
+
+  display:flex;
+  align-items:center;
+
+  gap:8px;
+}
+
+.top10CleanRoundCard
+.adminEditStatusPill,
+.top10CleanRoundCard
+.adminEditProgressPill{
+  min-width:64px;
+}
+
+/* سهم الفتح */
+
+.top10CleanRoundCard > summary::after{
+  content:"⌄";
+
+  width:35px;
+  height:35px;
+
+  flex:0 0 auto;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:11px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-size:1.08rem;
+
+  transition:
+    transform .18s var(--admin-ease),
+    color .18s var(--admin-ease),
+    background-color .18s var(--admin-ease),
+    border-color .18s var(--admin-ease);
+}
+
+.top10CleanRoundCard[open]
+> summary::after{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-secondary);
+
+  transform:rotate(180deg);
+}
+
+/* =========================
+   6) ROUND BODY
+========================= */
+
+.top10CleanBody{
+  padding:
+    clamp(16px,2.2vw,24px);
+
+  display:grid;
+  gap:18px;
+
+  background:#FFFFFF;
+}
+
+/* =========================
+   7) QUESTION ROW
+========================= */
+
+.top10CleanQuestionRow{
+  width:100%;
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:14px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    auto;
+
+  gap:10px;
+
+  align-items:center;
+}
+
+.top10CleanQuestionRow::before{
+  content:"سؤال الجولة";
+
+  grid-column:1 / -1;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:.9rem;
+}
+
+.top10CleanQuestionInput{
+  width:100%;
+  min-width:0;
+  min-height:58px;
+
+  border:
+    1px solid
+    rgba(35,61,77,.18);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-secondary);
+
+  background:#FFFFFF;
+
+  padding:12px 15px;
+
+  font-size:1.06rem;
+  line-height:1.5;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.top10CleanQuestionInput:focus{
+  outline:0;
+
+  border-color:
+    var(--admin-primary);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.12);
+}
+
+.top10CleanQuestionInput.adminMissingField{
+  border-color:
+    rgba(127,0,0,.28);
+
+  background:
+    #FFF8F8;
+}
+
+.top10CleanQuestionInput:not(
+  .adminMissingField
+){
+  border-color:
+    rgba(0,127,0,.20);
+}
+
+.top10CleanDeleteRoundBtn{
+  min-width:120px;
+  min-height:58px;
+
+  padding:
+    10px
+    16px;
+}
+
+/* =========================
+   8) ANSWERS AREA
+========================= */
+
+.top10CleanAnswersSplit{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:14px;
+
+  align-items:start;
+}
+
+.top10CleanAnswersColumn{
+  min-width:0;
+
+  display:grid;
+  gap:10px;
+}
+
+/* =========================
+   9) ANSWER CARD
+========================= */
+
+.top10CleanAnswerCard{
+  position:relative;
+
+  min-width:0;
+  min-height:68px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:#FFFFFF;
+
+  padding:9px;
+
+  display:grid;
+
+  grid-template-columns:
+    48px
+    minmax(0,1fr)
+    42px;
+
+  gap:9px;
+
+  align-items:center;
+
+  box-shadow:
+    0 7px 18px
+    rgba(35,61,77,.05);
+
+  overflow:hidden;
+
+  transition:
+    transform .16s var(--admin-ease),
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.top10CleanAnswerCard:hover{
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(254,127,45,.34);
+
+  box-shadow:
+    0 12px 25px
+    rgba(35,61,77,.09);
+}
+
+.top10CleanAnswerCard.top10Complete{
+  border-color:
+    rgba(0,127,0,.24);
+
+  background:
+    linear-gradient(
+      90deg,
+      #FFFFFF,
+      rgba(234,247,234,.46)
+    );
+}
+
+.top10CleanAnswerCard.top10Incomplete{
+  border-color:
+    rgba(127,0,0,.16);
+}
+
+.top10CleanAnswerCard::after{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  width:3px;
+
+  background:
+    var(--admin-primary);
+
+  opacity:.55;
+}
+
+.top10CleanAnswerCard.top10Complete::after{
+  background:
+    var(--admin-green);
+
+  opacity:1;
+}
+
+/* =========================
+   10) ANSWER NUMBER
+========================= */
+
+.top10CleanAnswerNumber{
+  width:48px;
+  height:48px;
+
+  border-radius:14px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "MolhimCustom",
+    "HanakaText",
+    sans-serif;
+
+  font-size:1.08rem;
+  line-height:1;
+
+  box-shadow:
+    0 7px 16px
+    rgba(35,61,77,.18);
+}
+
+.top10CleanAnswerCard.top10Complete
+.top10CleanAnswerNumber{
+  background:
+    var(--admin-green);
+}
+
+/* =========================
+   11) ANSWER INPUT
+========================= */
+
+.top10CleanAnswerInput{
+  width:100%;
+  min-width:0;
+  min-height:48px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:12px;
+
+  color:
+    var(--admin-text);
+
+  background:
+    var(--admin-soft);
+
+  padding:10px 13px;
+
+  font-size:.98rem;
+  line-height:1.4;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.top10CleanAnswerInput:focus{
+  outline:0;
+
+  border-color:
+    var(--admin-primary);
+
+  background:#FFFFFF;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.11);
+}
+
+.top10CleanAnswerInput.adminMissingField{
+  border-color:
+    rgba(127,0,0,.24);
+
+  background:
+    #FFF8F8;
+}
+
+.top10CleanAnswerInput:not(
+  .adminMissingField
+){
+  border-color:
+    rgba(0,127,0,.18);
+
+  background:#FFFFFF;
+}
+
+/* =========================
+   12) ANSWER DELETE
+========================= */
+
+.top10CleanAnswerDelete{
+  width:42px;
+  height:42px;
+
+  border:
+    1px solid
+    rgba(127,0,0,.15);
+
+  border-radius:12px;
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  display:grid;
+  place-items:center;
+
+  padding:0;
+
+  font-size:1.25rem;
+  line-height:1;
+}
+
+.top10CleanAnswerDelete:hover{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red);
+}
+
+.top10CleanAnswerDelete:disabled{
+  color:
+    var(--admin-muted);
+
+  border-color:
+    var(--admin-line);
+
+  background:
+    var(--admin-soft);
+}
+
+/* =========================
+   13) OPEN ANIMATION
+========================= */
+
+.top10CleanRoundCard[open]
+.top10CleanBody{
+  animation:
+    top10AdminOpen
+    .22s
+    var(--admin-ease);
+}
+
+@keyframes top10AdminOpen{
+  from{
+    opacity:0;
+    transform:translateY(-6px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================
+   14) SAVING STATE
+========================= */
+
+.adminIsSaving
+.top10AdminShell{
+  pointer-events:none;
+}
+
+.adminIsSaving
+.top10AdminShell
+.top10CleanTopBar{
+  pointer-events:auto;
+}
+
+.adminIsSaving
+.top10CleanRoundCard,
+.adminIsSaving
+.top10CleanAnswerCard{
+  opacity:.72;
+}
+
+/* =========================
+   15) LARGE SCREENS
+========================= */
+
+@media (min-width:1500px){
+
+  .top10CleanRoundsGrid{
+    gap:16px;
+  }
+
+  .top10CleanAnswersSplit{
+    gap:16px;
+  }
+
+  .top10CleanAnswersColumn{
+    gap:11px;
+  }
+
+  .top10CleanAnswerCard{
+    min-height:72px;
+
+    grid-template-columns:
+      52px
+      minmax(0,1fr)
+      44px;
+
+    padding:10px;
+  }
+
+  .top10CleanAnswerNumber{
+    width:52px;
+    height:52px;
+  }
+}
+
+/* =========================
+   16) LAPTOP
+========================= */
+
+@media (max-width:1180px){
+
+  .top10AdminShell
+  .top10CleanTopBar{
+    top:148px;
+  }
+
+  .top10CleanAnswersSplit{
+    gap:10px;
+  }
+
+  .top10CleanAnswerCard{
+    grid-template-columns:
+      44px
+      minmax(0,1fr)
+      40px;
+
+    gap:7px;
+  }
+
+  .top10CleanAnswerNumber{
+    width:44px;
+    height:44px;
+
+    border-radius:12px;
+  }
+
+  .top10CleanAnswerDelete{
+    width:40px;
+    height:40px;
+  }
+}
+
+/* =========================
+   17) TABLET
+========================= */
+
+@media (max-width:900px){
+
+  .top10AdminShell
+  .top10CleanTopBar{
+    position:relative;
+    top:auto;
+  }
+
+  .top10CleanRoundsGrid{
+    grid-template-columns:1fr;
+  }
+
+  .top10CleanRoundCard{
+    scroll-margin-top:24px;
+  }
+
+  .top10CleanAnswersSplit{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+}
+
+/* =========================
+   18) SMALL TABLET
+========================= */
+
+@media (max-width:760px){
+
+  .top10CleanAnswersSplit{
+    grid-template-columns:1fr;
+  }
+
+  .top10CleanQuestionRow{
+    grid-template-columns:1fr;
+  }
+
+  .top10CleanQuestionRow::before{
+    grid-column:auto;
+  }
+
+  .top10CleanDeleteRoundBtn{
+    width:100%;
+    min-height:48px;
+  }
+
+  .top10CleanAnswersColumn{
+    gap:9px;
+  }
+}
+
+/* =========================
+   19) MOBILE
+========================= */
+
+@media (max-width:620px){
+
+  .top10AdminShell{
+    gap:10px;
+  }
+
+  .top10AdminShell
+  .top10CleanTopBar{
+    padding:12px;
+  }
+
+  .top10AdminShell
+  .adminSectionTitle{
+    width:100%;
+
+    justify-content:center;
+  }
+
+  .top10AdminShell
+  .adminInlineActions{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .top10AdminShell
+  .adminSaveBtn,
+  .top10AdminShell
+  .adminDeleteAllBtn{
+    width:100%;
+    min-width:0;
+  }
+
+  .top10CleanRoundsGrid{
+    gap:10px;
+  }
+
+  .top10CleanRoundCard
+  > summary{
+    min-height:78px;
+
+    padding:
+      12px
+      14px;
+  }
+
+  .top10CleanSummaryTitle::before{
+    width:39px;
+    height:39px;
+
+    border-radius:12px;
+  }
+
+  .top10CleanRoundCard
+  .adminEditItemMeta{
+    gap:6px;
+  }
+
+  .top10CleanRoundCard
+  .adminEditStatusPill,
+  .top10CleanRoundCard
+  .adminEditProgressPill{
+    min-width:56px;
+
+    padding:
+      5px
+      8px;
+  }
+
+  .top10CleanRoundCard
+  > summary::after{
+    width:32px;
+    height:32px;
+  }
+
+  .top10CleanBody{
+    padding:12px;
+    gap:12px;
+  }
+
+  .top10CleanQuestionRow{
+    padding:11px;
+  }
+
+  .top10CleanQuestionInput{
+    min-height:54px;
+  }
+
+  .top10CleanAnswerCard{
+    min-height:64px;
+
+    grid-template-columns:
+      42px
+      minmax(0,1fr)
+      38px;
+
+    padding:8px;
+
+    gap:7px;
+  }
+
+  .top10CleanAnswerNumber{
+    width:42px;
+    height:42px;
+  }
+
+  .top10CleanAnswerInput{
+    min-height:44px;
+
+    padding:
+      9px
+      11px;
+  }
+
+  .top10CleanAnswerDelete{
+    width:38px;
+    height:38px;
+  }
+}
+
+/* =========================
+   20) SMALL MOBILE
+========================= */
+
+@media (max-width:430px){
+
+  .top10CleanRoundCard
+  > summary{
+    display:grid;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      auto;
+
+    gap:10px;
+  }
+
+  .top10CleanRoundCard
+  .adminEditItemMeta{
+    grid-column:1 / -1;
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+
+    order:3;
+  }
+
+  .top10CleanRoundCard
+  > summary::after{
+    grid-column:2;
+    grid-row:1;
+  }
+
+  .top10CleanRoundCard
+  .adminEditStatusPill,
+  .top10CleanRoundCard
+  .adminEditProgressPill{
+    width:100%;
+  }
+
+  .top10CleanAnswerCard{
+    grid-template-columns:
+      40px
+      minmax(0,1fr)
+      36px;
+
+    gap:6px;
+  }
+
+  .top10CleanAnswerNumber{
+    width:40px;
+    height:40px;
+
+    font-size:.98rem;
+  }
+
+  .top10CleanAnswerDelete{
+    width:36px;
+    height:36px;
+  }
+}
+
+/* =========================
+   21) FALLBACK
+========================= */
+
+@supports not selector(:has(*)){
+
+  .top10CleanRoundsGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .top10CleanRoundCard[open]{
+    grid-column:1 / -1;
+  }
+
+  .top10RoundHidden{
+    display:none;
+  }
+
+  @media (max-width:900px){
+
+    .top10CleanRoundsGrid{
+      grid-template-columns:1fr;
+    }
+  }
+}

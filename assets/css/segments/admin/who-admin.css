@@ -1,0 +1,1216 @@
+/* =========================================================
+   WHO ADMIN / إدارة فقرة من هو
+   CLEAN PROFESSIONAL DESIGN
+
+   File:
+   assets/css/segments/admin/who-admin.css
+========================================================= */
+
+/* =========================
+   1) ROOT
+========================= */
+
+.whoAdminShell{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+  gap:16px;
+}
+
+.compactWhoAdminShell{
+  align-content:start;
+}
+
+/* =========================
+   2) TOP BAR
+========================= */
+
+.whoAdminShell
+.adminEditorTopBar{
+  position:sticky;
+  top:112px;
+  z-index:20;
+
+  margin:0;
+
+  border-color:
+    rgba(35,61,77,.20);
+
+  background:
+    rgba(255,255,255,.97);
+
+  box-shadow:
+    0 14px 34px
+    rgba(35,61,77,.08);
+}
+
+.whoAdminShell
+.adminSectionTitle{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+
+.whoAdminShell
+.adminSectionTitle::before{
+  content:"؟";
+
+  width:46px;
+  height:46px;
+
+  flex:0 0 auto;
+
+  border-radius:15px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.65rem;
+  line-height:1;
+
+  box-shadow:
+    0 9px 20px
+    rgba(35,61,77,.22);
+}
+
+.whoAdminShell
+.adminInlineActions{
+  align-items:center;
+}
+
+.whoAdminShell
+.adminSaveBtn,
+.whoAdminShell
+.adminDeleteAllBtn{
+  min-width:130px;
+}
+
+/* =========================
+   3) ITEMS GRID
+========================= */
+
+.whoOnePageGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap:13px;
+
+  align-items:start;
+}
+
+.whoOnePageGrid.hasOpenCard,
+.whoOnePageGrid:has(
+  .whoItemOnePageCard[open]
+){
+  grid-template-columns:1fr;
+}
+
+/* =========================
+   4) ITEM CARD
+========================= */
+
+.whoItemOnePageCard{
+  position:relative;
+
+  min-width:0;
+
+  scroll-margin-top:220px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 10px 27px
+    rgba(35,61,77,.07);
+
+  overflow:hidden;
+
+  transition:
+    transform .18s var(--admin-ease),
+    border-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease);
+}
+
+.whoItemOnePageCard::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  width:5px;
+  z-index:2;
+
+  opacity:.55;
+
+  background:
+    var(--admin-primary);
+
+  transition:
+    width .18s var(--admin-ease),
+    opacity .18s var(--admin-ease);
+}
+
+.whoItemOnePageCard:hover{
+  transform:translateY(-2px);
+
+  border-color:
+    rgba(254,127,45,.34);
+
+  box-shadow:
+    0 16px 36px
+    rgba(35,61,77,.11);
+}
+
+.whoItemOnePageCard:hover::before,
+.whoItemOnePageCard[open]::before{
+  width:7px;
+  opacity:1;
+}
+
+.whoItemOnePageCard.isDone{
+  border-color:
+    rgba(0,127,0,.26);
+}
+
+.whoItemOnePageCard.isDone::before{
+  background:
+    var(--admin-green);
+}
+
+.whoItemOnePageCard.isMissing::before{
+  background:
+    var(--admin-primary);
+}
+
+.whoItemOnePageCard[open]{
+  grid-column:1 / -1;
+
+  transform:none;
+
+  border-color:
+    rgba(254,127,45,.38);
+
+  box-shadow:
+    0 22px 52px
+    rgba(35,61,77,.13);
+}
+
+/* =========================
+   5) ITEM SUMMARY
+========================= */
+
+.whoItemOnePageCard > summary{
+  min-height:96px;
+
+  list-style:none;
+  cursor:pointer;
+
+  padding:
+    15px
+    18px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    auto
+    auto;
+
+  align-items:center;
+
+  gap:12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #FAFBFC 100%
+    );
+
+  user-select:none;
+}
+
+.whoItemOnePageCard
+> summary::-webkit-details-marker{
+  display:none;
+}
+
+.whoItemOnePageCard
+> summary:hover{
+  background:
+    var(--admin-primary-soft);
+}
+
+.whoItemOnePageCard[open]
+> summary{
+  border-bottom:
+    1px solid var(--admin-line);
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      var(--admin-primary-soft) 100%
+    );
+}
+
+/* =========================
+   6) SUMMARY TITLE
+========================= */
+
+.whoItemOnePageCard
+.adminEditItemTitle{
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    48px
+    minmax(0,1fr);
+
+  align-items:center;
+
+  gap:11px;
+}
+
+.whoItemOnePageCard
+.adminEditItemTitle strong{
+  width:48px;
+  height:48px;
+
+  border-radius:15px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "MolhimCustom",
+    "HanakaText",
+    sans-serif;
+
+  font-size:1.15rem;
+  line-height:1;
+
+  box-shadow:
+    0 8px 18px
+    rgba(35,61,77,.18);
+}
+
+.whoItemOnePageCard.isDone
+.adminEditItemTitle strong{
+  background:
+    var(--admin-green);
+}
+
+.whoItemOnePageCard
+.adminEditItemTitle span{
+  min-width:0;
+
+  color:
+    var(--admin-muted);
+
+  font-size:.86rem;
+  line-height:1.45;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.whoItemOnePageCard.isDone
+.adminEditItemTitle span{
+  color:
+    var(--admin-green);
+}
+
+.whoItemOnePageCard.isMissing
+.adminEditItemTitle span{
+  color:
+    var(--admin-red);
+}
+
+/* =========================
+   7) SUMMARY META
+========================= */
+
+.whoItemOnePageCard
+.adminEditItemMeta{
+  display:flex;
+  align-items:center;
+
+  gap:7px;
+}
+
+.whoItemOnePageCard
+.adminEditStatusPill,
+.whoItemOnePageCard
+.adminEditProgressPill{
+  min-width:60px;
+}
+
+/* =========================
+   8) OPEN ICON
+========================= */
+
+.whoItemOnePageCard
+> summary::after{
+  content:"⌄";
+
+  width:34px;
+  height:34px;
+
+  flex:0 0 auto;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:11px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-size:1.05rem;
+
+  transition:
+    transform .18s var(--admin-ease),
+    color .18s var(--admin-ease),
+    background-color .18s var(--admin-ease),
+    border-color .18s var(--admin-ease);
+}
+
+.whoItemOnePageCard[open]
+> summary::after{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-secondary);
+
+  transform:rotate(180deg);
+}
+
+/* =========================
+   9) ITEM BODY
+========================= */
+
+.whoItemOnePageCard
+> .adminEditItemBody{
+  padding:
+    clamp(16px,2.3vw,24px);
+
+  background:#FFFFFF;
+}
+
+.whoItemOnePageCard[open]
+.adminEditItemBody{
+  animation:
+    whoAdminCardOpen
+    .22s
+    var(--admin-ease);
+}
+
+@keyframes whoAdminCardOpen{
+  from{
+    opacity:0;
+    transform:translateY(-6px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================
+   10) EDIT LAYOUT
+========================= */
+
+.whoOnePageLayout{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(300px,.82fr)
+    minmax(360px,1.18fr);
+
+  gap:18px;
+
+  align-items:stretch;
+}
+
+/* =========================
+   11) MEDIA COLUMN
+========================= */
+
+.whoOnePageMedia{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:14px;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:11px;
+}
+
+.whoOnePageMedia
+.adminField{
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:#FFFFFF;
+
+  padding:11px;
+}
+
+.whoOnePageMedia
+.adminField label{
+  display:block;
+
+  margin-bottom:8px;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:.9rem;
+}
+
+.whoOnePageMedia
+.adminField.adminMissingField{
+  border-color:
+    rgba(127,0,0,.24);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.whoOnePageMedia
+input[type="file"]{
+  min-height:54px;
+
+  background:
+    var(--admin-soft);
+}
+
+/* =========================
+   12) IMAGE PREVIEW
+========================= */
+
+.whoPreviewBox{
+  position:relative;
+
+  width:100%;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      #F1F3F5,
+      #E7ECEF
+    );
+
+  display:grid;
+  place-items:center;
+}
+
+.whoPreviewLarge{
+  min-height:360px;
+  height:min(46vw,500px);
+}
+
+.whoPreviewBox::before{
+  content:"معاينة الصورة";
+
+  position:absolute;
+  z-index:2;
+
+  top:10px;
+  right:10px;
+
+  border:
+    1px solid
+    rgba(35,61,77,.14);
+
+  border-radius:999px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    rgba(255,255,255,.92);
+
+  padding:
+    6px
+    10px;
+
+  font-size:.76rem;
+
+  pointer-events:none;
+}
+
+.whoPreviewBox
+.previewImg{
+  width:100%;
+  height:100%;
+
+  max-height:none;
+
+  object-fit:contain;
+  object-position:center;
+
+  background:
+    #EEF1F3;
+}
+
+.whoPreviewBox
+.emptyImageHint{
+  width:100%;
+  min-height:inherit;
+
+  display:grid;
+  place-items:center;
+
+  padding:34px;
+
+  color:
+    var(--admin-muted);
+
+  text-align:center;
+
+  font-size:.94rem;
+  line-height:1.6;
+}
+
+.whoPreviewBox
+.emptyImageHint::before{
+  content:"؟";
+
+  width:74px;
+  height:74px;
+
+  margin:
+    0 auto
+    14px;
+
+  border:
+    2px dashed
+    #BAC4CC;
+
+  border-radius:22px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    rgba(255,255,255,.68);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:2.2rem;
+}
+
+/* =========================
+   13) FIELDS COLUMN
+========================= */
+
+.whoOnePageFields{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:#FFFFFF;
+
+  padding:
+    clamp(16px,2vw,22px);
+
+  display:flex;
+  flex-direction:column;
+
+  gap:14px;
+}
+
+.whoOnePageFields::before{
+  content:"بيانات الإجابة";
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.05rem;
+
+  padding-bottom:12px;
+
+  border-bottom:
+    1px solid #EDF0F2;
+}
+
+.whoOnePageFields
+.adminField{
+  min-width:0;
+}
+
+.whoOnePageFields
+.adminField label{
+  display:block;
+
+  margin-bottom:8px;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:.9rem;
+}
+
+.whoOnePageFields
+.adminField input{
+  min-height:62px;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.08rem;
+}
+
+.whoOnePageFields
+.adminField:not(
+  .adminMissingField
+) input{
+  border-color:
+    rgba(0,127,0,.20);
+
+  background:#FFFFFF;
+}
+
+.whoOnePageFields
+.adminField.adminMissingField input{
+  border-color:
+    rgba(127,0,0,.30);
+
+  background:
+    #FFF8F8;
+}
+
+/* =========================
+   14) MISSING HINT
+========================= */
+
+.whoAdminShell
+.adminMissingHint{
+  border:
+    1px solid
+    rgba(127,0,0,.12);
+
+  border-radius:10px;
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  padding:
+    7px
+    10px;
+
+  font-size:.82rem;
+  line-height:1.4;
+}
+
+/* =========================
+   15) DELETE BUTTON
+========================= */
+
+.whoOnePageFields
+.adminDeleteBtn{
+  width:100%;
+  min-height:48px;
+
+  margin-top:auto;
+
+  border:
+    1px solid
+    rgba(127,0,0,.16);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  padding:
+    10px
+    15px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:.92rem;
+}
+
+.whoOnePageFields
+.adminDeleteBtn:hover{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red);
+}
+
+/* =========================
+   16) COLLAPSED CARD
+========================= */
+
+.whoItemOnePageCard:not([open]){
+  min-height:96px;
+}
+
+.whoItemOnePageCard:not([open])
+.adminEditItemBody{
+  display:none;
+}
+
+/* =========================
+   17) COMPLETE STATE
+========================= */
+
+.whoItemOnePageCard.isDone[open]
+.whoOnePageMedia{
+  border-color:
+    rgba(0,127,0,.22);
+}
+
+.whoItemOnePageCard.isDone[open]
+.whoOnePageFields{
+  border-color:
+    rgba(0,127,0,.22);
+}
+
+.whoItemOnePageCard.isDone
+.whoPreviewBox{
+  border-color:
+    rgba(0,127,0,.22);
+}
+
+/* =========================
+   18) MISSING STATE
+========================= */
+
+.whoItemOnePageCard.isMissing[open]
+.whoOnePageMedia{
+  border-color:
+    rgba(127,0,0,.18);
+}
+
+.whoItemOnePageCard.isMissing[open]
+.whoOnePageFields{
+  border-color:
+    rgba(127,0,0,.18);
+}
+
+/* =========================
+   19) SAVING STATE
+========================= */
+
+.adminIsSaving
+.whoAdminShell{
+  pointer-events:none;
+}
+
+.adminIsSaving
+.whoAdminShell
+.adminEditorTopBar{
+  pointer-events:auto;
+}
+
+.adminIsSaving
+.whoItemOnePageCard{
+  opacity:.72;
+}
+
+/* =========================
+   20) LARGE SCREENS
+========================= */
+
+@media (min-width:1500px){
+
+  .whoOnePageGrid{
+    gap:15px;
+  }
+
+  .whoOnePageLayout{
+    grid-template-columns:
+      minmax(360px,.8fr)
+      minmax(460px,1.2fr);
+
+    gap:22px;
+  }
+
+  .whoPreviewLarge{
+    height:500px;
+  }
+
+  .whoOnePageFields{
+    padding:24px;
+  }
+}
+
+/* =========================
+   21) LAPTOP
+========================= */
+
+@media (max-width:1180px){
+
+  .whoAdminShell
+  .adminEditorTopBar{
+    top:148px;
+  }
+
+  .whoOnePageGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .whoOnePageLayout{
+    grid-template-columns:
+      minmax(280px,.9fr)
+      minmax(320px,1.1fr);
+  }
+
+  .whoPreviewLarge{
+    min-height:320px;
+    height:420px;
+  }
+}
+
+/* =========================
+   22) TABLET
+========================= */
+
+@media (max-width:900px){
+
+  .whoAdminShell
+  .adminEditorTopBar{
+    position:relative;
+    top:auto;
+  }
+
+  .whoOnePageGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .whoItemOnePageCard{
+    scroll-margin-top:24px;
+  }
+
+  .whoOnePageLayout{
+    grid-template-columns:1fr;
+  }
+
+  .whoPreviewLarge{
+    min-height:360px;
+    height:min(62vw,500px);
+  }
+}
+
+/* =========================
+   23) SMALL TABLET
+========================= */
+
+@media (max-width:760px){
+
+  .whoOnePageGrid{
+    grid-template-columns:1fr;
+  }
+
+  .whoItemOnePageCard
+  > summary{
+    grid-template-columns:
+      minmax(0,1fr)
+      auto
+      auto;
+  }
+
+  .whoOnePageLayout{
+    grid-template-columns:
+      minmax(0,1fr)
+      minmax(240px,.72fr);
+  }
+
+  .whoPreviewLarge{
+    min-height:300px;
+    height:380px;
+  }
+}
+
+/* =========================
+   24) MOBILE
+========================= */
+
+@media (max-width:620px){
+
+  .whoAdminShell{
+    gap:10px;
+  }
+
+  .whoAdminShell
+  .adminEditorTopBar{
+    padding:12px;
+  }
+
+  .whoAdminShell
+  .adminSectionTitle{
+    width:100%;
+
+    justify-content:center;
+  }
+
+  .whoAdminShell
+  .adminInlineActions{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .whoAdminShell
+  .adminSaveBtn,
+  .whoAdminShell
+  .adminDeleteAllBtn{
+    width:100%;
+    min-width:0;
+  }
+
+  .whoOnePageGrid{
+    gap:10px;
+  }
+
+  .whoItemOnePageCard
+  > summary{
+    min-height:86px;
+
+    padding:
+      12px
+      14px;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      auto;
+  }
+
+  .whoItemOnePageCard
+  .adminEditItemTitle{
+    grid-template-columns:
+      42px
+      minmax(0,1fr);
+  }
+
+  .whoItemOnePageCard
+  .adminEditItemTitle strong{
+    width:42px;
+    height:42px;
+
+    border-radius:13px;
+
+    font-size:1rem;
+  }
+
+  .whoItemOnePageCard
+  .adminEditItemMeta{
+    grid-column:1 / -1;
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+
+    order:3;
+  }
+
+  .whoItemOnePageCard
+  .adminEditStatusPill,
+  .whoItemOnePageCard
+  .adminEditProgressPill{
+    width:100%;
+  }
+
+  .whoItemOnePageCard
+  > summary::after{
+    grid-column:2;
+    grid-row:1;
+
+    width:32px;
+    height:32px;
+  }
+
+  .whoItemOnePageCard
+  > .adminEditItemBody{
+    padding:12px;
+  }
+
+  .whoOnePageLayout{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .whoOnePageMedia,
+  .whoOnePageFields{
+    padding:12px;
+  }
+
+  .whoPreviewLarge{
+    min-height:260px;
+    height:min(95vw,420px);
+  }
+
+  .whoOnePageFields
+  .adminField input{
+    min-height:56px;
+
+    font-size:1rem;
+  }
+}
+
+/* =========================
+   25) SMALL MOBILE
+========================= */
+
+@media (max-width:420px){
+
+  .whoAdminShell
+  .adminInlineActions{
+    grid-template-columns:1fr;
+  }
+
+  .whoItemOnePageCard
+  .adminEditItemTitle span{
+    white-space:normal;
+
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    line-clamp:2;
+
+    overflow:hidden;
+  }
+
+  .whoPreviewLarge{
+    min-height:230px;
+    height:300px;
+  }
+}
+
+/* =========================
+   26) FALLBACK
+========================= */
+
+@supports not selector(:has(*)){
+
+  .whoOnePageGrid{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+
+  .whoOnePageGrid.hasOpenCard{
+    grid-template-columns:1fr;
+  }
+
+  .whoItemOnePageCard[open]{
+    grid-column:1 / -1;
+  }
+
+  @media (max-width:1180px){
+
+    .whoOnePageGrid{
+      grid-template-columns:
+        repeat(2,minmax(0,1fr));
+    }
+
+    .whoOnePageGrid.hasOpenCard{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (max-width:760px){
+
+    .whoOnePageGrid{
+      grid-template-columns:1fr;
+    }
+  }
+}

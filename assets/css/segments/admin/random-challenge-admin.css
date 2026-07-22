@@ -1,0 +1,2307 @@
+/* =========================================================
+   RANDOM CHALLENGE ADMIN / إدارة فقرة التحدي
+   CLEAN PROFESSIONAL DESIGN
+
+   Includes:
+   - اللاعب المشترك
+   - المزاد
+   - ماذا تعرف
+   - صح أو خطأ
+   - فتبلة
+
+   File:
+   assets/css/segments/admin/random-challenge-admin.css
+========================================================= */
+
+/* =========================
+   1) PAGE ROOT
+========================= */
+
+.randomChallengeAdminPage{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+  gap:14px;
+
+  align-content:start;
+}
+
+/* =========================
+   2) TOP BAR
+========================= */
+
+.randomChallengeAdminTopBar{
+  position:sticky;
+  top:112px;
+  z-index:22;
+
+  width:100%;
+  min-width:0;
+
+  margin:0;
+
+  border:
+    1px solid rgba(35,61,77,.20);
+
+  border-radius:
+    var(--admin-radius-lg);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 14px 34px
+    rgba(35,61,77,.08);
+
+  padding:
+    15px
+    18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:14px;
+}
+
+.randomChallengeAdminTopBar::before{
+  content:"ت";
+
+  width:48px;
+  height:48px;
+
+  flex:0 0 auto;
+
+  border-radius:15px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  box-shadow:
+    0 9px 20px
+    rgba(35,61,77,.22);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.45rem;
+  line-height:1;
+}
+
+.adminEditorTitleBox{
+  min-width:0;
+
+  flex:1 1 auto;
+
+  display:grid;
+  gap:4px;
+}
+
+.adminEditorTitleBox h2{
+  margin:0;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:
+    clamp(1.35rem,3vw,2rem);
+
+  line-height:1.2;
+}
+
+.adminEditorTitleBox span{
+  color:
+    var(--admin-muted);
+
+  font-size:.9rem;
+  line-height:1.5;
+}
+
+/* =========================
+   3) SECTION TABS
+========================= */
+
+.randomChallengeAdminTabs{
+  width:100%;
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-lg);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 10px 28px
+    rgba(35,61,77,.06);
+
+  padding:9px;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(5,minmax(0,1fr));
+
+  gap:8px;
+}
+
+.randomChallengeAdminTab{
+  width:100%;
+  min-width:0;
+  min-height:50px;
+
+  border:
+    1px solid transparent;
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  padding:
+    10px
+    13px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+
+  font-size:.94rem;
+  line-height:1.3;
+
+  white-space:normal;
+
+  transition:
+    transform .16s var(--admin-ease),
+    color .16s var(--admin-ease),
+    border-color .16s var(--admin-ease),
+    background-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease);
+}
+
+.randomChallengeAdminTab:hover{
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(254,127,45,.32);
+
+  background:
+    var(--admin-primary-soft);
+}
+
+.randomChallengeAdminTab.active{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-secondary);
+
+  box-shadow:
+    0 10px 22px
+    rgba(35,61,77,.18);
+}
+
+.randomChallengeAdminTab.active:hover{
+  background:
+    var(--admin-secondary-dark);
+}
+
+/* =========================
+   4) CONTENT AREA
+========================= */
+
+.randomChallengeAdminContent{
+  width:100%;
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-xl);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 12px 32px
+    rgba(35,61,77,.07);
+
+  padding:
+    clamp(13px,2.3vw,24px);
+}
+
+/* =========================
+   5) SHARED PLAYER
+========================= */
+
+.randomChallengeAdminContent
+> .adminEmptyState{
+  min-height:320px;
+
+  border:
+    1px dashed
+    rgba(35,61,77,.25);
+
+  border-radius:
+    var(--admin-radius-lg);
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  position:relative;
+
+  padding:
+    100px
+    24px
+    30px;
+
+  display:grid;
+  place-items:center;
+
+  text-align:center;
+
+  font-size:1.05rem;
+  line-height:1.7;
+}
+
+.randomChallengeAdminContent
+> .adminEmptyState::before{
+  content:"م";
+
+  position:absolute;
+
+  top:34px;
+  right:50%;
+
+  width:58px;
+  height:58px;
+
+  border-radius:18px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  transform:
+    translateX(50%);
+
+  box-shadow:
+    0 10px 24px
+    rgba(35,61,77,.20);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.6rem;
+}
+
+/* =========================
+   6) QUESTIONS EDITOR
+========================= */
+
+.randomChallengeQuestionsEditor{
+  width:100%;
+  min-width:0;
+}
+
+.randomChallengeOnePageGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(
+        min(100%,320px),
+        1fr
+      )
+    );
+
+  gap:12px;
+
+  align-items:start;
+}
+
+.randomChallengeOnePageGrid.hasOpenCard,
+.randomChallengeOnePageGrid:has(
+  .randomChallengeOnePageCard[open]
+){
+  grid-template-columns:1fr;
+}
+
+/* =========================
+   7) QUESTION CARD
+========================= */
+
+.randomChallengeOnePageCard{
+  position:relative;
+
+  min-width:0;
+
+  scroll-margin-top:225px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 9px 26px
+    rgba(35,61,77,.07);
+
+  overflow:hidden;
+
+  transition:
+    transform .18s var(--admin-ease),
+    border-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease);
+}
+
+.randomChallengeOnePageCard::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  z-index:2;
+
+  width:5px;
+
+  opacity:.55;
+
+  background:
+    var(--admin-primary);
+
+  transition:
+    width .18s var(--admin-ease),
+    opacity .18s var(--admin-ease);
+}
+
+.randomChallengeOnePageCard:hover{
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(254,127,45,.34);
+
+  box-shadow:
+    0 16px 36px
+    rgba(35,61,77,.11);
+}
+
+.randomChallengeOnePageCard:hover::before,
+.randomChallengeOnePageCard[open]::before{
+  width:7px;
+  opacity:1;
+}
+
+.randomChallengeOnePageCard.isDone{
+  border-color:
+    rgba(0,127,0,.27);
+}
+
+.randomChallengeOnePageCard.isDone::before{
+  background:
+    var(--admin-green);
+}
+
+.randomChallengeOnePageCard.isMissing::before{
+  background:
+    var(--admin-primary);
+}
+
+.randomChallengeOnePageCard[open]{
+  grid-column:1 / -1;
+
+  transform:none;
+
+  border-color:
+    rgba(254,127,45,.40);
+
+  box-shadow:
+    0 22px 52px
+    rgba(35,61,77,.13);
+}
+
+/* =========================
+   8) QUESTION SUMMARY
+========================= */
+
+.randomChallengeOnePageCard > summary{
+  min-height:90px;
+
+  list-style:none;
+  cursor:pointer;
+
+  padding:
+    14px
+    17px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    auto
+    auto;
+
+  align-items:center;
+
+  gap:11px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #FAFBFC 100%
+    );
+
+  user-select:none;
+}
+
+.randomChallengeOnePageCard
+> summary::-webkit-details-marker{
+  display:none;
+}
+
+.randomChallengeOnePageCard
+> summary:hover{
+  background:
+    var(--admin-primary-soft);
+}
+
+.randomChallengeOnePageCard[open]
+> summary{
+  border-bottom:
+    1px solid var(--admin-line);
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      var(--admin-primary-soft) 100%
+    );
+}
+
+/* =========================
+   9) SUMMARY TITLE
+========================= */
+
+.randomChallengeOnePageCard
+.adminEditItemTitle{
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    44px
+    minmax(0,1fr);
+
+  align-items:center;
+
+  gap:10px;
+}
+
+.randomChallengeOnePageCard
+.adminEditItemTitle::before{
+  content:"س";
+
+  width:44px;
+  height:44px;
+
+  grid-column:1;
+  grid-row:1;
+
+  border-radius:14px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  box-shadow:
+    0 8px 18px
+    rgba(35,61,77,.18);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.15rem;
+}
+
+.randomChallengeOnePageCard.isDone
+.adminEditItemTitle::before{
+  background:
+    var(--admin-green);
+}
+
+.randomChallengeOnePageCard
+.adminEditItemTitle strong{
+  grid-column:2;
+
+  min-width:0;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:
+    clamp(1rem,2vw,1.16rem);
+
+  line-height:1.35;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* =========================
+   10) SUMMARY META
+========================= */
+
+.randomChallengeOnePageCard
+.adminEditItemMeta{
+  display:flex;
+  align-items:center;
+
+  gap:7px;
+}
+
+.randomChallengeOnePageCard
+.adminEditStatusPill,
+.randomChallengeOnePageCard
+.adminEditProgressPill{
+  min-width:60px;
+}
+
+/* =========================
+   11) OPEN ICON
+========================= */
+
+.randomChallengeOnePageCard
+> summary::after{
+  content:"⌄";
+
+  width:34px;
+  height:34px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:11px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-size:1.05rem;
+
+  transition:
+    transform .18s var(--admin-ease),
+    color .18s var(--admin-ease),
+    background-color .18s var(--admin-ease),
+    border-color .18s var(--admin-ease);
+}
+
+.randomChallengeOnePageCard[open]
+> summary::after{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-secondary);
+
+  transform:
+    rotate(180deg);
+}
+
+/* =========================
+   12) QUESTION BODY
+========================= */
+
+.randomChallengeOnePageCard
+> .adminEditItemBody{
+  padding:
+    clamp(14px,2vw,20px);
+
+  display:grid;
+  gap:13px;
+
+  background:#FFFFFF;
+}
+
+.randomChallengeOnePageCard[open]
+.adminEditItemBody{
+  animation:
+    randomChallengeAdminOpen
+    .22s
+    var(--admin-ease);
+}
+
+@keyframes randomChallengeAdminOpen{
+  from{
+    opacity:0;
+    transform:
+      translateY(-6px);
+  }
+
+  to{
+    opacity:1;
+    transform:
+      translateY(0);
+  }
+}
+
+/* =========================
+   13) QUESTION FIELD
+========================= */
+
+.randomChallengeOnePageCard
+.adminField{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:12px;
+
+  display:grid;
+  gap:8px;
+}
+
+.randomChallengeOnePageCard
+.adminField:first-child::before{
+  content:"نص السؤال أو العبارة";
+
+  color:
+    var(--admin-secondary);
+
+  font-size:.88rem;
+  line-height:1.4;
+}
+
+.randomChallengeOnePageCard
+.adminField textarea{
+  width:100%;
+  min-width:0;
+
+  min-height:150px;
+  max-height:360px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-text);
+
+  background:#FFFFFF;
+
+  padding:
+    13px
+    15px;
+
+  resize:vertical;
+
+  font-size:1rem;
+  line-height:1.65;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.randomChallengeOnePageCard
+.adminField textarea:focus{
+  outline:0;
+
+  border-color:
+    var(--admin-primary);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.11);
+}
+
+.randomChallengeOnePageCard
+.adminField:not(.adminMissingField){
+  border-color:
+    rgba(0,127,0,.20);
+}
+
+.randomChallengeOnePageCard
+.adminField:not(.adminMissingField)
+textarea{
+  border-color:
+    rgba(0,127,0,.18);
+}
+
+.randomChallengeOnePageCard
+.adminField.adminMissingField{
+  border-color:
+    rgba(127,0,0,.20);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.randomChallengeOnePageCard
+.adminField.adminMissingField
+textarea{
+  border-color:
+    rgba(127,0,0,.28);
+
+  background:#FFF9F9;
+}
+
+/* =========================
+   14) TRUE / FALSE OPTIONS
+========================= */
+
+.randomChallengeTrueFalseOptions{
+  width:100%;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:9px;
+}
+
+.randomChallengeTrueFalseBtn{
+  width:100%;
+  min-height:56px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-secondary);
+
+  background:#FFFFFF;
+
+  padding:
+    10px
+    16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:1rem;
+
+  transition:
+    transform .16s var(--admin-ease),
+    color .16s var(--admin-ease),
+    border-color .16s var(--admin-ease),
+    background-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease);
+}
+
+.randomChallengeTrueFalseBtn:hover{
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(35,61,77,.32);
+
+  background:
+    var(--admin-soft);
+}
+
+.randomChallengeTrueFalseBtn.correct:hover,
+.randomChallengeTrueFalseBtn.selected.correct{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-green);
+
+  background:
+    var(--admin-green);
+
+  box-shadow:
+    0 9px 20px
+    rgba(0,127,0,.18);
+}
+
+.randomChallengeTrueFalseBtn.wrong:hover,
+.randomChallengeTrueFalseBtn.selected.wrong{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red);
+
+  box-shadow:
+    0 9px 20px
+    rgba(127,0,0,.18);
+}
+
+/* =========================
+   15) QUESTION DELETE
+========================= */
+
+.randomChallengeOnePageCard
+.adminDeleteMiniBtn{
+  width:100%;
+  min-height:44px;
+
+  border:
+    1px solid
+    rgba(127,0,0,.16);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  padding:
+    9px
+    14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:.88rem;
+}
+
+.randomChallengeOnePageCard
+.adminDeleteMiniBtn:hover{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red);
+}
+
+/* =========================================================
+   FATBLA / فتبلة
+========================================================= */
+
+/* =========================
+   16) FATBLA ROOT
+========================= */
+
+.fatblaAdminShell{
+  width:100%;
+  min-width:0;
+}
+
+.compactFatblaAdminShell{
+  display:grid;
+  gap:13px;
+}
+
+/* =========================
+   17) FATBLA GRID
+========================= */
+
+.fatblaOnePageGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:13px;
+
+  align-items:start;
+}
+
+.fatblaOnePageGrid.hasOpenCard,
+.fatblaOnePageGrid:has(
+  .fatblaQuestionOnePageCard[open]
+){
+  grid-template-columns:1fr;
+}
+
+/* =========================
+   18) FATBLA CARD
+========================= */
+
+.fatblaQuestionOnePageCard{
+  position:relative;
+
+  min-width:0;
+
+  scroll-margin-top:225px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 10px 27px
+    rgba(35,61,77,.07);
+
+  overflow:hidden;
+
+  transition:
+    transform .18s var(--admin-ease),
+    border-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease);
+}
+
+.fatblaQuestionOnePageCard::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  z-index:2;
+
+  width:5px;
+
+  opacity:.55;
+
+  background:
+    var(--admin-primary);
+
+  transition:
+    width .18s var(--admin-ease),
+    opacity .18s var(--admin-ease);
+}
+
+.fatblaQuestionOnePageCard:hover{
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(254,127,45,.34);
+
+  box-shadow:
+    0 16px 36px
+    rgba(35,61,77,.11);
+}
+
+.fatblaQuestionOnePageCard:hover::before,
+.fatblaQuestionOnePageCard[open]::before{
+  width:7px;
+  opacity:1;
+}
+
+.fatblaQuestionOnePageCard.isDone{
+  border-color:
+    rgba(0,127,0,.26);
+}
+
+.fatblaQuestionOnePageCard.isDone::before{
+  background:
+    var(--admin-green);
+}
+
+.fatblaQuestionOnePageCard.isMissing::before{
+  background:
+    var(--admin-primary);
+}
+
+.fatblaQuestionOnePageCard[open]{
+  grid-column:1 / -1;
+
+  transform:none;
+
+  border-color:
+    rgba(254,127,45,.40);
+
+  box-shadow:
+    0 22px 52px
+    rgba(35,61,77,.13);
+}
+
+/* =========================
+   19) FATBLA SUMMARY
+========================= */
+
+.fatblaQuestionOnePageCard > summary{
+  min-height:94px;
+
+  list-style:none;
+  cursor:pointer;
+
+  padding:
+    14px
+    17px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    auto
+    auto;
+
+  align-items:center;
+
+  gap:11px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #FAFBFC 100%
+    );
+
+  user-select:none;
+}
+
+.fatblaQuestionOnePageCard
+> summary::-webkit-details-marker{
+  display:none;
+}
+
+.fatblaQuestionOnePageCard
+> summary:hover{
+  background:
+    var(--admin-primary-soft);
+}
+
+.fatblaQuestionOnePageCard[open]
+> summary{
+  border-bottom:
+    1px solid var(--admin-line);
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      var(--admin-primary-soft) 100%
+    );
+}
+
+/* =========================
+   20) FATBLA SUMMARY TITLE
+========================= */
+
+.fatblaQuestionOnePageCard
+.adminEditItemTitle{
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    46px
+    minmax(0,1fr);
+
+  align-items:center;
+
+  gap:10px;
+}
+
+.fatblaQuestionOnePageCard
+.adminEditItemTitle::before{
+  content:"ف";
+
+  width:46px;
+  height:46px;
+
+  grid-column:1;
+  grid-row:1 / span 2;
+
+  border-radius:14px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  box-shadow:
+    0 8px 18px
+    rgba(35,61,77,.18);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.2rem;
+}
+
+.fatblaQuestionOnePageCard.isDone
+.adminEditItemTitle::before{
+  background:
+    var(--admin-green);
+}
+
+.fatblaQuestionOnePageCard
+.adminEditItemTitle strong{
+  grid-column:2;
+
+  min-width:0;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:
+    clamp(1rem,2vw,1.17rem);
+
+  line-height:1.35;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.fatblaQuestionOnePageCard
+.adminEditItemTitle span{
+  grid-column:2;
+
+  min-width:0;
+
+  color:
+    var(--admin-muted);
+
+  font-size:.83rem;
+  line-height:1.4;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.fatblaQuestionOnePageCard.isDone
+.adminEditItemTitle span{
+  color:
+    var(--admin-green);
+}
+
+.fatblaQuestionOnePageCard.isMissing
+.adminEditItemTitle span{
+  color:
+    var(--admin-red);
+}
+
+.fatblaQuestionOnePageCard
+.adminEditItemMeta{
+  display:flex;
+  align-items:center;
+
+  gap:7px;
+}
+
+.fatblaQuestionOnePageCard
+.adminEditStatusPill,
+.fatblaQuestionOnePageCard
+.adminEditProgressPill{
+  min-width:60px;
+}
+
+.fatblaQuestionOnePageCard
+> summary::after{
+  content:"⌄";
+
+  width:34px;
+  height:34px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:11px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-size:1.05rem;
+
+  transition:
+    transform .18s var(--admin-ease),
+    color .18s var(--admin-ease),
+    background-color .18s var(--admin-ease),
+    border-color .18s var(--admin-ease);
+}
+
+.fatblaQuestionOnePageCard[open]
+> summary::after{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-secondary);
+
+  transform:
+    rotate(180deg);
+}
+
+/* =========================
+   21) FATBLA BODY
+========================= */
+
+.fatblaQuestionOnePageCard
+> .adminEditItemBody{
+  padding:
+    clamp(15px,2.2vw,23px);
+
+  background:#FFFFFF;
+}
+
+.fatblaQuestionOnePageCard[open]
+.adminEditItemBody{
+  animation:
+    fatblaAdminOpen
+    .22s
+    var(--admin-ease);
+}
+
+@keyframes fatblaAdminOpen{
+  from{
+    opacity:0;
+    transform:
+      translateY(-6px);
+  }
+
+  to{
+    opacity:1;
+    transform:
+      translateY(0);
+  }
+}
+
+/* =========================
+   22) FATBLA LAYOUT
+========================= */
+
+.fatblaOnePageLayout{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(320px,.86fr)
+    minmax(360px,1.14fr);
+
+  gap:18px;
+
+  align-items:stretch;
+}
+
+.fatblaOnePageLayoutAnswerOnly{
+  position:relative;
+}
+
+/* =========================
+   23) FATBLA MEDIA
+========================= */
+
+.fatblaOnePageMedia{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:14px;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:11px;
+}
+
+.fatblaOnePageMedia
+.adminField{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:#FFFFFF;
+
+  padding:10px;
+
+  display:grid;
+  gap:8px;
+}
+
+.fatblaOnePageMedia
+.adminField label{
+  color:
+    var(--admin-secondary);
+
+  font-size:.87rem;
+}
+
+.fatblaOnePageMedia
+.adminField.adminMissingField{
+  border-color:
+    rgba(127,0,0,.22);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.fatblaOnePageMedia
+input[type="file"]{
+  min-height:52px;
+}
+
+/* =========================
+   24) FATBLA PREVIEW
+========================= */
+
+.fatblaPreviewBox{
+  position:relative;
+
+  width:100%;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      #F0F3F5,
+      #E5EAED
+    );
+
+  display:grid;
+  place-items:center;
+}
+
+.fatblaPreviewLarge{
+  min-height:360px;
+  height:min(44vw,500px);
+}
+
+.fatblaPreviewBox::before{
+  content:"معاينة الوسائط";
+
+  position:absolute;
+  z-index:2;
+
+  top:10px;
+  right:10px;
+
+  border:
+    1px solid
+    rgba(35,61,77,.14);
+
+  border-radius:999px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    rgba(255,255,255,.92);
+
+  padding:
+    5px
+    10px;
+
+  font-size:.75rem;
+
+  pointer-events:none;
+}
+
+.fatblaPreviewBox
+.previewImg{
+  width:100%;
+  height:100%;
+
+  max-height:none;
+
+  object-fit:contain;
+  object-position:center;
+
+  background:#EDF1F3;
+}
+
+.fatblaPreviewBox
+video.previewImg{
+  background:#151515;
+}
+
+.fatblaPreviewBox
+.emptyImageHint{
+  width:100%;
+  height:100%;
+
+  min-height:inherit;
+
+  color:
+    var(--admin-muted);
+
+  padding:30px;
+
+  display:grid;
+  place-items:center;
+
+  text-align:center;
+}
+
+/* =========================
+   25) FATBLA FIELDS
+========================= */
+
+.fatblaOnePageFields{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:#FFFFFF;
+
+  padding:
+    clamp(16px,2vw,22px);
+
+  display:flex;
+  flex-direction:column;
+
+  gap:14px;
+}
+
+.fatblaOnePageFields::before{
+  content:"بيانات الإجابة";
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.05rem;
+
+  padding-bottom:12px;
+
+  border-bottom:
+    1px solid #EDF0F2;
+}
+
+.fatblaOnePageFields
+.adminField{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:
+    var(--admin-soft);
+
+  padding:12px;
+
+  display:grid;
+  gap:8px;
+}
+
+.fatblaOnePageFields
+.adminField label{
+  color:
+    var(--admin-secondary);
+
+  font-size:.9rem;
+}
+
+.fatblaOnePageFields
+.adminField input{
+  width:100%;
+  min-width:0;
+
+  min-height:62px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-secondary);
+
+  background:#FFFFFF;
+
+  padding:
+    12px
+    15px;
+
+  font-size:1.07rem;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease);
+}
+
+.fatblaOnePageFields
+.adminField input:focus{
+  outline:0;
+
+  border-color:
+    var(--admin-primary);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.11);
+}
+
+.fatblaOnePageFields
+.adminField:not(.adminMissingField){
+  border-color:
+    rgba(0,127,0,.20);
+}
+
+.fatblaOnePageFields
+.adminField:not(.adminMissingField)
+input{
+  border-color:
+    rgba(0,127,0,.18);
+}
+
+.fatblaOnePageFields
+.adminField.adminMissingField{
+  border-color:
+    rgba(127,0,0,.21);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.fatblaOnePageFields
+.adminField.adminMissingField
+input{
+  border-color:
+    rgba(127,0,0,.28);
+
+  background:#FFF9F9;
+}
+
+/* =========================
+   26) FATBLA DELETE
+========================= */
+
+.fatblaOnePageFields
+.adminDeleteBtn{
+  width:100%;
+  min-height:48px;
+
+  margin-top:auto;
+
+  border:
+    1px solid
+    rgba(127,0,0,.16);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  padding:
+    10px
+    15px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:.9rem;
+}
+
+.fatblaOnePageFields
+.adminDeleteBtn:hover{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red);
+}
+
+/* =========================
+   27) MISSING HINT
+========================= */
+
+.randomChallengeAdminPage
+.adminMissingHint{
+  border:
+    1px solid
+    rgba(127,0,0,.12);
+
+  border-radius:10px;
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  padding:
+    7px
+    10px;
+
+  font-size:.82rem;
+  line-height:1.4;
+}
+
+/* =========================
+   28) BOTTOM ACTIONS
+========================= */
+
+.randomChallengeAdminActions{
+  width:100%;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-lg);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 12px 30px
+    rgba(35,61,77,.08);
+
+  padding:12px;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:9px;
+}
+
+.randomChallengeAdminActions
+.adminBtn{
+  width:100%;
+  min-height:54px;
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  padding:
+    11px
+    18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:1rem;
+}
+
+.randomChallengeAdminActions
+.adminBtnMango{
+  color:#FFFFFF;
+
+  border:
+    1px solid var(--admin-primary);
+
+  background:
+    var(--admin-primary);
+
+  box-shadow:
+    0 10px 23px
+    rgba(254,127,45,.22);
+}
+
+.randomChallengeAdminActions
+.adminBtnMango:hover{
+  background:
+    var(--admin-primary-hover);
+}
+
+.randomChallengeAdminActions
+.adminBtnDanger{
+  color:
+    var(--admin-red);
+
+  border:
+    1px solid
+    rgba(127,0,0,.18);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.randomChallengeAdminActions
+.adminBtnDanger:hover{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red);
+}
+
+/* =========================
+   29) COMPLETE STATES
+========================= */
+
+.fatblaQuestionOnePageCard.isDone
+.fatblaOnePageMedia,
+.fatblaQuestionOnePageCard.isDone
+.fatblaOnePageFields{
+  border-color:
+    rgba(0,127,0,.22);
+}
+
+/* =========================
+   30) SAVING STATE
+========================= */
+
+.adminIsSaving
+.randomChallengeAdminPage{
+  pointer-events:none;
+}
+
+.adminIsSaving
+.randomChallengeAdminTopBar{
+  pointer-events:auto;
+}
+
+.adminIsSaving
+.randomChallengeOnePageCard,
+.adminIsSaving
+.fatblaQuestionOnePageCard{
+  opacity:.72;
+}
+
+/* =========================
+   31) LARGE SCREENS
+========================= */
+
+@media (min-width:1500px){
+
+  .randomChallengeOnePageGrid{
+    grid-template-columns:
+      repeat(
+        auto-fit,
+        minmax(340px,1fr)
+      );
+  }
+
+  .randomChallengeOnePageGrid.hasOpenCard,
+  .randomChallengeOnePageGrid:has(
+    .randomChallengeOnePageCard[open]
+  ){
+    grid-template-columns:1fr;
+  }
+
+  .fatblaOnePageGrid{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+
+  .fatblaOnePageGrid.hasOpenCard,
+  .fatblaOnePageGrid:has(
+    .fatblaQuestionOnePageCard[open]
+  ){
+    grid-template-columns:1fr;
+  }
+
+  .fatblaOnePageLayout{
+    grid-template-columns:
+      minmax(410px,.82fr)
+      minmax(520px,1.18fr);
+
+    gap:22px;
+  }
+
+  .fatblaPreviewLarge{
+    height:520px;
+  }
+}
+
+/* =========================
+   32) LAPTOP
+========================= */
+
+@media (max-width:1180px){
+
+  .randomChallengeAdminTopBar{
+    top:148px;
+  }
+
+  .randomChallengeAdminTabs{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+
+  .fatblaOnePageLayout{
+    grid-template-columns:
+      minmax(290px,.9fr)
+      minmax(340px,1.1fr);
+  }
+
+  .fatblaPreviewLarge{
+    min-height:320px;
+    height:420px;
+  }
+}
+
+/* =========================
+   33) TABLET
+========================= */
+
+@media (max-width:900px){
+
+  .randomChallengeAdminTopBar{
+    position:relative;
+    top:auto;
+  }
+
+  .randomChallengeOnePageCard,
+  .fatblaQuestionOnePageCard{
+    scroll-margin-top:24px;
+  }
+
+  .randomChallengeAdminTabs{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .fatblaOnePageGrid{
+    grid-template-columns:1fr;
+  }
+
+  .fatblaOnePageLayout{
+    grid-template-columns:1fr;
+  }
+
+  .fatblaPreviewLarge{
+    min-height:350px;
+    height:min(62vw,500px);
+  }
+}
+
+/* =========================
+   34) SMALL TABLET
+========================= */
+
+@media (max-width:760px){
+
+  .randomChallengeOnePageGrid{
+    grid-template-columns:1fr;
+  }
+
+  .randomChallengeAdminTabs{
+    display:flex;
+
+    overflow-x:auto;
+    overflow-y:hidden;
+
+    scrollbar-width:thin;
+
+    scroll-snap-type:
+      x proximity;
+  }
+
+  .randomChallengeAdminTab{
+    flex:
+      0 0
+      min(190px,62vw);
+
+    scroll-snap-align:start;
+  }
+
+  .randomChallengeAdminActions{
+    grid-template-columns:1fr;
+  }
+}
+
+/* =========================
+   35) MOBILE
+========================= */
+
+@media (max-width:620px){
+
+  .randomChallengeAdminPage{
+    gap:10px;
+  }
+
+  .randomChallengeAdminTopBar{
+    padding:12px;
+
+    align-items:center;
+  }
+
+  .randomChallengeAdminTopBar::before{
+    width:42px;
+    height:42px;
+
+    border-radius:13px;
+  }
+
+  .adminEditorTitleBox h2{
+    font-size:1.35rem;
+  }
+
+  .adminEditorTitleBox span{
+    font-size:.82rem;
+  }
+
+  .randomChallengeAdminTabs{
+    border-radius:
+      var(--admin-radius-md);
+
+    padding:7px;
+  }
+
+  .randomChallengeAdminTab{
+    min-height:46px;
+
+    flex-basis:
+      min(170px,68vw);
+
+    font-size:.88rem;
+  }
+
+  .randomChallengeAdminContent{
+    border-radius:
+      var(--admin-radius-lg);
+
+    padding:10px;
+  }
+
+  .randomChallengeOnePageGrid,
+  .fatblaOnePageGrid{
+    gap:10px;
+  }
+
+  .randomChallengeOnePageCard
+  > summary,
+  .fatblaQuestionOnePageCard
+  > summary{
+    min-height:88px;
+
+    padding:
+      12px
+      14px;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      auto;
+  }
+
+  .randomChallengeOnePageCard
+  .adminEditItemTitle{
+    grid-template-columns:
+      40px
+      minmax(0,1fr);
+  }
+
+  .randomChallengeOnePageCard
+  .adminEditItemTitle::before{
+    width:40px;
+    height:40px;
+
+    border-radius:12px;
+  }
+
+  .fatblaQuestionOnePageCard
+  .adminEditItemTitle{
+    grid-template-columns:
+      40px
+      minmax(0,1fr);
+  }
+
+  .fatblaQuestionOnePageCard
+  .adminEditItemTitle::before{
+    width:40px;
+    height:40px;
+
+    border-radius:12px;
+  }
+
+  .randomChallengeOnePageCard
+  .adminEditItemMeta,
+  .fatblaQuestionOnePageCard
+  .adminEditItemMeta{
+    grid-column:1 / -1;
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
+    order:3;
+  }
+
+  .randomChallengeOnePageCard
+  .adminEditStatusPill,
+  .randomChallengeOnePageCard
+  .adminEditProgressPill,
+  .fatblaQuestionOnePageCard
+  .adminEditStatusPill,
+  .fatblaQuestionOnePageCard
+  .adminEditProgressPill{
+    width:100%;
+  }
+
+  .randomChallengeOnePageCard
+  > summary::after,
+  .fatblaQuestionOnePageCard
+  > summary::after{
+    grid-column:2;
+    grid-row:1;
+
+    width:32px;
+    height:32px;
+  }
+
+  .randomChallengeOnePageCard
+  > .adminEditItemBody,
+  .fatblaQuestionOnePageCard
+  > .adminEditItemBody{
+    padding:11px;
+  }
+
+  .randomChallengeOnePageCard
+  .adminField{
+    padding:10px;
+  }
+
+  .randomChallengeOnePageCard
+  .adminField textarea{
+    min-height:125px;
+  }
+
+  .randomChallengeTrueFalseBtn{
+    min-height:50px;
+  }
+
+  .fatblaOnePageLayout{
+    gap:11px;
+  }
+
+  .fatblaOnePageMedia,
+  .fatblaOnePageFields{
+    padding:11px;
+  }
+
+  .fatblaPreviewLarge{
+    min-height:250px;
+    height:min(94vw,390px);
+  }
+
+  .fatblaOnePageFields
+  .adminField input{
+    min-height:56px;
+
+    font-size:1rem;
+  }
+
+  .randomChallengeAdminActions{
+    padding:9px;
+  }
+}
+
+/* =========================
+   36) SMALL MOBILE
+========================= */
+
+@media (max-width:420px){
+
+  .randomChallengeAdminTopBar{
+    align-items:flex-start;
+  }
+
+  .randomChallengeAdminTopBar::before{
+    width:38px;
+    height:38px;
+
+    font-size:1.2rem;
+  }
+
+  .randomChallengeOnePageCard
+  .adminEditItemTitle strong,
+  .fatblaQuestionOnePageCard
+  .adminEditItemTitle strong,
+  .fatblaQuestionOnePageCard
+  .adminEditItemTitle span{
+    white-space:normal;
+  }
+
+  .fatblaQuestionOnePageCard
+  .adminEditItemTitle span{
+    display:-webkit-box;
+
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    line-clamp:2;
+
+    overflow:hidden;
+  }
+
+  .randomChallengeTrueFalseOptions{
+    grid-template-columns:1fr;
+  }
+
+  .fatblaPreviewLarge{
+    min-height:220px;
+    height:290px;
+  }
+}
+
+/* =========================
+   37) FALLBACK
+========================= */
+
+@supports not selector(:has(*)){
+
+  .randomChallengeOnePageGrid{
+    grid-template-columns:
+      repeat(
+        auto-fit,
+        minmax(300px,1fr)
+      );
+  }
+
+  .randomChallengeOnePageGrid.hasOpenCard{
+    grid-template-columns:1fr;
+  }
+
+  .randomChallengeOnePageCard[open]{
+    grid-column:1 / -1;
+  }
+
+  .fatblaOnePageGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .fatblaOnePageGrid.hasOpenCard{
+    grid-template-columns:1fr;
+  }
+
+  .fatblaQuestionOnePageCard[open]{
+    grid-column:1 / -1;
+  }
+
+  @media (min-width:1500px){
+
+    .fatblaOnePageGrid{
+      grid-template-columns:
+        repeat(3,minmax(0,1fr));
+    }
+
+    .fatblaOnePageGrid.hasOpenCard{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (max-width:900px){
+
+    .fatblaOnePageGrid{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (max-width:760px){
+
+    .randomChallengeOnePageGrid{
+      grid-template-columns:1fr;
+    }
+  }
+}

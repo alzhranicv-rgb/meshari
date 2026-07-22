@@ -1,0 +1,1113 @@
+/* =========================================================
+   EXPLAIN ADMIN / إدارة فقرة اشرح الكلمة
+   CLEAN PROFESSIONAL DESIGN
+
+   File:
+   assets/css/segments/admin/explain-admin.css
+========================================================= */
+
+/* =========================
+   1) ROOT
+========================= */
+
+.explainAdminShell{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+  gap:16px;
+}
+
+.compactExplainAdminShell{
+  align-content:start;
+}
+
+/* =========================
+   2) TOP BAR
+========================= */
+
+.explainAdminShell
+.adminEditorTopBar{
+  position:sticky;
+  top:112px;
+  z-index:20;
+
+  margin:0;
+
+  border-color:
+    rgba(35,61,77,.20);
+
+  background:
+    rgba(255,255,255,.97);
+
+  box-shadow:
+    0 14px 34px
+    rgba(35,61,77,.08);
+}
+
+.explainAdminShell
+.adminSectionTitle{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+
+.explainAdminShell
+.adminSectionTitle::before{
+  content:"ك";
+
+  width:46px;
+  height:46px;
+
+  flex:0 0 auto;
+
+  border-radius:15px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.45rem;
+  line-height:1;
+
+  box-shadow:
+    0 9px 20px
+    rgba(35,61,77,.22);
+}
+
+.explainAdminShell
+.adminInlineActions{
+  align-items:center;
+}
+
+.explainAdminShell
+.adminSaveBtn,
+.explainAdminShell
+.adminDeleteAllBtn{
+  min-width:145px;
+}
+
+/* =========================
+   3) WORDS GRID
+========================= */
+
+.explainOnePageGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap:13px;
+
+  align-items:start;
+}
+
+.explainOnePageGrid.hasOpenCard,
+.explainOnePageGrid:has(
+  .explainItemOnePageCard[open]
+){
+  grid-template-columns:1fr;
+}
+
+/* =========================
+   4) WORD CARD
+========================= */
+
+.explainItemOnePageCard{
+  position:relative;
+
+  min-width:0;
+
+  scroll-margin-top:220px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 10px 27px
+    rgba(35,61,77,.07);
+
+  overflow:hidden;
+
+  transition:
+    transform .18s var(--admin-ease),
+    border-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease);
+}
+
+.explainItemOnePageCard::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  width:5px;
+  z-index:2;
+
+  opacity:.55;
+
+  background:
+    var(--admin-primary);
+
+  transition:
+    width .18s var(--admin-ease),
+    opacity .18s var(--admin-ease);
+}
+
+.explainItemOnePageCard:hover{
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(254,127,45,.34);
+
+  box-shadow:
+    0 16px 36px
+    rgba(35,61,77,.11);
+}
+
+.explainItemOnePageCard:hover::before,
+.explainItemOnePageCard[open]::before{
+  width:7px;
+  opacity:1;
+}
+
+.explainItemOnePageCard.isDone{
+  border-color:
+    rgba(0,127,0,.26);
+}
+
+.explainItemOnePageCard.isDone::before{
+  background:
+    var(--admin-green);
+}
+
+.explainItemOnePageCard.isMissing::before{
+  background:
+    var(--admin-primary);
+}
+
+.explainItemOnePageCard[open]{
+  grid-column:1 / -1;
+
+  transform:none;
+
+  border-color:
+    rgba(254,127,45,.38);
+
+  box-shadow:
+    0 22px 52px
+    rgba(35,61,77,.13);
+}
+
+/* =========================
+   5) CARD SUMMARY
+========================= */
+
+.explainItemOnePageCard > summary{
+  min-height:94px;
+
+  list-style:none;
+  cursor:pointer;
+
+  padding:
+    15px
+    18px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    auto
+    auto;
+
+  align-items:center;
+
+  gap:12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #FAFBFC 100%
+    );
+
+  user-select:none;
+}
+
+.explainItemOnePageCard
+> summary::-webkit-details-marker{
+  display:none;
+}
+
+.explainItemOnePageCard
+> summary:hover{
+  background:
+    var(--admin-primary-soft);
+}
+
+.explainItemOnePageCard[open]
+> summary{
+  border-bottom:
+    1px solid var(--admin-line);
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      var(--admin-primary-soft) 100%
+    );
+}
+
+/* =========================
+   6) SUMMARY TITLE
+========================= */
+
+.explainItemOnePageCard
+.adminEditItemTitle{
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    46px
+    minmax(0,1fr);
+
+  align-items:center;
+
+  gap:11px;
+}
+
+.explainItemOnePageCard
+.adminEditItemTitle::before{
+  content:"";
+
+  grid-column:1;
+  grid-row:1 / span 2;
+
+  width:46px;
+  height:46px;
+
+  border-radius:15px;
+
+  background:
+    var(--admin-secondary);
+
+  box-shadow:
+    0 8px 18px
+    rgba(35,61,77,.18);
+}
+
+.explainItemOnePageCard
+.adminEditItemTitle::after{
+  content:"أ";
+
+  grid-column:1;
+  grid-row:1 / span 2;
+
+  z-index:1;
+
+  width:46px;
+  height:46px;
+
+  color:#FFFFFF;
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.2rem;
+}
+
+.explainItemOnePageCard.isDone
+.adminEditItemTitle::before{
+  background:
+    var(--admin-green);
+}
+
+.explainItemOnePageCard
+.adminEditItemTitle strong{
+  grid-column:2;
+
+  min-width:0;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:
+    clamp(1.03rem,2vw,1.2rem);
+
+  line-height:1.3;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.explainItemOnePageCard
+.adminEditItemTitle span{
+  grid-column:2;
+
+  min-width:0;
+
+  color:
+    var(--admin-muted);
+
+  font-size:.84rem;
+  line-height:1.4;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.explainItemOnePageCard.isDone
+.adminEditItemTitle span{
+  color:
+    var(--admin-green);
+}
+
+.explainItemOnePageCard.isMissing
+.adminEditItemTitle span{
+  color:
+    var(--admin-red);
+}
+
+/* =========================
+   7) STATUS PILLS
+========================= */
+
+.explainItemOnePageCard
+.adminEditItemMeta{
+  display:flex;
+  align-items:center;
+
+  gap:7px;
+}
+
+.explainItemOnePageCard
+.adminEditStatusPill,
+.explainItemOnePageCard
+.adminEditProgressPill{
+  min-width:60px;
+}
+
+/* =========================
+   8) OPEN ICON
+========================= */
+
+.explainItemOnePageCard
+> summary::after{
+  content:"⌄";
+
+  width:34px;
+  height:34px;
+
+  flex:0 0 auto;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:11px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-size:1.05rem;
+
+  transition:
+    transform .18s var(--admin-ease),
+    color .18s var(--admin-ease),
+    background-color .18s var(--admin-ease),
+    border-color .18s var(--admin-ease);
+}
+
+.explainItemOnePageCard[open]
+> summary::after{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-secondary);
+
+  transform:
+    rotate(180deg);
+}
+
+/* =========================
+   9) CARD BODY
+========================= */
+
+.explainItemOnePageCard
+> .adminEditItemBody{
+  padding:
+    clamp(16px,2.2vw,24px);
+
+  background:#FFFFFF;
+}
+
+.explainItemOnePageCard[open]
+.adminEditItemBody{
+  animation:
+    explainAdminCardOpen
+    .22s
+    var(--admin-ease);
+}
+
+@keyframes explainAdminCardOpen{
+  from{
+    opacity:0;
+    transform:translateY(-6px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================
+   10) EDIT LAYOUT
+========================= */
+
+.explainOnePageLayout{
+  width:100%;
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:
+    clamp(15px,2vw,22px);
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    auto;
+
+  gap:14px;
+
+  align-items:end;
+}
+
+/* =========================
+   11) WORD FIELD
+========================= */
+
+.explainOnePageLayout
+.adminField{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:#FFFFFF;
+
+  padding:14px;
+
+  display:grid;
+  gap:8px;
+}
+
+.explainOnePageLayout
+.adminField label{
+  color:
+    var(--admin-secondary);
+
+  font-size:.9rem;
+  line-height:1.4;
+}
+
+.explainOnePageLayout
+.adminField input{
+  width:100%;
+  min-width:0;
+
+  min-height:66px;
+
+  border:
+    1px solid
+    rgba(35,61,77,.18);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  padding:
+    12px
+    16px;
+
+  font-size:
+    clamp(1.05rem,2.2vw,1.25rem);
+
+  line-height:1.4;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.explainOnePageLayout
+.adminField input:focus{
+  outline:0;
+
+  border-color:
+    var(--admin-primary);
+
+  background:#FFFFFF;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.12);
+}
+
+.explainOnePageLayout
+.adminField:not(
+  .adminMissingField
+){
+  border-color:
+    rgba(0,127,0,.20);
+
+  background:
+    var(--admin-green-soft);
+}
+
+.explainOnePageLayout
+.adminField:not(
+  .adminMissingField
+) input{
+  border-color:
+    rgba(0,127,0,.20);
+
+  background:#FFFFFF;
+}
+
+.explainOnePageLayout
+.adminField.adminMissingField{
+  border-color:
+    rgba(127,0,0,.22);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.explainOnePageLayout
+.adminField.adminMissingField input{
+  border-color:
+    rgba(127,0,0,.30);
+
+  background:#FFF9F9;
+}
+
+/* =========================
+   12) MISSING HINT
+========================= */
+
+.explainAdminShell
+.adminMissingHint{
+  border:
+    1px solid
+    rgba(127,0,0,.12);
+
+  border-radius:10px;
+
+  color:
+    var(--admin-red);
+
+  background:
+    rgba(255,255,255,.68);
+
+  padding:
+    7px
+    10px;
+
+  font-size:.82rem;
+  line-height:1.4;
+}
+
+/* =========================
+   13) DELETE BUTTON
+========================= */
+
+.explainOnePageLayout
+.adminDeleteBtn{
+  min-width:150px;
+  min-height:66px;
+
+  border:
+    1px solid
+    rgba(127,0,0,.16);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  padding:
+    11px
+    18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:.92rem;
+}
+
+.explainOnePageLayout
+.adminDeleteBtn:hover{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red);
+}
+
+.explainOnePageLayout
+.adminDeleteBtn:disabled{
+  color:
+    var(--admin-muted);
+
+  border-color:
+    var(--admin-line);
+
+  background:
+    #E8EBEE;
+
+  opacity:.58;
+}
+
+/* =========================
+   14) CLOSED CARD
+========================= */
+
+.explainItemOnePageCard:not([open]){
+  min-height:94px;
+}
+
+.explainItemOnePageCard:not([open])
+.adminEditItemBody{
+  display:none;
+}
+
+/* =========================
+   15) COMPLETE STATE
+========================= */
+
+.explainItemOnePageCard.isDone[open]
+.explainOnePageLayout{
+  border-color:
+    rgba(0,127,0,.22);
+}
+
+.explainItemOnePageCard.isDone[open]
+.explainOnePageLayout::before{
+  content:"الكلمة جاهزة";
+
+  grid-column:1 / -1;
+
+  color:
+    var(--admin-green);
+
+  font-size:.86rem;
+}
+
+/* =========================
+   16) MISSING STATE
+========================= */
+
+.explainItemOnePageCard.isMissing[open]
+.explainOnePageLayout{
+  border-color:
+    rgba(127,0,0,.18);
+}
+
+/* =========================
+   17) SAVING STATE
+========================= */
+
+.adminIsSaving
+.explainAdminShell{
+  pointer-events:none;
+}
+
+.adminIsSaving
+.explainAdminShell
+.adminEditorTopBar{
+  pointer-events:auto;
+}
+
+.adminIsSaving
+.explainItemOnePageCard{
+  opacity:.72;
+}
+
+/* =========================
+   18) LARGE SCREENS
+========================= */
+
+@media (min-width:1500px){
+
+  .explainOnePageGrid{
+    grid-template-columns:
+      repeat(4,minmax(0,1fr));
+
+    gap:15px;
+  }
+
+  .explainOnePageGrid.hasOpenCard,
+  .explainOnePageGrid:has(
+    .explainItemOnePageCard[open]
+  ){
+    grid-template-columns:1fr;
+  }
+
+  .explainOnePageLayout{
+    padding:24px;
+  }
+
+  .explainOnePageLayout
+  .adminField input{
+    min-height:72px;
+  }
+
+  .explainOnePageLayout
+  .adminDeleteBtn{
+    min-height:72px;
+  }
+}
+
+/* =========================
+   19) LAPTOP
+========================= */
+
+@media (max-width:1180px){
+
+  .explainAdminShell
+  .adminEditorTopBar{
+    top:148px;
+  }
+
+  .explainOnePageGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .explainOnePageGrid.hasOpenCard,
+  .explainOnePageGrid:has(
+    .explainItemOnePageCard[open]
+  ){
+    grid-template-columns:1fr;
+  }
+}
+
+/* =========================
+   20) TABLET
+========================= */
+
+@media (max-width:900px){
+
+  .explainAdminShell
+  .adminEditorTopBar{
+    position:relative;
+    top:auto;
+  }
+
+  .explainItemOnePageCard{
+    scroll-margin-top:24px;
+  }
+
+  .explainOnePageLayout{
+    grid-template-columns:
+      minmax(0,1fr)
+      140px;
+  }
+
+  .explainOnePageLayout
+  .adminDeleteBtn{
+    min-width:0;
+  }
+}
+
+/* =========================
+   21) SMALL TABLET
+========================= */
+
+@media (max-width:760px){
+
+  .explainOnePageGrid{
+    grid-template-columns:1fr;
+  }
+
+  .explainOnePageLayout{
+    grid-template-columns:1fr;
+  }
+
+  .explainOnePageLayout
+  .adminDeleteBtn{
+    width:100%;
+    min-height:50px;
+  }
+}
+
+/* =========================
+   22) MOBILE
+========================= */
+
+@media (max-width:620px){
+
+  .explainAdminShell{
+    gap:10px;
+  }
+
+  .explainAdminShell
+  .adminEditorTopBar{
+    padding:12px;
+  }
+
+  .explainAdminShell
+  .adminSectionTitle{
+    width:100%;
+
+    justify-content:center;
+  }
+
+  .explainAdminShell
+  .adminInlineActions{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .explainAdminShell
+  .adminSaveBtn,
+  .explainAdminShell
+  .adminDeleteAllBtn{
+    width:100%;
+    min-width:0;
+  }
+
+  .explainOnePageGrid{
+    gap:10px;
+  }
+
+  .explainItemOnePageCard
+  > summary{
+    min-height:88px;
+
+    padding:
+      12px
+      14px;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      auto;
+  }
+
+  .explainItemOnePageCard
+  .adminEditItemTitle{
+    grid-template-columns:
+      42px
+      minmax(0,1fr);
+  }
+
+  .explainItemOnePageCard
+  .adminEditItemTitle::before,
+  .explainItemOnePageCard
+  .adminEditItemTitle::after{
+    width:42px;
+    height:42px;
+
+    border-radius:13px;
+  }
+
+  .explainItemOnePageCard
+  .adminEditItemMeta{
+    grid-column:1 / -1;
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+
+    order:3;
+  }
+
+  .explainItemOnePageCard
+  .adminEditStatusPill,
+  .explainItemOnePageCard
+  .adminEditProgressPill{
+    width:100%;
+  }
+
+  .explainItemOnePageCard
+  > summary::after{
+    grid-column:2;
+    grid-row:1;
+
+    width:32px;
+    height:32px;
+  }
+
+  .explainItemOnePageCard
+  > .adminEditItemBody{
+    padding:12px;
+  }
+
+  .explainOnePageLayout{
+    padding:11px;
+    gap:10px;
+  }
+
+  .explainOnePageLayout
+  .adminField{
+    padding:11px;
+  }
+
+  .explainOnePageLayout
+  .adminField input{
+    min-height:58px;
+
+    font-size:1rem;
+  }
+}
+
+/* =========================
+   23) SMALL MOBILE
+========================= */
+
+@media (max-width:420px){
+
+  .explainAdminShell
+  .adminInlineActions{
+    grid-template-columns:1fr;
+  }
+
+  .explainItemOnePageCard
+  .adminEditItemTitle strong{
+    white-space:normal;
+  }
+
+  .explainItemOnePageCard
+  .adminEditItemTitle span{
+    white-space:normal;
+
+    display:-webkit-box;
+
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    line-clamp:2;
+
+    overflow:hidden;
+  }
+}
+
+/* =========================
+   24) FALLBACK
+========================= */
+
+@supports not selector(:has(*)){
+
+  .explainOnePageGrid{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+
+  .explainOnePageGrid.hasOpenCard{
+    grid-template-columns:1fr;
+  }
+
+  .explainItemOnePageCard[open]{
+    grid-column:1 / -1;
+  }
+
+  @media (min-width:1500px){
+
+    .explainOnePageGrid{
+      grid-template-columns:
+        repeat(4,minmax(0,1fr));
+    }
+
+    .explainOnePageGrid.hasOpenCard{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (max-width:1180px){
+
+    .explainOnePageGrid{
+      grid-template-columns:
+        repeat(2,minmax(0,1fr));
+    }
+
+    .explainOnePageGrid.hasOpenCard{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media (max-width:760px){
+
+    .explainOnePageGrid{
+      grid-template-columns:1fr;
+    }
+  }
+}

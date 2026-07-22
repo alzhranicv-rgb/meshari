@@ -1,0 +1,2115 @@
+/* =========================================================
+   ARCHIVE ADMIN / إدارة فقرة الأرشيف
+   CLEAN PROFESSIONAL DESIGN
+
+   File:
+   assets/css/segments/admin/archive-admin.css
+========================================================= */
+
+/* =========================
+   1) ROOT
+========================= */
+
+.archiveAdminShell{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+  gap:16px;
+
+  align-content:start;
+}
+
+.archiveAdminCleanV2{
+  position:relative;
+}
+
+/* =========================
+   2) TOP BAR
+========================= */
+
+.archiveAdminShell
+.archiveAdminTopBar{
+  position:sticky;
+  top:112px;
+  z-index:20;
+
+  margin:0;
+
+  border-color:
+    rgba(35,61,77,.20);
+
+  background:
+    rgba(255,255,255,.97);
+
+  box-shadow:
+    0 14px 34px
+    rgba(35,61,77,.08);
+}
+
+.archiveAdminShell
+.adminSectionTitle{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+
+.archiveAdminShell
+.adminSectionTitle::before{
+  content:"أ";
+
+  width:46px;
+  height:46px;
+
+  flex:0 0 auto;
+
+  border-radius:15px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.4rem;
+  line-height:1;
+
+  box-shadow:
+    0 9px 20px
+    rgba(35,61,77,.22);
+}
+
+.archiveAdminShell
+.adminSectionHint{
+  margin:
+    5px
+    0
+    0;
+
+  color:
+    var(--admin-muted);
+
+  font-size:.88rem;
+  line-height:1.45;
+}
+
+.archiveInlineActions{
+  align-items:center;
+}
+
+.archiveInlineActions
+:is(
+  .adminSaveBtn,
+  .adminBtnMango,
+  .adminBtnLight,
+  .adminDeleteBtn,
+  .adminDeleteAllBtn
+){
+  min-height:46px;
+
+  padding:
+    9px
+    14px;
+
+  border-radius:12px;
+
+  font-size:.88rem;
+}
+
+.archiveInlineActions
+.adminSaveBtn{
+  min-width:112px;
+}
+
+.archiveInlineActions
+.adminBtnMango{
+  min-width:110px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-primary);
+
+  box-shadow:
+    0 9px 20px
+    rgba(254,127,45,.20);
+}
+
+.archiveInlineActions
+.adminBtnMango:hover{
+  background:
+    var(--admin-primary-hover);
+}
+
+.archiveInlineActions
+.adminBtnLight{
+  min-width:120px;
+
+  color:
+    var(--admin-secondary);
+
+  border:
+    1px solid var(--admin-line);
+
+  background:
+    var(--admin-soft);
+}
+
+.archiveInlineActions
+.adminBtnLight:hover{
+  border-color:
+    #B9C4CC;
+
+  background:
+    #EDF1F4;
+}
+
+/* =========================
+   3) ROUNDS GRID
+========================= */
+
+.archiveOnePageGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap:12px;
+
+  align-items:start;
+}
+
+/*
+   الجولة المفتوحة تظهر بكامل العرض.
+   الجولات المغلقة تكون في الأعلى للتنقل السريع.
+*/
+
+.archiveOnePageGrid.hasOpenCard{
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+}
+
+.archiveRoundOnePageCard{
+  order:1;
+}
+
+.archiveRoundOnePageCard[open]{
+  order:2;
+
+  grid-column:1 / -1;
+}
+
+/* =========================
+   4) ROUND CARD
+========================= */
+
+.archiveRoundOnePageCard{
+  position:relative;
+
+  min-width:0;
+
+  scroll-margin-top:220px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 10px 28px
+    rgba(35,61,77,.07);
+
+  overflow:hidden;
+
+  transition:
+    transform .18s var(--admin-ease),
+    border-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease);
+}
+
+.archiveRoundOnePageCard::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  z-index:2;
+
+  width:5px;
+
+  opacity:.54;
+
+  background:
+    var(--admin-primary);
+
+  transition:
+    width .18s var(--admin-ease),
+    opacity .18s var(--admin-ease);
+}
+
+.archiveRoundOnePageCard:hover{
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(254,127,45,.34);
+
+  box-shadow:
+    0 17px 38px
+    rgba(35,61,77,.11);
+}
+
+.archiveRoundOnePageCard:hover::before,
+.archiveRoundOnePageCard[open]::before{
+  width:7px;
+  opacity:1;
+}
+
+.archiveRoundOnePageCard.isDone{
+  border-color:
+    rgba(0,127,0,.26);
+}
+
+.archiveRoundOnePageCard.isDone::before{
+  background:
+    var(--admin-green);
+}
+
+.archiveRoundOnePageCard.isMissing::before{
+  background:
+    var(--admin-primary);
+}
+
+.archiveRoundOnePageCard[open]{
+  transform:none;
+
+  border-color:
+    rgba(254,127,45,.40);
+
+  box-shadow:
+    0 23px 54px
+    rgba(35,61,77,.13);
+}
+
+/* =========================
+   5) ROUND SUMMARY
+========================= */
+
+.archiveRoundOnePageCard > summary{
+  min-height:94px;
+
+  list-style:none;
+  cursor:pointer;
+
+  padding:
+    14px
+    17px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    auto
+    auto;
+
+  align-items:center;
+
+  gap:11px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #FAFBFC 100%
+    );
+
+  user-select:none;
+}
+
+.archiveRoundOnePageCard
+> summary::-webkit-details-marker{
+  display:none;
+}
+
+.archiveRoundOnePageCard
+> summary:hover{
+  background:
+    var(--admin-primary-soft);
+}
+
+.archiveRoundOnePageCard[open]
+> summary{
+  border-bottom:
+    1px solid var(--admin-line);
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      var(--admin-primary-soft) 100%
+    );
+}
+
+/* =========================
+   6) SUMMARY TITLE
+========================= */
+
+.archiveRoundOnePageCard
+.adminEditItemTitle{
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    46px
+    minmax(0,1fr);
+
+  align-items:center;
+
+  gap:10px;
+}
+
+.archiveRoundOnePageCard
+.adminEditItemTitle::before{
+  content:"";
+
+  grid-column:1;
+  grid-row:1 / span 2;
+
+  width:46px;
+  height:46px;
+
+  border-radius:14px;
+
+  background:
+    var(--admin-secondary);
+
+  box-shadow:
+    0 8px 18px
+    rgba(35,61,77,.18);
+}
+
+.archiveRoundOnePageCard
+.adminEditItemTitle::after{
+  content:"ج";
+
+  grid-column:1;
+  grid-row:1 / span 2;
+
+  z-index:1;
+
+  width:46px;
+  height:46px;
+
+  color:#FFFFFF;
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.18rem;
+}
+
+.archiveRoundOnePageCard.isDone
+.adminEditItemTitle::before{
+  background:
+    var(--admin-green);
+}
+
+.archiveRoundOnePageCard
+.adminEditItemTitle strong{
+  grid-column:2;
+
+  min-width:0;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:
+    clamp(1rem,2vw,1.16rem);
+
+  line-height:1.3;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.archiveRoundOnePageCard
+.adminEditItemTitle span{
+  grid-column:2;
+
+  min-width:0;
+
+  color:
+    var(--admin-muted);
+
+  font-size:.82rem;
+  line-height:1.4;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.archiveRoundOnePageCard.isDone
+.adminEditItemTitle span{
+  color:
+    var(--admin-green);
+}
+
+.archiveRoundOnePageCard.isMissing
+.adminEditItemTitle span{
+  color:
+    var(--admin-red);
+}
+
+/* =========================
+   7) SUMMARY META
+========================= */
+
+.archiveRoundOnePageCard
+.adminEditItemMeta{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+
+  gap:7px;
+}
+
+.archiveRoundOnePageCard
+.adminEditStatusPill,
+.archiveRoundOnePageCard
+.adminEditProgressPill{
+  min-width:60px;
+}
+
+.archiveSummaryDeleteBtn{
+  min-width:60px;
+  min-height:36px;
+
+  padding:
+    7px
+    10px;
+
+  border-radius:10px;
+
+  font-size:.8rem;
+}
+
+/* =========================
+   8) OPEN ICON
+========================= */
+
+.archiveRoundOnePageCard
+> summary::after{
+  content:"⌄";
+
+  width:34px;
+  height:34px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:11px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-size:1.05rem;
+
+  transition:
+    transform .18s var(--admin-ease),
+    color .18s var(--admin-ease),
+    background-color .18s var(--admin-ease),
+    border-color .18s var(--admin-ease);
+}
+
+.archiveRoundOnePageCard[open]
+> summary::after{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-secondary);
+
+  transform:
+    rotate(180deg);
+}
+
+/* =========================
+   9) ACTIVE ROUND BODY
+========================= */
+
+.archiveRoundOnePageCard
+> .adminEditItemBody{
+  padding:
+    clamp(15px,2.3vw,24px);
+
+  background:#FFFFFF;
+}
+
+.archiveRoundOnePageCard[open]
+.adminEditItemBody{
+  animation:
+    archiveAdminOpen
+    .22s
+    var(--admin-ease);
+}
+
+@keyframes archiveAdminOpen{
+  from{
+    opacity:0;
+    transform:translateY(-6px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================
+   10) BOARD
+========================= */
+
+.archiveAdminBoard{
+  width:100%;
+  min-width:0;
+}
+
+.archiveAdminBoardV2,
+.archiveOnePageBody{
+  display:grid;
+  gap:16px;
+}
+
+/* =========================
+   11) MAIN INFORMATION CARD
+========================= */
+
+.archiveMainInfoCard{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  box-shadow:
+    0 9px 24px
+    rgba(35,61,77,.05);
+
+  padding:
+    clamp(14px,2vw,20px);
+}
+
+.archiveOnePageInfoCard::before{
+  content:"بيانات المباراة";
+
+  display:block;
+
+  margin-bottom:13px;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.05rem;
+  line-height:1.3;
+}
+
+.archiveMainInfoGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1.25fr)
+    minmax(0,.85fr)
+    minmax(180px,.55fr);
+
+  gap:12px;
+
+  align-items:start;
+}
+
+.archiveMainInfoGrid
+.adminField{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:#FFFFFF;
+
+  padding:11px;
+
+  display:grid;
+  gap:8px;
+}
+
+.archiveMainInfoGrid
+.adminField label{
+  color:
+    var(--admin-secondary);
+
+  font-size:.88rem;
+}
+
+.archiveMainInfoGrid
+.adminField input{
+  width:100%;
+  min-width:0;
+  min-height:56px;
+
+  border:
+    1px solid
+    rgba(35,61,77,.18);
+
+  border-radius:12px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  padding:
+    11px
+    13px;
+
+  font-size:1rem;
+}
+
+.archiveMainInfoGrid
+.adminField input:focus{
+  outline:0;
+
+  border-color:
+    var(--admin-primary);
+
+  background:#FFFFFF;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.11);
+}
+
+.archiveMainInfoGrid
+.adminField:not(.adminMissingField){
+  border-color:
+    rgba(0,127,0,.20);
+}
+
+.archiveMainInfoGrid
+.adminField:not(.adminMissingField)
+input{
+  border-color:
+    rgba(0,127,0,.18);
+
+  background:#FFFFFF;
+}
+
+.archiveMainInfoGrid
+.adminField.adminMissingField{
+  border-color:
+    rgba(127,0,0,.22);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.archiveMainInfoGrid
+.adminField.adminMissingField
+input{
+  border-color:
+    rgba(127,0,0,.28);
+
+  background:#FFF9F9;
+}
+
+/* النتيجة */
+
+.archiveMainInfoGrid
+.adminField:last-child{
+  border-color:
+    rgba(254,127,45,.25);
+
+  background:
+    var(--admin-primary-soft);
+}
+
+.archiveMainInfoGrid
+.adminField:last-child input{
+  direction:ltr;
+  text-align:center;
+
+  color:
+    var(--admin-secondary);
+
+  background:#FFFFFF;
+
+  font-family:
+    "MolhimCustom",
+    "HanakaText",
+    sans-serif;
+
+  font-size:1.2rem;
+}
+
+/* =========================
+   12) IMAGES ROW
+========================= */
+
+.archiveImagesRow{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:14px;
+
+  align-items:stretch;
+}
+
+/* =========================
+   13) IMAGE CARD
+========================= */
+
+.archiveImageCard{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  box-shadow:
+    0 9px 24px
+    rgba(35,61,77,.05);
+
+  padding:14px;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:11px;
+
+  transition:
+    border-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease),
+    transform .18s var(--admin-ease);
+}
+
+.archiveImageCard:hover{
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(254,127,45,.32);
+
+  box-shadow:
+    0 14px 30px
+    rgba(35,61,77,.08);
+}
+
+.archiveImageCard.isDone{
+  border-color:
+    rgba(0,127,0,.24);
+}
+
+.archiveImageCard.isMissing{
+  border-color:
+    rgba(127,0,0,.18);
+}
+
+/* =========================
+   14) IMAGE CARD HEADER
+========================= */
+
+.archiveImageCardHead{
+  min-height:44px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:10px;
+
+  border-bottom:
+    1px solid var(--admin-line);
+
+  padding-bottom:10px;
+}
+
+.archiveImageCardHead h3{
+  margin:0;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.02rem;
+  line-height:1.3;
+}
+
+.archiveImageCardHead h3::before{
+  content:"ص";
+
+  width:36px;
+  height:36px;
+
+  margin-left:9px;
+
+  border-radius:11px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  display:inline-grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  vertical-align:middle;
+}
+
+.archiveImageCard.isDone
+.archiveImageCardHead h3::before{
+  background:
+    var(--admin-green);
+}
+
+.archiveImageCardHead
+.adminDeleteMiniBtn{
+  min-width:58px;
+  min-height:36px;
+
+  border:
+    1px solid
+    rgba(127,0,0,.15);
+
+  border-radius:10px;
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  padding:
+    7px
+    10px;
+
+  font-size:.8rem;
+}
+
+.archiveImageCardHead
+.adminDeleteMiniBtn:hover{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red);
+}
+
+.archiveImageCardHead
+.adminDeleteMiniBtn:disabled{
+  color:
+    var(--admin-muted);
+
+  border-color:
+    var(--admin-line);
+
+  background:
+    #E8EBEE;
+}
+
+/* =========================
+   15) IMAGE UPLOAD FIELD
+========================= */
+
+.archiveImageCard
+.adminField{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:#FFFFFF;
+
+  padding:10px;
+
+  display:grid;
+  gap:8px;
+}
+
+.archiveImageCard
+.adminField label{
+  color:
+    var(--admin-secondary);
+
+  font-size:.86rem;
+}
+
+.archiveImageCard
+.adminField.adminMissingField{
+  border-color:
+    rgba(127,0,0,.22);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.archiveImageCard
+input[type="file"]{
+  min-height:52px;
+}
+
+/* =========================
+   16) IMAGE PREVIEW
+========================= */
+
+.archiveImagePreviewBox{
+  position:relative;
+
+  width:100%;
+  min-height:300px;
+  height:min(34vw,420px);
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      #F0F3F5,
+      #E4E9ED
+    );
+
+  display:grid;
+  place-items:center;
+}
+
+.archiveImagePreviewBox::before{
+  content:"معاينة";
+
+  position:absolute;
+  z-index:2;
+
+  top:10px;
+  right:10px;
+
+  border:
+    1px solid
+    rgba(35,61,77,.14);
+
+  border-radius:999px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    rgba(255,255,255,.92);
+
+  padding:
+    5px
+    10px;
+
+  font-size:.74rem;
+
+  pointer-events:none;
+}
+
+.archiveAdminPreviewImg{
+  display:block;
+
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+  object-position:center;
+
+  background:#EDF1F3;
+}
+
+.archiveNoImage{
+  width:100%;
+  height:100%;
+
+  color:
+    var(--admin-muted);
+
+  display:grid;
+  place-items:center;
+
+  padding:28px;
+
+  text-align:center;
+}
+
+.archiveNoImage::before{
+  content:"ص";
+
+  width:66px;
+  height:66px;
+
+  margin:
+    0 auto
+    12px;
+
+  border:
+    2px dashed
+    #B9C4CC;
+
+  border-radius:20px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    rgba(255,255,255,.66);
+
+  display:grid;
+  place-items:center;
+
+  font-family:
+    "HanakaDisplay",
+    sans-serif;
+
+  font-size:1.8rem;
+}
+
+/* =========================
+   17) MISSING HINT
+========================= */
+
+.archiveAdminShell
+.adminMissingHint{
+  border:
+    1px solid
+    rgba(127,0,0,.12);
+
+  border-radius:10px;
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  padding:
+    7px
+    10px;
+
+  font-size:.82rem;
+  line-height:1.4;
+}
+
+/* =========================
+   18) TEXT GROUPS GRID
+========================= */
+
+.archiveAdminBottomGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:14px;
+
+  align-items:start;
+}
+
+.archiveTextGroup{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-soft);
+
+  padding:14px;
+
+  display:grid;
+  gap:11px;
+
+  align-content:start;
+}
+
+/* =========================
+   19) COLUMN TITLE
+========================= */
+
+.archiveAdminColumnTitle{
+  min-height:54px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:#FFFFFF;
+
+  padding:
+    10px
+    13px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:10px;
+}
+
+.archiveAdminColumnTitle span{
+  color:
+    var(--admin-secondary);
+
+  font-size:1rem;
+}
+
+.archiveAdminColumnTitle small{
+  flex:0 0 auto;
+
+  border-radius:999px;
+
+  color:
+    var(--admin-muted);
+
+  background:
+    var(--admin-soft);
+
+  padding:
+    5px
+    9px;
+
+  font-size:.76rem;
+}
+
+/* =========================
+   20) TEXT ITEM
+========================= */
+
+.archiveAdminItem{
+  position:relative;
+
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:#FFFFFF;
+
+  box-shadow:
+    0 7px 19px
+    rgba(35,61,77,.05);
+
+  padding:12px;
+
+  display:grid;
+  gap:11px;
+
+  overflow:hidden;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    transform .16s var(--admin-ease);
+}
+
+.archiveAdminItem::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  width:4px;
+
+  background:
+    var(--admin-primary);
+
+  opacity:.58;
+}
+
+.archiveAdminItem:hover{
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(254,127,45,.34);
+
+  box-shadow:
+    0 12px 25px
+    rgba(35,61,77,.09);
+}
+
+.archiveAdminItem.isDone{
+  border-color:
+    rgba(0,127,0,.22);
+}
+
+.archiveAdminItem.isDone::before{
+  background:
+    var(--admin-green);
+
+  opacity:1;
+}
+
+.archiveAdminItem.isMissing{
+  border-color:
+    rgba(127,0,0,.16);
+}
+
+/* =========================
+   21) REQUIRED ITEM
+========================= */
+
+.archiveAdminItemRequired{
+  border-color:
+    rgba(254,127,45,.40);
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF,
+      var(--admin-primary-soft)
+    );
+}
+
+.archiveAdminItemRequired::before{
+  width:6px;
+
+  background:
+    var(--admin-primary);
+
+  opacity:1;
+}
+
+.archiveAdminRequiredBadge{
+  min-height:30px;
+
+  border-radius:999px;
+
+  color:
+    var(--admin-primary);
+
+  background:
+    var(--admin-primary-soft);
+
+  border:
+    1px solid
+    rgba(254,127,45,.22);
+
+  padding:
+    6px
+    10px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:.76rem;
+}
+
+/* =========================
+   22) ITEM HEADER
+========================= */
+
+.archiveAdminItemHead{
+  min-width:0;
+
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+
+  gap:10px;
+}
+
+.archiveAdminItemTitleWrap{
+  min-width:0;
+
+  display:grid;
+  gap:4px;
+}
+
+.archiveAdminItemTitle{
+  color:
+    var(--admin-secondary);
+
+  font-size:.96rem;
+  line-height:1.35;
+}
+
+.archiveAdminItemMeta{
+  min-width:0;
+
+  display:flex;
+  flex-wrap:wrap;
+
+  gap:6px;
+}
+
+.archiveAdminItemMeta span{
+  max-width:100%;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:999px;
+
+  color:
+    var(--admin-muted);
+
+  background:
+    var(--admin-soft);
+
+  padding:
+    4px
+    8px;
+
+  font-size:.72rem;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.archiveAdminItemActions{
+  flex:0 0 auto;
+
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+
+  gap:6px;
+}
+
+.archiveAdminItemActions
+.adminDeleteMiniBtn{
+  min-width:54px;
+  min-height:32px;
+
+  border:
+    1px solid
+    rgba(127,0,0,.15);
+
+  border-radius:9px;
+
+  color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  padding:
+    6px
+    9px;
+
+  font-size:.76rem;
+}
+
+.archiveAdminItemActions
+.adminDeleteMiniBtn:hover{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red);
+}
+
+/* =========================
+   23) ITEM FIELDS
+========================= */
+
+.archiveAdminFields{
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(130px,.7fr)
+    minmax(150px,.75fr)
+    minmax(140px,.7fr);
+
+  gap:8px;
+
+  align-items:start;
+}
+
+.archiveAdminFields > input,
+.archiveAdminFields > textarea,
+.archiveAdminFields select{
+  width:100%;
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:11px;
+
+  color:
+    var(--admin-text);
+
+  background:
+    var(--admin-soft);
+
+  padding:
+    10px
+    12px;
+
+  font-family:
+    "HanakaText",
+    sans-serif;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.archiveAdminFields > input,
+.archiveAdminFields select{
+  min-height:48px;
+}
+
+.archiveAdminFields > textarea{
+  grid-column:1 / -1;
+
+  min-height:112px;
+  max-height:280px;
+
+  resize:vertical;
+
+  line-height:1.6;
+}
+
+.archiveAdminFields
+:is(input,textarea,select):focus{
+  outline:0;
+
+  border-color:
+    var(--admin-primary);
+
+  background:#FFFFFF;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.10);
+}
+
+.archiveAdminFields
+textarea.hasValue{
+  border-color:
+    rgba(0,127,0,.20);
+
+  background:#FFFFFF;
+}
+
+.archiveAdminFields
+textarea.adminMissingField{
+  border-color:
+    rgba(127,0,0,.28);
+
+  background:#FFF9F9;
+}
+
+/* =========================
+   24) SELECT WRAPPER
+========================= */
+
+.compactCountSelectWrap{
+  min-width:0;
+}
+
+.archiveAdminFields
+.compactCountSelect{
+  appearance:none;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      var(--admin-secondary) 50%
+    ),
+    linear-gradient(
+      135deg,
+      var(--admin-secondary) 50%,
+      transparent 50%
+    );
+
+  background-position:
+    17px calc(50% - 3px),
+    11px calc(50% - 3px);
+
+  background-size:
+    6px 6px,
+    6px 6px;
+
+  background-repeat:no-repeat;
+
+  padding-left:35px;
+}
+
+/* =========================
+   25) EMPTY COLUMN
+========================= */
+
+.archiveTextGroup:has(
+  .archiveAdminColumnTitle + .archiveAdminItem
+){
+  min-height:0;
+}
+
+.archiveTextGroup:not(
+  :has(.archiveAdminItem)
+)::after{
+  content:"لا توجد عناصر في هذا العمود";
+
+  min-height:90px;
+
+  border:
+    1px dashed
+    #BBC5CD;
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:
+    var(--admin-muted);
+
+  background:
+    rgba(255,255,255,.58);
+
+  display:grid;
+  place-items:center;
+
+  padding:18px;
+
+  text-align:center;
+
+  font-size:.86rem;
+}
+
+/* =========================
+   26) SAVING STATE
+========================= */
+
+.adminIsSaving
+.archiveAdminShell{
+  pointer-events:none;
+}
+
+.adminIsSaving
+.archiveAdminShell
+.archiveAdminTopBar{
+  pointer-events:auto;
+}
+
+.adminIsSaving
+.archiveRoundOnePageCard,
+.adminIsSaving
+.archiveImageCard,
+.adminIsSaving
+.archiveAdminItem{
+  opacity:.72;
+}
+
+/* =========================
+   27) LARGE SCREENS
+========================= */
+
+@media (min-width:1500px){
+
+  .archiveOnePageGrid,
+  .archiveOnePageGrid.hasOpenCard{
+    grid-template-columns:
+      repeat(4,minmax(0,1fr));
+  }
+
+  .archiveRoundOnePageCard[open]{
+    grid-column:1 / -1;
+  }
+
+  .archiveMainInfoGrid{
+    grid-template-columns:
+      minmax(0,1.3fr)
+      minmax(0,.85fr)
+      minmax(210px,.5fr);
+  }
+
+  .archiveImagePreviewBox{
+    height:440px;
+  }
+
+  .archiveAdminFields{
+    grid-template-columns:
+      minmax(150px,.8fr)
+      minmax(170px,.8fr)
+      minmax(160px,.75fr);
+  }
+}
+
+/* =========================
+   28) LAPTOP
+========================= */
+
+@media (max-width:1180px){
+
+  .archiveAdminShell
+  .archiveAdminTopBar{
+    top:148px;
+  }
+
+  .archiveOnePageGrid,
+  .archiveOnePageGrid.hasOpenCard{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .archiveRoundOnePageCard[open]{
+    grid-column:1 / -1;
+  }
+
+  .archiveInlineActions{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+
+  .archiveInlineActions
+  :is(
+    .adminSaveBtn,
+    .adminBtnMango,
+    .adminBtnLight,
+    .adminDeleteBtn,
+    .adminDeleteAllBtn
+  ){
+    width:100%;
+    min-width:0;
+  }
+
+  .archiveMainInfoGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .archiveMainInfoGrid
+  .adminField:last-child{
+    grid-column:1 / -1;
+  }
+
+  .archiveImagePreviewBox{
+    min-height:280px;
+    height:360px;
+  }
+}
+
+/* =========================
+   29) TABLET
+========================= */
+
+@media (max-width:900px){
+
+  .archiveAdminShell
+  .archiveAdminTopBar{
+    position:relative;
+    top:auto;
+  }
+
+  .archiveRoundOnePageCard{
+    scroll-margin-top:24px;
+  }
+
+  .archiveImagesRow,
+  .archiveAdminBottomGrid{
+    grid-template-columns:1fr;
+  }
+
+  .archiveImagePreviewBox{
+    min-height:340px;
+    height:min(62vw,460px);
+  }
+
+  .archiveAdminFields{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .archiveAdminFields
+  .compactCountSelectWrap:last-of-type{
+    grid-column:auto;
+  }
+
+  .archiveAdminFields > textarea{
+    grid-column:1 / -1;
+  }
+}
+
+/* =========================
+   30) SMALL TABLET
+========================= */
+
+@media (max-width:760px){
+
+  .archiveOnePageGrid,
+  .archiveOnePageGrid.hasOpenCard{
+    grid-template-columns:1fr;
+  }
+
+  .archiveRoundOnePageCard[open]{
+    grid-column:auto;
+  }
+
+  .archiveInlineActions{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .archiveMainInfoGrid{
+    grid-template-columns:1fr;
+  }
+
+  .archiveMainInfoGrid
+  .adminField:last-child{
+    grid-column:auto;
+  }
+
+  .archiveAdminFields{
+    grid-template-columns:1fr;
+  }
+
+  .archiveAdminFields > textarea{
+    grid-column:auto;
+  }
+}
+
+/* =========================
+   31) MOBILE
+========================= */
+
+@media (max-width:620px){
+
+  .archiveAdminShell{
+    gap:10px;
+  }
+
+  .archiveAdminShell
+  .archiveAdminTopBar{
+    padding:12px;
+  }
+
+  .archiveAdminShell
+  .adminSectionTitle{
+    width:100%;
+
+    justify-content:center;
+  }
+
+  .archiveAdminShell
+  .adminSectionHint{
+    text-align:center;
+  }
+
+  .archiveInlineActions{
+    width:100%;
+
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+  .archiveInlineActions
+  .adminDeleteAllBtn{
+    grid-column:1 / -1;
+  }
+
+  .archiveRoundOnePageCard
+  > summary{
+    min-height:90px;
+
+    padding:
+      12px
+      14px;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      auto;
+  }
+
+  .archiveRoundOnePageCard
+  .adminEditItemTitle{
+    grid-template-columns:
+      42px
+      minmax(0,1fr);
+  }
+
+  .archiveRoundOnePageCard
+  .adminEditItemTitle::before,
+  .archiveRoundOnePageCard
+  .adminEditItemTitle::after{
+    width:42px;
+    height:42px;
+
+    border-radius:13px;
+  }
+
+  .archiveRoundOnePageCard
+  .adminEditItemMeta{
+    grid-column:1 / -1;
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr
+      1fr
+      auto;
+
+    order:3;
+  }
+
+  .archiveRoundOnePageCard
+  .adminEditStatusPill,
+  .archiveRoundOnePageCard
+  .adminEditProgressPill{
+    width:100%;
+  }
+
+  .archiveRoundOnePageCard
+  > summary::after{
+    grid-column:2;
+    grid-row:1;
+
+    width:32px;
+    height:32px;
+  }
+
+  .archiveRoundOnePageCard
+  > .adminEditItemBody{
+    padding:11px;
+  }
+
+  .archiveAdminBoardV2{
+    gap:11px;
+  }
+
+  .archiveMainInfoCard,
+  .archiveImageCard,
+  .archiveTextGroup{
+    padding:11px;
+  }
+
+  .archiveImagePreviewBox{
+    min-height:250px;
+    height:min(94vw,390px);
+  }
+
+  .archiveAdminItem{
+    padding:10px;
+  }
+
+  .archiveAdminItemHead{
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .archiveAdminItemActions{
+    width:100%;
+
+    justify-content:space-between;
+  }
+
+  .archiveAdminItemActions
+  .adminDeleteMiniBtn{
+    margin-right:auto;
+  }
+
+  .archiveAdminFields > textarea{
+    min-height:100px;
+  }
+}
+
+/* =========================
+   32) SMALL MOBILE
+========================= */
+
+@media (max-width:430px){
+
+  .archiveInlineActions{
+    grid-template-columns:1fr;
+  }
+
+  .archiveInlineActions
+  .adminDeleteAllBtn{
+    grid-column:auto;
+  }
+
+  .archiveRoundOnePageCard
+  .adminEditItemMeta{
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+  .archiveSummaryDeleteBtn{
+    grid-column:1 / -1;
+
+    width:100%;
+  }
+
+  .archiveRoundOnePageCard
+  .adminEditItemTitle strong,
+  .archiveRoundOnePageCard
+  .adminEditItemTitle span{
+    white-space:normal;
+  }
+
+  .archiveRoundOnePageCard
+  .adminEditItemTitle span{
+    display:-webkit-box;
+
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    line-clamp:2;
+
+    overflow:hidden;
+  }
+
+  .archiveImagePreviewBox{
+    min-height:220px;
+    height:290px;
+  }
+
+  .archiveAdminColumnTitle{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+
+/* =========================
+   33) FALLBACK
+========================= */
+
+@supports not selector(:has(*)){
+
+  .archiveOnePageGrid,
+  .archiveOnePageGrid.hasOpenCard{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+
+  .archiveRoundOnePageCard[open]{
+    grid-column:1 / -1;
+  }
+
+  .archiveTextGroup::after{
+    display:none;
+  }
+
+  @media (min-width:1500px){
+
+    .archiveOnePageGrid,
+    .archiveOnePageGrid.hasOpenCard{
+      grid-template-columns:
+        repeat(4,minmax(0,1fr));
+    }
+  }
+
+  @media (max-width:1180px){
+
+    .archiveOnePageGrid,
+    .archiveOnePageGrid.hasOpenCard{
+      grid-template-columns:
+        repeat(2,minmax(0,1fr));
+    }
+  }
+
+  @media (max-width:760px){
+
+    .archiveOnePageGrid,
+    .archiveOnePageGrid.hasOpenCard{
+      grid-template-columns:1fr;
+    }
+
+    .archiveRoundOnePageCard[open]{
+      grid-column:auto;
+    }
+  }
+}

@@ -1,0 +1,309 @@
+/* =========================================================
+   ADMIN PERFORMANCE
+   تحسين سرعة التنقل وفتح البطاقات
+========================================================= */
+
+/* =========================
+   1) FAST INTERACTIONS
+========================= */
+
+.adminShellNew
+.adminWorkspace
+button,
+.adminShellNew
+.adminWorkspace
+summary{
+  touch-action:manipulation;
+
+  -webkit-tap-highlight-color:
+    transparent;
+}
+
+/* =========================
+   2) LIGHT BUTTON EFFECTS
+========================= */
+
+.adminShellNew
+.adminWorkspace
+button{
+  transition:
+    color 90ms ease,
+    background-color 90ms ease,
+    border-color 90ms ease,
+    opacity 90ms ease;
+}
+
+.adminShellNew
+.adminWorkspace
+button:hover,
+.adminShellNew
+.adminWorkspace
+button:active{
+  transform:none;
+}
+
+.adminShellNew
+.adminWorkspace
+button:active{
+  opacity:.88;
+}
+
+/* =========================
+   3) LIGHT CARD EFFECTS
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+:is(
+  .adminEditItemCard,
+  .warmupQuestionOnePageCard,
+  .top10CleanAnswerCard,
+  .finalRound2ScrambleItemCard,
+  .finalRound2SequenceItemCard,
+  .finalRound2ImageItemCard,
+  .archiveImageCard,
+  .archiveAdminItem
+){
+  transition:
+    border-color 90ms ease,
+    background-color 90ms ease,
+    opacity 90ms ease;
+
+  box-shadow:
+    0 4px 13px
+    rgba(35,61,77,.055);
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+:is(
+  .adminEditItemCard,
+  .warmupQuestionOnePageCard,
+  .top10CleanAnswerCard,
+  .finalRound2ScrambleItemCard,
+  .finalRound2SequenceItemCard,
+  .finalRound2ImageItemCard,
+  .archiveImageCard,
+  .archiveAdminItem
+):hover{
+  transform:none;
+
+  box-shadow:
+    0 5px 15px
+    rgba(35,61,77,.07);
+}
+
+/* البطاقة المفتوحة */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminEditItemCard[open]{
+  transform:none;
+
+  box-shadow:
+    0 8px 22px
+    rgba(35,61,77,.09);
+}
+
+/* =========================
+   4) REMOVE OPEN ANIMATIONS
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+:is(
+  .adminEditItemBody,
+  .top10CleanBody
+){
+  animation:none;
+}
+
+/* =========================
+   5) KEEP GRID STABLE
+========================= */
+
+/*
+   لا تحول كل البطاقات إلى عمود واحد.
+   البطاقة المفتوحة فقط تأخذ العرض الكامل.
+*/
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminEditCardsGrid.hasOpenCard{
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(
+        min(100%,300px),
+        1fr
+      )
+    );
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminEditCardsGrid.hasOpenCard
+> .adminEditItemCard[open]{
+  grid-column:1 / -1;
+}
+
+/* =========================
+   6) LIGHT SUMMARY EFFECTS
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminEditItemCard
+> summary{
+  transition:
+    background-color 90ms ease,
+    border-color 90ms ease;
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminEditItemCard
+> summary::after{
+  transition:
+    transform 90ms ease,
+    color 90ms ease,
+    background-color 90ms ease,
+    border-color 90ms ease;
+}
+
+/* =========================
+   7) OPTIMIZE OFFSCREEN CARDS
+========================= */
+
+@supports (content-visibility:auto){
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminEditItemCard:not([open]){
+    content-visibility:auto;
+
+    contain-intrinsic-size:
+      94px;
+  }
+
+  .adminShellNew
+  .adminWorkspace
+  .adminHomeSegmentCard{
+    content-visibility:auto;
+
+    contain-intrinsic-size:
+      180px;
+  }
+}
+
+/* =========================
+   8) MEDIA PERFORMANCE
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+:is(
+  .whoPreviewBox,
+  .fatblaPreviewBox,
+  .finalAdminPreviewBox,
+  .finalAdminImagePreview,
+  .archiveImagePreviewBox
+){
+  contain:paint;
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+:is(
+  img,
+  video,
+  .previewImg,
+  .archiveAdminPreviewImg
+){
+  transition:none;
+}
+
+/* =========================
+   9) FORM PERFORMANCE
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+:is(
+  input,
+  textarea,
+  select
+){
+  transition:
+    border-color 80ms ease,
+    background-color 80ms ease;
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+:is(
+  input,
+  textarea,
+  select
+):focus{
+  transform:none;
+}
+
+/* =========================
+   10) TABLET
+========================= */
+
+@media (max-width:760px){
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminEditCardsGrid.hasOpenCard{
+    grid-template-columns:1fr;
+  }
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminEditCardsGrid.hasOpenCard
+  > .adminEditItemCard[open]{
+    grid-column:auto;
+  }
+}
+
+/* =========================
+   11) REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion:reduce){
+
+  .adminShellNew
+  .adminWorkspace
+  *,
+  .adminShellNew
+  .adminWorkspace
+  *::before,
+  .adminShellNew
+  .adminWorkspace
+  *::after{
+    animation-duration:.01ms;
+    animation-iteration-count:1;
+
+    transition-duration:.01ms;
+
+    scroll-behavior:auto;
+  }
+}

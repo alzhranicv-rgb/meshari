@@ -1,0 +1,4151 @@
+/* =========================================================
+   ADMIN CORE / لوحة إدارة الأسئلة
+   CLEAN PROFESSIONAL BASE
+   File: assets/css/segments/admin/admin-core.css
+========================================================= */
+
+/* =========================
+   1) FONTS
+========================= */
+
+@font-face{
+  font-family:"HanakaDisplay";
+  src:url("../../../../fonts/dima.ttf") format("truetype");
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
+
+@font-face{
+  font-family:"HanakaText";
+  src:url("../../../../fonts/zain.ttf") format("truetype");
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
+
+@font-face{
+  font-family:"MolhimCustom";
+  src:url("../../../../fonts/Molhim.ttf") format("truetype");
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
+
+/* =========================
+   2) ROOT
+========================= */
+
+:root{
+  --admin-bg:#EAECF0;
+  --admin-surface:#FFFFFF;
+  --admin-soft:#F6F7F9;
+  --admin-line:#D5DADF;
+
+  --admin-primary:#FE7F2D;
+  --admin-primary-hover:#E96F20;
+  --admin-primary-soft:#FFF1E8;
+
+  --admin-secondary:#233D4D;
+  --admin-secondary-dark:#152C39;
+
+  --admin-text:#151515;
+  --admin-muted:#8793A0;
+
+  --admin-green:#007F00;
+  --admin-green-soft:#EAF7EA;
+
+  --admin-red:#7F0000;
+  --admin-red-soft:#FBEAEA;
+
+  --admin-blue:#00007F;
+  --admin-blue-soft:#EDEDFF;
+
+  --admin-radius-xl:34px;
+  --admin-radius-lg:26px;
+  --admin-radius-md:20px;
+  --admin-radius-sm:14px;
+
+  --admin-shadow-soft:
+    0 16px 40px rgba(35,61,77,.09);
+
+  --admin-shadow-card:
+    0 20px 52px rgba(35,61,77,.12);
+
+  --admin-shadow-strong:
+    0 30px 80px rgba(35,61,77,.18);
+
+  --admin-ease:
+    cubic-bezier(.16,1,.3,1);
+
+  --admin-content-max:1480px;
+  --admin-control-height:54px;
+
+  --admin-safe-top:
+    max(14px,env(safe-area-inset-top));
+
+  --admin-safe-right:
+    max(14px,env(safe-area-inset-right));
+
+  --admin-safe-bottom:
+    max(16px,env(safe-area-inset-bottom));
+
+  --admin-safe-left:
+    max(14px,env(safe-area-inset-left));
+}
+
+/* =========================
+   3) BASE
+========================= */
+
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  width:100%;
+  min-height:100%;
+  margin:0;
+
+  direction:rtl;
+
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+
+html{
+  scroll-behavior:smooth;
+  background:var(--admin-bg);
+}
+
+body{
+  min-height:100vh;
+  min-height:100dvh;
+
+  color:var(--admin-text);
+
+  font-family:"HanakaText",sans-serif;
+  font-weight:400;
+
+  background:
+    radial-gradient(
+      circle at 14% 12%,
+      rgba(254,127,45,.16),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 12%,
+      rgba(255,255,255,.80),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 80% 92%,
+      rgba(35,61,77,.10),
+      transparent 34%
+    ),
+    linear-gradient(
+      180deg,
+      #F8FAFC 0%,
+      var(--admin-bg) 58%,
+      #DDE4EA 100%
+    );
+}
+
+body::before{
+  content:"";
+
+  position:fixed;
+  inset:0;
+  z-index:-1;
+
+  pointer-events:none;
+
+  opacity:.30;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.28) 0 1px,
+      transparent 1px 18px
+    ),
+    linear-gradient(
+      45deg,
+      rgba(255,255,255,.20) 0 1px,
+      transparent 1px 20px
+    );
+}
+
+body.adminIsSaving{
+  cursor:progress;
+}
+
+.adminShellNew,
+.adminShellNew *,
+.adminPinScreen,
+.adminPinScreen *,
+.adminModalOverlay,
+.adminModalOverlay *,
+.adminConfirmOverlay,
+.adminConfirmOverlay *,
+.globalSegmentVisibilityOverlay,
+.globalSegmentVisibilityOverlay *,
+.gameToast,
+.gameToast *{
+  font-family:"HanakaText",sans-serif;
+  font-weight:400;
+}
+
+.hidden{
+  display:none !important;
+}
+
+img,
+video{
+  display:block;
+  max-width:100%;
+}
+
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+button{
+  border:0;
+
+  cursor:pointer;
+
+  -webkit-tap-highlight-color:
+    transparent;
+
+  transition:
+    transform .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease),
+    border-color .16s var(--admin-ease),
+    color .16s var(--admin-ease),
+    opacity .16s var(--admin-ease);
+}
+
+button:hover{
+  transform:translateY(-1px);
+}
+
+button:active{
+  transform:scale(.985);
+}
+
+button:disabled{
+  opacity:.44;
+  cursor:not-allowed;
+
+  transform:none;
+  box-shadow:none;
+}
+
+:is(
+  button,
+  input,
+  textarea,
+  select,
+  summary
+):focus-visible{
+  outline:
+    3px solid rgba(254,127,45,.28);
+
+  outline-offset:3px;
+}
+
+::selection{
+  color:#FFFFFF;
+  background:var(--admin-primary);
+}
+
+/* =========================
+   4) SHARED BUTTONS
+========================= */
+
+:is(
+  .adminBtn,
+  .adminPinBtn,
+  .adminModelPrimaryBtn,
+  .adminModelSoftBtn,
+  .adminModelDangerBtn,
+  .adminModelActionBtn,
+  .adminModelCreateBtn,
+  .adminModelLogoutBtn,
+  .adminWorkspaceActionBtn,
+  .adminSaveBtn,
+  .adminDeleteAllBtn,
+  .adminDeleteBtn,
+  .adminConfirmOkBtn,
+  .adminConfirmCancelBtn,
+  .globalSegmentCloseBtn
+){
+  min-height:
+    var(--admin-control-height);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  padding:11px 18px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  gap:8px;
+
+  white-space:nowrap;
+
+  font-size:1rem;
+  line-height:1;
+}
+
+/* Primary */
+
+:is(
+  .adminPinBtn,
+  .adminModelPrimaryBtn,
+  .adminModelCreateBtn,
+  .adminSaveBtn,
+  .adminWorkspaceActionBtn.primary,
+  .adminBtnMango
+){
+  color:#FFFFFF;
+  background:var(--admin-primary);
+
+  box-shadow:
+    0 12px 26px
+    rgba(254,127,45,.24);
+}
+
+:is(
+  .adminPinBtn,
+  .adminModelPrimaryBtn,
+  .adminModelCreateBtn,
+  .adminSaveBtn,
+  .adminWorkspaceActionBtn.primary,
+  .adminBtnMango
+):hover{
+  background:
+    var(--admin-primary-hover);
+
+  box-shadow:
+    0 15px 30px
+    rgba(254,127,45,.30);
+}
+
+/* Secondary */
+
+:is(
+  .adminModelSoftBtn,
+  .adminModelActionBtn,
+  .adminWorkspaceActionBtn,
+  .adminBtnLight,
+  .adminConfirmCancelBtn,
+  .globalSegmentCloseBtn
+){
+  color:var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  border:
+    1px solid var(--admin-line);
+}
+
+:is(
+  .adminModelSoftBtn,
+  .adminModelActionBtn,
+  .adminWorkspaceActionBtn,
+  .adminBtnLight,
+  .adminConfirmCancelBtn,
+  .globalSegmentCloseBtn
+):hover{
+  background:#EDF1F4;
+  border-color:#BCC6CE;
+}
+
+/* Delete */
+
+:is(
+  .adminModelDangerBtn,
+  .adminModelLogoutBtn,
+  .adminDeleteAllBtn,
+  .adminDeleteBtn,
+  .adminWorkspaceActionBtn.exit
+){
+  color:var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  border:
+    1px solid rgba(127,0,0,.20);
+}
+
+:is(
+  .adminModelDangerBtn,
+  .adminModelLogoutBtn,
+  .adminDeleteAllBtn,
+  .adminDeleteBtn,
+  .adminWorkspaceActionBtn.exit
+):hover{
+  color:#FFFFFF;
+
+  background:
+    var(--admin-red);
+
+  border-color:
+    var(--admin-red);
+}
+
+.adminDeleteBtn{
+  min-height:40px;
+
+  padding:8px 13px;
+
+  border-radius:12px;
+
+  font-size:.92rem;
+}
+
+.adminConfirmOkBtn{
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+}
+
+.adminConfirmOkBtn:hover{
+  background:
+    var(--admin-secondary-dark);
+}
+
+.adminConfirmCard.danger
+.adminConfirmOkBtn{
+  color:#FFFFFF;
+
+  background:
+    var(--admin-red);
+}
+
+/* =========================
+   5) SHARED FORM CONTROLS
+========================= */
+
+.adminField,
+.adminModelGateField{
+  min-width:0;
+
+  display:grid;
+  gap:8px;
+}
+
+:is(
+  .adminField,
+  .adminModelGateField
+) label{
+  color:var(--admin-secondary);
+
+  font-size:.94rem;
+  line-height:1.35;
+}
+
+:is(
+  .adminInput,
+  .adminSelect,
+  .adminPinInput,
+  .adminCleanInput,
+  .adminCleanTextarea,
+  .adminField input:not([type="file"]),
+  .adminField textarea,
+  .adminField select,
+  .adminModelGateField input,
+  .adminModelGateField select
+){
+  width:100%;
+  min-width:0;
+
+  min-height:
+    var(--admin-control-height);
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:var(--admin-text);
+
+  background:#FFFFFF;
+
+  padding:12px 15px;
+
+  font-size:1rem;
+  line-height:1.45;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+:is(
+  .adminInput,
+  .adminSelect,
+  .adminPinInput,
+  .adminCleanInput,
+  .adminCleanTextarea,
+  .adminField input:not([type="file"]),
+  .adminField textarea,
+  .adminField select,
+  .adminModelGateField input,
+  .adminModelGateField select
+):focus{
+  outline:0;
+
+  border-color:
+    var(--admin-primary);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.12);
+
+  background:#FFFFFF;
+}
+
+textarea,
+.adminCleanTextarea{
+  min-height:118px;
+  max-height:380px;
+
+  resize:vertical;
+}
+
+input::placeholder,
+textarea::placeholder{
+  color:#A6AFB8;
+  opacity:1;
+}
+
+select{
+  appearance:none;
+
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      var(--admin-secondary) 50%
+    ),
+    linear-gradient(
+      135deg,
+      var(--admin-secondary) 50%,
+      transparent 50%
+    );
+
+  background-position:
+    18px calc(50% - 3px),
+    12px calc(50% - 3px);
+
+  background-size:
+    6px 6px,
+    6px 6px;
+
+  background-repeat:no-repeat;
+
+  padding-left:38px !important;
+}
+
+input[type="file"],
+.adminCleanFile{
+  width:100%;
+
+  min-height:
+    var(--admin-control-height);
+
+  border:
+    1px dashed #B9C3CB;
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  color:var(--admin-muted);
+
+  background:
+    var(--admin-soft);
+
+  padding:8px;
+}
+
+input[type="file"]::file-selector-button{
+  min-height:38px;
+
+  margin-left:10px;
+
+  border:0;
+  border-radius:10px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  padding:8px 14px;
+
+  font:inherit;
+  cursor:pointer;
+}
+
+input[type="file"]:hover{
+  border-color:
+    var(--admin-primary);
+
+  background:
+    var(--admin-primary-soft);
+}
+
+.adminMissingField
+:is(input,textarea,select),
+:is(
+  input,
+  textarea,
+  select
+).adminMissingField,
+.adminField.adminMissingField
+input[type="file"]{
+  border-color:
+    rgba(127,0,0,.42);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.adminMissingHint{
+  color:var(--admin-red);
+
+  font-size:.86rem;
+  line-height:1.4;
+}
+
+/* =========================
+   6) PIN SCREEN
+========================= */
+
+.adminPinScreen{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+
+  min-height:100dvh;
+
+  display:grid;
+  place-items:center;
+
+  padding:
+    var(--admin-safe-top)
+    var(--admin-safe-right)
+    var(--admin-safe-bottom)
+    var(--admin-safe-left);
+
+  background:
+    radial-gradient(
+      circle at 18% 18%,
+      rgba(254,127,45,.25),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 84% 20%,
+      rgba(255,255,255,.16),
+      transparent 34%
+    ),
+    linear-gradient(
+      145deg,
+      var(--admin-secondary-dark),
+      var(--admin-secondary)
+    );
+}
+
+.adminPinCard{
+  width:min(100%,460px);
+
+  border:
+    1px solid rgba(255,255,255,.20);
+
+  border-radius:
+    var(--admin-radius-xl);
+
+  padding:34px;
+
+  background:
+    rgba(255,255,255,.97);
+
+  box-shadow:
+    var(--admin-shadow-strong);
+}
+
+.adminPinHeader{
+  margin-bottom:26px;
+
+  display:grid;
+  gap:6px;
+
+  text-align:center;
+}
+
+.adminPinLogo{
+  color:var(--admin-primary);
+  font-size:1rem;
+}
+
+.adminPinTitle{
+  color:var(--admin-secondary);
+
+  font-family:
+    "HanakaDisplay",sans-serif;
+
+  font-size:
+    clamp(2.4rem,8vw,4.1rem);
+
+  line-height:.95;
+}
+
+.adminPinSub{
+  color:var(--admin-muted);
+  font-size:.98rem;
+}
+
+.adminPinForm{
+  display:grid;
+  gap:14px;
+}
+
+.adminPinInput{
+  min-height:64px;
+
+  direction:ltr;
+  text-align:center;
+
+  letter-spacing:.45em;
+  font-size:1.5rem;
+}
+
+.adminPinBtn{
+  min-height:58px;
+  font-size:1.05rem;
+}
+
+.adminPinError{
+  min-height:24px;
+
+  color:var(--admin-red);
+
+  text-align:center;
+  font-size:.92rem;
+}
+
+.adminPinShake{
+  animation:
+    adminPinShake .34s ease;
+}
+
+@keyframes adminPinShake{
+  0%,
+  100%{
+    transform:translateX(0);
+  }
+
+  25%{
+    transform:translateX(8px);
+  }
+
+  50%{
+    transform:translateX(-8px);
+  }
+
+  75%{
+    transform:translateX(4px);
+  }
+}
+
+/* =========================
+   7) APP SHELL
+========================= */
+
+.adminShellNew{
+  width:100%;
+
+  min-height:100vh;
+  min-height:100dvh;
+}
+
+/* =========================
+   8) MODEL GATE
+========================= */
+
+.adminModelGate{
+  min-height:100vh;
+  min-height:100dvh;
+
+  display:grid;
+  place-items:center;
+
+  padding:
+    clamp(18px,3vw,38px)
+    max(
+      clamp(18px,3vw,38px),
+      env(safe-area-inset-right)
+    )
+    max(
+      clamp(18px,3vw,38px),
+      env(safe-area-inset-bottom)
+    )
+    max(
+      clamp(18px,3vw,38px),
+      env(safe-area-inset-left)
+    );
+}
+
+.adminModelGateCard{
+  width:min(100%,1180px);
+
+  min-height:620px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-xl);
+
+  overflow:hidden;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(300px,.9fr)
+    minmax(420px,1.1fr);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    var(--admin-shadow-strong);
+}
+
+.adminModelGateHero{
+  min-width:0;
+
+  color:#FFFFFF;
+
+  background:
+    radial-gradient(
+      circle at 18% 16%,
+      rgba(254,127,45,.62),
+      transparent 34%
+    ),
+    linear-gradient(
+      145deg,
+      var(--admin-secondary-dark),
+      var(--admin-secondary)
+    );
+
+  padding:
+    clamp(34px,5vw,70px);
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+
+  gap:12px;
+}
+
+.adminModelGateHero > span{
+  color:#FFD9C1;
+  font-size:1rem;
+}
+
+.adminModelGateHero h1{
+  margin:0;
+
+  font-family:
+    "HanakaDisplay",sans-serif;
+
+  font-size:
+    clamp(4rem,9vw,7.4rem);
+
+  line-height:.88;
+}
+
+.adminModelGateHero p{
+  max-width:520px;
+
+  margin:10px 0 0;
+
+  color:
+    rgba(255,255,255,.80);
+
+  font-size:1.05rem;
+  line-height:1.85;
+}
+
+.adminModelGatePanel{
+  padding:
+    clamp(28px,4vw,54px);
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+
+  gap:20px;
+
+  background:
+    var(--admin-surface);
+}
+
+.adminModelGateActions{
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:10px;
+}
+
+.adminModelCreateBox{
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-lg);
+
+  background:
+    var(--admin-soft);
+
+  padding:18px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr) auto;
+
+  gap:12px;
+
+  align-items:end;
+}
+
+.adminModelCreateBtn{
+  min-width:150px;
+}
+
+.adminModelLogoutBtn{
+  width:100%;
+}
+
+/* =========================
+   9) WORKSPACE
+========================= */
+
+.adminWorkspace{
+  width:100%;
+
+  min-height:100vh;
+  min-height:100dvh;
+
+  padding:
+    var(--admin-safe-top)
+    var(--admin-safe-right)
+    var(--admin-safe-bottom)
+    var(--admin-safe-left);
+}
+
+/* =========================
+   10) WORKSPACE HEADER
+========================= */
+
+.adminTopHeader{
+  width:
+    min(100%,var(--admin-content-max));
+
+  min-height:92px;
+
+  margin:
+    0 auto 14px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-lg);
+
+  padding:14px 18px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(180px,1fr)
+    minmax(220px,.8fr)
+    auto;
+
+  gap:14px;
+
+  align-items:center;
+
+  position:sticky;
+  top:var(--admin-safe-top);
+  z-index:30;
+
+  background:
+    rgba(255,255,255,.95);
+
+  box-shadow:
+    var(--admin-shadow-soft);
+
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+.adminTopBrand{
+  min-width:0;
+}
+
+.adminTopLogo{
+  color:var(--admin-secondary);
+
+  font-family:
+    "HanakaDisplay",sans-serif;
+
+  font-size:
+    clamp(2rem,4vw,3.2rem);
+
+  line-height:.9;
+}
+
+.adminTopSub{
+  margin-top:6px;
+
+  color:var(--admin-muted);
+
+  font-size:.9rem;
+}
+
+.adminCurrentModelPill{
+  min-width:0;
+  min-height:58px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:
+    var(--admin-soft);
+
+  padding:9px 14px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+
+  gap:2px;
+}
+
+.adminCurrentModelPill.hasModel{
+  border-color:
+    rgba(254,127,45,.35);
+
+  background:
+    var(--admin-primary-soft);
+}
+
+.adminCurrentModelLabel{
+  color:var(--admin-muted);
+  font-size:.78rem;
+}
+
+.adminCurrentModelPill strong{
+  display:block;
+
+  overflow:hidden;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.03rem;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.adminWorkspaceActions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+
+  gap:8px;
+}
+
+.adminWorkspaceActionBtn{
+  min-height:46px;
+
+  padding:10px 14px;
+
+  font-size:.92rem;
+}
+
+/* =========================
+   11) MAIN + EDITOR
+========================= */
+
+.adminMainNew{
+  width:
+    min(100%,var(--admin-content-max));
+
+  margin:0 auto;
+}
+
+.adminTabsNew{
+  margin-bottom:12px;
+}
+
+.adminEditor{
+  width:100%;
+
+  min-height:
+    calc(100dvh - 150px);
+
+  border:
+    1px solid rgba(213,218,223,.86);
+
+  border-radius:
+    var(--admin-radius-xl);
+
+  background:
+    rgba(255,255,255,.76);
+
+  box-shadow:
+    var(--admin-shadow-soft);
+
+  padding:
+    clamp(14px,2.5vw,28px);
+
+  overflow:hidden;
+}
+
+.adminEmptyState{
+  min-height:240px;
+
+  border:
+    1px dashed #BCC6CE;
+
+  border-radius:
+    var(--admin-radius-lg);
+
+  background:
+    rgba(246,247,249,.76);
+
+  color:var(--admin-muted);
+
+  display:grid;
+  place-items:center;
+
+  padding:28px;
+
+  text-align:center;
+
+  font-size:1.05rem;
+  line-height:1.7;
+}
+
+/* =========================
+   12) HOME DASHBOARD
+========================= */
+
+.adminHomePro{
+  display:grid;
+  gap:18px;
+}
+
+.adminHomeStats{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap:12px;
+}
+
+.adminHomeStatCard{
+  min-height:112px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    var(--admin-shadow-soft);
+
+  padding:18px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+
+  gap:8px;
+}
+
+.adminHomeStatCard span{
+  color:var(--admin-muted);
+  font-size:.9rem;
+}
+
+.adminHomeStatCard strong{
+  color:var(--admin-secondary);
+
+  font-size:
+    clamp(1.55rem,3vw,2.35rem);
+
+  line-height:1;
+}
+
+.adminHomeSegmentsGrid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap:12px;
+}
+
+.adminHomeSegmentCard{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  overflow:hidden;
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    var(--admin-shadow-soft);
+
+  transition:
+    transform .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease),
+    border-color .18s var(--admin-ease);
+}
+
+.adminHomeSegmentCard:hover{
+  transform:translateY(-2px);
+
+  border-color:
+    rgba(254,127,45,.40);
+
+  box-shadow:
+    var(--admin-shadow-card);
+}
+
+.adminHomeSegmentCard.isDone{
+  border-color:
+    rgba(0,127,0,.30);
+}
+
+.adminHomeSegmentCard.isDisabled{
+  opacity:.55;
+  filter:grayscale(.45);
+}
+
+.adminHomeSegmentMain{
+  width:100%;
+  min-height:150px;
+
+  padding:18px;
+
+  color:inherit;
+
+  background:#FFFFFF;
+
+  text-align:right;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+
+  gap:18px;
+}
+
+.adminHomeSegmentMain:hover{
+  background:#FFFCFA;
+}
+
+.adminHomeSegmentTop{
+  display:flex;
+
+  align-items:flex-start;
+  justify-content:space-between;
+
+  gap:12px;
+}
+
+.adminHomeSegmentTitleBox{
+  min-width:0;
+}
+
+.adminHomeSegmentTitle{
+  color:
+    var(--admin-secondary);
+
+  font-size:1.14rem;
+  line-height:1.35;
+}
+
+.adminHomeSegmentStatus{
+  flex:0 0 auto;
+
+  min-width:62px;
+
+  border-radius:999px;
+
+  padding:6px 10px;
+
+  text-align:center;
+
+  font-size:.78rem;
+}
+
+.adminHomeSegmentStatus.ready{
+  color:var(--admin-green);
+  background:var(--admin-green-soft);
+}
+
+.adminHomeSegmentStatus.missing{
+  color:var(--admin-red);
+  background:var(--admin-red-soft);
+}
+
+.adminHomeProgress{
+  display:grid;
+  gap:9px;
+}
+
+.adminHomeProgressInfo{
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  color:var(--admin-muted);
+
+  font-size:.88rem;
+}
+
+.adminHomeProgressInfo strong{
+  color:var(--admin-secondary);
+}
+
+.adminHomeProgressBar{
+  height:9px;
+
+  border-radius:999px;
+
+  overflow:hidden;
+
+  background:#E8ECEF;
+}
+
+.adminHomeProgressBar span{
+  display:block;
+
+  width:0;
+  height:100%;
+
+  border-radius:inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--admin-primary),
+      #FFAA72
+    );
+
+  transition:
+    width .35s var(--admin-ease);
+}
+
+.adminHomeSegmentCard.isDone
+.adminHomeProgressBar span{
+  background:
+    linear-gradient(
+      90deg,
+      var(--admin-green),
+      #4AB84A
+    );
+}
+
+/* =========================
+   13) UNIFIED SEGMENT HEADER
+   الهيدر الموحد لجميع الفقرات
+========================= */
+
+/* =========================
+   13.1) HEADER STRUCTURE
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+),
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.randomChallengeAdminPage
+> .randomChallengeAdminTopBar{
+  width:100%;
+  min-width:0;
+  min-height:auto;
+
+  margin:
+    0
+    0
+    14px;
+
+  position:relative;
+  inset:auto;
+  top:auto;
+  z-index:10;
+
+  border:
+    1px solid
+    var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-lg);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    0 12px 30px
+    rgba(35,61,77,.08);
+
+  padding:
+    16px
+    18px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(190px,1fr)
+    auto;
+
+  grid-template-areas:
+    "heading actions"
+    "tools tools";
+
+  align-items:center;
+
+  gap:
+    12px
+    16px;
+
+  overflow:visible;
+
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+
+/* يمنع تنسيقات flex القديمة من التأثير */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+:is(
+  .adminSectionHeaderPro,
+  .adminSectionHeaderInline,
+  .adminEditorTopBarWithActions
+){
+  flex-wrap:unset;
+  justify-content:unset;
+}
+
+/* =========================
+   13.2) REMOVE SEGMENT ICONS
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+.adminSectionTitle::before,
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.randomChallengeAdminPage
+> .randomChallengeAdminTopBar::before{
+  content:none;
+
+  width:0;
+  height:0;
+
+  display:none;
+
+  margin:0;
+
+  box-shadow:none;
+}
+
+/* =========================
+   13.3) HEADING AREA
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> :first-child,
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.randomChallengeAdminPage
+> .randomChallengeAdminTopBar
+> .adminEditorTitleBox{
+  grid-area:heading;
+
+  width:100%;
+  min-width:0;
+
+  margin:0;
+
+  display:grid;
+
+  align-content:center;
+
+  gap:4px;
+}
+
+/* العلامة البرتقالية الموحدة */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> :first-child{
+  position:relative;
+
+  padding-inline-start:17px;
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> :first-child::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:
+    3px;
+
+  inset-inline-start:0;
+
+  width:5px;
+
+  border-radius:999px;
+
+  background:
+    var(--admin-primary);
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.randomChallengeAdminPage
+> .randomChallengeAdminTopBar
+> .adminEditorTitleBox{
+  position:relative;
+
+  padding-inline-start:17px;
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.randomChallengeAdminPage
+> .randomChallengeAdminTopBar
+> .adminEditorTitleBox::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:
+    3px;
+
+  inset-inline-start:0;
+
+  width:5px;
+
+  border-radius:999px;
+
+  background:
+    var(--admin-primary);
+}
+
+/* =========================
+   13.4) TITLE
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+.adminSectionTitle,
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.randomChallengeAdminPage
+> .randomChallengeAdminTopBar
+.adminEditorTitleBox h2{
+  width:auto;
+
+  margin:0;
+  padding:0;
+
+  display:block;
+
+  color:
+    var(--admin-secondary);
+
+  font-family:
+    "HanakaText",
+    sans-serif;
+
+  font-size:
+    clamp(1.3rem,2.4vw,1.8rem);
+
+  line-height:1.2;
+
+  text-align:start;
+}
+
+/* =========================
+   13.5) SUBTITLE
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+:is(
+  .adminSectionHint,
+  p
+),
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.randomChallengeAdminPage
+> .randomChallengeAdminTopBar
+.adminEditorTitleBox span{
+  max-width:720px;
+
+  margin:
+    4px
+    0
+    0;
+
+  color:
+    var(--admin-muted);
+
+  font-size:.88rem;
+  line-height:1.5;
+
+  text-align:start;
+}
+
+/* =========================
+   13.6) ACTIONS AREA
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> .adminInlineActions{
+  grid-area:actions;
+
+  width:auto;
+  min-width:0;
+
+  margin:0;
+  padding:0;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:flex-end;
+
+  flex-wrap:wrap;
+
+  gap:8px;
+}
+
+/* توحيد حجم أزرار الهيدر */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> .adminInlineActions
+> button{
+  width:auto;
+  min-width:104px;
+  max-width:none;
+
+  min-height:46px;
+
+  margin:0;
+
+  padding:
+    9px
+    14px;
+
+  flex:
+    0
+    1
+    auto;
+
+  border-radius:12px;
+
+  font-size:.9rem;
+  line-height:1.15;
+
+  white-space:nowrap;
+}
+
+/* زر الحفظ */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> .adminInlineActions
+> .adminSaveBtn{
+  color:#FFFFFF;
+
+  border:
+    1px solid
+    var(--admin-primary);
+
+  background:
+    var(--admin-primary);
+
+  box-shadow:
+    0 8px 18px
+    rgba(254,127,45,.20);
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> .adminInlineActions
+> .adminSaveBtn:hover{
+  border-color:
+    var(--admin-primary-hover);
+
+  background:
+    var(--admin-primary-hover);
+}
+
+/* زر الإضافة */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> .adminInlineActions
+> .adminBtnMango{
+  color:#FFFFFF;
+
+  border:
+    1px solid
+    var(--admin-secondary);
+
+  background:
+    var(--admin-secondary);
+
+  box-shadow:none;
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> .adminInlineActions
+> .adminBtnMango:hover{
+  border-color:
+    var(--admin-secondary-dark);
+
+  background:
+    var(--admin-secondary-dark);
+}
+
+/* الأزرار الخفيفة */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> .adminInlineActions
+> :is(
+  .adminBtnLight,
+  .adminModelSoftBtn
+){
+  color:
+    var(--admin-secondary);
+
+  border:
+    1px solid
+    var(--admin-line);
+
+  background:
+    var(--admin-soft);
+}
+
+/* أزرار الحذف */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> .adminInlineActions
+> :is(
+  .adminDeleteBtn,
+  .adminDeleteAllBtn
+){
+  color:
+    var(--admin-red);
+
+  border:
+    1px solid
+    rgba(127,0,0,.18);
+
+  background:
+    var(--admin-red-soft);
+
+  box-shadow:none;
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> .adminInlineActions
+> :is(
+  .adminDeleteBtn,
+  .adminDeleteAllBtn
+):hover{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-red);
+
+  background:
+    var(--admin-red);
+}
+
+/* =========================
+   13.7) TOOLS ROW
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> .adminSectionToolsRow{
+  grid-area:tools;
+
+  width:100%;
+  min-width:0;
+
+  margin:0;
+
+  border-top:
+    1px solid
+    #EDF0F2;
+
+  padding:
+    12px
+    0
+    0;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:flex-start;
+
+  flex-wrap:wrap;
+
+  gap:7px;
+
+  overflow:visible;
+}
+
+/* إزالة أي حواف مزدوجة قديمة */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminOnePageEditor
+> :is(
+  .adminEditorTopBar,
+  .compactAdminEditorTopBar,
+  .archiveAdminTopBar
+)
+> .adminSectionToolsRowInline{
+  flex-basis:auto;
+
+  border-top:
+    1px solid
+    #EDF0F2;
+
+  padding-top:12px;
+}
+
+/* =========================
+   13.8) TOOL GROUPS
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminSectionToolsRow
+> :is(
+  .adminToolTabs,
+  .adminToolActions,
+  .adminMovedTool
+){
+  min-width:0;
+
+  margin:0;
+  padding:0;
+
+  display:flex;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+
+  gap:7px;
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminSectionToolsRow
+button{
+  width:auto;
+  min-width:44px;
+
+  min-height:40px;
+
+  margin:0;
+
+  border:
+    1px solid
+    var(--admin-line);
+
+  border-radius:11px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  padding:
+    8px
+    12px;
+
+  font-size:.85rem;
+  line-height:1.15;
+
+  white-space:nowrap;
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminSectionToolsRow
+button:hover{
+  border-color:
+    rgba(254,127,45,.34);
+
+  background:
+    var(--admin-primary-soft);
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.adminSectionToolsRow
+button.innerTabActive{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-secondary);
+
+  box-shadow:
+    0 7px 16px
+    rgba(35,61,77,.16);
+}
+
+/* =========================
+   13.9) RANDOM CHALLENGE HEADER
+========================= */
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.randomChallengeAdminPage
+> .randomChallengeAdminTopBar{
+  grid-template-columns:1fr;
+  grid-template-areas:"heading";
+
+  margin-bottom:0;
+}
+
+.adminShellNew
+.adminWorkspace
+.adminEditor
+.randomChallengeAdminPage
+> .randomChallengeAdminTabs{
+  margin:0;
+}
+
+/* =========================
+   13.10) LAPTOP
+========================= */
+
+@media (max-width:1180px){
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminOnePageEditor
+  > :is(
+    .adminEditorTopBar,
+    .compactAdminEditorTopBar,
+    .archiveAdminTopBar
+  ){
+    grid-template-columns:1fr;
+
+    grid-template-areas:
+      "heading"
+      "actions"
+      "tools";
+
+    gap:12px;
+  }
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminOnePageEditor
+  > :is(
+    .adminEditorTopBar,
+    .compactAdminEditorTopBar,
+    .archiveAdminTopBar
+  )
+  > .adminInlineActions{
+    width:100%;
+
+    justify-content:flex-start;
+  }
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminOnePageEditor
+  > :is(
+    .adminEditorTopBar,
+    .compactAdminEditorTopBar,
+    .archiveAdminTopBar
+  )
+  > .adminInlineActions
+  > button{
+    flex:
+      1
+      1
+      140px;
+  }
+}
+
+/* =========================
+   13.11) TABLET
+========================= */
+
+@media (max-width:760px){
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminOnePageEditor
+  > :is(
+    .adminEditorTopBar,
+    .compactAdminEditorTopBar,
+    .archiveAdminTopBar
+  ),
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .randomChallengeAdminPage
+  > .randomChallengeAdminTopBar{
+    margin-bottom:10px;
+
+    border-radius:
+      var(--admin-radius-md);
+
+    padding:13px;
+  }
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminOnePageEditor
+  > :is(
+    .adminEditorTopBar,
+    .compactAdminEditorTopBar,
+    .archiveAdminTopBar
+  )
+  > .adminInlineActions{
+    display:grid;
+
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
+    gap:8px;
+  }
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminOnePageEditor
+  > :is(
+    .adminEditorTopBar,
+    .compactAdminEditorTopBar,
+    .archiveAdminTopBar
+  )
+  > .adminInlineActions
+  > button{
+    width:100%;
+    min-width:0;
+
+    min-height:46px;
+
+    flex:none;
+  }
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminSectionToolsRow{
+    flex-wrap:nowrap;
+
+    overflow-x:auto;
+    overflow-y:hidden;
+
+    scrollbar-width:thin;
+
+    padding-bottom:3px;
+  }
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminSectionToolsRow
+  > :is(
+    .adminToolTabs,
+    .adminToolActions,
+    .adminMovedTool
+  ){
+    flex:0 0 auto;
+
+    flex-wrap:nowrap;
+  }
+}
+
+/* =========================
+   13.12) MOBILE
+========================= */
+
+@media (max-width:480px){
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminOnePageEditor
+  > :is(
+    .adminEditorTopBar,
+    .compactAdminEditorTopBar,
+    .archiveAdminTopBar
+  )
+  > .adminInlineActions{
+    grid-template-columns:1fr;
+  }
+
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .adminOnePageEditor
+  > :is(
+    .adminEditorTopBar,
+    .compactAdminEditorTopBar,
+    .archiveAdminTopBar
+  )
+  .adminSectionTitle,
+  .adminShellNew
+  .adminWorkspace
+  .adminEditor
+  .randomChallengeAdminPage
+  > .randomChallengeAdminTopBar
+  .adminEditorTitleBox h2{
+    font-size:1.25rem;
+  }
+}
+
+/* =========================
+   14) SHARED EDITOR CARDS
+========================= */
+
+.adminOnePageEditor{
+  min-width:0;
+}
+
+.adminEditCardsGrid{
+  width:100%;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:12px;
+
+  align-items:start;
+}
+
+.adminEditCardsGrid.hasOpenCard{
+  grid-template-columns:1fr;
+}
+
+.adminEditItemCard{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:#FFFFFF;
+
+  overflow:hidden;
+
+  box-shadow:
+    0 10px 28px
+    rgba(35,61,77,.06);
+
+  transition:
+    border-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease),
+    transform .18s var(--admin-ease);
+}
+
+.adminEditItemCard:hover{
+  border-color:#BEC7CE;
+
+  box-shadow:
+    0 15px 34px
+    rgba(35,61,77,.09);
+}
+
+.adminEditItemCard[open]{
+  grid-column:1 / -1;
+
+  border-color:
+    rgba(254,127,45,.42);
+
+  box-shadow:
+    var(--admin-shadow-card);
+}
+
+.adminEditItemCard.isDone{
+  border-color:
+    rgba(0,127,0,.28);
+}
+
+.adminEditItemCard.isMissing{
+  border-color:
+    rgba(127,0,0,.20);
+}
+
+.adminEditItemCard summary{
+  min-height:82px;
+
+  list-style:none;
+  cursor:pointer;
+
+  padding:15px 16px;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:space-between;
+
+  gap:14px;
+
+  background:#FFFFFF;
+
+  user-select:none;
+}
+
+.adminEditItemCard
+summary::-webkit-details-marker{
+  display:none;
+}
+
+.adminEditItemCard[open] summary{
+  border-bottom:
+    1px solid #EDF0F2;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF,
+      var(--admin-soft)
+    );
+}
+
+.adminEditItemTitle{
+  min-width:0;
+
+  display:grid;
+  gap:4px;
+}
+
+.adminEditItemTitle strong{
+  color:
+    var(--admin-secondary);
+
+  font-size:1.05rem;
+}
+
+.adminEditItemTitle span{
+  color:var(--admin-muted);
+
+  font-size:.86rem;
+  line-height:1.4;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.adminEditItemMeta{
+  flex:0 0 auto;
+
+  display:flex;
+  align-items:center;
+
+  gap:7px;
+}
+
+.adminEditStatusPill,
+.adminEditProgressPill{
+  min-height:30px;
+
+  border-radius:999px;
+
+  padding:6px 10px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:.78rem;
+}
+
+.adminEditStatusPill{
+  color:var(--admin-red);
+  background:var(--admin-red-soft);
+}
+
+.isDone .adminEditStatusPill{
+  color:var(--admin-green);
+  background:var(--admin-green-soft);
+}
+
+.adminEditProgressPill{
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  border:
+    1px solid var(--admin-line);
+}
+
+.adminEditItemBody{
+  padding:16px;
+
+  animation:
+    adminItemOpen .20s
+    var(--admin-ease);
+}
+
+@keyframes adminItemOpen{
+  from{
+    opacity:0;
+    transform:translateY(-5px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+:is(
+  .adminCard,
+  .adminQuestionCard,
+  .finalAdminCard,
+  .archiveMainInfoCard,
+  .archiveImageCard,
+  .adminEditorCleanCard
+){
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    var(--admin-shadow-soft);
+
+  padding:16px;
+}
+
+/* =========================
+   15) GENERIC GRIDS
+========================= */
+
+:is(
+  .adminFieldsGrid,
+  .adminFormGrid,
+  .adminTwoColumnGrid,
+  .adminEditorFieldsGrid
+){
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:12px;
+}
+
+/* =========================
+   16) MEDIA PREVIEW
+========================= */
+
+:is(
+  .finalAdminImagePreview,
+  .finalAdminPreviewBox,
+  .adminImagePreview,
+  .adminMediaPreview
+){
+  width:100%;
+
+  min-height:170px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  overflow:hidden;
+
+  background:
+    var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+}
+
+.previewImg,
+:is(
+  .finalAdminImagePreview,
+  .finalAdminPreviewBox,
+  .adminImagePreview,
+  .adminMediaPreview
+) > :is(img,video){
+  width:100%;
+
+  max-height:360px;
+
+  object-fit:contain;
+
+  background:#F0F3F5;
+}
+
+.emptyImageHint{
+  color:var(--admin-muted);
+
+  padding:24px;
+
+  text-align:center;
+}
+
+/* =========================
+   17) SETTINGS PAGE
+========================= */
+
+.adminSettingsGamePage{
+  display:grid;
+  gap:20px;
+}
+
+.adminSettingsGameGrid,
+.adminChallengeSettingsGrid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap:12px;
+}
+
+.adminSettingGameCard{
+  min-width:0;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    var(--admin-shadow-soft);
+
+  padding:16px;
+
+  display:grid;
+  gap:16px;
+}
+
+.adminSettingGameHead{
+  display:flex;
+
+  align-items:flex-start;
+  justify-content:space-between;
+
+  gap:12px;
+}
+
+.adminSettingGameTitleBox{
+  min-width:0;
+}
+
+.adminSettingGameTitleBox h3{
+  margin:0;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.05rem;
+  line-height:1.35;
+}
+
+.adminSettingGameTitleBox h3 span{
+  display:block;
+
+  margin-top:4px;
+
+  color:var(--admin-muted);
+
+  font-size:.82rem;
+}
+
+.adminSettingGameSelected{
+  flex:0 0 auto;
+
+  min-width:42px;
+  height:42px;
+
+  border-radius:12px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  border:
+    1px solid var(--admin-line);
+
+  display:grid;
+  place-items:center;
+}
+
+.adminSettingGameOptions{
+  display:flex;
+  flex-wrap:wrap;
+
+  gap:8px;
+}
+
+.adminSettingGameOption{
+  min-width:48px;
+  min-height:44px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:12px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  padding:8px 12px;
+}
+
+.adminSettingGameOption:hover{
+  border-color:
+    rgba(254,127,45,.50);
+
+  background:
+    var(--admin-primary-soft);
+}
+
+.adminSettingGameOption.selected{
+  color:#FFFFFF;
+
+  border-color:
+    var(--admin-primary);
+
+  background:
+    var(--admin-primary);
+
+  box-shadow:
+    0 8px 18px
+    rgba(254,127,45,.20);
+}
+
+.adminChallengeSettingsSection{
+  border-top:
+    1px solid var(--admin-line);
+
+  padding-top:20px;
+
+  display:grid;
+  gap:14px;
+}
+
+.adminChallengeSettingsHead h2{
+  margin:0;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.35rem;
+}
+
+.adminChallengeSettingsHead span{
+  display:block;
+
+  margin-top:4px;
+
+  color:var(--admin-muted);
+
+  font-size:.9rem;
+}
+
+.adminToggleSettingCard{
+  transition:
+    opacity .16s var(--admin-ease),
+    border-color .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.adminToggleSettingCard.isDisabled{
+  opacity:.66;
+
+  background:#F4F5F6;
+}
+
+.adminToggleSettingCard.isEnabled{
+  border-color:
+    rgba(0,127,0,.24);
+}
+
+.adminSettingToggleBtn{
+  min-width:80px;
+  min-height:38px;
+
+  border-radius:999px;
+
+  color:var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+
+  border:
+    1px solid rgba(127,0,0,.16);
+
+  padding:8px 12px;
+}
+
+.adminSettingToggleBtn.active{
+  color:var(--admin-green);
+
+  background:
+    var(--admin-green-soft);
+
+  border-color:
+    rgba(0,127,0,.18);
+}
+
+.adminChallengeAuctionCount{
+  display:grid;
+  gap:10px;
+}
+
+.adminChallengeAuctionCountTitle{
+  color:var(--admin-muted);
+  font-size:.86rem;
+}
+
+/* =========================
+   18) GLOBAL VISIBILITY
+========================= */
+
+.globalSegmentVisibilityOverlay,
+.adminModalOverlay,
+.adminConfirmOverlay{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+
+  padding:
+    var(--admin-safe-top)
+    var(--admin-safe-right)
+    var(--admin-safe-bottom)
+    var(--admin-safe-left);
+
+  display:grid;
+  place-items:center;
+
+  background:
+    rgba(21,44,57,.56);
+
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+
+.globalSegmentVisibilityPanel{
+  width:min(100%,980px);
+
+  max-height:
+    calc(100dvh - 32px);
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-xl);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    var(--admin-shadow-strong);
+
+  padding:20px;
+
+  overflow:auto;
+}
+
+.globalSegmentVisibilityHead{
+  margin-bottom:16px;
+
+  display:flex;
+
+  align-items:flex-start;
+  justify-content:space-between;
+
+  gap:14px;
+}
+
+.globalSegmentVisibilityHead h2{
+  margin:0;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.45rem;
+}
+
+.globalSegmentVisibilityHead p{
+  margin:5px 0 0;
+
+  color:var(--admin-muted);
+
+  line-height:1.55;
+}
+
+.globalSegmentCardsGrid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap:10px;
+}
+
+.globalSegmentToggleCard{
+  min-height:78px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-md);
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  padding:14px;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:space-between;
+
+  gap:12px;
+
+  text-align:right;
+}
+
+.globalSegmentToggleCard.isEnabled{
+  border-color:
+    rgba(0,127,0,.24);
+
+  background:
+    var(--admin-green-soft);
+}
+
+.globalSegmentToggleCard.isDisabled{
+  opacity:.68;
+}
+
+.globalSegmentToggleSwitch{
+  flex:0 0 auto;
+
+  width:48px;
+  height:28px;
+
+  border-radius:999px;
+
+  background:#C8D0D6;
+
+  padding:3px;
+
+  direction:ltr;
+
+  transition:
+    background-color
+    .16s var(--admin-ease);
+}
+
+.globalSegmentToggleSwitch span{
+  display:block;
+
+  width:22px;
+  height:22px;
+
+  border-radius:50%;
+
+  background:#FFFFFF;
+
+  box-shadow:
+    0 3px 8px
+    rgba(35,61,77,.20);
+
+  transform:translateX(0);
+
+  transition:
+    transform
+    .18s var(--admin-ease);
+}
+
+.globalSegmentToggleCard.isEnabled
+.globalSegmentToggleSwitch{
+  background:
+    var(--admin-green);
+}
+
+.globalSegmentToggleCard.isEnabled
+.globalSegmentToggleSwitch span{
+  transform:
+    translateX(20px);
+}
+
+/* =========================
+   19) MODALS
+========================= */
+
+.adminModalCard,
+.adminConfirmCard{
+  width:min(100%,560px);
+
+  max-height:
+    calc(100dvh - 32px);
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-xl);
+
+  background:
+    var(--admin-surface);
+
+  box-shadow:
+    var(--admin-shadow-strong);
+
+  padding:22px;
+
+  overflow:auto;
+}
+
+.adminModalTitle{
+  margin-bottom:18px;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.35rem;
+  line-height:1.3;
+}
+
+.adminModalActions,
+.adminConfirmActions{
+  margin-top:18px;
+
+  display:flex;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+
+  gap:9px;
+}
+
+.adminConfirmCard{
+  display:grid;
+
+  grid-template-columns:
+    auto minmax(0,1fr);
+
+  gap:14px;
+}
+
+.adminConfirmIcon{
+  width:50px;
+  height:50px;
+
+  border-radius:16px;
+
+  color:
+    var(--admin-secondary);
+
+  background:
+    var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-size:1.25rem;
+}
+
+.adminConfirmCard.danger
+.adminConfirmIcon{
+  color:var(--admin-red);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.adminConfirmContent h3{
+  margin:0;
+
+  color:
+    var(--admin-secondary);
+
+  font-size:1.25rem;
+}
+
+.adminConfirmContent p{
+  margin:7px 0 0;
+
+  color:var(--admin-muted);
+
+  line-height:1.65;
+}
+
+.adminConfirmActions{
+  grid-column:1 / -1;
+}
+
+/* =========================
+   20) MODEL CHECK
+========================= */
+
+.modelCheckModalCard{
+  width:min(100%,760px);
+}
+
+.modelCheckSummary{
+  margin-bottom:14px;
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  padding:12px 14px;
+}
+
+.modelCheckSummary.ready{
+  color:var(--admin-green);
+  background:var(--admin-green-soft);
+}
+
+.modelCheckSummary.notReady{
+  color:var(--admin-red);
+  background:var(--admin-red-soft);
+}
+
+.modelCheckList{
+  display:grid;
+  gap:9px;
+}
+
+.modelCheckItem{
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:
+    var(--admin-soft);
+
+  padding:13px;
+}
+
+.modelCheckItem.ok{
+  border-color:
+    rgba(0,127,0,.22);
+
+  background:
+    var(--admin-green-soft);
+}
+
+.modelCheckItem.bad{
+  border-color:
+    rgba(127,0,0,.18);
+
+  background:
+    var(--admin-red-soft);
+}
+
+.modelCheckItemHead{
+  display:flex;
+  align-items:center;
+
+  gap:9px;
+}
+
+.modelCheckIcon{
+  width:26px;
+  height:26px;
+
+  border-radius:50%;
+
+  display:grid;
+  place-items:center;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-red);
+}
+
+.modelCheckItem.ok
+.modelCheckIcon{
+  background:
+    var(--admin-green);
+}
+
+.modelCheckDetails{
+  margin-top:9px;
+
+  padding-right:35px;
+
+  color:var(--admin-muted);
+
+  display:grid;
+  gap:4px;
+
+  font-size:.88rem;
+  line-height:1.5;
+}
+
+/* =========================
+   21) TOAST
+========================= */
+
+.gameToast{
+  position:fixed;
+  z-index:1500;
+
+  right:50%;
+
+  bottom:
+    max(
+      22px,
+      env(safe-area-inset-bottom)
+    );
+
+  width:
+    min(
+      calc(100% - 28px),
+      520px
+    );
+
+  min-height:54px;
+
+  border:
+    1px solid rgba(255,255,255,.18);
+
+  border-radius:16px;
+
+  color:#FFFFFF;
+
+  background:
+    var(--admin-secondary);
+
+  box-shadow:
+    0 18px 44px
+    rgba(21,44,57,.28);
+
+  padding:12px 16px;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  gap:10px;
+
+  transform:
+    translate(50%,24px);
+
+  opacity:0;
+
+  pointer-events:none;
+
+  transition:
+    transform .22s var(--admin-ease),
+    opacity .22s var(--admin-ease);
+}
+
+.gameToast.show{
+  transform:translate(50%,0);
+  opacity:1;
+}
+
+.gameToast.success{
+  background:
+    var(--admin-green);
+}
+
+.gameToast.error{
+  background:
+    var(--admin-red);
+}
+
+.gameToast.warning{
+  background:#8A5B00;
+}
+
+.gameToast.info{
+  background:
+    var(--admin-secondary);
+}
+
+.gameToastIcon{
+  flex:0 0 auto;
+
+  width:26px;
+  height:26px;
+
+  border-radius:50%;
+
+  background:
+    rgba(255,255,255,.17);
+
+  display:grid;
+  place-items:center;
+
+  font-size:.86rem;
+}
+
+.gameToastText{
+  text-align:center;
+  line-height:1.4;
+}
+
+/* =========================
+   22) SAVING STATE
+========================= */
+
+.adminSavingBtn,
+.adminIsSaving .adminSaveBtn{
+  position:relative;
+  overflow:hidden;
+}
+
+.adminSavingBtn::after,
+.adminIsSaving .adminSaveBtn::after{
+  content:"";
+
+  width:16px;
+  height:16px;
+
+  border:
+    2px solid
+    rgba(255,255,255,.46);
+
+  border-top-color:#FFFFFF;
+
+  border-radius:50%;
+
+  animation:
+    adminSpin .75s linear infinite;
+}
+
+@keyframes adminSpin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+/* =========================
+   23) MISC
+========================= */
+
+.adminMoreMenuWrap{
+  position:relative;
+}
+
+.adminMoreMenu{
+  position:absolute;
+  z-index:50;
+
+  top:calc(100% + 8px);
+  left:0;
+
+  min-width:190px;
+
+  border:
+    1px solid var(--admin-line);
+
+  border-radius:
+    var(--admin-radius-sm);
+
+  background:#FFFFFF;
+
+  box-shadow:
+    var(--admin-shadow-card);
+
+  padding:8px;
+}
+
+#printPresenterArea{
+  display:none;
+}
+
+/* =========================
+   24) LAPTOP / TABLET
+========================= */
+
+@media (max-width:1180px){
+
+  .adminModelGateCard{
+    grid-template-columns:
+      minmax(280px,.8fr)
+      minmax(380px,1.2fr);
+  }
+
+  .adminTopHeader{
+    grid-template-columns:
+      minmax(160px,.8fr)
+      minmax(200px,.9fr);
+  }
+
+  .adminWorkspaceActions{
+    grid-column:1 / -1;
+    justify-content:stretch;
+  }
+
+  .adminWorkspaceActionBtn{
+    flex:1 1 150px;
+  }
+
+  .adminHomeSegmentsGrid,
+  .adminSettingsGameGrid,
+  .adminChallengeSettingsGrid,
+  .globalSegmentCardsGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+}
+
+/* =========================
+   25) TABLET
+========================= */
+
+@media (max-width:860px){
+
+  .adminModelGateCard{
+    min-height:0;
+
+    grid-template-columns:1fr;
+  }
+
+  .adminModelGateHero{
+    min-height:270px;
+    padding:34px;
+  }
+
+  .adminModelGateHero h1{
+    font-size:4.5rem;
+  }
+
+  .adminModelGatePanel{
+    padding:26px;
+  }
+
+  .adminTopHeader{
+    position:relative;
+    top:auto;
+
+    grid-template-columns:1fr;
+  }
+
+  .adminWorkspaceActions{
+    grid-column:auto;
+  }
+
+  .adminHomeStats{
+    grid-template-columns:1fr;
+  }
+
+  .adminHomeStatCard{
+    min-height:86px;
+  }
+
+  .adminEditCardsGrid,
+  :is(
+    .adminFieldsGrid,
+    .adminFormGrid,
+    .adminTwoColumnGrid,
+    .adminEditorFieldsGrid
+  ){
+    grid-template-columns:1fr;
+  }
+
+  :is(
+    .adminEditorTopBar,
+    .compactAdminEditorTopBar,
+    .archiveAdminTopBar
+  ){
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .adminInlineActions{
+    justify-content:stretch;
+  }
+
+  .adminInlineActions > button{
+    flex:1 1 160px;
+  }
+}
+
+/* =========================
+   26) MOBILE
+========================= */
+
+@media (max-width:620px){
+
+  :root{
+    --admin-control-height:52px;
+
+    --admin-radius-xl:24px;
+    --admin-radius-lg:20px;
+    --admin-radius-md:17px;
+  }
+
+  body{
+    background:
+      var(--admin-bg);
+  }
+
+  body::before{
+    display:none;
+  }
+
+  .adminPinCard{
+    padding:24px 18px;
+  }
+
+  .adminModelGate{
+    padding:10px;
+  }
+
+  .adminModelGateCard{
+    border-radius:22px;
+  }
+
+  .adminModelGateHero{
+    min-height:220px;
+
+    padding:28px 22px;
+  }
+
+  .adminModelGateHero h1{
+    font-size:4rem;
+  }
+
+  .adminModelGateHero p{
+    font-size:.95rem;
+    line-height:1.65;
+  }
+
+  .adminModelGatePanel{
+    padding:20px 16px;
+  }
+
+  .adminModelGateActions,
+  .adminModelCreateBox{
+    grid-template-columns:1fr;
+  }
+
+  .adminModelCreateBtn{
+    width:100%;
+  }
+
+  .adminWorkspace{
+    padding:
+      max(8px,env(safe-area-inset-top))
+      max(8px,env(safe-area-inset-right))
+      max(12px,env(safe-area-inset-bottom))
+      max(8px,env(safe-area-inset-left));
+  }
+
+  .adminTopHeader{
+    margin-bottom:8px;
+
+    border-radius:20px;
+
+    padding:12px;
+  }
+
+  .adminWorkspaceActions{
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .adminWorkspaceActionBtn.exit{
+    grid-column:1 / -1;
+  }
+
+  .adminEditor{
+    min-height:
+      calc(100dvh - 170px);
+
+    border-radius:22px;
+
+    padding:10px;
+  }
+
+  .adminHomeSegmentsGrid,
+  .adminSettingsGameGrid,
+  .adminChallengeSettingsGrid,
+  .globalSegmentCardsGrid{
+    grid-template-columns:1fr;
+  }
+
+  .adminHomeSegmentMain{
+    min-height:132px;
+  }
+
+  .adminEditItemCard summary{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .adminEditItemMeta{
+    width:100%;
+    flex-wrap:wrap;
+  }
+
+  .adminEditItemTitle span{
+    white-space:normal;
+  }
+
+  .adminDeleteBtn{
+    margin-right:auto;
+  }
+
+  .globalSegmentVisibilityPanel,
+  .adminModalCard,
+  .adminConfirmCard{
+    max-height:
+      calc(100dvh - 16px);
+
+    border-radius:22px;
+
+    padding:16px;
+  }
+
+  .globalSegmentVisibilityHead{
+    flex-direction:column;
+  }
+
+  .globalSegmentCloseBtn{
+    width:100%;
+  }
+
+  .adminConfirmCard{
+    grid-template-columns:1fr;
+  }
+
+  .adminConfirmActions{
+    grid-column:auto;
+  }
+
+  .adminModalActions,
+  .adminConfirmActions{
+    display:grid;
+
+    grid-template-columns:1fr;
+  }
+
+  .adminModalActions > button,
+  .adminConfirmActions > button{
+    width:100%;
+  }
+}
+
+/* =========================
+   27) SMALL MOBILE
+========================= */
+
+@media (max-width:390px){
+
+  .adminTopLogo{
+    font-size:2.1rem;
+  }
+
+  .adminWorkspaceActions{
+    grid-template-columns:1fr;
+  }
+
+  .adminWorkspaceActionBtn.exit{
+    grid-column:auto;
+  }
+
+  .adminHomeSegmentTop{
+    flex-direction:column;
+  }
+
+  .adminHomeSegmentStatus{
+    align-self:flex-start;
+  }
+
+  .adminEditItemMeta{
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .adminEditItemMeta
+  .adminDeleteBtn{
+    grid-column:1 / -1;
+
+    width:100%;
+  }
+}
+
+/* =========================
+   28) REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+    scroll-behavior:auto !important;
+
+    animation-duration:
+      .01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      .01ms !important;
+  }
+}
+/* =========================================================
+   ADMIN NOTIFICATIONS
+   TOP CENTER - CLEAN FINAL
+========================================================= */
+
+/* =========================
+   1) TOAST CONTAINER
+========================= */
+
+#gameToast{
+  position:fixed !important;
+
+  top:
+    calc(
+      16px +
+      env(safe-area-inset-top,0px)
+    ) !important;
+
+  right:auto !important;
+  bottom:auto !important;
+  left:50% !important;
+
+  z-index:999999 !important;
+
+  box-sizing:border-box !important;
+
+  width:max-content !important;
+  min-width:300px !important;
+  max-width:min(480px,calc(100vw - 28px)) !important;
+
+  height:auto !important;
+  min-height:66px !important;
+  max-height:170px !important;
+
+  margin:0 !important;
+
+  padding:
+    10px
+    12px !important;
+
+  border:
+    1px solid
+    rgba(255,255,255,.18) !important;
+
+  border-radius:18px !important;
+
+  color:#FFFFFF !important;
+
+  background:#233D4D !important;
+
+  box-shadow:
+    0 16px 38px
+    rgba(21,44,57,.22),
+    0 4px 12px
+    rgba(21,44,57,.10) !important;
+
+  display:flex !important;
+
+  align-items:center !important;
+  justify-content:flex-start !important;
+
+  gap:11px !important;
+
+  direction:rtl !important;
+
+  overflow:hidden !important;
+
+  opacity:0 !important;
+  visibility:hidden !important;
+
+  pointer-events:none !important;
+
+  transform:
+    translateX(-50%)
+    translateY(-12px) !important;
+
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease,
+    visibility 150ms ease !important;
+}
+
+/* =========================
+   2) SHOW / HIDDEN
+========================= */
+
+#gameToast.show{
+  opacity:1 !important;
+  visibility:visible !important;
+
+  transform:
+    translateX(-50%)
+    translateY(0) !important;
+}
+
+#gameToast.hidden{
+  display:none !important;
+}
+
+/* =========================
+   3) ACCENT LINE
+========================= */
+
+#gameToast::before{
+  content:"" !important;
+
+  position:absolute !important;
+
+  top:9px !important;
+  right:0 !important;
+  bottom:9px !important;
+
+  width:5px !important;
+
+  border-radius:
+    5px
+    0
+    0
+    5px !important;
+
+  background:
+    rgba(255,255,255,.55) !important;
+
+  pointer-events:none !important;
+}
+
+/* =========================
+   4) ICON BOX
+========================= */
+
+#gameToastIcon,
+#gameToast .gameToastIcon{
+  width:44px !important;
+  height:44px !important;
+
+  min-width:44px !important;
+  min-height:44px !important;
+
+  flex:
+    0 0
+    44px !important;
+
+  margin:0 !important;
+  padding:0 !important;
+
+  border:
+    1px solid
+    rgba(255,255,255,.24) !important;
+
+  border-radius:13px !important;
+
+  color:#FFFFFF !important;
+
+  background:
+    rgba(255,255,255,.15) !important;
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(255,255,255,.14) !important;
+
+  display:grid !important;
+  place-items:center !important;
+
+  font-family:
+    Arial,
+    sans-serif !important;
+
+  font-size:1.12rem !important;
+  font-weight:900 !important;
+  line-height:1 !important;
+}
+
+/* =========================
+   5) MESSAGE
+========================= */
+
+#gameToastText,
+#gameToast .gameToastText{
+  width:auto !important;
+  min-width:0 !important;
+  max-width:390px !important;
+
+  height:auto !important;
+
+  margin:0 !important;
+  padding:
+    1px
+    0 !important;
+
+  flex:
+    1 1
+    auto !important;
+
+  display:block !important;
+
+  color:#FFFFFF !important;
+
+  font-family:
+    "HanakaText",
+    sans-serif !important;
+
+  font-size:1rem !important;
+  font-weight:700 !important;
+  line-height:1.6 !important;
+
+  text-align:right !important;
+
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+}
+
+/* =========================
+   6) SUCCESS - GREEN
+========================= */
+
+#gameToast.success{
+  border-color:
+    rgba(255,255,255,.20) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #148447 0%,
+      #086634 100%
+    ) !important;
+
+  box-shadow:
+    0 16px 38px
+    rgba(8,102,52,.24),
+    0 4px 12px
+    rgba(8,102,52,.12) !important;
+}
+
+#gameToast.success::before{
+  background:
+    #8EE0AE !important;
+}
+
+#gameToast.success
+:is(
+  #gameToastIcon,
+  .gameToastIcon
+){
+  background:
+    rgba(255,255,255,.17) !important;
+}
+
+/* =========================
+   7) ERROR - BURGUNDY
+========================= */
+
+#gameToast.error{
+  border-color:
+    rgba(255,255,255,.18) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7D2534 0%,
+      #551420 100%
+    ) !important;
+
+  box-shadow:
+    0 16px 38px
+    rgba(85,20,32,.27),
+    0 4px 12px
+    rgba(85,20,32,.14) !important;
+}
+
+#gameToast.error::before{
+  background:
+    #E9A0AC !important;
+}
+
+#gameToast.error
+:is(
+  #gameToastIcon,
+  .gameToastIcon
+){
+  background:
+    rgba(255,255,255,.14) !important;
+}
+
+/* =========================
+   8) WARNING - BURGUNDY
+========================= */
+
+#gameToast.warning{
+  border-color:
+    rgba(255,255,255,.18) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #922F42 0%,
+      #681D2B 100%
+    ) !important;
+
+  box-shadow:
+    0 16px 38px
+    rgba(104,29,43,.25),
+    0 4px 12px
+    rgba(104,29,43,.13) !important;
+}
+
+#gameToast.warning::before{
+  background:
+    #F1B0BB !important;
+}
+
+#gameToast.warning
+:is(
+  #gameToastIcon,
+  .gameToastIcon
+){
+  background:
+    rgba(255,255,255,.15) !important;
+}
+
+/* =========================
+   9) INFO
+========================= */
+
+#gameToast.info{
+  border-color:
+    rgba(255,255,255,.16) !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #29495C 0%,
+      #152C39 100%
+    ) !important;
+}
+
+#gameToast.info::before{
+  background:
+    #A9C4D3 !important;
+}
+
+/* =========================
+   10) MOBILE
+========================= */
+
+@media (max-width:620px){
+
+  #gameToast{
+    top:
+      calc(
+        10px +
+        env(safe-area-inset-top,0px)
+      ) !important;
+
+    width:
+      calc(100vw - 18px) !important;
+
+    min-width:0 !important;
+
+    max-width:
+      calc(100vw - 18px) !important;
+
+    min-height:60px !important;
+    max-height:150px !important;
+
+    border-radius:16px !important;
+
+    padding:
+      9px
+      10px !important;
+
+    gap:9px !important;
+  }
+
+  #gameToastIcon,
+  #gameToast .gameToastIcon{
+    width:38px !important;
+    height:38px !important;
+
+    min-width:38px !important;
+    min-height:38px !important;
+
+    flex-basis:38px !important;
+
+    border-radius:11px !important;
+
+    font-size:1rem !important;
+  }
+
+  #gameToastText,
+  #gameToast .gameToastText{
+    max-width:none !important;
+
+    font-size:.93rem !important;
+    font-weight:700 !important;
+    line-height:1.55 !important;
+  }
+}
+
+/* =========================
+   11) REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion:reduce){
+
+  #gameToast{
+    transition:none !important;
+  }
+}
