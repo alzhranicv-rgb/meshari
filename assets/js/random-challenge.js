@@ -4954,9 +4954,12 @@ function triggerRandomBox5WrongEffect() {
 }
 
 function completeRandomBox5Number(isCorrect) {
-  if (
-    randomChallengeState.currentBox !== 5
-  ) {
+  const currentBox =
+    normalizeRandomChallengeBoxNumber(
+      randomChallengeState.currentBox
+    )
+
+  if (currentBox !== 5) {
     return
   }
 
@@ -4977,13 +4980,13 @@ function completeRandomBox5Number(isCorrect) {
      الإجابة الخاطئة
   ========================= */
 
-  if (!isCorrect) {
+  if (isCorrect !== true) {
     triggerRandomBox5WrongEffect()
     return
   }
 
   /* =========================
-     الإجابة الصحيحة
+     الفريق صاحب الإجابة
   ========================= */
 
   const selectedTeam =
@@ -4994,7 +4997,7 @@ function completeRandomBox5Number(isCorrect) {
     selectedTeam !== "B"
   ) {
     showGameToast(
-      "اختر الفريق الذي أجاب صحيحًا",
+      "اختر الفريق الذي أجاب صحيحًا"
     )
 
     return
@@ -5003,24 +5006,46 @@ function completeRandomBox5Number(isCorrect) {
   stopRandomBox5BlockTimer()
   stopRandomBox5ReturnTimer()
 
+  /* =========================
+     تهيئة بيانات فتبلة
+  ========================= */
+
+  if (
+    !box5.scores ||
+    typeof box5.scores !== "object"
+  ) {
+    box5.scores = {
+      A: 0,
+      B: 0
+    }
+  }
+
+  if (
+    !Array.isArray(
+      box5.openedNumbers
+    )
+  ) {
+    box5.openedNumbers = []
+  }
+
   const total =
     normalizeRandomChallengeFatblaCount(
       randomChallengeSettings
-        .fatblaCount || 5,
+        .fatblaCount || 5
     )
 
   const scoreA =
-  Number(box5.scores?.A || 0)
+    Number(box5.scores.A || 0)
 
-const scoreB =
-  Number(box5.scores?.B || 0)
+  const scoreB =
+    Number(box5.scores.B || 0)
 
   const remainingNumbersCount =
-  total -
-  box5.openedNumbers.length
+    total -
+    box5.openedNumbers.length
 
-const isFinalNumber =
-  remainingNumbersCount === 1
+  const isFinalNumber =
+    remainingNumbersCount === 1
 
   const isTie =
     scoreA === scoreB
@@ -5030,34 +5055,29 @@ const isFinalNumber =
       ? 2
       : 1
 
-  if (!box5.scores || typeof box5.scores !== "object") {
-  box5.scores = {
-    A: 0,
-    B: 0,
-  }
-}
+  /* =========================
+     إضافة النقاط
+  ========================= */
 
-if (selectedTeam === "A") {
-  box5.scores.A =
-    scoreA + points
-} else {
-  box5.scores.B =
-    scoreB + points
-}
-
-  if (
-    !Array.isArray(box5.openedNumbers)
-  ) {
-    box5.openedNumbers = []
+  if (selectedTeam === "A") {
+    box5.scores.A =
+      scoreA + points
+  } else {
+    box5.scores.B =
+      scoreB + points
   }
+
+  /* =========================
+     تسجيل الرقم وكشف الإجابة
+  ========================= */
 
   if (
     !box5.openedNumbers.includes(
-      currentNumber,
+      currentNumber
     )
   ) {
     box5.openedNumbers.push(
-      currentNumber,
+      currentNumber
     )
   }
 
@@ -5069,7 +5089,8 @@ if (selectedTeam === "A") {
     RANDOM_BOX5_BLOCK_TIMER_SECONDS
 
   if (
-    typeof playGameSound === "function"
+    typeof playGameSound ===
+    "function"
   ) {
     playGameSound("correct")
   }
@@ -5078,24 +5099,40 @@ if (selectedTeam === "A") {
   renderRandomChallengeControls()
   saveRandomChallengeState()
 
+  /* =========================
+     الرجوع للأرقام تلقائيًا
+  ========================= */
+
   randomBox5ReturnTimer =
     setTimeout(() => {
       randomBox5ReturnTimer = null
 
-      if (
-        randomChallengeState.currentBox !==
-        5
-      ) {
+      const latestBox =
+        normalizeRandomChallengeBoxNumber(
+          randomChallengeState.currentBox
+        )
+
+      if (latestBox !== 5) {
         return
       }
 
-      box5.currentNumber = null
-      box5.revealedAnswer = false
+      const latestBox5 =
+        randomChallengeState.box5
+
+      latestBox5.currentNumber = null
+      latestBox5.revealedAnswer = false
 
       clearRandomChallengeTeamSelection()
 
+      const openedCount =
+        Array.isArray(
+          latestBox5.openedNumbers
+        )
+          ? latestBox5.openedNumbers.length
+          : 0
+
       const allNumbersFinished =
-        box5.openedNumbers.length >= total
+        openedCount >= total
 
       if (allNumbersFinished) {
         finishRandomChallengeCurrentBox()
@@ -5105,7 +5142,7 @@ if (selectedTeam === "A") {
       renderRandomChallengeStage()
       renderRandomChallengeControls()
       saveRandomChallengeState()
-    }, 1800)
+    }, 6000)
 }
 
 
@@ -7294,13 +7331,12 @@ window.handleRandomBox4Timeout =
 
 /* فتبلة */
 
-window.openRandomBox5Number = openRandomBox5Number
+window.openRandomBox5Number =
+  openRandomBox5Number
 
-window.revealRandomBox5Answer = revealRandomBox5Answer
+window.completeRandomBox5Number =
+  completeRandomBox5Number
 
-window.completeRandomBox5Number = completeRandomBox5Number
-
-window.cancelRandomBox5Number = cancelRandomBox5Number
 window.startRandomBox5BlockTimer =
   startRandomBox5BlockTimer
 

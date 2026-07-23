@@ -1,243 +1,640 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0"
-  />
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
 
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#EEF3F6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
 
-  <title>الحنكة - لوحة المقدم</title>
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="default"
+  >
 
-  <!-- ملف تصميم المقدم فقط بدون تعارض مع العرض -->
-  <link rel="stylesheet" href="presenter.css" />
+  <title>لوحة المقدم</title>
+
+  <!-- =====================================================
+       PRESENTER CSS
+       المسار:
+       assets/css/presenter.css
+  ====================================================== -->
+
+  <link
+    rel="stylesheet"
+    href="assets/css/presenter.css"
+  >
 </head>
 
 <body>
 
-  <!-- شاشة دخول المقدم -->
-  <div id="presenterJoin" class="homePageShell presenterJoinShell">
+  <main
+    id="presenterApp"
+    class="presenterApp"
+  >
 
-    <div class="topBoard presenterTopBoard">
-      <div class="titleBox presenterJoinTitleBox">
-        <h1>الحنكة</h1>
-        <div class="modelNameDisplay">لوحة المقدم</div>
-      </div>
-    </div>
+    <!-- =====================================================
+         1) JOIN PAGE / شاشة الدخول
+    ====================================================== -->
 
-    <div class="presenterJoinCard">
-
-      <div class="presenterJoinLabel">كود الجلسة</div>
-
-      <input
-        id="joinCodeInput"
-        class="presenterJoinInput"
-        type="tel"
-        inputmode="numeric"
-        pattern="[0-9]*"
-        maxlength="4"
-        autocomplete="one-time-code"
-        placeholder="0000"
-        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4)"
-        onkeydown="if(event.key === 'Enter'){ event.preventDefault(); joinGameSession(); }"
-      />
-
-      <!-- اختيار طريقة المقدم -->
-      <div class="presenterModeBox">
-        <div class="presenterModeLabel">طريقة الدخول</div>
-
-        <div class="presenterModeBtns">
-          <button
-            type="button"
-            id="presenterControlModeBtn"
-            class="presenterModeBtn activePresenterMode"
-            onclick="setPresenterJoinMode('control')"
-          >
-            تحكم بالعرض
-          </button>
-
-          <button
-            type="button"
-            id="presenterReaderModeBtn"
-            class="presenterModeBtn"
-            onclick="setPresenterJoinMode('reader')"
-          >
-            دليل الأسئلة
-          </button>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        id="presenterJoinBtn"
-        class="winnerBtn presenterJoinBtn"
-        onclick="joinGameSession()"
-      >
-        دخول
-      </button>
-
-      <div id="presenterJoinStatus" class="presenterJoinStatus">
-        أدخل الكود الظاهر في شاشة الانترو
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- الصفحة الرئيسية للمقدم - وضع التحكم -->
-  <div id="presenterHome" class="homePageShell hidden">
-
-    <div class="topBoard" id="presenterScoreBoard">
-
-      <div class="teamBox" id="presenterHomeTeamABox">
-        <div class="teamName" id="presenterHomeTeamA">الفريق الأول</div>
-        <div class="teamScore" id="presenterHomeScoreA">0</div>
-      </div>
-
-      <div class="titleBox" id="presenterTitleBox">
-        <h1 id="presenterTitle">لوحة المقدم</h1>
-
-        <div id="presenterSubtitle" class="modelNameDisplay">
-          اختر الفقرة وتحكم بالعرض
-        </div>
-      </div>
-
-      <div class="teamBox" id="presenterHomeTeamBBox">
-        <div class="teamName" id="presenterHomeTeamB">الفريق الثاني</div>
-        <div class="teamScore" id="presenterHomeScoreB">0</div>
-      </div>
-
-    </div>
-
-    <!-- الفقرات ترسم تلقائياً حسب النموذج المختار -->
-    <div class="segmentsGrid" id="presenterSegmentsGrid"></div>
-
-    <button
-      type="button"
-      id="displayControlsEyeBtn"
-      class="presenterDisplayControlsBtn hideControlsMode"
-      onclick="togglePresenterDisplayControls()"
+    <section
+      id="presenterJoin"
+      class="presenterPage presenterJoinPage"
+      aria-labelledby="presenterJoinTitle"
     >
-      إخفاء التحكم
-    </button>
 
-  </div>
+      <div class="presenterJoinShell">
 
-  <!-- الصفحة الرئيسية للمقدم - دليل الأسئلة -->
-  <div id="presenterReaderHome" class="homePageShell presenterReaderHome hidden">
+        <header class="presenterJoinHeader">
 
-    <div class="presenterReaderHeader">
-      <button
-        type="button"
-        class="presenterReaderBackBtn"
-        onclick="presenterReaderLogout()"
-      >
-        خروج
-      </button>
+          <span class="presenterEyebrow">
+            الحنكة
+          </span>
 
-      <div class="presenterReaderTitleBox">
-        <h1>دليل الأسئلة</h1>
-        <div id="presenterReaderSubtitle" class="modelNameDisplay">
-          عرض الأسئلة والإجابات فقط
+          <h1 id="presenterJoinTitle">
+            لوحة المقدم
+          </h1>
+
+          <p>
+            أدخل كود الجلسة ثم اختر طريقة الدخول
+          </p>
+
+        </header>
+
+        <div
+          class="presenterJoinCard"
+          role="region"
+          aria-label="الدخول إلى الجلسة"
+        >
+
+          <div
+            class="presenterModeSwitch"
+            role="group"
+            aria-label="نوع الدخول"
+          >
+
+            <button
+              type="button"
+              id="presenterControlModeBtn"
+              class="presenterModeBtn activePresenterMode"
+              onclick="setPresenterJoinMode('control')"
+            >
+
+              <span
+                class="presenterModeIcon"
+                aria-hidden="true"
+              >
+                🎮
+              </span>
+
+              <strong>
+                وضع التحكم
+              </strong>
+
+              <small>
+                إدارة اللعبة وإرسال الأوامر
+              </small>
+
+            </button>
+
+            <button
+              type="button"
+              id="presenterReaderModeBtn"
+              class="presenterModeBtn"
+              onclick="setPresenterJoinMode('reader')"
+            >
+
+              <span
+                class="presenterModeIcon"
+                aria-hidden="true"
+              >
+                📖
+              </span>
+
+              <strong>
+                دليل الأسئلة
+              </strong>
+
+              <small>
+                قراءة الأسئلة والإجابات فقط
+              </small>
+
+            </button>
+
+          </div>
+
+          <form
+            class="presenterJoinForm"
+            onsubmit="
+              event.preventDefault();
+              joinGameSession();
+            "
+          >
+
+            <label for="joinCodeInput">
+              كود الجلسة
+            </label>
+
+            <input
+              id="joinCodeInput"
+              name="joinCode"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              pattern="[0-9]*"
+              maxlength="4"
+              enterkeyhint="go"
+              placeholder="0000"
+              aria-describedby="presenterJoinStatus"
+              oninput="
+                this.value = this.value
+                  .replace(/\D/g, '')
+                  .slice(0, 4)
+              "
+            >
+
+            <button
+              type="submit"
+              id="presenterJoinBtn"
+              class="presenterPrimaryBtn"
+            >
+              دخول
+            </button>
+
+          </form>
+
+          <p
+            id="presenterJoinStatus"
+            class="presenterJoinStatus"
+            role="status"
+            aria-live="polite"
+          >
+            وضع التحكم: ربط مع العرض والتحكم باللعبة
+          </p>
+
         </div>
+
       </div>
 
-      <button
-        type="button"
-        class="presenterReaderRefreshBtn"
-        onclick="renderPresenterReaderHome()"
-      >
-        تحديث
-      </button>
-    </div>
+    </section>
 
-    <div class="presenterReaderNotice">
-      هذا الوضع للقراءة فقط، بدون تحكم أو ربط مباشر مع العرض.
-    </div>
 
-    <div id="presenterReaderSegmentsGrid" class="presenterReaderSegmentsGrid"></div>
+    <!-- =====================================================
+         2) PRESENTER HOME / الصفحة الرئيسية
+    ====================================================== -->
 
-  </div>
+    <section
+      id="presenterHome"
+      class="presenterPage presenterHomePage hidden"
+      aria-labelledby="presenterTitle"
+    >
 
-  <!-- صفحة دليل الأسئلة داخل فقرة -->
-  <div id="presenterReaderSegmentPage" class="homePageShell presenterReaderSegmentPage hidden">
+      <div class="presenterHomeShell">
 
-    <div class="presenterCleanHeader presenterReaderCleanHeader">
+        <header class="presenterHomeHeader">
 
-      <button
-        type="button"
-        class="presenterCleanHeaderBtn presenterCleanBackBtn"
-        onclick="presenterReaderGoHome()"
-      >
-        رجوع
-      </button>
+          <div class="presenterHomeHeading">
 
-      <div class="presenterCleanHeaderTitle">
-        <h1 id="presenterReaderSegmentTitle">دليل الأسئلة</h1>
+            <span class="presenterEyebrow">
+              الحنكة
+            </span>
+
+            <h1 id="presenterTitle">
+              لوحة المقدم
+            </h1>
+
+            <p
+              id="presenterSubtitle"
+              class="presenterSubtitle"
+              aria-live="polite"
+            ></p>
+
+          </div>
+
+          <div
+            class="presenterHomeScores"
+            aria-label="النتيجة الإجمالية"
+          >
+
+            <article
+              class="
+                presenterHomeTeam
+                presenterHomeTeamA
+              "
+            >
+
+              <span id="presenterHomeTeamA">
+                الفريق الأول
+              </span>
+
+              <strong id="presenterHomeScoreA">
+                0
+              </strong>
+
+            </article>
+
+            <article
+              class="
+                presenterHomeTeam
+                presenterHomeTeamB
+              "
+            >
+
+              <span id="presenterHomeTeamB">
+                الفريق الثاني
+              </span>
+
+              <strong id="presenterHomeScoreB">
+                0
+              </strong>
+
+            </article>
+
+          </div>
+
+        </header>
+
+        <section
+          class="presenterSegmentsSection"
+          aria-labelledby="presenterSegmentsTitle"
+        >
+
+          <div class="presenterSectionHead">
+
+            <div>
+
+              <span>
+                الفقرات
+              </span>
+
+              <h2 id="presenterSegmentsTitle">
+                اختر الفقرة
+              </h2>
+
+            </div>
+
+          </div>
+
+          <div
+            id="presenterSegmentsGrid"
+            class="presenterSegmentsGrid"
+            aria-live="polite"
+          ></div>
+
+        </section>
+
       </div>
 
-      <button
-        type="button"
-        class="presenterCleanHeaderBtn presenterCleanEndBtn"
-        onclick="reloadPresenterReaderSegment()"
-      >
-        تحديث
-      </button>
+    </section>
 
-    </div>
 
-    <div id="presenterReaderPanel" class="presenterReaderPanel"></div>
+    <!-- =====================================================
+         3) SEGMENT PAGE / صفحة الفقرة
+    ====================================================== -->
 
-  </div>
+    <section
+      id="presenterSegmentPage"
+      class="presenterPage presenterSegmentPage hidden"
+      aria-labelledby="presenterSegmentTitle"
+    >
 
-  <!-- صفحة الفقرة - وضع التحكم -->
-  <div id="presenterSegmentPage" class="homePageShell presenterSegmentPage hidden">
+      <div class="presenterSegmentShell">
 
-    <div class="presenterCleanHeader">
+        <header class="presenterSegmentTopbar">
 
-      <button
-        type="button"
-        class="presenterCleanHeaderBtn presenterCleanBackBtn"
-        id="presenterBackBtn"
-        onclick="presenterGoHome()"
-      >
-        رجوع
-      </button>
+          <button
+            type="button"
+            class="presenterBackBtn"
+            onclick="presenterGoHome()"
+            aria-label="الرجوع إلى الرئيسية"
+          >
 
-      <div class="presenterCleanHeaderTitle">
-        <h1 id="presenterSegmentTitle">الفقرة</h1>
+            <span aria-hidden="true">
+              ←
+            </span>
+
+            <span>
+              الرئيسية
+            </span>
+
+          </button>
+
+          <h1 id="presenterSegmentTitle">
+            الفقرة
+          </h1>
+
+          <div
+            class="presenterTopbarSpacer"
+            aria-hidden="true"
+          ></div>
+
+        </header>
+
+        <div
+          id="presenterPanel"
+          class="presenterPanel"
+          aria-live="polite"
+        ></div>
+
       </div>
 
-      <button
-        type="button"
-        class="presenterCleanHeaderBtn presenterCleanEndBtn"
-        id="presenterEndBtn"
-        onclick="sendCommand('endSegment')"
-      >
-        إنهاء
-      </button>
+    </section>
+
+
+    <!-- =====================================================
+         4) READER HOME / دليل الأسئلة
+    ====================================================== -->
+
+    <section
+      id="presenterReaderHome"
+      class="presenterPage presenterReaderHome hidden"
+      aria-labelledby="presenterReaderTitle"
+    >
+
+      <div class="presenterReaderShell">
+
+        <header class="presenterReaderHeader">
+
+          <div>
+
+            <span class="presenterEyebrow">
+              وضع القراءة فقط
+            </span>
+
+            <h1 id="presenterReaderTitle">
+              دليل الأسئلة
+            </h1>
+
+            <p
+              id="presenterReaderSubtitle"
+              aria-live="polite"
+            ></p>
+
+          </div>
+
+          <button
+            type="button"
+            class="presenterReaderLogoutBtn"
+            onclick="presenterReaderLogout()"
+          >
+            خروج
+          </button>
+
+        </header>
+
+        <div
+          id="presenterReaderSegmentsGrid"
+          class="presenterReaderSegmentsGrid"
+          aria-live="polite"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         5) READER SEGMENT / دليل فقرة محددة
+    ====================================================== -->
+
+    <section
+      id="presenterReaderSegmentPage"
+      class="
+        presenterPage
+        presenterReaderSegmentPage
+        hidden
+      "
+      aria-labelledby="presenterReaderSegmentTitle"
+    >
+
+      <div class="presenterReaderSegmentShell">
+
+        <header class="presenterReaderSegmentTopbar">
+
+          <button
+            type="button"
+            class="presenterBackBtn"
+            onclick="presenterReaderGoHome()"
+            aria-label="الرجوع إلى دليل الأسئلة"
+          >
+
+            <span aria-hidden="true">
+              ←
+            </span>
+
+            <span>
+              الدليل
+            </span>
+
+          </button>
+
+          <h1 id="presenterReaderSegmentTitle">
+            الفقرة
+          </h1>
+
+          <div
+            class="presenterTopbarSpacer"
+            aria-hidden="true"
+          ></div>
+
+        </header>
+
+        <div
+          id="presenterReaderPanel"
+          class="presenterReaderPanel"
+          aria-live="polite"
+        ></div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       BOOT LOADING / التحميل الأولي
+  ====================================================== -->
+
+  <div
+    id="presenterBootLoading"
+    class="presenterBootLoading"
+    aria-live="polite"
+    aria-busy="true"
+  >
+
+    <div class="presenterBootLoadingCard">
+
+      <span
+        class="presenterLoadingSpinner"
+        aria-hidden="true"
+      ></span>
+
+      <strong>
+        جارٍ تجهيز لوحة المقدم...
+      </strong>
 
     </div>
 
-    <div id="presenterPanel" class="presenterPanel"></div>
+  </div>
+
+
+  <!-- =====================================================
+       BACKGROUND LOADING / التحميل الخلفي
+  ====================================================== -->
+
+  <div
+    id="presenterBackgroundLoading"
+    class="presenterBackgroundLoading hidden"
+    aria-live="polite"
+    aria-hidden="true"
+  >
+
+    <span
+      class="presenterBackgroundSpinner"
+      aria-hidden="true"
+    ></span>
+
+    <span>
+      جارٍ تحديث البيانات
+    </span>
 
   </div>
 
-  <!-- Toast -->
-  <div class="gameToast presenterToast hidden" id="presenterToast">
-    <div class="gameToastIcon">!</div>
-    <div class="gameToastText" id="presenterToastText"></div>
+
+  <!-- =====================================================
+       TOAST / التنبيهات
+  ====================================================== -->
+
+  <div
+    id="presenterToast"
+    class="presenterToast hidden"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+
+    <span id="presenterToastText"></span>
+
   </div>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="assets/js/supabase.js"></script>
-  <script src="presenter.js"></script>
+
+  <!-- =====================================================
+       1) SUPABASE LIBRARY
+  ====================================================== -->
+
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+
+  <!-- =====================================================
+       2) SUPABASE CONNECTION
+       assets/js/supabase.js
+  ====================================================== -->
+
+  <script
+    defer
+    src="assets/js/supabase.js"
+  ></script>
+
+
+  <!-- =====================================================
+       3) PRESENTER CORE
+       assets/js/presenter/presenter.js
+  ====================================================== -->
+
+  <script
+    defer
+    src="assets/js/presenter/presenter.js"
+  ></script>
+
+
+  <!-- =====================================================
+       4) WARMUP / التسخين
+  ====================================================== -->
+
+  <script
+    defer
+    src="assets/js/presenter/warmup-segments.js"
+  ></script>
+
+
+  <!-- =====================================================
+       5) TOP 10
+  ====================================================== -->
+
+  <script
+    defer
+    src="assets/js/presenter/top10-segments.js"
+  ></script>
+
+
+  <!-- =====================================================
+       6) WHO / من هو
+  ====================================================== -->
+
+  <script
+    defer
+    src="assets/js/presenter/who-segments.js"
+  ></script>
+
+
+  <!-- =====================================================
+       7) EXPLAIN / اشرح الكلمة
+  ====================================================== -->
+
+  <script
+    defer
+    src="assets/js/presenter/explain-segments.js"
+  ></script>
+
+
+  <!-- =====================================================
+       8) LETTERLI / حرفلي
+  ====================================================== -->
+
+  <script
+    defer
+    src="assets/js/presenter/letterli-segments.js"
+  ></script>
+
+
+  <!-- =====================================================
+       9) RANDOM CHALLENGE / التحدي
+  ====================================================== -->
+
+  <script
+    defer
+    src="assets/js/presenter/random-challenge-segments.js"
+  ></script>
+
+
+  <!-- =====================================================
+       10) FINAL / الفاصلة
+  ====================================================== -->
+
+  <script
+    defer
+    src="assets/js/presenter/final-segments.js"
+  ></script>
+
+
+  <!-- =====================================================
+       11) ARCHIVE / الأرشيف
+  ====================================================== -->
+
+  <script
+    defer
+    src="assets/js/presenter/archive-segments.js"
+  ></script>
 
 </body>
+
 </html>
