@@ -1,9 +1,7 @@
 /* =========================================================
    ARCHIVE ADMIN / إدارة فقرة الأرشيف
-   CLEAN PROFESSIONAL DESIGN
-
-   File:
-   assets/css/segments/admin/archive-admin.css
+   CLEAN FINAL
+   File: assets/css/segments/admin/archive-admin.css
 ========================================================= */
 
 /* =========================
@@ -30,70 +28,30 @@
 
 .archiveAdminShell
 .archiveAdminTopBar{
-  position:sticky;
-  top:112px;
-  z-index:20;
+  border-color:rgba(35,61,77,.20);
 
-  margin:0;
-
-  border-color:
-    rgba(35,61,77,.20);
-
-  background:
-    rgba(255,255,255,.97);
+  background:var(--admin-surface);
 
   box-shadow:
-    0 14px 34px
+    0 12px 30px
     rgba(35,61,77,.08);
 }
 
 .archiveAdminShell
 .adminSectionTitle{
+  color:var(--admin-secondary);
+
   display:flex;
   align-items:center;
-  gap:11px;
-}
 
-.archiveAdminShell
-.adminSectionTitle::before{
-  content:"أ";
-
-  width:46px;
-  height:46px;
-
-  flex:0 0 auto;
-
-  border-radius:15px;
-
-  color:#FFFFFF;
-
-  background:
-    var(--admin-secondary);
-
-  display:grid;
-  place-items:center;
-
-  font-family:
-    "HanakaDisplay",
-    sans-serif;
-
-  font-size:1.4rem;
-  line-height:1;
-
-  box-shadow:
-    0 9px 20px
-    rgba(35,61,77,.22);
+  gap:10px;
 }
 
 .archiveAdminShell
 .adminSectionHint{
-  margin:
-    5px
-    0
-    0;
+  margin:5px 0 0;
 
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
   font-size:.88rem;
   line-height:1.45;
@@ -113,13 +71,12 @@
 ){
   min-height:46px;
 
-  padding:
-    9px
-    14px;
-
   border-radius:12px;
 
+  padding:9px 14px;
+
   font-size:.88rem;
+  line-height:1.15;
 }
 
 .archiveInlineActions
@@ -133,8 +90,7 @@
 
   color:#FFFFFF;
 
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 
   box-shadow:
     0 9px 20px
@@ -143,31 +99,25 @@
 
 .archiveInlineActions
 .adminBtnMango:hover{
-  background:
-    var(--admin-primary-hover);
+  background:var(--admin-primary-hover);
 }
 
 .archiveInlineActions
 .adminBtnLight{
   min-width:120px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 }
 
 .archiveInlineActions
 .adminBtnLight:hover{
-  border-color:
-    #B9C4CC;
+  border-color:#B9C4CC;
 
-  background:
-    #EDF1F4;
+  background:#EDF1F4;
 }
 
 /* =========================
@@ -187,11 +137,6 @@
 
   align-items:start;
 }
-
-/*
-   الجولة المفتوحة تظهر بكامل العرض.
-   الجولات المغلقة تكون في الأعلى للتنقل السريع.
-*/
 
 .archiveOnePageGrid.hasOpenCard{
   grid-template-columns:
@@ -217,16 +162,13 @@
 
   min-width:0;
 
-  scroll-margin-top:220px;
+  scroll-margin-top:24px;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-surface);
+  background:var(--admin-surface);
 
   box-shadow:
     0 10px 28px
@@ -254,8 +196,7 @@
 
   opacity:.54;
 
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 
   transition:
     width .18s var(--admin-ease),
@@ -263,11 +204,9 @@
 }
 
 .archiveRoundOnePageCard:hover{
-  transform:
-    translateY(-2px);
+  transform:translateY(-2px);
 
-  border-color:
-    rgba(254,127,45,.34);
+  border-color:rgba(254,127,45,.34);
 
   box-shadow:
     0 17px 38px
@@ -281,25 +220,21 @@
 }
 
 .archiveRoundOnePageCard.isDone{
-  border-color:
-    rgba(0,127,0,.26);
+  border-color:rgba(0,127,0,.26);
 }
 
 .archiveRoundOnePageCard.isDone::before{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 }
 
 .archiveRoundOnePageCard.isMissing::before{
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 }
 
 .archiveRoundOnePageCard[open]{
   transform:none;
 
-  border-color:
-    rgba(254,127,45,.40);
+  border-color:rgba(254,127,45,.40);
 
   box-shadow:
     0 23px 54px
@@ -316,9 +251,7 @@
   list-style:none;
   cursor:pointer;
 
-  padding:
-    14px
-    17px;
+  padding:14px 17px;
 
   display:grid;
 
@@ -348,14 +281,12 @@
 
 .archiveRoundOnePageCard
 > summary:hover{
-  background:
-    var(--admin-primary-soft);
+  background:var(--admin-primary-soft);
 }
 
 .archiveRoundOnePageCard[open]
 > summary{
-  border-bottom:
-    1px solid var(--admin-line);
+  border-bottom:1px solid var(--admin-line);
 
   background:
     linear-gradient(
@@ -396,8 +327,7 @@
 
   border-radius:14px;
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
   box-shadow:
     0 8px 18px
@@ -421,17 +351,15 @@
   display:grid;
   place-items:center;
 
-  font-family:
-    "HanakaDisplay",
-    sans-serif;
+  font-family:"HanakaDisplay",sans-serif;
 
   font-size:1.18rem;
+  line-height:1;
 }
 
 .archiveRoundOnePageCard.isDone
 .adminEditItemTitle::before{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 }
 
 .archiveRoundOnePageCard
@@ -440,12 +368,9 @@
 
   min-width:0;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  font-size:
-    clamp(1rem,2vw,1.16rem);
-
+  font-size:clamp(1rem,2vw,1.16rem);
   line-height:1.3;
 
   overflow:hidden;
@@ -460,8 +385,7 @@
 
   min-width:0;
 
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
   font-size:.82rem;
   line-height:1.4;
@@ -474,14 +398,12 @@
 
 .archiveRoundOnePageCard.isDone
 .adminEditItemTitle span{
-  color:
-    var(--admin-green);
+  color:var(--admin-green);
 }
 
 .archiveRoundOnePageCard.isMissing
 .adminEditItemTitle span{
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 }
 
 /* =========================
@@ -508,13 +430,12 @@
   min-width:60px;
   min-height:36px;
 
-  padding:
-    7px
-    10px;
-
   border-radius:10px;
 
+  padding:7px 10px;
+
   font-size:.8rem;
+  line-height:1.15;
 }
 
 /* =========================
@@ -528,21 +449,19 @@
   width:34px;
   height:34px;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
   border-radius:11px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   display:grid;
   place-items:center;
 
   font-size:1.05rem;
+  line-height:1;
 
   transition:
     transform .18s var(--admin-ease),
@@ -555,14 +474,11 @@
 > summary::after{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-secondary);
+  border-color:var(--admin-secondary);
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
-  transform:
-    rotate(180deg);
+  transform:rotate(180deg);
 }
 
 /* =========================
@@ -571,14 +487,13 @@
 
 .archiveRoundOnePageCard
 > .adminEditItemBody{
-  padding:
-    clamp(15px,2.3vw,24px);
+  padding:clamp(15px,2.3vw,24px);
 
   background:#FFFFFF;
 }
 
 .archiveRoundOnePageCard[open]
-.adminEditItemBody{
+> .adminEditItemBody{
   animation:
     archiveAdminOpen
     .22s
@@ -619,21 +534,17 @@
 .archiveMainInfoCard{
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   box-shadow:
     0 9px 24px
     rgba(35,61,77,.05);
 
-  padding:
-    clamp(14px,2vw,20px);
+  padding:clamp(14px,2vw,20px);
 }
 
 .archiveOnePageInfoCard::before{
@@ -643,8 +554,7 @@
 
   margin-bottom:13px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:1.05rem;
   line-height:1.3;
@@ -670,11 +580,9 @@
 .adminField{
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
   background:#FFFFFF;
 
@@ -686,10 +594,10 @@
 
 .archiveMainInfoGrid
 .adminField label{
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:.88rem;
+  line-height:1.35;
 }
 
 .archiveMainInfoGrid
@@ -698,31 +606,25 @@
   min-width:0;
   min-height:56px;
 
-  border:
-    1px solid
-    rgba(35,61,77,.18);
+  border:1px solid rgba(35,61,77,.18);
 
   border-radius:12px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
-  padding:
-    11px
-    13px;
+  padding:11px 13px;
 
   font-size:1rem;
+  line-height:1.35;
 }
 
 .archiveMainInfoGrid
 .adminField input:focus{
   outline:0;
 
-  border-color:
-    var(--admin-primary);
+  border-color:var(--admin-primary);
 
   background:#FFFFFF;
 
@@ -733,46 +635,37 @@
 
 .archiveMainInfoGrid
 .adminField:not(.adminMissingField){
-  border-color:
-    rgba(0,127,0,.20);
+  border-color:rgba(0,127,0,.20);
 }
 
 .archiveMainInfoGrid
 .adminField:not(.adminMissingField)
 input{
-  border-color:
-    rgba(0,127,0,.18);
+  border-color:rgba(0,127,0,.18);
 
   background:#FFFFFF;
 }
 
 .archiveMainInfoGrid
 .adminField.adminMissingField{
-  border-color:
-    rgba(127,0,0,.22);
+  border-color:rgba(127,0,0,.22);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 }
 
 .archiveMainInfoGrid
 .adminField.adminMissingField
 input{
-  border-color:
-    rgba(127,0,0,.28);
+  border-color:rgba(127,0,0,.28);
 
   background:#FFF9F9;
 }
 
-/* النتيجة */
-
 .archiveMainInfoGrid
 .adminField:last-child{
-  border-color:
-    rgba(254,127,45,.25);
+  border-color:rgba(254,127,45,.25);
 
-  background:
-    var(--admin-primary-soft);
+  background:var(--admin-primary-soft);
 }
 
 .archiveMainInfoGrid
@@ -780,8 +673,7 @@ input{
   direction:ltr;
   text-align:center;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   background:#FFFFFF;
 
@@ -818,14 +710,11 @@ input{
 .archiveImageCard{
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   box-shadow:
     0 9px 24px
@@ -845,11 +734,9 @@ input{
 }
 
 .archiveImageCard:hover{
-  transform:
-    translateY(-1px);
+  transform:translateY(-1px);
 
-  border-color:
-    rgba(254,127,45,.32);
+  border-color:rgba(254,127,45,.32);
 
   box-shadow:
     0 14px 30px
@@ -857,13 +744,11 @@ input{
 }
 
 .archiveImageCard.isDone{
-  border-color:
-    rgba(0,127,0,.24);
+  border-color:rgba(0,127,0,.24);
 }
 
 .archiveImageCard.isMissing{
-  border-color:
-    rgba(127,0,0,.18);
+  border-color:rgba(127,0,0,.18);
 }
 
 /* =========================
@@ -879,8 +764,7 @@ input{
 
   gap:10px;
 
-  border-bottom:
-    1px solid var(--admin-line);
+  border-bottom:1px solid var(--admin-line);
 
   padding-bottom:10px;
 }
@@ -888,8 +772,7 @@ input{
 .archiveImageCardHead h3{
   margin:0;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:1.02rem;
   line-height:1.3;
@@ -907,23 +790,21 @@ input{
 
   color:#FFFFFF;
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
   display:inline-grid;
   place-items:center;
 
-  font-family:
-    "HanakaDisplay",
-    sans-serif;
+  font-family:"HanakaDisplay",sans-serif;
+
+  line-height:1;
 
   vertical-align:middle;
 }
 
 .archiveImageCard.isDone
 .archiveImageCardHead h3::before{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 }
 
 .archiveImageCardHead
@@ -931,46 +812,36 @@ input{
   min-width:58px;
   min-height:36px;
 
-  border:
-    1px solid
-    rgba(127,0,0,.15);
+  border:1px solid rgba(127,0,0,.15);
 
   border-radius:10px;
 
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 
-  padding:
-    7px
-    10px;
+  padding:7px 10px;
 
   font-size:.8rem;
+  line-height:1.15;
 }
 
 .archiveImageCardHead
 .adminDeleteMiniBtn:hover{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-red);
+  border-color:var(--admin-red);
 
-  background:
-    var(--admin-red);
+  background:var(--admin-red);
 }
 
 .archiveImageCardHead
 .adminDeleteMiniBtn:disabled{
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
-  border-color:
-    var(--admin-line);
+  border-color:var(--admin-line);
 
-  background:
-    #E8EBEE;
+  background:#E8EBEE;
 }
 
 /* =========================
@@ -981,11 +852,9 @@ input{
 .adminField{
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
   background:#FFFFFF;
 
@@ -997,19 +866,17 @@ input{
 
 .archiveImageCard
 .adminField label{
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:.86rem;
+  line-height:1.35;
 }
 
 .archiveImageCard
 .adminField.adminMissingField{
-  border-color:
-    rgba(127,0,0,.22);
+  border-color:rgba(127,0,0,.22);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 }
 
 .archiveImageCard
@@ -1028,11 +895,9 @@ input[type="file"]{
   min-height:300px;
   height:min(34vw,420px);
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
   overflow:hidden;
 
@@ -1056,23 +921,18 @@ input[type="file"]{
   top:10px;
   right:10px;
 
-  border:
-    1px solid
-    rgba(35,61,77,.14);
+  border:1px solid rgba(35,61,77,.14);
 
   border-radius:999px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    rgba(255,255,255,.92);
+  background:rgba(255,255,255,.92);
 
-  padding:
-    5px
-    10px;
+  padding:5px 10px;
 
   font-size:.74rem;
+  line-height:1.2;
 
   pointer-events:none;
 }
@@ -1093,8 +953,7 @@ input[type="file"]{
   width:100%;
   height:100%;
 
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
   display:grid;
   place-items:center;
@@ -1110,30 +969,23 @@ input[type="file"]{
   width:66px;
   height:66px;
 
-  margin:
-    0 auto
-    12px;
+  margin:0 auto 12px;
 
-  border:
-    2px dashed
-    #B9C4CC;
+  border:2px dashed #B9C4CC;
 
   border-radius:20px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    rgba(255,255,255,.66);
+  background:rgba(255,255,255,.66);
 
   display:grid;
   place-items:center;
 
-  font-family:
-    "HanakaDisplay",
-    sans-serif;
+  font-family:"HanakaDisplay",sans-serif;
 
   font-size:1.8rem;
+  line-height:1;
 }
 
 /* =========================
@@ -1142,21 +994,15 @@ input[type="file"]{
 
 .archiveAdminShell
 .adminMissingHint{
-  border:
-    1px solid
-    rgba(127,0,0,.12);
+  border:1px solid rgba(127,0,0,.12);
 
   border-radius:10px;
 
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 
-  padding:
-    7px
-    10px;
+  padding:7px 10px;
 
   font-size:.82rem;
   line-height:1.4;
@@ -1183,14 +1029,11 @@ input[type="file"]{
 .archiveTextGroup{
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   padding:14px;
 
@@ -1207,17 +1050,13 @@ input[type="file"]{
 .archiveAdminColumnTitle{
   min-height:54px;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
   background:#FFFFFF;
 
-  padding:
-    10px
-    13px;
+  padding:10px 13px;
 
   display:flex;
   align-items:center;
@@ -1227,10 +1066,10 @@ input[type="file"]{
 }
 
 .archiveAdminColumnTitle span{
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:1rem;
+  line-height:1.3;
 }
 
 .archiveAdminColumnTitle small{
@@ -1238,17 +1077,14 @@ input[type="file"]{
 
   border-radius:999px;
 
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
-  padding:
-    5px
-    9px;
+  padding:5px 9px;
 
   font-size:.76rem;
+  line-height:1.2;
 }
 
 /* =========================
@@ -1260,11 +1096,9 @@ input[type="file"]{
 
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
   background:#FFFFFF;
 
@@ -1295,18 +1129,15 @@ input[type="file"]{
 
   width:4px;
 
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 
   opacity:.58;
 }
 
 .archiveAdminItem:hover{
-  transform:
-    translateY(-1px);
+  transform:translateY(-1px);
 
-  border-color:
-    rgba(254,127,45,.34);
+  border-color:rgba(254,127,45,.34);
 
   box-shadow:
     0 12px 25px
@@ -1314,20 +1145,17 @@ input[type="file"]{
 }
 
 .archiveAdminItem.isDone{
-  border-color:
-    rgba(0,127,0,.22);
+  border-color:rgba(0,127,0,.22);
 }
 
 .archiveAdminItem.isDone::before{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 
   opacity:1;
 }
 
 .archiveAdminItem.isMissing{
-  border-color:
-    rgba(127,0,0,.16);
+  border-color:rgba(127,0,0,.16);
 }
 
 /* =========================
@@ -1335,8 +1163,7 @@ input[type="file"]{
 ========================= */
 
 .archiveAdminItemRequired{
-  border-color:
-    rgba(254,127,45,.40);
+  border-color:rgba(254,127,45,.40);
 
   background:
     linear-gradient(
@@ -1349,8 +1176,7 @@ input[type="file"]{
 .archiveAdminItemRequired::before{
   width:6px;
 
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 
   opacity:1;
 }
@@ -1358,27 +1184,22 @@ input[type="file"]{
 .archiveAdminRequiredBadge{
   min-height:30px;
 
+  border:1px solid rgba(254,127,45,.22);
+
   border-radius:999px;
 
-  color:
-    var(--admin-primary);
+  color:var(--admin-primary);
 
-  background:
-    var(--admin-primary-soft);
+  background:var(--admin-primary-soft);
 
-  border:
-    1px solid
-    rgba(254,127,45,.22);
-
-  padding:
-    6px
-    10px;
+  padding:6px 10px;
 
   display:inline-flex;
   align-items:center;
   justify-content:center;
 
   font-size:.76rem;
+  line-height:1.2;
 }
 
 /* =========================
@@ -1403,8 +1224,7 @@ input[type="file"]{
 }
 
 .archiveAdminItemTitle{
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:.96rem;
   line-height:1.35;
@@ -1422,22 +1242,18 @@ input[type="file"]{
 .archiveAdminItemMeta span{
   max-width:100%;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
   border-radius:999px;
 
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
-  padding:
-    4px
-    8px;
+  padding:4px 8px;
 
   font-size:.72rem;
+  line-height:1.2;
 
   overflow:hidden;
 
@@ -1460,34 +1276,27 @@ input[type="file"]{
   min-width:54px;
   min-height:32px;
 
-  border:
-    1px solid
-    rgba(127,0,0,.15);
+  border:1px solid rgba(127,0,0,.15);
 
   border-radius:9px;
 
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 
-  padding:
-    6px
-    9px;
+  padding:6px 9px;
 
   font-size:.76rem;
+  line-height:1.15;
 }
 
 .archiveAdminItemActions
 .adminDeleteMiniBtn:hover{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-red);
+  border-color:var(--admin-red);
 
-  background:
-    var(--admin-red);
+  background:var(--admin-red);
 }
 
 /* =========================
@@ -1515,24 +1324,17 @@ input[type="file"]{
   width:100%;
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
   border-radius:11px;
 
-  color:
-    var(--admin-text);
+  color:var(--admin-text);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
-  padding:
-    10px
-    12px;
+  padding:10px 12px;
 
-  font-family:
-    "HanakaText",
-    sans-serif;
+  font-family:"HanakaText",sans-serif;
 
   transition:
     border-color .16s var(--admin-ease),
@@ -1560,8 +1362,7 @@ input[type="file"]{
 :is(input,textarea,select):focus{
   outline:0;
 
-  border-color:
-    var(--admin-primary);
+  border-color:var(--admin-primary);
 
   background:#FFFFFF;
 
@@ -1572,16 +1373,14 @@ input[type="file"]{
 
 .archiveAdminFields
 textarea.hasValue{
-  border-color:
-    rgba(0,127,0,.20);
+  border-color:rgba(0,127,0,.20);
 
   background:#FFFFFF;
 }
 
 .archiveAdminFields
 textarea.adminMissingField{
-  border-color:
-    rgba(127,0,0,.28);
+  border-color:rgba(127,0,0,.28);
 
   background:#FFF9F9;
 }
@@ -1640,18 +1439,13 @@ textarea.adminMissingField{
 
   min-height:90px;
 
-  border:
-    1px dashed
-    #BBC5CD;
+  border:1px dashed #BBC5CD;
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
-  background:
-    rgba(255,255,255,.58);
+  background:rgba(255,255,255,.58);
 
   display:grid;
   place-items:center;
@@ -1661,6 +1455,7 @@ textarea.adminMissingField{
   text-align:center;
 
   font-size:.86rem;
+  line-height:1.5;
 }
 
 /* =========================
@@ -1688,59 +1483,18 @@ textarea.adminMissingField{
 }
 
 /* =========================
-   27) LARGE SCREENS
+   27) IPAD LANDSCAPE
 ========================= */
 
-@media (min-width:1500px){
+@media (orientation:landscape) and (min-width:768px) and (max-width:1220px){
 
-  .archiveOnePageGrid,
-  .archiveOnePageGrid.hasOpenCard{
-    grid-template-columns:
-      repeat(4,minmax(0,1fr));
+  .archiveAdminShell{
+    gap:12px;
   }
-
-  .archiveRoundOnePageCard[open]{
-    grid-column:1 / -1;
-  }
-
-  .archiveMainInfoGrid{
-    grid-template-columns:
-      minmax(0,1.3fr)
-      minmax(0,.85fr)
-      minmax(210px,.5fr);
-  }
-
-  .archiveImagePreviewBox{
-    height:440px;
-  }
-
-  .archiveAdminFields{
-    grid-template-columns:
-      minmax(150px,.8fr)
-      minmax(170px,.8fr)
-      minmax(160px,.75fr);
-  }
-}
-
-/* =========================
-   28) LAPTOP
-========================= */
-
-@media (max-width:1180px){
 
   .archiveAdminShell
   .archiveAdminTopBar{
-    top:148px;
-  }
-
-  .archiveOnePageGrid,
-  .archiveOnePageGrid.hasOpenCard{
-    grid-template-columns:
-      repeat(2,minmax(0,1fr));
-  }
-
-  .archiveRoundOnePageCard[open]{
-    grid-column:1 / -1;
+    padding:13px 14px;
   }
 
   .archiveInlineActions{
@@ -1750,6 +1504,8 @@ textarea.adminMissingField{
 
     grid-template-columns:
       repeat(3,minmax(0,1fr));
+
+    gap:8px;
   }
 
   .archiveInlineActions
@@ -1764,106 +1520,115 @@ textarea.adminMissingField{
     min-width:0;
   }
 
-  .archiveMainInfoGrid{
+  .archiveOnePageGrid,
+  .archiveOnePageGrid.hasOpenCard{
     grid-template-columns:
-      repeat(2,minmax(0,1fr));
+      repeat(3,minmax(0,1fr));
+
+    gap:10px;
   }
 
-  .archiveMainInfoGrid
-  .adminField:last-child{
+  .archiveRoundOnePageCard[open]{
     grid-column:1 / -1;
   }
 
-  .archiveImagePreviewBox{
-    min-height:280px;
-    height:360px;
-  }
-}
+  .archiveRoundOnePageCard > summary{
+    min-height:82px;
 
-/* =========================
-   29) TABLET
-========================= */
+    padding:12px 14px;
 
-@media (max-width:900px){
+    grid-template-columns:
+      minmax(0,1fr)
+      auto
+      auto;
 
-  .archiveAdminShell
-  .archiveAdminTopBar{
-    position:relative;
-    top:auto;
+    gap:10px;
   }
 
-  .archiveRoundOnePageCard{
-    scroll-margin-top:24px;
+  .archiveRoundOnePageCard
+  .adminEditItemTitle{
+    grid-template-columns:
+      42px
+      minmax(0,1fr);
+
+    gap:9px;
+  }
+
+  .archiveRoundOnePageCard
+  .adminEditItemTitle::before,
+  .archiveRoundOnePageCard
+  .adminEditItemTitle::after{
+    width:42px;
+    height:42px;
+
+    border-radius:13px;
+  }
+
+  .archiveRoundOnePageCard
+  .adminEditItemTitle strong{
+    font-size:1rem;
+  }
+
+  .archiveRoundOnePageCard
+  > summary::after{
+    width:32px;
+    height:32px;
+  }
+
+  .archiveRoundOnePageCard
+  > .adminEditItemBody{
+    padding:14px;
+  }
+
+  .archiveAdminBoardV2,
+  .archiveOnePageBody{
+    gap:12px;
+  }
+
+  .archiveMainInfoCard,
+  .archiveImageCard,
+  .archiveTextGroup{
+    padding:12px;
+  }
+
+  .archiveMainInfoGrid{
+    grid-template-columns:
+      minmax(0,1.2fr)
+      minmax(0,.9fr)
+      minmax(150px,.55fr);
+
+    gap:10px;
   }
 
   .archiveImagesRow,
   .archiveAdminBottomGrid{
-    grid-template-columns:1fr;
+    gap:10px;
   }
 
   .archiveImagePreviewBox{
-    min-height:340px;
-    height:min(62vw,460px);
+    min-height:260px;
+    height:340px;
   }
 
   .archiveAdminFields{
     grid-template-columns:
-      repeat(2,minmax(0,1fr));
-  }
+      minmax(120px,.7fr)
+      minmax(140px,.75fr)
+      minmax(120px,.7fr);
 
-  .archiveAdminFields
-  .compactCountSelectWrap:last-of-type{
-    grid-column:auto;
+    gap:7px;
   }
 
   .archiveAdminFields > textarea{
-    grid-column:1 / -1;
+    min-height:100px;
   }
 }
 
 /* =========================
-   30) SMALL TABLET
+   28) IPHONE PORTRAIT
 ========================= */
 
-@media (max-width:760px){
-
-  .archiveOnePageGrid,
-  .archiveOnePageGrid.hasOpenCard{
-    grid-template-columns:1fr;
-  }
-
-  .archiveRoundOnePageCard[open]{
-    grid-column:auto;
-  }
-
-  .archiveInlineActions{
-    grid-template-columns:
-      repeat(2,minmax(0,1fr));
-  }
-
-  .archiveMainInfoGrid{
-    grid-template-columns:1fr;
-  }
-
-  .archiveMainInfoGrid
-  .adminField:last-child{
-    grid-column:auto;
-  }
-
-  .archiveAdminFields{
-    grid-template-columns:1fr;
-  }
-
-  .archiveAdminFields > textarea{
-    grid-column:auto;
-  }
-}
-
-/* =========================
-   31) MOBILE
-========================= */
-
-@media (max-width:620px){
+@media (orientation:portrait) and (max-width:620px){
 
   .archiveAdminShell{
     gap:10px;
@@ -1889,9 +1654,25 @@ textarea.adminMissingField{
   .archiveInlineActions{
     width:100%;
 
+    display:grid;
+
     grid-template-columns:
       1fr
       1fr;
+
+    gap:8px;
+  }
+
+  .archiveInlineActions
+  :is(
+    .adminSaveBtn,
+    .adminBtnMango,
+    .adminBtnLight,
+    .adminDeleteBtn,
+    .adminDeleteAllBtn
+  ){
+    width:100%;
+    min-width:0;
   }
 
   .archiveInlineActions
@@ -1899,13 +1680,26 @@ textarea.adminMissingField{
     grid-column:1 / -1;
   }
 
+  .archiveOnePageGrid,
+  .archiveOnePageGrid.hasOpenCard{
+    grid-template-columns:1fr;
+
+    gap:10px;
+  }
+
+  .archiveRoundOnePageCard{
+    scroll-margin-top:18px;
+  }
+
+  .archiveRoundOnePageCard[open]{
+    grid-column:auto;
+  }
+
   .archiveRoundOnePageCard
   > summary{
     min-height:90px;
 
-    padding:
-      12px
-      14px;
+    padding:12px 14px;
 
     grid-template-columns:
       minmax(0,1fr)
@@ -1930,6 +1724,23 @@ textarea.adminMissingField{
   }
 
   .archiveRoundOnePageCard
+  .adminEditItemTitle strong,
+  .archiveRoundOnePageCard
+  .adminEditItemTitle span{
+    white-space:normal;
+  }
+
+  .archiveRoundOnePageCard
+  .adminEditItemTitle span{
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    line-clamp:2;
+
+    overflow:hidden;
+  }
+
+  .archiveRoundOnePageCard
   .adminEditItemMeta{
     grid-column:1 / -1;
 
@@ -1939,8 +1750,7 @@ textarea.adminMissingField{
 
     grid-template-columns:
       1fr
-      1fr
-      auto;
+      1fr;
 
     order:3;
   }
@@ -1949,6 +1759,12 @@ textarea.adminMissingField{
   .adminEditStatusPill,
   .archiveRoundOnePageCard
   .adminEditProgressPill{
+    width:100%;
+  }
+
+  .archiveSummaryDeleteBtn{
+    grid-column:1 / -1;
+
     width:100%;
   }
 
@@ -1966,7 +1782,8 @@ textarea.adminMissingField{
     padding:11px;
   }
 
-  .archiveAdminBoardV2{
+  .archiveAdminBoardV2,
+  .archiveOnePageBody{
     gap:11px;
   }
 
@@ -1976,9 +1793,27 @@ textarea.adminMissingField{
     padding:11px;
   }
 
+  .archiveMainInfoGrid,
+  .archiveImagesRow,
+  .archiveAdminBottomGrid{
+    grid-template-columns:1fr;
+
+    gap:10px;
+  }
+
+  .archiveMainInfoGrid
+  .adminField:last-child{
+    grid-column:auto;
+  }
+
   .archiveImagePreviewBox{
     min-height:250px;
     height:min(94vw,390px);
+  }
+
+  .archiveAdminColumnTitle{
+    align-items:flex-start;
+    flex-direction:column;
   }
 
   .archiveAdminItem{
@@ -2001,70 +1836,19 @@ textarea.adminMissingField{
     margin-right:auto;
   }
 
+  .archiveAdminFields{
+    grid-template-columns:1fr;
+  }
+
   .archiveAdminFields > textarea{
+    grid-column:auto;
+
     min-height:100px;
   }
 }
 
 /* =========================
-   32) SMALL MOBILE
-========================= */
-
-@media (max-width:430px){
-
-  .archiveInlineActions{
-    grid-template-columns:1fr;
-  }
-
-  .archiveInlineActions
-  .adminDeleteAllBtn{
-    grid-column:auto;
-  }
-
-  .archiveRoundOnePageCard
-  .adminEditItemMeta{
-    grid-template-columns:
-      1fr
-      1fr;
-  }
-
-  .archiveSummaryDeleteBtn{
-    grid-column:1 / -1;
-
-    width:100%;
-  }
-
-  .archiveRoundOnePageCard
-  .adminEditItemTitle strong,
-  .archiveRoundOnePageCard
-  .adminEditItemTitle span{
-    white-space:normal;
-  }
-
-  .archiveRoundOnePageCard
-  .adminEditItemTitle span{
-    display:-webkit-box;
-
-    -webkit-box-orient:vertical;
-    -webkit-line-clamp:2;
-    line-clamp:2;
-
-    overflow:hidden;
-  }
-
-  .archiveImagePreviewBox{
-    min-height:220px;
-    height:290px;
-  }
-
-  .archiveAdminColumnTitle{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-}
-
-/* =========================
-   33) FALLBACK
+   29) FALLBACK
 ========================= */
 
 @supports not selector(:has(*)){
@@ -2083,25 +1867,20 @@ textarea.adminMissingField{
     display:none;
   }
 
-  @media (min-width:1500px){
+  @media (orientation:landscape) and (min-width:768px) and (max-width:1220px){
 
     .archiveOnePageGrid,
     .archiveOnePageGrid.hasOpenCard{
       grid-template-columns:
-        repeat(4,minmax(0,1fr));
+        repeat(3,minmax(0,1fr));
+    }
+
+    .archiveRoundOnePageCard[open]{
+      grid-column:1 / -1;
     }
   }
 
-  @media (max-width:1180px){
-
-    .archiveOnePageGrid,
-    .archiveOnePageGrid.hasOpenCard{
-      grid-template-columns:
-        repeat(2,minmax(0,1fr));
-    }
-  }
-
-  @media (max-width:760px){
+  @media (orientation:portrait) and (max-width:620px){
 
     .archiveOnePageGrid,
     .archiveOnePageGrid.hasOpenCard{

@@ -38,7 +38,15 @@ function getPresenterArchiveActiveTeam() {
 
 function getPresenterArchiveMaxRound() {
   const root = getPresenterArchiveRoot()
-  return Number(root?.archiveMaxRound || 4)
+
+  const count = Number(
+    root?.archiveMaxRound ||
+    window.archiveMaxRound ||
+    localStorage.getItem("archive_max_round") ||
+    4
+  )
+
+  return Math.min(Math.max(count, 1), 4)
 }
 
 function getPresenterArchiveRound() {
@@ -61,6 +69,99 @@ function getPresenterArchiveRemainingPoints() {
   return Number(root?.archiveRemainingPoints || 0)
 }
 
+function getPresenterArchiveTimerSync() {
+  const root = getPresenterArchiveRoot()
+
+  return (
+    root?.archiveTimerSync ||
+    root?.archiveState?.timerSync ||
+    null
+  )
+}
+
+function getPresenterArchiveTimerValue() {
+  const timerSync = getPresenterArchiveTimerSync()
+
+  if (
+    timerSync &&
+    Number(timerSync.endsAt || 0) > Date.now()
+  ) {
+    return Math.max(
+      0,
+      Math.ceil((Number(timerSync.endsAt) - Date.now()) / 1000)
+    )
+  }
+
+  const root = getPresenterArchiveRoot()
+
+  return Number(
+    root?.timerValue ||
+    root?.archiveState?.timerValue ||
+    30
+  )
+}
+
+function isPresenterArchiveTimerRunning() {
+  const timerSync = getPresenterArchiveTimerSync()
+
+  return !!(
+    timerSync &&
+    Number(timerSync.endsAt || 0) > Date.now()
+  )
+}
+
+function getPresenterArchiveDoubleState() {
+  const root = getPresenterArchiveRoot()
+
+  return root?.archiveDoubleState || {
+    used: { A: false, B: false },
+    activeTeam: null
+  }
+}
+
+function getPresenterArchiveRoundErrors(round = getPresenterArchiveRound()) {
+  const state = getPresenterArchiveState()
+  const errors = state.errors || {}
+
+  return errors?.[round] || {
+    A: 0,
+    B: 0
+  }
+}
+
+function isPresenterArchiveRoundFinished(round = getPresenterArchiveRound()) {
+  const reveal = getPresenterArchiveRoundReveal(round)
+  const rows = presenterArchiveRows || []
+
+  if (!rows.length) return false
+
+  return rows.every(row => {
+    return !!reveal[Number(row.position)]
+  })
+}
+
+function canPresenterArchiveUseDouble() {
+  const team = getPresenterArchiveActiveTeam()
+  const doubleState = getPresenterArchiveDoubleState()
+
+  if (!team) return false
+  if (doubleState.activeTeam === team) return false
+  if (doubleState.used?.[team]) return false
+  if (doubleState.used?.A && doubleState.used?.B) return false
+
+  return true
+}
+
+function canPresenterArchiveWrong() {
+  const team = getPresenterArchiveActiveTeam()
+  const round = getPresenterArchiveRound()
+  const errors = getPresenterArchiveRoundErrors(round)
+
+  if (!team) return false
+
+  return Number(errors?.[team] || 0) < 3
+}
+
 function getPresenterArchiveRequiredItems() {
   return presenterArchiveRows
     .filter(item => String(item.label || "").trim() === "المطلوب")
@@ -71,8 +172,25 @@ async function loadPresenterArchiveRound(
   round,
   options = {}
 ) {
-  const model = Number(presenterModel || 0)
+  const model = Number(
+    presenterModel ||
+    localStorage.getItem("game_model") ||
+    0
+  )
+
   const safeRound = Number(round || 1)
+
+  if (!model || !safeRound) {
+    presenterArchiveBox = null
+    presenterArchiveRows = []
+    presenterArchiveLoadedRound = safeRound
+    presenterArchiveLoadedModel = model
+
+    return {
+      box: null,
+      rows: []
+    }
+  }
 
   if (
     presenterArchiveLoadedModel === model &&
@@ -128,25 +246,31 @@ async function loadPresenterArchiveRound(
 
   const payload = hasPayload
     ? result.data
-    : { box: null, rows: [] }
+    : {
+        box: null,
+        rows: []
+      }
 
   presenterArchiveBox = payload.box || null
   presenterArchiveRows =
-    Array.isArray(payload.rows) ? payload.rows : []
+    Array.isArray(payload.rows)
+      ? payload.rows
+      : []
 
-  if (hasPayload) {
-    presenterArchiveLoadedRound = safeRound
-    presenterArchiveLoadedModel = model
-  }
+  presenterArchiveLoadedRound = safeRound
+  presenterArchiveLoadedModel = model
 
-  if (result.error && !hasPayload) {
+  if (result.error && !presenterArchiveRows.length) {
     console.log(
       "LOAD PRESENTER ARCHIVE ERROR:",
       result.error
     )
   }
 
-  return payload
+  return {
+    box: presenterArchiveBox,
+    rows: presenterArchiveRows
+  }
 }
 
 function buildPresenterArchiveRequiredList() {
@@ -181,6 +305,7 @@ async function renderArchive() {
 
   const round = getPresenterArchiveRound()
   const remainingPoints = getPresenterArchiveRemainingPoints()
+  const timerValue = getPresenterArchiveTimerValue()
 
   await loadPresenterArchiveRound(round)
 
@@ -224,7 +349,7 @@ async function renderArchive() {
             class="presenterBtn dark presenterArchiveStartTimerBtn"
             onclick="sendCommand('startTimer')"
           >
-            بدء المؤقت
+            المؤقت ${timerValue}
           </button>
 
           <button
@@ -275,6 +400,7 @@ async function renderArchive() {
     </div>
   `
 
+  startPresenterArchiveTimerWatcher()
   refreshPresenterArchiveFromState()
 }
 
@@ -289,6 +415,10 @@ async function refreshPresenterArchiveFromState() {
 
   const remainingPoints = getPresenterArchiveRemainingPoints()
   const activeTeam = getPresenterArchiveActiveTeam()
+  const timerValue = getPresenterArchiveTimerValue()
+  const timerRunning = isPresenterArchiveTimerRunning()
+  const maxRound = getPresenterArchiveMaxRound()
+  const roundFinished = isPresenterArchiveRoundFinished(round)
 
   updatePresenterTeamButtonsOnly(activeTeam)
 
@@ -310,18 +440,64 @@ async function refreshPresenterArchiveFromState() {
   const doubleBtn = document.querySelector(".presenterArchiveDoubleBtn")
   const wrongBtn = document.querySelector(".presenterArchiveWrongBtn")
   const timerBtn = document.querySelector(".presenterArchiveStartTimerBtn")
+  const showAnswerBtn = document.querySelector(".presenterArchiveShowAnswerBtn")
+  const nextBtn = document.querySelector(".presenterArchiveNextRoundBtn")
 
   if (doubleBtn) {
-    doubleBtn.disabled = !activeTeam
+    const doubleState = getPresenterArchiveDoubleState()
+
+    doubleBtn.disabled = !canPresenterArchiveUseDouble()
+
+    if (activeTeam && doubleState.activeTeam === activeTeam) {
+      doubleBtn.innerText = "الدوبيلا مفعّل"
+    } else if (activeTeam && doubleState.used?.[activeTeam]) {
+      doubleBtn.innerText = "استخدم الدوبيلا"
+    } else {
+      doubleBtn.innerText = "دوبيلا"
+    }
   }
 
   if (wrongBtn) {
-    wrongBtn.disabled = !activeTeam
+    wrongBtn.disabled = !canPresenterArchiveWrong()
   }
 
   if (timerBtn) {
-    timerBtn.disabled = !activeTeam
+    timerBtn.disabled = timerRunning
+    timerBtn.innerText = timerRunning
+      ? `المؤقت ${timerValue}`
+      : "بدء المؤقت"
   }
+
+  if (showAnswerBtn) {
+    showAnswerBtn.disabled = !activeTeam
+  }
+
+  if (nextBtn) {
+    nextBtn.disabled =
+      round >= maxRound ||
+      !roundFinished
+  }
+}
+
+let presenterArchiveTimerWatcher = null
+
+function startPresenterArchiveTimerWatcher() {
+  clearInterval(presenterArchiveTimerWatcher)
+
+  presenterArchiveTimerWatcher = setInterval(() => {
+    if (presenterSegment !== "archive") return
+
+    const timerBtn = document.querySelector(".presenterArchiveStartTimerBtn")
+    if (!timerBtn) return
+
+    const timerValue = getPresenterArchiveTimerValue()
+    const timerRunning = isPresenterArchiveTimerRunning()
+
+    timerBtn.disabled = timerRunning
+    timerBtn.innerText = timerRunning
+      ? `المؤقت ${timerValue}`
+      : "بدء المؤقت"
+  }, 500)
 }
 
 function setPresenterArchiveRound(round) {

@@ -9,6 +9,7 @@
 .warmupWrap,
 .warmupWrap *{
   box-sizing:border-box;
+  font-weight:400;
 }
 
 .warmupWrap{
@@ -101,7 +102,7 @@
   color:var(--secondary);
   font-size:clamp(1.35rem,1.7vw,1.85rem);
   line-height:1;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 }
 
@@ -127,7 +128,7 @@
   color:#fff;
 
   font-size:.9rem;
-  font-weight:900;
+  font-weight:400;
   line-height:1;
 
   box-shadow:none;
@@ -227,7 +228,7 @@
   color:var(--text);
   font-size:clamp(1.12rem,1.55vw,1.45rem);
   line-height:1.18;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   white-space:normal;
@@ -255,7 +256,7 @@
 
   font-size:1.3rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
   box-shadow:none;
 }
@@ -315,7 +316,7 @@
   color:#fff;
 
   font-size:1rem;
-  font-weight:900;
+  font-weight:400;
   line-height:1;
   text-align:center;
 }
@@ -340,7 +341,7 @@
 
   font-size:clamp(1.25rem,1.9vw,1.75rem);
   line-height:1.42;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
@@ -374,33 +375,36 @@
   color:#fff;
   font-size:.82rem;
   line-height:1;
-  font-weight:800;
+  font-weight:400;
 }
 
 .timerPill strong{
   color:#fff;
   font-size:4.15rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 }
 
 #timer.timerDanger,
 #timer.timerTimeoutFx{
-  color:#FFD6C1;
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+  opacity:1;
+  visibility:visible;
 }
+
 /* =========================
    TIMER DANGER FX
-   نفس تصميم توب 10
 ========================= */
 
 .timerPill:has(#timer.timerDanger){
-  background:#7F0000 !important;
+  background:#7F0000;
   animation:warmupTimerPulse .75s ease-in-out infinite;
 }
 
 .timerPill:has(#timer.timerDanger) strong,
 #timer.timerDanger{
-  color:#fff !important;
+  color:#fff;
 }
 
 @keyframes warmupTimerPulse{
@@ -530,7 +534,7 @@
 
   font-size:clamp(1.7rem,2.6vw,3rem);
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
   box-shadow:none;
 
@@ -610,7 +614,7 @@
 
   font-size:1rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
   box-shadow:none;
 
@@ -698,7 +702,7 @@
   background:var(--primary);
   color:#fff;
 
-  font-weight:900;
+  font-weight:400;
 }
 
 .warmupFinishedCard h2{
@@ -707,7 +711,7 @@
   color:var(--secondary);
   font-size:2rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 }
 
 .warmupFinishedWinner{
@@ -720,7 +724,7 @@
   color:#fff;
 
   font-size:1.1rem;
-  font-weight:800;
+  font-weight:400;
 }
 
 .warmupFinishedScores{
@@ -745,7 +749,7 @@
 
   color:var(--text);
 
-  font-weight:700;
+  font-weight:400;
 
   white-space:nowrap;
   overflow:hidden;
@@ -755,7 +759,7 @@
 .warmupFinishedScores strong{
   color:var(--primary);
   font-size:1.85rem;
-  font-weight:900;
+  font-weight:400;
 }
 
 /* =========================
@@ -1144,456 +1148,86 @@
     transition:none;
   }
 }
-
 /* =========================================================
-   WARMUP DISPLAY - CATEGORY TITLE BIG / NUMBERS SMALL
-   ضع هذا آخر ملف تسخين العرض
+   WARMUP FIX - TEXT NOT CUT + NORMAL BOLD NUMBERS
 ========================================================= */
 
-/* منطقة الفئات */
-.warmupWrap .categoriesGrid{
-  height:calc(100% - 12px) !important;
-  margin-top:12px !important;
-  gap:10px !important;
+/* أسماء الفرق: أكبر وبدون قص */
+.teamNameBlock{
+  overflow:visible;
 }
 
-/* كرت الفئة: مساحة أكبر للاسم وأقل للأرقام */
-.warmupWrap .categoryCard{
-  grid-template-rows:120px 210px !important;
-  gap:8px !important;
-  padding:10px !important;
-  align-content:start !important;
+.teamNameBlock strong{
+  font-size:clamp(1.24rem,1.75vw,1.62rem);
+  line-height:1.12;
+  font-weight:400;
+
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
+  word-break:normal;
+
+  display:block;
+  -webkit-line-clamp:unset;
+  line-clamp:unset;
+  -webkit-box-orient:unset;
 }
 
-/* مربع اسم الفئة */
-.warmupWrap .categoryCardHead,
-.warmupWrap .categoryCard header{
-  height:112px !important;
-  min-height:112px !important;
-  max-height:112px !important;
-
-  padding:10px 12px !important;
-  border-radius:18px !important;
-
-  overflow:visible !important;
+/* نص أسماء الفئات: بدون قص */
+.categoryCardHead,
+.categoryCard header{
+  overflow:visible;
 }
 
-/* نص اسم الفئة: يظهر كامل بدون قص */
-.warmupWrap .categoryCardHead h3,
-.warmupWrap .categoryCard header h3{
-  font-size:clamp(1.25rem,1.7vw,1.75rem) !important;
-  line-height:1.18 !important;
-  font-weight:400 !important;
+.categoryCardHead h3,
+.categoryCard header h3{
+  font-size:clamp(1.34rem,1.85vw,2rem);
+  line-height:1.12;
+  font-weight:400;
 
-  white-space:normal !important;
-  overflow:visible !important;
-  text-overflow:unset !important;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
 
-  display:block !important;
-  -webkit-line-clamp:unset !important;
-  line-clamp:unset !important;
-  -webkit-box-orient:unset !important;
+  display:block;
+  -webkit-line-clamp:unset;
+  line-clamp:unset;
+  -webkit-box-orient:unset;
 }
 
-/* منطقة الأرقام: ارتفاع ثابت أصغر */
-.warmupWrap .numbers{
-  height:210px !important;
-  min-height:210px !important;
-  max-height:210px !important;
-
-  display:grid !important;
-  grid-template-rows:repeat(3,62px) !important;
-  gap:8px !important;
-  align-content:start !important;
+/* أرقام الفئات: بولد عادي فقط */
+.warmupNumberBtn{
+  font-weight:700;
 }
 
-/* أزرار الأرقام أصغر */
-.warmupWrap .warmupNumberBtn{
-  height:62px !important;
-  min-height:62px !important;
-  max-height:62px !important;
-
-  border-radius:14px !important;
-  font-size:clamp(1.65rem,2.3vw,2.45rem) !important;
-  line-height:1 !important;
-}
-
-/* =========================================================
-   GALAXY TAB A11 / TABLET LANDSCAPE
-========================================================= */
+/* =========================
+   IPAD / TABLET LANDSCAPE FIX
+========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-
-  .warmupWrap .categoriesGrid{
-    height:calc(100% - 8px) !important;
-    margin-top:8px !important;
-    gap:8px !important;
+  .teamNameBlock strong{
+    font-size:1.04rem;
+    line-height:1.1;
   }
 
-  .warmupWrap .categoryCard{
-    grid-template-rows:96px 168px !important;
-    gap:7px !important;
-    padding:8px !important;
+  .categoryCard{
+    grid-template-rows:70px minmax(0,1fr);
   }
 
-  .warmupWrap .categoryCardHead,
-  .warmupWrap .categoryCard header{
-    height:92px !important;
-    min-height:92px !important;
-    max-height:92px !important;
-
-    padding:8px 9px !important;
-    border-radius:15px !important;
+  .categoryCardHead,
+  .categoryCard header{
+    height:70px;
+    min-height:70px;
+    max-height:70px;
   }
 
-  .warmupWrap .categoryCardHead h3,
-  .warmupWrap .categoryCard header h3{
-    font-size:1.08rem !important;
-    line-height:1.13 !important;
-    font-weight:400 !important;
-
-    white-space:normal !important;
-    overflow:visible !important;
-    text-overflow:unset !important;
-
-    display:block !important;
-    -webkit-line-clamp:unset !important;
-    line-clamp:unset !important;
-    -webkit-box-orient:unset !important;
+  .categoryCardHead h3,
+  .categoryCard header h3{
+    font-size:1.08rem;
+    line-height:1.1;
   }
 
-  .warmupWrap .numbers{
-    height:168px !important;
-    min-height:168px !important;
-    max-height:168px !important;
-
-    grid-template-rows:repeat(3,50px) !important;
-    gap:6px !important;
-  }
-
-  .warmupWrap .warmupNumberBtn{
-    height:50px !important;
-    min-height:50px !important;
-    max-height:50px !important;
-
-    border-radius:12px !important;
-    font-size:1.6rem !important;
-  }
-}
-
-/* =========================================================
-   PHONE
-========================================================= */
-
-@media (max-width:767px){
-
-  .warmupWrap .categoryCard{
-    height:auto !important;
-    min-height:0 !important;
-    grid-template-rows:auto auto !important;
-  }
-
-  .warmupWrap .categoryCardHead,
-  .warmupWrap .categoryCard header{
-    height:auto !important;
-    min-height:82px !important;
-    max-height:none !important;
-  }
-
-  .warmupWrap .numbers{
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-
-    grid-template-rows:repeat(3,58px) !important;
-  }
-
-  .warmupWrap .warmupNumberBtn{
-    height:58px !important;
-    min-height:58px !important;
-    max-height:58px !important;
-  }
-}
-/* =========================================================
-   WARMUP DISPLAY - CATEGORY CARD FIT CONTENT
-   تنسيق المربع الأبيض مع الاسم والأرقام
-========================================================= */
-
-/* المربع الأبيض الخارجي */
-.warmupWrap .categoryCard{
-  height:auto !important;
-  min-height:0 !important;
-  max-height:none !important;
-
-  grid-template-rows:96px 168px !important;
-  align-self:start !important;
-
-  padding:8px !important;
-  gap:7px !important;
-
-  border-radius:18px !important;
-  background:#FFFFFF !important;
-  border:2px solid var(--line) !important;
-
-  overflow:hidden !important;
-}
-
-/* منطقة الفئات لا تمدد الكروت زيادة */
-.warmupWrap .categoriesGrid{
-  align-items:start !important;
-}
-
-/* مربع اسم الفئة */
-.warmupWrap .categoryCardHead,
-.warmupWrap .categoryCard header{
-  height:92px !important;
-  min-height:92px !important;
-  max-height:92px !important;
-
-  border-radius:15px !important;
-}
-
-/* منطقة الأرقام */
-.warmupWrap .numbers{
-  height:168px !important;
-  min-height:168px !important;
-  max-height:168px !important;
-
-  grid-template-rows:repeat(3,50px) !important;
-  gap:6px !important;
-}
-
-/* أزرار الأرقام */
-.warmupWrap .warmupNumberBtn{
-  height:50px !important;
-  min-height:50px !important;
-  max-height:50px !important;
-
-  border-radius:12px !important;
-}
-
-/* =========================================================
-   GALAXY TAB A11 / TABLET LANDSCAPE
-========================================================= */
-
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-
-  .warmupWrap .categoryCard{
-    grid-template-rows:90px 156px !important;
-
-    padding:8px !important;
-    gap:7px !important;
-    border-radius:17px !important;
-  }
-
-  .warmupWrap .categoryCardHead,
-  .warmupWrap .categoryCard header{
-    height:86px !important;
-    min-height:86px !important;
-    max-height:86px !important;
-
-    border-radius:14px !important;
-  }
-
-  .warmupWrap .numbers{
-    height:156px !important;
-    min-height:156px !important;
-    max-height:156px !important;
-
-    grid-template-rows:repeat(3,48px) !important;
-    gap:6px !important;
-  }
-
-  .warmupWrap .warmupNumberBtn{
-    height:48px !important;
-    min-height:48px !important;
-    max-height:48px !important;
-
-    border-radius:12px !important;
-    font-size:1.55rem !important;
-  }
-}
-/* =========================================================
-   WARMUP DISPLAY - NUMBERS SLIGHTLY BIGGER WITH CARD
-   تكبير الأرقام مع المربع الأبيض بتناسق
-========================================================= */
-
-/* المربع الأبيض الخارجي */
-.warmupWrap .categoryCard{
-  grid-template-rows:92px 186px !important;
-  padding:9px !important;
-  gap:8px !important;
-
-  height:auto !important;
-  min-height:0 !important;
-  align-self:start !important;
-
-  border-radius:19px !important;
-}
-
-/* مربع اسم الفئة */
-.warmupWrap .categoryCardHead,
-.warmupWrap .categoryCard header{
-  height:88px !important;
-  min-height:88px !important;
-  max-height:88px !important;
-
-  border-radius:15px !important;
-}
-
-/* نص اسم الفئة */
-.warmupWrap .categoryCardHead h3,
-.warmupWrap .categoryCard header h3{
-  font-size:clamp(1.25rem,1.65vw,1.75rem) !important;
-  line-height:1.16 !important;
-  font-weight:400 !important;
-
-  white-space:normal !important;
-  overflow:visible !important;
-  display:block !important;
-}
-
-/* منطقة الأرقام */
-.warmupWrap .numbers{
-  height:186px !important;
-  min-height:186px !important;
-  max-height:186px !important;
-
-  grid-template-rows:repeat(3,56px) !important;
-  gap:9px !important;
-}
-
-/* أزرار الأرقام */
-.warmupWrap .warmupNumberBtn{
-  height:56px !important;
-  min-height:56px !important;
-  max-height:56px !important;
-
-  border-radius:14px !important;
-  font-size:clamp(1.85rem,2.7vw,2.85rem) !important;
-  font-weight:900 !important;
-}
-
-/* =========================================================
-   GALAXY TAB A11 / TABLET LANDSCAPE
-========================================================= */
-
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-
-  .warmupWrap .categoryCard{
-    grid-template-rows:88px 174px !important;
-    padding:8px !important;
-    gap:8px !important;
-    border-radius:18px !important;
-  }
-
-  .warmupWrap .categoryCardHead,
-  .warmupWrap .categoryCard header{
-    height:84px !important;
-    min-height:84px !important;
-    max-height:84px !important;
-
-    border-radius:14px !important;
-  }
-
-  .warmupWrap .categoryCardHead h3,
-  .warmupWrap .categoryCard header h3{
-    font-size:1.16rem !important;
-    line-height:1.13 !important;
-    font-weight:400 !important;
-  }
-
-  .warmupWrap .numbers{
-    height:174px !important;
-    min-height:174px !important;
-    max-height:174px !important;
-
-    grid-template-rows:repeat(3,52px) !important;
-    gap:9px !important;
-  }
-
-  .warmupWrap .warmupNumberBtn{
-    height:52px !important;
-    min-height:52px !important;
-    max-height:52px !important;
-
-    border-radius:13px !important;
-    font-size:1.75rem !important;
-  }
-}
-/* =========================================================
-   WARMUP DISPLAY - MOVE CATEGORIES DOWN
-   تنزيل الفئات تحت شوي
-========================================================= */
-
-.warmupWrap .categoriesGrid{
-  margin-top:58px !important;
-  height:calc(100% - 28px) !important;
-}
-/* =========================================================
-   WARMUP DISPLAY - NUMBERS 58PX
-   تكبير الأرقام إلى 58
-========================================================= */
-
-.warmupWrap .categoryCard{
-  grid-template-rows:88px 192px !important;
-  padding:9px !important;
-  gap:8px !important;
-}
-
-.warmupWrap .numbers{
-  height:192px !important;
-  min-height:192px !important;
-  max-height:192px !important;
-
-  grid-template-rows:repeat(3,58px) !important;
-  gap:9px !important;
-}
-
-.warmupWrap .warmupNumberBtn{
-  height:58px !important;
-  min-height:58px !important;
-  max-height:58px !important;
-
-  border-radius:14px !important;
-  font-size:clamp(2rem,2.9vw,3.05rem) !important;
-  font-weight:900 !important;
-}
-
-/* Galaxy Tab A11 بالعرض */
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-  .warmupWrap .categoryCard{
-    grid-template-rows:86px 192px !important;
-    padding:8px !important;
-    gap:8px !important;
-  }
-
-  .warmupWrap .numbers{
-    height:192px !important;
-    min-height:192px !important;
-    max-height:192px !important;
-
-    grid-template-rows:repeat(3,58px) !important;
-    gap:9px !important;
-  }
-
-  .warmupWrap .warmupNumberBtn{
-    height:58px !important;
-    min-height:58px !important;
-    max-height:58px !important;
-
-    border-radius:14px !important;
-    font-size:1.95rem !important;
-  }
-}
-.warmupWrap .categoriesGrid{
-  margin-top:58px !important;
-  height:calc(100% - 58px) !important;
-}
-
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-  .warmupWrap .categoriesGrid{
-    margin-top:58px !important;
-    height:calc(100% - 58px) !important;
+  .warmupNumberBtn{
+    font-weight:700;
   }
 }

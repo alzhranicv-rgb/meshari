@@ -1,0 +1,1019 @@
+/* =========================================================
+   FINAL PRESENTER
+   MATCH DISPLAY COLORS
+========================================================= */
+
+.presenterFinalLayout,
+.presenterFinalLayout *{
+  box-sizing:border-box;
+}
+
+.presenterFinalLayout{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);
+  gap:10px;
+
+  color:var(--p-text);
+}
+
+.presenterFinalLeft,
+.presenterFinalRight{
+  min-height:0;
+
+  display:grid;
+  gap:10px;
+}
+
+.presenterFinalLeft{
+  grid-template-rows:minmax(0,1fr) auto;
+}
+
+.presenterFinalRight{
+  grid-template-rows:auto minmax(0,1fr);
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.presenterFinalNumbersCard,
+.presenterFinalPreviewCard,
+.presenterFinalStoryAnswerControl{
+  min-height:0;
+
+  display:grid;
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:22px;
+
+  overflow:hidden;
+}
+
+.presenterFinalNumbersCard{
+  grid-template-rows:minmax(0,1fr);
+}
+
+.presenterFinalPreviewCard{
+  grid-template-rows:minmax(0,1fr);
+}
+
+.presenterFinalPreviewBox{
+  min-height:0;
+
+  display:grid;
+
+  background:var(--p-soft);
+  border:2px solid var(--p-line);
+  border-radius:20px;
+
+  overflow:hidden;
+}
+
+/* =========================
+   NUMBERS
+========================= */
+
+.presenterFinalLayout .presenterGrid{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+
+  padding:2px;
+  overflow:auto;
+}
+
+.presenterFinalLayout .presenterGrid button{
+  min-height:82px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0;
+
+  background:var(--p-soft);
+  color:var(--p-secondary);
+
+  border:2px solid var(--p-line);
+  border-radius:20px;
+
+  font-size:28px;
+  line-height:1;
+  font-weight:400;
+
+  cursor:pointer;
+}
+
+.presenterFinalLayout .presenterGrid button.active,
+.presenterFinalLayout .presenterGrid button.selected{
+  background:var(--p-primary);
+  border-color:var(--p-primary);
+  color:#FFFFFF;
+}
+
+.presenterFinalLayout .presenterGrid button:disabled{
+  background:var(--p-disabled);
+  color:var(--p-disabled-text);
+  cursor:not-allowed;
+}
+
+/* =========================
+   TEAMS
+========================= */
+
+.presenterFinalTeamsArea{
+  min-height:76px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:22px;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.presenterFinalControlsArea{
+  min-height:0;
+}
+
+.presenterFinalControlsGrid{
+  min-height:72px;
+
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:22px;
+}
+
+.presenterFinalControlsGrid .presenterBtn{
+  width:100%;
+}
+
+/* =========================
+   PREVIEW GENERAL
+========================= */
+
+.presenterFinalOnlyAnswerView,
+.presenterFinalQuestionAnswerOnly,
+.presenterFinalSequencePreview,
+.presenterFinalStoryPreview{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  gap:10px;
+
+  padding:10px;
+  overflow:hidden;
+}
+
+.presenterFinalOnlyAnswerView{
+  grid-template-rows:auto minmax(0,1fr);
+}
+
+.presenterFinalOnlyAnswerLabel,
+.presenterFinalPreviewLabel{
+  display:none;
+}
+
+.presenterFinalOnlyAnswerText,
+.presenterFinalPreviewText,
+.presenterFinalEmptyText{
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:14px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:18px;
+
+  color:var(--p-text);
+  font-size:26px;
+  line-height:1.35;
+  text-align:center;
+
+  overflow:auto;
+}
+
+.presenterFinalOnlyAnswerText,
+.presenterFinalPreviewText.answerText{
+  color:var(--p-secondary);
+}
+
+.presenterFinalMiniNote{
+  margin-top:8px;
+  color:var(--p-muted);
+  font-size:16px;
+  line-height:1.3;
+  text-align:center;
+}
+
+/* =========================
+   QUESTION + ANSWER
+========================= */
+
+.presenterFinalQuestionAnswerOnly{
+  grid-template-rows:minmax(0,1fr) minmax(0,1fr);
+}
+
+.presenterFinalPreviewBlock{
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr);
+  gap:8px;
+
+  padding:10px;
+
+  background:var(--p-soft);
+  border:2px solid var(--p-line);
+  border-radius:20px;
+
+  overflow:hidden;
+}
+
+.presenterFinalImageStatusBlock{
+  grid-template-rows:minmax(0,1fr);
+}
+
+/* =========================
+   ANSWERS GRID
+========================= */
+
+.presenterFinalAnswersGrid{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+
+  overflow:auto;
+}
+
+.presenterFinalAnswerCard{
+  min-height:64px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  color:var(--p-secondary);
+
+  border:2px solid var(--p-line);
+  border-radius:18px;
+
+  font-size:20px;
+  line-height:1.25;
+  text-align:center;
+
+  cursor:pointer;
+}
+
+.presenterFinalAnswerCard.selectedCorrect{
+  background:#EAF7F2;
+  border-color:var(--p-green);
+  color:var(--p-green);
+}
+
+/* =========================
+   SEQUENCE
+========================= */
+
+.presenterFinalSequencePreview{
+  grid-template-rows:auto minmax(0,1fr);
+}
+
+.presenterFinalCountdownBox{
+  min-width:94px;
+  height:56px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  margin:0 auto;
+
+  background:var(--p-primary);
+  color:#FFFFFF;
+
+  border-radius:18px;
+
+  font-size:30px;
+  line-height:1;
+  font-weight:400;
+}
+
+/* =========================
+   STORY
+========================= */
+
+.presenterFinalStoryPartsOnly{
+  grid-template-rows:minmax(0,1fr);
+}
+
+.presenterFinalStoryParts{
+  min-height:0;
+
+  display:grid;
+  gap:8px;
+
+  overflow:auto;
+}
+
+.presenterFinalStoryPart{
+  min-height:52px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  color:var(--p-muted);
+
+  border:2px solid var(--p-line);
+  border-radius:18px;
+
+  font-size:19px;
+  line-height:1.3;
+  text-align:center;
+}
+
+.presenterFinalStoryPart.visiblePart{
+  color:var(--p-secondary);
+  border-color:var(--p-primary);
+  background:#FFF4EC;
+}
+
+/* =========================
+   IPHONE LANDSCAPE
+========================= */
+
+@media (orientation:landscape) and (max-width:950px){
+  .presenterFinalLayout{
+    gap:8px;
+  }
+
+  .presenterFinalLeft,
+  .presenterFinalRight{
+    gap:8px;
+  }
+
+  .presenterFinalNumbersCard,
+  .presenterFinalPreviewCard,
+  .presenterFinalStoryAnswerControl{
+    gap:8px;
+    padding:8px;
+    border-radius:18px;
+  }
+
+  .presenterFinalPreviewBox{
+    border-radius:17px;
+  }
+
+  .presenterFinalLayout .presenterGrid{
+    gap:8px;
+  }
+
+  .presenterFinalLayout .presenterGrid button{
+    min-height:60px;
+    border-radius:16px;
+    font-size:23px;
+  }
+
+  .presenterFinalTeamsArea{
+    min-height:62px;
+    gap:8px;
+    padding:8px;
+    border-radius:18px;
+  }
+
+  .presenterFinalControlsGrid{
+    min-height:62px;
+    gap:8px;
+    padding:8px;
+    border-radius:18px;
+  }
+
+  .presenterFinalOnlyAnswerView,
+  .presenterFinalQuestionAnswerOnly,
+  .presenterFinalSequencePreview,
+  .presenterFinalStoryPreview{
+    gap:8px;
+    padding:8px;
+  }
+
+  .presenterFinalOnlyAnswerText,
+  .presenterFinalPreviewText,
+  .presenterFinalEmptyText{
+    padding:10px;
+    border-radius:15px;
+    font-size:21px;
+    line-height:1.25;
+  }
+
+  .presenterFinalPreviewBlock{
+    padding:8px;
+    border-radius:17px;
+  }
+
+  .presenterFinalAnswersGrid{
+    gap:8px;
+  }
+
+  .presenterFinalAnswerCard{
+    min-height:48px;
+    padding:8px;
+    border-radius:15px;
+    font-size:16px;
+  }
+
+  .presenterFinalCountdownBox{
+    min-width:76px;
+    height:46px;
+    border-radius:15px;
+    font-size:25px;
+  }
+
+  .presenterFinalStoryParts{
+    gap:6px;
+  }
+
+  .presenterFinalStoryPart{
+    min-height:42px;
+    padding:8px;
+    border-radius:15px;
+    font-size:16px;
+  }
+}
+/* =========================
+   FINAL ROUND 2
+========================= */
+
+.presenterFinalRound2CommandGrid{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterFinalRound2CommandGrid .presenterBtn{
+  width:100%;
+  height:100%;
+  font-size:18px;
+}
+
+.presenterFinalRound2AnswerGrid{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+
+  overflow:auto;
+}
+
+.presenterFinalRound2AnswerCard{
+  min-height:76px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:12px;
+
+  background:#FFFFFF;
+  color:var(--p-secondary);
+
+  border:2px solid var(--p-line);
+  border-radius:20px;
+
+  cursor:pointer;
+}
+
+.presenterFinalRound2AnswerCard span{
+  font-size:24px;
+  line-height:1.25;
+  text-align:center;
+}
+
+.presenterFinalRound2AnswerCard.selectedCorrect{
+  background:rgba(22,163,74,.12);
+  border-color:var(--p-green);
+  color:var(--p-green);
+}
+
+.presenterFinalRound2SequenceView,
+.presenterFinalRound2ImageView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:10px;
+}
+
+.presenterFinalRound2Countdown,
+.presenterFinalRound2ImageStatus{
+  min-height:52px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  background:var(--p-primary);
+  color:#FFFFFF;
+
+  border-radius:18px;
+
+  font-size:28px;
+  line-height:1;
+}
+
+.presenterFinalRound2ImageStatus strong{
+  font-size:32px;
+  font-weight:400;
+}
+
+.presenterFinalRound2ImageStatus em{
+  font-style:normal;
+  padding:8px 12px;
+
+  background:#FFFFFF;
+  color:var(--p-primary);
+
+  border-radius:999px;
+
+  font-size:18px;
+  line-height:1;
+}
+
+.presenterFinalRound2Empty{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--p-muted);
+  font-size:24px;
+  text-align:center;
+}
+
+/* IPHONE PRO MAX LANDSCAPE */
+
+@media (orientation:landscape) and (max-width:950px) and (max-height:500px){
+  .presenterFinalRound2CommandGrid{
+    grid-template-columns:repeat(7,minmax(0,1fr));
+    gap:8px;
+  }
+
+  .presenterFinalRound2CommandGrid .presenterBtn{
+    min-height:0;
+    height:100%;
+    font-size:14px;
+  }
+
+  .presenterFinalRound2AnswerGrid{
+    gap:8px;
+  }
+
+  .presenterFinalRound2AnswerCard{
+    min-height:clamp(44px,11dvh,58px);
+    padding:8px;
+    border-radius:16px;
+  }
+
+  .presenterFinalRound2AnswerCard span{
+    font-size:clamp(16px,4.2dvh,20px);
+    line-height:1.2;
+  }
+
+  .presenterFinalRound2SequenceView,
+  .presenterFinalRound2ImageView{
+    gap:8px;
+  }
+
+  .presenterFinalRound2Countdown,
+  .presenterFinalRound2ImageStatus{
+    min-height:38px;
+    border-radius:15px;
+    font-size:21px;
+  }
+
+  .presenterFinalRound2ImageStatus strong{
+    font-size:25px;
+  }
+
+  .presenterFinalRound2ImageStatus em{
+    padding:6px 9px;
+    font-size:14px;
+  }
+
+  .presenterFinalRound2Empty{
+    font-size:18px;
+  }
+}
+/* =========================
+   FINAL ROUND 3
+========================= */
+
+.presenterFinalRound3CommandGrid{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterFinalRound3CommandGrid .presenterBtn{
+  width:100%;
+  height:100%;
+  font-size:20px;
+}
+
+.presenterFinalRound3StoryView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:10px;
+}
+
+.presenterFinalRound3StoryParts{
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:repeat(3,minmax(0,1fr));
+  gap:10px;
+
+  overflow:auto;
+}
+
+.presenterFinalRound3StoryPart{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:58px minmax(0,1fr);
+  gap:10px;
+  align-items:center;
+
+  padding:10px;
+
+  background:#FFFFFF;
+  border:2px solid var(--p-line);
+  border-radius:20px;
+
+  opacity:.55;
+}
+
+.presenterFinalRound3StoryPart.visiblePart{
+  opacity:1;
+  border-color:var(--p-primary);
+}
+
+.presenterFinalRound3StoryPart span{
+  height:46px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--p-primary);
+  color:#FFFFFF;
+
+  border-radius:16px;
+
+  font-size:24px;
+  line-height:1;
+}
+
+.presenterFinalRound3StoryPart strong{
+  min-width:0;
+
+  color:var(--p-secondary);
+  font-size:24px;
+  line-height:1.25;
+  font-weight:400;
+  text-align:center;
+}
+
+.presenterFinalRound3AnswerPanel{
+  min-height:78px;
+
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:12px;
+  align-items:center;
+
+  padding:12px;
+
+  background:var(--p-secondary);
+  border-radius:20px;
+
+  color:#FFFFFF;
+}
+
+.presenterFinalRound3AnswerPanel span{
+  color:var(--p-primary);
+  font-size:20px;
+  line-height:1;
+}
+
+.presenterFinalRound3AnswerPanel strong{
+  min-width:0;
+
+  font-size:28px;
+  line-height:1.25;
+  font-weight:400;
+  text-align:center;
+}
+
+.presenterFinalRound3Empty{
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--p-muted);
+  font-size:24px;
+}
+
+/* IPHONE PRO MAX LANDSCAPE */
+
+@media (orientation:landscape) and (max-width:950px) and (max-height:500px){
+  .presenterFinalRound3CommandGrid{
+    gap:8px;
+  }
+
+  .presenterFinalRound3CommandGrid .presenterBtn{
+    min-height:0;
+    height:100%;
+    font-size:16px;
+  }
+
+  .presenterFinalRound3StoryView{
+    gap:8px;
+  }
+
+  .presenterFinalRound3StoryParts{
+    gap:8px;
+  }
+
+  .presenterFinalRound3StoryPart{
+    grid-template-columns:42px minmax(0,1fr);
+    gap:8px;
+    padding:8px;
+    border-radius:16px;
+  }
+
+  .presenterFinalRound3StoryPart span{
+    height:34px;
+    border-radius:12px;
+    font-size:18px;
+  }
+
+  .presenterFinalRound3StoryPart strong{
+    font-size:clamp(16px,4.2dvh,20px);
+    line-height:1.2;
+  }
+
+  .presenterFinalRound3AnswerPanel{
+    min-height:52px;
+    gap:8px;
+    padding:8px;
+    border-radius:16px;
+  }
+
+  .presenterFinalRound3AnswerPanel span{
+    font-size:14px;
+  }
+
+  .presenterFinalRound3AnswerPanel strong{
+    font-size:clamp(18px,4.8dvh,22px);
+  }
+
+  .presenterFinalRound3Empty{
+    font-size:18px;
+  }
+}
+/* =========================
+   FINAL ROUND 4
+========================= */
+
+.presenterFinalRound4CommandGrid{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterFinalRound4CommandGrid .presenterBtn{
+  width:100%;
+  height:100%;
+  font-size:18px;
+}
+
+.presenterFinalRound4FocusView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:10px;
+}
+
+.presenterFinalRound4Status{
+  min-height:54px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  background:var(--p-primary);
+  color:#FFFFFF;
+
+  border-radius:18px;
+
+  font-size:24px;
+  line-height:1;
+}
+
+.presenterFinalRound4Status strong{
+  min-width:80px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:8px 12px;
+
+  background:#FFFFFF;
+  color:var(--p-primary);
+
+  border-radius:999px;
+
+  font-size:20px;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterFinalRound4Content{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.presenterFinalRound4Box{
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:10px;
+
+  padding:12px;
+
+  background:#FFFFFF;
+  border:2px solid var(--p-line);
+  border-radius:20px;
+
+  overflow:hidden;
+}
+
+.presenterFinalRound4Box span{
+  color:var(--p-primary);
+  font-size:20px;
+  line-height:1;
+}
+
+.presenterFinalRound4Box strong{
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--p-secondary);
+  font-size:28px;
+  line-height:1.3;
+  font-weight:400;
+  text-align:center;
+
+  overflow:auto;
+}
+
+.presenterFinalRound4Box.answerBox{
+  background:var(--p-secondary);
+  border-color:var(--p-secondary);
+}
+
+.presenterFinalRound4Box.answerBox span{
+  color:var(--p-primary);
+}
+
+.presenterFinalRound4Box.answerBox strong{
+  color:#FFFFFF;
+}
+
+/* IPHONE PRO MAX LANDSCAPE */
+
+@media (orientation:landscape) and (max-width:950px) and (max-height:500px){
+  .presenterFinalRound4CommandGrid{
+    gap:8px;
+  }
+
+  .presenterFinalRound4CommandGrid .presenterBtn{
+    min-height:0;
+    height:100%;
+    font-size:14px;
+  }
+
+  .presenterFinalRound4FocusView{
+    gap:8px;
+  }
+
+  .presenterFinalRound4Status{
+    min-height:38px;
+    gap:8px;
+    border-radius:15px;
+    font-size:18px;
+  }
+
+  .presenterFinalRound4Status strong{
+    min-width:58px;
+    padding:6px 9px;
+    font-size:14px;
+  }
+
+  .presenterFinalRound4Content{
+    gap:8px;
+  }
+
+  .presenterFinalRound4Box{
+    gap:8px;
+    padding:8px;
+    border-radius:16px;
+  }
+
+  .presenterFinalRound4Box span{
+    font-size:15px;
+  }
+
+  .presenterFinalRound4Box strong{
+    font-size:clamp(18px,4.8dvh,23px);
+    line-height:1.22;
+  }
+}

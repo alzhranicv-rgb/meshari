@@ -225,7 +225,7 @@ async function openAdminRandomChallenge() {
     )
 
     renderAdminSegmentActions()
-    await renderAdminTabsUnified()
+    scheduleAdminTabsRefresh()
 
     await loadRandomChallengeAdminRows(null, true)
 
@@ -1327,6 +1327,7 @@ async function saveFatblaSection() {
         row
       ])
     )
+        const fatblaStorageUrlsToDelete = []
 
     const rows = []
     const keepNumbers = new Set()
@@ -1375,6 +1376,11 @@ async function saveFatblaSection() {
           return false
         }
 
+                fatblaStorageUrlsToDelete.push(
+          oldMap[number]?.image,
+          oldMap[number]?.video
+        )
+
         video = ""
 
         Object.assign(item, {
@@ -1400,6 +1406,10 @@ async function saveFatblaSection() {
 
           return false
         }
+                fatblaStorageUrlsToDelete.push(
+          oldMap[number]?.image,
+          oldMap[number]?.video
+        )
 
         image = ""
 
@@ -1508,6 +1518,24 @@ async function saveFatblaSection() {
     )
 
     if (staleRows.length) {
+      const staleStorageDeleted =
+        await deleteAdminStorageUrls(
+          staleRows.flatMap(row => [
+            row.image,
+            row.video
+          ])
+        )
+
+      if (!staleStorageDeleted) {
+        showGameToast(
+          "توقف الحذف لأن ملفات فتبلة القديمة لم تُحذف",
+          "error"
+        )
+
+        return false
+      }
+      
+
       const deleteResults = await Promise.all(
         staleRows.map((oldRow) =>
           dbDelete(
@@ -1545,10 +1573,36 @@ async function saveFatblaSection() {
       }
     }
 
+        if (fatblaStorageUrlsToDelete.length) {
+      const replacedStorageDeleted =
+        await deleteAdminStorageUrls(
+          fatblaStorageUrlsToDelete
+        )
+
+      if (!replacedStorageDeleted) {
+        showGameToast(
+          "تم الحفظ لكن تعذر حذف بعض ملفات فتبلة القديمة",
+          "warning"
+        )
+
+        return false
+      }
+    }
+
     fatblaAdminLoaded = false
     fatblaAdminLoadedModel = null
 
     await loadFatblaAdminDraft(true)
+
+    if (
+  typeof updateAdminQuickSettingUI ===
+  "function"
+) {
+  updateAdminQuickSettingUI(
+    "auction",
+    fatblaAdminCount
+  )
+}
 
     invalidateRandomChallengeAdminCache()
     renderAdminRandomChallengePage()
@@ -1725,7 +1779,56 @@ async function deleteFatblaSection() {
       "جارٍ حذف فتبلة..."
     )
 
-    const model = Number(currentModel)
+    const model =
+      Number(currentModel)
+
+    const mediaResult =
+      await dbSelect(
+        "auction_questions",
+        query =>
+          query.eq(
+            "model",
+            model
+          ),
+        {
+          select: "image,video",
+          fallback: [],
+          logLabel:
+            "LOAD FATBLA MEDIA BEFORE DELETE"
+        }
+      )
+
+    if (!mediaResult.ok) {
+      console.error(
+        "LOAD FATBLA MEDIA BEFORE DELETE ERROR:",
+        mediaResult.error
+      )
+
+      showGameToast(
+        "تعذر قراءة صور وفيديوهات فتبلة",
+        "error"
+      )
+
+      return false
+    }
+
+    const storageDeleted =
+      await deleteAdminStorageUrls(
+        (mediaResult.data || [])
+          .flatMap(item => [
+            item.image,
+            item.video
+          ])
+      )
+
+    if (!storageDeleted) {
+      showGameToast(
+        "توقف الحذف لأن ملفات فتبلة لم تُحذف",
+        "error"
+      )
+
+      return false
+    }
 
     const [
       deleteQuestionsResult,
@@ -1783,6 +1886,15 @@ async function deleteFatblaSection() {
     fatblaAdminLoadedModel = null
 
     await loadFatblaAdminDraft(true)
+    if (
+  typeof updateAdminQuickSettingUI ===
+  "function"
+) {
+  updateAdminQuickSettingUI(
+    "auction",
+    fatblaAdminCount
+  )
+}
 
     invalidateRandomChallengeAdminCache()
     renderAdminRandomChallengePage()
@@ -1817,47 +1929,28 @@ async function deleteFatblaSection() {
     setAdminSaving(false)
   }
 }
-
 /* =========================
    13) PUBLIC API
 ========================= */
 
-window.getRandomChallengeAdminSections =
-  getRandomChallengeAdminSections
+Object.assign(window, {
+  getRandomChallengeAdminSections,
 
-window.openAdminRandomChallenge =
-  openAdminRandomChallenge
+  openAdminRandomChallenge,
+  switchRandomChallengeAdminSection,
 
-window.switchRandomChallengeAdminSection =
-  switchRandomChallengeAdminSection
+  openFatblaAdmin,
+  renderFatblaAdmin,
+  refreshFatblaAdmin,
 
-window.openFatblaAdmin =
-  openFatblaAdmin
+  saveRandomChallengeCurrentSection,
+  deleteRandomChallengeCurrentSection,
+  clearRandomChallengeAdminQuestion,
 
-window.renderFatblaAdmin =
-  renderFatblaAdmin
+  selectRandomChallengeTrueFalseAnswer,
 
-window.refreshFatblaAdmin =
-  refreshFatblaAdmin
-
-window.saveRandomChallengeCurrentSection =
-  saveRandomChallengeCurrentSection
-
-window.deleteRandomChallengeCurrentSection =
-  deleteRandomChallengeCurrentSection
-
-window.clearRandomChallengeAdminQuestion =
-  clearRandomChallengeAdminQuestion
-
-window.selectRandomChallengeTrueFalseAnswer =
-  selectRandomChallengeTrueFalseAnswer
-
-window.changeFatblaImage =
-  changeFatblaImage
-
-window.changeFatblaVideo =
-  changeFatblaVideo
-
-window.clearFatblaQuestion =
-  clearFatblaQuestion
-
+  changeFatblaImage,
+  changeFatblaVideo,
+  clearFatblaQuestion,
+  deleteFatblaSection
+})

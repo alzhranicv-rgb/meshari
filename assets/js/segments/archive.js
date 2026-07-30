@@ -38,6 +38,7 @@ let archiveTimer = null
 let archiveTurnLocked = false
 let archiveTimerStarted = false
 let archiveLastTickPlayed = null
+let archiveTimerSync = null
 
 let archiveDoubleState = {
   used: { A: false, B: false },
@@ -57,6 +58,9 @@ window.archiveRoundCache = archiveRoundCache
 
 const ARCHIVE_STORAGE_KEY = "archive_state_v1"
 
+const ARCHIVE_DATA_CACHE_TTL = 5 * 60 * 1000
+const ARCHIVE_SETTINGS_CACHE_TTL = 10 * 60 * 1000
+
 let archiveHistory = []
 
 window.archiveMaxRound = Number(window.archiveMaxRound || localStorage.getItem("archive_max_round") || 4)
@@ -69,25 +73,47 @@ const ARCHIVE_HISTORY_LIMIT = 80
 ========================= */
 
 async function loadArchiveMaxRound() {
-  if (!currentModel) {
+  const modelId = getArchiveModelId()
+
+  if (!modelId) {
     archiveMaxRound = 4
     window.archiveMaxRound = archiveMaxRound
     localStorage.setItem("archive_max_round", String(archiveMaxRound))
     return archiveMaxRound
   }
 
-  const { data, error } = await db
-    .from("segment_settings")
-    .select("item_count")
-    .eq("model", Number(currentModel))
-    .eq("segment", "archive")
-    .maybeSingle()
+  const { data, error } =
+    await loadArchiveCachedData(
+      "segment_settings",
+      {
+        select: "item_count",
+        filters: {
+          model: modelId,
+          segment: "archive"
+        },
+        maybeSingle: true,
+        ttl: ARCHIVE_SETTINGS_CACHE_TTL,
+        cacheKey:
+          `${getArchiveSupabaseCachePrefix()}archive_settings:${modelId}`
+      }
+    )
 
-  if (error) {
-    console.log(error)
-    archiveMaxRound = 4
+  if (error && !data) {
+    console.log("LOAD ARCHIVE SETTINGS ERROR:", error)
+    archiveMaxRound = Number(
+      localStorage.getItem("archive_max_round") ||
+      window.archiveMaxRound ||
+      4
+    )
   } else {
-    archiveMaxRound = Math.min(Math.max(Number(data?.item_count || 4), 1), 4)
+    archiveMaxRound =
+      Math.min(
+        Math.max(
+          Number(data?.item_count || 4),
+          1
+        ),
+        4
+      )
   }
 
   window.archiveMaxRound = archiveMaxRound
@@ -127,10 +153,15 @@ function isArchiveRoundFinished(round) {
 }
 
 function syncArchiveGlobals() {
+  if (archiveState) {
+    archiveState.timerSync = archiveTimerSync
+  }
+
   window.archiveState = archiveState
   window.archiveRevealState = archiveRevealState
   window.archiveRoundCache = archiveRoundCache
   window.archiveMaxRound = archiveMaxRound
+  window.archiveTimerSync = archiveTimerSync
 
   window.currentSegmentScores = {
     A: archiveState.scores.A,
@@ -176,31 +207,240 @@ function getArchiveDisplayThemeClass(round) {
   return "archiveThemeRound4"
 }
 
+function getArchiveModelId() {
+  return Number(
+    currentModel ||
+    window.currentModel ||
+    localStorage.getItem("game_model") ||
+    0
+  )
+}
+
+function getArchiveSupabaseCachePrefix() {
+  return typeof window.SUPABASE_CACHE_PREFIX === "string"
+    ? window.SUPABASE_CACHE_PREFIX
+    : "supabase_cache_v1:"
+}
+
+async function loadArchiveCachedData(table, options = {}) {
+  const finalOptions = {
+    ...options,
+    ttl: options.ttl ?? ARCHIVE_DATA_CACHE_TTL,
+    cache: options.cache !== false,
+    staleWhileRevalidate: options.staleWhileRevalidate !== false,
+    forceRefresh: options.forceRefresh === true
+  }
+
+  if (typeof window.cachedSupabaseSelect === "function") {
+    return await window.cachedSupabaseSelect(table, finalOptions)
+  }
+
+  try {
+    let query = db
+      .from(table)
+      .select(finalOptions.select || "*")
+
+    Object.entries(finalOptions.filters || {}).forEach(([column, filterValue]) => {
+      if (
+        filterValue &&
+        typeof filterValue === "object" &&
+        !Array.isArray(filterValue)
+      ) {
+        const operator = filterValue.operator || "eq"
+        const value = filterValue.value
+
+        if (operator === "in") {
+          query = query.in(column, Array.isArray(value) ? value : [])
+        } else if (operator === "gte") {
+          query = query.gte(column, value)
+        } else if (operator === "lte") {
+          query = query.lte(column, value)
+        } else if (operator === "is") {
+          query = query.is(column, value)
+        } else {
+          query = query.eq(column, value)
+        }
+
+        return
+      }
+
+      query = query.eq(column, filterValue)
+    })
+
+    const order = finalOptions.order || null
+
+    if (Array.isArray(order)) {
+      order.forEach(item => {
+        if (!item?.column) return
+
+        query = query.order(item.column, {
+          ascending: item.ascending !== false
+        })
+      })
+    } else if (order?.column) {
+      query = query.order(order.column, {
+        ascending: order.ascending !== false
+      })
+    }
+
+    if (Number(finalOptions.limit || 0) > 0) {
+      query = query.limit(Number(finalOptions.limit))
+    }
+
+    if (finalOptions.single) {
+      query = query.single()
+    } else if (finalOptions.maybeSingle) {
+      query = query.maybeSingle()
+    }
+
+    const { data, error } = await query
+
+    return {
+      data:
+        data ??
+        (
+          finalOptions.single ||
+          finalOptions.maybeSingle
+            ? null
+            : []
+        ),
+      error: error || null,
+      source: "network"
+    }
+  } catch (error) {
+    console.log(`ARCHIVE DIRECT LOAD ERROR [${table}]:`, error)
+
+    return {
+      data:
+        finalOptions.single ||
+        finalOptions.maybeSingle
+          ? null
+          : [],
+      error,
+      source: "error"
+    }
+  }
+}
+
+function createArchiveTimerSync(seconds = 30) {
+  const now = Date.now()
+  const duration = Math.max(0, Number(seconds || 0))
+
+  return {
+    startedAt: now,
+    endsAt: now + duration * 1000,
+    duration
+  }
+}
+
+function clearArchiveTimerSync() {
+  archiveTimerSync = null
+  if (archiveState) archiveState.timerSync = null
+  window.archiveTimerSync = null
+}
+
+function getArchiveTimerRemaining(fallback = 30) {
+  if (
+    archiveTimerSync &&
+    Number(archiveTimerSync.endsAt || 0) > Date.now()
+  ) {
+    return Math.max(
+      0,
+      Math.ceil((Number(archiveTimerSync.endsAt) - Date.now()) / 1000)
+    )
+  }
+
+  return Number(fallback || 30)
+}
+
+function setArchiveGameActiveTeam(team) {
+  const cleanTeam =
+    team === "A" || team === "B"
+      ? team
+      : ""
+
+  if (cleanTeam) {
+    selectedTeam = cleanTeam
+
+    if (typeof setGameActiveTeam === "function") {
+      setGameActiveTeam(cleanTeam, {
+        sync: false
+      })
+    }
+  }
+}
+
+function clearArchiveGameActiveTeam() {
+  selectedTeam = null
+
+  if (typeof clearGameActiveTeam === "function") {
+    clearGameActiveTeam({
+      sync: false
+    })
+  }
+}
+
 /* =========================
    Load round data
 ========================= */
 
 async function loadArchiveRoundData(round) {
-  const { data: boxData, error: boxError } = await db
-    .from("archive_boxes")
-    .select("*")
-    .eq("model", currentModel)
-    .eq("round", round)
-    .limit(1)
+  const modelId = getArchiveModelId()
+  const safeRound = Number(round || 1)
 
-  const { data: itemsData, error: itemsError } = await db
-    .from("archive_items")
-    .select("*")
-    .eq("model", currentModel)
-    .eq("round", round)
-    .order("position", { ascending: true })
+  if (!modelId || !safeRound) {
+    return {
+      box: null,
+      items: []
+    }
+  }
 
-  if (boxError) console.log(boxError)
-  if (itemsError) console.log(itemsError)
+  const [boxRes, itemsRes] = await Promise.all([
+    loadArchiveCachedData(
+      "archive_boxes",
+      {
+        select: "*",
+        filters: {
+          model: modelId,
+          round: safeRound
+        },
+        limit: 1,
+        ttl: ARCHIVE_DATA_CACHE_TTL,
+        cacheKey:
+          `${getArchiveSupabaseCachePrefix()}archive_box:${modelId}:${safeRound}`
+      }
+    ),
+
+    loadArchiveCachedData(
+      "archive_items",
+      {
+        select: "*",
+        filters: {
+          model: modelId,
+          round: safeRound
+        },
+        order: {
+          column: "position",
+          ascending: true
+        },
+        ttl: ARCHIVE_DATA_CACHE_TTL,
+        cacheKey:
+          `${getArchiveSupabaseCachePrefix()}archive_items:${modelId}:${safeRound}`
+      }
+    )
+  ])
+
+  if (boxRes.error && !(boxRes.data || []).length) {
+    console.log("LOAD ARCHIVE BOX ERROR:", boxRes.error)
+  }
+
+  if (itemsRes.error && !(itemsRes.data || []).length) {
+    console.log("LOAD ARCHIVE ITEMS ERROR:", itemsRes.error)
+  }
 
   return {
-    box: boxData?.[0] || null,
-    items: itemsData || []
+    box: boxRes.data?.[0] || null,
+    items: itemsRes.data || []
   }
 }
 
@@ -216,8 +456,14 @@ function getArchiveState() {
   }
 }
 
-function saveArchiveState() {
+let archiveStateSyncTimer = null
+let archiveStateSyncQueued = false
+let archiveStateSyncPending = false
+
+function saveArchiveState(options = {}) {
   const timerBox = document.getElementById("archiveTimerValue")
+
+  syncArchiveGlobals()
 
   const state = {
     archiveRevealState: JSON.parse(JSON.stringify(archiveRevealState || {})),
@@ -226,6 +472,9 @@ function saveArchiveState() {
     archiveTurnLocked,
     archiveTimerStarted,
     archiveLastTickPlayed,
+    archiveTimerSync: archiveTimerSync
+      ? JSON.parse(JSON.stringify(archiveTimerSync))
+      : null,
     archiveState: JSON.parse(JSON.stringify(archiveState || {})),
     archiveDoubleState: JSON.parse(JSON.stringify(archiveDoubleState || {})),
     archiveMaxRound,
@@ -236,12 +485,61 @@ function saveArchiveState() {
   localStorage.setItem(ARCHIVE_STORAGE_KEY, JSON.stringify(state))
   localStorage.setItem("active_segment", "archive")
 
-  if (typeof saveUnifiedGameState === "function") {
-    saveUnifiedGameState()
+  if (options.sync === false) {
+    return
   }
 
-  if (typeof syncDisplayStateToSession === "function") {
-    syncDisplayStateToSession()
+  const immediate = options.immediate === true
+  const delay = immediate ? 0 : 120
+
+  archiveStateSyncPending = true
+
+  clearTimeout(archiveStateSyncTimer)
+
+  archiveStateSyncTimer = setTimeout(() => {
+    runArchiveStateSync(immediate)
+  }, delay)
+}
+
+async function runArchiveStateSync(immediate = false) {
+  if (archiveStateSyncQueued) {
+    archiveStateSyncPending = true
+    return
+  }
+
+  if (
+    typeof saveUnifiedGameState !== "function" &&
+    typeof syncDisplayStateToSession !== "function"
+  ) {
+    archiveStateSyncPending = false
+    return
+  }
+
+  archiveStateSyncQueued = true
+  archiveStateSyncPending = false
+
+  try {
+    if (typeof saveUnifiedGameState === "function") {
+      await Promise.resolve(saveUnifiedGameState())
+    }
+
+    if (typeof syncDisplayStateToSession === "function") {
+      await Promise.resolve(
+        syncDisplayStateToSession({
+          immediate
+        })
+      )
+    }
+  } catch (error) {
+    console.log("ARCHIVE STATE SYNC ERROR:", error)
+  } finally {
+    archiveStateSyncQueued = false
+
+    if (archiveStateSyncPending) {
+      archiveStateSyncTimer = setTimeout(() => {
+        runArchiveStateSync(true)
+      }, 60)
+    }
   }
 }
 
@@ -266,6 +564,7 @@ function restoreArchiveState(saved) {
   archiveLastTeam = saved.archiveLastTeam || null
   archiveTurnLocked = !!saved.archiveTurnLocked
   archiveTimerStarted = !!saved.archiveTimerStarted
+  archiveTimerSync = saved.archiveTimerSync || saved.archiveState?.timerSync || null
   archiveState = saved.archiveState || archiveState
 
   archiveState.round = Math.min(
@@ -294,11 +593,12 @@ function restoreArchiveState(saved) {
   renderArchiveRoundUI()
   updateArchiveRequestedInput()
 
-  const timerValue = Number(saved.timerValue || 30)
+  const timerValue = getArchiveTimerRemaining(saved.timerValue || 30)
 
   if (archiveTimerStarted && timerValue > 0) {
     resumeArchiveTimer(timerValue)
   } else {
+    clearArchiveTimerSync()
     setArchiveTimerValue(timerValue)
   }
 
@@ -344,9 +644,23 @@ window.renderArchive = async function () {
   window.archiveState = archiveState
   window.currentSegmentScores = { A: 0, B: 0 }
 
-  for (let r = 1; r <= archiveMaxRound; r++) {
-    archiveRoundCache[r] = await loadArchiveRoundData(r) || { box: null, items: [] }
-  }
+  const roundEntries = await Promise.all(
+    Array.from({ length: archiveMaxRound }, async (_, i) => {
+      const round = i + 1
+
+      return [
+        round,
+        await loadArchiveRoundData(round)
+      ]
+    })
+  )
+
+  roundEntries.forEach(([round, data]) => {
+    archiveRoundCache[round] = data || {
+      box: null,
+      items: []
+    }
+  })
 
   syncArchiveGlobals()
 
@@ -356,7 +670,7 @@ window.renderArchive = async function () {
     restoreArchiveState(saved)
   } else {
     renderArchiveRoundUI()
-    saveArchiveState()
+    saveArchiveState({ immediate: true })
     updateArchiveEndState()
   }
 }
@@ -493,8 +807,9 @@ function resetArchiveTimer() {
   archiveTimer = null
   archiveTimerStarted = false
   archiveLastTickPlayed = null
+  clearArchiveTimerSync()
   setArchiveTimerValue(30)
-  saveArchiveState()
+  saveArchiveState({ immediate: true })
 }
 
 function startArchiveTimer() {
@@ -510,14 +825,16 @@ function runArchiveTimer(startValue) {
   archiveTimer = null
 
   let time = Number(startValue || 30)
+
   archiveTimerStarted = true
   archiveLastTickPlayed = null
+  archiveTimerSync = createArchiveTimerSync(time)
 
   setArchiveTimerValue(time)
-  saveArchiveState()
+  saveArchiveState({ immediate: true })
 
   archiveTimer = setInterval(() => {
-    time--
+    time = Math.max(0, time - 1)
     setArchiveTimerValue(time)
 
     if (time > 0 && time <= 5 && archiveLastTickPlayed !== time) {
@@ -525,17 +842,19 @@ function runArchiveTimer(startValue) {
       playGameSound("tick")
     }
 
-    saveArchiveState()
-
-    if (time <= 0) {
-      clearInterval(archiveTimer)
-      archiveTimer = null
-      archiveTimerStarted = false
-      archiveLastTickPlayed = null
-      setArchiveTimerValue(0)
-      playGameSound("timeout")
-      saveArchiveState()
+    if (time > 0) {
+      saveArchiveState({ sync: false })
+      return
     }
+
+    clearInterval(archiveTimer)
+    archiveTimer = null
+    archiveTimerStarted = false
+    archiveLastTickPlayed = null
+    clearArchiveTimerSync()
+    setArchiveTimerValue(0)
+    playGameSound("timeout")
+    saveArchiveState({ immediate: true })
   }, 1000)
 }
 
@@ -600,11 +919,12 @@ function selectArchiveTeam(team) {
   }
 
   archiveState.activeTeam = team
-  selectedTeam = team
   archiveTurnLocked = false
 
+  setArchiveGameActiveTeam(team)
+
   highlightArchiveTeam()
-  saveArchiveState()
+  saveArchiveState({ immediate: true })
 
   setTimeout(() => {
     highlightArchiveTeam()
@@ -630,6 +950,12 @@ function getArchiveTeamBox(team) {
 
 function highlightArchiveTeam() {
   const team = archiveState.activeTeam || null
+
+  if (team === "A" || team === "B") {
+    setArchiveGameActiveTeam(team)
+  } else {
+    clearArchiveGameActiveTeam()
+  }
 
   document.querySelectorAll(".archiveTeamCurrent").forEach(el => {
     el.classList.remove("archiveTeamCurrent")
@@ -689,7 +1015,7 @@ function activateArchiveDouble() {
   showGameToast(`تم تفعيل الدوبيلا لفريق ${team === "A" ? teamAName : teamBName}`)
 
   updateArchiveDoubleButton()
-  saveArchiveState()
+  saveArchiveState({ immediate: true })
 }
 
 function getArchiveScoreMultiplier(team) {
@@ -796,7 +1122,7 @@ function restoreArchiveSnapshot(snapshot) {
   renderArchiveRoundUI()
   setArchiveTimerValue(30)
   updateArchiveUndoButtonState()
-  saveArchiveState()
+  saveArchiveState({ immediate: true })
   updateArchiveEndState()
 }
 
@@ -900,7 +1226,7 @@ function renderArchiveRoundUI() {
 
   updateArchiveDoubleButton()
   syncArchiveGlobals()
-  saveArchiveState()
+  saveArchiveState({ sync: false })
   updateArchiveUndoButtonState()
   updateArchiveEndState()
 }
@@ -1051,7 +1377,7 @@ function toggleArchiveItem(position) {
   advanceArchiveTurn()
   syncArchiveGlobals()
   renderArchiveRoundUI()
-  saveArchiveState()
+  saveArchiveState({ immediate: true })
   updateArchiveEndState()
 }
 
@@ -1090,7 +1416,7 @@ function addArchiveError() {
   advanceArchiveTurn()
   syncArchiveGlobals()
   renderArchiveRoundUI()
-  saveArchiveState()
+  saveArchiveState({ immediate: true })
   updateArchiveEndState()
 }
 
@@ -1157,7 +1483,7 @@ function showArchiveAnswer() {
   advanceArchiveTurn()
   syncArchiveGlobals()
   renderArchiveRoundUI()
-  saveArchiveState()
+  saveArchiveState({ immediate: true })
   updateArchiveEndState()
 }
 
@@ -1167,15 +1493,25 @@ function showArchiveAnswer() {
 
 async function ensureArchiveRoundLoaded(round) {
   if (!archiveRoundCache[round]) {
-    archiveRoundCache[round] = { box: null, items: [] }
+    archiveRoundCache[round] = {
+      box: null,
+      items: []
+    }
   }
 
   const hasLoaded =
     archiveRoundCache[round].box ||
-    (Array.isArray(archiveRoundCache[round].items) && archiveRoundCache[round].items.length)
+    (
+      Array.isArray(archiveRoundCache[round].items) &&
+      archiveRoundCache[round].items.length
+    )
 
   if (!hasLoaded) {
-    archiveRoundCache[round] = await loadArchiveRoundData(round) || { box: null, items: [] }
+    archiveRoundCache[round] =
+      await loadArchiveRoundData(round) || {
+        box: null,
+        items: []
+      }
   }
 }
 
@@ -1188,6 +1524,7 @@ async function setArchiveRound(round) {
 
   archiveState.round = safeRound
   archiveState.activeTeam = null
+    archiveState.activeTeam = null
   archiveLastTeam = null
   archiveTurnLocked = false
   archiveRemainingPoints = 0
@@ -1202,7 +1539,7 @@ async function setArchiveRound(round) {
 
   syncArchiveGlobals()
   renderArchiveRoundUI()
-  saveArchiveState()
+  saveArchiveState({ immediate: true })
   updateArchiveEndState()
 }
 
@@ -1248,3 +1585,42 @@ function updateArchiveNavButtons() {
     btn.disabled = currentRound <= 1
   })
 }
+
+window.selectArchiveTeam =
+  selectArchiveTeam
+
+window.forceArchiveTeamFromPresenter =
+  selectArchiveTeam
+
+window.openArchiveNumber =
+  toggleArchiveItem
+
+window.openArchiveItem =
+  toggleArchiveItem
+
+window.showArchiveAnswer =
+  showArchiveAnswer
+
+window.startArchiveTimer =
+  startArchiveTimer
+
+window.activateArchiveDouble =
+  activateArchiveDouble
+
+window.addArchiveError =
+  addArchiveError
+
+window.addArchiveWrong =
+  addArchiveError
+
+window.archiveWrong =
+  addArchiveError
+
+window.undoArchiveAction =
+  undoArchiveAction
+
+window.nextArchiveRound =
+  nextArchiveRound
+
+window.setArchiveRound =
+  setArchiveRound

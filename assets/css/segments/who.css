@@ -1,9 +1,10 @@
 /* =========================================================
    WHO / من هو - CLEAN FINAL
+   NO PATCHES - NO BOLD EXCEPT NUMBER BUTTONS
 ========================================================= */
 
 /* =========================
-   BASE
+   1) BASE
 ========================= */
 
 .whoWrap,
@@ -66,7 +67,7 @@
 }
 
 /* =========================
-   HEADER
+   2) HEADER
 ========================= */
 
 .whoHeader{
@@ -104,7 +105,7 @@
   color:#fff;
 
   font-size:.9rem;
-  font-weight:900;
+  font-weight:400;
   line-height:1;
 
   transition:
@@ -131,7 +132,7 @@
 }
 
 /* =========================
-   TITLE + TIMER
+   3) TITLE + TIMER
 ========================= */
 
 .whoTitle{
@@ -150,9 +151,10 @@
   color:var(--secondary);
   font-size:clamp(1.35rem,1.8vw,1.95rem);
   line-height:1;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 }
+
 .whoTimerHidden{
   position:absolute;
   width:1px;
@@ -178,14 +180,26 @@
 
 .whoTimerPill strong{
   color:#fff;
+  -webkit-text-fill-color:#fff;
+
   font-size:clamp(1.6rem,2.3vw,2.3rem);
   line-height:1;
-  font-weight:900;
+  font-weight:400;
+
+  opacity:1;
+  visibility:visible;
 }
 
 .whoTimerPill.timerDanger{
   background:#7F0000;
   animation:whoTimerPulse .75s ease-in-out infinite;
+}
+
+.whoTimerPill.timerDanger strong{
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+  opacity:1;
+  visibility:visible;
 }
 
 @keyframes whoTimerPulse{
@@ -199,7 +213,7 @@
 }
 
 /* =========================
-   TEAMS
+   4) TEAMS
 ========================= */
 
 .whoTeamMini{
@@ -266,9 +280,9 @@
   width:100%;
 
   color:var(--text);
-  font-size:clamp(1.12rem,1.55vw,1.45rem);
-  line-height:1.18;
-  font-weight:900;
+  font-size:clamp(1.22rem,1.75vw,1.62rem);
+  line-height:1.12;
+  font-weight:400;
   text-align:center;
 
   white-space:normal;
@@ -296,7 +310,7 @@
 
   font-size:1.35rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 }
 
 .whoTeamMini.whoTeamCurrent > b{
@@ -304,7 +318,7 @@
 }
 
 /* =========================
-   POINTS CARD
+   5) POINTS CARD
 ========================= */
 
 .whoPointsCard{
@@ -342,7 +356,7 @@
 
   font-size:clamp(1rem,1.25vw,1.2rem);
   line-height:1.2;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
@@ -370,7 +384,7 @@
   color:var(--secondary);
 
   font-size:.92rem;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 }
 
@@ -389,7 +403,7 @@
 
   font-size:1.75rem;
   line-height:1;
-  font-weight:900;
+  font-weight:700;
 
   transition:
     transform .15s ease,
@@ -412,7 +426,7 @@
 }
 
 /* =========================
-   IMAGE STAGE / CONTENT
+   6) IMAGE STAGE / CONTENT
 ========================= */
 
 .whoImageStage{
@@ -458,7 +472,7 @@
 
   font-size:clamp(1.5rem,2.2vw,2.3rem);
   line-height:1.25;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 }
 
@@ -487,7 +501,7 @@
 }
 
 /* =========================
-   NUMBERS GRID - SAME TOP10 / WARMUP
+   7) NUMBERS GRID
 ========================= */
 
 .whoGrid{
@@ -530,7 +544,7 @@
 
   font-size:clamp(2rem,3vw,3.3rem);
   line-height:1;
-  font-weight:900;
+  font-weight:700;
 
   transition:
     transform .15s ease,
@@ -564,7 +578,7 @@
 }
 
 /* =========================
-   RESULT VIEW
+   8) RESULT VIEW
 ========================= */
 
 .whoResultView{
@@ -637,8 +651,9 @@
   color:#fff;
 
   font-size:.95rem;
-  font-weight:900;
+  font-weight:400;
 }
+
 .whoResultView.correctResult .whoResultAnswerLabel{
   background:#007F00;
   color:#fff;
@@ -662,7 +677,7 @@
 
   font-size:clamp(1.8rem,2.8vw,3rem);
   line-height:1.35;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
@@ -678,7 +693,7 @@
 }
 
 /* =========================
-   ACTION BAR - FIXED BOTTOM
+   9) ACTION BAR
 ========================= */
 
 .whoActionBar{
@@ -718,7 +733,7 @@
 
   font-size:1rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   transition:
@@ -771,7 +786,7 @@
 }
 
 /* =========================
-   IMAGE OVERLAY
+   10) IMAGE OVERLAY
 ========================= */
 
 .whoImageOverlay{
@@ -807,49 +822,65 @@
 }
 
 .whoImageOverlayTimer{
-  position:fixed;
-  top:22px;
-  right:22px;
+  position:absolute;
+  top:50%;
+  right:24px;
   z-index:10000;
 
-  width:96px;
-  height:96px;
+  width:150px;
+  height:140px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  border-radius:26px;
+  padding:10px;
+  border-radius:20px;
 
-  background:#FE7F2D;
+  background:var(--primary);
   color:#fff;
+  -webkit-text-fill-color:#fff;
 
-  border:3px solid rgba(255,255,255,.35);
+  border:2px solid rgba(255,255,255,.65);
+  box-shadow:0 14px 34px rgba(254,127,45,.30);
 
-  font-size:3rem;
+  font-size:clamp(3rem,4.6vw,5rem);
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
-  box-shadow:
-    0 14px 34px rgba(0,0,0,.35),
-    inset 0 0 0 1px rgba(255,255,255,.18);
+  transform:translateY(-50%) scale(1);
+  transform-origin:center center;
+
+  opacity:1;
+  visibility:visible;
 }
+
 .whoImageOverlayTimer.timerDanger{
   background:#7F0000;
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+
+  box-shadow:
+    0 0 0 4px rgba(127,0,0,.22),
+    0 14px 34px rgba(127,0,0,.38);
+
   animation:whoOverlayTimerPulse .75s ease-in-out infinite;
+
+  opacity:1;
+  visibility:visible;
 }
 
 @keyframes whoOverlayTimerPulse{
   0%{
-    transform:scale(1);
+    transform:translateY(-50%) scale(1);
   }
 
   50%{
-    transform:scale(1.08);
+    transform:translateY(-50%) scale(1.08);
   }
 
   100%{
-    transform:scale(1);
+    transform:translateY(-50%) scale(1);
   }
 }
 
@@ -905,7 +936,7 @@
 }
 
 /* =========================
-   IPAD LANDSCAPE
+   11) IPAD LANDSCAPE
 ========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
@@ -963,8 +994,8 @@
   }
 
   .whoTeamName strong{
-    font-size:.82rem;
-    line-height:1.15;
+    font-size:1.04rem;
+    line-height:1.1;
   }
 
   .whoTeamMini > b{
@@ -1080,96 +1111,21 @@
     font-size:1.65rem;
     line-height:1.35;
   }
-}
 
-/* =========================
-   PHONE
-========================= */
+  .whoImageOverlayTimer{
+    right:20px;
 
-@media (max-width:767px){
-  .whoWrap{
-    max-height:none;
-    overflow:auto;
+    width:126px;
+    height:118px;
 
-    padding:
-      calc(8px + env(safe-area-inset-top,0px))
-      calc(8px + env(safe-area-inset-right,0px))
-      calc(8px + env(safe-area-inset-bottom,0px))
-      calc(8px + env(safe-area-inset-left,0px));
+    border-radius:18px;
 
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-  }
-
-  .whoHeader{
-    height:auto;
-    min-height:0;
-
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-
-    padding:8px;
-    margin-top:0;
-  }
-
-  .whoTitle{
-    grid-column:1 / -1;
-    order:-1;
-  }
-
-  .whoTeamMini.teamA,
-  .whoTeamMini.teamB{
-    grid-template-columns:minmax(0,1fr) 52px;
-  }
-
-  .whoPointsCard{
-    width:100%;
-    height:auto;
-    min-height:150px;
-    margin-top:0;
-
-    grid-template-columns:1fr;
-  }
-
-  .whoPointsSide{
-    grid-template-columns:repeat(5,minmax(0,1fr));
-    grid-template-rows:38px 62px;
-  }
-
-  .whoPointsLabel{
-    grid-column:1 / -1;
-  }
-
-  .whoImageStage{
-    height:300px;
-    margin-top:0;
-  }
-
-  .whoGrid{
-    width:100%;
-    height:260px;
-    min-height:260px;
-
-    grid-template-columns:repeat(5,minmax(0,1fr));
-    grid-template-rows:repeat(3,minmax(0,1fr));
-  }
-
-  .whoActionBar{
-    width:100%;
-    height:auto;
-    min-height:0;
-
-    grid-template-columns:1fr;
-  }
-
-  .whoResultView{
-    grid-template-columns:1fr;
+    font-size:3.25rem;
   }
 }
 
 /* =========================
-   REDUCED MOTION
+   12) REDUCED MOTION
 ========================= */
 
 @media (prefers-reduced-motion:reduce){
@@ -1178,67 +1134,5 @@
   .whoWrap *::after{
     animation:none;
     transition:none;
-  }
-}
-/* =========================
-   WHO IMAGE OVERLAY TIMER
-   فقط في وضع التكبير
-   يمين في النص - برتقالي
-========================= */
-
-.whoImageOverlayTimer{
-  position:absolute !important;
-  top:50% !important;
-  right:24px !important;
-
-  width:150px !important;
-  height:140px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  padding:10px !important;
-  border-radius:20px !important;
-
-  background:var(--primary) !important;
-  color:#fff !important;
-
-  border:2px solid rgba(255,255,255,.65) !important;
-  box-shadow:0 14px 34px rgba(254,127,45,.30) !important;
-
-  font-size:clamp(3rem,4.6vw,5rem) !important;
-  line-height:1 !important;
-  font-weight:900 !important;
-
-  z-index:50 !important;
-
-  transform:translateY(-50%) scale(1);
-  transform-origin:center center;
-}
-
-/* آخر 5 ثواني */
-.whoImageOverlayTimer.timerDanger{
-  background:#7F0000 !important;
-  color:#fff !important;
-
-  box-shadow:
-    0 0 0 4px rgba(127,0,0,.22),
-    0 14px 34px rgba(127,0,0,.38) !important;
-
-  animation:whoOverlayTimerPulse .75s ease-in-out infinite !important;
-}
-
-@keyframes whoOverlayTimerPulse{
-  0%{
-    transform:translateY(-50%) scale(1);
-  }
-
-  50%{
-    transform:translateY(-50%) scale(1.08);
-  }
-
-  100%{
-    transform:translateY(-50%) scale(1);
   }
 }

@@ -70,6 +70,21 @@ async function dbSelect(
   }
 }
 
+function invalidateDatabaseCache(
+  table,
+  payload = null
+) {
+  if (
+    typeof window.invalidateSupabaseWriteCache ===
+    "function"
+  ) {
+    window.invalidateSupabaseWriteCache(
+      table,
+      payload
+    )
+  }
+}
+
 async function dbUpsert(
   table,
   rows,
@@ -116,6 +131,11 @@ async function dbUpsert(
       }
     }
 
+    invalidateDatabaseCache(
+      table,
+      data ?? rows
+    )
+
     return {
       ok: true,
       data: data ?? null,
@@ -134,6 +154,7 @@ async function dbUpsert(
     }
   }
 }
+
 
 async function dbInsert(
   table,
@@ -177,6 +198,11 @@ async function dbInsert(
         error
       }
     }
+
+    invalidateDatabaseCache(
+      table,
+      data ?? rows
+    )
 
     return {
       ok: true,
@@ -240,6 +266,11 @@ async function dbUpdate(
       }
     }
 
+    invalidateDatabaseCache(
+      table,
+      data ?? values
+    )
+
     return {
       ok: true,
       data: data ?? null,
@@ -302,11 +333,17 @@ async function dbDelete(
       }
     }
 
+    invalidateDatabaseCache(
+      table,
+      data ?? null
+    )
+
     return {
       ok: true,
       data: data ?? fallback,
       error: null
     }
+
   } catch (error) {
     console.error(
       `[DB DELETE CATCH] ${logLabel}:`,
@@ -321,8 +358,20 @@ async function dbDelete(
   }
 }
 
-window.dbSelect = dbSelect
-window.dbUpsert = dbUpsert
-window.dbInsert = dbInsert
-window.dbUpdate = dbUpdate
-window.dbDelete = dbDelete
+window.dbSelect =
+  dbSelect
+
+window.dbUpsert =
+  dbUpsert
+
+window.dbInsert =
+  dbInsert
+
+window.dbUpdate =
+  dbUpdate
+
+window.dbDelete =
+  dbDelete
+
+window.invalidateDatabaseCache =
+  invalidateDatabaseCache

@@ -1,0 +1,1273 @@
+/* =========================================================
+   RANDOM CHALLENGE PRESENTER - CLEAN FINAL
+========================================================= */
+
+.presenterRandomControlView,
+.presenterRandomControlView *{
+  box-sizing:border-box;
+}
+
+.presenterRandomControlView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:
+    clamp(72px,10dvh,90px)
+    minmax(0,1fr)
+    clamp(64px,9dvh,82px);
+
+  gap:10px;
+
+  color:var(--p-text);
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.presenterRandomControlHeader{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:clamp(98px,12vw,130px) minmax(0,1fr) clamp(98px,12vw,130px);
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--p-secondary);
+  border:2px solid var(--p-secondary);
+  border-radius:24px;
+}
+
+.presenterRandomControlView[data-random-mode="select"] .presenterRandomControlHeader{
+  grid-template-columns:minmax(0,1fr) minmax(260px,32vw,420px);
+}
+
+.presenterRandomHeaderTitle{
+  min-width:0;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  background:var(--p-primary);
+  color:#FFFFFF;
+
+  border-radius:18px;
+}
+
+.presenterRandomHeaderTitle strong{
+  min-width:0;
+
+  font-size:28px;
+  line-height:1;
+  font-weight:400;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.presenterRandomHeaderTitle span{
+  width:44px;
+  height:44px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#FFFFFF;
+  color:var(--p-primary);
+
+  border-radius:14px;
+
+  font-size:22px;
+  line-height:1;
+}
+
+.presenterRandomBackBtn,
+.presenterRandomEndBtn{
+  width:100%;
+  height:100%;
+
+  border:0;
+  border-radius:18px;
+
+  color:#FFFFFF;
+  font-family:inherit;
+  font-size:20px;
+  line-height:1;
+  font-weight:400;
+
+  cursor:pointer;
+}
+
+.presenterRandomBackBtn{
+  background:var(--p-muted);
+}
+
+.presenterRandomEndBtn{
+  background:var(--p-red);
+}
+
+.presenterRandomHeaderScores,
+.presenterRandomScorePanel{
+  min-width:0;
+  height:100%;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.presenterRandomHeaderScores span,
+.presenterRandomScorePanel span{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+
+  padding:0 14px;
+
+  background:#FFFFFF;
+  color:var(--p-secondary);
+
+  border:2px solid rgba(255,255,255,.35);
+  border-radius:18px;
+
+  font-size:18px;
+  line-height:1;
+}
+
+.presenterRandomHeaderScores strong,
+.presenterRandomScorePanel strong{
+  min-width:42px;
+  height:42px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--p-primary);
+  color:#FFFFFF;
+
+  border-radius:14px;
+
+  font-size:24px;
+  line-height:1;
+  font-weight:400;
+}
+
+/* =========================
+   SELECT VIEW
+========================= */
+
+.presenterRandomSelectMain{
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+
+  overflow:hidden;
+}
+
+.presenterRandomChooseGrid{
+  width:min(100%,980px);
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:12px;
+}
+
+.presenterRandomChooseBtn{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  justify-items:center;
+
+  padding:16px;
+
+  background:var(--p-soft);
+  color:var(--p-secondary);
+
+  border:2px solid var(--p-line);
+  border-radius:24px;
+
+  font-family:inherit;
+  cursor:pointer;
+}
+
+.presenterRandomChooseBtn span{
+  width:72px;
+  height:72px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--p-primary);
+  color:#FFFFFF;
+
+  border-radius:22px;
+
+  font-size:36px;
+  line-height:1;
+}
+
+.presenterRandomChooseBtn strong{
+  font-size:24px;
+  line-height:1.15;
+  font-weight:400;
+  text-align:center;
+}
+
+.presenterRandomChooseBtn.presenterOpened{
+  background:var(--p-disabled);
+  color:var(--p-disabled-text);
+  cursor:not-allowed;
+}
+
+.presenterRandomChooseBtn.presenterPendingNumber{
+  border-color:var(--p-primary);
+}
+
+/* =========================
+   PLAY VIEW
+========================= */
+
+.presenterRandomControlMain{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) clamp(230px,24vw,310px);
+  gap:10px;
+}
+
+.presenterRandomContentPanel,
+.presenterRandomSidePanel{
+  min-height:0;
+
+  display:grid;
+  gap:10px;
+
+  overflow:hidden;
+}
+
+.presenterRandomContentPanel{
+  grid-template-rows:minmax(0,1fr);
+}
+
+.presenterRandomSidePanel{
+  grid-template-rows:minmax(0,1fr) 82px;
+}
+
+.presenterRandomTeamsBox,
+.presenterRandomScorePanel{
+  min-height:0;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+}
+
+.presenterRandomTeamsBox{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  overflow:auto;
+}
+
+.presenterRandomCommandBar{
+  min-height:0;
+
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:minmax(0,1fr);
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+}
+
+.presenterRandomCommandBar .presenterBtn{
+  width:100%;
+  height:100%;
+  min-height:0;
+  font-size:20px;
+}
+
+/* =========================
+   QUESTION CARD
+========================= */
+
+.presenterRandomQuestionView,
+.presenterRandomFatblaQuestionView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:58px minmax(0,1fr);
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+
+  overflow:hidden;
+}
+
+.presenterRandomFatblaQuestionView{
+  grid-template-rows:58px minmax(90px,28%) minmax(0,1fr) auto auto;
+}
+
+.presenterRandomQuestionHeader{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+}
+
+.presenterRandomQuestionHeader strong{
+  min-width:0;
+
+  color:var(--p-secondary);
+  font-size:28px;
+  line-height:1;
+  font-weight:400;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.presenterRandomQuestionHeader span{
+  min-width:68px;
+  height:44px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0 12px;
+
+  background:var(--p-primary);
+  color:#FFFFFF;
+
+  border-radius:16px;
+
+  font-size:22px;
+  line-height:1;
+}
+
+.presenterRandomQuestionBody{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.presenterRandomQABox{
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:10px;
+
+  padding:14px;
+
+  background:#FFFFFF;
+  border:2px solid var(--p-line);
+  border-radius:22px;
+
+  overflow:hidden;
+}
+
+.presenterRandomQABox span{
+  color:var(--p-primary);
+  font-size:20px;
+  line-height:1;
+}
+
+.presenterRandomQABox strong{
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--p-secondary);
+  font-size:30px;
+  line-height:1.3;
+  font-weight:400;
+  text-align:center;
+
+  overflow:auto;
+}
+
+.presenterRandomQABox.answerBox{
+  background:var(--p-secondary);
+  border-color:var(--p-secondary);
+}
+
+.presenterRandomQABox.answerBox strong{
+  color:#FFFFFF;
+}
+
+/* =========================
+   BOX 1
+========================= */
+
+.presenterRandomPoolView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+}
+
+.presenterRandomPoolBtn{
+  min-height:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
+  background:var(--p-soft);
+  color:var(--p-secondary);
+
+  border:2px solid var(--p-line);
+  border-radius:24px;
+
+  font-family:inherit;
+  cursor:pointer;
+}
+
+.presenterRandomPoolBtn.active{
+  background:var(--p-primary);
+  border-color:var(--p-primary);
+  color:#FFFFFF;
+}
+
+.presenterRandomPoolBtn span{
+  font-size:58px;
+  line-height:1;
+}
+
+.presenterRandomPoolBtn strong{
+  font-size:30px;
+  line-height:1.15;
+  font-weight:400;
+}
+
+.presenterRandomPlayersView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+}
+
+.presenterRandomPlayerNames{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 70px minmax(0,1fr);
+  gap:12px;
+  align-items:center;
+}
+
+.presenterRandomPlayerNameCard{
+  min-width:0;
+  min-height:0;
+  height:100%;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:10px;
+
+  padding:12px;
+
+  background:var(--p-soft);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+}
+
+.presenterRandomPlayerImageBox{
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+.presenterRandomPlayerImageBox img,
+.presenterRandomPlayerPlaceholder{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  object-fit:contain;
+
+  background:#FFFFFF;
+  border:2px solid var(--p-line);
+  border-radius:20px;
+}
+
+.presenterRandomPlayerPlaceholder{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--p-muted);
+  font-size:52px;
+}
+
+.presenterRandomPlayerNameCard strong{
+  min-height:46px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--p-secondary);
+  font-size:24px;
+  line-height:1.2;
+  font-weight:400;
+  text-align:center;
+}
+
+.presenterRandomVsText{
+  width:70px;
+  height:70px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--p-primary);
+  color:#FFFFFF;
+
+  border-radius:22px;
+
+  font-size:24px;
+  line-height:1;
+}
+
+.presenterRandomStatusPanel{
+  min-height:70px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:12px;
+
+  background:var(--p-secondary);
+  color:#FFFFFF;
+
+  border-radius:22px;
+}
+
+.presenterRandomStatusPanel strong{
+  font-size:28px;
+  line-height:1.2;
+  font-weight:400;
+  text-align:center;
+}
+
+/* =========================
+   BOX 2 / METRICS
+========================= */
+
+.presenterRandomAuctionView,
+.presenterRandomBox4View,
+.presenterRandomKnowView{
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+}
+
+.presenterRandomAuctionInput{
+  width:100%;
+  height:68px;
+
+  padding:0 18px;
+
+  background:#FFFFFF;
+  color:var(--p-secondary);
+
+  border:2px solid var(--p-line);
+  border-radius:20px;
+
+  font-family:inherit;
+  font-size:28px;
+  line-height:1;
+  text-align:center;
+}
+
+.presenterRandomMetricsGrid{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterRandomMetric{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
+  align-items:center;
+
+  padding:12px;
+
+  background:var(--p-soft);
+  color:var(--p-secondary);
+
+  border:2px solid var(--p-line);
+  border-radius:22px;
+
+  font-family:inherit;
+}
+
+button.presenterRandomMetric{
+  cursor:pointer;
+}
+
+.presenterRandomMetric span{
+  color:var(--p-muted);
+  font-size:18px;
+  line-height:1;
+  text-align:center;
+}
+
+.presenterRandomMetric strong{
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--p-secondary);
+  font-size:36px;
+  line-height:1;
+  font-weight:400;
+  text-align:center;
+}
+
+.presenterRandomMetric.timerMetric strong,
+.presenterRandomTimerBox{
+  color:#FFFFFF;
+  background:var(--p-primary);
+}
+
+.presenterRandomMetric strong.danger,
+.presenterRandomTimerBox.danger{
+  background:var(--p-red);
+}
+
+/* =========================
+   BOX 3
+========================= */
+
+.presenterRandomKnowView{
+  grid-template-rows:92px minmax(0,1fr);
+}
+
+.presenterRandomTimerBox{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:22px;
+
+  font-size:46px;
+  line-height:1;
+}
+
+.presenterRandomKnowBoard{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.presenterRandomKnowTeam{
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:10px;
+  align-items:center;
+
+  padding:14px;
+
+  background:#FFFFFF;
+  border:2px solid var(--p-line);
+  border-radius:22px;
+}
+
+.presenterRandomKnowTeam.active{
+  border-color:var(--p-primary);
+  box-shadow:0 0 0 3px rgba(254,127,45,.18);
+}
+
+.presenterRandomKnowTeam span{
+  color:var(--p-secondary);
+  font-size:22px;
+  line-height:1.1;
+  text-align:center;
+}
+
+.presenterRandomKnowTeam strong{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--p-red);
+  font-size:42px;
+  line-height:1;
+  font-weight:400;
+}
+
+/* =========================
+   BOX 4
+========================= */
+
+.presenterRandomStartView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:18px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+}
+
+.presenterRandomStartView strong{
+  color:var(--p-secondary);
+  font-size:42px;
+  line-height:1.2;
+  font-weight:400;
+  text-align:center;
+}
+
+.presenterRandomBox4View{
+  grid-template-rows:minmax(0,1fr);
+}
+
+/* =========================
+   BOX 5
+========================= */
+
+.presenterRandomFatblaNumbersView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+}
+
+.presenterRandomFatblaNumbers{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+
+  overflow:auto;
+}
+
+.presenterRandomFatblaNumber{
+  min-height:92px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0;
+
+  background:var(--p-soft);
+  color:var(--p-secondary);
+
+  border:2px solid var(--p-line);
+  border-radius:22px;
+
+  font-size:36px;
+  line-height:1;
+  font-weight:400;
+
+  cursor:pointer;
+}
+
+.presenterRandomFatblaNumber.presenterOpened,
+.presenterRandomFatblaNumber:disabled{
+  background:var(--p-disabled);
+  color:var(--p-disabled-text);
+  cursor:not-allowed;
+}
+
+.presenterRandomMediaPreview,
+.presenterRandomMediaEmpty{
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--p-soft);
+  border:2px solid var(--p-line);
+  border-radius:22px;
+
+  overflow:hidden;
+}
+
+.presenterRandomMediaPreview img,
+.presenterRandomMediaPreview video{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.presenterRandomMediaEmpty{
+  color:var(--p-muted);
+  font-size:28px;
+}
+
+.presenterRandomNote,
+.presenterRandomBlockStatus{
+  min-height:46px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  padding:8px 12px;
+
+  background:#FFFFFF;
+  border:2px solid var(--p-line);
+  border-radius:18px;
+
+  color:var(--p-secondary);
+  font-size:20px;
+  line-height:1.2;
+  text-align:center;
+}
+
+.presenterRandomBlockStatus{
+  background:var(--p-secondary);
+  color:#FFFFFF;
+}
+
+.presenterRandomBlockStatus strong{
+  min-width:46px;
+  height:34px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--p-primary);
+  color:#FFFFFF;
+
+  border-radius:12px;
+
+  font-size:22px;
+  line-height:1;
+  font-weight:400;
+}
+
+/* =========================
+   IPHONE PRO MAX LANDSCAPE
+========================= */
+
+@media (orientation:landscape) and (max-width:950px) and (max-height:500px){
+  .presenterRandomControlView{
+    grid-template-rows:
+      clamp(56px,14dvh,68px)
+      minmax(0,1fr)
+      clamp(52px,13dvh,62px);
+
+    gap:8px;
+  }
+
+  .presenterRandomControlHeader{
+    grid-template-columns:82px minmax(0,1fr) 82px;
+    gap:8px;
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .presenterRandomControlView[data-random-mode="select"] .presenterRandomControlHeader{
+    grid-template-columns:minmax(0,1fr) 260px;
+  }
+
+  .presenterRandomHeaderTitle{
+    border-radius:15px;
+  }
+
+  .presenterRandomHeaderTitle strong{
+    font-size:21px;
+  }
+
+  .presenterRandomHeaderTitle span{
+    width:34px;
+    height:34px;
+    border-radius:11px;
+    font-size:16px;
+  }
+
+  .presenterRandomBackBtn,
+  .presenterRandomEndBtn{
+    border-radius:15px;
+    font-size:16px;
+  }
+
+  .presenterRandomHeaderScores,
+  .presenterRandomScorePanel{
+    gap:8px;
+  }
+
+  .presenterRandomHeaderScores span,
+  .presenterRandomScorePanel span{
+    padding:0 8px;
+    border-radius:15px;
+    font-size:13px;
+  }
+
+  .presenterRandomHeaderScores strong,
+  .presenterRandomScorePanel strong{
+    min-width:32px;
+    height:32px;
+    border-radius:11px;
+    font-size:18px;
+  }
+
+  .presenterRandomSelectMain{
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .presenterRandomChooseGrid{
+    gap:8px;
+  }
+
+  .presenterRandomChooseBtn{
+    gap:8px;
+    padding:10px;
+    border-radius:18px;
+  }
+
+  .presenterRandomChooseBtn span{
+    width:48px;
+    height:48px;
+    border-radius:16px;
+    font-size:25px;
+  }
+
+  .presenterRandomChooseBtn strong{
+    font-size:17px;
+  }
+
+  .presenterRandomControlMain{
+    grid-template-columns:minmax(0,1fr) 180px;
+    gap:8px;
+  }
+
+  .presenterRandomContentPanel,
+  .presenterRandomSidePanel{
+    gap:8px;
+  }
+
+  .presenterRandomSidePanel{
+    grid-template-rows:minmax(0,1fr) 58px;
+  }
+
+  .presenterRandomTeamsBox,
+  .presenterRandomScorePanel,
+  .presenterRandomCommandBar{
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .presenterRandomCommandBar{
+    gap:8px;
+  }
+
+  .presenterRandomCommandBar .presenterBtn{
+    font-size:15px;
+  }
+
+  .presenterRandomQuestionView,
+  .presenterRandomFatblaQuestionView{
+    grid-template-rows:42px minmax(0,1fr);
+    gap:8px;
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .presenterRandomFatblaQuestionView{
+    grid-template-rows:42px minmax(60px,25%) minmax(0,1fr) auto auto;
+  }
+
+  .presenterRandomQuestionHeader strong{
+    font-size:20px;
+  }
+
+  .presenterRandomQuestionHeader span{
+    min-width:46px;
+    height:32px;
+    border-radius:12px;
+    font-size:15px;
+  }
+
+  .presenterRandomQuestionBody{
+    gap:8px;
+  }
+
+  .presenterRandomQABox{
+    gap:8px;
+    padding:8px;
+    border-radius:16px;
+  }
+
+  .presenterRandomQABox span{
+    font-size:15px;
+  }
+
+  .presenterRandomQABox strong{
+    font-size:clamp(17px,4.4dvh,22px);
+    line-height:1.22;
+  }
+
+  .presenterRandomPoolView,
+  .presenterRandomPlayersView,
+  .presenterRandomAuctionView,
+  .presenterRandomBox4View,
+  .presenterRandomKnowView,
+  .presenterRandomStartView,
+  .presenterRandomFatblaNumbersView{
+    gap:8px;
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .presenterRandomPoolBtn{
+    gap:8px;
+    border-radius:18px;
+  }
+
+  .presenterRandomPoolBtn span{
+    font-size:34px;
+  }
+
+  .presenterRandomPoolBtn strong{
+    font-size:20px;
+  }
+
+  .presenterRandomPlayerNames{
+    grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);
+    gap:8px;
+  }
+
+  .presenterRandomPlayerNameCard{
+    gap:8px;
+    padding:8px;
+    border-radius:18px;
+  }
+
+  .presenterRandomPlayerImageBox img,
+  .presenterRandomPlayerPlaceholder{
+    border-radius:15px;
+  }
+
+  .presenterRandomPlayerNameCard strong{
+    min-height:32px;
+    font-size:17px;
+  }
+
+  .presenterRandomVsText{
+    width:48px;
+    height:48px;
+    border-radius:16px;
+    font-size:16px;
+  }
+
+  .presenterRandomStatusPanel{
+    min-height:46px;
+    border-radius:16px;
+  }
+
+  .presenterRandomStatusPanel strong{
+    font-size:19px;
+  }
+
+  .presenterRandomAuctionInput{
+    height:46px;
+    border-radius:16px;
+    font-size:20px;
+  }
+
+  .presenterRandomMetricsGrid{
+    gap:8px;
+  }
+
+  .presenterRandomMetric{
+    gap:6px;
+    padding:8px;
+    border-radius:16px;
+  }
+
+  .presenterRandomMetric span{
+    font-size:13px;
+  }
+
+  .presenterRandomMetric strong{
+    font-size:24px;
+  }
+
+  .presenterRandomKnowView{
+    grid-template-rows:56px minmax(0,1fr);
+  }
+
+  .presenterRandomTimerBox{
+    border-radius:16px;
+    font-size:28px;
+  }
+
+  .presenterRandomKnowBoard{
+    gap:8px;
+  }
+
+  .presenterRandomKnowTeam{
+    gap:8px;
+    padding:8px;
+    border-radius:16px;
+  }
+
+  .presenterRandomKnowTeam span{
+    font-size:16px;
+  }
+
+  .presenterRandomKnowTeam strong{
+    font-size:28px;
+  }
+
+  .presenterRandomStartView strong{
+    font-size:28px;
+  }
+
+  .presenterRandomFatblaNumbers{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:8px;
+  }
+
+  .presenterRandomFatblaNumber{
+    min-height:clamp(48px,12dvh,62px);
+    border-radius:16px;
+    font-size:26px;
+  }
+
+  .presenterRandomMediaPreview,
+  .presenterRandomMediaEmpty{
+    border-radius:16px;
+  }
+
+  .presenterRandomMediaEmpty{
+    font-size:20px;
+  }
+
+  .presenterRandomNote,
+  .presenterRandomBlockStatus{
+    min-height:34px;
+    padding:6px 9px;
+    border-radius:14px;
+    font-size:14px;
+  }
+
+  .presenterRandomBlockStatus strong{
+    min-width:34px;
+    height:26px;
+    border-radius:9px;
+    font-size:16px;
+  }
+}

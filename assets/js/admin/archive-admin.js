@@ -7,6 +7,7 @@ let archiveAdminRound = 1
 let archiveAdminRoundsCount = 4
 let archivePendingExtraCount = 0
 let archiveDraftState = {}
+let archiveDraftStateByRound = {}
 let archiveExtraTextPositions = []
 
 /* =========================
@@ -36,6 +37,10 @@ function collectArchiveDraftState() {
   }
 
   archiveDraftState = draft
+
+archiveDraftStateByRound[
+  Number(archiveAdminRound || 1)
+] = draft
 }
 
 function getArchiveDraftItem(position, dbItem = {}) {
@@ -267,18 +272,25 @@ async function renderArchiveAdmin() {
   archiveAdminRound = 1
   archivePendingExtraCount = 0
   archiveDraftState = {}
+archiveDraftStateByRound = {}
 
   await renderArchiveAdminRound(1)
 }
 
 function openArchiveOnePageRound(round) {
-  if (Number(round) === Number(archiveAdminRound)) return
+  const nextRound = Number(round || 1)
+
+  if (nextRound === Number(archiveAdminRound)) {
+    return
+  }
 
   collectArchiveDraftState()
 
-  archiveAdminRound = Number(round || 1)
+  archiveAdminRound = nextRound
   archivePendingExtraCount = 0
-  archiveDraftState = {}
+
+  archiveDraftState =
+    archiveDraftStateByRound[nextRound] || {}
 
   renderArchiveAdminRound(archiveAdminRound)
 }
@@ -626,7 +638,7 @@ async function applyArchiveRoundsCount() {
 
     showGameToast("تم حفظ عدد جولات الأرشيف")
     await renderArchiveAdminRound(archiveAdminRound)
-    await renderAdminTabsUnified()
+    scheduleAdminTabsRefresh()
     return true
   } catch (err) {
     console.log("APPLY ARCHIVE ROUNDS COUNT ERROR:", err)
@@ -831,11 +843,15 @@ async function saveArchiveRoundNew() {
     }
 
     archivePendingExtraCount = 0
-    archiveDraftState = {}
+archiveDraftState = {}
+
+delete archiveDraftStateByRound[round]
+
+invalidateAdminHomeCache()
 
     showGameToast(`تم حفظ الجولة ${round}`)
     await renderArchiveAdminRound(round)
-    await renderAdminTabsUnified()
+    scheduleAdminTabsRefresh()
     return true
   } catch (err) {
     console.log("SAVE ARCHIVE ROUND CATCH:", err)
@@ -851,120 +867,517 @@ async function saveArchiveRoundNew() {
 ========================= */
 
 async function deleteArchiveItem(round, position) {
-  if (!canRunAdminDelete()) return
+  if (!canRunAdminDelete()) {
+    return false
+  }
 
   if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
+    showGameToast(
+      "افتح النموذج أولاً",
+      "warning"
+    )
+
+    return false
   }
 
-  const ok = confirm(`هل تريد حذف العنصر ${position} من الجولة ${round}؟`)
-  if (!ok) return
+  const safeRound =
+    Number(round || 1)
 
-  const deleteResult = await dbDelete(
-    "archive_items",
-    (query) => query.eq("model", Number(currentModel)).eq("round", Number(round)).eq("position", Number(position)),
-    {
-      logLabel: "DELETE ARCHIVE ITEM"
+  const safePosition =
+    Number(position || 0)
+
+  const confirmed =
+    await showAdminConfirm(
+      `هل تريد حذف العنصر ${safePosition} من الجولة ${safeRound}؟\n\nسيتم حذف الصورة المرتبطة به إن وجدت.`,
+      {
+        title: "حذف عنصر من الأرشيف",
+        okText: "حذف",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!confirmed) {
+    return false
+  }
+
+  try {
+    const currentModelId =
+      Number(currentModel)
+
+    const itemResult =
+      await dbSelect(
+        "archive_items",
+        query =>
+          query
+            .eq(
+              "model",
+              currentModelId
+            )
+            .eq(
+              "round",
+              safeRound
+            )
+            .eq(
+              "position",
+              safePosition
+            )
+            .maybeSingle(),
+        {
+          select: "image",
+          fallback: null,
+          logLabel:
+            "LOAD ARCHIVE ITEM BEFORE DELETE"
+        }
+      )
+
+    if (!itemResult.ok) {
+      console.error(
+        "LOAD ARCHIVE ITEM BEFORE DELETE ERROR:",
+        itemResult.error
+      )
+
+      showGameToast(
+        "تعذر قراءة صورة العنصر",
+        "error"
+      )
+
+      return false
     }
-  )
 
-  if (!deleteResult.ok) {
-    console.log("DELETE ARCHIVE ITEM ERROR:", deleteResult.error)
+    const storageDeleted =
+      await deleteAdminStorageUrls([
+        itemResult.data?.image
+      ])
 
-    showGameToast("تعذر حذف العنصر")
+    if (!storageDeleted) {
+      showGameToast(
+        "توقف الحذف لأن صورة العنصر لم تُحذف",
+        "error"
+      )
 
-    return
+      return false
+    }
+
+    const deleteResult =
+      await dbDelete(
+        "archive_items",
+        query =>
+          query
+            .eq(
+              "model",
+              currentModelId
+            )
+            .eq(
+              "round",
+              safeRound
+            )
+            .eq(
+              "position",
+              safePosition
+            ),
+        {
+          logLabel: "DELETE ARCHIVE ITEM"
+        }
+      )
+
+    if (!deleteResult.ok) {
+      console.error(
+        "DELETE ARCHIVE ITEM ERROR:",
+        deleteResult.error
+      )
+
+      showGameToast(
+        "تعذر حذف العنصر",
+        "error"
+      )
+
+      return false
+    }
+
+    invalidateAdminHomeCache()
+
+    showGameToast(
+      `تم حذف العنصر ${safePosition}`,
+      "success"
+    )
+
+    await renderArchiveAdminRound(safeRound)
+    scheduleAdminTabsRefresh()
+
+    return true
+  } catch (error) {
+    console.error(
+      "DELETE ARCHIVE ITEM CATCH:",
+      error
+    )
+
+    showGameToast(
+      "حدث خطأ أثناء حذف العنصر",
+      "error"
+    )
+
+    return false
   }
-
-  showGameToast(`تم حذف العنصر ${position}`)
-  await renderArchiveAdminRound(round)
-  await renderAdminTabsUnified()
 }
 
 async function deleteArchiveSegment(round = null) {
-  if (!canRunAdminDelete()) return
-
-  if (!currentModel) {
-    showGameToast("افتح النموذج أولاً")
-    return
+  if (!canRunAdminDelete()) {
+    return false
   }
 
-  const hasRound = round !== null && round !== undefined
+  if (!currentModel) {
+    showGameToast(
+      "افتح النموذج أولاً",
+      "warning"
+    )
 
-  const safeRound = Number(round || archiveAdminRound || 1)
+    return false
+  }
 
-  const ok = confirm(hasRound ? `هل تريد حذف الجولة ${safeRound} من الأرشيف؟` : "هل تريد حذف جميع جولات الأرشيف؟")
+  const hasRound =
+    round !== null &&
+    round !== undefined
 
-  if (!ok) return
+  const safeRound =
+    Number(round || archiveAdminRound || 1)
+
+  const confirmed = await showAdminConfirm(
+    hasRound
+      ? `هل تريد حذف الجولة ${safeRound} من الأرشيف؟`
+      : "هل تريد حذف جميع جولات الأرشيف؟",
+    {
+      title: hasRound
+        ? "حذف جولة من الأرشيف"
+        : "حذف الأرشيف بالكامل",
+
+      okText: hasRound
+        ? "حذف الجولة"
+        : "حذف الأرشيف",
+
+      cancelText: "إلغاء",
+      danger: true
+    }
+  )
+
+  if (!confirmed) {
+    return false
+  }
 
   try {
     if (hasRound) {
-      const [itemsRes, boxRes] = await Promise.all([
-        dbDelete("archive_items", (query) => query.eq("model", Number(currentModel)).eq("round", safeRound), {
-          logLabel: "DELETE ARCHIVE ROUND ITEMS"
-        }),
+            const currentModelId =
+        Number(currentModel)
 
-        dbDelete("archive_boxes", (query) => query.eq("model", Number(currentModel)).eq("round", safeRound), {
-          logLabel: "DELETE ARCHIVE ROUND BOXES"
-        })
+      const roundImagesResult =
+        await dbSelect(
+          "archive_items",
+          query =>
+            query
+              .eq(
+                "model",
+                currentModelId
+              )
+              .eq(
+                "round",
+                safeRound
+              ),
+          {
+            select: "image",
+            fallback: [],
+            logLabel:
+              "LOAD ARCHIVE ROUND IMAGES BEFORE DELETE"
+          }
+        )
+
+      if (!roundImagesResult.ok) {
+        console.error(
+          "LOAD ARCHIVE ROUND IMAGES BEFORE DELETE ERROR:",
+          roundImagesResult.error
+        )
+
+        showGameToast(
+          "تعذر قراءة صور الجولة",
+          "error"
+        )
+
+        return false
+      }
+
+      const storageDeleted =
+        await deleteAdminStorageUrls(
+          (roundImagesResult.data || [])
+            .map(item => item.image)
+        )
+
+      if (!storageDeleted) {
+        showGameToast(
+          "توقف الحذف لأن صور الجولة لم تُحذف",
+          "error"
+        )
+
+        return false
+      }
+      
+      const [
+        itemsRes,
+        boxRes
+      ] = await Promise.all([
+        dbDelete(
+          "archive_items",
+
+          (query) =>
+            query
+              .eq(
+                "model",
+                Number(currentModel)
+              )
+              .eq(
+                "round",
+                safeRound
+              ),
+
+          {
+            logLabel:
+              "DELETE ARCHIVE ROUND ITEMS"
+          }
+        ),
+
+        dbDelete(
+          "archive_boxes",
+
+          (query) =>
+            query
+              .eq(
+                "model",
+                Number(currentModel)
+              )
+              .eq(
+                "round",
+                safeRound
+              ),
+
+          {
+            logLabel:
+              "DELETE ARCHIVE ROUND BOXES"
+          }
+        )
       ])
 
       if (!itemsRes.ok || !boxRes.ok) {
-        console.log(itemsRes.error || boxRes.error)
+        console.log(
+          itemsRes.error ||
+          boxRes.error
+        )
 
-        showGameToast("تعذر حذف الجولة")
+        showGameToast(
+          "تعذر حذف الجولة",
+          "error"
+        )
 
-        return
+        return false
       }
-
-      showGameToast(`تم حذف الجولة ${safeRound}`)
 
       archivePendingExtraCount = 0
       archiveDraftState = {}
 
+      delete archiveDraftStateByRound[safeRound]
+
+      invalidateAdminHomeCache()
+
+      showGameToast(
+        `تم حذف الجولة ${safeRound}`,
+        "success"
+      )
+
       await renderArchiveAdminRound(safeRound)
+      scheduleAdminTabsRefresh()
 
-      await renderAdminTabsUnified()
-
-      return
+      return true
     }
 
-    const [itemsRes, boxesRes, settingsRes] = await Promise.all([
-      dbDelete("archive_items", (query) => query.eq("model", Number(currentModel)), {
-        logLabel: "DELETE ARCHIVE ITEMS"
-      }),
+        const currentModelId =
+      Number(currentModel)
 
-      dbDelete("archive_boxes", (query) => query.eq("model", Number(currentModel)), {
-        logLabel: "DELETE ARCHIVE BOXES"
-      }),
+    const archiveImagesResult =
+      await dbSelect(
+        "archive_items",
+        query =>
+          query.eq(
+            "model",
+            currentModelId
+          ),
+        {
+          select: "image",
+          fallback: [],
+          logLabel:
+            "LOAD ARCHIVE IMAGES BEFORE DELETE"
+        }
+      )
 
-      dbDelete("segment_settings", (query) => query.eq("model", Number(currentModel)).eq("segment", "archive"), {
-        logLabel: "DELETE ARCHIVE SETTINGS"
-      })
+    if (!archiveImagesResult.ok) {
+      console.error(
+        "LOAD ARCHIVE IMAGES BEFORE DELETE ERROR:",
+        archiveImagesResult.error
+      )
+
+      showGameToast(
+        "تعذر قراءة صور الأرشيف",
+        "error"
+      )
+
+      return false
+    }
+
+    const storageDeleted =
+      await deleteAdminStorageUrls(
+        (archiveImagesResult.data || [])
+          .map(item => item.image)
+      )
+
+    if (!storageDeleted) {
+      showGameToast(
+        "توقف الحذف لأن صور الأرشيف لم تُحذف",
+        "error"
+      )
+
+      return false
+    }
+
+    const [
+      itemsRes,
+      boxesRes,
+      settingsRes
+    ] = await Promise.all([
+      dbDelete(
+        "archive_items",
+
+        (query) =>
+          query.eq(
+            "model",
+            Number(currentModel)
+          ),
+
+        {
+          logLabel:
+            "DELETE ARCHIVE ITEMS"
+        }
+      ),
+
+      dbDelete(
+        "archive_boxes",
+
+        (query) =>
+          query.eq(
+            "model",
+            Number(currentModel)
+          ),
+
+        {
+          logLabel:
+            "DELETE ARCHIVE BOXES"
+        }
+      ),
+
+      dbDelete(
+        "segment_settings",
+
+        (query) =>
+          query
+            .eq(
+              "model",
+              Number(currentModel)
+            )
+            .eq(
+              "segment",
+              "archive"
+            ),
+
+        {
+          logLabel:
+            "DELETE ARCHIVE SETTINGS"
+        }
+      )
     ])
 
-    if (!itemsRes.ok || !boxesRes.ok || !settingsRes.ok) {
-      console.log(itemsRes.error || boxesRes.error || settingsRes.error)
+    if (
+      !itemsRes.ok ||
+      !boxesRes.ok ||
+      !settingsRes.ok
+    ) {
+      console.log(
+        itemsRes.error ||
+        boxesRes.error ||
+        settingsRes.error
+      )
 
-      showGameToast("تعذر حذف الأرشيف")
+      showGameToast(
+        "تعذر حذف الأرشيف",
+        "error"
+      )
 
-      return
+      return false
     }
 
     archiveAdminRoundsCount = 4
     archiveAdminRound = 1
     archivePendingExtraCount = 0
     archiveDraftState = {}
+    archiveDraftStateByRound = {}
 
-    showGameToast("تم حذف الأرشيف بالكامل")
+    if (
+      typeof updateAdminQuickSettingUI ===
+      "function"
+    ) {
+      updateAdminQuickSettingUI(
+        "archive",
+        archiveAdminRoundsCount
+      )
+    }
+
+    invalidateAdminHomeCache()
+
+    showGameToast(
+      "تم حذف الأرشيف بالكامل",
+      "success"
+    )
 
     await renderArchiveAdmin()
-    await renderAdminTabsUnified()
-  } catch (err) {
-    console.log("DELETE ARCHIVE SEGMENT ERROR:", err)
+    scheduleAdminTabsRefresh()
 
-    showGameToast("حدث خطأ أثناء حذف الأرشيف")
+    return true
+  } catch (error) {
+    console.log(
+      "DELETE ARCHIVE SEGMENT ERROR:",
+      error
+    )
+
+    showGameToast(
+      "حدث خطأ أثناء حذف الأرشيف",
+      "error"
+    )
+
+    return false
   }
 }
 
+/* =========================
+   35) Global Exports
+========================= */
+
+Object.assign(window, {
+  renderArchiveAdmin,
+  renderArchiveAdminRound,
+  openArchiveOnePageRound,
+
+  addArchiveTextBox,
+  removeArchiveTextBox,
+  applyArchiveRoundsCount,
+
+  saveArchiveRoundNew,
+  deleteArchiveItem,
+  deleteArchiveSegment,
+
+  handleArchiveParentChange,
+  getArchiveDoneMap
+})

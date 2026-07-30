@@ -811,10 +811,13 @@ async function clearWhoItem(number) {
   const item =
     getWhoDraftItem(itemNumber)
 
-  const hasSavedData =
-    isAdminFieldFilled(
-      item.image
-    )
+const hasSavedData =
+  isAdminFieldFilled(
+    item.image
+  ) ||
+  isAdminFieldFilled(
+    item.answer
+  )
 
   if (!hasSavedData) {
     resetWhoDraftItem(
@@ -854,6 +857,20 @@ async function clearWhoItem(number) {
   }
 
   try {
+    const storageDeleted =
+      await deleteAdminStorageUrls([
+        item.image
+      ])
+
+    if (!storageDeleted) {
+      showGameToast(
+        "توقف الحذف لأن صورة العنصر لم تُحذف",
+        "error"
+      )
+
+      return false
+    }
+
     const deleteResult =
       await dbDelete(
         "who_images",
@@ -937,19 +954,12 @@ async function deleteWhoSegment() {
 
   const confirmed =
     await showAdminConfirm(
-      "هل تريد حذف فقرة من هو كاملة نهائيًا؟",
+      "هل تريد حذف فقرة من هو كاملة؟\n\nسيتم حذف كل الصور والإجابات الخاصة بهذه الفقرة نهائيًا.",
       {
-        title:
-          "حذف فقرة من هو",
-
-        okText:
-          "حذف الفقرة",
-
-        cancelText:
-          "إلغاء",
-
-        danger:
-          true
+        title: "حذف فقرة من هو",
+        okText: "حذف الفقرة",
+        cancelText: "إلغاء",
+        danger: true
       }
     )
 
@@ -958,59 +968,97 @@ async function deleteWhoSegment() {
   }
 
   try {
-    const [
-      rowsResult,
-      settingsResult
-    ] = await Promise.all([
-      dbDelete(
-        "who_images",
+    setAdminSaving(
+      true,
+      "جارٍ حذف فقرة من هو..."
+    )
 
-        (query) =>
+    const currentModelId =
+      Number(currentModel)
+
+    const imagesResult =
+      await dbSelect(
+        "who_images",
+        query =>
           query.eq(
             "model",
-            Number(currentModel)
+            currentModelId
           ),
-
         {
-          logLabel:
-            "DELETE WHO IMAGES"
+          select: "image",
+          fallback: [],
+          logLabel: "LOAD WHO IMAGES BEFORE DELETE"
         }
-      ),
+      )
 
-      dbDelete(
-        "segment_settings",
+    if (!imagesResult.ok) {
+      console.error(
+        "LOAD WHO IMAGES BEFORE DELETE ERROR:",
+        imagesResult.error
+      )
 
-        (query) =>
-          query
-            .eq(
+      showGameToast(
+        "تعذر قراءة صور فقرة من هو",
+        "error"
+      )
+
+      return false
+    }
+
+    const storageDeleted =
+      await deleteAdminStorageUrls(
+        (imagesResult.data || [])
+          .map(item => item.image)
+      )
+
+    if (!storageDeleted) {
+      showGameToast(
+        "توقف الحذف لأن صور فقرة من هو لم تُحذف",
+        "error"
+      )
+
+      return false
+    }
+
+    const deleteResults =
+      await Promise.all([
+        dbDelete(
+          "who_images",
+          query =>
+            query.eq(
               "model",
-              Number(currentModel)
-            )
-            .eq(
-              "segment",
-              "who"
+              currentModelId
             ),
+          {
+            logLabel: "DELETE WHO IMAGES SEGMENT"
+          }
+        ),
 
-        {
-          logLabel:
-            "DELETE WHO SETTINGS"
-        }
-      )
-    ])
+        dbDelete(
+          "segment_settings",
+          query =>
+            query
+              .eq(
+                "model",
+                currentModelId
+              )
+              .eq(
+                "segment",
+                "who"
+              ),
+          {
+            logLabel: "DELETE WHO SETTINGS"
+          }
+        )
+      ])
 
-    const failedResult =
-      [
-        rowsResult,
-        settingsResult
-      ].find(
-        (result) =>
-          !result?.ok
-      )
+    const failed =
+      deleteResults.find(result => !result?.ok)
 
-    if (failedResult) {
-      console.log(
+    if (failed) {
+      console.error(
         "DELETE WHO SEGMENT ERROR:",
-        failedResult.error
+        failed.error
       )
 
       showGameToast(
@@ -1021,30 +1069,21 @@ async function deleteWhoSegment() {
       return false
     }
 
-    setWhoAdminCount(15)
-    resetWhoAdminDraft()
-
-    if (
-      typeof updateAdminQuickSettingUI ===
-      "function"
-    ) {
-      updateAdminQuickSettingUI(
-        "who",
-        whoAdminCount
-      )
-    }
+    whoAdminDraft = {}
 
     invalidateAdminHomeCache()
-    renderWhoAdminFromDraft()
+    updateAdminQuickSettingUI("who", 0)
+
+    await renderWhoAdmin()
 
     showGameToast(
-      "تم حذف فقرة من هو",
+      "تم حذف فقرة من هو كاملة",
       "success"
     )
 
     return true
   } catch (error) {
-    console.log(
+    console.error(
       "DELETE WHO SEGMENT CATCH:",
       error
     )
@@ -1055,6 +1094,8 @@ async function deleteWhoSegment() {
     )
 
     return false
+  } finally {
+    setAdminSaving(false)
   }
 }
 

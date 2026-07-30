@@ -10,10 +10,14 @@ let warmupQuestionLocked = false
 let currentWarmupQuestionKey = null
 let warmupLastTickPlayed = null
 let warmupTimer = null
+let warmupTimerStartedAt = 0
+let warmupTimerEndsAt = 0
+let warmupTimerDuration = 0
 let warmupStateSyncTimer = null
 let warmupResultPending = false
 let warmupDataCache = null
 let warmupDataPromise = null
+let warmupDataCacheModel = null
 
 const WARMUP_DATA_CACHE_TTL =
   5 * 60 * 1000
@@ -75,7 +79,13 @@ function saveWarmupState(options = {}) {
 
     timerValue: Number(
       timerBox?.innerText || 0
-    )
+    ),
+
+    timerSync: {
+      startedAt: Number(warmupTimerStartedAt || 0),
+      endsAt: Number(warmupTimerEndsAt || 0),
+      duration: Number(warmupTimerDuration || 0)
+    }
   }
 
   localStorage.setItem(
@@ -93,11 +103,8 @@ function saveWarmupState(options = {}) {
     B: Number(warmupScoreB || 0)
   }
 
-  if (
-    typeof saveUnifiedGameState ===
-    "function"
-  ) {
-    saveUnifiedGameState()
+  if (options.sync === false) {
+    return
   }
 
   clearTimeout(warmupStateSyncTimer)
@@ -106,6 +113,13 @@ function saveWarmupState(options = {}) {
     options.immediate === true
 
   warmupStateSyncTimer = setTimeout(() => {
+    if (
+      typeof saveUnifiedGameState ===
+      "function"
+    ) {
+      saveUnifiedGameState()
+    }
+
     if (
       typeof syncDisplayStateToSession ===
       "function"
@@ -277,8 +291,21 @@ window.renderWarmup = async function () {
   clearTimeout(warmupStateSyncTimer)
   warmupStateSyncTimer = null
 
+  const warmupCurrentModelId = Number(
+  currentModel ||
+  window.currentModel ||
+  localStorage.getItem("game_model") ||
+  0
+)
+
+if (
+  warmupDataCacheModel &&
+  warmupDataCacheModel !== warmupCurrentModelId
+) {
   warmupDataCache = null
-  warmupDataPromise = null
+}
+
+warmupDataPromise = null
 
   const saved = getWarmupState()
 
@@ -468,9 +495,14 @@ function buildWarmupDataMap(rows = []) {
   }
 }
 
-function applyWarmupFreshData(rows = []) {
+function applyWarmupFreshData(rows = [], modelId = null) {
   warmupDataCache =
     buildWarmupDataMap(rows)
+
+  if (modelId) {
+    warmupDataCacheModel =
+      Number(modelId)
+  }
 
   return warmupDataCache
 }
@@ -496,11 +528,12 @@ async function loadWarmupData(
   }
 
   if (
-    warmupDataCache &&
-    options.forceRefresh !== true
-  ) {
-    return warmupDataCache
-  }
+  warmupDataCache &&
+  warmupDataCacheModel === modelId &&
+  options.forceRefresh !== true
+) {
+  return warmupDataCache
+}
 
   if (
     warmupDataPromise &&
@@ -563,7 +596,7 @@ async function loadWarmupData(
                   onBackgroundUpdate:
                     freshRows => {
                       applyWarmupFreshData(
-                        freshRows || []
+                       freshRows || []
                       )
                     }
                 }
@@ -619,7 +652,8 @@ async function loadWarmupData(
         }
 
         return applyWarmupFreshData(
-          rows
+            rows,
+             modelId
         )
       } catch (error) {
         console.log(
@@ -783,6 +817,7 @@ function updateWarmupDoubleButton() {
   btn.disabled = false
   btn.innerText = "دوبيلا"
 }
+
 function setWarmupActiveTeam(
   team,
   options = {}
@@ -801,7 +836,7 @@ function setWarmupActiveTeam(
     "function"
   ) {
     setGameActiveTeam(team, {
-      sync: options.sync !== false
+      sync: false
     })
   }
 
@@ -810,7 +845,10 @@ function setWarmupActiveTeam(
   if (options.save !== false) {
     saveWarmupState({
       immediate:
-        options.immediate === true
+        options.immediate === true,
+
+      sync:
+        options.sync !== false
     })
   }
 
@@ -998,7 +1036,8 @@ async function openWarmupQuestion(
     setWarmupActiveTeam(
       autoTeam,
       {
-        immediate: true
+        sync: false,
+        save: false
       }
     )
   }
@@ -1153,6 +1192,13 @@ function runWarmupTimer(startValue) {
     Number(startValue || 0)
   )
 
+    warmupTimerStartedAt = Date.now()
+  warmupTimerDuration = time
+  warmupTimerEndsAt =
+    time > 0
+      ? warmupTimerStartedAt + time * 1000
+      : 0
+
   warmupLastTickPlayed = null
 
   timerBox.innerText = time
@@ -1166,7 +1212,9 @@ function runWarmupTimer(startValue) {
     "timerTimeoutFx"
   )
 
-  saveWarmupState()
+  saveWarmupState({
+    sync: false
+  })
 
   if (time <= 0) return
 
@@ -1189,7 +1237,9 @@ function runWarmupTimer(startValue) {
       playGameSound("tick")
     }
 
-    saveWarmupState()
+    saveWarmupState({
+     sync: false
+     })
 
     if (time > 0) return
 
@@ -1216,6 +1266,8 @@ function runWarmupTimer(startValue) {
 
     playGameSound("timeout")
 
+        warmupTimerEndsAt = 0
+
     saveWarmupState({
       immediate: true
     })
@@ -1227,6 +1279,10 @@ function resetWarmupTimer(options = {}) {
   warmupTimer = null
 
   warmupLastTickPlayed = null
+
+  warmupTimerStartedAt = 0
+  warmupTimerEndsAt = 0
+  warmupTimerDuration = 0
 
   const timerBox =
     document.getElementById("timer")
@@ -1276,73 +1332,104 @@ function warmupCorrect() {
     return
   }
 
- warmupResultPending = true
+  const answeringTeam = selectedTeam
 
-resetWarmupTimer({
-  save: false
-})
+  warmupResultPending = true
 
-saveWarmupState({
-  immediate: true
-})
+  resetWarmupTimer({
+    save: false
+  })
+
+  const questionBox =
+    document.getElementById("questionBox")
+
+  if (questionBox && window.currentAnswer) {
+    questionBox.innerText =
+      window.currentAnswer
+  }
+
+  saveWarmupState({
+    immediate: true
+  })
 
   playGameSound("correct")
   flashScreen("correct")
 
-  showWarmupAnswerForSeconds(() => {
-    const team = selectedTeam
-    const points = getWarmupScoreValue(team)
+  setTimeout(() => {
+    warmupResultPending = false
 
-    if (team === "A") {
+    const points =
+      getWarmupScoreValue(answeringTeam)
+
+    if (answeringTeam === "A") {
       warmupScoreA += points
-      const box = document.getElementById("roundScoreA")
-      if (box) box.innerText = warmupScoreA
+
+      const box =
+        document.getElementById("roundScoreA")
+
+      if (box) {
+        box.innerText = warmupScoreA
+      }
     }
 
-    if (team === "B") {
+    if (answeringTeam === "B") {
       warmupScoreB += points
-      const box = document.getElementById("roundScoreB")
-      if (box) box.innerText = warmupScoreB
+
+      const box =
+        document.getElementById("roundScoreB")
+
+      if (box) {
+        box.innerText = warmupScoreB
+      }
     }
 
     clearWarmupActiveDouble()
 
-    lastAnsweredTeam = selectedTeam
+    lastAnsweredTeam = answeringTeam
 
-const nextTeam = getNextWarmupTeam()
+    const nextTeam =
+      getNextWarmupTeam()
 
-if (nextTeam) {
-  setWarmupActiveTeam(nextTeam, {
-    sync: false,
-    save: false
-  })
-}
+    if (nextTeam) {
+      setWarmupActiveTeam(nextTeam, {
+        sync: false,
+        save: false
+      })
+    }
 
     window.currentSegmentScores = {
       A: warmupScoreA,
       B: warmupScoreB
     }
 
-    const questionBox = document.getElementById("questionBox")
-    if (questionBox) questionBox.innerText = "اختر رقم السؤال"
+    if (questionBox) {
+      questionBox.innerText =
+        "اختر رقم السؤال"
+    }
 
     currentPoints = 0
     window.currentAnswer = ""
     warmupQuestionLocked = false
     currentWarmupQuestionKey = null
+
     clearWarmupSelectedButton()
+
     resetWarmupTimer({
-  save: false
-})
+      save: false
+    })
 
-updateWarmupDoubleButton()
+    updateWarmupDoubleButton()
 
-saveWarmupState({
-  immediate: true
-})
-    renderWarmupFinishedIfNeeded()
-  })
+    saveWarmupState({
+      immediate: true
+    })
+
+    renderWarmupFinishedIfNeeded({
+      save: false
+    })
+  }, 5000)
 }
+
 
 function warmupWrong() {
   if (warmupResultPending) return
@@ -1352,54 +1439,77 @@ function warmupWrong() {
     return
   }
 
-warmupResultPending = true
+  const answeringTeam = selectedTeam
 
-resetWarmupTimer({
-  save: false
-})
+  warmupResultPending = true
 
-saveWarmupState({
-  immediate: true
-})
+  resetWarmupTimer({
+    save: false
+  })
+
+  const questionBox =
+    document.getElementById("questionBox")
+
+  if (questionBox && window.currentAnswer) {
+    questionBox.innerText =
+      window.currentAnswer
+  }
+
+  saveWarmupState({
+    immediate: true
+  })
 
   playGameSound("wrong")
   flashScreen("wrong")
 
-  showWarmupAnswerForSeconds(() => {
+  setTimeout(() => {
+    warmupResultPending = false
+
     clearWarmupActiveDouble()
 
-    if (selectedTeam) {
-      lastAnsweredTeam = selectedTeam
+    if (
+      answeringTeam === "A" ||
+      answeringTeam === "B"
+    ) {
+      lastAnsweredTeam = answeringTeam
     }
 
-    const nextTeam = getNextWarmupTeam()
+    const nextTeam =
+      getNextWarmupTeam()
 
-if (nextTeam) {
-  setWarmupActiveTeam(nextTeam, {
-    sync: false,
-    save: false
-  })
-}
+    if (nextTeam) {
+      setWarmupActiveTeam(nextTeam, {
+        sync: false,
+        save: false
+      })
+    }
 
-    const questionBox = document.getElementById("questionBox")
-    if (questionBox) questionBox.innerText = "اختر رقم السؤال"
+    if (questionBox) {
+      questionBox.innerText =
+        "اختر رقم السؤال"
+    }
 
     currentPoints = 0
     window.currentAnswer = ""
     warmupQuestionLocked = false
     currentWarmupQuestionKey = null
+
     clearWarmupSelectedButton()
+
     resetWarmupTimer({
+      save: false
+    })
+
+    updateWarmupDoubleButton()
+
+    saveWarmupState({
+      immediate: true
+    })
+
+    renderWarmupFinishedIfNeeded({
   save: false
 })
-
-updateWarmupDoubleButton()
-
-saveWarmupState({
-  immediate: true
-})
-    renderWarmupFinishedIfNeeded()
-  })
+  }, 5000)
 }
 
 function getWarmupTotalQuestionsCount() {
@@ -1427,7 +1537,8 @@ function getWarmupWinnerText() {
 
   return "تعادل"
 }
-function renderWarmupFinishedIfNeeded() {
+
+function renderWarmupFinishedIfNeeded(options = {}) {
   if (!isWarmupFinished()) return false
 
   window.currentSegmentScores = {
@@ -1435,7 +1546,12 @@ function renderWarmupFinishedIfNeeded() {
     B: Number(warmupScoreB || 0)
   }
 
-  saveWarmupState()
+  if (options.save !== false) {
+    saveWarmupState({
+      immediate:
+        options.immediate === true
+    })
+  }
 
   if (typeof updateEndRoundButtonState === "function") {
     updateEndRoundButtonState()
@@ -1443,3 +1559,47 @@ function renderWarmupFinishedIfNeeded() {
 
   return true
 }
+window.openWarmupQuestion =
+  openWarmupQuestion
+
+window.selectWarmupQuestion =
+  openWarmupQuestion
+
+window.showWarmupQuestion =
+  openWarmupQuestion
+
+window.activateWarmupDouble =
+  activateWarmupDouble
+
+window.useWarmupDouble =
+  activateWarmupDouble
+
+window.toggleWarmupDouble =
+  activateWarmupDouble
+
+window.markWarmupCorrect =
+  warmupCorrect
+
+window.warmupCorrect =
+  warmupCorrect
+
+window.answerWarmupCorrect =
+  warmupCorrect
+
+window.scoreWarmupCorrect =
+  warmupCorrect
+
+window.markWarmupWrong =
+  warmupWrong
+
+window.warmupWrong =
+  warmupWrong
+
+window.answerWarmupWrong =
+  warmupWrong
+
+window.scoreWarmupWrong =
+  warmupWrong
+
+window.saveWarmupState =
+  saveWarmupState

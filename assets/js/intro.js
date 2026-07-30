@@ -12,7 +12,8 @@ let introSegmentsRequestToken = 0
 
 const INTRO_MODELS_CACHE_TTL = 10 * 60 * 1000
 const INTRO_MODEL_DATA_CACHE_TTL = 5 * 60 * 1000
-const INTRO_GLOBAL_VISIBILITY_CACHE_TTL = 10 * 60 * 1000
+const INTRO_MODELS_FALLBACK_KEY =
+  "intro_models_fallback_v1"
 
 const INTRO_MIN_SEGMENTS_COUNT = 6
 const INTRO_MAX_SEGMENTS_COUNT = 11
@@ -297,27 +298,20 @@ function escapeIntroHtml(value) {
 }
 
 function normalizeIntroSegmentKey(key) {
-  const value =
-    String(key || "").trim()
+  const value = String(key || "").trim()
 
-  if (value === "final_round1") {
-    return "finalRound1"
-  }
+  if (value === "final_round1") return "finalRound1"
+  if (value === "final_round2") return "finalRound2"
+  if (value === "final_round3") return "finalRound3"
+  if (value === "final_round4") return "finalRound4"
 
-  if (value === "final_round2") {
-    return "finalRound2"
-  }
-
-  if (value === "final_round3") {
-    return "finalRound3"
-  }
-
-  if (value === "final_round4") {
-    return "finalRound4"
-  }
-
-  if (value === "auction") {
-    return "letterli"
+  if (
+    value === "auction" ||
+    value === "fatbla" ||
+    value === "fitbala" ||
+    value === "فتبلة"
+  ) {
+    return ""
   }
 
   return value
@@ -458,6 +452,47 @@ async function generateUniqueJoinCode() {
    MODELS
 ========================================================= */
 
+
+function readIntroModelsFallback() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem(
+        INTRO_MODELS_FALLBACK_KEY
+      ) || "[]"
+    )
+
+    return Array.isArray(saved)
+      ? saved
+      : []
+  } catch {
+    return []
+  }
+}
+
+function saveIntroModelsFallback(rows = []) {
+  try {
+    const cleanRows = (Array.isArray(rows) ? rows : [])
+      .map(row => ({
+        id: row.id,
+        name: row.name || `نموذج ${row.id}`
+      }))
+      .filter(row => row.id)
+
+    if (!cleanRows.length) return
+
+    localStorage.setItem(
+      INTRO_MODELS_FALLBACK_KEY,
+      JSON.stringify(cleanRows)
+    )
+  } catch (error) {
+    console.log(
+      "SAVE INTRO MODELS FALLBACK ERROR:",
+      error
+    )
+  }
+}
+
+
 function renderIntroModelOptions(rows, options = {}) {
   const select = document.getElementById("introModelSelect")
 
@@ -573,7 +608,28 @@ async function loadIntroModels() {
   })
 
   if (result.error && !result.data?.length) {
-    console.log("loadIntroModels error:", result.error)
+    console.log(
+      "loadIntroModels error:",
+      result.error
+    )
+
+    const fallbackModels =
+      readIntroModelsFallback()
+
+    if (fallbackModels.length) {
+      renderIntroModelOptions(
+        fallbackModels,
+        {
+          preserveValue: false
+        }
+      )
+
+      showGameToast(
+        "تم تحميل النماذج من الكاش"
+      )
+
+      return
+    }
 
     select.innerHTML = `
       <option value="">
@@ -599,6 +655,12 @@ async function loadIntroModels() {
       preserveValue: false
     }
   )
+
+  if (rendered) {
+    saveIntroModelsFallback(
+      result.data || []
+    )
+  }
 
   if (!rendered) {
     showGameToast("لا توجد نماذج متاحة")
@@ -816,6 +878,7 @@ async function endOldIntroSessionIfExists(
 ========================================================= */
 
 function clearGameLocalState() {
+  localStorage.removeItem("segment_start_lottery_v1")
   localStorage.removeItem("main_score_a")
   localStorage.removeItem("main_score_b")
 
@@ -851,6 +914,7 @@ function clearGameLocalState() {
   )
   localStorage.removeItem(
   "selected_game_segments"
+  
 )
 
 }
@@ -992,14 +1056,11 @@ function buildIntroVisibleSegmentsMap(
     getIntroDefaultVisibleSegmentsMap()
 
   ;(rows || []).forEach(row => {
-    const segmentKey =
-      normalizeIntroSegmentKey(
-        row.segment_key
-      )
+    const segmentKey = normalizeIntroSegmentKey(row.segment_key)
 
-    if (!map[segmentKey]) {
-      return
-    }
+if (!segmentKey || !map[segmentKey]) {
+  return
+}
 
     map[segmentKey] = {
       is_visible:
@@ -1016,62 +1077,6 @@ function buildIntroVisibleSegmentsMap(
   return map
 }
 
-/* =========================================================
-   GLOBAL VISIBILITY CACHE
-========================================================= */
-
-async function loadIntroGlobalSegmentVisibilityMap(
-  options = {}
-) {
-  const map = {}
-
-  if (
-    !window.cachedSupabaseSelect ||
-    !window.db
-  ) {
-    return map
-  }
-
-  const result = await window.cachedSupabaseSelect(
-    "global_segment_visibility",
-    {
-      select: "segment_key,is_enabled",
-      ttl: INTRO_GLOBAL_VISIBILITY_CACHE_TTL,
-      staleWhileRevalidate:
-        options.staleWhileRevalidate !== false,
-      forceRefresh:
-        options.forceRefresh === true,
-      onBackgroundUpdate:
-        options.onBackgroundUpdate
-    }
-  )
-
-  if (result.error && !result.data?.length) {
-    console.log(
-      "INTRO GLOBAL SEGMENT VISIBILITY ERROR:",
-      result.error
-    )
-  }
-
-  ;(result.data || []).forEach(row => {
-  const segmentKey =
-    normalizeIntroSegmentKey(
-      row.segment_key
-    )
-
-  map[segmentKey] =
-    row.is_enabled !== false
-})
-
-  return map
-}
-
-function isIntroSegmentGloballyEnabled(
-  segmentKey,
-  globalMap = {}
-) {
-  return globalMap[segmentKey] !== false
-}
 
 /* =========================================================
    DEFAULT SEGMENTS
@@ -1157,6 +1162,12 @@ async function ensureIntroVisibleSegmentsDefaults(
 /* =========================================================
    RELATIONAL MODEL DATA
 ========================================================= */
+
+function getIntroSupabaseCachePrefix() {
+  return typeof window.SUPABASE_CACHE_PREFIX === "string"
+    ? window.SUPABASE_CACHE_PREFIX
+    : "supabase_cache_"
+}
 
 async function loadIntroModelRelations(
   modelId,
@@ -1258,7 +1269,7 @@ async function loadIntroModelRelations(
             false,
 
           cacheKey:
-            `${SUPABASE_CACHE_PREFIX}${modelCacheKey}`
+  `${getIntroSupabaseCachePrefix()}${modelCacheKey}`
         }
       ),
 
@@ -1289,7 +1300,7 @@ async function loadIntroModelRelations(
             false,
 
           cacheKey:
-            `${SUPABASE_CACHE_PREFIX}${visibleCacheKey}`
+  `${getIntroSupabaseCachePrefix()}${visibleCacheKey}`
         }
       ),
 
@@ -1315,7 +1326,7 @@ async function loadIntroModelRelations(
             false,
 
           cacheKey:
-            `${SUPABASE_CACHE_PREFIX}${settingsCacheKey}`
+  `${getIntroSupabaseCachePrefix()}${settingsCacheKey}`
         }
       )
     ])
@@ -1374,7 +1385,6 @@ async function loadIntroModelRelations(
 function applyIntroSegmentsData({
   modelId,
   visibleRows = [],
-  globalMap = {},
   preserveSelection = false
 }) {
   const selectedModelId = Number(
@@ -1395,9 +1405,12 @@ function applyIntroSegmentsData({
     ...INTRO_ALL_GAME_SEGMENTS
   ]
     .filter(item => {
-      return isIntroSegmentGloballyEnabled(
-        item.key,
-        globalMap
+      const row =
+        visibleMap[item.key]
+
+      return (
+        row &&
+        row.is_visible !== false
       )
     })
     .sort((a, b) => {
@@ -1461,7 +1474,8 @@ async function loadIntroVisibleSegments() {
   const order =
     document.getElementById("introSegmentsOrder")
 
-  const requestToken = ++introSegmentsRequestToken
+  const requestToken =
+    ++introSegmentsRequestToken
 
   introVisibleSegmentsReady = false
   introVisibleSegmentsClickOrder = []
@@ -1510,249 +1524,145 @@ async function loadIntroVisibleSegments() {
     getIntroSegmentsLoadingMarkup(
       "جارٍ تحميل الفقرات..."
     )
-let latestGlobalMap = {}
 
-const modelPromise =
-  loadIntroModelRelations(
-    modelId,
-    {
-      staleWhileRevalidate: true,
+  const modelResult =
+    await loadIntroModelRelations(
+      modelId,
+      {
+        staleWhileRevalidate: true,
 
-      onBackgroundUpdate: freshModel => {
-        const currentModelId =
-          Number(
-            document.getElementById(
-              "introModelSelect"
-            )?.value || 0
-          )
+        onBackgroundUpdate: freshModel => {
+          const currentModelId =
+            Number(
+              document.getElementById(
+                "introModelSelect"
+              )?.value || 0
+            )
 
-        if (
-          currentModelId !== modelId ||
-          requestToken !==
-            introSegmentsRequestToken
-        ) {
-          return
-        }
-
-        applyIntroSegmentsData({
-          modelId,
-
-          visibleRows:
-            freshModel
-              ?.visible_segments ||
-            [],
-
-          globalMap:
-            latestGlobalMap,
-
-          preserveSelection: true
-        })
-      }
-    }
-  )
-
-const globalVisibilityPromise =
-  loadIntroGlobalSegmentVisibilityMap({
-    staleWhileRevalidate: true,
-
-    onBackgroundUpdate: freshRows => {
-      const freshMap = {}
-
-      ;(freshRows || []).forEach(row => {
-  const segmentKey =
-    normalizeIntroSegmentKey(
-      row.segment_key
-    )
-
-  freshMap[segmentKey] =
-    row.is_enabled !== false
-})
-
-      latestGlobalMap =
-        freshMap
-
-      const currentModelId =
-        Number(
-          document.getElementById(
-            "introModelSelect"
-          )?.value || 0
-        )
-
-      if (
-        currentModelId !== modelId ||
-        requestToken !==
-          introSegmentsRequestToken
-      ) {
-        return
-      }
-
-      modelPromise.then(
-        latestModelResult => {
           if (
-            !latestModelResult?.data
+            currentModelId !== modelId ||
+            requestToken !== introSegmentsRequestToken
           ) {
             return
           }
 
           applyIntroSegmentsData({
             modelId,
-
             visibleRows:
-              latestModelResult.data
-                .visible_segments ||
-              [],
-
-            globalMap:
-              latestGlobalMap,
-
+              freshModel?.visible_segments || [],
             preserveSelection: true
           })
         }
-      )
-    }
-  })
-
-const [
-  modelResult,
-  globalMap
-] = await Promise.all([
-  modelPromise,
-  globalVisibilityPromise
-])
-
-latestGlobalMap =
-  globalMap || {}
-
-if (
-  requestToken !==
-  introSegmentsRequestToken
-) {
-  return
-}
-
-if (
-  modelResult.error &&
-  !modelResult.data
-) {
-  console.log(
-    "INTRO MODEL RELATIONS ERROR:",
-    modelResult.error
-  )
-
-  grid.innerHTML = `
-    <div class="introSegmentsEmpty">
-      تعذر تحميل الفقرات
-    </div>
-  `
-
-  if (triggerSummary) {
-    triggerSummary.textContent =
-      "تعذر تحميل الفقرات"
-  }
-
-  showGameToast(
-    "تعذر تحميل الفقرات"
-  )
-
-  return
-}
-
-const modelData =
-  modelResult.data || {}
-
-const visibleRows =
-  Array.isArray(
-    modelData.visible_segments
-  )
-    ? modelData.visible_segments
-    : []
-
-applyIntroSegmentsData({
-  modelId,
-  visibleRows,
-  globalMap: latestGlobalMap,
-  preserveSelection: false
-})
-
-/*
-  إنشاء الصفوف الناقصة بالخلفية
-  بدون تعطيل ظهور الفقرات.
-*/
-setTimeout(async () => {
-  const currentModelId =
-    Number(
-      document.getElementById(
-        "introModelSelect"
-      )?.value || 0
-    )
-
-  if (
-    currentModelId !== modelId ||
-    requestToken !==
-      introSegmentsRequestToken
-  ) {
-    return
-  }
-
-  const defaultsReady =
-    await ensureIntroVisibleSegmentsDefaults(
-      modelId,
-      visibleRows
-    )
-
-  if (!defaultsReady) {
-    return
-  }
-
-  if (
-    visibleRows.length >=
-    INTRO_ALL_GAME_SEGMENTS.length
-  ) {
-    return
-  }
-
-  const freshResult =
-    await loadIntroModelRelations(
-      modelId,
-      {
-        forceRefresh: true,
-        staleWhileRevalidate: false
       }
     )
 
-  const latestSelectedModelId =
-    Number(
-      document.getElementById(
-        "introModelSelect"
-      )?.value || 0
-    )
-
   if (
-    latestSelectedModelId !== modelId ||
     requestToken !==
-      introSegmentsRequestToken
+    introSegmentsRequestToken
   ) {
     return
   }
 
-  if (!freshResult?.data) {
+  if (
+    modelResult.error &&
+    !modelResult.data
+  ) {
+    console.log(
+      "INTRO MODEL RELATIONS ERROR:",
+      modelResult.error
+    )
+
+    grid.innerHTML = `
+      <div class="introSegmentsEmpty">
+        تعذر تحميل الفقرات
+      </div>
+    `
+
+    if (triggerSummary) {
+      triggerSummary.textContent =
+        "تعذر تحميل الفقرات"
+    }
+
+    showGameToast("تعذر تحميل الفقرات")
     return
   }
 
+  const modelData =
+    modelResult.data || {}
+
+  const visibleRows =
+    Array.isArray(modelData.visible_segments)
+      ? modelData.visible_segments
+      : []
+
   applyIntroSegmentsData({
     modelId,
-
-    visibleRows:
-      freshResult.data
-        .visible_segments ||
-      [],
-
-    globalMap:
-      latestGlobalMap,
-
-    preserveSelection: true
+    visibleRows,
+    preserveSelection: false
   })
-}, 0)
+
+  setTimeout(async () => {
+    const currentModelId =
+      Number(
+        document.getElementById(
+          "introModelSelect"
+        )?.value || 0
+      )
+
+    if (
+      currentModelId !== modelId ||
+      requestToken !== introSegmentsRequestToken
+    ) {
+      return
+    }
+
+    const defaultsReady =
+      await ensureIntroVisibleSegmentsDefaults(
+        modelId,
+        visibleRows
+      )
+
+    if (!defaultsReady) return
+
+    if (
+      visibleRows.length >=
+      INTRO_ALL_GAME_SEGMENTS.length
+    ) {
+      return
+    }
+
+    const freshResult =
+      await loadIntroModelRelations(
+        modelId,
+        {
+          forceRefresh: true,
+          staleWhileRevalidate: false
+        }
+      )
+
+    const latestSelectedModelId =
+      Number(
+        document.getElementById(
+          "introModelSelect"
+        )?.value || 0
+      )
+
+    if (
+      latestSelectedModelId !== modelId ||
+      requestToken !== introSegmentsRequestToken
+    ) {
+      return
+    }
+
+    if (!freshResult?.data) return
+
+    applyIntroSegmentsData({
+      modelId,
+      visibleRows:
+        freshResult.data.visible_segments || [],
+      preserveSelection: true
+    })
+  }, 0)
 }
 
 /* =========================================================
@@ -1968,6 +1878,33 @@ function refreshIntroSegmentsPickerUI() {
   }
 }
 
+function getIntroSelectedSegmentsForSession() {
+  const availableMap =
+    new Map(
+      introAvailableSegments.map(item => [
+        item.key,
+        item
+      ])
+    )
+
+  return introVisibleSegmentsClickOrder
+    .map((key, index) => {
+      const item =
+        availableMap.get(key)
+
+      if (!item) return null
+
+      return {
+        key: item.key,
+        segment_key: item.key,
+        title: item.title || item.name || "",
+        sort_order: index + 1,
+        is_visible: true
+      }
+    })
+    .filter(Boolean)
+}
+
 window.toggleIntroVisibleSegment =
   function (key) {
     const exists =
@@ -2043,7 +1980,7 @@ async function saveIntroVisibleSegments() {
   const selectedCount =
     introVisibleSegmentsClickOrder.length
 
-    if (
+  if (
     selectedCount < INTRO_MIN_SEGMENTS_COUNT ||
     selectedCount > INTRO_MAX_SEGMENTS_COUNT
   ) {
@@ -2054,69 +1991,11 @@ async function saveIntroVisibleSegments() {
     return false
   }
 
-  const selectedOrderMap = {}
-
-  introVisibleSegmentsClickOrder.forEach((key, index) => {
-    selectedOrderMap[key] = index + 1
-  })
-
-  const now = new Date().toISOString()
-
-  const rows = INTRO_ALL_GAME_SEGMENTS.map(item => {
-    const selected = Object.prototype.hasOwnProperty.call(
-      selectedOrderMap,
-      item.key
-    )
-
-    return {
-      model: modelId,
-      segment_key: item.key,
-      is_visible: selected,
-      sort_order: selected
-        ? selectedOrderMap[item.key]
-        : 100 + Number(item.sort || 0),
-      updated_at: now
-    }
-  })
-
-  let result
-
-  if (typeof window.upsertData === "function") {
-    result = await window.upsertData(
-      "visible_segments",
-      rows,
-      {
-        onConflict: "model,segment_key"
-      }
-    )
-  } else {
-    const { data, error } = await db
-      .from("visible_segments")
-      .upsert(rows, {
-        onConflict: "model,segment_key"
-      })
-      .select()
-
-    result = { data, error }
-  }
-
-  if (result?.error) {
-    console.log(
-      "SAVE INTRO VISIBLE SEGMENTS ERROR:",
-      result.error
-    )
-
-    showGameToast("تعذر حفظ الفقرات المختارة")
-    return false
-  }
-
-  if (typeof window.invalidateModelCache === "function") {
-    window.invalidateModelCache(modelId)
-  }
-
   localStorage.setItem(
     "selected_game_segments",
-    JSON.stringify(introVisibleSegmentsClickOrder)
+    JSON.stringify(
+      introVisibleSegmentsClickOrder
+    )
   )
 
   return true
@@ -2256,6 +2135,12 @@ window.startGameFromIntro = async function () {
 
   randomChallenge:
     null,
+
+  selectedSegments:
+    getIntroSelectedSegmentsForSession(),
+
+  selectedSegmentKeys:
+    introVisibleSegmentsClickOrder.slice(),
 
   toast:
     null

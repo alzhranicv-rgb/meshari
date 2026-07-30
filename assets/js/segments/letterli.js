@@ -1,6 +1,6 @@
 /* =========================================================
    LETTERLI / حرفلي
-   File: assets/js/letterli.js
+   File: assets/js/segments/letterli.js
 ========================================================= */
 
 const LETTERLI_EXCEL_PATH =
@@ -8,6 +8,8 @@ const LETTERLI_EXCEL_PATH =
 
 const LETTERLI_STORAGE_KEY =
   "letterli_state_v1"
+
+const LETTERLI_TIMER_SECONDS = 5
 
 const LETTERLI_ALPHABET = [
   "أ",
@@ -46,7 +48,12 @@ let letterliLoaded = false
 let letterliLoading = false
 let letterliSpinTimer = null
 let letterliCountdownTimer = null
+let letterliTimerSync = null
 let letterliLoadError = ""
+
+let letterliStateSyncTimer = null
+let letterliStateSyncQueued = false
+let letterliStateSyncPending = false
 
 let letterliState =
   createDefaultLetterliState()
@@ -62,6 +69,7 @@ function createDefaultLetterliState() {
   return {
     currentLetter: null,
     currentQuestionIndex: null,
+    currentQuestion: null,
 
     usedLetters: [],
     usedQuestions: {},
@@ -75,8 +83,9 @@ function createDefaultLetterliState() {
     questionVisible: false,
     answerVisible: false,
 
-    timerValue: 5,
+    timerValue: LETTERLI_TIMER_SECONDS,
     timerRunning: false,
+    timerSync: null,
 
     spinning: false
   }
@@ -110,6 +119,82 @@ function normalizeLetterliLetter(value) {
     : ""
 }
 
+function buildLetterliQuestionSnapshot(question) {
+  if (!question) return null
+
+  return {
+    id: cleanLetterliText(question.id),
+    letter: normalizeLetterliLetter(question.letter),
+    question: cleanLetterliText(question.question),
+    answer: cleanLetterliText(question.answer)
+  }
+}
+
+function syncLetterliGlobals() {
+  letterliState.timerSync = letterliTimerSync
+
+  window.letterliState = letterliState
+  window.letterliTimerSync = letterliTimerSync
+
+  window.currentSegmentScores = {
+    A: Number(letterliState.scoreA || 0),
+    B: Number(letterliState.scoreB || 0)
+  }
+}
+
+function createLetterliTimerSync(seconds = LETTERLI_TIMER_SECONDS) {
+  const now = Date.now()
+  const duration = Math.max(0, Number(seconds || 0))
+
+  return {
+    startedAt: now,
+    endsAt: now + duration * 1000,
+    duration
+  }
+}
+
+function clearLetterliTimerSync() {
+  letterliTimerSync = null
+  letterliState.timerSync = null
+  window.letterliTimerSync = null
+}
+
+function getLetterliTimerRemaining(fallback = LETTERLI_TIMER_SECONDS) {
+  if (
+    letterliTimerSync &&
+    Number(letterliTimerSync.endsAt || 0) > Date.now()
+  ) {
+    return Math.max(
+      0,
+      Math.ceil((Number(letterliTimerSync.endsAt) - Date.now()) / 1000)
+    )
+  }
+
+  return Number(fallback || LETTERLI_TIMER_SECONDS)
+}
+
+function setLetterliGameActiveTeam(team) {
+  if (team !== "A" && team !== "B") return
+
+  window.selectedTeam = team
+
+  if (typeof window.setGameActiveTeam === "function") {
+    window.setGameActiveTeam(team, {
+      sync: false
+    })
+  }
+}
+
+function clearLetterliGameActiveTeam() {
+  window.selectedTeam = null
+
+  if (typeof window.clearGameActiveTeam === "function") {
+    window.clearGameActiveTeam({
+      sync: false
+    })
+  }
+}
+
 /* =========================================================
    STORAGE
 ========================================================= */
@@ -126,8 +211,9 @@ function loadLetterliState() {
       letterliState =
         createDefaultLetterliState()
 
-      window.letterliState =
-        letterliState
+      letterliTimerSync = null
+
+      syncLetterliGlobals()
 
       return
     }
@@ -135,6 +221,12 @@ function loadLetterliState() {
     letterliState = {
       ...createDefaultLetterliState(),
       ...saved,
+
+      currentQuestion:
+        saved.currentQuestion &&
+        typeof saved.currentQuestion === "object"
+          ? buildLetterliQuestionSnapshot(saved.currentQuestion)
+          : null,
 
       usedLetters:
         Array.isArray(saved.usedLetters)
@@ -175,8 +267,15 @@ function loadLetterliState() {
       timerRunning: false
     }
 
-    window.letterliState =
-      letterliState
+    letterliTimerSync =
+      saved.timerSync ||
+      saved.letterliTimerSync ||
+      saved.currentTimerSync ||
+      null
+
+    letterliState.timerSync = letterliTimerSync
+
+    syncLetterliGlobals()
   } catch (error) {
     console.warn(
       "LETTERLI STATE LOAD ERROR:",
@@ -186,16 +285,14 @@ function loadLetterliState() {
     letterliState =
       createDefaultLetterliState()
 
-    window.letterliState =
-      letterliState
+    letterliTimerSync = null
+
+    syncLetterliGlobals()
   }
 }
 
-function saveLetterliState(
-  options = {}
-) {
-  window.letterliState =
-    letterliState
+function saveLetterliState(options = {}) {
+  syncLetterliGlobals()
 
   localStorage.setItem(
     LETTERLI_STORAGE_KEY,
@@ -204,13 +301,71 @@ function saveLetterliState(
     )
   )
 
+  localStorage.setItem(
+    "active_segment",
+    "letterli"
+  )
+
+  if (options.sync === false) {
+    return
+  }
+
+  const immediate = options.immediate === true
+  const delay = immediate ? 0 : 120
+
+  letterliStateSyncPending = true
+
+  clearTimeout(letterliStateSyncTimer)
+
+  letterliStateSyncTimer = setTimeout(() => {
+    runLetterliStateSync(immediate)
+  }, delay)
+}
+
+async function runLetterliStateSync(immediate = false) {
+  if (letterliStateSyncQueued) {
+    letterliStateSyncPending = true
+    return
+  }
+
   if (
-    options.sync !== false &&
-    typeof window
-      .syncDisplayStateToSession ===
-      "function"
+    typeof window.saveUnifiedGameState !== "function" &&
+    typeof window.syncDisplayStateToSession !== "function"
   ) {
-    window.syncDisplayStateToSession()
+    letterliStateSyncPending = false
+    return
+  }
+
+  letterliStateSyncQueued = true
+  letterliStateSyncPending = false
+
+  try {
+    if (typeof window.saveUnifiedGameState === "function") {
+      await Promise.resolve(
+        window.saveUnifiedGameState()
+      )
+    }
+
+    if (typeof window.syncDisplayStateToSession === "function") {
+      await Promise.resolve(
+        window.syncDisplayStateToSession({
+          immediate
+        })
+      )
+    }
+  } catch (error) {
+    console.log(
+      "LETTERLI STATE SYNC ERROR:",
+      error
+    )
+  } finally {
+    letterliStateSyncQueued = false
+
+    if (letterliStateSyncPending) {
+      letterliStateSyncTimer = setTimeout(() => {
+        runLetterliStateSync(true)
+      }, 60)
+    }
   }
 }
 
@@ -223,13 +378,9 @@ function resetLetterliState() {
 
   letterliLoadError = ""
 
-  window.letterliState =
-    letterliState
+  letterliTimerSync = null
 
-  window.currentSegmentScores = {
-    A: 0,
-    B: 0
-  }
+  syncLetterliGlobals()
 
   localStorage.removeItem(
     LETTERLI_STORAGE_KEY
@@ -556,7 +707,24 @@ function getLetterliCurrentQuestion() {
       letter
     )
 
-  return questions[index] || null
+  const question =
+    questions[index] || null
+
+  if (question) {
+    return question
+  }
+
+  const savedQuestion =
+    letterliState.currentQuestion
+
+  if (
+    savedQuestion &&
+    normalizeLetterliLetter(savedQuestion.letter) === letter
+  ) {
+    return savedQuestion
+  }
+
+  return null
 }
 
 function getLetterliUnusedLetters() {
@@ -630,21 +798,17 @@ function selectLetterliQuestion(
     )
 
   if (!questions.length) {
-    letterliState.currentQuestionIndex =
-      null
+    letterliState.currentQuestionIndex = null
+    letterliState.currentQuestion = null
+    letterliState.questionVisible = false
+    letterliState.answerVisible = false
 
-    letterliState.questionVisible =
-  false
+    stopLetterliCountdown(true)
 
-   letterliState.answerVisible =
-  false
+    saveLetterliState({ immediate: true })
+    renderLetterli()
 
-   stopLetterliCountdown(true)
-
-saveLetterliState()
-renderLetterli()
-
-return null
+    return null
   }
 
   const currentIndex =
@@ -708,22 +872,19 @@ return null
     return null
   }
 
-  letterliState.currentLetter =
-  normalized
+  letterliState.currentLetter = normalized
+  letterliState.currentQuestionIndex = selectedIndex
+  letterliState.currentQuestion =
+    buildLetterliQuestionSnapshot(
+      questions[selectedIndex]
+    )
 
-letterliState.currentQuestionIndex =
-  selectedIndex
+  letterliState.selectedTeam = null
+  letterliState.questionVisible = false
+  letterliState.answerVisible = false
 
-letterliState.selectedTeam =
-  null
-
-letterliState.questionVisible =
-  false
-
-letterliState.answerVisible =
-  false
-
-stopLetterliCountdown(true)
+  clearLetterliGameActiveTeam()
+  stopLetterliCountdown(true)
 
   const nextUsedIndexes =
     Array.from(
@@ -737,7 +898,7 @@ stopLetterliCountdown(true)
     normalized
   ] = nextUsedIndexes
 
-  saveLetterliState()
+  saveLetterliState({ immediate: true })
   renderLetterli()
 
   return questions[selectedIndex]
@@ -891,6 +1052,7 @@ async function startLetterliSpin() {
   letterliState.questionVisible = false
   letterliState.selectedTeam = null
   letterliState.currentQuestionIndex = null
+  letterliState.currentQuestion = null
 
   saveLetterliState({
     sync: false
@@ -1011,9 +1173,11 @@ function finishLetterliSpin(
     )
   }
 
-  saveLetterliState()
+  saveLetterliState({
+    sync: false
+  })
 
-selectLetterliQuestion(letter)
+  selectLetterliQuestion(letter)
 
 requestAnimationFrame(() => {
   const letterElement =
@@ -1067,15 +1231,16 @@ function stopLetterliCountdown(
   }
 
   letterliState.timerRunning = false
+  clearLetterliTimerSync()
 
   if (reset) {
-    letterliState.timerValue = 5
+    letterliState.timerValue = LETTERLI_TIMER_SECONDS
   }
 }
 
 function resetLetterliCountdown() {
   stopLetterliCountdown(true)
-  saveLetterliState()
+  saveLetterliState({ immediate: true })
   renderLetterli()
 }
 
@@ -1096,28 +1261,31 @@ function startLetterliCountdown() {
     return
   }
 
-  letterliState.timerValue = 5
+  letterliState.timerValue = LETTERLI_TIMER_SECONDS
   letterliState.timerRunning = true
+  letterliTimerSync =
+    createLetterliTimerSync(
+      LETTERLI_TIMER_SECONDS
+    )
 
-  saveLetterliState()
+  saveLetterliState({ immediate: true })
   renderLetterli()
 
   letterliCountdownTimer =
     window.setInterval(() => {
       letterliState.timerValue =
-        Math.max(
-          0,
-          Number(
-            letterliState.timerValue || 0
-          ) - 1
+        getLetterliTimerRemaining(
+          letterliState.timerValue
         )
 
       if (
-        letterliState.timerValue === 0
+        letterliState.timerValue <= 0
       ) {
         stopLetterliCountdown(false)
 
-        saveLetterliState()
+        letterliState.timerValue = 0
+
+        saveLetterliState({ immediate: true })
         renderLetterli()
 
         if (
@@ -1165,7 +1333,7 @@ function toggleLetterliQuestion() {
   letterliState.answerVisible =
     false
 
-  saveLetterliState()
+  saveLetterliState({ immediate: true })
   renderLetterli()
 }
 
@@ -1184,32 +1352,15 @@ function markLetterliCorrectAnswer() {
     return
   }
 
-
   stopLetterliCountdown(false)
 
-  letterliState.questionVisible =
-    false
+  letterliState.questionVisible = false
+  letterliState.answerVisible = true
+  letterliState.selectedTeam = null
 
-  letterliState.answerVisible =
-    true
+  clearLetterliGameActiveTeam()
 
-  letterliState.selectedTeam =
-    null
-
-  window.selectedTeam =
-    null
-
-  if (
-    typeof window
-      .clearGameActiveTeam ===
-    "function"
-  ) {
-    window.clearGameActiveTeam({
-      sync: false
-    })
-  }
-
-  saveLetterliState()
+  saveLetterliState({ immediate: true })
   renderLetterli()
 }
 
@@ -1252,14 +1403,11 @@ function selectLetterliTeam(team) {
     return false
   }
 
-  letterliState.selectedTeam =
-    team
+  letterliState.selectedTeam = team
+
+  setLetterliGameActiveTeam(team)
 
   addLetterliPoint(team)
-
-  saveLetterliState({
-  sync: false
-})
 
   letterliState.completedCount =
     Number(
@@ -1268,35 +1416,16 @@ function selectLetterliTeam(team) {
 
   stopLetterliCountdown(true)
 
-  letterliState.currentLetter =
-    null
+  letterliState.currentLetter = null
+  letterliState.currentQuestionIndex = null
+  letterliState.currentQuestion = null
+  letterliState.questionVisible = false
+  letterliState.answerVisible = false
+  letterliState.selectedTeam = null
 
-  letterliState.currentQuestionIndex =
-    null
+  clearLetterliGameActiveTeam()
 
-  letterliState.questionVisible =
-    false
-
-  letterliState.answerVisible =
-    false
-
-  letterliState.selectedTeam =
-    null
-
-  window.selectedTeam =
-    null
-
-  if (
-    typeof window
-      .clearGameActiveTeam ===
-    "function"
-  ) {
-    window.clearGameActiveTeam({
-      sync: false
-    })
-  }
-
-  saveLetterliState()
+  saveLetterliState({ immediate: true })
   renderLetterli()
 
   return true
@@ -1376,12 +1505,18 @@ function renderLetterli() {
   ========================= */
 
   if (elements.timer) {
+    const liveTimerValue =
+      letterliState.timerRunning
+        ? getLetterliTimerRemaining(
+            letterliState.timerValue
+          )
+        : Number(
+            letterliState.timerValue ??
+            LETTERLI_TIMER_SECONDS
+          )
+
     elements.timer.textContent =
-      String(
-        Number(
-          letterliState.timerValue ?? 5
-        )
-      )
+      String(liveTimerValue)
 
     elements.timer.classList.toggle(
   "timerDanger",
@@ -1629,17 +1764,6 @@ function addLetterliPoint(team) {
     )
   }
 
-  if (
-    typeof window
-      .showAnswerResultOverlay ===
-    "function"
-  ) {
-    window.showAnswerResultOverlay(
-      "correct",
-      1
-    )
-  }
-
   return true
 }
 
@@ -1725,15 +1849,7 @@ async function openLetterliSegment() {
   stopLetterliSpin()
   loadLetterliState()
 
-  window.currentSegmentScores = {
-  A: Number(
-    letterliState.scoreA || 0
-  ),
-
-  B: Number(
-    letterliState.scoreB || 0
-  )
-}
+  syncLetterliGlobals()
 
   letterliLoadError = ""
 
@@ -1958,9 +2074,8 @@ async function openLetterliSegment() {
         ) ||
         !questions[currentIndex]
       ) {
-        letterliState
-          .currentQuestionIndex =
-          null
+        letterliState.currentQuestionIndex = null
+        letterliState.currentQuestion = null
 
         selectLetterliQuestion(
           currentLetter
@@ -1974,6 +2089,10 @@ async function openLetterliSegment() {
     "active_segment",
     "letterli"
   )
+
+  saveLetterliState({
+    immediate: true
+  })
 
   renderLetterli()
 
@@ -2025,6 +2144,15 @@ window.stopLetterliCountdown =
 
 window.getLetterliDisplayedScore =
   getLetterliDisplayedScore
+
+  window.getLetterliTimerRemaining =
+  getLetterliTimerRemaining
+
+window.getLetterliTimerSync =
+  () => letterliTimerSync
+
+window.syncLetterliGlobals =
+  syncLetterliGlobals
 
 /* =========================================================
    INITIAL LOAD

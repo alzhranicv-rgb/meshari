@@ -12,6 +12,7 @@ let explainStateSyncTimer = null
 let explainDataCache = {}
 let explainDataPromise = null
 
+
 const EXPLAIN_DATA_CACHE_TTL =
   5 * 60 * 1000
 
@@ -37,7 +38,10 @@ window.explainState = {
   answerResult: null,
   scores: { A: 0, B: 0 },
   attempts: { A: 0, B: 0 },
-  wordPoolKey: ""
+  wordPoolKey: "",
+compensationActive: false,
+compensationNumber: null,
+compensationReturnTeam: null
 }
 
 /* =========================
@@ -74,7 +78,7 @@ function setExplainActiveTeam(
       "function"
     ) {
       setGameActiveTeam(team, {
-        sync: options.sync !== false
+        sync: false
       })
     }
   } else if (
@@ -82,7 +86,7 @@ function setExplainActiveTeam(
     "function"
   ) {
     clearGameActiveTeam({
-      sync: options.sync !== false
+      sync: false
     })
   }
 
@@ -93,7 +97,10 @@ function setExplainActiveTeam(
   if (options.save === true) {
     saveExplainState({
       immediate:
-        options.immediate === true
+        options.immediate === true,
+
+      sync:
+        options.sync !== false
     })
   }
 
@@ -200,6 +207,12 @@ function saveExplainState(options = {}) {
           .filter(number => number > 0)
       )
     ]
+        window.explainState.timerSync = {
+      startedAt: Number(explainTimerStartedAt || 0),
+      endsAt: Number(explainTimerEndsAt || 0),
+      duration: Number(explainTimerDuration || 0)
+    }
+    
 
     localStorage.setItem(
       EXPLAIN_STORAGE_KEY,
@@ -229,30 +242,32 @@ function saveExplainState(options = {}) {
       )
     }
 
-    if (
-      typeof saveUnifiedGameState ===
-      "function"
-    ) {
-      saveUnifiedGameState()
+    if (options.sync !== false) {
+      clearTimeout(
+        explainStateSyncTimer
+      )
+
+      const immediate =
+        options.immediate === true
+
+      explainStateSyncTimer = setTimeout(() => {
+        if (
+          typeof saveUnifiedGameState ===
+          "function"
+        ) {
+          saveUnifiedGameState()
+        }
+
+        if (
+          typeof syncDisplayStateToSession ===
+          "function"
+        ) {
+          syncDisplayStateToSession({
+            immediate
+          })
+        }
+      }, immediate ? 0 : 120)
     }
-
-    clearTimeout(
-      explainStateSyncTimer
-    )
-
-    const immediate =
-      options.immediate === true
-
-    explainStateSyncTimer = setTimeout(() => {
-      if (
-        typeof syncDisplayStateToSession ===
-        "function"
-      ) {
-        syncDisplayStateToSession({
-          immediate
-        })
-      }
-    }, immediate ? 0 : 120)
 
     if (
       typeof updateEndRoundButtonState ===
@@ -294,6 +309,10 @@ function resetExplainTimer() {
   clearInterval(explainTimer)
   explainTimer = null
   explainTimerLastTick = null
+
+  explainTimerStartedAt = 0
+  explainTimerEndsAt = 0
+  explainTimerDuration = 0
 }
 
 function resetExplainRevealTimeout() {
@@ -493,7 +512,19 @@ function applyExplainLoadedData(
       )
     },
 
-    wordPoolKey
+    wordPoolKey,
+
+    compensationActive:
+      !!sourceState?.compensationActive,
+
+    compensationNumber:
+      Number(sourceState?.compensationNumber || 0) || null,
+
+    compensationReturnTeam:
+      sourceState?.compensationReturnTeam === "A" ||
+      sourceState?.compensationReturnTeam === "B"
+        ? sourceState.compensationReturnTeam
+        : null
   }
 
   explainDoubleState =
@@ -906,21 +937,39 @@ function buildExplainHtml() {
 
           ${Array.from({ length: count }, (_, idx) => {
 
-            const number = idx + 1
-            const used =
-              window.explainState.usedNumbers.includes(number)
+const number = idx + 1
 
-            return `
-              <button
-                type="button"
-                id="explainNumber_${number}"
-                class="finalRound3Card finalTeamMediaNumberCard ${used ? "used" : ""}"
-                onclick="openExplainNumber(${number})"
-                ${used ? "disabled" : ""}
-              >
-                ${used ? "" : number}
-              </button>
-            `
+const used =
+  window.explainState.usedNumbers.includes(number)
+
+const isCompensation =
+  isExplainCompensationNumber(number)
+
+return `
+  <button
+    type="button"
+    id="explainNumber_${number}"
+    class="finalRound3Card finalTeamMediaNumberCard ${used ? "used" : ""} ${isCompensation && !used ? "segmentCompensationNumber" : ""}"
+    ${used ? "disabled" : ""}
+    ${
+      used
+        ? ""
+        : isCompensation
+          ? `
+            onpointerdown="startExplainCompensationPress(event, ${number})"
+            onpointerup="clearExplainCompensationPress()"
+            onpointerleave="clearExplainCompensationPress()"
+            onpointercancel="clearExplainCompensationPress()"
+            oncontextmenu="return false"
+            onselectstart="return false"
+            onclick="blockExplainCompensationNormalClick(event)"
+          `
+          : `onclick="openExplainNumber(${number})"`
+    }
+  >
+    ${used ? "" : number}
+  </button>
+`
           }).join("")}
 
         </div>
@@ -1298,6 +1347,29 @@ function selectExplainTeam(
     )
   }
 
+  const compensationActive =
+    window.explainState.compensationActive === true
+
+  if (
+    window.explainState.currentNumber &&
+    compensationActive &&
+    !force
+  ) {
+    setExplainActiveTeam(team, {
+      sync: options.sync !== false,
+      save: false
+    })
+
+    updateExplainUI()
+    renderExplainCompensationBadge()
+
+    saveExplainState({
+      immediate: true
+    })
+
+    return true
+  }
+
   if (
     window.explainState.currentNumber &&
     !force
@@ -1350,23 +1422,161 @@ window.selectExplainTeam =
 window.forceExplainTeamFromPresenter =
   forceExplainTeamFromPresenter
 
-function openExplainNumber(number) {
+let explainCompensationPressTimer = null
+let explainCompensationPressActivated = false
+
+function getExplainCompensationNumber() {
+  const count =
+    normalizeExplainWordsCount(
+      window.explainState?.wordsCount ||
+      window.explainWordsCount ||
+      localStorage.getItem("explain_words_count") ||
+      0
+    )
+
+  return [5, 7, 9].includes(count) ? count : 0
+}
+
+function isExplainCompensationNumber(number) {
+  const n = Number(number || 0)
+  return n > 0 && n === getExplainCompensationNumber()
+}
+
+function clearExplainCompensationPress() {
+  clearTimeout(explainCompensationPressTimer)
+  explainCompensationPressTimer = null
+
+  document
+    .querySelectorAll(".segmentCompensationPressing")
+    .forEach(el => {
+      el.classList.remove("segmentCompensationPressing")
+    })
+}
+
+function startExplainCompensationPress(event, number) {
+  event.preventDefault()
+  event.stopPropagation()
+
+  unlockAudioContext()
+  clearExplainCompensationPress()
+
+  const n = Number(number || 0)
+
+  if (!isExplainCompensationNumber(n)) {
+    return false
+  }
+
+  explainCompensationPressActivated = false
+
+  const button =
+    event.currentTarget
+
+      if (
+    event.pointerId &&
+    typeof button?.setPointerCapture === "function"
+  ) {
+    button.setPointerCapture(event.pointerId)
+  }
+
+  button?.classList.add(
+    "segmentCompensationPressing"
+  )
+
+  explainCompensationPressTimer =
+    setTimeout(() => {
+      explainCompensationPressActivated = true
+
+      button?.classList.remove(
+        "segmentCompensationPressing"
+      )
+
+      openExplainNumber(n, {
+        compensation: true
+      })
+    }, 700)
+
+  return false
+}
+
+function blockExplainCompensationNormalClick(event) {
+  event.preventDefault()
+  event.stopPropagation()
+
+  clearExplainCompensationPress()
+
+  if (!explainCompensationPressActivated) {
+    showGameToast(
+      "اضغط مطولاً لتفعيل التعويض"
+    )
+  }
+
+  explainCompensationPressActivated = false
+
+  return false
+}
+
+function renderExplainCompensationBadge() {
+  document
+    .getElementById("explainCompensationBadge")
+    ?.remove()
+
+  if (window.explainState?.compensationActive !== true) {
+    return
+  }
+
+  const wrap =
+    document.querySelector(".explainWrap")
+
+  if (!wrap) return
+
+  wrap.insertAdjacentHTML(
+    "afterbegin",
+    `
+      <div
+        id="explainCompensationBadge"
+        class="segmentCompensationBadge"
+      >
+        التعويض
+      </div>
+    `
+  )
+}
+
+function openExplainNumber(number, options = {}) {
   unlockAudioContext()
 
   if (window.explainState.revealLock) return
 
   const n = Number(number || 0)
-  const activeTeam = selectedTeam || window.explainState.currentTeam
 
-  if (!activeTeam) {
-    showGameToast("اختر الفريق أولاً")
+  const isCompensation =
+    isExplainCompensationNumber(n)
+
+  const compensationMode =
+    options.compensation === true
+
+  if (isCompensation && !compensationMode) {
+    showGameToast(
+      "اضغط مطولاً لتفعيل التعويض"
+    )
+
     return
   }
 
-  if (!canExplainTeamPlay(activeTeam)) {
-    const other = getExplainOtherTeam(activeTeam)
-    showGameToast(`الدور الآن لـ ${getExplainTeamName(other)}`)
-    return
+  const activeTeam =
+    selectedTeam || window.explainState.currentTeam
+
+  if (!isCompensation) {
+    if (!activeTeam) {
+      showGameToast("اختر الفريق أولاً")
+      return
+    }
+
+    if (!canExplainTeamPlay(activeTeam)) {
+      const other = getExplainOtherTeam(activeTeam)
+      showGameToast(`الدور الآن لـ ${getExplainTeamName(other)}`)
+      return
+    }
   }
 
   if (window.explainState.usedNumbers.includes(n)) {
@@ -1387,14 +1597,44 @@ function openExplainNumber(number) {
   window.explainState.currentNumber = n
   window.explainState.currentWord = item.word
 
-  setExplainActiveTeam(activeTeam)
+  window.explainState.compensationActive =
+    isCompensation && compensationMode
+
+  window.explainState.compensationNumber =
+    window.explainState.compensationActive
+      ? n
+      : null
+
+  window.explainState.compensationReturnTeam =
+    window.explainState.compensationActive &&
+    (
+      activeTeam === "A" ||
+      activeTeam === "B"
+    )
+      ? activeTeam
+      : null
+
+  if (window.explainState.compensationActive) {
+    selectedTeam = null
+    window.selectedTeam = null
+
+    setExplainActiveTeam(null)
+  } else {
+    setExplainActiveTeam(activeTeam)
+  }
 
   window.explainState.wordVisible = true
   window.explainState.timerVisible = false
   window.explainState.timeLeft = EXPLAIN_TIMER_SECONDS
 
   playGameSound("open")
+
   updateExplainUI()
+  renderExplainCompensationBadge()
+
+  saveExplainState({
+    immediate: true
+  })
 }
 
 function hideExplainWord() {
@@ -1405,6 +1645,9 @@ function hideExplainWord() {
 
   playGameSound("answer")
   updateExplainUI()
+    saveExplainState({
+    immediate: true
+  })
 }
 
 /* =========================
@@ -1448,6 +1691,12 @@ function runExplainTimer(seconds) {
     0,
     Number(seconds || 0)
   )
+    explainTimerStartedAt = Date.now()
+  explainTimerDuration = time
+  explainTimerEndsAt =
+    time > 0
+      ? explainTimerStartedAt + time * 1000
+      : 0
 
   window.explainState.timerVisible =
     time > 0
@@ -1469,6 +1718,8 @@ function runExplainTimer(seconds) {
   if (time <= 0) {
     window.explainState.timerVisible =
       false
+
+    explainTimerEndsAt = 0
 
     return
   }
@@ -1510,7 +1761,9 @@ function runExplainTimer(seconds) {
     }
 
     updateExplainUI()
-    saveExplainState()
+    saveExplainState({
+      sync: false
+    })
   }, 1000)
 }
 
@@ -1523,17 +1776,35 @@ function finishExplainNumber(isCorrect) {
 
   if (window.explainState.revealLock) return
 
-  const activeTeam = window.explainState.currentTeam || selectedTeam
-
-  if (!activeTeam) {
-    showGameToast("اختر الفريق أولاً")
-    return
-  }
-
   const n = Number(window.explainState.currentNumber || 0)
 
   if (!n) {
     showGameToast("اختر رقم أولاً")
+    return
+  }
+
+  const compensationActive =
+    window.explainState.compensationActive === true &&
+    Number(window.explainState.compensationNumber || 0) === n &&
+    isExplainCompensationNumber(n)
+
+  const returnTeam =
+    window.explainState.compensationReturnTeam
+
+  const activeTeam =
+    window.explainState.currentTeam || selectedTeam
+
+  if (!compensationActive && !activeTeam) {
+    showGameToast("اختر الفريق أولاً")
+    return
+  }
+
+  if (
+    compensationActive &&
+    isCorrect &&
+    !activeTeam
+  ) {
+    showGameToast("اختر الفريق قبل تسجيل التعويض")
     return
   }
 
@@ -1551,7 +1822,10 @@ function finishExplainNumber(isCorrect) {
   window.explainState.answerResult = isCorrect ? "correct" : "wrong"
 
   if (isCorrect) {
-    const points = getExplainScoreValue(activeTeam)
+    const points =
+      compensationActive
+        ? 2
+        : getExplainScoreValue(activeTeam)
 
     window.explainState.scores[activeTeam] =
       Number(window.explainState.scores[activeTeam] || 0) + points
@@ -1563,17 +1837,23 @@ function finishExplainNumber(isCorrect) {
     flashScreen("wrong")
   }
 
-  clearExplainActiveDouble(activeTeam)
+  if (activeTeam) {
+    clearExplainActiveDouble(activeTeam)
 
-  window.explainState.attempts[activeTeam] =
-    Number(window.explainState.attempts[activeTeam] || 0) + 1
+    window.explainState.attempts[activeTeam] =
+      Number(window.explainState.attempts[activeTeam] || 0) + 1
+  }
 
   if (
-  !window.explainState.usedNumbers
-    .includes(n)
-) {
-  window.explainState.usedNumbers.push(n)
-}
+    !window.explainState.usedNumbers
+      .includes(n)
+  ) {
+    window.explainState.usedNumbers.push(n)
+  }
+
+  window.explainState.compensationActive = false
+  window.explainState.compensationNumber = null
+  window.explainState.compensationReturnTeam = null
 
   window.currentSegmentScores = {
     A: Number(window.explainState.scores.A || 0),
@@ -1581,24 +1861,43 @@ function finishExplainNumber(isCorrect) {
   }
 
   updateExplainUI()
+  renderExplainCompensationBadge()
+
   saveExplainState({
-  immediate: true
-})
+    immediate: true
+  })
 
   explainRevealTimeout = setTimeout(() => {
     const allDone =
       window.explainState.usedNumbers.length >=
       normalizeExplainWordsCount(window.explainState.wordsCount)
 
-    const nextTeam = allDone ? null : getExplainOtherTeam(activeTeam)
+    let nextTeam = null
+
+    if (!allDone) {
+      if (activeTeam) {
+        nextTeam = getExplainOtherTeam(activeTeam)
+      } else if (
+        returnTeam === "A" ||
+        returnTeam === "B"
+      ) {
+        nextTeam = returnTeam
+      }
+    }
 
     window.explainState.currentNumber = null
     window.explainState.currentWord = ""
 
     if (nextTeam) {
-      setExplainActiveTeam(nextTeam)
+      setExplainActiveTeam(nextTeam, {
+        sync: false,
+        save: false
+      })
     } else {
-      setExplainActiveTeam(null)
+      setExplainActiveTeam(null, {
+        sync: false,
+        save: false
+      })
     }
 
     window.explainState.wordVisible = true
@@ -1609,7 +1908,10 @@ function finishExplainNumber(isCorrect) {
 
     updateExplainUI()
     updateExplainDoubleButton()
-    saveExplainState()
+
+    saveExplainState({
+      immediate: true
+    })
   }, 5000)
 }
 
@@ -1624,6 +1926,14 @@ function wrongExplainAnswer() {
 window.activateExplainDouble = activateExplainDouble
 window.selectExplainTeam = selectExplainTeam
 window.openExplainNumber = openExplainNumber
+window.startExplainCompensationPress =
+  startExplainCompensationPress
+
+window.clearExplainCompensationPress =
+  clearExplainCompensationPress
+
+window.blockExplainCompensationNormalClick =
+  blockExplainCompensationNormalClick
 window.hideExplainWord = hideExplainWord
 window.startExplainTimer = startExplainTimer
 window.correctExplainAnswer = correctExplainAnswer

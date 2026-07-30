@@ -1,9 +1,7 @@
 /* =========================================================
    EXPLAIN ADMIN / إدارة فقرة اشرح الكلمة
-   CLEAN PROFESSIONAL DESIGN
-
-   File:
-   assets/css/segments/admin/explain-admin.css
+   CLEAN FINAL
+   File: assets/css/segments/admin/explain-admin.css
 ========================================================= */
 
 /* =========================
@@ -28,59 +26,23 @@
 
 .explainAdminShell
 .adminEditorTopBar{
-  position:sticky;
-  top:112px;
-  z-index:20;
+  border-color:rgba(35,61,77,.20);
 
-  margin:0;
-
-  border-color:
-    rgba(35,61,77,.20);
-
-  background:
-    rgba(255,255,255,.97);
+  background:var(--admin-surface);
 
   box-shadow:
-    0 14px 34px
+    0 12px 30px
     rgba(35,61,77,.08);
 }
 
 .explainAdminShell
 .adminSectionTitle{
+  color:var(--admin-secondary);
+
   display:flex;
   align-items:center;
-  gap:11px;
-}
 
-.explainAdminShell
-.adminSectionTitle::before{
-  content:"ك";
-
-  width:46px;
-  height:46px;
-
-  flex:0 0 auto;
-
-  border-radius:15px;
-
-  color:#FFFFFF;
-
-  background:
-    var(--admin-secondary);
-
-  display:grid;
-  place-items:center;
-
-  font-family:
-    "HanakaDisplay",
-    sans-serif;
-
-  font-size:1.45rem;
-  line-height:1;
-
-  box-shadow:
-    0 9px 20px
-    rgba(35,61,77,.22);
+  gap:10px;
 }
 
 .explainAdminShell
@@ -129,16 +91,13 @@
 
   min-width:0;
 
-  scroll-margin-top:220px;
+  scroll-margin-top:24px;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-surface);
+  background:var(--admin-surface);
 
   box-shadow:
     0 10px 27px
@@ -165,8 +124,7 @@
 
   opacity:.55;
 
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 
   transition:
     width .18s var(--admin-ease),
@@ -174,11 +132,9 @@
 }
 
 .explainItemOnePageCard:hover{
-  transform:
-    translateY(-2px);
+  transform:translateY(-2px);
 
-  border-color:
-    rgba(254,127,45,.34);
+  border-color:rgba(254,127,45,.34);
 
   box-shadow:
     0 16px 36px
@@ -192,18 +148,15 @@
 }
 
 .explainItemOnePageCard.isDone{
-  border-color:
-    rgba(0,127,0,.26);
+  border-color:rgba(0,127,0,.26);
 }
 
 .explainItemOnePageCard.isDone::before{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 }
 
 .explainItemOnePageCard.isMissing::before{
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 }
 
 .explainItemOnePageCard[open]{
@@ -211,8 +164,7 @@
 
   transform:none;
 
-  border-color:
-    rgba(254,127,45,.38);
+  border-color:rgba(254,127,45,.38);
 
   box-shadow:
     0 22px 52px
@@ -229,9 +181,7 @@
   list-style:none;
   cursor:pointer;
 
-  padding:
-    15px
-    18px;
+  padding:15px 18px;
 
   display:grid;
 
@@ -261,14 +211,12 @@
 
 .explainItemOnePageCard
 > summary:hover{
-  background:
-    var(--admin-primary-soft);
+  background:var(--admin-primary-soft);
 }
 
 .explainItemOnePageCard[open]
 > summary{
-  border-bottom:
-    1px solid var(--admin-line);
+  border-bottom:1px solid var(--admin-line);
 
   background:
     linear-gradient(
@@ -309,8 +257,7 @@
 
   border-radius:15px;
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
   box-shadow:
     0 8px 18px
@@ -334,17 +281,15 @@
   display:grid;
   place-items:center;
 
-  font-family:
-    "HanakaDisplay",
-    sans-serif;
+  font-family:"HanakaDisplay",sans-serif;
 
   font-size:1.2rem;
+  line-height:1;
 }
 
 .explainItemOnePageCard.isDone
 .adminEditItemTitle::before{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 }
 
 .explainItemOnePageCard
@@ -353,12 +298,9 @@
 
   min-width:0;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  font-size:
-    clamp(1.03rem,2vw,1.2rem);
-
+  font-size:clamp(1.03rem,2vw,1.2rem);
   line-height:1.3;
 
   overflow:hidden;
@@ -373,8 +315,7 @@
 
   min-width:0;
 
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
   font-size:.84rem;
   line-height:1.4;
@@ -387,14 +328,12 @@
 
 .explainItemOnePageCard.isDone
 .adminEditItemTitle span{
-  color:
-    var(--admin-green);
+  color:var(--admin-green);
 }
 
 .explainItemOnePageCard.isMissing
 .adminEditItemTitle span{
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 }
 
 /* =========================
@@ -429,21 +368,19 @@
 
   flex:0 0 auto;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
   border-radius:11px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   display:grid;
   place-items:center;
 
   font-size:1.05rem;
+  line-height:1;
 
   transition:
     transform .18s var(--admin-ease),
@@ -456,14 +393,11 @@
 > summary::after{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-secondary);
+  border-color:var(--admin-secondary);
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
-  transform:
-    rotate(180deg);
+  transform:rotate(180deg);
 }
 
 /* =========================
@@ -472,14 +406,13 @@
 
 .explainItemOnePageCard
 > .adminEditItemBody{
-  padding:
-    clamp(16px,2.2vw,24px);
+  padding:clamp(16px,2.2vw,24px);
 
   background:#FFFFFF;
 }
 
 .explainItemOnePageCard[open]
-.adminEditItemBody{
+> .adminEditItemBody{
   animation:
     explainAdminCardOpen
     .22s
@@ -506,17 +439,13 @@
   width:100%;
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
-  padding:
-    clamp(15px,2vw,22px);
+  padding:clamp(15px,2vw,22px);
 
   display:grid;
 
@@ -537,11 +466,9 @@
 .adminField{
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
   background:#FFFFFF;
 
@@ -553,8 +480,7 @@
 
 .explainOnePageLayout
 .adminField label{
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:.9rem;
   line-height:1.4;
@@ -567,26 +493,17 @@
 
   min-height:66px;
 
-  border:
-    1px solid
-    rgba(35,61,77,.18);
+  border:1px solid rgba(35,61,77,.18);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
-  padding:
-    12px
-    16px;
+  padding:12px 16px;
 
-  font-size:
-    clamp(1.05rem,2.2vw,1.25rem);
-
+  font-size:clamp(1.05rem,2.2vw,1.25rem);
   line-height:1.4;
 
   transition:
@@ -599,8 +516,7 @@
 .adminField input:focus{
   outline:0;
 
-  border-color:
-    var(--admin-primary);
+  border-color:var(--admin-primary);
 
   background:#FFFFFF;
 
@@ -613,36 +529,30 @@
 .adminField:not(
   .adminMissingField
 ){
-  border-color:
-    rgba(0,127,0,.20);
+  border-color:rgba(0,127,0,.20);
 
-  background:
-    var(--admin-green-soft);
+  background:var(--admin-green-soft);
 }
 
 .explainOnePageLayout
 .adminField:not(
   .adminMissingField
 ) input{
-  border-color:
-    rgba(0,127,0,.20);
+  border-color:rgba(0,127,0,.20);
 
   background:#FFFFFF;
 }
 
 .explainOnePageLayout
 .adminField.adminMissingField{
-  border-color:
-    rgba(127,0,0,.22);
+  border-color:rgba(127,0,0,.22);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 }
 
 .explainOnePageLayout
 .adminField.adminMissingField input{
-  border-color:
-    rgba(127,0,0,.30);
+  border-color:rgba(127,0,0,.30);
 
   background:#FFF9F9;
 }
@@ -653,21 +563,15 @@
 
 .explainAdminShell
 .adminMissingHint{
-  border:
-    1px solid
-    rgba(127,0,0,.12);
+  border:1px solid rgba(127,0,0,.12);
 
   border-radius:10px;
 
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 
-  background:
-    rgba(255,255,255,.68);
+  background:rgba(255,255,255,.68);
 
-  padding:
-    7px
-    10px;
+  padding:7px 10px;
 
   font-size:.82rem;
   line-height:1.4;
@@ -682,51 +586,40 @@
   min-width:150px;
   min-height:66px;
 
-  border:
-    1px solid
-    rgba(127,0,0,.16);
+  border:1px solid rgba(127,0,0,.16);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 
-  padding:
-    11px
-    18px;
+  padding:11px 18px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
   font-size:.92rem;
+  line-height:1.15;
 }
 
 .explainOnePageLayout
 .adminDeleteBtn:hover{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-red);
+  border-color:var(--admin-red);
 
-  background:
-    var(--admin-red);
+  background:var(--admin-red);
 }
 
 .explainOnePageLayout
 .adminDeleteBtn:disabled{
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
-  border-color:
-    var(--admin-line);
+  border-color:var(--admin-line);
 
-  background:
-    #E8EBEE;
+  background:#E8EBEE;
 
   opacity:.58;
 }
@@ -750,8 +643,7 @@
 
 .explainItemOnePageCard.isDone[open]
 .explainOnePageLayout{
-  border-color:
-    rgba(0,127,0,.22);
+  border-color:rgba(0,127,0,.22);
 }
 
 .explainItemOnePageCard.isDone[open]
@@ -760,10 +652,10 @@
 
   grid-column:1 / -1;
 
-  color:
-    var(--admin-green);
+  color:var(--admin-green);
 
   font-size:.86rem;
+  line-height:1.3;
 }
 
 /* =========================
@@ -772,8 +664,7 @@
 
 .explainItemOnePageCard.isMissing[open]
 .explainOnePageLayout{
-  border-color:
-    rgba(127,0,0,.18);
+  border-color:rgba(127,0,0,.18);
 }
 
 /* =========================
@@ -797,16 +688,20 @@
 }
 
 /* =========================
-   18) LARGE SCREENS
+   18) IPAD LANDSCAPE
 ========================= */
 
-@media (min-width:1500px){
+@media (orientation:landscape) and (min-width:768px) and (max-width:1220px){
+
+  .explainAdminShell{
+    gap:12px;
+  }
 
   .explainOnePageGrid{
     grid-template-columns:
-      repeat(4,minmax(0,1fr));
+      repeat(3,minmax(0,1fr));
 
-    gap:15px;
+    gap:10px;
   }
 
   .explainOnePageGrid.hasOpenCard,
@@ -816,99 +711,91 @@
     grid-template-columns:1fr;
   }
 
-  .explainOnePageLayout{
-    padding:24px;
-  }
+  .explainItemOnePageCard > summary{
+    min-height:82px;
 
-  .explainOnePageLayout
-  .adminField input{
-    min-height:72px;
-  }
+    padding:12px 14px;
 
-  .explainOnePageLayout
-  .adminDeleteBtn{
-    min-height:72px;
-  }
-}
-
-/* =========================
-   19) LAPTOP
-========================= */
-
-@media (max-width:1180px){
-
-  .explainAdminShell
-  .adminEditorTopBar{
-    top:148px;
-  }
-
-  .explainOnePageGrid{
     grid-template-columns:
-      repeat(2,minmax(0,1fr));
+      minmax(0,1fr)
+      auto
+      auto;
+
+    gap:10px;
   }
 
-  .explainOnePageGrid.hasOpenCard,
-  .explainOnePageGrid:has(
-    .explainItemOnePageCard[open]
-  ){
-    grid-template-columns:1fr;
-  }
-}
+  .explainItemOnePageCard
+  .adminEditItemTitle{
+    grid-template-columns:
+      42px
+      minmax(0,1fr);
 
-/* =========================
-   20) TABLET
-========================= */
-
-@media (max-width:900px){
-
-  .explainAdminShell
-  .adminEditorTopBar{
-    position:relative;
-    top:auto;
+    gap:9px;
   }
 
-  .explainItemOnePageCard{
-    scroll-margin-top:24px;
+  .explainItemOnePageCard
+  .adminEditItemTitle::before,
+  .explainItemOnePageCard
+  .adminEditItemTitle::after{
+    width:42px;
+    height:42px;
+
+    border-radius:13px;
+  }
+
+  .explainItemOnePageCard
+  .adminEditItemTitle::after{
+    font-size:1.1rem;
+  }
+
+  .explainItemOnePageCard
+  .adminEditItemTitle strong{
+    font-size:1rem;
+  }
+
+  .explainItemOnePageCard
+  > summary::after{
+    width:32px;
+    height:32px;
+  }
+
+  .explainItemOnePageCard
+  > .adminEditItemBody{
+    padding:14px;
   }
 
   .explainOnePageLayout{
     grid-template-columns:
       minmax(0,1fr)
       140px;
+
+    padding:14px;
+
+    gap:12px;
+  }
+
+  .explainOnePageLayout
+  .adminField{
+    padding:12px;
+  }
+
+  .explainOnePageLayout
+  .adminField input{
+    min-height:58px;
   }
 
   .explainOnePageLayout
   .adminDeleteBtn{
     min-width:0;
+    min-height:58px;
   }
 }
 
 /* =========================
-   21) SMALL TABLET
+   19) IPHONE PORTRAIT
 ========================= */
 
-@media (max-width:760px){
-
-  .explainOnePageGrid{
-    grid-template-columns:1fr;
-  }
-
-  .explainOnePageLayout{
-    grid-template-columns:1fr;
-  }
-
-  .explainOnePageLayout
-  .adminDeleteBtn{
-    width:100%;
-    min-height:50px;
-  }
-}
-
-/* =========================
-   22) MOBILE
-========================= */
-
-@media (max-width:620px){
+@media (orientation:portrait) and (max-width:620px){
 
   .explainAdminShell{
     gap:10px;
@@ -933,7 +820,8 @@
     display:grid;
 
     grid-template-columns:
-      1fr 1fr;
+      1fr
+      1fr;
   }
 
   .explainAdminShell
@@ -945,16 +833,20 @@
   }
 
   .explainOnePageGrid{
+    grid-template-columns:1fr;
+
     gap:10px;
+  }
+
+  .explainItemOnePageCard{
+    scroll-margin-top:18px;
   }
 
   .explainItemOnePageCard
   > summary{
     min-height:88px;
 
-    padding:
-      12px
-      14px;
+    padding:12px 14px;
 
     grid-template-columns:
       minmax(0,1fr)
@@ -979,6 +871,25 @@
   }
 
   .explainItemOnePageCard
+  .adminEditItemTitle strong{
+    font-size:1rem;
+
+    white-space:normal;
+  }
+
+  .explainItemOnePageCard
+  .adminEditItemTitle span{
+    white-space:normal;
+
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    line-clamp:2;
+
+    overflow:hidden;
+  }
+
+  .explainItemOnePageCard
   .adminEditItemMeta{
     grid-column:1 / -1;
 
@@ -987,7 +898,8 @@
     display:grid;
 
     grid-template-columns:
-      1fr 1fr;
+      1fr
+      1fr;
 
     order:3;
   }
@@ -1014,7 +926,10 @@
   }
 
   .explainOnePageLayout{
+    grid-template-columns:1fr;
+
     padding:11px;
+
     gap:10px;
   }
 
@@ -1029,40 +944,17 @@
 
     font-size:1rem;
   }
-}
 
-/* =========================
-   23) SMALL MOBILE
-========================= */
-
-@media (max-width:420px){
-
-  .explainAdminShell
-  .adminInlineActions{
-    grid-template-columns:1fr;
-  }
-
-  .explainItemOnePageCard
-  .adminEditItemTitle strong{
-    white-space:normal;
-  }
-
-  .explainItemOnePageCard
-  .adminEditItemTitle span{
-    white-space:normal;
-
-    display:-webkit-box;
-
-    -webkit-box-orient:vertical;
-    -webkit-line-clamp:2;
-    line-clamp:2;
-
-    overflow:hidden;
+  .explainOnePageLayout
+  .adminDeleteBtn{
+    width:100%;
+    min-width:0;
+    min-height:50px;
   }
 }
 
 /* =========================
-   24) FALLBACK
+   20) FALLBACK
 ========================= */
 
 @supports not selector(:has(*)){
@@ -1080,11 +972,11 @@
     grid-column:1 / -1;
   }
 
-  @media (min-width:1500px){
+  @media (orientation:landscape) and (min-width:768px) and (max-width:1220px){
 
     .explainOnePageGrid{
       grid-template-columns:
-        repeat(4,minmax(0,1fr));
+        repeat(3,minmax(0,1fr));
     }
 
     .explainOnePageGrid.hasOpenCard{
@@ -1092,22 +984,169 @@
     }
   }
 
-  @media (max-width:1180px){
-
-    .explainOnePageGrid{
-      grid-template-columns:
-        repeat(2,minmax(0,1fr));
-    }
-
-    .explainOnePageGrid.hasOpenCard{
-      grid-template-columns:1fr;
-    }
-  }
-
-  @media (max-width:760px){
+  @media (orientation:portrait) and (max-width:620px){
 
     .explainOnePageGrid{
       grid-template-columns:1fr;
     }
   }
+}
+/* =========================
+   ADMIN COMPENSATION CARD
+   CLEAN DESIGN - CSS ONLY
+========================= */
+
+.explainItemOnePageCard:last-child,
+.finalRound1OnePageCard:last-child,
+.finalStoryOnePageCard:last-child,
+.finalFocusOnePageCard:last-child,
+.fatblaQuestionOnePageCard:last-child{
+  --admin-comp:#FE7F2D;
+  --admin-comp-soft:#FFF7ED;
+  --admin-comp-line:rgba(254,127,45,.34);
+
+  border-color:var(--admin-comp);
+  background:
+    linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 58%,#FFF7ED 100%);
+
+  box-shadow:
+    0 0 0 3px rgba(254,127,45,.10),
+    0 16px 34px rgba(254,127,45,.12);
+}
+
+.explainItemOnePageCard:last-child::before,
+.finalRound1OnePageCard:last-child::before,
+.finalStoryOnePageCard:last-child::before,
+.finalFocusOnePageCard:last-child::before,
+.fatblaQuestionOnePageCard:last-child::before{
+  background:var(--admin-comp);
+}
+
+/* رأس الكرت */
+.explainItemOnePageCard:last-child > summary,
+.finalRound1OnePageCard:last-child > summary,
+.finalStoryOnePageCard:last-child > summary,
+.finalFocusOnePageCard:last-child > summary,
+.fatblaQuestionOnePageCard:last-child > summary{
+  position:relative;
+
+  padding-inline-start:118px;
+
+  background:#FFF1E6;
+  border-color:var(--admin-comp-line);
+}
+
+.explainItemOnePageCard:last-child > summary::before,
+.finalRound1OnePageCard:last-child > summary::before,
+.finalStoryOnePageCard:last-child > summary::before,
+.finalFocusOnePageCard:last-child > summary::before,
+.fatblaQuestionOnePageCard:last-child > summary::before{
+  content:"تعويض";
+
+  position:absolute;
+  inset-inline-start:12px;
+  top:50%;
+  transform:translateY(-50%);
+
+  min-width:78px;
+  height:30px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0 12px;
+
+  border-radius:999px;
+
+  background:var(--admin-comp);
+  color:#FFFFFF;
+
+  font-size:13px;
+  line-height:1;
+  font-weight:400;
+
+  pointer-events:none;
+}
+
+/* عند فتح الكرت */
+.explainItemOnePageCard:last-child[open],
+.finalRound1OnePageCard:last-child[open],
+.finalStoryOnePageCard:last-child[open],
+.finalFocusOnePageCard:last-child[open],
+.fatblaQuestionOnePageCard:last-child[open]{
+  border-color:var(--admin-comp);
+  background:#FFFFFF;
+
+  box-shadow:
+    0 0 0 4px rgba(254,127,45,.14),
+    0 18px 38px rgba(254,127,45,.14);
+}
+
+.explainItemOnePageCard:last-child[open] > summary,
+.finalRound1OnePageCard:last-child[open] > summary,
+.finalStoryOnePageCard:last-child[open] > summary,
+.finalFocusOnePageCard:last-child[open] > summary,
+.fatblaQuestionOnePageCard:last-child[open] > summary{
+  background:#FFF7ED;
+  border-color:var(--admin-comp);
+}
+
+/* مربعات الحقول */
+.explainItemOnePageCard:last-child .adminField,
+.finalRound1OnePageCard:last-child .adminField,
+.finalStoryOnePageCard:last-child .adminField,
+.finalStoryOnePageCard:last-child .finalStoryAnswerBox,
+.finalFocusOnePageCard:last-child .adminField,
+.fatblaQuestionOnePageCard:last-child .fatblaOnePageFields,
+.fatblaQuestionOnePageCard:last-child .adminField{
+  background:#FFF7ED;
+  border-color:var(--admin-comp-line);
+}
+
+/* عناوين الحقول */
+.explainItemOnePageCard:last-child .adminField label,
+.finalRound1OnePageCard:last-child .adminField label,
+.finalStoryOnePageCard:last-child .adminField label,
+.finalStoryOnePageCard:last-child .finalStoryAnswerBox label,
+.finalFocusOnePageCard:last-child .adminField label,
+.fatblaQuestionOnePageCard:last-child .adminField label{
+  color:var(--admin-comp);
+}
+
+/* مربعات الكتابة والإجابة فقط */
+.explainItemOnePageCard:last-child .adminField input:not([type="file"]),
+.explainItemOnePageCard:last-child .adminField textarea,
+.finalRound1OnePageCard:last-child .adminField input:not([type="file"]),
+.finalRound1OnePageCard:last-child .adminField textarea,
+.finalStoryOnePageCard:last-child .adminField input:not([type="file"]),
+.finalStoryOnePageCard:last-child .adminField textarea,
+.finalStoryOnePageCard:last-child .finalStoryAnswerBox textarea,
+.finalFocusOnePageCard:last-child .adminField input:not([type="file"]),
+.finalFocusOnePageCard:last-child .adminField textarea,
+.fatblaQuestionOnePageCard:last-child .adminField input:not([type="file"]),
+.fatblaQuestionOnePageCard:last-child .adminField textarea{
+  background:#FFFFFF;
+  border-color:var(--admin-comp);
+  color:#151515;
+
+  box-shadow:0 0 0 3px rgba(254,127,45,.10);
+}
+
+/* عند الكتابة */
+.explainItemOnePageCard:last-child .adminField input:not([type="file"]):focus,
+.explainItemOnePageCard:last-child .adminField textarea:focus,
+.finalRound1OnePageCard:last-child .adminField input:not([type="file"]):focus,
+.finalRound1OnePageCard:last-child .adminField textarea:focus,
+.finalStoryOnePageCard:last-child .adminField input:not([type="file"]):focus,
+.finalStoryOnePageCard:last-child .adminField textarea:focus,
+.finalStoryOnePageCard:last-child .finalStoryAnswerBox textarea:focus,
+.finalFocusOnePageCard:last-child .adminField input:not([type="file"]):focus,
+.finalFocusOnePageCard:last-child .adminField textarea:focus,
+.fatblaQuestionOnePageCard:last-child .adminField input:not([type="file"]):focus,
+.fatblaQuestionOnePageCard:last-child .adminField textarea:focus{
+  border-color:var(--admin-comp);
+  box-shadow:
+    0 0 0 4px rgba(254,127,45,.16),
+    0 10px 20px rgba(254,127,45,.10);
 }

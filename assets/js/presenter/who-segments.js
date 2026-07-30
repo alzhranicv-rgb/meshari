@@ -6,6 +6,7 @@ let presenterWhoRows = []
 let presenterWhoRowsPromise = null
 let presenterWhoActionBusy = false
 let presenterWhoPendingNumber = null
+let presenterWhoTimerInterval = null
 
 let presenterWhoScoreLocked = false
 let presenterWhoLastScoreKey = ""
@@ -74,7 +75,9 @@ function getPresenterWhoActiveTeam() {
 
   return (
     state?.activeTeam ||
+    state?.selectedTeam ||
     root?.activeTeam ||
+    root?.selectedTeam ||
     presenterSelectedTeam ||
     null
   )
@@ -192,6 +195,38 @@ function getPresenterWhoDoubleState() {
       },
       activeTeam: null
     }
+  )
+}
+
+function getPresenterWhoScoringLocked() {
+  const root = getPresenterWhoRoot()
+  const state = getPresenterWhoState()
+
+  return !!(
+    root?.whoScoringLocked ||
+    state?.whoScoringLocked
+  )
+}
+
+function getPresenterWhoTimerSync() {
+  const root = getPresenterWhoRoot()
+  const state = getPresenterWhoState()
+
+  return (
+    root?.timerSync ||
+    state?.timerSync ||
+    presenterLiveState?.timerSync ||
+    null
+  )
+}
+
+function getPresenterWhoTimerStarted() {
+  const root = getPresenterWhoRoot()
+  const state = getPresenterWhoState()
+
+  return !!(
+    root?.whoTimerStarted ||
+    state?.whoTimerStarted
   )
 }
 
@@ -423,6 +458,39 @@ async function loadPresenterWhoRows(options = {}) {
   return presenterWhoRowsPromise
 }
 
+async function sendPresenterWhoCommandSafe(
+  action,
+  payload = {}
+) {
+  if (typeof sendCommand !== "function") {
+    return false
+  }
+
+  try {
+    const result = await Promise.race([
+      sendCommand(action, {
+        ...payload,
+        segment: "who"
+      }),
+
+      new Promise(resolve => {
+        setTimeout(() => {
+          resolve(false)
+        }, 2500)
+      })
+    ])
+
+    return result !== false
+  } catch (error) {
+    console.log(
+      "PRESENTER WHO COMMAND ERROR:",
+      error
+    )
+
+    return false
+  }
+}
+
 /* =========================
    HTML BUILDERS
 ========================= */
@@ -549,58 +617,47 @@ async function renderWho() {
   }
 
   panel.innerHTML = `
-    <div class="presenterWhoLayout presenterSegmentReadableLayout">
+    <section class="presenterWhoControlView">
 
-      <!-- الصف العلوي: الفرق وحالة الفقرة -->
-      <section class="presenterWhoTopBar">
+      <header class="presenterWhoControlHeader">
 
-        <div class="presenterWhoTeamsBox">
+        <div class="presenterWhoHeaderTeams">
           ${teamButtons()}
         </div>
 
-        <div class="presenterWhoStatusBox">
-          <div class="presenterWhoStatusHead">
-            <div>
-              <div class="presenterLabel">
-                من هو
-              </div>
+        <div class="presenterWhoHeaderInfo">
 
-              <div
-                id="presenterWhoStatusText"
-                class="presenterWhoStatusText"
-              >
-                اختر الفريق ثم قيمة النقاط
-              </div>
-            </div>
+          <span
+            id="presenterWhoStatusText"
+            class="presenterWhoStatusText"
+          >
+            —
+          </span>
 
-            <div
-              id="presenterWhoCurrentBadge"
-              class="presenterWhoCurrentBadge"
-            >
-              —
-            </div>
-          </div>
+          <strong
+            id="presenterWhoCurrentBadge"
+            class="presenterWhoCurrentBadge"
+          >
+            —
+          </strong>
+
+          <strong
+            id="presenterWhoTimer"
+            class="presenterWhoTimer"
+          >
+            —
+          </strong>
+
         </div>
 
-      </section>
+      </header>
 
-      <!-- المحتوى الرئيسي -->
-      <div class="presenterWhoMainContent">
+      <main class="presenterWhoControlMain">
 
-        <!-- النقاط والأرقام -->
-        <section
-          class="presenterCard presenterWhoNumbersCard"
-        >
-          <header class="presenterWhoCardHeader">
-            <div>
-              <div class="presenterLabel">
-                قيمة النقاط
-              </div>
+        <section class="presenterWhoBoardCard">
 
-              <div class="presenterWhoSectionHint">
-                اختر قيمة السؤال قبل فتح الرقم
-              </div>
-            </div>
+          <header class="presenterWhoPanelTitle">
+            <h2>النقاط</h2>
           </header>
 
           <div
@@ -610,62 +667,51 @@ async function renderWho() {
             ${buildPresenterWhoPointsHtml()}
           </div>
 
-          <div class="presenterWhoNumbersSection">
-            <div
-              class="presenterLabel presenterWhoNumbersLabel"
-            >
-              اختر الرقم
-            </div>
+          <header class="presenterWhoPanelTitle">
+            <h2>الأرقام</h2>
+          </header>
 
-            <div
-              id="presenterWhoGrid"
-              class="presenterWhoGrid"
-            >
-              ${buildPresenterWhoNumbersHtml()}
-            </div>
+          <div
+            id="presenterWhoGrid"
+            class="presenterWhoGrid"
+          >
+            ${buildPresenterWhoNumbersHtml()}
           </div>
+
         </section>
 
-        <!-- الإجابة والصورة -->
-        <section
-          class="presenterCard presenterWhoPreviewCard"
-        >
-          <header class="presenterWhoPreviewHead">
-            <div>
-              <div class="presenterLabel">
-                الإجابة
-              </div>
+        <section class="presenterWhoPreviewPanel">
 
-              <div class="presenterWhoSectionHint">
-                تظهر للمقدم فقط
-              </div>
-            </div>
+          <header class="presenterWhoPanelTitle">
+            <h2>الإجابة</h2>
 
-            <div
+            <span
               id="presenterWhoMediaLabel"
               class="presenterWhoMediaLabel"
-            ></div>
+            ></span>
           </header>
 
           <div class="presenterWhoPreviewContent">
+
             <div
               id="presenterWhoAnswerText"
-              class="presenterAnswerBody presenterWhoAnswerText"
+              class="presenterWhoAnswerText"
             >
               —
             </div>
 
             <div
               id="presenterWhoImageBox"
-              class="presenterImagePreviewBox presenterWhoImageBox hidden"
+              class="presenterWhoImageBox hidden"
             ></div>
+
           </div>
+
         </section>
 
-      </div>
+      </main>
 
-      <!-- أزرار التحكم ثابتة في الأسفل -->
-      <footer class="presenterWhoActions presenterSegmentActionsBar">
+      <footer class="presenterWhoCommandBar">
 
         <button
           type="button"
@@ -682,7 +728,7 @@ async function renderWho() {
           class="presenterBtn gray presenterWhoCompensationBtn"
           onclick="runPresenterWhoAction('compensation')"
         >
-          التعويض
+          تعويض
         </button>
 
         <button
@@ -691,7 +737,7 @@ async function renderWho() {
           class="presenterBtn red"
           onclick="sendPresenterWhoScore('wrong')"
         >
-          ✕ خطأ
+          خطأ
         </button>
 
         <button
@@ -700,15 +746,16 @@ async function renderWho() {
           class="presenterBtn green"
           onclick="sendPresenterWhoScore('correct')"
         >
-          ✓ صح
+          صح
         </button>
 
       </footer>
 
-    </div>
+    </section>
   `
 
   refreshPresenterWhoFromState()
+    startPresenterWhoTimerWatcher()
 
   if (!presenterWhoRows.length) {
     await loadPresenterWhoRows({
@@ -722,7 +769,6 @@ async function renderWho() {
     refreshPresenterWhoFromState()
   } else {
     loadPresenterWhoRows({
-      forceRefresh: true,
       backgroundRefresh: false
     }).then(() => {
       if (presenterSegment !== "who") return
@@ -778,7 +824,8 @@ async function selectPresenterWhoPoints(points) {
 
   refreshPresenterWhoFromState()
 
-  const sent = await sendCommand(
+const sent =
+  await sendPresenterWhoCommandSafe(
     "setPoints",
     {
       points: safePoints
@@ -900,7 +947,8 @@ async function openWhoPresenterNumber(
   showPresenterWhoPreview(safeNumber)
   refreshPresenterWhoFromState()
 
-  const sent = await sendCommand(
+const sent =
+  await sendPresenterWhoCommandSafe(
     "openNumber",
     {
       number: safeNumber,
@@ -1042,7 +1090,8 @@ async function runPresenterWhoAction(action) {
   presenterWhoActionBusy = true
   updatePresenterWhoActionButtons()
 
-  const sent = await sendCommand(
+const sent =
+  await sendPresenterWhoCommandSafe(
     action,
     {
       team: activeTeam,
@@ -1068,13 +1117,20 @@ async function sendPresenterWhoScore(action) {
   const team = getPresenterWhoActiveTeam()
   const points = getPresenterWhoCurrentPoints()
   const compensationMode = getPresenterWhoCompensationMode()
+  const displayScoringLocked =
+    getPresenterWhoScoringLocked()
+
+  if (displayScoringLocked) {
+    showToast("انتظر انتهاء عرض الإجابة")
+    return
+  }
 
   if (!number) {
     showToast("اختر رقمًا أولاً")
     return
   }
 
-  if (!team && !compensationMode) {
+  if (!team) {
     showToast("اختر الفريق أولاً")
     return
   }
@@ -1098,7 +1154,8 @@ async function sendPresenterWhoScore(action) {
 
   updatePresenterWhoActionButtons()
 
-  const sent = await sendCommand(
+const sent =
+  await sendPresenterWhoCommandSafe(
     action,
     {
       __who_score_key: scoreKey,
@@ -1135,6 +1192,8 @@ function updatePresenterWhoActionButtons() {
   const currentNumber = getPresenterWhoCurrentNumber()
   const activeTeam = getPresenterWhoActiveTeam()
   const compensationMode = getPresenterWhoCompensationMode()
+  const displayScoringLocked =
+    getPresenterWhoScoringLocked()
 
   const doubleUsed =
     isPresenterWhoDoubleUsed(activeTeam)
@@ -1160,6 +1219,7 @@ function updatePresenterWhoActionButtons() {
   if (doubleButton) {
     doubleButton.disabled =
       busy ||
+      displayScoringLocked ||
       !activeTeam ||
       locked ||
       !!currentNumber ||
@@ -1180,12 +1240,14 @@ function updatePresenterWhoActionButtons() {
   if (compensationButton) {
     compensationButton.disabled =
       busy ||
+      displayScoringLocked ||
       !canPresenterWhoCompensation()
   }
 
   const scoreDisabled =
     busy ||
     presenterWhoScoreLocked ||
+    displayScoringLocked ||
     !currentNumber
 
   if (correctButton) {
@@ -1201,8 +1263,125 @@ function updatePresenterWhoActionButtons() {
    REFRESH FROM DISPLAY
 ========================= */
 
+function getPresenterWhoRemainingSeconds() {
+  const timerSync =
+    getPresenterWhoTimerSync()
+
+  const endsAt =
+    Number(timerSync?.endsAt || 0)
+
+  if (endsAt > 0) {
+    return Math.max(
+      0,
+      Math.ceil(
+        (endsAt - Date.now()) / 1000
+      )
+    )
+  }
+
+  const root =
+    getPresenterWhoRoot()
+
+  const state =
+    getPresenterWhoState()
+
+  return Math.max(
+    0,
+    Number(
+      root?.timerValue ??
+      state?.timerValue ??
+      0
+    )
+  )
+}
+
+function updatePresenterWhoTimer() {
+  const timerBox =
+    document.getElementById(
+      "presenterWhoTimer"
+    )
+
+  if (!timerBox) return
+
+  const currentNumber =
+    getPresenterWhoCurrentNumber()
+
+  const timerSync =
+    getPresenterWhoTimerSync()
+
+  const timerStarted =
+    getPresenterWhoTimerStarted()
+
+  if (
+    !currentNumber &&
+    !timerStarted &&
+    !timerSync?.endsAt
+  ) {
+    timerBox.innerText = "—"
+
+    timerBox.classList.remove(
+      "timerRunning",
+      "timerDanger",
+      "timerFinished"
+    )
+
+    return
+  }
+
+  const remaining =
+    getPresenterWhoRemainingSeconds()
+
+  timerBox.innerText =
+    String(remaining)
+
+  timerBox.classList.toggle(
+    "timerRunning",
+    remaining > 5
+  )
+
+  timerBox.classList.toggle(
+    "timerDanger",
+    remaining > 0 &&
+    remaining <= 5
+  )
+
+  timerBox.classList.toggle(
+    "timerFinished",
+    remaining === 0
+  )
+}
+
+function startPresenterWhoTimerWatcher() {
+  stopPresenterWhoTimerWatcher()
+
+  updatePresenterWhoTimer()
+
+  presenterWhoTimerInterval =
+    setInterval(() => {
+      if (presenterSegment !== "who") {
+        stopPresenterWhoTimerWatcher()
+        return
+      }
+
+      updatePresenterWhoTimer()
+    }, 250)
+}
+
+function stopPresenterWhoTimerWatcher() {
+  if (presenterWhoTimerInterval) {
+    clearInterval(
+      presenterWhoTimerInterval
+    )
+
+    presenterWhoTimerInterval = null
+  }
+}
+
 function refreshPresenterWhoFromState() {
-  if (presenterSegment !== "who") return
+  if (presenterSegment !== "who") {
+    stopPresenterWhoTimerWatcher()
+    return
+  }
 
   const used = getPresenterWhoUsedNumbers()
   const currentNumber = getPresenterWhoCurrentNumber()
@@ -1210,6 +1389,8 @@ function refreshPresenterWhoFromState() {
   const currentPoints = getPresenterWhoCurrentPoints()
   const compensationMode = getPresenterWhoCompensationMode()
   const activeTeam = getPresenterWhoActiveTeam()
+    const displayScoringLocked =
+    getPresenterWhoScoringLocked()
 
   updatePresenterTeamButtonsOnly(activeTeam)
 
@@ -1235,6 +1416,7 @@ function refreshPresenterWhoFromState() {
 
       button.disabled =
         presenterWhoActionBusy ||
+        displayScoringLocked ||
         locked ||
         compensationMode
     })
@@ -1282,6 +1464,7 @@ function refreshPresenterWhoFromState() {
         isUsed ||
         isPending ||
         presenterWhoActionBusy ||
+        displayScoringLocked ||
         locked ||
         isLocked15
 
@@ -1312,7 +1495,10 @@ function refreshPresenterWhoFromState() {
   )
 
   if (statusBox) {
-    if (compensationMode) {
+    if (displayScoringLocked) {
+      statusBox.innerText =
+        "الإجابة ظاهرة — انتظر"
+    } else if (compensationMode) {
       statusBox.innerText =
         "وضع التعويض مفعل"
     } else if (!activeTeam) {
@@ -1376,7 +1562,13 @@ function refreshPresenterWhoFromState() {
   }
 
   updatePresenterWhoActionButtons()
+    updatePresenterWhoTimer()
 }
+
+window.addEventListener(
+  "beforeunload",
+  stopPresenterWhoTimerWatcher
+)
 
 /* =========================
    Reader: Who - من هو

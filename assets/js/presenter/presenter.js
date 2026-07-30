@@ -1,4 +1,11 @@
+/* =========================================================
+   PRESENTER / المقدم
+   CLEAN FOUNDATION
+========================================================= */
 
+/* =========================
+   1) MAIN STATE
+========================= */
 
 let presenterModel = 1
 let presenterSegment = null
@@ -7,28 +14,37 @@ let presenterTeamBName = "الفريق الثاني"
 let presenterSelectedTeam = null
 let presenterSessionId = null
 let presenterChannel = null
-let presenterFinalRound = 1
 let presenterLiveState = null
+
+let presenterFinalRound = 1
+let presenterFinalRoundOverride = null
+let presenterFinalForcedRound = null
+let presenterFinalForcedRoundUntil = 0
+
 let lastPresenterToastTime = 0
 let presenterSyncTimer = null
 let presenterGoingHome = false
 let presenterJustJoined = false
-let presenterFinalForcedRound = null
-let presenterFinalForcedRoundUntil = 0
-let presenterFinalRoundOverride = null
+
 let presenterLocalSyncUntil = 0
 let presenterLocalOpenedSegment = null
 let presenterChannelHealthy = false
+
+let presenterJoinMode =
+  localStorage.getItem("presenter_join_mode") ||
+  "control"
+
+let presenterReaderSegment = null
+
 /* =========================
-   PRESENTER DATA CACHE
+   2) CACHE SETTINGS
 ========================= */
 
 const PRESENTER_SESSION_CACHE_TTL = 30 * 1000
 const PRESENTER_MODEL_CACHE_TTL = 5 * 60 * 1000
-const PRESENTER_GLOBAL_CACHE_TTL = 10 * 60 * 1000
 const PRESENTER_CONTENT_CACHE_TTL = 10 * 60 * 1000
 const PRESENTER_READER_CACHE_TTL = 15 * 60 * 1000
-const PRESENTER_CACHE_VERSION = 3
+const PRESENTER_CACHE_VERSION = 5
 
 const PRESENTER_SESSION_SELECT = `
   id,
@@ -45,53 +61,264 @@ const PRESENTER_SESSION_SELECT = `
 
 const presenterResourceRequests = new Map()
 let presenterDeferredPreloadToken = 0
+let presenterModelDataLoaded = false
+let presenterModelDataPromise = null
+let presenterVisibilityPromise = null
+let presenterLastSessionStateKey = ""
 
-function getPresenterResourceCacheKey(namespace, parts = []) {
+/* =========================
+   3) SEGMENT REGISTRY
+   مصدر واحد للفقرات
+========================= */
+
+const PRESENTER_SEGMENTS = [
+  {
+    key: "warmup",
+    title: "التسخين",
+    sort: 1,
+    moduleKey: "warmup",
+    displaySegment: "warmup",
+    needsLottery: true
+  },
+  {
+    key: "top10",
+    title: "Top 10",
+    sort: 2,
+    moduleKey: "top10",
+    displaySegment: "top10",
+    needsLottery: true
+  },
+  {
+    key: "letterli",
+    title: "حرفلي",
+    sort: 3,
+    moduleKey: "letterli",
+    displaySegment: "letterli",
+    needsLottery: false
+  },
+  {
+    key: "who",
+    title: "من هو",
+    sort: 4,
+    moduleKey: "who",
+    displaySegment: "who",
+    needsLottery: true
+  },
+  {
+    key: "explain",
+    title: "اشرح الكلمة",
+    sort: 5,
+    moduleKey: "explain",
+    displaySegment: "explain",
+    needsLottery: true
+  },
+  {
+    key: "final_round1",
+    title: "ٮدوں ٮڡاط",
+    sort: 6,
+    moduleKey: "final",
+    displaySegment: "final",
+    finalRound: 1,
+    needsLottery: false
+  },
+  {
+    key: "final_round2",
+    title: "صح صحلي",
+    sort: 7,
+    moduleKey: "final",
+    displaySegment: "final",
+    finalRound: 2,
+    needsLottery: true
+  },
+  {
+    key: "final_round3",
+    title: "قصة",
+    sort: 8,
+    moduleKey: "final",
+    displaySegment: "final",
+    finalRound: 3,
+    needsLottery: false
+  },
+  {
+    key: "final_round4",
+    title: "التركيز",
+    sort: 9,
+    moduleKey: "final",
+    displaySegment: "final",
+    finalRound: 4,
+    needsLottery: true
+  },
+  {
+    key: "archive",
+    title: "الأرشيف",
+    sort: 10,
+    moduleKey: "archive",
+    displaySegment: "archive",
+    needsLottery: true
+  },
+  {
+    key: "randomChallenge",
+    title: "التحدي",
+    sort: 11,
+    moduleKey: "randomChallenge",
+    displaySegment: "randomChallenge",
+    needsLottery: false
+  }
+]
+
+const ALL_PRESENTER_SEGMENTS = PRESENTER_SEGMENTS
+
+let presenterVisibleSegments =
+  PRESENTER_SEGMENTS.map(item => ({
+    ...item,
+    is_visible: true,
+    sort_order: item.sort
+  }))
+
+/* =========================
+   4) BASIC HELPERS
+========================= */
+
+function getPresenterModuleFunction(name) {
+  const fn = window[name]
+  return typeof fn === "function" ? fn : null
+}
+
+function withPresenterTimeout(
+  promise,
+  ms = 3500,
+  fallback = null
+) {
+  let timer = null
+
+  const timeoutPromise =
+    new Promise(resolve => {
+      timer = setTimeout(() => {
+        resolve(fallback)
+      }, ms)
+    })
+
+  return Promise
+    .race([promise, timeoutPromise])
+    .finally(() => {
+      if (timer) clearTimeout(timer)
+    })
+}
+
+function queuePresenterIdleTask(
+  task,
+  options = {}
+) {
+  const delay = Number(options.delay || 0)
+  const timeout = Number(options.timeout || 2000)
+
+  const run = () => {
+    if (typeof task !== "function") return
+
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(() => task(), {
+        timeout
+      })
+      return
+    }
+
+    setTimeout(task, 0)
+  }
+
+  if (delay > 0) {
+    setTimeout(run, delay)
+    return
+  }
+
+  run()
+}
+
+function mergePresenterObjects(base = {}, patch = {}) {
+  const output = {
+    ...(base || {})
+  }
+
+  Object.keys(patch || {}).forEach(key => {
+    const value = patch[key]
+
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value)
+    ) {
+      output[key] = mergePresenterObjects(
+        output[key] || {},
+        value
+      )
+      return
+    }
+
+    output[key] = value
+  })
+
+  return output
+}
+
+/* =========================
+   5) RESOURCE CACHE
+========================= */
+
+function getPresenterResourceCacheKey(
+  namespace = "resource",
+  parts = []
+) {
+  const cleanParts =
+    Array.isArray(parts)
+      ? parts
+      : [parts]
+
   return [
     "presenter_cache",
-    PRESENTER_CACHE_VERSION,
+    `v${PRESENTER_CACHE_VERSION}`,
     namespace,
-    ...parts
-  ].join("_")
+    ...cleanParts
+  ]
+    .map(part =>
+      String(part ?? "")
+        .trim()
+        .replace(/[^a-zA-Z0-9_-]/g, "_")
+    )
+    .join("_")
 }
 
 function readPresenterResourceCache(
   cacheKey,
-  ttl = PRESENTER_CONTENT_CACHE_TTL,
+  ttl = 0,
   options = {}
 ) {
   try {
-    const saved = JSON.parse(
-      localStorage.getItem(cacheKey) || "null"
-    )
+    const raw =
+      localStorage.getItem(cacheKey)
+
+    if (!raw) return null
+
+    const parsed = JSON.parse(raw)
+    const savedAt = Number(parsed.savedAt || 0)
+    const age = Date.now() - savedAt
 
     if (
-      !saved ||
-      !Object.prototype.hasOwnProperty.call(saved, "data") ||
-      !saved.savedAt
+      ttl &&
+      age > ttl &&
+      options.allowStale !== true
     ) {
       return null
     }
 
-    const age = Date.now() - Number(saved.savedAt)
-    const stale = age > Number(ttl || 0)
-
-    if (stale && options.allowStale !== true) {
-      return null
-    }
-
-    return {
-      data: saved.data,
-      savedAt: Number(saved.savedAt),
-      age,
-      stale
-    }
+    return parsed
   } catch {
     return null
   }
 }
 
-function savePresenterResourceCache(cacheKey, data) {
+function savePresenterResourceCache(
+  cacheKey,
+  data
+) {
   try {
     localStorage.setItem(
       cacheKey,
@@ -101,371 +328,368 @@ function savePresenterResourceCache(cacheKey, data) {
       })
     )
   } catch (error) {
-    console.log("SAVE PRESENTER RESOURCE CACHE ERROR:", error)
+    console.log("PRESENTER CACHE SAVE ERROR:", error)
   }
 }
 
 function removePresenterResourceCache(cacheKey) {
   try {
     localStorage.removeItem(cacheKey)
-  } catch {
-    // تجاهل أخطاء التخزين المحلي
-  }
-}
-
-function runPresenterResourceRequest(cacheKey, requestFactory) {
-  if (presenterResourceRequests.has(cacheKey)) {
-    return presenterResourceRequests.get(cacheKey)
-  }
-
-  const promise = Promise.resolve()
-    .then(requestFactory)
-    .finally(() => {
-      presenterResourceRequests.delete(cacheKey)
-    })
-
-  presenterResourceRequests.set(cacheKey, promise)
-  return promise
-}
-
-function queuePresenterIdleTask(callback, options = {}) {
-  const delay = Math.max(0, Number(options.delay || 0))
-  const timeout = Math.max(500, Number(options.timeout || 2000))
-
-  return setTimeout(() => {
-    if (typeof window.requestIdleCallback === "function") {
-      window.requestIdleCallback(
-        () => callback(),
-        { timeout }
-      )
-      return
-    }
-
-    setTimeout(callback, 0)
-  }, delay)
-}
-
-
-async function withPresenterTimeout(
-  promise,
-  timeoutMs = 3500,
-  fallback = null
-) {
-  let timer = null
-
-  try {
-    return await Promise.race([
-      Promise.resolve(promise),
-      new Promise(resolve => {
-        timer = setTimeout(
-          () => resolve(fallback),
-          Math.max(500, Number(timeoutMs || 3500))
-        )
-      })
-    ])
-  } finally {
-    if (timer) clearTimeout(timer)
-  }
+  } catch {}
 }
 
 async function loadPresenterCachedResource({
   cacheKey,
-  ttl = PRESENTER_CONTENT_CACHE_TTL,
+  ttl = 0,
   forceRefresh = false,
   staleWhileRevalidate = true,
   fetcher
-}) {
+} = {}) {
   if (!cacheKey || typeof fetcher !== "function") {
     return {
       data: null,
-      error: new Error("Invalid presenter resource loader"),
-      source: "error"
+      error: new Error("Invalid cached resource")
     }
   }
 
-  const cached = readPresenterResourceCache(
-    cacheKey,
-    ttl,
-    { allowStale: staleWhileRevalidate }
-  )
+  const cached =
+    readPresenterResourceCache(
+      cacheKey,
+      ttl,
+      { allowStale: staleWhileRevalidate }
+    )
 
-  const fetchFresh = () => runPresenterResourceRequest(
-    cacheKey,
-    async () => {
-      try {
-        const result = await fetcher()
-        const data = result?.data ?? null
-        const error = result?.error || null
-
-        if (!error) {
-          savePresenterResourceCache(cacheKey, data)
-        }
-
-        return {
-          data,
-          error,
-          source: "network"
-        }
-      } catch (error) {
-        return {
-          data: null,
-          error,
-          source: "error"
-        }
-      }
-    }
-  )
-
-  if (!forceRefresh && cached) {
-    if (
-      staleWhileRevalidate &&
-      (
-        cached.stale ||
-        cached.age > Math.max(30 * 1000, ttl * 0.6)
-      )
-    ) {
-      queuePresenterIdleTask(() => {
-        fetchFresh().catch(() => null)
-      })
+  if (cached && forceRefresh !== true) {
+    if (staleWhileRevalidate) {
+      fetcher()
+        .then(result => {
+          if (!result?.error) {
+            savePresenterResourceCache(
+              cacheKey,
+              result?.data || null
+            )
+          }
+        })
+        .catch(error => {
+          console.log(
+            "PRESENTER BACKGROUND CACHE ERROR:",
+            error
+          )
+        })
     }
 
     return {
       data: cached.data,
       error: null,
-      source: cached.stale
-        ? "stale-cache"
-        : "cache"
+      source: "cache"
     }
   }
 
-  const fresh = await fetchFresh()
-
-  if (fresh.error && cached) {
-    return {
-      data: cached.data,
-      error: fresh.error,
-      source: "stale-cache"
-    }
+  if (presenterResourceRequests.has(cacheKey)) {
+    return presenterResourceRequests.get(cacheKey)
   }
 
-  return fresh
+  const request = (async () => {
+    try {
+      const result = await fetcher()
+
+      if (!result?.error) {
+        savePresenterResourceCache(
+          cacheKey,
+          result?.data || null
+        )
+      }
+
+      return result
+    } catch (error) {
+      return {
+        data: cached?.data || null,
+        error,
+        source: cached ? "stale-cache" : "error"
+      }
+    } finally {
+      presenterResourceRequests.delete(cacheKey)
+    }
+  })()
+
+  presenterResourceRequests.set(cacheKey, request)
+  return request
 }
 
-function ensurePresenterLoadingStyles() {
-  if (document.getElementById("presenterLoadingStyles")) return
+/* =========================
+   6) LOADING UI
+========================= */
 
-  const style = document.createElement("style")
-  style.id = "presenterLoadingStyles"
-  style.textContent = `
-    @keyframes presenterLoadingSpin {
-      to { transform: rotate(360deg); }
-    }
-
-    .presenterInlineLoading {
-      width: 100%;
-      min-height: 92px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      color: #233D4D;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .presenterLoadingSpinner {
-      width: 28px;
-      height: 28px;
-      flex: 0 0 28px;
-      border: 3px solid #D5DADF;
-      border-top-color: #FE7F2D;
-      border-radius: 50%;
-      animation: presenterLoadingSpin .75s linear infinite;
-    }
-
-    #presenterBootLoading {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: rgba(238, 243, 246, .96);
-    }
-
-    #presenterBootLoading.visible {
-      display: flex;
-    }
-
-    #presenterBootLoading .presenterBootLoadingCard {
-      width: min(92vw, 360px);
-      min-height: 150px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: #FFFFFF;
-      border: 2px solid #D5DADF;
-      border-radius: 22px;
-    }
-
-    #presenterBackgroundLoading {
-      position: fixed;
-      right: 14px;
-      bottom: 14px;
-      z-index: 9998;
-      display: none;
-      align-items: center;
-      gap: 9px;
-      max-width: min(88vw, 320px);
-      padding: 10px 14px;
-      background: #FFFFFF;
-      border: 1px solid #D5DADF;
-      border-radius: 14px;
-      color: #233D4D;
-      box-shadow: 0 8px 24px rgba(35, 61, 77, .12);
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    #presenterBackgroundLoading.visible {
-      display: flex;
-    }
-
-    #presenterBackgroundLoading .presenterLoadingSpinner {
-      width: 18px;
-      height: 18px;
-      flex-basis: 18px;
-      border-width: 2px;
-    }
-  `
-
-  document.head.appendChild(style)
-}
-
-function getPresenterLoadingMarkup(text = "جارٍ التحميل...") {
+function getPresenterLoadingMarkup(
+  text = "جارٍ التحميل..."
+) {
   return `
-    <div class="presenterInlineLoading" role="status" aria-live="polite">
-      <span class="presenterLoadingSpinner" aria-hidden="true"></span>
-      <span>${String(text || "جارٍ التحميل...")}</span>
+    <div class="presenterLoadingBox">
+      <div class="presenterLoadingSpinner"></div>
+      <div class="presenterLoadingText">${text}</div>
     </div>
   `
 }
 
-function showPresenterBootLoading(text = "جاري تجهيز لوحة المقدم...") {
-  ensurePresenterLoadingStyles()
+function showPresenterBootLoading(
+  text = "جاري تجهيز لوحة المقدم..."
+) {
+  const overlay =
+    document.getElementById("presenterBootLoading")
 
-  let overlay = document.getElementById("presenterBootLoading")
+  if (!overlay) return
 
-  if (!overlay) {
-    overlay = document.createElement("div")
-    overlay.id = "presenterBootLoading"
-    overlay.innerHTML = `
-      <div class="presenterBootLoadingCard"></div>
-    `
-    document.body.appendChild(overlay)
+  const label =
+    overlay.querySelector("[data-loading-text]") ||
+    overlay.querySelector(".presenterLoadingText")
+
+  if (label) {
+    label.innerText = text
   }
 
-  const card = overlay.querySelector(".presenterBootLoadingCard")
-  if (card) card.innerHTML = getPresenterLoadingMarkup(text)
-
+  overlay.classList.remove("hidden")
   overlay.classList.add("visible")
+  overlay.style.display = ""
 }
 
 function hidePresenterBootLoading() {
-  document
-    .getElementById("presenterBootLoading")
-    ?.classList.remove("visible")
+  const overlay =
+    document.getElementById("presenterBootLoading")
+
+  if (!overlay) return
+
+  overlay.classList.remove("visible")
+  overlay.classList.add("hidden")
+  overlay.style.display = "none"
 }
 
-function setPresenterBackgroundLoading(
-  visible,
-  text = "جاري تجهيز بيانات الفقرات..."
+function setPresenterBackgroundLoading(active) {
+  const box =
+    document.getElementById("presenterBackgroundLoading")
+
+  if (!box) return
+
+  box.classList.toggle("hidden", !active)
+}
+
+/* =========================
+   7) SEGMENT HELPERS
+========================= */
+
+function normalizePresenterSegmentKey(key) {
+  const value = String(key || "").trim()
+
+  if (!value) return ""
+
+  if (value === "final") {
+    return `final_round${Number(getPresenterFinalRound() || 1)}`
+  }
+
+  if (value === "finalRound1") return "final_round1"
+  if (value === "finalRound2") return "final_round2"
+  if (value === "finalRound3") return "final_round3"
+  if (value === "finalRound4") return "final_round4"
+
+  if (value === "final_round1") return "final_round1"
+  if (value === "final_round2") return "final_round2"
+  if (value === "final_round3") return "final_round3"
+  if (value === "final_round4") return "final_round4"
+
+  if (value === "random_challenge") return "randomChallenge"
+  if (value === "randomchallenge") return "randomChallenge"
+  if (value === "randomChallenge") return "randomChallenge"
+
+  if (value === "top_10") return "top10"
+  if (value === "topTen") return "top10"
+
+  if (
+    value === "auction" ||
+    value === "fatbla" ||
+    value === "fitbala" ||
+    value === "فتبلة"
+  ) {
+    return ""
+  }
+
+  return value
+}
+
+function getPresenterSegmentConfig(segment) {
+  const key = normalizePresenterSegmentKey(segment)
+
+  return PRESENTER_SEGMENTS.find(item => {
+    return item.key === key
+  }) || null
+}
+
+function getPresenterSegmentTitle(segment) {
+  return (
+    getPresenterSegmentConfig(segment)?.title ||
+    "لوحة المقدم"
+  )
+}
+
+function getPresenterSegmentName(segment) {
+  return getPresenterSegmentTitle(segment)
+}
+
+function getPresenterFinalRound() {
+  return Number(
+    presenterFinalRoundOverride ||
+    presenterFinalRound ||
+    presenterLiveState?.final?.round ||
+    1
+  )
+}
+
+function getPresenterFinalRoundTitle(round = 1) {
+  const titles = {
+    1: "ٮدوں ٮڡاط",
+    2: "صح صحلي",
+    3: "قصة",
+    4: "التركيز"
+  }
+
+  return titles[Number(round || 1)] || "الفاصلة"
+}
+
+function getPresenterFinalRoundFromKey(segment) {
+  const key = normalizePresenterSegmentKey(segment)
+
+  if (key === "final_round1") return 1
+  if (key === "final_round2") return 2
+  if (key === "final_round3") return 3
+  if (key === "final_round4") return 4
+
+  return Number(getPresenterFinalRound() || 1)
+}
+
+function getPresenterFinalSessionSegmentKey(round) {
+  const r = Math.min(
+    Math.max(Number(round || 1), 1),
+    4
+  )
+
+  return `finalRound${r}`
+}
+
+function normalizePresenterSegmentFromSession(segment) {
+  const raw = String(segment || "").trim()
+
+  if (!raw) return null
+
+  if (
+    raw === "final" ||
+    raw === "finalRound1" ||
+    raw === "finalRound2" ||
+    raw === "finalRound3" ||
+    raw === "finalRound4" ||
+    raw === "final_round1" ||
+    raw === "final_round2" ||
+    raw === "final_round3" ||
+    raw === "final_round4"
+  ) {
+    return "final"
+  }
+
+  const key = normalizePresenterSegmentKey(raw)
+  const config = getPresenterSegmentConfig(key)
+
+  if (!config) return null
+
+  return config.moduleKey || config.key
+}
+
+function getPresenterFinalRoundFromSessionSegment(
+  segment,
+  fallback = 1
 ) {
-  ensurePresenterLoadingStyles()
+  const key = String(segment || "")
 
-  let badge = document.getElementById("presenterBackgroundLoading")
+  if (key === "finalRound1" || key === "final_round1") return 1
+  if (key === "finalRound2" || key === "final_round2") return 2
+  if (key === "finalRound3" || key === "final_round3") return 3
+  if (key === "finalRound4" || key === "final_round4") return 4
 
-  if (!badge) {
-    badge = document.createElement("div")
-    badge.id = "presenterBackgroundLoading"
-    document.body.appendChild(badge)
-  }
-
-  if (visible) {
-    badge.innerHTML = `
-      <span class="presenterLoadingSpinner" aria-hidden="true"></span>
-      <span>${String(text || "جاري تجهيز البيانات...")}</span>
-    `
-  }
-
-  badge.classList.toggle("visible", !!visible)
+  return Number(fallback || 1)
 }
 
-let presenterModelDataLoaded = false
-let presenterModelDataPromise = null
-let presenterVisibilityPromise = null
+function normalizePresenterFinalSegmentKey(segment) {
+  const key = normalizePresenterSegmentKey(segment)
+
+  if (key === "final_round1") return "finalRound1"
+  if (key === "final_round2") return "finalRound2"
+  if (key === "final_round3") return "finalRound3"
+  if (key === "final_round4") return "finalRound4"
+
+  return key
+}
+
+function getPresenterCurrentSegmentKey() {
+  if (presenterSegment === "final") {
+    return `final_round${Number(getPresenterFinalRound() || 1)}`
+  }
+
+  return normalizePresenterSegmentKey(
+    presenterSegment || ""
+  )
+}
+
+function markPresenterLocalSync(
+  segment = presenterSegment,
+  ms = 1200
+) {
+  presenterLocalSyncUntil = Date.now() + ms
+  presenterLocalOpenedSegment =
+    segment || presenterSegment || null
+}
+
+function isPresenterLocalSyncProtected() {
+  return Date.now() < presenterLocalSyncUntil
+}
+
+/* =========================
+   8) SESSION CACHE + API
+========================= */
 
 function getPresenterSessionCacheKey(sessionId) {
-  return `presenter_session_cache_${sessionId}`
+  return getPresenterResourceCacheKey(
+    "session",
+    [sessionId]
+  )
 }
 
 function readPresenterSessionCache(sessionId) {
-  try {
-    const saved = JSON.parse(
-      localStorage.getItem(
-        getPresenterSessionCacheKey(sessionId)
-      ) || "null"
-    )
-
-    if (!saved?.data || !saved?.savedAt) {
-      return null
-    }
-
-    if (
-      Date.now() - Number(saved.savedAt) >
-      PRESENTER_SESSION_CACHE_TTL
-    ) {
-      return null
-    }
-
-    return saved.data
-  } catch {
-    return null
-  }
+  return readPresenterResourceCache(
+    getPresenterSessionCacheKey(sessionId),
+    PRESENTER_SESSION_CACHE_TTL,
+    { allowStale: true }
+  )?.data || null
 }
 
 function savePresenterSessionCache(data) {
   if (!data?.id) return
 
-  try {
-    localStorage.setItem(
-      getPresenterSessionCacheKey(data.id),
-      JSON.stringify({
-        data,
-        savedAt: Date.now()
-      })
-    )
-  } catch (error) {
-    console.log(
-      "SAVE PRESENTER SESSION CACHE ERROR:",
-      error
-    )
-  }
+  savePresenterResourceCache(
+    getPresenterSessionCacheKey(data.id),
+    data
+  )
 }
 
-async function loadPresenterSession(sessionId, options = {}) {
+async function loadPresenterSession(
+  sessionId,
+  options = {}
+) {
   if (!sessionId || !window.db) {
     return {
       data: null,
-      error: new Error("Session is unavailable"),
-      source: "error"
+      error: new Error("No session or db")
     }
   }
 
   if (options.forceRefresh !== true) {
-    const cached = readPresenterSessionCache(sessionId)
+    const cached =
+      readPresenterSessionCache(sessionId)
 
     if (cached) {
       return {
@@ -483,478 +707,150 @@ async function loadPresenterSession(sessionId, options = {}) {
       .eq("id", sessionId)
       .maybeSingle()
 
-    if (data) {
+    if (!error && data) {
       savePresenterSessionCache(data)
     }
 
-    return {
-      data,
-      error,
-      source: "network"
-    }
+    return { data, error }
   } catch (error) {
-    return {
-      data: null,
-      error,
-      source: "error"
-    }
+    return { data: null, error }
   }
 }
 
-/* =========================
-   SAFE PRESENTER SESSION UPDATE
-   تحديث آمن وموحد للجلسة
-========================= */
-
-let presenterSessionUpdateQueue = Promise.resolve()
-let presenterSessionUpdateCounter = 0
-
-function mergePresenterObjects(base, patch) {
-  const output = {
-    ...(base && typeof base === "object" ? base : {})
-  }
-
-  Object.entries(patch || {}).forEach(([key, value]) => {
-    const oldValue = output[key]
-
-    if (
-      value &&
-      typeof value === "object" &&
-      !Array.isArray(value) &&
-      oldValue &&
-      typeof oldValue === "object" &&
-      !Array.isArray(oldValue)
-    ) {
-      output[key] = mergePresenterObjects(
-        oldValue,
-        value
-      )
-    } else {
-      output[key] = value
-    }
-  })
-
-  return output
-}
-
-function updatePresenterLocalSessionData(data) {
-  if (!data?.id) return
-
-  savePresenterSessionCache(data)
-
-  presenterSessionId = data.id
-  presenterModel = Number(
-    data.model ||
-    presenterModel ||
-    1
-  )
-
-  presenterTeamAName =
-    data.team_a ||
-    presenterTeamAName ||
-    "الفريق الأول"
-
-  presenterTeamBName =
-    data.team_b ||
-    presenterTeamBName ||
-    "الفريق الثاني"
-
-  presenterLiveState =
-    data.state ||
-    presenterLiveState ||
-    {}
-
-  if (
-    typeof syncPresenterSelectedTeamFromDisplayState ===
-    "function"
-  ) {
-    syncPresenterSelectedTeamFromDisplayState()
-  }
-}
-
-async function performPresenterSessionUpdate(
-  sessionId,
-  patch = {},
-  options = {}
-) {
-  if (!sessionId || !window.db) {
-    return {
-      data: null,
-      error: new Error("Session is unavailable")
-    }
-  }
-
-  const updateId =
-    ++presenterSessionUpdateCounter
-
-  try {
-    const { data: currentData, error: readError } =
-      await db
-        .from("game_sessions")
-        .select(PRESENTER_SESSION_SELECT)
-        .eq("id", sessionId)
-        .maybeSingle()
-
-    if (readError || !currentData) {
-      console.log(
-        "SAFE SESSION READ ERROR:",
-        readError
-      )
-
-      return {
-        data: null,
-        error:
-          readError ||
-          new Error("Session not found")
-      }
-    }
-
-    if (
-      currentData.status === "ended" &&
-      options.allowEnded !== true
-    ) {
-      return {
-        data: currentData,
-        error: new Error("Session has ended")
-      }
-    }
-
-    const nextUpdate = {
-      ...patch,
-      updated_at: new Date().toISOString()
-    }
-
-    if (
-      patch.state &&
-      typeof patch.state === "object"
-    ) {
-      nextUpdate.state =
-        options.replaceState === true
-          ? patch.state
-          : mergePresenterObjects(
-              currentData.state || {},
-              patch.state
-            )
-    }
-
-    const { data, error } = await db
-      .from("game_sessions")
-      .update(nextUpdate)
-      .eq("id", sessionId)
-      .select(PRESENTER_SESSION_SELECT)
-      .maybeSingle()
-
-    if (error || !data) {
-      console.log(
-        "SAFE SESSION UPDATE ERROR:",
-        error
-      )
-
-      return {
-        data: null,
-        error:
-          error ||
-          new Error("Session update failed")
-      }
-    }
-
-    updatePresenterLocalSessionData(data)
-
-    if (
-      options.applySession !== false &&
-      typeof applyPresenterSessionData ===
-        "function"
-    ) {
-      applyPresenterSessionData(data)
-    }
-
-    return {
-      data,
-      error: null,
-      updateId
-    }
-  } catch (error) {
-    console.log(
-      "SAFE SESSION UPDATE CATCH:",
-      error
-    )
-
-    return {
-      data: null,
-      error
-    }
-  }
-}
-
-function updatePresenterSessionSafely(
+async function updatePresenterSessionSafely(
   patch = {},
   options = {}
 ) {
   const sessionId =
     options.sessionId ||
     presenterSessionId ||
-    localStorage.getItem(
-      "presenter_session_id"
-    )
-
-  const task = async () => {
-    return performPresenterSessionUpdate(
-      sessionId,
-      patch,
-      options
-    )
-  }
-
-  presenterSessionUpdateQueue =
-    presenterSessionUpdateQueue
-      .catch(() => null)
-      .then(task)
-
-  return presenterSessionUpdateQueue
-}
-
-window.updatePresenterSessionSafely =
-  updatePresenterSessionSafely
-
-/* =========================
-   PRESENTER SEGMENT NORMALIZER
-========================= */
-
-function normalizePresenterSegmentKey(key) {
-  const value = String(key || "").trim()
-
-  if (value === "finalRound1") return "final_round1"
-  if (value === "finalRound2") return "final_round2"
-  if (value === "finalRound3") return "final_round3"
-  if (value === "finalRound4") return "final_round4"
-
-  if (value === "final_round1") return "final_round1"
-  if (value === "final_round2") return "final_round2"
-  if (value === "final_round3") return "final_round3"
-  if (value === "final_round4") return "final_round4"
-
-  return value
-}
-
-window.normalizePresenterSegmentKey =
-  normalizePresenterSegmentKey
-
-function getPresenterSegmentName(segment) {
-  const key = normalizePresenterSegmentKey(segment)
-
-  if (key === "final") {
-    const round = Number(
-      presenterFinalRound ||
-      presenterLiveState?.final?.round ||
-      1
-    )
-
-    const finalTitles = {
-      1: "ٮدوں ٮڡاط",
-      2: "صح صحلي",
-      3: "قصة",
-      4: "التركيز"
-    }
-
-    return finalTitles[round] || "الفاصلة"
-  }
-
-  const item = ALL_PRESENTER_SEGMENTS.find(segmentItem => {
-    return normalizePresenterSegmentKey(segmentItem.key) === key
-  })
-
-  return item?.title || "لوحة المقدم"
-}
-
-window.getPresenterSegmentName = getPresenterSegmentName
-
-function isPresenterSegmentGloballyEnabled(
-  segmentKey,
-  globalMap = {}
-) {
-  const key = normalizePresenterSegmentKey(segmentKey)
-  return globalMap[key] !== false
-}
-
-function markPresenterLocalSync(segment = presenterSegment, ms = 1200) {
-  presenterLocalSyncUntil = Date.now() + ms
-  presenterLocalOpenedSegment = segment || presenterSegment || null
-}
-
-function isPresenterLocalSyncProtected() {
-  return Date.now() < presenterLocalSyncUntil
-}
-/* =========================
-   PRESENTER MODE
-   control = تحكم
-   reader  = دليل الأسئلة فقط
-========================= */
-
-let presenterJoinMode = localStorage.getItem("presenter_join_mode") || "control"
-let presenterReaderSegment = null
-
-function setPresenterJoinMode(mode) {
-  presenterJoinMode = mode === "reader" ? "reader" : "control"
-  localStorage.setItem("presenter_join_mode", presenterJoinMode)
-
-  document.getElementById("presenterControlModeBtn")?.classList.toggle(
-    "activePresenterMode",
-    presenterJoinMode === "control"
-  )
-
-  document.getElementById("presenterReaderModeBtn")?.classList.toggle(
-    "activePresenterMode",
-    presenterJoinMode === "reader"
-  )
-
-  const status = document.getElementById("presenterJoinStatus")
-
-  if (status) {
-    status.innerText =
-      presenterJoinMode === "reader"
-        ? "وضع قراءة فقط: الأسئلة والإجابات بدون تحكم"
-        : "وضع تحكم: ربط مع العرض والتحكم باللعبة"
-  }
-}
-
-function syncPresenterJoinModeUI() {
-  setPresenterJoinMode(presenterJoinMode)
-}
-const ALL_PRESENTER_SEGMENTS = [
-  { key: "warmup", title: "التسخين", sort: 1 },
-  { key: "top10", title: "Top 10", sort: 2 },
-  { key: "who", title: "من هو", sort: 3 },
-  { key: "explain", title: "اشرح الكلمة", sort: 4 },
-  { key: "letterli", title: "حرفلي", sort: 5 },
-
-  { key: "final_round1", title: "ٮدوں ٮڡاط", sort: 6, finalRound: 1 },
-  { key: "final_round2", title: "صح صحلي", sort: 7, finalRound: 2 },
-  { key: "final_round3", title: "قصة", sort: 8, finalRound: 3 },
-  { key: "final_round4", title: "التركيز", sort: 9, finalRound: 4 },
-
-  { key: "archive", title: "الأرشيف", sort: 10 },
-  { key: "randomChallenge", title: "التحدي", sort: 11 }
-]
-
-
-let presenterVisibleSegments = ALL_PRESENTER_SEGMENTS
-  .map(item => ({
-    ...item,
-    is_visible: true,
-    sort_order: item.sort
-  }))
-
-document.addEventListener("DOMContentLoaded", async () => {
-  const urlParams =
-    new URLSearchParams(window.location.search)
-
-  const openedFromQr =
-    urlParams.get("join") === "1"
-
-  if (openedFromQr) {
-    localStorage.removeItem("presenter_session_id")
-    localStorage.removeItem("presenter_join_code")
-  }
-
-  const savedSessionId =
     localStorage.getItem("presenter_session_id")
 
-  if (!savedSessionId) {
-    hidePresenterBootLoading()
-    showPresenterJoin()
-    return
+  if (!sessionId || !window.db) {
+    return {
+      data: null,
+      error: new Error("No session or db")
+    }
   }
 
-  showPresenterBootLoading()
+  try {
+    const currentRes = await db
+      .from("game_sessions")
+      .select(PRESENTER_SESSION_SELECT)
+      .eq("id", sessionId)
+      .maybeSingle()
 
-  const cachedSession =
-    readPresenterSessionCache(savedSessionId)
-
-  if (cachedSession) {
-    if (cachedSession.status === "ended") {
-      hidePresenterBootLoading()
-      renderPresenterEnded()
-      return
+    if (currentRes.error || !currentRes.data) {
+      return {
+        data: null,
+        error: currentRes.error || new Error("Session not found")
+      }
     }
 
-    presenterSessionId = cachedSession.id
-    presenterModel = Number(cachedSession.model || 1)
-    presenterTeamAName =
-      cachedSession.team_a || "الفريق الأول"
-    presenterTeamBName =
-      cachedSession.team_b || "الفريق الثاني"
-    presenterLiveState =
-      cachedSession.state || {}
+    const current = currentRes.data
 
-    syncPresenterSelectedTeamFromDisplayState()
-
-    if (presenterJoinMode === "reader") {
-      await renderPresenterReaderHome()
-    } else {
-      applyPresenterSessionData(cachedSession)
+    const updatePayload = {
+      updated_at: new Date().toISOString()
     }
 
-    hidePresenterBootLoading()
-  }
-
-  const result = await loadPresenterSession(
-    savedSessionId,
-    { forceRefresh: true }
-  )
-
-  if (result.error || !result.data) {
-    hidePresenterBootLoading()
-
-    if (!cachedSession) {
-      localStorage.removeItem("presenter_session_id")
-      localStorage.removeItem("presenter_join_code")
-      showPresenterJoin()
+    if ("active_segment" in patch) {
+      updatePayload.active_segment = patch.active_segment
     }
 
-    return
+    if ("status" in patch) {
+      updatePayload.status = patch.status
+    }
+
+    if ("ended_at" in patch) {
+      updatePayload.ended_at = patch.ended_at
+    }
+
+    if ("state" in patch) {
+      updatePayload.state =
+        options.replaceState === true
+          ? patch.state
+          : mergePresenterObjects(
+              current.state || {},
+              patch.state || {}
+            )
+    }
+
+    const { data, error } = await db
+      .from("game_sessions")
+      .update(updatePayload)
+      .eq("id", sessionId)
+      .select(PRESENTER_SESSION_SELECT)
+      .maybeSingle()
+
+    if (!error && data) {
+      savePresenterSessionCache(data)
+
+      if (
+        presenterChannel &&
+        presenterChannelHealthy
+      ) {
+        presenterChannel.send({
+          type: "broadcast",
+          event: "session_state",
+          payload: data
+        }).catch(() => null)
+      }
+
+      if (options.applySession !== false) {
+        applyPresenterSessionData(data)
+      }
+    }
+
+    return { data, error }
+  } catch (error) {
+    return { data: null, error }
   }
-
-  const data = result.data
-
-  if (data.status === "ended") {
-    hidePresenterBootLoading()
-    renderPresenterEnded()
-    return
-  }
-
-  presenterSessionId = data.id
-  presenterModel = Number(data.model || 1)
-  presenterTeamAName =
-    data.team_a || "الفريق الأول"
-  presenterTeamBName =
-    data.team_b || "الفريق الثاني"
-  presenterLiveState =
-    data.state || {}
-
-  syncPresenterSelectedTeamFromDisplayState()
-
-  if (presenterJoinMode === "reader") {
-    await renderPresenterReaderHome()
-    hidePresenterBootLoading()
-    return
-  }
-
-  applyPresenterSessionData(data)
-  subscribeToGameSession(data.id)
-  hidePresenterBootLoading()
-})
+}
 
 /* =========================
-   PAGE MODE
+   9) PAGE MODE
 ========================= */
 
 function hideAllPresenterPages() {
   document.getElementById("presenterJoin")?.classList.add("hidden")
   document.getElementById("presenterHome")?.classList.add("hidden")
   document.getElementById("presenterSegmentPage")?.classList.add("hidden")
-
   document.getElementById("presenterReaderHome")?.classList.add("hidden")
   document.getElementById("presenterReaderSegmentPage")?.classList.add("hidden")
+}
+
+function syncPresenterJoinModeUI() {
+  document
+    .getElementById("presenterControlModeBtn")
+    ?.classList.toggle("active", presenterJoinMode === "control")
+
+  document
+    .getElementById("presenterReaderModeBtn")
+    ?.classList.toggle("active", presenterJoinMode === "reader")
+}
+
+function setPresenterJoinMode(mode) {
+  presenterJoinMode =
+    mode === "reader"
+      ? "reader"
+      : "control"
+
+  localStorage.setItem(
+    "presenter_join_mode",
+    presenterJoinMode
+  )
+
+  syncPresenterJoinModeUI()
+
+  const status =
+    document.getElementById("presenterJoinStatus")
+
+  if (status) {
+    status.innerText =
+      presenterJoinMode === "reader"
+        ? "وضع القراءة: عرض الأسئلة والإجابات فقط"
+        : "وضع التحكم: ربط مع العرض والتحكم باللعبة"
+  }
 }
 
 function showPresenterJoin() {
@@ -977,78 +873,198 @@ function showPresenterSegmentPage() {
 
 function showPresenterReaderHomePage() {
   hideAllPresenterPages()
-  document
-    .getElementById("presenterReaderHome")
-    ?.classList.remove("hidden")
+  document.getElementById("presenterReaderHome")?.classList.remove("hidden")
 }
 
 function showPresenterReaderSegmentPage() {
   hideAllPresenterPages()
-  document
-    .getElementById("presenterReaderSegmentPage")
-    ?.classList.remove("hidden")
+  document.getElementById("presenterReaderSegmentPage")?.classList.remove("hidden")
 }
 
-async function loadPresenterGlobalSegmentVisibilityMap(
-  options = {}
-) {
-  const map = {}
+/* =========================
+   10) BOOT
+========================= */
 
+function renderPresenterBootFallback(data = null) {
   try {
-    const result = await withPresenterTimeout(
-      loadPresenterCachedResource({
-        cacheKey: getPresenterResourceCacheKey(
-          "global_segment_visibility"
-        ),
-        ttl: PRESENTER_GLOBAL_CACHE_TTL,
-        forceRefresh: options.forceRefresh === true,
-        staleWhileRevalidate:
-          options.staleWhileRevalidate !== false,
-        fetcher: async () => {
-          const { data, error } = await db
-            .from("global_segment_visibility")
-            .select("segment_key,is_enabled")
-
-          return { data: data || [], error }
-        }
-      }),
-      3200,
-      {
-        data: [],
-        error: new Error("Global visibility timeout"),
-        source: "timeout"
-      }
-    )
-
-    const rows = Array.isArray(result?.data)
-      ? result.data
-      : []
-
-    rows.forEach(row => {
-      const key = normalizePresenterSegmentKey(
-        row.segment_key
-      )
-
-      map[key] = row.is_enabled !== false
-    })
-
-    if (result?.error && !rows.length) {
-      console.log(
-        "PRESENTER GLOBAL VISIBILITY FALLBACK:",
-        result.error
-      )
+    if (data) {
+      presenterSessionId = data.id || presenterSessionId
+      presenterModel = Number(data.model || presenterModel || 1)
+      presenterTeamAName = data.team_a || presenterTeamAName || "الفريق الأول"
+      presenterTeamBName = data.team_b || presenterTeamBName || "الفريق الثاني"
+      presenterLiveState = data.state || presenterLiveState || {}
     }
 
-    return map
-  } catch (error) {
-    console.log(
-      "PRESENTER GLOBAL VISIBILITY CATCH:",
-      error
-    )
+    presenterSegment = null
+    presenterSelectedTeam = null
 
-    return map
+    renderPresenterHome()
+  } catch (error) {
+    console.log("PRESENTER BOOT FALLBACK ERROR:", error)
+
+    hideAllPresenterPages()
+    document.getElementById("presenterHome")?.classList.remove("hidden")
   }
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+  let cachedSession = null
+
+  try {
+    const urlParams =
+      new URLSearchParams(window.location.search)
+
+    const openedFromQr =
+      urlParams.get("join") === "1"
+
+    if (openedFromQr) {
+      localStorage.removeItem("presenter_session_id")
+      localStorage.removeItem("presenter_join_code")
+    }
+
+    const savedSessionId =
+      localStorage.getItem("presenter_session_id")
+
+    if (!savedSessionId) {
+      hidePresenterBootLoading()
+      showPresenterJoin()
+      return
+    }
+
+    showPresenterBootLoading()
+
+    cachedSession =
+      readPresenterSessionCache(savedSessionId)
+
+    if (cachedSession) {
+      if (cachedSession.status === "ended") {
+        hidePresenterBootLoading()
+        renderPresenterEnded()
+        return
+      }
+
+      presenterSessionId = cachedSession.id
+      presenterModel = Number(cachedSession.model || 1)
+      presenterTeamAName = cachedSession.team_a || "الفريق الأول"
+      presenterTeamBName = cachedSession.team_b || "الفريق الثاني"
+      presenterLiveState = cachedSession.state || {}
+
+      try {
+        syncPresenterSelectedTeamFromDisplayState()
+
+        if (presenterJoinMode === "reader") {
+          await renderPresenterReaderHome()
+        } else {
+          applyPresenterSessionData(cachedSession)
+        }
+      } catch (error) {
+        console.log(
+          "PRESENTER CACHED SESSION APPLY ERROR:",
+          error
+        )
+
+        renderPresenterBootFallback(cachedSession)
+      }
+
+      hidePresenterBootLoading()
+    }
+
+    const result = await withPresenterTimeout(
+      loadPresenterSession(savedSessionId, {
+        forceRefresh: true
+      }),
+      4500,
+      cachedSession
+        ? {
+            data: cachedSession,
+            error: null,
+            source: "timeout-cache"
+          }
+        : {
+            data: null,
+            error: new Error("Presenter session timeout"),
+            source: "timeout"
+          }
+    )
+
+    if (result.error || !result.data) {
+      hidePresenterBootLoading()
+
+      if (!cachedSession) {
+        localStorage.removeItem("presenter_session_id")
+        localStorage.removeItem("presenter_join_code")
+        showPresenterJoin()
+      }
+
+      return
+    }
+
+    const data = result.data
+
+    if (data.status === "ended") {
+      hidePresenterBootLoading()
+      renderPresenterEnded()
+      return
+    }
+
+    presenterSessionId = data.id
+    presenterModel = Number(data.model || 1)
+    presenterTeamAName = data.team_a || "الفريق الأول"
+    presenterTeamBName = data.team_b || "الفريق الثاني"
+    presenterLiveState = data.state || {}
+
+    try {
+      syncPresenterSelectedTeamFromDisplayState()
+
+      if (presenterJoinMode === "reader") {
+        await renderPresenterReaderHome()
+        hidePresenterBootLoading()
+        return
+      }
+
+      applyPresenterSessionData(data)
+      subscribeToGameSession(data.id)
+    } catch (error) {
+      console.log("PRESENTER SESSION APPLY ERROR:", error)
+
+      try {
+        subscribeToGameSession(data.id)
+      } catch (subscribeError) {
+        console.log(
+          "PRESENTER SUBSCRIBE ERROR:",
+          subscribeError
+        )
+      }
+
+      renderPresenterBootFallback(data)
+    }
+
+    hidePresenterBootLoading()
+  } catch (error) {
+    console.log("PRESENTER BOOT ERROR:", error)
+
+    hidePresenterBootLoading()
+
+    const savedSessionId =
+      localStorage.getItem("presenter_session_id")
+
+    if (savedSessionId && cachedSession) {
+      renderPresenterBootFallback(cachedSession)
+      return
+    }
+
+    if (savedSessionId) {
+      renderPresenterBootFallback()
+      return
+    }
+
+    showPresenterJoin()
+  }
+})
+
+/* =========================
+   11) MODEL VISIBILITY
+========================= */
 
 async function loadPresenterModelData(options = {}) {
   const modelId = Number(presenterModel || 0)
@@ -1127,28 +1143,12 @@ async function loadPresenterModelData(options = {}) {
   return presenterModelDataPromise
 }
 
-function applyPresenterVisibleSegments(
-  rows = [],
-  globalMap = {}
-) {
+function applyPresenterVisibleSegments(rows = []) {
   const map = {}
 
-  ALL_PRESENTER_SEGMENTS.forEach(item => {
-    const key =
-      normalizePresenterSegmentKey(item.key)
-
-    if (
-      !isPresenterSegmentGloballyEnabled(
-        key,
-        globalMap
-      )
-    ) {
-      return
-    }
-
-    map[key] = {
+  PRESENTER_SEGMENTS.forEach(item => {
+    map[item.key] = {
       ...item,
-      key,
       is_visible: true,
       sort_order: item.sort
     }
@@ -1156,15 +1156,13 @@ function applyPresenterVisibleSegments(
 
   ;(rows || []).forEach(row => {
     const key =
-      normalizePresenterSegmentKey(
-        row.segment_key
-      )
+      normalizePresenterSegmentKey(row.segment_key)
 
     if (!map[key]) return
 
     map[key] = {
       ...map[key],
-      is_visible: !!row.is_visible,
+      is_visible: row.is_visible !== false,
       sort_order: Number(
         row.sort_order ||
         map[key].sort
@@ -1185,43 +1183,86 @@ function applyPresenterVisibleSegments(
   return presenterVisibleSegments
 }
 
+function getPresenterSelectedSegmentsFromState() {
+  const rows =
+    presenterLiveState?.selectedSegments || []
+
+  if (!Array.isArray(rows) || !rows.length) {
+    return []
+  }
+
+  return rows
+    .map((row, index) => {
+      const key =
+        normalizePresenterSegmentKey(
+          row.key ||
+          row.segment_key ||
+          row
+        )
+
+      const config =
+        getPresenterSegmentConfig(key)
+
+      if (!config) return null
+
+      return {
+        ...config,
+        title:
+          row.title ||
+          config.title,
+        is_visible: true,
+        sort_order:
+          Number(row.sort_order || index + 1)
+      }
+    })
+    .filter(Boolean)
+    .sort((a, b) => {
+      return (
+        Number(a.sort_order || a.sort) -
+        Number(b.sort_order || b.sort)
+      )
+    })
+}
+
+function applyPresenterSelectedSegmentsFromState() {
+  const selected =
+    getPresenterSelectedSegmentsFromState()
+
+  if (!selected.length) {
+    return false
+  }
+
+  presenterVisibleSegments = selected
+  return true
+}
+
 function applyPresenterCachedVisibilityNow() {
-  const globalCached = readPresenterResourceCache(
-    getPresenterResourceCacheKey(
-      "global_segment_visibility"
-    ),
-    PRESENTER_GLOBAL_CACHE_TTL,
-    { allowStale: true }
-  )
+  if (applyPresenterSelectedSegmentsFromState()) {
+    return presenterVisibleSegments
+  }
 
-  const modelCached = readPresenterResourceCache(
-    getPresenterResourceCacheKey(
-      "model_relations",
-      [Number(presenterModel || 0)]
-    ),
-    PRESENTER_MODEL_CACHE_TTL,
-    { allowStale: true }
-  )
-
-  const globalMap = {}
-
-  ;(globalCached?.data || []).forEach(row => {
-    const key = normalizePresenterSegmentKey(
-      row.segment_key
+  const modelCached =
+    readPresenterResourceCache(
+      getPresenterResourceCacheKey(
+        "model_relations",
+        [Number(presenterModel || 0)]
+      ),
+      PRESENTER_MODEL_CACHE_TTL,
+      { allowStale: true }
     )
 
-    globalMap[key] = row.is_enabled !== false
-  })
-
   return applyPresenterVisibleSegments(
-    modelCached?.data?.visible_segments || [],
-    globalMap
+    modelCached?.data?.visible_segments || []
   )
 }
 
 async function loadPresenterVisibleSegments(
   options = {}
 ) {
+  if (applyPresenterSelectedSegmentsFromState()) {
+    return presenterVisibleSegments
+  }
+
   if (
     presenterVisibilityPromise &&
     options.forceRefresh !== true
@@ -1231,35 +1272,20 @@ async function loadPresenterVisibleSegments(
 
   presenterVisibilityPromise = (async () => {
     try {
-      const settled = await Promise.allSettled([
-        loadPresenterGlobalSegmentVisibilityMap({
-          forceRefresh:
-            options.forceRefresh === true,
-          staleWhileRevalidate:
-            options.staleWhileRevalidate !== false
-        }),
-
-        loadPresenterModelData({
+      const modelData =
+        await loadPresenterModelData({
           forceRefresh:
             options.forceRefresh === true,
           staleWhileRevalidate:
             options.staleWhileRevalidate !== false
         })
-      ])
 
-      const globalMap =
-        settled[0]?.status === "fulfilled"
-          ? settled[0].value || {}
-          : {}
-
-      const modelData =
-        settled[1]?.status === "fulfilled"
-          ? settled[1].value || null
-          : null
+      if (applyPresenterSelectedSegmentsFromState()) {
+        return presenterVisibleSegments
+      }
 
       return applyPresenterVisibleSegments(
-        modelData?.visible_segments || [],
-        globalMap
+        modelData?.visible_segments || []
       )
     } catch (error) {
       console.log(
@@ -1268,7 +1294,7 @@ async function loadPresenterVisibleSegments(
       )
 
       if (!presenterVisibleSegments.length) {
-        applyPresenterVisibleSegments([], {})
+        applyPresenterVisibleSegments([])
       }
 
       return presenterVisibleSegments
@@ -1282,103 +1308,22 @@ async function loadPresenterVisibleSegments(
   }
 }
 
-function getPresenterDeferredPreloadTasks() {
-  const visibleKeys = new Set(
-    presenterVisibleSegments.map(item =>
-      normalizePresenterSegmentKey(item.key)
-    )
-  )
-
-  const tasks = []
-
-  const warmupLoader = getPresenterModuleFunction(
-    "loadPresenterWarmupRows"
-  )
-
-  if (visibleKeys.has("warmup") && warmupLoader) {
-    tasks.push(() =>
-      warmupLoader({ backgroundRefresh: false })
-    )
-  }
-
-  const top10Loader = getPresenterModuleFunction(
-    "loadPresenterTop10RoundRows"
-  )
-
-  if (visibleKeys.has("top10") && top10Loader) {
-    tasks.push(() =>
-      top10Loader(1, { backgroundRefresh: false })
-    )
-  }
-
-  const whoLoader = getPresenterModuleFunction(
-    "loadPresenterWhoRows"
-  )
-
-  if (visibleKeys.has("who") && whoLoader) {
-    tasks.push(() =>
-      whoLoader({ backgroundRefresh: false })
-    )
-  }
-
-  return tasks
-}
-
-function schedulePresenterDeferredPreload() {
-  const token = ++presenterDeferredPreloadToken
-
-  queuePresenterIdleTask(async () => {
-    const tasks = getPresenterDeferredPreloadTasks()
-
-    if (!tasks.length || token !== presenterDeferredPreloadToken) {
-      setPresenterBackgroundLoading(false)
-      return
-    }
-
-    setPresenterBackgroundLoading(true)
-
-    try {
-      for (const task of tasks) {
-        if (
-          token !== presenterDeferredPreloadToken ||
-          !presenterSessionId
-        ) {
-          break
-        }
-
-        if (document.hidden) {
-          await new Promise(resolve => setTimeout(resolve, 350))
-        }
-
-        try {
-          await task()
-        } catch (error) {
-          console.log("PRESENTER DEFERRED LOAD ERROR:", error)
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 120))
-      }
-    } finally {
-      if (token === presenterDeferredPreloadToken) {
-        setPresenterBackgroundLoading(false)
-      }
-    }
-  }, {
-    delay: 700,
-    timeout: 2500
-  })
-}
-
 function isPresenterSegmentVisible(segment) {
   const key = normalizePresenterSegmentKey(segment)
 
   return presenterVisibleSegments.some(item => {
-    return normalizePresenterSegmentKey(item.key) === key
+    return item.key === key
   })
 }
 
+/* =========================
+   12) SEGMENT LOCKS
+========================= */
+
 function getPresenterSegmentLockKeys(segmentKey) {
   const key = normalizePresenterSegmentKey(segmentKey)
+
+  if (!key) return []
 
   if (key === "final_round1") {
     return ["final_round1", "finalRound1"]
@@ -1400,18 +1345,33 @@ function getPresenterSegmentLockKeys(segmentKey) {
 }
 
 function isPresenterSegmentLocked(segmentKey) {
-  const status = presenterLiveState?.segmentStatus || {}
+  const status =
+    presenterLiveState?.segmentStatus || {}
+
   return getPresenterSegmentLockKeys(segmentKey).some(key => {
     return !!status?.[key]?.locked
   })
 }
 
 function getPresenterCurrentLockKey() {
-  if (presenterSegment === "final") {
-    return `final_round${Number(getPresenterFinalRound() || 1)}`
+  return getPresenterCurrentSegmentKey()
+}
+
+/* =========================
+   13) HOME
+========================= */
+
+function getPresenterTotalScores() {
+  const s = presenterLiveState || {}
+
+  if (s.mainScores) {
+    return {
+      A: Number(s.mainScores.A || 0),
+      B: Number(s.mainScores.B || 0)
+    }
   }
 
-  return presenterSegment || ""
+  return { A: 0, B: 0 }
 }
 
 function buildPresenterSegmentsGridHtml() {
@@ -1424,19 +1384,18 @@ function buildPresenterSegmentsGridHtml() {
   }
 
   return presenterVisibleSegments.map(item => {
-    const key = normalizePresenterSegmentKey(item.key)
-    const locked = isPresenterSegmentLocked(key)
+    const key =
+      normalizePresenterSegmentKey(item.key)
 
-    const clickAction = item.finalRound
-      ? `openPresenterFinalCard(${Number(item.finalRound)})`
-      : `openPresenterSegment('${key}')`
+    const locked =
+      isPresenterSegmentLocked(key)
 
     return `
       <button
         type="button"
-        class="segmentCard presenterSegmentCard ${locked ? "presenterLockedSegment" : ""}"
+        class="segmentCard presenterSegmentCard presenterSegmentCardClean ${locked ? "presenterLockedSegment" : ""}"
         data-segment="${key}"
-        onclick="${clickAction}"
+        onclick="openPresenterSegmentCard('${key}')"
         ${locked ? "disabled" : ""}
       >
         <span>${item.title}</span>
@@ -1446,13 +1405,15 @@ function buildPresenterSegmentsGridHtml() {
 }
 
 async function renderPresenterSegmentsGrid() {
-  const grid = document.getElementById("presenterSegmentsGrid")
+  const grid =
+    document.getElementById("presenterSegmentsGrid")
+
   if (!grid) return
 
   applyPresenterCachedVisibilityNow()
 
   if (!presenterVisibleSegments.length) {
-    applyPresenterVisibleSegments([], {})
+    applyPresenterVisibleSegments([])
   }
 
   grid.innerHTML = buildPresenterSegmentsGridHtml()
@@ -1474,16 +1435,117 @@ async function renderPresenterSegmentsGrid() {
   }
 }
 
+function renderPresenterHome() {
+  showPresenterHomePage()
+
+  const scores = getPresenterTotalScores()
+
+  const teamA =
+    document.getElementById("presenterHomeTeamA")
+
+  const teamB =
+    document.getElementById("presenterHomeTeamB")
+
+  const scoreA =
+    document.getElementById("presenterHomeScoreA")
+
+  const scoreB =
+    document.getElementById("presenterHomeScoreB")
+
+  const title =
+    document.getElementById("presenterTitle")
+
+  const subtitle =
+    document.getElementById("presenterSubtitle")
+
+  const panel =
+    document.getElementById("presenterPanel")
+
+  if (teamA) teamA.innerText = presenterTeamAName
+  if (teamB) teamB.innerText = presenterTeamBName
+  if (scoreA) scoreA.innerText = scores.A
+  if (scoreB) scoreB.innerText = scores.B
+  if (title) title.innerText = "لوحة المقدم"
+
+  const modelName =
+    presenterLiveState?.currentModelName || ""
+
+  if (subtitle) {
+    subtitle.innerHTML = presenterSessionId
+      ? `<span class="presenterOnlineDot">✅</span><span class="presenterModelName">${modelName || "بدون اسم نموذج"}</span>`
+      : `<span class="presenterOfflineDot">❌</span><span class="presenterModelName">غير متصل</span>`
+  }
+
+  if (panel) {
+    panel.dataset.segment = ""
+    delete panel.dataset.finalRound
+  }
+
+  renderPresenterSegmentsGrid()
+    .then(() => {
+      updatePresenterLockedSegments()
+      schedulePresenterDeferredPreload()
+    })
+    .catch(error => {
+      console.log(
+        "RENDER PRESENTER SEGMENTS ERROR:",
+        error
+      )
+    })
+
+  ensurePresenterInsideModeSwitch()
+}
+
+function updatePresenterHomeScoresOnly() {
+  const scores = getPresenterTotalScores()
+
+  const scoreA =
+    document.getElementById("presenterHomeScoreA")
+
+  const scoreB =
+    document.getElementById("presenterHomeScoreB")
+
+  if (scoreA) scoreA.innerText = scores.A
+  if (scoreB) scoreB.innerText = scores.B
+}
+
+function updatePresenterLockedSegments() {
+  document
+    .querySelectorAll("#presenterSegmentsGrid .segmentCard")
+    .forEach(card => {
+      const key = card.dataset.segment
+      if (!key) return
+
+      const locked =
+        isPresenterSegmentLocked(key)
+
+      card.classList.toggle(
+        "presenterLockedSegment",
+        locked
+      )
+
+      card.disabled = locked
+    })
+}
+
 /* =========================
-   JOIN SESSION
+   14) JOIN SESSION
 ========================= */
 
 async function joinGameSession() {
-  const input = document.getElementById("joinCodeInput")
-  const status = document.getElementById("presenterJoinStatus")
-  const btn = document.getElementById("presenterJoinBtn")
+  const input =
+    document.getElementById("joinCodeInput")
 
-  const code = (input?.value || "").replace(/\D/g, "").trim()
+  const status =
+    document.getElementById("presenterJoinStatus")
+
+  const btn =
+    document.getElementById("presenterJoinBtn")
+
+  const code =
+    (input?.value || "")
+      .replace(/\D/g, "")
+      .trim()
 
   if (input) input.value = code
 
@@ -1493,7 +1555,9 @@ async function joinGameSession() {
   }
 
   if (!window.db) {
-    if (status) status.innerText = "الاتصال غير جاهز، أعد المحاولة"
+    if (status) {
+      status.innerText = "الاتصال غير جاهز، أعد المحاولة"
+    }
     return
   }
 
@@ -1504,7 +1568,9 @@ async function joinGameSession() {
     btn.innerText = "جاري الدخول..."
   }
 
-  if (status) status.innerText = "جاري التحقق من الكود..."
+  if (status) {
+    status.innerText = "جاري التحقق من الكود..."
+  }
 
   try {
     const { data, error } = await db
@@ -1515,11 +1581,8 @@ async function joinGameSession() {
       .maybeSingle()
 
     if (error || !data) {
-      if (status) status.innerText = "الكود غير صحيح أو اللعبة منتهية"
-
-      if (btn) {
-        btn.disabled = false
-        btn.innerText = "دخول"
+      if (status) {
+        status.innerText = "الكود غير صحيح أو اللعبة منتهية"
       }
 
       return
@@ -1544,30 +1607,36 @@ async function joinGameSession() {
 
     presenterJustJoined = true
 
-if (presenterJoinMode === "reader") {
-  presenterJustJoined = false
-  renderPresenterReaderHome()
-  showToast("تم الدخول إلى دليل الأسئلة")
-  return
-}
+    if (presenterJoinMode === "reader") {
+      presenterJustJoined = false
+      await renderPresenterReaderHome()
+      showToast("تم الدخول إلى دليل الأسئلة")
+      return
+    }
 
-await markPresenterStartedSession(
-  data.id,
-  presenterLiveState
-)
+setPresenterBackgroundLoading(false)
 
 renderPresenterHome()
 subscribeToGameSession(data.id)
 
-showToast("تم الدخول للجلسة")
+markPresenterStartedSession(data.id)
+  .catch(error => {
+    console.log(
+      "PRESENTER START MARK ERROR:",
+      error
+    )
+  })
+  .finally(() => {
+    setPresenterBackgroundLoading(false)
+  })
 
-  } catch (e) {
-    console.log("JOIN SESSION ERROR:", e)
+showToast("تم الدخول للجلسة")
+  } catch (error) {
+    console.log("JOIN SESSION ERROR:", error)
 
     if (status) {
       status.innerText = "تعذر الدخول، تأكد من الاتصال"
     }
-
   } finally {
     if (btn) {
       btn.disabled = false
@@ -1577,10 +1646,8 @@ showToast("تم الدخول للجلسة")
 }
 
 /* =========================
-   SESSION SYNC / SEGMENT ROUTER - CLEAN BASE
+   15) SESSION SYNC
 ========================= */
-
-let presenterLastSessionStateKey = ""
 
 function getPresenterSessionStateKey(data) {
   if (!data) return ""
@@ -1594,127 +1661,46 @@ function getPresenterSessionStateKey(data) {
   })
 }
 
-function normalizePresenterSegmentFromSession(segment) {
-  const key = String(segment || "")
-
-  if (
-    key === "finalRound1" ||
-    key === "finalRound2" ||
-    key === "finalRound3" ||
-    key === "finalRound4" ||
-    key === "final_round1" ||
-    key === "final_round2" ||
-    key === "final_round3" ||
-    key === "final_round4"
-  ) {
-    return "final"
-  }
-
-  return key || null
-}
-
-function getPresenterFinalRoundFromSessionSegment(segment, fallback = 1) {
-  const key = String(segment || "")
-
-  if (key === "finalRound1" || key === "final_round1") return 1
-  if (key === "finalRound2" || key === "final_round2") return 2
-  if (key === "finalRound3" || key === "final_round3") return 3
-  if (key === "finalRound4" || key === "final_round4") return 4
-
-  return Number(fallback || 1)
-}
-
-function getPresenterFinalSessionSegmentKey(round) {
-  const r = Number(round || 1)
-
-  if (r === 1) return "finalRound1"
-  if (r === 2) return "finalRound2"
-  if (r === 3) return "finalRound3"
-  if (r === 4) return "finalRound4"
-
-  return "finalRound1"
-}
-
-function getPresenterModuleFunction(name) {
-  const fn = window[name]
-  return typeof fn === "function" ? fn : null
-}
-
 function getPresenterSegmentHandler(segment) {
-  const key = normalizePresenterSegmentFromSession(segment)
+  const runtimeSegment =
+    normalizePresenterSegmentFromSession(segment)
 
   const handlers = {
     warmup: {
       render: getPresenterModuleFunction("renderWarmup"),
       refresh: getPresenterModuleFunction("refreshPresenterWarmupFromState")
     },
-
     top10: {
       render: getPresenterModuleFunction("renderTop10"),
       refresh: getPresenterModuleFunction("refreshPresenterTop10FromState")
     },
-
-    auction: {
-      render: getPresenterModuleFunction("renderAuction"),
-      refresh: getPresenterModuleFunction("refreshPresenterAuctionFromState"),
-      afterRender: () => {
-        const ensureVideoButton = getPresenterModuleFunction(
-          "ensurePresenterAuctionVideoButton"
-        )
-
-        if (ensureVideoButton) {
-          setTimeout(ensureVideoButton, 120)
-        }
-      },
-      afterRefresh: () => {
-        const ensureVideoButton = getPresenterModuleFunction(
-          "ensurePresenterAuctionVideoButton"
-        )
-
-        if (ensureVideoButton) {
-          setTimeout(ensureVideoButton, 80)
-        }
-      }
-    },
-
-    who: {
-      render: getPresenterModuleFunction("renderWho"),
-      refresh: getPresenterModuleFunction("refreshPresenterWhoFromState")
-    },
-
-    explain: {
-      render: getPresenterModuleFunction("renderExplain"),
-      refresh: getPresenterModuleFunction("refreshPresenterExplainFromState")
-    },
-
     letterli: {
       render: getPresenterModuleFunction("renderPresenterLetterli"),
       refresh: getPresenterModuleFunction("refreshPresenterLetterliFromState")
     },
-
-    archive: {
-      render: getPresenterModuleFunction("renderArchive"),
-      refresh: getPresenterModuleFunction(
-        "refreshPresenterArchiveFromState"
-      )
+    who: {
+      render: getPresenterModuleFunction("renderWho"),
+      refresh: getPresenterModuleFunction("refreshPresenterWhoFromState")
     },
-
-    randomChallenge: {
-      render: getPresenterModuleFunction("renderPresenterRandomChallenge"),
-      refresh: getPresenterModuleFunction(
-        "refreshPresenterRandomChallengeFromState"
-      )
+    explain: {
+      render: getPresenterModuleFunction("renderExplain"),
+      refresh: getPresenterModuleFunction("refreshPresenterExplainFromState")
     },
-
     final: {
       render: getPresenterModuleFunction("renderFinal"),
-      refresh: getPresenterModuleFunction(
-        "refreshPresenterFinalFromState"
-      )
+      refresh: getPresenterModuleFunction("refreshPresenterFinalFromState")
+    },
+    archive: {
+      render: getPresenterModuleFunction("renderArchive"),
+      refresh: getPresenterModuleFunction("refreshPresenterArchiveFromState")
+    },
+    randomChallenge: {
+      render: getPresenterModuleFunction("renderPresenterRandomChallenge"),
+      refresh: getPresenterModuleFunction("refreshPresenterRandomChallengeFromState")
     }
   }
 
-  const handler = handlers[key] || null
+  const handler = handlers[runtimeSegment] || null
 
   if (!handler || typeof handler.render !== "function") {
     return null
@@ -1729,15 +1715,21 @@ function refreshPresenterCurrentSegmentFromState() {
   try {
     syncPresenterSelectedTeamFromDisplayState()
 
-    const handler = getPresenterSegmentHandler(presenterSegment)
+    const handler =
+      getPresenterSegmentHandler(presenterSegment)
 
-    if (!handler || typeof handler.refresh !== "function") return
+    if (!handler || typeof handler.refresh !== "function") {
+      return
+    }
 
     const result = handler.refresh()
 
     if (result && typeof result.catch === "function") {
-      result.catch(err => {
-        console.log("PRESENTER REFRESH ASYNC ERROR:", err)
+      result.catch(error => {
+        console.log(
+          "PRESENTER REFRESH ASYNC ERROR:",
+          error
+        )
       })
     }
 
@@ -1748,67 +1740,120 @@ function refreshPresenterCurrentSegmentFromState() {
     if (typeof refreshPresenterEnhancements === "function") {
       refreshPresenterEnhancements()
     }
-  } catch (err) {
-    console.log("PRESENTER REFRESH CURRENT SEGMENT ERROR:", err)
+  } catch (error) {
+    console.log(
+      "PRESENTER REFRESH CURRENT SEGMENT ERROR:",
+      error
+    )
   }
 }
 
 function isPresenterPanelReadyForSegment(segment) {
-  const panel = document.getElementById("presenterPanel")
+  const panel =
+    document.getElementById("presenterPanel")
+
   if (!panel) return false
 
-  const normalized = normalizePresenterSegmentFromSession(segment)
-  const currentRendered = panel.dataset.segment || ""
-  const panelText = panel.innerText || ""
+  const runtimeSegment =
+    normalizePresenterSegmentFromSession(segment)
+
+  const currentRendered =
+    panel.dataset.segment || ""
+
+  const currentRound =
+    Number(panel.dataset.finalRound || 0)
+
+  const panelText =
+    panel.innerText || ""
 
   const panelIsEmpty =
     !panel.innerHTML.trim() ||
     panelText.includes("جارٍ التحميل") ||
+    panelText.includes("جارٍ تحميل") ||
+    panelText.includes("جاري تحميل") ||
+    panelText.includes("جاري التحميل") ||
     panelText.includes("حدث خطأ في تحميل الفقرة")
 
-  return currentRendered === normalized && !panelIsEmpty
+  if (runtimeSegment === "final") {
+    return (
+      currentRendered === "final" &&
+      currentRound === Number(getPresenterFinalRound() || 1) &&
+      !panelIsEmpty
+    )
+  }
+
+  return (
+    currentRendered === runtimeSegment &&
+    !panelIsEmpty
+  )
 }
 
 async function renderPresenterSegmentShell(segment) {
-  const panel = document.getElementById("presenterPanel")
+  const panel =
+    document.getElementById("presenterPanel")
+
   if (!panel) return
 
-  const normalized = normalizePresenterSegmentFromSession(segment)
+  const runtimeSegment =
+    normalizePresenterSegmentFromSession(segment)
+
+  if (!runtimeSegment) {
+    presenterSegment = null
+    presenterSelectedTeam = null
+    renderPresenterHome()
+    return
+  }
 
   showPresenterSegmentPage()
 
-  const title = document.getElementById("presenterSegmentTitle")
+  const title =
+    document.getElementById("presenterSegmentTitle")
 
   if (title) {
     title.innerText =
-      normalized === "final"
+      runtimeSegment === "final"
         ? getPresenterFinalRoundTitle(getPresenterFinalRound())
-        : getPresenterSegmentName(normalized)
+        : getPresenterSegmentName(runtimeSegment)
   }
 
-  panel.dataset.segment = normalized
+  panel.dataset.segment = runtimeSegment
+
+  if (runtimeSegment === "final") {
+    panel.dataset.finalRound =
+      String(getPresenterFinalRound() || 1)
+  } else {
+    delete panel.dataset.finalRound
+  }
+
   panel.innerHTML = `
-    <section class="presenterCard">
+    <section class="presenterCard presenterSegmentLoadingCard">
       ${getPresenterLoadingMarkup("جارٍ تحميل الفقرة...")}
     </section>
   `
 }
 
 async function openPresenterSegmentFromSync(segment) {
-  segment = normalizePresenterSegmentFromSession(segment)
+  const runtimeSegment =
+    normalizePresenterSegmentFromSession(segment)
 
-  const panel = document.getElementById("presenterPanel")
-  if (!panel || !segment) return
+  const panel =
+    document.getElementById("presenterPanel")
 
-  loadPresenterVisibleSegments().catch(() => null)
+  if (!panel) return
 
-  let visibilityKey = segment
-
-  if (segment === "final") {
-    visibilityKey = `final_round${Number(getPresenterFinalRound() || 1)}`
+  if (!runtimeSegment) {
+    presenterSegment = null
+    presenterSelectedTeam = null
+    renderPresenterHome()
+    return
   }
 
-  if (!isPresenterSegmentVisible(visibilityKey)) {
+  const visibleKey =
+    runtimeSegment === "final"
+      ? `final_round${Number(getPresenterFinalRound() || 1)}`
+      : runtimeSegment
+
+  if (!isPresenterSegmentVisible(visibleKey)) {
     showToast("هذه الفقرة معطلة من الأدمن")
     presenterSegment = null
     presenterSelectedTeam = null
@@ -1816,7 +1861,7 @@ async function openPresenterSegmentFromSync(segment) {
     return
   }
 
-  if (isPresenterSegmentLocked(visibilityKey)) {
+  if (isPresenterSegmentLocked(visibleKey)) {
     showToast("هذه الفقرة منتهية")
     presenterSegment = null
     presenterSelectedTeam = null
@@ -1824,14 +1869,12 @@ async function openPresenterSegmentFromSync(segment) {
     return
   }
 
-  const handler = getPresenterSegmentHandler(segment)
+  presenterSegment = runtimeSegment
+
+  const handler =
+    getPresenterSegmentHandler(runtimeSegment)
 
   if (!handler || typeof handler.render !== "function") {
-    console.error(
-      "PRESENTER SEGMENT MODULE IS NOT READY:",
-      segment
-    )
-
     panel.innerHTML = `
       <section class="presenterCard">
         <div class="presenterLabel">
@@ -1850,12 +1893,12 @@ async function openPresenterSegmentFromSync(segment) {
     return
   }
 
-  if (isPresenterPanelReadyForSegment(segment)) {
+  if (isPresenterPanelReadyForSegment(runtimeSegment)) {
     refreshPresenterCurrentSegmentFromState()
     return
   }
 
-  await renderPresenterSegmentShell(segment)
+  await renderPresenterSegmentShell(runtimeSegment)
 
   try {
     const result = handler.render()
@@ -1864,15 +1907,18 @@ async function openPresenterSegmentFromSync(segment) {
       await result
     }
 
-    panel.dataset.segment = segment
+    panel.dataset.segment = runtimeSegment
 
-    if (typeof handler.afterRender === "function") {
-      handler.afterRender()
+    if (runtimeSegment === "final") {
+      panel.dataset.finalRound =
+        String(getPresenterFinalRound() || 1)
+    } else {
+      delete panel.dataset.finalRound
     }
 
     refreshPresenterCurrentSegmentFromState()
-  } catch (err) {
-    console.log("Presenter render error:", err)
+  } catch (error) {
+    console.log("Presenter render error:", error)
 
     panel.innerHTML = `
       <section class="presenterCard">
@@ -1881,6 +1927,7 @@ async function openPresenterSegmentFromSync(segment) {
         </div>
 
         <button
+          type="button"
           class="presenterBtn gray"
           onclick="presenterGoHome()"
         >
@@ -1899,30 +1946,36 @@ function applyPresenterSessionData(data) {
     return
   }
 
-  const rawNextSegment = data.active_segment || null
-  const nextSegment = normalizePresenterSegmentFromSession(rawNextSegment)
+  const rawNextSegment =
+    data.active_segment || null
+
+  const nextSegment =
+    normalizePresenterSegmentFromSession(rawNextSegment)
 
   if (
-  isPresenterLocalSyncProtected() &&
-  presenterSegment &&
-  !nextSegment
-) {
-  return
-}
+    isPresenterLocalSyncProtected() &&
+    presenterSegment &&
+    !nextSegment
+  ) {
+    return
+  }
 
-if (
-  isPresenterLocalSyncProtected() &&
-  presenterLocalOpenedSegment &&
-  nextSegment &&
-  normalizePresenterSegmentFromSession(presenterLocalOpenedSegment) !== nextSegment
-) {
-  return
-}
+  if (
+    isPresenterLocalSyncProtected() &&
+    presenterLocalOpenedSegment &&
+    nextSegment &&
+    normalizePresenterSegmentFromSession(presenterLocalOpenedSegment) !== nextSegment
+  ) {
+    return
+  }
 
-  const nextFinalRound = getPresenterFinalRoundFromSessionSegment(
-    rawNextSegment,
-    data.state?.final?.round || presenterFinalRound || 1
-  )
+  const nextFinalRound =
+    getPresenterFinalRoundFromSessionSegment(
+      rawNextSegment,
+      data.state?.final?.round ||
+        presenterFinalRound ||
+        1
+    )
 
   const oldSegment = presenterSegment
   const oldSessionId = presenterSessionId
@@ -1933,16 +1986,19 @@ if (
   presenterTeamAName = data.team_a || "الفريق الأول"
   presenterTeamBName = data.team_b || "الفريق الثاني"
 
-  let incomingState = data.state || {}
+  let incomingState =
+    data.state || {}
 
   if (nextSegment === "final") {
-    let roundToUse = Number(nextFinalRound || 1)
+    let roundToUse =
+      Number(nextFinalRound || 1)
 
     if (
       presenterFinalForcedRound &&
       Date.now() < presenterFinalForcedRoundUntil
     ) {
-      roundToUse = Number(presenterFinalForcedRound)
+      roundToUse =
+        Number(presenterFinalForcedRound)
     }
 
     presenterFinalRound = roundToUse
@@ -1989,7 +2045,11 @@ if (
 
   const toast = presenterLiveState?.toast
 
-  if (toast?.text && toast?.time && toast.time !== lastPresenterToastTime) {
+  if (
+    toast?.text &&
+    toast?.time &&
+    toast.time !== lastPresenterToastTime
+  ) {
     lastPresenterToastTime = toast.time
     showToast(toast.text)
   }
@@ -2000,12 +2060,10 @@ if (
     return
   }
 
-  const currentLockKey =
-    presenterSegment === "final"
-      ? `final_round${Number(getPresenterFinalRound() || 1)}`
-      : presenterSegment
+  const lockKey =
+    getPresenterCurrentLockKey()
 
-  if (isPresenterSegmentLocked(currentLockKey)) {
+  if (isPresenterSegmentLocked(lockKey)) {
     showToast("هذه الفقرة منتهية")
     presenterSegment = null
     presenterSelectedTeam = null
@@ -2025,9 +2083,7 @@ if (
   refreshPresenterCurrentSegmentFromState()
 }
 
-async function markPresenterStartedSession(
-  sessionId
-) {
+async function markPresenterStartedSession(sessionId) {
   if (!sessionId) return false
 
   const result =
@@ -2050,14 +2106,16 @@ async function markPresenterStartedSession(
       "MARK PRESENTER STARTED ERROR:",
       result.error
     )
-
     return false
   }
 
   return true
 }
 
-async function fetchPresenterSessionNow(sessionId, forceApply = false) {
+async function fetchPresenterSessionNow(
+  sessionId,
+  forceApply = false
+) {
   if (!sessionId || !window.db) return
 
   try {
@@ -2068,20 +2126,31 @@ async function fetchPresenterSessionNow(sessionId, forceApply = false) {
       .maybeSingle()
 
     if (error || !data) {
-      console.log("PRESENTER SESSION FETCH ERROR:", error)
+      console.log(
+        "PRESENTER SESSION FETCH ERROR:",
+        error
+      )
       return
     }
 
-    const nextKey = getPresenterSessionStateKey(data)
+    const nextKey =
+      getPresenterSessionStateKey(data)
 
-    if (!forceApply && nextKey === presenterLastSessionStateKey) {
+    if (
+      !forceApply &&
+      nextKey === presenterLastSessionStateKey
+    ) {
       return
     }
 
     presenterLastSessionStateKey = nextKey
+    savePresenterSessionCache(data)
     applyPresenterSessionData(data)
-  } catch (err) {
-    console.log("PRESENTER SESSION FETCH CATCH:", err)
+  } catch (error) {
+    console.log(
+      "PRESENTER SESSION FETCH CATCH:",
+      error
+    )
   }
 }
 
@@ -2101,11 +2170,12 @@ function subscribeToGameSession(sessionId) {
   presenterLastSessionStateKey = ""
   presenterChannelHealthy = false
 
-  presenterChannel = db.channel("game_session_" + sessionId, {
-    config: {
-      broadcast: { self: false, ack: true }
-    }
-  })
+  presenterChannel =
+    db.channel("game_session_" + sessionId, {
+      config: {
+        broadcast: { self: false, ack: true }
+      }
+    })
 
   presenterChannel
     .on(
@@ -2115,7 +2185,18 @@ function subscribeToGameSession(sessionId) {
         const data = payload?.payload
         if (!data) return
 
-        presenterLastSessionStateKey = getPresenterSessionStateKey(data)
+        const nextKey =
+          getPresenterSessionStateKey(data)
+
+        if (
+          nextKey &&
+          nextKey === presenterLastSessionStateKey
+        ) {
+          return
+        }
+
+        presenterLastSessionStateKey = nextKey
+        savePresenterSessionCache(data)
         applyPresenterSessionData(data)
       }
     )
@@ -2131,12 +2212,26 @@ function subscribeToGameSession(sessionId) {
         const data = payload?.new
         if (!data) return
 
-        presenterLastSessionStateKey = getPresenterSessionStateKey(data)
+        const nextKey =
+          getPresenterSessionStateKey(data)
+
+        if (
+          nextKey &&
+          nextKey === presenterLastSessionStateKey
+        ) {
+          return
+        }
+
+        presenterLastSessionStateKey = nextKey
+        savePresenterSessionCache(data)
         applyPresenterSessionData(data)
       }
     )
     .subscribe(status => {
-      console.log("PRESENTER SESSION CHANNEL:", status)
+      console.log(
+        "PRESENTER SESSION CHANNEL:",
+        status
+      )
 
       if (status === "SUBSCRIBED") {
         presenterChannelHealthy = true
@@ -2160,11 +2255,13 @@ function subscribeToGameSession(sessionId) {
 
   presenterSyncTimer = setInterval(() => {
     if (document.hidden) return
-    if (presenterChannelHealthy) return
-    fetchPresenterSessionNow(sessionId, false)
-  }, 2000)
-}
 
+    fetchPresenterSessionNow(
+      sessionId,
+      false
+    )
+  }, 1500)
+}
 
 function renderPresenterEnded() {
   presenterDeferredPreloadToken += 1
@@ -2181,7 +2278,8 @@ function renderPresenterEnded() {
 
   showPresenterJoin()
 
-  const status = document.getElementById("presenterJoinStatus")
+  const status =
+    document.getElementById("presenterJoinStatus")
 
   if (status) {
     status.innerText = "انتهت اللعبة — أدخل كود جديد"
@@ -2189,89 +2287,255 @@ function renderPresenterEnded() {
 }
 
 /* =========================
-   HOME / NAVIGATION - CLEAN BASE
+   16) UNIFIED SEGMENT OPENING
 ========================= */
 
-function getPresenterTotalScores() {
-  const s = presenterLiveState || {}
+function getPresenterOpenInfo(segment) {
+  const key = normalizePresenterSegmentKey(segment)
+  const config = getPresenterSegmentConfig(key)
 
-  if (s.mainScores) {
-    return {
-      A: Number(s.mainScores.A || 0),
-      B: Number(s.mainScores.B || 0)
+  if (!config) return null
+
+  const finalRound =
+    config.finalRound
+      ? Number(config.finalRound)
+      : null
+
+  return {
+    key,
+    title: config.title,
+    runtimeSegment: config.moduleKey || config.key,
+    displaySegment: config.displaySegment || config.key,
+    sessionSegment: finalRound
+      ? getPresenterFinalSessionSegmentKey(finalRound)
+      : config.key,
+    finalRound,
+    needsLottery: !!config.needsLottery
+  }
+}
+
+function getPresenterOpenCommandPayload(openInfo) {
+  const payload = {
+    segment: openInfo.displaySegment,
+    segmentKey: openInfo.key,
+    activeSegment: openInfo.sessionSegment,
+    needsLottery: openInfo.needsLottery === true
+  }
+
+  if (openInfo.finalRound) {
+    payload.round = openInfo.finalRound
+    payload.finalRound = openInfo.finalRound
+  }
+
+  return payload
+}
+
+function setPresenterLocalOpenState(openInfo) {
+  presenterSelectedTeam = null
+  presenterSegment = openInfo.runtimeSegment
+
+  if (openInfo.finalRound) {
+    presenterFinalRound = openInfo.finalRound
+    presenterFinalRoundOverride = openInfo.finalRound
+    presenterFinalForcedRound = openInfo.finalRound
+    presenterFinalForcedRoundUntil =
+      Date.now() + 30000
+
+    presenterFinalSelected = {
+      round: openInfo.finalRound,
+      number: null
+    }
+
+    presenterLiveState = {
+      ...(presenterLiveState || {}),
+      final: {
+        ...(presenterLiveState?.final || {}),
+        round: openInfo.finalRound
+      }
+    }
+
+    return
+  }
+
+  presenterFinalRoundOverride = null
+  presenterFinalSelected = null
+}
+
+async function syncPresenterOpenedSegment(openInfo) {
+  const patch = {
+    active_segment: openInfo.sessionSegment
+  }
+
+  if (openInfo.finalRound) {
+    patch.state = {
+      final: {
+        round: openInfo.finalRound
+      }
     }
   }
 
-  return { A: 0, B: 0 }
-}
+  const result =
+    await updatePresenterSessionSafely(
+      patch,
+      {
+        applySession: false
+      }
+    )
 
-function renderPresenterHome() {
-  showPresenterHomePage()
-
-  const scores = getPresenterTotalScores()
-
-  const teamA = document.getElementById("presenterHomeTeamA")
-  const teamB = document.getElementById("presenterHomeTeamB")
-  const scoreA = document.getElementById("presenterHomeScoreA")
-  const scoreB = document.getElementById("presenterHomeScoreB")
-  const title = document.getElementById("presenterTitle")
-  const subtitle = document.getElementById("presenterSubtitle")
-  const panel = document.getElementById("presenterPanel")
-
-  if (teamA) teamA.innerText = presenterTeamAName
-  if (teamB) teamB.innerText = presenterTeamBName
-  if (scoreA) scoreA.innerText = scores.A
-  if (scoreB) scoreB.innerText = scores.B
-
-  if (title) title.innerText = "لوحة المقدم"
-
-  const modelName = presenterLiveState?.currentModelName || ""
-
-  if (subtitle) {
-    subtitle.innerHTML = presenterSessionId
-      ? `<span class="presenterOnlineDot">✅</span><span class="presenterModelName">${modelName || "بدون اسم نموذج"}</span>`
-      : `<span class="presenterOfflineDot">❌</span><span class="presenterModelName">غير متصل</span>`
+  if (result.error) {
+    console.log(
+      "SYNC OPEN SEGMENT ERROR:",
+      result.error
+    )
   }
 
-  if (panel) {
-    panel.dataset.segment = ""
+  return !result.error
+}
+
+async function renderPresenterOpenedSegment(openInfo) {
+  await renderPresenterSegmentShell(openInfo.runtimeSegment)
+  await openPresenterSegmentFromSync(openInfo.runtimeSegment)
+}
+
+async function openPresenterSegmentCard(segment) {
+  const openInfo =
+    getPresenterOpenInfo(segment)
+
+  if (!openInfo) {
+    showToast("الفقرة غير معروفة")
+    return
   }
 
-  renderPresenterSegmentsGrid()
-    .then(() => {
-      updatePresenterLockedSegments()
-      schedulePresenterDeferredPreload()
-    })
-    .catch(error => {
-      console.log("RENDER PRESENTER SEGMENTS ERROR:", error)
-    })
+  loadPresenterVisibleSegments().catch(() => null)
 
-  ensurePresenterInsideModeSwitch()
+  if (!isPresenterSegmentVisible(openInfo.key)) {
+    showToast("هذه الفقرة معطلة من الأدمن")
+    renderPresenterHome()
+    return
+  }
+
+  if (isPresenterSegmentLocked(openInfo.key)) {
+    showToast("هذه الفقرة منتهية")
+    renderPresenterHome()
+    return
+  }
+
+  setPresenterLocalOpenState(openInfo)
+
+  markPresenterLocalSync(
+    openInfo.runtimeSegment,
+    openInfo.finalRound ? 1800 : 1400
+  )
+
+  const commandPromise =
+    sendCommand(
+      "openSegment",
+      getPresenterOpenCommandPayload(openInfo)
+    )
+
+  const sessionPromise =
+    syncPresenterOpenedSegment(openInfo)
+      .catch(error => {
+        console.log(
+          "OPEN SEGMENT SESSION SYNC CATCH:",
+          error
+        )
+        return false
+      })
+
+  const renderPromise =
+    renderPresenterOpenedSegment(openInfo)
+      .catch(error => {
+        console.log(
+          "OPEN SEGMENT RENDER CATCH:",
+          error
+        )
+        showToast("تعذر فتح الفقرة في المقدم")
+      })
+
+  const sent = await commandPromise
+
+  if (!sent) {
+    showToast("تعذر فتح الفقرة في العرض")
+  }
+
+  await sessionPromise
+  await renderPromise
 }
 
-function updatePresenterHomeScoresOnly() {
-  const scores = getPresenterTotalScores()
-
-  const scoreA = document.getElementById("presenterHomeScoreA")
-  const scoreB = document.getElementById("presenterHomeScoreB")
-
-  if (scoreA) scoreA.innerText = scores.A
-  if (scoreB) scoreB.innerText = scores.B
+async function openPresenterSegment(segment) {
+  return openPresenterSegmentCard(segment)
 }
 
-function updatePresenterLockedSegments() {
-  document
-    .querySelectorAll("#presenterSegmentsGrid .segmentCard")
-    .forEach(card => {
-      const key = card.dataset.segment
-      if (!key) return
-
-      const isLocked = isPresenterSegmentLocked(key)
-
-      card.classList.toggle("presenterLockedSegment", isLocked)
-      card.disabled = isLocked
-    })
+async function openPresenterFinalCard(round) {
+  return openPresenterSegmentCard(
+    `final_round${Number(round || 1)}`
+  )
 }
+
+async function forcePresenterFinalRound(round) {
+  round = Math.min(
+    Math.max(Number(round || 1), 1),
+    4
+  )
+
+  presenterSegment = "final"
+  presenterFinalRound = round
+  presenterFinalForcedRound = round
+  presenterFinalForcedRoundUntil =
+    Date.now() + 30000
+  presenterFinalRoundOverride = round
+
+  presenterFinalSelected = {
+    round,
+    number: null
+  }
+
+  presenterLiveState = {
+    ...(presenterLiveState || {}),
+    final: {
+      ...(presenterLiveState?.final || {}),
+      round
+    }
+  }
+
+  const sessionId =
+    localStorage.getItem("presenter_session_id")
+
+  if (!sessionId) return false
+
+  const result =
+    await updatePresenterSessionSafely(
+      {
+        active_segment:
+          getPresenterFinalSessionSegmentKey(round),
+        state: {
+          final: {
+            round
+          }
+        }
+      },
+      {
+        sessionId,
+        applySession: false
+      }
+    )
+
+  if (result.error) {
+    console.log(
+      "FORCE FINAL ROUND SAFE ERROR:",
+      result.error
+    )
+
+    return false
+  }
+
+  return true
+}
+
+/* =========================
+   17) GO HOME
+========================= */
 
 async function presenterGoHome() {
   presenterGoingHome = true
@@ -2281,9 +2545,10 @@ async function presenterGoHome() {
   markPresenterLocalSync(null, 1200)
   renderPresenterHome()
 
-  const sent = await sendCommand("goHome", {
-    segment: null
-  })
+  const sent =
+    await sendCommand("goHome", {
+      segment: null
+    })
 
   if (!sent) {
     presenterGoingHome = false
@@ -2319,167 +2584,8 @@ async function presenterGoHome() {
   }, 500)
 }
 
-async function openPresenterSegment(segment) {
-  segment = normalizePresenterSegmentKey(segment)
-
-  loadPresenterVisibleSegments().catch(() => null)
-
-  if (!isPresenterSegmentVisible(segment)) {
-    showToast("هذه الفقرة معطلة من الأدمن")
-    renderPresenterHome()
-    return
-  }
-
-  if (isPresenterSegmentLocked(segment)) {
-    showToast("هذه الفقرة منتهية")
-    return
-  }
-
-  presenterSelectedTeam = null
-  presenterSegment = normalizePresenterSegmentFromSession(segment)
-
-  markPresenterLocalSync(presenterSegment, 1400)
-
-  await renderPresenterSegmentShell(presenterSegment)
-  await openPresenterSegmentFromSync(presenterSegment)
-
-  const sent = await sendCommand("openSegment", { segment })
-
-  if (!sent) {
-    showToast("تعذر فتح الفقرة في العرض")
-  }
-}
-
-async function openPresenterFinalCard(round) {
-  round = Number(round || 1)
-
-  const finalKey = `final_round${round}`
-
-  loadPresenterVisibleSegments().catch(() => null)
-
-  if (!isPresenterSegmentVisible(finalKey)) {
-    showToast("هذه الفقرة معطلة من الأدمن")
-    renderPresenterHome()
-    return
-  }
-
-  if (isPresenterSegmentLocked(finalKey)) {
-    showToast("هذه الفقرة منتهية")
-    renderPresenterHome()
-    return
-  }
-
-  presenterSelectedTeam = null
-  presenterSegment = "final"
-  presenterFinalRound = round
-  presenterFinalForcedRound = round
-  presenterFinalForcedRoundUntil = Date.now() + 60000
-  presenterFinalRoundOverride = round
-  presenterFinalSelected = { round, number: null }
-
-  presenterLiveState = {
-    ...(presenterLiveState || {}),
-    final: {
-      ...(presenterLiveState?.final || {}),
-      round
-    }
-  }
-
-  markPresenterLocalSync("final", 1600)
-
-  await renderPresenterSegmentShell("final")
-  await openPresenterSegmentFromSync("final")
-
-  forcePresenterFinalRound(round).catch(error => {
-    console.log(
-      "FORCE FINAL ROUND BACKGROUND ERROR:",
-      error
-    )
-  })
-
-  sendCommand("openSegment", {
-    segment: "final",
-    round
-  }).then(sent => {
-    if (!sent) {
-      showToast("تعذر فتح الفاصلة في العرض")
-    }
-  }).catch(error => {
-    console.log(
-      "OPEN FINAL SEGMENT ERROR:",
-      error
-    )
-    showToast("تعذر فتح الفاصلة في العرض")
-  })
-}
-
-async function forcePresenterFinalRound(round) {
-  round = Math.min(
-    Math.max(Number(round || 1), 1),
-    4
-  )
-
-  presenterSegment = "final"
-  presenterFinalRound = round
-  presenterFinalForcedRound = round
-  presenterFinalForcedRoundUntil =
-    Date.now() + 30000
-  presenterFinalRoundOverride = round
-
-  presenterFinalSelected = {
-    round,
-    number: null
-  }
-
-  presenterLiveState = {
-    ...(presenterLiveState || {}),
-    final: {
-      ...(presenterLiveState?.final || {}),
-      round
-    }
-  }
-
-  const sessionId =
-    localStorage.getItem(
-      "presenter_session_id"
-    )
-
-  if (!sessionId) return false
-
-  const result =
-    await updatePresenterSessionSafely(
-      {
-        active_segment:
-          getPresenterFinalSessionSegmentKey(
-            round
-          ),
-
-        state: {
-          final: {
-            round
-          }
-        }
-      },
-      {
-        sessionId,
-        applySession: false
-      }
-    )
-
-  if (result.error) {
-    console.log(
-      "FORCE FINAL ROUND SAFE ERROR:",
-      result.error
-    )
-
-    return false
-  }
-
-  return true
-}
-
 /* =========================
-   SHARED UI / TEAM SYNC - CLEAN BASE
+   18) TEAM SYNC
 ========================= */
 
 function getPresenterActiveTeamFromState() {
@@ -2496,14 +2602,6 @@ function getPresenterActiveTeamFromState() {
     return (
       presenterLiveState?.top10?.top10State?.activeTeam ||
       presenterLiveState?.top10?.activeTeam ||
-      null
-    )
-  }
-
-  if (presenterSegment === "auction") {
-    return (
-      presenterLiveState?.auction?.auctionState?.activeTeam ||
-      presenterLiveState?.auction?.activeTeam ||
       null
     )
   }
@@ -2542,11 +2640,12 @@ function getPresenterActiveTeamFromState() {
   }
 
   if (presenterSegment === "final") {
-    const round = Number(
-      presenterLiveState?.final?.round ||
-      presenterFinalRound ||
-      1
-    )
+    const round =
+      Number(
+        presenterLiveState?.final?.round ||
+        presenterFinalRound ||
+        1
+      )
 
     if (round === 1) {
       return (
@@ -2585,7 +2684,9 @@ function getPresenterActiveTeamFromState() {
   return null
 }
 
-function getPresenterFinalTeamForRound(round = getPresenterFinalRound()) {
+function getPresenterFinalTeamForRound(
+  round = getPresenterFinalRound()
+) {
   return getPresenterActiveTeamFromState()
 }
 
@@ -2595,33 +2696,52 @@ function updatePresenterTeamButtonsOnly(team) {
       ? team
       : null
 
-  const teamA = document.getElementById("teamA")
-  const teamB = document.getElementById("teamB")
+  const teamA =
+    document.getElementById("teamA")
+
+  const teamB =
+    document.getElementById("teamB")
 
   if (teamA) {
-    teamA.classList.toggle("selectedPresenterTeam", cleanTeam === "A")
-    teamA.classList.toggle("activeTeam", cleanTeam === "A")
+    teamA.classList.toggle(
+      "selectedPresenterTeam",
+      cleanTeam === "A"
+    )
+    teamA.classList.toggle(
+      "activeTeam",
+      cleanTeam === "A"
+    )
   }
 
   if (teamB) {
-    teamB.classList.toggle("selectedPresenterTeam", cleanTeam === "B")
-    teamB.classList.toggle("activeTeam", cleanTeam === "B")
+    teamB.classList.toggle(
+      "selectedPresenterTeam",
+      cleanTeam === "B"
+    )
+    teamB.classList.toggle(
+      "activeTeam",
+      cleanTeam === "B"
+    )
   }
 }
 
 function syncPresenterSelectedTeamFromDisplayState() {
-  const syncedTeam = getPresenterActiveTeamFromState()
+  const syncedTeam =
+    getPresenterActiveTeamFromState()
 
   presenterSelectedTeam =
     syncedTeam === "A" || syncedTeam === "B"
       ? syncedTeam
       : null
 
-  updatePresenterTeamButtonsOnly(presenterSelectedTeam)
+  updatePresenterTeamButtonsOnly(
+    presenterSelectedTeam
+  )
 }
 
 function teamButtons() {
-  const activeTeam = getPresenterActiveTeamFromState()
+  const activeTeam =
+    getPresenterActiveTeamFromState()
 
   return `
     <div class="presenterTeams">
@@ -2675,21 +2795,6 @@ function setPresenterLocalActiveTeam(team) {
         activeTeam: team,
         top10State: {
           ...(s.top10?.top10State || {}),
-          activeTeam: team
-        }
-      }
-    }
-    return
-  }
-
-  if (presenterSegment === "auction") {
-    presenterLiveState = {
-      ...s,
-      auction: {
-        ...(s.auction || {}),
-        activeTeam: team,
-        auctionState: {
-          ...(s.auction?.auctionState || {}),
           activeTeam: team
         }
       }
@@ -2763,7 +2868,8 @@ function setPresenterLocalActiveTeam(team) {
   }
 
   if (presenterSegment === "final") {
-    const round = Number(getPresenterFinalRound() || 1)
+    const round =
+      Number(getPresenterFinalRound() || 1)
 
     presenterLiveState = {
       ...s,
@@ -2797,17 +2903,23 @@ async function selectTeam(team) {
   markPresenterLocalSync(presenterSegment, 900)
 
   if (presenterSegment === "randomChallenge") {
-    document.querySelectorAll(".presenterRandomTeamName").forEach((box, index) => {
-      const boxTeam = index === 0 ? "A" : "B"
-      box.classList.toggle("active", boxTeam === team)
-    })
+    document
+      .querySelectorAll(".presenterRandomTeamName")
+      .forEach((box, index) => {
+        const boxTeam = index === 0 ? "A" : "B"
+        box.classList.toggle("active", boxTeam === team)
+      })
   }
 
-  const sent = await sendCommand("selectTeam", {
-    team,
-    segment: presenterSegment || null,
-    round: presenterSegment === "final" ? getPresenterFinalRound() : null
-  })
+  const sent =
+    await sendCommand("selectTeam", {
+      team,
+      segment: presenterSegment || null,
+      round:
+        presenterSegment === "final"
+          ? getPresenterFinalRound()
+          : null
+    })
 
   if (!sent) {
     syncPresenterSelectedTeamFromDisplayState()
@@ -2816,7 +2928,7 @@ async function selectTeam(team) {
 }
 
 /* =========================
-   Presenter Button Guard - CLEAN
+   19) ACTION GUARD + COMMANDS
 ========================= */
 
 let presenterActionLocks = new Map()
@@ -2827,12 +2939,10 @@ function getPresenterCurrentNumberForLock() {
   }
 
   if (presenterSegment === "top10") {
-    const top10 = presenterLiveState?.top10?.top10State || {}
-    return `${top10.round || ""}_${top10.currentNumber || ""}_${top10.question?.[top10.round] || ""}`
-  }
+    const top10 =
+      presenterLiveState?.top10?.top10State || {}
 
-  if (presenterSegment === "auction") {
-    return presenterLiveState?.auction?.auctionState?.currentQuestionNumber || ""
+    return `${top10.round || ""}_${top10.currentNumber || ""}_${top10.question?.[top10.round] || ""}`
   }
 
   if (presenterSegment === "who") {
@@ -2844,22 +2954,30 @@ function getPresenterCurrentNumberForLock() {
   }
 
   if (presenterSegment === "archive") {
-    const archive = presenterLiveState?.archive?.archiveState || {}
+    const archive =
+      presenterLiveState?.archive?.archiveState || {}
+
     return archive.round || ""
   }
 
   if (presenterSegment === "randomChallenge") {
-    const random = presenterLiveState?.randomChallenge || {}
+    const random =
+      presenterLiveState?.randomChallenge || {}
+
     return `${random.currentBox || ""}_${random.box1?.pool || ""}_${random.box2?.numberInput || ""}_${random.box3?.activeTeam || ""}`
   }
 
   if (presenterSegment === "final") {
-    const final = presenterLiveState?.final || {}
-    const round = Number(final.round || presenterFinalRound || 1)
+    const final =
+      presenterLiveState?.final || {}
+
+    const round =
+      Number(final.round || presenterFinalRound || 1)
 
     if (round === 1) return `r1_${final.round1?.currentNumber || ""}`
     if (round === 2) return `r2_${final.round2?.currentNumber || ""}`
     if (round === 3) return `r3_${final.round3?.currentNumber || ""}`
+
     if (round === 4) {
       return `r4_${final.round4?.teamMedia?.currentNumber || final.round4?.currentNumber || ""}`
     }
@@ -2868,30 +2986,28 @@ function getPresenterCurrentNumberForLock() {
   return ""
 }
 
-
 function getPresenterActionLockTime(action) {
+  if (action === "selectTeam") return 120
 
-    if (action === "selectTeam") return 120
- 
-const fastActions = [
-  "toggleRound2Correct",
-  "toggleRound2ImageCorrect",
-  "hideRound2SequenceWord",
-  "randomBox3ScorePoints",
-  "randomBox3SwitchTeam",
-  "randomBox3Pass",
-  "showStoryPart",
-  "showNextImage",
-  "showAnswer",
-  "switchTurn",
-  "randomSetAuctionPoints",
-  "decreaseCountdown",
-  "showQuestion",
-  "playCurrentFinalVideo",
-  "restartCurrentFinalVideo",
-  "restartCurrentFinalImage",
-  "stopCurrentFinalVideo"
-]
+  const fastActions = [
+    "toggleRound2Correct",
+    "toggleRound2ImageCorrect",
+    "hideRound2SequenceWord",
+    "randomBox3ScorePoints",
+    "randomBox3SwitchTeam",
+    "randomBox3Pass",
+    "showStoryPart",
+    "showNextImage",
+    "showAnswer",
+    "switchTurn",
+    "randomSetAuctionPoints",
+    "decreaseCountdown",
+    "showQuestion",
+    "playCurrentFinalVideo",
+    "restartCurrentFinalVideo",
+    "restartCurrentFinalImage",
+    "stopCurrentFinalVideo"
+  ]
 
   if (fastActions.includes(action)) return 120
 
@@ -2924,17 +3040,20 @@ const fastActions = [
   ]
 
   if (mediumActions.includes(action)) return 800
-
   if (action === "undo") return 600
 
   return 450
 }
 
-function getPresenterActionLockKey(action, payload = {}) {
-  const segment = presenterSegment || "global"
+function getPresenterActionLockKey(
+  action,
+  payload = {}
+) {
+  const segment =
+    presenterSegment || "global"
 
   if (action === "openSegment") {
-    return `${segment}_${action}_${payload.segment || ""}_${payload.round || ""}`
+    return `${segment}_${action}_${payload.segmentKey || payload.segment || ""}_${payload.round || ""}`
   }
 
   if (action === "openNumber") {
@@ -2985,11 +3104,19 @@ function getPresenterActionLockKey(action, payload = {}) {
   return `${segment}_${action}_${JSON.stringify(payload || {})}`
 }
 
-function lockPresenterActionButton(action, payload = {}) {
-  const key = getPresenterActionLockKey(action, payload)
+function lockPresenterActionButton(
+  action,
+  payload = {}
+) {
+  const key =
+    getPresenterActionLockKey(action, payload)
+
   const now = Date.now()
-  const lockTime = getPresenterActionLockTime(action)
-  const lastTime = presenterActionLocks.get(key) || 0
+  const lockTime =
+    getPresenterActionLockTime(action)
+
+  const lastTime =
+    presenterActionLocks.get(key) || 0
 
   if (now - lastTime < lockTime) {
     return false
@@ -2998,13 +3125,15 @@ function lockPresenterActionButton(action, payload = {}) {
   presenterActionLocks.set(key, now)
 
   if (presenterActionLocks.size > 120) {
-    presenterActionLocks = new Map(
-      Array.from(presenterActionLocks.entries()).slice(-60)
-    )
+    presenterActionLocks =
+      new Map(
+        Array.from(presenterActionLocks.entries()).slice(-60)
+      )
   }
 
   return true
 }
+
 async function sendCommand(action, payload = {}) {
   if (!lockPresenterActionButton(action, payload)) {
     return false
@@ -3029,18 +3158,20 @@ async function sendCommand(action, payload = {}) {
   const command = {
     session_id: sessionId,
     model: Number(presenterModel || 1),
-    segment: presenterSegment || "global",
+    segment:
+      payload.segmentKey ||
+      presenterSegment ||
+      "global",
     action,
-
     payload: {
       ...payload,
       __client_command_id: clientCommandId
     },
-
     created_at: new Date().toISOString()
   }
 
-  /* المسار السريع فقط */
+  let broadcastSent = false
+
   if (
     presenterChannel &&
     presenterChannelHealthy
@@ -3053,9 +3184,7 @@ async function sendCommand(action, payload = {}) {
           payload: command
         })
 
-      if (result !== "error") {
-        return true
-      }
+      broadcastSent = result !== "error"
     } catch (error) {
       console.log(
         "PRESENTER BROADCAST ERROR:",
@@ -3064,52 +3193,171 @@ async function sendCommand(action, payload = {}) {
     }
   }
 
-  /* قاعدة البيانات تستخدم فقط عند فشل Realtime */
-  try {
-    const { error } = await db
-      .from("presenter_commands")
-      .insert(command)
+  async function saveFallbackCommand() {
+    try {
+      const { error } = await db
+        .from("presenter_commands")
+        .insert(command)
 
-    if (error) {
+      if (error) {
+        console.log(
+          "PRESENTER COMMAND FALLBACK ERROR:",
+          error
+        )
+        return false
+      }
+
+      return true
+    } catch (error) {
       console.log(
-        "PRESENTER COMMAND FALLBACK ERROR:",
+        "PRESENTER COMMAND FALLBACK CATCH:",
         error
       )
-
-      showToast("تعذر تنفيذ الأمر")
       return false
     }
+  }
 
+  if (broadcastSent) {
+    saveFallbackCommand()
     return true
-  } catch (error) {
-    console.log(
-      "PRESENTER COMMAND FALLBACK CATCH:",
-      error
-    )
+  }
 
+  const fallbackSaved =
+    await saveFallbackCommand()
+
+  if (!fallbackSaved) {
     showToast("تعذر تنفيذ الأمر")
     return false
   }
+
+  return true
 }
 
 /* =========================
-   TOAST
+   20) DEFERRED PRELOAD
+========================= */
+
+function getPresenterDeferredPreloadTasks() {
+  const visibleKeys =
+    new Set(
+      presenterVisibleSegments.map(item =>
+        normalizePresenterSegmentKey(item.key)
+      )
+    )
+
+  const tasks = []
+
+  const warmupLoader =
+    getPresenterModuleFunction("loadPresenterWarmupRows")
+
+  if (visibleKeys.has("warmup") && warmupLoader) {
+    tasks.push(() =>
+      warmupLoader({ backgroundRefresh: false })
+    )
+  }
+
+  const top10Loader =
+    getPresenterModuleFunction("loadPresenterTop10RoundRows")
+
+  if (visibleKeys.has("top10") && top10Loader) {
+    tasks.push(() =>
+      top10Loader(1, { backgroundRefresh: false })
+    )
+  }
+
+  const whoLoader =
+    getPresenterModuleFunction("loadPresenterWhoRows")
+
+  if (visibleKeys.has("who") && whoLoader) {
+    tasks.push(() =>
+      whoLoader({ backgroundRefresh: false })
+    )
+  }
+
+  return tasks
+}
+
+function schedulePresenterDeferredPreload() {
+  const token = ++presenterDeferredPreloadToken
+
+  queuePresenterIdleTask(async () => {
+    const tasks =
+      getPresenterDeferredPreloadTasks()
+
+    if (
+      !tasks.length ||
+      token !== presenterDeferredPreloadToken
+    ) {
+      setPresenterBackgroundLoading(false)
+      return
+    }
+
+    setPresenterBackgroundLoading(true)
+
+    try {
+      for (const task of tasks) {
+        if (
+          token !== presenterDeferredPreloadToken ||
+          !presenterSessionId
+        ) {
+          break
+        }
+
+        if (document.hidden) {
+          await new Promise(resolve =>
+            setTimeout(resolve, 350)
+          )
+        }
+
+        try {
+          await task()
+        } catch (error) {
+          console.log(
+            "PRESENTER DEFERRED LOAD ERROR:",
+            error
+          )
+        }
+
+        await new Promise(resolve =>
+          setTimeout(resolve, 120)
+        )
+      }
+    } finally {
+      if (token === presenterDeferredPreloadToken) {
+        setPresenterBackgroundLoading(false)
+      }
+    }
+  }, {
+    delay: 700,
+    timeout: 2500
+  })
+}
+
+/* =========================
+   21) TOAST + DISPLAY CONTROLS
 ========================= */
 
 let presenterToastTimer = null
 let presenterToastHideTimer = null
+let presenterDisplayControlsHidden = false
 
 function showToast(text) {
-  const t = document.getElementById("presenterToast")
-  const textBox = document.getElementById("presenterToastText")
-  const iconBox = t?.querySelector(".gameToastIcon")
+  const t =
+    document.getElementById("presenterToast")
+
+  const textBox =
+    document.getElementById("presenterToastText")
+
+  const iconBox =
+    t?.querySelector(".gameToastIcon")
 
   if (!t) return
 
   clearTimeout(presenterToastTimer)
   clearTimeout(presenterToastHideTimer)
 
-  const msg = String(text || "")
+  const msg =
+    String(text || "")
 
   if (textBox) textBox.innerText = msg
   else t.innerText = msg
@@ -3154,7 +3402,10 @@ function showToast(text) {
 
     presenterToastHideTimer = setTimeout(() => {
       t.classList.add("hidden")
-      t.classList.remove("presenterToastSuccess", "presenterToastError")
+      t.classList.remove(
+        "presenterToastSuccess",
+        "presenterToastError"
+      )
 
       if (textBox) textBox.innerText = ""
       if (iconBox) iconBox.innerText = "!"
@@ -3162,65 +3413,75 @@ function showToast(text) {
   }, 1600)
 }
 
-
-let presenterDisplayControlsHidden = false
-
 function updateDisplayControlsEyeButton(isHidden) {
-  const btn = document.getElementById("displayControlsEyeBtn")
+  const btn =
+    document.getElementById("displayControlsEyeBtn")
+
   if (!btn) return
 
-  btn.innerText = isHidden ? "إظهار التحكم" : "إخفاء التحكم"
-  btn.classList.toggle("showControlsMode", isHidden)
-  btn.classList.toggle("hideControlsMode", !isHidden)
-  btn.title = isHidden ? "إظهار أزرار التحكم" : "إخفاء أزرار التحكم"
+  btn.innerText =
+    isHidden
+      ? "إظهار التحكم"
+      : "إخفاء التحكم"
+
+  btn.classList.toggle(
+    "showControlsMode",
+    isHidden
+  )
+
+  btn.classList.toggle(
+    "hideControlsMode",
+    !isHidden
+  )
+
+  btn.title =
+    isHidden
+      ? "إظهار أزرار التحكم"
+      : "إخفاء أزرار التحكم"
 }
 
 function togglePresenterDisplayControls() {
-  presenterDisplayControlsHidden = !presenterDisplayControlsHidden
-  updateDisplayControlsEyeButton(presenterDisplayControlsHidden)
+  presenterDisplayControlsHidden =
+    !presenterDisplayControlsHidden
+
+  updateDisplayControlsEyeButton(
+    presenterDisplayControlsHidden
+  )
+
   sendCommand("toggleDisplayControls")
 }
 
 /* =========================
-   EXTERNAL SEGMENT MODULES
-========================= */
-
-/*
-  تم نقل منطق الفقرات التالية إلى ملفات مستقلة:
-  - التسخين
-  - Top 10
-  - من هو
-  - اشرح الكلمة
-  - حرفلي
-  - فتبلة
-  - التحدي
-
-  يبقى presenter.js مسؤولًا عن التوجيه والمزامنة والدوال المشتركة.
-*/
-
-/* =========================
-   EXTERNAL SEGMENT MODULES
-   FINAL + ARCHIVE
-   تم نقل المنطق بالكامل إلى:
-   - final-segments.js
-   - archive-segments.js
-========================= */
-
-/* =========================
-   READER MODE - دليل الأسئلة فقط
-========================= */
-
-/* =========================
-   READER CACHE
+   22) READER MODE
 ========================= */
 
 const presenterReaderHtmlCache = new Map()
 
+function readerEscape(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
+}
+
+function readerId(parts = []) {
+  return parts
+    .map(x =>
+      String(x ?? "").replace(/[^a-zA-Z0-9_-]/g, "_")
+    )
+    .join("_")
+}
+
 function getPresenterReaderCacheKey(segment) {
-  const model = Number(presenterModel || 0)
-  const key = normalizePresenterFinalSegmentKey(
-    normalizePresenterSegmentKey(segment)
-  )
+  const model =
+    Number(presenterModel || 0)
+
+  const key =
+    normalizePresenterFinalSegmentKey(
+      normalizePresenterSegmentKey(segment)
+    )
 
   return `${model}_${key}`
 }
@@ -3233,8 +3494,11 @@ function getPresenterReaderStorageKey(segment) {
 }
 
 function getPresenterReaderCachedHtml(segment) {
-  const key = getPresenterReaderCacheKey(segment)
-  const memoryValue = presenterReaderHtmlCache.get(key)
+  const key =
+    getPresenterReaderCacheKey(segment)
+
+  const memoryValue =
+    presenterReaderHtmlCache.get(key)
 
   if (
     memoryValue?.html &&
@@ -3244,12 +3508,14 @@ function getPresenterReaderCachedHtml(segment) {
     return memoryValue.html
   }
 
-  const cached = readPresenterResourceCache(
-    getPresenterReaderStorageKey(segment),
-    PRESENTER_READER_CACHE_TTL
-  )
+  const cached =
+    readPresenterResourceCache(
+      getPresenterReaderStorageKey(segment),
+      PRESENTER_READER_CACHE_TTL
+    )
 
-  const html = String(cached?.data?.html || "")
+  const html =
+    String(cached?.data?.html || "")
 
   if (html) {
     presenterReaderHtmlCache.set(key, {
@@ -3264,13 +3530,16 @@ function getPresenterReaderCachedHtml(segment) {
 function savePresenterReaderCachedHtml(segment, html) {
   if (!html) return
 
-  const key = getPresenterReaderCacheKey(segment)
+  const key =
+    getPresenterReaderCacheKey(segment)
+
   const payload = {
     html,
     savedAt: Date.now()
   }
 
   presenterReaderHtmlCache.set(key, payload)
+
   savePresenterResourceCache(
     getPresenterReaderStorageKey(segment),
     { html }
@@ -3281,12 +3550,16 @@ function clearPresenterReaderCache(segment = null) {
   if (!segment) {
     presenterReaderHtmlCache.clear()
 
-    const prefix = getPresenterResourceCacheKey(
-      "reader_html"
-    )
+    const prefix =
+      getPresenterResourceCacheKey("reader_html")
 
-    for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+    for (
+      let index = localStorage.length - 1;
+      index >= 0;
+      index -= 1
+    ) {
       const key = localStorage.key(index)
+
       if (key?.startsWith(prefix)) {
         removePresenterResourceCache(key)
       }
@@ -3310,59 +3583,33 @@ function normalizePresenterReaderSegmentKey(segment) {
   )
 }
 
-function presenterReaderLogout() {
-  clearPresenterReaderCache()
-  closeReaderMediaViewer()
-
-  localStorage.removeItem("presenter_session_id")
-  localStorage.removeItem("presenter_join_code")
-
-  presenterSessionId = null
-  presenterReaderSegment = null
-
-  showPresenterJoin()
-}
-
-function presenterReaderGoHome() {
-  presenterReaderSegment = null
-  renderPresenterReaderHome()
-}
-
 function getPresenterReaderSegmentTitle(segment) {
-  const key = normalizePresenterSegmentKey(segment)
+  const key =
+    normalizePresenterSegmentKey(segment)
 
-  const item = ALL_PRESENTER_SEGMENTS.find(x => {
-    return normalizePresenterSegmentKey(x.key) === key
-  })
+  const item =
+    ALL_PRESENTER_SEGMENTS.find(x => {
+      return normalizePresenterSegmentKey(x.key) === key
+    })
 
   return item?.title || "الفقرة"
 }
 
-function readerEscape(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;")
-}
-
-function readerId(parts = []) {
-  return parts
-    .map(x => String(x ?? "").replace(/[^a-zA-Z0-9_-]/g, "_"))
-    .join("_")
-}
-
 function getReaderReadMap() {
   try {
-    return JSON.parse(localStorage.getItem("presenter_reader_read_map") || "{}")
+    return JSON.parse(
+      localStorage.getItem("presenter_reader_read_map") || "{}"
+    )
   } catch {
     return {}
   }
 }
 
 function saveReaderReadMap(map) {
-  localStorage.setItem("presenter_reader_read_map", JSON.stringify(map || {}))
+  localStorage.setItem(
+    "presenter_reader_read_map",
+    JSON.stringify(map || {})
+  )
 }
 
 function isReaderItemRead(id) {
@@ -3372,12 +3619,17 @@ function isReaderItemRead(id) {
 
 function toggleReaderRead(id, el = null) {
   const map = getReaderReadMap()
+
   map[id] = !map[id]
   saveReaderReadMap(map)
 
   if (el) {
     el.classList.toggle("readerRead", !!map[id])
   }
+}
+
+function readerReadClass(id) {
+  return isReaderItemRead(id) ? "readerRead" : ""
 }
 
 function readerEmpty(text = "لا توجد بيانات") {
@@ -3440,102 +3692,6 @@ function readerMedia({ image = "", video = "" } = {}) {
       لا توجد صورة
     </div>
   `
-}
-
-function openReaderMediaFromElement(element) {
-  if (!element) return
-
-  const type =
-    element.dataset.readerMediaType === "video"
-      ? "video"
-      : "image"
-
-  const src = String(
-    element.dataset.readerMediaSrc || ""
-  )
-
-  if (!src) return
-
-  openReaderMediaViewer({
-    type,
-    src
-  })
-}
-
-function ensureReaderMediaViewer() {
-  let viewer = document.getElementById("readerMediaViewer")
-
-  if (viewer) return viewer
-
-  viewer = document.createElement("div")
-  viewer.id = "readerMediaViewer"
-  viewer.className = "readerMediaViewer hidden"
-
-  viewer.innerHTML = `
-    <div class="readerMediaViewerBackdrop" onclick="closeReaderMediaViewer()"></div>
-
-    <div class="readerMediaViewerBox">
-      <button
-        type="button"
-        class="readerMediaViewerClose"
-        onclick="closeReaderMediaViewer()"
-      >
-        إغلاق
-      </button>
-
-      <div id="readerMediaViewerContent" class="readerMediaViewerContent"></div>
-    </div>
-  `
-
-  document.body.appendChild(viewer)
-  return viewer
-}
-
-function openReaderMediaViewer({ type = "image", src = "" } = {}) {
-  const cleanSrc = String(src || "")
-  if (!cleanSrc) return
-
-  const viewer = ensureReaderMediaViewer()
-  const content = document.getElementById("readerMediaViewerContent")
-
-  if (!content) return
-
-  if (type === "video") {
-    content.innerHTML = `
-      <video
-        src="${readerEscape(cleanSrc)}"
-        controls
-        autoplay
-        playsinline
-      ></video>
-    `
-  } else {
-    content.innerHTML = `
-      <img src="${readerEscape(cleanSrc)}" alt="">
-    `
-  }
-
-  viewer.classList.remove("hidden")
-  document.body.classList.add("readerMediaViewerOpen")
-}
-
-function closeReaderMediaViewer() {
-  const viewer = document.getElementById("readerMediaViewer")
-  const content = document.getElementById("readerMediaViewerContent")
-
-  if (content) {
-    content.innerHTML = ""
-  }
-
-  if (viewer) {
-    viewer.classList.add("hidden")
-  }
-
-  document.body.classList.remove("readerMediaViewerOpen")
-}
-
-function readerReadClass(id) {
-  return isReaderItemRead(id) ? "readerRead" : ""
 }
 
 function readerMiniCard({
@@ -3619,19 +3775,20 @@ function readerMiniCard({
 async function renderPresenterReaderHome() {
   showPresenterReaderHomePage()
 
-  const grid = document.getElementById(
-    "presenterReaderSegmentsGrid"
-  )
+  const grid =
+    document.getElementById("presenterReaderSegmentsGrid")
 
-  const subtitle = document.getElementById(
-    "presenterReaderSubtitle"
-  )
+  const subtitle =
+    document.getElementById("presenterReaderSubtitle")
 
   if (subtitle) {
-    const modelName = presenterLiveState?.currentModelName || ""
-    subtitle.innerText = modelName
-      ? `النموذج: ${modelName}`
-      : `النموذج رقم ${presenterModel}`
+    const modelName =
+      presenterLiveState?.currentModelName || ""
+
+    subtitle.innerText =
+      modelName
+        ? `النموذج: ${modelName}`
+        : `النموذج رقم ${presenterModel}`
   }
 
   if (!grid) return
@@ -3640,7 +3797,7 @@ async function renderPresenterReaderHome() {
     applyPresenterCachedVisibilityNow()
 
     if (!presenterVisibleSegments.length) {
-      applyPresenterVisibleSegments([], {})
+      applyPresenterVisibleSegments([])
     }
 
     if (!presenterVisibleSegments.length) {
@@ -3652,20 +3809,22 @@ async function renderPresenterReaderHome() {
       return
     }
 
-    grid.innerHTML = presenterVisibleSegments.map(item => {
-      const key = normalizePresenterSegmentKey(item.key)
+    grid.innerHTML =
+      presenterVisibleSegments.map(item => {
+        const key =
+          normalizePresenterSegmentKey(item.key)
 
-      return `
-        <button
-          type="button"
-          class="presenterReaderSegmentCard"
-          onclick="openPresenterReaderSegment('${key}')"
-        >
-          <strong>${readerEscape(item.title)}</strong>
-          <span>عرض الأسئلة والإجابات</span>
-        </button>
-      `
-    }).join("")
+        return `
+          <button
+            type="button"
+            class="presenterReaderSegmentCard"
+            onclick="openPresenterReaderSegment('${key}')"
+          >
+            <strong>${readerEscape(item.title)}</strong>
+            <span>عرض الأسئلة والإجابات</span>
+          </button>
+        `
+      }).join("")
   }
 
   paintReaderSegments()
@@ -3684,7 +3843,8 @@ async function renderPresenterReaderHome() {
 }
 
 async function openPresenterReaderSegment(segment) {
-  segment = normalizePresenterReaderSegmentKey(segment)
+  segment =
+    normalizePresenterReaderSegmentKey(segment)
 
   loadPresenterVisibleSegments().catch(() => null)
 
@@ -3697,21 +3857,21 @@ async function openPresenterReaderSegment(segment) {
   presenterReaderSegment = segment
   showPresenterReaderSegmentPage()
 
-  const title = document.getElementById(
-    "presenterReaderSegmentTitle"
-  )
+  const title =
+    document.getElementById("presenterReaderSegmentTitle")
 
-  const panel = document.getElementById(
-    "presenterReaderPanel"
-  )
+  const panel =
+    document.getElementById("presenterReaderPanel")
 
   if (title) {
-    title.innerText = getPresenterReaderSegmentTitle(segment)
+    title.innerText =
+      getPresenterReaderSegmentTitle(segment)
   }
 
   if (!panel) return
 
-  const cachedHtml = getPresenterReaderCachedHtml(segment)
+  const cachedHtml =
+    getPresenterReaderCachedHtml(segment)
 
   if (cachedHtml) {
     panel.innerHTML = cachedHtml
@@ -3737,26 +3897,28 @@ async function openPresenterReaderSegment(segment) {
     }
 
     if (segment === "letterli") {
-      panel.innerHTML = readerEmpty(
-        "فقرة حرفلي تعتمد على ملف Excel وأسئلة ثابتة"
-      )
+      panel.innerHTML =
+        readerEmpty(
+          "فقرة حرفلي تعتمد على ملف Excel وأسئلة ثابتة"
+        )
     } else if (segment === "randomChallenge") {
-      panel.innerHTML = readerEmpty(
-        "فقرة التحدي لا تحتوي على أسئلة من الأدمن"
-      )
-    } else if (segment === "auction") {
-      await renderPresenterReaderAuction()
+      panel.innerHTML =
+        readerEmpty(
+          "فقرة التحدي لا تحتوي على أسئلة من الأدمن"
+        )
     } else if (segment === "archive") {
       await renderPresenterReaderArchive()
     } else {
-      const reader = getPresenterModuleFunction(
-        externalReaders[segment]
-      )
+      const reader =
+        getPresenterModuleFunction(
+          externalReaders[segment]
+        )
 
       if (!reader) {
-        panel.innerHTML = readerEmpty(
-          "هذه الفقرة غير مدعومة في دليل الأسئلة"
-        )
+        panel.innerHTML =
+          readerEmpty(
+            "هذه الفقرة غير مدعومة في دليل الأسئلة"
+          )
       } else {
         await reader()
       }
@@ -3766,12 +3928,13 @@ async function openPresenterReaderSegment(segment) {
       segment,
       panel.innerHTML
     )
-  } catch (err) {
-    console.log("READER SEGMENT ERROR:", err)
+  } catch (error) {
+    console.log("READER SEGMENT ERROR:", error)
 
-    panel.innerHTML = readerEmpty(
-      "تعذر تحميل بيانات الفقرة"
-    )
+    panel.innerHTML =
+      readerEmpty(
+        "تعذر تحميل بيانات الفقرة"
+      )
   }
 }
 
@@ -3788,74 +3951,156 @@ async function reloadPresenterReaderSegment() {
     )
 
   clearPresenterReaderCache(segment)
-
   await openPresenterReaderSegment(segment)
 }
 
-/* =========================
-   Reader: Top 10
-   تم نقله إلى: top10-segments.js
-========================= */
+function presenterReaderLogout() {
+  clearPresenterReaderCache()
+  closeReaderMediaViewer()
 
-/* =========================
-   Reader: Auction - فتبلة
-   الرقم + الصورة/الفيديو مصغر + الإجابة فقط
-========================= */
+  localStorage.removeItem("presenter_session_id")
+  localStorage.removeItem("presenter_join_code")
 
-async function renderPresenterReaderAuction() {
-  const panel = document.getElementById("presenterReaderPanel")
-  if (!panel) return
+  presenterSessionId = null
+  presenterReaderSegment = null
 
-  const rows = await loadPresenterAuctionRows({
-    backgroundRefresh: false
-  })
+  showPresenterJoin()
+}
 
-  if (!rows.length) {
-    panel.innerHTML = readerEmpty("لا توجد أسئلة في فتبلة")
-    return
-  }
-
-  panel.innerHTML = `
-    <div class="readerMediaList">
-      ${rows.map(row => readerMiniCard({
-        id: readerId(["auction", row.number]),
-        number: row.number,
-        title: `رقم ${row.number}`,
-        answer: row.answer,
-        image: row.image,
-        video: row.video
-      })).join("")}
-    </div>
-  `
+function presenterReaderGoHome() {
+  presenterReaderSegment = null
+  renderPresenterReaderHome()
 }
 
 /* =========================
-   Reader: Final Rounds
-   تم نقلها إلى: final-segments.js
+   23) READER MEDIA VIEWER
 ========================= */
 
+function openReaderMediaFromElement(element) {
+  if (!element) return
+
+  const type =
+    element.dataset.readerMediaType === "video"
+      ? "video"
+      : "image"
+
+  const src =
+    String(element.dataset.readerMediaSrc || "")
+
+  if (!src) return
+
+  openReaderMediaViewer({ type, src })
+}
+
+function ensureReaderMediaViewer() {
+  let viewer =
+    document.getElementById("readerMediaViewer")
+
+  if (viewer) return viewer
+
+  viewer = document.createElement("div")
+  viewer.id = "readerMediaViewer"
+  viewer.className = "readerMediaViewer hidden"
+
+  viewer.innerHTML = `
+    <div class="readerMediaViewerBackdrop" onclick="closeReaderMediaViewer()"></div>
+
+    <div class="readerMediaViewerBox">
+      <button
+        type="button"
+        class="readerMediaViewerClose"
+        onclick="closeReaderMediaViewer()"
+      >
+        إغلاق
+      </button>
+
+      <div id="readerMediaViewerContent" class="readerMediaViewerContent"></div>
+    </div>
+  `
+
+  document.body.appendChild(viewer)
+  return viewer
+}
+
+function openReaderMediaViewer({
+  type = "image",
+  src = ""
+} = {}) {
+  const cleanSrc =
+    String(src || "")
+
+  if (!cleanSrc) return
+
+  const viewer =
+    ensureReaderMediaViewer()
+
+  const content =
+    document.getElementById("readerMediaViewerContent")
+
+  if (!content) return
+
+  if (type === "video") {
+    content.innerHTML = `
+      <video
+        src="${readerEscape(cleanSrc)}"
+        controls
+        autoplay
+        playsinline
+      ></video>
+    `
+  } else {
+    content.innerHTML = `
+      <img src="${readerEscape(cleanSrc)}" alt="">
+    `
+  }
+
+  viewer.classList.remove("hidden")
+  document.body.classList.add("readerMediaViewerOpen")
+}
+
+function closeReaderMediaViewer() {
+  const viewer =
+    document.getElementById("readerMediaViewer")
+
+  const content =
+    document.getElementById("readerMediaViewerContent")
+
+  if (content) {
+    content.innerHTML = ""
+  }
+
+  if (viewer) {
+    viewer.classList.add("hidden")
+  }
+
+  document.body.classList.remove("readerMediaViewerOpen")
+}
+
 /* =========================
-   Reader: Archive
+   24) READER ARCHIVE
 ========================= */
 
 async function renderPresenterReaderArchive() {
-  const panel = document.getElementById("presenterReaderPanel")
+  const panel =
+    document.getElementById("presenterReaderPanel")
+
   if (!panel) return
 
-  const [boxesRes, itemsRes] = await Promise.all([
-    db
-      .from("archive_boxes")
-      .select("*")
-      .eq("model", Number(presenterModel))
-      .order("round", { ascending: true }),
+  const [boxesRes, itemsRes] =
+    await Promise.all([
+      db
+        .from("archive_boxes")
+        .select("*")
+        .eq("model", Number(presenterModel))
+        .order("round", { ascending: true }),
 
-    db
-      .from("archive_items")
-      .select("*")
-      .eq("model", Number(presenterModel))
-      .order("round", { ascending: true })
-      .order("position", { ascending: true })
-  ])
+      db
+        .from("archive_items")
+        .select("*")
+        .eq("model", Number(presenterModel))
+        .order("round", { ascending: true })
+        .order("position", { ascending: true })
+    ])
 
   if (boxesRes.error) throw boxesRes.error
   if (itemsRes.error) throw itemsRes.error
@@ -3864,20 +4109,25 @@ async function renderPresenterReaderArchive() {
   const items = itemsRes.data || []
 
   if (!boxes.length && !items.length) {
-    panel.innerHTML = readerEmpty("لا توجد بيانات في الأرشيف")
+    panel.innerHTML =
+      readerEmpty("لا توجد بيانات في الأرشيف")
     return
   }
 
-  const rounds = [...new Set([
-    ...boxes.map(row => Number(row.round)),
-    ...items.map(row => Number(row.round))
-  ])].sort((a, b) => a - b)
+  const rounds =
+    [...new Set([
+      ...boxes.map(row => Number(row.round)),
+      ...items.map(row => Number(row.round))
+    ])].sort((a, b) => a - b)
 
   panel.innerHTML = `
     <div class="readerRoundsStack">
       ${rounds.map(round => {
-        const box = boxes.find(row => Number(row.round) === round) || {}
-        const roundItems = items.filter(row => Number(row.round) === round)
+        const box =
+          boxes.find(row => Number(row.round) === round) || {}
+
+        const roundItems =
+          items.filter(row => Number(row.round) === round)
 
         return `
           <section class="readerRoundPage">
@@ -3897,7 +4147,10 @@ async function renderPresenterReaderArchive() {
                 number: item.position,
                 title: item.label || `العنصر ${item.position}`,
                 question: item.text,
-                answer: String(item.label || "").trim() === "المطلوب" ? item.text : "",
+                answer:
+                  String(item.label || "").trim() === "المطلوب"
+                    ? item.text
+                    : "",
                 image: item.image
               })).join("")}
             </div>
@@ -3907,13 +4160,14 @@ async function renderPresenterReaderArchive() {
     </div>
   `
 }
+
 /* =========================
-   INSIDE MODE SWITCH
-   تغيير الوضع بعد الدخول
+   25) INSIDE MODE SWITCH
 ========================= */
 
 function ensurePresenterInsideModeSwitch() {
-  let box = document.getElementById("presenterInsideModeSwitch")
+  let box =
+    document.getElementById("presenterInsideModeSwitch")
 
   if (box) {
     updatePresenterInsideModeSwitch()
@@ -3947,31 +4201,45 @@ function ensurePresenterInsideModeSwitch() {
 }
 
 function updatePresenterInsideModeSwitch() {
-  const box = document.getElementById("presenterInsideModeSwitch")
+  const box =
+    document.getElementById("presenterInsideModeSwitch")
+
   if (!box) return
 
-  const hasSession = !!localStorage.getItem("presenter_session_id")
+  const hasSession =
+    !!localStorage.getItem("presenter_session_id")
 
   box.classList.toggle("hidden", !hasSession)
 
-  document.getElementById("insideControlModeBtn")?.classList.toggle(
-    "active",
-    presenterJoinMode === "control"
-  )
+  document
+    .getElementById("insideControlModeBtn")
+    ?.classList.toggle(
+      "active",
+      presenterJoinMode === "control"
+    )
 
-  document.getElementById("insideReaderModeBtn")?.classList.toggle(
-    "active",
-    presenterJoinMode === "reader"
-  )
+  document
+    .getElementById("insideReaderModeBtn")
+    ?.classList.toggle(
+      "active",
+      presenterJoinMode === "reader"
+    )
 }
 
 async function switchPresenterInsideMode(mode) {
-  const nextMode = mode === "reader" ? "reader" : "control"
+  const nextMode =
+    mode === "reader"
+      ? "reader"
+      : "control"
 
   presenterJoinMode = nextMode
-  localStorage.setItem("presenter_join_mode", presenterJoinMode)
+  localStorage.setItem(
+    "presenter_join_mode",
+    presenterJoinMode
+  )
 
-  const sessionId = localStorage.getItem("presenter_session_id")
+  const sessionId =
+    localStorage.getItem("presenter_session_id")
 
   if (!sessionId) {
     showPresenterJoin()
@@ -3999,37 +4267,79 @@ async function switchPresenterInsideMode(mode) {
     return
   }
 
-  if (presenterJoinMode === "control") {
-    presenterReaderSegment = null
-    presenterSegment = null
+  presenterReaderSegment = null
+  presenterSegment = null
 
-    showPresenterBootLoading(
-      "جاري التحويل إلى وضع التحكم..."
-    )
+  showPresenterBootLoading(
+    "جاري التحويل إلى وضع التحكم..."
+  )
 
-    const result = await loadPresenterSession(
+  const result =
+    await loadPresenterSession(
       sessionId,
       { forceRefresh: true }
     )
 
-    const data = result.data
+  const data = result.data
 
-    if (result.error || !data || data.status === "ended") {
-      hidePresenterBootLoading()
-      renderPresenterEnded()
-      return
-    }
-
-    applyPresenterSessionData(data)
-    subscribeToGameSession(sessionId)
-
-    renderPresenterHome()
-    ensurePresenterInsideModeSwitch()
+  if (
+    result.error ||
+    !data ||
+    data.status === "ended"
+  ) {
     hidePresenterBootLoading()
-    showToast("تم التحويل إلى وضع التحكم")
+    renderPresenterEnded()
+    return
+  }
+
+  applyPresenterSessionData(data)
+  subscribeToGameSession(sessionId)
+
+  renderPresenterHome()
+  ensurePresenterInsideModeSwitch()
+  hidePresenterBootLoading()
+  showToast("تم التحويل إلى وضع التحكم")
+}
+
+function hidePresenterInsideModeSwitch() {
+  const box =
+    document.getElementById("presenterInsideModeSwitch")
+
+  if (box) {
+    box.classList.add("hidden")
   }
 }
-function hidePresenterInsideModeSwitch() {
-  const box = document.getElementById("presenterInsideModeSwitch")
-  if (box) box.classList.add("hidden")
-}
+
+/* =========================
+   26) EXPORTS
+========================= */
+
+window.normalizePresenterSegmentKey = normalizePresenterSegmentKey
+window.normalizePresenterFinalSegmentKey = normalizePresenterFinalSegmentKey
+window.getPresenterSegmentName = getPresenterSegmentName
+window.getPresenterFinalRound = getPresenterFinalRound
+window.getPresenterFinalRoundTitle = getPresenterFinalRoundTitle
+window.getPresenterFinalTeamForRound = getPresenterFinalTeamForRound
+
+window.joinGameSession = joinGameSession
+window.presenterGoHome = presenterGoHome
+window.openPresenterSegment = openPresenterSegment
+window.openPresenterSegmentCard = openPresenterSegmentCard
+window.openPresenterFinalCard = openPresenterFinalCard
+window.forcePresenterFinalRound = forcePresenterFinalRound
+window.selectTeam = selectTeam
+window.teamButtons = teamButtons
+window.sendCommand = sendCommand
+window.showToast = showToast
+window.togglePresenterDisplayControls = togglePresenterDisplayControls
+
+window.renderPresenterReaderHome = renderPresenterReaderHome
+window.openPresenterReaderSegment = openPresenterReaderSegment
+window.reloadPresenterReaderSegment = reloadPresenterReaderSegment
+window.presenterReaderLogout = presenterReaderLogout
+window.presenterReaderGoHome = presenterReaderGoHome
+window.toggleReaderRead = toggleReaderRead
+window.openReaderMediaFromElement = openReaderMediaFromElement
+window.closeReaderMediaViewer = closeReaderMediaViewer
+window.switchPresenterInsideMode = switchPresenterInsideMode
+window.setPresenterJoinMode = setPresenterJoinMode

@@ -29,6 +29,12 @@ let whoFinishTimeout = null
 let whoDataCache = {}
 let whoDataPromise = null
 
+let whoDataCacheModel = null
+
+let whoTimerStartedAt = 0
+let whoTimerEndsAt = 0
+let whoTimerDuration = 0
+
 const WHO_DATA_CACHE_TTL =
   10 * 60 * 1000
 let whoMaxNumber = Number(
@@ -100,7 +106,16 @@ function saveWhoState(options = {}) {
       !!whoCompensationMode,
 
     timerValue:
-      Number(timerBox?.innerText || 0)
+      Number(timerBox?.innerText || 0),
+
+    timerSync: {
+      startedAt: Number(whoTimerStartedAt || 0),
+      endsAt: Number(whoTimerEndsAt || 0),
+      duration: Number(whoTimerDuration || 0)
+    },
+
+    whoScoringLocked:
+      !!whoScoringLocked
   }
 
   localStorage.setItem(
@@ -115,11 +130,8 @@ function saveWhoState(options = {}) {
 
   syncWhoGlobals()
 
-  if (
-    typeof saveUnifiedGameState ===
-    "function"
-  ) {
-    saveUnifiedGameState()
+  if (options.sync === false) {
+    return
   }
 
   clearTimeout(whoStateSyncTimer)
@@ -128,6 +140,13 @@ function saveWhoState(options = {}) {
     options.immediate === true
 
   whoStateSyncTimer = setTimeout(() => {
+    if (
+      typeof saveUnifiedGameState ===
+      "function"
+    ) {
+      saveUnifiedGameState()
+    }
+
     if (
       typeof syncDisplayStateToSession ===
       "function"
@@ -234,7 +253,9 @@ function restoreWhoState(saved) {
     !!saved.whoCompensationMode
 
   whoLastTickPlayed = null
-  whoScoringLocked = false
+
+  whoScoringLocked =
+    !!saved.whoScoringLocked
 
   syncWhoGlobals()
 
@@ -312,7 +333,10 @@ function restoreWhoState(saved) {
    Data Cache
 ========================= */
 
-function buildWhoDataCache(rows = []) {
+function buildWhoDataCache(
+  rows = [],
+  modelId = null
+) {
   const cache = {}
 
   ;(rows || []).forEach(row => {
@@ -328,14 +352,21 @@ function buildWhoDataCache(rows = []) {
 
     cache[number] = {
       number,
+
       answer:
         String(row.answer || ""),
+
       image:
         String(row.image || "")
     }
   })
 
   whoDataCache = cache
+
+  if (modelId) {
+    whoDataCacheModel =
+      Number(modelId)
+  }
 
   return whoDataCache
 }
@@ -360,6 +391,18 @@ async function loadWhoData(
         new Error(
           "رقم النموذج غير صالح"
         )
+    }
+  }
+
+    if (
+    whoDataCacheModel === modelId &&
+    Object.keys(whoDataCache || {}).length &&
+    options.forceRefresh !== true
+  ) {
+    return {
+      data: Object.values(whoDataCache),
+      error: null,
+      source: "memory"
     }
   }
 
@@ -414,7 +457,8 @@ async function loadWhoData(
                 onBackgroundUpdate:
                   freshRows => {
                     buildWhoDataCache(
-                      freshRows || []
+                      freshRows || [],
+                      modelId
                     )
                   }
               }
@@ -448,7 +492,8 @@ async function loadWhoData(
       }
 
       buildWhoDataCache(
-        result?.data || []
+        result?.data || [],
+        modelId
       )
 
       return {
@@ -504,7 +549,24 @@ window.renderWho = async function () {
   clearTimeout(whoFinishTimeout)
   whoFinishTimeout = null
 
-  whoDataCache = {}
+  const whoCurrentModelId =
+    Number(
+      window.currentModel ||
+      currentModel ||
+      localStorage.getItem(
+        "game_model"
+      ) ||
+      0
+    )
+
+  if (
+    whoDataCacheModel &&
+    whoDataCacheModel !==
+      whoCurrentModelId
+  ) {
+    whoDataCache = {}
+  }
+
   whoDataPromise = null
   whoScoringLocked = false
 
@@ -943,8 +1005,7 @@ function setWhoActiveTeam(
       "function"
     ) {
       setGameActiveTeam(team, {
-        sync:
-          options.sync !== false
+        sync: false
       })
     } else {
       document.body.dataset.activeTeam =
@@ -956,8 +1017,7 @@ function setWhoActiveTeam(
       "function"
     ) {
       clearGameActiveTeam({
-        sync:
-          options.sync !== false
+        sync: false
       })
     } else {
       delete document.body.dataset
@@ -972,7 +1032,10 @@ function setWhoActiveTeam(
   if (options.save === true) {
     saveWhoState({
       immediate:
-        options.immediate === true
+        options.immediate === true,
+
+      sync:
+        options.sync !== false
     })
   }
 
@@ -1439,6 +1502,13 @@ function runWhoTimer(startValue) {
     Number(startValue || 0)
   )
 
+    whoTimerStartedAt = Date.now()
+  whoTimerDuration = time
+  whoTimerEndsAt =
+    time > 0
+      ? whoTimerStartedAt + time * 1000
+      : 0
+
   whoTimerStarted =
     time > 0
 
@@ -1469,10 +1539,13 @@ function runWhoTimer(startValue) {
 
   updateTimerUI()
 
-  saveWhoState()
+  saveWhoState({
+    sync: false
+  })
 
   if (time <= 0) {
     whoTimerStarted = false
+    whoTimerEndsAt = 0
     return
   }
 
@@ -1494,7 +1567,9 @@ function runWhoTimer(startValue) {
       playGameSound("tick")
     }
 
-    saveWhoState()
+    saveWhoState({
+      sync: false
+    })
 
     if (time > 0) return
 
@@ -1503,6 +1578,7 @@ function runWhoTimer(startValue) {
 
     whoTimerStarted = false
     whoLastTickPlayed = null
+    whoTimerEndsAt = 0
 
     timerBox.innerText = 0
     timerBox.classList.remove(
@@ -1534,6 +1610,10 @@ function resetWhoTimer(
 
   whoTimerStarted = false
   whoLastTickPlayed = null
+
+  whoTimerStartedAt = 0
+  whoTimerEndsAt = 0
+  whoTimerDuration = 0
 
   const timerBox =
     document.getElementById("timer")
@@ -1710,10 +1790,10 @@ function whoCorrect() {
   updateWhoCompensationButton()
 
   saveWhoState({
-  immediate: true
-})
+    immediate: true
+  })
 
-finishWhoAfterAnswerDelay(team)
+  finishWhoAfterAnswerDelay(team)
 }
 
 function whoWrong() {

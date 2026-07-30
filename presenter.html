@@ -22,20 +22,29 @@
   <!-- =====================================================
        PRESENTER CSS
        المسار:
-       assets/css/presenter.css
+       assets/css/presenter.css?v=2
   ====================================================== -->
 
   <link
     rel="stylesheet"
-    href="assets/css/presenter.css"
+    href="assets/css/presenter.css?v=2"
   >
+  <!-- Presenter Segments CSS -->
+  <link rel="stylesheet" href="assets/css/presenter/presenter-core.css?v=2">
+  <link rel="stylesheet" href="assets/css/presenter/segments/warmup-presenter.css?v=2">
+  <link rel="stylesheet" href="assets/css/presenter/segments/top10-presenter.css?v=2">
+  <link rel="stylesheet" href="assets/css/presenter/segments/who-presenter.css?v=2">
+  <link rel="stylesheet" href="assets/css/presenter/segments/explain-presenter.css?v=2">
+  <link rel="stylesheet" href="assets/css/presenter/segments/letterli-presenter.css?v=2">
+  <link rel="stylesheet" href="assets/css/presenter/segments/final-presenter.css?v=2">
+  <link rel="stylesheet" href="assets/css/presenter/segments/random-challenge-presenter.css?v=2">
 </head>
 
 <body>
 
   <main
     id="presenterApp"
-    class="presenterApp"
+    class="presenterApp presenterLandscapeApp"
   >
 
     <!-- =====================================================
@@ -190,13 +199,13 @@
 
     <section
       id="presenterHome"
-      class="presenterPage presenterHomePage hidden"
+      class="presenterPage presenterHomePage presenterLandscapeView hidden"
       aria-labelledby="presenterTitle"
     >
 
-      <div class="presenterHomeShell">
+      <div class="presenterHomeShell presenterLandscapeShell">
 
-        <header class="presenterHomeHeader">
+        <header class="presenterHomeHeader presenterMainHeader">
 
           <div class="presenterHomeHeading">
 
@@ -282,7 +291,7 @@
 
           <div
             id="presenterSegmentsGrid"
-            class="presenterSegmentsGrid"
+            class="presenterSegmentsGrid presenterSegmentsCardsGrid"
             aria-live="polite"
           ></div>
 
@@ -299,17 +308,17 @@
 
     <section
       id="presenterSegmentPage"
-      class="presenterPage presenterSegmentPage hidden"
+      class="presenterPage presenterSegmentPage presenterLandscapeView hidden"
       aria-labelledby="presenterSegmentTitle"
     >
 
-      <div class="presenterSegmentShell">
+      <div class="presenterSegmentShell presenterLandscapeShell">
 
-        <header class="presenterSegmentTopbar">
+        <header class="presenterSegmentTopbar presenterSegmentHeader">
 
           <button
             type="button"
-            class="presenterBackBtn"
+            class="presenterBackBtn presenterHeaderBtn"
             onclick="presenterGoHome()"
             aria-label="الرجوع إلى الرئيسية"
           >
@@ -337,7 +346,7 @@
 
         <div
           id="presenterPanel"
-          class="presenterPanel"
+          class="presenterPanel presenterSegmentPanel"
           aria-live="polite"
         ></div>
 

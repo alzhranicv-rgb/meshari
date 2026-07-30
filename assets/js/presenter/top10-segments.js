@@ -8,6 +8,7 @@ let presenterTop10LoadedRound = null
 let presenterTop10RowsPromise = null
 let presenterTop10ActionBusy = false
 let presenterTop10PendingNumber = null
+let presenterTop10TimerInterval = null
 
 const PRESENTER_TOP10_CACHE_TTL = 5 * 60 * 1000
 
@@ -92,7 +93,9 @@ function getPresenterTop10ActiveTeam() {
 
   return (
     state?.activeTeam ||
+    state?.selectedTeam ||
     root?.activeTeam ||
+    root?.selectedTeam ||
     presenterSelectedTeam ||
     null
   )
@@ -113,6 +116,8 @@ function getPresenterTop10CurrentNumber() {
   const state = getPresenterTop10State()
 
   return Number(
+    root?.currentTop10Number ||
+    state?.currentTop10Number ||
     state?.currentNumber ||
     root?.currentNumber ||
     0
@@ -154,6 +159,66 @@ function getPresenterTop10Question(
     state.question?.[round] ||
     state.currentQuestion ||
     "اختر إجابة من القائمة"
+  )
+}
+function getPresenterTop10DoubleState() {
+  const root = getPresenterTop10Root()
+  const state = getPresenterTop10State()
+
+  return (
+    root?.top10DoubleState ||
+    state?.top10DoubleState ||
+    {
+      used: {
+        A: false,
+        B: false
+      },
+      activeTeam: null
+    }
+  )
+}
+
+function isPresenterTop10RoundFinished(
+  round = getPresenterTop10Round()
+) {
+  return (
+    getPresenterTop10Opened(round)
+      .length >= 10
+  )
+}
+
+function isPresenterTop10ShowAnswerReady(
+  round = getPresenterTop10Round()
+) {
+  const errors =
+    getPresenterTop10Errors(round)
+
+  return (
+    errors.A >= 3 &&
+    errors.B >= 3 &&
+    !isPresenterTop10RoundFinished(round)
+  )
+}
+
+function getPresenterTop10TimerSync() {
+  const root = getPresenterTop10Root()
+  const state = getPresenterTop10State()
+
+  return (
+    root?.timerSync ||
+    state?.timerSync ||
+    presenterLiveState?.timerSync ||
+    null
+  )
+}
+
+function getPresenterTop10TimerStarted() {
+  const root = getPresenterTop10Root()
+  const state = getPresenterTop10State()
+
+  return !!(
+    root?.top10TimerStarted ||
+    state?.top10TimerStarted
   )
 }
 
@@ -397,6 +462,39 @@ async function loadPresenterTop10RoundRows(
   return presenterTop10RowsPromise
 }
 
+async function sendPresenterTop10CommandSafe(
+  action,
+  payload = {}
+) {
+  if (typeof sendCommand !== "function") {
+    return false
+  }
+
+  try {
+    const result = await Promise.race([
+      sendCommand(action, {
+        ...payload,
+        segment: "top10"
+      }),
+
+      new Promise(resolve => {
+        setTimeout(() => {
+          resolve(false)
+        }, 2500)
+      })
+    ])
+
+    return result !== false
+  } catch (error) {
+    console.log(
+      "PRESENTER TOP10 COMMAND ERROR:",
+      error
+    )
+
+    return false
+  }
+}
+
 /* =========================
    HTML HELPERS
 ========================= */
@@ -604,6 +702,13 @@ async function renderTop10() {
             aria-live="polite"
           >
             اختر الفريق ثم الإجابة
+          </div>
+
+          <div
+            id="presenterTop10Timer"
+            class="presenterTop10Timer presenterWarmupTimer"
+          >
+            —
           </div>
 
         </div>
@@ -814,6 +919,7 @@ async function renderTop10() {
   `
 
   refreshPresenterTop10FromState()
+    startPresenterTop10TimerWatcher()
 
   if (!presenterTop10Rows.length) {
     await loadPresenterTop10RoundRows(
@@ -838,7 +944,6 @@ async function renderTop10() {
   loadPresenterTop10RoundRows(
     round,
     {
-      forceRefresh: true,
       backgroundRefresh: false
     }
   ).then(() => {
@@ -974,7 +1079,8 @@ async function openTop10PresenterNumber(
 
   refreshPresenterTop10FromState()
 
-  const sent = await sendCommand(
+const sent =
+  await sendPresenterTop10CommandSafe(
     "openNumber",
     {
       number: safeNumber,
@@ -1037,11 +1143,26 @@ async function runPresenterTop10Action(
   const currentNumber =
     getPresenterTop10CurrentNumber()
 
-  const pendingScore =
-    getPresenterTop10PendingScore()
-
   const maxRound =
     getPresenterTop10MaxRound()
+
+  const roundFinished =
+    isPresenterTop10RoundFinished(round)
+
+  const showAnswerReady =
+    isPresenterTop10ShowAnswerReady(round)
+
+  const doubleState =
+    getPresenterTop10DoubleState()
+
+  const doubleUsed =
+    activeTeam
+      ? !!doubleState?.used?.[activeTeam]
+      : false
+
+  const doubleActive =
+    activeTeam &&
+    doubleState?.activeTeam === activeTeam
 
   if (action === "double") {
     if (!activeTeam) {
@@ -1049,47 +1170,62 @@ async function runPresenterTop10Action(
       return
     }
 
-    if (currentNumber || pendingScore) {
+    if (roundFinished) {
+      showToast("انتهت الجولة")
+      return
+    }
+
+    if (doubleActive) {
+      showToast("دوببلا مفعّل")
+      return
+    }
+
+    if (doubleUsed) {
+      showToast("تم استخدام دوببلا لهذا الفريق")
+      return
+    }
+  }
+
+  if (action === "wrong") {
+    if (!activeTeam) {
+      showToast("اختر الفريق أولاً")
+      return
+    }
+
+    if (roundFinished) {
+      showToast("انتهت الجولة")
+      return
+    }
+  }
+
+  if (action === "showAnswer") {
+    if (!showAnswerReady) {
       showToast(
-        "فعّل دوببلا قبل فتح الإجابة"
+        "إظهار الإجابات بعد اكتمال أخطاء الفريقين"
       )
       return
     }
   }
 
-  if (
-    action === "wrong" &&
-    !activeTeam
-  ) {
-    showToast("اختر الفريق أولاً")
-    return
-  }
+  if (action === "nextRound") {
+    if (round >= maxRound) {
+      showToast("هذه آخر جولة")
+      return
+    }
 
-  if (
-    action === "showAnswer" &&
-    !currentNumber
-  ) {
-    showToast("اختر إجابة أولاً")
-    return
-  }
-
-  if (
-    action === "nextRound" &&
-    round >= maxRound
-  ) {
-    showToast("هذه آخر جولة")
-    return
+    if (!roundFinished) {
+      showToast("افتح جميع الإجابات أولاً")
+      return
+    }
   }
 
   presenterTop10ActionBusy = true
   updatePresenterTop10ActionButtons()
 
-  /*
-    تحديث مرئي سريع عند تبديل الدور.
-  */
   if (
     action === "switchTurn" &&
-    activeTeam
+    activeTeam &&
+    !roundFinished
   ) {
     const nextTeam =
       activeTeam === "A" ? "B" : "A"
@@ -1105,7 +1241,8 @@ async function runPresenterTop10Action(
     )
   }
 
-  const sent = await sendCommand(
+const sent =
+  await sendPresenterTop10CommandSafe(
     action,
     {
       round,
@@ -1147,11 +1284,13 @@ async function runPresenterTop10Action(
     )
   }
 
-  setTimeout(() => {
-    presenterTop10ActionBusy = false
+setTimeout(() => {
+  presenterTop10ActionBusy = false
 
-    updatePresenterTop10ActionButtons()
-  }, 300)
+  refreshPresenterTop10FromState()
+  updatePresenterTop10ActionButtons()
+  updatePresenterTop10Timer()
+}, 300)
 }
 
 function updatePresenterTop10ActionButtons() {
@@ -1164,11 +1303,23 @@ function updatePresenterTop10ActionButtons() {
   const maxRound =
     getPresenterTop10MaxRound()
 
-  const currentNumber =
-    getPresenterTop10CurrentNumber()
+  const roundFinished =
+    isPresenterTop10RoundFinished(round)
 
-  const pendingScore =
-    getPresenterTop10PendingScore()
+  const showAnswerReady =
+    isPresenterTop10ShowAnswerReady(round)
+
+  const doubleState =
+    getPresenterTop10DoubleState()
+
+  const doubleUsed =
+    activeTeam
+      ? !!doubleState?.used?.[activeTeam]
+      : false
+
+  const doubleActive =
+    activeTeam &&
+    doubleState?.activeTeam === activeTeam
 
   const busy =
     presenterTop10ActionBusy
@@ -1207,20 +1358,29 @@ function updatePresenterTop10ActionButtons() {
     doubleButton.disabled =
       busy ||
       !activeTeam ||
-      !!currentNumber ||
-      !!pendingScore
+      roundFinished ||
+      doubleUsed ||
+      doubleActive
+
+    doubleButton.innerText =
+      doubleActive
+        ? "دوببلا مفعّل"
+        : doubleUsed
+        ? "تم استخدام دوببلا"
+        : "دوببلا"
   }
 
   if (showAnswerButton) {
     showAnswerButton.disabled =
       busy ||
-      !currentNumber
+      !showAnswerReady
   }
 
   if (wrongButton) {
     wrongButton.disabled =
       busy ||
-      !activeTeam
+      !activeTeam ||
+      roundFinished
   }
 
   if (undoButton) {
@@ -1230,13 +1390,15 @@ function updatePresenterTop10ActionButtons() {
   if (switchButton) {
     switchButton.disabled =
       busy ||
-      !activeTeam
+      !activeTeam ||
+      roundFinished
   }
 
   if (nextRoundButton) {
     nextRoundButton.disabled =
       busy ||
-      round >= maxRound
+      round >= maxRound ||
+      !roundFinished
 
     nextRoundButton.innerText =
       round >= maxRound
@@ -1304,7 +1466,6 @@ async function ensurePresenterTop10RoundLoaded(
     loadPresenterTop10RoundRows(
       safeRound,
       {
-        forceRefresh: true,
         backgroundRefresh: false
       }
     )
@@ -1398,12 +1559,129 @@ async function setPresenterTop10Round(
   }
 }
 
+
+
 /* =========================
    REFRESH FROM DISPLAY
 ========================= */
 
+function getPresenterTop10RemainingSeconds() {
+  const timerSync =
+    getPresenterTop10TimerSync()
+
+  const endsAt =
+    Number(timerSync?.endsAt || 0)
+
+  if (endsAt > 0) {
+    return Math.max(
+      0,
+      Math.ceil(
+        (endsAt - Date.now()) / 1000
+      )
+    )
+  }
+
+  const root =
+    getPresenterTop10Root()
+
+  const state =
+    getPresenterTop10State()
+
+  return Math.max(
+    0,
+    Number(
+      root?.timerValue ??
+      state?.timerValue ??
+      0
+    )
+  )
+}
+
+function updatePresenterTop10Timer() {
+  const timerBox =
+    document.getElementById(
+      "presenterTop10Timer"
+    )
+
+  if (!timerBox) return
+
+  const activeTeam =
+    getPresenterTop10ActiveTeam()
+
+  const timerSync =
+    getPresenterTop10TimerSync()
+
+  const timerStarted =
+    getPresenterTop10TimerStarted()
+
+  if (
+    !activeTeam &&
+    !timerStarted &&
+    !timerSync?.endsAt
+  ) {
+    timerBox.innerText = "—"
+
+    timerBox.classList.remove(
+      "timerRunning",
+      "timerDanger",
+      "timerFinished"
+    )
+
+    return
+  }
+
+  const remaining =
+    getPresenterTop10RemainingSeconds()
+
+  timerBox.innerText =
+    String(remaining)
+
+  timerBox.classList.toggle(
+    "timerRunning",
+    remaining > 5
+  )
+
+  timerBox.classList.toggle(
+    "timerDanger",
+    remaining > 0 &&
+    remaining <= 5
+  )
+
+  timerBox.classList.toggle(
+    "timerFinished",
+    remaining === 0
+  )
+}
+
+function startPresenterTop10TimerWatcher() {
+  stopPresenterTop10TimerWatcher()
+
+  updatePresenterTop10Timer()
+
+  presenterTop10TimerInterval =
+    setInterval(() => {
+      if (presenterSegment !== "top10") {
+        stopPresenterTop10TimerWatcher()
+        return
+      }
+
+      updatePresenterTop10Timer()
+    }, 250)
+}
+
+function stopPresenterTop10TimerWatcher() {
+  if (presenterTop10TimerInterval) {
+    clearInterval(
+      presenterTop10TimerInterval
+    )
+
+    presenterTop10TimerInterval = null
+  }
+}
+
 async function refreshPresenterTop10FromState() {
   if (presenterSegment !== "top10") {
+    stopPresenterTop10TimerWatcher()
     return
   }
 
@@ -1432,6 +1710,9 @@ async function refreshPresenterTop10FromState() {
 
   const currentNumber =
     getPresenterTop10CurrentNumber()
+
+      const roundFinished =
+    isPresenterTop10RoundFinished(round)
 
   updatePresenterTeamButtonsOnly(
     activeTeam
@@ -1483,12 +1764,12 @@ async function refreshPresenterTop10FromState() {
     )
 
   if (statusBox) {
-    if (!activeTeam) {
+    if (roundFinished) {
+      statusBox.innerText =
+        "انتهت الجولة"
+    } else if (!activeTeam) {
       statusBox.innerText =
         "اختر الفريق أولاً"
-    } else if (currentNumber) {
-      statusBox.innerText =
-        "الإجابة مفتوحة"
     } else {
       const teamName =
         activeTeam === "A"
@@ -1551,7 +1832,8 @@ async function refreshPresenterTop10FromState() {
         isOpened ||
         isPending ||
         presenterTop10ActionBusy ||
-        !activeTeam
+        !activeTeam ||
+        roundFinished
 
       const textBox =
         button.querySelector(
@@ -1589,7 +1871,13 @@ async function refreshPresenterTop10FromState() {
     })
 
   updatePresenterTop10ActionButtons()
+    updatePresenterTop10Timer()
 }
+
+window.addEventListener(
+  "beforeunload",
+  stopPresenterTop10TimerWatcher
+)
 
 /* =========================
    Reader: Top 10
@@ -1649,114 +1937,166 @@ async function renderPresenterReaderTop10() {
       .sort((a, b) => a - b)
 
   panel.innerHTML = `
-    <div class="readerTop10Stack">
+    <section class="presenterTop10ControlView">
 
-      ${rounds.map(round => {
-        const roundRows =
-          rows.filter(row => {
-            return (
-              Number(row.round) ===
-              round
-            )
-          })
+      <header class="presenterTop10ControlHeader">
 
-        const question =
-          roundRows[0]?.question || ""
+        <div class="presenterTop10HeaderTeams">
+          ${teamButtons()}
+        </div>
 
-        const questionId =
-          readerId([
-            "top10",
-            round,
-            "question"
-          ])
+        <div class="presenterTop10HeaderInfo">
 
-        return `
-          <section class="readerTop10Round">
+          <span
+            id="presenterTop10StatusText"
+            class="presenterTop10StatusText"
+          >
+            —
+          </span>
 
-            <header class="readerTop10RoundHead">
+          <span class="presenterTop10RoundBadge">
+            <span>جولة</span>
 
-              <div>
-                <span>Top 10</span>
-                <h2>الجولة ${round}</h2>
-              </div>
+            <strong id="presenterTop10RoundText">
+              ${round}
+            </strong>
+          </span>
 
-              <strong>
-                ${roundRows.length} إجابات
-              </strong>
+          <strong
+            id="presenterTop10Timer"
+            class="presenterTop10Timer"
+          >
+            —
+          </strong>
 
-            </header>
+        </div>
 
-            <div
-              class="
-                readerMainQuestion
-                readerTop10Question
-                ${readerReadClass(questionId)}
-              "
-              onclick="
-                toggleReaderRead(
-                  '${questionId}',
-                  this
-                )
-              "
-            >
-              <label>السؤال</label>
+      </header>
 
-              <p>
-                ${readerEscape(
-                  question ||
-                  "لا يوجد سؤال رئيسي"
-                )}
-              </p>
+      <main class="presenterTop10ControlMain">
+
+        <section class="presenterTop10QuestionPanel">
+
+          <header class="presenterTop10PanelTitle">
+            <h2>السؤال</h2>
+
+            <div class="presenterTop10ErrorsMini">
+
+              <span class="presenterTop10ErrorMiniBox teamA">
+                <span>
+                  ${escapePresenterTop10Html(presenterTeamAName)}
+                </span>
+
+                <strong id="presenterTop10ErrorsA">
+                  ${errors.A} / 3
+                </strong>
+              </span>
+
+              <span class="presenterTop10ErrorMiniBox teamB">
+                <span>
+                  ${escapePresenterTop10Html(presenterTeamBName)}
+                </span>
+
+                <strong id="presenterTop10ErrorsB">
+                  ${errors.B} / 3
+                </strong>
+              </span>
+
             </div>
+          </header>
 
-            <div class="readerTop10Answers">
+          <div
+            id="presenterTop10QuestionText"
+            class="presenterTop10QuestionText"
+          >
+            ${escapePresenterTop10Html(getPresenterTop10Question(round))}
+          </div>
 
-              ${roundRows.map(row => {
-                const answerId =
-                  readerId([
-                    "top10",
-                    round,
-                    row.position
-                  ])
+        </section>
 
-                return `
-                  <article
-                    class="
-                      readerTop10Answer
-                      ${readerReadClass(answerId)}
-                    "
-                    onclick="
-                      toggleReaderRead(
-                        '${answerId}',
-                        this
-                      )
-                    "
-                  >
-                    <strong>
-                      ${readerEscape(
-                        row.position
-                      )}
-                    </strong>
+        <section class="presenterTop10AnswersPanel">
 
-                    <div>
-                      <label>الإجابة</label>
+          <header class="presenterTop10PanelTitle">
+            <h2>الإجابات</h2>
+          </header>
 
-                      <span>
-                        ${readerEscape(
-                          row.answer || "—"
-                        )}
-                      </span>
-                    </div>
-                  </article>
+          <div
+            id="presenterTop10AnswersCols"
+            class="presenterTop10AnswersCols"
+          >
+            ${
+              presenterTop10Rows.length
+                ? buildPresenterTop10AnswersHtml()
+                : `
+                  <div class="presenterTop10Loading">
+                    جارٍ التحميل
+                  </div>
                 `
-              }).join("")}
+            }
+          </div>
 
-            </div>
+        </section>
 
-          </section>
-        `
-      }).join("")}
+      </main>
 
-    </div>
+      <footer class="presenterTop10CommandBar">
+
+        <button
+          type="button"
+          id="presenterTop10DoubleBtn"
+          class="presenterBtn gray presenterTop10DoubleBtn"
+          onclick="runPresenterTop10Action('double')"
+        >
+          دوببلا
+        </button>
+
+        <button
+          type="button"
+          id="presenterTop10ShowAnswerBtn"
+          class="presenterBtn green"
+          onclick="runPresenterTop10Action('showAnswer')"
+        >
+          الإجابات
+        </button>
+
+        <button
+          type="button"
+          id="presenterTop10WrongBtn"
+          class="presenterBtn red"
+          onclick="runPresenterTop10Action('wrong')"
+        >
+          خطأ
+        </button>
+
+        <button
+          type="button"
+          id="presenterTop10UndoBtn"
+          class="presenterBtn gray"
+          onclick="runPresenterTop10Action('undo')"
+        >
+          تراجع
+        </button>
+
+        <button
+          type="button"
+          id="presenterTop10SwitchBtn"
+          class="presenterBtn blue"
+          onclick="runPresenterTop10Action('switchTurn')"
+        >
+          تبديل
+        </button>
+
+        <button
+          type="button"
+          id="presenterTop10NextRoundBtn"
+          class="presenterBtn blue"
+          onclick="runPresenterTop10Action('nextRound')"
+        >
+          التالي
+        </button>
+
+      </footer>
+
+    </section>
   `
 }

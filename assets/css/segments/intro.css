@@ -1,9 +1,10 @@
 /* =========================================================
-   INTRO / المقدمة - CLEAN SIMPLE FINAL v501
+   INTRO / المقدمة - CLEAN SIMPLE FINAL v502
+   iPad 11 Landscape Only - No Bold
 ========================================================= */
 
 /* =========================
-   BASE
+   1) BASE
 ========================= */
 
 *{
@@ -21,7 +22,10 @@ body{
   width:100%;
   min-height:100vh;
   overflow:hidden;
+
   font-family:"HanakaText",sans-serif;
+  font-weight:400;
+
   background:#EAECF0;
   color:#151515;
 }
@@ -30,6 +34,7 @@ button,
 input,
 select{
   font-family:"HanakaText",sans-serif;
+  font-weight:400;
 }
 
 button{
@@ -49,7 +54,7 @@ button{
   --text:#151515;
   --muted:#8793A0;
 
-  --btn-nav:#0c3a9b;
+  --btn-nav:#0A7C6E;
   --btn-correct:#007F00;
   --btn-wrong:#7F0000;
   --btn-double:#00007F;
@@ -58,7 +63,7 @@ button{
 }
 
 /* =========================
-   PAGE
+   2) PAGE
 ========================= */
 
 .introPage{
@@ -85,7 +90,7 @@ button{
 }
 
 /* =========================
-   MAIN
+   3) MAIN
 ========================= */
 
 .introCard{
@@ -117,7 +122,7 @@ button{
 }
 
 /* =========================
-   TITLE AREA
+   4) TITLE AREA
 ========================= */
 
 .introTitleArea{
@@ -153,7 +158,7 @@ button{
 
   font-size:.9rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   box-shadow:0 0 0 4px rgba(254,127,45,.10);
@@ -255,7 +260,7 @@ button{
 }
 
 /* =========================
-   PANEL
+   5) PANEL
 ========================= */
 
 .introPanel{
@@ -276,7 +281,7 @@ button{
 }
 
 /* =========================
-   TEAMS
+   6) TEAMS
 ========================= */
 
 .introTeamsRow{
@@ -291,7 +296,7 @@ button{
 }
 
 /* =========================
-   LABELED FIELDS
+   7) LABELED FIELDS
 ========================= */
 
 .introLabeledField{
@@ -328,7 +333,7 @@ button{
 
   font-size:.86rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
@@ -360,7 +365,7 @@ button{
 
   font-size:1.22rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   transition:
@@ -417,7 +422,7 @@ button{
 }
 
 /* =========================
-   MODEL + SEGMENTS - CLEAN CONNECTED STRIP
+   8) MODEL + SEGMENTS STRIP
 ========================= */
 
 .introTopSetupRow{
@@ -471,7 +476,7 @@ button{
 
   font-size:.82rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
@@ -502,7 +507,7 @@ button{
 
   font-size:.98rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   cursor:pointer;
@@ -518,7 +523,6 @@ button{
   box-shadow:0 0 0 4px rgba(254,127,45,.14);
 }
 
-/* الخط الفاصل بين النموذج واختيار الفقرات */
 .introSegmentsInfoRow{
   min-width:0;
   min-height:0;
@@ -552,7 +556,7 @@ button{
 
   border-radius:18px;
 
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
@@ -605,7 +609,7 @@ button{
 }
 
 /* =========================
-   SEGMENTS - BIGGER CARDS
+   9) SEGMENTS
 ========================= */
 
 .introSegmentsPanel{
@@ -698,7 +702,7 @@ button{
 
   font-size:.98rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 }
 
 .introSegmentPickTitle{
@@ -719,7 +723,7 @@ button{
 
   font-size:1.12rem;
   line-height:1.18;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   white-space:normal;
@@ -750,6 +754,7 @@ button{
 .introSegmentPickBtn:disabled .introSegmentPickState{
   display:none;
 }
+
 .introSegmentsEmpty{
   grid-column:1 / -1;
 
@@ -769,12 +774,12 @@ button{
 
   font-size:.94rem;
   line-height:1.35;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 }
 
 /* =========================
-   START
+   10) START
 ========================= */
 
 #startGameBtn{
@@ -793,7 +798,7 @@ button{
 
   font-size:1.12rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
   cursor:pointer;
 
@@ -825,7 +830,7 @@ button{
 }
 
 /* =========================
-   PRESENTER MODAL
+   11) PRESENTER MODAL
 ========================= */
 
 .introPresenterModal{
@@ -897,7 +902,7 @@ button{
 
   font-size:1.4rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
   cursor:pointer;
 }
@@ -927,7 +932,7 @@ button{
 
   border-radius:16px;
 
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
@@ -1025,7 +1030,7 @@ button{
   color:#fff;
 
   font-size:.88rem;
-  font-weight:900;
+  font-weight:400;
 }
 
 .presenterIntroCodeValue{
@@ -1043,7 +1048,7 @@ button{
 
   font-size:clamp(3rem,6vw,5.2rem);
   line-height:1;
-  font-weight:900;
+  font-weight:400;
   letter-spacing:4px;
 
   cursor:pointer;
@@ -1066,7 +1071,7 @@ button{
 
   font-size:.76rem;
   line-height:1.3;
-  font-weight:800;
+  font-weight:400;
   text-align:center;
 
   word-break:break-all;
@@ -1092,7 +1097,7 @@ button{
   color:#fff;
 
   font-size:1rem;
-  font-weight:900;
+  font-weight:400;
 
   cursor:pointer;
 }
@@ -1105,312 +1110,308 @@ button{
   background:var(--btn-nav);
 }
 
-body .gameToast{
-  inset:auto auto calc(22px + env(safe-area-inset-bottom,0px)) 50%;
-  width:auto;
-  height:auto;
-}
+/* =========================
+   12) TOAST POSITION
+========================= */
+
 body .gameToast{
   inset:calc(18px + env(safe-area-inset-top,0px)) auto auto 50%;
   width:auto;
   height:auto;
 }
+
 /* =========================
-   IPAD / TABLET LANDSCAPE
+   13) IPAD 11 LANDSCAPE
 ========================= */
 
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+@media (orientation:landscape) and (min-width:900px) and (max-width:1300px){
   .introPage{
-    padding:10px;
+    padding:
+      calc(10px + env(safe-area-inset-top,0px))
+      calc(12px + env(safe-area-inset-right,0px))
+      calc(10px + env(safe-area-inset-bottom,0px))
+      calc(12px + env(safe-area-inset-left,0px));
   }
 
   .introCard{
-    width:min(100%,1080px);
+    width:min(100%,1160px);
     height:100%;
 
-    grid-template-rows:142px minmax(0,1fr);
-    gap:8px;
+    grid-template-rows:148px minmax(0,1fr);
+    gap:10px;
   }
 
   .introTitleArea{
-    grid-template-rows:30px minmax(0,1fr);
-    gap:5px;
+    grid-template-rows:34px minmax(0,1fr);
+    gap:6px;
   }
 
   .introTopBadge{
-    min-width:120px;
-    height:30px;
-    padding:0 14px;
+    min-width:132px;
+    height:34px;
+    padding:0 16px;
+
     border-radius:999px;
-    font-size:.62rem;
+
+    font-size:.72rem;
   }
 
   .introTitle{
-    height:107px;
-    font-size:5.15rem;
+    height:108px;
+    font-size:5.35rem;
   }
 
   .introTitle::before{
-    height:56px;
-    width:min(340px,44%);
+    width:min(360px,46%);
+    height:58px;
   }
 
   .introTitle::after{
+    width:min(310px,42%);
     height:5px;
     bottom:2px;
   }
 
   .introPanel{
-    grid-template-rows:62px 56px minmax(0,1fr) 50px;
-    gap:8px;
+    grid-template-rows:72px 66px minmax(0,1fr) 56px;
+    gap:9px;
 
     padding:10px;
-    border-radius:22px;
+    border-radius:24px;
   }
 
   .introTeamsRow{
-    gap:8px;
+    gap:9px;
   }
 
   .introLabeledField{
-    grid-template-columns:88px minmax(0,1fr);
-    gap:6px;
-    padding:5px;
-    border-radius:16px;
-  }
+    grid-template-columns:104px minmax(0,1fr);
+    gap:7px;
 
-  .introMiniLabel{
-    border-radius:12px;
-    font-size:.56rem;
-  }
-
-  .introField input,
-  .introModelRow select{
-    border-radius:12px;
-    font-size:.7rem;
-  }
-
-  .introTopSetupRow{
-    grid-template-columns:290px minmax(0,1fr);
-    gap:8px;
-  }
-
-  .introSegmentsInfoRow{
-    grid-template-columns:108px minmax(0,1fr) 74px;
-    gap:6px;
-    padding:5px;
-    border-radius:16px;
-  }
-
-  .introSegmentsTitle,
-  .introSegmentsSummary,
-  .introSegmentsCounter{
-    border-radius:12px;
-    font-size:.54rem;
-  }
-
-  .introSegmentsCounter{
-    width:74px;
-    min-width:74px;
-  }
-
-  .introSegmentsGrid{
-    grid-template-columns:repeat(5,minmax(0,1fr));
-    gap:6px;
-  }
-
-  .introSegmentPickBtn{
-    min-height:56px;
-    border-radius:13px;
-    padding:5px;
-  }
-
-  .introSegmentPickBtn.selected::before{
-    top:5px;
-    inset-inline-start:5px;
-
-    width:22px;
-    height:22px;
-
-    border-radius:7px;
-
-    font-size:.58rem;
-  }
-
-  .introSegmentPickTitle{
-    border-radius:9px;
-    font-size:.58rem;
-  }
-
-  #startGameBtn{
-    height:50px;
-    border-radius:16px;
-    font-size:.86rem;
-  }
-}
-
-/* =========================
-   PHONE
-========================= */
-
-@media (max-width:767px){
-  body{
-    overflow:auto;
-  }
-
-  .introPage{
-    height:auto;
-    min-height:100dvh;
-    max-height:none;
-
-    align-items:flex-start;
-
-    padding:
-      calc(8px + env(safe-area-inset-top,0px))
-      calc(8px + env(safe-area-inset-right,0px))
-      calc(8px + env(safe-area-inset-bottom,0px))
-      calc(8px + env(safe-area-inset-left,0px));
-
-    overflow:visible;
-  }
-
-  .introCard{
-    width:100%;
-    height:auto;
-    max-height:none;
-
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-
-    overflow:visible;
-  }
-
-  .introTitleArea{
-    grid-template-rows:34px 120px;
-    gap:6px;
-  }
-
-  .introTopBadge{
-    height:34px;
-    min-width:120px;
-    padding:0 16px;
-    font-size:.72rem;
-  }
-
-  .introTitle{
-    height:120px;
-    font-size:4rem;
-  }
-
-  .introTitle::before{
-    width:78%;
-    height:58px;
-  }
-
-  .introTitle::after{
-    width:58%;
-    height:5px;
-  }
-
-  .introPanel{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-
-    padding:10px;
-    border-radius:22px;
-
-    overflow:visible;
-  }
-
-  .introTeamsRow{
-    grid-template-columns:1fr;
-  }
-
-  .introLabeledField{
-    min-height:66px;
-    grid-template-columns:96px minmax(0,1fr);
-    gap:6px;
     padding:5px;
     border-radius:18px;
   }
 
   .introMiniLabel{
     border-radius:13px;
-    font-size:.64rem;
+    font-size:.66rem;
   }
 
-  .introField,
-  .introModelRow{
-    height:56px;
+  .introField input,
+  .introModelRow select{
+    border-radius:13px;
+    font-size:.84rem;
+  }
+
+  .introField input::placeholder{
+    font-size:.8rem;
   }
 
   .introTopSetupRow{
-    grid-template-columns:1fr;
-    overflow:visible;
+    grid-template-columns:320px minmax(0,1fr);
+
+    padding:5px;
+    border-radius:18px;
+  }
+
+  .introModelBox{
+    grid-template-columns:104px minmax(0,1fr);
+    gap:6px;
+
+    padding-inline-end:7px;
+  }
+
+  .introModelBox .introMiniLabel{
+    border-radius:13px;
+    font-size:.64rem;
+  }
+
+  .introModelRow select{
+    padding:0 10px;
+    font-size:.76rem;
   }
 
   .introSegmentsInfoRow{
-    min-height:58px;
-    grid-template-columns:1fr;
-    overflow:visible;
+    grid-template-columns:116px minmax(0,1fr) 82px;
+    gap:6px;
+
+    padding-inline-start:7px;
   }
 
   .introSegmentsTitle,
   .introSegmentsSummary,
   .introSegmentsCounter{
-    height:48px;
-    width:100%;
+    border-radius:13px;
   }
 
-  .introSegmentsPanel{
-    overflow:visible;
+  .introSegmentsTitle{
+    font-size:.62rem;
+  }
+
+  .introSegmentsSummary{
+    font-size:.6rem;
+  }
+
+  .introSegmentsCounter{
+    width:82px;
+    min-width:82px;
+
+    font-size:.56rem;
   }
 
   .introSegmentsGrid{
-    grid-template-columns:1fr;
-    overflow:visible;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:10px;
+
+    padding:3px;
   }
 
   .introSegmentPickBtn{
-    min-height:76px;
+    min-height:122px;
+
+    padding:7px;
+    border-radius:20px;
   }
 
-  .introPresenterModal{
-    align-items:flex-start;
-    overflow:auto;
+  .introSegmentPickBtn.selected::before{
+    top:7px;
+    inset-inline-start:7px;
+
+    width:28px;
+    height:28px;
+
+    border-radius:10px;
+
+    font-size:.7rem;
+  }
+
+  .introSegmentPickTitle{
+    padding:0 10px;
+
+    border-radius:15px;
+
+    font-size:.88rem;
+    line-height:1.15;
+  }
+
+  .introSegmentsEmpty{
+    min-height:130px;
+
+    border-radius:18px;
+
+    font-size:.8rem;
+  }
+
+  #startGameBtn{
+    height:56px;
+
+    border-radius:18px;
+
+    font-size:.9rem;
   }
 
   .introPresenterModalCard{
-    width:100%;
-    height:auto;
-    max-height:none;
+    width:min(100%,860px);
+    height:min(500px,calc(100dvh - 24px));
 
-    display:flex;
-    flex-direction:column;
-    gap:10px;
+    grid-template-rows:62px minmax(0,1fr) 58px;
+    gap:8px;
 
-    overflow:visible;
+    padding:10px;
+    border-radius:24px;
+  }
+
+  .introPresenterModalClose{
+    top:16px;
+    inset-inline-end:16px;
+
+    width:38px;
+    height:38px;
+
+    border-radius:13px;
+
+    font-size:1.25rem;
   }
 
   .introPresenterHeader{
-    grid-template-columns:1fr;
-    padding-inline-end:48px;
+    grid-template-columns:170px minmax(0,1fr);
+    gap:8px;
+
+    padding-inline-end:50px;
+  }
+
+  .introPresenterTitle,
+  .introPresenterText{
+    height:46px;
+    border-radius:14px;
+  }
+
+  .introPresenterTitle{
+    font-size:.86rem;
+  }
+
+  .introPresenterText{
+    font-size:.72rem;
   }
 
   .introPresenterContent{
-    grid-template-columns:1fr;
-    overflow:visible;
+    grid-template-columns:290px minmax(0,1fr);
+    gap:8px;
+  }
+
+  .introPresenterQrBox,
+  .presenterIntroCodeBox{
+    border-radius:18px;
+  }
+
+  .introPresenterQrBox img{
+    max-width:225px;
+    border-radius:16px;
+  }
+
+  .introPresenterInfoBox{
+    grid-template-rows:minmax(0,1fr) 58px;
+    gap:8px;
+  }
+
+  .presenterIntroCodeBox{
+    grid-template-rows:38px minmax(0,1fr);
+    gap:8px;
+
+    padding:8px;
+  }
+
+  .presenterIntroCodeLabel{
+    height:38px;
+    border-radius:13px;
+
+    font-size:.74rem;
+  }
+
+  .presenterIntroCodeValue{
+    border-radius:14px;
+    font-size:4rem;
+  }
+
+  .introPresenterLink{
+    border-radius:14px;
+    font-size:.66rem;
   }
 
   .introPresenterActions{
-    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .introPresenterCopyBtn{
+    height:58px;
+    border-radius:16px;
+
+    font-size:.84rem;
   }
 }
 
 /* =========================
-   REDUCED MOTION
+   14) REDUCED MOTION
 ========================= */
 
 @media (prefers-reduced-motion:reduce){
@@ -1420,24 +1421,4 @@ body .gameToast{
     animation:none;
     transition:none;
   }
-}
-/* =========================
-   INTRO - REMOVE BOLD
-========================= */
-
-.introPage,
-.introPage *,
-.introWrap,
-.introWrap *,
-.introScreen,
-.introScreen *,
-.setupScreen,
-.setupScreen *,
-.setupShell,
-.setupShell *,
-.hero,
-.hero *,
-.panel,
-.panel *{
-  font-weight:400 !important;
 }

@@ -12,9 +12,9 @@
   <link rel="stylesheet" href="assets/css/segments/who.css?v=1002" />
   <link rel="stylesheet" href="assets/css/segments/explain.css?v=1002" />
   <link rel="stylesheet" href="assets/css/segments/archive.css?v=1002" />
-  <link rel="stylesheet" href="assets/css/segments/warmup.css?v=1002" />
+  <link rel="stylesheet" href="assets/css/segments/warmup.css?v=1003" />
   <link rel="stylesheet" href="assets/css/segments/letterli.css?v=1002" />
-  <link rel="stylesheet" href="assets/css/segments/random-challenge.css?v=1002" />
+  <link rel="stylesheet" href="assets/css/segments/random-challenge.css?v=1004" />
   <link rel="stylesheet" href="assets/css/segments/final.css?v=1002" />
 </head>
 
@@ -53,7 +53,7 @@
     <div class="homeSegmentsShowcase" id="segmentsGrid"></div>
 
     <div class="winnerArea homeWinnerArea" id="winnerArea">
-      <button class="winnerBtn homeWinnerBtn" onclick="showDetailedFinalResults()">
+      <button class="winnerBtn homeWinnerBtn" onclick="announceWinner()">
         النتيجة النهائية
       </button>
 
@@ -90,279 +90,31 @@
     </div>
   </div>
 
-  <div id="finalResultsOverlay" class="finalResultsOverlay hidden">
-
-    <section class="finalResultsBoard">
-
-      <button
-        class="finalResultsClose"
-        type="button"
-        onclick="closeDetailedFinalResults()"
-      >
-        ×
-      </button>
-
-      <header class="finalResultsTop">
-
-        <div class="finalWinnerBlock">
-          <span class="finalWinnerLabel">النتيجة النهائية</span>
-          <strong id="finalResultsWinnerName" class="finalWinnerName">—</strong>
-          <small id="finalResultsWinnerSub" class="finalWinnerSub">بانتظار النتائج</small>
-        </div>
-
-      </header>
-
-      <section class="finalQuickStats">
-        <div>
-          <span>المكتملة</span>
-          <b id="finalQuickCompleted">0/0</b>
-        </div>
-
-        <div>
-          <span>التعادلات</span>
-          <b id="finalQuickDraws">0</b>
-        </div>
-
-        <div>
-          <span>المتبقي</span>
-          <b id="finalQuickPending">0</b>
-        </div>
-      </section>
-
-      <main class="finalResultsCeremony">
-
-        <section class="finalTeamsStatsGrid">
-
-          <div id="finalResultsTeamABox" class="finalTeamStatsBox teamA">
-            <div class="finalTeamStatsName" id="finalTeamAStatsName">—</div>
-
-            <div class="finalTeamStatsMain">
-              <strong id="finalTeamAStatsWins">0</strong>
-              <span>فقرات فاز بها</span>
-            </div>
-
-            <div class="finalTeamStatsMiniGrid">
-              <div>
-                <b id="finalTeamAStatsPoints">0</b>
-                <small>نقاط الفقرات</small>
-              </div>
-
-              <div>
-                <b id="finalTeamAStatsCompleted">0</b>
-                <small>فقرات مكتملة</small>
-              </div>
-            </div>
-          </div>
-
-          <div id="finalResultsTeamBBox" class="finalTeamStatsBox teamB">
-            <div class="finalTeamStatsName" id="finalTeamBStatsName">—</div>
-
-            <div class="finalTeamStatsMain">
-              <strong id="finalTeamBStatsWins">0</strong>
-              <span>فقرات فاز بها</span>
-            </div>
-
-            <div class="finalTeamStatsMiniGrid">
-              <div>
-                <b id="finalTeamBStatsPoints">0</b>
-                <small>نقاط الفقرات</small>
-              </div>
-
-              <div>
-                <b id="finalTeamBStatsCompleted">0</b>
-                <small>فقرات مكتملة</small>
-              </div>
-            </div>
-          </div>
-
-        </section>
-
-        <section class="finalResultsSegmentsGrid">
-
-          <div class="finalSegmentResultItem" data-result-card="warmup">
-            <b class="finalMatchNo">1</b>
-            <h3>التسخين</h3>
-
-            <div class="finalSegmentScoreLine">
-              <em id="resultWarmupA">0</em>
-              <span>-</span>
-              <em id="resultWarmupB">0</em>
-            </div>
-
-            <strong id="resultWarmupWinner" class="finalMatchWinner">لم تلعب</strong>
-          </div>
-
-          <div class="finalSegmentResultItem" data-result-card="top10">
-            <b class="finalMatchNo">2</b>
-            <h3>Top 10</h3>
-
-            <div class="finalSegmentScoreLine">
-              <em id="resultTop10A">0</em>
-              <span>-</span>
-              <em id="resultTop10B">0</em>
-            </div>
-
-            <strong id="resultTop10Winner" class="finalMatchWinner">لم تلعب</strong>
-          </div>
-
-          <div class="finalSegmentResultItem" data-result-card="letterli">
-  <b class="finalMatchNo">3</b>
-  <h3>حرفلي</h3>
-
-  <div class="finalSegmentScoreLine">
-    <em id="resultLetterliA">0</em>
-    <span>-</span>
-    <em id="resultLetterliB">0</em>
-  </div>
-
-  <strong id="resultLetterliWinner" class="finalMatchWinner">لم تلعب</strong>
-</div>
-
-          <div class="finalSegmentResultItem" data-result-card="who">
-            <b class="finalMatchNo">4</b>
-            <h3>من هو</h3>
-
-            <div class="finalSegmentScoreLine">
-              <em id="resultWhoA">0</em>
-              <span>-</span>
-              <em id="resultWhoB">0</em>
-            </div>
-
-            <strong id="resultWhoWinner" class="finalMatchWinner">لم تلعب</strong>
-          </div>
-
-          <div class="finalSegmentResultItem" data-result-card="explain">
-            <b class="finalMatchNo">5</b>
-            <h3>اشرح الكلمة</h3>
-
-            <div class="finalSegmentScoreLine">
-              <em id="resultExplainA">0</em>
-              <span>-</span>
-              <em id="resultExplainB">0</em>
-            </div>
-
-            <strong id="resultExplainWinner" class="finalMatchWinner">لم تلعب</strong>
-          </div>
-
-          <div class="finalSegmentResultItem" data-result-card="final1">
-            <b class="finalMatchNo">6</b>
-            <h3>ٮدوں ٮڡاط</h3>
-
-            <div class="finalSegmentScoreLine">
-              <em id="resultFinal1A">0</em>
-              <span>-</span>
-              <em id="resultFinal1B">0</em>
-            </div>
-
-            <strong id="resultFinal1Winner" class="finalMatchWinner">لم تلعب</strong>
-          </div>
-
-          <div class="finalSegmentResultItem" data-result-card="final2">
-            <b class="finalMatchNo">7</b>
-            <h3>صح صحلي</h3>
-
-            <div class="finalSegmentScoreLine">
-              <em id="resultFinal2A">0</em>
-              <span>-</span>
-              <em id="resultFinal2B">0</em>
-            </div>
-
-            <strong id="resultFinal2Winner" class="finalMatchWinner">لم تلعب</strong>
-          </div>
-
-          <div class="finalSegmentResultItem" data-result-card="final3">
-            <b class="finalMatchNo">8</b>
-            <h3>قصة</h3>
-
-            <div class="finalSegmentScoreLine">
-              <em id="resultFinal3A">0</em>
-              <span>-</span>
-              <em id="resultFinal3B">0</em>
-            </div>
-
-            <strong id="resultFinal3Winner" class="finalMatchWinner">لم تلعب</strong>
-          </div>
-
-          <div class="finalSegmentResultItem" data-result-card="final4">
-            <b class="finalMatchNo">9</b>
-            <h3>التركيز</h3>
-
-            <div class="finalSegmentScoreLine">
-              <em id="resultFinal4A">0</em>
-              <span>-</span>
-              <em id="resultFinal4B">0</em>
-            </div>
-
-            <strong id="resultFinal4Winner" class="finalMatchWinner">لم تلعب</strong>
-          </div>
-
-          <div class="finalSegmentResultItem" data-result-card="archive">
-            <b class="finalMatchNo">10</b>
-            <h3>الأرشيف</h3>
-
-            <div class="finalSegmentScoreLine">
-              <em id="resultArchiveA">0</em>
-              <span>-</span>
-              <em id="resultArchiveB">0</em>
-            </div>
-
-            <strong id="resultArchiveWinner" class="finalMatchWinner">لم تلعب</strong>
-          </div>
-
-          <div class="finalSegmentResultItem" data-result-card="randomChallenge">
-            <b class="finalMatchNo">11</b>
-            <h3>التحدي</h3>
-
-            <div class="finalSegmentScoreLine">
-              <em id="resultRandomChallengeA">0</em>
-              <span>-</span>
-              <em id="resultRandomChallengeB">0</em>
-            </div>
-
-            <strong id="resultRandomChallengeWinner" class="finalMatchWinner">لم تلعب</strong>
-          </div>
-
-        </section>
-
-      </main>
-
-      <footer class="finalResultsFooter">
-        <button type="button" onclick="announceWinnerFromDetailedResults()">
-          إعلان الفائز
-        </button>
-
-        <button type="button" onclick="closeDetailedFinalResults()">
-          إغلاق
-        </button>
-      </footer>
-
-    </section>
-
-  </div>
-
   <div id="gameToast" class="gameToast hidden">
     <div class="gameToastIcon">!</div>
     <div id="gameToastText" class="gameToastText"></div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <script src="assets/js/supabase.js"></script>
 
-  <script src="assets/js/game.js?v=1002"></script>
-  <script src="assets/js/game-state.js?v=1002"></script>
+  <script src="assets/js/game.js?v=1007"></script>
+  <script src="assets/js/game-state.js?v=1007"></script>
 
-  <script src="assets/js/warmup.js?v=1002"></script>
-  <script src="assets/js/top10.js?v=1002"></script>
-  <script src="assets/js/who.js?v=1002"></script>
-  <script src="assets/js/explain.js?v=1002"></script>
-  <script src="assets/js/final.js?v=1002"></script>
-  <script src="assets/js/archive.js?v=1002"></script>
-  <script src="assets/js/letterli.js?v=1002"></script>
+  <script src="assets/js/segments/warmup.js?v=1002"></script>
+  <script src="assets/js/segments/top10.js?v=1002"></script>
+  <script src="assets/js/segments/who.js?v=1002"></script>
+  <script src="assets/js/segments/explain.js?v=1002"></script>
+  <script src="assets/js/segments/final.js?v=1002"></script>
+  <script src="assets/js/segments/archive.js?v=1002"></script>
+  <script src="assets/js/segments/letterli.js?v=1002"></script>
+
   <script src="assets/js/random-shared-player-media.js?v=1002"></script>
-  <script src="assets/js/random-challenge.js?v=1002"></script>
-  <script src="assets/js/presenter/presenter-listener.js?v=1003"></script>
+  <script src="assets/js/segments/random-challenge.js?v=1002"></script>
+
+  <script src="assets/js/presenter/presenter-listener.js?v=1007"></script>
 
 </body>
 </html>

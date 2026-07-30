@@ -17,7 +17,7 @@
   ========================== -->
   <link
     rel="stylesheet"
-    href="styles.css"
+    href="styles.css?v=1045"
   >
 
   <!-- =========================
@@ -25,7 +25,7 @@
   ========================== -->
   <link
     rel="stylesheet"
-    href="assets/css/segments/admin/admin-core.css"
+    href="assets/css/segments/admin/admin-core.css?v=1045"
   >
 
   <!-- =========================
@@ -33,42 +33,42 @@
   ========================== -->
   <link
     rel="stylesheet"
-    href="assets/css/segments/admin/warmup-admin.css"
+    href="assets/css/segments/admin/warmup-admin.css?v=1045"
   >
 
   <link
     rel="stylesheet"
-    href="assets/css/segments/admin/top10-admin.css"
+    href="assets/css/segments/admin/top10-admin.css?v=1045"
   >
 
   <link
     rel="stylesheet"
-    href="assets/css/segments/admin/who-admin.css"
+    href="assets/css/segments/admin/who-admin.css?v=1045"
   >
 
   <link
     rel="stylesheet"
-    href="assets/css/segments/admin/explain-admin.css"
+    href="assets/css/segments/admin/explain-admin.css?v=1045"
   >
 
   <link
     rel="stylesheet"
-    href="assets/css/segments/admin/final-admin.css"
+    href="assets/css/segments/admin/final-admin.css?v=1045"
   >
 
   <link
     rel="stylesheet"
-    href="assets/css/segments/admin/archive-admin.css"
+    href="assets/css/segments/admin/archive-admin.css?v=1045"
   >
 
   <link
     rel="stylesheet"
-    href="assets/css/segments/admin/random-challenge-admin.css"
+    href="assets/css/segments/admin/random-challenge-admin.css?v=1045"
   >
 
   <link
-  rel="stylesheet"
-  href="assets/css/segments/admin/admin-performance.css"
+    rel="stylesheet"
+    href="assets/css/segments/admin/admin-performance.css?v=1045"
   >
 
   <!-- =========================
@@ -76,12 +76,12 @@
   ========================== -->
   <script
     defer
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
   ></script>
 
   <script
     defer
-    src="assets/js/supabase.js"
+    src="assets/js/supabase.js?v=1045"
   ></script>
 
   <!-- =========================
@@ -89,7 +89,7 @@
   ========================== -->
   <script
     defer
-    src="assets/js/database.js"
+    src="assets/js/admin/database.js?v=1045"
   ></script>
 
   <!-- =========================
@@ -97,7 +97,7 @@
   ========================== -->
   <script
     defer
-    src="admin.js"
+    src="assets/js/admin/admin.js?v=1045"
   ></script>
 
   <!-- =========================
@@ -105,37 +105,37 @@
   ========================== -->
   <script
     defer
-    src="assets/js/admin/warmup-admin.js"
+    src="assets/js/admin/warmup-admin.js?v=1045"
   ></script>
 
   <script
     defer
-    src="assets/js/admin/top10-admin.js"
+    src="assets/js/admin/top10-admin.js?v=1045"
   ></script>
 
   <script
     defer
-    src="assets/js/admin/who-admin.js"
+    src="assets/js/admin/who-admin.js?v=1045"
   ></script>
 
   <script
     defer
-    src="assets/js/admin/explain-admin.js"
+    src="assets/js/admin/explain-admin.js?v=1045"
   ></script>
 
   <script
     defer
-    src="assets/js/admin/final-admin.js"
+    src="assets/js/admin/final-admin.js?v=1045"
   ></script>
 
   <script
     defer
-    src="assets/js/admin/archive-admin.js"
+    src="assets/js/admin/archive-admin.js?v=1045"
   ></script>
 
   <script
     defer
-    src="assets/js/admin/random-challenge-admin.js"
+    src="assets/js/admin/random-challenge-admin.js?v=1045"
   ></script>
 
   <!-- =========================
@@ -174,7 +174,7 @@
         </div>
 
         <div class="adminPinSub">
-          أدخل الرقم السري للمتابعة
+          أدخل كود الأدمن للمتابعة
         </div>
 
       </div>
@@ -187,9 +187,9 @@
           type="tel"
           inputmode="numeric"
           pattern="[0-9]*"
-          maxlength="6"
+          maxlength="40"
           autocomplete="one-time-code"
-          placeholder="••••"
+          placeholder="كود الأدمن"
         >
 
         <button
@@ -251,65 +251,98 @@
 
         <div class="adminModelGatePanel">
 
-          <div class="adminModelGateField">
-
-            <label for="modelsList">
-              النماذج المحفوظة
-            </label>
-
-            <select
-              id="modelsList"
-              class="adminSelect"
-            >
-              <option value="">
-                اختر النموذج
-              </option>
-            </select>
-
-          </div>
-
-          <div class="adminModelGateActions">
+          <div
+            id="adminModelGateStart"
+            class="adminModelGateActions"
+          >
 
             <button
               type="button"
               class="adminModelPrimaryBtn"
-              onclick="openSelectedModel()"
+              onclick="showAdminModelLoginMode()"
             >
-              فتح النموذج
+              الدخول للنموذج
+            </button>
+
+            <button
+              type="button"
+              class="adminModelCreateBtn"
+              onclick="showAdminModelCreateMode()"
+            >
+              إنشاء نموذج
             </button>
 
             <button
               type="button"
               class="adminModelSoftBtn"
-              onclick="renameSelectedModel()"
+              onclick="openSupabaseCleanupGatePage()"
             >
-              تعديل الاسم
-            </button>
-
-            <button
-              type="button"
-              class="adminModelDangerBtn"
-              onclick="deleteSelectedModel()"
-            >
-              حذف النموذج
-            </button>
-
-            <button
-              type="button"
-              class="adminModelActionBtn adminSegmentSettingsEntryBtn"
-              onclick="openGlobalSegmentVisibilityPanel()"
-            >
-              إعدادات الفقرات
+              تنظيف Supabase
             </button>
 
           </div>
 
-          <div class="adminModelCreateBox">
+          <div
+            id="adminModelLoginBox"
+            class="hidden"
+          >
+
+            <div class="adminModelGateField">
+
+              <label for="modelsList">
+                النماذج المحفوظة
+              </label>
+
+              <select
+                id="modelsList"
+                class="adminSelect"
+              >
+                <option value="">
+                  اختر النموذج
+                </option>
+              </select>
+
+            </div>
+
+            <div class="adminModelGateActions">
+
+              <button
+                type="button"
+                class="adminModelPrimaryBtn"
+                onclick="openSelectedModel()"
+              >
+                فتح النموذج
+              </button>
+
+              <button
+                type="button"
+                class="adminModelDangerBtn"
+                onclick="deleteSelectedModel()"
+              >
+                حذف النموذج
+              </button>
+
+              <button
+                type="button"
+                class="adminModelSoftBtn"
+                onclick="showAdminModelGateStart()"
+              >
+                رجوع
+              </button>
+
+            </div>
+
+          </div>
+
+          <div
+            id="adminModelCreateBox"
+            class="adminModelCreateBox hidden"
+          >
 
             <div class="adminModelGateField">
 
               <label for="modelName">
-                إنشاء نموذج جديد
+                اسم النموذج
               </label>
 
               <input
@@ -323,13 +356,69 @@
 
             </div>
 
-            <button
-              type="button"
-              class="adminModelCreateBtn"
-              onclick="createModel()"
-            >
-              إنشاء نموذج
-            </button>
+            <div class="adminModelGateField">
+
+              <label for="modelAdminPin">
+                الرقم السري للنموذج
+              </label>
+
+              <input
+                id="modelAdminPin"
+                class="adminInput"
+                type="password"
+                maxlength="40"
+                autocomplete="new-password"
+                placeholder="اكتب رقم سري خاص بالنموذج"
+              >
+
+            </div>
+
+            <div class="adminModelGateField">
+
+              <label for="modelAdminPinConfirm">
+                تأكيد الرقم السري
+              </label>
+
+              <input
+                id="modelAdminPinConfirm"
+                class="adminInput"
+                type="password"
+                maxlength="40"
+                autocomplete="new-password"
+                placeholder="أعد كتابة الرقم السري"
+              >
+
+            </div>
+
+            <div class="adminModelGateField">
+
+              <label>
+                الفقرات المفعلة في البداية
+              </label>
+
+              <div id="newModelSegmentsList"></div>
+
+            </div>
+
+            <div class="adminModelGateActions">
+
+              <button
+                type="button"
+                class="adminModelCreateBtn"
+                onclick="createModel()"
+              >
+                إنشاء النموذج
+              </button>
+
+              <button
+                type="button"
+                class="adminModelSoftBtn"
+                onclick="showAdminModelGateStart()"
+              >
+                رجوع
+              </button>
+
+            </div>
 
           </div>
 
@@ -453,66 +542,21 @@
 
   </div>
 
-
-  <!-- =========================
-       GLOBAL SEGMENT VISIBILITY
-  ========================== -->
-  <div
-    id="globalSegmentVisibilityOverlay"
-    class="globalSegmentVisibilityOverlay hidden"
-  >
-
-    <div class="globalSegmentVisibilityPanel">
-
-      <div class="globalSegmentVisibilityHead">
-
-        <div>
-
-          <h2>
-            إعدادات الفقرات
-          </h2>
-
-          <p>
-            إظهار أو إخفاء الفقرات من اللعبة قبل الدخول للنموذج.
-          </p>
-
-        </div>
-
-        <button
-          type="button"
-          class="globalSegmentCloseBtn"
-          onclick="closeGlobalSegmentVisibilityPanel()"
-        >
-          إغلاق
-        </button>
-
-      </div>
-
-      <div
-        id="globalSegmentVisibilityGrid"
-        class="globalSegmentVisibilityGrid"
-      ></div>
-
-    </div>
-
-  </div>
-
-
   <!-- =========================
        TOAST
   ========================== -->
   <div
-  id="gameToast"
-  class="gameToast hidden"
-  role="status"
-  aria-live="polite"
-  aria-atomic="true"
->
-  <span
-    id="gameToastText"
-    class="gameToastText"
-  ></span>
-</div>
+    id="gameToast"
+    class="gameToast hidden"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    <span
+      id="gameToastText"
+      class="gameToastText"
+    ></span>
+  </div>
 
 
   <!-- =========================
@@ -525,8 +569,6 @@
        ADMIN PIN BOOTSTRAP
   ========================== -->
   <script>
-    const ADMIN_PIN = "9900"
-
     let adminPanelInitPromise = null
     let adminPinBusy = false
 
@@ -659,35 +701,47 @@
         errorBox.innerText = ""
       }
 
-      if (pin !== ADMIN_PIN) {
-        if (errorBox) {
-          errorBox.innerText =
-            "الرقم السري غير صحيح"
-        }
-
-        if (input) {
-          input.value = ""
-          input.focus()
-
-          input.classList.remove(
-            "adminPinShake"
-          )
-
-          void input.offsetWidth
-
-          input.classList.add(
-            "adminPinShake"
-          )
-        }
-
-        return false
-      }
-
       try {
         setAdminPinBusy(true)
 
+        if (
+          typeof window.claimAdminDeviceAccess !==
+          "function"
+        ) {
+          throw new Error(
+            "claimAdminDeviceAccess is not ready"
+          )
+        }
+
+        const accessGranted =
+          await window.claimAdminDeviceAccess(pin)
+
+        if (!accessGranted) {
+          if (errorBox) {
+            errorBox.innerText =
+              "كود الأدمن غير صحيح"
+          }
+
+          if (input) {
+            input.value = ""
+            input.focus()
+
+            input.classList.remove(
+              "adminPinShake"
+            )
+
+            void input.offsetWidth
+
+            input.classList.add(
+              "adminPinShake"
+            )
+          }
+
+          return false
+        }
+
         localStorage.setItem(
-          "admin_pin_ok",
+          "admin_device_ok",
           "1"
         )
 
@@ -698,7 +752,7 @@
 
         if (!initialized) {
           localStorage.removeItem(
-            "admin_pin_ok"
+            "admin_device_ok"
           )
 
           lockAdminPanel()
@@ -714,7 +768,7 @@
         )
 
         localStorage.removeItem(
-          "admin_pin_ok"
+          "admin_device_ok"
         )
 
         lockAdminPanel()
@@ -732,7 +786,7 @@
 
     function logoutAdminPin() {
       localStorage.removeItem(
-        "admin_pin_ok"
+        "admin_device_ok"
       )
 
       location.reload()
@@ -772,7 +826,7 @@
 
         const isUnlocked =
           localStorage.getItem(
-            "admin_pin_ok"
+            "admin_device_ok"
           ) === "1"
 
         if (!isUnlocked) {
@@ -780,8 +834,24 @@
           return
         }
 
-        unlockAdminPanel()
         setAdminPinBusy(true)
+
+        const accessStillValid =
+          typeof window.checkAdminDeviceAccess ===
+          "function" &&
+          await window.checkAdminDeviceAccess()
+
+        if (!accessStillValid) {
+          localStorage.removeItem(
+            "admin_device_ok"
+          )
+
+          lockAdminPanel()
+          input?.focus()
+          return
+        }
+
+        unlockAdminPanel()
 
         try {
           const initialized =
@@ -789,7 +859,7 @@
 
           if (!initialized) {
             localStorage.removeItem(
-              "admin_pin_ok"
+              "admin_device_ok"
             )
 
             lockAdminPanel()

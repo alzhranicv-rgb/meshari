@@ -6,6 +6,7 @@ let presenterExplainActionBusy = false
 let presenterExplainPendingNumber = null
 let presenterExplainTimerInterval = null
 let presenterExplainLastScoreKey = ""
+const PRESENTER_EXPLAIN_TIMER_SECONDS = 60
 
 /* =========================
    STATE HELPERS
@@ -18,17 +19,22 @@ function getPresenterExplainRoot() {
 function getPresenterExplainState() {
   const root = getPresenterExplainRoot()
 
-  return root?.explainState || root || {
-    wordsCount: 4,
+  const fallback = {
+    wordsCount: 5,
     words: [],
     usedNumbers: [],
     currentNumber: null,
     currentWord: "",
     currentTeam: null,
+    selectedTeam: null,
     wordVisible: true,
     timerVisible: false,
-    timeLeft: 45,
-    timerEndsAt: 0,
+    timeLeft: PRESENTER_EXPLAIN_TIMER_SECONDS,
+    timerSync: {
+      startedAt: 0,
+      endsAt: 0,
+      duration: 0
+    },
     revealLock: false,
     answerResult: null,
     scores: {
@@ -40,7 +46,18 @@ function getPresenterExplainState() {
       B: 0
     }
   }
+
+  if (root?.explainState) {
+    return root.explainState
+  }
+
+  if (root && Object.keys(root).length) {
+    return root
+  }
+
+  return fallback
 }
+
 
 function getPresenterExplainWordsCount() {
   const root = getPresenterExplainRoot()
@@ -51,10 +68,13 @@ function getPresenterExplainWordsCount() {
     root?.wordsCount ||
     presenterLiveState?.explainWordsCount ||
     localStorage.getItem("explain_words_count") ||
-    4
+    5
   )
 
-  return count === 6 ? 6 : 4
+  if (count === 9) return 9
+  if (count === 7) return 7
+
+  return 5
 }
 
 function getPresenterExplainWords() {
@@ -94,8 +114,10 @@ function getPresenterExplainActiveTeam() {
   return (
     explain?.currentTeam ||
     explain?.activeTeam ||
+    explain?.selectedTeam ||
     root?.currentTeam ||
     root?.activeTeam ||
+    root?.selectedTeam ||
     presenterSelectedTeam ||
     null
   )
@@ -150,7 +172,7 @@ function getPresenterExplainSavedTimeLeft() {
     Number(
       explain?.timeLeft ??
       root?.timeLeft ??
-      45
+      PRESENTER_EXPLAIN_TIMER_SECONDS
     )
   )
 }
@@ -191,6 +213,39 @@ function getPresenterExplainScoreKey() {
   const word = getPresenterExplainCurrentWord() || ""
 
   return `${number}_${team}_${word}`
+}
+
+function getPresenterExplainDoubleState() {
+  const root = getPresenterExplainRoot()
+  const explain = getPresenterExplainState()
+
+  return (
+    root?.explainDoubleState ||
+    explain?.explainDoubleState ||
+    {
+      used: {
+        A: false,
+        B: false
+      },
+      activeTeam: null
+    }
+  )
+}
+
+function isPresenterExplainDoubleUsed(team) {
+  if (team !== "A" && team !== "B") {
+    return false
+  }
+
+  return !!getPresenterExplainDoubleState()?.used?.[team]
+}
+
+function isPresenterExplainDoubleActive(team) {
+  if (team !== "A" && team !== "B") {
+    return false
+  }
+
+  return getPresenterExplainDoubleState()?.activeTeam === team
 }
 
 /* =========================
@@ -286,6 +341,39 @@ function stopPresenterExplainTimerWatcher() {
   )
 
   presenterExplainTimerInterval = null
+}
+
+async function sendPresenterExplainCommandSafe(
+  action,
+  payload = {}
+) {
+  if (typeof sendCommand !== "function") {
+    return false
+  }
+
+  try {
+    const result = await Promise.race([
+      sendCommand(action, {
+        ...payload,
+        segment: "explain"
+      }),
+
+      new Promise(resolve => {
+        setTimeout(() => {
+          resolve(false)
+        }, 2500)
+      })
+    ])
+
+    return result !== false
+  } catch (error) {
+    console.log(
+      "PRESENTER EXPLAIN COMMAND ERROR:",
+      error
+    )
+
+    return false
+  }
 }
 
 /* =========================
@@ -527,6 +615,15 @@ async function renderExplain() {
         class="presenterExplainActions"
         aria-label="أزرار التحكم"
       >
+
+              <button
+          type="button"
+          id="presenterExplainDoubleBtn"
+          class="presenterBtn gray presenterExplainDoubleBtn"
+          onclick="runPresenterExplainAction('double')"
+        >
+          دوببلا
+        </button>
         <button
           type="button"
           id="presenterExplainStartTimerBtn"
@@ -658,8 +755,13 @@ async function openExplainPresenterNumber(
         activeTeam,
         wordVisible: true,
         timerVisible: false,
-        timeLeft: 45,
+        timeLeft: PRESENTER_EXPLAIN_TIMER_SECONDS,
         timerEndsAt: 0,
+        timerSync: {
+          startedAt: 0,
+          endsAt: 0,
+          duration: 0
+        },
         revealLock: false,
         answerResult: null
       }
@@ -679,7 +781,8 @@ async function openExplainPresenterNumber(
 
   refreshPresenterExplainFromState()
 
-  const sent = await sendCommand(
+const sent =
+  await sendPresenterExplainCommandSafe(
     "openNumber",
     {
       number: safeNumber,
@@ -737,19 +840,47 @@ async function runPresenterExplainAction(action) {
   const wordVisible =
     getPresenterExplainWordVisible()
 
-  if (!currentNumber) {
-    showToast("اختر رقمًا أولاً")
-    return
-  }
+  const doubleUsed =
+    isPresenterExplainDoubleUsed(activeTeam)
 
-  if (!activeTeam) {
-    showToast("اختر الفريق أولاً")
-    return
-  }
+  const doubleActive =
+    isPresenterExplainDoubleActive(activeTeam)
 
-  if (revealLock) {
-    showToast("انتظر نهاية النتيجة")
-    return
+  if (action === "double") {
+    if (!activeTeam) {
+      showToast("اختر الفريق أولاً")
+      return
+    }
+
+    if (currentNumber || revealLock) {
+      showToast("فعّل دوببلا قبل اختيار الرقم")
+      return
+    }
+
+    if (doubleActive) {
+      showToast("دوببلا مفعّل")
+      return
+    }
+
+    if (doubleUsed) {
+      showToast("تم استخدام دوببلا لهذا الفريق")
+      return
+    }
+  } else {
+    if (!currentNumber) {
+      showToast("اختر رقمًا أولاً")
+      return
+    }
+
+    if (!activeTeam) {
+      showToast("اختر الفريق أولاً")
+      return
+    }
+
+    if (revealLock) {
+      showToast("انتظر نهاية النتيجة")
+      return
+    }
   }
 
   if (
@@ -782,12 +913,13 @@ async function runPresenterExplainAction(action) {
   presenterExplainActionBusy = true
   updatePresenterExplainActionButtons()
 
-  /*
-    تحديث محلي سريع للمؤقت.
-  */
   if (action === "startTimer") {
+    const startedAt =
+      Date.now()
+
     const endsAt =
-      Date.now() + 45 * 1000
+      startedAt +
+      PRESENTER_EXPLAIN_TIMER_SECONDS * 1000
 
     const root =
       getPresenterExplainRoot()
@@ -803,7 +935,7 @@ async function runPresenterExplainAction(action) {
 
         timerVisible: true,
         timerEndsAt: endsAt,
-        timeLeft: 45,
+        timeLeft: PRESENTER_EXPLAIN_TIMER_SECONDS,
 
         explainState: {
           ...explain,
@@ -811,10 +943,13 @@ async function runPresenterExplainAction(action) {
           timerVisible: true,
           timerEndsAt: endsAt,
           timerSync: {
+            startedAt,
             endsAt,
-            running: true
+            duration:
+              PRESENTER_EXPLAIN_TIMER_SECONDS
           },
-          timeLeft: 45
+          timeLeft:
+            PRESENTER_EXPLAIN_TIMER_SECONDS
         }
       }
     }
@@ -822,9 +957,6 @@ async function runPresenterExplainAction(action) {
     updatePresenterExplainTimer()
   }
 
-  /*
-    تغيير نص الزر فورًا.
-  */
   if (action === "toggleWordVisible") {
     const root =
       getPresenterExplainRoot()
@@ -848,10 +980,47 @@ async function runPresenterExplainAction(action) {
     }
   }
 
-  const sent = await sendCommand(
+  if (action === "double") {
+    const root =
+      getPresenterExplainRoot()
+
+    const explain =
+      getPresenterExplainState()
+
+    const doubleState =
+      getPresenterExplainDoubleState()
+
+    presenterLiveState = {
+      ...(presenterLiveState || {}),
+
+      explain: {
+        ...root,
+
+        currentTeam: activeTeam,
+
+        explainDoubleState: {
+          used: {
+            A: !!doubleState?.used?.A,
+            B: !!doubleState?.used?.B,
+            [activeTeam]: true
+          },
+          activeTeam
+        },
+
+        explainState: {
+          ...explain,
+          currentTeam: activeTeam,
+          activeTeam
+        }
+      }
+    }
+  }
+
+const sent =
+  await sendPresenterExplainCommandSafe(
     action,
     {
-      number: currentNumber,
+      number: currentNumber || null,
       team: activeTeam,
       scoreKey:
         action === "correct" ||
@@ -919,8 +1088,19 @@ function updatePresenterExplainActionButtons() {
   const wordVisible =
     getPresenterExplainWordVisible()
 
+  const doubleUsed =
+    isPresenterExplainDoubleUsed(activeTeam)
+
+  const doubleActive =
+    isPresenterExplainDoubleActive(activeTeam)
+
   const busy =
     presenterExplainActionBusy
+
+  const doubleButton =
+    document.getElementById(
+      "presenterExplainDoubleBtn"
+    )
 
   const timerButton =
     document.getElementById(
@@ -947,6 +1127,23 @@ function updatePresenterExplainActionButtons() {
     !currentNumber ||
     !activeTeam ||
     revealLock
+
+  if (doubleButton) {
+    doubleButton.disabled =
+      busy ||
+      !activeTeam ||
+      !!currentNumber ||
+      revealLock ||
+      doubleUsed ||
+      doubleActive
+
+    doubleButton.innerText =
+      doubleActive
+        ? "دوببلا مفعّل"
+        : doubleUsed
+          ? "تم استخدام دوببلا"
+          : "دوببلا"
+  }
 
   if (timerButton) {
     timerButton.disabled =
@@ -1007,6 +1204,12 @@ function refreshPresenterExplainFromState() {
 
   const activeTeam =
     getPresenterExplainActiveTeam()
+
+      const doubleUsed =
+    isPresenterExplainDoubleUsed(activeTeam)
+
+  const doubleActive =
+    isPresenterExplainDoubleActive(activeTeam)
 
   const revealLock =
     getPresenterExplainRevealLock()
@@ -1098,6 +1301,9 @@ function refreshPresenterExplainFromState() {
     if (!activeTeam) {
       statusBox.innerText =
         "اختر الفريق أولاً"
+    } else if (doubleActive) {
+      statusBox.innerText =
+        "دوببلا مفعّل"
     } else if (revealLock) {
       statusBox.innerText =
         "جارٍ تسجيل النتيجة"
@@ -1330,27 +1536,163 @@ async function renderPresenterReaderExplain() {
   }
 
   panel.innerHTML = `
-    <section class="readerExplainPage">
-      <header class="readerExplainHead">
-        <div>
-          <span>دليل الأسئلة</span>
-          <h2>اشرح الكلمة</h2>
+    <section
+      class="presenterExplainControlView"
+      data-presenter-segment="explain"
+    >
+
+      <header class="presenterExplainControlHeader">
+
+        <div class="presenterExplainHeaderTeams">
+          ${teamButtons()}
         </div>
 
-        <strong>${rows.length} كلمات</strong>
+        <div class="presenterExplainHeaderInfo">
+
+          <span
+            id="presenterExplainStatusText"
+            class="presenterExplainStatusText"
+          >
+            —
+          </span>
+
+          <strong
+            id="presenterExplainCurrentBadge"
+            class="presenterExplainCurrentBadge"
+          >
+            ${
+              currentNumber
+                ? `رقم ${currentNumber}`
+                : "—"
+            }
+          </strong>
+
+          <strong
+            id="presenterExplainTimerText"
+            class="presenterExplainTimerBox ${
+              getPresenterExplainTimerVisible()
+                ? ""
+                : "hidden"
+            }"
+          >
+            ${
+              getPresenterExplainTimerVisible()
+                ? getPresenterExplainRemainingTime()
+                : "—"
+            }
+          </strong>
+
+        </div>
+
       </header>
 
-      <div class="readerSimpleGrid readerExplainGrid">
-        ${rows.map(row => readerMiniCard({
-          id: readerId([
-            "explain",
-            row.number
-          ]),
-          number: row.number,
-          title: `الكلمة رقم ${row.number}`,
-          answer: row.word
-        })).join("")}
-      </div>
+      <main class="presenterExplainControlMain">
+
+        <section class="presenterExplainNumbersPanel">
+
+          <header class="presenterExplainPanelTitle">
+            <h2>الأرقام</h2>
+
+            <span class="presenterExplainCountBadge">
+              ${count}
+            </span>
+          </header>
+
+          <div
+            id="presenterExplainNumbersGrid"
+            class="presenterExplainNumbersGrid"
+            style="grid-template-columns:repeat(${count},minmax(0,1fr));"
+          >
+            ${buildPresenterExplainNumbersHtml()}
+          </div>
+
+        </section>
+
+        <section class="presenterExplainWordPanel">
+
+          <header class="presenterExplainPanelTitle">
+            <h2>الكلمة</h2>
+
+            <span
+              id="presenterExplainWordState"
+              class="presenterExplainWordState"
+            ></span>
+          </header>
+
+          <div
+            id="presenterExplainWordText"
+            class="presenterExplainWordBox ${
+              explain.answerResult === "correct"
+                ? "answerCorrect"
+                : ""
+            } ${
+              explain.answerResult === "wrong"
+                ? "answerWrong"
+                : ""
+            }"
+          >
+            ${
+              currentNumber
+                ? escapePresenterExplainHtml(
+                    currentWord || "—"
+                  )
+                : "—"
+            }
+          </div>
+
+        </section>
+
+      </main>
+
+      <footer class="presenterExplainCommandBar">
+
+        <button
+          type="button"
+          id="presenterExplainDoubleBtn"
+          class="presenterBtn gray presenterExplainDoubleBtn"
+          onclick="runPresenterExplainAction('double')"
+        >
+          دوببلا
+        </button>
+
+        <button
+          type="button"
+          id="presenterExplainStartTimerBtn"
+          class="presenterBtn presenterExplainStartTimerBtn"
+          onclick="runPresenterExplainAction('startTimer')"
+        >
+          المؤقت
+        </button>
+
+        <button
+          type="button"
+          id="presenterExplainToggleWordBtn"
+          class="presenterBtn blue presenterExplainToggleWordBtn"
+          onclick="runPresenterExplainAction('toggleWordVisible')"
+        >
+          الكلمة
+        </button>
+
+        <button
+          type="button"
+          id="presenterExplainWrongBtn"
+          class="presenterBtn red presenterExplainWrongBtn"
+          onclick="runPresenterExplainAction('wrong')"
+        >
+          خطأ
+        </button>
+
+        <button
+          type="button"
+          id="presenterExplainCorrectBtn"
+          class="presenterBtn green presenterExplainCorrectBtn"
+          onclick="runPresenterExplainAction('correct')"
+        >
+          صح
+        </button>
+
+      </footer>
+
     </section>
   `
 }

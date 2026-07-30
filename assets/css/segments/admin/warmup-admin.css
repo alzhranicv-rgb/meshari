@@ -1,13 +1,11 @@
 /* =========================================================
    WARMUP ADMIN / إدارة فقرة التسخين
-   CLEAN PROFESSIONAL DESIGN
-
-   File:
-   assets/css/segments/admin/warmup-admin.css
+   CLEAN FINAL
+   File: assets/css/segments/admin/warmup-admin.css
 ========================================================= */
 
 /* =========================
-   1) WARMUP ROOT
+   1) ROOT
 ========================= */
 
 .warmupAdminShell{
@@ -28,47 +26,23 @@
 
 .warmupAdminShell
 .adminEditorTopBar{
-  position:sticky;
-  top:112px;
-  z-index:20;
+  border-color:rgba(254,127,45,.24);
 
-  margin:0;
-
-  border-color:
-    rgba(254,127,45,.24);
-
-  background:
-    rgba(255,255,255,.97);
+  background:var(--admin-surface);
 
   box-shadow:
-    0 14px 34px
+    0 12px 30px
     rgba(35,61,77,.08);
 }
 
 .warmupAdminShell
 .adminSectionTitle{
+  color:var(--admin-secondary);
+
   display:flex;
   align-items:center;
-  gap:11px;
-}
 
-.warmupAdminShell
-.adminSectionTitle::before{
-  content:"";
-
-  width:12px;
-  height:38px;
-
-  flex:0 0 auto;
-
-  border-radius:999px;
-
-  background:
-    var(--admin-primary);
-
-  box-shadow:
-    0 7px 18px
-    rgba(254,127,45,.24);
+  gap:10px;
 }
 
 .warmupAdminShell
@@ -113,13 +87,11 @@
 
   min-width:0;
 
-  scroll-margin-top:220px;
+  scroll-margin-top:24px;
 
-  border-color:
-    var(--admin-line);
+  border-color:var(--admin-line);
 
-  background:
-    var(--admin-surface);
+  background:var(--admin-surface);
 }
 
 .warmupCategoryOnePageCard::before{
@@ -136,8 +108,7 @@
 
   opacity:.42;
 
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 
   transition:
     opacity .18s var(--admin-ease),
@@ -151,18 +122,15 @@
 }
 
 .warmupCategoryOnePageCard.isDone::before{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 }
 
 .warmupCategoryOnePageCard.isMissing::before{
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 }
 
 .warmupCategoryOnePageCard[open]{
-  border-color:
-    rgba(254,127,45,.38);
+  border-color:rgba(254,127,45,.38);
 
   box-shadow:
     0 22px 50px
@@ -176,9 +144,7 @@
 .warmupCategoryOnePageCard > summary{
   min-height:86px;
 
-  padding:
-    15px
-    20px;
+  padding:15px 20px;
 
   background:
     linear-gradient(
@@ -189,8 +155,7 @@
 }
 
 .warmupCategoryOnePageCard > summary:hover{
-  background:
-    var(--admin-primary-soft);
+  background:var(--admin-primary-soft);
 }
 
 .warmupCategoryOnePageCard[open] > summary{
@@ -206,8 +171,11 @@
 
 .warmupCategoryOnePageCard
 .adminEditItemTitle{
+  min-width:0;
+
   display:flex;
   align-items:center;
+
   gap:12px;
 }
 
@@ -220,47 +188,45 @@
 
   flex:0 0 auto;
 
-  border:
-    1px solid
-    rgba(254,127,45,.26);
+  border:1px solid rgba(254,127,45,.26);
 
   border-radius:14px;
 
-  color:
-    var(--admin-primary);
+  color:var(--admin-primary);
 
-  background:
-    var(--admin-primary-soft);
+  background:var(--admin-primary-soft);
 
   display:grid;
   place-items:center;
 
-  font-family:
-    "HanakaDisplay",
-    sans-serif;
+  font-family:"HanakaDisplay",sans-serif;
 
   font-size:1.3rem;
+  line-height:1;
 }
 
 .warmupCategoryOnePageCard.isDone
 .adminEditItemTitle::before{
-  color:
-    var(--admin-green);
+  color:var(--admin-green);
 
-  border-color:
-    rgba(0,127,0,.20);
+  border-color:rgba(0,127,0,.20);
 
-  background:
-    var(--admin-green-soft);
+  background:var(--admin-green-soft);
 }
 
 .warmupCategoryOnePageCard
 .adminEditItemTitle strong{
-  color:
-    var(--admin-secondary);
+  min-width:0;
 
-  font-size:
-    clamp(1.05rem,2vw,1.25rem);
+  color:var(--admin-secondary);
+
+  font-size:clamp(1.05rem,2vw,1.25rem);
+  line-height:1.3;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 
 .warmupCategoryOnePageCard
@@ -275,8 +241,6 @@
   min-width:62px;
 }
 
-/* فتح وإغلاق */
-
 .warmupCategoryOnePageCard > summary::after{
   content:"⌄";
 
@@ -285,37 +249,34 @@
 
   flex:0 0 auto;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
   border-radius:11px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   display:grid;
   place-items:center;
 
   font-size:1.05rem;
+  line-height:1;
 
   transition:
     transform .18s var(--admin-ease),
     background-color .18s var(--admin-ease),
-    color .18s var(--admin-ease);
+    color .18s var(--admin-ease),
+    border-color .18s var(--admin-ease);
 }
 
 .warmupCategoryOnePageCard[open]
 > summary::after{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-secondary);
+  border-color:var(--admin-secondary);
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
   transform:rotate(180deg);
 }
@@ -326,14 +287,12 @@
 
 .warmupCategoryOnePageCard
 > .adminEditItemBody{
-  padding:
-    clamp(16px,2vw,22px);
+  padding:clamp(16px,2vw,22px);
 
   display:grid;
   gap:16px;
 
-  background:
-    #FFFFFF;
+  background:#FFFFFF;
 }
 
 /* =========================
@@ -345,14 +304,11 @@
 > .adminField:first-child{
   position:relative;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   padding:14px;
 }
@@ -366,10 +322,10 @@
 
   margin-bottom:8px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:.9rem;
+  line-height:1.3;
 }
 
 .warmupCategoryOnePageCard
@@ -377,14 +333,11 @@
 > .adminField:first-child input{
   min-height:58px;
 
-  border-color:
-    rgba(35,61,77,.18);
+  border-color:rgba(35,61,77,.18);
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    #FFFFFF;
+  background:#FFFFFF;
 
   font-size:1.08rem;
 }
@@ -392,18 +345,15 @@
 .warmupCategoryOnePageCard
 > .adminEditItemBody
 > .adminField:first-child input:focus{
-  border-color:
-    var(--admin-primary);
+  border-color:var(--admin-primary);
 }
 
 .warmupCategoryOnePageCard
 > .adminEditItemBody
 > .adminField:first-child.adminMissingField{
-  border-color:
-    rgba(127,0,0,.22);
+  border-color:rgba(127,0,0,.22);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 }
 
 /* =========================
@@ -434,14 +384,11 @@
   min-width:0;
   min-height:100%;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-surface);
+  background:var(--admin-surface);
 
   box-shadow:
     0 10px 24px
@@ -451,6 +398,7 @@
 
   display:flex;
   flex-direction:column;
+
   gap:12px;
 
   overflow:hidden;
@@ -462,11 +410,9 @@
 }
 
 .warmupQuestionOnePageCard:hover{
-  transform:
-    translateY(-2px);
+  transform:translateY(-2px);
 
-  border-color:
-    rgba(254,127,45,.34);
+  border-color:rgba(254,127,45,.34);
 
   box-shadow:
     0 16px 32px
@@ -474,13 +420,11 @@
 }
 
 .warmupQuestionOnePageCard.isDone{
-  border-color:
-    rgba(0,127,0,.26);
+  border-color:rgba(0,127,0,.26);
 }
 
 .warmupQuestionOnePageCard.isMissing{
-  border-color:
-    rgba(127,0,0,.18);
+  border-color:rgba(127,0,0,.18);
 }
 
 .warmupQuestionOnePageCard::after{
@@ -493,15 +437,13 @@
 
   height:4px;
 
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 
   opacity:.65;
 }
 
 .warmupQuestionOnePageCard.isDone::after{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 
   opacity:1;
 }
@@ -532,8 +474,7 @@
 
   color:#FFFFFF;
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
   display:grid;
   place-items:center;
@@ -544,6 +485,7 @@
     sans-serif;
 
   font-size:1.15rem;
+  line-height:1;
 
   box-shadow:
     0 8px 18px
@@ -552,52 +494,43 @@
 
 .warmupQuestionOnePageCard.isDone
 .adminEditSubHead strong{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 }
 
 .warmupQuestionOnePageCard
 .adminEditSubHead span{
+  border:1px solid var(--admin-line);
+
   border-radius:999px;
 
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
-  background:
-    var(--admin-soft);
-
-  border:
-    1px solid var(--admin-line);
+  background:var(--admin-soft);
 
   padding:6px 10px;
 
   font-size:.78rem;
+  line-height:1.2;
 
   white-space:nowrap;
 }
 
 .warmupQuestionOnePageCard.isDone
 .adminEditSubHead span{
-  color:
-    var(--admin-green);
+  color:var(--admin-green);
 
-  border-color:
-    rgba(0,127,0,.18);
+  border-color:rgba(0,127,0,.18);
 
-  background:
-    var(--admin-green-soft);
+  background:var(--admin-green-soft);
 }
 
 .warmupQuestionOnePageCard.isMissing
 .adminEditSubHead span{
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 
-  border-color:
-    rgba(127,0,0,.14);
+  border-color:rgba(127,0,0,.14);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 }
 
 /* =========================
@@ -615,10 +548,10 @@
 
   margin-bottom:7px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:.84rem;
+  line-height:1.3;
 }
 
 .warmupQuestionOnePageCard
@@ -647,18 +580,15 @@
 .warmupQuestionOnePageCard
 .adminField.adminMissingField
 :is(input,textarea){
-  border-color:
-    rgba(127,0,0,.30);
+  border-color:rgba(127,0,0,.30);
 
-  background:
-    #FFF8F8;
+  background:#FFF8F8;
 }
 
 .warmupQuestionOnePageCard
 .adminField:not(.adminMissingField)
 :is(input,textarea){
-  border-color:
-    rgba(0,127,0,.18);
+  border-color:rgba(0,127,0,.18);
 }
 
 /* =========================
@@ -672,17 +602,13 @@
 
   margin-top:auto;
 
-  border:
-    1px solid
-    rgba(127,0,0,.16);
+  border:1px solid rgba(127,0,0,.16);
 
   border-radius:12px;
 
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 
   padding:9px 13px;
 
@@ -691,17 +617,16 @@
   justify-content:center;
 
   font-size:.88rem;
+  line-height:1.15;
 }
 
 .warmupQuestionOnePageCard
 .adminDeleteMiniBtn:hover{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-red);
+  border-color:var(--admin-red);
 
-  background:
-    var(--admin-red);
+  background:var(--admin-red);
 }
 
 /* =========================
@@ -712,11 +637,9 @@
 .adminEmptyState{
   min-height:260px;
 
-  border-color:
-    rgba(254,127,45,.26);
+  border-color:rgba(254,127,45,.26);
 
-  background:
-    var(--admin-primary-soft);
+  background:var(--admin-primary-soft);
 }
 
 /* =========================
@@ -742,115 +665,87 @@
 }
 
 /* =========================
-   15) LARGE SCREENS
+   15) IPAD LANDSCAPE
 ========================= */
 
-@media (min-width:1500px){
+@media (orientation:landscape) and (min-width:768px) and (max-width:1220px){
+
+  .warmupAdminShell{
+    gap:12px;
+  }
 
   .warmupOnePageGrid{
-    gap:16px;
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
+    gap:10px;
   }
 
-  .warmupQuestionsOnePageGrid{
-    gap:14px;
+  .warmupOnePageGrid.hasOpenCard{
+    grid-template-columns:1fr;
   }
 
-  .warmupQuestionOnePageCard{
-    padding:16px;
+  .warmupCategoryOnePageCard > summary{
+    min-height:78px;
+
+    padding:12px 14px;
   }
 
-  .warmupQuestionOnePageCard textarea{
-    min-height:150px;
+  .warmupCategoryOnePageCard
+  .adminEditItemTitle::before{
+    width:38px;
+    height:38px;
+
+    border-radius:12px;
+
+    font-size:1.16rem;
   }
-}
 
-/* =========================
-   16) LAPTOP
-========================= */
+  .warmupCategoryOnePageCard
+  .adminEditItemTitle strong{
+    font-size:1.02rem;
+  }
 
-@media (max-width:1180px){
+  .warmupCategoryOnePageCard
+  > .adminEditItemBody{
+    padding:14px;
 
-  .warmupAdminShell
-  .adminEditorTopBar{
-    top:148px;
+    gap:12px;
   }
 
   .warmupQuestionsOnePageGrid{
     grid-template-columns:
       repeat(3,minmax(0,1fr));
+
+    gap:10px;
   }
 
   .warmupQuestionOnePageCard{
     padding:12px;
-  }
-}
 
-/* =========================
-   17) TABLET
-========================= */
-
-@media (max-width:900px){
-
-  .warmupAdminShell
-  .adminEditorTopBar{
-    position:relative;
-    top:auto;
-  }
-
-  .warmupOnePageGrid{
-    grid-template-columns:1fr;
-  }
-
-  .warmupQuestionsOnePageGrid{
-    grid-template-columns:
-      repeat(3,minmax(0,1fr));
-  }
-
-  .warmupCategoryOnePageCard{
-    scroll-margin-top:24px;
-  }
-}
-
-/* =========================
-   18) SMALL TABLET
-========================= */
-
-@media (max-width:760px){
-
-  .warmupQuestionsOnePageGrid{
-    grid-template-columns:1fr;
-  }
-
-  .warmupQuestionOnePageCard{
-    display:grid;
-
-    grid-template-columns:
-      minmax(0,1.35fr)
-      minmax(180px,.65fr);
-
-    align-items:start;
+    gap:10px;
   }
 
   .warmupQuestionOnePageCard
-  .adminEditSubHead{
-    grid-column:1 / -1;
-  }
+  .adminEditSubHead strong{
+    width:38px;
+    height:38px;
 
-  .warmupQuestionOnePageCard
-  .adminDeleteMiniBtn{
-    grid-column:1 / -1;
+    border-radius:12px;
+
+    font-size:1.05rem;
   }
 
   .warmupQuestionOnePageCard textarea{
-    min-height:110px;
+    min-height:112px;
   }
 }
 
 /* =========================
-   19) MOBILE
+   16) IPHONE PORTRAIT
 ========================= */
 
-@media (max-width:620px){
+@media (orientation:portrait) and (max-width:620px){
 
   .warmupAdminShell{
     gap:10px;
@@ -877,7 +772,8 @@
     display:grid;
 
     grid-template-columns:
-      1fr 1fr;
+      1fr
+      1fr;
   }
 
   .warmupAdminShell
@@ -889,11 +785,16 @@
   }
 
   .warmupOnePageGrid{
+    grid-template-columns:1fr;
+
     gap:10px;
   }
 
-  .warmupCategoryOnePageCard
-  > summary{
+  .warmupCategoryOnePageCard{
+    scroll-margin-top:18px;
+  }
+
+  .warmupCategoryOnePageCard > summary{
     min-height:78px;
 
     padding:12px 14px;
@@ -908,6 +809,15 @@
     height:38px;
 
     border-radius:12px;
+
+    font-size:1.15rem;
+  }
+
+  .warmupCategoryOnePageCard
+  .adminEditItemTitle strong{
+    font-size:1rem;
+
+    white-space:normal;
   }
 
   .warmupCategoryOnePageCard
@@ -926,6 +836,7 @@
   .warmupCategoryOnePageCard
   > .adminEditItemBody{
     padding:12px;
+
     gap:12px;
   }
 
@@ -935,10 +846,18 @@
     padding:11px;
   }
 
+  .warmupQuestionsOnePageGrid{
+    grid-template-columns:1fr;
+
+    gap:10px;
+  }
+
   .warmupQuestionOnePageCard{
+    padding:12px;
+
     display:flex;
 
-    padding:12px;
+    gap:10px;
   }
 
   .warmupQuestionOnePageCard textarea{
@@ -949,65 +868,19 @@
   .adminDeleteMiniBtn{
     grid-column:auto;
   }
-}
-
-/* =========================
-   20) SMALL MOBILE
-========================= */
-
-@media (max-width:420px){
 
   .warmupCategoryOnePageCard
-  > summary{
-    display:grid;
-
-    grid-template-columns:
-      minmax(0,1fr)
-      auto;
-
-    gap:10px;
-  }
-
+  .adminEditItemStatus,
   .warmupCategoryOnePageCard
-  .adminEditItemTitle{
-    min-width:0;
-  }
-
+  .adminEditProgressPill,
   .warmupCategoryOnePageCard
-  .adminEditItemMeta{
-    grid-column:1 / -1;
-
-    width:100%;
-
-    display:grid;
-
-    grid-template-columns:
-      1fr 1fr;
-
-    order:3;
-  }
-
-  .warmupCategoryOnePageCard
-  > summary::after{
-    grid-column:2;
-    grid-row:1;
-  }
-
-  .warmupCategoryOnePageCard
-  .adminEditStatusPill,
-  .warmupCategoryOnePageCard
-  .adminEditProgressPill{
-    width:100%;
-  }
-
-  .warmupQuestionOnePageCard
-  .adminEditSubHead{
-    align-items:center;
+  .adminEditStatusPill{
+    white-space:nowrap;
   }
 }
 
 /* =========================
-   21) FALLBACK FOR :has
+   17) FALLBACK FOR :has
 ========================= */
 
 @supports not selector(:has(*)){
@@ -1015,6 +888,7 @@
   .warmupQuestionOnePageCard
   .adminField{
     position:relative;
+
     padding-top:24px;
   }
 

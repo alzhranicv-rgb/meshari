@@ -1,36 +1,36 @@
 /* =========================
    GAME STATE MANAGER
-   حفظ موحد + منع التكرار + مزامنة مخففة
+   حفظ موحد محلي فقط
 ========================= */
 
-const GAME_STATE_STORAGE_KEY = "hanaka_game_state_v1"
-const GAME_STATE_LAST_SYNC_HASH_KEY = "hanaka_game_state_last_sync_hash_v1"
+const GAME_STATE_STORAGE_KEY =
+  "hanaka_game_state_v1"
 
 const GAME_STATE_SAVE_DELAY = 120
-const GAME_STATE_SYNC_DELAY = 220
 
 let unifiedStateSaveTimer = null
-let unifiedStateSyncTimer = null
-
-let unifiedStateSyncInProgress = false
-let unifiedStateSyncQueued = false
-
-let lastUnifiedStateHash =
-  localStorage.getItem(GAME_STATE_LAST_SYNC_HASH_KEY) || ""
 
 /* =========================
    Safe Helpers
 ========================= */
 
-function getSafeLocalJson(key, fallback = null) {
+function getSafeLocalJson(
+  key,
+  fallback = null
+) {
   try {
-    const raw = localStorage.getItem(key)
+    const raw =
+      localStorage.getItem(key)
 
     if (!raw) return fallback
 
     return JSON.parse(raw) ?? fallback
   } catch (error) {
-    console.log(`GAME STATE JSON ERROR [${key}]:`, error)
+    console.log(
+      `GAME STATE JSON ERROR [${key}]:`,
+      error
+    )
+
     return fallback
   }
 }
@@ -75,6 +75,40 @@ function getUnifiedMainScore(team) {
   )
 }
 
+function normalizeUnifiedSegmentKey(key) {
+  key = String(key || "")
+
+  if (key === "final_round1") return "finalRound1"
+  if (key === "final_round2") return "finalRound2"
+  if (key === "final_round3") return "finalRound3"
+  if (key === "final_round4") return "finalRound4"
+
+  if (
+    key === "random_challenge" ||
+    key === "randomchallenge"
+  ) {
+    return "randomChallenge"
+  }
+
+  if (
+    key === "top_10" ||
+    key === "topTen"
+  ) {
+    return "top10"
+  }
+
+  if (
+    key === "auction" ||
+    key === "fatbla" ||
+    key === "fitbala" ||
+    key === "فتبلة"
+  ) {
+    return ""
+  }
+
+  return key
+}
+
 /* =========================
    Stable Hash
 ========================= */
@@ -91,7 +125,9 @@ function sortUnifiedObject(value) {
     return Object.keys(value)
       .sort()
       .reduce((result, key) => {
-        result[key] = sortUnifiedObject(value[key])
+        result[key] =
+          sortUnifiedObject(value[key])
+
         return result
       }, {})
   }
@@ -111,7 +147,11 @@ function createUnifiedStateHash(state) {
       sortUnifiedObject(cleanState)
     )
   } catch (error) {
-    console.log("GAME STATE HASH ERROR:", error)
+    console.log(
+      "GAME STATE HASH ERROR:",
+      error
+    )
+
     return ""
   }
 }
@@ -121,25 +161,33 @@ function createUnifiedStateHash(state) {
 ========================= */
 
 function getUnifiedGameState() {
+  const activeSegment =
+    normalizeUnifiedSegmentKey(
+      localStorage.getItem("active_segment") ||
+      null
+    )
+
   const finalState =
-    getSafeLocalJson("final_state_v3", null)
+    getSafeLocalJson(
+      "final_state_v3",
+      null
+    )
 
   return {
-    version: 2,
+    version: 3,
 
     sessionId:
       localStorage.getItem("game_session_id") ||
       null,
 
-    activeSegment:
-      localStorage.getItem("active_segment") ||
-      null,
+    activeSegment,
 
     activeTeam:
       localStorage.getItem("active_team_v1") ||
       null,
 
-    model: getUnifiedModelId(),
+    model:
+      getUnifiedModelId(),
 
     modelName:
       localStorage.getItem("game_model_name") ||
@@ -155,6 +203,9 @@ function getUnifiedGameState() {
       A: getUnifiedMainScore("A"),
       B: getUnifiedMainScore("B")
     },
+
+    currentSegmentScores:
+      window.currentSegmentScores || null,
 
     display: {
       controlsHidden:
@@ -182,13 +233,9 @@ function getUnifiedGameState() {
           null
         ),
 
-      auction:
+      letterli:
         getSafeLocalJson(
-          "auction_state_v2",
-          null
-        ) ||
-        getSafeLocalJson(
-          "auction_state_v1",
+          "letterli_state_v1",
           null
         ),
 
@@ -204,7 +251,8 @@ function getUnifiedGameState() {
           null
         ),
 
-      final: finalState,
+      final:
+        finalState,
 
       archive:
         getSafeLocalJson(
@@ -219,7 +267,8 @@ function getUnifiedGameState() {
         )
     },
 
-    updatedAt: new Date().toISOString()
+    updatedAt:
+      new Date().toISOString()
   }
 }
 
@@ -227,9 +276,14 @@ function getUnifiedGameState() {
    Local Save
 ========================= */
 
-function saveUnifiedGameState(options = {}) {
-  const state = getUnifiedGameState()
-  const hash = createUnifiedStateHash(state)
+function saveUnifiedGameState(
+  options = {}
+) {
+  const state =
+    getUnifiedGameState()
+
+  const hash =
+    createUnifiedStateHash(state)
 
   const previousState =
     loadUnifiedGameState()
@@ -283,15 +337,22 @@ function scheduleUnifiedGameStateSave(
   const immediate =
     options.immediate === true
 
-  clearTimeout(unifiedStateSaveTimer)
+  clearTimeout(
+    unifiedStateSaveTimer
+  )
 
   if (immediate) {
-    return saveUnifiedGameState(options)
+    return saveUnifiedGameState(
+      options
+    )
   }
 
-  unifiedStateSaveTimer = setTimeout(() => {
-    saveUnifiedGameState(options)
-  }, GAME_STATE_SAVE_DELAY)
+  unifiedStateSaveTimer =
+    setTimeout(() => {
+      saveUnifiedGameState(
+        options
+      )
+    }, GAME_STATE_SAVE_DELAY)
 
   return null
 }
@@ -304,176 +365,56 @@ function loadUnifiedGameState() {
 }
 
 function resetUnifiedGameState() {
-  clearTimeout(unifiedStateSaveTimer)
-  clearTimeout(unifiedStateSyncTimer)
+  clearTimeout(
+    unifiedStateSaveTimer
+  )
 
   unifiedStateSaveTimer = null
-  unifiedStateSyncTimer = null
-
-  unifiedStateSyncInProgress = false
-  unifiedStateSyncQueued = false
-  lastUnifiedStateHash = ""
 
   localStorage.removeItem(
     GAME_STATE_STORAGE_KEY
   )
-
-  localStorage.removeItem(
-    GAME_STATE_LAST_SYNC_HASH_KEY
-  )
 }
 
 /* =========================
-   Remote Sync
+   Compatibility Only
+   لا يرسل أي مزامنة خارجية
 ========================= */
 
 async function performUnifiedGameStateSync(
   options = {}
 ) {
-  const saved = saveUnifiedGameState({
-    force:
-      options.forceSave === true
-  })
-
-  const state = saved.state
-  const hash = saved.hash
-
-  if (!state) {
-    return {
-      synced: false,
-      reason: "no_state"
-    }
-  }
-
-  if (!state.sessionId) {
-    return {
-      synced: false,
-      reason: "no_session"
-    }
-  }
-
-  if (!state.model) {
-    return {
-      synced: false,
-      reason: "no_model"
-    }
-  }
-
-  if (
-    options.force !== true &&
-    hash &&
-    hash === lastUnifiedStateHash
-  ) {
-    return {
-      synced: false,
-      reason: "unchanged",
-      state
-    }
-  }
-
-  if (
-    typeof window.performDisplayStateSync ===
-    "function"
-  ) {
-    try {
-      await window.performDisplayStateSync()
-
-      if (hash) {
-        lastUnifiedStateHash = hash
-
-        localStorage.setItem(
-          GAME_STATE_LAST_SYNC_HASH_KEY,
-          hash
-        )
-      }
-
-      return {
-        synced: true,
-        state
-      }
-    } catch (error) {
-      console.log(
-        "SYNC UNIFIED GAME STATE ERROR:",
-        error
-      )
-
-      return {
-        synced: false,
-        reason: "sync_error",
-        error,
-        state
-      }
-    }
-  }
-
-  if (
-    typeof window.syncDisplayStateToSession ===
-    "function"
-  ) {
-    window.syncDisplayStateToSession({
-      immediate: true
+  const saved =
+    saveUnifiedGameState({
+      force:
+        options.forceSave === true ||
+        options.force === true
     })
-
-    return {
-      synced: true,
-      queued: true,
-      state
-    }
-  }
 
   return {
     synced: false,
-    reason: "sync_function_missing",
-    state
+    localOnly: true,
+    state: saved.state,
+    changed: saved.changed,
+    hash: saved.hash
   }
 }
 
-function syncUnifiedGameState(options = {}) {
-  const immediate =
-    options.immediate === true
-
-  const delay = immediate
-    ? 0
-    : GAME_STATE_SYNC_DELAY
-
-  clearTimeout(unifiedStateSyncTimer)
-
-  unifiedStateSyncTimer = setTimeout(
-    async () => {
-      if (unifiedStateSyncInProgress) {
-        unifiedStateSyncQueued = true
-        return
-      }
-
-      unifiedStateSyncInProgress = true
-
-      try {
-        await performUnifiedGameStateSync(
-          options
-        )
-      } finally {
-        unifiedStateSyncInProgress = false
-
-        if (unifiedStateSyncQueued) {
-          unifiedStateSyncQueued = false
-
-          syncUnifiedGameState({
-            ...options,
-            immediate: true
-          })
-        }
-      }
-    },
-    delay
-  )
-
+function syncUnifiedGameState(
+  options = {}
+) {
   return scheduleUnifiedGameStateSave({
-    immediate
+    immediate:
+      options.immediate === true,
+    force:
+      options.force === true ||
+      options.forceSave === true
   })
 }
 
 /* =========================
    Storage Listener
+   حفظ محلي فقط بدون مزامنة خارجية
 ========================= */
 
 function shouldTrackUnifiedStorageKey(key) {
@@ -490,10 +431,10 @@ function shouldTrackUnifiedStorageKey(key) {
     "main_score_b",
     "presenter_hide_controls",
     "segment_status_v1",
+
     "warmup_state_v1",
     "top10_state_v1",
-    "auction_state_v1",
-    "auction_state_v2",
+    "letterli_state_v1",
     "who_state_v1",
     "explain_state_v1",
     "final_state_v3",
@@ -513,7 +454,7 @@ window.addEventListener(
       return
     }
 
-    syncUnifiedGameState()
+    scheduleUnifiedGameStateSave()
   }
 )
 
@@ -531,9 +472,8 @@ document.addEventListener(
       return
     }
 
-    syncUnifiedGameState({
-      immediate: true,
-      forceSave: true
+    saveUnifiedGameState({
+      force: true
     })
   }
 )
@@ -562,3 +502,9 @@ window.performUnifiedGameStateSync =
 
 window.syncUnifiedGameState =
   syncUnifiedGameState
+
+window.createUnifiedStateHash =
+  createUnifiedStateHash
+
+window.normalizeUnifiedSegmentKey =
+  normalizeUnifiedSegmentKey

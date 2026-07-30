@@ -37,6 +37,11 @@ let top10SaveDelayTimer = null
 let top10RoundAnswersCache = {}
 let top10DataCache = null
 let top10DataPromise = null
+let top10DataCacheModel = null
+
+let top10TimerStartedAt = 0
+let top10TimerEndsAt = 0
+let top10TimerDuration = 0
 
 const TOP10_DATA_CACHE_TTL =
   5 * 60 * 1000
@@ -173,6 +178,12 @@ function saveTop10State(options = {}) {
     timerValue:
       Number(timerBox?.innerText || 0),
 
+    timerSync: {
+      startedAt: Number(top10TimerStartedAt || 0),
+      endsAt: Number(top10TimerEndsAt || 0),
+      duration: Number(top10TimerDuration || 0)
+    },
+
     top10History:
       cloneTop10Data(top10History || [])
   }
@@ -194,11 +205,8 @@ function saveTop10State(options = {}) {
 
   syncTop10Globals()
 
-  if (
-    typeof saveUnifiedGameState ===
-    "function"
-  ) {
-    saveUnifiedGameState()
+  if (options.sync === false) {
+    return
   }
 
   clearTimeout(top10StateSyncTimer)
@@ -207,6 +215,13 @@ function saveTop10State(options = {}) {
     options.immediate === true
 
   top10StateSyncTimer = setTimeout(() => {
+    if (
+      typeof saveUnifiedGameState ===
+      "function"
+    ) {
+      saveUnifiedGameState()
+    }
+
     if (
       typeof syncDisplayStateToSession ===
       "function"
@@ -697,6 +712,7 @@ async function loadTop10Data(
 
   if (
     top10DataCache &&
+    top10DataCacheModel === modelId &&
     options.forceRefresh !== true
   ) {
     return top10DataCache
@@ -761,6 +777,9 @@ async function loadTop10Data(
                       ? freshRows
                       : []
 
+                  top10DataCacheModel =
+                    modelId
+
                   buildTop10DataCache(
                     top10DataCache
                   )
@@ -805,6 +824,9 @@ async function loadTop10Data(
         Array.isArray(rows)
           ? rows
           : []
+
+      top10DataCacheModel =
+        modelId
 
       buildTop10DataCache(
         top10DataCache
@@ -906,8 +928,25 @@ window.renderTop10 =
 
     top10SaveDelayTimer = null
 
-    top10RoundAnswersCache = {}
-    top10DataCache = null
+    const top10CurrentModelId =
+      Number(
+        window.currentModel ||
+        currentModel ||
+        localStorage.getItem(
+          "game_model"
+        ) ||
+        0
+      )
+
+    if (
+      top10DataCacheModel &&
+      top10DataCacheModel !==
+        top10CurrentModelId
+    ) {
+      top10RoundAnswersCache = {}
+      top10DataCache = null
+    }
+
     top10DataPromise = null
 
     await loadTop10MaxRound()
@@ -934,6 +973,7 @@ window.renderTop10 =
     currentTop10Number = null
     top10TimerStarted = false
     top10LastTickPlayed = null
+    top10TimerEndsAt = 0
     top10AnimatingNumber = null
     top10History = []
 
@@ -1242,6 +1282,7 @@ function renderTop10Errors(team) {
 function getOtherTeam(team) {
   return team === "A" ? "B" : "A"
 }
+
 function setTop10ActiveTeam(
   team,
   options = {}
@@ -1261,7 +1302,7 @@ function setTop10ActiveTeam(
       "function"
     ) {
       setGameActiveTeam(team, {
-        sync: options.sync !== false
+        sync: false
       })
     }
   } else if (
@@ -1269,7 +1310,7 @@ function setTop10ActiveTeam(
     "function"
   ) {
     clearGameActiveTeam({
-      sync: options.sync !== false
+      sync: false
     })
   }
 
@@ -1280,12 +1321,53 @@ function setTop10ActiveTeam(
   if (options.save === true) {
     saveTop10State({
       immediate:
-        options.immediate === true
+        options.immediate === true,
+
+      sync:
+        options.sync !== false
     })
   }
 
   return true
 }
+
+function applyTop10RoundStarterFromLottery(round = top10State?.round || 1) {
+  if (
+    typeof getTop10RoundStarterTeam !== "function" ||
+    typeof setTop10ActiveTeam !== "function"
+  ) {
+    return false
+  }
+
+  const team =
+    getTop10RoundStarterTeam(round)
+
+  if (
+    team !== "A" &&
+    team !== "B"
+  ) {
+    return false
+  }
+
+  setTop10ActiveTeam(team, {
+    sync: true,
+    announce: true
+  })
+
+  if (typeof highlightTop10TurnTeam === "function") {
+    highlightTop10TurnTeam()
+  }
+
+  if (typeof saveTop10State === "function") {
+    saveTop10State()
+  }
+
+  return true
+}
+
+window.applyTop10RoundStarterFromLottery =
+  applyTop10RoundStarterFromLottery
+
 /* =========================
    Game Actions
 ========================= */
@@ -1565,6 +1647,8 @@ function stopTop10Timer(
 
   top10TimerStarted = false
   top10LastTickPlayed = null
+    top10TimerStarted = false
+  top10LastTickPlayed = null
 
   const timerBox =
     document.getElementById("timer")
@@ -1809,6 +1893,12 @@ function runTop10Timer(seconds) {
     0,
     Number(seconds || 0)
   )
+    top10TimerStartedAt = Date.now()
+  top10TimerDuration = time
+  top10TimerEndsAt =
+    time > 0
+      ? top10TimerStartedAt + time * 1000
+      : 0
 
   top10TimerStarted =
     time > 0
@@ -1830,10 +1920,13 @@ function runTop10Timer(seconds) {
     "timerTimeoutFx"
   )
 
-  saveTop10State()
+  saveTop10State({
+    sync: false
+  })
 
   if (time <= 0) {
     top10TimerStarted = false
+    top10TimerEndsAt = 0
     return
   }
 
@@ -1859,7 +1952,9 @@ function runTop10Timer(seconds) {
       playGameSound("tick")
     }
 
-    saveTop10State()
+    saveTop10State({
+      sync: false
+    })
 
     if (time > 0) return
 
@@ -2043,6 +2138,8 @@ async function nextTop10Round() {
 
   top10State.round = nextRound
   top10State.lastTeam = null
+  top10State.activeTeam = null
+   top10DoubleState.activeTeam = null
 
   if (!top10State.opened[nextRound]) {
     top10State.opened[nextRound] = []
@@ -2071,6 +2168,8 @@ async function nextTop10Round() {
   })
 
   await loadTop10RoundQuestion(nextRound)
+
+  applyTop10RoundStarterFromLottery(nextRound)
 
   syncTop10Globals()
   renderCurrentRoundTop10UI()

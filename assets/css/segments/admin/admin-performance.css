@@ -122,36 +122,6 @@ button:active{
   animation:none;
 }
 
-/* =========================
-   5) KEEP GRID STABLE
-========================= */
-
-/*
-   لا تحول كل البطاقات إلى عمود واحد.
-   البطاقة المفتوحة فقط تأخذ العرض الكامل.
-*/
-
-.adminShellNew
-.adminWorkspace
-.adminEditor
-.adminEditCardsGrid.hasOpenCard{
-  grid-template-columns:
-    repeat(
-      auto-fit,
-      minmax(
-        min(100%,300px),
-        1fr
-      )
-    );
-}
-
-.adminShellNew
-.adminWorkspace
-.adminEditor
-.adminEditCardsGrid.hasOpenCard
-> .adminEditItemCard[open]{
-  grid-column:1 / -1;
-}
 
 /* =========================
    6) LIGHT SUMMARY EFFECTS
@@ -260,28 +230,6 @@ button:active{
   select
 ):focus{
   transform:none;
-}
-
-/* =========================
-   10) TABLET
-========================= */
-
-@media (max-width:760px){
-
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .adminEditCardsGrid.hasOpenCard{
-    grid-template-columns:1fr;
-  }
-
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .adminEditCardsGrid.hasOpenCard
-  > .adminEditItemCard[open]{
-    grid-column:auto;
-  }
 }
 
 /* =========================

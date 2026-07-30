@@ -1,23 +1,23 @@
 /* =========================================================
-   FINAL / الفاصلة - CLEAN FINAL NO PATCHES
-   PART 1: BASE + UNIFIED HEADER + LAYOUT + NUMBERS + ACTIONS
-   مطابق لتصميم التسخين
+   FINAL / الفاصلة - CLEAN FINAL
+   NO PATCHES - NO PHONE - NO BOLD EXCEPT NUMBER CARDS
+   File: assets/css/segments/final.css
 ========================================================= */
 
 /* =========================
-   FONTS
+   1) FONTS
 ========================= */
 
 @font-face{
   font-family:"MolhimCustom";
-  src:url("../../../fonts/Molhim.ttf") format("truetype");
+  src:url("../../fonts/Molhim.ttf") format("truetype");
   font-weight:400;
   font-style:normal;
   font-display:swap;
 }
 
 /* =========================
-   BASE
+   2) BASE
 ========================= */
 
 .finalWrapNew,
@@ -57,13 +57,6 @@
     calc(14px + env(safe-area-inset-left,0px));
 
   display:grid;
-
-  /*
-    نفس فكرة التسخين:
-    1 الهيدر
-    2 المحتوى + الأرقام
-    3 أزرار التحكم
-  */
   grid-template-rows:138px minmax(0,1fr) 76px;
   gap:10px;
 
@@ -78,6 +71,7 @@
 .finalWrapNew button{
   font-family:"HanakaText",sans-serif;
   -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
 }
 
 .finalWrapNew h1,
@@ -87,7 +81,6 @@
   font-weight:400;
 }
 
-/* إخفاء أي عناصر قديمة ما نحتاجها */
 .finalHeaderQuestionRow,
 .finalMiniTabs,
 .finalMiniTitle,
@@ -105,8 +98,7 @@
 }
 
 /* =========================
-   HEADER
-   مطابق للتسخين
+   3) HEADER
 ========================= */
 
 .megaHeader.finalScoreBoards,
@@ -120,11 +112,6 @@
   margin:30px auto 0;
 
   display:grid;
-
-  /*
-    RTL مثل التسخين:
-    رجوع | الفريق B | اسم الفقرة | الفريق A | إنهاء
-  */
   grid-template-columns:92px minmax(220px,1fr) 220px minmax(220px,1fr) 92px;
   align-items:center;
   gap:10px;
@@ -142,8 +129,7 @@
 }
 
 /* =========================
-   HEADER BUTTONS
-   نفس dockBtn في التسخين
+   4) HEADER BUTTONS
 ========================= */
 
 .dockBtn.finalHeaderBtn,
@@ -166,7 +152,7 @@
   color:#fff;
 
   font-size:.9rem;
-  font-weight:900;
+  font-weight:400;
   line-height:1;
 
   box-shadow:none;
@@ -208,8 +194,7 @@
 }
 
 /* =========================
-   SEGMENT TITLE
-   نفس segmentTitlePlain
+   5) SEGMENT TITLE
 ========================= */
 
 .segmentTitlePlain.finalSegmentNameBox,
@@ -235,7 +220,7 @@
   color:var(--secondary);
   font-size:clamp(1.35rem,2.15vw,2.25rem);
   line-height:1.08;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   white-space:normal;
@@ -244,8 +229,7 @@
 }
 
 /* =========================
-   TEAMS
-   مطابق للتسخين 100%
+   6) TEAMS
 ========================= */
 
 .teamMini.finalScorePanel,
@@ -281,13 +265,11 @@
   transform:translateY(-1px);
 }
 
-/* الفريق الأول مثل التسخين */
 .teamMini.teamA.finalScorePanel,
 .finalScorePanelLeft{
   grid-template-columns:minmax(0,1fr) 62px;
 }
 
-/* الفريق الثاني مثل التسخين */
 .teamMini.teamB.finalScorePanel,
 .finalScorePanelRight{
   grid-template-columns:62px minmax(0,1fr);
@@ -315,9 +297,9 @@
 
   color:var(--text);
 
-  font-size:clamp(1.12rem,1.55vw,1.45rem);
-  line-height:1.18;
-  font-weight:900;
+  font-size:clamp(1.22rem,1.75vw,1.62rem);
+  line-height:1.12;
+  font-weight:400;
   text-align:center;
 
   white-space:normal;
@@ -331,9 +313,9 @@
   width:100%;
 
   color:var(--text);
-  font-size:clamp(1.12rem,1.55vw,1.45rem);
-  line-height:1.18;
-  font-weight:900;
+  font-size:clamp(1.22rem,1.75vw,1.62rem);
+  line-height:1.12;
+  font-weight:400;
   text-align:center;
 
   white-space:normal;
@@ -363,7 +345,7 @@
 
   font-size:1.3rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
   box-shadow:none;
 }
@@ -372,7 +354,6 @@
   display:none;
 }
 
-/* الفريق النشط مطابق للتسخين */
 .teamMini.finalScorePanel.finalScoreTeamCurrent,
 .teamMini.finalScorePanel.warmupTeamCurrent,
 .finalScorePanel.finalScoreTeamCurrent,
@@ -393,8 +374,9 @@
 .finalScorePanel.selectedPresenterTeam .finalScoreValueBox{
   background:var(--primary);
 }
+
 /* =========================
-   MAIN STAGE
+   7) MAIN STAGE
 ========================= */
 
 .finalMainStage,
@@ -413,8 +395,7 @@
 }
 
 /* =========================
-   ROUND WRAPS
-   المحتوى ثم الأرقام
+   8) ROUND WRAPS
 ========================= */
 
 .finalRound1StartView,
@@ -436,7 +417,7 @@
 }
 
 /* =========================
-   CONTENT AREA
+   9) CONTENT AREA
 ========================= */
 
 .finalRound1ContentShell,
@@ -476,8 +457,7 @@
 }
 
 /* =========================
-   NUMBERS
-   نفس مقاس وروح التسخين
+   10) NUMBERS
 ========================= */
 
 .finalRound1NumbersBar,
@@ -533,20 +513,70 @@
 }
 
 .finalRound1GridSingleRow{
-  grid-template-columns:repeat(4,minmax(0,1fr));
-}
-
-.finalRound1GridSingleRow:has(.finalRound1Card:nth-child(6)):not(:has(.finalRound1Card:nth-child(7))){
-  grid-template-columns:repeat(6,minmax(0,1fr));
-}
-
-.finalRound1GridSingleRow:has(.finalRound1Card:nth-child(8)){
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-auto-flow:column;
+  grid-auto-columns:minmax(0,1fr);
+  grid-template-columns:none;
 }
 
 .finalRound2SixNumbersGrid,
 .finalRound2Grid{
-  grid-template-columns:repeat(6,minmax(0,1fr));
+  grid-template-columns:
+    minmax(0,1fr)
+    minmax(0,1fr)
+    minmax(0,1fr)
+    18px
+    minmax(0,1fr)
+    minmax(0,1fr)
+    minmax(0,1fr);
+}
+
+.finalRound2SixNumbersGrid::before,
+.finalRound2Grid::before{
+  content:"";
+
+  grid-column:4;
+  grid-row:1;
+
+  width:100%;
+  height:64px;
+
+  display:block;
+
+  border-radius:18px;
+
+  background:var(--primary);
+
+  pointer-events:none;
+}
+
+.finalRound2SixNumbersGrid .finalRound2Card:nth-child(1),
+.finalRound2Grid .finalRound2Card:nth-child(1){
+  grid-column:1;
+}
+
+.finalRound2SixNumbersGrid .finalRound2Card:nth-child(2),
+.finalRound2Grid .finalRound2Card:nth-child(2){
+  grid-column:2;
+}
+
+.finalRound2SixNumbersGrid .finalRound2Card:nth-child(3),
+.finalRound2Grid .finalRound2Card:nth-child(3){
+  grid-column:3;
+}
+
+.finalRound2SixNumbersGrid .finalRound2Card:nth-child(4),
+.finalRound2Grid .finalRound2Card:nth-child(4){
+  grid-column:5;
+}
+
+.finalRound2SixNumbersGrid .finalRound2Card:nth-child(5),
+.finalRound2Grid .finalRound2Card:nth-child(5){
+  grid-column:6;
+}
+
+.finalRound2SixNumbersGrid .finalRound2Card:nth-child(6),
+.finalRound2Grid .finalRound2Card:nth-child(6){
+  grid-column:7;
 }
 
 .finalStoryNumbersGrid,
@@ -554,7 +584,6 @@
 .finalTeamMediaNumbersGrid{
   grid-template-columns:repeat(4,minmax(0,1fr));
 }
-
 
 .finalRound1Card,
 .finalRound2Card,
@@ -580,7 +609,7 @@
 
   font-size:clamp(1.65rem,2.55vw,2.85rem);
   line-height:1;
-  font-weight:900;
+  font-weight:700;
 
   box-shadow:none;
 
@@ -656,9 +685,9 @@
   background:var(--secondary);
   color:#fff;
 }
+
 /* =========================
-   ACTION BUTTONS
-   مطابق للتسخين
+   11) ACTION BUTTONS
 ========================= */
 
 .actionBar.finalControlsBar,
@@ -713,7 +742,7 @@
 
   font-size:clamp(.78rem,1vw,1rem);
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
   box-shadow:none;
 
@@ -812,8 +841,9 @@
   background:var(--secondary);
   color:#fff;
 }
+
 /* =========================
-   PLACEHOLDER
+   12) PLACEHOLDER
 ========================= */
 
 .finalRoundPlaceholder,
@@ -840,7 +870,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.35rem,2vw,2rem);
   line-height:1.3;
-  font-weight:900;
+  font-weight:400;
 
   display:flex;
   align-items:center;
@@ -852,9 +882,120 @@
   overflow:hidden;
 }
 
+.finalWrapNew,
+.finalWrapNew *{
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+
+.finalWrapNew .segmentCompensationNumber{
+  position:relative;
+  overflow:hidden;
+
+  touch-action:none;
+
+  border:2px solid #FE7F2D;
+  background:#FFF7ED;
+  color:#FE7F2D;
+
+  box-shadow:
+    inset 0 0 0 2px rgba(254,127,45,.18),
+    0 10px 24px rgba(254,127,45,.18);
+}
+
+.finalWrapNew .segmentCompensationNumber::after{
+  content:"تعويض";
+
+  position:absolute;
+  left:7px;
+  right:7px;
+  bottom:6px;
+
+  height:19px;
+  border-radius:999px;
+
+  background:#FE7F2D;
+  color:#FFFFFF;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:11px;
+  line-height:1;
+  font-weight:400;
+}
+
+.finalWrapNew .segmentCompensationNumber.segmentCompensationPressing{
+  transform:scale(.94);
+
+  border-color:#0A7C6E;
+  background:#ECFDF5;
+  color:#0A7C6E;
+
+  box-shadow:
+    inset 0 0 0 2px rgba(10,124,110,.18),
+    0 12px 28px rgba(10,124,110,.22);
+}
+
+.finalWrapNew .segmentCompensationNumber.segmentCompensationPressing::after{
+  background:#0A7C6E;
+  color:#FFFFFF;
+}
+
+.finalWrapNew .segmentCompensationBadge{
+  position:absolute;
+  top:146px;
+  left:50%;
+  z-index:20;
+
+  transform:translateX(-50%);
+
+  min-height:40px;
+  padding:7px 28px;
+
+  border-radius:16px;
+  border:2px solid #0A7C6E;
+
+  background:#ECFDF5;
+  color:#0A7C6E;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:28px;
+  line-height:1;
+  font-weight:400;
+
+  pointer-events:none;
+}
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .finalWrapNew .segmentCompensationBadge{
+    top:98px;
+
+    min-height:34px;
+    padding:6px 22px;
+
+    border-radius:14px;
+
+    font-size:22px;
+  }
+
+  .finalWrapNew .segmentCompensationNumber::after{
+    left:5px;
+    right:5px;
+    bottom:4px;
+
+    height:16px;
+    font-size:9px;
+  }
+}
+
 /* =========================
-   IPAD / TABLET LANDSCAPE
-   مطابق للتسخين
+   13) IPAD / TABLET LANDSCAPE
 ========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
@@ -924,15 +1065,15 @@
 
     border-radius:12px;
 
-    font-size:.82rem;
-    line-height:1.15;
+    font-size:1.04rem;
+    line-height:1.1;
   }
 
   .teamNameBlock.finalScoreTeamNameBox strong,
   .finalScoreTeamNameBox strong,
   .finalScoreTeamNameFix strong{
-    font-size:.82rem;
-    line-height:1.15;
+    font-size:1.04rem;
+    line-height:1.1;
   }
 
   .finalScoreValueBox,
@@ -953,31 +1094,31 @@
     font-size:1.22rem;
   }
 
-.finalRound1StartView,
-.finalRound1PlayLayout,
-.finalRound2Wrap,
-.finalRound3Wrap,
-.finalStoryWrap,
-.finalRound4TeamMediaWrap,
-.finalTeamMediaWrap{
-  grid-template-rows:minmax(0,1fr) 82px;
-  gap:8px;
-}
+  .finalRound1StartView,
+  .finalRound1PlayLayout,
+  .finalRound2Wrap,
+  .finalRound3Wrap,
+  .finalStoryWrap,
+  .finalRound4TeamMediaWrap,
+  .finalTeamMediaWrap{
+    grid-template-rows:minmax(0,1fr) 82px;
+    gap:8px;
+  }
 
   .finalRound1NumbersBar,
-.finalRound2NumbersBar,
-.finalRound3NumbersBar,
-.finalStoryNumbersBar,
-.finalTeamMediaNumbersBar,
-.finalRound1TopNumbersBar{
-  width:min(100%,820px);
-  height:82px;
-  min-height:82px;
-  max-height:82px;
+  .finalRound2NumbersBar,
+  .finalRound3NumbersBar,
+  .finalStoryNumbersBar,
+  .finalTeamMediaNumbersBar,
+  .finalRound1TopNumbersBar{
+    width:min(100%,820px);
+    height:82px;
+    min-height:82px;
+    max-height:82px;
 
-  padding:16px 14px;
-  border-radius:24px;
-}
+    padding:16px 14px;
+    border-radius:24px;
+  }
 
   .finalRound1GridSingleRow,
   .finalRound2SixNumbersGrid,
@@ -991,6 +1132,23 @@
     max-height:62px;
     gap:8px;
   }
+
+.finalRound2SixNumbersGrid,
+.finalRound2Grid{
+  grid-template-columns:
+    minmax(0,1fr)
+    minmax(0,1fr)
+    minmax(0,1fr)
+    14px
+    minmax(0,1fr)
+    minmax(0,1fr)
+    minmax(0,1fr);
+}
+.finalRound2SixNumbersGrid::before,
+.finalRound2Grid::before{
+  height:62px;
+  border-radius:14px;
+}
 
   .finalRound1Card,
   .finalRound2Card,
@@ -1038,137 +1196,12 @@
   }
 }
 
-/* =========================
-   PHONE
-========================= */
-
-@media (max-width:767px){
-  .finalWrapNew{
-    max-height:none;
-    overflow:auto;
-
-    padding:
-      calc(8px + env(safe-area-inset-top,0px))
-      calc(8px + env(safe-area-inset-right,0px))
-      calc(8px + env(safe-area-inset-bottom,0px))
-      calc(8px + env(safe-area-inset-left,0px));
-
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-  }
-
-  .megaHeader.finalScoreBoards,
-  .finalScoreBoards,
-  #finalScoreBoards.finalScoreBoards{
-    height:auto;
-    min-height:0;
-    max-height:none;
-
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-
-    padding:8px;
-    margin-top:0;
-  }
-
-  .segmentTitlePlain.finalSegmentNameBox,
-  .finalSegmentNameBox{
-    grid-column:1 / -1;
-    order:-1;
-  }
-
-  .teamMini.teamA.finalScorePanel,
-  .teamMini.teamB.finalScorePanel,
-  .finalScorePanelLeft,
-  .finalScorePanelRight{
-    grid-template-columns:minmax(0,1fr) 52px;
-  }
-
-  .finalRound1StartView,
-  .finalRound1PlayLayout,
-  .finalRound2Wrap,
-  .finalRound3Wrap,
-  .finalStoryWrap,
-  .finalRound4TeamMediaWrap,
-  .finalTeamMediaWrap{
-    grid-template-rows:minmax(0,1fr) auto;
-    gap:8px;
-  }
-
-  .finalRound1NumbersBar,
-  .finalRound2NumbersBar,
-  .finalRound3NumbersBar,
-  .finalStoryNumbersBar,
-  .finalTeamMediaNumbersBar,
-  .finalRound1TopNumbersBar{
-    height:auto;
-    min-height:0;
-    max-height:none;
-  }
-
-  .finalRound1GridSingleRow,
-  .finalRound2SixNumbersGrid,
-  .finalStoryNumbersGrid,
-  .finalTeamMediaNumbersGrid,
-  .finalRound2Grid,
-  .finalRound3Grid{
-    height:auto;
-    min-height:0;
-    max-height:none;
-
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:8px;
-  }
-
-  .finalRound1Card,
-  .finalRound2Card,
-  .finalRound3Card,
-  .finalStoryNumberCard,
-  .finalTeamMediaNumberCard{
-    height:52px;
-    min-height:52px;
-    max-height:52px;
-
-    border-radius:15px;
-    font-size:1.35rem;
-  }
-
-  .actionBar.finalControlsBar,
-  .finalControlsBar,
-  .finalRound1ControlsBar,
-  .finalRound2ControlsBar,
-  .finalRound3ControlsBar,
-  #finalControlsBar{
-    width:100%;
-    height:auto;
-    min-height:0;
-    max-height:none;
-
-    grid-template-columns:1fr;
-  }
-}
-
-/* =========================
-   REDUCED MOTION
-========================= */
-
-@media (prefers-reduced-motion:reduce){
-  .finalWrapNew *,
-  .finalWrapNew *::before,
-  .finalWrapNew *::after{
-    animation:none;
-    transition:none;
-  }
-}
-
 /* =========================================================
-   FINAL CSS — PART 2
-   ROUND 1: ٮدوں ٮڡاط / بدون نقاط
+   PART 2: ROUND 1 / بدون نقاط
 ========================================================= */
 
 /* =========================
-   ROUND 1 BASE
+   14) ROUND 1 BASE
 ========================= */
 
 .finalRound1ContentShell{
@@ -1210,11 +1243,6 @@
 
   overflow:hidden;
 }
-
-/* =========================
-   BEFORE ANSWER
-   قبل ظهور الإجابة
-========================= */
 
 .finalRound1StageLayout.finalRound1QuestionOnlyLayout{
   display:flex;
@@ -1280,8 +1308,8 @@
   color:var(--text);
 
   font-family:"MolhimCustom","HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(2.35rem,4vw,4.55rem);
-  line-height:1.35;
+  font-size:clamp(2.15rem,3vw,3.35rem);
+  line-height:1.45;
   font-weight:400;
 
   text-align:center;
@@ -1296,8 +1324,7 @@
 }
 
 /* =========================
-   AFTER ANSWER
-   بعد ظهور الإجابة
+   15) ROUND 1 ANSWER
 ========================= */
 
 .finalRound1StageLayout.finalRound1AnswerLayout{
@@ -1362,10 +1389,6 @@
   overflow:hidden;
 }
 
-/* =========================
-   ANSWER CARD
-========================= */
-
 .finalRound1ResultBox{
   width:100%;
   height:100%;
@@ -1406,7 +1429,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:1rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
   flex:0 0 auto;
 }
@@ -1446,7 +1469,7 @@
 }
 
 /* =========================
-   IMAGES
+   16) ROUND 1 IMAGES / PARTS
 ========================= */
 
 .finalRound1ImageFrame{
@@ -1468,9 +1491,6 @@
 
   border-radius:22px;
 }
-/* =========================
-   QUESTION PARTS - احتياط
-========================= */
 
 .finalRound1QuestionStage{
   flex-direction:column;
@@ -1499,7 +1519,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.1rem,1.7vw,1.55rem);
   line-height:1.25;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
@@ -1520,19 +1540,87 @@
 
   font-size:1.15rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 }
-
-/* =========================
-   START PLACEHOLDER
-========================= */
 
 .finalStartPlaceholder{
   margin:35px auto 0;
 }
 
 /* =========================
-   ROUND 1 iPAD
+   17) ROUND 1 OVERLAY
+========================= */
+
+.finalRound1Overlay{
+  position:fixed;
+  inset:0;
+  z-index:999999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:clamp(18px,3vw,44px);
+
+  background:rgba(6,9,15,.78);
+}
+
+.finalRound1OverlayInner{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.finalRound1OverlayPaper{
+  width:min(92vw,1180px);
+  min-height:min(72vh,680px);
+  max-height:86vh;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:clamp(42px,5.2vw,82px);
+
+  overflow:hidden;
+
+  animation:finalRound1PaperZoomIn .22s ease-out both;
+}
+
+.finalRound1OverlayPaper::before,
+.finalRound1OverlayPaper::after{
+  display:none;
+}
+
+.finalRound1OverlayText{
+  width:100%;
+  max-width:1020px;
+
+  text-align:center;
+
+  white-space:normal;
+  overflow-wrap:break-word;
+  word-break:normal;
+  text-wrap:normal;
+}
+
+@keyframes finalRound1PaperZoomIn{
+  from{
+    opacity:0;
+    transform:scale(.88) translateY(22px);
+  }
+
+  to{
+    opacity:1;
+    transform:scale(1) translateY(0);
+  }
+}
+
+/* =========================
+   18) ROUND 1 IPAD
 ========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
@@ -1594,58 +1682,12 @@
   }
 }
 
-/* =========================
-   ROUND 1 PHONE
-========================= */
-
-@media (max-width:767px){
-  .finalRound1StageLayout{
-    width:100%;
-    height:auto;
-    min-height:280px;
-
-    margin:0;
-  }
-
-  .finalRound1StageLayout.finalRound1AnswerLayout{
-    grid-template-columns:1fr;
-    grid-template-rows:minmax(0,1fr) 150px;
-    gap:8px;
-  }
-
-  .finalRound1TextCard,
-  .finalRound1ImageFrame,
-  .finalRound1QuestionStage,
-  .finalRound1RevealCard{
-    border-radius:22px;
-    padding:14px;
-  }
-
-  .finalRound1TextCardInner{
-    font-size:clamp(1.55rem,7vw,2.5rem);
-    line-height:1.28;
-  }
-
-  .finalRound1ResultBox{
-    border-radius:22px;
-    padding:14px 12px;
-  }
-
-  .finalRound1ResultText,
-  .finalRound1AnswerMolhimFont,
-  .finalRound1AnswerProjectFont{
-    font-size:1rem;
-    line-height:1.3;
-  }
-}
-
 /* =========================================================
-   FINAL CSS — PART 3
-   ROUND 2: صح صحلي
+   PART 3: ROUND 2 / صح صحلي
 ========================================================= */
 
 /* =========================
-   ROUND 2 BASE
+   19) ROUND 2 BASE
 ========================= */
 
 .finalRound2Wrap{
@@ -1678,13 +1720,9 @@
   color:var(--text);
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.4rem,2vw,2rem);
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 }
-
-/* =========================
-   PLACEHOLDER داخل صح صحلي
-========================= */
 
 .finalRound2WordsStage .finalRoundPlaceholder{
   width:min(100%,900px);
@@ -1704,8 +1742,7 @@
 }
 
 /* =========================
-   SCRAMBLE REVEAL
-   ظهور التلميحة والكلمة المبعثرة
+   20) ROUND 2 SCRAMBLE
 ========================= */
 
 .finalHintStage{
@@ -1745,7 +1782,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.05rem,1.6vw,1.45rem);
   line-height:1.25;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
@@ -1767,18 +1804,33 @@
 
   color:var(--text);
 
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-family:"HanakaText",sans-serif;
   font-size:clamp(2.3rem,4.5vw,5rem);
   line-height:1.1;
-  font-weight:900;
+  font-weight:400;
+  letter-spacing:0;
   text-align:center;
 
   overflow:hidden;
 }
 
+/* رقم 1 و 4 */
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).active) .finalHintText,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).active) .finalHintText,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).used.active) .finalHintText,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).used.active) .finalHintText{
+  background:linear-gradient(135deg,#ff9f2f,#ff7a1a);
+  color:#fff;
+  border:2px solid rgba(255,255,255,.65);
+  box-shadow:0 14px 34px rgba(255,122,26,.30);
+
+  font-size:clamp(2.1rem,3vw,3.35rem);
+  line-height:1.2;
+  font-weight:400;
+}
+
 /* =========================
-   SCRAMBLE ANSWERS
-   بعد ظهور الإجابات
+   21) ROUND 2 ANSWERS
 ========================= */
 
 .finalRound2ScrambleAnswerStage{
@@ -1850,8 +1902,8 @@
 }
 
 .finalRound2AnswerCard.selectedCorrect{
-  border-color:var(--primary);
-  box-shadow:0 0 0 4px rgba(254,127,45,.14);
+  border-color:var(--btn-correct);
+  box-shadow:0 0 0 4px rgba(0,127,0,.14);
 }
 
 .finalRound2AnswerScrambled,
@@ -1870,7 +1922,7 @@
 
   font-family:"HanakaText",sans-serif;
   line-height:1.18;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
@@ -1893,14 +1945,42 @@
 }
 
 .finalRound2AnswerCard.selectedCorrect .finalRound2AnswerCorrect{
-  background:#FFF7ED;
-  border-color:rgba(254,127,45,.35);
-  color:var(--primary);
+  background:#F0FDF4;
+  border-color:rgba(0,127,0,.28);
+  color:var(--btn-correct);
+}
+
+.finalRound2AnswerCard.selectedCorrect .finalRound2AnswerScrambled{
+  background:var(--btn-correct);
+  color:#fff;
+}
+
+/* رقم 1 و 4 عند ظهور الإجابات */
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).active) .finalRound2AnswerScrambled,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).active) .finalRound2AnswerScrambled,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).used.active) .finalRound2AnswerScrambled,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).used.active) .finalRound2AnswerScrambled{
+  background:linear-gradient(135deg,#ff9f2f,#ff7a1a);
+  color:#fff;
+  border:2px solid rgba(255,255,255,.65);
+  box-shadow:0 12px 28px rgba(255,122,26,.26);
+
+  font-size:clamp(1.45rem,2vw,2.15rem);
+  line-height:1.18;
+  font-weight:400;
+}
+
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).active) .finalRound2AnswerCorrect,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).active) .finalRound2AnswerCorrect,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(1).used.active) .finalRound2AnswerCorrect,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(4).used.active) .finalRound2AnswerCorrect{
+  font-size:clamp(1.35rem,1.9vw,2.05rem);
+  line-height:1.18;
+  font-weight:400;
 }
 
 /* =========================
-   SEQUENCE
-   الترتيب والعداد
+   22) ROUND 2 SEQUENCE
 ========================= */
 
 .finalSequenceStageBox{
@@ -1944,18 +2024,24 @@
   color:#fff;
   font-size:.85rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 }
 
 .finalSequenceTimerBadge strong{
   color:#fff;
   font-size:2.55rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 }
 
 .finalSequenceTimerBadge.danger{
   background:var(--btn-wrong);
+  color:#fff;
+}
+
+.finalSequenceTimerBadge.danger span,
+.finalSequenceTimerBadge.danger strong{
+  color:#fff;
 }
 
 .finalSequenceWordsWrap{
@@ -1967,13 +2053,16 @@
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:12px;
 
+  align-content:center;
+
   overflow:hidden;
 }
 
 .finalSequenceWordBtn{
   width:100%;
-  height:100%;
-  min-height:0;
+  height:82px;
+  min-height:82px;
+  max-height:82px;
 
   display:flex;
   align-items:center;
@@ -1984,16 +2073,17 @@
   border:0;
   border-radius:22px;
 
-  background:var(--primary);
+  background:var(--secondary);
   color:#fff;
 
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.1rem,1.65vw,1.55rem);
   line-height:1.2;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   cursor:pointer;
+  touch-action:manipulation;
 
   overflow:hidden;
 
@@ -2013,6 +2103,25 @@
 }
 
 .finalSequenceWordBtn.isHiddenWord,
+.finalSequenceWordBtn:disabled.isHiddenWord{
+  background:#DCE2E8;
+  color:transparent;
+  text-shadow:none;
+  font-size:0;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+.finalSequenceWordBtn.isHiddenWord::after{
+  content:"";
+  width:42px;
+  height:8px;
+  border-radius:999px;
+  background:rgba(135,147,160,.55);
+  display:block;
+}
+
 .finalSequenceWordBtn:disabled{
   background:#DCE2E8;
   color:var(--muted);
@@ -2026,8 +2135,120 @@
   color:#fff;
 }
 
+.finalSequenceWordsDone .finalSequenceWordBtn.isHiddenWord{
+  background:#DCE2E8;
+  color:transparent;
+  font-size:0;
+}
+
+.finalSequenceWordBtn.showWordsBox{
+  cursor:pointer;
+  background:#111827;
+  color:#fff;
+}
+
+/* رقم 2 و 5 */
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).active) .finalSequenceTimerBadge,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).active) .finalSequenceTimerBadge,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).used.active) .finalSequenceTimerBadge,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).used.active) .finalSequenceTimerBadge{
+  width:260px;
+  height:92px;
+  min-width:260px;
+  min-height:92px;
+  max-width:260px;
+  max-height:92px;
+
+  margin:0 auto;
+
+  display:grid;
+  grid-template-columns:1fr 88px;
+  align-items:center;
+  gap:12px;
+
+  direction:rtl;
+
+  padding:10px 12px;
+
+  border-radius:28px;
+
+  background:linear-gradient(135deg,#ff9f2f,#ff7a1a);
+  color:#fff;
+
+  border:2px solid rgba(255,255,255,.65);
+  box-shadow:0 14px 34px rgba(255,122,26,.30);
+
+  overflow:hidden;
+}
+
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).active) .finalSequenceTimerBadge span,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).active) .finalSequenceTimerBadge span,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).used.active) .finalSequenceTimerBadge span,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).used.active) .finalSequenceTimerBadge span{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#fff;
+  font-size:1.35rem;
+  line-height:1;
+  font-weight:400;
+
+  background:rgba(255,255,255,.16);
+  border-radius:20px;
+}
+
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).active) .finalSequenceTimerBadge strong,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).active) .finalSequenceTimerBadge strong,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(2).used.active) .finalSequenceTimerBadge strong,
+.finalRound2Wrap:has(.finalRound2Card:nth-child(5).used.active) .finalSequenceTimerBadge strong{
+  width:88px;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#ff7a1a;
+  background:#fff;
+
+  border-radius:20px;
+
+  font-size:3rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.finalSequenceWordsReveal .finalSequenceWordBtn{
+  animation:finalSequenceWordReveal .34s cubic-bezier(.2,.9,.2,1) both;
+}
+
+.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(1){ animation-delay:.02s; }
+.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(2){ animation-delay:.05s; }
+.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(3){ animation-delay:.08s; }
+.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(4){ animation-delay:.11s; }
+.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(5){ animation-delay:.14s; }
+.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(6){ animation-delay:.17s; }
+
+@keyframes finalSequenceWordReveal{
+  from{
+    opacity:0;
+    transform:translateY(12px);
+    filter:blur(4px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+    filter:blur(0);
+  }
+}
+
 /* =========================
-   IMAGE QUESTION
+   23) ROUND 2 IMAGE QUESTION
 ========================= */
 
 .finalRound3ImageFrame{
@@ -2067,7 +2288,7 @@
 }
 
 /* =========================
-   IMAGE ANSWERS
+   24) ROUND 2 IMAGE ANSWERS
 ========================= */
 
 .finalRound2ImageAnswerStage,
@@ -2131,8 +2352,8 @@
 }
 
 .finalRound3AnswerCard.selectedCorrect{
-  border-color:var(--primary);
-  box-shadow:0 0 0 4px rgba(254,127,45,.14);
+  border-color:var(--btn-correct);
+  box-shadow:0 0 0 4px rgba(0,127,0,.14);
 }
 
 .finalAnswerChip{
@@ -2155,20 +2376,66 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.1rem,1.65vw,1.55rem);
   line-height:1.25;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
 }
 
 .finalRound3AnswerCard.selectedCorrect .finalAnswerChip{
-  background:#FFF7ED;
-  border-color:rgba(254,127,45,.35);
-  color:var(--primary);
+  background:#F0FDF4;
+  border-color:rgba(0,127,0,.28);
+  color:var(--btn-correct);
+}
+
+.finalRound2ImageAnswerStage .finalRound3AnswersList,
+.finalRound3ResultView.finalRound2ImageAnswerStage .finalRound3AnswersList{
+  width:min(100%,980px);
+  height:auto;
+  min-height:0;
+
+  display:grid;
+  grid-auto-flow:unset;
+  grid-auto-columns:unset;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+
+  gap:12px;
+
+  align-items:center;
+  justify-content:center;
+
+  overflow:visible;
+}
+
+.finalRound2ImageAnswerStage .finalRound3AnswersList.finalAnswersCount4{
+  width:min(100%,760px);
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+.finalRound2ImageAnswerStage .finalRound3AnswerCard{
+  height:118px;
+  min-height:118px;
+  max-height:118px;
+
+  padding:10px;
+
+  border-radius:22px;
+  border:2px solid var(--line);
+
+  background:var(--surface);
+}
+
+.finalRound2ImageAnswerStage .finalAnswerChip{
+  height:100%;
+
+  border-radius:17px;
+
+  font-size:clamp(1.05rem,1.55vw,1.45rem);
+  line-height:1.22;
 }
 
 /* =========================
-   IMAGE AUTO OVERLAY
+   25) ROUND 2 IMAGE AUTO OVERLAY
 ========================= */
 
 .finalRound2ImageAutoOverlay{
@@ -2218,7 +2485,7 @@
 
   font-family:"HanakaText",sans-serif;
   font-size:1rem;
-  font-weight:900;
+  font-weight:400;
 
   z-index:2;
 }
@@ -2236,10 +2503,6 @@
   border-radius:26px;
 }
 
-/* =========================
-   MINI SHAKE
-========================= */
-
 .finalRound2MiniShakeFx{
   animation:finalRound2MiniShake .38s ease;
 }
@@ -2253,7 +2516,7 @@
 }
 
 /* =========================
-   ROUND 2 iPAD
+   26) ROUND 2 IPAD
 ========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
@@ -2352,9 +2615,18 @@
   }
 
   .finalSequenceWordBtn{
+    height:64px;
+    min-height:64px;
+    max-height:64px;
+
     border-radius:18px;
     font-size:1rem;
     padding:10px;
+  }
+
+  .finalSequenceWordBtn.isHiddenWord::after{
+    width:34px;
+    height:7px;
   }
 
   .finalRound3ImageFrame{
@@ -2368,384 +2640,7 @@
   .finalRound3ImageFrame img{
     border-radius:18px;
   }
-}
 
-/* =========================
-   ROUND 2 PHONE
-========================= */
-
-@media (max-width:767px){
-  .finalRound2Wrap{
-    grid-template-rows:minmax(0,1fr) auto;
-    gap:8px;
-  }
-
-  .finalRound2WordsStage{
-    width:100%;
-    height:auto;
-    min-height:280px;
-
-    margin:0;
-
-    font-size:1rem;
-  }
-
-  .finalHintStage{
-    width:100%;
-    min-height:230px;
-
-    grid-template-rows:70px minmax(0,1fr);
-    gap:10px;
-
-    padding:10px;
-    border-radius:22px;
-  }
-
-  .finalHintText{
-    height:70px;
-    min-height:70px;
-
-    border-radius:17px;
-    font-size:.9rem;
-  }
-
-  .finalWordChipLarge{
-    min-height:120px;
-
-    border-radius:18px;
-
-    font-size:2rem;
-  }
-
-  .finalRound2AnswerGrid,
-  .finalRound2ScrambleGrid,
-  .finalRound3AnswersList{
-    width:100%;
-    height:auto;
-
-    grid-template-columns:1fr;
-    gap:8px;
-  }
-
-  .finalRound2AnswerCard,
-  .finalRound3AnswerCard{
-    min-height:96px;
-    border-radius:20px;
-  }
-
-  .finalSequenceStageBox{
-    width:100%;
-    min-height:280px;
-
-    grid-template-rows:72px minmax(0,1fr);
-    gap:10px;
-
-    padding:10px;
-    border-radius:22px;
-  }
-
-  .finalSequenceWordsWrap{
-    grid-template-columns:1fr;
-    gap:8px;
-  }
-
-  .finalSequenceWordBtn{
-    min-height:58px;
-    border-radius:17px;
-    font-size:1rem;
-  }
-
-  .finalRound3ImageFrame{
-    width:100%;
-    min-height:260px;
-
-    border-radius:22px;
-    padding:10px;
-  }
-}
-/* =========================================================
-   FINAL CSS — ROUND 2 FIXES
-   صح صحلي: 1/4 + 2/5 + 3/6
-========================================================= */
-
-/* =========================
-   رقم 1 و 4
-   الكلمة المبعثرة + التلميحة
-========================= */
-
-/* مربع التلميحة باللون الثاني */
-.finalHintText{
-  background:var(--secondary);
-  color:#fff;
-}
-
-/* الكلمة المبعثرة بالخط الثاني */
-.finalWordChipLarge{
-  font-family:"HanakaText",sans-serif;
-  font-weight:900;
-  letter-spacing:0;
-}
-
-/* تحديد إجابات 1 و 4 باللون الأخضر */
-.finalRound2AnswerCard.selectedCorrect{
-  border-color:var(--btn-correct);
-  box-shadow:0 0 0 4px rgba(0,127,0,.14);
-}
-
-.finalRound2AnswerCard.selectedCorrect .finalRound2AnswerCorrect{
-  background:#F0FDF4;
-  border-color:rgba(0,127,0,.28);
-  color:var(--btn-correct);
-}
-
-.finalRound2AnswerCard.selectedCorrect .finalRound2AnswerScrambled{
-  background:var(--btn-correct);
-  color:#fff;
-}
-
-/* =========================
-   رقم 2 و 5
-   العداد + اختفاء الكلمة عند الضغط
-========================= */
-
-/* مربع العداد برتقالي */
-.finalSequenceTimerBadge{
-  background:var(--primary);
-  color:#fff;
-}
-
-.finalSequenceTimerBadge.danger{
-  background:var(--btn-wrong);
-}
-
-/* عند ضغط الكلمة تختفي بصريًا */
-.finalSequenceWordBtn.isHiddenWord,
-.finalSequenceWordBtn:disabled.isHiddenWord{
-  background:#DCE2E8;
-  color:transparent;
-  text-shadow:none;
-  font-size:0;
-  cursor:not-allowed;
-  transform:none;
-  filter:none;
-}
-
-/* نخلي المربع موجود لكن فاضي ومرتب */
-.finalSequenceWordBtn.isHiddenWord::after{
-  content:"";
-  width:42px;
-  height:8px;
-  border-radius:999px;
-  background:rgba(135,147,160,.55);
-  display:block;
-}
-
-/* لما تنتهي كل الكلمات، لا نرجع النص */
-.finalSequenceWordsDone .finalSequenceWordBtn.isHiddenWord{
-  background:#DCE2E8;
-  color:transparent;
-  font-size:0;
-}
-
-/* =========================
-   رقم 3 و 6
-   إجابات الصور صف واحد
-========================= */
-
-.finalRound2ImageAnswerStage .finalRound3AnswersList,
-.finalRound3ResultView.finalRound2ImageAnswerStage .finalRound3AnswersList{
-  width:min(100%,1180px);
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-auto-flow:column;
-  grid-auto-columns:minmax(0,1fr);
-  grid-template-columns:none;
-
-  gap:12px;
-
-  overflow:hidden;
-}
-
-/* كروت إجابات الصور مرتبة */
-.finalRound2ImageAnswerStage .finalRound3AnswerCard{
-  min-width:0;
-  min-height:0;
-
-  padding:10px;
-
-  border-radius:24px;
-  border:2px solid var(--line);
-
-  background:var(--surface);
-}
-
-/* تحديد إجابات 3 و 6 باللون الأخضر */
-.finalRound2ImageAnswerStage .finalRound3AnswerCard.selectedCorrect{
-  border-color:var(--btn-correct);
-  box-shadow:0 0 0 4px rgba(0,127,0,.14);
-}
-
-.finalRound2ImageAnswerStage .finalRound3AnswerCard.selectedCorrect .finalAnswerChip{
-  background:#F0FDF4;
-  border-color:rgba(0,127,0,.28);
-  color:var(--btn-correct);
-}
-
-/* =========================
-   iPAD
-========================= */
-
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-  .finalRound2ImageAnswerStage .finalRound3AnswersList,
-  .finalRound3ResultView.finalRound2ImageAnswerStage .finalRound3AnswersList{
-    width:min(100%,1040px);
-    gap:10px;
-  }
-
-  .finalRound2ImageAnswerStage .finalRound3AnswerCard{
-    border-radius:20px;
-    padding:8px;
-  }
-
-  .finalRound2ImageAnswerStage .finalAnswerChip{
-    font-size:.95rem;
-    line-height:1.18;
-    padding:8px;
-  }
-
-  .finalSequenceWordBtn.isHiddenWord::after{
-    width:34px;
-    height:7px;
-  }
-}
-
-/* =========================
-   PHONE
-========================= */
-
-@media (max-width:767px){
-  .finalRound2ImageAnswerStage .finalRound3AnswersList,
-  .finalRound3ResultView.finalRound2ImageAnswerStage .finalRound3AnswersList{
-    grid-auto-flow:row;
-    grid-auto-columns:unset;
-    grid-template-columns:1fr;
-    height:auto;
-  }
-
-  .finalRound2ImageAnswerStage .finalRound3AnswerCard{
-    min-height:86px;
-  }
-}
-/* =========================================================
-   ROUND 2 COLOR FIX
-   رجوع اللون الثاني بدل البرتقالي
-========================================================= */
-
-/* رقم 1 و 4: مربع التلميحة باللون الثاني */
-.finalHintText{
-  background:var(--secondary);
-  color:#fff;
-}
-
-/* رقم 2 و 5: مربع العداد يرجع اللون الثاني بدل البرتقالي */
-.finalSequenceTimerBadge{
-  background:var(--secondary);
-  color:#fff;
-}
-
-.finalSequenceTimerBadge span,
-.finalSequenceTimerBadge strong{
-  color:#fff;
-}
-
-/* وقت الخطر يبقى أحمر */
-.finalSequenceTimerBadge.danger{
-  background:var(--btn-wrong);
-  color:#fff;
-}
-
-/* أزرار كلمات رقم 2 و 5 ترجع للون الثاني بدل البرتقالي */
-.finalSequenceWordBtn{
-  background:var(--secondary);
-  color:#fff;
-}
-
-/* الكلمة المختفية تبقى رمادية */
-.finalSequenceWordBtn.isHiddenWord,
-.finalSequenceWordBtn:disabled.isHiddenWord{
-  background:#DCE2E8;
-  color:transparent;
-  text-shadow:none;
-  font-size:0;
-}
-/* =========================================================
-   ROUND 2 ANSWERS FIX
-   مربعات الإجابات عادية بدون تمدد زائد
-========================================================= */
-
-/* رقم 3 و 6: إجابات الصور ترجع كروت عادية */
-.finalRound2ImageAnswerStage .finalRound3AnswersList,
-.finalRound3ResultView.finalRound2ImageAnswerStage .finalRound3AnswersList{
-  width:min(100%,980px);
-  height:auto;
-  min-height:0;
-
-  display:grid;
-  grid-auto-flow:unset;
-  grid-auto-columns:unset;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-
-  gap:12px;
-
-  align-items:center;
-  justify-content:center;
-
-  overflow:visible;
-}
-
-.finalRound2ImageAnswerStage .finalRound3AnswerCard{
-  height:118px;
-  min-height:118px;
-  max-height:118px;
-
-  padding:10px;
-
-  border-radius:22px;
-}
-
-.finalRound2ImageAnswerStage .finalAnswerChip{
-  height:100%;
-
-  border-radius:17px;
-
-  font-size:clamp(1.05rem,1.55vw,1.45rem);
-  line-height:1.22;
-}
-
-/* لو عدد الإجابات 4 تكون 2 × 2 */
-.finalRound2ImageAnswerStage .finalRound3AnswersList.finalAnswersCount4{
-  width:min(100%,760px);
-  grid-template-columns:repeat(2,minmax(0,1fr));
-}
-
-/* رقم 2 و 5: كلمات الترتيب لا تكون ممدودة زيادة */
-.finalSequenceWordsWrap{
-  align-content:center;
-}
-
-.finalSequenceWordBtn{
-  height:82px;
-  min-height:82px;
-  max-height:82px;
-}
-
-/* =========================
-   iPAD
-========================= */
-
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
   .finalRound2ImageAnswerStage .finalRound3AnswersList,
   .finalRound3ResultView.finalRound2ImageAnswerStage .finalRound3AnswersList{
     width:min(100%,880px);
@@ -2766,45 +2661,14 @@
     font-size:.95rem;
     line-height:1.18;
   }
-
-  .finalSequenceWordBtn{
-    height:64px;
-    min-height:64px;
-    max-height:64px;
-  }
 }
 
-/* =========================
-   PHONE
-========================= */
-
-@media (max-width:767px){
-  .finalRound2ImageAnswerStage .finalRound3AnswersList,
-  .finalRound3ResultView.finalRound2ImageAnswerStage .finalRound3AnswersList{
-    width:100%;
-    grid-template-columns:1fr;
-    gap:8px;
-  }
-
-  .finalRound2ImageAnswerStage .finalRound3AnswerCard{
-    height:86px;
-    min-height:86px;
-    max-height:86px;
-  }
-
-  .finalSequenceWordBtn{
-    height:58px;
-    min-height:58px;
-    max-height:58px;
-  }
-}
 /* =========================================================
-   FINAL CSS — PART 4
-   ROUND 3: قصة — CLEAN
+   PART 4: ROUND 3 / قصة
 ========================================================= */
 
 /* =========================
-   STORY BASE
+   27) STORY BASE
 ========================= */
 
 .finalStoryWrap,
@@ -2850,10 +2714,6 @@
   overflow:hidden;
 }
 
-/* =========================
-   EMPTY STATE
-========================= */
-
 .finalStoryCleanEmpty{
   width:min(100%,760px);
   height:190px;
@@ -2874,14 +2734,14 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.5rem,2.3vw,2.35rem);
   line-height:1.2;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
 }
 
 /* =========================
-   STORY CONTENT
+   28) STORY CONTENT
 ========================= */
 
 .finalStoryStackContent{
@@ -2897,12 +2757,18 @@
 }
 
 .finalStoryStackContent.finalStoryHasAnswer{
-  grid-template-rows:minmax(0,1fr) 170px;
-}
+  width:100%;
+  height:100%;
+  min-height:0;
 
-/* =========================
-   STORY PARTS STACK
-========================= */
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 260px;
+  grid-template-rows:minmax(0,1fr);
+  gap:12px;
+
+  align-items:center;
+  overflow:hidden;
+}
 
 .finalStoryPartsStack{
   width:100%;
@@ -2928,6 +2794,17 @@
   grid-template-rows:repeat(3,minmax(0,1fr));
 }
 
+.finalStoryStackContent.finalStoryHasAnswer .finalStoryPartsStack{
+  min-height:0;
+  height:100%;
+
+  display:grid;
+  grid-template-rows:repeat(3,minmax(0,1fr));
+  gap:8px;
+
+  overflow:hidden;
+}
+
 .finalStoryStackPart{
   width:100%;
   min-width:0;
@@ -2943,6 +2820,26 @@
   border:2px solid var(--line);
   border-radius:26px;
 
+  overflow:hidden;
+}
+
+.finalStoryStackContent.finalStoryHasAnswer .finalStoryStackPart{
+  min-height:0;
+  height:100%;
+
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr);
+  align-items:center;
+  gap:10px;
+
+  padding:8px 12px;
+
+  border-radius:18px;
+
+  background:var(--surface);
+  border:1px solid var(--line);
+
+  box-shadow:none;
   overflow:hidden;
 }
 
@@ -2962,7 +2859,25 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.45rem,2.1vw,2.15rem);
   line-height:1;
-  font-weight:900;
+  font-weight:400;
+}
+
+.finalStoryStackContent.finalStoryHasAnswer .finalStoryStackPoints{
+  width:36px;
+  height:36px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:12px;
+
+  color:#fff;
+  background:var(--primary);
+
+  font-size:1rem;
+  font-weight:400;
+  line-height:1;
 }
 
 .finalStoryStackText{
@@ -2985,7 +2900,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.45rem,2.15vw,2.45rem);
   line-height:1.28;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   white-space:normal;
@@ -2995,13 +2910,29 @@
   overflow:hidden;
 }
 
-/* =========================
-   STORY ANSWER — CLEAN BEST
-========================= */
+.finalStoryStackContent.finalStoryHasAnswer .finalStoryStackText{
+  min-width:0;
 
-.finalStoryStackContent.finalStoryHasAnswer{
-  grid-template-rows:minmax(0,1fr) 150px;
+  color:var(--text);
+
+  font-size:clamp(.95rem,1.42vw,1.28rem);
+  line-height:1.18;
+  font-weight:400;
+
+  white-space:normal;
+  overflow-wrap:break-word;
+  word-break:normal;
+  text-wrap:normal;
+
+  overflow:visible;
+  line-clamp:unset;
+  -webkit-line-clamp:unset;
+  -webkit-box-orient:unset;
 }
+
+/* =========================
+   29) STORY ANSWER
+========================= */
 
 .finalStoryCleanAnswer{
   width:100%;
@@ -3022,6 +2953,31 @@
   overflow:hidden;
 }
 
+.finalStoryStackContent.finalStoryHasAnswer .finalStoryCleanAnswer{
+  width:100%;
+  height:auto;
+  min-height:150px;
+  max-height:230px;
+
+  align-self:center;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  padding:18px 16px;
+
+  border-radius:24px;
+
+  background:var(--surface);
+  border:1px solid var(--line);
+
+  box-shadow:none;
+  overflow:hidden;
+}
+
 .finalStoryAnswerBadge{
   width:100%;
   height:100%;
@@ -3038,7 +2994,29 @@
   font-family:"HanakaText",sans-serif;
   font-size:1rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
+}
+
+.finalStoryStackContent.finalStoryHasAnswer .finalStoryAnswerBadge{
+  width:auto;
+  min-width:105px;
+  height:38px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  margin:0;
+  padding:0 18px;
+
+  border-radius:999px;
+
+  color:#fff;
+  background:var(--btn-correct);
+
+  font-size:.9rem;
+  font-weight:400;
+  line-height:1;
 }
 
 .finalStoryAnswerText{
@@ -3061,7 +3039,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.55rem,2.35vw,2.35rem);
   line-height:1.28;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   white-space:normal;
@@ -3071,72 +3049,32 @@
   overflow:hidden;
 }
 
-/* iPAD */
-@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
-  .finalStoryStackContent.finalStoryHasAnswer{
-    grid-template-rows:minmax(0,1fr) 126px;
-  }
+.finalStoryStackContent.finalStoryHasAnswer .finalStoryAnswerText{
+  width:100%;
 
-  .finalStoryCleanAnswer{
-    height:126px;
-    min-height:126px;
-    max-height:126px;
+  color:var(--text);
 
-    grid-template-columns:105px minmax(0,1fr);
+  font-size:clamp(1.15rem,1.75vw,1.85rem);
+  line-height:1.22;
+  font-weight:400;
 
-    gap:8px;
-    padding:8px;
-    border-radius:22px;
-  }
+  text-align:center;
 
-  .finalStoryAnswerBadge{
-    border-radius:17px;
-    font-size:.82rem;
-  }
+  white-space:normal;
+  overflow-wrap:break-word;
+  word-break:normal;
+  text-wrap:normal;
 
-  .finalStoryAnswerText{
-    border-radius:17px;
-    padding:10px 16px;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  padding:0;
 
-    font-size:clamp(1.2rem,1.8vw,1.65rem);
-    line-height:1.25;
-  }
+  overflow:visible;
 }
 
-/* PHONE */
-@media (max-width:767px){
-  .finalStoryStackContent.finalStoryHasAnswer{
-    grid-template-rows:minmax(0,1fr) 140px;
-  }
-
-  .finalStoryCleanAnswer{
-    height:140px;
-    min-height:140px;
-    max-height:140px;
-
-    grid-template-columns:1fr;
-    grid-template-rows:36px minmax(0,1fr);
-
-    gap:8px;
-    padding:8px;
-    border-radius:22px;
-  }
-
-  .finalStoryAnswerBadge{
-    border-radius:15px;
-    font-size:.78rem;
-  }
-
-  .finalStoryAnswerText{
-    border-radius:15px;
-    padding:8px 10px;
-
-    font-size:1rem;
-    line-height:1.25;
-  }
-}
 /* =========================
-   STORY NUMBERS
+   30) STORY NUMBERS
 ========================= */
 
 .finalStoryNumbersBar,
@@ -3170,7 +3108,9 @@
   max-height:64px;
 
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-auto-flow:column;
+  grid-auto-columns:minmax(0,1fr);
+  grid-template-columns:none;
   gap:14px;
 
   margin:0 auto;
@@ -3180,14 +3120,6 @@
   border:0;
 
   overflow:hidden;
-}
-
-.finalStoryNumbersGrid:has(.finalStoryNumberCard:nth-child(6)){
-  grid-template-columns:repeat(6,minmax(0,1fr));
-}
-
-.finalStoryNumbersGrid:has(.finalStoryNumberCard:nth-child(8)){
-  grid-template-columns:repeat(8,minmax(0,1fr));
 }
 
 .finalStoryNumberCard,
@@ -3212,7 +3144,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.65rem,2.55vw,2.85rem);
   line-height:1;
-  font-weight:900;
+  font-weight:700;
 
   box-shadow:none;
 
@@ -3252,7 +3184,7 @@
 }
 
 /* =========================
-   iPAD
+   31) STORY IPAD
 ========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
@@ -3281,7 +3213,8 @@
   }
 
   .finalStoryStackContent.finalStoryHasAnswer{
-    grid-template-rows:minmax(0,1fr) 138px;
+    grid-template-columns:minmax(0,1fr) 240px;
+    gap:10px;
   }
 
   .finalStoryPartsStack{
@@ -3311,26 +3244,27 @@
     line-height:1.32;
   }
 
-  .finalStoryCleanAnswer{
-    height:138px;
-    min-height:138px;
-    max-height:138px;
-
-    padding:12px 16px 12px 132px;
-
-    border-radius:22px;
-
-    font-size:clamp(1.25rem,1.9vw,1.75rem);
-    line-height:1.3;
+  .finalStoryStackContent.finalStoryHasAnswer .finalStoryStackText{
+    font-size:clamp(.82rem,1.2vw,1.05rem);
+    line-height:1.18;
   }
 
-  .finalStoryCleanAnswer::before{
-    inset-block:8px;
-    inset-inline-start:8px;
-    width:105px;
+  .finalStoryStackContent.finalStoryHasAnswer .finalStoryCleanAnswer{
+    min-height:132px;
+    max-height:210px;
+    padding:14px 12px;
+    border-radius:22px;
+  }
 
-    border-radius:17px;
-    font-size:.82rem;
+  .finalStoryStackContent.finalStoryHasAnswer .finalStoryAnswerBadge{
+    min-width:96px;
+    height:34px;
+    font-size:.78rem;
+  }
+
+  .finalStoryStackContent.finalStoryHasAnswer .finalStoryAnswerText{
+    font-size:clamp(1rem,1.45vw,1.45rem);
+    line-height:1.2;
   }
 
   .finalStoryNumbersBar,
@@ -3346,14 +3280,18 @@
     transform:translateY(-6px);
   }
 
-  .finalStoryNumbersGrid,
-  .finalRound3Grid{
-    height:56px;
-    min-height:56px;
-    max-height:56px;
+.finalStoryNumbersGrid,
+.finalRound3Grid{
+  height:56px;
+  min-height:56px;
+  max-height:56px;
 
-    gap:10px;
-  }
+  grid-auto-flow:column;
+  grid-auto-columns:minmax(0,1fr);
+  grid-template-columns:none;
+
+  gap:10px;
+}
 
   .finalStoryNumberCard,
   .finalRound3Card{
@@ -3366,144 +3304,12 @@
   }
 }
 
-/* =========================
-   PHONE
-========================= */
-
-@media (max-width:767px){
-  .finalStoryWrap,
-  .finalRound3Wrap{
-    grid-template-rows:minmax(0,1fr) auto;
-    gap:8px;
-  }
-
-  .finalRound3ImageStage,
-  .finalStoryStage{
-    width:100%;
-    height:auto;
-    min-height:280px;
-
-    margin:0;
-  }
-
-  .finalStoryCleanEmpty{
-    width:100%;
-    height:150px;
-    min-height:150px;
-
-    border-radius:22px;
-
-    font-size:1.45rem;
-  }
-
-  .finalStoryStackContent{
-    height:auto;
-    min-height:280px;
-  }
-
-  .finalStoryStackContent.finalStoryHasAnswer{
-    grid-template-rows:minmax(0,1fr) 150px;
-  }
-
-  .finalStoryPartsStack,
-  .finalStoryPartsStack.finalStoryPartsCount1,
-  .finalStoryPartsStack.finalStoryPartsCount2,
-  .finalStoryPartsStack.finalStoryPartsCount3{
-    grid-template-columns:1fr;
-    gap:8px;
-  }
-
-  .finalStoryStackPart{
-    min-height:110px;
-
-    grid-template-rows:42px minmax(0,1fr);
-    gap:8px;
-
-    padding:8px;
-    border-radius:20px;
-  }
-
-  .finalStoryStackPoints{
-    height:42px;
-    border-radius:15px;
-
-    font-size:1.2rem;
-  }
-
-  .finalStoryStackText{
-    border-radius:16px;
-    padding:10px 12px;
-
-    font-size:1.25rem;
-    line-height:1.28;
-  }
-
-  .finalStoryCleanAnswer{
-    height:150px;
-    min-height:150px;
-    max-height:150px;
-
-    padding:52px 10px 10px;
-
-    border-radius:22px;
-
-    font-size:1rem;
-    line-height:1.3;
-  }
-
-  .finalStoryCleanAnswer::before{
-    inset-block-start:8px;
-    inset-inline-start:8px;
-    width:calc(100% - 16px);
-    height:36px;
-
-    border-radius:15px;
-    font-size:.78rem;
-  }
-
-  .finalStoryNumbersBar,
-  .finalRound3NumbersBar{
-    width:100%;
-    height:auto;
-    min-height:74px;
-    max-height:none;
-
-    transform:none;
-
-    padding:10px;
-    border-radius:22px;
-  }
-
-  .finalStoryNumbersGrid,
-  .finalRound3Grid,
-  .finalStoryNumbersGrid:has(.finalStoryNumberCard:nth-child(6)),
-  .finalStoryNumbersGrid:has(.finalStoryNumberCard:nth-child(8)){
-    height:auto;
-    min-height:0;
-    max-height:none;
-
-    grid-template-columns:1fr;
-    gap:8px;
-  }
-
-  .finalStoryNumberCard,
-  .finalRound3Card{
-    height:58px;
-    min-height:58px;
-    max-height:58px;
-
-    border-radius:16px;
-    font-size:1.4rem;
-  }
-}
-
 /* =========================================================
-   FINAL CSS — PART 5
-   ROUND 4: التركيز — CLEAN
+   PART 5: ROUND 4 / التركيز
 ========================================================= */
 
 /* =========================
-   BASE
+   32) ROUND 4 BASE
 ========================= */
 
 .finalRound4TeamMediaWrap{
@@ -3545,10 +3351,6 @@
   overflow:hidden;
 }
 
-/* =========================
-   EMPTY
-========================= */
-
 .finalTeamMediaEmptyState{
   width:min(100%,760px);
   height:190px;
@@ -3569,14 +3371,14 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.5rem,2.3vw,2.35rem);
   line-height:1.2;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
 }
 
 /* =========================
-   MAIN CONTENT
+   33) ROUND 4 CONTENT
 ========================= */
 
 .finalRound3TeamMediaContent{
@@ -3591,22 +3393,16 @@
   overflow:hidden;
 }
 
-/* إذا فيه ميديا فقط */
 .finalRound3TeamMediaContent.finalFocusHasMedia:not(.finalFocusHasText){
   grid-template-rows:minmax(0,1fr);
 }
 
-/* إذا فيه سؤال أو إجابة فقط */
 .finalRound3TeamMediaContent.finalFocusTextOnly,
 .finalRound3TeamMediaContent.finalFocusMediaHiddenText{
   display:flex;
   align-items:center;
   justify-content:center;
 }
-
-/* =========================
-   MEDIA FRAME
-========================= */
 
 .finalTeamMediaFrame{
   width:100%;
@@ -3651,7 +3447,6 @@
   height:100%;
 }
 
-/* زر التشغيل */
 .finalTeamMediaPlayBadge{
   position:absolute;
   inset-inline-start:50%;
@@ -3674,7 +3469,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:2rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
   cursor:pointer;
 
@@ -3682,7 +3477,7 @@
 }
 
 /* =========================
-   TEXT ROW
+   34) ROUND 4 TEXT
 ========================= */
 
 .finalTeamMediaTextRow{
@@ -3700,6 +3495,7 @@
 
   overflow:hidden;
 }
+
 .finalRound3TeamMediaContent.finalFocusHasQuestion.finalFocusHasAnswer .finalTeamMediaTextRow{
   width:min(100%,960px);
   height:100%;
@@ -3729,10 +3525,6 @@
   min-height:150px;
   max-height:150px;
 }
-
-/* =========================
-   QUESTION
-========================= */
 
 .finalTeamMediaQuestionBox{
   width:min(100%,960px);
@@ -3771,7 +3563,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.8rem,3vw,3.4rem);
   line-height:1.28;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   white-space:normal;
@@ -3782,7 +3574,7 @@
 }
 
 /* =========================
-   ANSWER / RESULT
+   35) ROUND 4 ANSWER
 ========================= */
 
 .finalTeamMediaResultBox{
@@ -3822,7 +3614,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:1rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 }
 
 .finalTeamMediaResultBox.wrongResult{
@@ -3854,7 +3646,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.55rem,2.35vw,2.35rem);
   line-height:1.28;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   white-space:normal;
@@ -3871,7 +3663,7 @@
 }
 
 /* =========================
-   NUMBERS
+   36) ROUND 4 NUMBERS
 ========================= */
 
 .finalTeamMediaNumbersBar,
@@ -3905,25 +3697,6 @@
   max-height:64px;
 
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:14px;
-
-  margin:0 auto;
-  padding:0;
-
-  background:transparent;
-  border:0;
-
-  overflow:hidden;
-}
-
-.finalTeamMediaNumbersGrid{
-  width:100%;
-  height:64px;
-  min-height:64px;
-  max-height:64px;
-
-  display:grid;
   gap:14px;
 
   margin:0 auto;
@@ -3937,12 +3710,10 @@
   grid-template-columns:repeat(4,minmax(0,1fr));
 }
 
-/* 7 أزرار */
 .finalTeamMediaNumbersGrid:has(.finalTeamMediaNumberCard:nth-child(7)):not(:has(.finalTeamMediaNumberCard:nth-child(8))){
   grid-template-columns:repeat(7,minmax(0,1fr));
 }
 
-/* 9 أزرار */
 .finalTeamMediaNumbersGrid:has(.finalTeamMediaNumberCard:nth-child(9)){
   grid-template-columns:repeat(9,minmax(0,1fr));
 }
@@ -3968,7 +3739,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:clamp(1.65rem,2.55vw,2.85rem);
   line-height:1;
-  font-weight:900;
+  font-weight:700;
 
   transition:
     transform .15s ease,
@@ -4001,7 +3772,7 @@
 }
 
 /* =========================
-   OVERLAY
+   37) ROUND 4 OVERLAY
 ========================= */
 
 .finalRound3TeamMediaOverlay,
@@ -4081,7 +3852,7 @@
   font-family:"HanakaText",sans-serif;
   font-size:1.7rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
   cursor:pointer;
 
@@ -4089,7 +3860,7 @@
 }
 
 /* =========================
-   iPAD
+   38) ROUND 4 IPAD
 ========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
@@ -4216,607 +3987,14 @@
 }
 
 /* =========================
-   PHONE
+   39) REDUCED MOTION
 ========================= */
 
-@media (max-width:767px){
-  .finalRound4TeamMediaWrap{
-    grid-template-rows:minmax(0,1fr) auto;
-    gap:8px;
-  }
-
-  .finalRound3TeamMediaStage{
-    width:100%;
-    height:auto;
-    min-height:280px;
-
-    margin:0;
-  }
-
-  .finalTeamMediaEmptyState{
-    width:100%;
-    height:150px;
-    min-height:150px;
-
-    border-radius:22px;
-
-    font-size:1.45rem;
-  }
-
-  .finalRound3TeamMediaContent{
-    width:100%;
-    height:auto;
-    min-height:280px;
-  }
-
-  .finalTeamMediaFrame{
-    min-height:260px;
-
-    padding:10px;
-    border-radius:22px;
-  }
-
-  .finalTeamMediaImage,
-  .finalTeamMediaVideo{
-    border-radius:18px;
-  }
-
-  .finalTeamMediaPlayBadge{
-    width:62px;
-    height:62px;
-
-    border-radius:20px;
-    font-size:1.45rem;
-  }
-
-  .finalTeamMediaQuestionBox{
-    width:100%;
-    min-height:180px;
-
-    padding:10px;
-    border-radius:22px;
-  }
-
-  .finalTeamMediaQuestionText{
-    min-height:140px;
-
-    padding:16px;
-    border-radius:18px;
-
-    font-size:1.45rem;
-    line-height:1.25;
-  }
-
-  .finalTeamMediaResultBox{
-    width:100%;
-    height:140px;
-    min-height:140px;
-    max-height:140px;
-
-    grid-template-columns:1fr;
-    grid-template-rows:36px minmax(0,1fr);
-
-    gap:8px;
-    padding:8px;
-    border-radius:22px;
-  }
-
-  .finalTeamMediaResultBox::before{
-    border-radius:15px;
-    font-size:.78rem;
-  }
-
-  .finalRound3TeamMediaAnswer{
-    border-radius:15px;
-    padding:8px 10px;
-
-    font-size:1rem;
-    line-height:1.25;
-  }
-
-  .finalTeamMediaNumbersBar,
-  .finalRound3NumbersBar.finalTeamMediaNumbersBar{
-    width:100%;
-    height:auto;
-    min-height:74px;
-    max-height:none;
-
-    transform:none;
-
-    padding:10px;
-    border-radius:22px;
-  }
-
-  .finalTeamMediaNumbersGrid,
-  .finalRound3Grid.finalTeamMediaNumbersGrid,
-  .finalTeamMediaNumbersGrid:has(.finalTeamMediaNumberCard:nth-child(6)),
-  .finalTeamMediaNumbersGrid:has(.finalTeamMediaNumberCard:nth-child(8)){
-    height:auto;
-    min-height:0;
-    max-height:none;
-
-    grid-template-columns:1fr;
-    gap:8px;
-  }
-
-  .finalTeamMediaNumberCard{
-    height:58px;
-    min-height:58px;
-    max-height:58px;
-
-    border-radius:16px;
-    font-size:1.4rem;
-  }
-
-  .finalRound3TeamMediaOverlay,
-  .finalRound4TeamMediaOverlay{
-    padding:12px;
-  }
-
-  .finalRound3TeamMediaOverlayImage,
-  .finalRound3TeamMediaOverlayVideo{
-    border-radius:18px;
-  }
-
-  .finalRound3TeamMediaCloseBtn{
-    width:44px;
-    height:44px;
-
-    top:12px;
-    inset-inline-end:12px;
-
-    border-radius:15px;
-  }
-}
-/* =========================
-   FINAL ROUND 1 - SAME DESIGN ZOOM
-   تكبير القصاصة بنفس تصميمها قبل التكبير
-========================= */
-
-.finalRound1Overlay{
-  position:fixed;
-  inset:0;
-  z-index:999999;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  padding:clamp(18px,3vw,44px);
-
-  background:rgba(6,9,15,.78);
-}
-
-.finalRound1OverlayInner{
-  width:100%;
-  height:100%;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.finalRound1OverlayPaper{
-  width:min(92vw,1180px) !important;
-  min-height:min(72vh,680px) !important;
-  max-height:86vh !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  padding:clamp(42px,5.2vw,82px) !important;
-
-  overflow:hidden !important;
-
-  animation:finalRound1PaperZoomIn .22s ease-out both;
-}
-
-/* لا نغير ألوان البطاقة المكبرة */
-.finalRound1OverlayPaper::before,
-.finalRound1OverlayPaper::after{
-  display:none !important;
-}
-
-.finalRound1OverlayText{
-  width:100%;
-  max-width:1020px;
-
-  text-align:center;
-
-  white-space:normal;
-  overflow-wrap:break-word;
-  word-break:normal;
-  text-wrap:normal;
-}
-
-@keyframes finalRound1PaperZoomIn{
-  from{
-    opacity:0;
-    transform:scale(.88) translateY(22px);
-  }
-
-  to{
-    opacity:1;
-    transform:scale(1) translateY(0);
-  }
-}
-
-/* تكبير الخط قبل الضغط فقط بدون تغيير التصميم */
-.finalRound1TextCardInner{
-  font-size:clamp(2.15rem, 3vw, 3.35rem) !important;
-  line-height:1.45 !important;
-}
-
-/* =========================================================
-   FINAL ROUND 3 - STORY COMPACT ANSWER LAYOUT
-   ترتيب قصة: الأجزاء واضحة + كرت إجابة صغير غير ممدود
-========================================================= */
-
-.finalRound3Wrap.finalStoryWrap{
-  height:calc(100dvh - 185px) !important;
-  min-height:0 !important;
-
-  display:grid !important;
-  grid-template-rows:minmax(0,1fr) auto !important;
-  gap:8px !important;
-
-  overflow:hidden !important;
-}
-
-.finalRound3ImageStageWrap.finalStoryStageWrap{
-  min-height:0 !important;
-  height:100% !important;
-  overflow:hidden !important;
-}
-
-.finalRound3ImageStage.finalStoryStage{
-  min-height:0 !important;
-  height:100% !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  padding:6px !important;
-  overflow:hidden !important;
-}
-
-/* الحاوية عند ظهور الإجابة */
-.finalStoryStackContent.finalStoryHasAnswer{
-  width:100% !important;
-  height:100% !important;
-  min-height:0 !important;
-
-  display:grid !important;
-  grid-template-columns:minmax(0,1fr) 260px !important;
-  grid-template-rows:minmax(0,1fr) !important;
-  gap:12px !important;
-
-  align-items:center !important;
-  overflow:hidden !important;
-}
-
-/* الأجزاء */
-.finalStoryStackContent.finalStoryHasAnswer .finalStoryPartsStack{
-  min-height:0 !important;
-  height:100% !important;
-
-  display:grid !important;
-  grid-template-rows:repeat(3,minmax(0,1fr)) !important;
-  gap:8px !important;
-
-  overflow:hidden !important;
-}
-
-/* كرت الجزء */
-.finalStoryStackContent.finalStoryHasAnswer .finalStoryStackPart{
-  min-height:0 !important;
-  height:100% !important;
-
-  display:grid !important;
-  grid-template-columns:42px minmax(0,1fr) !important;
-  align-items:center !important;
-  gap:10px !important;
-
-  padding:8px 12px !important;
-
-  border-radius:18px !important;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.92), rgba(239,245,249,.74)) !important;
-
-  border:1px solid rgba(36,24,94,.10) !important;
-
-  box-shadow:
-    0 8px 18px rgba(31,44,61,.07),
-    inset 0 0 0 1px rgba(255,255,255,.58) !important;
-
-  overflow:hidden !important;
-}
-
-/* رقم النقاط */
-.finalStoryStackContent.finalStoryHasAnswer .finalStoryStackPoints{
-  width:36px !important;
-  height:36px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  border-radius:12px !important;
-
-  color:#fff !important;
-  background:linear-gradient(135deg,#D96A3A 0%,#F08A52 100%) !important;
-
-  font-size:1rem !important;
-  font-weight:900 !important;
-  line-height:1 !important;
-}
-
-/* نص الجزء */
-.finalStoryStackContent.finalStoryHasAnswer .finalStoryStackText{
-  min-width:0 !important;
-
-  color:#26324A !important;
-
-  font-size:clamp(.95rem,1.42vw,1.28rem) !important;
-  line-height:1.18 !important;
-  font-weight:800 !important;
-
-  white-space:normal !important;
-  overflow-wrap:break-word !important;
-  word-break:normal !important;
-  text-wrap:normal !important;
-
-  overflow:visible !important;
-  line-clamp:unset !important;
-  -webkit-line-clamp:unset !important;
-  -webkit-box-orient:unset !important;
-}
-
-/* كرت الإجابة — صغير ومرتب */
-.finalStoryStackContent.finalStoryHasAnswer .finalStoryCleanAnswer{
-  width:100% !important;
-  height:auto !important;
-  min-height:150px !important;
-  max-height:230px !important;
-
-  align-self:center !important;
-
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:12px !important;
-
-  padding:18px 16px !important;
-
-  border-radius:24px !important;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.94), rgba(235,242,247,.78)) !important;
-
-  border:1px solid rgba(36,24,94,.12) !important;
-
-  box-shadow:
-    0 14px 32px rgba(31,44,61,.12),
-    inset 0 0 0 1px rgba(255,255,255,.68) !important;
-
-  overflow:hidden !important;
-}
-
-/* شارة الإجابة */
-.finalStoryStackContent.finalStoryHasAnswer .finalStoryAnswerBadge{
-  width:auto !important;
-  min-width:105px !important;
-  height:38px !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  margin:0 !important;
-  padding:0 18px !important;
-
-  border-radius:999px !important;
-
-  color:#fff !important;
-  background:linear-gradient(135deg,#244437 0%,#3E765F 100%) !important;
-
-  font-size:.9rem !important;
-  font-weight:900 !important;
-  line-height:1 !important;
-}
-
-/* نص الإجابة */
-.finalStoryStackContent.finalStoryHasAnswer .finalStoryAnswerText{
-  width:100% !important;
-
-  color:#24185E !important;
-
-  font-size:clamp(1.15rem,1.75vw,1.85rem) !important;
-  line-height:1.22 !important;
-  font-weight:900 !important;
-
-  text-align:center !important;
-
-  white-space:normal !important;
-  overflow-wrap:break-word !important;
-  word-break:normal !important;
-  text-wrap:normal !important;
-
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-  padding:0 !important;
-
-  overflow:visible !important;
-}
-/* =========================================================
-   FINAL / صح صحلي
-   رقم 1 و 4 - الكلمات المبعثرة
-   تلميحة برتقالي + خط أكبر
-========================================================= */
-
-.finalRound2Wrap:has(.finalRound2Card:nth-child(1).active) .finalHintText,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(4).active) .finalHintText,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(1).used.active) .finalHintText,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(4).used.active) .finalHintText{
-  background:linear-gradient(135deg,#ff9f2f,#ff7a1a) !important;
-  color:#fff !important;
-  border:2px solid rgba(255,255,255,.65) !important;
-  box-shadow:0 14px 34px rgba(255,122,26,.30) !important;
-
-  font-size:clamp(2.1rem,3vw,3.35rem) !important;
-  line-height:1.2 !important;
-  font-weight:900 !important;
-}
-/* =========================================================
-   FINAL / صح صحلي
-   رقم 1 و 4 - عند ظهور الإجابات
-   تلوين الكلمات المبعثرة بالبرتقالي + تكبير الخط
-========================================================= */
-
-.finalRound2Wrap:has(.finalRound2Card:nth-child(1).active) .finalRound2AnswerScrambled,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(4).active) .finalRound2AnswerScrambled,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(1).used.active) .finalRound2AnswerScrambled,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(4).used.active) .finalRound2AnswerScrambled{
-  background:linear-gradient(135deg,#ff9f2f,#ff7a1a) !important;
-  color:#fff !important;
-  border:2px solid rgba(255,255,255,.65) !important;
-  box-shadow:0 12px 28px rgba(255,122,26,.26) !important;
-
-  font-size:clamp(1.45rem,2vw,2.15rem) !important;
-  line-height:1.18 !important;
-  font-weight:900 !important;
-}
-
-/* تكبير الإجابة الصحيحة تحتها */
-.finalRound2Wrap:has(.finalRound2Card:nth-child(1).active) .finalRound2AnswerCorrect,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(4).active) .finalRound2AnswerCorrect,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(1).used.active) .finalRound2AnswerCorrect,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(4).used.active) .finalRound2AnswerCorrect{
-  font-size:clamp(1.35rem,1.9vw,2.05rem) !important;
-  line-height:1.18 !important;
-  font-weight:900 !important;
-}
-/* مربع المتبقي - يمين ويسار */
-.finalRound2Wrap:has(.finalRound2Card:nth-child(2).active) .finalSequenceTimerBadge,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(5).active) .finalSequenceTimerBadge,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(2).used.active) .finalSequenceTimerBadge,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(5).used.active) .finalSequenceTimerBadge{
-  width:260px !important;
-  height:92px !important;
-  min-width:260px !important;
-  min-height:92px !important;
-  max-width:260px !important;
-  max-height:92px !important;
-
-  margin:0 auto !important;
-
-  display:grid !important;
-  grid-template-columns:1fr 88px !important;
-  align-items:center !important;
-  gap:12px !important;
-
-  direction:rtl !important;
-
-  padding:10px 12px !important;
-
-  border-radius:28px !important;
-
-  background:linear-gradient(135deg,#ff9f2f,#ff7a1a) !important;
-  color:#fff !important;
-
-  border:2px solid rgba(255,255,255,.65) !important;
-  box-shadow:0 14px 34px rgba(255,122,26,.30) !important;
-
-  overflow:hidden !important;
-}
-
-/* كلمة المتبقي - يمين */
-.finalRound2Wrap:has(.finalRound2Card:nth-child(2).active) .finalSequenceTimerBadge span,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(5).active) .finalSequenceTimerBadge span,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(2).used.active) .finalSequenceTimerBadge span,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(5).used.active) .finalSequenceTimerBadge span{
-  width:100% !important;
-  height:100% !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  color:#fff !important;
-  font-size:1.35rem !important;
-  line-height:1 !important;
-  font-weight:900 !important;
-
-  background:rgba(255,255,255,.16) !important;
-  border-radius:20px !important;
-}
-
-/* الرقم - يسار */
-.finalRound2Wrap:has(.finalRound2Card:nth-child(2).active) .finalSequenceTimerBadge strong,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(5).active) .finalSequenceTimerBadge strong,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(2).used.active) .finalSequenceTimerBadge strong,
-.finalRound2Wrap:has(.finalRound2Card:nth-child(5).used.active) .finalSequenceTimerBadge strong{
-  width:88px !important;
-  height:100% !important;
-
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-
-  color:#ff7a1a !important;
-  background:#fff !important;
-
-  border-radius:20px !important;
-
-  font-size:3rem !important;
-  line-height:1 !important;
-  font-weight:900 !important;
-}
-
-.finalSequenceWordBtn.showWordsBox{
-  cursor:pointer !important;
-  background:#111827 !important;
-  color:#fff !important;
-}
-html,
-body{
-  touch-action:manipulation;
-}
-
-button,
-.actionBtn,
-.finalRound2Card,
-.finalSequenceTimerBadge,
-.finalSequenceWordBtn{
-  touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;
-}
-.finalSequenceWordsReveal .finalSequenceWordBtn{
-  animation:finalSequenceWordReveal .34s cubic-bezier(.2,.9,.2,1) both;
-}
-
-.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(1){ animation-delay:.02s; }
-.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(2){ animation-delay:.05s; }
-.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(3){ animation-delay:.08s; }
-.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(4){ animation-delay:.11s; }
-.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(5){ animation-delay:.14s; }
-.finalSequenceWordsReveal .finalSequenceWordBtn:nth-child(6){ animation-delay:.17s; }
-
-@keyframes finalSequenceWordReveal{
-  from{
-    opacity:0;
-    transform:translateY(12px);
-    filter:blur(4px);
-  }
-
-  to{
-    opacity:1;
-    transform:translateY(0);
-    filter:blur(0);
+@media (prefers-reduced-motion:reduce){
+  .finalWrapNew *,
+  .finalWrapNew *::before,
+  .finalWrapNew *::after{
+    animation:none;
+    transition:none;
   }
 }

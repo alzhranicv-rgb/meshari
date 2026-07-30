@@ -1,9 +1,10 @@
 /* =========================================================
    EXPLAIN / اشرح الكلمة - CLEAN FINAL
+   NO PATCHES - NO BOLD EXCEPT NUMBER CARDS
 ========================================================= */
 
 /* =========================
-   BASE
+   1) BASE
 ========================= */
 
 .explainWrap,
@@ -26,6 +27,7 @@
   --btn-correct:#007F00;
   --btn-wrong:#7F0000;
   --btn-start:#00004C;
+  --btn-double:#00007F;
   --btn-disabled:#D7DCE2;
   --btn-disabled-text:#7B8792;
 
@@ -41,8 +43,14 @@
     calc(14px + env(safe-area-inset-left,0px));
 
   display:grid;
-  grid-template-rows:138px minmax(0,1fr) 140px 76px;
-  gap:10px;
+  position:relative;
+
+  grid-template-rows:138px minmax(0,1fr) 92px 76px;
+  gap:14px;
+
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
 
   overflow:hidden;
   direction:rtl;
@@ -65,7 +73,7 @@
 }
 
 /* =========================
-   HEADER
+   2) HEADER
 ========================= */
 
 .explainHeader{
@@ -103,7 +111,7 @@
   color:#fff;
 
   font-size:.9rem;
-  font-weight:900;
+  font-weight:400;
   line-height:1;
 
   transition:
@@ -130,7 +138,7 @@
 }
 
 /* =========================
-   TITLE
+   3) TITLE
 ========================= */
 
 .explainTitle{
@@ -147,12 +155,12 @@
   color:var(--secondary);
   font-size:clamp(1.25rem,1.65vw,1.8rem);
   line-height:1;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 }
 
 /* =========================
-   TEAMS
+   4) TEAMS
 ========================= */
 
 .explainTeamMini{
@@ -219,9 +227,9 @@
   width:100%;
 
   color:var(--text);
-  font-size:clamp(1.12rem,1.55vw,1.45rem);
-  line-height:1.18;
-  font-weight:900;
+  font-size:clamp(1.22rem,1.75vw,1.62rem);
+  line-height:1.12;
+  font-weight:400;
   text-align:center;
 
   white-space:normal;
@@ -249,7 +257,7 @@
 
   font-size:1.35rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 }
 
 .explainTeamMini.explainTeamCurrent > b{
@@ -257,7 +265,7 @@
 }
 
 /* =========================
-   MAIN STAGE
+   5) MAIN STAGE
 ========================= */
 
 .explainMainStage{
@@ -273,7 +281,7 @@
   align-items:center;
   justify-content:center;
 
-  padding:14px;
+  padding:18px;
 
   background:var(--surface);
   border:2px solid var(--line);
@@ -292,18 +300,18 @@
   align-items:center;
   justify-content:center;
 
-  padding:22px;
+  padding:28px;
 
-  border-radius:22px;
+  border-radius:24px;
 
   background:var(--soft);
-  border:1px solid var(--line);
+  border:2px solid var(--line);
 
   color:var(--secondary);
 
   font-size:clamp(2.4rem,5vw,5.5rem);
   line-height:1.12;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 
   overflow:hidden;
@@ -318,21 +326,10 @@
 
   font-size:clamp(1.5rem,2.2vw,2.3rem);
   line-height:1.25;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
 }
 
-.explainWordBox.hiddenWord,
-.explainWordBox.wordBoxInvisible{
-  background:#111827;
-  border-color:#111827;
-}
-
-.explainWordBox.hiddenWord::after,
-.explainWordBox.wordBoxInvisible::after{
-  content:"";
-  display:none;
-}
 .explainWordBox.hiddenWord,
 .explainWordBox.wordBoxInvisible{
   background:var(--secondary);
@@ -342,7 +339,13 @@
 
   font-size:clamp(5rem,12vw,12rem);
   line-height:1;
-  font-weight:900;
+  font-weight:400;
+}
+
+.explainWordBox.hiddenWord::after,
+.explainWordBox.wordBoxInvisible::after{
+  content:"";
+  display:none;
 }
 
 .explainWordBox.hiddenWord.danger,
@@ -365,7 +368,7 @@
 }
 
 /* =========================
-   TIMER
+   6) TIMER
 ========================= */
 
 .explainTimerBox{
@@ -385,16 +388,20 @@
 
   background:var(--secondary);
   color:#fff;
+  -webkit-text-fill-color:#fff;
 
   border:3px solid rgba(255,255,255,.45);
 
   font-size:3rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
 
   box-shadow:
     0 14px 34px rgba(0,0,0,.22),
     inset 0 0 0 1px rgba(255,255,255,.18);
+
+  opacity:1;
+  visibility:visible;
 }
 
 .explainTimerBox.hidden{
@@ -403,7 +410,13 @@
 
 .explainTimerBox.danger{
   background:#7F0000;
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+
   animation:explainTimerPulse .75s ease-in-out infinite;
+
+  opacity:1;
+  visibility:visible;
 }
 
 @keyframes explainTimerPulse{
@@ -417,14 +430,109 @@
 }
 
 /* =========================
-   EXPLAIN NUMBERS
-   نفس تصميم التركيز
+   7) EXPLAIN NUMBERS
 ========================= */
 
-.explainNumbersGrid{
-  width:min(100%,1040px);
-  margin:10px auto 0;
-  padding:12px;
+.explainWrap .segmentCompensationNumber{
+  position:relative;
+  overflow:hidden;
+
+  border:2px solid #FE7F2D;
+  background:#FFF7ED;
+  color:#FE7F2D;
+
+  box-shadow:
+    inset 0 0 0 2px rgba(254,127,45,.18),
+    0 10px 24px rgba(254,127,45,.18);
+}
+
+.explainWrap .segmentCompensationNumber::after{
+  content:"تعويض";
+
+  position:absolute;
+  left:7px;
+  right:7px;
+  bottom:6px;
+
+  height:19px;
+  border-radius:999px;
+
+  background:#FE7F2D;
+  color:#FFFFFF;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:11px;
+  line-height:1;
+  font-weight:400;
+}
+
+.explainWrap .segmentCompensationNumber.segmentCompensationPressing{
+  transform:scale(.94);
+
+  border-color:#0A7C6E;
+  background:#ECFDF5;
+  color:#0A7C6E;
+
+  box-shadow:
+    inset 0 0 0 2px rgba(10,124,110,.18),
+    0 12px 28px rgba(10,124,110,.22);
+}
+
+.explainWrap .segmentCompensationNumber.segmentCompensationPressing::after{
+  background:#0A7C6E;
+  color:#FFFFFF;
+}
+
+.explainWrap .segmentCompensationBadge{
+  position:absolute;
+  top:146px;
+  left:50%;
+  z-index:20;
+
+  transform:translateX(-50%);
+
+  min-height:40px;
+  padding:7px 28px;
+
+  border-radius:16px;
+  border:2px solid #0A7C6E;
+
+  background:#ECFDF5;
+  color:#0A7C6E;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:28px;
+  line-height:1;
+  font-weight:400;
+
+  pointer-events:none;
+}
+
+.explainWrap .finalRound3NumbersBar.finalTeamMediaNumbersBar{
+  width:min(100%,980px);
+  height:92px;
+  min-height:92px;
+  max-height:92px;
+  margin:0 auto;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.explainWrap .finalRound3Grid.finalTeamMediaNumbersGrid{
+  width:100%;
+  height:72px;
+  min-height:72px;
+  max-height:72px;
+
+  padding:10px;
 
   display:grid;
   gap:10px;
@@ -435,85 +543,33 @@
   border-radius:24px;
 }
 
-.explainNumberCard{
-  width:100%;
-  height:64px;
+.explainWrap .finalRound3Card.finalTeamMediaNumberCard{
+  height:52px;
+  min-height:52px;
+  max-height:52px;
 
-  border:0;
-  border-radius:18px;
+  border-radius:16px;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:var(--primary);
-  color:#fff;
-
-  font-size:1.8rem;
-  font-weight:900;
-  line-height:1;
-
-  cursor:pointer;
-
-  transition:
-    transform .15s ease,
-    background .15s ease,
-    filter .15s ease;
-}
-
-.explainNumberCard span{
-  font:inherit;
-  line-height:1;
-}
-
-.explainNumberCard:hover:not(:disabled):not(.used){
-  transform:translateY(-1px);
-  filter:brightness(1.03);
-}
-
-.explainNumberCard:active:not(:disabled){
-  transform:scale(.97);
-}
-
-.explainNumberCard.active{
-  background:var(--secondary);
-  color:#fff;
-}
-
-.explainNumberCard.locked{
-  opacity:.55;
-}
-
-.explainNumberCard.used,
-.explainNumberCard:disabled{
-  background:#DCE2E8;
-  color:var(--muted);
-
-  cursor:not-allowed;
-  box-shadow:none;
-  transform:none;
-  filter:none;
-}
-
-.explainNumberCard.used.active{
-  background:var(--secondary);
-  color:#fff;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
 }
 
 /* =========================
-   ACTION BAR
+   8) ACTION BAR
 ========================= */
 
 .explainActionBar{
-  width:min(100%,860px);
+  width:min(100%,980px);
   height:76px;
   min-height:76px;
   max-height:76px;
   margin:0 auto;
 
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:12px;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
 
   padding:10px;
 
@@ -522,6 +578,9 @@
   border-radius:24px;
 
   align-self:end;
+  align-items:center;
+  justify-content:center;
+
   overflow:hidden;
 }
 
@@ -529,6 +588,7 @@
   width:100%;
   height:52px;
   min-height:52px;
+  min-width:0;
 
   border:0;
   border-radius:16px;
@@ -543,8 +603,12 @@
 
   font-size:1rem;
   line-height:1;
-  font-weight:900;
+  font-weight:400;
   text-align:center;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 
   transition:
     transform .15s ease,
@@ -561,16 +625,30 @@
   transform:scale(.97);
 }
 
+.explainDoubleBtn{
+  order:1;
+  background:var(--btn-double);
+  color:#fff;
+}
+
 .explainStartBtn{
+  order:2;
   background:var(--btn-start);
 }
 
 .explainCorrectBtn{
+  order:3;
   background:var(--btn-correct);
 }
 
 .explainWrongBtn{
+  order:4;
   background:var(--btn-wrong);
+}
+
+.explainDoubleBtn.activeDouble{
+  background:var(--primary);
+  color:#fff;
 }
 
 .explainActionBtn:disabled{
@@ -582,15 +660,88 @@
   filter:none;
 }
 
+.explainWrap .segmentCompensationNumber{
+  position:relative;
+  overflow:hidden;
+
+  border:2px solid #FE7F2D;
+  background:#FFF7ED;
+  color:#FE7F2D;
+
+  box-shadow:
+    inset 0 0 0 2px rgba(254,127,45,.18),
+    0 10px 24px rgba(254,127,45,.18);
+}
+
+.explainWrap .segmentCompensationNumber::after{
+  content:"تعويض";
+
+  position:absolute;
+  left:7px;
+  right:7px;
+  bottom:6px;
+
+  height:19px;
+  border-radius:999px;
+
+  background:#FE7F2D;
+  color:#FFFFFF;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:11px;
+  line-height:1;
+  font-weight:400;
+}
+
+.explainWrap .segmentCompensationNumber.segmentCompensationPressing{
+  transform:scale(.94);
+
+  border-color:#0A7C6E;
+  background:#ECFDF5;
+  color:#0A7C6E;
+
+  box-shadow:
+    inset 0 0 0 2px rgba(10,124,110,.18),
+    0 12px 28px rgba(10,124,110,.22);
+}
+
+.explainWrap .segmentCompensationNumber.segmentCompensationPressing::after{
+  background:#0A7C6E;
+  color:#FFFFFF;
+}
+
+.explainWrap .segmentCompensationBadge{
+  margin:8px auto 0;
+  min-height:42px;
+  padding:8px 22px;
+
+  border-radius:16px;
+  border:2px solid #0A7C6E;
+
+  background:#ECFDF5;
+  color:#0A7C6E;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:28px;
+  line-height:1;
+  font-weight:400;
+}
+
 /* =========================
-   IPAD LANDSCAPE
+   9) IPAD LANDSCAPE
 ========================= */
 
 @media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
   .explainWrap{
     padding:10px;
-    grid-template-rows:90px minmax(0,1fr) 105px 70px;
-    gap:8px;
+    grid-template-rows:90px minmax(0,1fr) 78px 70px;
+    gap:10px;
   }
 
   .explainHeader{
@@ -641,8 +792,8 @@
   }
 
   .explainTeamName strong{
-    font-size:.82rem;
-    line-height:1.15;
+    font-size:1.04rem;
+    line-height:1.1;
   }
 
   .explainTeamMini > b{
@@ -688,35 +839,32 @@
     font-size:2.15rem;
   }
 
-.explainWrap{
-  padding:10px;
-  grid-template-rows:90px minmax(0,1fr) 78px 70px;
-  gap:8px;
-}
+  .explainNumbersGrid{
+    width:min(100%,760px);
+    height:66px;
+    min-height:66px;
+    max-height:66px;
 
-.explainNumbersGrid{
-  width:min(100%,760px);
-  height:66px;
-  min-height:66px;
-  max-height:66px;
+    grid-auto-flow:column;
+    grid-auto-columns:minmax(0,1fr);
+    grid-template-rows:50px;
 
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  grid-template-rows:50px;
+    gap:8px;
+    padding:8px;
+    border-radius:22px;
+  }
 
-  gap:8px;
-  padding:8px;
-  border-radius:22px;
-}
+  .explainNumberCard{
+    height:50px;
+    max-height:50px;
 
-.explainNumberCard{
-  max-height:50px;
-  border-radius:16px;
-  font-size:1.7rem;
-}
+    border-radius:16px;
+    font-size:1.7rem;
+  }
 
-.explainNumberCard span{
-  font-size:1.7rem;
-}
+  .explainNumberCard span{
+    font-size:1.7rem;
+  }
 
   .explainActionBar{
     width:min(100%,760px);
@@ -724,7 +872,9 @@
     min-height:70px;
     max-height:70px;
 
+    gap:8px;
     padding:9px;
+
     border-radius:22px;
   }
 
@@ -734,82 +884,58 @@
 
     border-radius:15px;
 
-    font-size:.9rem;
+    font-size:.82rem;
   }
-}
+    .explainWrap .segmentCompensationBadge{
+    top:98px;
 
-/* =========================
-   PHONE
-========================= */
+    min-height:34px;
+    padding:6px 22px;
 
-@media (max-width:767px){
-  .explainWrap{
-    max-height:none;
-    overflow:auto;
+    border-radius:14px;
 
-    padding:
-      calc(8px + env(safe-area-inset-top,0px))
-      calc(8px + env(safe-area-inset-right,0px))
-      calc(8px + env(safe-area-inset-bottom,0px))
-      calc(8px + env(safe-area-inset-left,0px));
-
-    display:flex;
-    flex-direction:column;
-    gap:10px;
+    font-size:22px;
   }
 
-  .explainHeader{
-    height:auto;
-    min-height:0;
+  .explainWrap .finalRound3NumbersBar.finalTeamMediaNumbersBar{
+    width:min(100%,760px);
+    height:78px;
+    min-height:78px;
+    max-height:78px;
+  }
 
-    grid-template-columns:1fr 1fr;
-    gap:8px;
+  .explainWrap .finalRound3Grid.finalTeamMediaNumbersGrid{
+    height:64px;
+    min-height:64px;
+    max-height:64px;
 
     padding:8px;
-    margin-top:0;
+    gap:8px;
+
+    border-radius:22px;
   }
 
-  .explainTitle{
-    grid-column:1 / -1;
-    order:-1;
+  .explainWrap .finalRound3Card.finalTeamMediaNumberCard{
+    height:48px;
+    min-height:48px;
+    max-height:48px;
+
+    border-radius:15px;
   }
 
-  .explainTeamMini.teamA,
-  .explainTeamMini.teamB{
-    grid-template-columns:minmax(0,1fr) 52px;
+  .explainWrap .segmentCompensationNumber::after{
+    left:5px;
+    right:5px;
+    bottom:4px;
+
+    height:16px;
+    font-size:9px;
   }
-
-  .explainMainStage{
-    height:300px;
-    margin-top:0;
-  }
-
-  .explainNumbersGrid{
-    width:100%;
-    height:130px;
-    min-height:130px;
-    max-height:130px;
-
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    grid-template-rows:1fr;
-  }
-
-  .explainNumberCard,
-  .explainNumberCard span{
-    font-size:1.8rem;
-  }
-
-  .explainActionBar{
-    width:100%;
-    height:auto;
-    min-height:0;
-
-    grid-template-columns:1fr;
-  }
+  
 }
 
 /* =========================
-   REDUCED MOTION
+   10) REDUCED MOTION
 ========================= */
 
 @media (prefers-reduced-motion:reduce){
@@ -819,102 +945,4 @@
     animation:none;
     transition:none;
   }
-}
-/* =========================
-   EXPLAIN - ACTION BUTTONS LAYOUT ONLY
-   ترتيب فقط بدون تغيير ألوان المشروع
-========================= */
-
-.explainActionBar{
-  width:min(100%,980px);
-  margin:0 auto;
-
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:10px;
-
-  align-items:center;
-  justify-content:center;
-
-  overflow:visible;
-}
-
-.explainActionBtn{
-  width:100%;
-  min-width:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-/* نفس ترتيب الأزرار */
-.explainDoubleBtn{
-  order:1;
-}
-
-.explainStartBtn{
-  order:2;
-}
-
-.explainCorrectBtn{
-  order:3;
-}
-
-.explainWrongBtn{
-  order:4;
-}
-
-/* حالة الدبل فقط بدون تغيير لون الزر */
-.explainDoubleBtn.activeDouble{
-  transform:translateY(-1px);
-}
-/* =========================
-   EXPLAIN - DOUBLE BUTTON COLOR
-   لون الدبل مثل باقي الفقرات
-========================= */
-
-.explainDoubleBtn{
-  color:#fff !important;
-
-  background:
-    linear-gradient(135deg,#FF9B51 0%,#FFB15F 100%) !important;
-
-  border:0 !important;
-
-  box-shadow:
-    0 12px 26px rgba(255,155,81,.24),
-    inset 0 0 0 1px rgba(255,255,255,.28) !important;
-}
-
-.explainDoubleBtn.activeDouble{
-  color:#fff !important;
-
-  background:
-    linear-gradient(135deg,#FF8A2A 0%,#FFB15F 100%) !important;
-
-  box-shadow:
-    0 0 0 3px rgba(255,155,81,.24),
-    0 16px 34px rgba(255,155,81,.34),
-    inset 0 0 0 1px rgba(255,255,255,.35) !important;
-}
-
-.explainDoubleBtn:disabled{
-  opacity:.55;
-}
-/* =========================
-   EXPLAIN NUMBERS POSITION
-========================= */
-
-.explainWrap .finalRound3NumbersBar{
-    margin-top:30px !important;
-}
-
-.explainWrap .finalTeamMediaNumbersGrid{
-    max-width:1040px;
-    margin:0 auto;
 }

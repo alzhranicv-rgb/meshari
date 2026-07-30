@@ -71,15 +71,15 @@ window.currentModelName = currentModelName
 ========================= */
 
 const DISPLAY_MODEL_CACHE_TTL = 5 * 60 * 1000
-const DISPLAY_GLOBAL_CACHE_TTL = 10 * 60 * 1000
 
 let displayModelDataLoaded = false
 let displayModelDataPromise = null
-let displayVisibilityLoadedAt = 0
 
 let displaySyncTimer = null
 let displaySyncInProgress = false
 let displaySyncQueued = false
+let displayLastBroadcastStateKey = ""
+let displayLastDatabaseStateKey = ""
 
 function getDisplayModelId() {
   return Number(
@@ -198,14 +198,31 @@ function escapeDisplayHtml(value) {
 }
 
 function normalizeDisplaySegmentKey(key) {
-  key = String(key || "")
+  const value = String(key || "").trim()
 
-  if (key === "final_round1") return "finalRound1"
-  if (key === "final_round2") return "finalRound2"
-  if (key === "final_round3") return "finalRound3"
-  if (key === "final_round4") return "finalRound4"
+  if (!value) return ""
 
-  return key
+  if (value === "final_round1") return "finalRound1"
+  if (value === "final_round2") return "finalRound2"
+  if (value === "final_round3") return "finalRound3"
+  if (value === "final_round4") return "finalRound4"
+
+  if (value === "random_challenge") return "randomChallenge"
+  if (value === "randomchallenge") return "randomChallenge"
+
+  if (value === "top_10") return "top10"
+  if (value === "topTen") return "top10"
+
+  if (
+    value === "auction" ||
+    value === "fatbla" ||
+    value === "fitbala" ||
+    value === "فتبلة"
+  ) {
+    return ""
+  }
+
+  return value
 }
 
 function isFinalSegmentKey(key) {
@@ -320,6 +337,21 @@ function getSafeJson(key) {
   }
 }
 
+function getDisplaySessionStateKey(sessionData) {
+  try {
+    return JSON.stringify({
+      id: sessionData?.id || "",
+      model: sessionData?.model || 0,
+      team_a: sessionData?.team_a || "",
+      team_b: sessionData?.team_b || "",
+      active_segment: sessionData?.active_segment || null,
+      state: sessionData?.state || null
+    })
+  } catch {
+    return `${Date.now()}_${Math.random()}`
+  }
+}
+
 async function performDisplayStateSync() {
   try {
     const sessionId =
@@ -394,6 +426,11 @@ async function performDisplayStateSync() {
         localStorage.getItem(
           "presenter_hide_controls"
         ) === "1",
+        selectedSegments:
+  getDisplaySelectedSegmentsFromState(),
+
+selectedSegmentKeys:
+  getCachedSelectedDisplaySegments(),
 
       segmentStatus:
         getSafeJson(
@@ -413,7 +450,7 @@ async function performDisplayStateSync() {
 
       letterli:
         getSafeJson(
-         "letterli_state_v1"
+          "letterli_state_v1"
         ),
 
       who:
@@ -493,11 +530,20 @@ async function performDisplayStateSync() {
         ) ||
         teamBName,
 
-      active_segment:
-        localStorage.getItem(
-          "active_segment"
-        ) ||
-        null,
+active_segment: (() => {
+  const key =
+    normalizeDisplaySegmentKey(
+      localStorage.getItem(
+        "active_segment"
+      )
+    )
+
+  if (!key || key === "home") {
+    return null
+  }
+
+  return key
+})(),
 
       state,
 
@@ -505,40 +551,76 @@ async function performDisplayStateSync() {
         new Date().toISOString()
     }
 
-    try {
-      if (
-        typeof presenterCommandChannel !==
-          "undefined" &&
-        presenterCommandChannel
-      ) {
-        const payload = {
-          type: "broadcast",
-          event: "session_state",
-          payload: sessionData
-        }
-
-        const channelState =
-          presenterCommandChannel.state
-
-        if (
-  channelState === "joined"
-) {
-  await presenterCommandChannel.send(payload)
-} else if (
-  typeof presenterCommandChannel.httpSend === "function"
-) {
-  await presenterCommandChannel.httpSend(
-    "session_state",
-    sessionData
-  )
-}
-      }
-    } catch (error) {
-      console.log(
-        "Display session broadcast error:",
-        error
+    const stateKey =
+      getDisplaySessionStateKey(
+        sessionData
       )
+
+    if (
+      stateKey !==
+      displayLastBroadcastStateKey
+    ) {
+      displayLastBroadcastStateKey =
+        stateKey
+
+      try {
+        if (
+          typeof presenterCommandChannel !==
+            "undefined" &&
+          presenterCommandChannel
+        ) {
+          const payload = {
+            type: "broadcast",
+            event: "session_state",
+            payload: sessionData
+          }
+
+          const channelState =
+            presenterCommandChannel.state
+
+          if (channelState === "joined") {
+            presenterCommandChannel
+              .send(payload)
+              .catch(error => {
+                console.log(
+                  "Display session broadcast error:",
+                  error
+                )
+              })
+          } else if (
+            typeof presenterCommandChannel
+              .httpSend === "function"
+          ) {
+            presenterCommandChannel
+              .httpSend(
+                "session_state",
+                sessionData
+              )
+              .catch(error => {
+                console.log(
+                  "Display session http broadcast error:",
+                  error
+                )
+              })
+          }
+        }
+      } catch (error) {
+        console.log(
+          "Display session broadcast start error:",
+          error
+        )
+      }
     }
+
+    if (
+      stateKey ===
+      displayLastDatabaseStateKey
+    ) {
+      return
+    }
+
+    displayLastDatabaseStateKey =
+      stateKey
 
     const {
       error: sessionError
@@ -547,6 +629,7 @@ async function performDisplayStateSync() {
       .upsert(sessionData)
 
     if (sessionError) {
+      displayLastDatabaseStateKey = ""
       throw sessionError
     }
   } catch (error) {
@@ -603,7 +686,7 @@ let winnerFxTimeouts = []
 
 function initWinnerSound() {
   if (!winnerSound) {
-    winnerSound = new Audio("sounds/win.mp3")
+    winnerSound = new Audio("assets/sounds/win.mp3")
     winnerSound.preload = "auto"
     winnerSound.loop = true
     winnerSound.volume = 0.9
@@ -777,13 +860,13 @@ function initGameSounds() {
   if (sharedGameSounds) return
 
   sharedGameSounds = {
-    correct: new Audio("sounds/correct.mp3"),
-    wrong: new Audio("sounds/wrong.mp3"),
-    tick: new Audio("sounds/tick.mp3"),
-    timeout: new Audio("sounds/timer.mp3"),
-    bid: new Audio("sounds/bid.mp3"),
-    open: new Audio("sounds/open.mp3"),
-    answer: new Audio("sounds/answer.mp3")
+    correct: new Audio("assets/sounds/correct.mp3"),
+    wrong: new Audio("assets/sounds/wrong.mp3"),
+    tick: new Audio("assets/sounds/tick.mp3"),
+    timeout: new Audio("assets/sounds/timer.mp3"),
+    bid: new Audio("assets/sounds/bid.mp3"),
+    open: new Audio("assets/sounds/open.mp3"),
+    answer: new Audio("assets/sounds/answer.mp3")
   }
 
   Object.values(sharedGameSounds).forEach(sound => {
@@ -991,9 +1074,11 @@ async function loadDisplayModelData(options = {}) {
               )
 
               applyVisibleSegmentsForDisplay(
-                freshModel.visible_segments || [],
-                window.displayGlobalVisibilityMap || {}
-              )
+  freshModel.visible_segments || [],
+  {
+    fallbackAll: true
+  }
+)
 
               renderVisibleSegmentsHome()
               updateSegmentCards()
@@ -1084,10 +1169,15 @@ async function loadDisplaySegmentCounts(options = {}) {
 }
 
 async function loadDisplayCountForSegment(segmentKey) {
-  /*
-    الإعدادات جرى تحميلها كلها في طلب واحد.
-    لا نرسل طلبًا جديدًا عند فتح كل فقرة.
-  */
+
+  const key =
+    normalizeDisplaySegmentKey(
+      segmentKey
+    )
+
+  if (key === "randomChallenge") {
+    return key
+  }
 
   if (!displayModelDataLoaded) {
     await loadDisplayModelData({
@@ -1095,136 +1185,35 @@ async function loadDisplayCountForSegment(segmentKey) {
     })
   }
 
-  return segmentKey
+  return key
 }
 
-/* =========================
-   Global Segment Visibility - Display
-========================= */
-
-window.displayGlobalVisibilityMap =
-  window.displayGlobalVisibilityMap || {}
-
-async function loadDisplayGlobalSegmentVisibilityMap(
-  options = {}
-) {
-  const map = {}
-
-  try {
-    let rows = []
-
-    if (typeof window.cachedSupabaseSelect === "function") {
-      const result = await window.cachedSupabaseSelect(
-        "global_segment_visibility",
-        {
-          select: "segment_key,is_enabled",
-          ttl: DISPLAY_GLOBAL_CACHE_TTL,
-          forceRefresh: options.forceRefresh === true,
-          staleWhileRevalidate:
-            options.staleWhileRevalidate !== false,
-
-          onBackgroundUpdate: freshRows => {
-            const freshMap = {}
-
-            ;(freshRows || []).forEach(row => {
-              freshMap[
-                normalizeDisplaySegmentKey(row.segment_key)
-              ] = row.is_enabled !== false
-            })
-
-            window.displayGlobalVisibilityMap = freshMap
-
-            if (window.lastDisplayVisibleRows) {
-              applyVisibleSegmentsForDisplay(
-                window.lastDisplayVisibleRows,
-                freshMap
-              )
-
-              renderVisibleSegmentsHome()
-              updateSegmentCards()
-            }
-          }
-        }
-      )
-
-      rows = result.data || []
-
-      if (result.error && !rows.length) {
-        console.log(
-          "DISPLAY GLOBAL VISIBILITY ERROR:",
-          result.error
-        )
-      }
-    } else {
-      const { data, error } = await db
-        .from("global_segment_visibility")
-        .select("segment_key,is_enabled")
-
-      if (error) {
-        console.log(
-          "DISPLAY GLOBAL VISIBILITY ERROR:",
-          error
-        )
-      }
-
-      rows = data || []
-    }
-
-    rows.forEach(row => {
-      map[
-        normalizeDisplaySegmentKey(row.segment_key)
-      ] = row.is_enabled !== false
-    })
-
-    window.displayGlobalVisibilityMap = map
-    displayVisibilityLoadedAt = Date.now()
-
-    return map
-  } catch (error) {
-    console.log(
-      "DISPLAY GLOBAL VISIBILITY CATCH:",
-      error
-    )
-
-    return map
-  }
-}
-
-function isDisplaySegmentGloballyEnabled(
-  segmentKey,
-  globalMap = {}
-) {
-  const key =
-    normalizeDisplaySegmentKey(segmentKey)
-
-  return globalMap[key] !== false
-}
 
 function applyVisibleSegmentsForDisplay(
   rows = [],
-  globalMap = {}
+  options = {}
 ) {
-  window.lastDisplayVisibleRows = rows || []
+  window.lastDisplayVisibleRows =
+    rows || []
 
   const map = {}
+
+  const hasRows =
+    Array.isArray(rows) &&
+    rows.length > 0
+
+  const fallbackAll =
+    options.fallbackAll === true
 
   ALL_DISPLAY_SEGMENTS.forEach(item => {
     const key =
       normalizeDisplaySegmentKey(item.key)
 
-    if (
-      !isDisplaySegmentGloballyEnabled(
-        key,
-        globalMap
-      )
-    ) {
-      return
-    }
-
     map[key] = {
       ...item,
       key,
-      is_visible: true,
+      is_visible:
+        !hasRows && fallbackAll,
       sort_order: item.sort
     }
   })
@@ -1235,11 +1224,12 @@ function applyVisibleSegmentsForDisplay(
         row.segment_key
       )
 
-    if (!map[key]) return
+    if (!key || !map[key]) return
 
     map[key] = {
       ...map[key],
-      is_visible: !!row.is_visible,
+      is_visible:
+        row.is_visible !== false,
       sort_order: Number(
         row.sort_order ||
         map[key].sort
@@ -1263,35 +1253,32 @@ function applyVisibleSegmentsForDisplay(
 async function loadVisibleSegmentsForDisplay(
   options = {}
 ) {
-  const modelId = getDisplayModelId()
+  const modelId =
+    getDisplayModelId()
 
-  const [globalMap, modelData] =
-    await Promise.all([
-      loadDisplayGlobalSegmentVisibilityMap({
-        forceRefresh:
-          options.forceRefresh === true,
-        staleWhileRevalidate:
-          options.staleWhileRevalidate !== false
-      }),
+  const modelData =
+    await loadDisplayModelData({
+      forceRefresh:
+        options.forceRefresh === true,
 
-      loadDisplayModelData({
-        forceRefresh:
-          options.forceRefresh === true,
-        staleWhileRevalidate:
-          options.staleWhileRevalidate !== false
-      })
-    ])
+      staleWhileRevalidate:
+        options.staleWhileRevalidate !== false
+    })
 
   if (!modelId || !modelData) {
     return applyVisibleSegmentsForDisplay(
       [],
-      globalMap
+      {
+        fallbackAll: false
+      }
     )
   }
 
   return applyVisibleSegmentsForDisplay(
     modelData.visible_segments || [],
-    globalMap
+    {
+      fallbackAll: true
+    }
   )
 }
 /* =========================
@@ -1657,29 +1644,38 @@ function showSegmentEndOverlay(segmentKey, winner) {
   return new Promise(resolve => {
     closeSegmentEndOverlay()
 
-    const title = getSegmentArabicTitle(segmentKey)
-    const scores = getSegmentEndScores(segmentKey)
+    const title =
+      getSegmentArabicTitle(segmentKey)
+
+    const scores =
+      getSegmentEndScores(segmentKey)
 
     const isTie =
       !winner ||
       winner === "تعادل" ||
       Number(scores.A) === Number(scores.B)
 
-    const winnerText = isTie ? "تعادل" : winner
+    const winnerText =
+      isTie ? "تعادل" : winner
 
-    const overlay = document.createElement("div")
+    const overlay =
+      document.createElement("div")
+
     overlay.id = "segmentEndOverlay"
-    overlay.className = `segmentEndOverlay ${isTie ? "segmentEndTie" : ""}`
+    overlay.className =
+      `segmentEndOverlay ${isTie ? "segmentEndTie" : ""}`
 
     overlay.innerHTML = `
       <section class="segmentEndCard">
 
-        <div class="segmentEndTop">
+        <div class="segmentEndHeader">
           <span class="segmentEndBadge">منتهية</span>
           <span class="segmentEndMiniTitle">نهاية الفقرة</span>
         </div>
 
-        <h2 class="segmentEndTitle">${escapeDisplayHtml(title)}</h2>
+        <div class="segmentEndSegmentName">
+          ${escapeDisplayHtml(title)}
+        </div>
 
         <div class="segmentEndWinnerBox">
           <span>${isTie ? "النتيجة" : "الفائز"}</span>
@@ -1693,7 +1689,9 @@ function showSegmentEndOverlay(segmentKey, winner) {
             <b>${Number(scores.A || 0)}</b>
           </div>
 
-          <div class="segmentEndVs">VS</div>
+          <div class="segmentEndVs">
+            VS
+          </div>
 
           <div class="segmentEndTeamScore teamB">
             <b>${Number(scores.B || 0)}</b>
@@ -1702,8 +1700,8 @@ function showSegmentEndOverlay(segmentKey, winner) {
 
         </div>
 
-        <div class="segmentEndActions">
-          
+        <div class="segmentEndHint">
+          جاري الرجوع للرئيسية...
         </div>
 
       </section>
@@ -1716,19 +1714,19 @@ function showSegmentEndOverlay(segmentKey, winner) {
       resolve()
     }
 
-    document.getElementById("segmentEndHomeBtn")?.addEventListener("click", finish)
-    document.getElementById("segmentEndCloseBtn")?.addEventListener("click", finish)
-
     setTimeout(() => {
       if (document.body.contains(overlay)) {
         finish()
       }
-    }, 4200)
+    }, 3600)
   })
 }
 
-window.showSegmentEndOverlay = showSegmentEndOverlay
-window.closeSegmentEndOverlay = closeSegmentEndOverlay
+window.showSegmentEndOverlay =
+  showSegmentEndOverlay
+
+window.closeSegmentEndOverlay =
+  closeSegmentEndOverlay
 
 function showAnswerResultOverlay(type = "correct", points = "") {
   const isCorrect = type === "correct"
@@ -1826,6 +1824,7 @@ function clearAllSegmentPlayStatesForNewSession() {
   localStorage.removeItem("final_state_v3")
 
   localStorage.removeItem("archive_state_v1")
+  localStorage.removeItem("segment_start_lottery_v1")
   localStorage.removeItem(
     "random_challenge_state_v1"
   )
@@ -1854,7 +1853,10 @@ function resetDisplayStatesIfNewSession() {
   localStorage.setItem(DISPLAY_SESSION_MARKER_KEY, sessionId)
 }
 async function restoreDisplayAfterRefresh() {
-  const activeSegment = localStorage.getItem("active_segment")
+  const activeSegment =
+    normalizeDisplaySegmentKey(
+      localStorage.getItem("active_segment")
+    )
 
   if (
     activeSegment &&
@@ -1865,6 +1867,11 @@ async function restoreDisplayAfterRefresh() {
     await openSegmentPage(activeSegment)
     return
   }
+
+  localStorage.removeItem("active_segment")
+  clearGameActiveTeam({
+    sync: false
+  })
 
   renderMainHome(true)
 }
@@ -2187,11 +2194,6 @@ function addMainScore(team) {
 ========================= */
 
 function announceMainWinner() {
-  if (typeof showDetailedFinalResults === "function") {
-    showDetailedFinalResults()
-    return
-  }
-
   let winner = ""
 
   if (scoreA > scoreB) winner = teamAName
@@ -2202,11 +2204,6 @@ function announceMainWinner() {
 }
 
 function announceWinner() {
-  if (typeof showDetailedFinalResults === "function") {
-    showDetailedFinalResults()
-    return
-  }
-
   playWinnerEffects()
   homeRefreshLocked = false
 
@@ -2284,6 +2281,7 @@ localStorage.removeItem("random_challenge_state_v1")
   localStorage.removeItem("game_session_id")
   localStorage.removeItem("game_join_code")
   localStorage.removeItem("display_session_marker_v1")
+  localStorage.removeItem("segment_start_lottery_v1")
 
   const overlay = document.getElementById("winnerOverlay")
   if (overlay) overlay.classList.add("hidden")
@@ -2296,9 +2294,21 @@ localStorage.removeItem("random_challenge_state_v1")
 ========================= */
 
 function getVisibleDisplaySegments() {
+  const selected =
+    getDisplaySelectedSegmentsFromState()
+
+  if (selected.length) {
+    return selected.slice(0, 11)
+  }
+
   return visibleDisplaySegments
     .filter(item => item.is_visible)
-    .sort((a, b) => Number(a.sort_order || a.sort) - Number(b.sort_order || b.sort))
+    .sort((a, b) => {
+      return (
+        Number(a.sort_order || a.sort) -
+        Number(b.sort_order || b.sort)
+      )
+    })
     .slice(0, 11)
 }
 
@@ -2356,11 +2366,56 @@ function getDisplayWinnerDomId(key) {
   return `winner_${key}`
 }
 
+function getDisplaySelectedSegmentsFromState() {
+  const keys =
+    getCachedSelectedDisplaySegments()
+
+  if (!keys.length) {
+    return []
+  }
+
+  return keys
+    .map((key, index) => {
+      const cleanKey =
+        normalizeDisplaySegmentKey(key)
+
+      const base =
+        ALL_DISPLAY_SEGMENTS.find(item => {
+          return (
+            normalizeDisplaySegmentKey(item.key) ===
+            cleanKey
+          )
+        })
+
+      if (!base) return null
+
+      return {
+        ...base,
+        key: cleanKey,
+        title: base.title,
+        sort_order: index + 1,
+        is_visible: true
+      }
+    })
+    .filter(Boolean)
+}
+
+function getDisplayHomeSegments() {
+  const selected =
+    getDisplaySelectedSegmentsFromState()
+
+  if (selected.length) {
+    return selected
+  }
+
+  return getVisibleDisplaySegments()
+}
+
 function renderVisibleSegmentsHome() {
   const grid = document.getElementById("segmentsGrid")
   if (!grid) return
 
-  const segments = getVisibleDisplaySegments()
+  const segments = getDisplayHomeSegments()
 
   grid.innerHTML = segments.map(item => {
     const key = normalizeDisplaySegmentKey(item.key)
@@ -2430,6 +2485,664 @@ function setSegmentWinnerLabel(key) {
     }
   }
 }
+
+/* =========================
+   Segment Start Lottery
+   قرعة بداية الفقرة
+========================= */
+
+const SEGMENT_START_LOTTERY_KEY =
+  "segment_start_lottery_v1"
+
+const SEGMENT_START_LOTTERY_DURATION = 5
+
+const SEGMENT_START_LOTTERY_SEGMENTS = new Set([
+  "warmup",
+  "top10",
+  "who",
+  "explain",
+  "finalRound2",
+  "finalRound4",
+  "archive"
+])
+
+let segmentStartLotteryTimer = null
+let segmentStartLotteryCountdownTimer = null
+
+function readSegmentStartLotteryState() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem(
+        SEGMENT_START_LOTTERY_KEY
+      ) || "{}"
+    )
+
+    return saved && typeof saved === "object"
+      ? saved
+      : {}
+  } catch {
+    return {}
+  }
+}
+
+function saveSegmentStartLotteryState(state = {}) {
+  localStorage.setItem(
+    SEGMENT_START_LOTTERY_KEY,
+    JSON.stringify(state)
+  )
+}
+
+function getOppositeTeam(team) {
+  return team === "A" ? "B" : "A"
+}
+
+function isSegmentStartLotteryEnabled(segmentKey) {
+  const key =
+    normalizeDisplaySegmentKey(segmentKey)
+
+  return SEGMENT_START_LOTTERY_SEGMENTS.has(key)
+}
+
+function getSavedSegmentStartTeam(segmentKey) {
+  const key =
+    normalizeDisplaySegmentKey(segmentKey)
+
+  const state =
+    readSegmentStartLotteryState()
+
+  const team =
+    state?.[key]?.team
+
+  return team === "A" || team === "B"
+    ? team
+    : ""
+}
+
+function isSegmentStartLotteryApplied(segmentKey) {
+  const key =
+    normalizeDisplaySegmentKey(segmentKey)
+
+  const state =
+    readSegmentStartLotteryState()
+
+  return state?.[key]?.applied === true
+}
+
+function markSegmentStartLotteryApplied(segmentKey) {
+  const key =
+    normalizeDisplaySegmentKey(segmentKey)
+
+  if (!key) return false
+
+  const state =
+    readSegmentStartLotteryState()
+
+  if (!state[key]) {
+    state[key] = {}
+  }
+
+  state[key].applied = true
+  state[key].appliedAt = Date.now()
+
+  saveSegmentStartLotteryState(state)
+
+  return true
+}
+
+function saveSegmentStartTeam(segmentKey, team) {
+  const key =
+    normalizeDisplaySegmentKey(segmentKey)
+
+  if (
+    !key ||
+    team !== "A" &&
+    team !== "B"
+  ) {
+    return false
+  }
+
+  const state =
+    readSegmentStartLotteryState()
+
+state[key] = {
+  team,
+  startedAt: Date.now(),
+  applied: false
+}
+
+  if (key === "top10") {
+    state.top10RoundStarter = {
+      firstTeam: team,
+      startedAt: Date.now()
+    }
+  }
+
+  saveSegmentStartLotteryState(state)
+  return true
+}
+
+function applySegmentStartTeam(team, options = {}) {
+  if (
+    team !== "A" &&
+    team !== "B"
+  ) {
+    return ""
+  }
+
+  selectedTeam = team
+
+  setGameActiveTeam(team, {
+    sync: options.sync !== false
+  })
+
+  if (options.announce === true) {
+    showDisplayCurrentTurn(team)
+  }
+
+  return team
+}
+
+function applySegmentStartTeamAfterRender(
+  team,
+  segmentKey = ""
+) {
+  if (
+    team !== "A" &&
+    team !== "B"
+  ) {
+    return false
+  }
+
+  const key =
+    normalizeDisplaySegmentKey(
+      segmentKey ||
+      localStorage.getItem("active_segment") ||
+      getCurrentSegmentKey() ||
+      ""
+    )
+
+  applySegmentStartTeam(team, {
+    sync: true,
+    announce: true
+  })
+
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      if (typeof selectTeam === "function") {
+        selectTeam(team)
+      }
+
+      if (
+        key === "warmup" &&
+        typeof setWarmupActiveTeam === "function"
+      ) {
+        setWarmupActiveTeam(team)
+      }
+
+      if (
+        key === "top10" &&
+        typeof setTop10ActiveTeam === "function"
+      ) {
+        setTop10ActiveTeam(team)
+      }
+
+      if (
+        key === "who" &&
+        typeof setWhoActiveTeam === "function"
+      ) {
+        setWhoActiveTeam(team)
+      }
+
+      if (
+        key === "explain" &&
+        typeof setExplainActiveTeam === "function"
+      ) {
+        setExplainActiveTeam(team)
+      }
+
+      if (
+        key === "finalRound2" ||
+        key === "finalRound4"
+      ) {
+        if (
+          window.finalState &&
+          window.finalState.round2 &&
+          key === "finalRound2"
+        ) {
+          window.finalState.round = 2
+          window.finalState.round2.activeTeam = team
+        }
+
+        if (
+          window.finalState &&
+          window.finalState.round4 &&
+          key === "finalRound4"
+        ) {
+          window.finalState.round = 4
+          window.finalState.round4.activeTeam = team
+        }
+
+        if (typeof setFinalActiveTeam === "function") {
+          setFinalActiveTeam(team)
+        }
+
+        if (typeof highlightFinalTeam === "function") {
+          highlightFinalTeam(team)
+        }
+
+        if (typeof saveFinalState === "function") {
+          saveFinalState()
+        }
+      }
+
+      if (
+        key === "archive" &&
+        typeof setArchiveActiveTeam === "function"
+      ) {
+        setArchiveActiveTeam(team)
+      }
+
+            markSegmentStartLotteryApplied(key)
+
+      syncDisplayStateToSession()
+    }, 160)
+  })
+
+  return true
+}
+
+function getTop10RoundStarterTeam(round = 1) {
+  const state =
+    readSegmentStartLotteryState()
+
+  const firstTeam =
+    state?.top10RoundStarter?.firstTeam ||
+    state?.top10?.team ||
+    ""
+
+  if (
+    firstTeam !== "A" &&
+    firstTeam !== "B"
+  ) {
+    return getGameActiveTeam() || "A"
+  }
+
+  const roundNumber =
+    Number(round || 1)
+
+  return roundNumber % 2 === 0
+    ? getOppositeTeam(firstTeam)
+    : firstTeam
+}
+
+function applyTop10RoundStarterTeam(round = 1) {
+  const team =
+    getTop10RoundStarterTeam(round)
+
+  return applySegmentStartTeam(team, {
+    announce: true
+  })
+}
+
+function clearSegmentStartLotteryTimers() {
+  clearInterval(segmentStartLotteryTimer)
+  clearInterval(segmentStartLotteryCountdownTimer)
+
+  segmentStartLotteryTimer = null
+  segmentStartLotteryCountdownTimer = null
+}
+
+function closeSegmentStartLotteryOverlay() {
+  clearSegmentStartLotteryTimers()
+  document.getElementById(
+    "segmentStartLotteryOverlay"
+  )?.remove()
+}
+
+function showSegmentStartLotteryOverlay(segmentKey) {
+  return new Promise(resolve => {
+    closeSegmentStartLotteryOverlay()
+
+    const key =
+      normalizeDisplaySegmentKey(segmentKey)
+
+    const title =
+      getSegmentArabicTitle(key)
+
+    let activeTeam = ""
+    let selectedLotteryTeam = ""
+    let running = false
+    let remaining =
+      SEGMENT_START_LOTTERY_DURATION
+
+    const overlay =
+      document.createElement("div")
+
+    overlay.id =
+      "segmentStartLotteryOverlay"
+
+    overlay.className =
+      "segmentStartLotteryOverlay"
+
+    overlay.innerHTML = `
+      <section class="segmentStartLotteryCard">
+
+        <div class="segmentStartLotteryTop">
+          <span>قرعة البداية</span>
+          <b>${escapeDisplayHtml(title)}</b>
+        </div>
+
+        <div
+          class="segmentStartLotteryTimer"
+          id="segmentStartLotteryTimer"
+        >
+          ${SEGMENT_START_LOTTERY_DURATION}
+        </div>
+
+        <div class="segmentStartLotteryTeams">
+
+         <button
+  type="button"
+  class="segmentStartLotteryTeam teamA"
+  id="segmentStartLotteryTeamA"
+>
+  <strong>${escapeDisplayHtml(teamAName || "الفريق الأول")}</strong>
+</button>
+
+         <button
+  type="button"
+  class="segmentStartLotteryTeam teamB"
+  id="segmentStartLotteryTeamB"
+>
+  <strong>${escapeDisplayHtml(teamBName || "الفريق الثاني")}</strong>
+</button>
+
+        </div>
+
+        <div
+          class="segmentStartLotteryResult"
+          id="segmentStartLotteryResult"
+        >
+          اضغط بدء القرعة
+        </div>
+
+        <div class="segmentStartLotteryActions">
+
+          <button
+            type="button"
+            class="segmentStartLotteryBtn primary"
+            id="segmentStartLotteryRunBtn"
+          >
+            بدء القرعة
+          </button>
+
+          <button
+            type="button"
+            class="segmentStartLotteryBtn"
+            id="segmentStartLotteryRetryBtn"
+            hidden
+          >
+            إعادة القرعة
+          </button>
+
+          <button
+            type="button"
+            class="segmentStartLotteryBtn start"
+            id="segmentStartLotteryStartBtn"
+            hidden
+          >
+            بدء الفقرة
+          </button>
+
+        </div>
+
+      </section>
+    `
+
+    document.body.appendChild(overlay)
+
+    const timerBox =
+      document.getElementById(
+        "segmentStartLotteryTimer"
+      )
+
+    const resultBox =
+      document.getElementById(
+        "segmentStartLotteryResult"
+      )
+
+    const teamA =
+      document.getElementById(
+        "segmentStartLotteryTeamA"
+      )
+
+    const teamB =
+      document.getElementById(
+        "segmentStartLotteryTeamB"
+      )
+
+    const runBtn =
+      document.getElementById(
+        "segmentStartLotteryRunBtn"
+      )
+
+    const retryBtn =
+      document.getElementById(
+        "segmentStartLotteryRetryBtn"
+      )
+
+    const startBtn =
+      document.getElementById(
+        "segmentStartLotteryStartBtn"
+      )
+
+function renderActiveTeam(team = "", locked = false) {
+  activeTeam =
+    team === "A" || team === "B"
+      ? team
+      : ""
+
+  teamA?.classList.toggle(
+    "active",
+    !locked && activeTeam === "A"
+  )
+
+  teamB?.classList.toggle(
+    "active",
+    !locked && activeTeam === "B"
+  )
+
+  teamA?.classList.toggle(
+    "selected",
+    locked && activeTeam === "A"
+  )
+
+  teamB?.classList.toggle(
+    "selected",
+    locked && activeTeam === "B"
+  )
+}
+
+function getRandomLotteryTeam() {
+  return Math.random() < 0.5 ? "A" : "B"
+}
+
+    function setResultTeam(team) {
+      selectedLotteryTeam = team
+      renderActiveTeam(team, true)
+
+      const name =
+        team === "A"
+          ? teamAName
+          : teamBName
+
+      if (resultBox) {
+        resultBox.textContent =
+          `البداية مع ${name}`
+      }
+
+      if (startBtn) startBtn.hidden = false
+      if (retryBtn) retryBtn.hidden = false
+    }
+
+function stopLottery() {
+  running = false
+  clearSegmentStartLotteryTimers()
+
+  const finalTeam =
+    getRandomLotteryTeam()
+
+  setResultTeam(finalTeam)
+
+  if (runBtn) runBtn.hidden = true
+  if (retryBtn) retryBtn.hidden = false
+  if (startBtn) startBtn.hidden = false
+}
+
+    function startLottery() {
+      clearSegmentStartLotteryTimers()
+
+      running = true
+      selectedLotteryTeam = ""
+      activeTeam = getRandomLotteryTeam()
+      renderActiveTeam(activeTeam, false)
+      remaining =
+        SEGMENT_START_LOTTERY_DURATION
+
+      if (runBtn) runBtn.hidden = true
+      if (retryBtn) retryBtn.hidden = true
+      if (startBtn) startBtn.hidden = true
+
+      if (resultBox) {
+  resultBox.textContent =
+    "جاري تحديد الفريق..."
+}
+
+      if (timerBox) {
+        timerBox.textContent =
+          remaining
+      }
+
+      const endsAt =
+        Date.now() +
+        SEGMENT_START_LOTTERY_DURATION * 1000
+
+      segmentStartLotteryTimer =
+        setInterval(() => {
+          renderActiveTeam(
+            activeTeam === "A" ? "B" : "A",
+            false
+          )
+        }, 75)
+
+      segmentStartLotteryCountdownTimer =
+        setInterval(() => {
+          remaining = Math.max(
+            0,
+            Math.ceil(
+              (endsAt - Date.now()) / 1000
+            )
+          )
+
+          if (timerBox) {
+            timerBox.textContent =
+              remaining
+          }
+
+          if (remaining <= 0) {
+            stopLottery()
+          }
+        }, 120)
+    }
+
+    runBtn?.addEventListener(
+      "click",
+      startLottery
+    )
+
+    retryBtn?.addEventListener(
+      "click",
+      startLottery
+    )
+
+    teamA?.addEventListener("click", () => {
+      if (running) return
+      setResultTeam("A")
+    })
+
+    teamB?.addEventListener("click", () => {
+      if (running) return
+      setResultTeam("B")
+    })
+
+    startBtn?.addEventListener("click", () => {
+      if (
+        selectedLotteryTeam !== "A" &&
+        selectedLotteryTeam !== "B"
+      ) {
+        return
+      }
+
+      closeSegmentStartLotteryOverlay()
+      resolve(selectedLotteryTeam)
+    })
+  })
+}
+
+async function ensureSegmentStartLotteryBeforeOpen(segmentKey) {
+  const key =
+    normalizeDisplaySegmentKey(segmentKey)
+
+  if (!isSegmentStartLotteryEnabled(key)) {
+    return true
+  }
+
+  const savedTeam =
+    getSavedSegmentStartTeam(key)
+
+if (savedTeam) {
+  if (!isSegmentStartLotteryApplied(key)) {
+    applySegmentStartTeam(savedTeam, {
+      sync: true
+    })
+  }
+
+  return true
+}
+
+  const team =
+    await showSegmentStartLotteryOverlay(key)
+
+  if (
+    team !== "A" &&
+    team !== "B"
+  ) {
+    return false
+  }
+
+  saveSegmentStartTeam(key, team)
+
+  applySegmentStartTeam(team, {
+    sync: true,
+    announce: true
+  })
+
+  return true
+}
+
+window.getTop10RoundStarterTeam =
+  getTop10RoundStarterTeam
+
+window.applyTop10RoundStarterTeam =
+  applyTop10RoundStarterTeam
+
+  window.applySegmentStartTeamAfterRender =
+  applySegmentStartTeamAfterRender
+
+window.closeSegmentStartLotteryOverlay =
+  closeSegmentStartLotteryOverlay
+
+
 /* =========================
    Open Segment
 ========================= */
@@ -2467,14 +3180,23 @@ async function openSegmentPage(
 
   clearDisplayTemporaryFx()
 
-  if (!displayModelDataLoaded) {
+  const canOpenRandomChallengeFallback =
+    segmentKey === "randomChallenge" &&
+    typeof window.renderRandomChallenge === "function"
+
+  if (
+    !displayModelDataLoaded &&
+    !canOpenRandomChallengeFallback
+  ) {
     await loadVisibleSegmentsForDisplay({
       staleWhileRevalidate: true
     })
   }
 
+
   if (
     !isFinalAny &&
+    !canOpenRandomChallengeFallback &&
     !isSegmentVisibleOnDisplay(
       segmentKey
     )
@@ -2551,13 +3273,23 @@ async function openSegmentPage(
       lockKey
     )
 
-  if (
-    segmentStatus[lockKey]?.locked
-  ) {
-    return
-  }
+if (
+  segmentStatus[lockKey]?.locked
+) {
+  return
+}
 
-  displayProFxLock = false
+const lotteryReady =
+  await ensureSegmentStartLotteryBeforeOpen(
+    lockKey
+  )
+
+if (!lotteryReady) {
+  return
+}
+
+displayProFxLock = false
+
 
   await loadDisplayCountForSegment(
     lockKey
@@ -2565,12 +3297,24 @@ async function openSegmentPage(
 
   homeRefreshLocked = true
 
-  localStorage.setItem(
-    "active_segment",
-    isFinalAny
-      ? lockKey
-      : segmentKey
-  )
+const displayActiveSegmentKey =
+  isFinalAny
+    ? lockKey
+    : segmentKey
+
+localStorage.setItem(
+  "active_segment",
+  displayActiveSegmentKey
+)
+
+if (
+  typeof syncDisplayStateToSession ===
+  "function"
+) {
+  syncDisplayStateToSession({
+    immediate: true
+  })
+}
 
   const homeScreen =
     getFirstElement([
@@ -2854,9 +3598,25 @@ async function openSegmentPage(
     )
   }
 
-  syncDisplayStateToSession()
+const startTeam =
+  getSavedSegmentStartTeam(lockKey)
 
-  applyPresenterHideDisplayControlsState()
+if (
+  (
+    startTeam === "A" ||
+    startTeam === "B"
+  ) &&
+  !isSegmentStartLotteryApplied(lockKey)
+) {
+  applySegmentStartTeamAfterRender(
+    startTeam,
+    lockKey
+  )
+}
+
+syncDisplayStateToSession()
+
+applyPresenterHideDisplayControlsState()
 }
 
 function openMainSegment(segmentKey) {
@@ -2875,7 +3635,20 @@ function openMaToSegment(segmentKey) {
   openMainSegment(segmentKey)
 }
 
+window.openSegmentPage =
+  openSegmentPage
+
+window.openDisplaySegment =
+  openSegmentPage
+
+window.openSegmentFromPresenter =
+  openSegmentPage
+
+window.openMainSegment =
+  openMainSegment
+
 function openSegment(title, content) {
+
   const area = document.getElementById("segmentArea")
   if (!area) return
 
@@ -2950,21 +3723,28 @@ function goHome() {
   stopAllDisplaySegmentTimers()
   window.currentSegmentScores = null
 
-  localStorage.removeItem("active_segment")
-  clearGameActiveTeam()
+ localStorage.removeItem("active_segment")
 
-  homeRefreshLocked = false
+clearGameActiveTeam({
+  sync: false
+})
 
-  syncDisplayStateToSession()
+homeRefreshLocked = false
 
-  stopEndButtonWatcher()
+stopEndButtonWatcher()
 
-  const content = document.querySelector(".segmentContentWrap")
+const content =
+  document.querySelector(
+    ".segmentContentWrap"
+  )
 
-  playSoftExit(content, () => {
-    renderMainHome(true)
-    syncDisplayStateToSession()
+playSoftExit(content, () => {
+  renderMainHome(true)
+
+  syncDisplayStateToSession({
+    immediate: true
   })
+})
 }
 
 function updateEndRoundButtonState() {
@@ -3180,7 +3960,6 @@ async function endCurrentSegment() {
 
       updateMainScoreBoard()
       bumpScore("mainScoreA")
-      showLastScoreUpdate("A", 1)
     }
 
     if (winner === teamBName) {
@@ -3193,7 +3972,6 @@ async function endCurrentSegment() {
 
       updateMainScoreBoard()
       bumpScore("mainScoreB")
-      showLastScoreUpdate("B", 1)
     }
 
     updateLeadingTeamStyle()
@@ -4735,12 +5513,13 @@ function toggleDisplayControlsFromScreen() {
   applyPresenterHideDisplayControlsState()
   updateDisplayControlsEyeButton(isHidden)
 
-  showGameToast(isHidden ? "تم إخفاء أزرار التحكم" : "تم إظهار أزرار التحكم")
-
-  if (typeof syncDisplayStateToSession === "function") {
-    syncDisplayStateToSession()
+  showGameToast(
+  isHidden
+    ? "تم إخفاء أزرار التحكم"
+    : "تم إظهار أزرار التحكم"
+)
   }
-}
+
 
 function restoreDisplayControlsEye() {
   const isHidden = localStorage.getItem("presenter_hide_controls") === "1"
@@ -5433,312 +6212,3 @@ function getRealSegmentScores(segmentKey) {
 
   return { A, B }
 }
-
-function getFinalResultsRows() {
-  segmentStatus = loadSegmentStatus()
-
-  const visibleKeys = getVisibleFinalResultKeys()
-
-  return FINAL_RESULTS_CONFIG
-    .filter(item => visibleKeys.includes(item.segmentKey))
-    .map(item => {
-      const status = segmentStatus?.[item.segmentKey] || {
-        locked: false,
-        winner: "",
-        scoreA: 0,
-        scoreB: 0
-      }
-
-      const fallbackScores = getRealSegmentScores(item.segmentKey)
-
-      const A = Number(status.locked ? status.scoreA : fallbackScores.A || 0)
-      const B = Number(status.locked ? status.scoreB : fallbackScores.B || 0)
-
-      let winnerTeam = ""
-
-      if (status.locked) {
-        if (A > B) winnerTeam = "A"
-        else if (B > A) winnerTeam = "B"
-        else winnerTeam = "draw"
-      }
-
-      return {
-        ...item,
-        A,
-        B,
-        locked: !!status.locked,
-        winnerText: status.winner || "",
-        winnerTeam
-      }
-    })
-}
-
-function getFinalResultsStats() {
-  const rows = getFinalResultsRows()
-
-  const stats = {
-    A: 0,
-    B: 0,
-    draw: 0,
-    pending: 0,
-    selectedCount: rows.length,
-    completedCount: 0
-  }
-
-  rows.forEach(row => {
-    if (!row.locked) {
-      stats.pending += 1
-      return
-    }
-
-    stats.completedCount += 1
-
-    if (row.winnerTeam === "A") stats.A += 1
-    else if (row.winnerTeam === "B") stats.B += 1
-    else stats.draw += 1
-  })
-
-  return stats
-}
-
-function getUnifiedFinalWinner(stats = getFinalResultsStats()) {
-  if (stats.A > stats.B) {
-    return {
-      team: "A",
-      name: resultTeamName("A"),
-      type: "team"
-    }
-  }
-
-  if (stats.B > stats.A) {
-    return {
-      team: "B",
-      name: resultTeamName("B"),
-      type: "team"
-    }
-  }
-
-  return {
-    team: "draw",
-    name: "تعادل",
-    type: "draw"
-  }
-}
-
-function hideAllFinalResultCards() {
-  document.querySelectorAll("[data-result-card]").forEach(card => {
-    card.classList.add("hiddenFinalResultCard")
-    card.classList.remove("teamA", "teamB", "draw", "pending")
-  })
-}
-
-function updateSingleResultCard(row, index) {
-  let winnerText = "لم تلعب"
-  let winnerClass = "pending"
-
-  if (row.locked) {
-    setResultText(`result${row.prefix}A`, row.A)
-    setResultText(`result${row.prefix}B`, row.B)
-
-    if (row.winnerTeam === "A") {
-      winnerText = resultTeamName("A")
-      winnerClass = "teamA"
-    } else if (row.winnerTeam === "B") {
-      winnerText = resultTeamName("B")
-      winnerClass = "teamB"
-    } else {
-      winnerText = "تعادل"
-      winnerClass = "draw"
-    }
-  } else {
-    setResultText(`result${row.prefix}A`, "—")
-    setResultText(`result${row.prefix}B`, "—")
-  }
-
-  setResultText(`result${row.prefix}Winner`, winnerText)
-
-  const card = document.querySelector(`[data-result-card="${row.cardKey}"]`)
-  if (!card) return
-
-  card.classList.remove("hiddenFinalResultCard", "teamA", "teamB", "draw", "pending")
-  card.classList.add(winnerClass)
-
-  const number = card.querySelector(".finalMatchNo")
-  if (number) number.innerText = index + 1
-
-  const title = card.querySelector("h3")
-  if (title) title.innerText = row.title
-}
-
-function updateFinalResultsUI() {
-  hideAllFinalResultCards()
-
-  const rows = getFinalResultsRows()
-  const stats = getFinalResultsStats()
-  const winner = getUnifiedFinalWinner(stats)
-
-  const overlay = document.getElementById("finalResultsOverlay")
-  const board = document.querySelector(".finalResultsBoard")
-  const list =
-    document.querySelector(".finalResultsSegmentsGrid") ||
-    document.querySelector(".finalResultsTimeline") ||
-    document.querySelector(".finalResultsList")
-
-  const totalPointsA = rows.reduce((sum, row) => sum + Number(row.A || 0), 0)
-  const totalPointsB = rows.reduce((sum, row) => sum + Number(row.B || 0), 0)
-
-  if (overlay) {
-    overlay.classList.remove(
-      "resultsCount1",
-      "resultsCount2",
-      "resultsCount3",
-      "resultsCount4",
-      "resultsCount5",
-      "resultsCount6",
-      "resultsCount7",
-      "resultsCount8",
-      "resultsCount9",
-      "resultsCount10",
-      "resultsCount11",
-      "teamA",
-      "teamB",
-      "draw"
-    )
-
-    overlay.classList.add(
-  `resultsCount${Math.max(
-    1,
-    Math.min(rows.length, 11)
-  )}`
-)
-
-    if (winner.team === "A") overlay.classList.add("teamA")
-    else if (winner.team === "B") overlay.classList.add("teamB")
-    else overlay.classList.add("draw")
-  }
-
-  if (board) {
-    board.style.setProperty("--results-count", rows.length)
-  }
-
-  if (list) {
-    list.style.setProperty("--results-count", rows.length)
-  }
-
-  rows.forEach((row, index) => {
-    updateSingleResultCard(row, index)
-  })
-
-  setResultText("finalTeamAStatsName", resultTeamName("A"))
-  setResultText("finalTeamBStatsName", resultTeamName("B"))
-
-  setResultText("finalTeamAStatsWins", stats.A)
-  setResultText("finalTeamBStatsWins", stats.B)
-
-  setResultText("finalTeamAStatsPoints", totalPointsA)
-  setResultText("finalTeamBStatsPoints", totalPointsB)
-
-  setResultText("finalTeamAStatsCompleted", stats.completedCount)
-  setResultText("finalTeamBStatsCompleted", stats.completedCount)
-
-  setResultText("finalResultsDrawTotal", stats.draw)
-
-  setResultText("finalQuickCompleted", `${stats.completedCount}/${stats.selectedCount}`)
-  setResultText("finalQuickDraws", stats.draw)
-  setResultText("finalQuickPending", stats.pending)
-
-  const teamABox = document.getElementById("finalResultsTeamABox")
-  const teamBBox = document.getElementById("finalResultsTeamBBox")
-  const winnerName = document.getElementById("finalResultsWinnerName")
-  const winnerSub = document.getElementById("finalResultsWinnerSub")
-
-  if (teamABox) teamABox.classList.remove("winner")
-  if (teamBBox) teamBBox.classList.remove("winner")
-
-  if (!rows.length) {
-    if (winnerName) winnerName.innerText = "لا توجد فقرات"
-    if (winnerSub) winnerSub.innerText = "لم يتم اختيار أي فقرة"
-    return
-  }
-
-  if (!stats.completedCount) {
-    if (winnerName) winnerName.innerText = "بانتظار النتائج"
-    if (winnerSub) winnerSub.innerText = `الفقرات المختارة: ${stats.selectedCount}`
-    return
-  }
-
-  if (winner.team === "A") {
-    if (winnerName) winnerName.innerText = winner.name
-    if (winnerSub) {
-      winnerSub.innerText = `فاز في ${stats.A} من ${stats.completedCount} فقرات`
-    }
-
-    if (teamABox) teamABox.classList.add("winner")
-    return
-  }
-
-  if (winner.team === "B") {
-    if (winnerName) winnerName.innerText = winner.name
-    if (winnerSub) {
-      winnerSub.innerText = `فاز في ${stats.B} من ${stats.completedCount} فقرات`
-    }
-
-    if (teamBBox) teamBBox.classList.add("winner")
-    return
-  }
-
-  if (winnerName) winnerName.innerText = "تعادل"
-  if (winnerSub) winnerSub.innerText = `تعادل في عدد الفقرات — ${stats.A} / ${stats.B}`
-}
-
-function showDetailedFinalResults() {
-  updateFinalResultsUI()
-
-  const overlay = document.getElementById("finalResultsOverlay")
-  if (!overlay) return
-
-  overlay.classList.remove("hidden", "closing")
-}
-
-function closeDetailedFinalResults() {
-  const overlay = document.getElementById("finalResultsOverlay")
-  if (!overlay) return
-
-  overlay.classList.add("closing")
-
-  setTimeout(() => {
-    overlay.classList.add("hidden")
-    overlay.classList.remove("closing")
-  }, 180)
-}
-
-function announceWinnerFromDetailedResults() {
-  const stats = getFinalResultsStats()
-  const winner = getUnifiedFinalWinner(stats)
-
-  closeDetailedFinalResults()
-
-  setTimeout(() => {
-    if (typeof playWinnerEffects === "function") {
-      playWinnerEffects()
-    }
-
-    if (typeof showWinnerOverlay === "function") {
-      showWinnerOverlay(winner.name, { homeWinner: true })
-    }
-  }, 220)
-}
-document.addEventListener("visibilitychange", () => {
-  if (
-    document.visibilityState === "hidden" &&
-    localStorage.getItem("game_session_id")
-  ) {
-    syncDisplayStateToSession({
-      immediate: true
-    })
-  }
-})
-
-window.showDetailedFinalResults = showDetailedFinalResults
-window.closeDetailedFinalResults = closeDetailedFinalResults
-window.announceWinnerFromDetailedResults = announceWinnerFromDetailedResults

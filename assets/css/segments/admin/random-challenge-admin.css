@@ -1,16 +1,5 @@
 /* =========================================================
    RANDOM CHALLENGE ADMIN / إدارة فقرة التحدي
-   CLEAN PROFESSIONAL DESIGN
-
-   Includes:
-   - اللاعب المشترك
-   - المزاد
-   - ماذا تعرف
-   - صح أو خطأ
-   - فتبلة
-
-   File:
-   assets/css/segments/admin/random-challenge-admin.css
 ========================================================= */
 
 /* =========================
@@ -32,93 +21,51 @@
 ========================= */
 
 .randomChallengeAdminTopBar{
-  position:sticky;
-  top:112px;
-  z-index:22;
-
   width:100%;
   min-width:0;
 
-  margin:0;
+  margin:0 0 10px;
 
-  border:
-    1px solid rgba(35,61,77,.20);
+  border:1px solid rgba(35,61,77,.20);
 
-  border-radius:
-    var(--admin-radius-lg);
+  border-radius:var(--admin-radius-lg);
 
-  background:
-    var(--admin-surface);
+  background:var(--admin-surface);
 
   box-shadow:
-    0 14px 34px
+    0 12px 30px
     rgba(35,61,77,.08);
 
-  padding:
-    15px
-    18px;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  gap:14px;
-}
-
-.randomChallengeAdminTopBar::before{
-  content:"ت";
-
-  width:48px;
-  height:48px;
-
-  flex:0 0 auto;
-
-  border-radius:15px;
-
-  color:#FFFFFF;
-
-  background:
-    var(--admin-secondary);
-
-  box-shadow:
-    0 9px 20px
-    rgba(35,61,77,.22);
+  padding:16px 18px;
 
   display:grid;
-  place-items:center;
 
-  font-family:
-    "HanakaDisplay",
-    sans-serif;
+  grid-template-columns:1fr;
 
-  font-size:1.45rem;
-  line-height:1;
+  gap:4px;
 }
 
+.randomChallengeAdminPage
 .adminEditorTitleBox{
   min-width:0;
-
-  flex:1 1 auto;
 
   display:grid;
   gap:4px;
 }
 
+.randomChallengeAdminPage
 .adminEditorTitleBox h2{
   margin:0;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  font-size:
-    clamp(1.35rem,3vw,2rem);
-
+  font-size:clamp(1.35rem,3vw,2rem);
   line-height:1.2;
 }
 
+.randomChallengeAdminPage
 .adminEditorTitleBox span{
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
   font-size:.9rem;
   line-height:1.5;
@@ -132,14 +79,11 @@
   width:100%;
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-lg);
+  border-radius:var(--admin-radius-lg);
 
-  background:
-    var(--admin-surface);
+  background:var(--admin-surface);
 
   box-shadow:
     0 10px 28px
@@ -160,21 +104,15 @@
   min-width:0;
   min-height:50px;
 
-  border:
-    1px solid transparent;
+  border:1px solid transparent;
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
-  padding:
-    10px
-    13px;
+  padding:10px 13px;
 
   display:flex;
   align-items:center;
@@ -196,24 +134,19 @@
 }
 
 .randomChallengeAdminTab:hover{
-  transform:
-    translateY(-1px);
+  transform:translateY(-1px);
 
-  border-color:
-    rgba(254,127,45,.32);
+  border-color:rgba(254,127,45,.32);
 
-  background:
-    var(--admin-primary-soft);
+  background:var(--admin-primary-soft);
 }
 
 .randomChallengeAdminTab.active{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-secondary);
+  border-color:var(--admin-secondary);
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
   box-shadow:
     0 10px 22px
@@ -221,8 +154,7 @@
 }
 
 .randomChallengeAdminTab.active:hover{
-  background:
-    var(--admin-secondary-dark);
+  background:var(--admin-secondary-dark);
 }
 
 /* =========================
@@ -233,21 +165,17 @@
   width:100%;
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-xl);
+  border-radius:var(--admin-radius-xl);
 
-  background:
-    var(--admin-surface);
+  background:var(--admin-surface);
 
   box-shadow:
     0 12px 32px
     rgba(35,61,77,.07);
 
-  padding:
-    clamp(13px,2.3vw,24px);
+  padding:clamp(13px,2.3vw,24px);
 }
 
 /* =========================
@@ -258,25 +186,17 @@
 > .adminEmptyState{
   min-height:320px;
 
-  border:
-    1px dashed
-    rgba(35,61,77,.25);
+  border:1px dashed rgba(35,61,77,.25);
 
-  border-radius:
-    var(--admin-radius-lg);
+  border-radius:var(--admin-radius-lg);
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   position:relative;
 
-  padding:
-    100px
-    24px
-    30px;
+  padding:100px 24px 30px;
 
   display:grid;
   place-items:center;
@@ -303,11 +223,9 @@
 
   color:#FFFFFF;
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
-  transform:
-    translateX(50%);
+  transform:translateX(50%);
 
   box-shadow:
     0 10px 24px
@@ -316,11 +234,10 @@
   display:grid;
   place-items:center;
 
-  font-family:
-    "HanakaDisplay",
-    sans-serif;
+  font-family:"HanakaDisplay",sans-serif;
 
   font-size:1.6rem;
+  line-height:1;
 }
 
 /* =========================
@@ -368,16 +285,13 @@
 
   min-width:0;
 
-  scroll-margin-top:225px;
+  scroll-margin-top:24px;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-surface);
+  background:var(--admin-surface);
 
   box-shadow:
     0 9px 26px
@@ -405,8 +319,7 @@
 
   opacity:.55;
 
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 
   transition:
     width .18s var(--admin-ease),
@@ -414,11 +327,9 @@
 }
 
 .randomChallengeOnePageCard:hover{
-  transform:
-    translateY(-2px);
+  transform:translateY(-2px);
 
-  border-color:
-    rgba(254,127,45,.34);
+  border-color:rgba(254,127,45,.34);
 
   box-shadow:
     0 16px 36px
@@ -432,18 +343,15 @@
 }
 
 .randomChallengeOnePageCard.isDone{
-  border-color:
-    rgba(0,127,0,.27);
+  border-color:rgba(0,127,0,.27);
 }
 
 .randomChallengeOnePageCard.isDone::before{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 }
 
 .randomChallengeOnePageCard.isMissing::before{
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 }
 
 .randomChallengeOnePageCard[open]{
@@ -451,8 +359,7 @@
 
   transform:none;
 
-  border-color:
-    rgba(254,127,45,.40);
+  border-color:rgba(254,127,45,.40);
 
   box-shadow:
     0 22px 52px
@@ -469,9 +376,7 @@
   list-style:none;
   cursor:pointer;
 
-  padding:
-    14px
-    17px;
+  padding:14px 17px;
 
   display:grid;
 
@@ -501,14 +406,12 @@
 
 .randomChallengeOnePageCard
 > summary:hover{
-  background:
-    var(--admin-primary-soft);
+  background:var(--admin-primary-soft);
 }
 
 .randomChallengeOnePageCard[open]
 > summary{
-  border-bottom:
-    1px solid var(--admin-line);
+  border-bottom:1px solid var(--admin-line);
 
   background:
     linear-gradient(
@@ -551,8 +454,7 @@
 
   color:#FFFFFF;
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
   box-shadow:
     0 8px 18px
@@ -561,17 +463,15 @@
   display:grid;
   place-items:center;
 
-  font-family:
-    "HanakaDisplay",
-    sans-serif;
+  font-family:"HanakaDisplay",sans-serif;
 
   font-size:1.15rem;
+  line-height:1;
 }
 
 .randomChallengeOnePageCard.isDone
 .adminEditItemTitle::before{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 }
 
 .randomChallengeOnePageCard
@@ -580,12 +480,9 @@
 
   min-width:0;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  font-size:
-    clamp(1rem,2vw,1.16rem);
-
+  font-size:clamp(1rem,2vw,1.16rem);
   line-height:1.35;
 
   overflow:hidden;
@@ -624,21 +521,19 @@
   width:34px;
   height:34px;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
   border-radius:11px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   display:grid;
   place-items:center;
 
   font-size:1.05rem;
+  line-height:1;
 
   transition:
     transform .18s var(--admin-ease),
@@ -651,14 +546,11 @@
 > summary::after{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-secondary);
+  border-color:var(--admin-secondary);
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
-  transform:
-    rotate(180deg);
+  transform:rotate(180deg);
 }
 
 /* =========================
@@ -667,8 +559,7 @@
 
 .randomChallengeOnePageCard
 > .adminEditItemBody{
-  padding:
-    clamp(14px,2vw,20px);
+  padding:clamp(14px,2vw,20px);
 
   display:grid;
   gap:13px;
@@ -677,7 +568,7 @@
 }
 
 .randomChallengeOnePageCard[open]
-.adminEditItemBody{
+> .adminEditItemBody{
   animation:
     randomChallengeAdminOpen
     .22s
@@ -687,14 +578,12 @@
 @keyframes randomChallengeAdminOpen{
   from{
     opacity:0;
-    transform:
-      translateY(-6px);
+    transform:translateY(-6px);
   }
 
   to{
     opacity:1;
-    transform:
-      translateY(0);
+    transform:translateY(0);
   }
 }
 
@@ -706,14 +595,11 @@
 .adminField{
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   padding:12px;
 
@@ -725,8 +611,7 @@
 .adminField:first-child::before{
   content:"نص السؤال أو العبارة";
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:.88rem;
   line-height:1.4;
@@ -740,20 +625,15 @@
   min-height:150px;
   max-height:360px;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
-  color:
-    var(--admin-text);
+  color:var(--admin-text);
 
   background:#FFFFFF;
 
-  padding:
-    13px
-    15px;
+  padding:13px 15px;
 
   resize:vertical;
 
@@ -770,8 +650,7 @@
 .adminField textarea:focus{
   outline:0;
 
-  border-color:
-    var(--admin-primary);
+  border-color:var(--admin-primary);
 
   box-shadow:
     0 0 0 4px
@@ -780,31 +659,26 @@
 
 .randomChallengeOnePageCard
 .adminField:not(.adminMissingField){
-  border-color:
-    rgba(0,127,0,.20);
+  border-color:rgba(0,127,0,.20);
 }
 
 .randomChallengeOnePageCard
 .adminField:not(.adminMissingField)
 textarea{
-  border-color:
-    rgba(0,127,0,.18);
+  border-color:rgba(0,127,0,.18);
 }
 
 .randomChallengeOnePageCard
 .adminField.adminMissingField{
-  border-color:
-    rgba(127,0,0,.20);
+  border-color:rgba(127,0,0,.20);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 }
 
 .randomChallengeOnePageCard
 .adminField.adminMissingField
 textarea{
-  border-color:
-    rgba(127,0,0,.28);
+  border-color:rgba(127,0,0,.28);
 
   background:#FFF9F9;
 }
@@ -828,26 +702,22 @@ textarea{
   width:100%;
   min-height:56px;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   background:#FFFFFF;
 
-  padding:
-    10px
-    16px;
+  padding:10px 16px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
   font-size:1rem;
+  line-height:1.2;
 
   transition:
     transform .16s var(--admin-ease),
@@ -858,25 +728,20 @@ textarea{
 }
 
 .randomChallengeTrueFalseBtn:hover{
-  transform:
-    translateY(-1px);
+  transform:translateY(-1px);
 
-  border-color:
-    rgba(35,61,77,.32);
+  border-color:rgba(35,61,77,.32);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 }
 
 .randomChallengeTrueFalseBtn.correct:hover,
 .randomChallengeTrueFalseBtn.selected.correct{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-green);
+  border-color:var(--admin-green);
 
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 
   box-shadow:
     0 9px 20px
@@ -887,11 +752,9 @@ textarea{
 .randomChallengeTrueFalseBtn.selected.wrong{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-red);
+  border-color:var(--admin-red);
 
-  background:
-    var(--admin-red);
+  background:var(--admin-red);
 
   box-shadow:
     0 9px 20px
@@ -907,41 +770,32 @@ textarea{
   width:100%;
   min-height:44px;
 
-  border:
-    1px solid
-    rgba(127,0,0,.16);
+  border:1px solid rgba(127,0,0,.16);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 
-  padding:
-    9px
-    14px;
+  padding:9px 14px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
   font-size:.88rem;
+  line-height:1.15;
 }
 
 .randomChallengeOnePageCard
 .adminDeleteMiniBtn:hover{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-red);
+  border-color:var(--admin-red);
 
-  background:
-    var(--admin-red);
+  background:var(--admin-red);
 }
-
 /* =========================================================
    FATBLA / فتبلة
 ========================================================= */
@@ -994,16 +848,13 @@ textarea{
 
   min-width:0;
 
-  scroll-margin-top:225px;
+  scroll-margin-top:24px;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-surface);
+  background:var(--admin-surface);
 
   box-shadow:
     0 10px 27px
@@ -1031,8 +882,7 @@ textarea{
 
   opacity:.55;
 
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 
   transition:
     width .18s var(--admin-ease),
@@ -1040,11 +890,9 @@ textarea{
 }
 
 .fatblaQuestionOnePageCard:hover{
-  transform:
-    translateY(-2px);
+  transform:translateY(-2px);
 
-  border-color:
-    rgba(254,127,45,.34);
+  border-color:rgba(254,127,45,.34);
 
   box-shadow:
     0 16px 36px
@@ -1058,18 +906,15 @@ textarea{
 }
 
 .fatblaQuestionOnePageCard.isDone{
-  border-color:
-    rgba(0,127,0,.26);
+  border-color:rgba(0,127,0,.26);
 }
 
 .fatblaQuestionOnePageCard.isDone::before{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 }
 
 .fatblaQuestionOnePageCard.isMissing::before{
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 }
 
 .fatblaQuestionOnePageCard[open]{
@@ -1077,8 +922,7 @@ textarea{
 
   transform:none;
 
-  border-color:
-    rgba(254,127,45,.40);
+  border-color:rgba(254,127,45,.40);
 
   box-shadow:
     0 22px 52px
@@ -1095,9 +939,7 @@ textarea{
   list-style:none;
   cursor:pointer;
 
-  padding:
-    14px
-    17px;
+  padding:14px 17px;
 
   display:grid;
 
@@ -1127,14 +969,12 @@ textarea{
 
 .fatblaQuestionOnePageCard
 > summary:hover{
-  background:
-    var(--admin-primary-soft);
+  background:var(--admin-primary-soft);
 }
 
 .fatblaQuestionOnePageCard[open]
 > summary{
-  border-bottom:
-    1px solid var(--admin-line);
+  border-bottom:1px solid var(--admin-line);
 
   background:
     linear-gradient(
@@ -1177,8 +1017,7 @@ textarea{
 
   color:#FFFFFF;
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
   box-shadow:
     0 8px 18px
@@ -1187,17 +1026,15 @@ textarea{
   display:grid;
   place-items:center;
 
-  font-family:
-    "HanakaDisplay",
-    sans-serif;
+  font-family:"HanakaDisplay",sans-serif;
 
   font-size:1.2rem;
+  line-height:1;
 }
 
 .fatblaQuestionOnePageCard.isDone
 .adminEditItemTitle::before{
-  background:
-    var(--admin-green);
+  background:var(--admin-green);
 }
 
 .fatblaQuestionOnePageCard
@@ -1206,12 +1043,9 @@ textarea{
 
   min-width:0;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  font-size:
-    clamp(1rem,2vw,1.17rem);
-
+  font-size:clamp(1rem,2vw,1.17rem);
   line-height:1.35;
 
   overflow:hidden;
@@ -1226,8 +1060,7 @@ textarea{
 
   min-width:0;
 
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
   font-size:.83rem;
   line-height:1.4;
@@ -1240,14 +1073,12 @@ textarea{
 
 .fatblaQuestionOnePageCard.isDone
 .adminEditItemTitle span{
-  color:
-    var(--admin-green);
+  color:var(--admin-green);
 }
 
 .fatblaQuestionOnePageCard.isMissing
 .adminEditItemTitle span{
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 }
 
 .fatblaQuestionOnePageCard
@@ -1272,21 +1103,19 @@ textarea{
   width:34px;
   height:34px;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
   border-radius:11px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   display:grid;
   place-items:center;
 
   font-size:1.05rem;
+  line-height:1;
 
   transition:
     transform .18s var(--admin-ease),
@@ -1299,14 +1128,11 @@ textarea{
 > summary::after{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-secondary);
+  border-color:var(--admin-secondary);
 
-  background:
-    var(--admin-secondary);
+  background:var(--admin-secondary);
 
-  transform:
-    rotate(180deg);
+  transform:rotate(180deg);
 }
 
 /* =========================
@@ -1315,14 +1141,13 @@ textarea{
 
 .fatblaQuestionOnePageCard
 > .adminEditItemBody{
-  padding:
-    clamp(15px,2.2vw,23px);
+  padding:clamp(15px,2.2vw,23px);
 
   background:#FFFFFF;
 }
 
 .fatblaQuestionOnePageCard[open]
-.adminEditItemBody{
+> .adminEditItemBody{
   animation:
     fatblaAdminOpen
     .22s
@@ -1332,14 +1157,12 @@ textarea{
 @keyframes fatblaAdminOpen{
   from{
     opacity:0;
-    transform:
-      translateY(-6px);
+    transform:translateY(-6px);
   }
 
   to{
     opacity:1;
-    transform:
-      translateY(0);
+    transform:translateY(0);
   }
 }
 
@@ -1373,14 +1196,11 @@ textarea{
 .fatblaOnePageMedia{
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   padding:14px;
 
@@ -1394,11 +1214,9 @@ textarea{
 .adminField{
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
   background:#FFFFFF;
 
@@ -1410,19 +1228,17 @@ textarea{
 
 .fatblaOnePageMedia
 .adminField label{
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:.87rem;
+  line-height:1.35;
 }
 
 .fatblaOnePageMedia
 .adminField.adminMissingField{
-  border-color:
-    rgba(127,0,0,.22);
+  border-color:rgba(127,0,0,.22);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 }
 
 .fatblaOnePageMedia
@@ -1439,11 +1255,9 @@ input[type="file"]{
 
   width:100%;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
   overflow:hidden;
 
@@ -1472,23 +1286,18 @@ input[type="file"]{
   top:10px;
   right:10px;
 
-  border:
-    1px solid
-    rgba(35,61,77,.14);
+  border:1px solid rgba(35,61,77,.14);
 
   border-radius:999px;
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
-  background:
-    rgba(255,255,255,.92);
+  background:rgba(255,255,255,.92);
 
-  padding:
-    5px
-    10px;
+  padding:5px 10px;
 
   font-size:.75rem;
+  line-height:1.2;
 
   pointer-events:none;
 }
@@ -1515,11 +1324,9 @@ video.previewImg{
 .emptyImageHint{
   width:100%;
   height:100%;
-
   min-height:inherit;
 
-  color:
-    var(--admin-muted);
+  color:var(--admin-muted);
 
   padding:30px;
 
@@ -1536,16 +1343,13 @@ video.previewImg{
 .fatblaOnePageFields{
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-md);
+  border-radius:var(--admin-radius-md);
 
   background:#FFFFFF;
 
-  padding:
-    clamp(16px,2vw,22px);
+  padding:clamp(16px,2vw,22px);
 
   display:flex;
   flex-direction:column;
@@ -1556,29 +1360,25 @@ video.previewImg{
 .fatblaOnePageFields::before{
   content:"بيانات الإجابة";
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:1.05rem;
+  line-height:1.3;
 
   padding-bottom:12px;
 
-  border-bottom:
-    1px solid #EDF0F2;
+  border-bottom:1px solid #EDF0F2;
 }
 
 .fatblaOnePageFields
 .adminField{
   min-width:0;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
-  background:
-    var(--admin-soft);
+  background:var(--admin-soft);
 
   padding:12px;
 
@@ -1588,10 +1388,10 @@ video.previewImg{
 
 .fatblaOnePageFields
 .adminField label{
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   font-size:.9rem;
+  line-height:1.35;
 }
 
 .fatblaOnePageFields
@@ -1601,22 +1401,18 @@ video.previewImg{
 
   min-height:62px;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
-  color:
-    var(--admin-secondary);
+  color:var(--admin-secondary);
 
   background:#FFFFFF;
 
-  padding:
-    12px
-    15px;
+  padding:12px 15px;
 
   font-size:1.07rem;
+  line-height:1.4;
 
   transition:
     border-color .16s var(--admin-ease),
@@ -1627,8 +1423,7 @@ video.previewImg{
 .adminField input:focus{
   outline:0;
 
-  border-color:
-    var(--admin-primary);
+  border-color:var(--admin-primary);
 
   box-shadow:
     0 0 0 4px
@@ -1637,31 +1432,26 @@ video.previewImg{
 
 .fatblaOnePageFields
 .adminField:not(.adminMissingField){
-  border-color:
-    rgba(0,127,0,.20);
+  border-color:rgba(0,127,0,.20);
 }
 
 .fatblaOnePageFields
 .adminField:not(.adminMissingField)
 input{
-  border-color:
-    rgba(0,127,0,.18);
+  border-color:rgba(0,127,0,.18);
 }
 
 .fatblaOnePageFields
 .adminField.adminMissingField{
-  border-color:
-    rgba(127,0,0,.21);
+  border-color:rgba(127,0,0,.21);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 }
 
 .fatblaOnePageFields
 .adminField.adminMissingField
 input{
-  border-color:
-    rgba(127,0,0,.28);
+  border-color:rgba(127,0,0,.28);
 
   background:#FFF9F9;
 }
@@ -1677,39 +1467,31 @@ input{
 
   margin-top:auto;
 
-  border:
-    1px solid
-    rgba(127,0,0,.16);
+  border:1px solid rgba(127,0,0,.16);
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 
-  padding:
-    10px
-    15px;
+  padding:10px 15px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
   font-size:.9rem;
+  line-height:1.15;
 }
 
 .fatblaOnePageFields
 .adminDeleteBtn:hover{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-red);
+  border-color:var(--admin-red);
 
-  background:
-    var(--admin-red);
+  background:var(--admin-red);
 }
 
 /* =========================
@@ -1718,21 +1500,15 @@ input{
 
 .randomChallengeAdminPage
 .adminMissingHint{
-  border:
-    1px solid
-    rgba(127,0,0,.12);
+  border:1px solid rgba(127,0,0,.12);
 
   border-radius:10px;
 
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 
-  padding:
-    7px
-    10px;
+  padding:7px 10px;
 
   font-size:.82rem;
   line-height:1.4;
@@ -1745,14 +1521,11 @@ input{
 .randomChallengeAdminActions{
   width:100%;
 
-  border:
-    1px solid var(--admin-line);
+  border:1px solid var(--admin-line);
 
-  border-radius:
-    var(--admin-radius-lg);
+  border-radius:var(--admin-radius-lg);
 
-  background:
-    var(--admin-surface);
+  background:var(--admin-surface);
 
   box-shadow:
     0 12px 30px
@@ -1773,29 +1546,25 @@ input{
   width:100%;
   min-height:54px;
 
-  border-radius:
-    var(--admin-radius-sm);
+  border-radius:var(--admin-radius-sm);
 
-  padding:
-    11px
-    18px;
+  padding:11px 18px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
   font-size:1rem;
+  line-height:1.15;
 }
 
 .randomChallengeAdminActions
 .adminBtnMango{
   color:#FFFFFF;
 
-  border:
-    1px solid var(--admin-primary);
+  border:1px solid var(--admin-primary);
 
-  background:
-    var(--admin-primary);
+  background:var(--admin-primary);
 
   box-shadow:
     0 10px 23px
@@ -1804,32 +1573,25 @@ input{
 
 .randomChallengeAdminActions
 .adminBtnMango:hover{
-  background:
-    var(--admin-primary-hover);
+  background:var(--admin-primary-hover);
 }
 
 .randomChallengeAdminActions
 .adminBtnDanger{
-  color:
-    var(--admin-red);
+  color:var(--admin-red);
 
-  border:
-    1px solid
-    rgba(127,0,0,.18);
+  border:1px solid rgba(127,0,0,.18);
 
-  background:
-    var(--admin-red-soft);
+  background:var(--admin-red-soft);
 }
 
 .randomChallengeAdminActions
 .adminBtnDanger:hover{
   color:#FFFFFF;
 
-  border-color:
-    var(--admin-red);
+  border-color:var(--admin-red);
 
-  background:
-    var(--admin-red);
+  background:var(--admin-red);
 }
 
 /* =========================
@@ -1840,8 +1602,7 @@ input{
 .fatblaOnePageMedia,
 .fatblaQuestionOnePageCard.isDone
 .fatblaOnePageFields{
-  border-color:
-    rgba(0,127,0,.22);
+  border-color:rgba(0,127,0,.22);
 }
 
 /* =========================
@@ -1866,17 +1627,52 @@ input{
 }
 
 /* =========================
-   31) LARGE SCREENS
+   31) IPAD LANDSCAPE
 ========================= */
 
-@media (min-width:1500px){
+@media (orientation:landscape) and (min-width:768px) and (max-width:1220px){
+
+  .randomChallengeAdminPage{
+    gap:12px;
+  }
+
+  .randomChallengeAdminTopBar{
+    margin-bottom:8px;
+
+    padding:13px 14px;
+  }
+
+  .randomChallengeAdminPage
+  .adminEditorTitleBox h2{
+    font-size:1.35rem;
+  }
+
+  .randomChallengeAdminTabs{
+    grid-template-columns:
+      repeat(5,minmax(0,1fr));
+
+    gap:7px;
+  }
+
+  .randomChallengeAdminTab{
+    min-height:46px;
+
+    padding:9px 10px;
+
+    font-size:.84rem;
+  }
+
+  .randomChallengeAdminContent{
+    padding:14px;
+
+    border-radius:var(--admin-radius-lg);
+  }
 
   .randomChallengeOnePageGrid{
     grid-template-columns:
-      repeat(
-        auto-fit,
-        minmax(340px,1fr)
-      );
+      repeat(3,minmax(0,1fr));
+
+    gap:10px;
   }
 
   .randomChallengeOnePageGrid.hasOpenCard,
@@ -1886,9 +1682,42 @@ input{
     grid-template-columns:1fr;
   }
 
+  .randomChallengeOnePageCard > summary,
+  .fatblaQuestionOnePageCard > summary{
+    min-height:82px;
+
+    padding:12px 14px;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      auto
+      auto;
+
+    gap:10px;
+  }
+
+  .randomChallengeOnePageCard
+  .adminEditItemTitle{
+    grid-template-columns:
+      40px
+      minmax(0,1fr);
+  }
+
+  .randomChallengeOnePageCard
+  .adminEditItemTitle::before{
+    width:40px;
+    height:40px;
+
+    border-radius:12px;
+
+    font-size:1.05rem;
+  }
+
   .fatblaOnePageGrid{
     grid-template-columns:
-      repeat(3,minmax(0,1fr));
+      repeat(2,minmax(0,1fr));
+
+    gap:10px;
   }
 
   .fatblaOnePageGrid.hasOpenCard,
@@ -1898,92 +1727,98 @@ input{
     grid-template-columns:1fr;
   }
 
-  .fatblaOnePageLayout{
+  .fatblaQuestionOnePageCard
+  .adminEditItemTitle{
     grid-template-columns:
-      minmax(410px,.82fr)
-      minmax(520px,1.18fr);
-
-    gap:22px;
+      42px
+      minmax(0,1fr);
   }
 
-  .fatblaPreviewLarge{
-    height:520px;
-  }
-}
+  .fatblaQuestionOnePageCard
+  .adminEditItemTitle::before{
+    width:42px;
+    height:42px;
 
-/* =========================
-   32) LAPTOP
-========================= */
+    border-radius:13px;
 
-@media (max-width:1180px){
-
-  .randomChallengeAdminTopBar{
-    top:148px;
+    font-size:1.1rem;
   }
 
-  .randomChallengeAdminTabs{
-    grid-template-columns:
-      repeat(3,minmax(0,1fr));
+  .randomChallengeOnePageCard
+  > summary::after,
+  .fatblaQuestionOnePageCard
+  > summary::after{
+    width:32px;
+    height:32px;
+  }
+
+  .randomChallengeOnePageCard
+  > .adminEditItemBody,
+  .fatblaQuestionOnePageCard
+  > .adminEditItemBody{
+    padding:12px;
+  }
+
+  .randomChallengeOnePageCard
+  .adminField textarea{
+    min-height:120px;
   }
 
   .fatblaOnePageLayout{
     grid-template-columns:
       minmax(290px,.9fr)
       minmax(340px,1.1fr);
+
+    gap:14px;
+  }
+
+  .fatblaOnePageMedia,
+  .fatblaOnePageFields{
+    padding:12px;
   }
 
   .fatblaPreviewLarge{
-    min-height:320px;
-    height:420px;
+    min-height:300px;
+    height:400px;
+  }
+
+  .fatblaOnePageFields
+  .adminField input{
+    min-height:56px;
   }
 }
 
 /* =========================
-   33) TABLET
+   32) IPHONE PORTRAIT
 ========================= */
 
-@media (max-width:900px){
+@media (orientation:portrait) and (max-width:620px){
+
+  .randomChallengeAdminPage{
+    gap:10px;
+  }
 
   .randomChallengeAdminTopBar{
-    position:relative;
-    top:auto;
+    margin-bottom:8px;
+
+    padding:12px;
   }
 
-  .randomChallengeOnePageCard,
-  .fatblaQuestionOnePageCard{
-    scroll-margin-top:24px;
+  .randomChallengeAdminPage
+  .adminEditorTitleBox h2{
+    font-size:1.35rem;
   }
 
-  .randomChallengeAdminTabs{
-    grid-template-columns:
-      repeat(2,minmax(0,1fr));
-  }
-
-  .fatblaOnePageGrid{
-    grid-template-columns:1fr;
-  }
-
-  .fatblaOnePageLayout{
-    grid-template-columns:1fr;
-  }
-
-  .fatblaPreviewLarge{
-    min-height:350px;
-    height:min(62vw,500px);
-  }
-}
-
-/* =========================
-   34) SMALL TABLET
-========================= */
-
-@media (max-width:760px){
-
-  .randomChallengeOnePageGrid{
-    grid-template-columns:1fr;
+  .randomChallengeAdminPage
+  .adminEditorTitleBox span{
+    font-size:.82rem;
   }
 
   .randomChallengeAdminTabs{
+    border-radius:var(--admin-radius-md);
+
+    padding:7px;
+
     display:flex;
 
     overflow-x:auto;
@@ -1991,80 +1826,35 @@ input{
 
     scrollbar-width:thin;
 
-    scroll-snap-type:
-      x proximity;
-  }
-
-  .randomChallengeAdminTab{
-    flex:
-      0 0
-      min(190px,62vw);
-
-    scroll-snap-align:start;
-  }
-
-  .randomChallengeAdminActions{
-    grid-template-columns:1fr;
-  }
-}
-
-/* =========================
-   35) MOBILE
-========================= */
-
-@media (max-width:620px){
-
-  .randomChallengeAdminPage{
-    gap:10px;
-  }
-
-  .randomChallengeAdminTopBar{
-    padding:12px;
-
-    align-items:center;
-  }
-
-  .randomChallengeAdminTopBar::before{
-    width:42px;
-    height:42px;
-
-    border-radius:13px;
-  }
-
-  .adminEditorTitleBox h2{
-    font-size:1.35rem;
-  }
-
-  .adminEditorTitleBox span{
-    font-size:.82rem;
-  }
-
-  .randomChallengeAdminTabs{
-    border-radius:
-      var(--admin-radius-md);
-
-    padding:7px;
+    scroll-snap-type:x proximity;
   }
 
   .randomChallengeAdminTab{
     min-height:46px;
 
-    flex-basis:
-      min(170px,68vw);
+    flex:0 0 min(170px,68vw);
+
+    scroll-snap-align:start;
 
     font-size:.88rem;
   }
 
   .randomChallengeAdminContent{
-    border-radius:
-      var(--admin-radius-lg);
+    border-radius:var(--admin-radius-lg);
 
     padding:10px;
   }
 
   .randomChallengeOnePageGrid,
   .fatblaOnePageGrid{
+    grid-template-columns:1fr;
+
     gap:10px;
+  }
+
+  .randomChallengeOnePageCard,
+  .fatblaQuestionOnePageCard{
+    scroll-margin-top:18px;
   }
 
   .randomChallengeOnePageCard
@@ -2073,9 +1863,7 @@ input{
   > summary{
     min-height:88px;
 
-    padding:
-      12px
-      14px;
+    padding:12px 14px;
 
     grid-template-columns:
       minmax(0,1fr)
@@ -2083,6 +1871,8 @@ input{
   }
 
   .randomChallengeOnePageCard
+  .adminEditItemTitle,
+  .fatblaQuestionOnePageCard
   .adminEditItemTitle{
     grid-template-columns:
       40px
@@ -2090,6 +1880,8 @@ input{
   }
 
   .randomChallengeOnePageCard
+  .adminEditItemTitle::before,
+  .fatblaQuestionOnePageCard
   .adminEditItemTitle::before{
     width:40px;
     height:40px;
@@ -2097,19 +1889,23 @@ input{
     border-radius:12px;
   }
 
+  .randomChallengeOnePageCard
+  .adminEditItemTitle strong,
   .fatblaQuestionOnePageCard
-  .adminEditItemTitle{
-    grid-template-columns:
-      40px
-      minmax(0,1fr);
+  .adminEditItemTitle strong,
+  .fatblaQuestionOnePageCard
+  .adminEditItemTitle span{
+    white-space:normal;
   }
 
   .fatblaQuestionOnePageCard
-  .adminEditItemTitle::before{
-    width:40px;
-    height:40px;
+  .adminEditItemTitle span{
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    line-clamp:2;
 
-    border-radius:12px;
+    overflow:hidden;
   }
 
   .randomChallengeOnePageCard
@@ -2167,11 +1963,17 @@ input{
     min-height:125px;
   }
 
+  .randomChallengeTrueFalseOptions{
+    grid-template-columns:1fr;
+  }
+
   .randomChallengeTrueFalseBtn{
     min-height:50px;
   }
 
   .fatblaOnePageLayout{
+    grid-template-columns:1fr;
+
     gap:11px;
   }
 
@@ -2193,59 +1995,14 @@ input{
   }
 
   .randomChallengeAdminActions{
+    grid-template-columns:1fr;
+
     padding:9px;
   }
 }
 
 /* =========================
-   36) SMALL MOBILE
-========================= */
-
-@media (max-width:420px){
-
-  .randomChallengeAdminTopBar{
-    align-items:flex-start;
-  }
-
-  .randomChallengeAdminTopBar::before{
-    width:38px;
-    height:38px;
-
-    font-size:1.2rem;
-  }
-
-  .randomChallengeOnePageCard
-  .adminEditItemTitle strong,
-  .fatblaQuestionOnePageCard
-  .adminEditItemTitle strong,
-  .fatblaQuestionOnePageCard
-  .adminEditItemTitle span{
-    white-space:normal;
-  }
-
-  .fatblaQuestionOnePageCard
-  .adminEditItemTitle span{
-    display:-webkit-box;
-
-    -webkit-box-orient:vertical;
-    -webkit-line-clamp:2;
-    line-clamp:2;
-
-    overflow:hidden;
-  }
-
-  .randomChallengeTrueFalseOptions{
-    grid-template-columns:1fr;
-  }
-
-  .fatblaPreviewLarge{
-    min-height:220px;
-    height:290px;
-  }
-}
-
-/* =========================
-   37) FALLBACK
+   33) FALLBACK
 ========================= */
 
 @supports not selector(:has(*)){
@@ -2279,11 +2036,20 @@ input{
     grid-column:1 / -1;
   }
 
-  @media (min-width:1500px){
+  @media (orientation:landscape) and (min-width:768px) and (max-width:1220px){
+
+    .randomChallengeOnePageGrid{
+      grid-template-columns:
+        repeat(3,minmax(0,1fr));
+    }
+
+    .randomChallengeOnePageGrid.hasOpenCard{
+      grid-template-columns:1fr;
+    }
 
     .fatblaOnePageGrid{
       grid-template-columns:
-        repeat(3,minmax(0,1fr));
+        repeat(2,minmax(0,1fr));
     }
 
     .fatblaOnePageGrid.hasOpenCard{
@@ -2291,17 +2057,170 @@ input{
     }
   }
 
-  @media (max-width:900px){
+  @media (orientation:portrait) and (max-width:620px){
 
+    .randomChallengeOnePageGrid,
     .fatblaOnePageGrid{
       grid-template-columns:1fr;
     }
   }
+}
+/* =========================
+   ADMIN COMPENSATION CARD
+   CLEAN DESIGN - CSS ONLY
+========================= */
 
-  @media (max-width:760px){
+.explainItemOnePageCard:last-child,
+.finalRound1OnePageCard:last-child,
+.finalStoryOnePageCard:last-child,
+.finalFocusOnePageCard:last-child,
+.fatblaQuestionOnePageCard:last-child{
+  --admin-comp:#FE7F2D;
+  --admin-comp-soft:#FFF7ED;
+  --admin-comp-line:rgba(254,127,45,.34);
 
-    .randomChallengeOnePageGrid{
-      grid-template-columns:1fr;
-    }
-  }
+  border-color:var(--admin-comp);
+  background:
+    linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 58%,#FFF7ED 100%);
+
+  box-shadow:
+    0 0 0 3px rgba(254,127,45,.10),
+    0 16px 34px rgba(254,127,45,.12);
+}
+
+.explainItemOnePageCard:last-child::before,
+.finalRound1OnePageCard:last-child::before,
+.finalStoryOnePageCard:last-child::before,
+.finalFocusOnePageCard:last-child::before,
+.fatblaQuestionOnePageCard:last-child::before{
+  background:var(--admin-comp);
+}
+
+/* رأس الكرت */
+.explainItemOnePageCard:last-child > summary,
+.finalRound1OnePageCard:last-child > summary,
+.finalStoryOnePageCard:last-child > summary,
+.finalFocusOnePageCard:last-child > summary,
+.fatblaQuestionOnePageCard:last-child > summary{
+  position:relative;
+
+  padding-inline-start:118px;
+
+  background:#FFF1E6;
+  border-color:var(--admin-comp-line);
+}
+
+.explainItemOnePageCard:last-child > summary::before,
+.finalRound1OnePageCard:last-child > summary::before,
+.finalStoryOnePageCard:last-child > summary::before,
+.finalFocusOnePageCard:last-child > summary::before,
+.fatblaQuestionOnePageCard:last-child > summary::before{
+  content:"تعويض";
+
+  position:absolute;
+  inset-inline-start:12px;
+  top:50%;
+  transform:translateY(-50%);
+
+  min-width:78px;
+  height:30px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0 12px;
+
+  border-radius:999px;
+
+  background:var(--admin-comp);
+  color:#FFFFFF;
+
+  font-size:13px;
+  line-height:1;
+  font-weight:400;
+
+  pointer-events:none;
+}
+
+/* عند فتح الكرت */
+.explainItemOnePageCard:last-child[open],
+.finalRound1OnePageCard:last-child[open],
+.finalStoryOnePageCard:last-child[open],
+.finalFocusOnePageCard:last-child[open],
+.fatblaQuestionOnePageCard:last-child[open]{
+  border-color:var(--admin-comp);
+  background:#FFFFFF;
+
+  box-shadow:
+    0 0 0 4px rgba(254,127,45,.14),
+    0 18px 38px rgba(254,127,45,.14);
+}
+
+.explainItemOnePageCard:last-child[open] > summary,
+.finalRound1OnePageCard:last-child[open] > summary,
+.finalStoryOnePageCard:last-child[open] > summary,
+.finalFocusOnePageCard:last-child[open] > summary,
+.fatblaQuestionOnePageCard:last-child[open] > summary{
+  background:#FFF7ED;
+  border-color:var(--admin-comp);
+}
+
+/* مربعات الحقول */
+.explainItemOnePageCard:last-child .adminField,
+.finalRound1OnePageCard:last-child .adminField,
+.finalStoryOnePageCard:last-child .adminField,
+.finalStoryOnePageCard:last-child .finalStoryAnswerBox,
+.finalFocusOnePageCard:last-child .adminField,
+.fatblaQuestionOnePageCard:last-child .fatblaOnePageFields,
+.fatblaQuestionOnePageCard:last-child .adminField{
+  background:#FFF7ED;
+  border-color:var(--admin-comp-line);
+}
+
+/* عناوين الحقول */
+.explainItemOnePageCard:last-child .adminField label,
+.finalRound1OnePageCard:last-child .adminField label,
+.finalStoryOnePageCard:last-child .adminField label,
+.finalStoryOnePageCard:last-child .finalStoryAnswerBox label,
+.finalFocusOnePageCard:last-child .adminField label,
+.fatblaQuestionOnePageCard:last-child .adminField label{
+  color:var(--admin-comp);
+}
+
+/* مربعات الكتابة والإجابة فقط */
+.explainItemOnePageCard:last-child .adminField input:not([type="file"]),
+.explainItemOnePageCard:last-child .adminField textarea,
+.finalRound1OnePageCard:last-child .adminField input:not([type="file"]),
+.finalRound1OnePageCard:last-child .adminField textarea,
+.finalStoryOnePageCard:last-child .adminField input:not([type="file"]),
+.finalStoryOnePageCard:last-child .adminField textarea,
+.finalStoryOnePageCard:last-child .finalStoryAnswerBox textarea,
+.finalFocusOnePageCard:last-child .adminField input:not([type="file"]),
+.finalFocusOnePageCard:last-child .adminField textarea,
+.fatblaQuestionOnePageCard:last-child .adminField input:not([type="file"]),
+.fatblaQuestionOnePageCard:last-child .adminField textarea{
+  background:#FFFFFF;
+  border-color:var(--admin-comp);
+  color:#151515;
+
+  box-shadow:0 0 0 3px rgba(254,127,45,.10);
+}
+
+/* عند الكتابة */
+.explainItemOnePageCard:last-child .adminField input:not([type="file"]):focus,
+.explainItemOnePageCard:last-child .adminField textarea:focus,
+.finalRound1OnePageCard:last-child .adminField input:not([type="file"]):focus,
+.finalRound1OnePageCard:last-child .adminField textarea:focus,
+.finalStoryOnePageCard:last-child .adminField input:not([type="file"]):focus,
+.finalStoryOnePageCard:last-child .adminField textarea:focus,
+.finalStoryOnePageCard:last-child .finalStoryAnswerBox textarea:focus,
+.finalFocusOnePageCard:last-child .adminField input:not([type="file"]):focus,
+.finalFocusOnePageCard:last-child .adminField textarea:focus,
+.fatblaQuestionOnePageCard:last-child .adminField input:not([type="file"]):focus,
+.fatblaQuestionOnePageCard:last-child .adminField textarea:focus{
+  border-color:var(--admin-comp);
+  box-shadow:
+    0 0 0 4px rgba(254,127,45,.16),
+    0 10px 20px rgba(254,127,45,.10);
 }

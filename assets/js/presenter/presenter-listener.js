@@ -168,21 +168,27 @@
   }
 
   function setDisplayActiveSegment(segment) {
-    const key =
-      normalizeDisplayPresenterSegment(
-        segment
-      )
+  const key =
+    normalizeDisplayPresenterSegment(
+      segment
+    )
 
-    try {
+  try {
+    if (!key || key === "global") {
+      localStorage.removeItem(
+        "active_segment"
+      )
+    } else {
       localStorage.setItem(
         "active_segment",
         key
       )
-    } catch {}
+    }
+  } catch {}
 
-    window.activeSegment = key
-    window.currentSegment = key
-  }
+  window.activeSegment = key || ""
+  window.currentSegment = key || ""
+}
 
   function getWindowFunction(name) {
     const fn = window[name]
@@ -270,46 +276,52 @@
      5) NORMALIZERS
   ========================= */
 
-  function normalizeDisplayPresenterSegment(
-    segment
-  ) {
-    const key =
-      String(segment || "")
-        .trim()
-        .replace(/\s+/g, "")
+  function isDeletedStandalonePresenterSegment(segment) {
+  const key = String(segment || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .toLowerCase()
 
-    const aliases = {
-      finalRound1: "final",
-      finalRound2: "final",
-      finalRound3: "final",
-      finalRound4: "final",
+  return (
+    key === "auction" ||
+    key === "fatbla" ||
+    key === "fitbala" ||
+    key === "فتبلة"
+  )
+}
 
-      final_round1: "final",
-      final_round2: "final",
-      final_round3: "final",
-      final_round4: "final",
+function normalizeDisplayPresenterSegment(segment) {
+  const key =
+    String(segment || "")
+      .trim()
+      .replace(/\s+/g, "")
 
-      random_challenge:
-        "randomChallenge",
+  if (!key) return ""
 
-      randomchallenge:
-        "randomChallenge",
-
-      top_10:
-        "top10",
-
-      topTen:
-        "top10",
-
-      fitbala:
-        "auction",
-
-      fatbla:
-        "auction"
-    }
-
-    return aliases[key] || key || "global"
+  if (isDeletedStandalonePresenterSegment(key)) {
+    return ""
   }
+
+  const aliases = {
+    finalRound1: "final",
+    finalRound2: "final",
+    finalRound3: "final",
+    finalRound4: "final",
+
+    final_round1: "final",
+    final_round2: "final",
+    final_round3: "final",
+    final_round4: "final",
+
+    random_challenge: "randomChallenge",
+    randomchallenge: "randomChallenge",
+
+    top_10: "top10",
+    topTen: "top10"
+  }
+
+  return aliases[key] || key
+}
 
   function getFinalRoundFromSegment(
     segment,
@@ -456,6 +468,8 @@
       )
 
     const rawSegment =
+      payload.segmentKey ||
+      payload.activeSegment ||
       payload.segment ||
       command.segment ||
       getDisplayActiveSegment()
@@ -468,7 +482,9 @@
     const round =
       getFinalRoundFromSegment(
         rawSegment,
+        payload.finalRound ||
         payload.round ||
+        command.finalRound ||
         command.round ||
         1
       )
@@ -616,29 +632,33 @@
      7) POST ACTION SYNC
   ========================= */
 
-  function scheduleDisplayStateSync() {
-    clearTimeout(
-      presenterListenerSyncTimer
-    )
+function scheduleDisplayStateSync() {
+  clearTimeout(
+    presenterListenerSyncTimer
+  )
 
-    presenterListenerSyncTimer =
-      setTimeout(async () => {
-        try {
-          const saveUnified =
-            getWindowFunction(
-              "saveUnifiedGameState"
-            )
+  presenterListenerSyncTimer =
+    setTimeout(async () => {
+      let unifiedHandled = false
 
-          if (saveUnified) {
-            await saveUnified()
-          }
-        } catch (error) {
-          console.log(
-            "PRESENTER LISTENER SAVE STATE ERROR:",
-            error
+      try {
+        const saveUnified =
+          getWindowFunction(
+            "saveUnifiedGameState"
           )
-        }
 
+        if (saveUnified) {
+          await saveUnified()
+          unifiedHandled = true
+        }
+      } catch (error) {
+        console.log(
+          "PRESENTER LISTENER SAVE STATE ERROR:",
+          error
+        )
+      }
+
+      if (!unifiedHandled) {
         try {
           const syncSession =
             getWindowFunction(
@@ -656,17 +676,18 @@
             error
           )
         }
+      }
 
-        try {
-          const updateEndButton =
-            getWindowFunction(
-              "updateEndRoundButtonState"
-            )
+      try {
+        const updateEndButton =
+          getWindowFunction(
+            "updateEndRoundButtonState"
+          )
 
-          updateEndButton?.()
-        } catch {}
-      }, PRESENTER_LISTENER_SYNC_DELAY)
-  }
+        updateEndButton?.()
+      } catch {}
+    }, PRESENTER_LISTENER_SYNC_DELAY)
+}
 
   /* =========================
      8) GLOBAL COMMANDS
@@ -678,9 +699,15 @@
     const payload = command.payload || {}
 
     const requestedSegment =
+      payload.segmentKey ||
+      payload.activeSegment ||
       payload.segment ||
       command.rawSegment ||
       command.segment
+
+    if (isDeletedStandalonePresenterSegment(requestedSegment)) {
+      return goDisplayHomeFromPresenter()
+    }
 
     const normalized =
       normalizeDisplayPresenterSegment(
@@ -690,7 +717,9 @@
     const round =
       getFinalRoundFromSegment(
         requestedSegment,
+        payload.finalRound ||
         payload.round ||
+        command.finalRound ||
         command.round ||
         1
       )
@@ -711,22 +740,18 @@
             "openSegmentPage"
           ],
           args: [
-            routeKey,
-            {
-              ...payload,
-              round
-            }
-          ]
+           routeKey,
+           round
+           ]
         },
         {
-          names: [
-            "openSegment",
-            "showSegment",
-            "startSegment",
-            "renderSegment"
-          ],
-          args: [routeKey]
-        }
+  names: [
+    "showSegment",
+    "startSegment",
+    "renderSegment"
+  ],
+  args: [routeKey]
+}
       ])
 
     if (general.handled) {
@@ -755,16 +780,6 @@
       ).handled
     }
 
-    if (normalized === "auction") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "renderAuction",
-            "startAuction"
-          ]
-        )
-      ).handled
-    }
 
     if (normalized === "who") {
       return (
@@ -1052,12 +1067,6 @@
         "selectTop10Team"
       ],
 
-      auction: [
-        "forceAuctionTeamFromPresenter",
-        "setAuctionActiveTeam",
-        "selectAuctionTeam"
-      ],
-
       who: [
         "forceWhoTeamFromPresenter",
         "setWhoActiveTeam",
@@ -1333,88 +1342,6 @@
   }
 
   /* =========================
-     12) AUCTION / فتبلة
-  ========================= */
-
-  async function handleAuctionCommand(
-    action,
-    payload
-  ) {
-    if (action === "openNumber") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "openAuctionQuestion",
-            "openAuctionNumber",
-            "showAuctionQuestion"
-          ],
-          [
-            Number(payload.number || 0)
-          ]
-        )
-      ).handled
-    }
-
-    const actionMap = {
-      double: [
-        "activateAuctionDouble",
-        "useAuctionDouble"
-      ],
-
-      correct: [
-        "auctionCorrect",
-        "markAuctionCorrect",
-        "scoreAuctionCorrect"
-      ],
-
-      wrong: [
-        "auctionWrong",
-        "markAuctionWrong",
-        "scoreAuctionWrong"
-      ],
-
-      undo: [
-        "undoAuctionAction",
-        "auctionUndo"
-      ],
-
-      zoomImage: [
-        "zoomAuctionImage",
-        "openAuctionImageViewer",
-        "zoomCurrentAuctionImage"
-      ],
-
-      playAuctionVideo: [
-        "playAuctionVideo",
-        "playCurrentAuctionVideo"
-      ],
-
-      showAnswer: [
-        "showAuctionAnswer",
-        "revealAuctionAnswer"
-      ]
-    }
-
-    const names =
-      actionMap[action] || []
-
-    if (!names.length) {
-      return false
-    }
-
-    return (
-      await invokeDisplayFunction(
-        names,
-        [
-          payload.number,
-          payload.team,
-          payload
-        ]
-      )
-    ).handled
-  }
-
-  /* =========================
      13) WHO / من هو
   ========================= */
 
@@ -1423,19 +1350,20 @@
     payload
   ) {
     if (action === "openNumber") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "openWhoNumber",
-            "openWhoImage",
-            "showWhoNumber"
-          ],
-          [
-            Number(payload.number || 0)
-          ]
-        )
-      ).handled
-    }
+  return (
+    await invokeDisplayFunction(
+      [
+        "chooseWho",
+        "openWhoNumber",
+        "openWhoImage",
+        "showWhoNumber"
+      ],
+      [
+        Number(payload.number || 0)
+      ]
+    )
+  ).handled
+}
 
     if (action === "setPoints") {
       return (
@@ -1535,40 +1463,47 @@
       ).handled
     }
 
-    const actionMap = {
-      startTimer: [
-        "startExplainTimer",
-        "startExplainWordTimer"
-      ],
+const actionMap = {
+  double: [
+    "activateExplainDouble"
+  ],
 
-      toggleWordVisible: [
-        "toggleExplainWordVisible",
-        "toggleExplainWord",
-        "toggleWordVisible"
-      ],
+  startTimer: [
+    "startExplainTimer",
+    "startExplainWordTimer"
+  ],
 
-      showAnswer: [
-        "showExplainWord",
-        "revealExplainWord"
-      ],
+  toggleWordVisible: [
+    "hideExplainWord",
+    "toggleExplainWordVisible",
+    "toggleExplainWord",
+    "toggleWordVisible"
+  ],
 
-      correct: [
-        "explainCorrect",
-        "markExplainCorrect",
-        "scoreExplainCorrect"
-      ],
+  showAnswer: [
+    "showExplainWord",
+    "revealExplainWord"
+  ],
 
-      wrong: [
-        "explainWrong",
-        "markExplainWrong",
-        "scoreExplainWrong"
-      ],
+  correct: [
+    "correctExplainAnswer",
+    "explainCorrect",
+    "markExplainCorrect",
+    "scoreExplainCorrect"
+  ],
 
-      undo: [
-        "undoExplainAction",
-        "explainUndo"
-      ]
-    }
+  wrong: [
+    "wrongExplainAnswer",
+    "explainWrong",
+    "markExplainWrong",
+    "scoreExplainWrong"
+  ],
+
+  undo: [
+    "undoExplainAction",
+    "explainUndo"
+  ]
+}
 
     const names =
       actionMap[action] || []
@@ -1593,57 +1528,117 @@
      15) LETTERLI / حرفلي
   ========================= */
 
-  async function handleLetterliCommand(
-    action,
-    payload
+async function handleLetterliCommand(
+  action,
+  payload = {}
+) {
+  if (
+    action === "letterliStartSpin" ||
+    action === "startLetterli" ||
+    action === "startSpin"
   ) {
-    const actionMap = {
-      letterliPreviousQuestion: [
-        "letterliPreviousQuestion",
-        "previousLetterliQuestion"
-      ],
+    return (
+      await invokeDisplayFunction(
+        [
+          "startLetterliSpin",
+          "window.startLetterliSpin"
+        ],
+        []
+      )
+    ).handled
+  }
 
-      letterliNextQuestion: [
-        "letterliNextQuestion",
-        "nextLetterliQuestion"
-      ],
+  if (
+    action === "letterliChangeQuestion" ||
+    action === "changeLetterliQuestion" ||
+    action === "nextQuestion" ||
+    action === "letterliNextQuestion"
+  ) {
+    return (
+      await invokeDisplayFunction(
+        [
+          "changeLetterliQuestion",
+          "window.changeLetterliQuestion"
+        ],
+        []
+      )
+    ).handled
+  }
 
-      letterliToggleQuestion: [
-        "letterliToggleQuestion",
-        "toggleLetterliQuestion"
-      ],
+  if (
+    action === "letterliShowQuestion" ||
+    action === "letterliToggleQuestion" ||
+    action === "toggleLetterliQuestion"
+  ) {
+    return (
+      await invokeDisplayFunction(
+        [
+          "toggleLetterliQuestion",
+          "window.toggleLetterliQuestion"
+        ],
+        []
+      )
+    ).handled
+  }
 
-      letterliToggleAnswer: [
-        "letterliToggleAnswer",
-        "toggleLetterliAnswer"
-      ],
+  if (
+    action === "letterliShowAnswer" ||
+    action === "letterliToggleAnswer" ||
+    action === "toggleLetterliAnswer"
+  ) {
+    return (
+      await invokeDisplayFunction(
+        [
+          "markLetterliCorrectAnswer",
+          "window.markLetterliCorrectAnswer"
+        ],
+        []
+      )
+    ).handled
+  }
 
-      previousQuestion: [
-        "letterliPreviousQuestion",
-        "previousLetterliQuestion"
-      ],
+  if (
+    action === "letterliStartTimer" ||
+    action === "startTimer"
+  ) {
+    return (
+      await invokeDisplayFunction(
+        [
+          "startLetterliCountdown",
+          "window.startLetterliCountdown"
+        ],
+        []
+      )
+    ).handled
+  }
 
-      nextQuestion: [
-        "letterliNextQuestion",
-        "nextLetterliQuestion"
-      ]
-    }
+  if (
+    action === "letterliScoreTeam" ||
+    action === "scoreTeam"
+  ) {
+    const team =
+      payload?.team === "A" ||
+      payload?.team === "B"
+        ? payload.team
+        : ""
 
-    const names =
-      actionMap[action] || []
-
-    if (!names.length) {
+    if (!team) {
       return false
     }
 
     return (
       await invokeDisplayFunction(
-        names,
-        [payload]
+        [
+          "selectLetterliTeam",
+          "window.selectLetterliTeam"
+        ],
+        [team]
       )
     ).handled
   }
 
+  return false
+}
   /* =========================
      16) RANDOM CHALLENGE
   ========================= */
@@ -1715,6 +1710,206 @@
         )
       ).handled
     }
+
+          if (action === "randomStartBox3Timer") {
+        if (payload.team) {
+          await invokeDisplayFunction(
+            [
+              "setRandomChallengePresenterTeam"
+            ],
+            [
+              payload.team
+            ]
+          )
+        }
+
+        return (
+          await invokeDisplayFunction(
+            [
+              "startRandomBox3Timer"
+            ]
+          )
+        ).handled
+      }
+
+      if (action === "randomFinishRound") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "finishRandomBox3ToPoints"
+            ]
+          )
+        ).handled
+      }
+
+      if (action === "randomStartBox4Game") {
+        if (payload.team) {
+          await invokeDisplayFunction(
+            [
+              "setRandomChallengePresenterTeam"
+            ],
+            [
+              payload.team
+            ]
+          )
+        }
+
+        return (
+          await invokeDisplayFunction(
+            [
+              "startRandomBox4Game"
+            ]
+          )
+        ).handled
+      }
+
+      if (action === "randomStartBox4SecondTeam") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "startRandomBox4SecondTeam"
+            ]
+          )
+        ).handled
+      }
+
+      if (action === "randomBox4Answer") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "answerRandomBox4"
+            ],
+            [
+              payload.selectedAnswer ||
+              payload.answer ||
+              "صح"
+            ]
+          )
+        ).handled
+      }
+
+      if (action === "randomBox4Next") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "nextRandomBox4Question"
+            ]
+          )
+        ).handled
+      }
+
+      if (action === "randomBox5OpenNumber") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "openRandomBox5Number"
+            ],
+            [
+              Number(payload.number || 0)
+            ]
+          )
+        ).handled
+      }
+
+if (action === "randomBox5BlockTimer") {
+  return (
+    await invokeDisplayFunction(
+      [
+        "toggleRandomBox5BlockMode",
+        "startRandomBox5BlockTimer"
+      ],
+      []
+    )
+  ).handled
+}
+
+            if (action === "randomBox5RevealAnswer") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "revealRandomBox5Answer"
+            ]
+          )
+        ).handled
+      }
+
+            if (action === "randomBox5PlayVideo") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "playRandomBox5Video"
+            ]
+          )
+        ).handled
+      }
+
+      if (action === "randomBox5CompleteNumber") {
+        if (payload.team) {
+          await invokeDisplayFunction(
+            [
+              "setRandomChallengePresenterTeam"
+            ],
+            [
+              payload.team
+            ]
+          )
+        }
+
+        return (
+          await invokeDisplayFunction(
+            [
+              "completeRandomBox5Number"
+            ],
+            [
+              payload.correct === true ||
+              payload.isCorrect === true
+            ]
+          )
+        ).handled
+      }
+
+      if (action === "randomBox5CancelNumber") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "cancelRandomBox5Number"
+            ]
+          )
+        ).handled
+      }
+
+      if (action === "randomBackToBoxes") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "handleRandomChallengeBack"
+            ]
+          )
+        ).handled
+      }
+
+      if (action === "randomResetBox1") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "resetRandomChallengeBox1"
+            ]
+          )
+        ).handled
+      }
+
+      if (action === "randomSkip") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "startRandomChallengeBox1"
+            ],
+            [
+              payload.pool || "saudi"
+            ]
+          )
+        ).handled
+      }
 
     if (
       action ===
@@ -1998,14 +2193,16 @@
         ],
 
         3: [
-          "openFinalRound3Number",
-          "openFinalRound3Card"
-        ],
+  "openFinalRound3StoryCard",
+  "openFinalRound3Number",
+  "openFinalRound3Card"
+],
 
-        4: [
-          "openFinalRound4Number",
-          "openFinalRound4Card"
-        ]
+4: [
+  "openFinalRound4TeamMediaCard",
+  "openFinalRound4Number",
+  "openFinalRound4Card"
+]
       }
 
       return (
@@ -2039,6 +2236,175 @@
         ])
       ).handled
     }
+
+        if (safeRound === 1) {
+      if (action === "correct") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "finalRound1Correct"
+            ],
+            []
+          )
+        ).handled
+      }
+
+      if (action === "wrong") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "finalRound1Wrong"
+            ],
+            []
+          )
+        ).handled
+      }
+
+      if (action === "showAnswer") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "showFinalRound1Answer"
+            ],
+            []
+          )
+        ).handled
+      }
+
+      if (action === "showQuestion") {
+        return (
+          await invokeDisplayFunction(
+            [
+              "showFinalRound1Question"
+            ],
+            []
+          )
+        ).handled
+      }
+
+if (action === "zoomImage") {
+  const imageZoom =
+    await invokeDisplayFunction(
+      [
+        "toggleFinalRound1ImageOverlay"
+      ],
+      []
+    )
+
+  const textZoom =
+    await invokeDisplayFunction(
+      [
+        "toggleFinalRound1Overlay"
+      ],
+      []
+    )
+
+  return imageZoom.handled || textZoom.handled
+}
+    }
+
+    if (safeRound === 3) {
+  if (action === "showStoryPart") {
+    return (
+      await invokeDisplayFunction(
+        [
+          "showFinalRound3StoryPart"
+        ],
+        []
+      )
+    ).handled
+  }
+
+  if (action === "correct") {
+    return (
+      await invokeDisplayFunction(
+        [
+          "finalRound3StoryCorrect"
+        ],
+        []
+      )
+    ).handled
+  }
+
+  if (action === "wrong") {
+    return (
+      await invokeDisplayFunction(
+        [
+          "finalRound3StoryWrong"
+        ],
+        []
+      )
+    ).handled
+  }
+}
+
+if (safeRound === 4) {
+  if (action === "showQuestion") {
+    return (
+      await invokeDisplayFunction(
+        [
+          "showFinalRound4TeamMediaQuestion"
+        ],
+        []
+      )
+    ).handled
+  }
+
+  if (action === "correct") {
+    return (
+      await invokeDisplayFunction(
+        [
+          "finalRound4TeamMediaCorrect"
+        ],
+        []
+      )
+    ).handled
+  }
+
+  if (action === "wrong") {
+    return (
+      await invokeDisplayFunction(
+        [
+          "finalRound4TeamMediaWrong"
+        ],
+        []
+      )
+    ).handled
+  }
+
+  if (action === "playCurrentFinalVideo") {
+    return (
+      await invokeDisplayFunction(
+        [
+          "playFinalRound4TeamMediaVideo"
+        ],
+        []
+      )
+    ).handled
+  }
+
+  if (action === "restartCurrentFinalVideo") {
+    return (
+      await invokeDisplayFunction(
+        [
+          "restartFinalRound4TeamMediaVideo"
+        ],
+        []
+      )
+    ).handled
+  }
+
+  if (action === "restartCurrentFinalImage") {
+    return (
+      await invokeDisplayFunction(
+        [
+          "restartFinalRound4TeamMediaImage"
+        ],
+        []
+      )
+    ).handled
+  }
+}
 
     const actionMap = {
       double: [
@@ -2075,67 +2441,79 @@
         "revealFinalStoryPart"
       ],
 
-      toggleRound2Correct: [
-        "toggleRound2Correct",
-        "toggleFinalRound2Correct"
-      ],
+toggleRound2Correct: [
+  "toggleFinalRound2CorrectSelection",
+  "toggleRound2Correct",
+  "toggleFinalRound2Correct"
+],
 
-      toggleRound2ImageCorrect: [
-        "toggleRound2ImageCorrect",
-        "toggleFinalRound2ImageCorrect"
-      ],
+toggleRound2ImageCorrect: [
+  "toggleFinalRound2ImageCorrectSelection",
+  "toggleRound2ImageCorrect",
+  "toggleFinalRound2ImageCorrect"
+],
 
-      hideRound2SequenceWord: [
-        "hideRound2SequenceWord",
-        "hideFinalSequenceWord"
-      ],
+hideRound2SequenceWord: [
+  "hideFinalRound2SequenceWord",
+  "hideRound2SequenceWord",
+  "hideFinalSequenceWord"
+],
 
-      decreaseCountdown: [
-        "decreaseCountdown",
-        "decreaseFinalCountdown"
-      ],
+decreaseCountdown: [
+  "finalRound2DecreaseCountdown",
+  "decreaseCountdown",
+  "decreaseFinalCountdown"
+],
 
-      showNextImage: [
-        "showNextImage",
-        "showFinalNextImage"
-      ],
+showNextImage: [
+  "finalRound2ShowNextImage",
+  "showNextImage",
+  "showFinalNextImage"
+],
 
-      recordScrambleScore: [
-        "recordScrambleScore"
-      ],
+recordScrambleScore: [
+  "finalRound2RecordScore",
+  "recordScrambleScore"
+],
 
-      recordSequenceScore: [
-        "recordSequenceScore"
-      ],
+recordSequenceScore: [
+  "finalRound2RecordSequenceScore",
+  "recordSequenceScore"
+],
 
-      recordImageScore: [
-        "recordImageScore"
-      ],
+recordImageScore: [
+  "finalRound2RecordImageScore",
+  "recordImageScore"
+],
 
-      showQuestion: [
-        "showFinalQuestion",
-        "showQuestion"
-      ],
+showQuestion: [
+  "showFinalRound4TeamMediaQuestion",
+  "showFinalQuestion",
+  "showQuestion"
+],
 
       showAnswer: [
         "showFinalAnswer",
         "showAnswer"
       ],
 
-      playCurrentFinalVideo: [
-        "playCurrentFinalVideo",
-        "playFinalVideo"
-      ],
+playCurrentFinalVideo: [
+  "playFinalRound4TeamMediaVideo",
+  "playCurrentFinalVideo",
+  "playFinalVideo"
+],
 
-      restartCurrentFinalVideo: [
-        "restartCurrentFinalVideo",
-        "restartFinalVideo"
-      ],
+restartCurrentFinalVideo: [
+  "restartFinalRound4TeamMediaVideo",
+  "restartCurrentFinalVideo",
+  "restartFinalVideo"
+],
 
-      restartCurrentFinalImage: [
-        "restartCurrentFinalImage",
-        "restartFinalImage"
-      ],
+restartCurrentFinalImage: [
+  "restartFinalRound4TeamMediaImage",
+  "restartCurrentFinalImage",
+  "restartFinalImage"
+],
 
       stopCurrentFinalVideo: [
         "stopCurrentFinalVideo",
@@ -2236,6 +2614,21 @@
       return false
     }
 
+        if (
+      isDeletedStandalonePresenterSegment(
+        command.rawSegment
+      )
+    ) {
+      if (
+        action === "openSegment" ||
+        action === "goHome"
+      ) {
+        return goDisplayHomeFromPresenter()
+      }
+
+      return false
+    }
+
     if (action === "openSegment") {
       return openDisplaySegmentFromPresenter(
         command
@@ -2295,17 +2688,6 @@
     ) {
       handled =
         await handleTop10Command(
-          action,
-          payload
-        )
-    }
-
-    if (
-      !handled &&
-      command.segment === "auction"
-    ) {
-      handled =
-        await handleAuctionCommand(
           action,
           payload
         )
@@ -2896,12 +3278,13 @@
   window.addEventListener(
     "storage",
     event => {
-      const sessionKeys = new Set([
-        "game_session_id",
-        "display_session_id",
-        "current_session_id",
-        "session_id"
-      ])
+const sessionKeys = new Set([
+  "game_session_id",
+  "display_session_id",
+  "current_session_id",
+  "session_id",
+  "presenter_session_id"
+])
 
       if (
         sessionKeys.has(event.key)

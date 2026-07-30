@@ -22,6 +22,12 @@ window.db = db
 const SUPABASE_CACHE_PREFIX = "supabase_cache_v1:"
 const SUPABASE_DEFAULT_CACHE_TTL = 5 * 60 * 1000
 
+window.SUPABASE_CACHE_PREFIX =
+  SUPABASE_CACHE_PREFIX
+
+window.SUPABASE_DEFAULT_CACHE_TTL =
+  SUPABASE_DEFAULT_CACHE_TTL
+
 const supabasePendingRequests = new Map()
 
 /* =========================================================
@@ -900,11 +906,20 @@ function invalidateModelCache(
    GLOBAL EXPORTS
 ========================================================= */
 
-window.saveData = saveData
-window.loadData = loadData
-window.updateData = updateData
-window.deleteData = deleteData
-window.upsertData = upsertData
+window.saveData =
+  saveData
+
+window.loadData =
+  loadData
+
+window.updateData =
+  updateData
+
+window.deleteData =
+  deleteData
+
+window.upsertData =
+  upsertData
 
 window.cachedSupabaseSelect =
   cachedSupabaseSelect
@@ -912,8 +927,23 @@ window.cachedSupabaseSelect =
 window.refreshSupabaseCacheInBackground =
   refreshSupabaseCacheInBackground
 
+window.runSupabaseSelect =
+  runSupabaseSelect
+
 window.loadModelWithRelations =
   loadModelWithRelations
+
+window.createSupabaseCacheKey =
+  createSupabaseCacheKey
+
+window.readSupabaseCache =
+  readSupabaseCache
+
+window.writeSupabaseCache =
+  writeSupabaseCache
+
+window.removeSupabaseCacheKey =
+  removeSupabaseCacheKey
 
 window.clearSupabaseTableCache =
   clearSupabaseTableCache
@@ -921,7 +951,11 @@ window.clearSupabaseTableCache =
 window.clearAllSupabaseCache =
   clearAllSupabaseCache
 
+window.clearSupabaseCacheByPrefix =
+  clearSupabaseCacheByPrefix
+
 window.invalidateModelCache =
   invalidateModelCache
-  window.invalidateSupabaseWriteCache =
+
+window.invalidateSupabaseWriteCache =
   invalidateSupabaseWriteCache

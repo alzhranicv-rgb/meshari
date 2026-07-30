@@ -71,8 +71,13 @@ function getFinalStoryDbNumber(displayNumber) {
   return 200 + Number(displayNumber || 1)
 }
 
-function getFinalRound4DbNumber(displayNumber) {
+function getFinalRound2ImageDbNumber(displayNumber) {
   return FINAL_ROUND2_IMAGE_DB_NUMBERS[Number(displayNumber)] || 0
+}
+
+/* Alias قديم للتوافق */
+function getFinalRound4DbNumber(displayNumber) {
+  return getFinalRound2ImageDbNumber(displayNumber)
 }
 
 function getFinalRound2Type(number) {
@@ -639,7 +644,7 @@ async function getFinalAdminDoneMap() {
   })
 
   for (const displayNumber of FINAL_ROUND2_IMAGE_NUMBERS) {
-    const dbNumber = getFinalRound4DbNumber(displayNumber)
+    const dbNumber = getFinalRound2ImageDbNumber(displayNumber)
 
     for (let i = 1; i <= 5; i++) {
       const row = imageMap[`${dbNumber}_${i}`]
@@ -863,7 +868,7 @@ async function changeFinalRound1CardsCount() {
     updateAdminQuickSettingUI("finalRound1", safeCount)
 
     await renderFinalAdminRound(1)
-    await renderAdminTabsUnified()
+    scheduleAdminTabsRefresh()
 
     showGameToast("تم حفظ العدد", "success")
     return true
@@ -894,7 +899,7 @@ async function changeFinalRound3Count() {
     updateAdminQuickSettingUI("finalRound3", safeCount)
 
     await renderFinalAdminRound(3)
-    await renderAdminTabsUnified()
+    scheduleAdminTabsRefresh()
 
     showGameToast("تم حفظ العدد", "success")
     return true
@@ -925,7 +930,7 @@ async function changeFinalRound4Count() {
     updateAdminQuickSettingUI("finalRound4", safeCount)
 
     await renderFinalAdminRound(4)
-    await renderAdminTabsUnified()
+    scheduleAdminTabsRefresh()
 
     showGameToast("تم حفظ العدد", "success")
     return true
@@ -986,7 +991,7 @@ async function saveFinalRound(round) {
     invalidateFinalAdminCache()
     showGameToast(`تم حفظ ${title}`, "success")
     await renderFinalAdminRound(safeRound)
-    await renderAdminTabsUnified()
+    scheduleAdminTabsRefresh()
     return true
   } catch (err) {
     console.log("SAVE FINAL ROUND ERROR:", err)
@@ -1474,7 +1479,7 @@ function buildFinalRound2ImageOnePageCard(displayNumber, rows = []) {
           <button
             type="button"
             class="adminDeleteBtn finalRound2SummaryDeleteBtn"
-            onclick="event.preventDefault(); event.stopPropagation(); clearFinalRound4Item(${n});"
+            onclick="event.preventDefault(); event.stopPropagation(); clearFinalRound2ImageItem(${n});"
           >
             حذف
           </button>
@@ -1566,7 +1571,7 @@ async function buildFinalRound4ImageAdmin() {
   return `
     <div class="finalAdminRound3Wrap">
       ${FINAL_ROUND2_IMAGE_NUMBERS.map((displayNumber) => {
-        const dbNumber = getFinalRound4DbNumber(displayNumber)
+        const dbNumber = getFinalRound2ImageDbNumber(displayNumber)
         const rowsByOrder = getRowsByOrder(grouped[dbNumber] || [], "image_order")
 
         return `
@@ -1574,7 +1579,7 @@ async function buildFinalRound4ImageAdmin() {
             <div class="finalAdminCardHead">
               <h3>رقم ${displayNumber}</h3>
 
-              <button class="adminDeleteBtn" onclick="clearFinalRound4Item(${displayNumber})">
+              <button class="adminDeleteBtn" onclick="clearFinalRound2ImageItem(${displayNumber})">
                 حذف
               </button>
             </div>
@@ -1716,7 +1721,7 @@ async function saveFinalRound2(skipSavingLock = false) {
       }
     }
 
-    const imageSaved = await saveFinalRound4Image(true)
+    const imageSaved = await saveFinalRound2Image(true)
 
     if (!imageSaved) {
       showGameToast("تم حفظ صح صحلي لكن تعذر حفظ صور 3 و 6")
@@ -1739,7 +1744,7 @@ async function saveFinalRound2(skipSavingLock = false) {
   }
 }
 
-async function saveFinalRound4Image(skipSavingLock = false) {
+async function saveFinalRound2Image(skipSavingLock = false) {
   if (!skipSavingLock && isAdminSaving()) return false
 
   if (!currentModel) {
@@ -1778,7 +1783,7 @@ async function saveFinalRound4Image(skipSavingLock = false) {
     const rows = []
 
     for (const displayNumber of FINAL_ROUND2_IMAGE_NUMBERS) {
-      const dbNumber = getFinalRound4DbNumber(displayNumber)
+      const dbNumber = getFinalRound2ImageDbNumber(displayNumber)
 
       for (let imageOrder = 1; imageOrder <= 5; imageOrder++) {
         const file = document.getElementById(`finalRound4File_${displayNumber}_${imageOrder}`)?.files?.[0] || null
@@ -1884,6 +1889,11 @@ async function saveFinalRound4Image(skipSavingLock = false) {
   } finally {
     if (!skipSavingLock) setAdminSaving(false)
   }
+}
+
+/* Alias قديم للتوافق */
+async function saveFinalRound4Image(skipSavingLock = false) {
+  return saveFinalRound2Image(skipSavingLock)
 }
 
 /* =========================
@@ -2583,6 +2593,75 @@ function getFinalRoundDeleteOperations(round, model) {
   return operations[round] || []
 }
 
+
+async function deleteFinalRoundStorageFiles(round) {
+  const safeRound =
+    Number(round || 0)
+
+  const operations = {
+    1: [
+      {
+        table: "final_round1_items",
+        buildQuery: query =>
+          query
+            .gte("number", 1)
+            .lte("number", 9),
+        logLabel: "DELETE FINAL ROUND 1 STORAGE"
+      }
+    ],
+
+    2: [
+      {
+        table: "final_round2_items",
+        buildQuery: query => query,
+        logLabel: "DELETE FINAL ROUND 2 STORAGE"
+      },
+      {
+        table: "final_round3_items",
+        buildQuery: query =>
+          query.in("number", [101, 102]),
+        logLabel: "DELETE FINAL ROUND 2 IMAGES STORAGE"
+      }
+    ],
+
+    3: [
+      {
+        table: "final_round1_items",
+        buildQuery: query =>
+          query
+            .gte("number", 201)
+            .lte("number", 209),
+        logLabel: "DELETE FINAL ROUND 3 STORAGE"
+      }
+    ],
+
+    4: [
+      {
+        table: "final_round3_items",
+        buildQuery: query =>
+          query
+            .gte("number", 1)
+            .lte("number", 9),
+        logLabel: "DELETE FINAL ROUND 4 STORAGE"
+      }
+    ]
+  }
+
+  const list =
+    operations[safeRound] || []
+
+  for (const item of list) {
+    const deleted =
+      await deleteFinalAdminStorageForQuery(item)
+
+    if (!deleted) {
+      return false
+    }
+  }
+
+  return true
+}
+
 function resetFinalRoundAdminCount(round) {
   const resetters = {
     1: () => {
@@ -2602,7 +2681,85 @@ function resetFinalRoundAdminCount(round) {
 async function refreshFinalAdminAfterDelete(round) {
   invalidateFinalAdminCache()
   await renderFinalAdminRound(round)
-  await renderAdminTabsUnified()
+  scheduleAdminTabsRefresh()
+}
+
+function collectFinalAdminStorageUrls(rows = []) {
+  return []
+    .concat(rows || [])
+    .flatMap(row => {
+      return Object
+        .values(row || {})
+        .filter(value => {
+          const text =
+            String(value || "").trim()
+
+          return (
+            text.startsWith("model_") ||
+            text.includes("/storage/v1/object/")
+          )
+        })
+    })
+}
+
+async function deleteFinalAdminStorageForQuery({
+  table,
+  buildQuery,
+  logLabel
+}) {
+  const model =
+    Number(currentModel)
+
+  const readResult =
+    await dbSelect(
+      table,
+      query =>
+        buildQuery(
+          query.eq(
+            "model",
+            model
+          )
+        ),
+      {
+        select: "*",
+        fallback: [],
+        logLabel:
+          `${logLabel} STORAGE READ`
+      }
+    )
+
+  if (!readResult.ok) {
+    console.error(
+      `${logLabel} STORAGE READ ERROR:`,
+      readResult.error
+    )
+
+    showGameToast(
+      "تعذر قراءة ملفات الصور والفيديو",
+      "error"
+    )
+
+    return false
+  }
+
+  const urls =
+    collectFinalAdminStorageUrls(
+      readResult.data || []
+    )
+
+  const storageDeleted =
+    await deleteAdminStorageUrls(urls)
+
+  if (!storageDeleted) {
+    showGameToast(
+      "توقف الحذف لأن ملفات الصور والفيديو لم تُحذف",
+      "error"
+    )
+
+    return false
+  }
+
+  return true
 }
 
 async function clearFinalAdminItem({
@@ -2621,11 +2778,35 @@ async function clearFinalAdminItem({
     return false
   }
 
-  if (!window.confirm(confirmMessage)) return false
+  const confirmed =
+    await showAdminConfirm(
+      confirmMessage,
+      {
+        title: "تأكيد الحذف",
+        okText: "حذف",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!confirmed) {
+    return false
+  }
 
   finalAdminDeleteBusy = true
 
   try {
+    const storageDeleted =
+      await deleteFinalAdminStorageForQuery({
+        table,
+        buildQuery,
+        logLabel
+      })
+
+    if (!storageDeleted) {
+      return false
+    }
+
     const result = await dbDelete(
       table,
       (query) => buildQuery(query.eq("model", Number(currentModel))),
@@ -2661,12 +2842,40 @@ async function deleteFinalRound(round) {
   const safeRound = Math.min(Math.max(Number(round || 1), 1), 4)
   const title = getFinalAdminRoundTitle(safeRound)
 
-  if (!window.confirm(`هل تريد حذف "${title}"؟`)) return
+  const confirmed =
+    await showAdminConfirm(
+      `هل تريد حذف "${title}"؟`,
+      {
+        title: "حذف فقرة من الفاصلة",
+        okText: "حذف الفقرة",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!confirmed) {
+    return false
+  }
 
   finalAdminDeleteBusy = true
 
   try {
-    const model = Number(currentModel)
+    const model =
+      Number(currentModel)
+
+    const storageDeleted =
+      await deleteFinalRoundStorageFiles(
+        safeRound
+      )
+
+    if (!storageDeleted) {
+      showGameToast(
+        "توقف الحذف لأن ملفات الفقرة لم تُحذف",
+        "error"
+      )
+
+      return false
+    }
 
     const metaResult = await dbDelete(
       "final_round_meta",
@@ -2740,7 +2949,16 @@ async function clearFinalRound3StoryItem(number) {
   }
 
   const safeNumber = Number(number || 0)
-  const confirmed = window.confirm(`حذف رقم ${safeNumber} من قصة؟`)
+  const confirmed =
+    await showAdminConfirm(
+      `حذف رقم ${safeNumber} من قصة؟`,
+      {
+        title: "حذف رقم من قصة",
+        okText: "حذف",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
 
   if (!confirmed) return false
 
@@ -2748,6 +2966,21 @@ async function clearFinalRound3StoryItem(number) {
 
   try {
     const dbNumber = getFinalStoryDbNumber(safeNumber)
+
+    const storageDeleted =
+      await deleteFinalAdminStorageForQuery({
+        table: "final_round1_items",
+        buildQuery: query =>
+          query.eq(
+            "number",
+            Number(dbNumber)
+          ),
+        logLabel: "CLEAR FINAL STORY ITEM"
+      })
+
+    if (!storageDeleted) {
+      return false
+    }
 
     const deleteResult = await dbDelete(
       "final_round1_items",
@@ -2769,7 +3002,7 @@ async function clearFinalRound3StoryItem(number) {
     invalidateFinalAdminCache()
     showGameToast(`تم حذف رقم ${safeNumber}`, "success")
     await renderFinalAdminRound(3)
-    await renderAdminTabsUnified()
+    scheduleAdminTabsRefresh()
 
     return true
   } finally {
@@ -2791,19 +3024,24 @@ async function clearFinalRound3Item(number) {
   })
 }
 
-async function clearFinalRound4Item(displayNumber) {
+async function clearFinalRound2ImageItem(displayNumber) {
   const safeDisplayNumber = Number(displayNumber)
-  const dbNumber = getFinalRound4DbNumber(safeDisplayNumber)
+  const dbNumber = getFinalRound2ImageDbNumber(safeDisplayNumber)
 
   return clearFinalAdminItem({
-    confirmMessage: `حذف رقم ${safeDisplayNumber} من اشرح الصورة؟`,
+    confirmMessage: `حذف رقم ${safeDisplayNumber} من صور صح صحلي؟`,
     table: "final_round3_items",
     buildQuery: (query) => query.eq("number", dbNumber),
-    logLabel: "CLEAR FINAL ROUND 4 ITEM",
+    logLabel: "CLEAR FINAL ROUND 2 IMAGE ITEM",
     errorLabel: "تعذر حذف الرقم",
     successMessage: `تم حذف رقم ${safeDisplayNumber}`,
     renderRound: 2
   })
+}
+
+/* Alias قديم للتوافق */
+async function clearFinalRound4Item(displayNumber) {
+  return clearFinalRound2ImageItem(displayNumber)
 }
 
 /* =========================
@@ -2826,56 +3064,16 @@ Object.assign(window, {
 
   clearFinalRound1Item,
   clearFinalRound2Item,
+  clearFinalRound2ImageItem,
   clearFinalRound3StoryItem,
   clearFinalRound3Item,
   clearFinalRound4Item,
 
   getFinalAdminDoneMap,
   getFinalStoryDbNumber,
+  getFinalRound2ImageDbNumber,
   getFinalRound4DbNumber,
   isFinalRound2ImageNumber,
   isFinalRound2ScrambleNumber,
   isFinalRound2SequenceNumber
 })
-/* =========================
-   FINAL ADMIN EXPORTS
-========================= */
-
-window.renderFinalAdmin =
-  renderFinalAdmin
-
-window.renderFinalAdminRound =
-  renderFinalAdminRound
-
-window.saveFinalRound =
-  saveFinalRound
-
-window.deleteFinalRound =
-  deleteFinalRound
-
-window.changeFinalRound1CardsCount =
-  changeFinalRound1CardsCount
-
-window.changeFinalRound3Count =
-  changeFinalRound3Count
-
-window.changeFinalRound4Count =
-  changeFinalRound4Count
-
-window.syncFinalRound2Answer =
-  syncFinalRound2Answer
-
-window.clearFinalRound1Item =
-  clearFinalRound1Item
-
-window.clearFinalRound2Item =
-  clearFinalRound2Item
-
-window.clearFinalRound3StoryItem =
-  clearFinalRound3StoryItem
-
-window.clearFinalRound3Item =
-  clearFinalRound3Item
-
-window.clearFinalRound4Item =
-  clearFinalRound4Item

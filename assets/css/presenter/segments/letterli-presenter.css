@@ -1,0 +1,273 @@
+/* =========================================================
+   LETTERLI PRESENTER - CONTROL HTML
+========================================================= */
+
+.presenterLetterliControlView,
+.presenterLetterliControlView *{
+  box-sizing:border-box;
+}
+
+.presenterLetterliControlView{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:
+    clamp(72px,10dvh,90px)
+    minmax(0,1fr)
+    clamp(64px,9dvh,82px)
+    clamp(58px,8dvh,72px);
+
+  gap:10px;
+  color:var(--p-text);
+}
+
+/* HEADER */
+
+.presenterLetterliControlHeader{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--p-secondary);
+  border:2px solid var(--p-secondary);
+  border-radius:24px;
+}
+
+.presenterLetterliInfoCard{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  background:#FFFFFF;
+  border:2px solid var(--p-line);
+  border-radius:18px;
+
+  color:var(--p-secondary);
+  font-size:20px;
+  line-height:1;
+}
+
+.presenterLetterliInfoCard strong{
+  color:var(--p-primary);
+  font-size:32px;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterLetterliInfoCard.active{
+  background:var(--p-primary);
+  border-color:var(--p-primary);
+  color:#FFFFFF;
+}
+
+.presenterLetterliInfoCard.active strong{
+  color:#FFFFFF;
+}
+
+.presenterLetterliInfoCard.timer strong{
+  color:var(--p-primary);
+}
+
+.presenterLetterliVisibilityCard,
+#presenterLetterliStatusText{
+  display:none;
+}
+
+/* MAIN */
+
+.presenterLetterliControlMain{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.presenterLetterliPanel{
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:46px minmax(0,1fr);
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+
+  overflow:hidden;
+}
+
+.presenterLetterliPanelTitle{
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+}
+
+.presenterLetterliPanelTitle h2{
+  margin:0;
+
+  color:var(--p-secondary);
+  font-size:24px;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterLetterliQuestionText,
+.presenterLetterliAnswerText{
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:16px;
+
+  background:var(--p-soft);
+  border:2px solid var(--p-line);
+  border-radius:20px;
+
+  color:var(--p-text);
+  font-size:30px;
+  line-height:1.35;
+  text-align:center;
+
+  overflow:auto;
+}
+
+.presenterLetterliAnswerText{
+  color:var(--p-secondary);
+}
+
+/* COMMANDS */
+
+.presenterLetterliCommandBar{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+}
+
+.presenterLetterliScoreBar{
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+
+  padding:8px 10px;
+
+  background:var(--p-surface);
+  border:2px solid var(--p-line);
+  border-radius:24px;
+}
+
+.presenterLetterliCommandBar .presenterBtn,
+.presenterLetterliScoreBar .presenterBtn{
+  width:100%;
+  height:100%;
+}
+
+.presenterLetterliScoreBar .presenterBtn{
+  justify-content:space-between;
+  padding-inline:18px;
+}
+
+.presenterLetterliScoreBar .presenterBtn span{
+  font-size:26px;
+  line-height:1;
+}
+
+/* IPHONE PRO MAX LANDSCAPE */
+
+@media (orientation:landscape) and (max-width:950px) and (max-height:500px){
+  .presenterLetterliControlView{
+    grid-template-rows:
+      clamp(56px,14dvh,68px)
+      minmax(0,1fr)
+      clamp(52px,13dvh,62px)
+      clamp(46px,11dvh,56px);
+
+    gap:8px;
+  }
+
+  .presenterLetterliControlHeader{
+    gap:8px;
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .presenterLetterliInfoCard{
+    gap:6px;
+    border-radius:15px;
+    font-size:15px;
+  }
+
+  .presenterLetterliInfoCard strong{
+    font-size:25px;
+  }
+
+  .presenterLetterliControlMain{
+    gap:8px;
+  }
+
+  .presenterLetterliPanel{
+    grid-template-rows:32px minmax(0,1fr);
+    gap:8px;
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .presenterLetterliPanelTitle h2{
+    font-size:18px;
+  }
+
+  .presenterLetterliQuestionText,
+  .presenterLetterliAnswerText{
+    padding:10px;
+    border-radius:16px;
+    font-size:clamp(20px,5dvh,24px);
+    line-height:1.25;
+  }
+
+  .presenterLetterliCommandBar{
+    gap:8px;
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .presenterLetterliScoreBar{
+    gap:8px;
+    padding:6px 8px;
+    border-radius:20px;
+  }
+
+  .presenterLetterliCommandBar .presenterBtn,
+  .presenterLetterliScoreBar .presenterBtn{
+    min-height:0;
+    height:100%;
+    font-size:16px;
+  }
+
+  .presenterLetterliScoreBar .presenterBtn span{
+    font-size:21px;
+  }
+}

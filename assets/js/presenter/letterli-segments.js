@@ -1,13 +1,54 @@
+/* =========================
+   LETTERLI / حرفلي
+========================= */
 
 let presenterLetterliActionBusy = false
+let presenterLetterliTimerWatcher = null
+
+const PRESENTER_LETTERLI_TIMER_SECONDS = 5
 
 const PRESENTER_LETTERLI_ACTIONS = Object.freeze({
-  previous: "letterliPreviousQuestion",
-  next: "letterliNextQuestion",
-  toggleQuestion: "letterliToggleQuestion",
-  toggleAnswer: "letterliToggleAnswer",
-  reopen: "openSegment"
+  spin: "letterliStartSpin",
+  changeQuestion: "letterliChangeQuestion",
+  showQuestion: "letterliShowQuestion",
+  showAnswer: "letterliShowAnswer",
+  startTimer: "letterliStartTimer",
+  scoreA: "letterliScoreTeam",
+  scoreB: "letterliScoreTeam"
 })
+
+async function sendPresenterLetterliCommandSafe(
+  action,
+  payload = {}
+) {
+  if (typeof sendCommand !== "function") {
+    return false
+  }
+
+  try {
+    const result = await Promise.race([
+      sendCommand(action, {
+        ...payload,
+        segment: "letterli"
+      }),
+
+      new Promise(resolve => {
+        setTimeout(() => {
+          resolve(false)
+        }, 2500)
+      })
+    ])
+
+    return result !== false
+  } catch (error) {
+    console.log(
+      "PRESENTER LETTERLI COMMAND ERROR:",
+      error
+    )
+
+    return false
+  }
+}
 
 /* =========================
    1) STATE
@@ -27,13 +68,40 @@ function getPresenterLetterliCurrentItem() {
   const root = getPresenterLetterliRoot()
   const state = getPresenterLetterliState()
 
-  return (
+  const currentQuestion =
+    state.currentQuestion ||
+    root.currentQuestion ||
     state.currentItem ||
     state.currentQuestionItem ||
     root.currentItem ||
     root.currentQuestionItem ||
-    {}
-  )
+    null
+
+  if (
+    currentQuestion &&
+    typeof currentQuestion === "object"
+  ) {
+    return currentQuestion
+  }
+
+  return {
+    question:
+      typeof currentQuestion === "string"
+        ? currentQuestion
+        : "",
+    answer:
+      state.currentAnswer ||
+      state.answer ||
+      root.currentAnswer ||
+      root.answer ||
+      "",
+    letter:
+      state.currentLetter ||
+      state.letter ||
+      root.currentLetter ||
+      root.letter ||
+      ""
+  }
 }
 
 function getPresenterLetterliQuestion() {
@@ -42,10 +110,8 @@ function getPresenterLetterliQuestion() {
   const item = getPresenterLetterliCurrentItem()
 
   return String(
-    state.currentQuestion ??
-    state.question ??
     item.question ??
-    root.currentQuestion ??
+    state.question ??
     root.question ??
     ""
   ).trim()
@@ -57,9 +123,9 @@ function getPresenterLetterliAnswer() {
   const item = getPresenterLetterliCurrentItem()
 
   return String(
+    item.answer ??
     state.currentAnswer ??
     state.answer ??
-    item.answer ??
     root.currentAnswer ??
     root.answer ??
     ""
@@ -73,8 +139,8 @@ function getPresenterLetterliLetter() {
 
   return String(
     state.currentLetter ??
-    state.letter ??
     item.letter ??
+    state.letter ??
     root.currentLetter ??
     root.letter ??
     ""
@@ -85,11 +151,11 @@ function getPresenterLetterliQuestionVisible() {
   const root = getPresenterLetterliRoot()
   const state = getPresenterLetterliState()
 
-  return (
+  return !!(
     state.questionVisible ??
     root.questionVisible ??
-    true
-  ) !== false
+    false
+  )
 }
 
 function getPresenterLetterliAnswerVisible() {
@@ -103,45 +169,108 @@ function getPresenterLetterliAnswerVisible() {
   )
 }
 
-function getPresenterLetterliPosition() {
+function getPresenterLetterliSpinning() {
   const root = getPresenterLetterliRoot()
   const state = getPresenterLetterliState()
 
-  const explicitNumber = Number(
-    state.currentNumber ??
-    state.questionNumber ??
-    root.currentNumber ??
-    root.questionNumber ??
-    0
+  return !!(
+    state.spinning ??
+    root.spinning ??
+    false
   )
+}
 
-  const total = Math.max(
-    0,
-    Number(
-      state.totalQuestions ??
-      state.total ??
-      root.totalQuestions ??
-      root.total ??
-      0
+function getPresenterLetterliTimerSync() {
+  const root = getPresenterLetterliRoot()
+  const state = getPresenterLetterliState()
+
+  return (
+    root.letterliTimerSync ||
+    root.timerSync ||
+    state.timerSync ||
+    null
+  )
+}
+
+function getPresenterLetterliTimerValue() {
+  const timerSync =
+    getPresenterLetterliTimerSync()
+
+  if (
+    timerSync &&
+    Number(timerSync.endsAt || 0) > Date.now()
+  ) {
+    return Math.max(
+      0,
+      Math.ceil(
+        (
+          Number(timerSync.endsAt) -
+          Date.now()
+        ) / 1000
+      )
     )
-  )
-
-  if (explicitNumber > 0) {
-    return {
-      current: explicitNumber,
-      total
-    }
   }
 
-  const index = Number(
-    state.currentIndex ??
-    root.currentIndex ??
-    -1
+  const root = getPresenterLetterliRoot()
+  const state = getPresenterLetterliState()
+
+  return Number(
+    state.timerValue ??
+    root.timerValue ??
+    PRESENTER_LETTERLI_TIMER_SECONDS
   )
+}
+
+function isPresenterLetterliTimerRunning() {
+  const timerSync =
+    getPresenterLetterliTimerSync()
+
+  return !!(
+    timerSync &&
+    Number(timerSync.endsAt || 0) > Date.now()
+  )
+}
+
+function getPresenterLetterliScore(team) {
+  const state = getPresenterLetterliState()
+
+  if (team === "A") {
+    return Number(
+      state.scoreA ??
+      state.scores?.A ??
+      0
+    )
+  }
+
+  if (team === "B") {
+    return Number(
+      state.scoreB ??
+      state.scores?.B ??
+      0
+    )
+  }
+
+  return 0
+}
+
+function getPresenterLetterliPosition() {
+  const state = getPresenterLetterliState()
+  const hasQuestion =
+    !!getPresenterLetterliQuestion()
+
+  const completed =
+    Number(
+      state.completedCount ??
+      state.answeredCount ??
+      0
+    )
 
   return {
-    current: index >= 0 ? index + 1 : 0,
-    total
+    current:
+      hasQuestion
+        ? completed + 1
+        : completed || 0,
+    total: 0
   }
 }
 
@@ -150,99 +279,156 @@ function getPresenterLetterliPosition() {
 ========================= */
 
 function renderPresenterLetterli() {
-  const panel = document.getElementById("presenterPanel")
+  const panel =
+    document.getElementById("presenterPanel")
+
   if (!panel) return
+
+  const teamA =
+    typeof teamAName !== "undefined"
+      ? teamAName
+      : "الفريق الأول"
+
+  const teamB =
+    typeof teamBName !== "undefined"
+      ? teamBName
+      : "الفريق الثاني"
 
   panel.dataset.segment = "letterli"
 
   panel.innerHTML = `
-    <section class="presenterLetterliView">
+    <section class="presenterLetterliControlView">
 
-      <div class="presenterLetterliMetaRow">
-        <div class="presenterLetterliMetaCard">
-          <span class="presenterLabel">السؤال الحالي</span>
+      <header class="presenterLetterliControlHeader">
+
+        <div class="presenterLetterliInfoCard">
+          <span>السؤال</span>
           <strong id="presenterLetterliPositionText">—</strong>
         </div>
 
-        <div class="presenterLetterliMetaCard">
-          <span class="presenterLabel">الحرف</span>
+        <div class="presenterLetterliInfoCard active">
+          <span>الحرف</span>
           <strong id="presenterLetterliCurrentLetter">—</strong>
         </div>
 
-        <div class="presenterLetterliVisibilityCard">
-          <span id="presenterLetterliQuestionVisibility">السؤال ظاهر في العرض</span>
-          <span id="presenterLetterliAnswerVisibility">الإجابة مخفية في العرض</span>
+        <div class="presenterLetterliInfoCard timer">
+          <span>الوقت</span>
+          <strong id="presenterLetterliTimerText">5</strong>
         </div>
-      </div>
 
-      <div class="presenterLetterliContentGrid">
-        <article class="presenterLetterliContentCard">
-          <div class="presenterLabel">السؤال عند المقدم</div>
+        <div class="presenterLetterliVisibilityCard">
+          <span id="presenterLetterliQuestionVisibility">—</span>
+          <span id="presenterLetterliAnswerVisibility">—</span>
+        </div>
+
+      </header>
+
+      <main class="presenterLetterliControlMain">
+
+        <section class="presenterLetterliPanel">
+
+          <header class="presenterLetterliPanelTitle">
+            <h2>السؤال</h2>
+          </header>
+
           <div
             id="presenterLetterliQuestionText"
-            class="presenterQuestionText presenterLetterliQuestionText"
+            class="presenterLetterliQuestionText"
           >
-            بانتظار السؤال...
+            —
           </div>
-        </article>
 
-        <article class="presenterLetterliContentCard presenterLetterliAnswerCard">
-          <div class="presenterLabel">الإجابة عند المقدم</div>
+        </section>
+
+        <section class="presenterLetterliPanel">
+
+          <header class="presenterLetterliPanelTitle">
+            <h2>الإجابة</h2>
+          </header>
+
           <div
             id="presenterLetterliAnswerText"
-            class="presenterAnswerBox presenterLetterliAnswerText"
+            class="presenterLetterliAnswerText"
           >
-            بانتظار الإجابة...
+            —
           </div>
-        </article>
-      </div>
 
-      <div class="presenterLetterliControls">
-        <button
-          id="presenterLetterliPreviousBtn"
-          type="button"
-          class="presenterBtn"
-          onclick="runPresenterLetterliAction('previous')"
-        >
-          السؤال السابق
-        </button>
+        </section>
+
+      </main>
+
+      <footer class="presenterLetterliCommandBar">
 
         <button
-          id="presenterLetterliNextBtn"
+          id="presenterLetterliSpinBtn"
           type="button"
           class="presenterBtn orange"
-          onclick="runPresenterLetterliAction('next')"
+          onclick="runPresenterLetterliAction('spin')"
         >
-          السؤال التالي
+          خلط
         </button>
 
         <button
-          id="presenterLetterliToggleQuestionBtn"
+          id="presenterLetterliChangeQuestionBtn"
           type="button"
           class="presenterBtn"
-          onclick="runPresenterLetterliAction('toggleQuestion')"
+          onclick="runPresenterLetterliAction('changeQuestion')"
         >
-          إخفاء السؤال من العرض
+          تغيير
         </button>
 
         <button
-          id="presenterLetterliToggleAnswerBtn"
+          id="presenterLetterliShowQuestionBtn"
+          type="button"
+          class="presenterBtn green"
+          onclick="runPresenterLetterliAction('showQuestion')"
+        >
+          السؤال
+        </button>
+
+        <button
+          id="presenterLetterliShowAnswerBtn"
           type="button"
           class="presenterBtn blue"
-          onclick="runPresenterLetterliAction('toggleAnswer')"
+          onclick="runPresenterLetterliAction('showAnswer')"
         >
-          إظهار الإجابة في العرض
+          الإجابة
         </button>
 
         <button
-          id="presenterLetterliReopenBtn"
+          id="presenterLetterliStartTimerBtn"
           type="button"
           class="presenterBtn"
-          onclick="runPresenterLetterliAction('reopen')"
+          onclick="runPresenterLetterliAction('startTimer')"
         >
-          إعادة فتح حرفلي في العرض
+          المؤقت
         </button>
-      </div>
+
+      </footer>
+
+      <footer class="presenterLetterliScoreBar">
+
+        <button
+          id="presenterLetterliScoreABtn"
+          type="button"
+          class="presenterBtn green"
+          onclick="runPresenterLetterliAction('scoreA')"
+        >
+          ${teamA}
+          <span id="presenterLetterliScoreA">0</span>
+        </button>
+
+        <button
+          id="presenterLetterliScoreBBtn"
+          type="button"
+          class="presenterBtn green"
+          onclick="runPresenterLetterliAction('scoreB')"
+        >
+          ${teamB}
+          <span id="presenterLetterliScoreB">0</span>
+        </button>
+
+      </footer>
 
       <div
         id="presenterLetterliStatusText"
@@ -252,6 +438,7 @@ function renderPresenterLetterli() {
     </section>
   `
 
+  startPresenterLetterliTimerWatcher()
   refreshPresenterLetterliFromState()
 }
 
@@ -260,7 +447,8 @@ function renderPresenterLetterli() {
 ========================= */
 
 function refreshPresenterLetterliFromState() {
-  const panel = document.getElementById("presenterPanel")
+  const panel =
+    document.getElementById("presenterPanel")
 
   if (
     !panel ||
@@ -269,49 +457,68 @@ function refreshPresenterLetterliFromState() {
     return
   }
 
-  const question = getPresenterLetterliQuestion()
-  const answer = getPresenterLetterliAnswer()
-  const letter = getPresenterLetterliLetter()
-  const questionVisible = getPresenterLetterliQuestionVisible()
-  const answerVisible = getPresenterLetterliAnswerVisible()
-  const position = getPresenterLetterliPosition()
+  const question =
+    getPresenterLetterliQuestion()
 
-  const questionBox = document.getElementById(
-    "presenterLetterliQuestionText"
-  )
+  const answer =
+    getPresenterLetterliAnswer()
 
-  const answerBox = document.getElementById(
-    "presenterLetterliAnswerText"
-  )
+  const letter =
+    getPresenterLetterliLetter()
 
-  const letterBox = document.getElementById(
-    "presenterLetterliCurrentLetter"
-  )
+  const questionVisible =
+    getPresenterLetterliQuestionVisible()
 
-  const positionBox = document.getElementById(
-    "presenterLetterliPositionText"
-  )
+  const answerVisible =
+    getPresenterLetterliAnswerVisible()
 
-  const questionVisibilityBox = document.getElementById(
-    "presenterLetterliQuestionVisibility"
-  )
+  const spinning =
+    getPresenterLetterliSpinning()
 
-  const answerVisibilityBox = document.getElementById(
-    "presenterLetterliAnswerVisibility"
-  )
+  const timerValue =
+    getPresenterLetterliTimerValue()
 
-  const toggleQuestionButton = document.getElementById(
-    "presenterLetterliToggleQuestionBtn"
-  )
+  const timerRunning =
+    isPresenterLetterliTimerRunning()
 
-  const toggleAnswerButton = document.getElementById(
-    "presenterLetterliToggleAnswerBtn"
-  )
+  const position =
+    getPresenterLetterliPosition()
 
-  /*
-    السؤال والإجابة يظهران دائمًا عند المقدم.
-    حالة الإخفاء تخص شاشة العرض فقط.
-  */
+  const questionBox =
+    document.getElementById(
+      "presenterLetterliQuestionText"
+    )
+
+  const answerBox =
+    document.getElementById(
+      "presenterLetterliAnswerText"
+    )
+
+  const letterBox =
+    document.getElementById(
+      "presenterLetterliCurrentLetter"
+    )
+
+  const timerBox =
+    document.getElementById(
+      "presenterLetterliTimerText"
+    )
+
+  const positionBox =
+    document.getElementById(
+      "presenterLetterliPositionText"
+    )
+
+  const questionVisibilityBox =
+    document.getElementById(
+      "presenterLetterliQuestionVisibility"
+    )
+
+  const answerVisibilityBox =
+    document.getElementById(
+      "presenterLetterliAnswerVisibility"
+    )
+
   if (questionBox) {
     questionBox.textContent =
       question || "بانتظار اختيار السؤال من العرض"
@@ -323,23 +530,27 @@ function refreshPresenterLetterliFromState() {
   }
 
   if (letterBox) {
-    letterBox.textContent = letter || "—"
+    letterBox.textContent =
+      letter || "—"
+  }
+
+  if (timerBox) {
+    timerBox.textContent =
+      String(timerValue)
   }
 
   if (positionBox) {
-    positionBox.textContent = position.current
-      ? (
-          position.total
-            ? `${position.current} من ${position.total}`
-            : String(position.current)
-        )
-      : "—"
+    positionBox.textContent =
+      position.current
+        ? String(position.current)
+        : "—"
   }
 
   if (questionVisibilityBox) {
-    questionVisibilityBox.textContent = questionVisible
-      ? "السؤال ظاهر في العرض"
-      : "السؤال مخفي في العرض"
+    questionVisibilityBox.textContent =
+      questionVisible
+        ? "السؤال ظاهر في العرض"
+        : "السؤال مخفي في العرض"
 
     questionVisibilityBox.classList.toggle(
       "isHiddenInDisplay",
@@ -348,9 +559,10 @@ function refreshPresenterLetterliFromState() {
   }
 
   if (answerVisibilityBox) {
-    answerVisibilityBox.textContent = answerVisible
-      ? "الإجابة ظاهرة في العرض"
-      : "الإجابة مخفية في العرض"
+    answerVisibilityBox.textContent =
+      answerVisible
+        ? "الإجابة ظاهرة في العرض"
+        : "الإجابة مخفية في العرض"
 
     answerVisibilityBox.classList.toggle(
       "isHiddenInDisplay",
@@ -358,19 +570,33 @@ function refreshPresenterLetterliFromState() {
     )
   }
 
-  if (toggleQuestionButton) {
-    toggleQuestionButton.textContent = questionVisible
-      ? "إخفاء السؤال من العرض"
-      : "إظهار السؤال في العرض"
+  const scoreA =
+    document.getElementById(
+      "presenterLetterliScoreA"
+    )
+
+  const scoreB =
+    document.getElementById(
+      "presenterLetterliScoreB"
+    )
+
+  if (scoreA) {
+    scoreA.textContent =
+      getPresenterLetterliScore("A")
   }
 
-  if (toggleAnswerButton) {
-    toggleAnswerButton.textContent = answerVisible
-      ? "إخفاء الإجابة من العرض"
-      : "إظهار الإجابة في العرض"
+  if (scoreB) {
+    scoreB.textContent =
+      getPresenterLetterliScore("B")
   }
 
-  updatePresenterLetterliButtons()
+  updatePresenterLetterliButtons({
+    hasQuestion: Boolean(question),
+    questionVisible,
+    answerVisible,
+    spinning,
+    timerRunning
+  })
 }
 
 /* =========================
@@ -378,51 +604,252 @@ function refreshPresenterLetterliFromState() {
 ========================= */
 
 async function runPresenterLetterliAction(action) {
-  if (presenterLetterliActionBusy) return false
+  if (presenterLetterliActionBusy) {
+    return false
+  }
 
-  const command = PRESENTER_LETTERLI_ACTIONS[action]
-  if (!command) return false
+  const command =
+    PRESENTER_LETTERLI_ACTIONS[action]
+
+  if (!command) {
+    return false
+  }
 
   presenterLetterliActionBusy = true
   updatePresenterLetterliButtons()
 
-  const payload =
-    action === "reopen"
-      ? { segment: "letterli" }
-      : {
-          currentQuestion: getPresenterLetterliQuestion(),
-          currentAnswer: getPresenterLetterliAnswer()
-        }
+  let payload = {
+    currentLetter:
+      getPresenterLetterliLetter(),
+    currentQuestion:
+      getPresenterLetterliQuestion(),
+    currentAnswer:
+      getPresenterLetterliAnswer()
+  }
 
-  const sent = await sendCommand(command, payload)
 
-  presenterLetterliActionBusy = false
-  updatePresenterLetterliButtons()
+  if (action === "scoreA") {
+    payload = {
+      team: "A"
+    }
+  }
 
-  if (!sent) {
-    showToast("تعذر تنفيذ أمر حرفلي")
+  if (action === "scoreB") {
+    payload = {
+      team: "B"
+    }
+  }
+
+const sent =
+  await sendPresenterLetterliCommandSafe(
+    command,
+    payload
+  )
+
+presenterLetterliActionBusy = false
+refreshPresenterLetterliFromState()
+updatePresenterLetterliButtons()
+
+if (!sent) {
+    if (
+      typeof showToast === "function"
+    ) {
+      showToast(
+        "تعذر تنفيذ أمر حرفلي"
+      )
+    }
+
     return false
   }
 
   return true
 }
 
-function updatePresenterLetterliButtons() {
-  document
-    .querySelectorAll(
-      "#presenterPanel[data-segment='letterli'] button"
+function updatePresenterLetterliButtons(
+  state = {}
+) {
+  const panel =
+    document.querySelector(
+      "#presenterPanel[data-segment='letterli']"
     )
-    .forEach(button => {
-      button.disabled = presenterLetterliActionBusy
-    })
+
+  if (!panel) return
+
+  const hasQuestion =
+    state.hasQuestion ??
+    Boolean(
+      getPresenterLetterliQuestion()
+    )
+
+  const questionVisible =
+    state.questionVisible ??
+    getPresenterLetterliQuestionVisible()
+
+  const answerVisible =
+    state.answerVisible ??
+    getPresenterLetterliAnswerVisible()
+
+  const spinning =
+    state.spinning ??
+    getPresenterLetterliSpinning()
+
+  const timerRunning =
+    state.timerRunning ??
+    isPresenterLetterliTimerRunning()
+
+  const setDisabled = (
+    selector,
+    disabled
+  ) => {
+    const button =
+      panel.querySelector(selector)
+
+    if (button) {
+      button.disabled =
+        presenterLetterliActionBusy ||
+        !!disabled
+    }
+  }
+
+  setDisabled(
+    "#presenterLetterliSpinBtn",
+    spinning || hasQuestion
+  )
+
+  setDisabled(
+    "#presenterLetterliChangeQuestionBtn",
+    spinning || !hasQuestion || answerVisible
+  )
+
+  setDisabled(
+    "#presenterLetterliShowQuestionBtn",
+    spinning || !hasQuestion || questionVisible || answerVisible
+  )
+
+  setDisabled(
+    "#presenterLetterliShowAnswerBtn",
+    spinning || !hasQuestion || answerVisible
+  )
+
+  setDisabled(
+    "#presenterLetterliStartTimerBtn",
+    spinning || !hasQuestion || answerVisible || timerRunning
+  )
+
+  setDisabled(
+    "#presenterLetterliScoreABtn",
+    spinning || !hasQuestion || !answerVisible
+  )
+
+  setDisabled(
+    "#presenterLetterliScoreBBtn",
+    spinning || !hasQuestion || !answerVisible
+  )
+
+
+  const showQuestionBtn =
+    panel.querySelector(
+      "#presenterLetterliShowQuestionBtn"
+    )
+
+  if (showQuestionBtn) {
+    showQuestionBtn.textContent =
+      questionVisible
+        ? "السؤال ظاهر في العرض"
+        : "إظهار السؤال في العرض"
+  }
+
+  const showAnswerBtn =
+    panel.querySelector(
+      "#presenterLetterliShowAnswerBtn"
+    )
+
+  if (showAnswerBtn) {
+    showAnswerBtn.textContent =
+      answerVisible
+        ? "الإجابة ظاهرة"
+        : "إظهار الإجابة"
+  }
+
+  const timerBtn =
+    panel.querySelector(
+      "#presenterLetterliStartTimerBtn"
+    )
+
+  if (timerBtn) {
+    timerBtn.textContent =
+      timerRunning
+        ? `المؤقت ${getPresenterLetterliTimerValue()}`
+        : "بدء المؤقت"
+  }
 }
 
 /* =========================
-   5) PUBLIC HOOKS
+   5) TIMER WATCHER
 ========================= */
 
-window.renderPresenterLetterli = renderPresenterLetterli
+function startPresenterLetterliTimerWatcher() {
+  clearInterval(
+    presenterLetterliTimerWatcher
+  )
+
+  presenterLetterliTimerWatcher =
+    setInterval(() => {
+      const panel =
+        document.querySelector(
+          "#presenterPanel[data-segment='letterli']"
+        )
+
+      if (!panel) return
+
+      const timerBox =
+        document.getElementById(
+          "presenterLetterliTimerText"
+        )
+
+      const timerBtn =
+        document.getElementById(
+          "presenterLetterliStartTimerBtn"
+        )
+
+      const timerValue =
+        getPresenterLetterliTimerValue()
+
+      const timerRunning =
+        isPresenterLetterliTimerRunning()
+
+      if (timerBox) {
+        timerBox.textContent =
+          String(timerValue)
+      }
+
+      if (timerBtn) {
+        timerBtn.disabled =
+          presenterLetterliActionBusy ||
+          timerRunning ||
+          !getPresenterLetterliQuestion() ||
+          getPresenterLetterliAnswerVisible()
+
+        timerBtn.textContent =
+          timerRunning
+            ? `المؤقت ${timerValue}`
+            : "بدء المؤقت"
+      }
+    }, 500)
+}
+
+/* =========================
+   6) PUBLIC HOOKS
+========================= */
+
+window.renderPresenterLetterli =
+  renderPresenterLetterli
+
 window.refreshPresenterLetterliFromState =
   refreshPresenterLetterliFromState
+
 window.runPresenterLetterliAction =
   runPresenterLetterliAction
+
+window.startPresenterLetterliTimerWatcher =
+  startPresenterLetterliTimerWatcher
