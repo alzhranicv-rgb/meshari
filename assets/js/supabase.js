@@ -2,25 +2,95 @@
    SUPABASE CORE
 ========================================================= */
 
-const SUPABASE_URL =
+const SUPABASE_PRIMARY_URL =
+  "https://api.aj-77.com"
+
+const SUPABASE_FALLBACK_URL =
   "https://onwjghmlekuydehphkgy.supabase.co"
+
+const SUPABASE_URL =
+  SUPABASE_PRIMARY_URL
 
 const SUPABASE_ANON_KEY =
   "sb_publishable_k9IYD_5T8pr5Zy37nqXX_g_S0CZLlrK"
 
-const db = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY,
-  {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false
+const SUPABASE_ACTIVE_URL_KEY =
+  "supabase_active_url_v1"
+
+function getSavedSupabaseUrl() {
+  try {
+    const saved =
+      localStorage.getItem(
+        SUPABASE_ACTIVE_URL_KEY
+      )
+
+    if (
+      saved === SUPABASE_PRIMARY_URL ||
+      saved === SUPABASE_FALLBACK_URL
+    ) {
+      return saved
     }
+  } catch {}
+
+  return SUPABASE_PRIMARY_URL
+}
+
+let activeSupabaseUrl =
+  getSavedSupabaseUrl()
+
+function saveActiveSupabaseUrl(url) {
+  if (
+    url !== SUPABASE_PRIMARY_URL &&
+    url !== SUPABASE_FALLBACK_URL
+  ) {
+    return
   }
-)
+
+  activeSupabaseUrl = url
+
+  try {
+    localStorage.setItem(
+      SUPABASE_ACTIVE_URL_KEY,
+      url
+    )
+  } catch {}
+}
+
+function getOtherSupabaseUrl(url) {
+  return url === SUPABASE_PRIMARY_URL
+    ? SUPABASE_FALLBACK_URL
+    : SUPABASE_PRIMARY_URL
+}
+
+function createSupabaseClient(url) {
+  return supabase.createClient(
+    url,
+    SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false
+      }
+    }
+  )
+}
+
+let db =
+  createSupabaseClient(
+    activeSupabaseUrl
+  )
 
 window.db = db
+
+window.SUPABASE_PRIMARY_URL =
+  SUPABASE_PRIMARY_URL
+
+window.SUPABASE_FALLBACK_URL =
+  SUPABASE_FALLBACK_URL
+
+window.getActiveSupabaseUrl =
+  () => activeSupabaseUrl
 
 /* =========================================================
    CACHE SETTINGS
