@@ -1,379 +1,665 @@
 /* =========================================================
-   WARMUP PRESENTER - CONTROL HTML
+   PRESENTER SEGMENT: WARMUP / التسخين
+   File: assets/css/presenter/segments/warmup.css
+
+   المسؤوليات:
+   - تخطيط فقرة التسخين.
+   - بطاقات الفئات والأرقام.
+   - معاينة السؤال والإجابة.
+   - المؤقت والأزرار الخاصة بالتسخين.
+   - وضع القراءة الخاص بالتسخين.
+
+   لا يحتوي على:
+   - تنسيقات عامة للصفحة.
+   - تنسيقات بقية الفقرات.
+   - تنسيقات الأرشيف.
 ========================================================= */
 
-.presenterWarmupControlView,
-.presenterWarmupControlView *{
-  box-sizing:border-box;
-}
+/* =========================
+   1) MAIN LAYOUT
+========================= */
 
-.presenterWarmupControlView{
+.presenterWarmupLayout{
   width:100%;
   height:100%;
+  min-width:0;
   min-height:0;
 
   display:grid;
-  grid-template-rows:86px minmax(0,1fr) 78px;
+  grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);
   gap:10px;
-
-  color:var(--p-text);
 }
 
-/* HEADER */
-
-.presenterWarmupControlHeader{
+.presenterWarmupLeft,
+.presenterWarmupRight{
+  min-width:0;
   min-height:0;
+}
 
+.presenterWarmupLeft{
+  display:flex;
+}
+
+.presenterWarmupRight{
   display:grid;
-  grid-template-columns:minmax(0,1fr) 170px;
-  gap:10px;
-
-  padding:10px;
-
-  background:var(--p-secondary);
-  border:2px solid var(--p-secondary);
-  border-radius:24px;
+  grid-template-rows:auto minmax(0,1fr) auto;
+  gap:8px;
 }
 
-.presenterWarmupHeaderTeams{
-  min-width:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-}
-
-.presenterWarmupHeaderTimer{
-  min-width:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.presenterWarmupStatusText{
-  display:none;
-}
-
-.presenterWarmupTimer{
+.presenterWarmupNumbersCard,
+.presenterWarmupPreviewCard{
   width:100%;
   height:100%;
+  min-width:0;
+  min-height:0;
+}
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.presenterWarmupNumbersCard{
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
+  overflow:hidden;
+}
 
-  background:var(--p-primary);
-  color:#FFFFFF;
+.presenterWarmupPreviewCard{
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto minmax(84px,.58fr);
+  gap:7px;
+  overflow:hidden;
+}
 
-  border-radius:18px;
+/* =========================
+   2) COMMON LABEL
+========================= */
 
-  font-size:34px;
-  line-height:1;
+.presenterLabel{
+  color:var(--presenter-primary);
+  font-size:.7rem;
+  line-height:1.2;
   font-weight:400;
 }
 
-/* MAIN */
+/* =========================
+   3) NUMBERS HEADER
+========================= */
 
-.presenterWarmupControlMain{
-  min-height:0;
+.presenterWarmupCardHeader{
+  min-width:0;
 
   display:grid;
-  grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
-  gap:10px;
+  grid-template-columns:minmax(0,1fr) 62px;
+  align-items:center;
+  gap:8px;
 }
 
-.presenterWarmupBoardCard,
-.presenterWarmupControlCard{
+.presenterWarmupCardHeader > div:first-child{
+  min-width:0;
+}
+
+.presenterWarmupStatusText{
+  min-width:0;
+  margin-top:3px;
+
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+
+  color:var(--presenter-muted);
+  font-size:.72rem;
+  line-height:1.3;
+}
+
+/* =========================
+   4) TIMER
+========================= */
+
+.presenterWarmupTimer{
+  width:62px;
+  height:52px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid var(--presenter-line);
+  border-radius:15px;
+  background:var(--presenter-surface-soft);
+  color:var(--presenter-secondary);
+
+  font-family:"MolhimCustom","HanakaText",sans-serif;
+  font-size:1.3rem;
+  line-height:1;
+  font-weight:400;
+
+  transition:
+    border-color var(--presenter-transition),
+    background var(--presenter-transition),
+    color var(--presenter-transition);
+}
+
+.presenterWarmupTimer.timerRunning{
+  border-color:rgba(21,107,154,.35);
+  background:var(--presenter-blue-soft);
+  color:var(--presenter-blue);
+}
+
+.presenterWarmupTimer.timerDanger{
+  border-color:rgba(180,35,24,.34);
+  background:var(--presenter-red-soft);
+  color:var(--presenter-red);
+}
+
+.presenterWarmupTimer.timerFinished{
+  border-color:var(--presenter-red);
+  background:var(--presenter-red);
+  color:#FFFFFF;
+}
+
+/* =========================
+   5) CATEGORIES
+========================= */
+
+.presenterWarmupCats{
+  min-width:0;
   min-height:0;
 
   display:grid;
-  gap:10px;
-
-  padding:10px;
-
-  background:var(--p-surface);
-  border:2px solid var(--p-line);
-  border-radius:24px;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
 
   overflow:hidden;
 }
 
-.presenterWarmupBoardCard{
-  grid-template-rows:44px minmax(0,1fr);
-}
-
-.presenterWarmupControlCard{
-  grid-template-rows:minmax(0,1fr) minmax(0,.72fr);
-}
-
-.presenterWarmupPanelTitle{
-  min-height:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.presenterWarmupPanelTitle h2{
-  margin:0;
-
-  color:var(--p-secondary);
-  font-size:24px;
-  line-height:1;
-  font-weight:400;
-}
-
-/* CATS */
-
-.presenterWarmupCats{
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-
-  overflow:auto;
-}
-
 .presenterWarmupCat{
+  min-width:0;
   min-height:0;
+  padding:8px;
 
   display:grid;
-  grid-template-rows:42px minmax(0,1fr);
-  gap:8px;
+  grid-template-rows:minmax(48px,auto) minmax(0,1fr);
+  gap:7px;
 
-  padding:10px;
+  border:2px solid var(--presenter-line);
+  border-radius:var(--presenter-radius-md);
+  background:var(--presenter-surface-soft);
 
-  background:var(--p-soft);
-  border:2px solid var(--p-line);
-  border-radius:20px;
+  overflow:hidden;
 }
 
 .presenterWarmupCatTitle{
+  min-width:0;
+  min-height:48px;
+  padding:6px;
+
   display:flex;
   align-items:center;
   justify-content:center;
 
-  color:var(--p-secondary);
-  font-size:21px;
-  line-height:1;
+  overflow:hidden;
+
+  border-radius:11px;
+  background:var(--presenter-secondary);
+  color:#FFFFFF;
+
+  font-size:.78rem;
+  line-height:1.35;
   text-align:center;
+  font-weight:400;
 }
 
 .presenterWarmupNumbers{
+  min-width:0;
+  min-height:0;
+
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
+  grid-template-rows:repeat(3,minmax(0,1fr));
+  gap:7px;
 }
 
-.presenterWarmupNumbers button{
-  min-height:62px;
+/* =========================
+   6) NUMBER BUTTONS
+========================= */
+
+.presenterWarmupNumbers .presenterNumberBtn{
+  width:100%;
+  min-width:0;
+  min-height:0;
+  padding:4px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  padding:0;
+  border:2px solid var(--presenter-line-strong);
+  border-radius:13px;
+  background:var(--presenter-surface);
+  color:var(--presenter-secondary);
 
-  background:#FFFFFF;
-  color:var(--p-secondary);
-
-  border:2px solid var(--p-line);
-  border-radius:18px;
-
-  font-size:28px;
+  font-family:"MolhimCustom","HanakaText",sans-serif;
+  font-size:1.3rem;
   line-height:1;
   font-weight:400;
 
   cursor:pointer;
+
+  transition:
+    transform var(--presenter-transition),
+    border-color var(--presenter-transition),
+    background var(--presenter-transition),
+    color var(--presenter-transition),
+    opacity var(--presenter-transition);
 }
 
-.presenterWarmupNumbers button.active,
-.presenterWarmupNumbers button.selected{
-  background:var(--p-primary);
-  border-color:var(--p-primary);
+.presenterWarmupNumbers .presenterNumberBtn:hover{
+  border-color:var(--presenter-primary);
+  background:var(--presenter-primary-soft);
+}
+
+.presenterWarmupNumbers .presenterNumberBtn:active{
+  transform:translateY(1px);
+}
+
+.presenterWarmupNumbers .presenterNumberBtn.selectedPresenterTeam{
+  border-color:var(--presenter-primary);
+  background:var(--presenter-primary);
   color:#FFFFFF;
 }
 
-.presenterWarmupNumbers button:disabled{
-  background:var(--p-disabled);
-  color:var(--p-disabled-text);
+.presenterWarmupNumbers .presenterNumberBtn.presenterOpened{
+  border-color:var(--presenter-line);
+  background:
+    linear-gradient(
+      135deg,
+      transparent 46%,
+      var(--presenter-line-strong) 47%,
+      var(--presenter-line-strong) 53%,
+      transparent 54%
+    ),
+    var(--presenter-surface-muted);
+  color:transparent;
+}
+
+.presenterWarmupNumbers .presenterNumberBtn:disabled{
   cursor:not-allowed;
 }
 
-/* QUESTION / ANSWER */
-
-.presenterWarmupQuestionPanel,
-.presenterWarmupAnswerPanel{
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:42px minmax(0,1fr);
-  gap:8px;
-
-  padding:10px;
-
-  background:var(--p-soft);
-  border:2px solid var(--p-line);
-  border-radius:20px;
-
-  overflow:hidden;
+.presenterWarmupNumbers .presenterNumberBtn:disabled:not(.presenterOpened):not(.selectedPresenterTeam){
+  opacity:.48;
 }
 
-.presenterWarmupQuestionMeta{
-  color:var(--p-primary);
-  font-size:18px;
-  line-height:1;
-}
+/* =========================
+   7) LOADING
+========================= */
 
-.presenterWarmupQuestionText,
-.presenterWarmupAnswerText{
-  min-height:0;
+.presenterWarmupLoading{
+  grid-column:1 / -1;
+
+  min-height:140px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  padding:14px;
-
-  background:#FFFFFF;
-  border:2px solid var(--p-line);
-  border-radius:18px;
-
-  color:var(--p-text);
-  font-size:27px;
-  line-height:1.35;
+  color:var(--presenter-muted);
+  font-size:.78rem;
   text-align:center;
-
-  overflow:auto;
 }
 
-.presenterWarmupAnswerText{
-  color:var(--p-secondary);
+/* =========================
+   8) TEAM BOX
+========================= */
+
+.presenterWarmupTeamsBox{
+  min-width:0;
 }
 
-/* ACTIONS */
+.presenterWarmupTeamsBox .presenterTeamsRow,
+.presenterWarmupTeamsBox .presenterTeamSelector{
+  gap:7px;
+}
 
-.presenterWarmupCommandBar{
+.presenterWarmupTeamsBox .presenterTeamBtn{
+  min-height:50px;
+}
+
+/* =========================
+   9) PREVIEW
+========================= */
+
+.presenterWarmupPreviewHead,
+.presenterWarmupAnswerHead{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.presenterWarmupQuestionMeta{
+  min-width:0;
+
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+
+  color:var(--presenter-muted);
+  font-size:.68rem;
+  line-height:1.2;
+}
+
+.presenterQuestionBody,
+.presenterAnswerBody{
+  min-width:0;
   min-height:0;
-
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:10px;
-
   padding:10px;
 
-  background:var(--p-surface);
-  border:2px solid var(--p-line);
-  border-radius:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:auto;
+  overscroll-behavior:contain;
+
+  border:2px solid var(--presenter-line);
+  border-radius:var(--presenter-radius-md);
+  background:var(--presenter-surface-soft);
+  color:var(--presenter-secondary);
+
+  line-height:1.55;
+  text-align:center;
+  font-weight:400;
 }
 
-.presenterWarmupCommandBar .presenterBtn{
+.presenterBigQuestionBody{
+  font-size:clamp(.95rem,2vw,1.35rem);
+}
+
+.presenterBigAnswerBody{
+  border-color:rgba(22,130,60,.26);
+  background:var(--presenter-green-soft);
+  color:var(--presenter-green);
+  font-size:clamp(.9rem,1.65vw,1.15rem);
+}
+
+/* =========================
+   10) ACTIONS
+========================= */
+
+.presenterWarmupActions{
+  min-width:0;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+
+.presenterWarmupActions .presenterBtn{
+  min-height:52px;
+}
+
+.presenterWarmupActions .presenterDoubleBtn{
+  border-color:var(--presenter-line-strong);
+  background:var(--presenter-surface);
+  color:var(--presenter-secondary);
+}
+
+.presenterWarmupActions .presenterDoubleBtn.presenterUsedDouble{
+  border-color:var(--presenter-line);
+  background:var(--presenter-gray-soft);
+  color:var(--presenter-gray);
+}
+
+.presenterWarmupActions .presenterWrongBtn{
+  border-color:var(--presenter-red);
+  background:var(--presenter-red);
+  color:#FFFFFF;
+}
+
+.presenterWarmupActions .presenterCorrectBtn{
+  border-color:var(--presenter-green);
+  background:var(--presenter-green);
+  color:#FFFFFF;
+}
+
+/* =========================
+   11) READER MODE
+========================= */
+
+.readerWarmupGrid{
   width:100%;
-  height:100%;
+  min-width:0;
 
-  font-size:22px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
 }
 
-/* IPHONE PRO MAX LANDSCAPE */
+.readerCategoryBox{
+  min-width:0;
+  padding:10px;
 
-@media (orientation:landscape) and (max-width:950px) and (max-height:500px){
-  .presenterWarmupControlView{
-    grid-template-rows:
-      clamp(56px,14dvh,68px)
-      minmax(0,1fr)
-      clamp(52px,13dvh,62px);
+  display:grid;
+  gap:8px;
 
+  border:2px solid var(--presenter-line);
+  border-radius:var(--presenter-radius-lg);
+  background:var(--presenter-surface);
+}
+
+.readerCategoryBox h2{
+  min-width:0;
+  padding:7px 10px;
+
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+
+  border-radius:11px;
+  background:var(--presenter-secondary);
+  color:#FFFFFF;
+
+  font-size:.9rem;
+  line-height:1.2;
+  text-align:center;
+  font-weight:400;
+}
+
+.readerCategoryQuestions{
+  min-width:0;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+
+/* =========================
+   12) GALAXY TAB A11 LANDSCAPE
+========================= */
+
+@media
+  (min-width:900px)
+  and (max-width:1400px)
+  and (orientation:landscape)
+  and (min-height:500px){
+
+  .presenterWarmupLayout{
+    grid-template-columns:minmax(0,1.12fr) minmax(340px,.88fr);
     gap:8px;
   }
 
-  .presenterWarmupControlHeader{
-    grid-template-columns:minmax(0,1fr) 120px;
-    gap:8px;
-    padding:8px;
-    border-radius:20px;
+  .presenterWarmupRight{
+    gap:7px;
   }
 
-  .presenterWarmupTimer{
-    border-radius:16px;
-    font-size:26px;
-  }
-
-  .presenterWarmupControlMain{
-    gap:8px;
-  }
-
-  .presenterWarmupBoardCard,
-  .presenterWarmupControlCard{
-    gap:8px;
-    padding:8px;
-    border-radius:20px;
-  }
-
-  .presenterWarmupBoardCard{
-    grid-template-rows:32px minmax(0,1fr);
-  }
-
-  .presenterWarmupControlCard{
-    grid-template-rows:minmax(0,1fr) minmax(0,.72fr);
-  }
-
-  .presenterWarmupPanelTitle h2{
-    font-size:18px;
+  .presenterWarmupNumbersCard,
+  .presenterWarmupPreviewCard{
+    padding:9px;
   }
 
   .presenterWarmupCats{
-    gap:8px;
+    gap:7px;
   }
 
   .presenterWarmupCat{
-    grid-template-rows:28px minmax(0,1fr);
+    padding:7px;
     gap:6px;
-    padding:8px;
-    border-radius:17px;
   }
 
   .presenterWarmupCatTitle{
-    font-size:16px;
+    min-height:44px;
+    font-size:.74rem;
   }
 
   .presenterWarmupNumbers{
     gap:6px;
   }
 
-  .presenterWarmupNumbers button{
-    min-height:clamp(38px,10dvh,46px);
-    border-radius:14px;
-    font-size:21px;
+  .presenterWarmupNumbers .presenterNumberBtn{
+    font-size:1.2rem;
   }
 
-  .presenterWarmupQuestionPanel,
-  .presenterWarmupAnswerPanel{
-    grid-template-rows:28px minmax(0,1fr);
+  .presenterWarmupTimer{
+    width:58px;
+    height:48px;
+    font-size:1.18rem;
+  }
+}
+
+/* =========================
+   13) IPHONE PRO MAX LANDSCAPE
+========================= */
+
+@media
+  (min-width:740px)
+  and (max-width:960px)
+  and (orientation:landscape)
+  and (max-height:500px){
+
+  .presenterWarmupLayout{
+    grid-template-columns:minmax(0,1.12fr) minmax(300px,.88fr);
     gap:6px;
-    padding:8px;
-    border-radius:17px;
   }
 
-  .presenterWarmupQuestionText,
-  .presenterWarmupAnswerText{
-    padding:8px;
-    border-radius:14px;
-    font-size:clamp(18px,4.8dvh,21px);
-    line-height:1.25;
+  .presenterWarmupRight{
+    grid-template-rows:40px minmax(0,1fr) 42px;
+    gap:5px;
   }
 
-  .presenterWarmupCommandBar{
-    gap:8px;
-    padding:8px;
-    border-radius:20px;
+  .presenterWarmupNumbersCard,
+  .presenterWarmupPreviewCard{
+    padding:6px;
+    border-radius:13px;
   }
 
-  .presenterWarmupCommandBar .presenterBtn{
-    min-height:0;
-    height:100%;
-    font-size:18px;
+  .presenterWarmupNumbersCard{
+    gap:5px;
+  }
+
+  .presenterWarmupPreviewCard{
+    grid-template-rows:18px minmax(0,1fr) 16px minmax(50px,.56fr);
+    gap:4px;
+  }
+
+  .presenterWarmupCardHeader{
+    grid-template-columns:minmax(0,1fr) 46px;
+    gap:5px;
+  }
+
+  .presenterLabel{
+    font-size:.55rem;
+  }
+
+  .presenterWarmupStatusText{
+    margin-top:1px;
+    font-size:.55rem;
+  }
+
+  .presenterWarmupTimer{
+    width:46px;
+    height:36px;
+    border-radius:10px;
+    font-size:.9rem;
+  }
+
+  .presenterWarmupCats{
+    gap:5px;
+  }
+
+  .presenterWarmupCat{
+    padding:5px;
+    grid-template-rows:34px minmax(0,1fr);
+    gap:4px;
+    border-radius:10px;
+  }
+
+  .presenterWarmupCatTitle{
+    min-height:34px;
+    padding:3px;
+    border-radius:8px;
+    font-size:.58rem;
+    line-height:1.2;
+  }
+
+  .presenterWarmupNumbers{
+    gap:4px;
+  }
+
+  .presenterWarmupNumbers .presenterNumberBtn{
+    border-radius:8px;
+    font-size:.84rem;
+  }
+
+  .presenterWarmupTeamsBox .presenterTeamBtn{
+    min-height:40px;
+  }
+
+  .presenterWarmupQuestionMeta{
+    font-size:.52rem;
+  }
+
+  .presenterQuestionBody,
+  .presenterAnswerBody{
+    padding:5px;
+    border-radius:9px;
+    line-height:1.35;
+  }
+
+  .presenterBigQuestionBody{
+    font-size:.72rem;
+  }
+
+  .presenterBigAnswerBody{
+    font-size:.68rem;
+  }
+
+  .presenterWarmupActions{
+    gap:5px;
+  }
+
+  .presenterWarmupActions .presenterBtn{
+    min-height:42px;
+    padding:5px 7px;
+    font-size:.62rem;
+  }
+
+  .readerWarmupGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+  }
+
+  .readerCategoryBox{
+    padding:6px;
+    gap:5px;
+    border-radius:11px;
+  }
+
+  .readerCategoryBox h2{
+    padding:5px 7px;
+    border-radius:8px;
+    font-size:.66rem;
+  }
+
+  .readerCategoryQuestions{
+    gap:5px;
   }
 }

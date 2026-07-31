@@ -1,12 +1,6 @@
-/* =========================================================
-   PRESENTER FINAL RESPONSIVE LAYER
-   الأجهزة المستهدفة فقط:
-   1) Tablet A11
-   2) iPhone Pro Max
-========================================================= */
 
 /* =========================
-   1) FONTS + VARIABLES
+   1) FONTS
 ========================= */
 
 @font-face{
@@ -20,46 +14,95 @@
 @font-face{
   font-family:"HanakaText";
   src:url("../fonts/zain.ttf") format("truetype");
-  font-weight:400 900;
+  font-weight:400;
   font-style:normal;
   font-display:swap;
 }
 
+@font-face{
+  font-family:"MolhimCustom";
+  src:url("../fonts/Molhim.ttf") format("truetype");
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
+
+/* =========================
+   2) VARIABLES
+========================= */
+
 :root{
   --presenter-bg:#EEF3F6;
+  --presenter-bg-soft:#F6F8FA;
+
   --presenter-surface:#FFFFFF;
-  --presenter-soft:#F6F8FA;
+  --presenter-surface-soft:#F8FAFB;
+  --presenter-surface-muted:#EFF3F5;
+
   --presenter-line:#D4DCE3;
   --presenter-line-strong:#B9C5CF;
 
   --presenter-primary:#FE7F2D;
   --presenter-primary-dark:#E76717;
+  --presenter-primary-soft:rgba(254,127,45,.13);
+
   --presenter-secondary:#233D4D;
+  --presenter-secondary-soft:rgba(35,61,77,.10);
 
   --presenter-text:#18242C;
   --presenter-muted:#6E7D88;
 
   --presenter-green:#16823C;
+  --presenter-green-soft:rgba(22,130,60,.12);
+
   --presenter-red:#B42318;
+  --presenter-red-soft:rgba(180,35,24,.11);
+
   --presenter-blue:#156B9A;
+  --presenter-blue-soft:rgba(21,107,154,.11);
+
   --presenter-gray:#657783;
+  --presenter-gray-soft:rgba(101,119,131,.12);
 
   --presenter-radius-xl:26px;
   --presenter-radius-lg:20px;
   --presenter-radius-md:15px;
+  --presenter-radius-sm:11px;
 
-  --presenter-shadow:0 10px 28px rgba(35,61,77,.09);
-  --presenter-shadow-soft:0 6px 16px rgba(35,61,77,.07);
+  --presenter-shadow:
+    0 10px 28px rgba(35,61,77,.09);
 
-  --presenter-safe-top:max(10px,env(safe-area-inset-top));
-  --presenter-safe-right:max(10px,env(safe-area-inset-right));
-  --presenter-safe-bottom:max(10px,env(safe-area-inset-bottom));
-  --presenter-safe-left:max(10px,env(safe-area-inset-left));
+  --presenter-shadow-soft:
+    0 6px 16px rgba(35,61,77,.07);
+
+  --presenter-transition:
+    .16s ease;
+
+  --presenter-safe-top:
+    max(8px,env(safe-area-inset-top));
+
+  --presenter-safe-right:
+    max(8px,env(safe-area-inset-right));
+
+  --presenter-safe-bottom:
+    max(8px,env(safe-area-inset-bottom));
+
+  --presenter-safe-left:
+    max(8px,env(safe-area-inset-left));
+
+  --presenter-app-height:
+    100dvh;
 }
 
 /* =========================
-   2) RESET
+   3) RESET
 ========================= */
+
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
 
 html,
 body{
@@ -79,31 +122,296 @@ html{
 body{
   direction:rtl;
   overflow:hidden;
-  background:
-    radial-gradient(circle at 16% 10%,rgba(254,127,45,.09),transparent 28%),
-    linear-gradient(180deg,#F6F8FA 0%,var(--presenter-bg) 100%);
-  color:var(--presenter-text);
-  font-family:"HanakaText",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   overscroll-behavior:none;
+
+  background:
+    radial-gradient(
+      circle at 18% 12%,
+      rgba(254,127,45,.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      var(--presenter-bg-soft) 0%,
+      var(--presenter-bg) 100%
+    );
+
+  color:var(--presenter-text);
+
+  font-family:
+    "HanakaText",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  font-weight:400;
 }
 
 button,
 input,
 textarea,
 select{
+  margin:0;
   font:inherit;
+  font-weight:400;
 }
 
 button{
-  -webkit-appearance:none;
-  appearance:none;
   touch-action:manipulation;
-  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+
+input,
+textarea,
+select{
+  color:inherit;
+}
+
+img,
+video,
+canvas,
+svg{
+  display:block;
+  max-width:100%;
 }
 
 img,
 video{
-  max-width:100%;
+  object-fit:contain;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p{
+  margin:0;
+  font-weight:400;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+strong,
+b{
+  font-weight:400;
+}
+
+/* =========================
+   4) APP ROOT
+========================= */
+
+.presenterApp{
+  width:100%;
+  height:var(--presenter-app-height);
+  min-height:var(--presenter-app-height);
+  max-height:var(--presenter-app-height);
+  overflow:hidden;
+  position:relative;
+  isolation:isolate;
+}
+
+/* =========================
+   5) GENERAL PAGE
+========================= */
+
+.presenterPage{
+  width:100%;
+  height:var(--presenter-app-height);
+  min-height:var(--presenter-app-height);
+  max-height:var(--presenter-app-height);
+
+  padding:
+    var(--presenter-safe-top)
+    var(--presenter-safe-right)
+    var(--presenter-safe-bottom)
+    var(--presenter-safe-left);
+
+  overflow:hidden;
+}
+
+.presenterJoinPage,
+.presenterHomePage,
+.presenterSegmentPage,
+.presenterReaderHome,
+.presenterReaderSegmentPage{
+  position:absolute;
+  inset:0;
+}
+
+/* =========================
+   6) PAGE SHELLS
+========================= */
+
+.presenterJoinShell,
+.presenterHomeShell,
+.presenterSegmentShell,
+.presenterReaderShell,
+.presenterReaderSegmentShell{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  margin:0 auto;
+}
+
+.presenterHomeShell,
+.presenterReaderShell{
+  max-width:1180px;
+}
+
+.presenterSegmentShell,
+.presenterReaderSegmentShell{
+  max-width:1280px;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
+}
+
+/* =========================
+   7) GENERAL PANELS
+========================= */
+
+.presenterPanel,
+.presenterReaderPanel{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+  position:relative;
+}
+
+.presenterPanel > *,
+.presenterReaderPanel > *{
+  min-width:0;
+}
+
+/* =========================
+   8) SCROLL CONTAINERS
+========================= */
+
+.presenterScrollArea{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  overflow-x:hidden;
+  overflow-y:auto;
+
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+
+  scrollbar-width:thin;
+  scrollbar-color:
+    var(--presenter-line-strong)
+    transparent;
+}
+
+.presenterScrollArea::-webkit-scrollbar{
+  width:6px;
+  height:6px;
+}
+
+.presenterScrollArea::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+.presenterScrollArea::-webkit-scrollbar-thumb{
+  border-radius:999px;
+  background:var(--presenter-line-strong);
+}
+
+/* =========================
+   9) GENERIC MEDIA
+========================= */
+
+.presenterMedia{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+}
+
+.presenterMedia img,
+.presenterMedia video{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+/* =========================
+   10) GENERIC TEXT SAFETY
+========================= */
+
+.presenterTextClamp{
+  overflow:hidden;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+}
+
+.presenterSingleLine{
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.presenterBreakText{
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+
+/* =========================
+   11) INTERACTION STATES
+========================= */
+
+button,
+[role="button"]{
+  user-select:none;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible{
+  outline:3px solid rgba(254,127,45,.28);
+  outline-offset:2px;
+}
+
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled{
+  cursor:not-allowed;
+}
+
+/* =========================
+   12) ACCESSIBILITY
+========================= */
+
+.presenterVisuallyHidden{
+  width:1px;
+  height:1px;
+  position:absolute;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  clip-path:inset(50%);
+  white-space:nowrap;
 }
 
 .hidden{
@@ -111,544 +419,24 @@ video{
 }
 
 /* =========================
-   3) APP + PAGES
-========================= */
-
-.presenterApp{
-  width:100%;
-  height:100%;
-  min-height:0;
-}
-
-.presenterPage{
-  width:100%;
-  height:100dvh;
-  min-height:0;
-  padding:
-    var(--presenter-safe-top)
-    var(--presenter-safe-right)
-    var(--presenter-safe-bottom)
-    var(--presenter-safe-left);
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
-}
-
-.presenterJoinShell,
-.presenterHomeShell,
-.presenterReaderShell,
-.presenterReaderSegmentShell{
-  width:min(100%,1340px);
-  min-height:100%;
-  margin:0 auto;
-}
-
-/* =========================
-   7) SHARED SURFACES
-========================= */
-
-.presenterCard,
-.readerBlock,
-.readerMiniCard,
-.readerCategoryBox,
-.readerTop10Round,
-.readerWarmupQuestionCard,
-.readerPartItem{
-  background:var(--presenter-surface);
-  border:2px solid var(--presenter-line);
-  box-shadow:var(--presenter-shadow-soft);
-}
-
-.presenterCard{
-  max-width:none;
-  padding:12px;
-  border-radius:20px;
-}
-
-.presenterLabel{
-  margin:0 0 7px;
-  color:var(--presenter-muted);
-  font-size:.78rem;
-  line-height:1.15;
-  font-weight:400;
-}
-
-.presenterStatusText{
-  color:var(--presenter-secondary);
-  font-size:.9rem;
-  line-height:1.25;
-  font-weight:400;
-}
-
-.presenterBtn{
-  min-height:58px;
-  padding:8px 10px;
-  border:0;
-  border-radius:16px;
-  background:var(--presenter-secondary);
-  color:#FFF;
-  font-size:.92rem;
-  line-height:1.15;
-  font-weight:400;
-  box-shadow:none;
-  cursor:pointer;
-}
-
-.presenterBtn.orange{
-  background:var(--presenter-primary);
-}
-
-.presenterBtn.green{
-  background:var(--presenter-green);
-}
-
-.presenterBtn.red{
-  background:var(--presenter-red);
-}
-
-.presenterBtn.blue{
-  background:var(--presenter-blue);
-}
-
-.presenterBtn.gray{
-  background:var(--presenter-gray);
-}
-
-.presenterBtn.dark{
-  background:var(--presenter-secondary);
-}
-
-.presenterBtn:active:not(:disabled){
-  transform:scale(.975);
-}
-
-.presenterBtn:disabled{
-  opacity:.38;
-  filter:grayscale(.25);
-  cursor:not-allowed;
-  pointer-events:none;
-}
-
-.presenterTeams{
-  width:100%;
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
-}
-
-.presenterTeams .presenterBtn{
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-
-.selectedPresenterTeam,
-.activeTeam{
-  outline:3px solid var(--presenter-primary);
-  outline-offset:2px;
-  box-shadow:0 0 0 6px rgba(254,127,45,.12);
-}
-
-.presenterGrid{
-  width:100%;
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:7px;
-}
-
-.presenterNumberBtn{
-  min-width:0;
-  min-height:54px;
-  padding:5px;
-  border:2px solid var(--presenter-line);
-  border-radius:14px;
-  background:var(--presenter-soft);
-  color:var(--presenter-secondary);
-  font-size:1.15rem;
-  line-height:1;
-  font-weight:400;
-  box-shadow:none;
-  cursor:pointer;
-}
-
-.presenterNumberBtn:disabled{
-  opacity:.38;
-  pointer-events:none;
-}
-
-.presenterOpened,
-.opened{
-  opacity:.46;
-}
-
-.presenterQuestionBody,
-.presenterAnswerBody,
-.presenterBigQuestionBody,
-.presenterBigAnswerBody,
-.presenterQuestionText,
-.presenterAnswerBox{
-  width:100%;
-  min-height:78px;
-  padding:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:2px solid var(--presenter-line);
-  border-radius:16px;
-  background:var(--presenter-soft);
-  color:var(--presenter-secondary);
-  font-size:1rem;
-  line-height:1.45;
-  font-weight:400;
-  text-align:center;
-  box-shadow:none;
-  overflow:auto;
-}
-
-.presenterAnswerBody,
-.presenterAnswerBox,
-.presenterBigAnswerBody{
-  color:#0A6B3B;
-  background:#F2FBF6;
-  border-color:#B9DFC8;
-}
-
-.presenterImagePreviewBox{
-  min-height:120px;
-  max-height:none;
-  border:2px solid var(--presenter-line);
-  border-radius:16px;
-  background:var(--presenter-soft);
-  box-shadow:none;
-}
-
-.presenterImagePreviewBox img,
-.presenterImagePreviewBox video{
-  width:100%;
-  height:100%;
-  max-height:none;
-  object-fit:contain;
-}
-
-.presenterInlineLoading,
-.readerLoadingCard{
-  min-height:100px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--presenter-muted);
-  font-weight:400;
-  text-align:center;
-}
-
-/* =========================
-   16) READER MODE
-========================= */
-
-.presenterReaderShell{
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:12px;
-}
-
-.presenterReaderHeader{
-  padding:14px;
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 84px;
-  gap:10px;
-  align-items:center;
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-xl);
-  background:var(--presenter-surface);
-  box-shadow:var(--presenter-shadow-soft);
-}
-
-.presenterReaderHeader > div{
-  min-width:0;
-}
-
-.presenterReaderLogoutBtn{
-  min-height:50px;
-  color:var(--presenter-red);
-  background:#FFF1F0;
-  border-color:#E7C2BE;
-}
-
-.presenterReaderSegmentsGrid{
-  min-height:0;
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-  align-content:start;
-}
-
-.presenterReaderSegmentCard{
-  min-height:92px;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:5px;
-  border:2px solid var(--presenter-line);
-  border-radius:18px;
-  background:var(--presenter-surface);
-  color:var(--presenter-secondary);
-  box-shadow:var(--presenter-shadow-soft);
-}
-
-.presenterReaderSegmentCard strong{
-  font-size:1.1rem;
-  line-height:1.2;
-  font-weight:400;
-}
-
-.presenterReaderSegmentCard span{
-  color:var(--presenter-muted);
-  font-size:.7rem;
-  line-height:1.2;
-  font-weight:400;
-}
-
-.presenterReaderSegmentShell{
-  height:100%;
-  min-height:0;
-  display:grid;
-  grid-template-rows:62px minmax(0,1fr);
-  gap:10px;
-}
-
-.presenterReaderPanel{
-  min-height:0;
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
-}
-
-.readerWarmupView,
-.readerTop10Stack,
-.readerWhoList,
-.readerExplainPage,
-.readerRoundsStack,
-.readerSimpleGrid,
-.readerWordsOnly{
-  display:grid;
-  gap:10px;
-}
-
-.readerWarmupIntro,
-.readerRoundHead,
-.readerTop10RoundHead,
-.readerCategoryHeader,
-.readerExplainHead,
-.readerMiniTop,
-.readerWarmupQuestionHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-
-.readerBlock,
-.readerMiniCard,
-.readerCategoryBox,
-.readerTop10Round,
-.readerWarmupQuestionCard,
-.readerPartItem,
-.readerEmptyCard{
-  padding:12px;
-  border-radius:18px;
-}
-
-.readerEmptyCard{
-  min-height:120px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border:2px dashed var(--presenter-line-strong);
-  background:var(--presenter-surface);
-  color:var(--presenter-muted);
-  font-weight:400;
-  text-align:center;
-}
-
-.readerCategoryQuestions,
-.readerWarmupGrid,
-.readerExplainGrid,
-.readerTop10Answers,
-.readerPartsList{
-  display:grid;
-  gap:8px;
-}
-
-.readerWarmupGrid,
-.readerExplainGrid,
-.readerSimpleGrid{
-  grid-template-columns:repeat(2,minmax(0,1fr));
-}
-
-.readerWarmupQuestionField,
-.readerWarmupAnswerField,
-.readerTop10Question,
-.readerTop10Answer,
-.readerMainQuestion,
-.readerWordOnly{
-  padding:9px;
-  border:2px solid var(--presenter-line);
-  border-radius:13px;
-  background:var(--presenter-soft);
-  color:var(--presenter-secondary);
-  font-size:.82rem;
-  line-height:1.4;
-  font-weight:400;
-}
-
-.readerWarmupAnswerField,
-.readerTop10Answer,
-.readerWordOnly{
-  color:#0A6B3B;
-  background:#F2FBF6;
-  border-color:#B9DFC8;
-}
-
-.readerMediaList{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
-}
-
-.readerMediaThumb{
-  min-height:120px;
-  overflow:hidden;
-  border:2px solid var(--presenter-line);
-  border-radius:14px;
-  background:var(--presenter-soft);
-}
-
-.readerMediaThumb img,
-.readerMediaThumb video{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-}
-
-.readerMediaHint,
-.readerNoMedia,
-.readerArchiveInfo{
-  color:var(--presenter-muted);
-  font-size:.72rem;
-  line-height:1.3;
-  font-weight:400;
-}
-
-.readerMediaViewer{
-  position:fixed;
-  inset:0;
-  z-index:100000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:18px;
-}
-
-.readerMediaViewerBackdrop{
-  position:absolute;
-  inset:0;
-  background:rgba(10,22,30,.78);
-}
-
-.readerMediaViewerBox{
-  position:relative;
-  z-index:1;
-  width:min(100%,1000px);
-  height:min(88dvh,760px);
-  padding:12px;
-  display:grid;
-  grid-template-rows:44px minmax(0,1fr);
-  gap:8px;
-  border-radius:22px;
-  background:#FFF;
-}
-
-.readerMediaViewerClose{
-  justify-self:start;
-  width:44px;
-  height:44px;
-  border:0;
-  border-radius:13px;
-  background:var(--presenter-red);
-  color:#FFF;
-  font-size:1.3rem;
-  font-weight:400;
-}
-
-.readerMediaViewerContent{
-  min-height:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-
-.readerMediaViewerContent img,
-.readerMediaViewerContent video{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-}
-
-.readerRead{
-  opacity:.52;
-}
-
-/* =========================
-   17) INSIDE MODE SWITCH
-========================= */
-
-.presenterInsideModeSwitch{
-  position:fixed;
-  z-index:9990;
-  left:50%;
-  bottom:calc(10px + env(safe-area-inset-bottom));
-  transform:translateX(-50%);
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:5px;
-  padding:5px;
-  border:2px solid var(--presenter-line);
-  border-radius:16px;
-  background:rgba(255,255,255,.96);
-  box-shadow:0 10px 26px rgba(35,61,77,.16);
-}
-
-.presenterInsideModeSwitch button{
-  min-width:94px;
-  min-height:40px;
-  padding:5px 9px;
-  border:0;
-  border-radius:11px;
-  background:var(--presenter-soft);
-  color:var(--presenter-secondary);
-  font-size:.75rem;
-  font-weight:400;
-}
-
-.presenterInsideModeSwitch button.active{
-  background:var(--presenter-primary);
-  color:#FFF;
-}
-
-/* =========================
-   18) LOADING + TOAST
+   13) BOOT LOADING
 ========================= */
 
 .presenterBootLoading{
   position:fixed;
   inset:0;
   z-index:120000;
+
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:18px;
+
+  padding:
+    var(--presenter-safe-top)
+    var(--presenter-safe-right)
+    var(--presenter-safe-bottom)
+    var(--presenter-safe-left);
+
   background:var(--presenter-bg);
 }
 
@@ -656,15 +444,19 @@ video{
   width:min(100%,360px);
   min-height:120px;
   padding:18px;
+
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   gap:12px;
+
   border:2px solid var(--presenter-line);
   border-radius:22px;
-  background:#FFF;
+
+  background:var(--presenter-surface);
   color:var(--presenter-secondary);
+
   box-shadow:var(--presenter-shadow);
   text-align:center;
 }
@@ -673,34 +465,71 @@ video{
 .presenterBackgroundSpinner{
   width:32px;
   height:32px;
+
+  flex:0 0 auto;
+
   border:4px solid var(--presenter-line);
   border-top-color:var(--presenter-primary);
   border-radius:50%;
-  animation:presenterSpinner .75s linear infinite;
+
+  animation:
+    presenterSpinner
+    .75s
+    linear
+    infinite;
+}
+
+.presenterBootLoadingText{
+  color:var(--presenter-secondary);
+  font-size:.9rem;
+  line-height:1.45;
+  text-align:center;
 }
 
 @keyframes presenterSpinner{
-  to{transform:rotate(360deg)}
+  to{
+    transform:rotate(360deg);
+  }
 }
+
+/* =========================
+   14) BACKGROUND LOADING
+========================= */
 
 .presenterBackgroundLoading{
   position:fixed;
   z-index:9995;
-  top:calc(10px + env(safe-area-inset-top));
+
+  top:var(--presenter-safe-top);
   left:50%;
-  transform:translateX(-50%);
+
   min-height:42px;
+  max-width:min(calc(100% - 24px),420px);
+
   padding:7px 12px;
+
   display:flex;
   align-items:center;
+  justify-content:center;
   gap:8px;
+
   border:2px solid var(--presenter-line);
   border-radius:999px;
-  background:#FFF;
+
+  background:var(--presenter-surface);
   color:var(--presenter-secondary);
+
   font-size:.72rem;
-  font-weight:400;
+  line-height:1.3;
+  text-align:center;
+
   box-shadow:var(--presenter-shadow-soft);
+
+  transform:translateX(-50%);
+}
+
+.presenterBackgroundLoading:empty{
+  display:none;
 }
 
 .presenterBackgroundSpinner{
@@ -709,35 +538,59 @@ video{
   border-width:3px;
 }
 
+/* =========================
+   15) TOAST
+========================= */
+
 .presenterToast{
   position:fixed;
   z-index:130000;
+
   left:50%;
-  bottom:calc(66px + env(safe-area-inset-bottom));
+  bottom:calc(12px + env(safe-area-inset-bottom));
+
   width:min(calc(100% - 24px),460px);
-  min-height:58px;
-  padding:12px 14px;
+  min-height:54px;
+
+  padding:11px 14px;
+
   display:flex;
   align-items:center;
   justify-content:center;
-  border:0;
+
   border-radius:17px;
+
   background:var(--presenter-secondary);
-  color:#FFF;
-  font-size:.88rem;
-  line-height:1.35;
-  font-weight:400;
+  color:#FFFFFF;
+
+  font-size:.86rem;
+  line-height:1.4;
   text-align:center;
-  box-shadow:0 14px 34px rgba(35,61,77,.26);
-  transform:translateX(-50%) translateY(14px);
+
+  box-shadow:
+    0 14px 34px rgba(35,61,77,.26);
+
+  transform:
+    translateX(-50%)
+    translateY(14px);
+
   opacity:0;
+  visibility:hidden;
   pointer-events:none;
-  transition:opacity .16s ease,transform .16s ease;
+
+  transition:
+    opacity var(--presenter-transition),
+    transform var(--presenter-transition),
+    visibility var(--presenter-transition);
 }
 
 .presenterToast.show{
   opacity:1;
-  transform:translateX(-50%) translateY(0);
+  visibility:visible;
+
+  transform:
+    translateX(-50%)
+    translateY(0);
 }
 
 .presenterToast.presenterToastSuccess{
@@ -746,4 +599,138 @@ video{
 
 .presenterToast.presenterToastError{
   background:var(--presenter-red);
+}
+
+.presenterToast.presenterToastInfo{
+  background:var(--presenter-blue);
+}
+
+/* =========================
+   16) REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion:reduce){
+  *,
+  *::before,
+  *::after{
+    scroll-behavior:auto;
+    animation-duration:.01ms;
+    animation-iteration-count:1;
+    transition-duration:.01ms;
+  }
+}
+
+/* =========================================================
+   17) IPHONE PRO MAX - LANDSCAPE
+========================================================= */
+
+@media
+  (min-width:740px)
+  and (max-width:960px)
+  and (orientation:landscape)
+  and (max-height:500px){
+
+  :root{
+    --presenter-safe-top:
+      max(5px,env(safe-area-inset-top));
+
+    --presenter-safe-right:
+      max(7px,env(safe-area-inset-right));
+
+    --presenter-safe-bottom:
+      max(5px,env(safe-area-inset-bottom));
+
+    --presenter-safe-left:
+      max(7px,env(safe-area-inset-left));
+  }
+
+  .presenterSegmentShell,
+  .presenterReaderSegmentShell{
+    gap:6px;
+  }
+
+  .presenterToast{
+    bottom:calc(7px + env(safe-area-inset-bottom));
+    min-height:44px;
+    padding:8px 12px;
+    font-size:.74rem;
+  }
+
+  .presenterBackgroundLoading{
+    min-height:36px;
+    padding:5px 10px;
+    font-size:.66rem;
+  }
+
+  .presenterBootLoadingCard{
+    width:min(100%,320px);
+    min-height:100px;
+    padding:14px;
+  }
+
+  .presenterLoadingSpinner{
+    width:28px;
+    height:28px;
+  }
+}
+
+/* =========================================================
+   18) GALAXY TAB A11 - LANDSCAPE
+========================================================= */
+
+@media
+  (min-width:900px)
+  and (max-width:1400px)
+  and (orientation:landscape)
+  and (min-height:500px){
+
+  :root{
+    --presenter-safe-top:
+      max(10px,env(safe-area-inset-top));
+
+    --presenter-safe-right:
+      max(10px,env(safe-area-inset-right));
+
+    --presenter-safe-bottom:
+      max(10px,env(safe-area-inset-bottom));
+
+    --presenter-safe-left:
+      max(10px,env(safe-area-inset-left));
+  }
+
+  .presenterHomeShell,
+  .presenterReaderShell{
+    max-width:1180px;
+  }
+
+  .presenterSegmentShell,
+  .presenterReaderSegmentShell{
+    max-width:1280px;
+    gap:10px;
+  }
+
+  .presenterBootLoadingCard{
+    width:min(100%,390px);
+    min-height:130px;
+  }
+}
+
+/* =========================
+   19) SMALL HEIGHT SAFETY
+========================= */
+
+@media (max-height:430px){
+  .presenterPage{
+    --presenter-safe-top:
+      max(4px,env(safe-area-inset-top));
+
+    --presenter-safe-right:
+      max(6px,env(safe-area-inset-right));
+
+    --presenter-safe-bottom:
+      max(4px,env(safe-area-inset-bottom));
+
+    --presenter-safe-left:
+      max(6px,env(safe-area-inset-left));
+  }
 }

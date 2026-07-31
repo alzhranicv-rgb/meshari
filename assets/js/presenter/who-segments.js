@@ -625,30 +625,39 @@ async function renderWho() {
           ${teamButtons()}
         </div>
 
-        <div class="presenterWhoHeaderInfo">
+<div class="presenterWhoHeaderInfo">
 
-          <span
-            id="presenterWhoStatusText"
-            class="presenterWhoStatusText"
-          >
-            —
-          </span>
+  <span
+    id="presenterWhoStatusText"
+    class="presenterWhoStatusText"
+  >
+    —
+  </span>
 
-          <strong
-            id="presenterWhoCurrentBadge"
-            class="presenterWhoCurrentBadge"
-          >
-            —
-          </strong>
+  <strong
+    id="presenterWhoCurrentBadge"
+    class="presenterWhoCurrentBadge"
+  >
+    —
+  </strong>
 
-          <strong
-            id="presenterWhoTimer"
-            class="presenterWhoTimer"
-          >
-            —
-          </strong>
+  <strong
+    id="presenterWhoTimer"
+    class="presenterWhoTimer"
+  >
+    —
+  </strong>
 
-        </div>
+  <button
+    type="button"
+    id="presenterWhoCompensationBtn"
+    class="presenterBtn gray presenterWhoCompensationBtn"
+    onclick="runPresenterWhoAction('compensation')"
+  >
+    تعويض
+  </button>
+
+</div>
 
       </header>
 
@@ -721,15 +730,14 @@ async function renderWho() {
         >
           دوببلا
         </button>
-
-        <button
-          type="button"
-          id="presenterWhoCompensationBtn"
-          class="presenterBtn gray presenterWhoCompensationBtn"
-          onclick="runPresenterWhoAction('compensation')"
-        >
-          تعويض
-        </button>
+<button
+  type="button"
+  id="presenterWhoCompensationBtn"
+  class="presenterBtn gray presenterWhoCompensationBtn"
+  onclick="runPresenterWhoAction('compensation')"
+>
+  تعويض
+</button>
 
         <button
           type="button"

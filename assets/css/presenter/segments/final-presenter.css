@@ -1,1019 +1,2386 @@
 /* =========================================================
-   FINAL PRESENTER
-   MATCH DISPLAY COLORS
+   PRESENTER SEGMENT: FINAL ROUND 1 / بدون نقاط
+   File: assets/css/presenter/segments/final-round1.css
+
+   المسؤوليات:
+   - تخطيط الجولة الأولى من الفاصلة.
+   - أرقام البطاقات.
+   - اختيار الفريق.
+   - عرض الإجابة والملاحظة.
+   - أزرار دوبيلا والتكبير والصح والخطأ والتراجع.
+   - وضع التركيز عند فتح رقم.
+   - نافذة تكبير إجابة الصورة للجولة الأولى فقط.
+
+   لا يحتوي على:
+   - الجولة الثانية.
+   - الجولة الثالثة.
+   - الجولة الرابعة.
+   - الأرشيف.
 ========================================================= */
 
-.presenterFinalLayout,
-.presenterFinalLayout *{
-  box-sizing:border-box;
+/* =========================
+   1) LAYOUT
+========================= */
+
+.presenterFinalLayout{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,1.02fr) minmax(340px,.98fr);
+  gap:8px;
+
+  overflow:hidden;
+}
+
+.presenterFinalLeft,
+.presenterFinalRight{
+  min-width:0;
+  min-height:0;
+}
+
+.presenterFinalLeft{
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:8px;
+}
+
+.presenterFinalRight{
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
+}
+
+/* =========================
+   2) NUMBERS CARD
+========================= */
+
+.presenterFinalNumbersCard{
+  min-width:0;
+  min-height:0;
+  height:100%;
+  padding:10px;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
+
+  overflow:hidden;
+}
+
+.presenterFinalNumbersGrid{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  gap:7px;
+
+  overflow:hidden;
+}
+
+.presenterFinalNumbersGrid.finalNumbersCount4{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(0,1fr));
+}
+
+.presenterFinalNumbersGrid.finalNumbersCount6{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(0,1fr));
+}
+
+.presenterFinalNumbersGrid.finalNumbersCount8{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(0,1fr));
+}
+
+/* =========================
+   3) NUMBER BUTTONS
+========================= */
+
+.presenterFinalNumbersGrid .presenterNumberBtn{
+  width:100%;
+  min-width:0;
+  min-height:0;
+  padding:6px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid var(--presenter-line-strong);
+  border-radius:14px;
+  background:var(--presenter-surface-soft);
+  color:var(--presenter-secondary);
+
+  font-family:"MolhimCustom","HanakaText",sans-serif;
+  font-size:1.45rem;
+  line-height:1;
+  font-weight:400;
+
+  cursor:pointer;
+
+  transition:
+    transform var(--presenter-transition),
+    border-color var(--presenter-transition),
+    background var(--presenter-transition),
+    color var(--presenter-transition),
+    opacity var(--presenter-transition);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:hover{
+  border-color:var(--presenter-primary);
+  background:var(--presenter-primary-soft);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:active{
+  transform:translateY(1px);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn.selectedPresenterTeam{
+  border-color:var(--presenter-primary);
+  background:var(--presenter-primary);
+  color:#FFFFFF;
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn.presenterOpened{
+  border-color:var(--presenter-line);
+  background:
+    linear-gradient(
+      135deg,
+      transparent 46%,
+      var(--presenter-line-strong) 47%,
+      var(--presenter-line-strong) 53%,
+      transparent 54%
+    ),
+    var(--presenter-surface-muted);
+  color:transparent;
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:disabled{
+  cursor:not-allowed;
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:disabled:not(.presenterOpened):not(.selectedPresenterTeam){
+  opacity:.48;
+}
+
+/* =========================
+   4) TEAM AREA
+========================= */
+
+.presenterFinalTeamsArea{
+  min-width:0;
+}
+
+.presenterFinalTeamsArea .presenterTeamsRow,
+.presenterFinalTeamsArea .presenterTeamSelector{
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
+
+.presenterFinalTeamsArea .presenterTeamBtn{
+  min-height:54px;
+}
+
+/* =========================
+   5) PREVIEW CARD
+========================= */
+
+.presenterFinalPreviewCard{
+  min-width:0;
+  min-height:0;
+  height:100%;
+  padding:10px;
+
+  display:flex;
+
+  overflow:hidden;
+}
+
+.presenterFinalPreviewBox{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  padding:12px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:auto;
+  overscroll-behavior:contain;
+
+  border:2px solid var(--presenter-line);
+  border-radius:var(--presenter-radius-md);
+  background:var(--presenter-surface-soft);
+  color:var(--presenter-muted);
+
+  font-size:.8rem;
+  line-height:1.4;
+  text-align:center;
+}
+
+/* =========================
+   6) ROUND 1 ANSWER
+========================= */
+
+.presenterFinalOnlyAnswerView{
+  width:100%;
+  min-width:0;
+  min-height:100%;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+}
+
+.presenterFinalOnlyAnswerLabel{
+  min-height:28px;
+  padding:5px 10px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:999px;
+  background:var(--presenter-secondary-soft);
+  color:var(--presenter-secondary);
+
+  font-size:.62rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterFinalOnlyAnswerText{
+  width:100%;
+  min-width:0;
+  padding:12px;
+
+  border:2px solid rgba(22,130,60,.28);
+  border-radius:var(--presenter-radius-md);
+  background:var(--presenter-green-soft);
+  color:var(--presenter-green);
+
+  font-size:clamp(1rem,2.1vw,1.55rem);
+  line-height:1.5;
+  text-align:center;
+  font-weight:400;
+  overflow-wrap:anywhere;
+}
+
+.presenterFinalMiniNote{
+  width:100%;
+  min-width:0;
+  padding:8px 10px;
+
+  border:1px solid var(--presenter-line);
+  border-radius:11px;
+  background:var(--presenter-surface);
+  color:var(--presenter-muted);
+
+  font-size:.68rem;
+  line-height:1.45;
+  text-align:center;
+  font-weight:400;
+  overflow-wrap:anywhere;
+}
+
+/* =========================
+   7) CONTROLS
+========================= */
+
+.presenterFinalControlsArea{
+  min-width:0;
+}
+
+.presenterFinalControlsArea.finalControlsRound1{
+  min-width:0;
+}
+
+.presenterFinalControlsGrid{
+  min-width:0;
+
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:6px;
+}
+
+.presenterFinalControlsGrid .presenterBtn{
+  min-height:50px;
+}
+
+.presenterFinalControlsGrid .gray{
+  background:var(--presenter-surface);
+  border-color:var(--presenter-line-strong);
+  color:var(--presenter-secondary);
+}
+
+.presenterFinalControlsGrid .blue{
+  background:var(--presenter-blue);
+  border-color:var(--presenter-blue);
+  color:#FFFFFF;
+}
+
+.presenterFinalControlsGrid .green{
+  background:var(--presenter-green);
+  border-color:var(--presenter-green);
+  color:#FFFFFF;
+}
+
+.presenterFinalControlsGrid .red{
+  background:var(--presenter-red);
+  border-color:var(--presenter-red);
+  color:#FFFFFF;
+}
+
+/* =========================
+   8) ROUND 1 FOCUS MODE
+========================= */
+
+body.presenterFinalRound1FocusMode .presenterFinalLayout{
+  grid-template-columns:minmax(250px,.72fr) minmax(0,1.28fr);
+}
+
+body.presenterFinalRound1FocusMode .presenterFinalNumbersCard{
+  opacity:.78;
+}
+
+body.presenterFinalRound1FocusMode .presenterFinalPreviewCard{
+  border-color:rgba(254,127,45,.48);
+}
+
+body.presenterFinalRound1FocusMode .presenterFinalOnlyAnswerText{
+  font-size:clamp(1.15rem,2.5vw,1.8rem);
+}
+
+/* =========================
+   9) ROUND 1 IMAGE ANSWER ZOOM
+========================= */
+
+.finalRound1ImageAnswerOverlay{
+  position:fixed;
+  inset:0;
+  z-index:9998;
+
+  padding:
+    max(12px,env(safe-area-inset-top))
+    max(12px,env(safe-area-inset-right))
+    max(12px,env(safe-area-inset-bottom))
+    max(12px,env(safe-area-inset-left));
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(15,23,32,.78);
+}
+
+.finalRound1ImageAnswerInner{
+  width:min(96vw,1180px);
+  height:min(92dvh,780px);
+  min-width:0;
+  min-height:0;
+  padding:12px;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:10px;
+
+  border:2px solid var(--presenter-line);
+  border-radius:var(--presenter-radius-xl);
+  background:var(--presenter-surface);
+  box-shadow:var(--presenter-shadow);
+}
+
+.finalRound1ImageAnswerMedia{
+  min-width:0;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid var(--presenter-line);
+  border-radius:var(--presenter-radius-lg);
+  background:var(--presenter-surface-soft);
+
+  overflow:hidden;
+}
+
+.finalRound1ImageAnswerImg{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.finalRound1ImageAnswerBox{
+  min-width:0;
+  min-height:64px;
+  padding:10px 14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid rgba(22,130,60,.28);
+  border-radius:var(--presenter-radius-md);
+  background:var(--presenter-green-soft);
+  color:var(--presenter-green);
+
+  font-size:clamp(.9rem,1.7vw,1.25rem);
+  line-height:1.45;
+  text-align:center;
+  font-weight:400;
+}
+
+/* =========================
+   10) GALAXY TAB A11 LANDSCAPE
+========================= */
+
+@media
+  (min-width:900px)
+  and (max-width:1400px)
+  and (orientation:landscape)
+  and (min-height:500px){
+
+  .presenterFinalLayout{
+    grid-template-columns:minmax(0,1.05fr) minmax(330px,.95fr);
+    gap:7px;
+  }
+
+  .presenterFinalLeft,
+  .presenterFinalRight{
+    gap:7px;
+  }
+
+  .presenterFinalNumbersCard,
+  .presenterFinalPreviewCard{
+    padding:8px;
+  }
+
+  .presenterFinalNumbersGrid{
+    gap:6px;
+  }
+
+  .presenterFinalNumbersGrid .presenterNumberBtn{
+    font-size:1.3rem;
+  }
+
+  .presenterFinalControlsGrid{
+    gap:5px;
+  }
+
+  .presenterFinalControlsGrid .presenterBtn{
+    min-height:46px;
+  }
+}
+
+/* =========================
+   11) IPHONE PRO MAX LANDSCAPE
+========================= */
+
+@media
+  (min-width:740px)
+  and (max-width:960px)
+  and (orientation:landscape)
+  and (max-height:500px){
+
+  .presenterFinalLayout{
+    grid-template-columns:minmax(0,1.06fr) minmax(270px,.94fr);
+    gap:5px;
+  }
+
+  .presenterFinalLeft{
+    grid-template-rows:minmax(0,1fr) 42px;
+    gap:5px;
+  }
+
+  .presenterFinalRight{
+    grid-template-rows:40px minmax(0,1fr);
+    gap:5px;
+  }
+
+  .presenterFinalNumbersCard,
+  .presenterFinalPreviewCard{
+    padding:5px;
+    gap:4px;
+    border-radius:11px;
+  }
+
+  .presenterFinalNumbersGrid{
+    gap:4px;
+  }
+
+  .presenterFinalNumbersGrid .presenterNumberBtn{
+    padding:3px;
+    border-radius:8px;
+    font-size:.82rem;
+  }
+
+  .presenterFinalTeamsArea .presenterTeamBtn{
+    min-height:40px;
+    padding:4px;
+    font-size:.54rem;
+  }
+
+  .presenterFinalPreviewBox{
+    padding:6px;
+    border-radius:8px;
+    font-size:.56rem;
+  }
+
+  .presenterFinalOnlyAnswerView{
+    gap:5px;
+  }
+
+  .presenterFinalOnlyAnswerLabel{
+    min-height:20px;
+    padding:3px 7px;
+    font-size:.45rem;
+  }
+
+  .presenterFinalOnlyAnswerText{
+    padding:6px;
+    border-radius:8px;
+    font-size:.72rem;
+    line-height:1.35;
+  }
+
+  .presenterFinalMiniNote{
+    padding:5px 6px;
+    border-radius:7px;
+    font-size:.48rem;
+    line-height:1.3;
+  }
+
+  .presenterFinalControlsGrid{
+    gap:4px;
+  }
+
+  .presenterFinalControlsGrid .presenterBtn{
+    min-height:42px;
+    padding:4px 5px;
+    border-radius:8px;
+    font-size:.5rem;
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalLayout{
+    grid-template-columns:minmax(180px,.66fr) minmax(0,1.34fr);
+  }
+
+  body.presenterFinalRound1FocusMode .presenterFinalOnlyAnswerText{
+    font-size:.78rem;
+  }
+
+  .finalRound1ImageAnswerOverlay{
+    padding:6px;
+  }
+
+  .finalRound1ImageAnswerInner{
+    width:98vw;
+    height:96dvh;
+    padding:6px;
+    gap:5px;
+    border-radius:12px;
+  }
+
+  .finalRound1ImageAnswerMedia{
+    border-radius:9px;
+  }
+
+  .finalRound1ImageAnswerBox{
+    min-height:42px;
+    padding:5px 8px;
+    border-radius:8px;
+    font-size:.58rem;
+  }
 }
 
 .presenterFinalLayout{
   width:100%;
   height:100%;
+  min-width:0;
   min-height:0;
-
   display:grid;
-  grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);
-  gap:10px;
-
-  color:var(--p-text);
+  grid-template-columns:minmax(0,1.02fr) minmax(340px,.98fr);
+  gap:8px;
+  overflow:hidden;
 }
 
 .presenterFinalLeft,
 .presenterFinalRight{
+  min-width:0;
   min-height:0;
-
-  display:grid;
-  gap:10px;
 }
 
 .presenterFinalLeft{
+  display:grid;
   grid-template-rows:minmax(0,1fr) auto;
+  gap:8px;
 }
 
 .presenterFinalRight{
-  grid-template-rows:auto minmax(0,1fr);
-}
-
-/* =========================
-   CARDS
-========================= */
-
-.presenterFinalNumbersCard,
-.presenterFinalPreviewCard,
-.presenterFinalStoryAnswerControl{
-  min-height:0;
-
   display:grid;
-  gap:10px;
-
-  padding:10px;
-
-  background:var(--p-surface);
-  border:2px solid var(--p-line);
-  border-radius:22px;
-
-  overflow:hidden;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
 }
 
 .presenterFinalNumbersCard{
-  grid-template-rows:minmax(0,1fr);
-}
-
-.presenterFinalPreviewCard{
-  grid-template-rows:minmax(0,1fr);
-}
-
-.presenterFinalPreviewBox{
+  min-width:0;
   min-height:0;
-
+  height:100%;
+  padding:10px;
   display:grid;
-
-  background:var(--p-soft);
-  border:2px solid var(--p-line);
-  border-radius:20px;
-
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
   overflow:hidden;
 }
 
-/* =========================
-   NUMBERS
-========================= */
-
-.presenterFinalLayout .presenterGrid{
+.presenterFinalNumbersGrid{
+  min-width:0;
   min-height:0;
-
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:10px;
-
-  padding:2px;
-  overflow:auto;
+  gap:7px;
+  overflow:hidden;
 }
 
-.presenterFinalLayout .presenterGrid button{
-  min-height:82px;
+.presenterFinalNumbersGrid.finalNumbersCount6{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(0,1fr));
+}
 
+.presenterFinalNumbersGrid .presenterNumberBtn{
+  width:100%;
+  min-width:0;
+  min-height:0;
+  padding:6px;
   display:flex;
   align-items:center;
   justify-content:center;
-
-  padding:0;
-
-  background:var(--p-soft);
-  color:var(--p-secondary);
-
-  border:2px solid var(--p-line);
-  border-radius:20px;
-
-  font-size:28px;
+  border:2px solid var(--presenter-line-strong);
+  border-radius:14px;
+  background:var(--presenter-surface-soft);
+  color:var(--presenter-secondary);
+  font-family:"MolhimCustom","HanakaText",sans-serif;
+  font-size:1.4rem;
   line-height:1;
   font-weight:400;
-
   cursor:pointer;
+  transition:
+    transform var(--presenter-transition),
+    border-color var(--presenter-transition),
+    background var(--presenter-transition),
+    color var(--presenter-transition),
+    opacity var(--presenter-transition);
 }
 
-.presenterFinalLayout .presenterGrid button.active,
-.presenterFinalLayout .presenterGrid button.selected{
-  background:var(--p-primary);
-  border-color:var(--p-primary);
+.presenterFinalNumbersGrid .presenterNumberBtn:hover{
+  border-color:var(--presenter-primary);
+  background:var(--presenter-primary-soft);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:active{
+  transform:translateY(1px);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn.selectedPresenterTeam{
+  border-color:var(--presenter-primary);
+  background:var(--presenter-primary);
   color:#FFFFFF;
 }
 
-.presenterFinalLayout .presenterGrid button:disabled{
-  background:var(--p-disabled);
-  color:var(--p-disabled-text);
+.presenterFinalNumbersGrid .presenterNumberBtn.presenterOpened{
+  border-color:var(--presenter-line);
+  background:
+    linear-gradient(
+      135deg,
+      transparent 46%,
+      var(--presenter-line-strong) 47%,
+      var(--presenter-line-strong) 53%,
+      transparent 54%
+    ),
+    var(--presenter-surface-muted);
+  color:transparent;
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:disabled{
   cursor:not-allowed;
 }
 
-/* =========================
-   TEAMS
-========================= */
+.presenterFinalNumbersGrid .presenterNumberBtn:disabled:not(.presenterOpened):not(.selectedPresenterTeam){
+  opacity:.48;
+}
 
 .presenterFinalTeamsArea{
-  min-height:76px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-
-  padding:10px;
-
-  background:var(--p-surface);
-  border:2px solid var(--p-line);
-  border-radius:22px;
+  min-width:0;
 }
 
-/* =========================
-   CONTROLS
-========================= */
-
-.presenterFinalControlsArea{
-  min-height:0;
-}
-
-.presenterFinalControlsGrid{
-  min-height:72px;
-
+.presenterFinalTeamsArea .presenterTeamsRow,
+.presenterFinalTeamsArea .presenterTeamSelector{
+  min-width:0;
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:10px;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
 
+.presenterFinalTeamsArea .presenterTeamBtn{
+  min-height:54px;
+}
+
+.presenterFinalPreviewCard{
+  min-width:0;
+  min-height:0;
+  height:100%;
   padding:10px;
-
-  background:var(--p-surface);
-  border:2px solid var(--p-line);
-  border-radius:22px;
+  display:flex;
+  overflow:hidden;
 }
 
-.presenterFinalControlsGrid .presenterBtn{
-  width:100%;
-}
-
-/* =========================
-   PREVIEW GENERAL
-========================= */
-
-.presenterFinalOnlyAnswerView,
-.presenterFinalQuestionAnswerOnly,
-.presenterFinalSequencePreview,
-.presenterFinalStoryPreview{
+.presenterFinalPreviewBox{
   width:100%;
   height:100%;
+  min-width:0;
   min-height:0;
-
-  display:grid;
-  gap:10px;
-
   padding:10px;
-  overflow:hidden;
-}
-
-.presenterFinalOnlyAnswerView{
-  grid-template-rows:auto minmax(0,1fr);
-}
-
-.presenterFinalOnlyAnswerLabel,
-.presenterFinalPreviewLabel{
-  display:none;
-}
-
-.presenterFinalOnlyAnswerText,
-.presenterFinalPreviewText,
-.presenterFinalEmptyText{
-  min-height:0;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
-  padding:14px;
-
-  background:var(--p-surface);
-  border:2px solid var(--p-line);
-  border-radius:18px;
-
-  color:var(--p-text);
-  font-size:26px;
-  line-height:1.35;
-  text-align:center;
-
   overflow:auto;
-}
-
-.presenterFinalOnlyAnswerText,
-.presenterFinalPreviewText.answerText{
-  color:var(--p-secondary);
-}
-
-.presenterFinalMiniNote{
-  margin-top:8px;
-  color:var(--p-muted);
-  font-size:16px;
-  line-height:1.3;
+  overscroll-behavior:contain;
+  border:2px solid var(--presenter-line);
+  border-radius:var(--presenter-radius-md);
+  background:var(--presenter-surface-soft);
+  color:var(--presenter-muted);
   text-align:center;
 }
 
 /* =========================
-   QUESTION + ANSWER
-========================= */
-
-.presenterFinalQuestionAnswerOnly{
-  grid-template-rows:minmax(0,1fr) minmax(0,1fr);
-}
-
-.presenterFinalPreviewBlock{
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:minmax(0,1fr);
-  gap:8px;
-
-  padding:10px;
-
-  background:var(--p-soft);
-  border:2px solid var(--p-line);
-  border-radius:20px;
-
-  overflow:hidden;
-}
-
-.presenterFinalImageStatusBlock{
-  grid-template-rows:minmax(0,1fr);
-}
-
-/* =========================
-   ANSWERS GRID
+   المبعثرة
 ========================= */
 
 .presenterFinalAnswersGrid{
+  width:100%;
+  min-width:0;
   min-height:0;
-
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-
-  overflow:auto;
+  grid-auto-rows:minmax(54px,1fr);
+  gap:7px;
 }
 
 .presenterFinalAnswerCard{
-  min-height:64px;
-
+  min-width:0;
+  min-height:54px;
+  padding:8px 10px;
   display:flex;
   align-items:center;
   justify-content:center;
-
-  padding:10px;
-
-  background:var(--p-surface);
-  color:var(--p-secondary);
-
-  border:2px solid var(--p-line);
-  border-radius:18px;
-
-  font-size:20px;
-  line-height:1.25;
+  border:2px solid var(--presenter-line);
+  border-radius:12px;
+  background:var(--presenter-surface);
+  color:var(--presenter-secondary);
+  font-size:.82rem;
+  line-height:1.35;
+  font-weight:400;
   text-align:center;
-
   cursor:pointer;
+  overflow:hidden;
+  transition:
+    transform var(--presenter-transition),
+    border-color var(--presenter-transition),
+    background var(--presenter-transition),
+    color var(--presenter-transition);
+}
+
+.presenterFinalAnswerCard:hover{
+  border-color:var(--presenter-primary);
+  background:var(--presenter-primary-soft);
+}
+
+.presenterFinalAnswerCard:active{
+  transform:translateY(1px);
 }
 
 .presenterFinalAnswerCard.selectedCorrect{
-  background:#EAF7F2;
-  border-color:var(--p-green);
-  color:var(--p-green);
+  border-color:var(--presenter-green);
+  background:var(--presenter-green-soft);
+  color:var(--presenter-green);
+}
+
+.presenterFinalAnswerCard span{
+  min-width:0;
+  overflow-wrap:anywhere;
 }
 
 /* =========================
-   SEQUENCE
+   الترتيب
 ========================= */
 
 .presenterFinalSequencePreview{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  display:grid;
   grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
 }
 
 .presenterFinalCountdownBox{
-  min-width:94px;
-  height:56px;
-
+  min-height:48px;
+  padding:8px 12px;
   display:flex;
   align-items:center;
   justify-content:center;
-
-  margin:0 auto;
-
-  background:var(--p-primary);
-  color:#FFFFFF;
-
-  border-radius:18px;
-
-  font-size:30px;
+  border:2px solid rgba(21,107,154,.30);
+  border-radius:12px;
+  background:var(--presenter-blue-soft);
+  color:var(--presenter-blue);
+  font-family:"MolhimCustom","HanakaText",sans-serif;
+  font-size:1rem;
   line-height:1;
   font-weight:400;
 }
 
 /* =========================
-   STORY
+   الصور
 ========================= */
 
-.presenterFinalStoryPartsOnly{
-  grid-template-rows:minmax(0,1fr);
-}
-
-.presenterFinalStoryParts{
+.presenterFinalImagePreview,
+.presenterFinalRound2ImagePreview{
+  width:100%;
+  height:100%;
+  min-width:0;
   min-height:0;
-
   display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
   gap:8px;
-
-  overflow:auto;
 }
 
-.presenterFinalStoryPart{
-  min-height:52px;
-
+.presenterFinalImageMedia,
+.presenterFinalRound2ImageMedia{
+  min-width:0;
+  min-height:0;
   display:flex;
   align-items:center;
   justify-content:center;
-
-  padding:10px;
-
-  background:var(--p-surface);
-  color:var(--p-muted);
-
-  border:2px solid var(--p-line);
-  border-radius:18px;
-
-  font-size:19px;
-  line-height:1.3;
-  text-align:center;
+  border:2px solid var(--presenter-line);
+  border-radius:12px;
+  background:var(--presenter-surface);
+  overflow:hidden;
 }
 
-.presenterFinalStoryPart.visiblePart{
-  color:var(--p-secondary);
-  border-color:var(--p-primary);
-  background:#FFF4EC;
+.presenterFinalImageMedia img,
+.presenterFinalRound2ImageMedia img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.presenterFinalImageAnswers,
+.presenterFinalRound2ImageAnswers{
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
 }
 
 /* =========================
-   IPHONE LANDSCAPE
+   التحكم
 ========================= */
 
-@media (orientation:landscape) and (max-width:950px){
+.presenterFinalControlsArea.finalControlsRound2{
+  min-width:0;
+}
+
+.finalControlsRound2 .presenterFinalControlsGrid{
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:6px;
+}
+
+.finalControlsRound2 .presenterBtn{
+  min-height:50px;
+}
+
+.finalControlsRound2 .presenterBtn.gray{
+  background:var(--presenter-surface);
+  border-color:var(--presenter-line-strong);
+  color:var(--presenter-secondary);
+}
+
+.finalControlsRound2 .presenterBtn.dark{
+  background:var(--presenter-secondary);
+  border-color:var(--presenter-secondary);
+  color:#FFFFFF;
+}
+
+.finalControlsRound2 .presenterBtn.blue{
+  background:var(--presenter-blue);
+  border-color:var(--presenter-blue);
+  color:#FFFFFF;
+}
+
+.finalControlsRound2 .presenterBtn.green{
+  background:var(--presenter-green);
+  border-color:var(--presenter-green);
+  color:#FFFFFF;
+}
+
+.finalControlsRound2 .presenterBtn:disabled{
+  opacity:.42;
+}
+
+/* =========================
+   TABLET LANDSCAPE
+========================= */
+
+@media
+  (min-width:900px)
+  and (max-width:1400px)
+  and (orientation:landscape)
+  and (min-height:500px){
+
   .presenterFinalLayout{
-    gap:8px;
+    grid-template-columns:minmax(0,1.05fr) minmax(330px,.95fr);
+    gap:7px;
   }
 
   .presenterFinalLeft,
   .presenterFinalRight{
-    gap:8px;
+    gap:7px;
   }
 
   .presenterFinalNumbersCard,
-  .presenterFinalPreviewCard,
-  .presenterFinalStoryAnswerControl{
-    gap:8px;
+  .presenterFinalPreviewCard{
     padding:8px;
-    border-radius:18px;
-  }
-
-  .presenterFinalPreviewBox{
-    border-radius:17px;
-  }
-
-  .presenterFinalLayout .presenterGrid{
-    gap:8px;
-  }
-
-  .presenterFinalLayout .presenterGrid button{
-    min-height:60px;
-    border-radius:16px;
-    font-size:23px;
-  }
-
-  .presenterFinalTeamsArea{
-    min-height:62px;
-    gap:8px;
-    padding:8px;
-    border-radius:18px;
-  }
-
-  .presenterFinalControlsGrid{
-    min-height:62px;
-    gap:8px;
-    padding:8px;
-    border-radius:18px;
-  }
-
-  .presenterFinalOnlyAnswerView,
-  .presenterFinalQuestionAnswerOnly,
-  .presenterFinalSequencePreview,
-  .presenterFinalStoryPreview{
-    gap:8px;
-    padding:8px;
-  }
-
-  .presenterFinalOnlyAnswerText,
-  .presenterFinalPreviewText,
-  .presenterFinalEmptyText{
-    padding:10px;
-    border-radius:15px;
-    font-size:21px;
-    line-height:1.25;
-  }
-
-  .presenterFinalPreviewBlock{
-    padding:8px;
-    border-radius:17px;
   }
 
   .presenterFinalAnswersGrid{
-    gap:8px;
-  }
-
-  .presenterFinalAnswerCard{
-    min-height:48px;
-    padding:8px;
-    border-radius:15px;
-    font-size:16px;
-  }
-
-  .presenterFinalCountdownBox{
-    min-width:76px;
-    height:46px;
-    border-radius:15px;
-    font-size:25px;
-  }
-
-  .presenterFinalStoryParts{
     gap:6px;
   }
 
-  .presenterFinalStoryPart{
+  .finalControlsRound2 .presenterFinalControlsGrid{
+    gap:5px;
+  }
+
+  .finalControlsRound2 .presenterBtn{
+    min-height:46px;
+    padding-inline:7px;
+    font-size:.66rem;
+  }
+}
+
+/* =========================
+   IPHONE PRO MAX LANDSCAPE
+========================= */
+
+@media
+  (min-width:740px)
+  and (max-width:960px)
+  and (orientation:landscape)
+  and (max-height:500px){
+
+  .presenterFinalLayout{
+    grid-template-columns:minmax(0,1.06fr) minmax(270px,.94fr);
+    gap:5px;
+  }
+
+  .presenterFinalLeft{
+    grid-template-rows:minmax(0,1fr) 42px;
+    gap:5px;
+  }
+
+  .presenterFinalRight{
+    grid-template-rows:40px minmax(0,1fr);
+    gap:5px;
+  }
+
+  .presenterFinalNumbersCard,
+  .presenterFinalPreviewCard{
+    padding:5px;
+    gap:4px;
+    border-radius:11px;
+  }
+
+  .presenterFinalNumbersGrid{
+    gap:4px;
+  }
+
+  .presenterFinalNumbersGrid .presenterNumberBtn{
+    padding:3px;
+    border-radius:8px;
+    font-size:.82rem;
+  }
+
+  .presenterFinalTeamsArea .presenterTeamBtn{
+    min-height:40px;
+    padding:4px;
+    font-size:.54rem;
+  }
+
+  .presenterFinalPreviewBox{
+    padding:5px;
+    border-radius:8px;
+  }
+
+  .presenterFinalAnswersGrid{
+    grid-auto-rows:minmax(34px,1fr);
+    gap:4px;
+  }
+
+  .presenterFinalAnswerCard{
+    min-height:34px;
+    padding:4px 5px;
+    border-radius:8px;
+    font-size:.54rem;
+    line-height:1.2;
+  }
+
+  .presenterFinalSequencePreview{
+    gap:4px;
+  }
+
+  .presenterFinalCountdownBox{
+    min-height:30px;
+    padding:4px 7px;
+    border-radius:8px;
+    font-size:.62rem;
+  }
+
+  .presenterFinalImagePreview,
+  .presenterFinalRound2ImagePreview{
+    gap:4px;
+  }
+
+  .presenterFinalImageMedia,
+  .presenterFinalRound2ImageMedia{
+    border-radius:8px;
+  }
+
+  .presenterFinalImageAnswers,
+  .presenterFinalRound2ImageAnswers{
+    gap:4px;
+  }
+
+  .finalControlsRound2 .presenterFinalControlsGrid{
+    gap:4px;
+  }
+
+  .finalControlsRound2 .presenterBtn{
     min-height:42px;
-    padding:8px;
-    border-radius:15px;
-    font-size:16px;
+    padding:4px 3px;
+    border-radius:8px;
+    font-size:.43rem;
   }
 }
+
 /* =========================
-   FINAL ROUND 2
+   1) LAYOUT
 ========================= */
 
-.presenterFinalRound2CommandGrid{
+.presenterFinalLayout{
   width:100%;
   height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:repeat(7,minmax(0,1fr));
-  gap:10px;
-}
-
-.presenterFinalRound2CommandGrid .presenterBtn{
-  width:100%;
-  height:100%;
-  font-size:18px;
-}
-
-.presenterFinalRound2AnswerGrid{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-
-  overflow:auto;
-}
-
-.presenterFinalRound2AnswerCard{
-  min-height:76px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  padding:12px;
-
-  background:#FFFFFF;
-  color:var(--p-secondary);
-
-  border:2px solid var(--p-line);
-  border-radius:20px;
-
-  cursor:pointer;
-}
-
-.presenterFinalRound2AnswerCard span{
-  font-size:24px;
-  line-height:1.25;
-  text-align:center;
-}
-
-.presenterFinalRound2AnswerCard.selectedCorrect{
-  background:rgba(22,163,74,.12);
-  border-color:var(--p-green);
-  color:var(--p-green);
-}
-
-.presenterFinalRound2SequenceView,
-.presenterFinalRound2ImageView{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:10px;
-}
-
-.presenterFinalRound2Countdown,
-.presenterFinalRound2ImageStatus{
-  min-height:52px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-
-  background:var(--p-primary);
-  color:#FFFFFF;
-
-  border-radius:18px;
-
-  font-size:28px;
-  line-height:1;
-}
-
-.presenterFinalRound2ImageStatus strong{
-  font-size:32px;
-  font-weight:400;
-}
-
-.presenterFinalRound2ImageStatus em{
-  font-style:normal;
-  padding:8px 12px;
-
-  background:#FFFFFF;
-  color:var(--p-primary);
-
-  border-radius:999px;
-
-  font-size:18px;
-  line-height:1;
-}
-
-.presenterFinalRound2Empty{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:var(--p-muted);
-  font-size:24px;
-  text-align:center;
-}
-
-/* IPHONE PRO MAX LANDSCAPE */
-
-@media (orientation:landscape) and (max-width:950px) and (max-height:500px){
-  .presenterFinalRound2CommandGrid{
-    grid-template-columns:repeat(7,minmax(0,1fr));
-    gap:8px;
-  }
-
-  .presenterFinalRound2CommandGrid .presenterBtn{
-    min-height:0;
-    height:100%;
-    font-size:14px;
-  }
-
-  .presenterFinalRound2AnswerGrid{
-    gap:8px;
-  }
-
-  .presenterFinalRound2AnswerCard{
-    min-height:clamp(44px,11dvh,58px);
-    padding:8px;
-    border-radius:16px;
-  }
-
-  .presenterFinalRound2AnswerCard span{
-    font-size:clamp(16px,4.2dvh,20px);
-    line-height:1.2;
-  }
-
-  .presenterFinalRound2SequenceView,
-  .presenterFinalRound2ImageView{
-    gap:8px;
-  }
-
-  .presenterFinalRound2Countdown,
-  .presenterFinalRound2ImageStatus{
-    min-height:38px;
-    border-radius:15px;
-    font-size:21px;
-  }
-
-  .presenterFinalRound2ImageStatus strong{
-    font-size:25px;
-  }
-
-  .presenterFinalRound2ImageStatus em{
-    padding:6px 9px;
-    font-size:14px;
-  }
-
-  .presenterFinalRound2Empty{
-    font-size:18px;
-  }
-}
-/* =========================
-   FINAL ROUND 3
-========================= */
-
-.presenterFinalRound3CommandGrid{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:10px;
-}
-
-.presenterFinalRound3CommandGrid .presenterBtn{
-  width:100%;
-  height:100%;
-  font-size:20px;
-}
-
-.presenterFinalRound3StoryView{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:minmax(0,1fr) auto;
-  gap:10px;
-}
-
-.presenterFinalRound3StoryParts{
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:repeat(3,minmax(0,1fr));
-  gap:10px;
-
-  overflow:auto;
-}
-
-.presenterFinalRound3StoryPart{
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:58px minmax(0,1fr);
-  gap:10px;
-  align-items:center;
-
-  padding:10px;
-
-  background:#FFFFFF;
-  border:2px solid var(--p-line);
-  border-radius:20px;
-
-  opacity:.55;
-}
-
-.presenterFinalRound3StoryPart.visiblePart{
-  opacity:1;
-  border-color:var(--p-primary);
-}
-
-.presenterFinalRound3StoryPart span{
-  height:46px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:var(--p-primary);
-  color:#FFFFFF;
-
-  border-radius:16px;
-
-  font-size:24px;
-  line-height:1;
-}
-
-.presenterFinalRound3StoryPart strong{
   min-width:0;
-
-  color:var(--p-secondary);
-  font-size:24px;
-  line-height:1.25;
-  font-weight:400;
-  text-align:center;
-}
-
-.presenterFinalRound3AnswerPanel{
-  min-height:78px;
-
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr);
-  gap:12px;
-  align-items:center;
-
-  padding:12px;
-
-  background:var(--p-secondary);
-  border-radius:20px;
-
-  color:#FFFFFF;
-}
-
-.presenterFinalRound3AnswerPanel span{
-  color:var(--p-primary);
-  font-size:20px;
-  line-height:1;
-}
-
-.presenterFinalRound3AnswerPanel strong{
-  min-width:0;
-
-  font-size:28px;
-  line-height:1.25;
-  font-weight:400;
-  text-align:center;
-}
-
-.presenterFinalRound3Empty{
-  height:100%;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:var(--p-muted);
-  font-size:24px;
-}
-
-/* IPHONE PRO MAX LANDSCAPE */
-
-@media (orientation:landscape) and (max-width:950px) and (max-height:500px){
-  .presenterFinalRound3CommandGrid{
-    gap:8px;
-  }
-
-  .presenterFinalRound3CommandGrid .presenterBtn{
-    min-height:0;
-    height:100%;
-    font-size:16px;
-  }
-
-  .presenterFinalRound3StoryView{
-    gap:8px;
-  }
-
-  .presenterFinalRound3StoryParts{
-    gap:8px;
-  }
-
-  .presenterFinalRound3StoryPart{
-    grid-template-columns:42px minmax(0,1fr);
-    gap:8px;
-    padding:8px;
-    border-radius:16px;
-  }
-
-  .presenterFinalRound3StoryPart span{
-    height:34px;
-    border-radius:12px;
-    font-size:18px;
-  }
-
-  .presenterFinalRound3StoryPart strong{
-    font-size:clamp(16px,4.2dvh,20px);
-    line-height:1.2;
-  }
-
-  .presenterFinalRound3AnswerPanel{
-    min-height:52px;
-    gap:8px;
-    padding:8px;
-    border-radius:16px;
-  }
-
-  .presenterFinalRound3AnswerPanel span{
-    font-size:14px;
-  }
-
-  .presenterFinalRound3AnswerPanel strong{
-    font-size:clamp(18px,4.8dvh,22px);
-  }
-
-  .presenterFinalRound3Empty{
-    font-size:18px;
-  }
-}
-/* =========================
-   FINAL ROUND 4
-========================= */
-
-.presenterFinalRound4CommandGrid{
-  width:100%;
-  height:100%;
   min-height:0;
 
   display:grid;
-  grid-template-columns:repeat(7,minmax(0,1fr));
-  gap:10px;
-}
-
-.presenterFinalRound4CommandGrid .presenterBtn{
-  width:100%;
-  height:100%;
-  font-size:18px;
-}
-
-.presenterFinalRound4FocusView{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:10px;
-}
-
-.presenterFinalRound4Status{
-  min-height:54px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-
-  background:var(--p-primary);
-  color:#FFFFFF;
-
-  border-radius:18px;
-
-  font-size:24px;
-  line-height:1;
-}
-
-.presenterFinalRound4Status strong{
-  min-width:80px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  padding:8px 12px;
-
-  background:#FFFFFF;
-  color:var(--p-primary);
-
-  border-radius:999px;
-
-  font-size:20px;
-  line-height:1;
-  font-weight:400;
-}
-
-.presenterFinalRound4Content{
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.presenterFinalRound4Box{
-  min-height:0;
-
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:10px;
-
-  padding:12px;
-
-  background:#FFFFFF;
-  border:2px solid var(--p-line);
-  border-radius:20px;
+  grid-template-columns:minmax(0,1fr) minmax(360px,1fr);
+  gap:8px;
 
   overflow:hidden;
 }
 
-.presenterFinalRound4Box span{
-  color:var(--p-primary);
-  font-size:20px;
-  line-height:1;
+.presenterFinalLeft,
+.presenterFinalRight{
+  min-width:0;
+  min-height:0;
 }
 
-.presenterFinalRound4Box strong{
+.presenterFinalLeft{
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:8px;
+}
+
+.presenterFinalRight{
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
+}
+
+/* =========================
+   2) NUMBERS
+========================= */
+
+.presenterFinalNumbersCard{
+  min-width:0;
+  min-height:0;
+  height:100%;
+  padding:10px;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
+
+  overflow:hidden;
+}
+
+.presenterFinalNumbersGrid{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  gap:8px;
+
+  overflow:hidden;
+}
+
+.presenterFinalNumbersGrid.finalNumbersCount2{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:minmax(0,1fr);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn{
+  width:100%;
+  min-width:0;
+  min-height:0;
+  padding:8px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid var(--presenter-line-strong);
+  border-radius:16px;
+  background:var(--presenter-surface-soft);
+  color:var(--presenter-secondary);
+
+  font-family:"MolhimCustom","HanakaText",sans-serif;
+  font-size:2rem;
+  line-height:1;
+  font-weight:400;
+
+  cursor:pointer;
+
+  transition:
+    transform var(--presenter-transition),
+    border-color var(--presenter-transition),
+    background var(--presenter-transition),
+    color var(--presenter-transition),
+    opacity var(--presenter-transition);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:hover{
+  border-color:var(--presenter-primary);
+  background:var(--presenter-primary-soft);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:active{
+  transform:translateY(1px);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn.selectedPresenterTeam{
+  border-color:var(--presenter-primary);
+  background:var(--presenter-primary);
+  color:#FFFFFF;
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn.presenterOpened{
+  border-color:var(--presenter-line);
+  background:
+    linear-gradient(
+      135deg,
+      transparent 46%,
+      var(--presenter-line-strong) 47%,
+      var(--presenter-line-strong) 53%,
+      transparent 54%
+    ),
+    var(--presenter-surface-muted);
+  color:transparent;
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:disabled{
+  cursor:not-allowed;
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:disabled:not(.presenterOpened):not(.selectedPresenterTeam){
+  opacity:.48;
+}
+
+/* =========================
+   3) TEAMS
+========================= */
+
+.presenterFinalTeamsArea{
+  min-width:0;
+}
+
+.presenterFinalTeamsArea .presenterTeamsRow,
+.presenterFinalTeamsArea .presenterTeamSelector{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
+
+.presenterFinalTeamsArea .presenterTeamBtn{
+  min-height:54px;
+}
+
+/* =========================
+   4) PREVIEW
+========================= */
+
+.presenterFinalPreviewCard{
+  min-width:0;
+  min-height:0;
+  height:100%;
+  padding:10px;
+
+  display:flex;
+
+  overflow:hidden;
+}
+
+.presenterFinalPreviewBox{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  padding:10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:auto;
+  overscroll-behavior:contain;
+
+  border:2px solid var(--presenter-line);
+  border-radius:var(--presenter-radius-md);
+  background:var(--presenter-surface-soft);
+  color:var(--presenter-muted);
+
+  text-align:center;
+}
+
+/* =========================
+   5) STORY VIEW
+========================= */
+
+.presenterFinalStoryView,
+.presenterFinalRound3View{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto auto;
+  gap:8px;
+}
+
+.presenterFinalStoryMedia,
+.presenterFinalRound3Media{
+  min-width:0;
   min-height:0;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  color:var(--p-secondary);
-  font-size:28px;
-  line-height:1.3;
-  font-weight:400;
+  border:2px solid var(--presenter-line);
+  border-radius:14px;
+  background:var(--presenter-surface);
+
+  overflow:hidden;
+}
+
+.presenterFinalStoryMedia img,
+.presenterFinalRound3Media img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.presenterFinalStoryAnswer,
+.presenterFinalRound3Answer{
+  min-width:0;
+  min-height:58px;
+  padding:9px 12px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid rgba(22,130,60,.28);
+  border-radius:12px;
+  background:var(--presenter-green-soft);
+  color:var(--presenter-green);
+
+  font-size:clamp(.9rem,1.7vw,1.2rem);
+  line-height:1.45;
   text-align:center;
+  font-weight:400;
 
-  overflow:auto;
+  overflow-wrap:anywhere;
 }
 
-.presenterFinalRound4Box.answerBox{
-  background:var(--p-secondary);
-  border-color:var(--p-secondary);
+.presenterFinalStoryNote,
+.presenterFinalRound3Note{
+  min-width:0;
+  min-height:42px;
+  padding:7px 10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1px solid var(--presenter-line);
+  border-radius:11px;
+  background:var(--presenter-surface);
+  color:var(--presenter-muted);
+
+  font-size:.68rem;
+  line-height:1.4;
+  text-align:center;
+  font-weight:400;
+
+  overflow-wrap:anywhere;
 }
 
-.presenterFinalRound4Box.answerBox span{
-  color:var(--p-primary);
+/* =========================
+   6) IMAGE STRIP
+========================= */
+
+.presenterFinalStoryImages,
+.presenterFinalRound3Images{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+  gap:6px;
 }
 
-.presenterFinalRound4Box.answerBox strong{
+.presenterFinalStoryImage,
+.presenterFinalRound3Image{
+  min-width:0;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid var(--presenter-line);
+  border-radius:11px;
+  background:var(--presenter-surface);
+
+  overflow:hidden;
+}
+
+.presenterFinalStoryImage img,
+.presenterFinalRound3Image img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+/* =========================
+   7) CONTROLS
+========================= */
+
+.presenterFinalControlsArea.finalControlsRound3{
+  min-width:0;
+}
+
+.finalControlsRound3 .presenterFinalControlsGrid{
+  min-width:0;
+
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:6px;
+}
+
+.finalControlsRound3 .presenterBtn{
+  min-height:50px;
+}
+
+.finalControlsRound3 .presenterBtn.gray{
+  background:var(--presenter-surface);
+  border-color:var(--presenter-line-strong);
+  color:var(--presenter-secondary);
+}
+
+.finalControlsRound3 .presenterBtn.blue{
+  background:var(--presenter-blue);
+  border-color:var(--presenter-blue);
   color:#FFFFFF;
 }
 
-/* IPHONE PRO MAX LANDSCAPE */
+.finalControlsRound3 .presenterBtn.green{
+  background:var(--presenter-green);
+  border-color:var(--presenter-green);
+  color:#FFFFFF;
+}
 
-@media (orientation:landscape) and (max-width:950px) and (max-height:500px){
-  .presenterFinalRound4CommandGrid{
-    gap:8px;
+.finalControlsRound3 .presenterBtn.red{
+  background:var(--presenter-red);
+  border-color:var(--presenter-red);
+  color:#FFFFFF;
+}
+
+/* =========================
+   8) ZOOM
+========================= */
+
+.presenterFinalStoryZoom,
+.presenterFinalRound3Zoom{
+  position:fixed;
+  inset:0;
+  z-index:9998;
+
+  padding:
+    max(10px,env(safe-area-inset-top))
+    max(10px,env(safe-area-inset-right))
+    max(10px,env(safe-area-inset-bottom))
+    max(10px,env(safe-area-inset-left));
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(15,23,32,.78);
+}
+
+.presenterFinalStoryZoomInner,
+.presenterFinalRound3ZoomInner{
+  width:min(96vw,1180px);
+  height:min(92dvh,780px);
+  min-width:0;
+  min-height:0;
+  padding:10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid var(--presenter-line);
+  border-radius:var(--presenter-radius-xl);
+  background:var(--presenter-surface);
+  box-shadow:var(--presenter-shadow);
+}
+
+.presenterFinalStoryZoomInner img,
+.presenterFinalRound3ZoomInner img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+/* =========================
+   9) TABLET LANDSCAPE
+========================= */
+
+@media
+  (min-width:900px)
+  and (max-width:1400px)
+  and (orientation:landscape)
+  and (min-height:500px){
+
+  .presenterFinalLayout{
+    grid-template-columns:minmax(0,1.04fr) minmax(340px,.96fr);
+    gap:7px;
   }
 
-  .presenterFinalRound4CommandGrid .presenterBtn{
-    min-height:0;
-    height:100%;
-    font-size:14px;
+  .presenterFinalLeft,
+  .presenterFinalRight{
+    gap:7px;
   }
 
-  .presenterFinalRound4FocusView{
-    gap:8px;
-  }
-
-  .presenterFinalRound4Status{
-    min-height:38px;
-    gap:8px;
-    border-radius:15px;
-    font-size:18px;
-  }
-
-  .presenterFinalRound4Status strong{
-    min-width:58px;
-    padding:6px 9px;
-    font-size:14px;
-  }
-
-  .presenterFinalRound4Content{
-    gap:8px;
-  }
-
-  .presenterFinalRound4Box{
-    gap:8px;
+  .presenterFinalNumbersCard,
+  .presenterFinalPreviewCard{
     padding:8px;
-    border-radius:16px;
   }
 
-  .presenterFinalRound4Box span{
-    font-size:15px;
+  .presenterFinalNumbersGrid .presenterNumberBtn{
+    font-size:1.7rem;
   }
 
-  .presenterFinalRound4Box strong{
-    font-size:clamp(18px,4.8dvh,23px);
-    line-height:1.22;
+  .finalControlsRound3 .presenterFinalControlsGrid{
+    gap:5px;
+  }
+
+  .finalControlsRound3 .presenterBtn{
+    min-height:46px;
+  }
+}
+
+/* =========================
+   10) IPHONE PRO MAX LANDSCAPE
+========================= */
+
+@media
+  (min-width:740px)
+  and (max-width:960px)
+  and (orientation:landscape)
+  and (max-height:500px){
+
+  .presenterFinalLayout{
+    grid-template-columns:minmax(0,1.04fr) minmax(280px,.96fr);
+    gap:5px;
+  }
+
+  .presenterFinalLeft{
+    grid-template-rows:minmax(0,1fr) 42px;
+    gap:5px;
+  }
+
+  .presenterFinalRight{
+    grid-template-rows:40px minmax(0,1fr);
+    gap:5px;
+  }
+
+  .presenterFinalNumbersCard,
+  .presenterFinalPreviewCard{
+    padding:5px;
+    gap:4px;
+    border-radius:11px;
+  }
+
+  .presenterFinalNumbersGrid{
+    gap:4px;
+  }
+
+  .presenterFinalNumbersGrid .presenterNumberBtn{
+    padding:4px;
+    border-radius:9px;
+    font-size:1rem;
+  }
+
+  .presenterFinalTeamsArea .presenterTeamBtn{
+    min-height:40px;
+    padding:4px;
+    font-size:.54rem;
+  }
+
+  .presenterFinalPreviewBox{
+    padding:5px;
+    border-radius:8px;
+  }
+
+  .presenterFinalStoryView,
+  .presenterFinalRound3View{
+    gap:4px;
+  }
+
+  .presenterFinalStoryMedia,
+  .presenterFinalRound3Media{
+    border-radius:8px;
+  }
+
+  .presenterFinalStoryAnswer,
+  .presenterFinalRound3Answer{
+    min-height:34px;
+    padding:4px 6px;
+    border-radius:8px;
+    font-size:.54rem;
+    line-height:1.3;
+  }
+
+  .presenterFinalStoryNote,
+  .presenterFinalRound3Note{
+    min-height:28px;
+    padding:4px 6px;
+    border-radius:7px;
+    font-size:.44rem;
+    line-height:1.25;
+  }
+
+  .presenterFinalStoryImages,
+  .presenterFinalRound3Images{
+    grid-template-columns:repeat(auto-fit,minmax(70px,1fr));
+    gap:4px;
+  }
+
+  .presenterFinalStoryImage,
+  .presenterFinalRound3Image{
+    border-radius:7px;
+  }
+
+  .finalControlsRound3 .presenterFinalControlsGrid{
+    gap:4px;
+  }
+
+  .finalControlsRound3 .presenterBtn{
+    min-height:42px;
+    padding:4px;
+    border-radius:8px;
+    font-size:.48rem;
+  }
+
+  .presenterFinalStoryZoom,
+  .presenterFinalRound3Zoom{
+    padding:5px;
+  }
+
+  .presenterFinalStoryZoomInner,
+  .presenterFinalRound3ZoomInner{
+    width:98vw;
+    height:96dvh;
+    padding:5px;
+    border-radius:11px;
+  }
+}
+
+
+/* =========================
+   1) LAYOUT
+========================= */
+
+.presenterFinalLayout{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,1.02fr) minmax(350px,.98fr);
+  gap:8px;
+
+  overflow:hidden;
+}
+
+.presenterFinalLeft,
+.presenterFinalRight{
+  min-width:0;
+  min-height:0;
+}
+
+.presenterFinalLeft{
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:8px;
+}
+
+.presenterFinalRight{
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
+}
+
+/* =========================
+   2) NUMBERS / CARDS
+========================= */
+
+.presenterFinalNumbersCard{
+  min-width:0;
+  min-height:0;
+  height:100%;
+  padding:10px;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:8px;
+
+  overflow:hidden;
+}
+
+.presenterFinalNumbersGrid{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(0,1fr));
+  gap:8px;
+
+  overflow:hidden;
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn,
+.presenterFinalFocusCard{
+  width:100%;
+  min-width:0;
+  min-height:0;
+  padding:8px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid var(--presenter-line-strong);
+  border-radius:15px;
+  background:var(--presenter-surface-soft);
+  color:var(--presenter-secondary);
+
+  font-family:"MolhimCustom","HanakaText",sans-serif;
+  font-size:1.45rem;
+  line-height:1;
+  font-weight:400;
+
+  cursor:pointer;
+
+  transition:
+    transform var(--presenter-transition),
+    border-color var(--presenter-transition),
+    background var(--presenter-transition),
+    color var(--presenter-transition),
+    opacity var(--presenter-transition);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:hover,
+.presenterFinalFocusCard:hover{
+  border-color:var(--presenter-primary);
+  background:var(--presenter-primary-soft);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:active,
+.presenterFinalFocusCard:active{
+  transform:translateY(1px);
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn.selectedPresenterTeam,
+.presenterFinalFocusCard.active,
+.presenterFinalFocusCard.selected{
+  border-color:var(--presenter-primary);
+  background:var(--presenter-primary);
+  color:#FFFFFF;
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn.presenterOpened,
+.presenterFinalFocusCard.opened,
+.presenterFinalFocusCard.used{
+  border-color:var(--presenter-line);
+  background:
+    linear-gradient(
+      135deg,
+      transparent 46%,
+      var(--presenter-line-strong) 47%,
+      var(--presenter-line-strong) 53%,
+      transparent 54%
+    ),
+    var(--presenter-surface-muted);
+  color:transparent;
+}
+
+.presenterFinalNumbersGrid .presenterNumberBtn:disabled,
+.presenterFinalFocusCard:disabled{
+  cursor:not-allowed;
+  opacity:.48;
+}
+
+/* =========================
+   3) TEAM AREA
+========================= */
+
+.presenterFinalTeamsArea{
+  min-width:0;
+}
+
+.presenterFinalTeamsArea .presenterTeamsRow,
+.presenterFinalTeamsArea .presenterTeamSelector{
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
+
+.presenterFinalTeamsArea .presenterTeamBtn{
+  min-height:54px;
+}
+
+/* =========================
+   4) FOCUS STATUS
+========================= */
+
+.presenterFinalFocusStatus,
+.presenterFinalRound4Status{
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+
+.presenterFinalFocusStatusBox,
+.presenterFinalRound4StatusBox{
+  min-width:0;
+  min-height:48px;
+  padding:7px 9px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+
+  border:1px solid var(--presenter-line);
+  border-radius:11px;
+  background:var(--presenter-surface);
+}
+
+.presenterFinalFocusStatusBox span,
+.presenterFinalRound4StatusBox span{
+  color:var(--presenter-muted);
+  font-size:.54rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterFinalFocusStatusBox strong,
+.presenterFinalRound4StatusBox strong{
+  color:var(--presenter-secondary);
+  font-family:"MolhimCustom","HanakaText",sans-serif;
+  font-size:.82rem;
+  line-height:1;
+  font-weight:400;
+}
+
+/* =========================
+   5) TIMER
+========================= */
+
+.presenterFinalFocusTimer,
+.presenterFinalRound4Timer{
+  min-width:76px;
+  min-height:48px;
+  padding:7px 12px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid rgba(21,107,154,.30);
+  border-radius:12px;
+  background:var(--presenter-blue-soft);
+  color:var(--presenter-blue);
+
+  font-family:"MolhimCustom","HanakaText",sans-serif;
+  font-size:1rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterFinalFocusTimer.warning,
+.presenterFinalRound4Timer.warning{
+  border-color:rgba(254,127,45,.38);
+  background:var(--presenter-primary-soft);
+  color:var(--presenter-primary-dark);
+}
+
+.presenterFinalFocusTimer.danger,
+.presenterFinalRound4Timer.danger{
+  border-color:rgba(180,35,24,.32);
+  background:var(--presenter-red-soft);
+  color:var(--presenter-red);
+}
+
+/* =========================
+   6) PREVIEW
+========================= */
+
+.presenterFinalPreviewCard{
+  min-width:0;
+  min-height:0;
+  height:100%;
+  padding:10px;
+
+  display:flex;
+
+  overflow:hidden;
+}
+
+.presenterFinalPreviewBox{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  padding:10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  overflow:auto;
+  overscroll-behavior:contain;
+
+  border:2px solid var(--presenter-line);
+  border-radius:var(--presenter-radius-md);
+  background:var(--presenter-surface-soft);
+  color:var(--presenter-muted);
+
+  text-align:center;
+}
+
+/* =========================
+   7) FOCUS VIEW
+========================= */
+
+.presenterFinalFocusView,
+.presenterFinalRound4View{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto auto;
+  gap:8px;
+}
+
+.presenterFinalFocusMedia,
+.presenterFinalRound4Media{
+  min-width:0;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid var(--presenter-line);
+  border-radius:14px;
+  background:var(--presenter-surface);
+
+  overflow:hidden;
+}
+
+.presenterFinalFocusMedia img,
+.presenterFinalRound4Media img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.presenterFinalFocusAnswer,
+.presenterFinalRound4Answer{
+  min-width:0;
+  min-height:58px;
+  padding:9px 12px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid rgba(22,130,60,.28);
+  border-radius:12px;
+  background:var(--presenter-green-soft);
+  color:var(--presenter-green);
+
+  font-size:clamp(.9rem,1.7vw,1.2rem);
+  line-height:1.45;
+  text-align:center;
+  font-weight:400;
+
+  overflow-wrap:anywhere;
+}
+
+.presenterFinalFocusNote,
+.presenterFinalRound4Note{
+  min-width:0;
+  min-height:40px;
+  padding:7px 10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1px solid var(--presenter-line);
+  border-radius:10px;
+  background:var(--presenter-surface);
+  color:var(--presenter-muted);
+
+  font-size:.66rem;
+  line-height:1.4;
+  text-align:center;
+  font-weight:400;
+
+  overflow-wrap:anywhere;
+}
+
+/* =========================
+   8) ERRORS
+========================= */
+
+.presenterFinalFocusErrors,
+.presenterFinalRound4Errors{
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
+
+.presenterFinalFocusErrorBox,
+.presenterFinalRound4ErrorBox{
+  min-width:0;
+  min-height:42px;
+  padding:6px 8px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+
+  border:1px solid var(--presenter-line);
+  border-radius:10px;
+  background:var(--presenter-surface);
+}
+
+.presenterFinalFocusErrorBox span,
+.presenterFinalRound4ErrorBox span{
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+
+  color:var(--presenter-muted);
+  font-size:.54rem;
+}
+
+.presenterFinalFocusErrorBox strong,
+.presenterFinalRound4ErrorBox strong{
+  color:var(--presenter-red);
+  font-family:"MolhimCustom","HanakaText",sans-serif;
+  font-size:.78rem;
+  font-weight:400;
+}
+
+/* =========================
+   9) CONTROLS
+========================= */
+
+.presenterFinalControlsArea.finalControlsRound4{
+  min-width:0;
+}
+
+.finalControlsRound4 .presenterFinalControlsGrid{
+  min-width:0;
+
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:6px;
+}
+
+.finalControlsRound4 .presenterBtn{
+  min-height:50px;
+}
+
+.finalControlsRound4 .presenterBtn.gray{
+  background:var(--presenter-surface);
+  border-color:var(--presenter-line-strong);
+  color:var(--presenter-secondary);
+}
+
+.finalControlsRound4 .presenterBtn.dark{
+  background:var(--presenter-secondary);
+  border-color:var(--presenter-secondary);
+  color:#FFFFFF;
+}
+
+.finalControlsRound4 .presenterBtn.blue{
+  background:var(--presenter-blue);
+  border-color:var(--presenter-blue);
+  color:#FFFFFF;
+}
+
+.finalControlsRound4 .presenterBtn.green{
+  background:var(--presenter-green);
+  border-color:var(--presenter-green);
+  color:#FFFFFF;
+}
+
+.finalControlsRound4 .presenterBtn.red{
+  background:var(--presenter-red);
+  border-color:var(--presenter-red);
+  color:#FFFFFF;
+}
+
+.finalControlsRound4 .presenterBtn.orange{
+  background:var(--presenter-primary);
+  border-color:var(--presenter-primary);
+  color:#FFFFFF;
+}
+
+.finalControlsRound4 .presenterBtn:disabled{
+  opacity:.42;
+}
+
+/* =========================
+   10) ZOOM
+========================= */
+
+.presenterFinalFocusZoom,
+.presenterFinalRound4Zoom{
+  position:fixed;
+  inset:0;
+  z-index:9998;
+
+  padding:
+    max(10px,env(safe-area-inset-top))
+    max(10px,env(safe-area-inset-right))
+    max(10px,env(safe-area-inset-bottom))
+    max(10px,env(safe-area-inset-left));
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(15,23,32,.78);
+}
+
+.presenterFinalFocusZoomInner,
+.presenterFinalRound4ZoomInner{
+  width:min(96vw,1180px);
+  height:min(92dvh,780px);
+  min-width:0;
+  min-height:0;
+  padding:10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:2px solid var(--presenter-line);
+  border-radius:var(--presenter-radius-xl);
+  background:var(--presenter-surface);
+  box-shadow:var(--presenter-shadow);
+}
+
+.presenterFinalFocusZoomInner img,
+.presenterFinalRound4ZoomInner img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+/* =========================
+   11) ACTIVE MODE
+========================= */
+
+body.presenterFinalRound4Active .presenterFinalLayout{
+  grid-template-columns:minmax(250px,.72fr) minmax(0,1.28fr);
+}
+
+body.presenterFinalRound4Active .presenterFinalNumbersCard{
+  opacity:.76;
+}
+
+body.presenterFinalRound4Active .presenterFinalPreviewCard{
+  border-color:rgba(254,127,45,.48);
+}
+
+/* =========================
+   12) TABLET LANDSCAPE
+========================= */
+
+@media
+  (min-width:900px)
+  and (max-width:1400px)
+  and (orientation:landscape)
+  and (min-height:500px){
+
+  .presenterFinalLayout{
+    grid-template-columns:minmax(0,1.04fr) minmax(340px,.96fr);
+    gap:7px;
+  }
+
+  .presenterFinalLeft,
+  .presenterFinalRight{
+    gap:7px;
+  }
+
+  .presenterFinalNumbersCard,
+  .presenterFinalPreviewCard{
+    padding:8px;
+  }
+
+  .presenterFinalNumbersGrid{
+    gap:6px;
+  }
+
+  .presenterFinalNumbersGrid .presenterNumberBtn,
+  .presenterFinalFocusCard{
+    font-size:1.25rem;
+  }
+
+  .finalControlsRound4 .presenterFinalControlsGrid{
+    gap:5px;
+  }
+
+  .finalControlsRound4 .presenterBtn{
+    min-height:46px;
+    padding-inline:6px;
+    font-size:.64rem;
+  }
+}
+
+/* =========================
+   13) IPHONE PRO MAX LANDSCAPE
+========================= */
+
+@media
+  (min-width:740px)
+  and (max-width:960px)
+  and (orientation:landscape)
+  and (max-height:500px){
+
+  .presenterFinalLayout{
+    grid-template-columns:minmax(0,1.04fr) minmax(280px,.96fr);
+    gap:5px;
+  }
+
+  .presenterFinalLeft{
+    grid-template-rows:minmax(0,1fr) 42px;
+    gap:5px;
+  }
+
+  .presenterFinalRight{
+    grid-template-rows:40px minmax(0,1fr);
+    gap:5px;
+  }
+
+  .presenterFinalNumbersCard,
+  .presenterFinalPreviewCard{
+    padding:5px;
+    gap:4px;
+    border-radius:11px;
+  }
+
+  .presenterFinalNumbersGrid{
+    gap:4px;
+  }
+
+  .presenterFinalNumbersGrid .presenterNumberBtn,
+  .presenterFinalFocusCard{
+    padding:4px;
+    border-radius:8px;
+    font-size:.76rem;
+  }
+
+  .presenterFinalTeamsArea .presenterTeamBtn{
+    min-height:40px;
+    padding:4px;
+    font-size:.54rem;
+  }
+
+  .presenterFinalFocusStatus,
+  .presenterFinalRound4Status{
+    gap:4px;
+  }
+
+  .presenterFinalFocusStatusBox,
+  .presenterFinalRound4StatusBox{
+    min-height:32px;
+    padding:4px;
+    border-radius:7px;
+  }
+
+  .presenterFinalFocusStatusBox span,
+  .presenterFinalRound4StatusBox span{
+    font-size:.4rem;
+  }
+
+  .presenterFinalFocusStatusBox strong,
+  .presenterFinalRound4StatusBox strong{
+    font-size:.54rem;
+  }
+
+  .presenterFinalFocusTimer,
+  .presenterFinalRound4Timer{
+    min-width:52px;
+    min-height:32px;
+    padding:4px 7px;
+    border-radius:8px;
+    font-size:.62rem;
+  }
+
+  .presenterFinalPreviewBox{
+    padding:5px;
+    border-radius:8px;
+  }
+
+  .presenterFinalFocusView,
+  .presenterFinalRound4View{
+    gap:4px;
+  }
+
+  .presenterFinalFocusMedia,
+  .presenterFinalRound4Media{
+    border-radius:8px;
+  }
+
+  .presenterFinalFocusAnswer,
+  .presenterFinalRound4Answer{
+    min-height:34px;
+    padding:4px 6px;
+    border-radius:8px;
+    font-size:.54rem;
+    line-height:1.3;
+  }
+
+  .presenterFinalFocusNote,
+  .presenterFinalRound4Note{
+    min-height:26px;
+    padding:4px 6px;
+    border-radius:7px;
+    font-size:.42rem;
+  }
+
+  .presenterFinalFocusErrors,
+  .presenterFinalRound4Errors{
+    gap:4px;
+  }
+
+  .presenterFinalFocusErrorBox,
+  .presenterFinalRound4ErrorBox{
+    min-height:28px;
+    padding:3px 5px;
+    border-radius:7px;
+  }
+
+  .presenterFinalFocusErrorBox span,
+  .presenterFinalRound4ErrorBox span{
+    font-size:.4rem;
+  }
+
+  .presenterFinalFocusErrorBox strong,
+  .presenterFinalRound4ErrorBox strong{
+    font-size:.52rem;
+  }
+
+  .finalControlsRound4 .presenterFinalControlsGrid{
+    gap:4px;
+  }
+
+  .finalControlsRound4 .presenterBtn{
+    min-height:42px;
+    padding:4px 2px;
+    border-radius:8px;
+    font-size:.42rem;
+  }
+
+  body.presenterFinalRound4Active .presenterFinalLayout{
+    grid-template-columns:minmax(180px,.66fr) minmax(0,1.34fr);
+  }
+
+  .presenterFinalFocusZoom,
+  .presenterFinalRound4Zoom{
+    padding:5px;
+  }
+
+  .presenterFinalFocusZoomInner,
+  .presenterFinalRound4ZoomInner{
+    width:98vw;
+    height:96dvh;
+    padding:5px;
+    border-radius:11px;
   }
 }
