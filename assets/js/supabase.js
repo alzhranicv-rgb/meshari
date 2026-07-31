@@ -2,10 +2,10 @@
    SUPABASE CORE
 ========================================================= */
 const SUPABASE_PRIMARY_URL =
-  "https://api.aj-77.com"
+  "https://onwjghmlekuydehphkgy.supabase.co"
 
 const SUPABASE_FALLBACK_URL =
-  "https://onwjghmlekuydehphkgy.supabase.co"
+  "https://api.aj-77.com"
 
 const SUPABASE_URL =
   SUPABASE_PRIMARY_URL
