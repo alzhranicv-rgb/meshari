@@ -86,154 +86,43 @@ window.invalidateAdminHomeCache =
   invalidateAdminHomeCache
 
 
-  /* =========================
+/* =========================
    ADMIN AUTH DEVICE
 ========================= */
+
+const ADMIN_LOCAL_USER_ID =
+  "00000000-0000-0000-0000-000000000000"
 
 let adminAuthReadyPromise = null
 
 async function ensureAdminAnonymousSession() {
-  if (
-    typeof db === "undefined" ||
-    !db?.auth
-  ) {
-    console.error(
-      "ADMIN AUTH ERROR: Supabase auth is unavailable"
-    )
-
-    return null
-  }
-
   if (adminAuthReadyPromise) {
     return adminAuthReadyPromise
   }
 
-  adminAuthReadyPromise = (async () => {
-    try {
-      const sessionResult =
-        await db.auth.getSession()
+  adminAuthReadyPromise =
+    Promise.resolve({
+      id: ADMIN_LOCAL_USER_ID
+    })
 
-      let user =
-        sessionResult.data?.session?.user ||
-        null
-
-      if (!user) {
-        const signInResult =
-          await db.auth.signInAnonymously()
-
-        if (signInResult.error) {
-          console.error(
-            "ADMIN ANON AUTH ERROR:",
-            signInResult.error
-          )
-
-          return null
-        }
-
-        user =
-          signInResult.data?.user ||
-          signInResult.data?.session?.user ||
-          null
-      }
-
-      window.adminAuthUserId = user?.id || ""
-
-      console.log(
-        "ADMIN AUTH USER ID:",
-        window.adminAuthUserId
-      )
-
-      return user
-    } catch (error) {
-      console.error(
-        "ADMIN AUTH CATCH:",
-        error
-      )
-
-      return null
-    }
-  })()
+  window.adminAuthUserId =
+    ADMIN_LOCAL_USER_ID
 
   return adminAuthReadyPromise
 }
 
 async function checkAdminDeviceAccess() {
-  const user =
-    await ensureAdminAnonymousSession()
-
-  if (!user?.id) {
-    return false
-  }
-
-  const result = await dbSelect(
-    "admin_devices",
-    query =>
-      query
-        .eq("user_id", user.id)
-        .eq("is_active", true)
-        .maybeSingle(),
-    {
-      select: "id,user_id,is_active",
-      fallback: null,
-      logLabel: "CHECK ADMIN DEVICE"
-    }
-  )
-
-  return Boolean(
-    result.ok &&
-    result.data?.is_active === true
-  )
+  return true
 }
 
-async function claimAdminDeviceAccess(accessCode) {
-  const code =
-    String(accessCode || "").trim()
-
-  if (!code) {
-    return false
-  }
-
-  const user =
-    await ensureAdminAnonymousSession()
-
-  if (!user?.id) {
-    return false
-  }
-
-  const deviceName =
-    [
-      navigator.platform || "",
-      navigator.userAgent || ""
-    ]
-      .filter(Boolean)
-      .join(" - ")
-      .slice(0, 180)
-
-  const { data, error } =
-    await db.rpc(
-      "claim_admin_device",
-      {
-        access_code: code,
-        device_name: deviceName
-      }
-    )
-
-  if (error) {
-    console.error(
-      "CLAIM ADMIN DEVICE ERROR:",
-      error
-    )
-
-    return false
-  }
-
-  return data === true
+async function claimAdminDeviceAccess() {
+  return true
 }
 
 window.ensureAdminAnonymousSession =
   ensureAdminAnonymousSession
 
-  window.checkAdminDeviceAccess =
+window.checkAdminDeviceAccess =
   checkAdminDeviceAccess
 
 window.claimAdminDeviceAccess =
