@@ -90,9 +90,6 @@ window.invalidateAdminHomeCache =
    ADMIN AUTH DEVICE
 ========================= */
 
-const ADMIN_LOCAL_USER_ID =
-  "00000000-0000-0000-0000-000000000000"
-
 let adminAuthReadyPromise = null
 
 async function ensureAdminAnonymousSession() {
@@ -100,22 +97,60 @@ async function ensureAdminAnonymousSession() {
     return adminAuthReadyPromise
   }
 
-  adminAuthReadyPromise =
-    Promise.resolve({
-      id: ADMIN_LOCAL_USER_ID
-    })
+  adminAuthReadyPromise = (async () => {
+    const {
+      data: sessionData,
+      error: sessionError
+    } = await db.auth.getSession()
 
-  window.adminAuthUserId =
-    ADMIN_LOCAL_USER_ID
+    if (
+      sessionError
+    ) {
+      console.log(
+        "ADMIN AUTH SESSION ERROR:",
+        sessionError
+      )
+    }
+
+    if (
+      sessionData?.session?.user?.id
+    ) {
+      window.adminAuthUserId =
+        sessionData.session.user.id
+
+      return sessionData.session.user
+    }
+
+    const {
+      data,
+      error
+    } = await db.auth.signInAnonymously()
+
+    if (error) {
+      console.log(
+        "ADMIN AUTH ANON ERROR:",
+        error
+      )
+
+      throw error
+    }
+
+    window.adminAuthUserId =
+      data?.user?.id || null
+
+    return data?.user || null
+  })()
 
   return adminAuthReadyPromise
 }
 
 async function checkAdminDeviceAccess() {
+  await ensureAdminAnonymousSession()
   return true
 }
 
 async function claimAdminDeviceAccess() {
+  await ensureAdminAnonymousSession()
   return true
 }
 
@@ -129,7 +164,12 @@ window.claimAdminDeviceAccess =
   claimAdminDeviceAccess
 
 document.addEventListener("DOMContentLoaded", () => {
-  ensureAdminAnonymousSession()
+  ensureAdminAnonymousSession().catch(error => {
+    console.log(
+      "ADMIN AUTH BOOT ERROR:",
+      error
+    )
+  })
 })
 
 /* =========================
