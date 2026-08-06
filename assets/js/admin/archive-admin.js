@@ -382,8 +382,6 @@ async function renderArchiveAdminRound(round) {
 
   normalizeAdminEditorCards()
 
-  const grid = document.querySelector(".archiveOnePageGrid")
-  if (grid) grid.classList.add("hasOpenCard")
 }
 
 function buildArchiveRoundOnePageCard(round, box, items = [], isActive = false, activeBox = null, activeItems = []) {

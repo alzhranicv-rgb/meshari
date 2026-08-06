@@ -3773,6 +3773,54 @@ function playRandomBox5Video() {
   }
 }
 
+function zoomRandomBox5Image() {
+  if (randomChallengeState.currentBox !== 5) return
+
+  const box5 =
+    randomChallengeState.box5
+
+  const currentNumber =
+    Number(box5?.currentNumber || 0)
+
+  if (!currentNumber) {
+    showGameToast("اختر رقمًا أولاً")
+    return
+  }
+
+  const item =
+    getRandomFatblaItem(currentNumber)
+
+  const image =
+    String(item?.image || "").trim()
+
+  if (!image) {
+    showGameToast("لا توجد صورة للتكبير")
+    return
+  }
+
+  document
+    .getElementById("randomBox5ImageOverlay")
+    ?.remove()
+
+  document.body.insertAdjacentHTML(
+    "beforeend",
+    `
+      <div
+        id="randomBox5ImageOverlay"
+        class="randomBox5ImageOverlay"
+        onclick="this.remove()"
+      >
+        <div class="randomBox5ImageOverlayInner">
+          <img
+            src="${escapeDisplayHtml(image)}"
+            alt=""
+          >
+        </div>
+      </div>
+    `
+  )
+}
+
 function renderRandomBox5BlockTimerOnly() {
   const box5 =
     randomChallengeState.box5
@@ -3864,14 +3912,42 @@ function toggleRandomBox5BlockMode() {
     box5.blockTimer =
       RANDOM_BOX5_BLOCK_TIMER_SECONDS
 
+    if (typeof clearRandomTimerSync === "function") {
+      clearRandomTimerSync(
+        box5,
+        "blockTimerSync"
+      )
+    }
+
     renderRandomBox5BlockTimerOnly()
   }
 
   renderRandomChallengeControls()
 
   saveRandomChallengeState({
-    sync: false,
+    immediate: true
   })
+
+  if (
+    box5.blockArmed &&
+    box5.currentNumber &&
+    !box5.revealedAnswer
+  ) {
+    const item =
+      getRandomFatblaItem(
+        box5.currentNumber
+      )
+
+    const hasImage =
+      !!String(item?.image || "").trim() &&
+      !String(item?.video || "").trim()
+
+    if (hasImage) {
+      setTimeout(() => {
+        handleRandomBox5BlockAutoStart()
+      }, 80)
+    }
+  }
 }
 
 function handleRandomBox5BlockAutoStart() {
@@ -5051,6 +5127,7 @@ window.startRandomBox5BlockTimer = startRandomBox5BlockTimer
 window.cancelRandomBox5Number = cancelRandomBox5Number
 window.revealRandomBox5Answer = revealRandomBox5Answer
 window.playRandomBox5Video = playRandomBox5Video
+window.zoomRandomBox5Image = zoomRandomBox5Image
 
 window.hasRandomChallengeProgress = hasRandomChallengeProgress
 window.checkRandomChallengeCompleted = checkRandomChallengeCompleted

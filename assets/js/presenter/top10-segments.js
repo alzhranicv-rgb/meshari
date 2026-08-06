@@ -545,12 +545,6 @@ function buildPresenterTop10AnswerButton(
     presenterTop10PendingNumber ===
     Number(number)
 
-  const openedName =
-    getTop10OpenedTeamName(
-      round,
-      number
-    )
-
   const disabled =
     isOpened ||
     isPending ||
@@ -568,36 +562,14 @@ function buildPresenterTop10AnswerButton(
       "
       data-top10-number="${number}"
       ${disabled ? "disabled" : ""}
-      onclick="
-        openTop10PresenterNumber(
-          ${number},
-          event
-        )
-      "
+      onclick="openTop10PresenterNumber(${number}, event)"
     >
       <span class="presenterTop10AnswerNo">
         ${number}
       </span>
 
       <span class="presenterTop10AnswerText">
-        ${escapePresenterTop10Html(
-          row?.answer || "-"
-        )}
-      </span>
-
-      <span class="presenterTop10OpenedBy">
-        ${
-          isOpened || isPending
-            ? escapePresenterTop10Html(
-                openedName ||
-                (
-                  isPending
-                    ? "جارٍ الفتح..."
-                    : "تم الفتح"
-                )
-              )
-            : ""
-        }
+        ${escapePresenterTop10Html(row?.answer || "-")}
       </span>
     </button>
   `
@@ -677,143 +649,17 @@ async function renderTop10() {
   panel.dataset.segment = "top10"
 
   panel.innerHTML = `
-    <section class="presenterTop10Screen">
+    <section
+      class="presenterTop10Screen"
+      aria-label="لوحة تحكم Top 10"
+    >
 
-      <header class="presenterTop10Header">
-
-        <div class="presenterTop10TeamsBox">
-          ${teamButtons()}
-        </div>
-
-        <div class="presenterTop10RoundInfo">
-
-          <div class="presenterTop10RoundBadge">
-            <span>الجولة</span>
-
-            <strong id="presenterTop10RoundText">
-              ${round}
-            </strong>
-          </div>
-
-          <div
-            id="presenterTop10StatusText"
-            class="presenterTop10StatusText"
-            role="status"
-            aria-live="polite"
-          >
-            اختر الفريق ثم الإجابة
-          </div>
-
-          <div
-            id="presenterTop10Timer"
-            class="presenterTop10Timer presenterWarmupTimer"
-          >
-            —
-          </div>
-
-        </div>
-
-      </header>
-
-      <main class="presenterTop10Content">
+      <main class="presenterTop10Main">
 
         <section
-          class="
-            presenterCard
-            presenterTop10QuestionCard
-            presenterTop10QuestionArea
-          "
+          class="presenterCard presenterTop10AnswersCard"
+          aria-label="إجابات Top 10"
         >
-
-          <header class="presenterTop10QuestionHead">
-
-            <div>
-              <div class="presenterLabel">
-                السؤال
-              </div>
-
-              <div class="presenterTop10QuestionHint">
-                السؤال الحالي للجولة
-              </div>
-            </div>
-
-            <div class="presenterTop10ErrorsMini">
-
-              <div
-                class="
-                  presenterTop10ErrorMiniBox
-                  teamA
-                "
-              >
-                <span>
-                  ${escapePresenterTop10Html(
-                    presenterTeamAName
-                  )}
-                </span>
-
-                <strong id="presenterTop10ErrorsA">
-                  ${errors.A} / 3
-                </strong>
-              </div>
-
-              <div
-                class="
-                  presenterTop10ErrorMiniBox
-                  teamB
-                "
-              >
-                <span>
-                  ${escapePresenterTop10Html(
-                    presenterTeamBName
-                  )}
-                </span>
-
-                <strong id="presenterTop10ErrorsB">
-                  ${errors.B} / 3
-                </strong>
-              </div>
-
-            </div>
-
-          </header>
-
-          <div class="presenterTop10QuestionClear">
-
-            <div
-              id="presenterTop10QuestionText"
-              class="presenterTop10QuestionText"
-            >
-              ${escapePresenterTop10Html(
-                getPresenterTop10Question(round)
-              )}
-            </div>
-
-          </div>
-
-        </section>
-
-        <section
-          class="
-            presenterCard
-            presenterTop10AnswersCard
-            presenterTop10AnswersArea
-          "
-        >
-
-          <header class="presenterTop10AnswersHead">
-
-            <div>
-              <div class="presenterLabel">
-                الإجابات
-              </div>
-
-              <div class="presenterTop10AnswersHint">
-                اختر إجابة واحدة من القائمة
-              </div>
-            </div>
-
-          </header>
-
           <div
             id="presenterTop10AnswersCols"
             class="presenterTop10AnswersCols"
@@ -830,96 +676,132 @@ async function renderTop10() {
                 `
             }
           </div>
+        </section>
+
+        <section
+          class="presenterCard presenterTop10ControlCard"
+          aria-label="تحكم Top 10"
+        >
+
+          <div class="presenterTop10RoundLine">
+
+            <div class="presenterTop10RoundBadge">
+              <span>الجولة</span>
+
+              <strong id="presenterTop10RoundText">
+                ${round}
+              </strong>
+            </div>
+
+            <div
+              id="presenterTop10Timer"
+              class="presenterTop10Timer"
+            >
+              —
+            </div>
+
+          </div>
+
+          <div class="presenterTop10ErrorsLine">
+
+            <div class="presenterTop10ErrorMiniBox teamA">
+              <span>A</span>
+
+              <strong id="presenterTop10ErrorsA">
+                ${errors.A} / 3
+              </strong>
+            </div>
+
+            <div class="presenterTop10ErrorMiniBox teamB">
+              <span>B</span>
+
+              <strong id="presenterTop10ErrorsB">
+                ${errors.B} / 3
+              </strong>
+            </div>
+
+          </div>
+
+          <div
+            id="presenterTop10QuestionText"
+            class="presenterTop10QuestionText"
+            aria-live="polite"
+          >
+            ${escapePresenterTop10Html(
+              getPresenterTop10Question(round)
+            )}
+          </div>
+
+          <div
+            class="presenterTop10Actions"
+            aria-label="أزرار التحكم"
+          >
+
+            <button
+              type="button"
+              id="presenterTop10DoubleBtn"
+              class="presenterBtn presenterTop10DoubleBtn"
+              onclick="runPresenterTop10Action('double')"
+            >
+              دوببلا
+            </button>
+
+            <button
+              type="button"
+              id="presenterTop10ShowAnswerBtn"
+              class="presenterBtn presenterTop10ShowAnswerBtn"
+              onclick="runPresenterTop10Action('showAnswer')"
+            >
+              الإجابات
+            </button>
+
+            <button
+              type="button"
+              id="presenterTop10WrongBtn"
+              class="presenterBtn presenterTop10WrongBtn"
+              onclick="runPresenterTop10Action('wrong')"
+            >
+              خطأ
+            </button>
+
+            <button
+              type="button"
+              id="presenterTop10UndoBtn"
+              class="presenterBtn presenterTop10UndoBtn"
+              onclick="runPresenterTop10Action('undo')"
+            >
+              تراجع
+            </button>
+
+            <button
+              type="button"
+              id="presenterTop10SwitchBtn"
+              class="presenterBtn presenterTop10SwitchBtn"
+              onclick="runPresenterTop10Action('switchTurn')"
+            >
+              تبديل
+            </button>
+
+            <button
+              type="button"
+              id="presenterTop10NextRoundBtn"
+              class="presenterBtn presenterTop10NextRoundBtn"
+              onclick="runPresenterTop10Action('nextRound')"
+            >
+              التالي
+            </button>
+
+          </div>
 
         </section>
 
       </main>
 
-      <footer class="presenterTop10Actions">
-
-        <button
-          type="button"
-          id="presenterTop10DoubleBtn"
-          class="
-            presenterBtn
-            gray
-            presenterTop10DoubleBtn
-          "
-          onclick="
-            runPresenterTop10Action('double')
-          "
-        >
-          دوببلا
-        </button>
-
-        <button
-          type="button"
-          id="presenterTop10ShowAnswerBtn"
-          class="presenterBtn green"
-          onclick="
-            runPresenterTop10Action(
-              'showAnswer'
-            )
-          "
-        >
-          إظهار الإجابات
-        </button>
-
-        <button
-          type="button"
-          id="presenterTop10WrongBtn"
-          class="presenterBtn red"
-          onclick="
-            runPresenterTop10Action('wrong')
-          "
-        >
-          خطأ الفريق
-        </button>
-
-        <button
-          type="button"
-          id="presenterTop10UndoBtn"
-          class="presenterBtn gray"
-          onclick="
-            runPresenterTop10Action('undo')
-          "
-        >
-          تراجع
-        </button>
-
-        <button
-          type="button"
-          id="presenterTop10SwitchBtn"
-          class="presenterBtn blue"
-          onclick="
-            runPresenterTop10Action(
-              'switchTurn'
-            )
-          "
-        >
-          تبديل الدور
-        </button>
-
-        <button
-          type="button"
-          id="presenterTop10NextRoundBtn"
-          class="presenterBtn blue"
-          onclick="
-            runPresenterTop10Action(
-              'nextRound'
-            )
-          "
-        >
-          الجولة التالية
-        </button>
-
-      </footer>
-
     </section>
   `
 
   refreshPresenterTop10FromState()
-    startPresenterTop10TimerWatcher()
+  startPresenterTop10TimerWatcher()
 
   if (!presenterTop10Rows.length) {
     await loadPresenterTop10RoundRows(
@@ -1937,166 +1819,53 @@ async function renderPresenterReaderTop10() {
       .sort((a, b) => a - b)
 
   panel.innerHTML = `
-    <section class="presenterTop10ControlView">
+    <section class="readerRoundsStack">
+      ${rounds
+        .map(round => {
+          const roundRows =
+            rows.filter(row => {
+              return Number(row.round) === Number(round)
+            })
 
-      <header class="presenterTop10ControlHeader">
+          const question =
+            roundRows[0]?.question || "—"
 
-        <div class="presenterTop10HeaderTeams">
-          ${teamButtons()}
-        </div>
+          return `
+            <section class="readerRoundPage">
 
-        <div class="presenterTop10HeaderInfo">
+              <header class="readerRoundHead">
+                <h2>الجولة ${round}</h2>
+                <span>Top 10</span>
+              </header>
 
-          <span
-            id="presenterTop10StatusText"
-            class="presenterTop10StatusText"
-          >
-            —
-          </span>
+              <article class="readerQuestionCard">
+                ${escapePresenterTop10Html(question)}
+              </article>
 
-          <span class="presenterTop10RoundBadge">
-            <span>جولة</span>
+              <div class="readerSimpleGrid">
+                ${roundRows
+                  .map(row => {
+                    return `
+                      <article class="readerMiniCard">
+                        <div class="readerBlock">
+                          <label>الرقم</label>
+                          <p>${Number(row.position || 0)}</p>
+                        </div>
 
-            <strong id="presenterTop10RoundText">
-              ${round}
-            </strong>
-          </span>
+                        <div class="readerBlock">
+                          <label>الإجابة</label>
+                          <p>${escapePresenterTop10Html(row.answer || "—")}</p>
+                        </div>
+                      </article>
+                    `
+                  })
+                  .join("")}
+              </div>
 
-          <strong
-            id="presenterTop10Timer"
-            class="presenterTop10Timer"
-          >
-            —
-          </strong>
-
-        </div>
-
-      </header>
-
-      <main class="presenterTop10ControlMain">
-
-        <section class="presenterTop10QuestionPanel">
-
-          <header class="presenterTop10PanelTitle">
-            <h2>السؤال</h2>
-
-            <div class="presenterTop10ErrorsMini">
-
-              <span class="presenterTop10ErrorMiniBox teamA">
-                <span>
-                  ${escapePresenterTop10Html(presenterTeamAName)}
-                </span>
-
-                <strong id="presenterTop10ErrorsA">
-                  ${errors.A} / 3
-                </strong>
-              </span>
-
-              <span class="presenterTop10ErrorMiniBox teamB">
-                <span>
-                  ${escapePresenterTop10Html(presenterTeamBName)}
-                </span>
-
-                <strong id="presenterTop10ErrorsB">
-                  ${errors.B} / 3
-                </strong>
-              </span>
-
-            </div>
-          </header>
-
-          <div
-            id="presenterTop10QuestionText"
-            class="presenterTop10QuestionText"
-          >
-            ${escapePresenterTop10Html(getPresenterTop10Question(round))}
-          </div>
-
-        </section>
-
-        <section class="presenterTop10AnswersPanel">
-
-          <header class="presenterTop10PanelTitle">
-            <h2>الإجابات</h2>
-          </header>
-
-          <div
-            id="presenterTop10AnswersCols"
-            class="presenterTop10AnswersCols"
-          >
-            ${
-              presenterTop10Rows.length
-                ? buildPresenterTop10AnswersHtml()
-                : `
-                  <div class="presenterTop10Loading">
-                    جارٍ التحميل
-                  </div>
-                `
-            }
-          </div>
-
-        </section>
-
-      </main>
-
-      <footer class="presenterTop10CommandBar">
-
-        <button
-          type="button"
-          id="presenterTop10DoubleBtn"
-          class="presenterBtn gray presenterTop10DoubleBtn"
-          onclick="runPresenterTop10Action('double')"
-        >
-          دوببلا
-        </button>
-
-        <button
-          type="button"
-          id="presenterTop10ShowAnswerBtn"
-          class="presenterBtn green"
-          onclick="runPresenterTop10Action('showAnswer')"
-        >
-          الإجابات
-        </button>
-
-        <button
-          type="button"
-          id="presenterTop10WrongBtn"
-          class="presenterBtn red"
-          onclick="runPresenterTop10Action('wrong')"
-        >
-          خطأ
-        </button>
-
-        <button
-          type="button"
-          id="presenterTop10UndoBtn"
-          class="presenterBtn gray"
-          onclick="runPresenterTop10Action('undo')"
-        >
-          تراجع
-        </button>
-
-        <button
-          type="button"
-          id="presenterTop10SwitchBtn"
-          class="presenterBtn blue"
-          onclick="runPresenterTop10Action('switchTurn')"
-        >
-          تبديل
-        </button>
-
-        <button
-          type="button"
-          id="presenterTop10NextRoundBtn"
-          class="presenterBtn blue"
-          onclick="runPresenterTop10Action('nextRound')"
-        >
-          التالي
-        </button>
-
-      </footer>
-
+            </section>
+          `
+        })
+        .join("")}
     </section>
   `
 }

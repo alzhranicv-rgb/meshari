@@ -1,795 +1,1369 @@
 /* =========================================================
-   PRESENTER SEGMENT: RANDOM CHALLENGE / التحدي
-   File: assets/css/presenter/segments/random-challenge.css
-
-   ملاحظات:
-   - اسم presenterRandomGlassCard موجود في JavaScript القديم.
-   - التنسيق هنا ليس زجاجيًا ولا بنفسجيًا.
-   - ألوان المشروع الحالية فقط.
-   - بطاقات بسيطة بحدود واضحة.
-   - مناسب للمقدم ووضع القراءة.
+   RANDOM CHALLENGE PRESENTER / التحدي
+   MATCHING EXPLAIN + FINAL LAYOUT
 ========================================================= */
 
 /* =========================
-   1) PAGE
+   1) BASE
 ========================= */
 
-.presenterRandomPage{
+.presenterPanel[data-segment="randomChallenge"]{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+}
+
+.presenterRandomScreen,
+.presenterRandomScreen *{
+  box-sizing:border-box;
+}
+
+.presenterRandomScreen{
+  --bg:#EAECF0;
+  --surface:#FFFFFF;
+  --soft:#F6F7F9;
+  --line:#D5DADF;
+
+  --primary:#FE7F2D;
+  --secondary:#233D4D;
+  --text:#151515;
+  --muted:#8793A0;
+
+  --btn-nav:#0A7C6E;
+  --btn-correct:#007F00;
+  --btn-wrong:#7F0000;
+  --btn-start:#00004C;
+  --btn-double:#00007F;
+  --btn-disabled:#D7DCE2;
+  --btn-disabled-text:#7B8792;
+
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  direction:rtl;
+  overflow:hidden;
+
+  font-family:"HanakaText",sans-serif;
+  color:var(--text);
+}
+
+.presenterRandomScreen button,
+.presenterRandomScreen input,
+.presenterRandomScreen textarea,
+.presenterRandomScreen select{
+  font-family:"HanakaText",sans-serif !important;
+  font-weight:400;
+}
+
+/* =========================
+   2) MAIN
+========================= */
+
+.presenterRandomMain{
   width:100%;
   height:100%;
   min-width:0;
   min-height:0;
 
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(300px,.46fr);
-  gap:8px;
+  grid-template-columns:minmax(0,1fr) 470px;
+  grid-template-areas:"content control";
+  gap:12px;
 
+  direction:ltr;
   overflow:hidden;
 }
 
-.presenterRandomMain,
-.presenterRandomSide{
+.presenterRandomHome{
+  grid-template-columns:1fr;
+  grid-template-areas:"control";
+}
+
+.presenterRandomContentCard{
+  grid-area:content;
+
+  width:100%;
+  height:100%;
   min-width:0;
   min-height:0;
-}
 
-.presenterRandomMain{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
+  padding:14px;
+
+  direction:rtl;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
+
+  box-shadow:none;
   overflow:hidden;
 }
 
-.presenterRandomSide{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  overflow:auto;
-  overscroll-behavior:contain;
+.presenterRandomControlCard{
+  grid-area:control;
+
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  padding:12px;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr);
+  gap:12px;
+
+  direction:rtl;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:26px;
+
+  box-shadow:none;
+  overflow:hidden;
+}
+
+.presenterRandomSelectCard{
+  width:100%;
+  max-width:900px;
+  margin:0 auto;
 }
 
 /* =========================
-   2) HEADER / TOP ACTIONS
+   3) HOME BOXES
 ========================= */
 
-.presenterRandomTopBar,
-.presenterRandomHeader{
-  min-width:0;
-
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr) auto;
+.presenterRandomHome{
+  display:flex;
   align-items:center;
-  gap:8px;
+  justify-content:center;
+
+  direction:rtl;
 }
 
-.presenterRandomBackBtn,
-.presenterRandomEndBtn{
-  min-width:86px;
-  min-height:48px;
-  padding:7px 12px;
+.presenterRandomSelectCard{
+  width:min(100%,820px);
+  height:auto;
+  min-height:0;
+
+  padding:12px;
+}
+
+.presenterRandomChooseGrid{
+  width:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));
+  justify-content:center;
+  align-content:center;
+  place-content:center;
+
+  gap:12px;
+  padding:14px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:22px;
+
+  overflow:hidden;
+}
+
+.presenterRandomChooseBtn{
+  width:100%;
+  height:118px;
+  min-width:0;
+  min-height:118px;
+
+  border:0;
+  border-radius:20px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  border:2px solid var(--presenter-line-strong);
-  border-radius:12px;
-  background:var(--presenter-surface);
-  color:var(--presenter-secondary);
-
-  font-size:.66rem;
-  line-height:1;
-  font-weight:400;
   cursor:pointer;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:1.15rem;
+  line-height:1.15;
+  font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
 }
 
-.presenterRandomEndBtn{
-  border-color:var(--presenter-red);
-  background:var(--presenter-red);
+.presenterRandomChooseBtn strong,
+.presenterRandomChooseName{
+  min-width:0;
+  max-width:100%;
+
+  display:block;
+
+  font-weight:400;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.presenterRandomChooseBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.02);
+}
+
+.presenterRandomChooseBtn:active{
+  transform:scale(.97);
+}
+
+.presenterRandomChooseBtn.presenterPendingNumber{
+  background:var(--secondary);
   color:#FFFFFF;
 }
 
-.presenterRandomTitle{
-  min-width:0;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
+.presenterRandomChooseBtn.presenterOpened,
+.presenterRandomChooseBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
 
-  color:var(--presenter-secondary);
-  font-size:.9rem;
-  text-align:center;
-  font-weight:400;
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
 }
-
 /* =========================
-   3) SHARED CARD
+   4) CONTENT COMMON
 ========================= */
 
-.presenterRandomGlassCard,
-.presenterRandomCard{
-  min-width:0;
-  min-height:0;
-  padding:10px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-lg);
-  background:var(--presenter-surface);
-
-  box-shadow:none;
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-
-  overflow:hidden;
-}
-
-/* =========================
-   4) HOME BOXES
-========================= */
-
-.presenterRandomBoxesGrid,
-.presenterRandomHomeGrid{
-  min-width:0;
-  min-height:0;
+.presenterRandomContentStack,
+.presenterRandomQuestionView,
+.presenterRandomFatblaQuestionView{
+  width:100%;
   height:100%;
+  min-width:0;
+  min-height:0;
 
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  grid-template-rows:repeat(2,minmax(0,1fr));
-  gap:8px;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:10px;
+
+  overflow:hidden;
 }
 
-.presenterRandomBoxBtn,
-.presenterRandomChallengeBox{
+.presenterRandomStartView{
+  width:100%;
+  height:100%;
   min-width:0;
   min-height:0;
-  padding:10px;
 
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:7px;
 
-  border:2px solid var(--presenter-line-strong);
-  border-radius:15px;
-  background:var(--presenter-surface);
-  color:var(--presenter-secondary);
+  padding:24px;
 
-  font-size:.76rem;
-  line-height:1.35;
-  text-align:center;
+  background:var(--soft);
+  border:2px solid var(--line);
+  border-radius:24px;
+
+  color:var(--secondary);
+
+  font-size:clamp(2.6rem,5vw,6.2rem);
+  line-height:1.12;
   font-weight:400;
+  text-align:center;
 
-  cursor:pointer;
-  transition:
-    transform var(--presenter-transition),
-    border-color var(--presenter-transition),
-    background var(--presenter-transition),
-    opacity var(--presenter-transition);
+  overflow:hidden;
 }
 
-.presenterRandomBoxBtn:hover,
-.presenterRandomChallengeBox:hover{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
+.presenterRandomStartView strong{
+  font-weight:400;
 }
 
-.presenterRandomBoxBtn:active,
-.presenterRandomChallengeBox:active{
-  transform:translateY(1px);
-}
-
-.presenterRandomBoxBtn.finished,
-.presenterRandomChallengeBox.finished,
-.presenterRandomChallengeBox.locked{
-  border-color:rgba(22,130,60,.32);
-  background:var(--presenter-green-soft);
-  color:var(--presenter-green);
-}
-
-.presenterRandomBoxBtn:disabled,
-.presenterRandomChallengeBox:disabled{
-  cursor:not-allowed;
-  opacity:.56;
-}
-
-/* =========================
-   5) TEAM SELECTOR
-========================= */
-
-.presenterRandomTeams,
-.presenterRandomTeamSelector{
-  min-width:0;
+.presenterRandomQuestionHeader{
+  width:100%;
+  min-height:52px;
 
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:7px;
+  grid-template-columns:minmax(0,1fr) 92px;
+  gap:10px;
+
+  overflow:hidden;
 }
 
-.presenterRandomTeamBtn,
-.presenterRandomTeamName{
+.presenterRandomQuestionHeader strong,
+.presenterRandomQuestionHeader span{
+  width:100%;
+  height:52px;
   min-width:0;
-  min-height:50px;
-  padding:7px 9px;
+  min-height:52px;
 
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:7px;
+  justify-content:center;
 
-  border:2px solid var(--presenter-line);
-  border-radius:12px;
-  background:var(--presenter-surface);
-  color:var(--presenter-secondary);
+  padding:8px 14px;
 
-  font-size:.64rem;
+  border-radius:18px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  font-size:.9rem;
+  line-height:1;
   font-weight:400;
-}
+  text-align:center;
 
-button.presenterRandomTeamBtn{
-  cursor:pointer;
-}
-
-.presenterRandomTeamBtn.active,
-.presenterRandomTeamName.active{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
-  color:var(--presenter-primary-dark);
-}
-
-.presenterRandomTeamBtn span,
-.presenterRandomTeamName span{
-  min-width:0;
-  overflow:hidden;
   white-space:nowrap;
+  overflow:hidden;
   text-overflow:ellipsis;
 }
 
-.presenterRandomTeamBtn strong,
-.presenterRandomTeamName strong{
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:.82rem;
-  font-weight:400;
+.presenterRandomQuestionHeader span{
+  background:var(--primary);
+  font-size:1.2rem;
 }
 
-/* =========================
-   6) BOX 1 - SHARED PLAYER
-========================= */
+.presenterRandomQuestionBody{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
 
-.presenterRandomPoolGrid{
+  display:grid;
+  grid-template-rows:repeat(2,minmax(0,1fr));
+  gap:10px;
+
+  overflow:hidden;
+}
+
+.presenterRandomQABox{
   width:100%;
   min-width:0;
   min-height:0;
 
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:34px minmax(0,1fr);
   gap:8px;
+
+  padding:8px;
+
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.96), rgba(246,247,249,.96)),
+    linear-gradient(135deg, rgba(254,127,45,.18), rgba(35,61,77,.08));
+
+  border:2px solid rgba(254,127,45,.28);
+  border-radius:18px;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.78),
+    0 8px 18px rgba(35,61,77,.07);
+
+  overflow:hidden;
 }
 
-.presenterRandomPoolBtn{
+.presenterRandomQABox span,
+.presenterRandomQABox strong{
   min-width:0;
-  min-height:130px;
-  padding:12px;
 
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:8px;
 
-  border:2px solid var(--presenter-line-strong);
-  border-radius:15px;
-  background:var(--presenter-surface-soft);
-  color:var(--presenter-secondary);
+  color:var(--secondary);
 
-  cursor:pointer;
-}
-
-.presenterRandomPoolBtn span{
-  font-size:1.8rem;
-  line-height:1;
-}
-
-.presenterRandomPoolBtn strong{
-  font-size:.78rem;
-  line-height:1.3;
+  font-family:"HanakaText",sans-serif;
+  line-height:1.25;
   font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+  overflow-wrap:anywhere;
 }
 
-.presenterRandomPoolBtn.active{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
-  color:var(--presenter-primary-dark);
+.presenterRandomQABox span{
+  color:var(--primary);
+  font-size:.95rem;
+}
+
+.presenterRandomQABox strong{
+  padding:10px;
+
+  background:
+    linear-gradient(135deg, #FFFFFF, rgba(246,247,249,.98));
+
+  border:1px solid rgba(35,61,77,.14);
+  border-right:4px solid rgba(254,127,45,.55);
+  border-radius:12px;
+
+  font-size:clamp(1.4rem,3vw,3.6rem);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.75);
+}
+
+.presenterRandomAuctionQuestionView{
+  grid-template-rows:52px minmax(0,1fr);
+}
+
+.presenterRandomAuctionQuestionBox{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:44px minmax(0,1fr);
+  gap:10px;
+
+  padding:10px;
+
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.96), rgba(246,247,249,.96)),
+    linear-gradient(135deg, rgba(254,127,45,.18), rgba(35,61,77,.08));
+
+  border:2px solid rgba(254,127,45,.28);
+  border-radius:20px;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.78),
+    0 8px 18px rgba(35,61,77,.07);
+
+  overflow:hidden;
+}
+
+.presenterRandomAuctionQuestionBox span,
+.presenterRandomAuctionQuestionBox strong{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--secondary);
+
+  font-family:"HanakaText",sans-serif;
+  line-height:1.25;
+  font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+  overflow-wrap:anywhere;
+}
+
+.presenterRandomAuctionQuestionBox span{
+  color:var(--primary);
+  font-size:1rem;
+}
+
+.presenterRandomAuctionQuestionBox strong{
+  padding:18px;
+
+  background:
+    linear-gradient(135deg, #FFFFFF, rgba(246,247,249,.98));
+
+  border:1px solid rgba(35,61,77,.14);
+  border-right:4px solid rgba(254,127,45,.55);
+  border-radius:16px;
+
+  font-size:clamp(1.9rem,4.2vw,5rem);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.75);
+}
+
+/* =========================
+   5) BOX 1 PLAYERS
+========================= */
+
+.presenterRandomBox1Content{
+  grid-template-rows:minmax(0,1fr);
+}
+
+.presenterRandomPlayersView{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  overflow:hidden;
 }
 
 .presenterRandomPlayerNames{
   width:100%;
+  height:100%;
   min-width:0;
   min-height:0;
 
   display:grid;
-  grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr);
-  align-items:center;
-  gap:8px;
+  grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);
+  gap:10px;
+
+  overflow:hidden;
 }
 
 .presenterRandomPlayerNameCard{
+  width:100%;
+  height:100%;
   min-width:0;
-  min-height:110px;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr) 58px;
+  gap:10px;
+
   padding:10px;
+
+  background:
+    radial-gradient(circle at 92% 10%, rgba(254,127,45,.18), transparent 34%),
+    linear-gradient(135deg, #FFFFFF, #F6F7F9);
+
+  border:2px solid rgba(254,127,45,.34);
+  border-radius:20px;
+
+  overflow:hidden;
+}
+
+.presenterRandomPlayerImageBox{
+  min-width:0;
+  min-height:0;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  border:2px solid var(--presenter-line);
-  border-radius:14px;
-  background:var(--presenter-surface-soft);
-  color:var(--presenter-secondary);
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:16px;
 
-  text-align:center;
+  overflow:hidden;
+}
+
+.presenterRandomPlayerImageBox img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+}
+
+.presenterRandomPlayerPlaceholder{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--muted);
+  font-size:2rem;
+  font-weight:400;
 }
 
 .presenterRandomPlayerNameCard strong{
   min-width:0;
-  overflow-wrap:anywhere;
-  font-size:clamp(.8rem,1.5vw,1.1rem);
-  line-height:1.35;
-  font-weight:400;
-}
 
-.presenterRandomVsText{
   display:flex;
   align-items:center;
   justify-content:center;
 
-  color:var(--presenter-primary);
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:1rem;
+  padding:8px;
+
+  background:
+    linear-gradient(135deg, #FFFFFF, rgba(246,247,249,.98));
+
+  border:1px solid rgba(35,61,77,.14);
+  border-radius:14px;
+
+  color:var(--secondary);
+
+  font-size:clamp(1rem,2vw,1.75rem);
+  line-height:1.15;
   font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.presenterRandomVsText{
+  width:64px;
+  height:64px;
+
+  align-self:center;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:
+    linear-gradient(135deg, var(--primary), #F97316);
+
+  color:#FFFFFF;
+  border-radius:18px;
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:400;
+
+  box-shadow:0 4px 10px rgba(254,127,45,.20);
+}
+
+.presenterRandomStatusPanel{
+  display:none !important;
 }
 
 /* =========================
-   7) BOX 2 - AUCTION
+   6) MEDIA / FATBLA
 ========================= */
 
-.presenterRandomAuctionCard{
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:8px;
+.presenterRandomFatblaQuestionView{
+  grid-template-rows:52px minmax(0,1fr) minmax(0,1fr) auto;
+  gap:10px;
 }
 
-.presenterRandomAuctionInputWrap{
+.presenterRandomMediaPreview,
+.presenterRandomMediaEmpty{
+  width:100%;
+  height:100%;
   min-width:0;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:
+    radial-gradient(circle at 92% 10%, rgba(254,127,45,.18), transparent 34%),
+    linear-gradient(135deg, #FFFFFF, #F6F7F9);
+
+  border:2px solid rgba(254,127,45,.34);
+  border-radius:20px;
+
+  overflow:hidden;
+}
+
+.presenterRandomMediaPreview video{
+  display:none !important;
+}
+
+.presenterRandomMediaPreview img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+}
+
+.presenterRandomMediaEmpty{
+  color:var(--muted);
+  font-size:2rem;
+}
+
+.presenterRandomFatblaQuestionView .presenterRandomQuestionBody{
+  grid-template-rows:repeat(2,minmax(0,1fr));
+}
+
+.presenterRandomNote{
+  width:100%;
+  min-height:42px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:8px 12px;
+
+  background:
+    linear-gradient(135deg, rgba(254,127,45,.10), #FFFFFF);
+
+  border:1px solid rgba(254,127,45,.34);
+  border-radius:14px;
+
+  color:var(--secondary);
+
+  font-size:.85rem;
+  line-height:1.25;
+  font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+  overflow-wrap:anywhere;
+}
+/* =========================
+   7) RIGHT CONTROL
+========================= */
+
+.presenterRandomBoxControls{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:12px;
+
+  overflow:hidden;
+}
+
+.presenterRandomBoxControls.is-empty{
+  grid-template-rows:auto;
+}
+
+.presenterRandomBoxControlsBody{
+  width:100%;
+  min-width:0;
+  min-height:0;
+
+  overflow:hidden;
+}
+
+.presenterRandomPoolView,
+.presenterRandomAuctionView,
+.presenterRandomKnowView,
+.presenterRandomBox4View,
+.presenterRandomFatblaNumbersView{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:22px;
+
+  gap:10px;
+  padding:12px;
+
+  overflow:hidden;
+}
+
+/* =========================
+   8) POOL BUTTONS
+========================= */
+
+.presenterRandomPoolView{
+  grid-template-columns:1fr;
+  align-content:center;
+}
+
+.presenterRandomPoolBtn{
+  width:100%;
+  height:112px;
+  min-height:112px;
+  min-width:0;
+
+  border:0;
+  border-radius:20px;
+
+  display:grid;
+  grid-template-rows:auto auto;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  cursor:pointer;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-size:1.15rem;
+  line-height:1.15;
+  font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
+}
+
+.presenterRandomPoolBtn span{
+  font-size:2rem;
+  line-height:1;
+}
+
+.presenterRandomPoolBtn strong{
+  font-weight:400;
+}
+
+.presenterRandomPoolBtn.active{
+  background:var(--secondary);
+}
+
+.presenterRandomPoolBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.02);
+}
+
+/* =========================
+   9) AUCTION / METRICS
+========================= */
+
+.presenterRandomAuctionView{
+  grid-template-rows:58px minmax(0,1fr);
 }
 
 .presenterRandomAuctionInput{
   width:100%;
-  min-height:70px;
+  height:58px;
+  min-width:0;
+  min-height:58px;
+
   padding:8px 12px;
 
-  border:2px solid var(--presenter-line-strong);
-  border-radius:14px;
-  outline:0;
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:18px;
 
-  background:var(--presenter-surface-soft);
-  color:var(--presenter-secondary);
-  caret-color:var(--presenter-primary);
+  color:var(--secondary);
 
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:1.8rem;
+  font-size:1.2rem;
   line-height:1;
-  text-align:center;
   font-weight:400;
+  text-align:center;
+
+  outline:none;
+  overflow:hidden;
 }
 
 .presenterRandomAuctionInput:focus{
-  border-color:var(--presenter-primary);
+  border-color:var(--primary);
 }
 
-.presenterRandomAuctionMetrics{
+.presenterRandomMetricsGrid{
+  width:100%;
+  height:100%;
   min-width:0;
+  min-height:0;
 
   display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:7px;
+  grid-template-columns:1fr;
+  gap:10px;
+
+  overflow:hidden;
 }
 
 .presenterRandomMetric{
+  width:100%;
   min-width:0;
-  min-height:86px;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:28px minmax(0,1fr);
+  gap:8px;
+
   padding:8px;
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:5px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.96), rgba(246,247,249,.96)),
+    linear-gradient(135deg, rgba(254,127,45,.18), rgba(35,61,77,.08));
 
-  border:2px solid var(--presenter-line);
-  border-radius:12px;
-  background:var(--presenter-surface);
-  color:var(--presenter-secondary);
+  border:2px solid rgba(254,127,45,.28);
+  border-radius:18px;
+
+  color:var(--secondary);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.78),
+    0 8px 18px rgba(35,61,77,.07);
+
+  overflow:hidden;
 }
 
 button.presenterRandomMetric{
   cursor:pointer;
 }
 
-.presenterRandomMetric span{
-  color:var(--presenter-muted);
-  font-size:.56rem;
-}
-
+.presenterRandomMetric span,
 .presenterRandomMetric strong{
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:1rem;
-  line-height:1;
-  font-weight:400;
-}
-
-.presenterRandomMetric.timerMetric{
-  border-color:rgba(21,107,154,.30);
-  background:var(--presenter-blue-soft);
-  color:var(--presenter-blue);
-}
-
-.presenterRandomMetric.pointsMetric{
-  border-color:rgba(22,130,60,.30);
-  background:var(--presenter-green-soft);
-  color:var(--presenter-green);
-}
-
-/* =========================
-   8) BOX 3 - WHAT DO YOU KNOW
-========================= */
-
-.presenterRandomKnowCard{
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:8px;
-}
-
-.presenterRandomBox3Timer{
-  width:72px;
-  height:54px;
-  margin-inline:auto;
+  min-width:0;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  border:2px solid rgba(21,107,154,.30);
-  border-radius:14px;
-  background:var(--presenter-blue-soft);
-  color:var(--presenter-blue);
-
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:1.15rem;
   font-weight:400;
-}
-
-.presenterRandomBox3Timer.danger,
-.presenterTimerDanger{
-  border-color:rgba(180,35,24,.32);
-  background:var(--presenter-red-soft);
-  color:var(--presenter-red);
-}
-
-.presenterRandomKnowBoard{
-  min-width:0;
-
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:7px;
-}
-
-/* =========================
-   9) POINT CHOICE
-========================= */
-
-.presenterRandomPointsGrid{
-  min-width:0;
-
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:7px;
-}
-
-.presenterRandomPointBtn{
-  min-width:0;
-  min-height:62px;
-  padding:8px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border:2px solid var(--presenter-line-strong);
-  border-radius:12px;
-  background:var(--presenter-surface);
-  color:var(--presenter-secondary);
-
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:.9rem;
-  font-weight:400;
-  cursor:pointer;
-}
-
-.presenterRandomPointBtn:hover{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
-}
-
-/* =========================
-   10) QUESTION / ANSWER
-========================= */
-
-.presenterRandomQuestionCard,
-.presenterRandomAnswerCard{
-  min-width:0;
-  padding:10px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:13px;
-  background:var(--presenter-surface);
-}
-
-.presenterRandomQuestionCard{
-  color:var(--presenter-secondary);
-}
-
-.presenterRandomAnswerCard{
-  border-color:rgba(22,130,60,.28);
-  background:var(--presenter-green-soft);
-  color:var(--presenter-green);
-}
-
-.presenterRandomQuestionText,
-.presenterRandomAnswerText{
-  min-width:0;
-
-  font-size:.78rem;
-  line-height:1.45;
   text-align:center;
-  font-weight:400;
-  overflow-wrap:anywhere;
-}
-
-/* =========================
-   11) BOX 4 - TRUE / FALSE
-========================= */
-
-.presenterRandomTrueFalseGrid{
-  min-width:0;
-
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:7px;
-}
-
-.presenterRandomTrueBtn,
-.presenterRandomFalseBtn{
-  min-height:58px;
-  padding:8px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border-radius:12px;
-  color:#FFFFFF;
-
-  font-size:.74rem;
-  font-weight:400;
-  cursor:pointer;
-}
-
-.presenterRandomTrueBtn{
-  border:2px solid var(--presenter-green);
-  background:var(--presenter-green);
-}
-
-.presenterRandomFalseBtn{
-  border:2px solid var(--presenter-red);
-  background:var(--presenter-red);
-}
-
-/* =========================
-   12) BOX 5 - FATBLA
-========================= */
-
-.presenterRandomFatblaGrid{
-  min-width:0;
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:7px;
-}
-
-.presenterRandomFatblaNumber{
-  min-width:0;
-  min-height:70px;
-  padding:7px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border:2px solid var(--presenter-line-strong);
-  border-radius:12px;
-  background:var(--presenter-surface);
-  color:var(--presenter-secondary);
-
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:1rem;
-  font-weight:400;
-  cursor:pointer;
-}
-
-.presenterRandomFatblaNumber.current{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
-  color:var(--presenter-primary-dark);
-}
-
-.presenterRandomFatblaNumber.opened,
-.presenterRandomFatblaNumber.used{
-  border-color:var(--presenter-line);
-  background:var(--presenter-surface-muted);
-  color:var(--presenter-muted);
-}
-
-.presenterRandomFatblaNumber:disabled{
-  cursor:not-allowed;
-  opacity:.52;
-}
-
-/* =========================
-   13) ACTIONS
-========================= */
-
-.presenterRandomActions,
-.presenterRandomControlGrid{
-  min-width:0;
-
-  display:grid;
-  grid-template-columns:repeat(6,minmax(0,1fr));
-  gap:6px;
-}
-
-.presenterRandomActions .presenterBtn,
-.presenterRandomControlGrid .presenterBtn,
-.presenterRandomActionBtn{
-  min-height:48px;
-}
-
-.presenterRandomActionBtn{
-  padding:7px 8px;
-
-  border:2px solid var(--presenter-line-strong);
-  border-radius:11px;
-  background:var(--presenter-surface);
-  color:var(--presenter-secondary);
-
-  font-size:.58rem;
-  font-weight:400;
-  cursor:pointer;
-}
-
-.presenterRandomActionBtn.green,
-.presenterRandomCorrectBtn{
-  border-color:var(--presenter-green);
-  background:var(--presenter-green);
-  color:#FFFFFF;
-}
-
-.presenterRandomActionBtn.red,
-.presenterRandomWrongBtn{
-  border-color:var(--presenter-red);
-  background:var(--presenter-red);
-  color:#FFFFFF;
-}
-
-.presenterRandomActionBtn.blue,
-.presenterRandomPrimaryBtn{
-  border-color:var(--presenter-blue);
-  background:var(--presenter-blue);
-  color:#FFFFFF;
-}
-
-.presenterRandomActionBtn.orange{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary);
-  color:#FFFFFF;
-}
-
-.presenterRandomActionBtn:disabled{
-  cursor:not-allowed;
-  opacity:.44;
-}
-
-/* =========================
-   14) READER MODE
-========================= */
-
-.readerRandomChallengeGrid,
-.readerRandomGrid{
-  min-width:0;
-
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
-}
-
-.readerRandomChallengeCard,
-.readerRandomCard{
-  min-width:0;
-  min-height:120px;
-  padding:9px;
-
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:7px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-surface);
 
   overflow:hidden;
 }
 
-.readerRandomChallengeCard h3,
-.readerRandomCard h3{
-  margin:0;
-  color:var(--presenter-primary);
-  font-size:.7rem;
-  font-weight:400;
+.presenterRandomMetric span{
+  color:var(--primary);
+  font-size:.75rem;
+  line-height:1;
 }
 
-.readerRandomChallengeCard p,
-.readerRandomCard p{
-  margin:0;
-  color:var(--presenter-secondary);
-  font-size:.66rem;
-  line-height:1.4;
-  font-weight:400;
+.presenterRandomMetric strong{
+  color:var(--secondary);
+  font-size:clamp(1.2rem,2.4vw,2.2rem);
+  line-height:1;
+}
+
+.presenterRandomMetric strong.danger,
+.presenterRandomMetric strong.presenterTimerDanger,
+.presenterRandomMetric strong.presenterTimerFinished{
+  color:var(--btn-wrong);
 }
 
 /* =========================
-   15) TABLET LANDSCAPE
+   10) KNOW / TIMER
 ========================= */
 
-@media
-  (min-width:900px)
-  and (max-width:1400px)
-  and (orientation:landscape)
-  and (min-height:500px){
+.presenterRandomKnowView{
+  grid-template-rows:80px minmax(0,1fr);
+}
 
-  .presenterRandomPage{
-    grid-template-columns:minmax(0,1fr) minmax(280px,.42fr);
-    gap:7px;
+.presenterRandomTimerBox{
+  width:100%;
+  height:80px;
+  min-height:80px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  border-radius:20px;
+
+  font-size:2.4rem;
+  line-height:1;
+  font-weight:400;
+
+  overflow:hidden;
+}
+
+.presenterRandomTimerBox.danger,
+.presenterRandomTimerBox.presenterTimerDanger,
+.presenterRandomTimerBox.presenterTimerFinished{
+  background:var(--btn-wrong);
+}
+
+.presenterRandomKnowBoard{
+  width:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+
+  overflow:hidden;
+}
+
+.presenterRandomKnowTeam{
+  width:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:28px minmax(0,1fr);
+  gap:8px;
+
+  padding:8px;
+
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.96), rgba(246,247,249,.96));
+
+  border:2px solid rgba(254,127,45,.28);
+  border-radius:18px;
+
+  overflow:hidden;
+}
+
+.presenterRandomKnowTeam.active{
+  border-color:var(--primary);
+}
+
+.presenterRandomKnowTeam span,
+.presenterRandomKnowTeam strong{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+}
+
+.presenterRandomKnowTeam span{
+  color:var(--secondary);
+  font-size:.82rem;
+  line-height:1;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.presenterRandomKnowTeam strong{
+  color:var(--btn-wrong);
+  font-size:2rem;
+  line-height:1;
+}
+
+/* =========================
+   11) FATBLA NUMBERS / BLOCK
+========================= */
+
+.presenterRandomFatblaNumbersView{
+  grid-template-rows:minmax(0,1fr) auto;
+}
+
+.presenterRandomFatblaNumbers{
+  width:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-auto-rows:74px;
+  justify-content:center;
+  align-content:center;
+
+  gap:10px;
+
+  overflow:hidden;
+}
+
+.presenterRandomFatblaNumber,
+.presenterNumberBtn{
+  width:100%;
+  height:74px;
+  min-width:0;
+  min-height:74px;
+
+  border:0;
+  border-radius:18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-size:1.55rem;
+  line-height:1;
+  font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
+}
+
+.presenterRandomFatblaNumber:hover,
+.presenterNumberBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.02);
+}
+
+.presenterRandomFatblaNumber:active,
+.presenterNumberBtn:active{
+  transform:scale(.97);
+}
+
+.presenterRandomFatblaNumber.presenterOpened,
+.presenterRandomFatblaNumber:disabled,
+.presenterNumberBtn.presenterOpened,
+.presenterNumberBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+.presenterRandomBlockStatus{
+  width:100%;
+  min-height:52px;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 78px;
+  gap:8px;
+
+  padding:8px;
+
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:16px;
+
+  overflow:hidden;
+}
+
+.presenterRandomBlockStatus span,
+.presenterRandomBlockStatus strong{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:6px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:12px;
+
+  color:var(--secondary);
+
+  font-size:.9rem;
+  line-height:1;
+  font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+}
+
+.presenterRandomBlockStatus strong{
+  color:var(--primary);
+  font-size:1.35rem;
+}
+
+.presenterRandomBlockStatus strong.danger,
+.presenterRandomBlockStatus strong.presenterTimerDanger,
+.presenterRandomBlockStatus strong.presenterTimerFinished{
+  color:var(--btn-wrong);
+}
+
+/* =========================
+   12) ACTIONS
+========================= */
+
+.presenterRandomCommandBar,
+.presenterRandomActions{
+  width:100%;
+  min-width:0;
+  min-height:0;
+  margin:0;
+
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-auto-rows:58px;
+  gap:10px;
+
+  padding:0;
+
+  background:transparent;
+  border:0;
+  border-radius:0;
+
+  box-shadow:none;
+  overflow:hidden;
+}
+
+.presenterRandomCommandBar .presenterBtn{
+  width:100%;
+  height:58px;
+  min-height:58px;
+  min-width:0;
+
+  border:0;
+  border-radius:18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  color:#FFFFFF;
+
+  font-size:.92rem;
+  line-height:1;
+  font-weight:400;
+  text-align:center;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    opacity .15s ease;
+}
+
+.presenterRandomCommandBar .presenterBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.presenterRandomCommandBar .presenterBtn:active{
+  transform:scale(.97);
+}
+
+.presenterRandomCommandBar .presenterBtn.gray{
+  background:var(--btn-nav);
+}
+
+.presenterRandomCommandBar .presenterBtn.dark{
+  background:var(--btn-start);
+}
+
+.presenterRandomCommandBar .presenterBtn.green{
+  background:var(--btn-correct);
+}
+
+.presenterRandomCommandBar .presenterBtn.red{
+  background:var(--btn-wrong);
+}
+
+.presenterRandomCommandBar .presenterBtn.blue{
+  background:var(--btn-double);
+}
+
+.presenterRandomCommandBar .presenterBtn:disabled{
+  background:var(--btn-disabled) !important;
+  color:var(--btn-disabled-text) !important;
+
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+/* =========================
+   13) IPAD / TABLET LANDSCAPE
+========================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .presenterRandomMain{
+    grid-template-columns:minmax(0,1fr) 410px;
+    gap:8px;
   }
 
-  .presenterRandomMain,
-  .presenterRandomSide{
-    gap:7px;
+  .presenterRandomContentCard,
+  .presenterRandomControlCard{
+    padding:10px;
+    border-radius:24px;
   }
 
-  .presenterRandomGlassCard,
-  .presenterRandomCard{
+  .presenterRandomBoxControls{
+    gap:8px;
+  }
+
+  .presenterRandomPoolView,
+  .presenterRandomAuctionView,
+  .presenterRandomKnowView,
+  .presenterRandomBox4View,
+  .presenterRandomFatblaNumbersView,
+  .presenterRandomChooseGrid{
+    gap:8px;
     padding:8px;
+    border-radius:17px;
   }
 
-  .presenterRandomActions,
-  .presenterRandomControlGrid{
-    gap:5px;
+  .presenterRandomChooseBtn,
+  .presenterRandomPoolBtn{
+    height:92px;
+    min-height:92px;
+    border-radius:16px;
+    font-size:.9rem;
+  }
+
+  .presenterRandomQuestionHeader{
+    grid-template-columns:minmax(0,1fr) 70px;
+    gap:8px;
+  }
+
+  .presenterRandomQuestionHeader strong,
+  .presenterRandomQuestionHeader span{
+    height:46px;
+    min-height:46px;
+    border-radius:14px;
+    font-size:.78rem;
+  }
+
+  .presenterRandomQuestionHeader span{
+    font-size:1rem;
+  }
+
+  .presenterRandomQABox{
+    border-radius:16px;
+  }
+
+  .presenterRandomQABox strong{
+    font-size:clamp(1.05rem,2.7vw,2.4rem);
+  }
+
+  .presenterRandomAuctionView{
+    grid-template-rows:46px minmax(0,1fr);
+  }
+
+  .presenterRandomAuctionInput{
+    height:46px;
+    min-height:46px;
+    border-radius:14px;
+    font-size:1rem;
+  }
+
+  .presenterRandomTimerBox{
+    height:58px;
+    min-height:58px;
+    border-radius:15px;
+    font-size:1.8rem;
+  }
+
+  .presenterRandomKnowView{
+    grid-template-rows:58px minmax(0,1fr);
+  }
+
+  .presenterRandomFatblaNumbers{
+    grid-auto-rows:58px;
+    gap:8px;
+  }
+
+  .presenterRandomFatblaNumber,
+  .presenterNumberBtn{
+    height:58px;
+    min-height:58px;
+    border-radius:14px;
+    font-size:1.1rem;
+  }
+
+  .presenterRandomCommandBar{
+    gap:8px;
+  }
+
+  .presenterRandomCommandBar .presenterBtn{
+    height:46px;
+    min-height:46px;
+
+    border-radius:14px;
+    font-size:.62rem;
   }
 }
 
 /* =========================
-   16) IPHONE PRO MAX LANDSCAPE
+   14) IPHONE PRO MAX LANDSCAPE
 ========================= */
 
 @media
@@ -798,202 +1372,255 @@ button.presenterRandomMetric{
   and (orientation:landscape)
   and (max-height:500px){
 
-  .presenterRandomPage{
-    grid-template-columns:minmax(0,1fr) 220px;
+  .presenterRandomMain{
+    grid-template-columns:minmax(0,1fr) 330px;
+    gap:6px;
+  }
+
+  .presenterRandomContentCard,
+  .presenterRandomControlCard{
+    padding:6px;
+    border-radius:15px;
+  }
+
+  .presenterRandomBoxControls{
     gap:5px;
   }
 
-  .presenterRandomMain,
-  .presenterRandomSide{
-    gap:5px;
+  .presenterRandomPoolView,
+  .presenterRandomAuctionView,
+  .presenterRandomKnowView,
+  .presenterRandomBox4View,
+  .presenterRandomFatblaNumbersView,
+  .presenterRandomChooseGrid{
+    gap:6px;
+    padding:6px;
+    border-radius:12px;
   }
 
-  .presenterRandomGlassCard,
-  .presenterRandomCard{
-    padding:5px;
-    border-radius:9px;
-  }
-
-  .presenterRandomBackBtn,
-  .presenterRandomEndBtn{
-    min-width:62px;
-    min-height:38px;
-    padding:4px 6px;
-    border-radius:8px;
-    font-size:.44rem;
-  }
-
-  .presenterRandomBoxesGrid,
-  .presenterRandomHomeGrid{
-    gap:4px;
-  }
-
-  .presenterRandomBoxBtn,
-  .presenterRandomChallengeBox{
-    padding:5px;
-    gap:3px;
-    border-radius:8px;
-    font-size:.48rem;
-  }
-
-  .presenterRandomTeamBtn,
-  .presenterRandomTeamName{
-    min-height:36px;
-    padding:4px 5px;
-    border-radius:8px;
-    font-size:.42rem;
-  }
-
-  .presenterRandomTeamBtn strong,
-  .presenterRandomTeamName strong{
-    font-size:.54rem;
-  }
-
-  .presenterRandomPoolGrid{
-    gap:4px;
-  }
-
+  .presenterRandomChooseBtn,
   .presenterRandomPoolBtn{
-    min-height:84px;
-    padding:5px;
-    gap:4px;
-    border-radius:8px;
+    height:64px;
+    min-height:64px;
+    border-radius:10px;
+    font-size:.58rem;
+  }
+
+  .presenterRandomChooseGrid{
+    grid-template-columns:repeat(auto-fit, minmax(92px, 1fr));
+    max-width:520px;
+    margin:auto;
   }
 
   .presenterRandomPoolBtn span{
-    font-size:1rem;
+    font-size:1.25rem;
   }
 
-  .presenterRandomPoolBtn strong{
+  .presenterRandomQuestionView,
+  .presenterRandomFatblaQuestionView,
+  .presenterRandomContentStack{
+    gap:5px;
+  }
+
+  .presenterRandomQuestionHeader{
+    grid-template-columns:minmax(0,1fr) 46px;
+    gap:5px;
+  }
+
+  .presenterRandomQuestionHeader strong,
+  .presenterRandomQuestionHeader span{
+    height:34px;
+    min-height:34px;
+    padding:5px 8px;
+    border-radius:10px;
     font-size:.48rem;
   }
 
-  .presenterRandomPlayerNames{
-    grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr);
+  .presenterRandomQuestionHeader span{
+    font-size:.7rem;
+  }
+
+  .presenterRandomQuestionBody{
+    gap:5px;
+  }
+
+  .presenterRandomQABox{
+    grid-template-rows:22px minmax(0,1fr);
     gap:4px;
+    padding:5px;
+    border-radius:10px;
+  }
+
+  .presenterRandomQABox span{
+    font-size:.46rem;
+  }
+
+  .presenterRandomQABox strong{
+    padding:5px;
+    border-radius:7px;
+    font-size:clamp(.72rem,2vw,1.35rem);
+  }
+
+  .presenterRandomStartView{
+    padding:8px;
+    border-radius:11px;
+    font-size:clamp(1.25rem,2.6vw,2rem);
+    line-height:1.1;
+  }
+
+  .presenterRandomPlayerNames{
+    grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr);
+    gap:5px;
   }
 
   .presenterRandomPlayerNameCard{
-    min-height:72px;
+    grid-template-rows:minmax(0,1fr) 34px;
+    gap:5px;
     padding:5px;
+    border-radius:10px;
+  }
+
+  .presenterRandomPlayerImageBox{
     border-radius:8px;
   }
 
   .presenterRandomPlayerNameCard strong{
-    font-size:.56rem;
+    padding:5px;
+    border-radius:7px;
+    font-size:.52rem;
   }
 
   .presenterRandomVsText{
-    font-size:.58rem;
+    width:36px;
+    height:36px;
+    border-radius:10px;
+    font-size:.55rem;
+  }
+
+  .presenterRandomStatusPanel{
+    min-height:34px;
+    padding:5px 8px;
+    border-radius:10px;
+    font-size:.55rem;
+  }
+
+  .presenterRandomFatblaQuestionView{
+    grid-template-rows:34px minmax(0,1fr) minmax(0,1fr) auto;
+  }
+
+  .presenterRandomMediaPreview,
+  .presenterRandomMediaEmpty{
+    border-radius:10px;
+  }
+
+  .presenterRandomNote{
+    min-height:28px;
+    padding:5px 8px;
+    border-radius:9px;
+    font-size:.48rem;
+  }
+
+  .presenterRandomAuctionView{
+    grid-template-rows:34px minmax(0,1fr);
   }
 
   .presenterRandomAuctionInput{
-    min-height:46px;
-    padding:4px 7px;
-    border-radius:8px;
-    font-size:1rem;
-  }
-
-  .presenterRandomAuctionMetrics{
-    gap:4px;
-  }
-
-  .presenterRandomMetric{
-    min-height:54px;
-    padding:4px;
-    border-radius:7px;
-    gap:3px;
-  }
-
-  .presenterRandomMetric span{
-    font-size:.38rem;
-  }
-
-  .presenterRandomMetric strong{
-    font-size:.58rem;
-  }
-
-  .presenterRandomBox3Timer{
-    width:46px;
     height:34px;
-    border-radius:8px;
-    font-size:.66rem;
+    min-height:34px;
+    border-radius:10px;
+    font-size:.72rem;
   }
 
-  .presenterRandomKnowBoard,
-  .presenterRandomPointsGrid,
-  .presenterRandomTrueFalseGrid{
-    gap:4px;
-  }
-
-  .presenterRandomPointBtn,
-  .presenterRandomTrueBtn,
-  .presenterRandomFalseBtn{
-    min-height:38px;
-    padding:4px;
-    border-radius:7px;
-    font-size:.46rem;
-  }
-
-  .presenterRandomQuestionCard,
-  .presenterRandomAnswerCard{
-    padding:5px;
-    border-radius:8px;
-  }
-
-  .presenterRandomQuestionText,
-  .presenterRandomAnswerText{
-    font-size:.48rem;
-    line-height:1.3;
-  }
-
-  .presenterRandomFatblaGrid{
-    gap:4px;
-  }
-
-  .presenterRandomFatblaNumber{
-    min-height:42px;
-    padding:4px;
-    border-radius:7px;
-    font-size:.58rem;
-  }
-
-  .presenterRandomActions,
-  .presenterRandomControlGrid{
-    gap:4px;
-  }
-
-  .presenterRandomActions .presenterBtn,
-  .presenterRandomControlGrid .presenterBtn,
-  .presenterRandomActionBtn{
-    min-height:40px;
-    padding:4px 2px;
-    border-radius:7px;
-    font-size:.4rem;
-  }
-
-  .readerRandomChallengeGrid,
-  .readerRandomGrid{
-    grid-template-columns:repeat(4,minmax(0,1fr));
+  .presenterRandomMetricsGrid{
     gap:5px;
   }
 
-  .readerRandomChallengeCard,
-  .readerRandomCard{
-    min-height:80px;
-    padding:5px;
+  .presenterRandomMetric{
+    grid-template-rows:18px minmax(0,1fr);
     gap:4px;
-    border-radius:8px;
+    padding:5px;
+    border-radius:10px;
   }
 
-  .readerRandomChallengeCard h3,
-  .readerRandomCard h3{
+  .presenterRandomMetric span{
+    font-size:.42rem;
+  }
+
+  .presenterRandomMetric strong{
+    font-size:.9rem;
+  }
+
+  .presenterRandomKnowView{
+    grid-template-rows:34px minmax(0,1fr);
+    gap:5px;
+  }
+
+  .presenterRandomTimerBox{
+    height:34px;
+    min-height:34px;
+    border-radius:10px;
+    font-size:1.15rem;
+  }
+
+  .presenterRandomKnowBoard{
+    gap:5px;
+  }
+
+  .presenterRandomKnowTeam{
+    grid-template-rows:18px minmax(0,1fr);
+    gap:4px;
+    padding:5px;
+    border-radius:10px;
+  }
+
+  .presenterRandomKnowTeam span{
+    font-size:.45rem;
+  }
+
+  .presenterRandomKnowTeam strong{
+    font-size:.95rem;
+  }
+
+  .presenterRandomFatblaNumbers{
+    grid-auto-rows:34px;
+    gap:6px;
+  }
+
+  .presenterRandomFatblaNumber,
+  .presenterNumberBtn{
+    height:34px;
+    min-height:34px;
+
+    border-radius:10px;
+    font-size:.78rem;
+  }
+
+  .presenterRandomBlockStatus{
+    min-height:34px;
+    grid-template-columns:minmax(0,1fr) 46px;
+    padding:4px;
+    border-radius:10px;
+  }
+
+  .presenterRandomBlockStatus span,
+  .presenterRandomBlockStatus strong{
+    border-radius:7px;
     font-size:.46rem;
   }
 
-  .readerRandomChallengeCard p,
-  .readerRandomCard p{
-    font-size:.4rem;
-    line-height:1.25;
+  .presenterRandomBlockStatus strong{
+    font-size:.72rem;
+  }
+
+  .presenterRandomCommandBar{
+    gap:6px;
+  }
+
+  .presenterRandomCommandBar .presenterBtn{
+    height:34px;
+    min-height:34px;
+
+    border-radius:10px;
+    font-size:.42rem;
   }
 }

@@ -5,6 +5,8 @@
 let presenterExplainActionBusy = false
 let presenterExplainPendingNumber = null
 let presenterExplainTimerInterval = null
+let presenterExplainCompensationPressTimer = null
+let presenterExplainCompensationPressActivated = false
 let presenterExplainLastScoreKey = ""
 const PRESENTER_EXPLAIN_TIMER_SECONDS = 60
 
@@ -389,6 +391,124 @@ function escapePresenterExplainHtml(value) {
     .replaceAll("'", "&#039;")
 }
 
+function getPresenterExplainCompensationNumber() {
+  const count =
+    getPresenterExplainWordsCount()
+
+  return [5, 7, 9].includes(count)
+    ? count
+    : 0
+}
+
+function isPresenterExplainCompensationNumber(number) {
+  return (
+    Number(number || 0) ===
+    getPresenterExplainCompensationNumber()
+  )
+}
+
+function clearPresenterExplainCompensationPress() {
+  clearTimeout(
+    presenterExplainCompensationPressTimer
+  )
+
+  presenterExplainCompensationPressTimer = null
+
+  document
+    .querySelectorAll(
+      ".segmentCompensationPressing"
+    )
+    .forEach(el => {
+      el.classList.remove(
+        "segmentCompensationPressing"
+      )
+    })
+}
+
+function startPresenterExplainCompensationPress(
+  event,
+  number
+) {
+  event.preventDefault()
+  event.stopPropagation()
+
+  clearPresenterExplainCompensationPress()
+
+  const safeNumber =
+    Number(number || 0)
+
+  if (
+    !isPresenterExplainCompensationNumber(
+      safeNumber
+    )
+  ) {
+    return false
+  }
+
+  presenterExplainCompensationPressActivated =
+    false
+
+  const button =
+    event.currentTarget
+
+  if (
+    event.pointerId &&
+    typeof button?.setPointerCapture ===
+      "function"
+  ) {
+    button.setPointerCapture(
+      event.pointerId
+    )
+  }
+
+  button?.classList.add(
+    "segmentCompensationPressing"
+  )
+
+  presenterExplainCompensationPressTimer =
+    setTimeout(() => {
+      presenterExplainCompensationPressActivated =
+        true
+
+      button?.classList.remove(
+        "segmentCompensationPressing"
+      )
+
+      openExplainPresenterNumber(
+        safeNumber,
+        event,
+        {
+          compensation: true
+        }
+      )
+    }, 700)
+
+  return false
+}
+
+function blockPresenterExplainCompensationNormalClick(
+  event,
+  number
+) {
+  event.preventDefault()
+  event.stopPropagation()
+
+  clearPresenterExplainCompensationPress()
+
+  if (
+    !presenterExplainCompensationPressActivated
+  ) {
+    showToast(
+      "اضغط مطولاً لتفعيل التعويض"
+    )
+  }
+
+  presenterExplainCompensationPressActivated =
+    false
+
+  return false
+}
+
 function buildPresenterExplainNumbersHtml() {
   const count =
     getPresenterExplainWordsCount()
@@ -419,13 +539,18 @@ function buildPresenterExplainNumbersHtml() {
       const isPending =
         presenterExplainPendingNumber === number
 
+      const isCompensation =
+        isPresenterExplainCompensationNumber(
+          number
+        )
+
       const disabled =
         isUsed ||
         isPending ||
         presenterExplainActionBusy ||
         !!currentNumber ||
         revealLock ||
-        !activeTeam
+        (!activeTeam && !isCompensation)
 
       return `
         <button
@@ -436,15 +561,28 @@ function buildPresenterExplainNumbersHtml() {
             ${isUsed ? "used presenterOpened" : ""}
             ${isCurrent ? "active selectedPresenterTeam" : ""}
             ${isPending ? "presenterPendingNumber" : ""}
+            ${isCompensation ? "presenterExplainCompensationNumber" : ""}
           "
           data-explain-number="${number}"
           ${disabled ? "disabled" : ""}
-          onclick="
-            openExplainPresenterNumber(
-              ${number},
-              event
-            )
-          "
+          ${
+            isCompensation
+              ? `
+                onpointerdown="startPresenterExplainCompensationPress(event, ${number})"
+                onpointerup="clearPresenterExplainCompensationPress()"
+                onpointerleave="clearPresenterExplainCompensationPress()"
+                onpointercancel="clearPresenterExplainCompensationPress()"
+                onclick="blockPresenterExplainCompensationNormalClick(event, ${number})"
+              `
+              : `
+                onclick="
+                  openExplainPresenterNumber(
+                    ${number},
+                    event
+                  )
+                "
+              `
+          }
           aria-label="فتح الكلمة رقم ${number}"
         >
           <span>
@@ -461,9 +599,10 @@ function buildPresenterExplainNumbersHtml() {
 ========================= */
 
 async function renderExplain() {
-  const panel = document.getElementById(
-    "presenterPanel"
-  )
+  const panel =
+    document.getElementById(
+      "presenterPanel"
+    )
 
   if (!panel) return
 
@@ -482,34 +621,19 @@ async function renderExplain() {
   panel.dataset.segment = "explain"
 
   panel.innerHTML = `
-    <div
-      class="presenterExplainPage"
-      data-presenter-segment="explain"
+    <section
+      class="presenterExplainScreen"
+      aria-label="لوحة تحكم اشرح الكلمة"
     >
 
-      <section class="presenterExplainOverview">
-
-        <div class="presenterExplainTeamsBox">
-          ${teamButtons()}
-        </div>
+      <main class="presenterExplainMain">
 
         <section
-          class="presenterCard presenterExplainStatusCard"
-          aria-label="حالة فقرة اشرح الكلمة"
+          class="presenterCard presenterExplainContentCard"
+          aria-label="المحتوى الظاهر"
         >
-          <div class="presenterExplainStatusItem">
-            <span class="presenterLabel">الحالة</span>
 
-            <strong
-              id="presenterExplainStatusText"
-              class="presenterExplainStatusText"
-            >
-              اختر الفريق ثم الرقم
-            </strong>
-          </div>
-
-          <div class="presenterExplainStatusItem">
-            <span class="presenterLabel">الرقم الحالي</span>
+          <div class="presenterExplainInfoLine">
 
             <strong
               id="presenterExplainCurrentBadge"
@@ -521,10 +645,11 @@ async function renderExplain() {
                   : "—"
               }
             </strong>
-          </div>
 
-          <div class="presenterExplainStatusItem presenterExplainTimerStatus">
-            <span class="presenterLabel">المؤقت</span>
+            <div
+              id="presenterExplainWordState"
+              class="presenterExplainWordState"
+            ></div>
 
             <strong
               id="presenterExplainTimerText"
@@ -540,52 +665,8 @@ async function renderExplain() {
                   : "—"
               }
             </strong>
+
           </div>
-        </section>
-
-      </section>
-
-      <section class="presenterExplainContent">
-
-        <section
-          class="presenterCard presenterExplainNumbersCard"
-          aria-label="أرقام الكلمات"
-        >
-          <header class="presenterExplainSectionHead">
-            <div>
-              <span class="presenterLabel">الاختيارات</span>
-              <h2>أرقام الكلمات</h2>
-            </div>
-
-            <span class="presenterExplainCountBadge">
-              ${count} كلمات
-            </span>
-          </header>
-
-          <div
-            id="presenterExplainNumbersGrid"
-            class="presenterExplainNumbersGrid"
-            style="grid-template-columns:repeat(${count},minmax(0,1fr));"
-          >
-            ${buildPresenterExplainNumbersHtml()}
-          </div>
-        </section>
-
-        <section
-          class="presenterCard presenterExplainWordCard"
-          aria-label="الكلمة الحالية"
-        >
-          <header class="presenterExplainSectionHead">
-            <div>
-              <span class="presenterLabel">المحتوى</span>
-              <h2>الكلمة الحالية</h2>
-            </div>
-
-            <span
-              id="presenterExplainWordState"
-              class="presenterExplainWordState"
-            ></span>
-          </header>
 
           <div
             id="presenterExplainWordText"
@@ -604,80 +685,100 @@ async function renderExplain() {
                 ? escapePresenterExplainHtml(
                     currentWord || "—"
                   )
-                : "اختر الفريق ثم رقم الكلمة"
+                : "اختر الفريق ثم الرقم"
             }
           </div>
+
         </section>
 
-      </section>
-
-      <footer
-        class="presenterExplainActions"
-        aria-label="أزرار التحكم"
-      >
-
-              <button
-          type="button"
-          id="presenterExplainDoubleBtn"
-          class="presenterBtn gray presenterExplainDoubleBtn"
-          onclick="runPresenterExplainAction('double')"
+        <section
+          class="presenterCard presenterExplainControlCard"
+          aria-label="الأرقام والتحكم"
         >
-          دوببلا
-        </button>
-        <button
-          type="button"
-          id="presenterExplainStartTimerBtn"
-          class="presenterBtn dark presenterExplainStartTimerBtn"
-          onclick="runPresenterExplainAction('startTimer')"
-        >
-          بدء المؤقت
-        </button>
 
-        <button
-          type="button"
-          id="presenterExplainToggleWordBtn"
-          class="presenterBtn blue presenterExplainToggleWordBtn"
-          onclick="runPresenterExplainAction('toggleWordVisible')"
-        >
-          إخفاء الكلمة
-        </button>
+          <div
+            id="presenterExplainNumbersGrid"
+            class="presenterExplainNumbersGrid count-${count}"
+          >
+            ${buildPresenterExplainNumbersHtml()}
+          </div>
 
-        <button
-          type="button"
-          id="presenterExplainWrongBtn"
-          class="presenterBtn red presenterExplainWrongBtn"
-          onclick="runPresenterExplainAction('wrong')"
-        >
-          ✕ خطأ
-        </button>
+          <div
+            class="presenterExplainActions"
+            aria-label="أزرار التحكم"
+          >
 
-        <button
-          type="button"
-          id="presenterExplainCorrectBtn"
-          class="presenterBtn green presenterExplainCorrectBtn"
-          onclick="runPresenterExplainAction('correct')"
-        >
-          ✓ صح
-        </button>
-      </footer>
+            <button
+              type="button"
+              id="presenterExplainDoubleBtn"
+              class="presenterBtn presenterExplainDoubleBtn"
+              onclick="runPresenterExplainAction('double')"
+            >
+              دوببلا
+            </button>
 
-    </div>
+            <button
+              type="button"
+              id="presenterExplainStartTimerBtn"
+              class="presenterBtn presenterExplainStartTimerBtn"
+              onclick="runPresenterExplainAction('startTimer')"
+            >
+              المؤقت
+            </button>
+
+            <button
+              type="button"
+              id="presenterExplainToggleWordBtn"
+              class="presenterBtn presenterExplainToggleWordBtn"
+              onclick="runPresenterExplainAction('toggleWordVisible')"
+            >
+              إخفاء بالعرض
+            </button>
+
+            <button
+              type="button"
+              id="presenterExplainWrongBtn"
+              class="presenterBtn presenterExplainWrongBtn"
+              onclick="runPresenterExplainAction('wrong')"
+            >
+              خطأ
+            </button>
+
+            <button
+              type="button"
+              id="presenterExplainCorrectBtn"
+              class="presenterBtn presenterExplainCorrectBtn"
+              onclick="runPresenterExplainAction('correct')"
+            >
+              صح
+            </button>
+
+          </div>
+
+        </section>
+
+      </main>
+
+    </section>
   `
 
   refreshPresenterExplainFromState()
   startPresenterExplainTimerWatcher()
 }
-
 /* =========================
    OPEN NUMBER
 ========================= */
 
 async function openExplainPresenterNumber(
   number,
-  event
+  event,
+  options = {}
 ) {
   const safeNumber =
     Number(number || 0)
+
+  const compensationMode =
+    options.compensation === true
 
   if (
     !safeNumber ||
@@ -699,7 +800,22 @@ async function openExplainPresenterNumber(
   const revealLock =
     getPresenterExplainRevealLock()
 
-  if (!activeTeam) {
+  const isCompensation =
+    isPresenterExplainCompensationNumber(
+      safeNumber
+    )
+
+  if (
+    isCompensation &&
+    !compensationMode
+  ) {
+    showToast(
+      "اضغط مطولاً لتفعيل التعويض"
+    )
+    return
+  }
+
+  if (!activeTeam && !compensationMode) {
     showToast("اختر الفريق أولاً")
     return
   }
@@ -734,9 +850,11 @@ async function openExplainPresenterNumber(
       safeNumber
     )
 
-  /*
-    تحديث فوري في واجهة المقدم.
-  */
+  const nextTeam =
+    compensationMode
+      ? null
+      : activeTeam
+
   presenterLiveState = {
     ...(presenterLiveState || {}),
 
@@ -744,15 +862,33 @@ async function openExplainPresenterNumber(
       ...root,
 
       currentNumber: safeNumber,
-      currentTeam: activeTeam,
+      currentTeam: nextTeam,
+      activeTeam: nextTeam,
+      selectedTeam: nextTeam,
 
       explainState: {
         ...explain,
 
         currentNumber: safeNumber,
         currentWord: word,
-        currentTeam: activeTeam,
-        activeTeam,
+        currentTeam: nextTeam,
+        activeTeam: nextTeam,
+        selectedTeam: nextTeam,
+
+        compensationActive: compensationMode,
+        compensationNumber:
+          compensationMode
+            ? safeNumber
+            : null,
+        compensationReturnTeam:
+          compensationMode &&
+          (
+            activeTeam === "A" ||
+            activeTeam === "B"
+          )
+            ? activeTeam
+            : null,
+
         wordVisible: true,
         timerVisible: false,
         timeLeft: PRESENTER_EXPLAIN_TIMER_SECONDS,
@@ -768,7 +904,8 @@ async function openExplainPresenterNumber(
     }
   }
 
-  const button = event?.currentTarget
+  const button =
+    event?.currentTarget
 
   if (button) {
     button.disabled = true
@@ -781,14 +918,15 @@ async function openExplainPresenterNumber(
 
   refreshPresenterExplainFromState()
 
-const sent =
-  await sendPresenterExplainCommandSafe(
-    "openNumber",
-    {
-      number: safeNumber,
-      team: activeTeam
-    }
-  )
+  const sent =
+    await sendPresenterExplainCommandSafe(
+      "openNumber",
+      {
+        number: safeNumber,
+        team: activeTeam,
+        compensation: compensationMode
+      }
+    )
 
   presenterExplainActionBusy = false
 
@@ -817,7 +955,6 @@ const sent =
     refreshPresenterExplainFromState()
   }, 220)
 }
-
 /* =========================
    ACTIONS
 ========================= */
@@ -1164,9 +1301,9 @@ function updatePresenterExplainActionButtons() {
       basicDisabled
 
     toggleWordButton.innerText =
-      wordVisible
-        ? "إخفاء الكلمة"
-        : "إظهار الكلمة"
+     wordVisible
+    ? "إخفاء بالعرض"
+    : "إظهار بالعرض"
   }
 
   if (correctButton) {
@@ -1268,9 +1405,8 @@ function refreshPresenterExplainFromState() {
         "—"
     }
 
-    wordBox.classList.toggle(
-      "presenterExplainWordHidden",
-      !!currentNumber && !wordVisible
+    wordBox.classList.remove(
+     "presenterExplainWordHidden"
     )
   }
 
@@ -1321,20 +1457,34 @@ function refreshPresenterExplainFromState() {
     }
   }
 
-  if (grid) {
-    grid.style.gridTemplateColumns =
-      `repeat(${count}, minmax(0, 1fr))`
+if (grid) {
+  grid.style.gridTemplateColumns = ""
 
-    const currentButtons =
-      grid.querySelectorAll(
-        "[data-explain-number]"
-      )
+  grid.classList.toggle(
+    "count-5",
+    count === 5
+  )
 
-    if (currentButtons.length !== count) {
-      grid.innerHTML =
-        buildPresenterExplainNumbersHtml()
-    }
+  grid.classList.toggle(
+    "count-7",
+    count === 7
+  )
+
+  grid.classList.toggle(
+    "count-9",
+    count === 9
+  )
+
+  const currentButtons =
+    grid.querySelectorAll(
+      "[data-explain-number]"
+    )
+
+  if (currentButtons.length !== count) {
+    grid.innerHTML =
+      buildPresenterExplainNumbersHtml()
   }
+ }
 
   document
     .querySelectorAll(
@@ -1382,13 +1532,23 @@ function refreshPresenterExplainFromState() {
         isPending
       )
 
-      button.disabled =
-        isUsed ||
-        isPending ||
-        presenterExplainActionBusy ||
-        !!currentNumber ||
-        revealLock ||
-        !activeTeam
+      const isCompensation =
+  isPresenterExplainCompensationNumber(
+    number
+  )
+
+button.classList.toggle(
+  "presenterExplainCompensationNumber",
+  isCompensation
+)
+
+button.disabled =
+  isUsed ||
+  isPending ||
+  presenterExplainActionBusy ||
+  !!currentNumber ||
+  revealLock ||
+  (!activeTeam && !isCompensation)
 
       const text = button.querySelector("span")
 
@@ -1519,9 +1679,10 @@ async function loadPresenterExplainReaderRows({
 ========================= */
 
 async function renderPresenterReaderExplain() {
-  const panel = document.getElementById(
-    "presenterReaderPanel"
-  )
+  const panel =
+    document.getElementById(
+      "presenterReaderPanel"
+    )
 
   if (!panel) return
 
@@ -1529,170 +1690,64 @@ async function renderPresenterReaderExplain() {
     await loadPresenterExplainReaderRows()
 
   if (!rows.length) {
-    panel.innerHTML = readerEmpty(
-      "لا توجد كلمات في اشرح الكلمة"
-    )
+    panel.innerHTML =
+      readerEmpty(
+        "لا توجد كلمات في اشرح الكلمة"
+      )
+
     return
   }
 
   panel.innerHTML = `
-    <section
-      class="presenterExplainControlView"
-      data-presenter-segment="explain"
-    >
+    <section class="readerRoundsStack">
 
-      <header class="presenterExplainControlHeader">
+      <section class="readerRoundPage">
 
-        <div class="presenterExplainHeaderTeams">
-          ${teamButtons()}
+        <header class="readerRoundHead">
+          <h2>اشرح الكلمة</h2>
+          <span>${rows.length} كلمات</span>
+        </header>
+
+        <div class="readerSimpleGrid">
+          ${rows
+            .map((row, index) => {
+              const number =
+                Number(
+                  row.number ||
+                  row.id ||
+                  index + 1
+                )
+
+              return `
+                <article
+                  class="readerMiniCard"
+                  data-reader-id="explain_${number}"
+                >
+                  <div class="readerBlock">
+                    <label>الرقم</label>
+                    <p>${number}</p>
+                  </div>
+
+                  <div class="readerBlock">
+                    <label>الكلمة</label>
+                    <p>${escapePresenterExplainHtml(row.word || "—")}</p>
+                  </div>
+                </article>
+              `
+            })
+            .join("")}
         </div>
 
-        <div class="presenterExplainHeaderInfo">
-
-          <span
-            id="presenterExplainStatusText"
-            class="presenterExplainStatusText"
-          >
-            —
-          </span>
-
-          <strong
-            id="presenterExplainCurrentBadge"
-            class="presenterExplainCurrentBadge"
-          >
-            ${
-              currentNumber
-                ? `رقم ${currentNumber}`
-                : "—"
-            }
-          </strong>
-
-          <strong
-            id="presenterExplainTimerText"
-            class="presenterExplainTimerBox ${
-              getPresenterExplainTimerVisible()
-                ? ""
-                : "hidden"
-            }"
-          >
-            ${
-              getPresenterExplainTimerVisible()
-                ? getPresenterExplainRemainingTime()
-                : "—"
-            }
-          </strong>
-
-        </div>
-
-      </header>
-
-      <main class="presenterExplainControlMain">
-
-        <section class="presenterExplainNumbersPanel">
-
-          <header class="presenterExplainPanelTitle">
-            <h2>الأرقام</h2>
-
-            <span class="presenterExplainCountBadge">
-              ${count}
-            </span>
-          </header>
-
-          <div
-            id="presenterExplainNumbersGrid"
-            class="presenterExplainNumbersGrid"
-            style="grid-template-columns:repeat(${count},minmax(0,1fr));"
-          >
-            ${buildPresenterExplainNumbersHtml()}
-          </div>
-
-        </section>
-
-        <section class="presenterExplainWordPanel">
-
-          <header class="presenterExplainPanelTitle">
-            <h2>الكلمة</h2>
-
-            <span
-              id="presenterExplainWordState"
-              class="presenterExplainWordState"
-            ></span>
-          </header>
-
-          <div
-            id="presenterExplainWordText"
-            class="presenterExplainWordBox ${
-              explain.answerResult === "correct"
-                ? "answerCorrect"
-                : ""
-            } ${
-              explain.answerResult === "wrong"
-                ? "answerWrong"
-                : ""
-            }"
-          >
-            ${
-              currentNumber
-                ? escapePresenterExplainHtml(
-                    currentWord || "—"
-                  )
-                : "—"
-            }
-          </div>
-
-        </section>
-
-      </main>
-
-      <footer class="presenterExplainCommandBar">
-
-        <button
-          type="button"
-          id="presenterExplainDoubleBtn"
-          class="presenterBtn gray presenterExplainDoubleBtn"
-          onclick="runPresenterExplainAction('double')"
-        >
-          دوببلا
-        </button>
-
-        <button
-          type="button"
-          id="presenterExplainStartTimerBtn"
-          class="presenterBtn presenterExplainStartTimerBtn"
-          onclick="runPresenterExplainAction('startTimer')"
-        >
-          المؤقت
-        </button>
-
-        <button
-          type="button"
-          id="presenterExplainToggleWordBtn"
-          class="presenterBtn blue presenterExplainToggleWordBtn"
-          onclick="runPresenterExplainAction('toggleWordVisible')"
-        >
-          الكلمة
-        </button>
-
-        <button
-          type="button"
-          id="presenterExplainWrongBtn"
-          class="presenterBtn red presenterExplainWrongBtn"
-          onclick="runPresenterExplainAction('wrong')"
-        >
-          خطأ
-        </button>
-
-        <button
-          type="button"
-          id="presenterExplainCorrectBtn"
-          class="presenterBtn green presenterExplainCorrectBtn"
-          onclick="runPresenterExplainAction('correct')"
-        >
-          صح
-        </button>
-
-      </footer>
+      </section>
 
     </section>
   `
 }
+window.startPresenterExplainCompensationPress =
+  startPresenterExplainCompensationPress
+
+window.clearPresenterExplainCompensationPress =
+  clearPresenterExplainCompensationPress
+
+window.blockPresenterExplainCompensationNormalClick =
+  blockPresenterExplainCompensationNormalClick

@@ -11,7 +11,7 @@ const ARCHIVE_MAX_TEXT_BOXES = 20
 const ALL_GAME_SEGMENTS = [
   { key: "warmup", title: "التسخين", sort: 1 },
   { key: "top10", title: "Top 10", sort: 2 },
-  { key: "letterli", title: "حرفلي", sort: 3 },
+  { key: "familyDidi", title: "فاملي ديدي", sort: 3 },
   { key: "who", title: "من هو", sort: 4 },
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
 
@@ -37,6 +37,10 @@ let adminNavBusy = false
 let adminSavingLock = false
 
 let gameToastTimer = null
+let supabaseRuntimeCleanupSummary = null
+let supabaseCleanupModels = []
+const ADMIN_MANAGEMENT_PIN =
+  "7850"
 
 let globalSegmentVisibilityMap = {}
 
@@ -46,6 +50,106 @@ let globalSegmentVisibilityLoadPromise = null
 const GLOBAL_SEGMENT_VISIBILITY_CACHE_MS =
   60 * 1000
 
+
+  const ADMIN_ACTIVE_MODEL_KEY =
+  "admin_active_model_v1"
+
+  const ADMIN_ACTIVE_VIEW_KEY =
+  "admin_active_view_v1"
+
+function saveAdminActiveView(
+  view = currentAdminSegment
+) {
+  const value =
+    String(view || "").trim()
+
+  try {
+    if (!value) {
+      sessionStorage.removeItem(
+        ADMIN_ACTIVE_VIEW_KEY
+      )
+
+      return
+    }
+
+    sessionStorage.setItem(
+      ADMIN_ACTIVE_VIEW_KEY,
+      value
+    )
+  } catch {}
+}
+
+function getSavedAdminActiveView() {
+  try {
+    return String(
+      sessionStorage.getItem(
+        ADMIN_ACTIVE_VIEW_KEY
+      ) || ""
+    ).trim()
+  } catch {
+    return ""
+  }
+}
+
+function clearSavedAdminActiveView() {
+  try {
+    sessionStorage.removeItem(
+      ADMIN_ACTIVE_VIEW_KEY
+    )
+  } catch {}
+}
+
+function saveAdminActiveModel() {
+  if (!currentModel) return
+
+  try {
+    sessionStorage.setItem(
+      ADMIN_ACTIVE_MODEL_KEY,
+      JSON.stringify({
+        id: Number(currentModel),
+        name: String(
+          currentModelName || ""
+        ),
+        setupCompleted:
+          currentModelSetupCompleted !== false
+      })
+    )
+  } catch {}
+}
+
+function getSavedAdminActiveModel() {
+  try {
+    const saved =
+      JSON.parse(
+        sessionStorage.getItem(
+          ADMIN_ACTIVE_MODEL_KEY
+        ) || "null"
+      )
+
+    const id =
+      Number(saved?.id || 0)
+
+    if (!id) return null
+
+    return {
+      id,
+      name:
+        String(saved?.name || ""),
+      setupCompleted:
+        saved?.setupCompleted !== false
+    }
+  } catch {
+    return null
+  }
+}
+
+function clearSavedAdminActiveModel() {
+  try {
+    sessionStorage.removeItem(
+      ADMIN_ACTIVE_MODEL_KEY
+    )
+  } catch {}
+}
 
 /* =========================
    Admin Home Cache
@@ -97,61 +201,195 @@ async function ensureAdminAnonymousSession() {
     return adminAuthReadyPromise
   }
 
-  adminAuthReadyPromise = (async () => {
-    const {
-      data: sessionData,
-      error: sessionError
-    } = await db.auth.getSession()
+  adminAuthReadyPromise =
+    (async () => {
+      let lastError = null
 
-    if (
-      sessionError
-    ) {
-      console.log(
-        "ADMIN AUTH SESSION ERROR:",
-        sessionError
+      for (
+        let attempt = 1;
+        attempt <= 2;
+        attempt++
+      ) {
+        try {
+          const {
+            data: sessionData,
+            error: sessionError
+          } =
+            await db.auth.getSession()
+
+          if (sessionError) {
+            console.warn(
+              "ADMIN AUTH SESSION ERROR:",
+              sessionError
+            )
+
+            lastError =
+              sessionError
+          }
+
+          const existingUser =
+            sessionData?.session?.user ||
+            null
+
+          if (existingUser?.id) {
+            window.adminAuthUserId =
+              existingUser.id
+
+            return existingUser
+          }
+
+          const {
+            data,
+            error
+          } =
+            await db.auth
+              .signInAnonymously()
+
+          if (error) {
+            throw error
+          }
+
+          const user =
+            data?.user ||
+            data?.session?.user ||
+            null
+
+          if (!user?.id) {
+            throw new Error(
+              "Anonymous admin user was not created"
+            )
+          }
+
+          window.adminAuthUserId =
+            user.id
+
+          return user
+        } catch (error) {
+          lastError =
+            error
+
+          console.warn(
+            `ADMIN AUTH ATTEMPT ${attempt} ERROR:`,
+            error
+          )
+
+          if (attempt < 2) {
+            await new Promise(resolve => {
+              setTimeout(
+                resolve,
+                800
+              )
+            })
+          }
+        }
+      }
+
+      throw (
+        lastError ||
+        new Error(
+          "Admin authentication failed"
+        )
       )
-    }
+    })()
 
-    if (
-      sessionData?.session?.user?.id
-    ) {
-      window.adminAuthUserId =
-        sessionData.session.user.id
+  try {
+    return await adminAuthReadyPromise
+  } catch (error) {
+ 
+    adminAuthReadyPromise =
+      null
 
-      return sessionData.session.user
-    }
+    window.adminAuthUserId =
+      null
+
+    throw error
+  }
+}
+
+async function checkAdminDeviceAccess() {
+  try {
+    await ensureAdminAnonymousSession()
 
     const {
       data,
       error
-    } = await db.auth.signInAnonymously()
+    } = await db.rpc(
+      "is_admin_device"
+    )
 
     if (error) {
-      console.log(
-        "ADMIN AUTH ANON ERROR:",
+      console.error(
+        "CHECK ADMIN DEVICE ACCESS ERROR:",
         error
       )
 
-      throw error
+      return null
     }
 
-    window.adminAuthUserId =
-      data?.user?.id || null
+    return data === true
+  } catch (error) {
+    console.error(
+      "CHECK ADMIN DEVICE ACCESS CATCH:",
+      error
+    )
 
-    return data?.user || null
-  })()
-
-  return adminAuthReadyPromise
+    return null
+  }
 }
 
-async function checkAdminDeviceAccess() {
-  await ensureAdminAnonymousSession()
-  return true
-}
+async function claimAdminDeviceAccess(code) {
+  const cleanCode =
+    String(code || "").trim()
 
-async function claimAdminDeviceAccess() {
-  await ensureAdminAnonymousSession()
-  return true
+  if (!cleanCode) {
+    return false
+  }
+
+  try {
+    await ensureAdminAnonymousSession()
+
+    const deviceName = [
+      navigator.platform || "",
+      navigator.userAgent || ""
+    ]
+      .filter(Boolean)
+      .join(" — ")
+      .slice(0, 500)
+
+    const {
+      data,
+      error
+    } = await db.rpc(
+      "claim_admin_device",
+      {
+        p_code: cleanCode,
+        p_device_name:
+          deviceName || null
+      }
+    )
+
+    if (error) {
+      console.error(
+        "CLAIM ADMIN DEVICE ACCESS ERROR:",
+        error
+      )
+
+      return false
+    }
+
+    if (data !== true) {
+      return false
+    }
+
+    return await checkAdminDeviceAccess()
+  } catch (error) {
+    console.error(
+      "CLAIM ADMIN DEVICE ACCESS CATCH:",
+      error
+    )
+
+    return false
+  }
 }
 
 window.ensureAdminAnonymousSession =
@@ -163,14 +401,7 @@ window.checkAdminDeviceAccess =
 window.claimAdminDeviceAccess =
   claimAdminDeviceAccess
 
-document.addEventListener("DOMContentLoaded", () => {
-  ensureAdminAnonymousSession().catch(error => {
-    console.log(
-      "ADMIN AUTH BOOT ERROR:",
-      error
-    )
-  })
-})
+
 
 /* =========================
    Admin Saving Lock
@@ -629,16 +860,150 @@ async function uploadVideoFile(
 /* =========================
    3) Initialization
 ========================= */
-
 async function initAdminPanel() {
   await loadModels()
 
+  const savedView =
+    getSavedAdminActiveView()
+
+  const savedModel =
+    getSavedAdminActiveModel()
+
+  /* =========================
+     1) استرجاع صفحات الإدارة
+  ========================= */
+
+if (
+  savedView === "management" ||
+  savedView === "modelsManagement" ||
+  savedView === "runtimeManagement"
+) {
+  clearSavedAdminActiveView()
+
   currentModel = null
   currentModelName = ""
+  currentModelSetupCompleted = true
   currentAdminSegment = ""
 
   updateAdminBrandModel()
   showAdminModelGate()
+
+  return true
+}
+
+  /* =========================
+     2) لا يوجد نموذج محفوظ
+  ========================= */
+
+  if (!savedModel) {
+    currentModel = null
+    currentModelName = ""
+    currentModelSetupCompleted = true
+    currentAdminSegment = ""
+
+    updateAdminBrandModel()
+    showAdminModelGate()
+
+    return true
+  }
+
+  const modelId =
+    Number(savedModel.id || 0)
+
+  const list =
+    document.getElementById(
+      "modelsList"
+    )
+
+  const modelExists =
+    modelId &&
+    list &&
+    Array.from(
+      list.options || []
+    ).some(option => {
+      return (
+        Number(option.value || 0) ===
+        modelId
+      )
+    })
+
+  /*
+    إذا انتهت جلسة المتصفح أو لم يعد النموذج
+    مفتوحًا، نرجع للصفحة الرئيسية.
+  */
+  if (
+    !modelExists ||
+    !isAdminModelUnlocked(modelId)
+  ) {
+    clearSavedAdminActiveModel()
+    clearSavedAdminActiveView()
+
+    currentModel = null
+    currentModelName = ""
+    currentModelSetupCompleted = true
+    currentAdminSegment = ""
+
+    updateAdminBrandModel()
+    showAdminModelGate()
+
+    return true
+  }
+
+  /* =========================
+     3) استرجاع النموذج المفتوح
+  ========================= */
+
+  if (list) {
+    list.value =
+      String(modelId)
+  }
+
+  currentModel =
+    modelId
+
+  currentModelName =
+    String(
+      savedModel.name ||
+      `نموذج ${modelId}`
+    )
+
+  currentModelSetupCompleted =
+    savedModel.setupCompleted !== false
+
+  updateAdminBrandModel()
+  showAdminWorkspace()
+
+  /* نموذج جديد لم تكتمل إعداداته */
+  if (
+    currentModelSetupCompleted ===
+    false
+  ) {
+    await openAdminSegmentSettings()
+    return true
+  }
+
+  /* =========================
+     4) استرجاع آخر صفحة
+  ========================= */
+
+  if (
+    !savedView ||
+    savedView === "home"
+  ) {
+    await renderAdminHome()
+    return true
+  }
+
+  if (savedView === "settings") {
+    await openAdminSegmentSettings()
+    return true
+  }
+
+  await openAdminSegment(
+    savedView
+  )
+
+  return true
 }
 
 /* =========================
@@ -986,10 +1351,17 @@ async function requestAdminModelAccess(
       data.setup_completed !== false
   }
 
-  const savedPin =
-    String(data.admin_pin || "").trim()
+const savedPin =
+  String(data.admin_pin || "").trim()
 
-  if (!savedPin) {
+if (
+  savedPin &&
+  isAdminModelUnlocked(id)
+) {
+  return modelInfo
+}
+
+if (!savedPin) {
     const newPin =
       await requestAdminPinModal({
         title: `تأمين ${modelName}`,
@@ -1327,6 +1699,12 @@ const SUPABASE_CLEANUP_TABLES = [
     table: "top10_questions",
     label: "Top 10"
   },
+
+  {
+    table: "family_didi_questions",
+    label: "فاملي ديدي"
+  },
+  
   {
     table: "auction_questions",
     label: "فتبلة"
@@ -1351,18 +1729,18 @@ const SUPABASE_CLEANUP_TABLES = [
     table: "final_round_meta",
     label: "بيانات الفاصلة"
   },
-  {
-    table: "final_round1_items",
-    label: "الفاصلة الجولة 1 / قصة"
-  },
-  {
-    table: "final_round2_items",
-    label: "الفاصلة الجولة 2"
-  },
-  {
-    table: "final_round3_items",
-    label: "الفاصلة صور / تركيز"
-  },
+{
+  table: "final_round1_items",
+  label: "ٮدوں ٮڡاط / قصة"
+},
+{
+  table: "final_round2_items",
+  label: "صح صحلي"
+},
+{
+  table: "final_round3_items",
+  label: "صور صح صحلي / التركيز"
+},
   {
     table: "archive_boxes",
     label: "الأرشيف الجولات"
@@ -1375,14 +1753,6 @@ const SUPABASE_CLEANUP_TABLES = [
     table: "random_challenge_questions",
     label: "التحدي"
   },
-  {
-    table: "game_sessions",
-    label: "جلسات اللعب / أسماء الفرق"
-  },
-  {
-    table: "presenter_commands",
-    label: "أوامر المقدم"
-  }
 ]
 
 const SUPABASE_CLEANUP_MEDIA_TABLES = [
@@ -1390,26 +1760,34 @@ const SUPABASE_CLEANUP_MEDIA_TABLES = [
     table: "questions",
     columns: ["image"]
   },
+
   {
     table: "auction_questions",
     columns: ["image", "video"]
   },
+
   {
     table: "who_images",
     columns: ["image"]
   },
+
   {
     table: "archive_items",
     columns: ["image"]
   },
+
+
   {
     table: "final_round1_items",
     columns: ["image"]
   },
+
+
   {
     table: "final_round3_items",
     columns: ["image", "video"]
-  }
+  },
+
 ]
 
 function normalizeCleanupStoragePath(value) {
@@ -1422,20 +1800,24 @@ function normalizeCleanupStoragePath(value) {
 async function getSupabaseCleanupUsedStoragePaths() {
   const usedPaths = new Set()
 
-  for (const item of SUPABASE_CLEANUP_MEDIA_TABLES) {
+  for (
+    const item of
+    SUPABASE_CLEANUP_MEDIA_TABLES
+  ) {
     const select =
       item.columns.join(",")
 
-    const result = await dbSelect(
-      item.table,
-      query => query,
-      {
-        select,
-        fallback: [],
-        logLabel:
-          `CLEANUP USED MEDIA ${item.table}`
-      }
-    )
+    const result =
+      await dbSelect(
+        item.table,
+        query => query,
+        {
+          select,
+          fallback: [],
+          logLabel:
+            `CLEANUP USED MEDIA ${item.table}`
+        }
+      )
 
     if (!result.ok) {
       console.error(
@@ -1443,13 +1825,15 @@ async function getSupabaseCleanupUsedStoragePaths() {
         result.error
       )
 
-      continue
+      return null
     }
 
     ;(result.data || []).forEach(row => {
       item.columns.forEach(column => {
         const path =
-          normalizeCleanupStoragePath(row[column])
+          normalizeCleanupStoragePath(
+            row[column]
+          )
 
         if (path) {
           usedPaths.add(path)
@@ -1460,6 +1844,7 @@ async function getSupabaseCleanupUsedStoragePaths() {
 
   return usedPaths
 }
+
 function chunkSupabaseCleanupItems(items, size = 100) {
   const chunks = []
 
@@ -1629,7 +2014,10 @@ async function collectSupabaseCleanupDeletePlan(modelIds) {
   }
 }
 
-async function deleteSupabaseCleanupRowsByIds(table, ids) {
+async function deleteSupabaseCleanupRowsByIds(
+  table,
+  ids
+) {
   const cleanIds =
     Array.from(
       new Set(ids || [])
@@ -1660,6 +2048,8 @@ async function deleteSupabaseCleanupRowsByIds(table, ids) {
           chunk
         ),
       {
+        select: "id",
+        fallback: [],
         logLabel:
           `CLEANUP DELETE ROWS ${table}`
       }
@@ -1673,31 +2063,89 @@ async function deleteSupabaseCleanupRowsByIds(table, ids) {
 
       return false
     }
+
+    const deletedIds =
+      Array.isArray(result.data)
+        ? result.data
+            .map(row => row?.id)
+            .filter(value => {
+              return (
+                value !== null &&
+                typeof value !== "undefined" &&
+                value !== ""
+              )
+            })
+        : []
+
+    if (
+      deletedIds.length !==
+      chunk.length
+    ) {
+      console.error(
+        `CLEANUP DELETE ROWS ${table} INCOMPLETE:`,
+        {
+          requested:
+            chunk.length,
+
+          deleted:
+            deletedIds.length,
+
+          chunk,
+
+          result:
+            result.data
+        }
+      )
+
+      return false
+    }
   }
 
   return true
 }
 
 async function deleteSupabaseCleanupUnusedStorage() {
-  const usedPaths =
-    await getSupabaseCleanupUsedStoragePaths()
-
-  let storageFiles = []
+  let usedPaths
+  let storageFiles
 
   try {
+    usedPaths =
+      await getSupabaseCleanupUsedStoragePaths()
+
+    if (!(usedPaths instanceof Set)) {
+      console.error(
+        "CLEANUP USED STORAGE PATHS INVALID"
+      )
+
+      return false
+    }
+
     storageFiles =
       await listStorageFilesRecursive("")
   } catch (error) {
     console.error(
-      "CLEANUP UNUSED STORAGE LIST ERROR:",
+      "CLEANUP UNUSED STORAGE READ ERROR:",
       error
     )
 
     return false
   }
 
+  const normalizedStorageFiles =
+    Array.from(
+      new Set(
+        (storageFiles || [])
+          .map(path => {
+            return normalizeCleanupStoragePath(
+              path
+            )
+          })
+          .filter(Boolean)
+      )
+    )
+
   const unusedPaths =
-    storageFiles.filter(path => {
+    normalizedStorageFiles.filter(path => {
       return !usedPaths.has(path)
     })
 
@@ -1705,7 +2153,29 @@ async function deleteSupabaseCleanupUnusedStorage() {
     return true
   }
 
-  return deleteAdminStorageUrls(unusedPaths)
+  const chunks =
+    chunkSupabaseCleanupItems(
+      unusedPaths,
+      100
+    )
+
+  for (const chunk of chunks) {
+    const deleted =
+      await deleteAdminStorageUrls(
+        chunk
+      )
+
+    if (!deleted) {
+      console.error(
+        "CLEANUP UNUSED STORAGE DELETE FAILED:",
+        chunk
+      )
+
+      return false
+    }
+  }
+
+  return true
 }
 
 async function cleanupSupabaseSafeResidues() {
@@ -1715,7 +2185,15 @@ async function cleanupSupabaseSafeResidues() {
 
   const confirmed =
     await showAdminConfirm(
-      "سيتم حذف البقايا الآمنة فقط:\n\n- صفوف الجداول التابعة لنماذج محذوفة\n- الصفوف التي بدون model\n- ملفات Storage غير المستخدمة\n\nلن يتم حذف أي ملف مستخدم داخل نموذج موجود.",
+      [
+        "سيتم حذف البقايا الآمنة فقط:",
+        "",
+        "- صفوف الجداول التابعة لنماذج محذوفة",
+        "- الصفوف التي بدون model",
+        "- ملفات Storage غير المستخدمة",
+        "",
+        "لن يتم حذف أي ملف مستخدم داخل نموذج موجود."
+      ].join("\n"),
       {
         title: "حذف البقايا الآمنة",
         okText: "نعم، احذف البقايا",
@@ -1751,30 +2229,25 @@ async function cleanupSupabaseSafeResidues() {
         modelIds
       )
 
-    if (plan.mediaPaths.length) {
-      const mediaDeleted =
-        await deleteAdminStorageUrls(
-          plan.mediaPaths
-        )
+    const failedPlan =
+      plan.tablePlans.find(item => {
+        return item.failed === true
+      })
 
-      if (!mediaDeleted) {
-        showGameToast(
-          "توقف التنظيف لأن بعض ملفات البقايا لم تُحذف",
-          "error"
-        )
+    if (failedPlan) {
+      showGameToast(
+        `تعذر فحص ${failedPlan.label}`,
+        "error"
+      )
 
-        return false
-      }
+      return false
     }
 
-    for (const tablePlan of plan.tablePlans) {
-      if (tablePlan.failed) {
-        showGameToast(
-          `تعذر فحص ${tablePlan.label}`,
-          "error"
-        )
+    let deletedRowsCount = 0
 
-        return false
+    for (const tablePlan of plan.tablePlans) {
+      if (!tablePlan.ids.length) {
+        continue
       }
 
       const rowsDeleted =
@@ -1785,34 +2258,46 @@ async function cleanupSupabaseSafeResidues() {
 
       if (!rowsDeleted) {
         showGameToast(
-          `تعذر حذف بقايا ${tablePlan.label}`,
+          `توقف التنظيف عند ${tablePlan.label}`,
           "error"
         )
 
+        await scanSupabaseCleanup()
+
         return false
       }
+
+      deletedRowsCount +=
+        tablePlan.ids.length
     }
 
     const unusedStorageDeleted =
       await deleteSupabaseCleanupUnusedStorage()
 
-    if (!unusedStorageDeleted) {
-      showGameToast(
-        "تم حذف الجداول لكن تعذر حذف بعض ملفات Storage غير المستخدمة",
-        "warning"
-      )
-
-      await scanSupabaseCleanup()
-
-      return false
-    }
-
     invalidateAdminHomeCache()
 
     await scanSupabaseCleanup()
 
+    if (!unusedStorageDeleted) {
+      showGameToast(
+        `تم حذف ${deletedRowsCount} صف، لكن تعذر حذف بعض ملفات Storage`,
+        "warning"
+      )
+
+      return false
+    }
+
+    if (!deletedRowsCount) {
+      showGameToast(
+        "لا توجد بقايا جداول للحذف، وتم فحص Storage",
+        "success"
+      )
+
+      return true
+    }
+
     showGameToast(
-      "تم حذف البقايا الآمنة",
+      `تم حذف ${deletedRowsCount} صف من البقايا الآمنة`,
       "success"
     )
 
@@ -1833,6 +2318,11 @@ async function cleanupSupabaseSafeResidues() {
     setAdminSaving(false)
   }
 }
+
+/* =========================
+   DELETE GAME RUNTIME DATA
+========================= */
+
 async function cleanupSupabaseRuntimeLogs() {
   if (isAdminSaving()) {
     return false
@@ -1840,10 +2330,20 @@ async function cleanupSupabaseRuntimeLogs() {
 
   const confirmed =
     await showAdminConfirm(
-      "سيتم حذف سجلات اللعب القديمة فقط:\n\n- جلسات اللعب\n- أسماء الفرق المحفوظة داخل الجلسات\n- أوامر المقدم\n- أكواد الدخول القديمة\n\nلن يتم حذف أي نموذج أو سؤال أو صورة.\n\nلا تستخدم هذا الزر أثناء وجود لعبة شغالة.",
+      [
+        "سيتم حذف جميع سجلات اللعب:",
+        "",
+        "- جلسات اللعب",
+        "- أسماء الفرق وأكواد الدخول داخل الجلسات",
+        "- أوامر المقدم",
+        "",
+        "لن يتم حذف أي نموذج أو سؤال أو صورة.",
+        "",
+        "لا تستخدم هذا الزر أثناء وجود لعبة شغالة."
+      ].join("\n"),
       {
-        title: "حذف سجلات اللعب",
-        okText: "نعم، احذف السجلات",
+        title: "حذف جلسات اللعب",
+        okText: "نعم، احذف الجلسات",
         cancelText: "إلغاء",
         danger: true
       }
@@ -1856,20 +2356,41 @@ async function cleanupSupabaseRuntimeLogs() {
   try {
     setAdminSaving(
       true,
-      "جارٍ حذف سجلات اللعب..."
+      "جارٍ حذف جلسات اللعب..."
     )
 
-    const sessionsResult =
-      await dbSelect(
+    const [
+      sessionsResult,
+      commandsResult
+    ] = await Promise.all([
+      dbSelect(
         "game_sessions",
-        query => query,
+        query =>
+          query.order("id", {
+            ascending: true
+          }),
         {
           select: "id",
           fallback: [],
           logLabel:
             "CLEANUP GAME SESSIONS READ"
         }
+      ),
+
+      dbSelect(
+        "presenter_commands",
+        query =>
+          query.order("id", {
+            ascending: true
+          }),
+        {
+          select: "id",
+          fallback: [],
+          logLabel:
+            "CLEANUP PRESENTER COMMANDS READ"
+        }
       )
+    ])
 
     if (!sessionsResult.ok) {
       console.error(
@@ -1885,18 +2406,6 @@ async function cleanupSupabaseRuntimeLogs() {
       return false
     }
 
-    const commandsResult =
-      await dbSelect(
-        "presenter_commands",
-        query => query,
-        {
-          select: "id",
-          fallback: [],
-          logLabel:
-            "CLEANUP PRESENTER COMMANDS READ"
-        }
-      )
-
     if (!commandsResult.ok) {
       console.error(
         "CLEANUP PRESENTER COMMANDS READ ERROR:",
@@ -1911,17 +2420,6 @@ async function cleanupSupabaseRuntimeLogs() {
       return false
     }
 
-    const commandIds =
-      (commandsResult.data || [])
-        .map(row => row.id)
-        .filter(value => {
-          return (
-            value !== null &&
-            typeof value !== "undefined" &&
-            value !== ""
-          )
-        })
-
     const sessionIds =
       (sessionsResult.data || [])
         .map(row => row.id)
@@ -1933,16 +2431,38 @@ async function cleanupSupabaseRuntimeLogs() {
           )
         })
 
-    if (
-      !commandIds.length &&
-      !sessionIds.length
-    ) {
-      showGameToast(
-        "لا توجد سجلات لعب للحذف",
-        "success"
-      )
+    const commandIds =
+      (commandsResult.data || [])
+        .map(row => row.id)
+        .filter(value => {
+          return (
+            value !== null &&
+            typeof value !== "undefined" &&
+            value !== ""
+          )
+        })
 
-      await scanSupabaseCleanup()
+    const beforeSessionsCount =
+      sessionIds.length
+
+    const beforeCommandsCount =
+      commandIds.length
+
+    if (
+      !beforeSessionsCount &&
+      !beforeCommandsCount
+    ) {
+      const scanResult =
+        await scanSupabaseCleanup()
+
+      showGameToast(
+        scanResult
+          ? "لا توجد جلسات لعب أو أوامر مقدم للحذف"
+          : "لا توجد سجلات للحذف، لكن تعذر تحديث تقرير التنظيف",
+        scanResult
+          ? "success"
+          : "warning"
+      )
 
       return true
     }
@@ -1970,23 +2490,105 @@ async function cleanupSupabaseRuntimeLogs() {
 
     if (!sessionsDeleted) {
       showGameToast(
-        "تعذر حذف جلسات اللعب",
+        "تم حذف أوامر المقدم لكن تعذر حذف جلسات اللعب",
         "error"
       )
+
+      await scanSupabaseCleanup()
 
       return false
     }
 
-    invalidateAdminHomeCache()
+    const [
+      remainingSessionsResult,
+      remainingCommandsResult
+    ] = await Promise.all([
+      dbSelect(
+        "game_sessions",
+        query => query,
+        {
+          select: "id",
+          fallback: [],
+          logLabel:
+            "CLEANUP GAME SESSIONS VERIFY"
+        }
+      ),
 
-    await scanSupabaseCleanup()
+      dbSelect(
+        "presenter_commands",
+        query => query,
+        {
+          select: "id",
+          fallback: [],
+          logLabel:
+            "CLEANUP PRESENTER COMMANDS VERIFY"
+        }
+      )
+    ])
 
-    showGameToast(
-      "تم حذف سجلات اللعب",
-      "success"
-    )
+    const remainingSessionsCount =
+      remainingSessionsResult.ok
+        ? (remainingSessionsResult.data || []).length
+        : null
 
-    return true
+    const remainingCommandsCount =
+      remainingCommandsResult.ok
+        ? (remainingCommandsResult.data || []).length
+        : null
+
+    const deletedSessionsCount =
+      remainingSessionsCount === null
+        ? beforeSessionsCount
+        : Math.max(
+            0,
+            beforeSessionsCount -
+              remainingSessionsCount
+          )
+
+const deletedCommandsCount =
+  remainingCommandsCount === null
+    ? beforeCommandsCount
+    : Math.max(
+        0,
+        beforeCommandsCount -
+          remainingCommandsCount
+      )
+
+      supabaseRuntimeCleanupSummary = {
+  beforeSessions:
+    beforeSessionsCount,
+
+  beforeCommands:
+    beforeCommandsCount,
+
+  deletedSessions:
+    deletedSessionsCount,
+
+  deletedCommands:
+    deletedCommandsCount,
+
+  remainingSessions:
+    remainingSessionsCount,
+
+  remainingCommands:
+    remainingCommandsCount
+}
+
+invalidateAdminHomeCache()
+
+const scanResult =
+  await scanSupabaseCleanup()
+
+showGameToast(
+  scanResult
+    ? "تم حذف سجلات اللعب وتحديث التقرير"
+    : "تم حذف سجلات اللعب لكن تعذر تحديث التقرير",
+  scanResult
+    ? "success"
+    : "warning"
+)
+
+return true
   } catch (error) {
     console.error(
       "CLEANUP RUNTIME LOGS ERROR:",
@@ -1994,7 +2596,7 @@ async function cleanupSupabaseRuntimeLogs() {
     )
 
     showGameToast(
-      "حدث خطأ أثناء حذف سجلات اللعب",
+      "حدث خطأ أثناء حذف جلسات اللعب",
       "error"
     )
 
@@ -2004,10 +2606,14 @@ async function cleanupSupabaseRuntimeLogs() {
   }
 }
 
-function renderSupabaseCleanupActions() {
-  const actions = workspaceActions()
 
-  if (!actions) return
+function renderSupabaseCleanupActions() {
+  const actions =
+    workspaceActions()
+
+  if (!actions) {
+    return
+  }
 
   actions.className =
     "adminWorkspaceActions adminWorkspaceActionsHome"
@@ -2018,7 +2624,23 @@ function renderSupabaseCleanupActions() {
       class="adminWorkspaceActionBtn primary"
       onclick="scanSupabaseCleanup()"
     >
-      فحص الآن
+      فحص قاعدة البيانات
+    </button>
+
+    <button
+      type="button"
+      class="adminWorkspaceActionBtn"
+      onclick="openAdminModelsManagement()"
+    >
+      إدارة النماذج
+    </button>
+
+    <button
+      type="button"
+      class="adminWorkspaceActionBtn"
+      onclick="openAdminRuntimeManagement()"
+    >
+      الجلسات والأوامر
     </button>
 
     <button
@@ -2026,33 +2648,1867 @@ function renderSupabaseCleanupActions() {
       class="adminWorkspaceActionBtn exit"
       onclick="cleanupSupabaseSafeResidues()"
     >
-      حذف البقايا الآمنة
-    </button>
-
-    <button
-      type="button"
-      class="adminWorkspaceActionBtn exit"
-      onclick="cleanupSupabaseRuntimeLogs()"
-    >
-      حذف سجلات اللعب
+      حذف البقايا
     </button>
 
     <button
       type="button"
       class="adminWorkspaceActionBtn"
-      onclick="showAdminModelGate()"
+      onclick="goAdminHome()"
     >
-      رجوع للنماذج
-    </button>
-
-    <button
-      type="button"
-      class="adminWorkspaceActionBtn exit"
-      onclick="exitCurrentModel()"
-    >
-      خروج
+      رجوع
     </button>
   `
+}
+
+async function openAdminModelsManagement() {
+  const area = editor()
+
+  if (!area) {
+    return false
+  }
+
+  currentAdminSegment =
+    "modelsManagement"
+
+    saveAdminActiveView(
+  "modelsManagement"
+)
+
+  area.innerHTML = `
+    <div class="adminEmptyState">
+      جارٍ تحميل بيانات النماذج...
+    </div>
+  `
+
+  try {
+    const modelsResult =
+      await dbSelect(
+        "models",
+        query =>
+          query.order(
+            "id",
+            { ascending: true }
+          ),
+        {
+          select:
+            "id,name,admin_pin,setup_completed",
+          fallback: [],
+          logLabel:
+            "ADMIN MODELS MANAGEMENT"
+        }
+      )
+
+    if (!modelsResult.ok) {
+      showGameToast(
+        "تعذر تحميل النماذج",
+        "error"
+      )
+
+      return false
+    }
+
+    const models =
+      Array.isArray(modelsResult.data)
+        ? modelsResult.data
+        : []
+
+    const modelStats =
+      new Map()
+
+    models.forEach(model => {
+      const id =
+        Number(model.id || 0)
+
+      if (!id) return
+
+      modelStats.set(id, {
+        totalRows: 0,
+        tables: {}
+      })
+    })
+
+    const tableResults =
+      await Promise.all(
+        SUPABASE_CLEANUP_TABLES.map(
+          async item => {
+            const result =
+              await dbSelect(
+                item.table,
+                query => query,
+                {
+                  select: "model",
+                  fallback: [],
+                  logLabel:
+                    `MANAGEMENT ${item.table}`
+                }
+              )
+
+            return {
+              ...item,
+              result
+            }
+          }
+        )
+      )
+
+    tableResults.forEach(item => {
+      if (!item.result.ok) {
+        return
+      }
+
+      ;(item.result.data || [])
+        .forEach(row => {
+          const modelId =
+            getCleanupModelId(
+              row.model
+            )
+
+          if (
+            !modelId ||
+            !modelStats.has(modelId)
+          ) {
+            return
+          }
+
+          const stats =
+            modelStats.get(modelId)
+
+          stats.totalRows += 1
+
+          stats.tables[item.table] =
+            Number(
+              stats.tables[item.table] ||
+              0
+            ) + 1
+        })
+    })
+
+    let storageFiles = []
+
+    try {
+      storageFiles =
+        await listStorageFilesRecursive(
+          ""
+        )
+    } catch (error) {
+      console.error(
+        "MODELS MANAGEMENT STORAGE ERROR:",
+        error
+      )
+
+      storageFiles = []
+    }
+
+    const managedModels =
+      models.map(model => {
+        const id =
+          Number(model.id || 0)
+
+        const stats =
+          modelStats.get(id) || {
+            totalRows: 0,
+            tables: {}
+          }
+
+        const storagePrefix =
+          `model_${id}/`
+
+        const filesCount =
+          storageFiles.filter(path => {
+            return String(path || "")
+              .startsWith(
+                storagePrefix
+              )
+          }).length
+
+        return {
+          ...model,
+          totalRows:
+            Number(
+              stats.totalRows || 0
+            ),
+          filesCount,
+          tables:
+            stats.tables || {}
+        }
+      })
+
+      supabaseCleanupModels =
+  managedModels
+
+    renderAdminModelsManagement(
+      managedModels
+    )
+
+    return true
+  } catch (error) {
+    console.error(
+      "OPEN ADMIN MODELS MANAGEMENT ERROR:",
+      error
+    )
+
+    area.innerHTML = `
+      <div class="adminEmptyState">
+        حدث خطأ أثناء تحميل إدارة النماذج
+      </div>
+    `
+
+    showGameToast(
+      "حدث خطأ أثناء تحميل النماذج",
+      "error"
+    )
+
+    return false
+  }
+}
+
+function renderAdminModelsManagement(
+  models = []
+) {
+  const area = editor()
+
+  if (!area) {
+    return
+  }
+
+  const totalRows =
+    models.reduce((sum, model) => {
+      return (
+        sum +
+        Number(model.totalRows || 0)
+      )
+    }, 0)
+
+  const totalFiles =
+    models.reduce((sum, model) => {
+      return (
+        sum +
+        Number(model.filesCount || 0)
+      )
+    }, 0)
+
+  const completedModels =
+    models.filter(model => {
+      return (
+        model.setup_completed !== false
+      )
+    }).length
+
+  area.innerHTML = `
+    <div class="adminEditorPage adminManagementPage">
+
+      <div class="adminEditorHeader">
+        <div>
+          <h2>إدارة النماذج</h2>
+          <p>
+            عرض بيانات النماذج والتحكم بها
+          </p>
+        </div>
+      </div>
+
+      <div class="adminHomeStats">
+
+        <div class="adminHomeStatCard">
+          <span>النماذج</span>
+          <strong>${models.length}</strong>
+        </div>
+
+        <div class="adminHomeStatCard">
+          <span>إجمالي البيانات</span>
+          <strong>${totalRows}</strong>
+        </div>
+
+        <div class="adminHomeStatCard">
+          <span>إجمالي الملفات</span>
+          <strong>${totalFiles}</strong>
+        </div>
+
+      </div>
+
+      <div class="adminEditorBlock">
+
+        ${
+          models.length
+            ? models
+                .map(
+                  buildAdminManagedModelCard
+                )
+                .join("")
+            : `
+              <div class="adminEmptyState">
+                لا توجد نماذج
+              </div>
+            `
+        }
+
+      </div>
+
+    </div>
+  `
+}
+
+function buildAdminManagedModelCard(
+  model
+) {
+  const id =
+    Number(model.id || 0)
+
+  const name =
+    String(
+      model.name ||
+      `نموذج ${id}`
+    )
+
+  const pin =
+    String(
+      model.admin_pin || ""
+    )
+
+  const completed =
+    model.setup_completed !== false
+
+  const tables =
+    model.tables || {}
+
+  return `
+    <details class="adminChallengeSettingsSection">
+
+      <summary class="adminChallengeSettingsSummary">
+
+        <div class="adminChallengeSettingsSummaryTitle">
+          <h2>
+            ${escapeHtml(name)}
+          </h2>
+
+          <span>
+            رقم النموذج: ${id}
+            —
+            ${completed ? "مكتمل" : "ناقص"}
+          </span>
+        </div>
+
+        <div class="adminChallengeSettingsSummaryMeta">
+
+          <span>
+            ${Number(model.totalRows || 0)}
+          </span>
+
+          <div class="adminChallengeSettingsArrow">
+            ⌄
+          </div>
+
+        </div>
+
+      </summary>
+
+      <div class="adminChallengeSettingsBody">
+
+        <div class="adminHomeStats">
+
+          <div class="adminHomeStatCard">
+            <span>الرقم السري</span>
+            <strong>
+              ${escapeHtml(pin || "غير محدد")}
+            </strong>
+          </div>
+
+          <div class="adminHomeStatCard">
+            <span>إجمالي البيانات</span>
+            <strong>
+              ${Number(model.totalRows || 0)}
+            </strong>
+          </div>
+
+          <div class="adminHomeStatCard">
+            <span>ملفات Storage</span>
+            <strong>
+              ${Number(model.filesCount || 0)}
+            </strong>
+          </div>
+
+        </div>
+
+        <div style="overflow:auto">
+
+          <table class="adminTable">
+
+            <thead>
+              <tr>
+                <th>الفقرة</th>
+                <th>عدد البيانات</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              ${buildAdminManagedModelTableRows(
+                tables
+              )}
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <div class="adminModalActions">
+
+          <button
+            type="button"
+            class="adminWorkspaceActionBtn primary"
+            onclick="openCleanupManagedModel(${id})"
+          >
+            فتح النموذج
+          </button>
+
+          <button
+            type="button"
+            class="adminWorkspaceActionBtn"
+            onclick="editManagedModelAccess(${id})"
+          >
+            تعديل الاسم والرمز
+          </button>
+
+          <button
+            type="button"
+            class="adminWorkspaceActionBtn exit"
+            onclick="deleteCleanupManagedModel(${id})"
+          >
+            حذف النموذج
+          </button>
+
+        </div>
+
+      </div>
+
+    </details>
+  `
+}
+
+function buildAdminManagedModelTableRows(
+  tables = {}
+) {
+  return SUPABASE_CLEANUP_TABLES
+    .map(item => {
+      return `
+        <tr>
+          <td>
+            ${escapeHtml(item.label)}
+          </td>
+
+          <td>
+            ${Number(
+              tables[item.table] || 0
+            )}
+          </td>
+        </tr>
+      `
+    })
+    .join("")
+}
+
+/* =========================
+   RUNTIME MANAGEMENT
+   جلسات اللعب وأوامر المقدم
+========================= */
+
+let adminRuntimeSessions = []
+let adminRuntimeCommands = []
+
+async function openAdminRuntimeManagement() {
+  const area = editor()
+
+  if (!area) {
+    return false
+  }
+
+  currentAdminSegment =
+    "runtimeManagement"
+
+    saveAdminActiveView(
+  "runtimeManagement"
+)
+
+  area.innerHTML = `
+    <div class="adminEmptyState">
+      جارٍ تحميل الجلسات والأوامر...
+    </div>
+  `
+
+  try {
+    const [
+      sessionsResult,
+      commandsResult
+    ] = await Promise.all([
+      dbSelect(
+        "game_sessions",
+        query =>
+          query.order(
+            "updated_at",
+            { ascending: false }
+          ),
+        {
+          select: "*",
+          fallback: [],
+          logLabel:
+            "ADMIN RUNTIME SESSIONS"
+        }
+      ),
+
+      dbSelect(
+        "presenter_commands",
+        query =>
+          query.order(
+            "id",
+            { ascending: false }
+          ),
+        {
+          select: "*",
+          fallback: [],
+          logLabel:
+            "ADMIN RUNTIME COMMANDS"
+        }
+      )
+    ])
+
+    if (!sessionsResult.ok) {
+      showGameToast(
+        "تعذر تحميل جلسات اللعب",
+        "error"
+      )
+
+      return false
+    }
+
+    if (!commandsResult.ok) {
+      showGameToast(
+        "تعذر تحميل أوامر المقدم",
+        "error"
+      )
+
+      return false
+    }
+
+    adminRuntimeSessions =
+      Array.isArray(sessionsResult.data)
+        ? sessionsResult.data
+        : []
+
+    adminRuntimeCommands =
+      Array.isArray(commandsResult.data)
+        ? commandsResult.data
+        : []
+
+    renderAdminRuntimeManagement()
+
+    return true
+  } catch (error) {
+    console.error(
+      "OPEN ADMIN RUNTIME MANAGEMENT ERROR:",
+      error
+    )
+
+    area.innerHTML = `
+      <div class="adminEmptyState">
+        حدث خطأ أثناء تحميل الجلسات والأوامر
+      </div>
+    `
+
+    showGameToast(
+      "حدث خطأ أثناء تحميل الجلسات والأوامر",
+      "error"
+    )
+
+    return false
+  }
+}
+
+function renderAdminRuntimeManagement() {
+  const area = editor()
+
+  if (!area) {
+    return
+  }
+
+  const activeSessions =
+    adminRuntimeSessions.filter(session => {
+      return !isAdminRuntimeSessionEnded(
+        session
+      )
+    }).length
+
+  const endedSessions =
+    Math.max(
+      0,
+      adminRuntimeSessions.length -
+        activeSessions
+    )
+
+  area.innerHTML = `
+    <div class="adminEditorPage adminManagementPage">
+
+      <div class="adminEditorHeader">
+        <div>
+          <h2>
+            الجلسات والأوامر
+          </h2>
+
+          <p>
+            إدارة سجلات اللعب وأوامر المقدم
+          </p>
+        </div>
+      </div>
+
+      <div class="adminHomeStats">
+
+        <div class="adminHomeStatCard">
+          <span>جلسات اللعب</span>
+
+          <strong>
+            ${adminRuntimeSessions.length}
+          </strong>
+        </div>
+
+        <div class="adminHomeStatCard">
+          <span>الجلسات النشطة</span>
+
+          <strong>
+            ${activeSessions}
+          </strong>
+        </div>
+
+        <div class="adminHomeStatCard">
+          <span>أوامر المقدم</span>
+
+          <strong>
+            ${adminRuntimeCommands.length}
+          </strong>
+        </div>
+
+      </div>
+
+      ${buildAdminRuntimeSessionsSection({
+        activeSessions,
+        endedSessions
+      })}
+
+      ${buildAdminRuntimeCommandsSection()}
+
+    </div>
+  `
+}
+
+function isAdminRuntimeSessionEnded(
+  session
+) {
+  const status =
+    String(
+      session?.status || ""
+    )
+      .trim()
+      .toLowerCase()
+
+  return (
+    Boolean(session?.ended_at) ||
+    [
+      "ended",
+      "finished",
+      "closed",
+      "complete",
+      "completed"
+    ].includes(status)
+  )
+}
+function buildAdminRuntimeSessionsSection({
+  activeSessions = 0,
+  endedSessions = 0
+} = {}) {
+  return `
+    <details
+      class="adminChallengeSettingsSection"
+    >
+
+      <summary
+        class="adminChallengeSettingsSummary"
+      >
+
+        <div
+          class="adminChallengeSettingsSummaryTitle"
+        >
+          <h2>
+            جلسات اللعب
+          </h2>
+
+          <span>
+            نشطة: ${activeSessions}
+            —
+            منتهية: ${endedSessions}
+          </span>
+        </div>
+
+        <div
+          class="adminChallengeSettingsSummaryMeta"
+        >
+          <span>
+            ${adminRuntimeSessions.length}
+          </span>
+
+          <div
+            class="adminChallengeSettingsArrow"
+          >
+            ⌄
+          </div>
+        </div>
+
+      </summary>
+
+      <div
+        class="adminChallengeSettingsBody"
+      >
+
+        <div class="adminModalActions">
+
+          <button
+            type="button"
+            class="adminWorkspaceActionBtn"
+            onclick="refreshAdminRuntimeManagement()"
+          >
+            تحديث
+          </button>
+
+          <button
+            type="button"
+            class="adminWorkspaceActionBtn exit"
+            onclick="deleteEndedAdminRuntimeSessions()"
+          >
+            حذف المنتهية
+          </button>
+
+          <button
+            type="button"
+            class="adminWorkspaceActionBtn exit"
+            onclick="deleteAllAdminRuntimeSessions()"
+          >
+            حذف جميع الجلسات
+          </button>
+
+        </div>
+
+        <div style="overflow:auto">
+
+          <table class="adminTable">
+
+            <thead>
+              <tr>
+                <th>الجلسة</th>
+                <th>النموذج</th>
+                <th>الفريق الأول</th>
+                <th>الفريق الثاني</th>
+                <th>كود الدخول</th>
+                <th>الفقرة</th>
+                <th>الحالة</th>
+                <th>آخر تحديث</th>
+                <th>حذف</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              ${buildAdminRuntimeSessionRows()}
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </details>
+  `
+}
+
+function buildAdminRuntimeSessionRows() {
+  if (!adminRuntimeSessions.length) {
+    return `
+      <tr>
+        <td colspan="9">
+          لا توجد جلسات لعب
+        </td>
+      </tr>
+    `
+  }
+
+  return adminRuntimeSessions
+    .map(session => {
+      const id =
+        String(session?.id || "")
+
+      const model =
+        session?.model ?? "-"
+
+      const teamA =
+        session?.team_a ||
+        session?.teamA ||
+        "-"
+
+      const teamB =
+        session?.team_b ||
+        session?.teamB ||
+        "-"
+
+      const joinCode =
+        session?.join_code ||
+        session?.joinCode ||
+        "-"
+
+      const segment =
+        session?.active_segment ||
+        session?.segment ||
+        "-"
+
+      const ended =
+        isAdminRuntimeSessionEnded(
+          session
+        )
+
+      const status =
+        ended
+          ? "منتهية"
+          : String(
+              session?.status ||
+              "نشطة"
+            )
+
+      const updatedAt =
+        formatAdminRuntimeDate(
+          session?.updated_at ||
+          session?.created_at
+        )
+
+      return `
+        <tr>
+
+          <td>
+            ${escapeHtml(
+              shortenAdminRuntimeValue(
+                id,
+                18
+              )
+            )}
+          </td>
+
+          <td>
+            ${escapeHtml(model)}
+          </td>
+
+          <td>
+            ${escapeHtml(teamA)}
+          </td>
+
+          <td>
+            ${escapeHtml(teamB)}
+          </td>
+
+          <td>
+            ${escapeHtml(joinCode)}
+          </td>
+
+          <td>
+            ${escapeHtml(segment)}
+          </td>
+
+          <td>
+            ${
+              ended
+                ? "منتهية"
+                : escapeHtml(status)
+            }
+          </td>
+
+          <td>
+            ${escapeHtml(updatedAt)}
+          </td>
+
+          <td>
+            <button
+              type="button"
+              class="adminDeleteBtn"
+              onclick='deleteAdminRuntimeSession(
+                ${JSON.stringify(id)}
+              )'
+            >
+              حذف
+            </button>
+          </td>
+
+        </tr>
+      `
+    })
+    .join("")
+}
+function buildAdminRuntimeCommandsSection() {
+  const sessionGroups =
+    getAdminRuntimeCommandGroups()
+
+  return `
+    <details
+      class="adminChallengeSettingsSection"
+    >
+
+      <summary
+        class="adminChallengeSettingsSummary"
+      >
+
+        <div
+          class="adminChallengeSettingsSummaryTitle"
+        >
+          <h2>
+            أوامر المقدم
+          </h2>
+
+          <span>
+            موزعة على
+            ${sessionGroups.length}
+            جلسة
+          </span>
+        </div>
+
+        <div
+          class="adminChallengeSettingsSummaryMeta"
+        >
+          <span>
+            ${adminRuntimeCommands.length}
+          </span>
+
+          <div
+            class="adminChallengeSettingsArrow"
+          >
+            ⌄
+          </div>
+        </div>
+
+      </summary>
+
+      <div
+        class="adminChallengeSettingsBody"
+      >
+
+        <div class="adminModalActions">
+
+          <button
+            type="button"
+            class="adminWorkspaceActionBtn"
+            onclick="refreshAdminRuntimeManagement()"
+          >
+            تحديث
+          </button>
+
+          <button
+            type="button"
+            class="adminWorkspaceActionBtn exit"
+            onclick="deleteAllAdminRuntimeCommands()"
+          >
+            حذف جميع الأوامر
+          </button>
+
+        </div>
+
+        ${
+          sessionGroups.length
+            ? sessionGroups
+                .map(
+                  buildAdminRuntimeCommandGroup
+                )
+                .join("")
+            : `
+              <div class="adminEmptyState">
+                لا توجد أوامر مقدم
+              </div>
+            `
+        }
+
+      </div>
+
+    </details>
+  `
+}
+
+function getAdminRuntimeCommandSessionId(
+  command
+) {
+  return String(
+    command?.session_id ||
+    command?.game_session_id ||
+    command?.session ||
+    "بدون جلسة"
+  )
+}
+
+function getAdminRuntimeCommandGroups() {
+  const groups =
+    new Map()
+
+  adminRuntimeCommands.forEach(command => {
+    const sessionId =
+      getAdminRuntimeCommandSessionId(
+        command
+      )
+
+    if (!groups.has(sessionId)) {
+      groups.set(sessionId, [])
+    }
+
+    groups
+      .get(sessionId)
+      .push(command)
+  })
+
+  return Array.from(
+    groups.entries()
+  ).map(([sessionId, commands]) => {
+    return {
+      sessionId,
+      commands
+    }
+  })
+}
+
+function buildAdminRuntimeCommandGroup(
+  group
+) {
+  const sessionId =
+    String(group?.sessionId || "")
+
+  const commands =
+    Array.isArray(group?.commands)
+      ? group.commands
+      : []
+
+  return `
+    <details
+      class="adminEditItemCard"
+    >
+
+      <summary>
+
+        <div class="adminEditItemTitle">
+
+          <strong>
+            الجلسة:
+            ${escapeHtml(
+              shortenAdminRuntimeValue(
+                sessionId,
+                24
+              )
+            )}
+          </strong>
+
+          <span>
+            ${commands.length}
+            أمر
+          </span>
+
+        </div>
+
+        <div class="adminEditItemMeta">
+
+          <span
+            class="adminEditProgressPill"
+          >
+            ${commands.length}
+          </span>
+
+        </div>
+
+      </summary>
+
+      <div class="adminEditItemBody">
+
+        <div class="adminModalActions">
+
+          <button
+            type="button"
+            class="adminDeleteBtn"
+            onclick='deleteAdminRuntimeCommandsForSession(
+              ${JSON.stringify(sessionId)}
+            )'
+          >
+            حذف أوامر الجلسة
+          </button>
+
+        </div>
+
+        <div style="overflow:auto">
+
+          <table class="adminTable">
+
+            <thead>
+              <tr>
+                <th>الرقم</th>
+                <th>الأمر</th>
+                <th>البيانات</th>
+                <th>التاريخ</th>
+                <th>حذف</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              ${commands
+                .map(
+                  buildAdminRuntimeCommandRow
+                )
+                .join("")}
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </details>
+  `
+}
+
+function buildAdminRuntimeCommandRow(
+  command
+) {
+  const id =
+    command?.id
+
+  const commandName =
+    command?.command ||
+    command?.type ||
+    command?.action ||
+    command?.event ||
+    "-"
+
+  const payload =
+    command?.payload ??
+    command?.data ??
+    command?.value ??
+    ""
+
+  const payloadText =
+    typeof payload === "string"
+      ? payload
+      : JSON.stringify(payload)
+
+  const createdAt =
+    formatAdminRuntimeDate(
+      command?.created_at ||
+      command?.updated_at
+    )
+
+  return `
+    <tr>
+
+      <td>
+        ${escapeHtml(id ?? "-")}
+      </td>
+
+      <td>
+        ${escapeHtml(commandName)}
+      </td>
+
+      <td>
+        ${escapeHtml(
+          shortenAdminRuntimeValue(
+            payloadText,
+            100
+          )
+        )}
+      </td>
+
+      <td>
+        ${escapeHtml(createdAt)}
+      </td>
+
+      <td>
+        <button
+          type="button"
+          class="adminDeleteBtn"
+          onclick='deleteAdminRuntimeCommand(
+            ${JSON.stringify(id)}
+          )'
+        >
+          حذف
+        </button>
+      </td>
+
+    </tr>
+  `
+}
+function formatAdminRuntimeDate(
+  value
+) {
+  if (!value) {
+    return "-"
+  }
+
+  const date =
+    new Date(value)
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return String(value)
+  }
+
+  return date.toLocaleString(
+    "ar-SA"
+  )
+}
+
+function shortenAdminRuntimeValue(
+  value,
+  maxLength = 40
+) {
+  const text =
+    String(value ?? "")
+
+  if (
+    text.length <= maxLength
+  ) {
+    return text
+  }
+
+  return (
+    text.slice(
+      0,
+      maxLength
+    ) + "..."
+  )
+}
+
+async function refreshAdminRuntimeManagement() {
+  return openAdminRuntimeManagement()
+}
+
+async function deleteAdminRuntimeSession(
+  sessionId
+) {
+  const id =
+    String(sessionId || "")
+
+  if (!id) {
+    return false
+  }
+
+  const confirmed =
+    await showAdminConfirm(
+      "حذف جلسة اللعب وأوامرها؟",
+      {
+        title: "حذف الجلسة",
+        okText: "حذف",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!confirmed) {
+    return false
+  }
+
+  setAdminSaving(
+    true,
+    "جارٍ حذف الجلسة..."
+  )
+
+  try {
+    const relatedCommands =
+      adminRuntimeCommands
+        .filter(command => {
+          return (
+            getAdminRuntimeCommandSessionId(
+              command
+            ) === id
+          )
+        })
+        .map(command => command.id)
+        .filter(value => {
+          return (
+            value !== null &&
+            typeof value !==
+              "undefined"
+          )
+        })
+
+    if (relatedCommands.length) {
+      const commandsDeleted =
+        await deleteSupabaseCleanupRowsByIds(
+          "presenter_commands",
+          relatedCommands
+        )
+
+      if (!commandsDeleted) {
+        showGameToast(
+          "تعذر حذف أوامر الجلسة",
+          "error"
+        )
+
+        return false
+      }
+    }
+
+    const sessionDeleted =
+      await deleteSupabaseCleanupRowsByIds(
+        "game_sessions",
+        [id]
+      )
+
+    if (!sessionDeleted) {
+      showGameToast(
+        "تعذر حذف الجلسة",
+        "error"
+      )
+
+      return false
+    }
+
+    await openAdminRuntimeManagement()
+
+    showGameToast(
+      "تم حذف الجلسة وأوامرها",
+      "success"
+    )
+
+    return true
+  } finally {
+    setAdminSaving(false)
+  }
+}
+
+async function deleteAdminRuntimeCommand(
+  commandId
+) {
+  const confirmed =
+    await showAdminConfirm(
+      "حذف أمر المقدم؟",
+      {
+        title: "حذف الأمر",
+        okText: "حذف",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!confirmed) {
+    return false
+  }
+
+  const deleted =
+    await deleteSupabaseCleanupRowsByIds(
+      "presenter_commands",
+      [commandId]
+    )
+
+  if (!deleted) {
+    showGameToast(
+      "تعذر حذف الأمر",
+      "error"
+    )
+
+    return false
+  }
+
+  await openAdminRuntimeManagement()
+
+  showGameToast(
+    "تم حذف الأمر",
+    "success"
+  )
+
+  return true
+}
+
+async function deleteAdminRuntimeCommandsForSession(
+  sessionId
+) {
+  const id =
+    String(sessionId || "")
+
+  const ids =
+    adminRuntimeCommands
+      .filter(command => {
+        return (
+          getAdminRuntimeCommandSessionId(
+            command
+          ) === id
+        )
+      })
+      .map(command => command.id)
+      .filter(value => {
+        return (
+          value !== null &&
+          typeof value !==
+            "undefined"
+        )
+      })
+
+  if (!ids.length) {
+    showGameToast(
+      "لا توجد أوامر للحذف",
+      "warning"
+    )
+
+    return false
+  }
+
+  const confirmed =
+    await showAdminConfirm(
+      `حذف ${ids.length} أمر من هذه الجلسة؟`,
+      {
+        title: "حذف أوامر الجلسة",
+        okText: "حذف",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!confirmed) {
+    return false
+  }
+
+  const deleted =
+    await deleteSupabaseCleanupRowsByIds(
+      "presenter_commands",
+      ids
+    )
+
+  if (!deleted) {
+    showGameToast(
+      "تعذر حذف أوامر الجلسة",
+      "error"
+    )
+
+    return false
+  }
+
+  await openAdminRuntimeManagement()
+
+  showGameToast(
+    "تم حذف أوامر الجلسة",
+    "success"
+  )
+
+  return true
+}
+
+async function deleteEndedAdminRuntimeSessions() {
+  const sessions =
+    adminRuntimeSessions.filter(
+      isAdminRuntimeSessionEnded
+    )
+
+  if (!sessions.length) {
+    showGameToast(
+      "لا توجد جلسات منتهية",
+      "warning"
+    )
+
+    return false
+  }
+
+  const confirmed =
+    await showAdminConfirm(
+      `حذف ${sessions.length} جلسة منتهية وأوامرها؟`,
+      {
+        title: "حذف الجلسات المنتهية",
+        okText: "حذف",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!confirmed) {
+    return false
+  }
+
+  return deleteAdminRuntimeSessionsList(
+    sessions
+  )
+}
+
+async function deleteAllAdminRuntimeSessions() {
+  if (!adminRuntimeSessions.length) {
+    showGameToast(
+      "لا توجد جلسات للحذف",
+      "warning"
+    )
+
+    return false
+  }
+
+  const confirmed =
+    await showAdminConfirm(
+      `حذف جميع الجلسات وعددها ${adminRuntimeSessions.length} مع أوامر المقدم؟`,
+      {
+        title: "حذف جميع الجلسات",
+        okText: "حذف الجميع",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!confirmed) {
+    return false
+  }
+
+  return deleteAdminRuntimeSessionsList(
+    adminRuntimeSessions
+  )
+}
+
+async function deleteAdminRuntimeSessionsList(
+  sessions
+) {
+  setAdminSaving(
+    true,
+    "جارٍ حذف الجلسات..."
+  )
+
+  try {
+    const sessionIds =
+      sessions
+        .map(session => session.id)
+        .filter(Boolean)
+
+    const sessionIdSet =
+      new Set(
+        sessionIds.map(String)
+      )
+
+    const commandIds =
+      adminRuntimeCommands
+        .filter(command => {
+          return sessionIdSet.has(
+            getAdminRuntimeCommandSessionId(
+              command
+            )
+          )
+        })
+        .map(command => command.id)
+        .filter(value => {
+          return (
+            value !== null &&
+            typeof value !==
+              "undefined"
+          )
+        })
+
+    if (commandIds.length) {
+      const commandsDeleted =
+        await deleteSupabaseCleanupRowsByIds(
+          "presenter_commands",
+          commandIds
+        )
+
+      if (!commandsDeleted) {
+        showGameToast(
+          "تعذر حذف أوامر الجلسات",
+          "error"
+        )
+
+        return false
+      }
+    }
+
+    const sessionsDeleted =
+      await deleteSupabaseCleanupRowsByIds(
+        "game_sessions",
+        sessionIds
+      )
+
+    if (!sessionsDeleted) {
+      showGameToast(
+        "تعذر حذف الجلسات",
+        "error"
+      )
+
+      return false
+    }
+
+    await openAdminRuntimeManagement()
+
+    showGameToast(
+      `تم حذف ${sessionIds.length} جلسة`,
+      "success"
+    )
+
+    return true
+  } finally {
+    setAdminSaving(false)
+  }
+}
+
+async function deleteAllAdminRuntimeCommands() {
+  const ids =
+    adminRuntimeCommands
+      .map(command => command.id)
+      .filter(value => {
+        return (
+          value !== null &&
+          typeof value !==
+            "undefined"
+        )
+      })
+
+  if (!ids.length) {
+    showGameToast(
+      "لا توجد أوامر للحذف",
+      "warning"
+    )
+
+    return false
+  }
+
+  const confirmed =
+    await showAdminConfirm(
+      `حذف جميع أوامر المقدم وعددها ${ids.length}؟`,
+      {
+        title: "حذف جميع الأوامر",
+        okText: "حذف الجميع",
+        cancelText: "إلغاء",
+        danger: true
+      }
+    )
+
+  if (!confirmed) {
+    return false
+  }
+
+  const deleted =
+    await deleteSupabaseCleanupRowsByIds(
+      "presenter_commands",
+      ids
+    )
+
+  if (!deleted) {
+    showGameToast(
+      "تعذر حذف أوامر المقدم",
+      "error"
+    )
+
+    return false
+  }
+
+  await openAdminRuntimeManagement()
+
+  showGameToast(
+    "تم حذف جميع أوامر المقدم",
+    "success"
+  )
+
+  return true
+}
+
+async function editManagedModelAccess(
+  modelId
+) {
+  const id =
+    Number(modelId || 0)
+
+  const result =
+    await dbSelect(
+      "models",
+      query =>
+        query
+          .eq("id", id)
+          .maybeSingle(),
+      {
+        select:
+          "id,name,admin_pin",
+        fallback: null,
+        logLabel:
+          "READ MANAGED MODEL ACCESS"
+      }
+    )
+
+  if (
+    !result.ok ||
+    !result.data
+  ) {
+    showGameToast(
+      "تعذر قراءة بيانات النموذج",
+      "error"
+    )
+
+    return false
+  }
+
+  const model =
+    result.data
+
+  document
+    .getElementById(
+      "managedModelAccessModal"
+    )
+    ?.remove()
+
+  document.body.insertAdjacentHTML(
+    "beforeend",
+    `
+      <div
+        class="adminModalOverlay"
+        id="managedModelAccessModal"
+      >
+
+        <div class="adminModalCard">
+
+          <div class="adminModalTitle">
+            تعديل النموذج
+          </div>
+
+          <div class="adminField">
+
+            <label>
+              اسم النموذج
+            </label>
+
+            <input
+              id="managedModelNameInput"
+              class="adminInput"
+              type="text"
+              value="${escapeHtml(
+                model.name || ""
+              )}"
+            >
+
+          </div>
+
+          <div class="adminField">
+
+            <label>
+              الرقم السري
+            </label>
+
+            <input
+              id="managedModelPinInput"
+              class="adminInput"
+              type="text"
+              inputmode="numeric"
+              value="${escapeHtml(
+                model.admin_pin || ""
+              )}"
+            >
+
+          </div>
+
+          <div class="adminModalActions">
+
+            <button
+              type="button"
+              class="adminBtn adminBtnLight"
+              onclick="closeManagedModelAccessModal()"
+            >
+              إلغاء
+            </button>
+
+            <button
+              type="button"
+              class="adminBtn adminBtnMango"
+              onclick="saveManagedModelAccess(${id})"
+            >
+              حفظ
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    `
+  )
+
+  return true
+}
+
+function closeManagedModelAccessModal() {
+  document
+    .getElementById(
+      "managedModelAccessModal"
+    )
+    ?.remove()
+}
+
+async function saveManagedModelAccess(
+  modelId
+) {
+  const id =
+    Number(modelId || 0)
+
+  const name =
+    String(
+      document
+        .getElementById(
+          "managedModelNameInput"
+        )
+        ?.value || ""
+    ).trim()
+
+  const pin =
+    String(
+      document
+        .getElementById(
+          "managedModelPinInput"
+        )
+        ?.value || ""
+    ).trim()
+
+  if (!name) {
+    showGameToast(
+      "اكتب اسم النموذج",
+      "warning"
+    )
+
+    return false
+  }
+
+  if (!pin) {
+    showGameToast(
+      "اكتب الرقم السري",
+      "warning"
+    )
+
+    return false
+  }
+
+  const result =
+    await dbUpdate(
+      "models",
+      {
+        name,
+        admin_pin: pin
+      },
+      query =>
+        query.eq("id", id),
+      {
+        logLabel:
+          "UPDATE MANAGED MODEL ACCESS"
+      }
+    )
+
+  if (!result.ok) {
+    showGameToast(
+      "تعذر تعديل النموذج",
+      "error"
+    )
+
+    return false
+  }
+
+  closeManagedModelAccessModal()
+
+  await loadModels()
+  await openAdminModelsManagement()
+
+  showGameToast(
+    "تم تعديل النموذج",
+    "success"
+  )
+
+  return true
 }
 
 function getCleanupModelId(value) {
@@ -2107,6 +4563,199 @@ function buildSupabaseCleanupStorageRows(storage) {
   `).join("")
 }
 
+
+function buildSupabaseRuntimeCleanupSummary() {
+  const summary =
+    supabaseRuntimeCleanupSummary
+
+  if (!summary) {
+    return ""
+  }
+
+  const remainingSessions =
+    summary.remainingSessions === null
+      ? "غير معروف"
+      : Number(summary.remainingSessions || 0)
+
+  const remainingCommands =
+    summary.remainingCommands === null
+      ? "غير معروف"
+      : Number(summary.remainingCommands || 0)
+
+  return `
+    <div class="adminEditorBlock">
+
+      <h3>
+        آخر حذف لسجلات اللعب
+      </h3>
+
+      <table class="adminTable">
+        <thead>
+          <tr>
+            <th>الحالة</th>
+            <th>جلسات اللعب</th>
+            <th>أوامر المقدم</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>قبل الحذف</td>
+            <td>
+              ${Number(
+                summary.beforeSessions || 0
+              )}
+            </td>
+            <td>
+              ${Number(
+                summary.beforeCommands || 0
+              )}
+            </td>
+          </tr>
+
+          <tr>
+            <td>تم الحذف</td>
+            <td>
+              ${Number(
+                summary.deletedSessions || 0
+              )}
+            </td>
+            <td>
+              ${Number(
+                summary.deletedCommands || 0
+              )}
+            </td>
+          </tr>
+
+          <tr>
+            <td>المتبقي</td>
+            <td>
+              ${remainingSessions}
+            </td>
+            <td>
+              ${remainingCommands}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  `
+}
+
+
+function getSupabaseCleanupManagedModel(
+  modelId
+) {
+  const id =
+    Number(modelId || 0)
+
+  return (
+    supabaseCleanupModels.find(model => {
+      return Number(model.id) === id
+    }) || null
+  )
+}
+
+async function openCleanupManagedModel(
+  modelId
+) {
+  const model =
+    getSupabaseCleanupManagedModel(
+      modelId
+    )
+
+  if (!model) {
+    showGameToast(
+      "تعذر العثور على النموذج",
+      "error"
+    )
+
+    return false
+  }
+
+  const id =
+    Number(model.id || 0)
+
+  const name =
+    String(
+      model.name ||
+      `نموذج ${id}`
+    )
+
+  const modelData =
+    await requestAdminModelAccess(
+      id,
+      name
+    )
+
+  if (!modelData) {
+    return false
+  }
+
+  currentModel =
+    id
+
+  currentModelName =
+    modelData.name || name
+
+  currentModelSetupCompleted =
+    modelData.setup_completed !== false
+
+  saveAdminActiveModel()
+  saveAdminActiveView(
+  "home"
+)
+  updateAdminBrandModel()
+  showAdminWorkspace()
+
+  if (
+    currentModelSetupCompleted ===
+    false
+  ) {
+    renderAdminSettingsActions()
+
+    await openAdminSegmentSettings()
+
+    return true
+  }
+
+  renderAdminHomeActions()
+
+  await renderAdminHome()
+
+  return true
+}
+
+async function deleteCleanupManagedModel(
+  modelId
+) {
+  const model =
+    getSupabaseCleanupManagedModel(
+      modelId
+    )
+
+  if (!model) {
+    showGameToast(
+      "تعذر العثور على النموذج",
+      "error"
+    )
+
+    return false
+  }
+
+  return deleteSelectedModel({
+    id: Number(model.id),
+    name: String(
+      model.name ||
+      `نموذج ${model.id}`
+    ),
+    skipModelPin: true,
+    stayOnCleanup: true
+  })
+}
+
+
 function renderSupabaseCleanupReport(report) {
   const area = editor()
 
@@ -2126,7 +4775,7 @@ function renderSupabaseCleanupReport(report) {
     <div class="adminEditorPage">
       <div class="adminEditorHeader">
         <div>
-          <h2>تنظيف Supabase</h2>
+          <h2>الإدارة</h2>
           <p>
             هذا التقرير للفحص فقط، ولا يحذف أي بيانات.
           </p>
@@ -2170,35 +4819,79 @@ function renderSupabaseCleanupReport(report) {
         </div>
       </div>
 
-      <div class="adminEditorBlock">
+            <div class="adminEditorBlock">
         <h3>تقرير Storage</h3>
 
         <div style="overflow:auto">
           <table class="adminTable">
             <thead>
-             <tr>
-  <th>المجلد / الملف</th>
-  <th>عدد الملفات</th>
-  <th>مستخدمة</th>
-  <th>غير مستخدمة</th>
-  <th>الحالة</th>
-  <th>ملاحظة</th>
-</tr>
+              <tr>
+                <th>المجلد / الملف</th>
+                <th>عدد الملفات</th>
+                <th>مستخدمة</th>
+                <th>غير مستخدمة</th>
+                <th>الحالة</th>
+                <th>ملاحظة</th>
+              </tr>
             </thead>
+
             <tbody>
-              ${buildSupabaseCleanupStorageRows(report.storage)}
+              ${buildSupabaseCleanupStorageRows(
+                report.storage
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      ${buildSupabaseRuntimeCleanupSummary()}
+
     </div>
   `
 }
 
+async function requestAdminManagementAccess() {
+  const enteredPin =
+    await requestAdminPinModal({
+      title: "دخول الإدارة",
+      message:
+        "اكتب الرقم السري الخاص بصفحة الإدارة",
+      confirmText: "دخول"
+    })
+
+  if (!enteredPin) {
+    return false
+  }
+
+  if (
+    String(enteredPin).trim() !==
+    ADMIN_MANAGEMENT_PIN
+  ) {
+    showGameToast(
+      "الرقم السري للإدارة غير صحيح",
+      "error"
+    )
+
+    return false
+  }
+
+  return true
+}
+
 async function openSupabaseCleanupGatePage() {
-  currentModel = null
-  currentModelName = ""
-  currentAdminSegment = "cleanup"
+  const accessGranted =
+    await requestAdminManagementAccess()
+
+  if (!accessGranted) {
+    return false
+  }
+
+  currentAdminSegment =
+    "management"
+
+  saveAdminActiveView(
+    "management"
+  )
 
   updateAdminBrandModel()
   showAdminWorkspace()
@@ -2207,15 +4900,29 @@ async function openSupabaseCleanupGatePage() {
 
   const area = editor()
 
-  if (area) {
-    area.innerHTML = `
-      <div class="adminEmptyState">
-        جارٍ فحص Supabase...
-      </div>
-    `
+  if (!area) {
+    return false
   }
 
-  await scanSupabaseCleanup()
+  area.innerHTML = `
+    <div class="adminEditorPage adminManagementPage">
+
+      <div class="adminEditorHeader">
+        <div>
+          <h2>الإدارة</h2>
+
+          <p>
+            إدارة النماذج والجلسات والأوامر وقاعدة البيانات
+          </p>
+        </div>
+      </div>
+
+      <div class="adminEmptyState">
+        اختر العملية المطلوبة من الأزرار بالأعلى
+      </div>
+
+    </div>
+  `
 
   return true
 }
@@ -2240,7 +4947,8 @@ async function scanSupabaseCleanup() {
           { ascending: true }
         ),
       {
-        select: "id,name",
+        select:
+  "id,name,setup_completed",
         fallback: [],
         logLabel: "CLEANUP MODELS"
       }
@@ -2262,6 +4970,8 @@ async function scanSupabaseCleanup() {
 
     const models =
       modelsResult.data || []
+
+    
 
     const modelIds =
       new Set(
@@ -2310,6 +5020,7 @@ async function scanSupabaseCleanup() {
       rows.forEach(row => {
         const modelId =
           getCleanupModelId(row.model)
+
 
         if (!modelId) {
           empty += 1
@@ -2375,88 +5086,112 @@ async function scanSupabaseCleanup() {
       folderMap[folder] += 1
     })
 
-    const folders =
-      Object.keys(folderMap)
-        .sort()
-        .map(folder => {
-          const match =
-            folder.match(/^model_(\d+)$/)
+const folders =
+  Object.keys(folderMap)
+    .sort()
+    .map(folder => {
+      const match =
+        folder.match(/^model_(\d+)$/)
 
-          const folderModelId =
-            match ? Number(match[1]) : 0
+      const folderModelId =
+        match ? Number(match[1]) : 0
 
-          const isUnknown =
-            folder === "model_unknown"
+      const isUnknown =
+        folder === "model_unknown"
 
-          const exists =
-            folderModelId
-              ? modelIds.has(folderModelId)
-              : false
+      const exists =
+        folderModelId
+          ? modelIds.has(folderModelId)
+          : false
 
-          const folderFiles =
-            storageFiles.filter(path => {
-              return (
-                String(path || "")
-                  .split("/")[0] === folder
-              )
-            })
-
-          const usedFiles =
-            folderFiles.filter(path => {
-              return usedStoragePaths.has(path)
-            }).length
-
-          const unusedFiles =
-            Math.max(
-              0,
-              folderFiles.length - usedFiles
-            )
-
-          return {
-            folder,
-            files: folderMap[folder],
-            usedFiles,
-            unusedFiles,
-            exists,
-            isCurrent:
-              currentModelId &&
-              folderModelId === currentModelId,
-            isUnknown
-          }
+      const folderFiles =
+        storageFiles.filter(path => {
+          return (
+            String(path || "")
+              .split("/")[0] === folder
+          )
         })
 
-    const storage = {
-      folders,
-      totalFiles: storageFiles.length,
-      usedFiles:
-        folders.reduce((sum, folder) => {
-          return sum + Number(folder.usedFiles || 0)
-        }, 0),
-      unusedFiles:
-        folders.reduce((sum, folder) => {
-          return sum + Number(folder.unusedFiles || 0)
-        }, 0),
-      orphanFolders:
-        folders.filter(folder => {
-          return (
-            !folder.exists ||
-            folder.isUnknown
-          )
-        }).length,
-      unknownFiles:
-        folders
-          .filter(folder => folder.isUnknown)
-          .reduce((sum, folder) => {
-            return sum + Number(folder.files || 0)
-          }, 0)
-    }
+      const usedFiles =
+        folderFiles.filter(path => {
+          return usedStoragePaths.has(path)
+        }).length
+
+      const unusedFiles =
+        Math.max(
+          0,
+          folderFiles.length - usedFiles
+        )
+
+      return {
+        folder,
+        files:
+          Number(folderMap[folder] || 0),
+        usedFiles,
+        unusedFiles,
+        exists,
+        isCurrent:
+          currentModelId &&
+          folderModelId === currentModelId,
+        isUnknown
+      }
+    })
+
+
+const storage = {
+  folders,
+  totalFiles:
+    storageFiles.length,
+
+  usedFiles:
+    folders.reduce((sum, folder) => {
+      return (
+        sum +
+        Number(folder.usedFiles || 0)
+      )
+    }, 0),
+
+  unusedFiles:
+    folders.reduce((sum, folder) => {
+      return (
+        sum +
+        Number(folder.unusedFiles || 0)
+      )
+    }, 0),
+
+  orphanFolders:
+    folders.filter(folder => {
+      return (
+        !folder.exists ||
+        folder.isUnknown
+      )
+    }).length,
+
+  unknownFiles:
+    folders
+      .filter(folder => {
+        return folder.isUnknown
+      })
+      .reduce((sum, folder) => {
+        return (
+          sum +
+          Number(folder.files || 0)
+        )
+      }, 0)
+}
+
 
     renderSupabaseCleanupReport({
-      modelsCount: models.length,
-      currentModelId,
-      tables: tableReports,
-      storage
-    })
+  modelsCount:
+    models.length,
+
+  currentModelId,
+
+  tables:
+    tableReports,
+
+  storage
+})
 
     showGameToast(
       "تم فحص Supabase بدون حذف",
@@ -3812,6 +6547,38 @@ function normalizeAdminEditorCards() {
         ""
       )
     })
+      area
+    .querySelectorAll(
+      `
+        .adminEditStatusPill,
+        .adminEditProgressPill,
+        .adminEditItemMeta span,
+        .adminEditItemCard summary span
+      `
+    )
+    .forEach(status => {
+      const text =
+        String(
+          status.textContent || ""
+        ).trim()
+
+      status.classList.remove(
+        "adminStatusDone",
+        "adminStatusMissing"
+      )
+
+      if (text === "مكتمل") {
+        status.classList.add(
+          "adminStatusDone"
+        )
+      }
+
+      if (text === "ناقص") {
+        status.classList.add(
+          "adminStatusMissing"
+        )
+      }
+    })
 }
 
 /* =========================
@@ -3824,7 +6591,9 @@ async function getAdminCompletionCounts() {
     top10: 0,
     who: 0,
     explain: 0,
-    letterli: 1,
+    familyDidi: 0,
+    familyDidiReadyRounds: 0,
+    familyDidiRoundsCount: 3,
 
     finalRound1: 0,
     finalRound2: 0,
@@ -3854,6 +6623,7 @@ async function getAdminCompletionCounts() {
   const [
     qWarmup,
     qTop10,
+    qFamilyDidi,
     qWho,
     qExplain,
 
@@ -3865,6 +6635,7 @@ async function getAdminCompletionCounts() {
     qArchive,
 
     top10Setting,
+    familyDidiSetting,
     auctionSetting,
     archiveSetting,
     whoSetting,
@@ -3900,6 +6671,34 @@ async function getAdminCompletionCounts() {
         logLabel: "ADMIN COMPLETION TOP10"
       }
     ),
+
+        dbSelect(
+      "family_didi_questions",
+      query =>
+        query
+          .eq("model", modelId)
+          .order("round", {
+            ascending: true
+          })
+          .order("position", {
+            ascending: true
+          }),
+      {
+        select: `
+          round,
+          position,
+          question,
+          answer,
+          points,
+          answers_count,
+          timer_seconds
+        `,
+        fallback: [],
+        logLabel:
+          "ADMIN COMPLETION FAMILY DIDI"
+      }
+    ),
+
 
     dbSelect(
       "who_images",
@@ -4033,6 +6832,21 @@ async function getAdminCompletionCounts() {
       }
     ),
 
+        dbSelect(
+      "segment_settings",
+      query =>
+        query
+          .eq("model", modelId)
+          .eq("segment", "familyDidi")
+          .maybeSingle(),
+      {
+        select: "item_count",
+        fallback: null,
+        logLabel:
+          "ADMIN FAMILY DIDI SETTING"
+      }
+    ),
+
     dbSelect(
       "segment_settings",
       query =>
@@ -4134,6 +6948,112 @@ async function getAdminCompletionCounts() {
 
   result.warmup = qWarmup.count || 0
   result.top10 = qTop10.count || 0
+  result.familyDidiRoundsCount =
+  Math.min(
+    Math.max(
+      Number(
+        familyDidiSetting
+          ?.data
+          ?.item_count || 3
+      ),
+      1
+    ),
+    5
+  )
+
+const familyDidiRows =
+  Array.isArray(
+    qFamilyDidi?.data
+  )
+    ? qFamilyDidi.data
+    : []
+
+let familyDidiReadyRounds = 0
+
+for (
+  let roundNumber = 1;
+  roundNumber <=
+    result.familyDidiRoundsCount;
+  roundNumber++
+) {
+  const roundRows =
+    familyDidiRows.filter(row => {
+      return (
+        Number(row.round) ===
+        roundNumber
+      )
+    })
+
+  if (!roundRows.length) {
+    continue
+  }
+
+  const firstRow =
+    roundRows[0]
+
+  const answersCount =
+    Math.min(
+      Math.max(
+        Number(
+          firstRow.answers_count || 8
+        ),
+        1
+      ),
+      8
+    )
+
+  const questionReady =
+    hasText(
+      firstRow.question
+    )
+
+  const timerReady =
+    Number(
+      firstRow.timer_seconds || 0
+    ) >= 1
+
+  const answersReady =
+    Array.from(
+      {
+        length: answersCount
+      },
+
+      (_, index) =>
+        index + 1
+    ).every(position => {
+      const item =
+        roundRows.find(row => {
+          return (
+            Number(
+              row.position
+            ) === position
+          )
+        })
+
+      return Boolean(
+        item &&
+        hasText(item.answer) &&
+        Number.isFinite(
+          Number(item.points)
+        ) &&
+        Number(item.points) >= 0
+      )
+    })
+
+  if (
+    questionReady &&
+    timerReady &&
+    answersReady
+  ) {
+    familyDidiReadyRounds++
+  }
+}
+
+result.familyDidiReadyRounds =
+  familyDidiReadyRounds
+
+result.familyDidi =
+  familyDidiReadyRounds
   result.who = qWho.count || 0
   result.explain = qExplain.count || 0
   result.finalRound1 = qFinalRound1.count || 0
@@ -4230,8 +7150,22 @@ function isSegmentDone(key, count, counts = {}) {
     return count >= rounds * 10
   }
 
-if (key === "letterli") {
-  return true
+if (key === "familyDidi") {
+  const rounds = Math.min(
+    Math.max(
+      Number(
+        counts.familyDidiRoundsCount || 3
+      ),
+      1
+    ),
+    5
+  )
+
+  return (
+    Number(
+      counts.familyDidiReadyRounds || 0
+    ) >= rounds
+  )
 }
 
   if (key === "who") {
@@ -4325,6 +7259,9 @@ async function renderAdminHome() {
 
   renderAdminHomeActions()
   currentAdminSegment = "home"
+  saveAdminActiveView(
+  "home"
+)
 
   if (!currentModel) {
     area.innerHTML = `
@@ -4452,8 +7389,6 @@ const visibleSegments =
 const isRandomChallenge =
   key === "randomChallenge"
 
-const isLetterli =
-  key === "letterli"
 
 const isDone =
   isSegmentDone(
@@ -4466,37 +7401,31 @@ const isEnabled =
   visibility[key] !== false
 
 const progressText =
-  isLetterli
-    ? "بدون إعداد"
-    : isRandomChallenge
-      ? isDone
-        ? "المحتوى جاهز"
-        : "يحتاج مراجعة"
-      : total > 0
-        ? `${done}/${total}`
-        : String(done)
+  isRandomChallenge
+    ? isDone
+      ? "المحتوى جاهز"
+      : "يحتاج مراجعة"
+    : total > 0
+      ? `${done}/${total}`
+      : String(done)
 
 const progressWidth =
-  isLetterli
-    ? 100
-    : isRandomChallenge
-      ? isDone
-        ? 100
-        : 0
-      : total > 0
-        ? Math.min(
-            Math.max(
-              (done / total) * 100,
-              0
-            ),
-            100
-          )
-        : 0
+  isRandomChallenge
+    ? isDone
+      ? 100
+      : 0
+    : total > 0
+      ? Math.min(
+          Math.max(
+            (done / total) * 100,
+            0
+          ),
+          100
+        )
+      : 0
 
 const openAction =
-  isLetterli
-    ? "showLetterliAdminInfo()"
-    : `openAdminSegment('${key}')`
+  `openAdminSegment('${key}')`
 
           return `
             <div
@@ -4662,9 +7591,17 @@ function getAdminSegmentRequiredCount(
   }
 
 
-  if (key === "letterli") {
-    return 1
-  }
+  if (key === "familyDidi") {
+  return Math.min(
+    Math.max(
+      Number(
+        counts.familyDidiRoundsCount || 3
+      ),
+      1
+    ),
+    5
+  )
+}
 
   if (key === "who") {
     return normalizeAdminSegmentCount(
@@ -4914,6 +7851,9 @@ async function openAdminSegmentSettings() {
   }
 
   currentAdminSegment = "settings"
+  saveAdminActiveView(
+  "settings"
+)
   renderAdminSettingsActions()
 
   scheduleAdminTabsRefresh()
@@ -4925,7 +7865,10 @@ async function openAdminSegmentSettings() {
 ] = await Promise.all([
   getAdminCompletionCounts(),
 
-  loadGlobalSegmentVisibilityMap(),
+loadModelSegmentVisibilityMap(
+  currentModel,
+  false
+),
 
   dbSelect(
     "segment_settings",
@@ -5018,6 +7961,25 @@ function getInitialSettingValue(value) {
     },
 
     {
+  key: "familyDidi",
+  title: "فاملي ديدي",
+  desc: "عدد الجولات",
+  inputId: "settingsFamilyDidiRounds",
+  value: getInitialSettingValue(
+    Math.min(
+      Math.max(
+        Number(
+          counts.familyDidiRoundsCount || 3
+        ),
+        1
+      ),
+      5
+    )
+  ),
+  options: [1, 2, 3, 4, 5]
+},
+
+    {
       key: "who",
       title: "من هو",
       desc: "عدد الأرقام",
@@ -5107,13 +8069,34 @@ function getInitialSettingValue(value) {
     }
   ]
 
-  const visibleSettings =
-    settings.filter(item => {
-      return isAdminSegmentGloballyEnabled(
+const visibleSettings =
+  settings
+    .filter(item => {
+      return isAdminSegmentVisibleForModel(
         item.key,
         visibility
       )
     })
+    .sort((a, b) => {
+      const sortA =
+        ALL_GAME_SEGMENTS.find(segment => {
+          return segment.key === a.key
+        })?.sort || 999
+
+      const sortB =
+        ALL_GAME_SEGMENTS.find(segment => {
+          return segment.key === b.key
+        })?.sort || 999
+
+      return sortA - sortB
+    })
+
+const challengeVisible =
+  isAdminSegmentVisibleForModel(
+    "randomChallenge",
+    visibility
+  )
+
 
 const auctionCount =
   isInitialSegmentSetup
@@ -5125,158 +8108,228 @@ const auctionCount =
 editor().innerHTML = `
   <div class="adminSettingsGamePage">
 
-    <div class="adminSettingsGameGrid">
-      ${visibleSettings
-        .map(item =>
-          buildAdminSettingCardPro(item)
-        )
-        .join("")}
-    </div>
+    <section class="adminSettingsMainSection">
 
-    <section class="adminChallengeSettingsSection">
+      <header class="adminSettingsSectionHead">
 
-      <div class="adminChallengeSettingsHead">
         <div>
-          <h2>إعدادات فقرة التحدي</h2>
-          <span>فعّل المربعات التي تريد ظهورها داخل الفقرة</span>
-        </div>
-      </div>
+          <h2>
+            إعدادات الفقرات
+          </h2>
 
-      <div class="adminChallengeSettingsGrid">
-
-        ${buildAdminToggleSettingCard({
-          key: "randomChallengeBox1",
-          title: "اللاعب المشترك",
-          desc: "إظهار أو إخفاء المربع",
-          inputId: "settingsRandomBox1Enabled",
-          enabled: challengeSettings.box1
-        })}
-
-        ${buildAdminToggleSettingCard({
-          key: "randomChallengeBox2",
-          title: "المزاد",
-          desc: "إظهار أو إخفاء المربع",
-          inputId: "settingsRandomBox2Enabled",
-          enabled: challengeSettings.box2
-        })}
-
-        ${buildAdminToggleSettingCard({
-          key: "randomChallengeBox3",
-          title: "ماذا تعرف",
-          desc: "إظهار أو إخفاء المربع",
-          inputId: "settingsRandomBox3Enabled",
-          enabled: challengeSettings.box3
-        })}
-
-        ${buildAdminToggleSettingCard({
-          key: "randomChallengeBox4",
-          title: "صح أو خطأ",
-          desc: "إظهار أو إخفاء المربع",
-          inputId: "settingsRandomBox4Enabled",
-          enabled: challengeSettings.box4
-        })}
-
-        <div
-          id="randomChallengeAuctionCard"
-          class="
-            adminSettingGameCard
-            adminToggleSettingCard
-            adminChallengeAuctionCard
-            ${
-              challengeSettings.auction
-                ? "isEnabled"
-                : "isDisabled"
-            }
-          "
-        >
-
-          <div class="adminSettingGameHead">
-
-            <div class="adminSettingGameTitleBox">
-              <h3>
-                فتبلة
-                <span>تفعيل المربع وتحديد عدد الأرقام</span>
-              </h3>
-            </div>
-
-            <button
-              type="button"
-              class="adminSettingToggleBtn ${
-                challengeSettings.auction
-                  ? "active"
-                  : ""
-              }"
-              onclick="toggleAdminChallengeSetting(
-                'settingsRandomAuctionEnabled',
-                this
-              )"
-            >
-              ${
-                challengeSettings.auction
-                  ? "مفعّل"
-                  : "معطّل"
-              }
-            </button>
-
-          </div>
-
-          <div class="adminChallengeAuctionCount">
-
-            <div class="adminChallengeAuctionCountTitle">
-              عدد الأرقام
-            </div>
-
-            <div class="adminSettingGameOptions adminChallengeAuctionOptions">
-              ${[3, 5, 7].map(option => `
-                <button
-                  type="button"
-                  class="adminSettingGameOption ${
-                    auctionCount === option
-                      ? "selected"
-                      : ""
-                  }"
-                  onclick="selectAdminSettingOption(
-                    'settingsAuctionCount',
-                    ${option},
-                    this
-                  )"
-                  ${
-                    challengeSettings.auction
-                      ? ""
-                      : "disabled"
-                  }
-                >
-                  ${option}
-                </button>
-              `).join("")}
-            </div>
-
-          </div>
-
-          <input
-            type="hidden"
-            id="settingsRandomAuctionEnabled"
-            value="${
-              challengeSettings.auction
-                ? "1"
-                : "0"
-            }"
-            data-segment="randomChallengeAuction"
-          >
-
-          <input
-            type="hidden"
-            id="settingsAuctionCount"
-            value="${auctionCount}"
-            data-segment="auction"
-          >
-
+          <span>
+            تظهر هنا الفقرات المفعلة داخل النموذج الحالي فقط
+          </span>
         </div>
 
-      </div>
+        <strong>
+          ${visibleSettings.length}
+        </strong>
+
+      </header>
+
+      ${
+        visibleSettings.length
+          ? `
+            <div class="adminSettingsGameGrid">
+              ${visibleSettings
+                .map(item => {
+                  return buildAdminSettingCardPro(
+                    item
+                  )
+                })
+                .join("")}
+            </div>
+          `
+          : `
+            <div class="adminSettingsEmpty">
+              لا توجد فقرات مفعلة تحتاج إلى إعدادات
+            </div>
+          `
+      }
 
     </section>
 
+    ${
+  challengeVisible
+    ? `
+      <details
+        class="adminChallengeSettingsSection adminChallengeSettingsDetails"
+      >
+        <summary class="adminChallengeSettingsSummary">
+
+  <div class="adminChallengeSettingsSummaryTitle">
+    <h2>
+      إعدادات التحدي
+    </h2>
+
+    <span>
+      تفعيل وإخفاء مربعات فقرة التحدي
+    </span>
+  </div>
+
+  <div class="adminChallengeSettingsSummaryMeta">
+
+    <span>
+      ${
+        [
+          challengeSettings.box1,
+          challengeSettings.box2,
+          challengeSettings.box3,
+          challengeSettings.box4,
+          challengeSettings.auction
+        ].filter(Boolean).length
+      } / 5
+    </span>
+
+    <b class="adminChallengeSettingsArrow">
+      ▼
+    </b>
+
+  </div>
+
+</summary>
+
+        <div class="adminChallengeSettingsBody">
+
+          <div class="adminChallengeSettingsGrid">
+
+            ${buildAdminToggleSettingCard({
+              key: "randomChallengeBox1",
+              title: "اللاعب المشترك",
+              desc: "إظهار أو إخفاء المربع",
+              inputId: "settingsRandomBox1Enabled",
+              enabled: challengeSettings.box1
+            })}
+
+            ${buildAdminToggleSettingCard({
+              key: "randomChallengeBox2",
+              title: "المزاد",
+              desc: "إظهار أو إخفاء المربع",
+              inputId: "settingsRandomBox2Enabled",
+              enabled: challengeSettings.box2
+            })}
+
+            ${buildAdminToggleSettingCard({
+              key: "randomChallengeBox3",
+              title: "ماذا تعرف",
+              desc: "إظهار أو إخفاء المربع",
+              inputId: "settingsRandomBox3Enabled",
+              enabled: challengeSettings.box3
+            })}
+
+            ${buildAdminToggleSettingCard({
+              key: "randomChallengeBox4",
+              title: "صح أو خطأ",
+              desc: "إظهار أو إخفاء المربع",
+              inputId: "settingsRandomBox4Enabled",
+              enabled: challengeSettings.box4
+            })}
+
+            <div
+              id="randomChallengeAuctionCard"
+              class="
+                adminSettingGameCard
+                adminToggleSettingCard
+                adminChallengeAuctionCard
+                ${
+                  challengeSettings.auction
+                    ? "isEnabled"
+                    : "isDisabled"
+                }
+              "
+            >
+
+              <div class="adminSettingGameHead">
+
+                <div class="adminSettingGameTitleBox">
+                  <h3>
+                    فتبلة
+                    <span>تفعيل المربع وتحديد عدد الأرقام</span>
+                  </h3>
+                </div>
+
+                <button
+                  type="button"
+                  class="adminSettingToggleBtn ${
+                    challengeSettings.auction
+                      ? "active"
+                      : ""
+                  }"
+                  onclick="toggleAdminChallengeSetting(
+                    'settingsRandomAuctionEnabled',
+                    this
+                  )"
+                >
+                  ${
+                    challengeSettings.auction
+                      ? "مفعّل"
+                      : "معطّل"
+                  }
+                </button>
+
+              </div>
+
+              <div class="adminChallengeAuctionCount">
+
+                <div class="adminChallengeAuctionCountTitle">
+                  عدد الأرقام
+                </div>
+
+                <div class="adminSettingGameOptions adminChallengeAuctionOptions">
+                  ${[3, 5, 7].map(option => `
+                    <button
+                      type="button"
+                      class="adminSettingGameOption ${
+                        auctionCount === option
+                          ? "selected"
+                          : ""
+                      }"
+                      onclick="selectAdminSettingOption(
+                        'settingsAuctionCount',
+                        ${option},
+                        this
+                      )"
+                      ${
+                        challengeSettings.auction
+                          ? ""
+                          : "disabled"
+                      }
+                    >
+                      ${option}
+                    </button>
+                  `).join("")}
+                </div>
+
+              </div>
+
+              <input
+                type="hidden"
+                id="settingsRandomAuctionEnabled"
+                value="${
+                  challengeSettings.auction
+                    ? "1"
+                    : "0"
+                }"
+                data-segment="randomChallengeAuction"
+              >
+
+              <input
+                type="hidden"
+                id="settingsAuctionCount"
+                value="${auctionCount}"
+                data-segment="auction"
+              >
+
+            </div>
+
+          </div>
+
+        </div>
+      </details>
+    `
+    : ""
+}
   </div>
 `
 }
@@ -5370,15 +8423,19 @@ async function saveAdminSegmentSettingsPage() {
       return true
     }
 
-    if (
-      !requireInitialSetting(
-        "settingsTop10Rounds",
-        "عدد جولات Top 10"
-      ) ||
-      !requireInitialSetting(
-        "settingsWhoCount",
-        "عدد أرقام من هو"
-      ) ||
+   if (
+  !requireInitialSetting(
+    "settingsTop10Rounds",
+    "عدد جولات Top 10"
+  ) ||
+  !requireInitialSetting(
+    "settingsFamilyDidiRounds",
+    "عدد جولات فاملي ديدي"
+  ) ||
+  !requireInitialSetting(
+    "settingsWhoCount",
+    "عدد أرقام من هو"
+  ) ||
       !requireInitialSetting(
         "settingsExplainCount",
         "عدد كلمات اشرح الكلمة"
@@ -5441,6 +8498,22 @@ async function saveAdminSegmentSettingsPage() {
         )
       )
     }
+
+    const familyDidiInput =
+  getSettingInput(
+    "settingsFamilyDidiRounds"
+  )
+
+if (familyDidiInput) {
+  addSetting(
+    "familyDidi",
+    normalizeAdminRoundCount(
+      familyDidiInput.value,
+      3,
+      5
+    )
+  )
+}
 
     const auctionInput =
       getSettingInput(
@@ -5683,6 +8756,22 @@ async function saveAdminSegmentSettingsPage() {
     }
 
     if (
+  Object.hasOwn(
+    savedSettingsMap,
+    "familyDidi"
+  ) &&
+  typeof familyDidiAdminRoundsCount !==
+    "undefined"
+) {
+  familyDidiAdminRoundsCount =
+    normalizeAdminRoundCount(
+      savedSettingsMap.familyDidi,
+      3,
+      5
+    )
+}
+
+    if (
       Object.hasOwn(
         savedSettingsMap,
         "archive"
@@ -5751,7 +8840,7 @@ function getAdminSegmentDescription(key) {
   const map = {
     warmup: "فئات وأسئلة التسخين",
     top10: "جولات Top 10 والإجابات",
-    letterli: "فقرة جاهزة بدون أسئلة من الأدمن",
+    familyDidi: "أسئلة وإجابات ونقاط فاملي ديدي",
     who: "صور وإجابات من هو",
     explain: "كلمات اشرح الكلمة",
     finalRound1: "فقرة من بدون نقط",
@@ -5867,9 +8956,16 @@ async function checkCurrentModelReady() {
       results.push(await checkTop10Ready())
     }
 
-    if (isAdminSegmentGloballyEnabled("letterli", visibility)) {
-      results.push(checkLetterliReady())
-    }
+    if (
+  isAdminSegmentGloballyEnabled(
+    "familyDidi",
+    visibility
+  )
+) {
+  results.push(
+    await checkFamilyDidiReady()
+  )
+}
 
     if (isAdminSegmentGloballyEnabled("who", visibility)) {
       results.push(await checkWhoReady())
@@ -5978,11 +9074,170 @@ async function checkWarmupReady() {
   )
 }
 
-function checkLetterliReady() {
+async function checkFamilyDidiReady() {
+  const maxRounds =
+    await getSegmentRoundCount(
+      "familyDidi",
+      3,
+      5
+    )
+
+  const result = await dbSelect(
+    "family_didi_questions",
+
+    query =>
+      query
+        .eq(
+          "model",
+          Number(currentModel)
+        )
+        .order(
+          "round",
+          {
+            ascending: true
+          }
+        )
+        .order(
+          "position",
+          {
+            ascending: true
+          }
+        ),
+
+    {
+      select: `
+        round,
+        position,
+        question,
+        answer,
+        points,
+        answers_count,
+        timer_seconds
+      `,
+      fallback: [],
+      logLabel:
+        "CHECK FAMILY DIDI READY"
+    }
+  )
+
+  if (!result.ok) {
+    console.log(result.error)
+
+    return readinessItem(
+      "فاملي ديدي",
+      false,
+      ["تعذر قراءة بيانات فاملي ديدي"]
+    )
+  }
+
+  const rows =
+    Array.isArray(result.data)
+      ? result.data
+      : []
+
+  const missing = []
+
+  for (
+    let roundNumber = 1;
+    roundNumber <= maxRounds;
+    roundNumber++
+  ) {
+    const roundRows =
+      rows.filter(row => {
+        return (
+          Number(row.round) ===
+          roundNumber
+        )
+      })
+
+    if (!roundRows.length) {
+      missing.push(
+        `الجولة ${roundNumber} غير موجودة`
+      )
+
+      continue
+    }
+
+    const firstRow =
+      roundRows[0]
+
+    const answersCount =
+      Math.min(
+        Math.max(
+          Number(
+            firstRow.answers_count || 8
+          ),
+          1
+        ),
+        8
+      )
+
+    if (
+      !hasText(
+        firstRow.question
+      )
+    ) {
+      missing.push(
+        `الجولة ${roundNumber}: السؤال فارغ`
+      )
+    }
+
+    if (
+      Number(
+        firstRow.timer_seconds || 0
+      ) < 1
+    ) {
+      missing.push(
+        `الجولة ${roundNumber}: المؤقت غير صحيح`
+      )
+    }
+
+    for (
+      let position = 1;
+      position <= answersCount;
+      position++
+    ) {
+      const item =
+        roundRows.find(row => {
+          return (
+            Number(row.position) ===
+            position
+          )
+        })
+
+      if (!item) {
+        missing.push(
+          `الجولة ${roundNumber}: الإجابة ${position} غير موجودة`
+        )
+
+        continue
+      }
+
+      if (!hasText(item.answer)) {
+        missing.push(
+          `الجولة ${roundNumber}: الإجابة ${position} فارغة`
+        )
+      }
+
+      if (
+        !Number.isFinite(
+          Number(item.points)
+        ) ||
+        Number(item.points) < 0
+      ) {
+        missing.push(
+          `الجولة ${roundNumber}: نقاط الإجابة ${position} غير صحيحة`
+        )
+      }
+    }
+  }
+
   return readinessItem(
-    "حرفلي",
-    true,
-    ["الفقرة جاهزة بأسئلة ثابتة"]
+    "فاملي ديدي",
+    missing.length === 0,
+    missing.length
+      ? missing
+      : [`${maxRounds} جولات مكتملة`]
   )
 }
 
@@ -7111,6 +10366,7 @@ async function createModel() {
     currentModel = data.id
     currentModelName = data.name || name
     currentModelSetupCompleted = false
+    saveAdminActiveModel()
 
     if (input) input.value = ""
     if (pinInput) pinInput.value = ""
@@ -7133,19 +10389,39 @@ async function createModel() {
 
 async function openSelectedModel() {
   const list =
-    document.getElementById("modelsList")
+    document.getElementById(
+      "modelsList"
+    )
 
   const id =
     Number(list?.value || 0)
 
   if (!id) {
-    showGameToast("اختر النموذج")
-    return
+    showGameToast(
+      "اختر النموذج",
+      "warning"
+    )
+
+    list?.focus()
+
+    return false
   }
 
   const optionName =
-    list.options[list.selectedIndex]?.textContent ||
+    list?.options?.[
+      list.selectedIndex
+    ]?.textContent ||
     `نموذج ${id}`
+
+  /*
+    عند الدخول من صفحة اختيار النماذج
+    نطلب الرقم السري دائمًا
+  */
+  try {
+    sessionStorage.removeItem(
+      getAdminModelAccessKey(id)
+    )
+  } catch {}
 
   const modelData =
     await requestAdminModelAccess(
@@ -7153,40 +10429,57 @@ async function openSelectedModel() {
       optionName
     )
 
-  if (!modelData) return
+  if (!modelData) {
+    return false
+  }
 
-  currentModel = id
+  currentModel =
+    id
 
   currentModelName =
-    modelData.name || optionName
+    modelData.name ||
+    optionName
 
   currentModelSetupCompleted =
     modelData.setup_completed !== false
 
+  saveAdminActiveModel()
+
   updateAdminBrandModel()
   showAdminWorkspace()
 
-  if (currentModelSetupCompleted === false) {
+  if (
+    currentModelSetupCompleted ===
+    false
+  ) {
     renderAdminSettingsActions()
 
     await openAdminSegmentSettings()
 
     showGameToast(
-      "أكمل إعدادات الفقرات أولاً",
+      "أكمل إعدادات الفقرات أولًا",
       "warning"
     )
 
-    return
+    return true
   }
 
   renderAdminHomeActions()
 
   await renderAdminHome()
 
-  showGameToast(`تم فتح ${currentModelName}`)
+  showGameToast(
+    `تم فتح ${currentModelName}`,
+    "success"
+  )
+
+  return true
 }
 
 async function exitCurrentModel() {
+  clearSavedAdminActiveModel()
+  clearSavedAdminActiveView()
+
   currentModel = null
   currentModelName = ""
   currentAdminSegment = ""
@@ -7298,6 +10591,7 @@ if (!updateResult.ok) {
 
   currentModel = id
   currentModelName = name
+  saveAdminActiveModel()
 
   updateAdminBrandModel()
   closeRenameModelModal()
@@ -7451,31 +10745,52 @@ async function deleteAdminStorageUrls(urls = []) {
 window.deleteAdminStorageUrls =
   deleteAdminStorageUrls
 
-async function deleteSelectedModel() {
+async function deleteSelectedModel(
+  options = {}
+) {
   const list =
-    document.getElementById("modelsList")
+    document.getElementById(
+      "modelsList"
+    )
 
   const id =
-    Number(list?.value || currentModel || 0)
+    Number(
+      options.id ||
+      list?.value ||
+      currentModel ||
+      0
+    )
 
   if (!id) {
-    showGameToast("اختر النموذج")
+    showGameToast(
+      "اختر النموذج"
+    )
+
     return false
   }
 
   const modelName =
-    list?.options?.[list.selectedIndex]?.textContent ||
-    currentModelName ||
-    `نموذج ${id}`
-
-  const modelData =
-    await requestAdminModelAccess(
-      id,
-      modelName
+    String(
+      options.name ||
+      list?.options?.[
+        list.selectedIndex
+      ]?.textContent ||
+      currentModelName ||
+      `نموذج ${id}`
     )
 
-  if (!modelData) {
-    return false
+  if (
+    options.skipModelPin !== true
+  ) {
+    const modelData =
+      await requestAdminModelAccess(
+        id,
+        modelName
+      )
+
+    if (!modelData) {
+      return false
+    }
   }
 
   const confirmed =
@@ -7611,6 +10926,14 @@ async function deleteSelectedModel() {
         }
       ),
 
+            dbDelete(
+        "family_didi_questions",
+        query => query.eq("model", id),
+        {
+          logLabel: "DELETE FAMILY DIDI QUESTIONS"
+        }
+      ),
+
       dbDelete(
         "questions",
         query => query.eq("model", id),
@@ -7679,15 +11002,30 @@ async function deleteSelectedModel() {
       return false
     }
 
-    if (Number(currentModel || 0) === id) {
-      currentModel = null
-      currentModelName = ""
-      currentModelSetupCompleted = true
-      currentAdminSegment = "home"
+    if (
+  Number(currentModel || 0) === id
+) {
+  clearSavedAdminActiveModel()
+  clearSavedAdminActiveView()
 
-      updateAdminBrandModel()
-      showAdminModelGate()
-    }
+  currentModel = null
+  currentModelName = ""
+
+  currentModelSetupCompleted =
+    true
+
+  updateAdminBrandModel()
+}
+
+if (
+  options.stayOnCleanup === true
+) {
+  currentAdminSegment =
+    "cleanup"
+} else {
+  currentAdminSegment =
+    "home"
+}
 
     await loadModels()
 
@@ -7696,6 +11034,17 @@ async function deleteSelectedModel() {
     }
 
     invalidateAdminHomeCache()
+
+    if (
+  options.stayOnCleanup === true
+) {
+  showAdminWorkspace()
+  renderSupabaseCleanupActions()
+
+  await scanSupabaseCleanup()
+} else if (!currentModel) {
+  showAdminModelGate()
+}
 
     showGameToast(
       "تم حذف النموذج وكل بياناته",
@@ -7743,6 +11092,9 @@ async function goAdminHome() {
 
   try {
     currentAdminSegment = "home"
+    saveAdminActiveView(
+  "home"
+)
     renderAdminHomeActions()
     await renderAdminHome()
 
@@ -7769,14 +11121,6 @@ function openAdminSegmentCard(segmentKey) {
   openAdminSegment(segmentKey)
 }
 
-function showLetterliAdminInfo() {
-  showGameToast(
-    "فقرة حرفلي جاهزة ولا تحتاج تعديل من الأدمن",
-    "info"
-  )
-
-  return true
-}
 
 async function openAdminSegment(segment) {
   if (!currentModel) {
@@ -7828,11 +11172,11 @@ async function openAdminSegment(segment) {
       return false
     }
 
-    if (segment === "letterli") {
-  return showLetterliAdminInfo()
-}
 
     currentAdminSegment = segment
+    saveAdminActiveView(
+  segment
+)
 
     renderAdminSegmentActions()
     scheduleAdminTabsRefresh()
@@ -7851,6 +11195,11 @@ async function openAdminSegment(segment) {
     if (segment === "top10") {
       await renderTop10Admin()
       return true
+    }
+
+    if (segment === "familyDidi") {
+    await renderFamilyDidiAdmin()
+    return true
     }
 
     if (segment === "who") {
@@ -7908,45 +11257,81 @@ async function openAdminSegment(segment) {
   }
 }
 
-function handleAdminEditCardToggle(card) {
+function handleAdminEditCardToggle(
+  card
+) {
   const grid =
     card?.closest(
       ".adminEditCardsGrid"
     )
 
-  if (!grid) {
-    return
-  }
+  if (!grid) return
 
   if (card.open) {
+    grid
+      .querySelectorAll(
+        ":scope > .adminEditItemCard[open]"
+      )
+      .forEach(item => {
+        if (item !== card) {
+          item.open = false
+        }
+      })
+
     grid.classList.add(
       "hasOpenCard"
     )
 
-    const openedCards =
-      grid.querySelectorAll(
-        ":scope > .adminEditItemCard[open]"
-      )
-
-    openedCards.forEach(item => {
-      if (item !== card) {
-        item.open = false
-      }
-    })
-
     return
   }
 
-  const remainingOpenCard =
-    grid.querySelector(
-      ":scope > .adminEditItemCard[open]"
+  const hasOpenCard =
+    Boolean(
+      grid.querySelector(
+        ":scope > .adminEditItemCard[open]"
+      )
     )
 
   grid.classList.toggle(
     "hasOpenCard",
-    Boolean(remainingOpenCard)
+    hasOpenCard
   )
 }
+
+document.addEventListener(
+  "toggle",
+  event => {
+    const card =
+      event.target?.closest?.(
+        ".adminEditItemCard"
+      )
+
+    if (!card) return
+
+    const grid =
+      card.closest(
+        ".adminEditCardsGrid"
+      )
+
+    if (!grid) return
+
+    setTimeout(() => {
+      const hasOpenCard =
+        Boolean(
+          grid.querySelector(
+            ".adminEditItemCard[open]"
+          )
+        )
+
+      grid.classList.toggle(
+        "hasOpenCard",
+        hasOpenCard
+      )
+    }, 0)
+  },
+  true
+)
+
 
 /* =========================
    MODEL SEGMENT VISIBILITY EXPORTS
@@ -7969,7 +11354,6 @@ window.closeModelSegmentVisibilityPanel =
 /* =========================
    ADMIN CORE EXPORTS
 ========================= */
-
 Object.assign(window, {
   initAdminPanel,
 
@@ -7985,6 +11369,24 @@ Object.assign(window, {
   makeSafeFileExt,
   makeUploadPath,
   getFileSizeMB,
+
+  openCleanupManagedModel,
+  deleteCleanupManagedModel,
+
+  openAdminModelsManagement,
+  editManagedModelAccess,
+  closeManagedModelAccessModal,
+  saveManagedModelAccess,
+
+  openAdminRuntimeManagement,
+  refreshAdminRuntimeManagement,
+
+  deleteAdminRuntimeSession,
+  deleteAdminRuntimeCommand,
+  deleteAdminRuntimeCommandsForSession,
+  deleteEndedAdminRuntimeSessions,
+  deleteAllAdminRuntimeSessions,
+  deleteAllAdminRuntimeCommands,
 
   createModel,
   openSelectedModel,
@@ -8004,7 +11406,6 @@ Object.assign(window, {
   adminBackToCards,
   showAdminHomeCards,
   showAdminEditorPage,
-showLetterliAdminInfo,
 
   openAdminSegment,
   openAdminSegmentCard,

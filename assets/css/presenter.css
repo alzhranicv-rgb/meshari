@@ -1,3 +1,8 @@
+/* =========================================================
+   PRESENTER / المقدم
+   GLOBAL BASE
+   File: assets/css/presenter.css
+========================================================= */
 
 /* =========================
    1) FONTS
@@ -28,74 +33,37 @@
 }
 
 /* =========================
-   2) VARIABLES
+   2) ROOT VARIABLES
 ========================= */
 
 :root{
-  --presenter-bg:#EEF3F6;
-  --presenter-bg-soft:#F6F8FA;
+  --app-height:100dvh;
 
-  --presenter-surface:#FFFFFF;
-  --presenter-surface-soft:#F8FAFB;
-  --presenter-surface-muted:#EFF3F5;
+  --bg:#EAECF0;
+  --surface:#FFFFFF;
+  --soft:#F6F7F9;
+  --line:#D5DADF;
 
-  --presenter-line:#D4DCE3;
-  --presenter-line-strong:#B9C5CF;
+  --primary:#FE7F2D;
+  --secondary:#233D4D;
+  --text:#151515;
+  --muted:#8793A0;
 
-  --presenter-primary:#FE7F2D;
-  --presenter-primary-dark:#E76717;
-  --presenter-primary-soft:rgba(254,127,45,.13);
+  --btn-nav:#0A7C6E;
+  --btn-correct:#007F00;
+  --btn-wrong:#7F0000;
+  --btn-blue:#00007F;
+  --btn-dark:#00004C;
+  --btn-double:#00007F;
+  --btn-undo:#4C4C00;
+  --btn-change:#795000;
 
-  --presenter-secondary:#233D4D;
-  --presenter-secondary-soft:rgba(35,61,77,.10);
-
-  --presenter-text:#18242C;
-  --presenter-muted:#6E7D88;
-
-  --presenter-green:#16823C;
-  --presenter-green-soft:rgba(22,130,60,.12);
-
-  --presenter-red:#B42318;
-  --presenter-red-soft:rgba(180,35,24,.11);
-
-  --presenter-blue:#156B9A;
-  --presenter-blue-soft:rgba(21,107,154,.11);
-
-  --presenter-gray:#657783;
-  --presenter-gray-soft:rgba(101,119,131,.12);
-
-  --presenter-radius-xl:26px;
-  --presenter-radius-lg:20px;
-  --presenter-radius-md:15px;
-  --presenter-radius-sm:11px;
-
-  --presenter-shadow:
-    0 10px 28px rgba(35,61,77,.09);
-
-  --presenter-shadow-soft:
-    0 6px 16px rgba(35,61,77,.07);
-
-  --presenter-transition:
-    .16s ease;
-
-  --presenter-safe-top:
-    max(8px,env(safe-area-inset-top));
-
-  --presenter-safe-right:
-    max(8px,env(safe-area-inset-right));
-
-  --presenter-safe-bottom:
-    max(8px,env(safe-area-inset-bottom));
-
-  --presenter-safe-left:
-    max(8px,env(safe-area-inset-left));
-
-  --presenter-app-height:
-    100dvh;
+  --btn-disabled:#D7DCE2;
+  --btn-disabled-text:#7B8792;
 }
 
 /* =========================
-   3) RESET
+   3) DOCUMENT RESET
 ========================= */
 
 *,
@@ -107,80 +75,78 @@
 html,
 body{
   width:100%;
+  min-width:100%;
   height:100%;
   min-height:100%;
+
   margin:0;
   padding:0;
 }
 
 html{
-  background:var(--presenter-bg);
+  direction:rtl;
+  background:var(--bg);
+
+  overflow:hidden;
+
   -webkit-text-size-adjust:100%;
   text-size-adjust:100%;
 }
 
 body{
-  direction:rtl;
+  width:100%;
+  height:var(--app-height,100dvh);
+  min-height:var(--app-height,100dvh);
+  max-height:var(--app-height,100dvh);
+
   overflow:hidden;
-  overscroll-behavior:none;
 
-  background:
-    radial-gradient(
-      circle at 18% 12%,
-      rgba(254,127,45,.08),
-      transparent 30%
-    ),
-    linear-gradient(
-      180deg,
-      var(--presenter-bg-soft) 0%,
-      var(--presenter-bg) 100%
-    );
+  direction:rtl;
 
-  color:var(--presenter-text);
+  background:var(--bg);
+  color:var(--text);
 
-  font-family:
-    "HanakaText",
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-
+  font-family:"HanakaText",sans-serif;
   font-weight:400;
-}
 
-button,
-input,
-textarea,
-select{
-  margin:0;
-  font:inherit;
-  font-weight:400;
-}
-
-button{
   touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;
+  overscroll-behavior:none;
 }
 
-input,
-textarea,
-select{
-  color:inherit;
+/* =========================
+   4) APP ROOT
+========================= */
+
+#presenterApp,
+.presenterApp{
+  width:100%;
+  height:var(--app-height,100dvh);
+  min-height:var(--app-height,100dvh);
+  max-height:var(--app-height,100dvh);
+
+  margin:0;
+  padding:0;
+
+  position:relative;
+
+  overflow:hidden;
+
+  direction:rtl;
+
+  background:var(--bg);
+  color:var(--text);
+
+  font-family:"HanakaText",sans-serif;
+  font-weight:400;
 }
 
-img,
-video,
-canvas,
-svg{
+.presenterLandscapeApp{
   display:block;
-  max-width:100%;
 }
 
-img,
-video{
-  object-fit:contain;
-}
+/* =========================
+   5) TYPOGRAPHY
+========================= */
 
 h1,
 h2,
@@ -188,549 +154,237 @@ h3,
 h4,
 h5,
 h6,
-p{
+p,
+figure{
   margin:0;
-  font-weight:400;
 }
 
-a{
-  color:inherit;
-  text-decoration:none;
-}
-
+h1,
+h2,
+h3,
 strong,
 b{
   font-weight:400;
 }
 
-/* =========================
-   4) APP ROOT
-========================= */
-
-.presenterApp{
-  width:100%;
-  height:var(--presenter-app-height);
-  min-height:var(--presenter-app-height);
-  max-height:var(--presenter-app-height);
-  overflow:hidden;
-  position:relative;
-  isolation:isolate;
+h1,
+h2,
+h3{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
 }
-
-/* =========================
-   5) GENERAL PAGE
-========================= */
-
-.presenterPage{
-  width:100%;
-  height:var(--presenter-app-height);
-  min-height:var(--presenter-app-height);
-  max-height:var(--presenter-app-height);
-
-  padding:
-    var(--presenter-safe-top)
-    var(--presenter-safe-right)
-    var(--presenter-safe-bottom)
-    var(--presenter-safe-left);
-
-  overflow:hidden;
-}
-
-.presenterJoinPage,
-.presenterHomePage,
-.presenterSegmentPage,
-.presenterReaderHome,
-.presenterReaderSegmentPage{
-  position:absolute;
-  inset:0;
-}
-
-/* =========================
-   6) PAGE SHELLS
-========================= */
-
-.presenterJoinShell,
-.presenterHomeShell,
-.presenterSegmentShell,
-.presenterReaderShell,
-.presenterReaderSegmentShell{
-  width:100%;
-  height:100%;
-  min-width:0;
-  min-height:0;
-  margin:0 auto;
-}
-
-.presenterHomeShell,
-.presenterReaderShell{
-  max-width:1180px;
-}
-
-.presenterSegmentShell,
-.presenterReaderSegmentShell{
-  max-width:1280px;
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:8px;
-}
-
-/* =========================
-   7) GENERAL PANELS
-========================= */
-
-.presenterPanel,
-.presenterReaderPanel{
-  width:100%;
-  height:100%;
-  min-width:0;
-  min-height:0;
-  overflow:hidden;
-  position:relative;
-}
-
-.presenterPanel > *,
-.presenterReaderPanel > *{
-  min-width:0;
-}
-
-/* =========================
-   8) SCROLL CONTAINERS
-========================= */
-
-.presenterScrollArea{
-  width:100%;
-  height:100%;
-  min-height:0;
-
-  overflow-x:hidden;
-  overflow-y:auto;
-
-  overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;
-
-  scrollbar-width:thin;
-  scrollbar-color:
-    var(--presenter-line-strong)
-    transparent;
-}
-
-.presenterScrollArea::-webkit-scrollbar{
-  width:6px;
-  height:6px;
-}
-
-.presenterScrollArea::-webkit-scrollbar-track{
-  background:transparent;
-}
-
-.presenterScrollArea::-webkit-scrollbar-thumb{
-  border-radius:999px;
-  background:var(--presenter-line-strong);
-}
-
-/* =========================
-   9) GENERIC MEDIA
-========================= */
-
-.presenterMedia{
-  width:100%;
-  height:100%;
-  min-width:0;
-  min-height:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  overflow:hidden;
-}
-
-.presenterMedia img,
-.presenterMedia video{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-}
-
-/* =========================
-   10) GENERIC TEXT SAFETY
-========================= */
-
-.presenterTextClamp{
-  overflow:hidden;
-  display:-webkit-box;
-  -webkit-box-orient:vertical;
-  -webkit-line-clamp:3;
-}
-
-.presenterSingleLine{
-  min-width:0;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-}
-
-.presenterBreakText{
-  overflow-wrap:anywhere;
-  word-break:normal;
-}
-
-/* =========================
-   11) INTERACTION STATES
-========================= */
 
 button,
-[role="button"]{
-  user-select:none;
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+button{
+  border:0;
+  outline:0;
+}
+
+button,
+a{
+  -webkit-tap-highlight-color:transparent;
 }
 
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
-select:focus-visible,
-[role="button"]:focus-visible{
+select:focus-visible{
   outline:3px solid rgba(254,127,45,.28);
-  outline-offset:2px;
-}
-
-button:disabled,
-input:disabled,
-textarea:disabled,
-select:disabled{
-  cursor:not-allowed;
+  outline-offset:3px;
 }
 
 /* =========================
-   12) ACCESSIBILITY
+   6) MEDIA
 ========================= */
 
-.presenterVisuallyHidden{
-  width:1px;
-  height:1px;
-  position:absolute;
-  overflow:hidden;
-  clip:rect(0 0 0 0);
-  clip-path:inset(50%);
-  white-space:nowrap;
+img,
+video,
+canvas,
+svg{
+  max-width:100%;
+  display:block;
 }
 
-.hidden{
+img,
+video{
+  object-fit:contain;
+  object-position:center;
+}
+
+/* =========================
+   7) BASIC UTILITIES
+========================= */
+
+.hidden,
+[hidden]{
   display:none !important;
 }
 
+.isHidden,
+.presenterHidden{
+  display:none !important;
+}
+
+.presenterVisuallyHidden{
+  position:absolute !important;
+
+  width:1px !important;
+  height:1px !important;
+
+  padding:0 !important;
+  margin:-1px !important;
+
+  overflow:hidden !important;
+  clip:rect(0,0,0,0) !important;
+  white-space:nowrap !important;
+  border:0 !important;
+}
+
+.noScroll{
+  overflow:hidden !important;
+}
+
 /* =========================
-   13) BOOT LOADING
+   8) SAFE TEXT
 ========================= */
 
-.presenterBootLoading{
-  position:fixed;
-  inset:0;
-  z-index:120000;
+.presenterApp,
+.presenterApp *{
+  text-rendering:geometricPrecision;
+}
+
+.presenterApp{
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+
+.presenterApp input,
+.presenterApp textarea{
+  user-select:text;
+  -webkit-user-select:text;
+}
+
+/* =========================
+   9) SCROLLBAR
+========================= */
+
+.presenterReaderPanel,
+.readerMediaViewerContent{
+  scrollbar-width:thin;
+  scrollbar-color:var(--line) transparent;
+}
+
+.presenterReaderPanel::-webkit-scrollbar,
+.readerMediaViewerContent::-webkit-scrollbar{
+  width:8px;
+  height:8px;
+}
+
+.presenterReaderPanel::-webkit-scrollbar-thumb,
+.readerMediaViewerContent::-webkit-scrollbar-thumb{
+  background:var(--line);
+  border-radius:999px;
+}
+
+.presenterReaderPanel::-webkit-scrollbar-track,
+.readerMediaViewerContent::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+/* =========================
+   10) SUPABASE / ERROR FALLBACK
+========================= */
+
+.presenterErrorBox{
+  width:min(100%,720px);
+  min-height:160px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  padding:
-    var(--presenter-safe-top)
-    var(--presenter-safe-right)
-    var(--presenter-safe-bottom)
-    var(--presenter-safe-left);
+  padding:22px;
 
-  background:var(--presenter-bg);
-}
+  margin:auto;
 
-.presenterBootLoadingCard{
-  width:min(100%,360px);
-  min-height:120px;
-  padding:18px;
+  background:var(--surface);
+  border:2px dashed var(--line);
+  border-radius:28px;
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
+  color:var(--muted);
 
-  border:2px solid var(--presenter-line);
-  border-radius:22px;
-
-  background:var(--presenter-surface);
-  color:var(--presenter-secondary);
-
-  box-shadow:var(--presenter-shadow);
+  font-size:1.1rem;
+  line-height:1.35;
+  font-weight:400;
   text-align:center;
 }
 
-.presenterLoadingSpinner,
-.presenterBackgroundSpinner{
-  width:32px;
-  height:32px;
+/* =========================
+   11) IOS / TOUCH FIXES
+========================= */
 
-  flex:0 0 auto;
-
-  border:4px solid var(--presenter-line);
-  border-top-color:var(--presenter-primary);
-  border-radius:50%;
-
-  animation:
-    presenterSpinner
-    .75s
-    linear
-    infinite;
+input,
+textarea,
+select{
+  -webkit-appearance:none;
+  appearance:none;
 }
 
-.presenterBootLoadingText{
-  color:var(--presenter-secondary);
-  font-size:.9rem;
-  line-height:1.45;
-  text-align:center;
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button{
+  -webkit-appearance:none;
+  margin:0;
 }
 
-@keyframes presenterSpinner{
-  to{
-    transform:rotate(360deg);
+input[type="number"]{
+  appearance:textfield;
+}
+
+button{
+  touch-action:manipulation;
+}
+
+
+
+/* =========================
+   12) PRINT
+========================= */
+
+@media print{
+  html,
+  body,
+  #presenterApp,
+  .presenterApp{
+    height:auto;
+    min-height:auto;
+    max-height:none;
+    overflow:visible;
+  }
+
+  .presenterToast,
+  .presenterBootLoading,
+  .presenterBackgroundLoading,
+  .presenterInsideModeSwitch{
+    display:none !important;
   }
 }
 
 /* =========================
-   14) BACKGROUND LOADING
-========================= */
-
-.presenterBackgroundLoading{
-  position:fixed;
-  z-index:9995;
-
-  top:var(--presenter-safe-top);
-  left:50%;
-
-  min-height:42px;
-  max-width:min(calc(100% - 24px),420px);
-
-  padding:7px 12px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:999px;
-
-  background:var(--presenter-surface);
-  color:var(--presenter-secondary);
-
-  font-size:.72rem;
-  line-height:1.3;
-  text-align:center;
-
-  box-shadow:var(--presenter-shadow-soft);
-
-  transform:translateX(-50%);
-}
-
-.presenterBackgroundLoading:empty{
-  display:none;
-}
-
-.presenterBackgroundSpinner{
-  width:20px;
-  height:20px;
-  border-width:3px;
-}
-
-/* =========================
-   15) TOAST
-========================= */
-
-.presenterToast{
-  position:fixed;
-  z-index:130000;
-
-  left:50%;
-  bottom:calc(12px + env(safe-area-inset-bottom));
-
-  width:min(calc(100% - 24px),460px);
-  min-height:54px;
-
-  padding:11px 14px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border-radius:17px;
-
-  background:var(--presenter-secondary);
-  color:#FFFFFF;
-
-  font-size:.86rem;
-  line-height:1.4;
-  text-align:center;
-
-  box-shadow:
-    0 14px 34px rgba(35,61,77,.26);
-
-  transform:
-    translateX(-50%)
-    translateY(14px);
-
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-
-  transition:
-    opacity var(--presenter-transition),
-    transform var(--presenter-transition),
-    visibility var(--presenter-transition);
-}
-
-.presenterToast.show{
-  opacity:1;
-  visibility:visible;
-
-  transform:
-    translateX(-50%)
-    translateY(0);
-}
-
-.presenterToast.presenterToastSuccess{
-  background:var(--presenter-green);
-}
-
-.presenterToast.presenterToastError{
-  background:var(--presenter-red);
-}
-
-.presenterToast.presenterToastInfo{
-  background:var(--presenter-blue);
-}
-
-/* =========================
-   16) REDUCED MOTION
+   13) REDUCED MOTION
 ========================= */
 
 @media (prefers-reduced-motion:reduce){
   *,
   *::before,
   *::after{
-    scroll-behavior:auto;
-    animation-duration:.01ms;
-    animation-iteration-count:1;
-    transition-duration:.01ms;
-  }
-}
-
-/* =========================================================
-   17) IPHONE PRO MAX - LANDSCAPE
-========================================================= */
-
-@media
-  (min-width:740px)
-  and (max-width:960px)
-  and (orientation:landscape)
-  and (max-height:500px){
-
-  :root{
-    --presenter-safe-top:
-      max(5px,env(safe-area-inset-top));
-
-    --presenter-safe-right:
-      max(7px,env(safe-area-inset-right));
-
-    --presenter-safe-bottom:
-      max(5px,env(safe-area-inset-bottom));
-
-    --presenter-safe-left:
-      max(7px,env(safe-area-inset-left));
-  }
-
-  .presenterSegmentShell,
-  .presenterReaderSegmentShell{
-    gap:6px;
-  }
-
-  .presenterToast{
-    bottom:calc(7px + env(safe-area-inset-bottom));
-    min-height:44px;
-    padding:8px 12px;
-    font-size:.74rem;
-  }
-
-  .presenterBackgroundLoading{
-    min-height:36px;
-    padding:5px 10px;
-    font-size:.66rem;
-  }
-
-  .presenterBootLoadingCard{
-    width:min(100%,320px);
-    min-height:100px;
-    padding:14px;
-  }
-
-  .presenterLoadingSpinner{
-    width:28px;
-    height:28px;
-  }
-}
-
-/* =========================================================
-   18) GALAXY TAB A11 - LANDSCAPE
-========================================================= */
-
-@media
-  (min-width:900px)
-  and (max-width:1400px)
-  and (orientation:landscape)
-  and (min-height:500px){
-
-  :root{
-    --presenter-safe-top:
-      max(10px,env(safe-area-inset-top));
-
-    --presenter-safe-right:
-      max(10px,env(safe-area-inset-right));
-
-    --presenter-safe-bottom:
-      max(10px,env(safe-area-inset-bottom));
-
-    --presenter-safe-left:
-      max(10px,env(safe-area-inset-left));
-  }
-
-  .presenterHomeShell,
-  .presenterReaderShell{
-    max-width:1180px;
-  }
-
-  .presenterSegmentShell,
-  .presenterReaderSegmentShell{
-    max-width:1280px;
-    gap:10px;
-  }
-
-  .presenterBootLoadingCard{
-    width:min(100%,390px);
-    min-height:130px;
-  }
-}
-
-/* =========================
-   19) SMALL HEIGHT SAFETY
-========================= */
-
-@media (max-height:430px){
-  .presenterPage{
-    --presenter-safe-top:
-      max(4px,env(safe-area-inset-top));
-
-    --presenter-safe-right:
-      max(6px,env(safe-area-inset-right));
-
-    --presenter-safe-bottom:
-      max(4px,env(safe-area-inset-bottom));
-
-    --presenter-safe-left:
-      max(6px,env(safe-area-inset-left));
+    animation:none !important;
+    transition:none !important;
+    scroll-behavior:auto !important;
   }
 }

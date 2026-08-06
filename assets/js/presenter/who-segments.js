@@ -604,70 +604,52 @@ function buildPresenterWhoNumbersHtml() {
 ========================= */
 
 async function renderWho() {
-  const panel = document.getElementById(
-    "presenterPanel"
-  )
+  const panel =
+    document.getElementById(
+      "presenterPanel"
+    )
 
   if (!panel) return
 
-  const cachedRows = readPresenterWhoCache()
+  const cachedRows =
+    readPresenterWhoCache()
 
   if (cachedRows?.length) {
     presenterWhoRows = cachedRows
   }
 
+  panel.dataset.segment = "who"
+
   panel.innerHTML = `
-    <section class="presenterWhoControlView">
+    <section
+      class="presenterWhoScreen"
+      aria-label="لوحة تحكم من هو"
+    >
 
-      <header class="presenterWhoControlHeader">
+      <main class="presenterWhoMain">
 
-        <div class="presenterWhoHeaderTeams">
-          ${teamButtons()}
-        </div>
+        <section
+          class="presenterCard presenterWhoBoardCard"
+          aria-label="النقاط والأرقام"
+        >
 
-<div class="presenterWhoHeaderInfo">
+          <div class="presenterWhoInfoLine">
 
-  <span
-    id="presenterWhoStatusText"
-    class="presenterWhoStatusText"
-  >
-    —
-  </span>
+            <strong
+              id="presenterWhoCurrentBadge"
+              class="presenterWhoCurrentBadge"
+            >
+              —
+            </strong>
 
-  <strong
-    id="presenterWhoCurrentBadge"
-    class="presenterWhoCurrentBadge"
-  >
-    —
-  </strong>
+            <strong
+              id="presenterWhoTimer"
+              class="presenterWhoTimer"
+            >
+              —
+            </strong>
 
-  <strong
-    id="presenterWhoTimer"
-    class="presenterWhoTimer"
-  >
-    —
-  </strong>
-
-  <button
-    type="button"
-    id="presenterWhoCompensationBtn"
-    class="presenterBtn gray presenterWhoCompensationBtn"
-    onclick="runPresenterWhoAction('compensation')"
-  >
-    تعويض
-  </button>
-
-</div>
-
-      </header>
-
-      <main class="presenterWhoControlMain">
-
-        <section class="presenterWhoBoardCard">
-
-          <header class="presenterWhoPanelTitle">
-            <h2>النقاط</h2>
-          </header>
+          </div>
 
           <div
             id="presenterWhoPointsGrid"
@@ -675,10 +657,6 @@ async function renderWho() {
           >
             ${buildPresenterWhoPointsHtml()}
           </div>
-
-          <header class="presenterWhoPanelTitle">
-            <h2>الأرقام</h2>
-          </header>
 
           <div
             id="presenterWhoGrid"
@@ -689,60 +667,59 @@ async function renderWho() {
 
         </section>
 
-        <section class="presenterWhoPreviewPanel">
+        <section
+          class="presenterCard presenterWhoPreviewCard"
+          aria-label="الإجابة والصورة"
+        >
 
-          <header class="presenterWhoPanelTitle">
-            <h2>الإجابة</h2>
+          <div
+            id="presenterWhoMediaLabel"
+            class="presenterWhoMediaLabel"
+          ></div>
 
-            <span
-              id="presenterWhoMediaLabel"
-              class="presenterWhoMediaLabel"
-            ></span>
-          </header>
-
-          <div class="presenterWhoPreviewContent">
-
-            <div
-              id="presenterWhoAnswerText"
-              class="presenterWhoAnswerText"
-            >
-              —
-            </div>
-
-            <div
-              id="presenterWhoImageBox"
-              class="presenterWhoImageBox hidden"
-            ></div>
-
+          <div
+            id="presenterWhoAnswerText"
+            class="presenterWhoAnswerText"
+          >
+            —
           </div>
+
+          <div
+            id="presenterWhoImageBox"
+            class="presenterWhoImageBox hidden"
+          ></div>
 
         </section>
 
       </main>
 
-      <footer class="presenterWhoCommandBar">
+      <footer
+        class="presenterWhoActions"
+        aria-label="أزرار التحكم"
+      >
 
         <button
           type="button"
           id="presenterWhoDoubleBtn"
-          class="presenterBtn gray presenterWhoDoubleBtn"
+          class="presenterBtn presenterWhoDoubleBtn"
           onclick="runPresenterWhoAction('double')"
         >
           دوببلا
         </button>
-<button
-  type="button"
-  id="presenterWhoCompensationBtn"
-  class="presenterBtn gray presenterWhoCompensationBtn"
-  onclick="runPresenterWhoAction('compensation')"
->
-  تعويض
-</button>
+
+        <button
+          type="button"
+          id="presenterWhoCompensationBtn"
+          class="presenterBtn presenterWhoCompensationBtn"
+          onclick="runPresenterWhoAction('compensation')"
+        >
+          تعويض
+        </button>
 
         <button
           type="button"
           id="presenterWhoWrongBtn"
-          class="presenterBtn red"
+          class="presenterBtn presenterWhoWrongBtn"
           onclick="sendPresenterWhoScore('wrong')"
         >
           خطأ
@@ -751,7 +728,7 @@ async function renderWho() {
         <button
           type="button"
           id="presenterWhoCorrectBtn"
-          class="presenterBtn green"
+          class="presenterBtn presenterWhoCorrectBtn"
           onclick="sendPresenterWhoScore('correct')"
         >
           صح
@@ -763,7 +740,7 @@ async function renderWho() {
   `
 
   refreshPresenterWhoFromState()
-    startPresenterWhoTimerWatcher()
+  startPresenterWhoTimerWatcher()
 
   if (!presenterWhoRows.length) {
     await loadPresenterWhoRows({
@@ -775,15 +752,18 @@ async function renderWho() {
     }
 
     refreshPresenterWhoFromState()
-  } else {
-    loadPresenterWhoRows({
-      backgroundRefresh: false
-    }).then(() => {
-      if (presenterSegment !== "who") return
-
-      refreshPresenterWhoFromState()
-    })
+    return
   }
+
+  loadPresenterWhoRows({
+    backgroundRefresh: false
+  }).then(() => {
+    if (presenterSegment !== "who") {
+      return
+    }
+
+    refreshPresenterWhoFromState()
+  })
 }
 
 /* =========================

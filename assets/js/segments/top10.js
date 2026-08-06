@@ -1217,44 +1217,72 @@ function buildTop10HTML() {
   `
 }
 
-function renderTop10Rect(num, opened) {
-  const round = top10State.round
-  const isOpened = opened.includes(num)
-  const isAnimating = top10AnimatingNumber === num
-  const answer = String(
-    top10State.answers?.[round]?.[num] || num
-  ).trim()
+function renderTop10Rect(
+  num,
+  opened
+) {
+  const round =
+    Number(top10State.round || 1)
 
-  let textSize = "normal"
+  const number =
+    Number(num || 0)
 
-  if (answer.length > 28) {
+  const isOpened =
+    opened.includes(number)
+
+  const isAnimating =
+    top10AnimatingNumber === number
+
+  const answer =
+    String(
+      top10State
+        .answers?.[round]?.[number] ||
+      ""
+    ).trim()
+
+  let textSize =
+    "normal"
+
+  if (answer.length > 30) {
     textSize = "long"
-  } else if (answer.length > 16) {
+  } else if (answer.length > 18) {
     textSize = "medium"
-  }
-
-  if (isOpened) {
-    return `
-      <button
-        class="top10Rect opened${isAnimating ? " top10RevealFx" : ""}"
-        data-num="${num}"
-        data-text-size="${textSize}"
-        disabled
-      >
-        <span class="top10RectInner">
-          ${escapeDisplayHtml(answer)}
-        </span>
-      </button>
-    `
   }
 
   return `
     <button
-      onclick="openTop10Number(${num})"
-      data-num="${num}"
-      class="top10Rect"
+      type="button"
+      id="top10Number${number}"
+      class="
+        top10Rect
+        ${isOpened ? "opened" : ""}
+        ${isAnimating ? "top10RectAnimating" : ""}
+      "
+      data-number="${number}"
+      data-num="${number}"
+      data-text-size="${textSize}"
+      onclick="openTop10Number(${number})"
+      ${
+        isOpened || isAnimating
+          ? "disabled"
+          : ""
+      }
     >
-      <span class="top10RectInner">${num}</span>
+
+      <span class="top10RectNumber">
+        ${number}
+      </span>
+
+      <span class="top10RectAnswer">
+        <span class="top10RectInner">
+          ${
+            isOpened
+              ? escapeDisplayHtml(answer)
+              : ""
+          }
+        </span>
+      </span>
+
     </button>
   `
 }
@@ -2290,63 +2318,82 @@ function switchTop10Turn() {
 async function showTop10Answer() {
   ensureTop10RoundState()
 
-  const round = Number(top10State.round || 1)
+  const round =
+    Number(
+      top10State.round || 1
+    )
 
-  const errorsA = Number(
-    top10State.errors?.[round]?.A || 0
-  )
+  const errorsA =
+    Number(
+      top10State.errors?.[round]?.A || 0
+    )
 
-  const errorsB = Number(
-    top10State.errors?.[round]?.B || 0
-  )
+  const errorsB =
+    Number(
+      top10State.errors?.[round]?.B || 0
+    )
 
-  if (errorsA < 3 || errorsB < 3) {
+  if (
+    errorsA < 3 ||
+    errorsB < 3
+  ) {
     showGameToast(
       "لا يمكن إظهار الإجابات حتى تكتمل أخطاء الفريقين"
     )
 
     updateTop10AnswerButton()
-    return
-  }
-
-  const opened =
-    top10State.opened?.[round] || []
-
-  if (opened.length >= 10) {
-    showGameToast(
-      "تم إظهار جميع الإجابات"
-    )
-
-    return
+    return false
   }
 
   let answers = null
 
   try {
     answers =
-      await loadTop10RoundAnswers(round)
+      await loadTop10RoundAnswers(
+        round
+      )
   } catch (error) {
     console.log(error)
-    showGameToast("تعذر تحميل الإجابات")
-    return
+
+    showGameToast(
+      "تعذر تحميل الإجابات"
+    )
+
+    return false
+  }
+
+  const remainingNumbers =
+    Array.from(
+      {
+        length: 10
+      },
+      (_, index) => index + 1
+    ).filter(number => {
+      return (
+        answers?.[number] &&
+        !top10State.opened?.[round]
+          ?.includes(number)
+      )
+    })
+
+  if (!remainingNumbers.length) {
+    showGameToast(
+      "تم إظهار جميع الإجابات"
+    )
+
+    updateTop10AnswerButton()
+    return true
   }
 
   pushTop10History()
 
-  for (let number = 1; number <= 10; number++) {
-    const item = answers?.[number]
+  const button =
+    document.getElementById(
+      "top10ShowAnswerBtn"
+    )
 
-    if (!item) continue
-
-    if (
-      !top10State.opened[round]
-        .includes(number)
-    ) {
-      top10State.opened[round].push(number)
-    }
-
-    top10State.answers[round][number] =
-      item.answer || ""
+  if (button) {
+    button.disabled = true
   }
 
   currentTop10Number = null
@@ -2363,7 +2410,51 @@ async function showTop10Answer() {
     save: false
   })
 
-  playGameSound("answer")
+  for (
+    const number of
+    remainingNumbers
+  ) {
+    const item =
+      answers[number]
+
+    const card =
+      document.querySelector(
+        `.top10Rect[data-number="${number}"]`
+      )
+
+    card?.classList.add(
+      "top10RevealFx"
+    )
+
+    await new Promise(resolve => {
+      setTimeout(resolve, 180)
+    })
+
+    if (
+      !top10State.opened[round]
+        .includes(number)
+    ) {
+      top10State.opened[round].push(
+        number
+      )
+    }
+
+    top10State.answers[round][number] =
+      item.answer || ""
+
+    updateTop10UIOnly()
+
+    if (
+      typeof playGameSound ===
+      "function"
+    ) {
+      playGameSound("answer")
+    }
+
+    await new Promise(resolve => {
+      setTimeout(resolve, 110)
+    })
+  }
 
   updateTop10UIOnly()
   updateTop10AnswerButton()
@@ -2378,6 +2469,8 @@ async function showTop10Answer() {
   ) {
     updateEndRoundButtonState()
   }
+
+  return true
 }
 
 window.showTop10Answer = showTop10Answer
@@ -2495,8 +2588,17 @@ function addTop10Error() {
     })
   }
 
-  playGameSound("wrong")
-  flashScreen("wrong")
+playGameSound("wrong")
+flashScreen("wrong")
+
+if (
+  typeof showScreenWrongCountFx ===
+  "function"
+) {
+  showScreenWrongCountFx(
+    Math.min(teamErrors, 3)
+  )
+}
 
   updateTop10UIOnly()
   updateTop10AnswerButton()

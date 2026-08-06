@@ -444,13 +444,16 @@
 ========================= */
 
 .top10NumbersBoard{
-  width:min(100%,1040px);
-  height:calc(100% - 22px);
+  width:min(100%,1140px);
+  height:calc(100% - 10px);
   min-height:0;
-  margin:22px auto 0;
+
+  margin:10px auto 0;
 
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
   gap:18px;
 
   overflow:hidden;
@@ -461,124 +464,341 @@
   min-height:0;
 
   display:grid;
-  grid-template-rows:repeat(5,minmax(0,1fr));
+  grid-template-rows:
+    repeat(5,minmax(0,1fr));
+
   gap:10px;
 }
 
+/* =========================
+   ANSWER CARD
+========================= */
+
 .top10Rect{
-  width:100%;
-  height:100%;
-  min-height:0;
+  position:relative;
 
-  border:0;
-  border-radius:20px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  cursor:pointer;
-
-  background:var(--primary);
-  color:#fff;
-
-  font-size:clamp(1.8rem,3vw,3.3rem);
-  line-height:1;
-  font-weight:700;
-
-  overflow:hidden;
-
-  transition:transform .15s ease, filter .15s ease, background .15s ease;
-}
-
-.top10Rect:hover{
-  transform:translateY(-1px);
-  filter:brightness(1.02);
-}
-
-.top10Rect:active{
-  transform:scale(.97);
-}
-
-.top10Rect.opened{
-  background:var(--btn-nav);
-  color:#fff;
-  cursor:not-allowed;
-  transform:none;
-  filter:none;
-  overflow:hidden;
-}
-
-.top10RectInner{
-  width:100%;
-  padding:4px 12px;
-
-  text-align:center;
-  line-height:1.15;
-  font-weight:700;
-
-  overflow:hidden;
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  line-clamp:2;
-  -webkit-box-orient:vertical;
-}
-
-.top10Rect.opened .top10RectInner{
   width:100%;
   height:100%;
   min-width:0;
   min-height:0;
 
-  padding:6px 10px;
+  padding:9px;
+
+  border:2px solid var(--line);
+  border-radius:20px;
+
+  display:grid;
+  place-items:center;
+
+  cursor:pointer;
+
+  background:var(--surface);
+  color:var(--text);
+
+  overflow:hidden;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    border-color .15s ease,
+    background-color .15s ease;
+}
+
+.top10Rect:hover:not(:disabled){
+  transform:translateY(-1px);
+
+  border-color:var(--primary);
+
+  filter:brightness(1.01);
+}
+
+.top10Rect:active:not(:disabled){
+  transform:scale(.98);
+}
+
+.top10Rect:disabled{
+  opacity:1;
+}
+
+/* =========================
+   CLOSED NUMBER
+========================= */
+
+.top10RectNumber{
+  width:min(100%,110px);
+  height:100%;
+  min-height:0;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  font-size:clamp(1.35rem,2vw,2.1rem);
-  line-height:1.22;
+  border-radius:16px;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-family:
+    "MolhimCustom",
+    "HanakaText",
+    sans-serif;
+
+  font-size:clamp(
+    1.9rem,
+    2.8vw,
+    3rem
+  );
+
+  line-height:1;
+  font-weight:400;
+
+  transition:
+    width .22s ease,
+    background-color .22s ease,
+    transform .22s ease;
+}
+
+/* =========================
+   ANSWER AREA
+========================= */
+
+.top10RectAnswer{
+  display:none;
+
+  min-width:0;
+  min-height:0;
+}
+
+.top10RectInner{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  padding:7px 13px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--soft);
+
+  border:1px solid var(--line);
+  border-radius:16px;
+
+  color:var(--text);
+
+  font-size:clamp(
+    1.25rem,
+    1.85vw,
+    1.75rem
+  );
+
+  line-height:1.18;
   font-weight:400;
   text-align:center;
 
   white-space:normal;
   overflow-wrap:anywhere;
-  word-break:break-word;
+  word-break:normal;
 
   overflow:hidden;
 }
 
-.top10Rect.opened[data-text-size="medium"] .top10RectInner{
-  font-size:clamp(1.15rem,1.7vw,1.7rem);
+/* =========================
+   OPENED ANSWER
+========================= */
+
+.top10Rect.opened{
+  grid-template-columns:
+    72px
+    minmax(0,1fr);
+
+  place-items:stretch;
+
+  gap:10px;
+
+  border-color:var(--btn-nav);
+
+  background:var(--surface);
+
+  cursor:not-allowed;
+
+  transform:none;
+  filter:none;
 }
 
-.top10Rect.opened[data-text-size="long"] .top10RectInner{
-  font-size:clamp(.98rem,1.35vw,1.4rem);
-  line-height:1.16;
-  padding:4px 7px;
+.top10Rect.opened
+.top10RectNumber{
+  width:72px;
+  min-width:72px;
+
+  background:var(--btn-nav);
+
+  font-size:clamp(
+    1.45rem,
+    2vw,
+    2rem
+  );
+}
+
+.top10Rect.opened
+.top10RectAnswer{
+  min-width:0;
+  min-height:0;
+
+  display:block;
+}
+
+/* =========================
+   TEXT SIZES
+========================= */
+
+.top10Rect.opened[
+  data-text-size="medium"
+]
+.top10RectInner{
+  font-size:clamp(
+    1.05rem,
+    1.55vw,
+    1.42rem
+  );
+
+  line-height:1.15;
+}
+
+.top10Rect.opened[
+  data-text-size="long"
+]
+.top10RectInner{
+  padding:5px 9px;
+
+  font-size:clamp(
+    .88rem,
+    1.22vw,
+    1.14rem
+  );
+
+  line-height:1.12;
+}
+
+/* =========================
+   OPEN ANIMATION
+========================= */
+
+.top10RectAnimating{
+  border-color:var(--primary);
+
+  animation:
+    top10AnswerOpening
+    .36s
+    ease
+    both;
 }
 
 .top10RevealFx{
-  animation:top10Reveal .45s ease both;
+  animation:
+    top10AnswerOpening
+    .45s
+    ease
+    both;
 }
 
-@keyframes top10Reveal{
+@keyframes top10AnswerOpening{
   0%{
-    transform:scale(.96);
-    filter:brightness(1);
+    transform:scale(.97);
   }
 
   50%{
-    transform:scale(1.025);
-    filter:brightness(1.08);
+    transform:scale(1.02);
   }
 
   100%{
     transform:scale(1);
-    filter:brightness(1);
   }
 }
 
+/* =========================
+   IPAD ANSWER CARDS
+========================= */
+
+@media
+  (min-width:768px)
+  and (max-width:1180px)
+  and (orientation:landscape){
+
+  .top10NumbersBoard{
+    width:min(100%,1100px);
+    height:calc(100% - 8px);
+
+    margin:8px auto 0;
+
+    gap:14px;
+  }
+
+  .top10Side{
+    gap:8px;
+  }
+
+  .top10Rect{
+    padding:7px;
+
+    border-radius:17px;
+  }
+
+  .top10RectNumber{
+    width:min(100%,94px);
+
+    border-radius:14px;
+
+    font-size:1.8rem;
+  }
+
+  .top10Rect.opened{
+    grid-template-columns:
+      62px
+      minmax(0,1fr);
+
+    gap:8px;
+  }
+
+  .top10Rect.opened
+  .top10RectNumber{
+    width:62px;
+    min-width:62px;
+
+    border-radius:14px;
+
+    font-size:1.45rem;
+  }
+
+  .top10RectInner{
+    padding:6px 10px;
+
+    border-radius:14px;
+
+    font-size:1.12rem;
+    line-height:1.16;
+  }
+
+  .top10Rect.opened[
+    data-text-size="medium"
+  ]
+  .top10RectInner{
+    font-size:.97rem;
+    line-height:1.13;
+  }
+
+  .top10Rect.opened[
+    data-text-size="long"
+  ]
+  .top10RectInner{
+    padding:4px 7px;
+
+    font-size:.82rem;
+    line-height:1.09;
+  }
+}
 /* =========================
    ACTION BAR
 ========================= */

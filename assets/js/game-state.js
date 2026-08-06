@@ -233,9 +233,9 @@ function getUnifiedGameState() {
           null
         ),
 
-      letterli:
+      familyDidi:
         getSafeLocalJson(
-          "letterli_state_v1",
+          "family_didi_state_v1",
           null
         ),
 
@@ -434,7 +434,8 @@ function shouldTrackUnifiedStorageKey(key) {
 
     "warmup_state_v1",
     "top10_state_v1",
-    "letterli_state_v1",
+    "family_didi_state_v1",
+     "family_didi_max_rounds",
     "who_state_v1",
     "explain_state_v1",
     "final_state_v3",

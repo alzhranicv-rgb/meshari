@@ -138,7 +138,7 @@ window.finalRound4Count = Number(
 const ALL_DISPLAY_SEGMENTS = [
   { key: "warmup", title: "التسخين", sort: 1 },
   { key: "top10", title: "Top 10", sort: 2 },
-  { key: "letterli", title: "حرفلي", sort: 3 },
+  { key: "familyDidi", title: "فاملي ديدي", sort: 3 },
   { key: "who", title: "من هو", sort: 4 },
   { key: "explain", title: "اشرح الكلمة", sort: 5 },
   { key: "finalRound1", title: "ٮدوں ٮڡاط", sort: 6 },
@@ -279,7 +279,7 @@ function defaultSegmentStatus() {
   return {
     warmup: item(),
     top10: item(),
-    letterli: item(),
+    familyDidi: item(),
     who: item(),
     explain: item(),
 
@@ -426,6 +426,8 @@ async function performDisplayStateSync() {
         localStorage.getItem(
           "presenter_hide_controls"
         ) === "1",
+        segmentStartLottery:
+  readSegmentStartLotteryState(),
         selectedSegments:
   getDisplaySelectedSegmentsFromState(),
 
@@ -448,10 +450,11 @@ selectedSegmentKeys:
           "top10_state_v1"
         ),
 
-      letterli:
+        familyDidi:
         getSafeJson(
-          "letterli_state_v1"
-        ),
+        "family_didi_state_v1"
+       ),
+
 
       who:
         getSafeJson(
@@ -1348,9 +1351,12 @@ function getSegmentWinnerLabelIds(key) {
     return ["segmentWinnerTop10", "winnerTop10"]
   }
 
-  if (key === "letterli") {
-    return ["segmentWinnerLetterli", "winnerLetterli"]
-  }
+  if (key === "familyDidi") {
+  return [
+    "segmentWinnerFamilyDidi",
+    "winnerFamilyDidi"
+  ]
+}
 
   if (key === "who") {
     return ["segmentWinnerWho", "winnerWho"]
@@ -1406,9 +1412,12 @@ function getSegmentCardIds(key) {
     return ["segmentCardTop10", "segmentTop10"]
   }
 
-  if (key === "letterli") {
-    return ["segmentCardLetterli", "segmentLetterli"]
-  }
+  if (key === "familyDidi") {
+  return [
+    "segmentCardFamilyDidi",
+    "segmentFamilyDidi"
+  ]
+}
 
   if (key === "who") {
     return ["segmentCardWho", "segmentWho"]
@@ -1605,24 +1614,30 @@ async function showSegmentIntro(segmentKey) {
 }
 
 function getSegmentArabicTitle(segmentKey) {
-  segmentKey = normalizeDisplaySegmentKey(segmentKey)
+  segmentKey =
+    normalizeDisplaySegmentKey(
+      segmentKey
+    )
 
   const titles = {
-  warmup: "التسخين",
-  top10: "Top 10",
-  letterli: "حرفلي",
-  who: "من هو",
-  explain: "اشرح الكلمة",
-  finalRound1: "ٮدوں ٮڡاط",
-  finalRound2: "صح صحلي",
-  finalRound3: "قصة",
-  finalRound4: "التركيز",
-  archive: "الأرشيف",
-  randomChallenge: "التحدي",
-  final: "الفاصلة"
-}
+    warmup: "التسخين",
+    top10: "Top 10",
+    familyDidi: "فاملي ديدي",
+    who: "من هو",
+    explain: "اشرح الكلمة",
+    finalRound1: "ٮدوں ٮڡاط",
+    finalRound2: "صح صحلي",
+    finalRound3: "قصة",
+    finalRound4: "التركيز",
+    archive: "الأرشيف",
+    randomChallenge: "التحدي",
+    final: "الفاصلة"
+  }
 
-  return titles[segmentKey] || "الفقرة"
+  return (
+    titles[segmentKey] ||
+    "الفقرة"
+  )
 }
 
 function getSegmentEndScores(segmentKey) {
@@ -1815,7 +1830,13 @@ function clearAllSegmentPlayStatesForNewSession() {
 
   localStorage.removeItem("warmup_state_v1")
   localStorage.removeItem("top10_state_v1")
-  localStorage.removeItem("letterli_state_v1")
+  localStorage.removeItem(
+  "family_didi_state_v1"
+  )
+
+  localStorage.removeItem(
+  "family_didi_max_rounds"
+  )
   localStorage.removeItem("who_state_v1")
   localStorage.removeItem("explain_state_v1")
 
@@ -1833,7 +1854,6 @@ function clearAllSegmentPlayStatesForNewSession() {
 
   window.usedQuestions = {}
   window.top10State = null
-  window.letterliState = null
   window.whoState = null
   window.explainState = null
   window.finalState = null
@@ -2270,7 +2290,6 @@ async function endGameAndGoIntro() {
 
   localStorage.removeItem("warmup_state_v1")
   localStorage.removeItem("top10_state_v1")
-  localStorage.removeItem("letterli_state_v1")
   localStorage.removeItem("who_state_v1")
   localStorage.removeItem("explain_state_v1")
   localStorage.removeItem("final_state_v2")
@@ -2329,7 +2348,9 @@ function getDisplaySegmentDomId(key) {
 
   if (key === "warmup") return "segmentWarmup"
   if (key === "top10") return "segmentTop10"
-  if (key === "letterli") return "segmentLetterli"
+  if (key === "familyDidi") {
+  return "segmentFamilyDidi"
+   }
   if (key === "who") return "segmentWho"
   if (key === "explain") return "segmentExplain"
 
@@ -2350,7 +2371,9 @@ function getDisplayWinnerDomId(key) {
 
   if (key === "warmup") return "winnerWarmup"
   if (key === "top10") return "winnerTop10"
-  if (key === "letterli") return "winnerLetterli"
+  if (key === "familyDidi") {
+  return "winnerFamilyDidi"
+  }
   if (key === "who") return "winnerWho"
   if (key === "explain") return "winnerExplain"
 
@@ -2508,6 +2531,7 @@ const SEGMENT_START_LOTTERY_SEGMENTS = new Set([
 
 let segmentStartLotteryTimer = null
 let segmentStartLotteryCountdownTimer = null
+let segmentStartLotteryController = null
 
 function readSegmentStartLotteryState() {
   try {
@@ -2618,6 +2642,9 @@ state[key] = {
   }
 
   saveSegmentStartLotteryState(state)
+  syncDisplayStateToSession({
+  immediate: true
+})
   return true
 }
 
@@ -2794,6 +2821,9 @@ function clearSegmentStartLotteryTimers() {
 
 function closeSegmentStartLotteryOverlay() {
   clearSegmentStartLotteryTimers()
+
+  segmentStartLotteryController = null
+
   document.getElementById(
     "segmentStartLotteryOverlay"
   )?.remove()
@@ -3055,6 +3085,66 @@ function stopLottery() {
         }, 120)
     }
 
+        function confirmLottery() {
+      if (
+        selectedLotteryTeam !== "A" &&
+        selectedLotteryTeam !== "B"
+      ) {
+        showGameToast(
+          "ابدأ القرعة أولاً"
+        )
+
+        return false
+      }
+
+      closeSegmentStartLotteryOverlay()
+      resolve(selectedLotteryTeam)
+
+      return true
+    }
+
+    segmentStartLotteryController = {
+      key,
+
+      start() {
+        startLottery()
+        return true
+      },
+
+      retry() {
+        startLottery()
+        return true
+      },
+
+      confirm() {
+        return confirmLottery()
+      },
+
+      selectTeam(team) {
+        if (running) {
+          return false
+        }
+
+        if (
+          team !== "A" &&
+          team !== "B"
+        ) {
+          return false
+        }
+
+        setResultTeam(team)
+        return true
+      },
+
+      getSelectedTeam() {
+        return selectedLotteryTeam
+      },
+
+      getKey() {
+        return key
+      }
+    }
+
     runBtn?.addEventListener(
       "click",
       startLottery
@@ -3075,17 +3165,10 @@ function stopLottery() {
       setResultTeam("B")
     })
 
-    startBtn?.addEventListener("click", () => {
-      if (
-        selectedLotteryTeam !== "A" &&
-        selectedLotteryTeam !== "B"
-      ) {
-        return
-      }
-
-      closeSegmentStartLotteryOverlay()
-      resolve(selectedLotteryTeam)
-    })
+    startBtn?.addEventListener(
+      "click",
+      confirmLottery
+    )
   })
 }
 
@@ -3130,6 +3213,76 @@ if (savedTeam) {
   return true
 }
 
+function isSegmentStartLotteryControllerReady(segmentKey = "") {
+  if (!segmentStartLotteryController) {
+    showGameToast(
+      "قرعة البداية غير مفتوحة"
+    )
+
+    return false
+  }
+
+  const key =
+    normalizeDisplaySegmentKey(segmentKey)
+
+  if (
+    key &&
+    segmentStartLotteryController.getKey &&
+    segmentStartLotteryController.getKey() !== key
+  ) {
+    showGameToast(
+      "هذه القرعة لا تخص الفقرة الحالية"
+    )
+
+    return false
+  }
+
+  return true
+}
+
+function startSegmentStartLotteryFromPresenter(segmentKey = "") {
+  if (
+    !isSegmentStartLotteryControllerReady(segmentKey)
+  ) {
+    return false
+  }
+
+  return segmentStartLotteryController.start()
+}
+
+function retrySegmentStartLotteryFromPresenter(segmentKey = "") {
+  if (
+    !isSegmentStartLotteryControllerReady(segmentKey)
+  ) {
+    return false
+  }
+
+  return segmentStartLotteryController.retry()
+}
+
+function confirmSegmentStartLotteryFromPresenter(segmentKey = "") {
+  if (
+    !isSegmentStartLotteryControllerReady(segmentKey)
+  ) {
+    return false
+  }
+
+  return segmentStartLotteryController.confirm()
+}
+
+function selectSegmentStartLotteryTeamFromPresenter(
+  team,
+  segmentKey = ""
+) {
+  if (
+    !isSegmentStartLotteryControllerReady(segmentKey)
+  ) {
+    return false
+  }
+
+  return segmentStartLotteryController.selectTeam(team)
+}
+
 window.getTop10RoundStarterTeam =
   getTop10RoundStarterTeam
 
@@ -3141,6 +3294,18 @@ window.applyTop10RoundStarterTeam =
 
 window.closeSegmentStartLotteryOverlay =
   closeSegmentStartLotteryOverlay
+
+  window.startSegmentStartLotteryFromPresenter =
+  startSegmentStartLotteryFromPresenter
+
+window.retrySegmentStartLotteryFromPresenter =
+  retrySegmentStartLotteryFromPresenter
+
+window.confirmSegmentStartLotteryFromPresenter =
+  confirmSegmentStartLotteryFromPresenter
+
+window.selectSegmentStartLotteryTeamFromPresenter =
+  selectSegmentStartLotteryTeamFromPresenter
 
 
 /* =========================
@@ -3381,19 +3546,21 @@ if (
       await window.renderTop10()
     }
 
-    if (segmentKey === "letterli") {
-      if (
-        typeof window
-          .openLetterliSegment !==
-        "function"
-      ) {
-        throw new Error(
-          "openLetterliSegment is not loaded"
-        )
-      }
+    if (
+  segmentKey ===
+  "familyDidi"
+) {
+  if (
+    typeof window.renderFamilyDidi !==
+    "function"
+  ) {
+    throw new Error(
+      "renderFamilyDidi is not loaded"
+    )
+  }
 
-      await window.openLetterliSegment()
-    }
+  await window.renderFamilyDidi()
+}
 
     if (segmentKey === "who") {
       if (
@@ -3679,13 +3846,6 @@ function stopAllDisplaySegmentTimers() {
   ) {
     clearInterval(top10Timer)
     top10Timer = null
-  }
-
-  if (
-    typeof stopLetterliCountdown ===
-    "function"
-  ) {
-    stopLetterliCountdown(false)
   }
 
   if (
@@ -4079,9 +4239,11 @@ function getCurrentSegmentKey() {
     document.querySelector(
       ".top10Wrap"
     ) ||
+
     document.querySelector(
-      ".letterliWrap"
+     ".familyDidiWrap"
     ) ||
+
     document.querySelector(
       ".whoWrap"
     ) ||
@@ -4127,12 +4289,13 @@ function getCurrentSegmentKey() {
   }
 
   if (
-    segmentRoot.classList.contains(
-      "letterliWrap"
-    )
-  ) {
-    return "letterli"
-  }
+  segmentRoot.classList.contains(
+    "familyDidiWrap"
+  )
+) {
+  return "familyDidi"
+}
+
 
   if (
     segmentRoot.classList.contains(
@@ -4234,17 +4397,50 @@ function isDisplaySegmentBusyBeforeEnd(
     )
   }
 
-  if (segmentKey === "letterli") {
-    const state =
-      getLetterliDisplayState()
+if (
+  segmentKey ===
+  "familyDidi"
+) {
+  const saved =
+    window.familyDidiState ||
+    getSafeJson(
+      "family_didi_state_v1"
+    )
 
+  const state =
+    saved?.familyDidiState ||
+    saved ||
+    {}
+
+  const roundNumber =
+    Number(
+      state.round || 1
+    )
+
+  const round =
+    state.rounds?.[
+      roundNumber
+    ] ||
+    {}
+
+  if (
+    round.completed ||
+    round.resultRecorded
+  ) {
     return !!(
-      state.spinning ||
-      state.timerRunning ||
-      state.answerVisible ||
-      state.currentQuestionIndex !== null
+      window
+        .familyDidiTimerSync
+        ?.running
     )
   }
+
+  return !!(
+    state.activeTeam ||
+    window
+      .familyDidiTimerSync
+      ?.running
+  )
+}
 
   if (segmentKey === "who") {
     return !!(
@@ -4355,98 +4551,6 @@ function isDisplaySegmentBusyBeforeEnd(
 }
 
 /* =========================
-   Letterli Helpers
-========================= */
-
-function getLetterliDisplayState() {
-  return (
-    window.letterliState ||
-    getSafeJson(
-      "letterli_state_v1"
-    ) ||
-    {}
-  )
-}
-
-function getLetterliDisplayScores() {
-  const state =
-    getLetterliDisplayState()
-
-  return {
-    A: Number(
-      state.scoreA ??
-      state.scores?.A ??
-      state.teamScores?.A ??
-      0
-    ),
-
-    B: Number(
-      state.scoreB ??
-      state.scores?.B ??
-      state.teamScores?.B ??
-      0
-    )
-  }
-}
-
-function getLetterliCompletedCount() {
-  const state =
-    getLetterliDisplayState()
-
-  const possibleArrays = [
-    state.completedQuestions,
-    state.usedQuestionKeys,
-    state.usedQuestions,
-    state.answeredQuestions
-  ]
-
-  const completedArray =
-    possibleArrays.find(value => {
-      return Array.isArray(value)
-    })
-
-  if (completedArray) {
-    return completedArray.length
-  }
-
-  return Number(
-    state.completedCount ||
-    state.answeredCount ||
-    0
-  )
-}
-
-function canEndLetterliSegment() {
-  const state =
-    getLetterliDisplayState()
-
-  const scores =
-    getLetterliDisplayScores()
-
-  const completedCount =
-    getLetterliCompletedCount()
-
-  const hasPlayed =
-    completedCount > 0 ||
-    scores.A > 0 ||
-    scores.B > 0
-
-  const noCurrentQuestion =
-    state.currentQuestionIndex ===
-      null ||
-    typeof state.currentQuestionIndex ===
-      "undefined"
-
-  return !!(
-    hasPlayed &&
-    !state.spinning &&
-    !state.timerRunning &&
-    !state.answerVisible &&
-    noCurrentQuestion
-  )
-}
-
-/* =========================
    Can End Segment
 ========================= */
 
@@ -4526,13 +4630,51 @@ function canEndSegment(segmentKey) {
     )
   }
 
-  /* =========================
-     Letterli
-  ========================= */
+/* =========================
+   Family Didi
+========================= */
 
-  if (segmentKey === "letterli") {
-    return canEndLetterliSegment()
+if (
+  segmentKey ===
+  "familyDidi"
+) {
+  const saved =
+    window.familyDidiState ||
+    getSafeJson(
+      "family_didi_state_v1"
+    )
+
+  const state =
+    saved?.familyDidiState ||
+    saved ||
+    {}
+
+  const maxRounds =
+    getSafeSegmentNumber(
+      window.familyDidiMaxRounds ||
+      localStorage.getItem(
+        "family_didi_max_rounds"
+      ),
+      3,
+      5
+    )
+
+  for (
+    let roundNumber = 1;
+    roundNumber <= maxRounds;
+    roundNumber++
+  ) {
+    if (
+      !state.rounds?.[
+        roundNumber
+      ]?.completed
+    ) {
+      return false
+    }
   }
+
+  return true
+}
 
   /* =========================
      Who
@@ -5082,6 +5224,73 @@ function flashScreen(type = "correct") {
   }, 860)
 }
 
+let screenWrongCountFxTimer = null
+
+function showScreenWrongCountFx(
+  count = 1
+) {
+  const safeCount =
+    Math.min(
+      Math.max(
+        Number(count || 1),
+        1
+      ),
+      3
+    )
+
+  let layer =
+    document.getElementById(
+      "screenWrongCountFx"
+    )
+
+  if (!layer) {
+    layer =
+      document.createElement("div")
+
+    layer.id =
+      "screenWrongCountFx"
+
+    layer.className =
+      "screenWrongCountFx"
+
+    document.body.appendChild(
+      layer
+    )
+  }
+
+  clearTimeout(
+    screenWrongCountFxTimer
+  )
+
+  layer.innerHTML =
+    Array.from(
+      {
+        length: safeCount
+      },
+      () => "<span>×</span>"
+    ).join("")
+
+  layer.classList.remove(
+    "isVisible"
+  )
+
+  void layer.offsetWidth
+
+  layer.classList.add(
+    "isVisible"
+  )
+
+  screenWrongCountFxTimer =
+    setTimeout(() => {
+      layer.classList.remove(
+        "isVisible"
+      )
+    }, 900)
+}
+
+window.showScreenWrongCountFx =
+  showScreenWrongCountFx
+
 function flashTimerTimeout() {
   const layer = ensureScreenFlashLayer()
 
@@ -5419,15 +5628,14 @@ function applyPresenterHideDisplayControlsState() {
     ".top10Actions",
     ".top10Buttons",
 
-    /* حرفلي */
-    ".letterliActionBar",
-    "#letterliActionBar",
-    ".letterliControlsBar",
-    "#letterliControlsBar",
-    ".letterliControlPanel",
-    ".letterliControls",
-    ".letterliActions",
-    ".letterliButtons",
+    /* فاملي ديدي */
+".familyDidiActionBar",
+"#familyDidiActionBar",
+".familyDidiControlsBar",
+"#familyDidiControlsBar",
+".familyDidiControls",
+".familyDidiActions",
+".familyDidiButtons",
 
     /* من هو */
     ".whoControlsBar",
@@ -5923,11 +6131,12 @@ const FINAL_RESULTS_CONFIG = [
   },
 
   {
-    segmentKey: "letterli",
-    cardKey: "letterli",
-    prefix: "Letterli",
-    title: "حرفلي"
-  },
+  segmentKey: "familyDidi",
+  cardKey: "familyDidi",
+  prefix: "FamilyDidi",
+  title: "فاملي ديدي"
+},
+
 
   {
     segmentKey: "who",
@@ -6026,12 +6235,13 @@ function getResultState() {
       ) ||
       {},
 
-    letterli:
-      window.letterliState ||
-      readResultJson(
-        "letterli_state_v1"
-      ) ||
-      {},
+      familyDidi:
+  window.familyDidiState ||
+  readResultJson(
+    "family_didi_state_v1"
+  ) ||
+  {},
+
 
     who:
       window.whoState ||
@@ -6103,112 +6313,234 @@ function getVisibleFinalResultKeys() {
 }
 
 function getRealSegmentScores(segmentKey) {
-  const s = getResultState()
+  const s =
+    getResultState()
 
-  const final = s.final || {}
-  const warmup = s.warmup || {}
-  const top10 = unwrapResultState(s.top10, "top10State")
-  const letterli =
-  unwrapResultState(
-    s.letterli,
-    "letterliState"
-  )
-  const who = unwrapResultState(s.who, "whoState")
+  const final =
+    s.final || {}
+
+  const warmup =
+    s.warmup || {}
+
+  const top10 =
+    unwrapResultState(
+      s.top10,
+      "top10State"
+    )
+
+  const familyDidi =
+    unwrapResultState(
+      s.familyDidi,
+      "familyDidiState"
+    )
+
+
+  const who =
+    unwrapResultState(
+      s.who,
+      "whoState"
+    )
+
   const explain =
-  unwrapResultState(
-    s.explain,
-    "explainState"
-  )
-  const archive = unwrapResultState(s.archive, "archiveState")
-    const randomChallenge = unwrapResultState(s.randomChallenge, "randomChallengeState")
+    unwrapResultState(
+      s.explain,
+      "explainState"
+    )
+
+  const archive =
+    unwrapResultState(
+      s.archive,
+      "archiveState"
+    )
+
+  const randomChallenge =
+    unwrapResultState(
+      s.randomChallenge,
+      "randomChallengeState"
+    )
 
   let A = 0
   let B = 0
 
   if (segmentKey === "warmup") {
-    A = safeResultNumber(
-      window.warmupScoreA ??
-      warmup.warmupScoreA ??
-      warmup.scoreA ??
-      warmup.scores?.A
-    )
+    A =
+      safeResultNumber(
+        window.warmupScoreA ??
+        warmup.warmupScoreA ??
+        warmup.scoreA ??
+        warmup.scores?.A
+      )
 
-    B = safeResultNumber(
-      window.warmupScoreB ??
-      warmup.warmupScoreB ??
-      warmup.scoreB ??
-      warmup.scores?.B
-    )
+    B =
+      safeResultNumber(
+        window.warmupScoreB ??
+        warmup.warmupScoreB ??
+        warmup.scoreB ??
+        warmup.scores?.B
+      )
   }
 
   if (segmentKey === "top10") {
-    A = getResultScore(top10, "A")
-    B = getResultScore(top10, "B")
+    A =
+      getResultScore(
+        top10,
+        "A"
+      )
+
+    B =
+      getResultScore(
+        top10,
+        "B"
+      )
   }
 
-  if (segmentKey === "letterli") {
-  const state =
-    window.letterliState ||
-    readResultJson(
-      "letterli_state_v1"
-    ) ||
-    {}
+  if (
+    segmentKey ===
+    "familyDidi"
+  ) {
+    A =
+      getResultScore(
+        familyDidi,
+        "A"
+      )
 
-  A = safeResultNumber(
-    state.scoreA ??
-    state.scores?.A
-  )
+    B =
+      getResultScore(
+        familyDidi,
+        "B"
+      )
+  }
 
-  B = safeResultNumber(
-    state.scoreB ??
-    state.scores?.B
-  )
-}
 
   if (segmentKey === "who") {
-    A = safeResultNumber(who.scoreA ?? who.scores?.A)
-    B = safeResultNumber(who.scoreB ?? who.scores?.B)
+    A =
+      safeResultNumber(
+        who.scoreA ??
+        who.scores?.A
+      )
+
+    B =
+      safeResultNumber(
+        who.scoreB ??
+        who.scores?.B
+      )
   }
 
   if (segmentKey === "explain") {
-    A = getResultScore(explain, "A")
-    B = getResultScore(explain, "B")
+    A =
+      getResultScore(
+        explain,
+        "A"
+      )
+
+    B =
+      getResultScore(
+        explain,
+        "B"
+      )
   }
 
-  if (segmentKey === "finalRound1") {
-    A = getResultScore(final.round1, "A")
-    B = getResultScore(final.round1, "B")
+  if (
+    segmentKey ===
+    "finalRound1"
+  ) {
+    A =
+      getResultScore(
+        final.round1,
+        "A"
+      )
+
+    B =
+      getResultScore(
+        final.round1,
+        "B"
+      )
   }
 
-  if (segmentKey === "finalRound2") {
-    A = getResultScore(final.round2, "A")
-    B = getResultScore(final.round2, "B")
+  if (
+    segmentKey ===
+    "finalRound2"
+  ) {
+    A =
+      getResultScore(
+        final.round2,
+        "A"
+      )
+
+    B =
+      getResultScore(
+        final.round2,
+        "B"
+      )
   }
 
-  if (segmentKey === "finalRound3") {
-    A = getResultScore(final.round3, "A")
-    B = getResultScore(final.round3, "B")
+  if (
+    segmentKey ===
+    "finalRound3"
+  ) {
+    A =
+      getResultScore(
+        final.round3,
+        "A"
+      )
+
+    B =
+      getResultScore(
+        final.round3,
+        "B"
+      )
   }
 
-  if (segmentKey === "finalRound4") {
-    A = getResultScore(final.round4, "A")
-    B = getResultScore(final.round4, "B")
+  if (
+    segmentKey ===
+    "finalRound4"
+  ) {
+    A =
+      getResultScore(
+        final.round4,
+        "A"
+      )
+
+    B =
+      getResultScore(
+        final.round4,
+        "B"
+      )
   }
 
   if (segmentKey === "archive") {
-    A = getResultScore(archive, "A")
-    B = getResultScore(archive, "B")
+    A =
+      getResultScore(
+        archive,
+        "A"
+      )
+
+    B =
+      getResultScore(
+        archive,
+        "B"
+      )
   }
 
-    if (segmentKey === "randomChallenge") {
-  A = safeResultNumber(
-    randomChallenge.boxWins?.A ?? 0
-  )
+  if (
+    segmentKey ===
+    "randomChallenge"
+  ) {
+    A =
+      safeResultNumber(
+        randomChallenge
+          .boxWins?.A ?? 0
+      )
 
-  B = safeResultNumber(
-    randomChallenge.boxWins?.B ?? 0
-  )
-}
+    B =
+      safeResultNumber(
+        randomChallenge
+          .boxWins?.B ?? 0
+      )
+  }
 
-  return { A, B }
+  return {
+    A,
+    B
+  }
 }

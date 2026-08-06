@@ -1,0 +1,1543 @@
+/* =========================================================
+   FAMILY DIDI / فاملي ديدي
+   DISPLAY - CLEAN FINAL
+   HEADER + CONTROLS MATCH TOP 10
+========================================================= */
+
+/* =========================
+   1) BASE
+========================= */
+
+.familyDidiWrap,
+.familyDidiWrap *{
+  box-sizing:border-box;
+}
+
+.familyDidiWrap{
+  --bg:#EAECF0;
+  --surface:#FFFFFF;
+  --soft:#F6F7F9;
+  --line:#D5DADF;
+
+  --primary:#FE7F2D;
+  --secondary:#233D4D;
+  --text:#151515;
+  --muted:#8793A0;
+
+  --btn-nav:#0A7C6E;
+  --btn-correct:#007F00;
+  --btn-wrong:#7F0000;
+  --btn-double:#00007F;
+  --btn-disabled:#D7DCE2;
+  --btn-disabled-text:#7B8792;
+
+  width:100%;
+
+  height:var(--app-height,100dvh);
+  min-height:var(--app-height,100dvh);
+  max-height:var(--app-height,100dvh);
+
+  padding:
+    calc(10px + env(safe-area-inset-top,0px))
+    calc(14px + env(safe-area-inset-right,0px))
+    calc(10px + env(safe-area-inset-bottom,0px))
+    calc(14px + env(safe-area-inset-left,0px));
+
+  display:grid;
+
+  grid-template-rows:
+    138px
+    180px
+    minmax(0,1fr)
+    92px;
+
+  gap:10px;
+
+  overflow:hidden;
+  direction:rtl;
+
+  color:var(--text);
+  background:var(--bg);
+
+  font-family:"HanakaText",sans-serif;
+}
+
+.familyDidiWrap button{
+  font-family:"HanakaText",sans-serif;
+  font-weight:400;
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+.familyDidiWrap h1,
+.familyDidiWrap h2,
+.familyDidiWrap h3{
+  font-family:
+    "HanakaDisplay",
+    "HanakaText",
+    sans-serif;
+
+  font-weight:400;
+}
+
+/* =========================
+   2) HEADER
+   مطابق لتوب 10
+========================= */
+
+.familyDidiHeader{
+  width:min(100%,1400px);
+
+  height:108px;
+
+  margin:30px auto 0;
+
+  display:grid;
+
+  grid-template-columns:
+    92px
+    minmax(320px,1fr)
+    130px
+    minmax(320px,1fr)
+    92px;
+
+  align-items:center;
+
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--surface);
+
+  border:2px solid var(--line);
+  border-radius:22px;
+}
+
+/* =========================
+   3) HEADER BUTTONS
+========================= */
+
+.familyDidiDockBtn{
+  width:100%;
+
+  height:64px;
+  min-height:64px;
+
+  border:0;
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:var(--btn-nav);
+  color:#FFFFFF;
+
+  font-size:.9rem;
+  font-weight:400;
+  line-height:1;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease;
+}
+
+.familyDidiDockBtn:hover:not(:disabled){
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.familyDidiDockBtn:active:not(:disabled){
+  transform:scale(.97);
+}
+
+.familyDidiDockBtn:disabled{
+  background:#B9C3C9;
+  color:#FFFFFF;
+
+  opacity:1;
+
+  cursor:not-allowed;
+
+  transform:none;
+  filter:none;
+}
+
+/* =========================
+   4) TITLE
+========================= */
+
+.familyDidiTitle{
+  min-width:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  gap:6px;
+}
+
+.familyDidiTitle h1{
+  margin:0;
+
+  color:var(--secondary);
+
+  font-size:clamp(
+    1.25rem,
+    1.7vw,
+    1.75rem
+  );
+
+  line-height:1;
+  font-weight:400;
+  text-align:center;
+}
+
+.familyDidiTitle span{
+  min-height:26px;
+
+  padding:5px 12px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:999px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  font-size:.78rem;
+  font-weight:400;
+  line-height:1;
+}
+
+/* =========================
+   5) TEAMS
+========================= */
+
+.familyDidiTeamMini{
+  min-width:0;
+
+  height:84px;
+  min-height:84px;
+
+  display:grid;
+  align-items:center;
+
+  gap:8px;
+
+  padding:7px;
+
+  cursor:pointer;
+
+  background:var(--surface);
+
+  border:2px solid var(--line);
+  border-radius:19px;
+
+  overflow:hidden;
+
+  transition:
+    border-color .15s ease,
+    box-shadow .15s ease,
+    transform .15s ease;
+}
+
+.familyDidiTeamMini.teamA{
+  grid-template-columns:
+    minmax(0,1fr)
+    112px
+    62px;
+}
+
+.familyDidiTeamMini.teamB{
+  grid-template-columns:
+    62px
+    112px
+    minmax(0,1fr);
+}
+
+.familyDidiTeamMini:hover{
+  transform:translateY(-1px);
+}
+
+.familyDidiTeamMini.familyDidiTeamCurrent{
+  border-color:var(--primary);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.14);
+}
+
+/* =========================
+   6) TEAM NAME
+========================= */
+
+.familyDidiTeamName{
+  min-width:0;
+
+  height:62px;
+  min-height:62px;
+
+  padding:4px 8px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--soft);
+
+  border:1px solid var(--line);
+  border-radius:14px;
+
+  overflow:visible;
+}
+
+.familyDidiTeamName strong{
+  width:100%;
+  min-width:0;
+
+  display:block;
+
+  color:var(--text);
+
+  font-size:clamp(
+    1.22rem,
+    1.75vw,
+    1.62rem
+  );
+
+  line-height:1.12;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
+  word-break:normal;
+}
+
+/* =========================
+   7) TEAM SCORE
+========================= */
+
+.familyDidiTeamMini > b{
+  width:62px;
+  min-width:62px;
+
+  height:62px;
+  min-height:62px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:14px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  font-size:1.35rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.familyDidiTeamMini.familyDidiTeamCurrent > b{
+  background:var(--primary);
+}
+
+/* =========================
+   8) ERRORS
+   مطابق لتوب 10
+========================= */
+
+.familyDidiErrors{
+  height:62px;
+  min-height:62px;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:5px;
+
+  padding:6px;
+
+  background:var(--soft);
+
+  border:1px solid var(--line);
+  border-radius:14px;
+}
+
+.familyDidiErrorDot{
+  min-width:0;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:10px;
+
+  background:#E6EBEF;
+  color:#9BA6AF;
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.familyDidiErrorDot::before{
+  content:"×";
+}
+
+.familyDidiErrorDot.isActive{
+  background:var(--btn-wrong);
+  color:#FFFFFF;
+}
+
+/* =========================
+   9) QUESTION + TIMER
+========================= */
+
+.familyDidiQuestionCard{
+  width:min(100%,1120px);
+
+  height:124px;
+  min-height:124px;
+
+  margin:30px auto 0;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    132px;
+
+  align-items:stretch;
+
+  gap:12px;
+
+  padding:12px;
+
+  background:var(--surface);
+
+  border:2px solid var(--line);
+  border-radius:25px;
+}
+
+.familyDidiQuestionSide{
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    92px
+    minmax(0,1fr);
+
+  align-items:stretch;
+
+  gap:11px;
+}
+
+.familyDidiQuestionLabel{
+  padding:0 10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:17px;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-size:.9rem;
+  line-height:1;
+  font-weight:400;
+  text-align:center;
+}
+
+.familyDidiQuestionText{
+  width:100%;
+  min-width:0;
+
+  height:100%;
+  min-height:0;
+
+  padding:10px 18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--soft);
+
+  border:1px solid var(--line);
+  border-radius:17px;
+
+  color:var(--text);
+
+  font-size:clamp(
+    1.15rem,
+    1.85vw,
+    1.65rem
+  );
+
+  line-height:1.3;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:normal;
+
+  overflow:hidden;
+}
+.familyDidiQuestionText:disabled,
+.familyDidiQuestionText.isRevealed{
+  opacity:1;
+  color:var(--text);
+  -webkit-text-fill-color:var(--text);
+
+  cursor:default;
+  filter:none;
+}
+.familyDidiQuestionText{
+  appearance:none;
+  -webkit-appearance:none;
+}
+
+/* =========================
+   10) TIMER
+========================= */
+
+.familyDidiTimerPill{
+  width:100%;
+
+  height:100%;
+  min-height:0;
+
+  padding:8px;
+
+  border:0;
+  border-radius:17px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+}
+
+.familyDidiTimerPill strong{
+  color:#FFFFFF;
+
+  font-size:clamp(
+    2.45rem,
+    3.8vw,
+    4rem
+  );
+
+  line-height:1;
+  font-weight:400;
+}
+
+.familyDidiTimerPill.isRunning{
+  background:var(--secondary);
+}
+
+.familyDidiTimerPill.timerDanger{
+  background:var(--btn-wrong);
+
+  animation:
+    familyDidiTimerPulse
+    .75s
+    ease-in-out
+    infinite;
+}
+
+.familyDidiTimerPill.timerDanger strong{
+  color:#FFFFFF;
+  -webkit-text-fill-color:#FFFFFF;
+
+  opacity:1;
+  visibility:visible;
+}
+
+.familyDidiTimerPill.timerFinished{
+  background:var(--btn-wrong);
+}
+
+@keyframes familyDidiTimerPulse{
+  0%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.06);
+  }
+
+  100%{
+    transform:scale(1);
+  }
+}
+
+/* =========================
+   11) ANSWERS BOARD
+========================= */
+
+.familyDidiAnswersBoard{
+  width:min(100%,1140px);
+
+  height:calc(100% - 10px);
+  min-height:0;
+
+  margin:10px auto 0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:18px;
+
+  overflow:hidden;
+}
+
+.familyDidiAnswersSide{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+
+  grid-template-rows:
+    repeat(4,minmax(0,1fr));
+
+  gap:10px;
+}
+
+.familyDidiAnswersSide.isEmpty{
+  display:none;
+}
+
+.familyDidiAnswersBoard:has(
+  .familyDidiLeftSide.isEmpty
+){
+  grid-template-columns:
+    minmax(0,760px);
+
+  justify-content:center;
+}
+
+/* =========================
+   12) ANSWER CARD
+========================= */
+
+.familyDidiAnswerCard{
+  width:100%;
+  min-width:0;
+
+  height:100%;
+  min-height:0;
+
+  padding:9px;
+
+  display:grid;
+
+  grid-template-columns:
+    72px
+    minmax(0,1fr);
+
+  align-items:stretch;
+
+  gap:10px;
+
+  cursor:pointer;
+
+  background:var(--surface);
+  color:var(--text);
+
+  border:2px solid var(--line);
+  border-radius:20px;
+
+  overflow:hidden;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    border-color .15s ease,
+    background-color .15s ease;
+}
+
+.familyDidiAnswerCard:hover:not(:disabled){
+  transform:translateY(-1px);
+
+  border-color:var(--primary);
+
+  filter:brightness(1.01);
+}
+
+.familyDidiAnswerCard:active:not(:disabled){
+  transform:scale(.98);
+}
+
+.familyDidiAnswerCard:disabled{
+  opacity:1;
+}
+
+/* =========================
+   13) ANSWER NUMBER
+========================= */
+
+.familyDidiAnswerNumber{
+  width:72px;
+  min-width:72px;
+
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:16px;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-family:
+    "MolhimCustom",
+    "HanakaText",
+    sans-serif;
+
+  font-size:clamp(
+    1.9rem,
+    2.7vw,
+    2.8rem
+  );
+
+  line-height:1;
+  font-weight:400;
+}
+
+/* =========================
+   14) ANSWER CONTENT
+========================= */
+
+.familyDidiAnswerContent{
+  width:100%;
+  min-width:0;
+
+  height:100%;
+  min-height:0;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    76px;
+
+  align-items:stretch;
+
+  gap:10px;
+}
+
+/* =========================
+   15) ANSWER TEXT
+========================= */
+
+.familyDidiAnswerText{
+  min-width:0;
+  min-height:0;
+
+  padding:7px 13px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--soft);
+
+  border:1px solid var(--line);
+  border-radius:16px;
+
+  color:transparent;
+
+  font-size:clamp(
+    1.25rem,
+    1.85vw,
+    1.75rem
+  );
+
+  line-height:1.18;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:normal;
+
+  overflow:hidden;
+}
+
+.familyDidiAnswerMedium{
+  font-size:clamp(
+    1.05rem,
+    1.55vw,
+    1.42rem
+  );
+
+  line-height:1.15;
+}
+
+.familyDidiAnswerLong{
+  padding:5px 9px;
+
+  font-size:clamp(
+    .88rem,
+    1.22vw,
+    1.14rem
+  );
+
+  line-height:1.12;
+}
+
+/* =========================
+   16) ANSWER SCORE
+========================= */
+
+.familyDidiAnswerScore{
+  width:76px;
+  min-width:76px;
+
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:16px;
+
+  background:var(--secondary);
+  color:transparent;
+
+  font-family:
+    "MolhimCustom",
+    "HanakaText",
+    sans-serif;
+
+  font-size:clamp(
+    1.4rem,
+    2vw,
+    1.9rem
+  );
+
+  line-height:1;
+  font-weight:400;
+}
+
+/* =========================
+   17) OPENED ANSWER
+========================= */
+
+.familyDidiAnswerCard.isOpened{
+  background:var(--surface);
+
+  border-color:var(--btn-nav);
+
+  cursor:not-allowed;
+
+  transform:none;
+  filter:none;
+}
+
+.familyDidiAnswerCard.isOpened
+.familyDidiAnswerNumber{
+  background:var(--btn-nav);
+}
+
+.familyDidiAnswerCard.isOpened
+.familyDidiAnswerText{
+  color:var(--text);
+
+  background:#FFFFFF;
+}
+
+.familyDidiAnswerCard.isOpened
+.familyDidiAnswerScore{
+  background:var(--btn-nav);
+  color:#FFFFFF;
+}
+
+/* =========================
+   18) OPEN ANIMATION
+========================= */
+
+.familyDidiAnswerCard.isAnimating{
+  border-color:var(--primary);
+
+  animation:
+    familyDidiAnswerOpening
+    .36s
+    ease
+    both;
+}
+
+.familyDidiAnswerCard.isAnimating
+.familyDidiAnswerNumber{
+  background:var(--primary);
+}
+
+@keyframes familyDidiAnswerOpening{
+  0%{
+    transform:scale(.97);
+  }
+
+  50%{
+    transform:scale(1.02);
+  }
+
+  100%{
+    transform:scale(1);
+  }
+}
+
+/* =========================
+   19) ACTION BAR
+   مطابق لتوب 10
+========================= */
+
+.familyDidiActionBar{
+  width:min(100%,860px);
+
+  height:76px;
+  min-height:76px;
+
+  margin:0 auto;
+  padding:10px;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(6,minmax(0,1fr));
+
+  gap:8px;
+
+  align-self:end;
+
+  background:var(--surface);
+
+  border:2px solid var(--line);
+  border-radius:24px;
+}
+
+.familyDidiActionBtn{
+  width:100%;
+
+  height:52px;
+  min-height:52px;
+
+  border:0;
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  color:#FFFFFF;
+
+  font-size:.82rem;
+  line-height:1.1;
+  font-weight:400;
+  text-align:center;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    opacity .15s ease;
+}
+
+.familyDidiActionBtn:hover:not(:disabled){
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.familyDidiActionBtn:active:not(:disabled){
+  transform:scale(.97);
+}
+
+.familyDidiWrongBtn{
+  background:var(--btn-wrong);
+  color:#FFFFFF;
+}
+
+.familyDidiAwardBtn{
+  background:var(--btn-correct);
+  color:#FFFFFF;
+}
+
+.familyDidiShowAnswersBtn{
+  background:var(--btn-correct);
+  color:#FFFFFF;
+}
+
+
+.familyDidiUndoBtn{
+  background:var(--btn-nav);
+  color:#FFFFFF;
+}
+
+.familyDidiSwitchBtn{
+  background:#00004C;
+  color:#FFFFFF;
+}
+
+.familyDidiNextBtn{
+  background:#4C4C00;
+  color:#FFFFFF;
+}
+
+.familyDidiActionBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+
+  opacity:1;
+  cursor:not-allowed;
+
+  transform:none;
+  filter:none;
+}
+/* =========================
+   20) IPAD LANDSCAPE
+   مطابق لمقاسات توب 10
+========================= */
+
+@media
+  (min-width:768px)
+  and (max-width:1180px)
+  and (orientation:landscape){
+
+  .familyDidiWrap{
+    padding:10px;
+
+    grid-template-rows:
+      90px
+      156px
+      minmax(0,1fr)
+      78px;
+
+    gap:8px;
+  }
+
+  /* =========================
+     HEADER
+  ========================= */
+
+  .familyDidiHeader{
+    height:84px;
+
+    margin-top:6px;
+
+    grid-template-columns:
+      82px
+      minmax(200px,1fr)
+      118px
+      minmax(200px,1fr)
+      82px;
+
+    gap:8px;
+
+    padding:8px;
+
+    border-radius:19px;
+  }
+
+  .familyDidiDockBtn{
+    height:50px;
+    min-height:50px;
+
+    border-radius:13px;
+
+    font-size:.78rem;
+  }
+
+  /* =========================
+     TEAMS
+  ========================= */
+
+  .familyDidiTeamMini{
+    height:62px;
+    min-height:62px;
+
+    gap:6px;
+
+    padding:6px;
+
+    border-radius:16px;
+  }
+
+  .familyDidiTeamMini.teamA{
+    grid-template-columns:
+      minmax(0,1fr)
+      62px
+      52px;
+  }
+
+  .familyDidiTeamMini.teamB{
+    grid-template-columns:
+      52px
+      62px
+      minmax(0,1fr);
+  }
+
+  .familyDidiTeamName{
+    height:46px;
+    min-height:46px;
+
+    padding:4px 8px;
+
+    border-radius:12px;
+  }
+
+  .familyDidiTeamName strong{
+    font-size:1.04rem;
+    line-height:1.1;
+  }
+
+  .familyDidiTeamMini > b{
+    width:52px;
+    min-width:52px;
+
+    height:46px;
+    min-height:46px;
+
+    border-radius:12px;
+
+    font-size:1.12rem;
+  }
+
+  /* =========================
+     ERRORS
+  ========================= */
+
+  .familyDidiErrors{
+    height:46px;
+    min-height:46px;
+
+    gap:4px;
+
+    padding:5px;
+
+    border-radius:12px;
+  }
+
+  .familyDidiErrorDot{
+    border-radius:8px;
+
+    font-size:.8rem;
+  }
+
+  .familyDidiTitle h1{
+    font-size:1.1rem;
+  }
+
+  .familyDidiTitle span{
+    min-height:22px;
+
+    font-size:.66rem;
+  }
+
+  /* =========================
+     QUESTION
+  ========================= */
+
+  .familyDidiQuestionCard{
+    width:min(100%,1080px);
+
+    height:116px;
+    min-height:116px;
+
+    margin:20px auto 0;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      112px;
+
+    gap:10px;
+
+    padding:10px;
+
+    border-radius:22px;
+  }
+
+  .familyDidiQuestionSide{
+    grid-template-columns:
+      78px
+      minmax(0,1fr);
+
+    gap:9px;
+  }
+
+  .familyDidiQuestionLabel{
+    padding:0 8px;
+
+    border-radius:15px;
+
+    font-size:.76rem;
+  }
+
+  .familyDidiQuestionText{
+    padding:8px 13px;
+
+    border-radius:15px;
+
+    font-size:1rem;
+    line-height:1.26;
+  }
+
+  .familyDidiTimerPill{
+    border-radius:15px;
+  }
+
+  .familyDidiTimerPill strong{
+    font-size:1.65rem;
+  }
+
+  /* =========================
+     ANSWERS BOARD
+  ========================= */
+
+  .familyDidiAnswersBoard{
+    width:min(100%,1100px);
+
+    height:calc(100% - 8px);
+
+    margin:8px auto 0;
+
+    gap:14px;
+  }
+
+  .familyDidiAnswersSide{
+    grid-template-rows:
+      repeat(4,minmax(0,1fr));
+
+    gap:8px;
+  }
+
+  /* =========================
+     ANSWER CARD
+  ========================= */
+
+  .familyDidiAnswerCard{
+    grid-template-columns:
+      62px
+      minmax(0,1fr);
+
+    gap:8px;
+
+    padding:8px;
+
+    border-radius:17px;
+  }
+
+  .familyDidiAnswerNumber{
+    width:62px;
+    min-width:62px;
+
+    border-radius:14px;
+
+    font-size:1.7rem;
+  }
+
+  .familyDidiAnswerContent{
+    grid-template-columns:
+      minmax(0,1fr)
+      66px;
+
+    gap:8px;
+  }
+
+  .familyDidiAnswerText{
+    padding:6px 10px;
+
+    border-radius:14px;
+
+    font-size:1.12rem;
+    line-height:1.16;
+  }
+
+  .familyDidiAnswerMedium{
+    font-size:.97rem;
+    line-height:1.13;
+  }
+
+  .familyDidiAnswerLong{
+    padding:4px 7px;
+
+    font-size:.82rem;
+    line-height:1.09;
+  }
+
+  .familyDidiAnswerScore{
+    width:66px;
+    min-width:66px;
+
+    border-radius:14px;
+
+    font-size:1.18rem;
+  }
+
+/* =========================
+   ACTION BAR
+========================= */
+
+.familyDidiActionBar{
+  width:min(100%,760px);
+
+  height:70px;
+  min-height:70px;
+
+  grid-template-columns:
+    repeat(6,minmax(0,1fr));
+
+  gap:6px;
+  padding:9px;
+
+  border-radius:22px;
+}
+
+.familyDidiActionBtn{
+  height:48px;
+  min-height:48px;
+
+  border-radius:15px;
+
+  font-size:.68rem;
+  line-height:1.08;
+}
+}
+
+/* =========================
+   DOUBLE ROUND INTRO
+========================= */
+
+.familyDidiDoubleIntro{
+  position:fixed;
+  inset:0;
+  z-index:1000000;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:24px;
+
+  background:rgba(35,61,77,.74);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+
+  transition:
+    opacity .28s ease,
+    visibility .28s ease;
+}
+
+.familyDidiDoubleIntro.isVisible{
+  opacity:1;
+  visibility:visible;
+}
+
+.familyDidiDoubleIntroCard{
+  width:min(92vw,560px);
+  min-height:300px;
+
+  padding:34px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  gap:18px;
+
+  background:#FFFFFF;
+
+  border:4px solid #FE7F2D;
+  border-radius:36px;
+
+  box-shadow:
+    0 28px 80px rgba(0,0,0,.28),
+    0 0 0 12px rgba(254,127,45,.16);
+
+  text-align:center;
+
+  transform:scale(.78);
+  transition:transform .38s ease;
+}
+
+.familyDidiDoubleIntro.isVisible
+.familyDidiDoubleIntroCard{
+  transform:scale(1);
+}
+
+.familyDidiDoubleIntroCard span{
+  color:#233D4D;
+
+  font-family:
+    "HanakaDisplay",
+    "HanakaText",
+    sans-serif;
+
+  font-size:clamp(1.7rem,4vw,3rem);
+  line-height:1;
+  font-weight:400;
+}
+
+.familyDidiDoubleIntroCard strong{
+  color:#FE7F2D;
+
+  font-family:
+    "HanakaDisplay",
+    "HanakaText",
+    sans-serif;
+
+  font-size:clamp(3rem,7vw,6rem);
+  line-height:1;
+  font-weight:400;
+}
+
+.familyDidiDoubleIntroCard b{
+  width:104px;
+  height:104px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:50%;
+
+  background:#233D4D;
+  color:#FFFFFF;
+
+  font-size:3rem;
+  line-height:1;
+  font-weight:400;
+}
+
+/* =========================
+   21) REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion:reduce){
+
+  .familyDidiWrap *,
+  .familyDidiWrap *::before,
+  .familyDidiWrap *::after{
+    animation:none;
+    transition:none;
+  }
+}
+
+/* =========================
+   STEAL INTRO
+========================= */
+
+.familyDidiStealIntro{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+
+  display:grid;
+  place-items:center;
+
+  padding:24px;
+
+  background:rgba(35,61,77,.42);
+
+  opacity:0;
+  visibility:hidden;
+
+  transition:
+    opacity .28s ease,
+    visibility .28s ease;
+}
+
+.familyDidiStealIntro.isVisible{
+  opacity:1;
+  visibility:visible;
+}
+
+.familyDidiStealIntroCard{
+  width:min(90vw,620px);
+  min-height:290px;
+
+  padding:34px;
+
+  border:3px solid var(--primary);
+  border-radius:28px;
+
+  background:#FFFFFF;
+
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:18px;
+
+  text-align:center;
+
+  box-shadow:
+    0 28px 70px
+    rgba(35,61,77,.28);
+
+  transform:scale(.92);
+
+  transition:
+    transform .28s ease;
+}
+
+.familyDidiStealIntro.isVisible
+.familyDidiStealIntroCard{
+  transform:scale(1);
+}
+
+.familyDidiStealIntroCard span{
+  color:var(--primary);
+
+  font-size:clamp(1.6rem,4vw,2.7rem);
+  line-height:1.2;
+  font-weight:400;
+}
+
+.familyDidiStealIntroCard strong{
+  max-width:100%;
+
+  color:var(--secondary);
+
+  font-size:clamp(2rem,5vw,4rem);
+  line-height:1.25;
+  font-weight:400;
+
+  overflow-wrap:anywhere;
+}
+
+.familyDidiStealIntroCard b{
+  color:var(--secondary);
+
+  font-size:clamp(1.5rem,3.5vw,2.6rem);
+  line-height:1.3;
+  font-weight:400;
+}

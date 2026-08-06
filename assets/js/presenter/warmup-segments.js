@@ -1,4 +1,3 @@
-
 /* =========================
    WARMUP
 ========================= */
@@ -262,6 +261,10 @@ async function loadPresenterWarmupRows(options = {}) {
   return presenterWarmupRowsPromise
 }
 
+/* =========================
+   COMMANDS
+========================= */
+
 async function sendPresenterWarmupCommandSafe(
   action,
   payload = {}
@@ -330,15 +333,14 @@ function buildPresenterWarmupNumbersHtml() {
 
       return `
         <article
-          class="presenterWarmupCat"
+          class="presenterWarmupRow"
           data-warmup-category="${category}"
         >
-          <div class="presenterWarmupCatTitle">
+          <div class="presenterWarmupRowTitle">
             ${escapePresenterWarmupHtml(categoryName)}
           </div>
 
           <div class="presenterWarmupNumbers">
-
             ${[1, 2, 4]
               .map(number => {
                 const key =
@@ -352,12 +354,8 @@ function buildPresenterWarmupNumbersHtml() {
 
                 const isSelected =
                   presenterWarmupSelected &&
-                  Number(
-                    presenterWarmupSelected.category
-                  ) === Number(category) &&
-                  Number(
-                    presenterWarmupSelected.number
-                  ) === Number(number)
+                  Number(presenterWarmupSelected.category) === Number(category) &&
+                  Number(presenterWarmupSelected.number) === Number(number)
 
                 return `
                   <button
@@ -374,17 +372,13 @@ function buildPresenterWarmupNumbersHtml() {
                     data-warmup-category="${category}"
                     data-warmup-number="${number}"
                     ${
-                      isUsed || locked || presenterWarmupActionBusy
+                      isUsed ||
+                      locked ||
+                      presenterWarmupActionBusy
                         ? "disabled"
                         : ""
                     }
-                    onclick="
-                      openWarmupPresenterQuestion(
-                        ${category},
-                        ${number},
-                        event
-                      )
-                    "
+                    onclick="openWarmupPresenterQuestion(${category}, ${number}, event)"
                     aria-label="سؤال ${number} من ${escapePresenterWarmupHtml(categoryName)}"
                   >
                     ${isUsed ? "" : number}
@@ -392,7 +386,6 @@ function buildPresenterWarmupNumbersHtml() {
                 `
               })
               .join("")}
-
           </div>
         </article>
       `
@@ -401,9 +394,10 @@ function buildPresenterWarmupNumbersHtml() {
 }
 
 function renderPresenterWarmupNumbersOnly() {
-  const box = document.getElementById(
-    "presenterWarmupCats"
-  )
+  const box =
+    document.getElementById(
+      "presenterWarmupCats"
+    )
 
   if (!box) return
 
@@ -424,7 +418,7 @@ function renderPresenterWarmupQuestionPlaceholder() {
 
   if (questionBox) {
     questionBox.innerText =
-      "اختر الفريق ثم رقم السؤال"
+      "اختر الفريق من الهيدر ثم رقم السؤال"
   }
 
   if (answerBox) {
@@ -457,60 +451,15 @@ async function renderWarmup() {
       aria-label="لوحة تحكم فقرة التسخين"
     >
 
-      <!-- الفرق وحالة الجولة -->
-      <header class="presenterWarmupTopBar">
+      <main class="presenterWarmupMain">
 
-        <div class="presenterWarmupTeamsBox">
-          ${teamButtons()}
-        </div>
-
-        <div
-          class="presenterWarmupRoundStatus"
-          aria-live="polite"
-        >
-          <div
-            id="presenterWarmupStatusText"
-            class="presenterWarmupStatusText"
-          >
-            اختر الفريق أولاً
-          </div>
-
-          <div
-            id="presenterWarmupTimer"
-            class="presenterWarmupTimer"
-          >
-            —
-          </div>
-        </div>
-
-      </header>
-
-      <!-- محتوى الفقرة -->
-      <div class="presenterWarmupMain">
-
-        <!-- الفئات والأرقام -->
         <section
           class="presenterCard presenterWarmupNumbersCard"
-          aria-labelledby="presenterWarmupNumbersTitle"
+          aria-label="فئات وأسئلة التسخين"
         >
-          <header class="presenterWarmupCardHeader">
-            <div>
-              <h2
-                id="presenterWarmupNumbersTitle"
-                class="presenterLabel"
-              >
-                الفئات والأسئلة
-              </h2>
-
-              <p class="presenterWarmupCardHint">
-                اختر الفريق ثم اختر رقم السؤال
-              </p>
-            </div>
-          </header>
-
           <div
             id="presenterWarmupCats"
-            class="presenterWarmupCats"
+            class="presenterWarmupCats presenterWarmupRows"
           >
             ${
               presenterWarmupRows.length
@@ -527,57 +476,37 @@ async function renderWarmup() {
           </div>
         </section>
 
-        <!-- السؤال والإجابة -->
         <section
           class="presenterCard presenterWarmupPreviewCard"
-          aria-label="معاينة السؤال والإجابة"
+          aria-label="السؤال والإجابة"
         >
+          <div
+            id="presenterWarmupQuestionMeta"
+            class="presenterWarmupQuestionMeta"
+          ></div>
 
-          <article class="presenterWarmupQuestionBlock">
-            <header class="presenterWarmupPreviewHead">
-              <h2 class="presenterLabel">
-                السؤال
-              </h2>
+          <div
+            id="presenterWarmupQuestionText"
+            class="presenterQuestionBody presenterBigQuestionBody"
+            aria-live="polite"
+          >
+            اختر الفريق من الهيدر ثم رقم السؤال
+          </div>
 
-              <div
-                id="presenterWarmupQuestionMeta"
-                class="presenterWarmupQuestionMeta"
-              ></div>
-            </header>
-
-            <div
-              id="presenterWarmupQuestionText"
-              class="presenterQuestionBody presenterBigQuestionBody"
-              aria-live="polite"
-            >
-              اختر الفريق ثم رقم السؤال
-            </div>
-          </article>
-
-          <article class="presenterWarmupAnswerBlock">
-            <header class="presenterWarmupAnswerHead">
-              <h2 class="presenterLabel">
-                الإجابة
-              </h2>
-            </header>
-
-            <div
-              id="presenterWarmupAnswerText"
-              class="presenterAnswerBody presenterBigAnswerBody"
-              aria-live="polite"
-            >
-              —
-            </div>
-          </article>
-
+          <div
+            id="presenterWarmupAnswerText"
+            class="presenterAnswerBody presenterBigAnswerBody"
+            aria-live="polite"
+          >
+            —
+          </div>
         </section>
 
-      </div>
+      </main>
 
-      <!-- أزرار التحكم -->
       <footer
         class="presenterWarmupActions"
-        aria-label="أزرار التحكم في السؤال"
+        aria-label="أزرار التحكم"
       >
         <button
           type="button"
@@ -594,7 +523,7 @@ async function renderWarmup() {
           class="presenterBtn red presenterWrongBtn"
           onclick="runPresenterWarmupAction('wrong')"
         >
-          ✕ خطأ
+          خطأ
         </button>
 
         <button
@@ -603,7 +532,7 @@ async function renderWarmup() {
           class="presenterBtn green presenterCorrectBtn"
           onclick="runPresenterWarmupAction('correct')"
         >
-          ✓ صح
+          صح
         </button>
       </footer>
 
@@ -678,9 +607,6 @@ async function openWarmupPresenterQuestion(
     number: Number(number)
   }
 
-  /*
-    تحديث محلي فوري قبل الشبكة.
-  */
   presenterLiveState = {
     ...(presenterLiveState || {}),
 
@@ -720,15 +646,15 @@ async function openWarmupPresenterQuestion(
 
   refreshPresenterWarmupFromState()
 
-const sent =
-  await sendPresenterWarmupCommandSafe(
-    "openNumber",
-    {
-      category: Number(category),
-      number: Number(number),
-      team: activeTeam
-    }
-  )
+  const sent =
+    await sendPresenterWarmupCommandSafe(
+      "openNumber",
+      {
+        category: Number(category),
+        number: Number(number),
+        team: activeTeam
+      }
+    )
 
   presenterWarmupActionBusy = false
 
@@ -750,10 +676,6 @@ const sent =
     return
   }
 
-  /*
-    لا ننتظر Supabase.
-    التحديث القادم من العرض يثبت الحالة.
-  */
   setTimeout(() => {
     presenterWarmupActionBusy = false
     refreshPresenterWarmupFromState()
@@ -831,8 +753,7 @@ async function runPresenterWarmupAction(action) {
   const activeTeam =
     getPresenterWarmupActiveTeam()
 
-
-      const resultPending =
+  const resultPending =
     getPresenterWarmupResultPending()
 
   if (action === "double") {
@@ -873,14 +794,14 @@ async function runPresenterWarmupAction(action) {
   presenterWarmupActionBusy = true
   updatePresenterWarmupActionButtons()
 
-const sent =
-  await sendPresenterWarmupCommandSafe(
-    action,
-    {
-      team: activeTeam,
-      questionKey: currentKey
-    }
-  )
+  const sent =
+    await sendPresenterWarmupCommandSafe(
+      action,
+      {
+        team: activeTeam,
+        questionKey: currentKey
+      }
+    )
 
   if (!sent) {
     presenterWarmupActionBusy = false
@@ -889,10 +810,6 @@ const sent =
     return
   }
 
-  /*
-    بعد صح أو خطأ نفرغ المعاينة محليًا سريعًا.
-    الحالة النهائية ستأتي من العرض.
-  */
   if (
     action === "correct" ||
     action === "wrong"
@@ -902,11 +819,11 @@ const sent =
     }, 100)
   }
 
-setTimeout(() => {
-  presenterWarmupActionBusy = false
-  refreshPresenterWarmupFromState()
-  updatePresenterWarmupActionButtons()
-}, 350)
+  setTimeout(() => {
+    presenterWarmupActionBusy = false
+    refreshPresenterWarmupFromState()
+    updatePresenterWarmupActionButtons()
+  }, 350)
 }
 
 function updatePresenterWarmupActionButtons() {
@@ -1022,6 +939,9 @@ function updatePresenterWarmupTimer() {
   const timerBox =
     document.getElementById(
       "presenterWarmupTimer"
+    ) ||
+    document.getElementById(
+      "presenterGlobalTimer"
     )
 
   if (!timerBox) return
@@ -1055,10 +975,6 @@ function updatePresenterWarmupTimer() {
   const initialTime =
     getPresenterWarmupInitialTime(points)
 
-  /*
-    قبل وصول timerSync نعرض الوقت الأساسي
-    بدل ظهور صفر لحظي.
-  */
   const shownTime =
     timerSync?.endsAt
       ? remaining
@@ -1091,9 +1007,7 @@ function startPresenterWarmupTimerWatcher() {
 
   presenterWarmupTimerInterval =
     setInterval(() => {
-      if (
-        presenterSegment !== "warmup"
-      ) {
+      if (presenterSegment !== "warmup") {
         stopPresenterWarmupTimerWatcher()
         return
       }
@@ -1134,12 +1048,17 @@ function refreshPresenterWarmupFromState() {
   const activeTeam =
     getPresenterWarmupActiveTeam()
 
-      const resultPending =
+  const resultPending =
     getPresenterWarmupResultPending()
 
-  updatePresenterTeamButtonsOnly(
-    activeTeam
-  )
+  if (
+    typeof updatePresenterTeamButtonsOnly ===
+    "function"
+  ) {
+    updatePresenterTeamButtonsOnly(
+      activeTeam
+    )
+  }
 
   document
     .querySelectorAll(
@@ -1252,6 +1171,98 @@ function refreshPresenterWarmupFromState() {
 }
 
 /* =========================
+   READER
+========================= */
+
+async function renderPresenterReaderWarmup() {
+  const panel =
+    document.getElementById("presenterReaderPanel")
+
+  if (!panel) return
+
+  const rows =
+    await loadPresenterWarmupRows({
+      backgroundRefresh: false
+    })
+
+  if (!rows.length) {
+    panel.innerHTML =
+      typeof readerEmpty === "function"
+        ? readerEmpty("لا توجد أسئلة في التسخين")
+        : `
+          <div class="readerEmptyCard">
+            لا توجد أسئلة في التسخين
+          </div>
+        `
+
+    return
+  }
+
+  const grouped = [1, 2, 3, 4]
+    .map(category => {
+      const categoryRows =
+        rows.filter(row => {
+          return Number(row.category) === Number(category)
+        })
+
+      if (!categoryRows.length) return ""
+
+      const categoryName =
+        categoryRows[0]?.category_name ||
+        `الفئة ${category}`
+
+      return `
+        <section class="readerRoundPage">
+
+          <header class="readerRoundHead">
+            <h2>${escapePresenterWarmupHtml(categoryName)}</h2>
+            <span>التسخين</span>
+          </header>
+
+          <div class="readerSimpleGrid">
+            ${categoryRows
+              .map(row => {
+                const number =
+                  Number(row.number || 0)
+
+                return `
+                  <article
+                    class="readerMiniCard"
+                    data-reader-id="warmup_${category}_${number}"
+                  >
+                    <div class="readerBlock">
+                      <label>الرقم</label>
+                      <p>${number}</p>
+                    </div>
+
+                    <div class="readerBlock">
+                      <label>السؤال</label>
+                      <p>${escapePresenterWarmupHtml(row.question || "—")}</p>
+                    </div>
+
+                    <div class="readerBlock">
+                      <label>الإجابة</label>
+                      <p>${escapePresenterWarmupHtml(row.answer || "—")}</p>
+                    </div>
+                  </article>
+                `
+              })
+              .join("")}
+          </div>
+
+        </section>
+      `
+    })
+    .join("")
+
+  panel.innerHTML = `
+    <section class="readerRoundsStack">
+      ${grouped}
+    </section>
+  `
+}
+
+/* =========================
    CLEANUP
 ========================= */
 
@@ -1261,152 +1272,15 @@ window.addEventListener(
 )
 
 /* =========================
-   Reader: Warmup
-   كل فئة: الرقم + السؤال + الإجابة
+   EXPORTS
 ========================= */
 
-async function renderPresenterReaderWarmup() {
-  const panel =
-    document.getElementById("presenterReaderPanel")
-
-  if (!panel) return
-
-  const rows = await loadPresenterWarmupRows({
-    backgroundRefresh: false
-  })
-
-  if (!rows.length) {
-    panel.innerHTML =
-      readerEmpty("لا توجد أسئلة في التسخين")
-    return
-  }
-
-   panel.innerHTML = `
-    <section class="presenterWarmupControlView">
-
-      <header class="presenterWarmupControlHeader">
-
-        <div class="presenterWarmupHeaderTeams">
-          ${teamButtons()}
-        </div>
-
-        <div class="presenterWarmupHeaderTimer">
-          <span
-            id="presenterWarmupStatusText"
-            class="presenterWarmupStatusText"
-          >
-            —
-          </span>
-
-          <strong
-            id="presenterWarmupTimer"
-            class="presenterWarmupTimer"
-          >
-            —
-          </strong>
-        </div>
-
-      </header>
-
-      <main class="presenterWarmupControlMain">
-
-        <section class="presenterWarmupBoardCard">
-
-          <header class="presenterWarmupPanelTitle">
-            <h2>الفئات</h2>
-          </header>
-
-          <div
-            id="presenterWarmupCats"
-            class="presenterWarmupCats"
-          >
-            ${
-              presenterWarmupRows.length
-                ? buildPresenterWarmupNumbersHtml()
-                : `
-                  <div class="presenterWarmupLoading">
-                    جارٍ التحميل
-                  </div>
-                `
-            }
-          </div>
-
-        </section>
-
-        <section class="presenterWarmupControlCard">
-
-          <article class="presenterWarmupQuestionPanel">
-
-            <header class="presenterWarmupPanelTitle">
-              <h2>السؤال</h2>
-
-              <span
-                id="presenterWarmupQuestionMeta"
-                class="presenterWarmupQuestionMeta"
-              ></span>
-            </header>
-
-            <div
-              id="presenterWarmupQuestionText"
-              class="presenterWarmupQuestionText"
-              aria-live="polite"
-            >
-              —
-            </div>
-
-          </article>
-
-          <article class="presenterWarmupAnswerPanel">
-
-            <header class="presenterWarmupPanelTitle">
-              <h2>الإجابة</h2>
-            </header>
-
-            <div
-              id="presenterWarmupAnswerText"
-              class="presenterWarmupAnswerText"
-              aria-live="polite"
-            >
-              —
-            </div>
-
-          </article>
-
-        </section>
-
-      </main>
-
-      <footer class="presenterWarmupCommandBar">
-
-        <button
-          type="button"
-          id="presenterWarmupDoubleBtn"
-          class="presenterBtn gray presenterDoubleBtn"
-          onclick="runPresenterWarmupAction('double')"
-        >
-          دوببلا
-        </button>
-
-        <button
-          type="button"
-          id="presenterWarmupWrongBtn"
-          class="presenterBtn red presenterWrongBtn"
-          onclick="runPresenterWarmupAction('wrong')"
-        >
-          خطأ
-        </button>
-
-        <button
-          type="button"
-          id="presenterWarmupCorrectBtn"
-          class="presenterBtn green presenterCorrectBtn"
-          onclick="runPresenterWarmupAction('correct')"
-        >
-          صح
-        </button>
-
-      </footer>
-
-    </section>
-  `
-}
+window.renderWarmup = renderWarmup
+window.renderPresenterWarmup = renderWarmup
+window.refreshPresenterWarmupFromState = refreshPresenterWarmupFromState
+window.loadPresenterWarmupRows = loadPresenterWarmupRows
+window.openWarmupPresenterQuestion = openWarmupPresenterQuestion
+window.runPresenterWarmupAction = runPresenterWarmupAction
+window.renderPresenterReaderWarmup = renderPresenterReaderWarmup
+window.renderPresenterWarmupNumbersOnly = renderPresenterWarmupNumbersOnly
+window.stopPresenterWarmupTimerWatcher = stopPresenterWarmupTimerWatcher

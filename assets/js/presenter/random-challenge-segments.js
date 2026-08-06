@@ -1139,8 +1139,13 @@ function getPresenterRandomStructureKey() {
     state.box3?.currentQuestionNumber || 1,
     !!state.box3?.choosingPoints,
 
+    !!state.box4?.started,
+    !!state.box4?.secondTeamBreak,
+    !!state.box4?.reviewMode,
     state.box4?.currentQuestionNumber || 1,
     !!state.box4?.revealed,
+    state.box4?.activeTeam || "",
+    state.box4?.startingTeam || "",
 
     state.box5?.currentNumber || "",
         !!state.box5?.blockArmed,
@@ -3325,55 +3330,28 @@ async function presenterRandomBox5MediaAction() {
       state.box5?.currentNumber
     )
 
-  if (!row) {
+  if (!row || !row.image) {
     presenterRandomToast(
-      "لا توجد بيانات للرقم"
+      "لا توجد صورة"
     )
 
     return
   }
 
-  if (row.video) {
-const sent =
-  await sendPresenterRandomCommandSafe(
-    "randomBox5PlayVideo",
-    {
-      number: row.number,
-      box: 5
-    }
-  )
+  const sent =
+    await sendPresenterRandomCommandSafe(
+      "zoomImage",
+      {
+        number: row.number,
+        box: 5
+      }
+    )
 
-    if (!sent) {
-      presenterRandomToast(
-        "تعذر تشغيل الفيديو"
-      )
-    }
-
-    return
+  if (!sent) {
+    presenterRandomToast(
+      "تعذر تكبير الصورة"
+    )
   }
-
-  if (row.image) {
-const sent =
-  await sendPresenterRandomCommandSafe(
-    "zoomImage",
-    {
-      number: row.number,
-      box: 5
-    }
-  )
-
-    if (!sent) {
-      presenterRandomToast(
-        "تعذر تكبير الصورة"
-      )
-    }
-
-    return
-  }
-
-  presenterRandomToast(
-    "لا توجد صورة أو فيديو"
-  )
 }
 
 /* =========================
@@ -3601,7 +3579,7 @@ function updatePresenterRandomActionButtons() {
         disabled =
           busy ||
           !row ||
-          (!row.image && !row.video)
+          !row.image
       }
 
       if (action === "finish") {
@@ -3768,7 +3746,7 @@ function buildPresenterRandomBox1PlayersHtml(
 }
 
 function buildPresenterRandomBox5MediaHtml(row) {
-  if (!row) {
+  if (!row || !row.image) {
     return `
       <div class="presenterRandomMediaEmpty">
         —
@@ -3776,46 +3754,22 @@ function buildPresenterRandomBox5MediaHtml(row) {
     `
   }
 
-  if (row.video) {
-    return `
-      <div class="presenterRandomMediaPreview">
-
-        <video
-          src="${presenterRandomSafeHtml(row.video)}"
-          controls
-          muted
-          playsinline
-          preload="metadata"
-        ></video>
-
-      </div>
-    `
-  }
-
-  if (row.image) {
-    return `
-      <div class="presenterRandomMediaPreview">
-
-        <img
-          src="${presenterRandomSafeHtml(row.image)}"
-          alt=""
-          loading="eager"
-          decoding="async"
-        >
-
-      </div>
-    `
-  }
-
   return `
-    <div class="presenterRandomMediaEmpty">
-      —
+    <div class="presenterRandomMediaPreview">
+
+      <img
+        src="${presenterRandomSafeHtml(row.image)}"
+        alt=""
+        loading="eager"
+        decoding="async"
+      >
+
     </div>
   `
 }
 
 /* =========================
-   22) BOX CONTENT
+   22) BOX CONTENT + CONTROLS
 ========================= */
 
 function buildPresenterRandomBoxContent(state) {
@@ -3836,45 +3790,17 @@ function buildPresenterRandomBoxContent(state) {
 
     if (!started) {
       return `
-        <section class="presenterRandomPoolView">
-
-          <button
-            type="button"
-            class="presenterRandomPoolBtn ${state.box1?.pool === "saudi" ? "active" : ""}"
-            onclick="startPresenterRandomBox1('saudi')"
-          >
-            <span>🇸🇦</span>
-            <strong>الدوري السعودي</strong>
-          </button>
-
-          <button
-            type="button"
-            class="presenterRandomPoolBtn ${state.box1?.pool === "world" ? "active" : ""}"
-            onclick="startPresenterRandomBox1('world')"
-          >
-            <span>🌍</span>
-            <strong>عالمي</strong>
-          </button>
-
+        <section class="presenterRandomStartView">
+          <strong>اللاعب المشترك</strong>
         </section>
       `
     }
 
     return `
-      ${buildPresenterRandomBox1PlayersHtml(players)}
+      <section class="presenterRandomContentStack presenterRandomBox1Content">
 
-      <section class="presenterRandomStatusPanel">
-        <strong>
-          ${
-            state.box1?.rolling
-              ? "جاري الاختيار"
-              : activeTeam
-                ? presenterRandomSafeHtml(
-                    getPresenterRandomTeamName(activeTeam)
-                  )
-                : "اختر الفريق"
-          }
-        </strong>
+        ${buildPresenterRandomBox1PlayersHtml(players)}
+
       </section>
     `
   }
@@ -3892,58 +3818,26 @@ function buildPresenterRandomBoxContent(state) {
     const row =
       getPresenterRandomQuestion("auction", number)
 
-    const count =
-      getPresenterRandomAuctionCount(state)
-
-    const fixedPoints =
-      getPresenterRandomAuctionFixedPoints(state)
-
-    const timer =
-      getPresenterRandomRemainingTime(2)
-
     return `
-      ${buildPresenterRandomQuestionCard({
-        title: "المزاد",
-        number,
-        total: PRESENTER_RANDOM_BOX2_QUESTIONS_COUNT,
-        question: row?.question || state.box2?.question,
-        answer: row?.answer
-      })}
+      <section class="presenterRandomQuestionView presenterRandomAuctionQuestionView">
 
-      <section class="presenterRandomAuctionView">
+        <header class="presenterRandomQuestionHeader">
 
-        <input
-          id="presenterRandomAuctionInput"
-          class="presenterRandomAuctionInput"
-          type="tel"
-          inputmode="numeric"
-          autocomplete="off"
-          maxlength="5"
-          value="${count || ""}"
-          placeholder="عدد الإجابات"
-          oninput="setPresenterRandomAuctionPoints(this.value)"
-        >
+          <strong>المزاد</strong>
 
-        <div class="presenterRandomMetricsGrid">
+          <span>${number} / ${PRESENTER_RANDOM_BOX2_QUESTIONS_COUNT}</span>
 
-          <button
-            type="button"
-            class="presenterRandomMetric countMetric"
-            onclick="decreasePresenterRandomAuctionPoints()"
-          >
-            <span>العدد</span>
-            <strong id="presenterRandomAuctionCount">${count}</strong>
-          </button>
+        </header>
 
-          <div class="presenterRandomMetric timerMetric">
-            <span>الوقت</span>
-            <strong id="presenterRandomAuctionTimer">${timer}</strong>
-          </div>
+        <div class="presenterRandomAuctionQuestionBox">
 
-          <div class="presenterRandomMetric pointsMetric">
-            <span>النقاط</span>
-            <strong id="presenterRandomAuctionFixed">${fixedPoints}</strong>
-          </div>
+          <span>السؤال</span>
+
+          <strong>
+            ${presenterRandomSafeHtml(
+              row?.question || state.box2?.question || "—"
+            )}
+          </strong>
 
         </div>
 
@@ -3967,61 +3861,13 @@ function buildPresenterRandomBoxContent(state) {
         number
       )
 
-    const timer =
-      getPresenterRandomRemainingTime(3)
-
-    const errorsA =
-      Number(state.box3?.errors?.A || 0)
-
-    const errorsB =
-      Number(state.box3?.errors?.B || 0)
-
-    return `
-      ${buildPresenterRandomQuestionCard({
-        title: "ماذا تعرف",
-        number,
-        total: PRESENTER_RANDOM_BOX3_QUESTIONS_COUNT,
-        question: row?.question || state.box3?.question,
-        answer: row?.answer
-      })}
-
-      <section class="presenterRandomKnowView">
-
-        <div
-          id="presenterRandomBox3Timer"
-          class="presenterRandomTimerBox ${timer <= 2 ? "danger presenterTimerDanger" : ""}"
-        >
-          ${timer}
-        </div>
-
-        <div class="presenterRandomKnowBoard">
-
-          <div
-            class="presenterRandomKnowTeam presenterRandomTeamName ${activeTeam === "A" ? "active" : ""}"
-            data-random-team="A"
-          >
-            <span>
-              ${presenterRandomSafeHtml(presenterTeamAName)}
-            </span>
-
-            <strong>${errorsA} / 3</strong>
-          </div>
-
-          <div
-            class="presenterRandomKnowTeam presenterRandomTeamName ${activeTeam === "B" ? "active" : ""}"
-            data-random-team="B"
-          >
-            <span>
-              ${presenterRandomSafeHtml(presenterTeamBName)}
-            </span>
-
-            <strong>${errorsB} / 3</strong>
-          </div>
-
-        </div>
-
-      </section>
-    `
+    return buildPresenterRandomQuestionCard({
+      title: "ماذا تعرف",
+      number,
+      total: PRESENTER_RANDOM_BOX3_QUESTIONS_COUNT,
+      question: row?.question || state.box3?.question,
+      answer: row?.answer
+    })
   }
 
   if (currentBox === 4) {
@@ -4036,9 +3882,6 @@ function buildPresenterRandomBoxContent(state) {
 
     const row =
       getPresenterRandomQuestion("trueFalse", number)
-
-    const timer =
-      getPresenterRandomRemainingTime(4)
 
     if (!state.box4?.started) {
       return `
@@ -4082,17 +3925,243 @@ function buildPresenterRandomBoxContent(state) {
       `
     }
 
-    return `
-      ${buildPresenterRandomQuestionCard({
-        title: "صح أو خطأ",
-        number:
-          ((number - 1) %
-            PRESENTER_RANDOM_BOX4_TEAM_QUESTIONS_COUNT) + 1,
-        total: PRESENTER_RANDOM_BOX4_TEAM_QUESTIONS_COUNT,
-        question: row?.question,
-        answer: row?.answer
-      })}
+    return buildPresenterRandomQuestionCard({
+      title: "صح أو خطأ",
+      number:
+        ((number - 1) %
+          PRESENTER_RANDOM_BOX4_TEAM_QUESTIONS_COUNT) + 1,
+      total: PRESENTER_RANDOM_BOX4_TEAM_QUESTIONS_COUNT,
+      question: row?.question,
+      answer: row?.answer
+    })
+  }
 
+  if (currentBox === 5) {
+    const currentNumber =
+      Number(state.box5?.currentNumber || 0)
+
+    if (!currentNumber) {
+      return `
+        <section class="presenterRandomStartView">
+          <strong>فتبلة</strong>
+        </section>
+      `
+    }
+
+    const row =
+      getPresenterRandomFatblaRow(currentNumber)
+
+    return `
+      <section class="presenterRandomFatblaQuestionView">
+
+        <header class="presenterRandomQuestionHeader">
+
+          <strong>فتبلة</strong>
+
+          <span>${currentNumber}</span>
+
+        </header>
+
+        ${buildPresenterRandomBox5MediaHtml(row)}
+
+        <div class="presenterRandomQuestionBody">
+
+          <section class="presenterRandomQABox questionBox">
+            <span>السؤال</span>
+
+            <strong>
+              ${presenterRandomSafeHtml(
+                row?.question || "—"
+              )}
+            </strong>
+          </section>
+
+          <section class="presenterRandomQABox answerBox">
+            <span>الإجابة</span>
+
+            <strong>
+              ${presenterRandomSafeHtml(
+                row?.answer || "—"
+              )}
+            </strong>
+          </section>
+
+        </div>
+
+        ${
+          row?.note
+            ? `
+              <div class="presenterRandomNote">
+                ${presenterRandomSafeHtml(row.note)}
+              </div>
+            `
+            : ""
+        }
+
+      </section>
+    `
+  }
+
+  return ""
+}
+
+function buildPresenterRandomBoxControlsHtml(state) {
+  const currentBox =
+    Number(state.currentBox || 0)
+
+  const activeTeam =
+    getPresenterRandomActiveTeam()
+
+  let controlsHtml = ""
+
+  if (currentBox === 1) {
+    const players =
+      getPresenterRandomBox1Players(state)
+
+    const started =
+      !!state.box1?.started ||
+      !!state.box1?.rolling ||
+      players.filter(Boolean).length > 0
+
+    if (!started) {
+      controlsHtml = `
+        <section class="presenterRandomPoolView">
+
+          <button
+            type="button"
+            class="presenterRandomPoolBtn ${state.box1?.pool === "saudi" ? "active" : ""}"
+            onclick="startPresenterRandomBox1('saudi')"
+          >
+            <span>🇸🇦</span>
+            <strong>الدوري السعودي</strong>
+          </button>
+
+          <button
+            type="button"
+            class="presenterRandomPoolBtn ${state.box1?.pool === "world" ? "active" : ""}"
+            onclick="startPresenterRandomBox1('world')"
+          >
+            <span>🌍</span>
+            <strong>عالمي</strong>
+          </button>
+
+        </section>
+      `
+    }
+  }
+
+  if (currentBox === 2) {
+    const count =
+      getPresenterRandomAuctionCount(state)
+
+    const fixedPoints =
+      getPresenterRandomAuctionFixedPoints(state)
+
+    const timer =
+      getPresenterRandomRemainingTime(2)
+
+    controlsHtml = `
+      <section class="presenterRandomAuctionView">
+
+        <input
+          id="presenterRandomAuctionInput"
+          class="presenterRandomAuctionInput"
+          type="tel"
+          inputmode="numeric"
+          autocomplete="off"
+          maxlength="5"
+          value="${count || ""}"
+          placeholder="عدد الإجابات"
+          oninput="setPresenterRandomAuctionPoints(this.value)"
+        >
+
+        <div class="presenterRandomMetricsGrid">
+
+          <button
+            type="button"
+            class="presenterRandomMetric countMetric"
+            onclick="decreasePresenterRandomAuctionPoints()"
+          >
+            <span>العدد</span>
+            <strong id="presenterRandomAuctionCount">${count}</strong>
+          </button>
+
+          <div class="presenterRandomMetric timerMetric">
+            <span>الوقت</span>
+            <strong id="presenterRandomAuctionTimer">${timer}</strong>
+          </div>
+
+          <div class="presenterRandomMetric pointsMetric">
+            <span>النقاط</span>
+            <strong id="presenterRandomAuctionFixed">${fixedPoints}</strong>
+          </div>
+
+        </div>
+
+      </section>
+    `
+  }
+
+  if (currentBox === 3) {
+    const timer =
+      getPresenterRandomRemainingTime(3)
+
+    const errorsA =
+      Number(state.box3?.errors?.A || 0)
+
+    const errorsB =
+      Number(state.box3?.errors?.B || 0)
+
+    controlsHtml = `
+      <section class="presenterRandomKnowView">
+
+        <div
+          id="presenterRandomBox3Timer"
+          class="presenterRandomTimerBox ${timer <= 2 ? "danger presenterTimerDanger" : ""}"
+        >
+          ${timer}
+        </div>
+
+        <div class="presenterRandomKnowBoard">
+
+          <div
+            class="presenterRandomKnowTeam presenterRandomTeamName ${activeTeam === "A" ? "active" : ""}"
+            data-random-team="A"
+          >
+            <span>
+              ${presenterRandomSafeHtml(presenterTeamAName)}
+            </span>
+
+            <strong>${errorsA} / 3</strong>
+          </div>
+
+          <div
+            class="presenterRandomKnowTeam presenterRandomTeamName ${activeTeam === "B" ? "active" : ""}"
+            data-random-team="B"
+          >
+            <span>
+              ${presenterRandomSafeHtml(presenterTeamBName)}
+            </span>
+
+            <strong>${errorsB} / 3</strong>
+          </div>
+
+        </div>
+
+      </section>
+    `
+  }
+
+  if (
+    currentBox === 4 &&
+    state.box4?.started &&
+    !state.box4?.secondTeamBreak &&
+    !state.box4?.reviewMode
+  ) {
+    const timer =
+      getPresenterRandomRemainingTime(4)
+
+    controlsHtml = `
       <section class="presenterRandomBox4View">
 
         <div class="presenterRandomMetricsGrid">
@@ -4153,7 +4222,7 @@ function buildPresenterRandomBoxContent(state) {
       getPresenterRandomRemainingTime(5)
 
     if (!currentNumber) {
-      return `
+      controlsHtml = `
         <section class="presenterRandomFatblaNumbersView">
 
           <div class="presenterRandomFatblaNumbers">
@@ -4202,77 +4271,48 @@ function buildPresenterRandomBoxContent(state) {
 
         </section>
       `
+    } else if (blockTimerVisible) {
+      controlsHtml = `
+        <section class="presenterRandomBlockStatus">
+          <span>بلوك</span>
+
+          <strong id="presenterRandomBox5BlockTimer">
+            ${blockTimer}
+          </strong>
+        </section>
+      `
     }
-
-    const row =
-      getPresenterRandomFatblaRow(currentNumber)
-
-    return `
-      <section class="presenterRandomFatblaQuestionView">
-
-        <header class="presenterRandomQuestionHeader">
-
-          <strong>فتبلة</strong>
-
-          <span>${currentNumber}</span>
-
-        </header>
-
-        ${buildPresenterRandomBox5MediaHtml(row)}
-
-        <div class="presenterRandomQuestionBody">
-
-          <section class="presenterRandomQABox questionBox">
-            <span>السؤال</span>
-
-            <strong>
-              ${presenterRandomSafeHtml(
-                row?.question || "—"
-              )}
-            </strong>
-          </section>
-
-          <section class="presenterRandomQABox answerBox">
-            <span>الإجابة</span>
-
-            <strong>
-              ${presenterRandomSafeHtml(
-                row?.answer || "—"
-              )}
-            </strong>
-          </section>
-
-        </div>
-
-        ${
-          row?.note
-            ? `
-              <div class="presenterRandomNote">
-                ${presenterRandomSafeHtml(row.note)}
-              </div>
-            `
-            : ""
-        }
-
-        ${
-          blockTimerVisible
-            ? `
-              <div class="presenterRandomBlockStatus">
-                <span>بلوك</span>
-
-                <strong id="presenterRandomBox5BlockTimer">
-                  ${blockTimer}
-                </strong>
-              </div>
-            `
-            : ""
-        }
-
-      </section>
-    `
   }
 
-  return ""
+  return `
+    <div class="presenterRandomBoxControls ${controlsHtml ? "" : "is-empty"}">
+
+      ${
+        controlsHtml
+          ? `
+            <div class="presenterRandomBoxControlsBody">
+              ${controlsHtml}
+            </div>
+          `
+          : ""
+      }
+
+      <div class="presenterRandomCommandBar">
+
+        <button
+          type="button"
+          class="presenterBtn gray"
+          onclick="presenterRandomBackStep()"
+        >
+          الصناديق
+        </button>
+
+        ${buildPresenterRandomActionsHtml(state)}
+
+      </div>
+
+    </div>
+  `
 }
 
 /* =========================
@@ -4594,11 +4634,9 @@ function buildPresenterRandomActionsHtml(state) {
       )
 
     const mediaText =
-      row?.video
-        ? "فيديو"
-        : row?.image
-          ? "تكبير"
-          : "وسائط"
+      row?.image
+        ? "تكبير"
+        : "وسائط"
 
     return `
       <button
@@ -4714,158 +4752,75 @@ async function renderPresenterRandomChallenge() {
   const enabledBoxes =
     getPresenterRandomEnabledBoxes()
 
+  panel.dataset.segment =
+    "randomChallenge"
+
   panel.innerHTML = `
     <section
-      class="presenterRandomControlView"
+      class="presenterRandomScreen presenterRandomControlView"
       data-random-mode="${uiMode}"
+      data-current-box="${currentBox || 0}"
+      aria-label="التحدي"
     >
 
       ${
         !currentBox
           ? `
-            <header class="presenterRandomControlHeader">
+            <main class="presenterRandomMain presenterRandomHome presenterRandomSelectLayout">
 
-              <div class="presenterRandomHeaderTitle">
-                <strong>التحدي</strong>
-              </div>
+              <section class="presenterCard presenterRandomControlCard presenterRandomSelectCard">
 
-              <div class="presenterRandomHeaderScores">
+                <div class="presenterRandomChooseGrid">
 
-                <span>
-                  ${presenterRandomSafeHtml(presenterTeamAName)}
+                  ${enabledBoxes
+                    .map(box => {
+                      const finished =
+                        !!state?.[`box${box}`]?.finished
 
-                  <strong id="presenterRandomScoreA">
-                    ${getPresenterRandomMainScore("A", state)}
-                  </strong>
-                </span>
+                      const pending =
+                        presenterRandomPendingBox === box
 
-                <span>
-                  ${presenterRandomSafeHtml(presenterTeamBName)}
+                      return `
+                        <button
+                          type="button"
+                          class="
+                            presenterRandomChooseBtn
+                            ${finished ? "presenterOpened" : ""}
+                            ${pending ? "presenterPendingNumber" : ""}
+                          "
+                          data-random-action="openBox"
+                          data-random-box="${box}"
+                          onclick="openPresenterRandomBox(${box})"
+                          ${finished ? "disabled" : ""}
+                        >
+                          <strong class="presenterRandomChooseName">
+                            ${presenterRandomSafeHtml(
+                              getPresenterRandomBoxTitle(box)
+                            )}
+                          </strong>
+                        </button>
+                      `
+                    })
+                    .join("")}
 
-                  <strong id="presenterRandomScoreB">
-                    ${getPresenterRandomMainScore("B", state)}
-                  </strong>
-                </span>
+                </div>
 
-              </div>
-
-            </header>
-
-            <main class="presenterRandomSelectMain">
-
-              <div class="presenterRandomChooseGrid">
-
-                ${enabledBoxes
-                  .map(box => {
-                    const finished =
-                      !!state?.[`box${box}`]?.finished
-
-                    const pending =
-                      presenterRandomPendingBox === box
-
-                    return `
-                      <button
-                        type="button"
-                        class="
-                          presenterRandomChooseBtn
-                          ${finished ? "presenterOpened" : ""}
-                          ${pending ? "presenterPendingNumber" : ""}
-                        "
-                        data-random-action="openBox"
-                        data-random-box="${box}"
-                        onclick="openPresenterRandomBox(${box})"
-                      >
-                        <span>
-                          ${box}
-                        </span>
-
-                        <strong>
-                          ${presenterRandomSafeHtml(
-                            getPresenterRandomBoxTitle(box)
-                          )}
-                        </strong>
-                      </button>
-                    `
-                  })
-                  .join("")}
-
-              </div>
+              </section>
 
             </main>
           `
           : `
-            <header class="presenterRandomControlHeader">
+            <main class="presenterRandomMain presenterRandomRound presenterRandomPlayLayout">
 
-              <button
-                type="button"
-                class="presenterRandomBackBtn"
-                onclick="presenterRandomBackStep()"
-              >
-                رجوع
-              </button>
-
-              <div class="presenterRandomHeaderTitle">
-                <strong>
-                  ${presenterRandomSafeHtml(
-                    getPresenterRandomBoxTitle(currentBox)
-                  )}
-                </strong>
-
-                <span>
-                  ${currentBox}
-                </span>
-              </div>
-
-              <button
-                type="button"
-                class="presenterRandomEndBtn"
-                data-random-action="finish"
-                onclick="runPresenterRandomAction('randomFinishBox')"
-              >
-                إنهاء
-              </button>
-
-            </header>
-
-            <main class="presenterRandomControlMain">
-
-              <section class="presenterRandomContentPanel">
+              <section class="presenterCard presenterRandomContentCard">
                 ${buildPresenterRandomBoxContent(state)}
               </section>
 
-              <aside class="presenterRandomSidePanel">
-
-                <div class="presenterRandomTeamsBox">
-                  ${teamButtons()}
-                </div>
-
-                <section class="presenterRandomScorePanel">
-
-                  <span>
-                    ${presenterRandomSafeHtml(presenterTeamAName)}
-
-                    <strong id="presenterRandomScoreA">
-                      ${getPresenterRandomMainScore("A", state)}
-                    </strong>
-                  </span>
-
-                  <span>
-                    ${presenterRandomSafeHtml(presenterTeamBName)}
-
-                    <strong id="presenterRandomScoreB">
-                      ${getPresenterRandomMainScore("B", state)}
-                    </strong>
-                  </span>
-
-                </section>
-
-              </aside>
+              <section class="presenterCard presenterRandomControlCard presenterRandomActionsCard">
+                ${buildPresenterRandomBoxControlsHtml(state)}
+              </section>
 
             </main>
-
-            <footer class="presenterRandomCommandBar">
-              ${buildPresenterRandomActionsHtml(state)}
-            </footer>
           `
       }
 
@@ -5452,8 +5407,8 @@ window.cancelPresenterRandomBox5Number =
 
 window.presenterRandomBox5MediaAction =
   presenterRandomBox5MediaAction
-  
-  window.startPresenterRandomBox5BlockTimer =
+
+window.startPresenterRandomBox5BlockTimer =
   function () {
     return runPresenterRandomAction(
       "randomBox5BlockTimer"

@@ -2,75 +2,186 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
 
   <title>الحنكة</title>
 
-  <link rel="stylesheet" href="styles.css?v=1002" />
+  <link
+    rel="stylesheet"
+    href="styles.css?v=1002"
+  />
 
-  <link rel="stylesheet" href="assets/css/segments/top10.css?v=1002" />
-  <link rel="stylesheet" href="assets/css/segments/who.css?v=1002" />
-  <link rel="stylesheet" href="assets/css/segments/explain.css?v=1002" />
-  <link rel="stylesheet" href="assets/css/segments/archive.css?v=1002" />
-  <link rel="stylesheet" href="assets/css/segments/warmup.css?v=1003" />
-  <link rel="stylesheet" href="assets/css/segments/letterli.css?v=1002" />
-  <link rel="stylesheet" href="assets/css/segments/random-challenge.css?v=1004" />
-  <link rel="stylesheet" href="assets/css/segments/final.css?v=1002" />
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/top10.css?v=1002"
+  />
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/family-didi.css?v=1"
+  />
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/who.css?v=1002"
+  />
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/explain.css?v=1002"
+  />
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/archive.css?v=1002"
+  />
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/warmup.css?v=1003"
+  />
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/random-challenge.css?v=1004"
+  />
+
+  <link
+    rel="stylesheet"
+    href="assets/css/segments/final.css?v=1002"
+  />
 </head>
 
 <body>
 
-  <div id="homePage" class="homePageShell homeShowPage">
+  <div
+    id="homePage"
+    class="homePageShell homeShowPage"
+  >
 
     <div class="homeHero">
 
-      <div class="homeTeamCard homeTeamA" id="teamABox" onclick="addMainScore('A')">
+      <div
+        class="homeTeamCard homeTeamA"
+        id="teamABox"
+        onclick="addMainScore('A')"
+      >
         <div class="homeTeamText">
-          <div class="teamName homeTeamName" id="teamNameA">الفريق الأول</div>
+
+          <div
+            class="teamName homeTeamName"
+            id="teamNameA"
+          >
+            الفريق الأول
+          </div>
+
         </div>
 
-        <div class="teamScore homeTeamScore" id="mainScoreA">0</div>
+        <div
+          class="teamScore homeTeamScore"
+          id="mainScoreA"
+        >
+          0
+        </div>
       </div>
 
-      <div class="titleBox homeTitleBox" id="titleBox">
+      <div
+        class="titleBox homeTitleBox"
+        id="titleBox"
+      >
         <div class="homeTitleGlow"></div>
-        <h1>الحنكة</h1>
-        <div id="modelNameDisplay" class="modelNameDisplay homeModelName"></div>
+
+        <h1>
+          الحنكة
+        </h1>
+
+        <div
+          id="modelNameDisplay"
+          class="modelNameDisplay homeModelName"
+        ></div>
       </div>
 
-      <div class="homeTeamCard homeTeamB" id="teamBBox" onclick="addMainScore('B')">
+      <div
+        class="homeTeamCard homeTeamB"
+        id="teamBBox"
+        onclick="addMainScore('B')"
+      >
         <div class="homeTeamText">
-          <div class="teamName homeTeamName" id="teamNameB">الفريق الثاني</div>
+
+          <div
+            class="teamName homeTeamName"
+            id="teamNameB"
+          >
+            الفريق الثاني
+          </div>
+
         </div>
 
-        <div class="teamScore homeTeamScore" id="mainScoreB">0</div>
+        <div
+          class="teamScore homeTeamScore"
+          id="mainScoreB"
+        >
+          0
+        </div>
       </div>
 
     </div>
 
-    <div id="homeModelPopupArea" class="homeModelPopupArea hidden"></div>
+    <div
+      id="homeModelPopupArea"
+      class="homeModelPopupArea hidden"
+    ></div>
 
-    <div class="homeSegmentsShowcase" id="segmentsGrid"></div>
+    <div
+      class="homeSegmentsShowcase"
+      id="segmentsGrid"
+    ></div>
 
-    <div class="winnerArea homeWinnerArea" id="winnerArea">
-      <button class="winnerBtn homeWinnerBtn" onclick="announceWinner()">
+    <div
+      class="winnerArea homeWinnerArea"
+      id="winnerArea"
+    >
+      <button
+        class="winnerBtn homeWinnerBtn"
+        onclick="announceWinner()"
+      >
         النتيجة النهائية
       </button>
 
-      <div id="winnerBox" class="homeWinnerBox"></div>
+      <div
+        id="winnerBox"
+        class="homeWinnerBox"
+      ></div>
     </div>
 
   </div>
 
   <div id="segmentArea"></div>
 
-  <div id="winnerOverlay" class="hidden">
+  <div
+    id="winnerOverlay"
+    class="hidden"
+  >
     <div id="winnerOverlayCard">
-      <div id="winnerOverlayTitle">الفائز</div>
-      <div id="winnerOverlayName">—</div>
-      <div id="winnerOverlayBurst">✦ ✦ ✦</div>
+
+      <div id="winnerOverlayTitle">
+        الفائز
+      </div>
+
+      <div id="winnerOverlayName">
+        —
+      </div>
+
+      <div id="winnerOverlayBurst">
+        ✦ ✦ ✦
+      </div>
 
       <div class="winnerOverlayActions">
+
         <button
           id="winnerOverlayClose"
           type="button"
@@ -86,35 +197,55 @@
         >
           إنهاء
         </button>
+
       </div>
+
     </div>
   </div>
 
-  <div id="gameToast" class="gameToast hidden">
-    <div class="gameToastIcon">!</div>
-    <div id="gameToastText" class="gameToastText"></div>
+  <div
+    id="gameToast"
+    class="gameToast hidden"
+  >
+    <div class="gameToastIcon">
+      !
+    </div>
+
+    <div
+      id="gameToastText"
+      class="gameToastText"
+    ></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <script src="assets/js/supabase.js?v=1050"></script>
 
   <script src="assets/js/game.js?v=1007"></script>
+
   <script src="assets/js/game-state.js?v=1007"></script>
 
   <script src="assets/js/segments/warmup.js?v=1002"></script>
+
   <script src="assets/js/segments/top10.js?v=1002"></script>
+
+  <script src="assets/js/segments/family-didi.js?v=1"></script>
+
   <script src="assets/js/segments/who.js?v=1002"></script>
+
   <script src="assets/js/segments/explain.js?v=1002"></script>
+
   <script src="assets/js/segments/final.js?v=1002"></script>
+
   <script src="assets/js/segments/archive.js?v=1002"></script>
-  <script src="assets/js/segments/letterli.js?v=1002"></script>
 
   <script src="assets/js/random-shared-player-media.js?v=1002"></script>
+
   <script src="assets/js/segments/random-challenge.js?v=1002"></script>
 
-  <script src="assets/js/presenter/presenter-listener.js?v=1007"></script>
+  <script src="assets/js/presenter/presenter-listener.js?v=1021"></script>
 
 </body>
 </html>

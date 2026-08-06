@@ -1,252 +1,269 @@
 /* =========================================================
-   PRESENTER SEGMENT: EXPLAIN / اشرح الكلمة
-   File: assets/css/presenter/segments/explain.css
-
-   المسؤوليات:
-   - تخطيط فقرة اشرح الكلمة.
-   - اختيار الفريق وأرقام الكلمات.
-   - حالة الرقم والمؤقت.
-   - عرض الكلمة ونتيجة الإجابة.
-   - أزرار التحكم.
-   - وضع القراءة الخاص بالفقرة.
-
-   لا يحتوي على:
-   - تنسيقات عامة للصفحة.
-   - تنسيقات بقية الفقرات.
-   - تنسيقات الأرشيف.
+   EXPLAIN PRESENTER / اشرح الكلمة
+   MATCHING DISPLAY COLORS - CLEAN
 ========================================================= */
 
 /* =========================
-   1) PAGE
+   1) BASE
 ========================= */
 
-.presenterExplainPage{
+.presenterPanel[data-segment="explain"]{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+}
+
+.presenterExplainScreen,
+.presenterExplainScreen *{
+  box-sizing:border-box;
+}
+
+.presenterExplainScreen{
+  --bg:#EAECF0;
+  --surface:#FFFFFF;
+  --soft:#F6F7F9;
+  --line:#D5DADF;
+
+  --primary:#FE7F2D;
+  --secondary:#233D4D;
+  --text:#151515;
+  --muted:#8793A0;
+
+  --btn-nav:#0A7C6E;
+  --btn-correct:#007F00;
+  --btn-wrong:#7F0000;
+  --btn-start:#00004C;
+  --btn-double:#00007F;
+  --btn-disabled:#D7DCE2;
+  --btn-disabled-text:#7B8792;
+
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  direction:rtl;
+  overflow:hidden;
+
+  font-family:"HanakaText",sans-serif;
+  color:var(--text);
+}
+
+.presenterExplainOverview,
+.presenterExplainTeamsBox,
+.presenterExplainStatusCard,
+.presenterExplainStatusText,
+.presenterExplainPage > .presenterExplainOverview,
+.presenterExplainWordCard{
+  display:none !important;
+}
+
+/* =========================
+   2) MAIN
+========================= */
+
+.presenterExplainMain{
   width:100%;
   height:100%;
   min-width:0;
   min-height:0;
 
   display:grid;
-  grid-template-rows:auto minmax(0,1fr) auto;
-  gap:8px;
+  grid-template-columns:minmax(0,1fr) 470px;
+  grid-template-areas:"content control";
+  gap:12px;
 
+  direction:ltr;
   overflow:hidden;
 }
 
 /* =========================
-   2) OVERVIEW
+   3) LEFT CONTENT
 ========================= */
 
-.presenterExplainOverview{
-  min-width:0;
+.presenterExplainContentCard{
+  grid-area:content;
 
-  display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(360px,.92fr);
-  gap:8px;
-}
-
-.presenterExplainTeamsBox{
-  min-width:0;
-}
-
-.presenterExplainTeamsBox .presenterTeamsRow,
-.presenterExplainTeamsBox .presenterTeamSelector{
+  width:100%;
   height:100%;
-}
-
-.presenterExplainTeamsBox .presenterTeamBtn{
-  min-height:58px;
-}
-
-.presenterExplainStatusCard{
   min-width:0;
-  padding:8px;
+  min-height:0;
+
+  padding:14px;
 
   display:grid;
-  grid-template-columns:minmax(0,1.2fr) minmax(90px,.55fr) minmax(76px,.4fr);
-  align-items:stretch;
-  gap:7px;
+  grid-template-rows:52px minmax(0,1fr);
+  gap:10px;
+
+  direction:rtl;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
+
+  box-shadow:none;
+  overflow:hidden;
 }
 
-.presenterExplainStatusItem{
+.presenterExplainInfoLine{
+  width:100%;
   min-width:0;
-  min-height:48px;
-  padding:6px 8px;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:110px minmax(0,1fr) 120px;
+  gap:10px;
+}
+
+.presenterExplainCurrentBadge,
+.presenterExplainTimerBox,
+.presenterExplainWordState{
+  width:100%;
+  height:52px;
+  min-width:0;
+  min-height:52px;
 
   display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-
-  border:1px solid var(--presenter-line);
-  border-radius:11px;
-  background:var(--presenter-surface-soft);
-  text-align:center;
-}
-
-.presenterExplainStatusText,
-.presenterExplainCurrentBadge,
-.presenterExplainTimerBox{
-  max-width:100%;
-  font-weight:400;
-}
-
-.presenterExplainStatusText{
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-
-  color:var(--presenter-secondary);
-  font-size:.7rem;
-  line-height:1.2;
-}
-
-.presenterExplainCurrentBadge{
-  min-height:24px;
-  padding:4px 8px;
-
-  display:inline-flex;
   align-items:center;
   justify-content:center;
 
-  border-radius:999px;
-  background:var(--presenter-secondary-soft);
-  color:var(--presenter-secondary);
+  padding:8px 14px;
 
-  font-size:.64rem;
+  border-radius:18px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+  -webkit-text-fill-color:#FFFFFF;
+
+  font-size:.9rem;
   line-height:1;
+  font-weight:400;
+  text-align:center;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .presenterExplainCurrentBadge.active{
-  background:var(--presenter-primary-soft);
-  color:var(--presenter-primary-dark);
+  background:var(--primary);
 }
 
 .presenterExplainTimerBox{
-  min-width:48px;
-  min-height:34px;
-  padding:4px 8px;
+  font-size:1.5rem;
+}
 
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
+.presenterExplainTimerBox.hidden{
+  display:flex;
+  opacity:.45;
+}
 
-  border:2px solid var(--presenter-line);
-  border-radius:11px;
-  background:var(--presenter-surface);
-  color:var(--presenter-secondary);
-
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:1rem;
-  line-height:1;
-
-  transition:
-    border-color var(--presenter-transition),
-    background var(--presenter-transition),
-    color var(--presenter-transition);
+.presenterExplainTimerBox.danger,
+.presenterExplainTimerBox.presenterTimerDanger,
+.presenterExplainTimerBox.presenterTimerFinished{
+  background:#7F0000;
 }
 
 .presenterExplainTimerBox.danger,
 .presenterExplainTimerBox.presenterTimerDanger{
-  border-color:rgba(180,35,24,.34);
-  background:var(--presenter-red-soft);
-  color:var(--presenter-red);
+  animation:presenterExplainTimerPulse .75s ease-in-out infinite;
 }
 
-.presenterExplainTimerBox.presenterTimerFinished{
-  border-color:var(--presenter-red);
-  background:var(--presenter-red);
-  color:#FFFFFF;
+@keyframes presenterExplainTimerPulse{
+  0%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.06);
+  }
+
+  100%{
+    transform:scale(1);
+  }
 }
 
-/* =========================
-   3) CONTENT
-========================= */
-
-.presenterExplainContent{
-  min-width:0;
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:minmax(340px,.78fr) minmax(0,1.22fr);
-  gap:8px;
-
-  overflow:hidden;
+.presenterExplainWordState:empty::before{
+  content:"اشرح الكلمة";
 }
 
-.presenterExplainNumbersCard,
-.presenterExplainWordCard{
-  min-width:0;
-  min-height:0;
+.presenterExplainWordBox{
+  width:100%;
   height:100%;
-  overflow:hidden;
-}
-
-.presenterExplainNumbersCard{
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:8px;
-}
-
-.presenterExplainWordCard{
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:8px;
-}
-
-/* =========================
-   4) SECTION HEAD
-========================= */
-
-.presenterExplainSectionHead{
   min-width:0;
+  min-height:0;
 
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-
-.presenterExplainSectionHead > div{
-  min-width:0;
-}
-
-.presenterExplainSectionHead h2{
-  margin-top:3px;
-
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-
-  color:var(--presenter-secondary);
-  font-size:.92rem;
-  line-height:1.15;
-  font-weight:400;
-}
-
-.presenterExplainCountBadge,
-.presenterExplainWordState{
-  flex:0 0 auto;
-
-  min-height:28px;
-  padding:5px 9px;
-
-  display:inline-flex;
-  align-items:center;
   justify-content:center;
 
-  border-radius:999px;
-  background:var(--presenter-secondary-soft);
-  color:var(--presenter-secondary);
+  padding:24px;
 
-  font-size:.58rem;
-  line-height:1;
+  background:var(--soft);
+  border:2px solid var(--line);
+  border-radius:24px;
+
+  color:var(--secondary);
+
+  font-size:clamp(2.6rem,5vw,6.2rem);
+  line-height:1.12;
   font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
 }
 
-.presenterExplainWordState:empty{
-  display:none;
+.presenterExplainWordBox.presenterExplainWordHidden{
+  background:var(--soft);
+  border-color:var(--line);
+  color:var(--secondary);
+  font-size:clamp(2.6rem,5vw,6.2rem);
+}
+
+.presenterExplainWordBox.presenterExplainWordHidden::before{
+  content:none;
+}
+
+.presenterExplainWordBox.answerCorrect{
+  border-color:rgba(0,127,0,.45);
+  background:rgba(0,127,0,.08);
+  color:#007F00;
+}
+
+.presenterExplainWordBox.answerWrong{
+  border-color:rgba(127,0,0,.45);
+  background:rgba(127,0,0,.08);
+  color:#7F0000;
+}
+
+/* =========================
+   4) RIGHT CONTROL
+========================= */
+
+.presenterExplainControlCard{
+  grid-area:control;
+
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  padding:12px;
+
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:12px;
+
+  direction:rtl;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:26px;
+
+  box-shadow:none;
+  overflow:hidden;
 }
 
 /* =========================
@@ -254,401 +271,408 @@
 ========================= */
 
 .presenterExplainNumbersGrid{
+  width:100%;
   min-width:0;
   min-height:0;
 
   display:grid;
-  gap:8px;
+  justify-content:center;
+  align-content:center;
+
+  gap:10px;
+  padding:12px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:22px;
 
   overflow:hidden;
+}
+
+.presenterExplainNumbersGrid.count-5{
+  grid-template-columns:repeat(3,112px);
+  grid-auto-rows:112px;
+}
+
+.presenterExplainNumbersGrid.count-7{
+  grid-template-columns:repeat(4,92px);
+  grid-auto-rows:92px;
+}
+
+.presenterExplainNumbersGrid.count-9{
+  grid-template-columns:repeat(5,74px);
+  grid-auto-rows:74px;
 }
 
 .presenterExplainNumberCard{
   width:100%;
-  min-width:0;
-  min-height:0;
-  padding:6px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  position:relative;
-  overflow:hidden;
-
-  border:2px solid var(--presenter-line-strong);
-  border-radius:15px;
-  background:var(--presenter-surface-soft);
-  color:var(--presenter-secondary);
-
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:1.35rem;
-  line-height:1;
-  font-weight:400;
-
-  cursor:pointer;
-
-  transition:
-    transform var(--presenter-transition),
-    border-color var(--presenter-transition),
-    background var(--presenter-transition),
-    color var(--presenter-transition),
-    opacity var(--presenter-transition);
-}
-
-.presenterExplainNumberCard:hover{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
-}
-
-.presenterExplainNumberCard:active{
-  transform:translateY(1px);
-}
-
-.presenterExplainNumberCard.active,
-.presenterExplainNumberCard.selectedPresenterTeam{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary);
-  color:#FFFFFF;
-}
-
-.presenterExplainNumberCard.presenterPendingNumber{
-  border-color:var(--presenter-blue);
-  background:var(--presenter-blue-soft);
-  color:var(--presenter-blue);
-}
-
-.presenterExplainNumberCard.used,
-.presenterExplainNumberCard.presenterOpened{
-  border-color:var(--presenter-line);
-  background:
-    linear-gradient(
-      135deg,
-      transparent 46%,
-      var(--presenter-line-strong) 47%,
-      var(--presenter-line-strong) 53%,
-      transparent 54%
-    ),
-    var(--presenter-surface-muted);
-  color:transparent;
-}
-
-.presenterExplainNumberCard:disabled{
-  cursor:not-allowed;
-}
-
-.presenterExplainNumberCard:disabled:not(.used):not(.active):not(.presenterPendingNumber){
-  opacity:.48;
-}
-
-/* =========================
-   6) WORD
-========================= */
-
-.presenterExplainWordBox{
-  width:100%;
   height:100%;
   min-width:0;
   min-height:0;
-  padding:16px;
+
+  border:0;
+  border-radius:20px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  overflow:auto;
-  overscroll-behavior:contain;
+  cursor:pointer;
 
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-surface-soft);
-  color:var(--presenter-secondary);
+  background:var(--primary);
+  color:#FFFFFF;
 
-  font-size:clamp(1.35rem,3vw,2.4rem);
-  line-height:1.35;
-  text-align:center;
+  font-family:"HanakaText",sans-serif;
+  font-size:2.15rem;
+  line-height:1;
   font-weight:400;
 
   transition:
-    border-color var(--presenter-transition),
-    background var(--presenter-transition),
-    color var(--presenter-transition),
-    opacity var(--presenter-transition);
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
 }
 
-.presenterExplainWordBox.answerCorrect{
-  border-color:rgba(22,130,60,.38);
-  background:var(--presenter-green-soft);
-  color:var(--presenter-green);
+.presenterExplainNumberCard:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.02);
 }
 
-.presenterExplainWordBox.answerWrong{
-  border-color:rgba(180,35,24,.36);
-  background:var(--presenter-red-soft);
-  color:var(--presenter-red);
+.presenterExplainNumberCard:active{
+  transform:scale(.97);
 }
 
-.presenterExplainWordBox.presenterExplainWordHidden{
-  border-style:dashed;
+.presenterExplainNumberCard.active,
+.presenterExplainNumberCard.selectedPresenterTeam,
+.presenterExplainNumberCard.presenterPendingNumber{
+  background:var(--secondary);
+  color:#FFFFFF;
+}
+
+.presenterExplainNumberCard.presenterExplainCompensationNumber{
+  background:var(--btn-nav);
+  color:#FFFFFF;
+}
+
+.presenterExplainNumberCard.presenterExplainCompensationNumber span::after{
+  content:"تعويض";
+  display:block;
+  margin-top:5px;
+
+  font-size:.48rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterExplainNumberCard.segmentCompensationPressing{
+  background:var(--secondary);
+  transform:scale(.97);
+  filter:brightness(1.08);
+}
+
+.presenterExplainNumberCard.used,
+.presenterExplainNumberCard.presenterOpened,
+.presenterExplainNumberCard:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+.presenterExplainNumberCard.used span,
+.presenterExplainNumberCard.presenterOpened span{
   color:transparent;
-  position:relative;
 }
 
-.presenterExplainWordBox.presenterExplainWordHidden::after{
-  content:"الكلمة مخفية من شاشة العرض";
+/* =========================
+   6) ACTIONS
+========================= */
 
-  position:absolute;
-  inset:0;
+.presenterExplainActions{
+  width:100%;
+  min-width:0;
+  min-height:0;
+  margin:0;
+
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+
+  padding:0;
+
+  background:transparent;
+  border:0;
+  border-radius:0;
+
+  box-shadow:none;
+  overflow:hidden;
+}
+
+.presenterExplainActions .presenterBtn{
+  width:100%;
+  height:58px;
+  min-height:58px;
+  min-width:0;
+
+  border:0;
+  border-radius:18px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  padding:12px;
+  cursor:pointer;
 
-  color:var(--presenter-muted);
-  font-size:.78rem;
-  line-height:1.4;
+  color:#FFFFFF;
+
+  font-size:.92rem;
+  line-height:1;
+  font-weight:400;
   text-align:center;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    opacity .15s ease;
+}
+
+.presenterExplainActions .presenterBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.presenterExplainActions .presenterBtn:active{
+  transform:scale(.97);
+}
+
+.presenterExplainDoubleBtn{
+  background:var(--btn-double);
+}
+
+.presenterExplainStartTimerBtn{
+  background:var(--btn-start);
+}
+
+.presenterExplainToggleWordBtn{
+  background:var(--btn-nav);
+}
+
+.presenterExplainWrongBtn{
+  background:var(--btn-wrong);
+}
+
+.presenterExplainCorrectBtn{
+  background:var(--btn-correct);
+  grid-column:1 / -1;
+}
+
+.presenterExplainActions .presenterBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
 }
 
 /* =========================
-   7) ACTIONS
+   7) READER
 ========================= */
 
-.presenterExplainActions{
-  min-width:0;
-
+#presenterReaderPanel .readerRoundsStack{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:7px;
-}
-
-.presenterExplainActions .presenterBtn{
-  min-height:50px;
-}
-
-.presenterExplainActions .dark{
-  background:var(--presenter-secondary);
-  border-color:var(--presenter-secondary);
-  color:#FFFFFF;
-}
-
-.presenterExplainActions .blue{
-  background:var(--presenter-blue);
-  border-color:var(--presenter-blue);
-  color:#FFFFFF;
-}
-
-.presenterExplainActions .red{
-  background:var(--presenter-red);
-  border-color:var(--presenter-red);
-  color:#FFFFFF;
-}
-
-.presenterExplainActions .green{
-  background:var(--presenter-green);
-  border-color:var(--presenter-green);
-  color:#FFFFFF;
-}
-
-/* =========================
-   8) READER MODE
-========================= */
-
-.readerExplainPage{
-  width:100%;
-  min-width:0;
-
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
   gap:10px;
 }
 
-.readerExplainHead{
+#presenterReaderPanel .readerRoundPage{
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:22px;
+
+  box-shadow:none;
+}
+
+#presenterReaderPanel .readerRoundHead{
+  margin-bottom:10px;
+
   min-width:0;
-  padding:9px 11px;
 
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:10px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-lg);
-  background:var(--presenter-surface);
+  gap:8px;
 }
 
-.readerExplainHead > div{
-  min-width:0;
-}
+#presenterReaderPanel .readerRoundHead h2{
+  color:var(--secondary);
 
-.readerExplainHead span{
-  color:var(--presenter-primary);
-  font-size:.58rem;
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:1.05rem;
   line-height:1;
-}
-
-.readerExplainHead h2{
-  margin-top:3px;
-
-  color:var(--presenter-secondary);
-  font-size:1rem;
-  line-height:1.15;
   font-weight:400;
 }
 
-.readerExplainHead > strong{
-  flex:0 0 auto;
-  min-height:28px;
-  padding:5px 9px;
-
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
+#presenterReaderPanel .readerRoundHead span{
+  padding:6px 10px;
 
   border-radius:999px;
-  background:var(--presenter-secondary-soft);
-  color:var(--presenter-secondary);
 
-  font-size:.58rem;
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-size:.68rem;
   line-height:1;
   font-weight:400;
 }
 
-.readerSimpleGrid.readerExplainGrid,
-.readerExplainGrid{
-  min-width:0;
-
+#presenterReaderPanel .readerSimpleGrid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:8px;
 }
 
-/*
-  هذه الكلاسات تدعم البنية العامة التي يولدها readerMiniCard
-  بدون التأثير على بطاقات القراءة في بقية الفقرات.
-*/
-
-.readerExplainGrid .readerMiniCard{
+#presenterReaderPanel .readerMiniCard{
   min-width:0;
-  min-height:110px;
-  padding:9px;
+
+  padding:10px;
 
   display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:7px;
+  gap:8px;
 
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-surface);
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:18px;
 
-  cursor:pointer;
   overflow:hidden;
 }
 
-.readerExplainGrid .readerMiniCardNumber,
-.readerExplainGrid .readerMiniNumber{
-  width:34px;
-  height:34px;
+#presenterReaderPanel .readerBlock label{
+  display:block;
+  margin-bottom:4px;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  color:var(--muted);
 
-  border-radius:9px;
-  background:var(--presenter-secondary);
-  color:#FFFFFF;
-
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:.78rem;
-  line-height:1;
+  font-size:.68rem;
+  line-height:1.2;
   font-weight:400;
 }
 
-.readerExplainGrid .readerMiniCardContent,
-.readerExplainGrid .readerMiniBody{
-  min-width:0;
-}
+#presenterReaderPanel .readerBlock p{
+  color:var(--text);
 
-.readerExplainGrid .readerMiniCardTitle,
-.readerExplainGrid .readerMiniTitle{
-  color:var(--presenter-muted);
-  font-size:.56rem;
-  line-height:1.15;
-  font-weight:400;
-}
-
-.readerExplainGrid .readerMiniCardAnswer,
-.readerExplainGrid .readerMiniAnswer{
-  margin-top:5px;
-
-  color:var(--presenter-secondary);
   font-size:.82rem;
   line-height:1.4;
   font-weight:400;
+
   overflow-wrap:anywhere;
 }
 
-.readerExplainGrid .readerMiniCard.read,
-.readerExplainGrid .readerMiniCard.readerRead{
-  border-color:rgba(22,130,60,.34);
-  background:var(--presenter-green-soft);
-}
-
 /* =========================
-   9) GALAXY TAB A11 LANDSCAPE
+   8) IPAD / TABLET LANDSCAPE
 ========================= */
 
-@media
-  (min-width:900px)
-  and (max-width:1400px)
-  and (orientation:landscape)
-  and (min-height:500px){
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .presenterExplainMain{
+    grid-template-columns:minmax(0,1fr) 410px;
+    gap:8px;
+  }
 
-  .presenterExplainPage{
+  .presenterExplainContentCard,
+  .presenterExplainControlCard{
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .presenterExplainContentCard{
+    grid-template-rows:42px minmax(0,1fr);
     gap:7px;
   }
 
-  .presenterExplainOverview{
-    grid-template-columns:minmax(0,1fr) 390px;
-    gap:7px;
-  }
-
-  .presenterExplainTeamsBox .presenterTeamBtn{
-    min-height:54px;
-  }
-
-  .presenterExplainStatusCard{
-    padding:7px;
+  .presenterExplainInfoLine{
+    grid-template-columns:82px minmax(0,1fr) 90px;
     gap:6px;
   }
 
-  .presenterExplainContent{
-    grid-template-columns:minmax(320px,.75fr) minmax(0,1.25fr);
-    gap:7px;
+  .presenterExplainCurrentBadge,
+  .presenterExplainTimerBox,
+  .presenterExplainWordState{
+    height:42px;
+    min-height:42px;
+    border-radius:13px;
+    font-size:.62rem;
   }
 
-  .presenterExplainNumbersCard,
-  .presenterExplainWordCard{
-    padding:9px;
+  .presenterExplainTimerBox{
+    font-size:1.05rem;
   }
+
+.presenterExplainWordBox,
+.presenterExplainWordBox.presenterExplainWordHidden{
+  padding:12px;
+  border-radius:18px;
+  font-size:clamp(1.7rem,3.2vw,3.4rem);
+}
 
   .presenterExplainNumbersGrid{
-    gap:7px;
+    gap:8px;
+    padding:8px;
+    border-radius:17px;
+  }
+
+  .presenterExplainNumbersGrid.count-5{
+    grid-template-columns:repeat(3,96px);
+    grid-auto-rows:96px;
+  }
+
+  .presenterExplainNumbersGrid.count-7{
+    grid-template-columns:repeat(4,80px);
+    grid-auto-rows:80px;
+  }
+
+  .presenterExplainNumbersGrid.count-9{
+    grid-template-columns:repeat(5,64px);
+    grid-auto-rows:64px;
+  }
+
+  .presenterExplainNumberCard{
+    border-radius:16px;
+    font-size:1.72rem;
+  }
+
+  .presenterExplainNumberCard.presenterExplainCompensationNumber span::after{
+    margin-top:3px;
+    font-size:.34rem;
   }
 
   .presenterExplainActions{
-    gap:6px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
   }
 
   .presenterExplainActions .presenterBtn{
+    height:46px;
     min-height:46px;
+    border-radius:14px;
+    font-size:.66rem;
+  }
+
+  .presenterExplainCorrectBtn{
+    grid-column:1 / -1;
   }
 }
 
 /* =========================
-   10) IPHONE PRO MAX LANDSCAPE
+   9) IPHONE PRO MAX LANDSCAPE
 ========================= */
 
 @media
@@ -657,167 +681,113 @@
   and (orientation:landscape)
   and (max-height:500px){
 
-  .presenterExplainPage{
-    grid-template-rows:42px minmax(0,1fr) 42px;
+  .presenterExplainMain{
+    grid-template-columns:minmax(0,1fr) 330px;
+    gap:6px;
+  }
+
+  .presenterExplainContentCard,
+  .presenterExplainControlCard{
+    padding:6px;
+    border-radius:15px;
+  }
+
+  .presenterExplainContentCard{
+    grid-template-rows:30px minmax(0,1fr);
     gap:5px;
   }
 
-  .presenterExplainOverview{
-    grid-template-columns:minmax(0,1fr) 300px;
-    gap:5px;
-  }
-
-  .presenterExplainTeamsBox .presenterTeamBtn{
-    min-height:42px;
-  }
-
-  .presenterExplainStatusCard{
-    padding:4px;
-    grid-template-columns:minmax(0,1.15fr) 76px 58px;
+  .presenterExplainInfoLine{
+    grid-template-columns:58px minmax(0,1fr) 64px;
     gap:4px;
-    border-radius:10px;
   }
 
-  .presenterExplainStatusItem{
-    min-height:32px;
-    padding:3px 4px;
-    gap:2px;
-    border-radius:7px;
-  }
-
-  .presenterExplainStatusItem .presenterLabel{
-    font-size:.4rem;
-  }
-
-  .presenterExplainStatusText{
-    font-size:.48rem;
-  }
-
-  .presenterExplainCurrentBadge{
-    min-height:18px;
-    padding:3px 5px;
+  .presenterExplainCurrentBadge,
+  .presenterExplainTimerBox,
+  .presenterExplainWordState{
+    height:30px;
+    min-height:30px;
+    border-radius:9px;
     font-size:.44rem;
+    padding:4px 6px;
   }
 
   .presenterExplainTimerBox{
-    min-width:38px;
-    min-height:26px;
-    padding:3px 5px;
-    border-radius:7px;
-    font-size:.68rem;
+    font-size:.7rem;
   }
 
-  .presenterExplainContent{
-    grid-template-columns:minmax(230px,.72fr) minmax(0,1.28fr);
-    gap:5px;
-  }
-
-  .presenterExplainNumbersCard,
-  .presenterExplainWordCard{
-    padding:5px;
-    gap:4px;
-    border-radius:11px;
-  }
-
-  .presenterExplainSectionHead h2{
-    margin-top:1px;
-    font-size:.62rem;
-  }
-
-  .presenterExplainCountBadge,
-  .presenterExplainWordState{
-    min-height:20px;
-    padding:3px 6px;
-    font-size:.42rem;
-  }
+.presenterExplainWordBox,
+.presenterExplainWordBox.presenterExplainWordHidden{
+  padding:7px;
+  border-radius:11px;
+  font-size:clamp(1.15rem,2.2vw,1.85rem);
+  line-height:1.12;
+}
 
   .presenterExplainNumbersGrid{
-    gap:4px;
+    gap:6px;
+    padding:6px;
+    border-radius:12px;
+  }
+
+  .presenterExplainNumbersGrid.count-5{
+    grid-template-columns:repeat(3,72px);
+    grid-auto-rows:72px;
+  }
+
+  .presenterExplainNumbersGrid.count-7{
+    grid-template-columns:repeat(4,58px);
+    grid-auto-rows:58px;
+  }
+
+  .presenterExplainNumbersGrid.count-9{
+    grid-template-columns:repeat(5,46px);
+    grid-auto-rows:46px;
   }
 
   .presenterExplainNumberCard{
-    padding:3px;
-    border-radius:9px;
-    font-size:.82rem;
+    border-radius:11px;
+    font-size:1.2rem;
   }
 
-  .presenterExplainWordBox{
-    padding:7px;
-    border-radius:9px;
-    font-size:clamp(.8rem,2.3vw,1.15rem);
-    line-height:1.25;
-  }
-
-  .presenterExplainWordBox.presenterExplainWordHidden::after{
-    padding:6px;
-    font-size:.52rem;
+  .presenterExplainNumberCard.presenterExplainCompensationNumber span::after{
+    margin-top:2px;
+    font-size:.28rem;
   }
 
   .presenterExplainActions{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+  }
+
+  .presenterExplainActions .presenterBtn{
+    height:34px;
+    min-height:34px;
+    border-radius:10px;
+    font-size:.46rem;
+  }
+
+  .presenterExplainCorrectBtn{
+    grid-column:1 / -1;
+  }
+}
+
+/* =========================
+   10) SMALL HEIGHT FALLBACK
+========================= */
+
+@media (max-height:420px){
+  .presenterExplainMain{
+    gap:5px;
+  }
+
+  .presenterExplainContentCard,
+  .presenterExplainControlCard{
     gap:4px;
   }
 
   .presenterExplainActions .presenterBtn{
-    min-height:42px;
-    padding:4px 6px;
-    border-radius:8px;
-    font-size:.54rem;
-  }
-
-  .readerExplainPage{
-    gap:6px;
-  }
-
-  .readerExplainHead{
-    padding:5px 7px;
-    border-radius:10px;
-  }
-
-  .readerExplainHead span{
-    font-size:.42rem;
-  }
-
-  .readerExplainHead h2{
-    margin-top:2px;
-    font-size:.68rem;
-  }
-
-  .readerExplainHead > strong{
-    min-height:20px;
-    padding:3px 6px;
-    font-size:.42rem;
-  }
-
-  .readerSimpleGrid.readerExplainGrid,
-  .readerExplainGrid{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:5px;
-  }
-
-  .readerExplainGrid .readerMiniCard{
-    min-height:70px;
-    padding:5px;
-    gap:4px;
-    border-radius:8px;
-  }
-
-  .readerExplainGrid .readerMiniCardNumber,
-  .readerExplainGrid .readerMiniNumber{
-    width:24px;
-    height:24px;
-    border-radius:6px;
-    font-size:.55rem;
-  }
-
-  .readerExplainGrid .readerMiniCardTitle,
-  .readerExplainGrid .readerMiniTitle{
-    font-size:.42rem;
-  }
-
-  .readerExplainGrid .readerMiniCardAnswer,
-  .readerExplainGrid .readerMiniAnswer{
-    margin-top:3px;
-    font-size:.56rem;
-    line-height:1.25;
+    height:30px;
+    min-height:30px;
   }
 }

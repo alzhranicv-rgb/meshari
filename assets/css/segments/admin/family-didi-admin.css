@@ -1,0 +1,1379 @@
+/* =========================================================
+   FAMILY DIDI ADMIN / فاملي ديدي
+   MATCHING TOP 10 ADMIN
+========================================================= */
+
+/* =========================
+   1) BASE
+========================= */
+
+.familyDidiAdminShell,
+.familyDidiAdminShell *{
+  box-sizing:border-box;
+}
+
+.familyDidiAdminShell{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+  gap:14px;
+}
+
+.familyDidiAdminShell button,
+.familyDidiAdminShell input,
+.familyDidiAdminShell select{
+  font-family:"HanakaText",sans-serif;
+  font-weight:400;
+}
+
+/* =========================
+   2) TOP BAR
+========================= */
+
+.familyDidiAdminShell
+.familyDidiCleanTopBar{
+  width:100%;
+  min-width:0;
+
+  margin-bottom:12px;
+  padding:15px 16px;
+
+  display:grid;
+
+  grid-template-columns:
+    minmax(220px,1fr)
+    auto;
+
+  align-items:center;
+  gap:14px;
+
+  border:1px solid var(--admin-line);
+  border-radius:var(--admin-radius-md);
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #FAFBFC 100%
+    );
+
+  box-shadow:
+    0 11px 28px
+    rgba(35,61,77,.07);
+}
+
+.familyDidiAdminShell
+.adminSectionTitle{
+  min-width:0;
+  margin:0;
+
+  color:var(--admin-secondary);
+
+  font-size:clamp(1.18rem,2vw,1.42rem);
+  line-height:1.3;
+  font-weight:400;
+}
+
+.familyDidiAdminShell
+.adminInlineActions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:9px;
+}
+
+.familyDidiAdminShell
+.adminInlineActions > button,
+.familyDidiAdminShell
+.adminSaveBtn,
+.familyDidiAdminShell
+.adminDeleteAllBtn{
+  min-width:116px;
+  min-height:44px;
+
+  padding:9px 14px;
+
+  border-radius:var(--admin-radius-sm);
+
+  font-size:.9rem;
+  line-height:1.2;
+  font-weight:400;
+}
+
+/* =========================
+   3) ROUNDS GRID
+========================= */
+
+.familyDidiCleanRoundsGrid{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:14px;
+
+  align-items:start;
+}
+
+.familyDidiCleanRoundsGrid:has(
+  .familyDidiCleanRoundCard[open]
+){
+  grid-template-columns:1fr;
+}
+
+/* =========================
+   4) ROUND CARD
+========================= */
+
+.familyDidiCleanRoundCard{
+  position:relative;
+
+  min-width:0;
+
+  scroll-margin-top:24px;
+
+  border:1px solid var(--admin-line);
+
+  border-radius:var(--admin-radius-md);
+
+  background:var(--admin-surface);
+
+  box-shadow:
+    0 11px 28px
+    rgba(35,61,77,.07);
+
+  overflow:hidden;
+
+  transition:
+    transform .18s var(--admin-ease),
+    border-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease);
+}
+
+.familyDidiCleanRoundCard::before{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  z-index:2;
+
+  width:5px;
+
+  opacity:.52;
+
+  background:var(--admin-primary);
+
+  transition:
+    width .18s var(--admin-ease),
+    opacity .18s var(--admin-ease);
+}
+
+.familyDidiCleanRoundCard:hover{
+  transform:translateY(-2px);
+
+  border-color:rgba(35,61,77,.30);
+
+  box-shadow:
+    0 17px 38px
+    rgba(35,61,77,.11);
+}
+
+.familyDidiCleanRoundCard:hover::before,
+.familyDidiCleanRoundCard[open]::before{
+  width:7px;
+  opacity:1;
+}
+
+.familyDidiCleanRoundCard.familyDidiComplete{
+  border-color:rgba(0,127,0,.26);
+}
+
+.familyDidiCleanRoundCard.familyDidiComplete::before{
+  background:var(--admin-green);
+}
+
+.familyDidiCleanRoundCard.familyDidiIncomplete::before{
+  background:var(--admin-primary);
+}
+
+.familyDidiCleanRoundCard[open]{
+  grid-column:1 / -1;
+
+  transform:none;
+
+  border-color:rgba(254,127,45,.38);
+
+  box-shadow:
+    0 22px 52px
+    rgba(35,61,77,.13);
+}
+
+/* =========================
+   5) ROUND SUMMARY
+========================= */
+
+.familyDidiCleanRoundCard > summary{
+  min-height:88px;
+
+  list-style:none;
+  cursor:pointer;
+
+  padding:15px 20px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      #FAFBFC 100%
+    );
+
+  user-select:none;
+}
+
+.familyDidiCleanRoundCard
+> summary::-webkit-details-marker{
+  display:none;
+}
+
+.familyDidiCleanRoundCard
+> summary:hover{
+  background:var(--admin-primary-soft);
+}
+
+.familyDidiCleanRoundCard[open]
+> summary{
+  border-bottom:1px solid var(--admin-line);
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF 0%,
+      var(--admin-primary-soft) 100%
+    );
+}
+
+.familyDidiCleanSummaryTitle{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+
+  gap:12px;
+}
+
+.familyDidiCleanSummaryTitle::before{
+  content:"ج";
+
+  width:44px;
+  height:44px;
+
+  flex:0 0 auto;
+
+  border:1px solid rgba(35,61,77,.18);
+
+  border-radius:14px;
+
+  color:var(--admin-secondary);
+
+  background:var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-family:"HanakaDisplay",sans-serif;
+
+  font-size:1.25rem;
+  line-height:1;
+}
+
+.familyDidiComplete
+.familyDidiCleanSummaryTitle::before{
+  color:var(--admin-green);
+
+  border-color:rgba(0,127,0,.20);
+
+  background:var(--admin-green-soft);
+}
+
+.familyDidiCleanSummaryTitle strong{
+  min-width:0;
+
+  color:var(--admin-secondary);
+
+  font-size:clamp(1.08rem,2vw,1.28rem);
+  line-height:1.3;
+  font-weight:400;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.familyDidiCleanRoundCard
+.adminEditItemMeta{
+  margin-inline-start:auto;
+
+  display:flex;
+  align-items:center;
+
+  gap:8px;
+}
+
+.familyDidiCleanRoundCard
+.adminEditStatusPill,
+.familyDidiCleanRoundCard
+.adminEditProgressPill{
+  min-width:64px;
+}
+
+/* =========================
+   6) OPEN ICON
+========================= */
+
+.familyDidiCleanRoundCard > summary::after{
+  content:"⌄";
+
+  width:35px;
+  height:35px;
+
+  flex:0 0 auto;
+
+  border:1px solid var(--admin-line);
+
+  border-radius:11px;
+
+  color:var(--admin-secondary);
+
+  background:var(--admin-soft);
+
+  display:grid;
+  place-items:center;
+
+  font-size:1.08rem;
+  line-height:1;
+
+  transition:
+    transform .18s var(--admin-ease),
+    color .18s var(--admin-ease),
+    background-color .18s var(--admin-ease),
+    border-color .18s var(--admin-ease);
+}
+
+.familyDidiCleanRoundCard[open]
+> summary::after{
+  color:#FFFFFF;
+
+  border-color:var(--admin-secondary);
+
+  background:var(--admin-secondary);
+
+  transform:rotate(180deg);
+}
+
+/* =========================
+   7) ROUND BODY
+========================= */
+
+.familyDidiCleanBody{
+  padding:clamp(16px,2.2vw,24px);
+
+  display:grid;
+  gap:18px;
+
+  background:#FFFFFF;
+}
+
+/* =========================
+   8) ROUND HEADER
+========================= */
+
+.familyDidiRoundHeader{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:14px;
+  align-items:end;
+}
+
+.familyDidiCleanQuestionRow{
+  min-width:0;
+}
+
+.familyDidiCleanQuestionRow::before{
+  content:"سؤال الجولة";
+  display:block;
+  margin-bottom:6px;
+  color:var(--admin-secondary);
+  font-size:.82rem;
+}
+
+.familyDidiCleanQuestionInput{
+  width:100%;
+  height:46px;
+  min-height:46px;
+  padding:0 14px;
+  border-radius:12px;
+}
+
+/* =========================
+   9) SETTINGS
+========================= */
+
+.familyDidiRoundSettings{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  flex-wrap:nowrap;
+}
+
+.familyDidiSettingField{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.familyDidiSettingField span{
+  font-size:.72rem;
+  white-space:nowrap;
+}
+
+.familyDidiSettingField input,
+.familyDidiSettingField select{
+  width:82px;
+  min-width:82px;
+  height:38px;
+  padding:0 8px;
+  font-size:.84rem;
+}
+
+.familyDidiRoundSettings .adminWorkspaceActionBtn,
+.familyDidiRoundSettings .familyDidiCleanDeleteRoundBtn{
+  height:38px;
+  min-width:92px;
+  padding:0 12px;
+  font-size:.8rem;
+  white-space:nowrap;
+}
+
+@media(max-width:1100px){
+
+  .familyDidiRoundHeader{
+    grid-template-columns:1fr;
+  }
+
+  .familyDidiRoundSettings{
+    flex-wrap:wrap;
+  }
+
+}
+/* =========================
+   10) ANSWERS AREA
+========================= */
+
+.familyDidiCleanAnswersSplit{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:14px;
+
+  align-items:start;
+}
+
+.familyDidiCleanAnswersColumn{
+  min-width:0;
+
+  display:grid;
+  gap:10px;
+}
+
+.familyDidiEmptyColumn{
+  min-height:1px;
+}
+
+/* =========================
+   11) ANSWER CARD
+========================= */
+
+.familyDidiCleanAnswerCard{
+  position:relative;
+
+  min-width:0;
+  min-height:78px;
+
+  border:1px solid var(--admin-line);
+
+  border-radius:var(--admin-radius-sm);
+
+  background:#FFFFFF;
+
+  padding:9px;
+
+  display:grid;
+
+  grid-template-columns:
+    48px
+    minmax(220px,1fr)
+    112px
+    42px;
+
+  gap:9px;
+
+  align-items:center;
+
+  box-shadow:
+    0 7px 18px
+    rgba(35,61,77,.05);
+
+  overflow:hidden;
+
+  transition:
+    transform .16s var(--admin-ease),
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.familyDidiCleanAnswerCard:hover{
+  transform:translateY(-1px);
+
+  border-color:rgba(254,127,45,.34);
+
+  box-shadow:
+    0 12px 25px
+    rgba(35,61,77,.09);
+}
+
+.familyDidiCleanAnswerCard.familyDidiComplete{
+  border-color:rgba(0,127,0,.24);
+
+  background:
+    linear-gradient(
+      90deg,
+      #FFFFFF,
+      rgba(234,247,234,.46)
+    );
+}
+
+.familyDidiCleanAnswerCard.familyDidiIncomplete{
+  border-color:rgba(127,0,0,.16);
+}
+
+.familyDidiCleanAnswerCard::after{
+  content:"";
+
+  position:absolute;
+
+  inset-block:0;
+  inset-inline-start:0;
+
+  width:3px;
+
+  background:var(--admin-primary);
+
+  opacity:.55;
+}
+
+.familyDidiCleanAnswerCard.familyDidiComplete::after{
+  background:var(--admin-green);
+
+  opacity:1;
+}
+
+/* =========================
+   12) ANSWER NUMBER
+========================= */
+
+.familyDidiCleanAnswerNumber{
+  width:48px;
+  height:48px;
+
+  border-radius:14px;
+  color:#fff;
+  background:var(--admin-secondary);
+
+  display:grid;
+  place-items:center;
+
+  font-family:Arial,Helvetica,sans-serif;
+  font-weight:700;
+  direction:ltr;
+  unicode-bidi:isolate;
+  font-variant-numeric:normal;
+  font-feature-settings:normal;
+
+  font-size:1.08rem;
+  line-height:1;
+
+  box-shadow:0 7px 16px rgba(35,61,77,.18);
+}
+
+/* =========================
+   13) ANSWER INPUT
+========================= */
+
+.familyDidiCleanAnswerInput{
+  width:100%;
+  min-width:0;
+  min-height:54px;
+
+  border:1px solid var(--admin-line);
+
+  border-radius:12px;
+
+  color:var(--admin-text);
+
+  background:var(--admin-soft);
+
+  padding:10px 13px;
+
+  font-size:1.02rem;
+  line-height:1.4;
+  font-weight:400;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.familyDidiCleanAnswerInput:focus{
+  outline:0;
+
+  border-color:var(--admin-primary);
+
+  background:#FFFFFF;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.11);
+}
+
+.familyDidiCleanAnswerInput.adminMissingField{
+  border-color:rgba(127,0,0,.24);
+
+  background:#FFF8F8;
+}
+
+.familyDidiCleanAnswerInput:not(
+  .adminMissingField
+){
+  border-color:rgba(0,127,0,.18);
+
+  background:#FFFFFF;
+}
+
+/* =========================
+   14) POINTS FIELD
+========================= */
+
+.familyDidiCleanPointsField{
+  min-width:0;
+
+  display:grid;
+
+  grid-template-rows:auto 1fr;
+
+  gap:5px;
+}
+
+.familyDidiCleanPointsField span{
+  color:var(--admin-secondary);
+
+  font-size:.76rem;
+  line-height:1;
+  text-align:center;
+  font-weight:400;
+}
+
+.familyDidiCleanPointsInput{
+  width:100%;
+  min-width:0;
+  min-height:38px;
+
+  border:1px solid rgba(254,127,45,.24);
+  border-radius:11px;
+
+  color:var(--admin-secondary);
+  background:var(--admin-primary-soft);
+
+  padding:6px 8px;
+
+  text-align:center;
+  direction:ltr;
+  unicode-bidi:isolate;
+
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:.96rem;
+  font-weight:700;
+
+  outline:0;
+
+  font-variant-numeric:normal;
+  font-feature-settings:normal;
+
+  transition:
+    border-color .16s var(--admin-ease),
+    box-shadow .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.familyDidiCleanPointsInput:focus{
+  border-color:var(--admin-primary);
+
+  background:#FFFFFF;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(254,127,45,.11);
+}
+
+.familyDidiCleanAnswerCard.familyDidiComplete
+.familyDidiCleanPointsInput{
+  border-color:rgba(0,127,0,.20);
+
+  background:var(--admin-green-soft);
+}
+
+/* =========================
+   15) ANSWER DELETE
+========================= */
+
+.familyDidiCleanAnswerDelete{
+  width:42px;
+  height:42px;
+
+  border:1px solid rgba(127,0,0,.15);
+
+  border-radius:12px;
+
+  color:var(--admin-red);
+
+  background:var(--admin-red-soft);
+
+  display:grid;
+  place-items:center;
+
+  padding:0;
+
+  font-size:1.25rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.familyDidiCleanAnswerDelete:hover{
+  color:#FFFFFF;
+
+  border-color:var(--admin-red);
+
+  background:var(--admin-red);
+}
+
+.familyDidiCleanAnswerDelete:disabled{
+  color:var(--admin-muted);
+
+  border-color:var(--admin-line);
+
+  background:var(--admin-soft);
+}
+
+/* =========================
+   16) OPEN ANIMATION
+========================= */
+
+.familyDidiCleanRoundCard[open]
+.familyDidiCleanBody{
+  animation:
+    familyDidiAdminOpen
+    .22s
+    var(--admin-ease);
+}
+
+@keyframes familyDidiAdminOpen{
+  from{
+    opacity:0;
+    transform:translateY(-6px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================
+   17) SAVING STATE
+========================= */
+
+.adminIsSaving
+.familyDidiAdminShell{
+  pointer-events:none;
+}
+
+.adminIsSaving
+.familyDidiAdminShell
+.familyDidiCleanTopBar{
+  pointer-events:auto;
+}
+
+.adminIsSaving
+.familyDidiCleanRoundCard,
+.adminIsSaving
+.familyDidiCleanAnswerCard{
+  opacity:.72;
+}
+
+/* =========================
+   18) IPAD LANDSCAPE
+========================= */
+
+@media (orientation:landscape)
+and (min-width:768px)
+and (max-width:1220px){
+
+  .familyDidiAdminShell{
+    gap:12px;
+  }
+
+  .familyDidiAdminShell
+  .familyDidiCleanTopBar{
+    margin-bottom:10px;
+
+    padding:13px 14px;
+
+    grid-template-columns:
+      minmax(170px,1fr)
+      auto;
+
+    gap:10px;
+  }
+
+  .familyDidiAdminShell
+  .adminSectionTitle{
+    font-size:1.25rem;
+  }
+
+  .familyDidiAdminShell
+  .adminInlineActions > button{
+    min-height:42px;
+
+    padding:8px 11px;
+
+    font-size:.82rem;
+  }
+
+  .familyDidiCleanRoundsGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
+    gap:10px;
+  }
+
+  .familyDidiCleanRoundsGrid:has(
+    .familyDidiCleanRoundCard[open]
+  ){
+    grid-template-columns:1fr;
+  }
+
+  .familyDidiCleanRoundCard > summary{
+    min-height:80px;
+
+    padding:12px 14px;
+
+    gap:10px;
+  }
+
+  .familyDidiCleanSummaryTitle::before{
+    width:40px;
+    height:40px;
+
+    border-radius:12px;
+
+    font-size:1.12rem;
+  }
+
+  .familyDidiCleanSummaryTitle strong{
+    font-size:1.02rem;
+  }
+
+  .familyDidiCleanRoundCard
+  .adminEditItemMeta{
+    gap:6px;
+  }
+
+  .familyDidiCleanRoundCard
+  .adminEditStatusPill,
+  .familyDidiCleanRoundCard
+  .adminEditProgressPill{
+    min-width:58px;
+
+    padding:5px 8px;
+  }
+
+  .familyDidiCleanRoundCard > summary::after{
+    width:32px;
+    height:32px;
+  }
+
+  .familyDidiCleanBody{
+    padding:14px;
+
+    gap:14px;
+  }
+
+  .familyDidiCleanQuestionRow{
+    padding:12px;
+
+    grid-template-columns:
+      minmax(240px,1fr)
+      minmax(210px,auto)
+      auto;
+  }
+
+  .familyDidiCleanQuestionInput{
+    min-height:54px;
+  }
+
+  .familyDidiRoundSettings{
+    min-width:210px;
+
+    grid-template-columns:
+      repeat(2,minmax(95px,1fr));
+
+    gap:8px;
+  }
+
+  .familyDidiSettingField input,
+  .familyDidiSettingField select{
+    height:54px;
+
+    padding:8px 9px;
+
+    font-size:.88rem;
+  }
+
+  .familyDidiCleanAnswersSplit{
+    gap:10px;
+  }
+
+  .familyDidiCleanAnswersColumn{
+    gap:9px;
+  }
+
+  .familyDidiCleanAnswerCard{
+    min-height:72px;
+
+    grid-template-columns:
+      42px
+      minmax(140px,1fr)
+      88px
+      38px;
+
+    padding:8px;
+
+    gap:7px;
+  }
+
+  .familyDidiCleanAnswerNumber{
+    width:42px;
+    height:42px;
+
+    border-radius:12px;
+
+    font-size:1rem;
+  }
+
+  .familyDidiCleanAnswerInput{
+    min-height:46px;
+
+    padding:9px 10px;
+
+    font-size:.92rem;
+  }
+
+  .familyDidiCleanPointsField span{
+    font-size:.7rem;
+  }
+
+  .familyDidiCleanPointsInput{
+    min-height:34px;
+
+    padding:5px 6px;
+
+    font-size:.88rem;
+  }
+
+  .familyDidiCleanAnswerDelete{
+    width:38px;
+    height:38px;
+  }
+}
+
+/* =========================
+   19) MOBILE PORTRAIT
+========================= */
+
+@media (orientation:portrait)
+and (max-width:620px){
+
+  .familyDidiAdminShell{
+    gap:10px;
+  }
+
+  .familyDidiAdminShell
+  .familyDidiCleanTopBar{
+    margin-bottom:10px;
+
+    padding:12px;
+
+    grid-template-columns:1fr;
+
+    gap:12px;
+  }
+
+  .familyDidiAdminShell
+  .adminSectionTitle{
+    width:100%;
+
+    justify-content:center;
+
+    font-size:1.18rem;
+    text-align:center;
+  }
+
+  .familyDidiAdminShell
+  .adminInlineActions{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    justify-content:stretch;
+  }
+
+  .familyDidiAdminShell
+  .adminInlineActions > button,
+  .familyDidiAdminShell
+  .adminSaveBtn,
+  .familyDidiAdminShell
+  .adminDeleteAllBtn{
+    width:100%;
+    min-width:0;
+  }
+
+  .familyDidiCleanRoundsGrid{
+    grid-template-columns:1fr;
+
+    gap:10px;
+  }
+
+  .familyDidiCleanRoundCard{
+    scroll-margin-top:18px;
+  }
+
+  .familyDidiCleanRoundCard > summary{
+    min-height:78px;
+
+    padding:12px 14px;
+
+    display:grid;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      auto;
+
+    gap:10px;
+  }
+
+  .familyDidiCleanSummaryTitle{
+    min-width:0;
+  }
+
+  .familyDidiCleanSummaryTitle::before{
+    width:39px;
+    height:39px;
+
+    border-radius:12px;
+
+    font-size:1.1rem;
+  }
+
+  .familyDidiCleanSummaryTitle strong{
+    font-size:1rem;
+
+    white-space:normal;
+  }
+
+  .familyDidiCleanRoundCard
+  .adminEditItemMeta{
+    grid-column:1 / -1;
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    order:3;
+
+    margin-inline-start:0;
+  }
+
+  .familyDidiCleanRoundCard
+  .adminEditStatusPill,
+  .familyDidiCleanRoundCard
+  .adminEditProgressPill{
+    width:100%;
+    min-width:0;
+
+    padding:5px 8px;
+  }
+
+  .familyDidiCleanRoundCard > summary::after{
+    grid-column:2;
+    grid-row:1;
+
+    width:32px;
+    height:32px;
+  }
+
+  .familyDidiCleanBody{
+    padding:12px;
+
+    gap:12px;
+  }
+
+  .familyDidiCleanQuestionRow{
+    grid-template-columns:1fr;
+
+    padding:11px;
+  }
+
+  .familyDidiCleanQuestionRow::before{
+    grid-column:auto;
+  }
+
+  .familyDidiCleanQuestionInput{
+    min-height:54px;
+  }
+
+  .familyDidiRoundSettings{
+    width:100%;
+    min-width:0;
+
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .familyDidiSettingField input,
+  .familyDidiSettingField select{
+    height:50px;
+  }
+
+  .familyDidiCleanDeleteRoundBtn{
+    width:100%;
+    min-height:48px;
+  }
+
+  .familyDidiCleanAnswersSplit{
+    grid-template-columns:1fr;
+
+    gap:10px;
+  }
+
+  .familyDidiCleanAnswersColumn{
+    gap:9px;
+  }
+
+  .familyDidiEmptyColumn{
+    display:none;
+  }
+
+  .familyDidiCleanAnswerCard{
+    min-height:112px;
+
+    grid-template-columns:
+      42px
+      minmax(0,1fr)
+      88px;
+
+    padding:8px;
+
+    gap:7px;
+
+    align-items:end;
+  }
+
+  .familyDidiCleanAnswerNumber{
+    width:42px;
+    height:42px;
+
+    align-self:center;
+
+    border-radius:12px;
+
+    font-size:1rem;
+  }
+
+  .familyDidiCleanAnswerInput{
+    min-height:46px;
+
+    padding:9px 11px;
+  }
+
+  .familyDidiCleanPointsInput{
+    min-height:36px;
+  }
+
+  .familyDidiCleanAnswerDelete{
+    grid-column:1 / -1;
+
+    width:100%;
+    height:38px;
+  }
+}
+
+/* =========================
+   20) FALLBACK
+========================= */
+
+@supports not selector(:has(*)){
+
+  .familyDidiCleanRoundsGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .familyDidiCleanRoundCard[open]{
+    grid-column:1 / -1;
+  }
+
+  .familyDidiRoundHidden{
+    display:none;
+  }
+
+  @media (orientation:landscape)
+  and (min-width:768px)
+  and (max-width:1220px){
+
+    .familyDidiCleanRoundsGrid{
+      grid-template-columns:
+        repeat(2,minmax(0,1fr));
+    }
+  }
+
+  @media (orientation:portrait)
+  and (max-width:620px){
+
+    .familyDidiCleanRoundsGrid{
+      grid-template-columns:1fr;
+    }
+  }
+}
+
+/* =========================
+   ROUND HEADER
+========================= */
+
+.familyDidiRoundHeader{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:16px;
+  align-items:end;
+  margin-bottom:18px;
+}
+
+.familyDidiCleanQuestionRow{
+  min-width:0;
+}
+
+.familyDidiCleanQuestionInput{
+  width:100%;
+  height:48px;
+  padding:0 16px;
+  border-radius:12px;
+  font-size:16px;
+}
+
+/* =========================
+   ROUND SETTINGS
+========================= */
+
+.familyDidiRoundSettings{
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  flex-wrap:nowrap;
+}
+
+.familyDidiSettingField{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.familyDidiSettingField span{
+  font-size:12px;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.familyDidiSettingField select,
+.familyDidiSettingField input{
+  width:92px;
+  min-width:92px;
+  height:40px;
+  padding:0 10px;
+  border-radius:10px;
+  font-size:14px;
+}
+
+.familyDidiRoundSettings .adminWorkspaceActionBtn,
+.familyDidiRoundSettings .familyDidiCleanDeleteRoundBtn{
+  height:40px;
+  min-width:110px;
+  padding:0 14px;
+  border-radius:10px;
+  font-size:13px;
+  white-space:nowrap;
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width:1100px){
+
+  .familyDidiRoundHeader{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .familyDidiRoundSettings{
+    justify-content:flex-start;
+    flex-wrap:wrap;
+  }
+
+}

@@ -1,0 +1,1486 @@
+/* =========================================================
+   FAMILY DIDI PRESENTER
+   MATCHING TOP 10 PRESENTER
+========================================================= */
+
+.presenterPanel[data-segment="familyDidi"]{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+}
+
+.presenterFamilyDidiScreen,
+.presenterFamilyDidiScreen *{
+  box-sizing:border-box;
+}
+
+.presenterFamilyDidiScreen{
+  --bg:#EAECF0;
+  --surface:#FFFFFF;
+  --soft:#F6F7F9;
+  --line:#D5DADF;
+
+  --primary:#FE7F2D;
+  --secondary:#233D4D;
+  --text:#151515;
+  --muted:#8793A0;
+
+  --btn-nav:#0A7C6E;
+  --btn-correct:#007F00;
+  --btn-wrong:#7F0000;
+  --btn-switch:#00004C;
+  --btn-next:#4C4C00;
+  --btn-disabled:#D7DCE2;
+  --btn-disabled-text:#7B8792;
+
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:block;
+  direction:rtl;
+  overflow:hidden;
+
+  font-family:"HanakaText",sans-serif;
+  color:var(--text);
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.presenterFamilyDidiMain{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:
+    minmax(0,1fr)
+    minmax(360px,.56fr);
+
+  grid-template-areas:
+    "answers control";
+
+  gap:12px;
+
+  direction:ltr;
+  overflow:hidden;
+}
+
+/* =========================
+   CONTROL CARD
+========================= */
+
+.presenterFamilyDidiControlCard{
+  grid-area:control;
+
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  padding:12px;
+
+  display:grid;
+  grid-template-rows:
+    46px
+    54px
+    46px
+    minmax(70px,1fr)
+    28px
+    auto;
+
+  gap:8px;
+
+  direction:rtl;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
+
+  box-shadow:none;
+  overflow:hidden;
+}
+
+/* =========================
+   ROUND + TIMER
+========================= */
+
+.presenterFamilyDidiRoundLine{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+  grid-template-columns:
+    minmax(0,1fr)
+    110px;
+
+  align-items:center;
+  gap:8px;
+}
+
+.presenterFamilyDidiRoundBadge{
+  width:100%;
+  height:46px;
+  min-height:46px;
+
+  display:grid;
+  grid-template-columns:
+    minmax(0,1fr)
+    42px;
+
+  align-items:center;
+  gap:6px;
+
+  padding:6px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  border-radius:16px;
+  overflow:hidden;
+}
+
+.presenterFamilyDidiRoundBadge span{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:.78rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterFamilyDidiRoundBadge strong{
+  width:42px;
+  height:32px;
+  min-width:42px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:11px;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterFamilyDidiTimer{
+  width:100%;
+  height:46px;
+  min-height:46px;
+
+  border:0;
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:6px;
+
+  cursor:pointer;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:1.35rem;
+  line-height:1;
+  font-weight:400;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease;
+}
+
+.presenterFamilyDidiTimer:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.presenterFamilyDidiTimer:active{
+  transform:scale(.97);
+}
+
+.presenterFamilyDidiTimer.isRunning{
+  background:var(--btn-nav);
+}
+
+.presenterFamilyDidiTimer.timerDanger{
+  background:var(--btn-wrong);
+
+  animation:
+    presenterFamilyDidiTimerPulse
+    .75s
+    ease-in-out
+    infinite;
+}
+
+@keyframes presenterFamilyDidiTimerPulse{
+  0%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.06);
+  }
+
+  100%{
+    transform:scale(1);
+  }
+}
+
+/* =========================
+   POINTS
+========================= */
+
+.presenterFamilyDidiPointsLine{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:8px;
+}
+
+.presenterFamilyDidiPointsBox{
+  height:54px;
+  min-height:54px;
+
+  padding:6px;
+
+  display:grid;
+  grid-template-columns:
+    minmax(0,1fr)
+    58px;
+
+  align-items:center;
+  gap:6px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:16px;
+
+  overflow:hidden;
+}
+
+.presenterFamilyDidiPointsBox span{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--secondary);
+
+  font-size:.72rem;
+  line-height:1.15;
+  font-weight:400;
+  text-align:center;
+}
+
+.presenterFamilyDidiPointsBox strong{
+  width:58px;
+  height:40px;
+  min-width:58px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:12px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  font-size:1.05rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterFamilyDidiOpenedPointsBox strong{
+  background:var(--primary);
+}
+
+/* =========================
+   ERRORS
+========================= */
+
+.presenterFamilyDidiErrorsLine{
+  width:100%;
+  min-width:0;
+
+  display:grid;
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:8px;
+}
+
+.presenterFamilyDidiErrorBox{
+  height:46px;
+  min-height:46px;
+
+  padding:6px;
+
+  display:grid;
+  grid-template-columns:
+    38px
+    minmax(0,1fr);
+
+  align-items:center;
+  gap:6px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:16px;
+
+  overflow:hidden;
+}
+
+.presenterFamilyDidiErrorBox span{
+  width:38px;
+  height:30px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:10px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  font-size:.72rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterFamilyDidiErrorBox strong{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--btn-wrong);
+
+  font-size:.9rem;
+  line-height:1;
+  font-weight:400;
+  text-align:center;
+}
+
+/* =========================
+   QUESTION
+========================= */
+
+.presenterFamilyDidiQuestion{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:76px;
+
+  border:1px solid var(--line);
+  border-radius:22px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:14px 18px;
+
+  cursor:pointer;
+
+  background:var(--soft);
+  color:var(--text);
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.12rem,1.65vw,1.52rem);
+  line-height:1.38;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:normal;
+
+  overflow:hidden;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
+}
+
+.presenterFamilyDidiQuestion:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.02);
+}
+
+.presenterFamilyDidiQuestion:active{
+  transform:scale(.98);
+}
+
+.presenterFamilyDidiQuestion.hiddenQuestion{
+  background:var(--primary);
+  border-color:var(--primary);
+  color:#FFFFFF;
+  -webkit-text-fill-color:#FFFFFF;
+
+  font-size:clamp(1rem,1.45vw,1.34rem);
+}
+
+.presenterFamilyDidiQuestion.revealed,
+.presenterFamilyDidiQuestion:disabled{
+  opacity:1;
+
+  background:var(--soft);
+  color:var(--text);
+  -webkit-text-fill-color:var(--text);
+
+  cursor:default;
+  filter:none;
+  transform:none;
+}
+/* =========================
+   STATUS
+========================= */
+
+.presenterFamilyDidiStatus{
+  width:100%;
+  min-width:0;
+  min-height:28px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:4px 8px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  border-radius:12px;
+
+  font-size:.7rem;
+  line-height:1.1;
+  font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+}
+
+/* =========================
+   ANSWERS CARD
+========================= */
+
+.presenterFamilyDidiAnswersCard{
+  grid-area:answers;
+
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  padding:12px;
+
+  direction:rtl;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
+
+  box-shadow:none;
+  overflow:hidden;
+}
+
+.presenterFamilyDidiAnswersCols{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:14px;
+
+  overflow:hidden;
+}
+
+.presenterFamilyDidiAnswersCol{
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:
+    repeat(4,minmax(0,1fr));
+
+  gap:10px;
+}
+
+.presenterFamilyDidiAnswersCol.isEmpty{
+  display:none;
+}
+
+.presenterFamilyDidiAnswersCols:has(
+  .presenterFamilyDidiLeftCol.isEmpty
+){
+  grid-template-columns:
+    minmax(0,720px);
+
+  justify-content:center;
+}
+
+/* =========================
+   ANSWER BUTTON
+========================= */
+
+.presenterFamilyDidiAnswerBtn{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:74px;
+
+  border:0;
+  border-radius:20px;
+
+  display:grid;
+  grid-template-columns:
+    64px
+    minmax(0,1fr)
+    68px;
+
+  align-items:stretch;
+  gap:10px;
+
+  padding:9px;
+
+  cursor:pointer;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-family:"HanakaText",sans-serif;
+
+  overflow:hidden;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
+}
+
+.presenterFamilyDidiAnswerBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.02);
+}
+
+.presenterFamilyDidiAnswerBtn:active{
+  transform:scale(.97);
+}
+
+.presenterFamilyDidiAnswerBtn.opened{
+  background:var(--btn-nav);
+  color:#FFFFFF;
+}
+
+.presenterFamilyDidiAnswerBtn.pending{
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  animation:
+    presenterFamilyDidiPending
+    .6s
+    ease-in-out
+    infinite alternate;
+}
+
+.presenterFamilyDidiAnswerBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+.presenterFamilyDidiAnswerBtn.opened:disabled{
+  background:var(--btn-nav);
+  color:#FFFFFF;
+}
+
+.presenterFamilyDidiAnswerBtn.pending:disabled{
+  background:var(--secondary);
+  color:#FFFFFF;
+}
+
+@keyframes presenterFamilyDidiPending{
+  from{
+    filter:brightness(.94);
+  }
+
+  to{
+    filter:brightness(1.08);
+  }
+}
+
+/* =========================
+   ANSWER NUMBER
+========================= */
+
+.presenterFamilyDidiAnswerNo{
+  width:64px;
+  height:100%;
+  min-width:64px;
+  min-height:56px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:15px;
+
+  background:rgba(255,255,255,.24);
+  color:#FFFFFF;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(1.65rem,2.4vw,2.55rem);
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterFamilyDidiAnswerBtn:disabled
+.presenterFamilyDidiAnswerNo{
+  color:inherit;
+}
+
+/* =========================
+   ANSWER TEXT
+========================= */
+
+.presenterFamilyDidiAnswerText{
+  min-width:0;
+  min-height:56px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:7px 10px;
+
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:15px;
+
+  color:inherit;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.08rem,1.55vw,1.42rem);
+  line-height:1.3;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:normal;
+
+  overflow:hidden;
+}
+
+/* =========================
+   ANSWER POINTS
+========================= */
+
+.presenterFamilyDidiAnswerPoints{
+  width:68px;
+  height:100%;
+  min-width:68px;
+  min-height:56px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:15px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(1.25rem,1.85vw,1.7rem);
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterFamilyDidiAnswerBtn.opened:disabled{
+  background:var(--btn-nav);
+  color:#FFFFFF;
+}
+
+.presenterFamilyDidiAnswerBtn.pending:disabled{
+  background:var(--secondary);
+  color:#FFFFFF;
+}
+
+.presenterFamilyDidiAnswerBtn:disabled
+.presenterFamilyDidiAnswerText{
+  color:inherit;
+}
+
+.presenterFamilyDidiAnswerBtn.opened
+.presenterFamilyDidiAnswerPoints{
+  background:rgba(255,255,255,.18);
+}
+
+.presenterFamilyDidiAnswerBtn:disabled
+.presenterFamilyDidiAnswerPoints{
+  color:inherit;
+}
+
+.presenterFamilyDidiAnswerBtn:disabled
+.presenterFamilyDidiAnswerNo,
+.presenterFamilyDidiAnswerBtn:disabled
+.presenterFamilyDidiAnswerText,
+.presenterFamilyDidiAnswerBtn:disabled
+.presenterFamilyDidiAnswerPoints{
+  color:#FFFFFF;
+  -webkit-text-fill-color:#FFFFFF;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.presenterFamilyDidiActions{
+  width:100%;
+  height:auto;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap:8px;
+
+  padding:0;
+
+  background:transparent;
+  border:0;
+}
+
+.presenterFamilyDidiActions .presenterBtn{
+  width:100%;
+  height:48px;
+  min-height:48px;
+
+  border:0;
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  color:#FFFFFF;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:.74rem;
+  line-height:1.1;
+  font-weight:400;
+  text-align:center;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    opacity .15s ease;
+}
+
+.presenterFamilyDidiActions .presenterBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.presenterFamilyDidiActions .presenterBtn:active{
+  transform:scale(.97);
+}
+
+.presenterFamilyDidiWrongBtn{
+  background:var(--btn-wrong);
+}
+
+.presenterFamilyDidiAwardBtn{
+  background:var(--btn-correct);
+}
+
+.presenterFamilyDidiShowAnswersBtn{
+  background:var(--primary);
+}
+
+.presenterFamilyDidiUndoBtn{
+  background:var(--btn-nav);
+}
+
+.presenterFamilyDidiSwitchBtn{
+  background:var(--btn-switch);
+}
+
+.presenterFamilyDidiNextBtn{
+  background:var(--btn-next);
+}
+
+.presenterFamilyDidiActions
+.presenterBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.presenterFamilyDidiLoading{
+  width:100%;
+  height:100%;
+  min-height:120px;
+
+  grid-column:1 / -1;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:14px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:20px;
+
+  color:var(--muted);
+
+  font-size:.9rem;
+  line-height:1.4;
+  font-weight:400;
+  text-align:center;
+}
+
+/* =========================
+   READER
+========================= */
+
+#presenterReaderPanel
+.readerQuestionCard{
+  margin-bottom:10px;
+  padding:12px 14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:18px;
+
+  color:var(--text);
+
+  font-size:1rem;
+  line-height:1.45;
+  font-weight:400;
+  text-align:center;
+}
+/* =========================
+   IPAD / TABLET LANDSCAPE
+========================= */
+
+@media
+  (min-width:768px)
+  and (max-width:1180px)
+  and (orientation:landscape){
+
+  .presenterFamilyDidiMain{
+    grid-template-columns:
+      minmax(0,1fr)
+      340px;
+
+    gap:8px;
+  }
+
+  .presenterFamilyDidiControlCard,
+  .presenterFamilyDidiAnswersCard{
+    padding:8px;
+    border-radius:22px;
+  }
+
+  .presenterFamilyDidiControlCard{
+    grid-template-rows:
+      38px
+      44px
+      38px
+      minmax(66px,1fr)
+      24px
+      auto;
+
+    gap:6px;
+  }
+
+  /* =========================
+     ROUND + TIMER
+  ========================= */
+
+  .presenterFamilyDidiRoundLine{
+    grid-template-columns:
+      minmax(0,1fr)
+      90px;
+
+    gap:6px;
+  }
+
+  .presenterFamilyDidiRoundBadge,
+  .presenterFamilyDidiTimer,
+  .presenterFamilyDidiErrorBox{
+    height:38px;
+    min-height:38px;
+
+    border-radius:14px;
+  }
+
+  .presenterFamilyDidiRoundBadge{
+    grid-template-columns:
+      minmax(0,1fr)
+      34px;
+  }
+
+  .presenterFamilyDidiRoundBadge span{
+    font-size:.68rem;
+  }
+
+  .presenterFamilyDidiRoundBadge strong{
+    width:34px;
+    min-width:34px;
+    height:24px;
+
+    border-radius:9px;
+
+    font-size:.88rem;
+  }
+
+  .presenterFamilyDidiTimer{
+    font-size:1.08rem;
+  }
+
+  /* =========================
+     POINTS
+  ========================= */
+
+  .presenterFamilyDidiPointsLine{
+    gap:6px;
+  }
+
+  .presenterFamilyDidiPointsBox{
+    height:44px;
+    min-height:44px;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      48px;
+
+    padding:5px;
+    gap:5px;
+
+    border-radius:14px;
+  }
+
+  .presenterFamilyDidiPointsBox span{
+    font-size:.63rem;
+    line-height:1.12;
+  }
+
+  .presenterFamilyDidiPointsBox strong{
+    width:48px;
+    min-width:48px;
+    height:32px;
+
+    border-radius:10px;
+
+    font-size:.9rem;
+  }
+
+  /* =========================
+     ERRORS
+  ========================= */
+
+  .presenterFamilyDidiErrorsLine{
+    gap:6px;
+  }
+
+  .presenterFamilyDidiErrorBox{
+    grid-template-columns:
+      30px
+      minmax(0,1fr);
+
+    gap:5px;
+  }
+
+  .presenterFamilyDidiErrorBox span{
+    width:30px;
+    height:24px;
+
+    border-radius:8px;
+
+    font-size:.64rem;
+  }
+
+  .presenterFamilyDidiErrorBox strong{
+    font-size:.78rem;
+  }
+
+  /* =========================
+     QUESTION
+  ========================= */
+
+  .presenterFamilyDidiQuestion{
+    min-height:66px;
+
+    padding:10px 13px;
+
+    border-radius:18px;
+
+    font-size:1rem;
+    line-height:1.3;
+  }
+
+  .presenterFamilyDidiQuestion.hiddenQuestion{
+    font-size:.9rem;
+  }
+
+  .presenterFamilyDidiStatus{
+    min-height:24px;
+
+    border-radius:10px;
+
+    font-size:.61rem;
+  }
+
+  /* =========================
+     ANSWERS
+  ========================= */
+
+  .presenterFamilyDidiAnswersCols{
+    gap:10px;
+  }
+
+  .presenterFamilyDidiAnswersCol{
+    gap:7px;
+  }
+
+  .presenterFamilyDidiAnswerBtn{
+    min-height:64px;
+
+    grid-template-columns:
+      52px
+      minmax(0,1fr)
+      56px;
+
+    align-items:stretch;
+
+    gap:7px;
+    padding:7px;
+
+    border-radius:16px;
+  }
+
+  .presenterFamilyDidiAnswerNo{
+    width:52px;
+    min-width:52px;
+    min-height:48px;
+
+    border-radius:12px;
+
+    font-size:1.65rem;
+  }
+
+  .presenterFamilyDidiAnswerText{
+    min-height:48px;
+
+    padding:6px 8px;
+
+    border-radius:12px;
+
+    font-size:.98rem;
+    line-height:1.22;
+
+    -webkit-line-clamp:3;
+    line-clamp:3;
+  }
+
+  .presenterFamilyDidiAnswerPoints{
+    width:56px;
+    min-width:56px;
+    min-height:48px;
+
+    border-radius:12px;
+
+    font-size:1.15rem;
+  }
+
+  /* =========================
+     ACTIONS
+  ========================= */
+
+  .presenterFamilyDidiActions{
+    gap:6px;
+  }
+
+  .presenterFamilyDidiActions
+  .presenterBtn{
+    height:40px;
+    min-height:40px;
+
+    border-radius:14px;
+
+    font-size:.62rem;
+    line-height:1.08;
+  }
+}
+
+/* =========================
+   IPHONE PRO MAX LANDSCAPE
+========================= */
+
+@media
+  (min-width:740px)
+  and (max-width:960px)
+  and (orientation:landscape)
+  and (max-height:500px){
+
+  .presenterFamilyDidiMain{
+    grid-template-columns:
+      minmax(0,1fr)
+      292px;
+
+    gap:6px;
+  }
+
+  .presenterFamilyDidiControlCard,
+  .presenterFamilyDidiAnswersCard{
+    padding:6px;
+    border-radius:16px;
+  }
+
+  .presenterFamilyDidiControlCard{
+    grid-template-rows:
+      28px
+      34px
+      28px
+      minmax(46px,1fr)
+      20px
+      auto;
+
+    gap:4px;
+  }
+
+  /* =========================
+     ROUND + TIMER
+  ========================= */
+
+  .presenterFamilyDidiRoundLine{
+    grid-template-columns:
+      minmax(0,1fr)
+      62px;
+
+    gap:4px;
+  }
+
+  .presenterFamilyDidiRoundBadge,
+  .presenterFamilyDidiTimer,
+  .presenterFamilyDidiErrorBox{
+    height:28px;
+    min-height:28px;
+
+    border-radius:10px;
+  }
+
+  .presenterFamilyDidiRoundBadge{
+    grid-template-columns:
+      minmax(0,1fr)
+      24px;
+
+    padding:3px;
+    gap:3px;
+  }
+
+  .presenterFamilyDidiRoundBadge span{
+    font-size:.48rem;
+  }
+
+  .presenterFamilyDidiRoundBadge strong{
+    width:24px;
+    min-width:24px;
+    height:18px;
+
+    border-radius:6px;
+
+    font-size:.58rem;
+  }
+
+  .presenterFamilyDidiTimer{
+    font-size:.76rem;
+  }
+
+  /* =========================
+     POINTS
+  ========================= */
+
+  .presenterFamilyDidiPointsLine{
+    gap:4px;
+  }
+
+  .presenterFamilyDidiPointsBox{
+    height:34px;
+    min-height:34px;
+
+    grid-template-columns:
+      minmax(0,1fr)
+      34px;
+
+    padding:3px;
+    gap:3px;
+
+    border-radius:10px;
+  }
+
+  .presenterFamilyDidiPointsBox span{
+    font-size:.44rem;
+    line-height:1.08;
+  }
+
+  .presenterFamilyDidiPointsBox strong{
+    width:34px;
+    min-width:34px;
+    height:24px;
+
+    border-radius:7px;
+
+    font-size:.62rem;
+  }
+
+  /* =========================
+     ERRORS
+  ========================= */
+
+  .presenterFamilyDidiErrorsLine{
+    gap:4px;
+  }
+
+  .presenterFamilyDidiErrorBox{
+    grid-template-columns:
+      20px
+      minmax(0,1fr);
+
+    padding:3px;
+    gap:3px;
+  }
+
+  .presenterFamilyDidiErrorBox span{
+    width:20px;
+    height:18px;
+
+    border-radius:6px;
+
+    font-size:.48rem;
+  }
+
+  .presenterFamilyDidiErrorBox strong{
+    font-size:.53rem;
+  }
+
+  /* =========================
+     QUESTION
+  ========================= */
+
+  .presenterFamilyDidiQuestion{
+    min-height:46px;
+
+    padding:6px 8px;
+
+    border-radius:11px;
+
+    font-size:.64rem;
+    line-height:1.22;
+  }
+
+  .presenterFamilyDidiQuestion.hiddenQuestion{
+    font-size:.58rem;
+  }
+
+  .presenterFamilyDidiStatus{
+    min-height:20px;
+
+    padding:3px 5px;
+
+    border-radius:8px;
+
+    font-size:.44rem;
+  }
+
+  /* =========================
+     ANSWERS
+  ========================= */
+
+  .presenterFamilyDidiAnswersCols{
+    gap:6px;
+  }
+
+  .presenterFamilyDidiAnswersCol{
+    gap:5px;
+  }
+
+  .presenterFamilyDidiAnswerBtn{
+    min-height:40px;
+
+    grid-template-columns:
+      34px
+      minmax(0,1fr)
+      38px;
+
+    align-items:stretch;
+
+    gap:5px;
+    padding:4px;
+
+    border-radius:11px;
+  }
+
+  .presenterFamilyDidiAnswerNo{
+    width:34px;
+    min-width:34px;
+    min-height:32px;
+
+    border-radius:8px;
+
+    font-size:1rem;
+  }
+
+  .presenterFamilyDidiAnswerText{
+    min-height:32px;
+
+    padding:3px 5px;
+
+    border-radius:8px;
+
+    font-size:.61rem;
+    line-height:1.16;
+
+    -webkit-line-clamp:3;
+    line-clamp:3;
+  }
+
+  .presenterFamilyDidiAnswerPoints{
+    width:38px;
+    min-width:38px;
+    min-height:32px;
+
+    border-radius:8px;
+
+    font-size:.7rem;
+  }
+
+  /* =========================
+     ACTIONS
+  ========================= */
+
+  .presenterFamilyDidiActions{
+    gap:5px;
+  }
+
+  .presenterFamilyDidiActions
+  .presenterBtn{
+    height:28px;
+    min-height:28px;
+
+    border-radius:10px;
+
+    font-size:.45rem;
+    line-height:1.05;
+  }
+
+  #presenterReaderPanel
+  .readerQuestionCard{
+    margin-bottom:6px;
+
+    padding:7px;
+
+    border-radius:12px;
+
+    font-size:.62rem;
+    line-height:1.3;
+  }
+}
+
+/* =========================
+   SMALL HEIGHT FALLBACK
+========================= */
+
+@media (max-height:420px){
+
+  .presenterFamilyDidiMain{
+    gap:5px;
+  }
+
+  .presenterFamilyDidiControlCard{
+    gap:3px;
+  }
+
+  .presenterFamilyDidiQuestion{
+    min-height:42px;
+  }
+
+  .presenterFamilyDidiAnswerBtn{
+    min-height:36px;
+  }
+
+  .presenterFamilyDidiActions
+  .presenterBtn{
+    height:27px;
+    min-height:27px;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion:reduce){
+
+  .presenterFamilyDidiScreen *,
+  .presenterFamilyDidiScreen *::before,
+  .presenterFamilyDidiScreen *::after{
+    animation:none;
+    transition:none;
+  }
+}

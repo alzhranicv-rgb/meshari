@@ -36,15 +36,20 @@
     href="assets/css/segments/admin/warmup-admin.css?v=1045"
   >
 
-  <link
-    rel="stylesheet"
-    href="assets/css/segments/admin/top10-admin.css?v=1045"
-  >
+<link
+  rel="stylesheet"
+  href="assets/css/segments/admin/top10-admin.css?v=1045"
+>
 
-  <link
-    rel="stylesheet"
-    href="assets/css/segments/admin/who-admin.css?v=1045"
-  >
+<link
+  rel="stylesheet"
+  href="assets/css/segments/admin/family-didi-admin.css?v=1"
+>
+
+<link
+  rel="stylesheet"
+  href="assets/css/segments/admin/who-admin.css?v=1045"
+>
 
   <link
     rel="stylesheet"
@@ -64,11 +69,6 @@
   <link
     rel="stylesheet"
     href="assets/css/segments/admin/random-challenge-admin.css?v=1045"
-  >
-
-  <link
-    rel="stylesheet"
-    href="assets/css/segments/admin/admin-performance.css?v=1045"
   >
 
   <!-- =========================
@@ -112,6 +112,12 @@
     defer
     src="assets/js/admin/top10-admin.js?v=1045"
   ></script>
+
+  <script
+  defer
+  src="assets/js/admin/family-didi-admin.js?v=1"
+  ></script>
+
 
   <script
     defer
@@ -222,221 +228,209 @@
     class="adminShellNew hidden"
   >
 
-    <!-- =========================
-         MODEL GATE
-    ========================== -->
-    <section
-      id="adminModelGate"
-      class="adminModelGate"
-    >
+<!-- =========================
+     MODEL GATE
+========================== -->
+<section
+  id="adminModelGate"
+  class="adminModelGate"
+>
 
-      <div class="adminModelGateCard">
+  <div class="adminModelGateCard">
 
-        <div class="adminModelGateHero">
+    <div class="adminModelGateHero">
 
-          <span>
-            لوحة الأسئلة
-          </span>
+      <span>
+        لوحة الأسئلة
+      </span>
 
-          <h1>
-            الحنكة
-          </h1>
+      <h1>
+        الحنكة
+      </h1>
 
-          <p>
-            اختر نموذجًا للبدء، أو أنشئ نموذجًا جديدًا.
-            بعد فتح النموذج ستظهر لك لوحة الفقرات والتحرير.
-          </p>
+      <p>
+        اختر الدخول إلى نموذج، أو إنشاء نموذج جديد،
+        أو فتح الإدارة.
+      </p>
+
+    </div>
+
+    <div class="adminModelGatePanel">
+
+      <!-- الصفحة الرئيسية -->
+      <div
+        id="adminModelGateStart"
+        class="adminModelGateActions"
+      >
+
+        <button
+          type="button"
+          class="adminModelPrimaryBtn"
+          onclick="showAdminModelLoginMode()"
+        >
+          الدخول للنموذج
+        </button>
+
+        <button
+          type="button"
+          class="adminModelCreateBtn"
+          onclick="showAdminModelCreateMode()"
+        >
+          إنشاء نموذج
+        </button>
+
+        <button
+          type="button"
+          class="adminModelSoftBtn"
+          onclick="openSupabaseCleanupGatePage()"
+        >
+          الإدارة
+        </button>
+
+      </div>
+
+      <!-- الدخول إلى نموذج -->
+      <div
+        id="adminModelLoginBox"
+        class="hidden"
+      >
+
+        <div class="adminModelGateField">
+
+          <label for="modelsList">
+            النماذج المحفوظة
+          </label>
+
+          <select
+            id="modelsList"
+            class="adminSelect"
+          >
+            <option value="">
+              اختر النموذج
+            </option>
+          </select>
 
         </div>
 
-        <div class="adminModelGatePanel">
-
-          <div
-            id="adminModelGateStart"
-            class="adminModelGateActions"
-          >
-
-            <button
-              type="button"
-              class="adminModelPrimaryBtn"
-              onclick="showAdminModelLoginMode()"
-            >
-              الدخول للنموذج
-            </button>
-
-            <button
-              type="button"
-              class="adminModelCreateBtn"
-              onclick="showAdminModelCreateMode()"
-            >
-              إنشاء نموذج
-            </button>
-
-            <button
-              type="button"
-              class="adminModelSoftBtn"
-              onclick="openSupabaseCleanupGatePage()"
-            >
-              تنظيف Supabase
-            </button>
-
-          </div>
-
-          <div
-            id="adminModelLoginBox"
-            class="hidden"
-          >
-
-            <div class="adminModelGateField">
-
-              <label for="modelsList">
-                النماذج المحفوظة
-              </label>
-
-              <select
-                id="modelsList"
-                class="adminSelect"
-              >
-                <option value="">
-                  اختر النموذج
-                </option>
-              </select>
-
-            </div>
-
-            <div class="adminModelGateActions">
-
-              <button
-                type="button"
-                class="adminModelPrimaryBtn"
-                onclick="openSelectedModel()"
-              >
-                فتح النموذج
-              </button>
-
-              <button
-                type="button"
-                class="adminModelDangerBtn"
-                onclick="deleteSelectedModel()"
-              >
-                حذف النموذج
-              </button>
-
-              <button
-                type="button"
-                class="adminModelSoftBtn"
-                onclick="showAdminModelGateStart()"
-              >
-                رجوع
-              </button>
-
-            </div>
-
-          </div>
-
-          <div
-            id="adminModelCreateBox"
-            class="adminModelCreateBox hidden"
-          >
-
-            <div class="adminModelGateField">
-
-              <label for="modelName">
-                اسم النموذج
-              </label>
-
-              <input
-                id="modelName"
-                class="adminInput"
-                type="text"
-                maxlength="80"
-                autocomplete="off"
-                placeholder="اسم النموذج الجديد"
-              >
-
-            </div>
-
-            <div class="adminModelGateField">
-
-              <label for="modelAdminPin">
-                الرقم السري للنموذج
-              </label>
-
-              <input
-                id="modelAdminPin"
-                class="adminInput"
-                type="password"
-                maxlength="40"
-                autocomplete="new-password"
-                placeholder="اكتب رقم سري خاص بالنموذج"
-              >
-
-            </div>
-
-            <div class="adminModelGateField">
-
-              <label for="modelAdminPinConfirm">
-                تأكيد الرقم السري
-              </label>
-
-              <input
-                id="modelAdminPinConfirm"
-                class="adminInput"
-                type="password"
-                maxlength="40"
-                autocomplete="new-password"
-                placeholder="أعد كتابة الرقم السري"
-              >
-
-            </div>
-
-            <div class="adminModelGateField">
-
-              <label>
-                الفقرات المفعلة في البداية
-              </label>
-
-              <div id="newModelSegmentsList"></div>
-
-            </div>
-
-            <div class="adminModelGateActions">
-
-              <button
-                type="button"
-                class="adminModelCreateBtn"
-                onclick="createModel()"
-              >
-                إنشاء النموذج
-              </button>
-
-              <button
-                type="button"
-                class="adminModelSoftBtn"
-                onclick="showAdminModelGateStart()"
-              >
-                رجوع
-              </button>
-
-            </div>
-
-          </div>
+        <div class="adminModelGateActions">
 
           <button
             type="button"
-            class="adminModelLogoutBtn"
-            onclick="logoutAdminPin()"
+            class="adminModelPrimaryBtn"
+            onclick="openSelectedModel()"
           >
-            خروج من الأدمن
+            فتح النموذج
+          </button>
+
+          <button
+            type="button"
+            class="adminModelSoftBtn"
+            onclick="showAdminModelGateStart()"
+          >
+            رجوع
           </button>
 
         </div>
 
       </div>
 
-    </section>
+      <!-- إنشاء نموذج جديد -->
+      <div
+        id="adminModelCreateBox"
+        class="adminModelCreateBox hidden"
+      >
+
+        <div class="adminModelGateField">
+
+          <label for="modelName">
+            اسم النموذج
+          </label>
+
+          <input
+            id="modelName"
+            class="adminInput"
+            type="text"
+            maxlength="80"
+            autocomplete="off"
+            placeholder="اسم النموذج الجديد"
+          >
+
+        </div>
+
+        <div class="adminModelGateField">
+
+          <label for="modelAdminPin">
+            الرقم السري للنموذج
+          </label>
+
+          <input
+            id="modelAdminPin"
+            class="adminInput"
+            type="password"
+            inputmode="numeric"
+            maxlength="40"
+            autocomplete="new-password"
+            placeholder="اكتب رقمًا سريًا خاصًا بالنموذج"
+          >
+
+        </div>
+
+        <div class="adminModelGateField">
+
+          <label for="modelAdminPinConfirm">
+            تأكيد الرقم السري
+          </label>
+
+          <input
+            id="modelAdminPinConfirm"
+            class="adminInput"
+            type="password"
+            inputmode="numeric"
+            maxlength="40"
+            autocomplete="new-password"
+            placeholder="أعد كتابة الرقم السري"
+          >
+
+        </div>
+
+        <div class="adminModelGateField">
+
+          <label>
+            الفقرات المفعلة في البداية
+          </label>
+
+          <div id="newModelSegmentsList"></div>
+
+        </div>
+
+        <div class="adminModelGateActions">
+
+          <button
+            type="button"
+            class="adminModelCreateBtn"
+            onclick="createModel()"
+          >
+            إنشاء النموذج
+          </button>
+
+          <button
+            type="button"
+            class="adminModelSoftBtn"
+            onclick="showAdminModelGateStart()"
+          >
+            رجوع
+          </button>
+
+        </div>
+
+      </div>
 
 
+    </div>
+
+  </div>
+
+</section>
     <!-- =========================
          ADMIN WORKSPACE
     ========================== -->
@@ -565,124 +559,264 @@
   <div id="printPresenterArea"></div>
 
 
-  <!-- =========================
-       ADMIN PIN BOOTSTRAP
-  ========================== -->
-  <script>
-    let adminPanelInitPromise = null
-    let adminPinBusy = false
+<!-- =========================
+     ADMIN PIN BOOTSTRAP
+========================== -->
+<script>
+  let adminPanelInitPromise = null
+  let adminPinBusy = false
 
-    function unlockAdminPanel() {
-      document
-        .getElementById("adminPinScreen")
-        ?.classList.add("hidden")
+  function unlockAdminPanel() {
+    document
+      .getElementById("adminPinScreen")
+      ?.classList.add("hidden")
 
-      document
-        .getElementById("adminShellNew")
-        ?.classList.remove("hidden")
+    document
+      .getElementById("adminShellNew")
+      ?.classList.remove("hidden")
+  }
+
+  function lockAdminPanel() {
+    document
+      .getElementById("adminShellNew")
+      ?.classList.add("hidden")
+
+    document
+      .getElementById("adminPinScreen")
+      ?.classList.remove("hidden")
+  }
+
+  async function initializeAdminPanelOnce() {
+    if (adminPanelInitPromise) {
+      return adminPanelInitPromise
     }
 
-    function lockAdminPanel() {
-      document
-        .getElementById("adminShellNew")
-        ?.classList.add("hidden")
+    if (
+      typeof window.initAdminPanel !==
+      "function"
+    ) {
+      console.error(
+        "Missing function: initAdminPanel"
+      )
 
-      document
-        .getElementById("adminPinScreen")
-        ?.classList.remove("hidden")
-    }
-
-    async function initializeAdminPanelOnce() {
-      if (adminPanelInitPromise) {
-        return adminPanelInitPromise
-      }
-
-      if (
-        typeof window.initAdminPanel !==
-        "function"
-      ) {
-        console.error(
-          "Missing function: initAdminPanel"
+      const errorBox =
+        document.getElementById(
+          "adminPinError"
         )
 
-        const errorBox =
-          document.getElementById(
-            "adminPinError"
+      if (errorBox) {
+        errorBox.innerText =
+          "تعذر تحميل ملفات لوحة الأدمن"
+      }
+
+      return false
+    }
+
+    adminPanelInitPromise =
+      Promise.resolve()
+        .then(() => {
+          return window.initAdminPanel()
+        })
+        .then(() => true)
+        .catch(error => {
+          console.error(
+            "INIT ADMIN PANEL ERROR:",
+            error
           )
 
+          adminPanelInitPromise = null
+
+          const errorBox =
+            document.getElementById(
+              "adminPinError"
+            )
+
+          if (errorBox) {
+            errorBox.innerText =
+              "حدث خطأ أثناء تشغيل لوحة الأدمن"
+          }
+
+          return false
+        })
+
+    return adminPanelInitPromise
+  }
+
+  function setAdminPinBusy(value) {
+    adminPinBusy =
+      Boolean(value)
+
+    const button =
+      document.getElementById(
+        "adminPinLoginBtn"
+      )
+
+    const input =
+      document.getElementById(
+        "adminPinInput"
+      )
+
+    if (button) {
+      button.disabled =
+        adminPinBusy
+
+      button.innerText =
+        adminPinBusy
+          ? "جارٍ الدخول..."
+          : "دخول"
+    }
+
+    if (input) {
+      input.disabled =
+        adminPinBusy
+    }
+  }
+
+  async function checkAdminPinFromInput() {
+    if (adminPinBusy) {
+      return false
+    }
+
+    const input =
+      document.getElementById(
+        "adminPinInput"
+      )
+
+    const errorBox =
+      document.getElementById(
+        "adminPinError"
+      )
+
+    const pin =
+      String(input?.value || "")
+        .trim()
+
+    if (!pin) {
+      if (errorBox) {
+        errorBox.innerText =
+          "اكتب كود الأدمن"
+      }
+
+      input?.focus()
+
+      return false
+    }
+
+    if (errorBox) {
+      errorBox.innerText = ""
+    }
+
+    try {
+      setAdminPinBusy(true)
+
+      if (
+        typeof window.claimAdminDeviceAccess !==
+        "function"
+      ) {
+        throw new Error(
+          "claimAdminDeviceAccess is not ready"
+        )
+      }
+
+      const accessGranted =
+        await window.claimAdminDeviceAccess(
+          pin
+        )
+
+      if (!accessGranted) {
         if (errorBox) {
           errorBox.innerText =
-            "تعذر تحميل ملفات لوحة الأدمن"
+            "كود الأدمن غير صحيح"
+        }
+
+        if (input) {
+          input.value = ""
+          input.focus()
+
+          input.classList.remove(
+            "adminPinShake"
+          )
+
+          void input.offsetWidth
+
+          input.classList.add(
+            "adminPinShake"
+          )
         }
 
         return false
       }
 
-      adminPanelInitPromise =
-        Promise.resolve()
-          .then(() => {
-            return window.initAdminPanel()
-          })
-          .then(() => true)
-          .catch(error => {
-            console.error(
-              "INIT ADMIN PANEL ERROR:",
-              error
-            )
+      localStorage.setItem(
+        "admin_device_ok",
+        "1"
+      )
 
-            adminPanelInitPromise = null
+      unlockAdminPanel()
 
-            const errorBox =
-              document.getElementById(
-                "adminPinError"
-              )
+      const initialized =
+        await initializeAdminPanelOnce()
 
-            if (errorBox) {
-              errorBox.innerText =
-                "حدث خطأ أثناء تشغيل لوحة الأدمن"
-            }
+      if (!initialized) {
+        lockAdminPanel()
 
-            return false
-          })
-
-      return adminPanelInitPromise
-    }
-
-    function setAdminPinBusy(value) {
-      adminPinBusy =
-        Boolean(value)
-
-      const button =
-        document.getElementById(
-          "adminPinLoginBtn"
-        )
-
-      const input =
-        document.getElementById(
-          "adminPinInput"
-        )
-
-      if (button) {
-        button.disabled =
-          adminPinBusy
-
-        button.innerText =
-          adminPinBusy
-            ? "جارٍ الدخول..."
-            : "دخول"
-      }
-
-      if (input) {
-        input.disabled =
-          adminPinBusy
-      }
-    }
-
-    async function checkAdminPinFromInput() {
-      if (adminPinBusy) {
         return false
       }
 
+      return true
+    } catch (error) {
+      console.error(
+        "ADMIN PIN LOGIN ERROR:",
+        error
+      )
+
+      lockAdminPanel()
+
+      if (errorBox) {
+        errorBox.innerText =
+          "تعذر الاتصال، حاول مرة أخرى بعد قليل"
+      }
+
+      return false
+    } finally {
+      setAdminPinBusy(false)
+    }
+  }
+
+  async function logoutAdminPin() {
+    localStorage.removeItem(
+      "admin_device_ok"
+    )
+
+    sessionStorage.removeItem(
+      "admin_active_model_v1"
+    )
+
+    sessionStorage.removeItem(
+      "admin_active_view_v1"
+    )
+
+    try {
+      if (
+        window.db?.auth &&
+        typeof window.db.auth.signOut ===
+          "function"
+      ) {
+        await window.db.auth.signOut()
+      }
+    } catch (error) {
+      console.error(
+        "ADMIN LOGOUT ERROR:",
+        error
+      )
+    }
+
+    location.reload()
+  }
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
       const input =
         document.getElementById(
           "adminPinInput"
@@ -693,190 +827,66 @@
           "adminPinError"
         )
 
-      const pin =
-        String(input?.value || "")
-          .trim()
+      input?.addEventListener(
+        "input",
+        () => {
+          if (errorBox) {
+            errorBox.innerText = ""
+          }
+        }
+      )
 
-      if (errorBox) {
-        errorBox.innerText = ""
+      input?.addEventListener(
+        "keydown",
+        event => {
+          if (event.key === "Enter") {
+            event.preventDefault()
+
+            checkAdminPinFromInput()
+          }
+        }
+      )
+
+      const locallyApproved =
+        localStorage.getItem(
+          "admin_device_ok"
+        ) === "1"
+
+      if (!locallyApproved) {
+        lockAdminPanel()
+        setAdminPinBusy(false)
+        input?.focus()
+
+        return
       }
 
+      unlockAdminPanel()
+      setAdminPinBusy(true)
+
       try {
-        setAdminPinBusy(true)
-
-        if (
-          typeof window.claimAdminDeviceAccess !==
-          "function"
-        ) {
-          throw new Error(
-            "claimAdminDeviceAccess is not ready"
-          )
-        }
-
-        const accessGranted =
-          await window.claimAdminDeviceAccess(pin)
-
-        if (!accessGranted) {
-          if (errorBox) {
-            errorBox.innerText =
-              "كود الأدمن غير صحيح"
-          }
-
-          if (input) {
-            input.value = ""
-            input.focus()
-
-            input.classList.remove(
-              "adminPinShake"
-            )
-
-            void input.offsetWidth
-
-            input.classList.add(
-              "adminPinShake"
-            )
-          }
-
-          return false
-        }
-
-        localStorage.setItem(
-          "admin_device_ok",
-          "1"
-        )
-
-        unlockAdminPanel()
-
         const initialized =
           await initializeAdminPanelOnce()
 
         if (!initialized) {
-          localStorage.removeItem(
-            "admin_device_ok"
-          )
-
           lockAdminPanel()
 
-          return false
+          if (errorBox) {
+            errorBox.innerText =
+              "تعذر تشغيل لوحة الأدمن"
+          }
         }
-
-        return true
-      } catch (error) {
-        console.error(
-          "ADMIN PIN LOGIN ERROR:",
-          error
-        )
-
-        localStorage.removeItem(
-          "admin_device_ok"
-        )
-
-        lockAdminPanel()
-
-        if (errorBox) {
-          errorBox.innerText =
-            "تعذر تشغيل لوحة الأدمن"
-        }
-
-        return false
       } finally {
         setAdminPinBusy(false)
       }
     }
+  )
 
-    function logoutAdminPin() {
-      localStorage.removeItem(
-        "admin_device_ok"
-      )
+  window.checkAdminPinFromInput =
+    checkAdminPinFromInput
 
-      location.reload()
-    }
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      async () => {
-        const input =
-          document.getElementById(
-            "adminPinInput"
-          )
-
-        const errorBox =
-          document.getElementById(
-            "adminPinError"
-          )
-
-        input?.addEventListener(
-          "input",
-          () => {
-            if (errorBox) {
-              errorBox.innerText = ""
-            }
-          }
-        )
-
-        input?.addEventListener(
-          "keydown",
-          event => {
-            if (event.key === "Enter") {
-              event.preventDefault()
-              checkAdminPinFromInput()
-            }
-          }
-        )
-
-        const isUnlocked =
-          localStorage.getItem(
-            "admin_device_ok"
-          ) === "1"
-
-        if (!isUnlocked) {
-          input?.focus()
-          return
-        }
-
-        setAdminPinBusy(true)
-
-        const accessStillValid =
-          typeof window.checkAdminDeviceAccess ===
-          "function" &&
-          await window.checkAdminDeviceAccess()
-
-        if (!accessStillValid) {
-          localStorage.removeItem(
-            "admin_device_ok"
-          )
-
-          lockAdminPanel()
-          input?.focus()
-          return
-        }
-
-        unlockAdminPanel()
-
-        try {
-          const initialized =
-            await initializeAdminPanelOnce()
-
-          if (!initialized) {
-            localStorage.removeItem(
-              "admin_device_ok"
-            )
-
-            lockAdminPanel()
-            input?.focus()
-          }
-        } finally {
-          setAdminPinBusy(false)
-        }
-      }
-    )
-
-    window.checkAdminPinFromInput =
-      checkAdminPinFromInput
-
-    window.logoutAdminPin =
-      logoutAdminPin
-  </script>
+  window.logoutAdminPin =
+    logoutAdminPin
+</script>
 
 </body>
 </html>

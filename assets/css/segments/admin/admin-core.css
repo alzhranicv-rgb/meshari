@@ -1281,8 +1281,9 @@ input[type="file"]{
 .adminHomeSegmentTitle{
   color:var(--admin-secondary);
 
-  font-size:1.14rem;
-  line-height:1.35;
+  font-size:1.45rem;
+  line-height:1.25;
+  font-weight:400;
 }
 
 .adminHomeSegmentStatus{
@@ -1643,9 +1644,10 @@ input[type="file"]{
     gap:10px;
   }
 
-  .adminHomeSegmentTitle{
-    font-size:1.06rem;
-  }
+ .adminHomeSegmentTitle{
+  font-size:1.24rem;
+  line-height:1.25;
+}
 }
 /* =========================
    16) UNIFIED SEGMENT HEADER
@@ -2253,28 +2255,48 @@ button.innerTabActive{
   min-width:0;
 }
 
+/* =========================
+   CARDS GRID
+========================= */
+
 .adminEditCardsGrid{
   width:100%;
+  min-width:0;
 
   display:grid;
-
   grid-template-columns:
     repeat(2,minmax(0,1fr));
+
+  grid-auto-rows:max-content;
 
   gap:12px;
 
   align-items:start;
 }
 
+/*
+  عند وجود كرت مفتوح فقط:
+  تتحول الشبكة إلى عمود واحد.
+*/
+
 .adminEditCardsGrid.hasOpenCard{
   grid-template-columns:1fr;
 }
 
+/* =========================
+   CARD
+========================= */
+
 .adminEditItemCard{
+  width:100%;
   min-width:0;
+  min-height:0;
+  height:auto;
 
-  border:1px solid var(--admin-line);
+  align-self:start;
+  grid-column:auto;
 
+  border:2px solid var(--admin-line);
   border-radius:var(--admin-radius-md);
 
   background:#FFFFFF;
@@ -2282,61 +2304,131 @@ button.innerTabActive{
   overflow:hidden;
 
   box-shadow:
-    0 10px 28px
+    0 8px 22px
     rgba(35,61,77,.06);
 
   transition:
     border-color .18s var(--admin-ease),
-    box-shadow .18s var(--admin-ease),
-    transform .18s var(--admin-ease);
+    background-color .18s var(--admin-ease),
+    box-shadow .18s var(--admin-ease);
 }
 
-.adminEditItemCard:hover{
-  border-color:#BEC7CE;
+/* الكرت المغلق */
 
-  box-shadow:
-    0 15px 34px
-    rgba(35,61,77,.09);
+.adminEditItemCard:not([open]){
+  grid-column:auto;
+
+  height:auto;
+  min-height:0;
 }
+
+/*
+  نخفي جسم الكرت المغلق بشكل مؤكد.
+*/
+
+.adminEditItemCard:not([open])
+> :not(summary){
+  display:none !important;
+}
+
+/* الكرت المفتوح */
 
 .adminEditItemCard[open]{
   grid-column:1 / -1;
 
-  border-color:rgba(254,127,45,.42);
+  height:auto;
 
-  box-shadow:var(--admin-shadow-card);
+  border-color:rgba(254,127,45,.55);
+
+  background:#FFFFFF;
+
+  box-shadow:
+    0 16px 40px
+    rgba(35,61,77,.12);
 }
+
+/* =========================
+   COMPLETED / MISSING
+========================= */
+
+/* المكتمل */
 
 .adminEditItemCard.isDone{
-  border-color:rgba(0,127,0,.28);
+  border-color:rgba(0,127,0,.52);
+  background:#FBFFFB;
 }
+
+.adminEditItemCard.isDone:not([open]){
+  background:var(--admin-green-soft);
+}
+
+.adminEditItemCard.isDone
+.adminEditStatusPill{
+  color:var(--admin-green);
+
+  background:#FFFFFF;
+
+  border:1px solid rgba(0,127,0,.24);
+}
+
+/* الناقص */
 
 .adminEditItemCard.isMissing{
-  border-color:rgba(127,0,0,.20);
+  border-color:rgba(127,0,0,.42);
+  background:#FFFDFD;
 }
 
-.adminEditItemCard summary{
-  min-height:82px;
+.adminEditItemCard.isMissing:not([open]){
+  background:var(--admin-red-soft);
+}
 
-  list-style:none;
-  cursor:pointer;
+.adminEditItemCard.isMissing
+.adminEditStatusPill{
+  color:var(--admin-red);
+
+  background:#FFFFFF;
+
+  border:1px solid rgba(127,0,0,.20);
+}
+
+/*
+  في حال كان كرت لا يحمل isDone،
+  لكنه يحمل حالة ناقصة فقط.
+*/
+
+.adminEditItemCard:not(.isDone)
+.adminEditStatusPill{
+  color:var(--admin-red);
+
+  background:#FFFFFF;
+
+  border:1px solid rgba(127,0,0,.20);
+}
+
+/* =========================
+   SUMMARY
+========================= */
+
+.adminEditItemCard summary{
+  width:100%;
+  min-height:82px;
 
   padding:15px 16px;
 
   display:flex;
-
   align-items:center;
   justify-content:space-between;
 
   gap:14px;
 
-  background:#FFFFFF;
-
+  list-style:none;
+  cursor:pointer;
   user-select:none;
+
+  background:transparent;
 }
 
-.adminEditItemCard
-summary::-webkit-details-marker{
+.adminEditItemCard summary::-webkit-details-marker{
   display:none;
 }
 
@@ -2351,80 +2443,145 @@ summary::-webkit-details-marker{
     );
 }
 
+/* المكتمل */
+
+.adminEditItemCard.isDone:not([open])
+summary{
+  background:var(--admin-green-soft);
+}
+
+/* الناقص */
+
+.adminEditItemCard.isMissing:not([open])
+summary{
+  background:var(--admin-red-soft);
+}
+
+/* =========================
+   ARROW
+========================= */
+
+.adminEditItemCard summary::after{
+  content:"⌄";
+
+  width:36px;
+  height:36px;
+  min-width:36px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:11px;
+
+  color:#FFFFFF;
+  background:var(--admin-secondary);
+
+  font-family:Arial,sans-serif;
+  font-size:1rem;
+  line-height:1;
+
+  transition:
+    transform .18s var(--admin-ease),
+    background-color .18s var(--admin-ease);
+}
+
+.adminEditItemCard.isDone
+summary::after{
+  background:var(--admin-green);
+}
+
+.adminEditItemCard.isMissing
+summary::after{
+  background:var(--admin-red);
+}
+
+.adminEditItemCard[open]
+summary::after{
+  transform:rotate(180deg);
+
+  background:var(--admin-primary);
+}
+
+/* =========================
+   TITLE
+========================= */
+
 .adminEditItemTitle{
   min-width:0;
+  flex:1;
 
   display:grid;
-  gap:4px;
+  gap:5px;
 }
 
 .adminEditItemTitle strong{
   color:var(--admin-secondary);
 
-  font-size:1.05rem;
+  font-size:1.2rem;
+  line-height:1.3;
+  font-weight:400;
 }
 
 .adminEditItemTitle span{
   color:var(--admin-muted);
 
-  font-size:.86rem;
+  font-size:.88rem;
   line-height:1.4;
+  font-weight:400;
 
   overflow:hidden;
-
   text-overflow:ellipsis;
   white-space:nowrap;
 }
+
+/* =========================
+   META
+========================= */
 
 .adminEditItemMeta{
   flex:0 0 auto;
 
   display:flex;
   align-items:center;
+  flex-wrap:wrap;
 
   gap:7px;
 }
 
 .adminEditStatusPill,
 .adminEditProgressPill{
-  min-height:30px;
+  min-height:32px;
 
-  border-radius:999px;
-
-  padding:6px 10px;
+  padding:6px 11px;
 
   display:inline-flex;
   align-items:center;
   justify-content:center;
 
-  font-size:.78rem;
-}
+  border-radius:999px;
 
-.adminEditStatusPill{
-  color:var(--admin-red);
-  background:var(--admin-red-soft);
-}
-
-.isDone .adminEditStatusPill{
-  color:var(--admin-green);
-  background:var(--admin-green-soft);
+  font-size:.8rem;
+  line-height:1;
+  font-weight:400;
 }
 
 .adminEditProgressPill{
   color:var(--admin-secondary);
 
-  background:var(--admin-soft);
+  background:#FFFFFF;
 
   border:1px solid var(--admin-line);
 }
 
-.adminEditItemBody{
-  padding:16px;
+/* =========================
+   BODY
+========================= */
 
-  animation:
-    adminItemOpen
-    .20s
-    var(--admin-ease);
+.adminEditItemBody{
+  width:100%;
+  padding:16px;
+  animation:none;
 }
 
 @keyframes adminItemOpen{
@@ -2439,43 +2596,47 @@ summary::-webkit-details-marker{
   }
 }
 
-:is(
-  .adminCard,
-  .adminQuestionCard,
-  .finalAdminCard,
-  .archiveMainInfoCard,
-  .archiveImageCard,
-  .adminEditorCleanCard
-){
-  border:1px solid var(--admin-line);
-
-  border-radius:var(--admin-radius-md);
-
-  background:var(--admin-surface);
-
-  box-shadow:var(--admin-shadow-soft);
-
-  padding:16px;
-}
-
 /* =========================
-   18) GENERIC GRIDS
+   PHONE
 ========================= */
 
-:is(
-  .adminFieldsGrid,
-  .adminFormGrid,
-  .adminTwoColumnGrid,
-  .adminEditorFieldsGrid
-){
-  display:grid;
+@media
+  (orientation:portrait)
+  and (max-width:620px){
 
-  grid-template-columns:
-    repeat(2,minmax(0,1fr));
+  .adminEditCardsGrid,
+  .adminEditCardsGrid.hasOpenCard{
+    grid-template-columns:1fr;
+  }
 
-  gap:12px;
+  .adminEditItemCard{
+    grid-column:auto;
+  }
+
+  .adminEditItemCard[open]{
+    grid-column:1;
+  }
+
+  .adminEditItemCard summary{
+    min-height:76px;
+
+    padding:13px;
+
+    align-items:center;
+  }
+
+  .adminEditItemTitle strong{
+    font-size:1.08rem;
+  }
+
+  .adminEditItemTitle span{
+    white-space:normal;
+  }
+
+  .adminEditItemMeta{
+    width:auto;
+  }
 }
-
 /* =========================
    19) MEDIA PREVIEW
 ========================= */
@@ -2531,41 +2692,130 @@ summary::-webkit-details-marker{
 ========================= */
 
 .adminSettingsGamePage{
+  width:100%;
+
   display:grid;
-  gap:20px;
+  gap:18px;
 }
 
-.adminSettingsGameGrid,
-.adminChallengeSettingsGrid{
-  display:grid;
+/* =========================
+   MAIN SETTINGS SECTION
+========================= */
 
+.adminSettingsMainSection{
+  width:100%;
+
+  padding:16px;
+
+  display:grid;
+  gap:16px;
+
+  background:var(--admin-surface);
+  border:1px solid var(--admin-line);
+  border-radius:24px;
+
+  box-shadow:var(--admin-shadow-soft);
+}
+
+.adminSettingsSectionHead{
+  width:100%;
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:14px;
+
+  padding-bottom:14px;
+
+  border-bottom:1px solid var(--admin-line);
+}
+
+.adminSettingsSectionHead > div{
+  min-width:0;
+}
+
+.adminSettingsSectionHead h2{
+  margin:0;
+
+  color:var(--admin-secondary);
+
+  font-size:1.4rem;
+  line-height:1.2;
+  font-weight:400;
+}
+
+.adminSettingsSectionHead span{
+  display:block;
+
+  margin-top:5px;
+
+  color:var(--admin-muted);
+
+  font-size:.86rem;
+  line-height:1.35;
+  font-weight:400;
+}
+
+.adminSettingsSectionHead > strong{
+  width:46px;
+  height:46px;
+  min-width:46px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:14px;
+
+  background:var(--admin-secondary);
+  color:#FFFFFF;
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:400;
+}
+
+/* =========================
+   SETTINGS CARDS GRID
+========================= */
+
+.adminSettingsGameGrid{
+  width:100%;
+
+  display:grid;
   grid-template-columns:
-    repeat(3,minmax(0,1fr));
+    repeat(2,minmax(0,1fr));
 
   gap:12px;
 }
 
 .adminSettingGameCard{
   min-width:0;
+  min-height:154px;
 
-  border:1px solid var(--admin-line);
-
-  border-radius:var(--admin-radius-md);
-
-  background:var(--admin-surface);
-
-  box-shadow:var(--admin-shadow-soft);
-
-  padding:16px;
+  padding:15px;
 
   display:grid;
-  gap:16px;
+  grid-template-rows:auto 1fr;
+  align-content:stretch;
+
+  gap:15px;
+
+  border:1px solid var(--admin-line);
+  border-radius:20px;
+
+  background:var(--admin-soft);
+
+  box-shadow:none;
 }
 
 .adminSettingGameHead{
-  display:flex;
+  min-width:0;
 
-  align-items:flex-start;
+  display:flex;
+  align-items:center;
   justify-content:space-between;
 
   gap:12px;
@@ -2573,70 +2823,96 @@ summary::-webkit-details-marker{
 
 .adminSettingGameTitleBox{
   min-width:0;
+  flex:1;
 }
+
+/* اسم الفقرة على الكرت الخارجي */
 
 .adminSettingGameTitleBox h3{
   margin:0;
 
   color:var(--admin-secondary);
 
-  font-size:1.05rem;
-  line-height:1.35;
+  font-size:1.4rem;
+  line-height:1.2;
+  font-weight:400;
 }
 
 .adminSettingGameTitleBox h3 span{
   display:block;
 
-  margin-top:4px;
+  margin-top:6px;
 
   color:var(--admin-muted);
 
-  font-size:.82rem;
+  font-size:.84rem;
+  line-height:1.3;
+  font-weight:400;
 }
 
 .adminSettingGameSelected{
-  flex:0 0 auto;
+  width:48px;
+  height:48px;
+  min-width:48px;
 
-  min-width:42px;
-  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-  border:1px solid var(--admin-line);
+  border:0;
+  border-radius:14px;
 
-  border-radius:12px;
+  color:#FFFFFF;
+  background:var(--admin-secondary);
 
-  color:var(--admin-secondary);
-
-  background:var(--admin-soft);
-
-  display:grid;
-  place-items:center;
+  font-size:1.08rem;
+  line-height:1;
+  font-weight:400;
 }
 
 .adminSettingGameOptions{
-  display:flex;
-  flex-wrap:wrap;
+  width:100%;
+
+  display:grid;
+  grid-template-columns:
+    repeat(auto-fit,minmax(50px,1fr));
+
+  align-items:end;
 
   gap:8px;
 }
 
 .adminSettingGameOption{
-  min-width:48px;
-  min-height:44px;
+  width:100%;
+  min-width:0;
+  min-height:48px;
+
+  padding:8px;
 
   border:1px solid var(--admin-line);
-
-  border-radius:12px;
+  border-radius:13px;
 
   color:var(--admin-secondary);
+  background:#FFFFFF;
 
-  background:var(--admin-soft);
+  font-family:inherit;
+  font-size:.94rem;
+  line-height:1;
+  font-weight:400;
 
-  padding:8px 12px;
+  cursor:pointer;
+
+  transition:
+    transform .15s var(--admin-ease),
+    border-color .15s var(--admin-ease),
+    background-color .15s var(--admin-ease),
+    color .15s var(--admin-ease);
 }
 
 .adminSettingGameOption:hover{
-  border-color:rgba(254,127,45,.50);
+  transform:translateY(-1px);
 
+  border-color:rgba(254,127,45,.50);
   background:var(--admin-primary-soft);
 }
 
@@ -2644,40 +2920,241 @@ summary::-webkit-details-marker{
   color:#FFFFFF;
 
   border-color:var(--admin-primary);
-
   background:var(--admin-primary);
 
-  box-shadow:
-    0 8px 18px
-    rgba(254,127,45,.20);
+  box-shadow:none;
 }
+
+.adminSettingGameOption:disabled{
+  color:var(--admin-muted);
+
+  background:#E9ECEF;
+
+  cursor:not-allowed;
+  transform:none;
+}
+
+.adminSettingsEmpty{
+  min-height:150px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  border:1px dashed var(--admin-line);
+  border-radius:18px;
+
+  background:var(--admin-soft);
+  color:var(--admin-muted);
+
+  font-size:.9rem;
+  line-height:1.5;
+  font-weight:400;
+  text-align:center;
+}
+
+/* =========================
+   CHALLENGE SETTINGS WINDOW
+========================= */
 
 .adminChallengeSettingsSection{
-  border-top:1px solid var(--admin-line);
+  width:100%;
 
-  padding-top:20px;
+  padding:0;
 
-  display:grid;
-  gap:14px;
+  display:block;
+
+  border:1px solid var(--admin-line);
+  border-radius:24px;
+
+  background:var(--admin-surface);
+
+  box-shadow:var(--admin-shadow-soft);
+
+  overflow:hidden;
 }
 
-.adminChallengeSettingsHead h2{
+.adminChallengeSettingsSummary{
+  width:100%;
+  min-height:78px;
+
+  padding:15px 17px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:14px;
+
+  list-style:none;
+  cursor:pointer;
+  user-select:none;
+
+  background:var(--admin-soft);
+}
+
+.adminChallengeSettingsSummary::-webkit-details-marker{
+  display:none;
+}
+
+.adminChallengeSettingsSummaryTitle{
+  min-width:0;
+}
+
+.adminChallengeSettingsSummaryTitle h2{
   margin:0;
 
   color:var(--admin-secondary);
 
   font-size:1.35rem;
-  line-height:1.25;
+  line-height:1.2;
+  font-weight:400;
 }
 
-.adminChallengeSettingsHead span{
+.adminChallengeSettingsSummaryTitle span{
   display:block;
 
-  margin-top:4px;
+  margin-top:5px;
 
   color:var(--admin-muted);
 
-  font-size:.9rem;
+  font-size:.82rem;
+  line-height:1.3;
+  font-weight:400;
+}
+
+.adminChallengeSettingsSummaryMeta{
+  flex:0 0 auto;
+
+  display:flex;
+  align-items:center;
+
+  gap:8px;
+}
+
+.adminChallengeSettingsSummaryMeta > span{
+  min-width:50px;
+  height:40px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:12px;
+
+  background:var(--admin-primary);
+  color:#FFFFFF;
+
+  font-size:.82rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.adminChallengeSettingsArrow{
+  width:40px;
+  height:40px;
+  min-width:40px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:12px;
+
+  background:var(--admin-secondary);
+  color:#FFFFFF;
+
+  font-size:.74rem;
+  line-height:1;
+  font-weight:400;
+
+  transition:
+    transform .18s var(--admin-ease);
+}
+
+.adminChallengeSettingsDetails[open]
+.adminChallengeSettingsArrow{
+  transform:rotate(180deg);
+}
+
+.adminChallengeSettingsBody{
+  width:100%;
+
+  padding:14px;
+
+  border-top:1px solid var(--admin-line);
+
+  animation:
+    adminChallengeSettingsOpen
+    .18s
+    var(--admin-ease);
+}
+
+@keyframes adminChallengeSettingsOpen{
+  from{
+    opacity:0;
+    transform:translateY(-4px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================
+   CHALLENGE CARDS — ONE ROW
+========================= */
+
+.adminChallengeSettingsGrid{
+  width:100%;
+
+  display:grid;
+  grid-template-columns:
+    repeat(5,minmax(0,1fr));
+
+  gap:10px;
+
+  align-items:stretch;
+}
+
+.adminChallengeSettingsGrid
+.adminSettingGameCard{
+  min-width:0;
+  min-height:154px;
+
+  padding:12px;
+
+  gap:12px;
+}
+
+.adminChallengeSettingsGrid
+.adminSettingGameHead{
+  align-items:flex-start;
+  flex-direction:column;
+}
+
+.adminChallengeSettingsGrid
+.adminSettingGameTitleBox{
+  width:100%;
+}
+
+/* أسماء مربعات التحدي */
+
+.adminChallengeSettingsGrid
+.adminSettingGameTitleBox h3{
+  font-size:1.12rem;
+  line-height:1.22;
+}
+
+.adminChallengeSettingsGrid
+.adminSettingGameTitleBox h3 span{
+  margin-top:5px;
+
+  font-size:.72rem;
+  line-height:1.3;
 }
 
 .adminToggleSettingCard{
@@ -2695,21 +3172,25 @@ summary::-webkit-details-marker{
 
 .adminToggleSettingCard.isEnabled{
   border-color:rgba(0,127,0,.24);
+
+  background:#F8FFF8;
 }
 
 .adminSettingToggleBtn{
-  min-width:80px;
-  min-height:38px;
+  width:100%;
+  min-width:0;
+  min-height:40px;
 
   border:1px solid rgba(127,0,0,.16);
-
-  border-radius:999px;
+  border-radius:12px;
 
   color:var(--admin-red);
-
   background:var(--admin-red-soft);
 
-  padding:8px 12px;
+  padding:8px 10px;
+
+  font-size:.82rem;
+  line-height:1;
 }
 
 .adminSettingToggleBtn.active{
@@ -2727,81 +3208,21 @@ summary::-webkit-details-marker{
 
 .adminChallengeAuctionCountTitle{
   color:var(--admin-muted);
+
   font-size:.86rem;
+  line-height:1.3;
 }
 
 /* =========================
-   21) IPAD LANDSCAPE
+   TABLET SETTINGS
 ========================= */
 
-@media (orientation:landscape) and (min-width:768px) and (max-width:1220px){
+@media
+  (orientation:landscape)
+  and (min-width:768px)
+  and (max-width:1220px){
 
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .adminOnePageEditor
-  > :is(
-    .adminEditorTopBar,
-    .compactAdminEditorTopBar,
-    .archiveAdminTopBar
-  ){
-    grid-template-columns:
-      minmax(170px,1fr)
-      auto;
-
-    gap:10px;
-  }
-
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .adminOnePageEditor
-  > :is(
-    .adminEditorTopBar,
-    .compactAdminEditorTopBar,
-    .archiveAdminTopBar
-  )
-  > .adminInlineActions
-  > button{
-    min-width:92px;
-
-    min-height:42px;
-
-    padding:8px 11px;
-
-    font-size:.82rem;
-  }
-
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .adminSectionToolsRow{
-    flex-wrap:nowrap;
-
-    overflow-x:auto;
-    overflow-y:hidden;
-
-    scrollbar-width:thin;
-
-    padding-bottom:3px;
-  }
-
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .adminSectionToolsRow
-  > :is(
-    .adminToolTabs,
-    .adminToolActions,
-    .adminMovedTool
-  ){
-    flex:0 0 auto;
-
-    flex-wrap:nowrap;
-  }
-
-  .adminSettingsGameGrid,
-  .adminChallengeSettingsGrid{
+  .adminSettingsGameGrid{
     grid-template-columns:
       repeat(3,minmax(0,1fr));
 
@@ -2809,149 +3230,121 @@ summary::-webkit-details-marker{
   }
 
   .adminSettingGameCard{
-    padding:14px;
-  }
-}
-
-/* =========================
-   22) IPHONE PORTRAIT
-========================= */
-
-@media (orientation:portrait) and (max-width:620px){
-
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .adminOnePageEditor
-  > :is(
-    .adminEditorTopBar,
-    .compactAdminEditorTopBar,
-    .archiveAdminTopBar
-  ),
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .randomChallengeAdminPage
-  > .randomChallengeAdminTopBar{
-    margin-bottom:10px;
-
-    border-radius:var(--admin-radius-md);
+    min-height:146px;
 
     padding:13px;
-
-    grid-template-columns:1fr;
-
-    grid-template-areas:
-      "heading"
-      "actions"
-      "tools";
-
-    gap:12px;
   }
 
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .adminOnePageEditor
-  > :is(
-    .adminEditorTopBar,
-    .compactAdminEditorTopBar,
-    .archiveAdminTopBar
-  )
-  > .adminInlineActions{
-    width:100%;
+  .adminSettingGameTitleBox h3{
+    font-size:1.2rem;
+  }
 
-    display:grid;
-
+  .adminChallengeSettingsGrid{
     grid-template-columns:
-      repeat(2,minmax(0,1fr));
+      repeat(5,minmax(130px,1fr));
 
     gap:8px;
-  }
-
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .adminOnePageEditor
-  > :is(
-    .adminEditorTopBar,
-    .compactAdminEditorTopBar,
-    .archiveAdminTopBar
-  )
-  > .adminInlineActions
-  > button{
-    width:100%;
-    min-width:0;
-
-    min-height:46px;
-
-    flex:none;
-  }
-
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .adminSectionToolsRow{
-    flex-wrap:nowrap;
 
     overflow-x:auto;
     overflow-y:hidden;
 
+    padding-bottom:5px;
+
     scrollbar-width:thin;
-
-    padding-bottom:3px;
   }
 
-  .adminShellNew
-  .adminWorkspace
-  .adminEditor
-  .adminSectionToolsRow
-  > :is(
-    .adminToolTabs,
-    .adminToolActions,
-    .adminMovedTool
-  ){
-    flex:0 0 auto;
+  .adminChallengeSettingsGrid
+  .adminSettingGameTitleBox h3{
+    font-size:1rem;
+  }
+}
 
-    flex-wrap:nowrap;
+/* =========================
+   NARROW SCREENS
+========================= */
+
+@media (max-width:900px){
+
+  .adminSettingsGameGrid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
   }
 
-  .adminEditCardsGrid,
-  :is(
-    .adminFieldsGrid,
-    .adminFormGrid,
-    .adminTwoColumnGrid,
-    .adminEditorFieldsGrid
-  ){
-    grid-template-columns:1fr;
-  }
-
-  .adminEditItemCard summary{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .adminEditItemMeta{
-    width:100%;
-
-    flex-wrap:wrap;
-  }
-
-  .adminEditItemTitle span{
-    white-space:normal;
-  }
-
-  .adminDeleteBtn{
-    margin-right:auto;
-  }
-
-  .adminSettingsGameGrid,
   .adminChallengeSettingsGrid{
+    grid-template-columns:
+      repeat(5,minmax(150px,1fr));
+
+    overflow-x:auto;
+    overflow-y:hidden;
+
+    padding-bottom:6px;
+
+    scrollbar-width:thin;
+  }
+}
+
+/* =========================
+   PHONE SETTINGS
+========================= */
+
+@media
+  (orientation:portrait)
+  and (max-width:620px){
+
+  .adminSettingsMainSection{
+    padding:12px;
+
+    border-radius:20px;
+  }
+
+  .adminSettingsSectionHead h2{
+    font-size:1.2rem;
+  }
+
+  .adminSettingsGameGrid{
     grid-template-columns:1fr;
   }
 
   .adminSettingGameCard{
-    padding:14px;
+    min-height:auto;
+
+    padding:12px;
+
+    border-radius:17px;
+  }
+
+  .adminSettingGameTitleBox h3{
+    font-size:1.24rem;
+  }
+
+  .adminChallengeSettingsSummary{
+    min-height:70px;
+
+    padding:12px;
+  }
+
+  .adminChallengeSettingsSummaryTitle h2{
+    font-size:1.1rem;
+  }
+
+  .adminChallengeSettingsSummaryTitle span{
+    font-size:.72rem;
+  }
+
+  .adminChallengeSettingsBody{
+    padding:10px;
+  }
+
+  .adminChallengeSettingsGrid{
+    grid-template-columns:
+      repeat(5,minmax(160px,1fr));
+
+    overflow-x:auto;
+    overflow-y:hidden;
+
+    padding-bottom:6px;
+
+    scrollbar-width:thin;
   }
 }
 /* =========================
@@ -4010,5 +4403,704 @@ summary::-webkit-details-marker{
     animation-iteration-count:1;
 
     transition-duration:.01ms;
+  }
+}
+/* =========================
+   STATUS TEXT COLORS
+========================= */
+
+.adminStatusDone{
+  color:var(--admin-green) !important;
+  background:var(--admin-green-soft) !important;
+  border-color:rgba(0,127,0,.25) !important;
+}
+
+.adminStatusMissing{
+  color:var(--admin-red) !important;
+  background:var(--admin-red-soft) !important;
+  border-color:rgba(127,0,0,.22) !important;
+}
+/* =========================================================
+   ADMIN MANAGEMENT PAGE
+   إدارة النماذج والجلسات والأوامر
+========================================================= */
+
+/* =========================
+   1) PAGE
+========================= */
+
+.adminManagementPage{
+  width:100%;
+  min-width:0;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:16px;
+}
+
+.adminManagementPage
+.adminEditorHeader{
+  width:100%;
+  min-width:0;
+
+  border:1px solid var(--admin-line);
+  border-radius:var(--admin-radius-lg);
+
+  background:var(--admin-surface);
+
+  padding:18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:14px;
+
+  box-shadow:
+    0 10px 26px
+    rgba(35,61,77,.07);
+}
+
+.adminManagementPage
+.adminEditorHeader h2{
+  margin:0;
+
+  color:var(--admin-secondary);
+
+  font-size:1.55rem;
+  line-height:1.2;
+  font-weight:400;
+}
+
+.adminManagementPage
+.adminEditorHeader p{
+  margin:5px 0 0;
+
+  color:var(--admin-muted);
+
+  font-size:.9rem;
+  line-height:1.45;
+  font-weight:400;
+}
+
+/* =========================
+   2) SUMMARY
+========================= */
+
+.adminManagementPage
+.adminHomeStats{
+  width:100%;
+
+  display:grid;
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+
+  gap:12px;
+}
+
+.adminManagementPage
+.adminHomeStatCard{
+  min-width:0;
+  min-height:104px;
+
+  border:1px solid var(--admin-line);
+  border-radius:var(--admin-radius-md);
+
+  background:var(--admin-soft);
+
+  padding:15px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+
+  gap:8px;
+
+  box-shadow:none;
+}
+
+.adminManagementPage
+.adminHomeStatCard span{
+  color:var(--admin-muted);
+
+  font-size:.86rem;
+  line-height:1.3;
+}
+
+.adminManagementPage
+.adminHomeStatCard strong{
+  max-width:100%;
+
+  color:var(--admin-secondary);
+
+  font-size:1.65rem;
+  line-height:1.1;
+  font-weight:400;
+
+  overflow-wrap:anywhere;
+}
+
+/* =========================
+   3) MAIN BLOCK
+========================= */
+
+.adminManagementPage
+.adminEditorBlock{
+  width:100%;
+  min-width:0;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:12px;
+}
+
+/* =========================
+   4) COLLAPSIBLE SECTIONS
+========================= */
+
+.adminManagementPage
+.adminChallengeSettingsSection{
+  width:100%;
+  min-width:0;
+
+  margin:0;
+
+  border:1px solid var(--admin-line);
+  border-radius:var(--admin-radius-md);
+
+  background:var(--admin-surface);
+
+  overflow:hidden;
+
+  box-shadow:
+    0 8px 22px
+    rgba(35,61,77,.055);
+}
+
+.adminManagementPage
+.adminChallengeSettingsSection[open]{
+  border-color:
+    rgba(254,127,45,.38);
+
+  box-shadow:
+    0 12px 30px
+    rgba(35,61,77,.09);
+}
+
+.adminManagementPage
+.adminChallengeSettingsSummary{
+  width:100%;
+  min-width:0;
+  min-height:82px;
+
+  list-style:none;
+  cursor:pointer;
+
+  padding:14px 16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:14px;
+
+  background:#FFFFFF;
+
+  user-select:none;
+}
+
+.adminManagementPage
+.adminChallengeSettingsSummary::-webkit-details-marker{
+  display:none;
+}
+
+.adminManagementPage
+.adminChallengeSettingsSection[open]
+.adminChallengeSettingsSummary{
+  border-bottom:
+    1px solid var(--admin-line);
+
+  background:
+    linear-gradient(
+      180deg,
+      #FFFFFF,
+      var(--admin-soft)
+    );
+}
+
+.adminManagementPage
+.adminChallengeSettingsSummaryTitle{
+  min-width:0;
+  flex:1;
+}
+
+.adminManagementPage
+.adminChallengeSettingsSummaryTitle h2{
+  margin:0;
+
+  color:var(--admin-secondary);
+
+  font-size:1.22rem;
+  line-height:1.25;
+  font-weight:400;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.adminManagementPage
+.adminChallengeSettingsSummaryTitle span{
+  display:block;
+
+  margin-top:5px;
+
+  color:var(--admin-muted);
+
+  font-size:.84rem;
+  line-height:1.35;
+  font-weight:400;
+}
+
+.adminManagementPage
+.adminChallengeSettingsSummaryMeta{
+  flex:0 0 auto;
+
+  display:flex;
+  align-items:center;
+
+  gap:8px;
+}
+
+.adminManagementPage
+.adminChallengeSettingsSummaryMeta > span{
+  min-width:48px;
+  height:38px;
+
+  border-radius:12px;
+
+  color:#FFFFFF;
+  background:var(--admin-primary);
+
+  padding:7px 10px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:.9rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.adminManagementPage
+.adminChallengeSettingsArrow{
+  width:38px;
+  height:38px;
+  min-width:38px;
+
+  border-radius:12px;
+
+  color:#FFFFFF;
+  background:var(--admin-secondary);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-family:Arial,sans-serif;
+  font-size:.9rem;
+  line-height:1;
+
+  transition:
+    transform .16s var(--admin-ease),
+    background-color .16s var(--admin-ease);
+}
+
+.adminManagementPage
+.adminChallengeSettingsSection[open]
+.adminChallengeSettingsArrow{
+  transform:rotate(180deg);
+
+  background:var(--admin-primary);
+}
+
+/* =========================
+   5) SECTION BODY
+========================= */
+
+.adminManagementPage
+.adminChallengeSettingsBody{
+  width:100%;
+  min-width:0;
+
+  padding:16px;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:14px;
+}
+
+/* =========================
+   6) MODEL CARDS
+========================= */
+
+.adminManagementPage
+.adminEditorBlock
+> .adminChallengeSettingsSection{
+  margin:0;
+}
+
+.adminManagementPage
+.adminChallengeSettingsSection
++ .adminChallengeSettingsSection{
+  margin-top:0;
+}
+
+/* =========================
+   7) ACTIONS
+========================= */
+
+.adminManagementPage
+.adminModalActions{
+  width:100%;
+
+  margin:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+
+  flex-wrap:wrap;
+
+  gap:8px;
+}
+
+.adminManagementPage
+.adminModalActions
+> button{
+  width:auto;
+  min-width:118px;
+  min-height:44px;
+
+  margin:0;
+
+  padding:9px 14px;
+
+  border-radius:12px;
+
+  font-size:.88rem;
+  line-height:1.15;
+  font-weight:400;
+}
+
+/* =========================
+   8) TABLES
+========================= */
+
+.adminManagementPage
+.adminTable{
+  width:100%;
+  min-width:720px;
+
+  border:1px solid var(--admin-line);
+  border-radius:16px;
+
+  background:#FFFFFF;
+
+  border-collapse:separate;
+  border-spacing:0;
+
+  overflow:hidden;
+}
+
+.adminManagementPage
+.adminTable th{
+  color:var(--admin-secondary);
+  background:var(--admin-soft);
+
+  font-size:.84rem;
+  line-height:1.3;
+  font-weight:400;
+
+  white-space:nowrap;
+}
+
+.adminManagementPage
+.adminTable td{
+  color:var(--admin-text);
+
+  font-size:.86rem;
+  line-height:1.4;
+  font-weight:400;
+
+  vertical-align:middle;
+}
+
+.adminManagementPage
+.adminTable th,
+.adminManagementPage
+.adminTable td{
+  padding:11px 12px;
+
+  border-bottom:
+    1px solid #EDF0F2;
+}
+
+.adminManagementPage
+.adminTable tbody tr:last-child td{
+  border-bottom:0;
+}
+
+.adminManagementPage
+.adminTable tbody tr:hover td{
+  background:#FFFCFA;
+}
+
+/* =========================
+   9) COMMAND GROUPS
+========================= */
+
+.adminManagementPage
+.adminEditItemCard{
+  width:100%;
+  min-width:0;
+  height:auto;
+
+  margin:0;
+
+  align-self:auto;
+
+  border:1px solid var(--admin-line);
+  border-radius:16px;
+
+  background:#FFFFFF;
+
+  overflow:hidden;
+
+  box-shadow:none;
+}
+
+.adminManagementPage
+.adminEditItemCard
++ .adminEditItemCard{
+  margin-top:10px;
+}
+
+.adminManagementPage
+.adminEditItemCard summary{
+  min-height:70px;
+
+  padding:12px 14px;
+}
+
+.adminManagementPage
+.adminEditItemCard[open]{
+  grid-column:auto;
+
+  border-color:
+    rgba(254,127,45,.34);
+}
+
+.adminManagementPage
+.adminEditItemCard
+.adminEditItemBody{
+  padding:14px;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:12px;
+}
+
+/* =========================
+   10) STATUS
+========================= */
+
+.adminManagementPage
+.adminRuntimeStatusActive{
+  color:var(--admin-green);
+  background:var(--admin-green-soft);
+}
+
+.adminManagementPage
+.adminRuntimeStatusEnded{
+  color:var(--admin-muted);
+  background:var(--admin-soft);
+}
+
+.adminManagementPage
+.adminRuntimeStatusActive,
+.adminManagementPage
+.adminRuntimeStatusEnded{
+  min-height:30px;
+
+  border-radius:999px;
+
+  padding:6px 10px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:.78rem;
+  line-height:1;
+}
+
+/* =========================
+   11) IPAD LANDSCAPE
+========================= */
+
+@media
+  (orientation:landscape)
+  and (min-width:768px)
+  and (max-width:1220px){
+
+  .adminManagementPage{
+    gap:12px;
+  }
+
+  .adminManagementPage
+  .adminHomeStats{
+    gap:9px;
+  }
+
+  .adminManagementPage
+  .adminHomeStatCard{
+    min-height:90px;
+
+    padding:12px;
+  }
+
+  .adminManagementPage
+  .adminHomeStatCard strong{
+    font-size:1.42rem;
+  }
+
+  .adminManagementPage
+  .adminChallengeSettingsSummary{
+    min-height:74px;
+
+    padding:12px 14px;
+  }
+
+  .adminManagementPage
+  .adminChallengeSettingsBody{
+    padding:13px;
+  }
+
+  .adminManagementPage
+  .adminTable th,
+  .adminManagementPage
+  .adminTable td{
+    padding:9px 10px;
+
+    font-size:.8rem;
+  }
+}
+
+/* =========================
+   12) PHONE
+========================= */
+
+@media
+  (orientation:portrait)
+  and (max-width:620px){
+
+  .adminManagementPage{
+    gap:10px;
+  }
+
+  .adminManagementPage
+  .adminEditorHeader{
+    padding:14px;
+
+    border-radius:18px;
+  }
+
+  .adminManagementPage
+  .adminEditorHeader h2{
+    font-size:1.3rem;
+  }
+
+  .adminManagementPage
+  .adminHomeStats{
+    grid-template-columns:1fr;
+
+    gap:8px;
+  }
+
+  .adminManagementPage
+  .adminHomeStatCard{
+    min-height:76px;
+
+    padding:12px;
+  }
+
+  .adminManagementPage
+  .adminHomeStatCard strong{
+    font-size:1.32rem;
+  }
+
+  .adminManagementPage
+  .adminChallengeSettingsSummary{
+    min-height:72px;
+
+    padding:11px 12px;
+  }
+
+  .adminManagementPage
+  .adminChallengeSettingsSummaryTitle h2{
+    font-size:1.05rem;
+  }
+
+  .adminManagementPage
+  .adminChallengeSettingsSummaryTitle span{
+    white-space:normal;
+
+    font-size:.76rem;
+  }
+
+  .adminManagementPage
+  .adminChallengeSettingsSummaryMeta{
+    gap:6px;
+  }
+
+  .adminManagementPage
+  .adminChallengeSettingsSummaryMeta > span,
+  .adminManagementPage
+  .adminChallengeSettingsArrow{
+    min-width:36px;
+    width:36px;
+    height:36px;
+  }
+
+  .adminManagementPage
+  .adminChallengeSettingsBody{
+    padding:10px;
+  }
+
+  .adminManagementPage
+  .adminModalActions{
+    display:grid;
+    grid-template-columns:1fr;
+
+    gap:7px;
+  }
+
+  .adminManagementPage
+  .adminModalActions
+  > button{
+    width:100%;
+    min-width:0;
+  }
+
+  .adminManagementPage
+  .adminTable{
+    min-width:680px;
   }
 }

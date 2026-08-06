@@ -1,101 +1,61 @@
 /* =========================================================
    PRESENTER LISTENER / مستقبل أوامر المقدم
-   File: assets/js/presenter-listener.js
+   File: assets/js/presenter/presenter-listener.js
 
-   هذا الملف خاص بشاشة العرض فقط.
-
-   المسؤوليات:
-   - استقبال أوامر المقدم عبر Realtime.
-   - استقبال المسار الاحتياطي من presenter_commands.
-   - منع تنفيذ الأمر مرتين.
-   - توجيه كل أمر إلى دالة الفقرة المناسبة.
-   - دعم أسماء الفقرات القديمة والجديدة.
-   - عدم إنشاء اشتراك مكرر لقناة الجلسة الموجودة.
+   DISPLAY ONLY - MATCHED WITH DISPLAY EXPORTS
 ========================================================= */
 
 (() => {
   "use strict"
 
-  /* =========================
-     1) SINGLE INSTANCE
-  ========================= */
-
   if (window.__presenterListenerLoaded) {
-    console.log(
-      "PRESENTER LISTENER: already loaded"
-    )
+    console.log("PRESENTER LISTENER: already loaded")
     return
   }
 
   window.__presenterListenerLoaded = true
 
-  /* =========================
-     2) CONSTANTS
-  ========================= */
+  const PRESENTER_COMMAND_EVENT = "presenter_command"
+  const PRESENTER_COMMAND_TABLE = "presenter_commands"
 
-  const PRESENTER_COMMAND_EVENT =
-    "presenter_command"
+  const COMMAND_TTL = 2 * 60 * 1000
+  const COMMAND_CACHE_LIMIT = 500
+  const RETRY_DELAY = 400
+  const POST_SYNC_DELAY = 20
 
-  const PRESENTER_COMMAND_TABLE =
-    "presenter_commands"
-
-  const PRESENTER_COMMAND_TTL =
-    2 * 60 * 1000
-
-  const PRESENTER_COMMAND_CACHE_LIMIT =
-    500
-
-  const PRESENTER_LISTENER_RETRY_DELAY =
-    500
-
-  const PRESENTER_LISTENER_SYNC_DELAY =
-    80
+  let listenerSessionId = ""
+  let gameChannel = null
+  let dbChannel = null
+  let ownsGameChannel = false
+  let listenerStarted = false
+  let retryTimer = null
+  let syncTimer = null
+  let processedCommands = new Map()
 
   /* =========================
-     3) RUNTIME STATE
+     HELPERS
   ========================= */
 
-  let presenterListenerSessionId = ""
-  let presenterListenerGameChannel = null
-  let presenterListenerDbChannel = null
-
-  let presenterListenerOwnsGameChannel = false
-  let presenterListenerStarted = false
-  let presenterListenerRetryTimer = null
-  let presenterListenerSyncTimer = null
-
-  let presenterProcessedCommands = new Map()
-
-  /* =========================
-     4) SAFE GLOBAL HELPERS
-  ========================= */
-
-  function getPresenterListenerDb() {
-    if (window.db) {
-      return window.db
-    }
+  function getDb() {
+    if (window.db) return window.db
 
     try {
-      if (typeof db !== "undefined") {
-        return db
-      }
+      if (typeof db !== "undefined") return db
     } catch {}
 
     return null
   }
 
-  function readPresenterListenerStorage(key) {
+  function readStorage(key) {
     try {
-      return String(
-        localStorage.getItem(key) || ""
-      ).trim()
+      return String(localStorage.getItem(key) || "").trim()
     } catch {
       return ""
     }
   }
 
-  function getPresenterListenerSessionId() {
-    const globalCandidates = [
+  function getSessionId() {
+    const globals = [
       window.gameSessionId,
       window.currentGameSessionId,
       window.currentSessionId,
@@ -103,15 +63,12 @@
       window.sessionId
     ]
 
-    for (const value of globalCandidates) {
+    for (const value of globals) {
       const clean = String(value || "").trim()
-
-      if (clean) {
-        return clean
-      }
+      if (clean) return clean
     }
 
-    const storageKeys = [
+    const keys = [
       "game_session_id",
       "display_session_id",
       "current_session_id",
@@ -119,20 +76,14 @@
       "presenter_session_id"
     ]
 
-    for (const key of storageKeys) {
-      const value =
-        readPresenterListenerStorage(key)
-
-      if (value) {
-        return value
-      }
+    for (const key of keys) {
+      const value = readStorage(key)
+      if (value) return value
     }
 
     try {
       const params =
-        new URLSearchParams(
-          window.location?.search || ""
-        )
+        new URLSearchParams(window.location.search || "")
 
       return String(
         params.get("session_id") ||
@@ -144,7 +95,7 @@
     }
   }
 
-  function getDisplayActiveSegment() {
+  function getActiveSegment() {
     const globals = [
       window.activeSegment,
       window.currentSegment,
@@ -154,65 +105,27 @@
 
     for (const value of globals) {
       const clean = String(value || "").trim()
-
-      if (clean) {
-        return clean
-      }
+      if (clean) return clean
     }
 
-    return (
-      readPresenterListenerStorage(
-        "active_segment"
-      ) || "global"
-    )
+    return readStorage("active_segment") || "global"
   }
 
-  function setDisplayActiveSegment(segment) {
-  const key =
-    normalizeDisplayPresenterSegment(
-      segment
-    )
-
-  try {
-    if (!key || key === "global") {
-      localStorage.removeItem(
-        "active_segment"
-      )
-    } else {
-      localStorage.setItem(
-        "active_segment",
-        key
-      )
-    }
-  } catch {}
-
-  window.activeSegment = key || ""
-  window.currentSegment = key || ""
-}
-
-  function getWindowFunction(name) {
+  function getFn(name) {
     const fn = window[name]
-
-    return typeof fn === "function"
-      ? fn
-      : null
+    return typeof fn === "function" ? fn : null
   }
 
-  async function invokeDisplayFunction(
-    names,
-    args = []
-  ) {
-    const safeNames =
+  async function callFn(names, args = []) {
+    const list =
       Array.isArray(names)
         ? names
         : [names]
 
-    for (const name of safeNames) {
-      const fn = getWindowFunction(name)
+    for (const name of list) {
+      const fn = getFn(name)
 
-      if (!fn) {
-        continue
-      }
+      if (!fn) continue
 
       try {
         const result = fn(...args)
@@ -231,7 +144,7 @@
         }
       } catch (error) {
         console.log(
-          `PRESENTER COMMAND FUNCTION ERROR [${name}]:`,
+          `PRESENTER COMMAND ERROR [${name}]:`,
           error
         )
 
@@ -250,19 +163,15 @@
     }
   }
 
-  async function invokeDisplayVariants(
-    variants = []
-  ) {
+  async function callVariants(variants = []) {
     for (const variant of variants) {
       const result =
-        await invokeDisplayFunction(
+        await callFn(
           variant.names,
           variant.args || []
         )
 
-      if (result.handled) {
-        return result
-      }
+      if (result.handled) return result
     }
 
     return {
@@ -272,56 +181,36 @@
     }
   }
 
-  /* =========================
-     5) NORMALIZERS
-  ========================= */
+  function normalizeSegment(segment) {
+    const key =
+      String(segment || "")
+        .trim()
+        .replace(/\s+/g, "")
 
-  function isDeletedStandalonePresenterSegment(segment) {
-  const key = String(segment || "")
-    .trim()
-    .replace(/\s+/g, "")
-    .toLowerCase()
+    const aliases = {
+      finalRound1: "final",
+      finalRound2: "final",
+      finalRound3: "final",
+      finalRound4: "final",
 
-  return (
-    key === "auction" ||
-    key === "fatbla" ||
-    key === "fitbala" ||
-    key === "فتبلة"
-  )
-}
+      final_round1: "final",
+      final_round2: "final",
+      final_round3: "final",
+      final_round4: "final",
 
-function normalizeDisplayPresenterSegment(segment) {
-  const key =
-    String(segment || "")
-      .trim()
-      .replace(/\s+/g, "")
+      random_challenge: "randomChallenge",
+      randomchallenge: "randomChallenge",
 
-  if (!key) return ""
+      top_10: "top10",
+      topTen: "top10",
 
-  if (isDeletedStandalonePresenterSegment(key)) {
-    return ""
+      fatbla: "auction",
+      fitbala: "auction",
+      فتبلة: "auction"
+    }
+
+    return aliases[key] || key || "global"
   }
-
-  const aliases = {
-    finalRound1: "final",
-    finalRound2: "final",
-    finalRound3: "final",
-    finalRound4: "final",
-
-    final_round1: "final",
-    final_round2: "final",
-    final_round3: "final",
-    final_round4: "final",
-
-    random_challenge: "randomChallenge",
-    randomchallenge: "randomChallenge",
-
-    top_10: "top10",
-    topTen: "top10"
-  }
-
-  return aliases[key] || key
-}
 
   function getFinalRoundFromSegment(
     segment,
@@ -332,65 +221,60 @@ function normalizeDisplayPresenterSegment(segment) {
     if (
       key === "finalRound1" ||
       key === "final_round1"
-    ) {
-      return 1
-    }
+    ) return 1
 
     if (
       key === "finalRound2" ||
       key === "final_round2"
-    ) {
-      return 2
-    }
+    ) return 2
 
     if (
       key === "finalRound3" ||
       key === "final_round3"
-    ) {
-      return 3
-    }
+    ) return 3
 
     if (
       key === "finalRound4" ||
       key === "final_round4"
-    ) {
-      return 4
-    }
+    ) return 4
 
     return Math.min(
-      Math.max(
-        Number(fallback || 1),
-        1
-      ),
+      Math.max(Number(fallback || 1), 1),
       4
     )
   }
 
   function getFinalSegmentKey(round) {
-    const safeRound = Math.min(
-      Math.max(
-        Number(round || 1),
-        1
-      ),
-      4
-    )
+    const r =
+      Math.min(
+        Math.max(Number(round || 1), 1),
+        4
+      )
 
-    return `finalRound${safeRound}`
+    return `finalRound${r}`
   }
 
-  function normalizePresenterCommandPayload(
-    payload
-  ) {
-    if (!payload) {
-      return {}
-    }
+  function setActiveSegment(segment) {
+    const normalized =
+      normalizeSegment(segment)
 
-    if (
-      typeof payload === "string"
-    ) {
+    try {
+      localStorage.setItem(
+        "active_segment",
+        normalized
+      )
+    } catch {}
+
+    window.activeSegment = normalized
+    window.currentSegment = normalized
+  }
+
+  function normalizePayload(payload) {
+    if (!payload) return {}
+
+    if (typeof payload === "string") {
       try {
-        const parsed =
-          JSON.parse(payload)
+        const parsed = JSON.parse(payload)
 
         return parsed &&
           typeof parsed === "object"
@@ -401,42 +285,21 @@ function normalizeDisplayPresenterSegment(segment) {
       }
     }
 
-    if (
-      typeof payload !== "object"
-    ) {
-      return {}
-    }
+    if (typeof payload !== "object") return {}
 
-    return {
-      ...payload
-    }
+    return { ...payload }
   }
 
-  function normalizeIncomingPresenterCommand(
-    input
-  ) {
+  function normalizeCommand(input) {
     let command = input
 
-    /*
-      Broadcast:
-      {
-        type,
-        event,
-        payload: command
-      }
-    */
     if (
       command?.payload &&
-      command?.event ===
-        PRESENTER_COMMAND_EVENT
+      command?.event === PRESENTER_COMMAND_EVENT
     ) {
       command = command.payload
     }
 
-    /*
-      بعض إصدارات Supabase تعيد:
-      { payload: command }
-    */
     if (
       command?.payload?.action &&
       !command?.action
@@ -444,10 +307,6 @@ function normalizeDisplayPresenterSegment(segment) {
       command = command.payload
     }
 
-    /*
-      postgres_changes:
-      { new: row }
-    */
     if (
       command?.new &&
       !command?.action
@@ -463,28 +322,25 @@ function normalizeDisplayPresenterSegment(segment) {
     }
 
     const payload =
-      normalizePresenterCommandPayload(
-        command.payload
-      )
+      normalizePayload(command.payload)
 
     const rawSegment =
       payload.segmentKey ||
       payload.activeSegment ||
-      payload.segment ||
       command.segment ||
-      getDisplayActiveSegment()
+      payload.segment ||
+      getActiveSegment()
 
     const segment =
-      normalizeDisplayPresenterSegment(
-        rawSegment
-      )
+      normalizeSegment(rawSegment)
 
     const round =
       getFinalRoundFromSegment(
+        payload.activeSegment ||
+        payload.segmentKey ||
         rawSegment,
-        payload.finalRound ||
         payload.round ||
-        command.finalRound ||
+        payload.finalRound ||
         command.round ||
         1
       )
@@ -511,10 +367,7 @@ function normalizeDisplayPresenterSegment(segment) {
         ),
 
       segment,
-
-      rawSegment:
-        String(rawSegment || ""),
-
+      rawSegment: String(rawSegment || ""),
       round,
 
       action:
@@ -534,31 +387,22 @@ function normalizeDisplayPresenterSegment(segment) {
   }
 
   /* =========================
-     6) DEDUPLICATION
+     DEDUPE
   ========================= */
 
-  function createPresenterCommandKey(
-    command
-  ) {
-    const explicitId =
-      command?.payload
-        ?.__client_command_id ||
+  function commandKey(command) {
+    const id =
+      command?.payload?.__client_command_id ||
       command?.id
 
-    if (explicitId) {
-      return String(explicitId)
-    }
+    if (id) return String(id)
 
     let payloadKey = ""
 
     try {
       payloadKey =
-        JSON.stringify(
-          command?.payload || {}
-        )
-    } catch {
-      payloadKey = ""
-    }
+        JSON.stringify(command?.payload || {})
+    } catch {}
 
     return [
       command?.session_id || "",
@@ -569,157 +413,110 @@ function normalizeDisplayPresenterSegment(segment) {
     ].join("|")
   }
 
-  function cleanPresenterCommandCache() {
+  function cleanCommandCache() {
     const now = Date.now()
 
     for (
       const [key, createdAt]
-      of presenterProcessedCommands.entries()
+      of processedCommands.entries()
     ) {
-      if (
-        now - Number(createdAt || 0) >
-        PRESENTER_COMMAND_TTL
-      ) {
-        presenterProcessedCommands.delete(
-          key
-        )
+      if (now - Number(createdAt || 0) > COMMAND_TTL) {
+        processedCommands.delete(key)
       }
     }
 
-    if (
-      presenterProcessedCommands.size <=
-      PRESENTER_COMMAND_CACHE_LIMIT
-    ) {
+    if (processedCommands.size <= COMMAND_CACHE_LIMIT) {
       return
     }
 
-    presenterProcessedCommands = new Map(
-      Array
-        .from(
-          presenterProcessedCommands.entries()
-        )
-        .slice(
-          -Math.floor(
-            PRESENTER_COMMAND_CACHE_LIMIT / 2
-          )
-        )
-    )
+    processedCommands =
+      new Map(
+        Array
+          .from(processedCommands.entries())
+          .slice(-Math.floor(COMMAND_CACHE_LIMIT / 2))
+      )
   }
 
-  function markPresenterCommandProcessed(
-    command
-  ) {
-    cleanPresenterCommandCache()
+  function markProcessed(command) {
+    cleanCommandCache()
 
-    const key =
-      createPresenterCommandKey(command)
+    const key = commandKey(command)
 
-    if (
-      presenterProcessedCommands.has(key)
-    ) {
+    if (processedCommands.has(key)) {
       return false
     }
 
-    presenterProcessedCommands.set(
-      key,
-      Date.now()
-    )
-
+    processedCommands.set(key, Date.now())
     return true
   }
 
   /* =========================
-     7) POST ACTION SYNC
+     POST SYNC
   ========================= */
 
-function scheduleDisplayStateSync() {
-  clearTimeout(
-    presenterListenerSyncTimer
-  )
+  function schedulePostSync() {
+    clearTimeout(syncTimer)
 
-  presenterListenerSyncTimer =
-    setTimeout(async () => {
-      let unifiedHandled = false
-
-      try {
-        const saveUnified =
-          getWindowFunction(
-            "saveUnifiedGameState"
-          )
-
-        if (saveUnified) {
-          await saveUnified()
-          unifiedHandled = true
-        }
-      } catch (error) {
-        console.log(
-          "PRESENTER LISTENER SAVE STATE ERROR:",
-          error
-        )
-      }
-
-      if (!unifiedHandled) {
+    syncTimer =
+      setTimeout(async () => {
         try {
-          const syncSession =
-            getWindowFunction(
-              "syncDisplayStateToSession"
-            )
+          const saveUnified =
+            getFn("saveUnifiedGameState")
 
-          if (syncSession) {
-            await syncSession({
+          if (saveUnified) {
+            await saveUnified()
+          }
+        } catch (error) {
+          console.log(
+            "PRESENTER LISTENER SAVE ERROR:",
+            error
+          )
+        }
+
+        try {
+          const syncDisplay =
+            getFn("syncDisplayStateToSession")
+
+          if (syncDisplay) {
+            await syncDisplay({
               immediate: true
             })
           }
         } catch (error) {
           console.log(
-            "PRESENTER LISTENER SYNC ERROR:",
+            "PRESENTER LISTENER SESSION SYNC ERROR:",
             error
           )
         }
-      }
 
-      try {
-        const updateEndButton =
-          getWindowFunction(
-            "updateEndRoundButtonState"
-          )
-
-        updateEndButton?.()
-      } catch {}
-    }, PRESENTER_LISTENER_SYNC_DELAY)
-}
+        try {
+          getFn("updateEndRoundButtonState")?.()
+        } catch {}
+      }, POST_SYNC_DELAY)
+  }
 
   /* =========================
-     8) GLOBAL COMMANDS
+     GLOBAL
   ========================= */
 
-  async function openDisplaySegmentFromPresenter(
-    command
-  ) {
+  async function openSegmentFromPresenter(command) {
     const payload = command.payload || {}
 
-    const requestedSegment =
-      payload.segmentKey ||
+    const requested =
       payload.activeSegment ||
+      payload.segmentKey ||
       payload.segment ||
       command.rawSegment ||
       command.segment
 
-    if (isDeletedStandalonePresenterSegment(requestedSegment)) {
-      return goDisplayHomeFromPresenter()
-    }
-
     const normalized =
-      normalizeDisplayPresenterSegment(
-        requestedSegment
-      )
+      normalizeSegment(requested)
 
     const round =
       getFinalRoundFromSegment(
-        requestedSegment,
-        payload.finalRound ||
+        requested,
         payload.round ||
-        command.finalRound ||
+        payload.finalRound ||
         command.round ||
         1
       )
@@ -729,10 +526,10 @@ function scheduleDisplayStateSync() {
         ? getFinalSegmentKey(round)
         : normalized
 
-    setDisplayActiveSegment(routeKey)
+    setActiveSegment(routeKey)
 
-    const general =
-      await invokeDisplayVariants([
+    const opened =
+      await callVariants([
         {
           names: [
             "openSegmentFromPresenter",
@@ -740,154 +537,73 @@ function scheduleDisplayStateSync() {
             "openSegmentPage"
           ],
           args: [
-           routeKey,
-           round
-           ]
+            routeKey,
+            round,
+            payload
+          ]
         },
         {
-  names: [
-    "showSegment",
-    "startSegment",
-    "renderSegment"
-  ],
-  args: [routeKey]
-}
+          names: [
+            "openMainSegment",
+            "openMaToSegment"
+          ],
+          args: [routeKey]
+        }
       ])
 
-    if (general.handled) {
-      return true
-    }
+    if (opened.handled) return true
 
-    if (normalized === "warmup") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "renderWarmup",
-            "startWarmup"
-          ]
-        )
-      ).handled
-    }
-
-    if (normalized === "top10") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "renderTop10",
-            "startTop10"
-          ]
-        )
-      ).handled
-    }
-
-
-    if (normalized === "who") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "renderWho",
-            "startWho"
-          ]
-        )
-      ).handled
-    }
-
-    if (normalized === "explain") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "renderExplain",
-            "startExplain"
-          ]
-        )
-      ).handled
-    }
-
-    if (normalized === "letterli") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "renderLetterli",
-            "startLetterli"
-          ]
-        )
-      ).handled
-    }
-
-    if (
-      normalized === "randomChallenge"
-    ) {
-      return (
-        await invokeDisplayFunction(
-          [
-            "renderRandomChallenge",
-            "startRandomChallenge"
-          ]
-        )
-      ).handled
-    }
-
-    if (normalized === "archive") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "renderArchive",
-            "startArchive"
-          ]
-        )
-      ).handled
+    const renderMap = {
+      warmup: ["renderWarmup"],
+      top10: ["renderTop10"],
+      who: ["renderWho"],
+      explain: ["renderExplain"],
+      familyDidi: [
+  "selectFamilyDidiTeam"
+],
+      archive: ["renderArchive"],
+      randomChallenge: ["renderRandomChallenge"]
     }
 
     if (normalized === "final") {
-      const finalResult =
-        await invokeDisplayVariants([
-          {
-            names: [
-              "openFinalRound",
-              "setFinalRound",
-              "changeFinalRound"
-            ],
-            args: [round]
-          },
-          {
-            names: [
-              "renderFinal",
-              "startFinal"
-            ],
-            args: [round]
-          }
-        ])
-
-      return finalResult.handled
+      return (
+        await callFn(
+          ["renderFinal"],
+          [
+            round,
+            routeKey
+          ]
+        )
+      ).handled
     }
 
-    return false
-  }
-
-  async function goDisplayHomeFromPresenter() {
-    setDisplayActiveSegment("")
-
-    const result =
-      await invokeDisplayFunction(
-        [
-          "goHome",
-          "goToHome",
-          "showDisplayHome",
-          "showHome",
-          "showSegmentsScreen",
-          "goBackToSegments",
-          "backToSegments",
-          "returnToSegments",
-          "renderHome"
-        ]
+    return (
+      await callFn(
+        renderMap[normalized] || [],
+        [payload]
       )
-
-    return result.handled
+    ).handled
   }
 
-  function setDisplayControlsHiddenFallback(
-    hidden
-  ) {
+  async function goHomeFromPresenter() {
+    setActiveSegment("")
+
+    return (
+      await callFn([
+        "goHome",
+        "goToHome",
+        "showDisplayHome",
+        "showHome",
+        "showSegmentsScreen",
+        "goBackToSegments",
+        "backToSegments",
+        "returnToSegments",
+        "renderHome"
+      ])
+    ).handled
+  }
+
+  function setControlsHiddenFallback(hidden) {
     const safeHidden = !!hidden
 
     document.body?.classList.toggle(
@@ -900,19 +616,19 @@ function scheduleDisplayStateSync() {
       safeHidden
     )
 
-    const selectors = [
-      "#displayControls",
-      ".displayControls",
-      ".gameControls",
-      ".segmentControls",
-      ".controlsBar",
-      ".displayControlBar",
-      ".displayActionBar"
-    ]
-
     document
       .querySelectorAll(
-        selectors.join(",")
+        [
+          "#displayControls",
+          ".displayControls",
+          ".gameControls",
+          ".segmentControls",
+          ".controlsBar",
+          ".displayControlBar",
+          ".displayActionBar",
+          ".randomControlsBar",
+          ".randomChallengeActions"
+        ].join(",")
       )
       .forEach(element => {
         element.classList.toggle(
@@ -922,214 +638,173 @@ function scheduleDisplayStateSync() {
 
         element.setAttribute(
           "aria-hidden",
-          safeHidden
-            ? "true"
-            : "false"
+          safeHidden ? "true" : "false"
         )
       })
 
-    window.displayControlsHidden =
-      safeHidden
+    window.displayControlsHidden = safeHidden
   }
 
-  async function handleDisplayControlsCommand(
-    action,
-    payload
-  ) {
-    if (
-      action ===
-      "toggleDisplayControls"
-    ) {
-      const direct =
-        await invokeDisplayFunction(
-          [
-            "toggleDisplayControls",
-            "toggleGameControls",
-            "toggleSegmentControls"
-          ]
-        )
-
-      if (direct.handled) {
+async function handleControls(action, payload = {}) {
+  if (action === "toggleDisplayControls") {
+    if (typeof payload.hidden === "boolean") {
+      action =
+        payload.hidden
+          ? "hideDisplayControls"
+          : "showDisplayControls"
+    } else {
+      if (
+        typeof window.toggleDisplayControlsFromScreen === "function"
+      ) {
+        window.toggleDisplayControlsFromScreen()
         return true
       }
 
-      const current =
-        !!window.displayControlsHidden
-
-      setDisplayControlsHiddenFallback(
-        !current
+      setControlsHiddenFallback(
+        !window.displayControlsHidden
       )
 
       return true
     }
-
-    const hidden =
-      action === "hideDisplayControls"
-        ? true
-        : action === "showDisplayControls"
-          ? false
-          : !!payload.hidden
-
-    const direct =
-      await invokeDisplayVariants([
-        {
-          names: [
-            "setDisplayControlsHidden"
-          ],
-          args: [hidden]
-        },
-        {
-          names: [
-            "setDisplayControlsVisibility"
-          ],
-          args: [!hidden]
-        }
-      ])
-
-    if (direct.handled) {
-      return true
-    }
-
-    setDisplayControlsHiddenFallback(
-      hidden
-    )
-
-    return true
   }
 
-  async function endDisplaySegmentFromPresenter(
-    command
+  const hidden =
+    action === "hideDisplayControls"
+      ? true
+      : action === "showDisplayControls"
+        ? false
+        : !!payload.hidden
+
+  localStorage.setItem(
+    "presenter_hide_controls",
+    hidden ? "1" : "0"
+  )
+
+  if (
+    typeof window.applyPresenterHideDisplayControlsState === "function"
   ) {
-    const payload = command.payload || {}
+    window.applyPresenterHideDisplayControlsState()
+  }
 
-    const result =
-      await invokeDisplayVariants([
-        {
-          names: [
-            "endCurrentSegment",
-            "finishCurrentSegment",
-            "closeCurrentSegment"
-          ],
-          args: [payload]
-        },
-        {
-          names: [
-            "endSegment",
-            "finishSegment",
-            "closeSegment",
-            "handleSegmentEnd"
-          ],
-          args: [
-            command.segment,
-            payload
-          ]
-        }
-      ])
+  if (
+    typeof window.updateDisplayControlsEyeButton === "function"
+  ) {
+    window.updateDisplayControlsEyeButton(hidden)
+  }
 
-    if (!result.handled) {
-      await goDisplayHomeFromPresenter()
-    }
+  setControlsHiddenFallback(hidden)
 
+  return true
+}
+
+async function endSegmentFromPresenter(payload = {}) {
+  if (typeof window.endSegment === "function") {
+    window.endSegment()
     return true
   }
+
+  if (typeof window.finishSegment === "function") {
+    window.finishSegment()
+    return true
+  }
+
+  const endButton =
+    document.querySelector("[onclick='endSegment()']") ||
+    document.querySelector('[onclick="endSegment()"]') ||
+    document.querySelector("[onclick='finishSegment()']") ||
+    document.querySelector('[onclick="finishSegment()"]') ||
+    document.querySelector("#endSegmentBtn") ||
+    document.querySelector("#displayEndSegmentBtn") ||
+    document.querySelector("#megaEndBtn") ||
+    document.querySelector(".endSegmentBtn") ||
+    document.querySelector(".displayEndSegmentBtn") ||
+    document.querySelector(".megaEndBtn")
+
+  if (
+    endButton &&
+    typeof endButton.click === "function" &&
+    !endButton.disabled
+  ) {
+    endButton.click()
+    return true
+  }
+
+  return false
+}
 
   /* =========================
-     9) TEAM SELECTION
+     TEAM
   ========================= */
 
-  async function handleSelectTeamCommand(
-    command
-  ) {
+  async function handleTeam(command) {
     const payload = command.payload || {}
-    const team = String(
-      payload.team || ""
-    ).toUpperCase()
+    const team =
+      String(payload.team || "").toUpperCase()
 
-    if (
-      team !== "A" &&
-      team !== "B"
-    ) {
+    if (team !== "A" && team !== "B") {
       return false
     }
 
     const segment = command.segment
 
-    const namesBySegment = {
+    const map = {
       warmup: [
         "forceWarmupTeamFromPresenter",
-        "setWarmupActiveTeam",
         "selectWarmupTeam"
       ],
-
       top10: [
         "forceTop10TeamFromPresenter",
-        "setTop10ActiveTeam",
         "selectTop10Team"
       ],
-
       who: [
         "forceWhoTeamFromPresenter",
-        "setWhoActiveTeam",
         "selectWhoTeam"
       ],
-
       explain: [
         "forceExplainTeamFromPresenter",
-        "setExplainActiveTeam",
         "selectExplainTeam"
       ],
-
-      letterli: [
-        "setLetterliActiveTeam",
-        "selectLetterliTeam"
-      ],
-
-      randomChallenge: [
-        "selectRandomChallengeTeam",
-        "highlightRandomChallengeTeam"
-      ],
-
+      familyDidi: [
+  "openFamilyDidiSegment",
+  "renderFamilyDidi"
+],
       archive: [
         "forceArchiveTeamFromPresenter",
-        "setArchiveActiveTeam",
         "selectArchiveTeam"
       ],
-
       final: [
-        "forceFinalTeamFromPresenter",
-        "setFinalActiveTeam",
         "selectFinalTeam"
+      ],
+      randomChallenge: [
+        "setRandomChallengePresenterTeam",
+        "selectRandomChallengeTeam",
+        "highlightRandomChallengeTeam"
       ]
     }
 
     const specific =
-      await invokeDisplayFunction(
-        namesBySegment[segment] || [],
-        [team]
+      await callFn(
+        map[segment] || [],
+        [
+          team,
+          command.round,
+          payload
+        ]
       )
 
-    if (specific.handled) {
-      window.selectedTeam = team
-      return true
-    }
-
-    const generic =
-      await invokeDisplayFunction(
+    if (!specific.handled) {
+      await callFn(
         [
-          "forceTeamFromPresenter",
-          "setActiveTeam",
+          "setGameActiveTeam",
           "selectTeam"
         ],
         [
           team,
           segment,
-          command.round
+          command.round,
+          payload
         ]
       )
-
-    if (generic.handled) {
-      window.selectedTeam = team
-      return true
     }
 
     window.selectedTeam = team
@@ -1137,524 +812,871 @@ function scheduleDisplayStateSync() {
   }
 
   /* =========================
-     10) WARMUP
+     LOTTERY
   ========================= */
 
-  async function handleWarmupCommand(
-    action,
-    payload
-  ) {
-    if (action === "openNumber") {
-      const category =
-        Number(payload.category || 0)
+  function getLotterySegmentKey(command) {
+    const payload = command.payload || {}
 
-      const number =
-        Number(payload.number || 0)
-
-      return (
-        await invokeDisplayVariants([
-          {
-            names: [
-              "openWarmupQuestion",
-              "selectWarmupQuestion",
-              "showWarmupQuestion"
-            ],
-            args: [
-              category,
-              number
-            ]
-          },
-          {
-            names: [
-              "openWarmupNumber"
-            ],
-            args: [
-              number,
-              category
-            ]
-          }
-        ])
-      ).handled
+    if (payload.activeSegment) {
+      return payload.activeSegment
     }
 
-    const actionMap = {
-      double: [
-        "activateWarmupDouble",
-        "useWarmupDouble",
-        "toggleWarmupDouble"
-      ],
-
-      correct: [
-        "markWarmupCorrect",
-        "warmupCorrect",
-        "answerWarmupCorrect",
-        "scoreWarmupCorrect"
-      ],
-
-      wrong: [
-        "markWarmupWrong",
-        "warmupWrong",
-        "answerWarmupWrong",
-        "scoreWarmupWrong"
-      ],
-
-      undo: [
-        "undoWarmupAction",
-        "warmupUndo"
-      ],
-
-      startTimer: [
-        "startWarmupTimer",
-        "resumeWarmupTimer"
-      ],
-
-      showAnswer: [
-        "showWarmupAnswer",
-        "revealWarmupAnswer"
-      ]
-    }
-
-    const names =
-      actionMap[action] || []
-
-    if (!names.length) {
-      return false
+    if (
+      command.segment === "final" ||
+      payload.segment === "final"
+    ) {
+      return getFinalSegmentKey(
+        payload.round ||
+        payload.finalRound ||
+        command.round ||
+        1
+      )
     }
 
     return (
-      await invokeDisplayFunction(
-        names,
-        [
-          payload.team,
-          payload.number,
-          payload
-        ]
-      )
-    ).handled
+      payload.segmentKey ||
+      payload.segment ||
+      command.rawSegment ||
+      command.segment ||
+      ""
+    )
   }
 
-  /* =========================
-     11) TOP 10
-  ========================= */
+  async function handleLottery(command) {
+    const action = command.action
+    const payload = command.payload || {}
 
-  async function handleTop10Command(
-    action,
-    payload
-  ) {
-    if (action === "openNumber") {
-      return (
-        await invokeDisplayFunction(
+    const team =
+      payload.team === "A" || payload.team === "B"
+        ? payload.team
+        : null
+
+    const segmentKey =
+      getLotterySegmentKey(command)
+
+    if (action === "startLottery") {
+      await callFn(
+        [
+          "startSegmentStartLotteryFromPresenter"
+        ],
+        [segmentKey]
+      )
+
+      if (team) {
+        await callFn(
           [
-            "openTop10Number"
+            "selectSegmentStartLotteryTeamFromPresenter"
           ],
           [
-            Number(payload.number || 0)
+            team,
+            segmentKey
           ]
         )
-      ).handled
-    }
 
-    if (action === "setRound") {
-      const round =
-        Number(payload.round || 1)
-
-      const direct =
-        await invokeDisplayFunction(
-          [
-            "setTop10Round",
-            "goToTop10Round"
-          ],
-          [round]
-        )
-
-      if (direct.handled) {
-        return true
+        await handleTeam({
+          ...command,
+          action: "selectTeam",
+          payload: {
+            ...payload,
+            team
+          }
+        })
       }
 
-      return (
-        await invokeDisplayFunction(
-          [
-            "renderCurrentRoundTop10UI"
-          ],
-          [round]
-        )
-      ).handled
+      return true
     }
 
-    const actionMap = {
-      double: [
-        "activateTop10Double"
-      ],
+    if (action === "selectLotteryTeam") {
+      if (!team) return false
 
-      showAnswer: [
-        "showTop10Answer"
-      ],
+      await callFn(
+        [
+          "selectSegmentStartLotteryTeamFromPresenter"
+        ],
+        [
+          team,
+          segmentKey
+        ]
+      )
 
-      correct: [
-        "showTop10Answer",
-        "top10Correct"
-      ],
+      await handleTeam({
+        ...command,
+        action: "selectTeam",
+        payload: {
+          ...payload,
+          team
+        }
+      })
 
-      wrong: [
-        "addTop10Error",
-        "top10Wrong"
-      ],
-
-      undo: [
-        "undoTop10Action"
-      ],
-
-      switchTurn: [
-        "switchTop10Turn"
-      ],
-
-      nextRound: [
-        "nextTop10Round"
-      ],
-
-      previousRound: [
-        "prevTop10Round"
-      ],
-
-      startTimer: [
-        "startTop10TimerButton",
-        "startTop10Timer"
-      ]
+      return true
     }
 
-    const names =
-      actionMap[action] || []
+    if (action === "confirmLottery") {
+      await callFn(
+        [
+          "confirmSegmentStartLotteryFromPresenter"
+        ],
+        [segmentKey]
+      )
 
-    if (!names.length) {
+      if (team) {
+        await handleTeam({
+          ...command,
+          action: "selectTeam",
+          payload: {
+            ...payload,
+            team
+          }
+        })
+      }
+
+      return true
+    }
+
+    if (action === "retryLottery") {
+      await callFn(
+        [
+          "retrySegmentStartLotteryFromPresenter"
+        ],
+        [segmentKey]
+      )
+
+      return true
+    }
+
+    return false
+  }
+
+  /* =========================
+     WARMUP
+  ========================= */
+
+async function handleWarmup(action, payload = {}) {
+  async function syncWarmupTeamBeforeAction() {
+    const team =
+      String(payload.team || "").toUpperCase()
+
+    if (team !== "A" && team !== "B") {
       return false
     }
 
-    return (
-      await invokeDisplayFunction(
-        names,
+    const result =
+      await callFn(
         [
-          payload.team,
-          payload.number,
+          "forceWarmupTeamFromPresenter",
+          "selectWarmupTeam",
+          "setWarmupActiveTeam",
+          "setGameActiveTeam"
+        ],
+        [
+          team,
+          {
+            force: true,
+            immediate: true,
+            sync: false
+          },
+          payload
+        ]
+      )
+
+    window.selectedTeam = team
+    return result.handled
+  }
+
+  if (action === "openNumber") {
+    await syncWarmupTeamBeforeAction()
+
+    return (
+      await callFn(
+        [
+          "openWarmupQuestion",
+          "selectWarmupQuestion",
+          "showWarmupQuestion"
+        ],
+        [
+          Number(payload.category || 0),
+          Number(payload.number || 0),
           payload
         ]
       )
     ).handled
   }
 
-  /* =========================
-     13) WHO / من هو
-  ========================= */
-
-  async function handleWhoCommand(
-    action,
-    payload
+  if (
+    action === "double" ||
+    action === "correct" ||
+    action === "wrong"
   ) {
-    if (action === "openNumber") {
+    await syncWarmupTeamBeforeAction()
+  }
+
+  const map = {
+    double: [
+      "activateWarmupDouble",
+      "useWarmupDouble",
+      "toggleWarmupDouble"
+    ],
+    correct: [
+      "markWarmupCorrect",
+      "warmupCorrect",
+      "answerWarmupCorrect",
+      "scoreWarmupCorrect"
+    ],
+    wrong: [
+      "markWarmupWrong",
+      "warmupWrong",
+      "answerWarmupWrong",
+      "scoreWarmupWrong"
+    ],
+    startTimer: [
+      "startWarmupTimer"
+    ],
+    showAnswer: [
+      "showWarmupQuestion"
+    ],
+    undo: [
+      "undoWarmupAction"
+    ]
+  }
+
   return (
-    await invokeDisplayFunction(
+    await callFn(
+      map[action] || [],
       [
-        "chooseWho",
-        "openWhoNumber",
-        "openWhoImage",
-        "showWhoNumber"
-      ],
-      [
-        Number(payload.number || 0)
+        payload.team,
+        payload.number,
+        payload
       ]
     )
   ).handled
 }
 
-    if (action === "setPoints") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "setWhoPoints",
-            "selectWhoPoints",
-            "setCurrentWhoPoints"
-          ],
-          [
-            Number(payload.points || 0)
-          ]
-        )
-      ).handled
-    }
+  /* =========================
+     TOP 10
+  ========================= */
 
-    const actionMap = {
-      double: [
-        "activateWhoDouble",
-        "useWhoDouble"
-      ],
+async function handleTop10(action, payload = {}) {
+  async function syncTop10TeamBeforeAction() {
+    const team =
+      String(payload.team || "").toUpperCase()
 
-      compensation: [
-        "activateWhoCompensation",
-        "startWhoCompensation",
-        "enableWhoCompensation"
-      ],
-
-      correct: [
-        "whoCorrect",
-        "markWhoCorrect",
-        "scoreWhoCorrect"
-      ],
-
-      wrong: [
-        "whoWrong",
-        "markWhoWrong",
-        "scoreWhoWrong"
-      ],
-
-      undo: [
-        "undoWhoAction",
-        "whoUndo"
-      ],
-
-      zoomImage: [
-        "zoomWhoImage",
-        "openWhoImageViewer"
-      ],
-
-      playWhoVideo: [
-        "playWhoVideo",
-        "playCurrentWhoVideo"
-      ]
-    }
-
-    const names =
-      actionMap[action] || []
-
-    if (!names.length) {
+    if (team !== "A" && team !== "B") {
       return false
     }
 
+    await callFn(
+      [
+        "forceTop10TeamFromPresenter",
+        "selectTop10Team"
+      ],
+      [
+        team,
+        {
+          force: true,
+          immediate: true,
+          sync: false
+        },
+        payload
+      ]
+    )
+
+    if (
+      window.top10State &&
+      typeof window.top10State === "object"
+    ) {
+      window.top10State.activeTeam = team
+    }
+
+    window.selectedTeam = team
+    return true
+  }
+
+  if (action === "openNumber") {
+    await syncTop10TeamBeforeAction()
+
     return (
-      await invokeDisplayFunction(
-        names,
+      await callFn(
         [
-          payload.team,
-          payload.number,
-          payload.points,
+          "openTop10Number"
+        ],
+        [
+          Number(payload.number || 0),
           payload
         ]
       )
     ).handled
   }
 
-  /* =========================
-     14) EXPLAIN / اشرح الكلمة
-  ========================= */
+  if (action === "setRound") {
+    const round =
+      Number(payload.round || 1)
 
-  async function handleExplainCommand(
-    action,
-    payload
-  ) {
-    if (action === "openNumber") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "openExplainNumber",
-            "openExplainWord",
-            "showExplainWord"
-          ],
-          [
-            Number(payload.number || 0)
-          ]
-        )
-      ).handled
+    if (
+      window.top10State &&
+      typeof window.top10State === "object"
+    ) {
+      window.top10State.round = round
     }
 
-const actionMap = {
-  double: [
-    "activateExplainDouble"
-  ],
+    return (
+      await callFn(
+        [
+          "renderCurrentRoundTop10UI"
+        ],
+        [
+          round,
+          payload
+        ]
+      )
+    ).handled
+  }
 
-  startTimer: [
-    "startExplainTimer",
-    "startExplainWordTimer"
-  ],
+  if (
+    action === "double" ||
+    action === "wrong" ||
+    action === "switchTurn" ||
+    action === "startTimer"
+  ) {
+    await syncTop10TeamBeforeAction()
+  }
 
-  toggleWordVisible: [
-    "hideExplainWord",
-    "toggleExplainWordVisible",
-    "toggleExplainWord",
-    "toggleWordVisible"
-  ],
+  const map = {
+    double: [
+      "activateTop10Double"
+    ],
+    showAnswer: [
+      "showTop10Answer"
+    ],
+    correct: [
+      "showTop10Answer"
+    ],
+    wrong: [
+      "addTop10Error"
+    ],
+    undo: [
+      "undoTop10Action"
+    ],
+    switchTurn: [
+      "switchTop10Turn"
+    ],
+    nextRound: [
+      "nextTop10Round"
+    ],
+    previousRound: [
+      "prevTop10Round"
+    ],
+    startTimer: [
+      "startTop10TimerButton",
+      "startTop10Timer"
+    ]
+  }
 
-  showAnswer: [
-    "showExplainWord",
-    "revealExplainWord"
-  ],
-
-  correct: [
-    "correctExplainAnswer",
-    "explainCorrect",
-    "markExplainCorrect",
-    "scoreExplainCorrect"
-  ],
-
-  wrong: [
-    "wrongExplainAnswer",
-    "explainWrong",
-    "markExplainWrong",
-    "scoreExplainWrong"
-  ],
-
-  undo: [
-    "undoExplainAction",
-    "explainUndo"
-  ]
+  return (
+    await callFn(
+      map[action] || [],
+      [
+        payload.team,
+        payload.number,
+        payload
+      ]
+    )
+  ).handled
 }
 
-    const names =
-      actionMap[action] || []
+  /* =========================
+     WHO
+  ========================= */
 
-    if (!names.length) {
+async function handleWho(action, payload = {}) {
+  async function syncWhoTeamBeforeAction() {
+    const team =
+      String(payload.team || "").toUpperCase()
+
+    if (team !== "A" && team !== "B") {
       return false
     }
 
+    await callFn(
+      [
+        "forceWhoTeamFromPresenter",
+        "selectWhoTeam"
+      ],
+      [
+        team,
+        {
+          force: true,
+          immediate: true,
+          sync: false
+        },
+        payload
+      ]
+    )
+
+    if (
+      window.whoState &&
+      typeof window.whoState === "object"
+    ) {
+      window.whoState.activeTeam = team
+    }
+
+    window.selectedTeam = team
+    return true
+  }
+
+  async function syncWhoPointsBeforeOpen() {
+    const points =
+      Number(payload.points || 0)
+
+    if (!points) {
+      return false
+    }
+
+    if (
+      window.whoState &&
+      typeof window.whoState === "object"
+    ) {
+      window.whoState.currentPoints = points
+    }
+
     return (
-      await invokeDisplayFunction(
-        names,
+      await callFn(
         [
-          payload.team,
-          payload.number,
+          "setWhoPoints"
+        ],
+        [
+          points,
           payload
         ]
       )
     ).handled
   }
 
+  function syncWhoPointsSilently() {
+    const points =
+      Number(payload.points || 0)
+
+    if (!points) {
+      return false
+    }
+
+    if (
+      window.whoState &&
+      typeof window.whoState === "object"
+    ) {
+      window.whoState.currentPoints = points
+      return true
+    }
+
+    return false
+  }
+
+  if (action === "setPoints") {
+    return (
+      await callFn(
+        [
+          "setWhoPoints"
+        ],
+        [
+          Number(payload.points || 0),
+          payload
+        ]
+      )
+    ).handled
+  }
+
+  if (action === "openNumber") {
+    await syncWhoPointsBeforeOpen()
+    await syncWhoTeamBeforeAction()
+
+    return (
+      await callFn(
+        [
+          "chooseWho"
+        ],
+        [
+          Number(payload.number || 0),
+          payload
+        ]
+      )
+    ).handled
+  }
+
+  if (
+    action === "double" ||
+    action === "correct" ||
+    action === "wrong"
+  ) {
+    await syncWhoTeamBeforeAction()
+    syncWhoPointsSilently()
+  }
+
+  const map = {
+    double: [
+      "activateWhoDouble"
+    ],
+    compensation: [
+      "startWhoCompensation"
+    ],
+    correct: [
+      "whoCorrect"
+    ],
+    wrong: [
+      "whoWrong"
+    ],
+    zoomImage: [
+      "toggleWhoImageOverlay",
+      "openWhoImageOverlay"
+    ],
+    showAnswer: [
+      "showWhoAnswer"
+    ],
+    startTimer: [
+      "startWhoTimer"
+    ],
+    undo: [
+      "undoWhoAction"
+    ]
+  }
+
+  return (
+    await callFn(
+      map[action] || [],
+      [
+        payload.team,
+        payload.number,
+        payload.points,
+        payload
+      ]
+    )
+  ).handled
+}
   /* =========================
-     15) LETTERLI / حرفلي
+     EXPLAIN
   ========================= */
 
-async function handleLetterliCommand(
+async function handleExplain(action, payload = {}) {
+  async function syncExplainTeamBeforeAction() {
+    const team =
+      String(payload.team || "").toUpperCase()
+
+    if (team !== "A" && team !== "B") {
+      return false
+    }
+
+    await callFn(
+      [
+        "forceExplainTeamFromPresenter",
+        "selectExplainTeam"
+      ],
+      [
+        team,
+        {
+          force: true,
+          immediate: true,
+          sync: false
+        },
+        payload
+      ]
+    )
+
+    if (
+      window.explainState &&
+      typeof window.explainState === "object"
+    ) {
+      window.explainState.currentTeam = team
+      window.explainState.activeTeam = team
+      window.explainState.selectedTeam = team
+    }
+
+    window.selectedTeam = team
+    return true
+  }
+
+  if (action === "openNumber") {
+    if (payload.team) {
+      await syncExplainTeamBeforeAction()
+    }
+
+    return (
+      await callFn(
+        [
+          "openExplainNumber"
+        ],
+        [
+          Number(payload.number || 0),
+          {
+            ...payload,
+            compensation:
+              payload.compensation === true
+          }
+        ]
+      )
+    ).handled
+  }
+
+  if (
+    action === "double" ||
+    action === "startTimer" ||
+    action === "toggleWordVisible" ||
+    action === "showAnswer" ||
+    action === "correct" ||
+    action === "wrong"
+  ) {
+    await syncExplainTeamBeforeAction()
+  }
+
+  const map = {
+    double: [
+      "activateExplainDouble"
+    ],
+    startTimer: [
+      "startExplainTimer"
+    ],
+    toggleWordVisible: [
+      "hideExplainWord"
+    ],
+    showAnswer: [
+      "hideExplainWord"
+    ],
+    correct: [
+      "correctExplainAnswer"
+    ],
+    wrong: [
+      "wrongExplainAnswer"
+    ]
+  }
+
+  return (
+    await callFn(
+      map[action] || [],
+      [
+        payload.team,
+        payload.number,
+        payload
+      ]
+    )
+  ).handled
+}
+/* =========================
+   FAMILY DIDI
+========================= */
+
+async function handleFamilyDidi(
   action,
   payload = {}
 ) {
-  if (
-    action === "letterliStartSpin" ||
-    action === "startLetterli" ||
-    action === "startSpin"
-  ) {
-    return (
-      await invokeDisplayFunction(
-        [
-          "startLetterliSpin",
-          "window.startLetterliSpin"
-        ],
-        []
-      )
-    ).handled
-  }
+  const team =
+    String(
+      payload.team || ""
+    ).toUpperCase()
 
-  if (
-    action === "letterliChangeQuestion" ||
-    action === "changeLetterliQuestion" ||
-    action === "nextQuestion" ||
-    action === "letterliNextQuestion"
-  ) {
-    return (
-      await invokeDisplayFunction(
-        [
-          "changeLetterliQuestion",
-          "window.changeLetterliQuestion"
-        ],
-        []
-      )
-    ).handled
-  }
+  const hasTeam =
+    team === "A" ||
+    team === "B"
 
-  if (
-    action === "letterliShowQuestion" ||
-    action === "letterliToggleQuestion" ||
-    action === "toggleLetterliQuestion"
-  ) {
-    return (
-      await invokeDisplayFunction(
-        [
-          "toggleLetterliQuestion",
-          "window.toggleLetterliQuestion"
-        ],
-        []
-      )
-    ).handled
-  }
-
-  if (
-    action === "letterliShowAnswer" ||
-    action === "letterliToggleAnswer" ||
-    action === "toggleLetterliAnswer"
-  ) {
-    return (
-      await invokeDisplayFunction(
-        [
-          "markLetterliCorrectAnswer",
-          "window.markLetterliCorrectAnswer"
-        ],
-        []
-      )
-    ).handled
-  }
-
-  if (
-    action === "letterliStartTimer" ||
-    action === "startTimer"
-  ) {
-    return (
-      await invokeDisplayFunction(
-        [
-          "startLetterliCountdown",
-          "window.startLetterliCountdown"
-        ],
-        []
-      )
-    ).handled
-  }
-
-  if (
-    action === "letterliScoreTeam" ||
-    action === "scoreTeam"
-  ) {
-    const team =
-      payload?.team === "A" ||
-      payload?.team === "B"
-        ? payload.team
-        : ""
-
-    if (!team) {
+  async function syncFamilyDidiTeam() {
+    if (!hasTeam) {
       return false
     }
 
+    await callFn(
+      [
+        "selectFamilyDidiTeam"
+      ],
+      [
+        team,
+        {
+          history: false,
+          timer: false,
+          sync: false
+        },
+        payload
+      ]
+    )
+
+    if (
+      window.familyDidiState &&
+      typeof window.familyDidiState ===
+        "object"
+    ) {
+      window.familyDidiState.activeTeam =
+        team
+    }
+
+    window.selectedTeam = team
+
+    return true
+  }
+
+  /*
+    فتح السؤال لا يحتاج فريق.
+  */
+  if (
+    action === "revealQuestion"
+  ) {
     return (
-      await invokeDisplayFunction(
+      await callFn(
         [
-          "selectLetterliTeam",
-          "window.selectLetterliTeam"
+          "revealFamilyDidiQuestion"
         ],
-        [team]
+        [
+          {
+            sync: true
+          },
+          payload
+        ]
       )
     ).handled
   }
 
-  return false
+  /*
+    أول إجابتين يمكن فتحهما بدون فريق.
+    إذا أُرسل فريق نزامنه أولًا.
+  */
+  if (
+    action === "openAnswer"
+  ) {
+    if (hasTeam) {
+      await syncFamilyDidiTeam()
+    }
+
+    return (
+      await callFn(
+        [
+          "openFamilyDidiAnswer"
+        ],
+        [
+          Number(
+            payload.position ||
+            payload.number ||
+            0
+          ),
+          {
+            sync: true
+          },
+          payload
+        ]
+      )
+    ).handled
+  }
+
+  /*
+    اعتماد الجولة يحتاج الفريق الفائز.
+  */
+  if (
+    action === "awardRound"
+  ) {
+    if (hasTeam) {
+      await syncFamilyDidiTeam()
+    }
+
+    return (
+      await callFn(
+        [
+          "awardFamilyDidiRound"
+        ],
+        [
+          hasTeam
+            ? team
+            : null,
+          {
+            sync: true
+          },
+          payload
+        ]
+      )
+    ).handled
+  }
+
+  /*
+    الخطأ يمكن أن يعمل قبل تحديد الفريق
+    كتأثير فقط حسب منطق العرض.
+  */
+  if (
+    action === "wrong"
+  ) {
+    if (hasTeam) {
+      await syncFamilyDidiTeam()
+    }
+
+    return (
+      await callFn(
+        [
+          "addFamilyDidiError"
+        ],
+        [
+          {
+            sync: true
+          },
+          payload
+        ]
+      )
+    ).handled
+  }
+
+  if (
+    (
+      action === "switchTurn" ||
+      action === "startTimer"
+    ) &&
+    hasTeam
+  ) {
+    await syncFamilyDidiTeam()
+  }
+
+  const map = {
+    showRemainingAnswers: [
+      "showRemainingFamilyDidiAnswers"
+    ],
+
+    showAnswer: [
+      "showRemainingFamilyDidiAnswers"
+    ],
+
+    undo: [
+      "undoFamilyDidiAction"
+    ],
+
+    switchTurn: [
+      "switchFamilyDidiTurn"
+    ],
+
+    startTimer: [
+      "startFamilyDidiTimerButton",
+      "startFamilyDidiTimer"
+    ],
+
+    nextRound: [
+      "nextFamilyDidiRound"
+    ],
+
+    previousRound: [
+      "previousFamilyDidiRound"
+    ]
+  }
+
+  return (
+    await callFn(
+      map[action] || [],
+      [
+        payload
+      ]
+    )
+  ).handled
 }
   /* =========================
-     16) RANDOM CHALLENGE
+     RANDOM CHALLENGE
   ========================= */
 
-  async function handleRandomChallengeCommand(
-    action,
-    payload
-  ) {
+  async function handleRandom(action, payload = {}) {
     if (action === "randomOpenBox") {
       return (
-        await invokeDisplayFunction(
+        await callFn(
+          ["openRandomChallengeBox"],
           [
-            "openRandomChallengeBox"
-          ],
-          [
-            Number(payload.box || 0)
+            Number(payload.box || 0),
+            payload
           ]
         )
       ).handled
@@ -1662,21 +1684,44 @@ async function handleLetterliCommand(
 
     if (action === "randomStartBox1") {
       return (
-        await invokeDisplayFunction(
+        await callFn(
+          ["startRandomChallengeBox1"],
           [
-            "startRandomChallengeBox1"
-          ],
-          [
-            payload.pool || "saudi"
+            payload.pool || "saudi",
+            payload
           ]
         )
       ).handled
     }
 
-    if (
-      action ===
-      "randomSetAuctionPoints"
-    ) {
+    if (action === "randomResetBox1") {
+      return (
+        await callFn(
+          ["resetRandomChallengeBox1"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomBackToBoxes") {
+      return (
+        await callFn(
+          ["handleRandomChallengeBack"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomFinishBox") {
+      return (
+        await callFn(
+          ["finishRandomChallengeCurrentBox"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomSetAuctionPoints") {
       const value =
         Number(
           payload.count ??
@@ -1685,7 +1730,7 @@ async function handleLetterliCommand(
         )
 
       return (
-        await invokeDisplayFunction(
+        await callFn(
           [
             "setRandomBox2NumberValue",
             "updateRandomBox2Number"
@@ -1698,330 +1743,226 @@ async function handleLetterliCommand(
       ).handled
     }
 
-    if (
-      action ===
-      "randomStartBox2Timer"
-    ) {
+    if (action === "randomStartBox2Timer") {
       return (
-        await invokeDisplayFunction(
+        await callFn(
+          ["startRandomBox2Timer"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomStartBox3Timer") {
+      return (
+        await callFn(
+          ["startRandomBox3Timer"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomFinishRound") {
+      return (
+        await callFn(
+          ["finishRandomBox3ToPoints"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomBox3ScorePoints") {
+      return (
+        await callFn(
+          ["scoreRandomBox3Points"],
           [
-            "startRandomBox2Timer"
+            Number(payload.points || 0),
+            payload
           ]
         )
       ).handled
     }
 
-          if (action === "randomStartBox3Timer") {
-        if (payload.team) {
-          await invokeDisplayFunction(
-            [
-              "setRandomChallengePresenterTeam"
-            ],
-            [
-              payload.team
-            ]
-          )
-        }
-
-        return (
-          await invokeDisplayFunction(
-            [
-              "startRandomBox3Timer"
-            ]
-          )
-        ).handled
-      }
-
-      if (action === "randomFinishRound") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "finishRandomBox3ToPoints"
-            ]
-          )
-        ).handled
-      }
-
-      if (action === "randomStartBox4Game") {
-        if (payload.team) {
-          await invokeDisplayFunction(
-            [
-              "setRandomChallengePresenterTeam"
-            ],
-            [
-              payload.team
-            ]
-          )
-        }
-
-        return (
-          await invokeDisplayFunction(
-            [
-              "startRandomBox4Game"
-            ]
-          )
-        ).handled
-      }
-
-      if (action === "randomStartBox4SecondTeam") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "startRandomBox4SecondTeam"
-            ]
-          )
-        ).handled
-      }
-
-      if (action === "randomBox4Answer") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "answerRandomBox4"
-            ],
-            [
-              payload.selectedAnswer ||
-              payload.answer ||
-              "صح"
-            ]
-          )
-        ).handled
-      }
-
-      if (action === "randomBox4Next") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "nextRandomBox4Question"
-            ]
-          )
-        ).handled
-      }
-
-      if (action === "randomBox5OpenNumber") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "openRandomBox5Number"
-            ],
-            [
-              Number(payload.number || 0)
-            ]
-          )
-        ).handled
-      }
-
-if (action === "randomBox5BlockTimer") {
-  return (
-    await invokeDisplayFunction(
-      [
-        "toggleRandomBox5BlockMode",
-        "startRandomBox5BlockTimer"
-      ],
-      []
-    )
-  ).handled
-}
-
-            if (action === "randomBox5RevealAnswer") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "revealRandomBox5Answer"
-            ]
-          )
-        ).handled
-      }
-
-            if (action === "randomBox5PlayVideo") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "playRandomBox5Video"
-            ]
-          )
-        ).handled
-      }
-
-      if (action === "randomBox5CompleteNumber") {
-        if (payload.team) {
-          await invokeDisplayFunction(
-            [
-              "setRandomChallengePresenterTeam"
-            ],
-            [
-              payload.team
-            ]
-          )
-        }
-
-        return (
-          await invokeDisplayFunction(
-            [
-              "completeRandomBox5Number"
-            ],
-            [
-              payload.correct === true ||
-              payload.isCorrect === true
-            ]
-          )
-        ).handled
-      }
-
-      if (action === "randomBox5CancelNumber") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "cancelRandomBox5Number"
-            ]
-          )
-        ).handled
-      }
-
-      if (action === "randomBackToBoxes") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "handleRandomChallengeBack"
-            ]
-          )
-        ).handled
-      }
-
-      if (action === "randomResetBox1") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "resetRandomChallengeBox1"
-            ]
-          )
-        ).handled
-      }
-
-      if (action === "randomSkip") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "startRandomChallengeBox1"
-            ],
-            [
-              payload.pool || "saudi"
-            ]
-          )
-        ).handled
-      }
-
-    if (
-      action ===
-      "randomBox3ScorePoints"
-    ) {
+    if (action === "randomBox3Wrong") {
       return (
-        await invokeDisplayFunction(
+        await callFn(
+          ["randomBox3Wrong"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomBox3Pass") {
+      return (
+        await callFn(
+          ["nextRandomBox3Question"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomBox3SwitchTeam") {
+      return (
+        await callFn(
+          ["switchRandomBox3Team"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomStartBox4Game") {
+      return (
+        await callFn(
+          ["startRandomBox4Game"],
           [
-            "scoreRandomBox3Points"
-          ],
-          [
-            Number(payload.points || 0)
+            payload.team,
+            payload
           ]
         )
       ).handled
     }
 
-    if (
-      action ===
-      "randomBox3SwitchTeam"
-    ) {
+    if (action === "randomStartBox4SecondTeam") {
       return (
-        await invokeDisplayFunction(
+        await callFn(
+          ["startRandomBox4SecondTeam"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomBox4Answer") {
+      return (
+        await callFn(
+          ["answerRandomBox4"],
           [
-            "switchRandomBox3Team"
+            payload.answer ||
+            payload.selectedAnswer ||
+            "",
+            payload
           ]
         )
       ).handled
     }
 
-    if (
-      action ===
-      "randomBox3Pass"
-    ) {
+    if (action === "randomBox4Next") {
       return (
-        await invokeDisplayFunction(
+        await callFn(
+          ["nextRandomBox4Question"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomBox5OpenNumber") {
+      return (
+        await callFn(
+          ["openRandomBox5Number"],
           [
-            "randomBox3Pass"
+            Number(payload.number || 0),
+            payload
           ]
         )
       ).handled
     }
 
-    if (
-      action ===
-      "randomBox3Wrong"
-    ) {
+    if (action === "randomBox5RevealAnswer") {
       return (
-        await invokeDisplayFunction(
+        await callFn(
+          ["revealRandomBox5Answer"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomBox5CompleteNumber") {
+      return (
+        await callFn(
+          ["completeRandomBox5Number"],
           [
-            "randomBox3Wrong"
+            payload.correct ??
+            payload.isCorrect ??
+            false,
+            payload
           ]
         )
       ).handled
     }
 
-    if (
-      action ===
-      "randomFinishBox"
-    ) {
+    if (action === "randomBox5CancelNumber") {
       return (
-        await invokeDisplayFunction(
+        await callFn(
+          ["cancelRandomBox5Number"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomBox5BlockTimer") {
+      return (
+        await callFn(
+          ["startRandomBox5BlockTimer"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "randomSkip") {
+      return (
+        await callFn(
+          ["startRandomChallengeBox1"],
           [
-            "finishRandomChallengeCurrentBox"
+            payload.pool || "saudi",
+            {
+              ...payload,
+              skip: true
+            }
           ]
         )
       ).handled
     }
 
-    const actionMap = {
+    if (action === "randomBox5PlayVideo") {
+      return (
+        await callFn(
+          ["playRandomBox5Video"],
+          [payload]
+        )
+      ).handled
+    }
+
+    if (action === "zoomImage") {
+      return (
+        await callFn(
+          ["zoomRandomBox5Image"],
+          [
+            Number(payload.number || 0),
+            payload
+          ]
+        )
+      ).handled
+    }
+
+    const map = {
       correct: [
         "randomChallengeCorrect"
       ],
-
       wrong: [
         "randomChallengeWrong"
       ],
-
-      skip: [
-        "randomChallengeSkip"
-      ],
-
-      nextQuestion: [
-        "nextRandomBox2Question",
-        "nextRandomBox3Question",
-        "nextRandomBox4Question"
-      ],
-
       showAnswer: [
-        "revealRandomBox5Answer",
-        "answerRandomBox4"
+        "revealRandomBox5Answer"
       ],
-
       finishSegment: [
         "handleRandomChallengeEnd"
       ],
-
       goHome: [
         "goRandomChallengeHome"
       ]
     }
 
-    const names =
-      actionMap[action] || []
-
-    if (!names.length) {
-      return false
-    }
-
     return (
-      await invokeDisplayFunction(
-        names,
+      await callFn(
+        map[action] || [],
         [
           payload.team,
           payload.box,
@@ -2032,22 +1973,17 @@ if (action === "randomBox5BlockTimer") {
   }
 
   /* =========================
-     17) ARCHIVE / الأرشيف
+     ARCHIVE
   ========================= */
 
-  async function handleArchiveCommand(
-    action,
-    payload
-  ) {
+  async function handleArchive(action, payload = {}) {
     if (action === "setRound") {
       return (
-        await invokeDisplayFunction(
+        await callFn(
+          ["setArchiveRound"],
           [
-            "setArchiveRound",
-            "goToArchiveRound"
-          ],
-          [
-            Number(payload.round || 1)
+            Number(payload.round || 1),
+            payload
           ]
         )
       ).handled
@@ -2055,7 +1991,7 @@ if (action === "randomBox5BlockTimer") {
 
     if (action === "openNumber") {
       return (
-        await invokeDisplayFunction(
+        await callFn(
           [
             "openArchiveNumber",
             "openArchiveItem"
@@ -2065,7 +2001,8 @@ if (action === "randomBox5BlockTimer") {
               payload.number ||
               payload.position ||
               0
-            )
+            ),
+            payload
           ]
         )
       ).handled
@@ -2073,68 +2010,46 @@ if (action === "randomBox5BlockTimer") {
 
     if (action === "showAnswer") {
       return (
-        await invokeDisplayFunction(
-          [
-            "showArchiveAnswer",
-            "revealArchiveAnswer",
-            "openArchiveRequiredItem"
-          ],
+        await callFn(
+          ["showArchiveAnswer"],
           [
             Number(
               payload.position ||
               payload.number ||
               0
-            )
+            ),
+            payload
           ]
         )
       ).handled
     }
 
-    const actionMap = {
+    const map = {
       startTimer: [
         "startArchiveTimer"
       ],
-
       double: [
-        "activateArchiveDouble",
-        "useArchiveDouble"
+        "activateArchiveDouble"
       ],
-
-      correct: [
-        "archiveCorrect",
-        "markArchiveCorrect"
-      ],
-
       wrong: [
-        "archiveWrong",
         "addArchiveError",
-        "markArchiveWrong"
+        "addArchiveWrong",
+        "archiveWrong"
       ],
-
+      correct: [
+        "showArchiveAnswer"
+      ],
       undo: [
-        "undoArchiveAction",
-        "archiveUndo"
+        "undoArchiveAction"
       ],
-
       nextRound: [
         "nextArchiveRound"
-      ],
-
-      switchTurn: [
-        "switchArchiveTurn"
       ]
     }
 
-    const names =
-      actionMap[action] || []
-
-    if (!names.length) {
-      return false
-    }
-
     return (
-      await invokeDisplayFunction(
-        names,
+      await callFn(
+        map[action] || [],
         [
           payload.team,
           payload
@@ -2144,18 +2059,16 @@ if (action === "randomBox5BlockTimer") {
   }
 
   /* =========================
-     18) FINAL / الفاصلة
+     FINAL
   ========================= */
 
-  async function handleFinalCommand(
-    action,
-    payload,
-    round
-  ) {
-    const safeRound = Math.min(
+async function handleFinal(action, payload = {}, round = 1) {
+  const safeRound =
+    Math.min(
       Math.max(
         Number(
           payload.round ||
+          payload.finalRound ||
           round ||
           1
         ),
@@ -2164,431 +2077,331 @@ if (action === "randomBox5BlockTimer") {
       4
     )
 
-    if (action === "setRound") {
-      return (
-        await invokeDisplayFunction(
-          [
-            "setFinalRound",
-            "changeFinalRound",
-            "openFinalRound"
-          ],
-          [safeRound]
-        )
-      ).handled
-    }
+  async function syncFinalTeamBeforeAction() {
+    const team =
+      String(payload.team || "").toUpperCase()
 
-    if (action === "openNumber") {
-      const number =
-        Number(payload.number || 0)
-
-      const roundSpecificNames = {
-        1: [
-          "openFinalRound1Number",
-          "openFinalRound1Card"
-        ],
-
-        2: [
-          "openFinalRound2Number",
-          "openFinalRound2Card"
-        ],
-
-        3: [
-  "openFinalRound3StoryCard",
-  "openFinalRound3Number",
-  "openFinalRound3Card"
-],
-
-4: [
-  "openFinalRound4TeamMediaCard",
-  "openFinalRound4Number",
-  "openFinalRound4Card"
-]
-      }
-
-      return (
-        await invokeDisplayVariants([
-          {
-            names:
-              roundSpecificNames[
-                safeRound
-              ] || [],
-            args: [number]
-          },
-          {
-            names: [
-              "openFinalNumber",
-              "openFinalCard"
-            ],
-            args: [
-              number,
-              safeRound
-            ]
-          },
-          {
-            names: [
-              "openFinalRoundNumber"
-            ],
-            args: [
-              safeRound,
-              number
-            ]
-          }
-        ])
-      ).handled
-    }
-
-        if (safeRound === 1) {
-      if (action === "correct") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "finalRound1Correct"
-            ],
-            []
-          )
-        ).handled
-      }
-
-      if (action === "wrong") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "finalRound1Wrong"
-            ],
-            []
-          )
-        ).handled
-      }
-
-      if (action === "showAnswer") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "showFinalRound1Answer"
-            ],
-            []
-          )
-        ).handled
-      }
-
-      if (action === "showQuestion") {
-        return (
-          await invokeDisplayFunction(
-            [
-              "showFinalRound1Question"
-            ],
-            []
-          )
-        ).handled
-      }
-
-if (action === "zoomImage") {
-  const imageZoom =
-    await invokeDisplayFunction(
-      [
-        "toggleFinalRound1ImageOverlay"
-      ],
-      []
-    )
-
-  const textZoom =
-    await invokeDisplayFunction(
-      [
-        "toggleFinalRound1Overlay"
-      ],
-      []
-    )
-
-  return imageZoom.handled || textZoom.handled
-}
-    }
-
-    if (safeRound === 3) {
-  if (action === "showStoryPart") {
-    return (
-      await invokeDisplayFunction(
-        [
-          "showFinalRound3StoryPart"
-        ],
-        []
-      )
-    ).handled
-  }
-
-  if (action === "correct") {
-    return (
-      await invokeDisplayFunction(
-        [
-          "finalRound3StoryCorrect"
-        ],
-        []
-      )
-    ).handled
-  }
-
-  if (action === "wrong") {
-    return (
-      await invokeDisplayFunction(
-        [
-          "finalRound3StoryWrong"
-        ],
-        []
-      )
-    ).handled
-  }
-}
-
-if (safeRound === 4) {
-  if (action === "showQuestion") {
-    return (
-      await invokeDisplayFunction(
-        [
-          "showFinalRound4TeamMediaQuestion"
-        ],
-        []
-      )
-    ).handled
-  }
-
-  if (action === "correct") {
-    return (
-      await invokeDisplayFunction(
-        [
-          "finalRound4TeamMediaCorrect"
-        ],
-        []
-      )
-    ).handled
-  }
-
-  if (action === "wrong") {
-    return (
-      await invokeDisplayFunction(
-        [
-          "finalRound4TeamMediaWrong"
-        ],
-        []
-      )
-    ).handled
-  }
-
-  if (action === "playCurrentFinalVideo") {
-    return (
-      await invokeDisplayFunction(
-        [
-          "playFinalRound4TeamMediaVideo"
-        ],
-        []
-      )
-    ).handled
-  }
-
-  if (action === "restartCurrentFinalVideo") {
-    return (
-      await invokeDisplayFunction(
-        [
-          "restartFinalRound4TeamMediaVideo"
-        ],
-        []
-      )
-    ).handled
-  }
-
-  if (action === "restartCurrentFinalImage") {
-    return (
-      await invokeDisplayFunction(
-        [
-          "restartFinalRound4TeamMediaImage"
-        ],
-        []
-      )
-    ).handled
-  }
-}
-
-    const actionMap = {
-      double: [
-        "activateFinalDouble",
-        "useFinalDouble"
-      ],
-
-      correct: [
-        "finalCorrect",
-        "markFinalCorrect",
-        "scoreFinalCorrect"
-      ],
-
-      wrong: [
-        "finalWrong",
-        "markFinalWrong",
-        "scoreFinalWrong"
-      ],
-
-      undo: [
-        "undoFinalAction",
-        "finalUndo"
-      ],
-
-      zoomImage: [
-        "zoomFinalImage",
-        "zoomCurrentFinalImage",
-        "openFinalImageViewer"
-      ],
-
-      showStoryPart: [
-        "showStoryPart",
-        "showNextStoryPart",
-        "revealFinalStoryPart"
-      ],
-
-toggleRound2Correct: [
-  "toggleFinalRound2CorrectSelection",
-  "toggleRound2Correct",
-  "toggleFinalRound2Correct"
-],
-
-toggleRound2ImageCorrect: [
-  "toggleFinalRound2ImageCorrectSelection",
-  "toggleRound2ImageCorrect",
-  "toggleFinalRound2ImageCorrect"
-],
-
-hideRound2SequenceWord: [
-  "hideFinalRound2SequenceWord",
-  "hideRound2SequenceWord",
-  "hideFinalSequenceWord"
-],
-
-decreaseCountdown: [
-  "finalRound2DecreaseCountdown",
-  "decreaseCountdown",
-  "decreaseFinalCountdown"
-],
-
-showNextImage: [
-  "finalRound2ShowNextImage",
-  "showNextImage",
-  "showFinalNextImage"
-],
-
-recordScrambleScore: [
-  "finalRound2RecordScore",
-  "recordScrambleScore"
-],
-
-recordSequenceScore: [
-  "finalRound2RecordSequenceScore",
-  "recordSequenceScore"
-],
-
-recordImageScore: [
-  "finalRound2RecordImageScore",
-  "recordImageScore"
-],
-
-showQuestion: [
-  "showFinalRound4TeamMediaQuestion",
-  "showFinalQuestion",
-  "showQuestion"
-],
-
-      showAnswer: [
-        "showFinalAnswer",
-        "showAnswer"
-      ],
-
-playCurrentFinalVideo: [
-  "playFinalRound4TeamMediaVideo",
-  "playCurrentFinalVideo",
-  "playFinalVideo"
-],
-
-restartCurrentFinalVideo: [
-  "restartFinalRound4TeamMediaVideo",
-  "restartCurrentFinalVideo",
-  "restartFinalVideo"
-],
-
-restartCurrentFinalImage: [
-  "restartFinalRound4TeamMediaImage",
-  "restartCurrentFinalImage",
-  "restartFinalImage"
-],
-
-      stopCurrentFinalVideo: [
-        "stopCurrentFinalVideo",
-        "stopFinalVideo"
-      ],
-
-      nextRound: [
-        "nextFinalRound"
-      ]
-    }
-
-    const names =
-      actionMap[action] || []
-
-    if (!names.length) {
+    if (team !== "A" && team !== "B") {
       return false
     }
 
-    const index =
-      Number(payload.index ?? -1)
-
     return (
-      await invokeDisplayFunction(
-        names,
+      await callFn(
         [
-          index >= 0
-            ? index
-            : payload.team,
-
-          payload.number,
-          safeRound,
-          payload
+          "forceFinalTeamFromPresenter"
+        ],
+        [
+          team,
+          {
+            ...payload,
+            round: safeRound,
+            finalRound: safeRound
+          }
         ]
       )
     ).handled
   }
 
+  if (action === "setRound") {
+    return (
+      await callFn(
+        ["renderFinal"],
+        [
+          safeRound,
+          getFinalSegmentKey(safeRound)
+        ]
+      )
+    ).handled
+  }
+
+  if (action === "openNumber") {
+    const number =
+      Number(payload.number || 0)
+
+    if (safeRound === 2) {
+      await syncFinalTeamBeforeAction()
+    }
+
+    if (
+      safeRound === 4 &&
+      payload.compensation !== true
+    ) {
+      await syncFinalTeamBeforeAction()
+    }
+
+    if (safeRound === 1) {
+      return (
+        await callFn(
+          ["openFinalRound1Card"],
+          [
+            number,
+            {
+              ...payload,
+              round: 1,
+              finalRound: 1
+            }
+          ]
+        )
+      ).handled
+    }
+
+    if (safeRound === 2) {
+      return (
+        await callFn(
+          ["openFinalRound2Card"],
+          [
+            number,
+            {
+              ...payload,
+              round: 2,
+              finalRound: 2
+            }
+          ]
+        )
+      ).handled
+    }
+
+    if (safeRound === 3) {
+      return (
+        await callFn(
+          ["openFinalRound3StoryCard"],
+          [
+            number,
+            {
+              ...payload,
+              round: 3,
+              finalRound: 3
+            }
+          ]
+        )
+      ).handled
+    }
+
+    if (safeRound === 4) {
+      return (
+        await callFn(
+          ["openFinalRound4TeamMediaCard"],
+          [
+            number,
+            {
+              ...payload,
+              round: 4,
+              finalRound: 4
+            }
+          ]
+        )
+      ).handled
+    }
+  }
+
+  if (
+    action === "correct" ||
+    action === "wrong" ||
+    action === "recordScrambleScore" ||
+    action === "recordSequenceScore" ||
+    action === "recordImageScore"
+  ) {
+    await syncFinalTeamBeforeAction()
+  }
+
+  if (action === "correct") {
+    const map = {
+      1: ["finalRound1Correct"],
+      3: ["finalRound3StoryCorrect"],
+      4: ["finalRound4TeamMediaCorrect"]
+    }
+
+    if (safeRound === 2) {
+      return (
+        await callFn(
+          ["finalRound2RecordScore"],
+          [
+            true,
+            payload.team,
+            payload
+          ]
+        )
+      ).handled
+    }
+
+    return (
+      await callFn(
+        map[safeRound] || [],
+        [payload]
+      )
+    ).handled
+  }
+
+  if (action === "wrong") {
+    const map = {
+      1: ["finalRound1Wrong"],
+      3: ["finalRound3StoryWrong"],
+      4: ["finalRound4TeamMediaWrong"]
+    }
+
+    if (safeRound === 2) {
+      return (
+        await callFn(
+          ["finalRound2RecordScore"],
+          [
+            false,
+            payload.team,
+            payload
+          ]
+        )
+      ).handled
+    }
+
+    return (
+      await callFn(
+        map[safeRound] || [],
+        [payload]
+      )
+    ).handled
+  }
+
+  const map = {
+    double: [
+      "activateFinalDouble"
+    ],
+    undo: [
+      "undoFinalAction"
+    ],
+    showQuestion: [
+      "showFinalRound1Question",
+      "showFinalRound4TeamMediaQuestion"
+    ],
+    showAnswer: [
+      "showFinalRound1Answer"
+    ],
+    showStoryPart: [
+      "showFinalRound3StoryPart"
+    ],
+    showNextImage: [
+      "finalRound2ShowNextImage"
+    ],
+    toggleRound2Correct: [
+      "toggleFinalRound2CorrectSelection"
+    ],
+    toggleRound2ImageCorrect: [
+      "toggleFinalRound2ImageCorrectSelection"
+    ],
+    hideRound2SequenceWord: [
+      "hideFinalRound2SequenceWord"
+    ],
+    decreaseCountdown: [
+      "finalRound2DecreaseCountdown"
+    ],
+    recordScrambleScore: [
+      "finalRound2RecordScore"
+    ],
+    recordSequenceScore: [
+      "finalRound2RecordSequenceScore"
+    ],
+    recordImageScore: [
+      "finalRound2RecordImageScore"
+    ],
+    recordRound3Score: [
+      "finalRound3StoryCorrect"
+    ],
+    playCurrentFinalVideo: [
+      "playCurrentFinalVideo",
+      "playFinalRound4TeamMediaVideo"
+    ],
+    restartCurrentFinalVideo: [
+      "restartCurrentFinalVideo",
+      "restartFinalRound4TeamMediaVideo"
+    ],
+    restartCurrentFinalImage: [
+      "restartFinalRound4TeamMediaImage"
+    ],
+    stopCurrentFinalVideo: [
+      "stopCurrentFinalVideo"
+    ],
+    zoomImage: [
+      "toggleFinalRound1ImageOverlay",
+      "openFinalRound4TeamMediaOverlay"
+    ]
+  }
+
+  const value =
+    getFinalScoreValue(payload, true)
+
+  const argsMap = {
+    showStoryPart: [
+      Number(payload.index || payload.part || 0),
+      payload
+    ],
+    toggleRound2Correct: [
+      Number(payload.index || 0),
+      payload
+    ],
+    toggleRound2ImageCorrect: [
+      Number(payload.index || 0),
+      payload
+    ],
+    hideRound2SequenceWord: [
+      Number(payload.index || 0),
+      payload
+    ],
+    recordScrambleScore: [
+      value,
+      payload.team,
+      payload
+    ],
+    recordSequenceScore: [
+      value,
+      payload.team,
+      payload
+    ],
+    recordImageScore: [
+      value,
+      payload.team,
+      payload
+    ],
+    decreaseCountdown: [
+      payload
+    ],
+    showNextImage: [
+      payload
+    ],
+    zoomImage: [
+      payload.type || "image",
+      payload
+    ]
+  }
+
+  return (
+    await callFn(
+      map[action] || [],
+      argsMap[action] || [payload]
+    )
+  ).handled
+}
   /* =========================
-     19) GENERIC FALLBACK
+     GENERIC
   ========================= */
 
-  async function handleGenericDirectCommand(
-    command
-  ) {
+  async function handleGeneric(command) {
     const action = command.action
     const payload = command.payload || {}
 
-    /*
-      يدعم الأوامر التي يكون اسمها
-      مطابقًا تمامًا لاسم الدالة في العرض،
-      مثل أوامر حرفلي الجديدة.
-    */
     const direct =
-      await invokeDisplayFunction(
+      await callFn(
         [action],
         [payload]
       )
 
-    if (direct.handled) {
-      return true
-    }
+    if (direct.handled) return true
 
-    const generic =
-      await invokeDisplayVariants([
+    return (
+      await callVariants([
         {
-          names: [
-            "executePresenterCommand",
-            "dispatchPresenterCommand"
-          ],
+          names: ["executePresenterCommand"],
           args: [command]
         },
         {
-          names: [
-            "handleSegmentCommand"
-          ],
+          names: ["handleSegmentCommand"],
           args: [
             command.segment,
             action,
@@ -2596,47 +2409,33 @@ restartCurrentFinalImage: [
           ]
         }
       ])
-
-    return generic.handled
+    ).handled
   }
 
   /* =========================
-     20) COMMAND DISPATCHER
+     DISPATCH
   ========================= */
 
-  async function dispatchPresenterCommand(
-    command
-  ) {
+  async function dispatchPresenterCommand(command) {
     const action = command.action
     const payload = command.payload || {}
 
-    if (!action) {
-      return false
-    }
-
-        if (
-      isDeletedStandalonePresenterSegment(
-        command.rawSegment
-      )
-    ) {
-      if (
-        action === "openSegment" ||
-        action === "goHome"
-      ) {
-        return goDisplayHomeFromPresenter()
-      }
-
-      return false
-    }
+    if (!action) return false
 
     if (action === "openSegment") {
-      return openDisplaySegmentFromPresenter(
-        command
-      )
+      const handled =
+        await openSegmentFromPresenter(command)
+
+      if (handled) schedulePostSync()
+      return handled
     }
 
     if (action === "goHome") {
-      return goDisplayHomeFromPresenter()
+      const handled =
+        await goHomeFromPresenter()
+
+      if (handled) schedulePostSync()
+      return handled
     }
 
     if (
@@ -2645,116 +2444,87 @@ restartCurrentFinalImage: [
       action === "closeSegment" ||
       action === "endRound"
     ) {
-      return endDisplaySegmentFromPresenter(
-        command
-      )
+      const handled =
+        await endSegmentFromPresenter(payload)
+
+      if (handled) schedulePostSync()
+      return handled
     }
 
     if (
-      action ===
-        "toggleDisplayControls" ||
-      action ===
-        "showDisplayControls" ||
-      action ===
-        "hideDisplayControls" ||
-      action ===
-        "setDisplayControls"
+      action === "toggleDisplayControls" ||
+      action === "showDisplayControls" ||
+      action === "hideDisplayControls" ||
+      action === "setDisplayControls"
     ) {
-      return handleDisplayControlsCommand(
-        action,
-        payload
-      )
+      const handled =
+        await handleControls(action, payload)
+
+      if (handled) schedulePostSync()
+      return handled
     }
 
     if (action === "selectTeam") {
-      return handleSelectTeamCommand(
-        command
-      )
+      const handled =
+        await handleTeam(command)
+
+      if (handled) schedulePostSync()
+      return handled
+    }
+
+    if (
+      action === "startLottery" ||
+      action === "selectLotteryTeam" ||
+      action === "confirmLottery" ||
+      action === "retryLottery"
+    ) {
+      const handled =
+        await handleLottery(command)
+
+      if (handled) schedulePostSync()
+      return handled
     }
 
     let handled = false
 
     if (command.segment === "warmup") {
-      handled =
-        await handleWarmupCommand(
-          action,
-          payload
-        )
+      handled = await handleWarmup(action, payload)
+    }
+
+    if (!handled && command.segment === "top10") {
+      handled = await handleTop10(action, payload)
+    }
+
+    if (!handled && command.segment === "who") {
+      handled = await handleWho(action, payload)
+    }
+
+    if (!handled && command.segment === "explain") {
+      handled = await handleExplain(action, payload)
     }
 
     if (
-      !handled &&
-      command.segment === "top10"
-    ) {
-      handled =
-        await handleTop10Command(
-          action,
-          payload
-        )
+  !handled &&
+  command.segment === "familyDidi"
+) {
+  handled =
+    await handleFamilyDidi(
+      action,
+      payload
+    )
+}
+
+    if (!handled && command.segment === "randomChallenge") {
+      handled = await handleRandom(action, payload)
     }
 
-    if (
-      !handled &&
-      command.segment === "who"
-    ) {
-      handled =
-        await handleWhoCommand(
-          action,
-          payload
-        )
+    if (!handled && command.segment === "archive") {
+      handled = await handleArchive(action, payload)
     }
 
-    if (
-      !handled &&
-      command.segment === "explain"
-    ) {
+    if (!handled && command.segment === "final") {
       handled =
-        await handleExplainCommand(
-          action,
-          payload
-        )
-    }
-
-    if (
-      !handled &&
-      command.segment === "letterli"
-    ) {
-      handled =
-        await handleLetterliCommand(
-          action,
-          payload
-        )
-    }
-
-    if (
-      !handled &&
-      command.segment ===
-        "randomChallenge"
-    ) {
-      handled =
-        await handleRandomChallengeCommand(
-          action,
-          payload
-        )
-    }
-
-    if (
-      !handled &&
-      command.segment === "archive"
-    ) {
-      handled =
-        await handleArchiveCommand(
-          action,
-          payload
-        )
-    }
-
-    if (
-      !handled &&
-      command.segment === "final"
-    ) {
-      handled =
-        await handleFinalCommand(
+        await handleFinal(
           action,
           payload,
           command.round
@@ -2762,10 +2532,7 @@ restartCurrentFinalImage: [
     }
 
     if (!handled) {
-      handled =
-        await handleGenericDirectCommand(
-          command
-        )
+      handled = await handleGeneric(command)
     }
 
     if (!handled) {
@@ -2781,56 +2548,37 @@ restartCurrentFinalImage: [
       return false
     }
 
-    scheduleDisplayStateSync()
+    schedulePostSync()
     return true
   }
 
-  /* =========================
-     21) PUBLIC COMMAND HANDLER
-  ========================= */
+  async function handlePresenterCommand(input) {
+    const command = normalizeCommand(input)
 
-  async function handlePresenterCommand(
-    input
-  ) {
-    const command =
-      normalizeIncomingPresenterCommand(
-        input
-      )
-
-    if (!command) {
-      return false
-    }
+    if (!command) return false
 
     const activeSession =
-      presenterListenerSessionId ||
-      getPresenterListenerSessionId()
+      listenerSessionId ||
+      getSessionId()
 
     if (
       command.session_id &&
       activeSession &&
-      command.session_id !==
-        activeSession
+      command.session_id !== activeSession
     ) {
       return false
     }
 
-    if (
-      !markPresenterCommandProcessed(
-        command
-      )
-    ) {
+    if (!markProcessed(command)) {
       return false
     }
 
     try {
-      return await dispatchPresenterCommand(
-        command
-      )
+      return await dispatchPresenterCommand(command)
     } catch (error) {
       console.log(
         "PRESENTER COMMAND HANDLE ERROR:",
-        error,
-        command
+        error
       )
 
       return false
@@ -2838,113 +2586,54 @@ restartCurrentFinalImage: [
   }
 
   /* =========================
-     22) REALTIME CHANNEL
+     CHANNELS
   ========================= */
 
-  function isSameSupabaseChannel(
-    channel,
-    topic
-  ) {
-    const value = String(
-      channel?.topic ||
-      channel?.name ||
+  function isChannelJoined(channel) {
+    const state =
+      channel?.state ||
+      channel?.joinRef ||
       ""
-    )
 
     return (
-      value === topic ||
-      value === `realtime:${topic}` ||
-      value.endsWith(`:${topic}`)
+      state === "joined" ||
+      state === "joining" ||
+      channel?.joinedOnce === true
     )
   }
 
-  function findExistingGameChannel(
-    client,
-    topic
-  ) {
-    const globalCandidates = [
-      window.gameSessionChannel,
-      window.displaySessionChannel,
-      window.sessionChannel,
-      window.gameChannel,
-      window.realtimeChannel
-    ]
-
-    for (
-      const channel
-      of globalCandidates
-    ) {
-      if (
-        channel &&
-        isSameSupabaseChannel(
-          channel,
-          topic
-        )
-      ) {
-        return channel
-      }
-    }
-
+  function findGameChannel(client, topic) {
     try {
       const channels =
-        typeof client.getChannels ===
-          "function"
+        typeof client.getChannels === "function"
           ? client.getChannels()
           : []
 
-      return (
-        channels.find(channel =>
-          isSameSupabaseChannel(
-            channel,
-            topic
-          )
-        ) || null
-      )
+      return channels.find(channel => {
+        return (
+          channel.topic === topic ||
+          channel.topic === `realtime:${topic}` ||
+          channel.subTopic === topic
+        )
+      }) || null
     } catch {
       return null
     }
   }
 
-  function isSupabaseChannelJoined(
-    channel
-  ) {
-    const state =
-      String(
-        channel?.state ||
-        channel?._state ||
-        ""
-      ).toLowerCase()
+  function attachBroadcast(channel) {
+    if (!channel) return false
 
-    return (
-      state === "joined" ||
-      state === "subscribed"
-    )
-  }
-
-  function attachRealtimeCommandListener(
-    channel
-  ) {
-    if (
-      !channel ||
-      typeof channel.on !== "function"
-    ) {
-      return false
-    }
-
-    if (
-      channel.__presenterCommandHandlerAttached
-    ) {
+    if (channel.__presenterCommandAttached) {
       return true
     }
 
-    channel.__presenterCommandHandlerAttached =
-      true
+    channel.__presenterCommandAttached = true
 
     channel.on(
       "broadcast",
       {
-        event:
-          PRESENTER_COMMAND_EVENT
+        event: PRESENTER_COMMAND_EVENT
       },
       payload => {
         handlePresenterCommand(
@@ -2957,21 +2646,14 @@ restartCurrentFinalImage: [
     return true
   }
 
-  function setupPresenterRealtimeChannel(
-    client,
-    sessionId
-  ) {
+  function setupBroadcast(client, sessionId) {
     const topic =
       `game_session_${sessionId}`
 
     let channel =
-      findExistingGameChannel(
-        client,
-        topic
-      )
+      findGameChannel(client, topic)
 
-    presenterListenerOwnsGameChannel =
-      !channel
+    ownsGameChannel = !channel
 
     if (!channel) {
       channel = client.channel(
@@ -2987,21 +2669,15 @@ restartCurrentFinalImage: [
       )
     }
 
-    if (
-      !attachRealtimeCommandListener(
-        channel
-      )
-    ) {
+    if (!attachBroadcast(channel)) {
       return null
     }
 
-    presenterListenerGameChannel =
-      channel
+    gameChannel = channel
 
     if (
-      !isSupabaseChannelJoined(channel) &&
-      typeof channel.subscribe ===
-        "function"
+      !isChannelJoined(channel) &&
+      typeof channel.subscribe === "function"
     ) {
       channel.subscribe(status => {
         console.log(
@@ -3014,14 +2690,7 @@ restartCurrentFinalImage: [
     return channel
   }
 
-  /* =========================
-     23) DATABASE FALLBACK
-  ========================= */
-
-  function setupPresenterDatabaseChannel(
-    client,
-    sessionId
-  ) {
+  function setupDatabase(client, sessionId) {
     const topic =
       [
         "display_presenter_commands",
@@ -3040,10 +2709,8 @@ restartCurrentFinalImage: [
         {
           event: "INSERT",
           schema: "public",
-          table:
-            PRESENTER_COMMAND_TABLE,
-          filter:
-            `session_id=eq.${sessionId}`
+          table: PRESENTER_COMMAND_TABLE,
+          filter: `session_id=eq.${sessionId}`
         },
         payload => {
           handlePresenterCommand(
@@ -3059,125 +2726,89 @@ restartCurrentFinalImage: [
         )
       })
 
-    presenterListenerDbChannel =
-      channel
-
+    dbChannel = channel
     return channel
   }
 
   /* =========================
-     24) START / STOP
+     START / STOP
   ========================= */
 
   async function stopPresenterListener() {
-    clearTimeout(
-      presenterListenerRetryTimer
-    )
+    clearTimeout(retryTimer)
+    clearTimeout(syncTimer)
 
-    clearTimeout(
-      presenterListenerSyncTimer
-    )
+    const client = getDb()
 
-    const client =
-      getPresenterListenerDb()
-
-    if (
-      client &&
-      presenterListenerDbChannel
-    ) {
+    if (client && dbChannel) {
       try {
-        await client.removeChannel(
-          presenterListenerDbChannel
-        )
+        await client.removeChannel(dbChannel)
       } catch {}
     }
 
     if (
       client &&
-      presenterListenerGameChannel &&
-      presenterListenerOwnsGameChannel
+      gameChannel &&
+      ownsGameChannel
     ) {
       try {
-        await client.removeChannel(
-          presenterListenerGameChannel
-        )
+        await client.removeChannel(gameChannel)
       } catch {}
     }
 
-    presenterListenerDbChannel = null
-    presenterListenerGameChannel = null
-
-    presenterListenerOwnsGameChannel =
-      false
-
-    presenterListenerStarted = false
+    gameChannel = null
+    dbChannel = null
+    ownsGameChannel = false
+    listenerStarted = false
   }
 
-  function schedulePresenterListenerRetry() {
-    clearTimeout(
-      presenterListenerRetryTimer
-    )
+  function retryStart() {
+    clearTimeout(retryTimer)
 
-    presenterListenerRetryTimer =
+    retryTimer =
       setTimeout(() => {
         startPresenterListener()
-      }, PRESENTER_LISTENER_RETRY_DELAY)
+      }, RETRY_DELAY)
   }
 
-  async function startPresenterListener(
-    options = {}
-  ) {
-    const client =
-      getPresenterListenerDb()
+  async function startPresenterListener(options = {}) {
+    const client = getDb()
 
     const sessionId =
       String(
         options.sessionId ||
-        getPresenterListenerSessionId() ||
+        getSessionId() ||
         ""
       ).trim()
 
-    if (
-      !client ||
-      !sessionId
-    ) {
-      schedulePresenterListenerRetry()
+    if (!client || !sessionId) {
+      retryStart()
       return false
     }
 
     if (
-      presenterListenerStarted &&
-      presenterListenerSessionId ===
-        sessionId
+      listenerStarted &&
+      listenerSessionId === sessionId
     ) {
       return true
     }
 
     if (
-      presenterListenerStarted &&
-      presenterListenerSessionId !==
-        sessionId
+      listenerStarted &&
+      listenerSessionId !== sessionId
     ) {
       await stopPresenterListener()
     }
 
-    presenterListenerSessionId =
-      sessionId
+    listenerSessionId = sessionId
 
-    setupPresenterRealtimeChannel(
-      client,
-      sessionId
-    )
+    setupBroadcast(client, sessionId)
+    setupDatabase(client, sessionId)
 
-    setupPresenterDatabaseChannel(
-      client,
-      sessionId
-    )
-
-    presenterListenerStarted = true
+    listenerStarted = true
 
     console.log(
-      "PRESENTER LISTENER: ready",
+      "PRESENTER LISTENER READY:",
       sessionId
     )
 
@@ -3185,41 +2816,24 @@ restartCurrentFinalImage: [
   }
 
   /* =========================
-     25) STATUS / DEBUG
+     EXPORTS
   ========================= */
 
   function getPresenterListenerStatus() {
     return {
-      loaded:
-        !!window.__presenterListenerLoaded,
-
-      started:
-        presenterListenerStarted,
-
-      sessionId:
-        presenterListenerSessionId,
-
-      realtimeChannel:
-        !!presenterListenerGameChannel,
-
-      databaseChannel:
-        !!presenterListenerDbChannel,
-
-      ownsRealtimeChannel:
-        presenterListenerOwnsGameChannel,
-
-      processedCommands:
-        presenterProcessedCommands.size
+      loaded: !!window.__presenterListenerLoaded,
+      started: listenerStarted,
+      sessionId: listenerSessionId,
+      realtimeChannel: !!gameChannel,
+      databaseChannel: !!dbChannel,
+      ownsRealtimeChannel: ownsGameChannel,
+      processedCommands: processedCommands.size
     }
   }
 
   function clearPresenterListenerCommandCache() {
-    presenterProcessedCommands.clear()
+    processedCommands.clear()
   }
-
-  /* =========================
-     26) GLOBAL EXPORTS
-  ========================= */
 
   window.startPresenterListener =
     startPresenterListener
@@ -3240,36 +2854,27 @@ restartCurrentFinalImage: [
     clearPresenterListenerCommandCache
 
   window.normalizeDisplayPresenterSegment =
-    normalizeDisplayPresenterSegment
+    normalizeSegment
 
-  /*
-    توافق مع الاسم القديم الذي سبب الخطأ.
-    الملف لا يعتمد عليه، لكنه يوفّره
-    لبقية الملفات القديمة إن احتاجته.
-  */
   if (
     typeof window.normalizeDisplaySegmentKey !==
     "function"
   ) {
     window.normalizeDisplaySegmentKey =
-      normalizeDisplayPresenterSegment
+      normalizeSegment
   }
 
   /* =========================
-     27) AUTO START
+     AUTO START
   ========================= */
 
-  if (
-    document.readyState === "loading"
-  ) {
+  if (document.readyState === "loading") {
     document.addEventListener(
       "DOMContentLoaded",
       () => {
         startPresenterListener()
       },
-      {
-        once: true
-      }
+      { once: true }
     )
   } else {
     startPresenterListener()
@@ -3278,17 +2883,14 @@ restartCurrentFinalImage: [
   window.addEventListener(
     "storage",
     event => {
-const sessionKeys = new Set([
-  "game_session_id",
-  "display_session_id",
-  "current_session_id",
-  "session_id",
-  "presenter_session_id"
-])
+      const keys = new Set([
+        "game_session_id",
+        "display_session_id",
+        "current_session_id",
+        "session_id"
+      ])
 
-      if (
-        sessionKeys.has(event.key)
-      ) {
+      if (keys.has(event.key)) {
         startPresenterListener()
       }
     }

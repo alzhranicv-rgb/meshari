@@ -1,576 +1,421 @@
 /* =========================================================
-   PRESENTER SEGMENT: WHO / من هو
-   File: assets/css/presenter/segments/who.css
-
-   المسؤوليات:
-   - تخطيط فقرة من هو.
-   - أرقام الصور والنقاط.
-   - عرض الصورة والإجابة.
-   - الأخطاء والتعويض.
-   - أزرار التحكم.
-   - وضع القراءة الخاص بمن هو.
-
-   مهم:
-   - التعويض موجود في هذا الملف فقط.
-   - لا يحتوي على تنسيقات بقية الفقرات.
-   - لا يحتوي على تنسيقات الأرشيف.
+   WHO PRESENTER / من هو
+   MATCHING DISPLAY COLORS - CLEAN
 ========================================================= */
 
 /* =========================
-   1) PAGE
+   1) BASE
 ========================= */
 
-.presenterWhoPage,
-.presenterWhoLayout{
+.presenterPanel[data-segment="who"]{
   width:100%;
   height:100%;
   min-width:0;
   min-height:0;
-}
-
-.presenterWhoLayout{
-  display:grid;
-  grid-template-columns:minmax(0,1.12fr) minmax(330px,.88fr);
-  gap:8px;
   overflow:hidden;
 }
 
-.presenterWhoMain,
-.presenterWhoSide{
-  min-width:0;
-  min-height:0;
+.presenterWhoScreen,
+.presenterWhoScreen *{
+  box-sizing:border-box;
 }
 
-.presenterWhoMain{
-  display:grid;
-  grid-template-rows:minmax(0,1fr) auto;
-  gap:8px;
-}
+.presenterWhoScreen{
+  --bg:#EAECF0;
+  --surface:#FFFFFF;
+  --soft:#F6F7F9;
+  --line:#D5DADF;
 
-.presenterWhoSide{
-  display:grid;
-  grid-template-rows:auto auto minmax(0,1fr) auto;
-  gap:8px;
-}
+  --primary:#FE7F2D;
+  --secondary:#233D4D;
+  --text:#151515;
+  --muted:#8793A0;
 
-/* =========================
-   2) NUMBERS CARD
-========================= */
+  --btn-nav:#0A7C6E;
+  --btn-correct:#007F00;
+  --btn-wrong:#7F0000;
+  --btn-double:#00007F;
+  --btn-comp:#00004C;
+  --btn-disabled:#D7DCE2;
+  --btn-disabled-text:#7B8792;
 
-.presenterWhoNumbersCard{
-  min-width:0;
-  min-height:0;
+  width:100%;
   height:100%;
-  padding:10px;
-
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:8px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-lg);
-  background:var(--presenter-surface);
-  overflow:hidden;
-}
-
-.presenterWhoNumbersHead{
-  min-width:0;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-
-.presenterWhoStatusText{
-  min-width:0;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-  color:var(--presenter-muted);
-  font-size:.68rem;
-}
-
-.presenterWhoNumbers{
   min-width:0;
   min-height:0;
 
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  grid-template-rows:repeat(3,minmax(0,1fr));
-  gap:7px;
-}
+  grid-template-rows:minmax(0,1fr) 76px;
+  gap:10px;
 
-/* =========================
-   3) NUMBER BUTTONS
-========================= */
-
-.presenterWhoNumbers .presenterNumberBtn,
-.presenterWhoPointBtn{
-  min-width:0;
-  min-height:0;
-  padding:5px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border:2px solid var(--presenter-line-strong);
-  border-radius:13px;
-  background:var(--presenter-surface-soft);
-  color:var(--presenter-secondary);
-
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:1.15rem;
-  line-height:1;
-  font-weight:400;
-
-  cursor:pointer;
-  position:relative;
+  direction:rtl;
   overflow:hidden;
-
-  transition:
-    transform var(--presenter-transition),
-    border-color var(--presenter-transition),
-    background var(--presenter-transition),
-    color var(--presenter-transition),
-    opacity var(--presenter-transition);
-}
-
-.presenterWhoNumbers .presenterNumberBtn:hover,
-.presenterWhoPointBtn:hover{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
-}
-
-.presenterWhoNumbers .presenterNumberBtn:active,
-.presenterWhoPointBtn:active{
-  transform:translateY(1px);
-}
-
-.presenterWhoNumbers .presenterNumberBtn.selectedPresenterTeam,
-.presenterWhoPointBtn.selectedPresenterTeam,
-.presenterWhoPointBtn.activeWhoPoint{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary);
-  color:#FFFFFF;
-}
-
-.presenterWhoNumbers .presenterNumberBtn.presenterOpened{
-  border-color:var(--presenter-line);
-  background:
-    linear-gradient(
-      135deg,
-      transparent 46%,
-      var(--presenter-line-strong) 47%,
-      var(--presenter-line-strong) 53%,
-      transparent 54%
-    ),
-    var(--presenter-surface-muted);
-  color:transparent;
-}
-
-.presenterWhoNumbers .presenterPendingNumber{
-  border-color:var(--presenter-blue);
-  background:var(--presenter-blue-soft);
-  color:var(--presenter-blue);
-}
-
-.presenterWhoNumbers .presenterWhoLocked15{
-  border-color:rgba(180,35,24,.30);
-  background:var(--presenter-red-soft);
-  color:var(--presenter-red);
-  opacity:.72;
-}
-
-.presenterWhoNumbers .presenterWhoLocked15::after{
-  content:"مقفول";
-  position:absolute;
-  inset-inline:4px;
-  bottom:4px;
-  min-height:16px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border-radius:999px;
-  background:var(--presenter-red);
-  color:#FFFFFF;
 
   font-family:"HanakaText",sans-serif;
-  font-size:.42rem;
+  color:var(--text);
+}
+
+/* إخفاء أي هيدر قديم داخل الفقرة */
+.presenterWhoControlHeader,
+.presenterWhoHeaderTeams,
+.presenterWhoHeaderInfo,
+.presenterWhoStatusText{
+  display:none !important;
+}
+
+/* =========================
+   2) MAIN
+========================= */
+
+.presenterWhoMain{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 360px;
+  gap:12px;
+
+  overflow:hidden;
+}
+
+/* =========================
+   3) BOARD CARD
+========================= */
+
+.presenterWhoBoardCard{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  padding:12px;
+
+  display:grid;
+  grid-template-rows:52px 74px minmax(0,1fr);
+  gap:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
+
+  box-shadow:none;
+  overflow:hidden;
+}
+
+.presenterWhoInfoLine{
+  width:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 120px;
+  gap:10px;
+}
+
+.presenterWhoCurrentBadge,
+.presenterWhoTimer{
+  width:100%;
+  height:52px;
+  min-height:52px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:8px 12px;
+
+  border-radius:18px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  font-size:1rem;
   line-height:1;
   font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
 }
 
-.presenterWhoNumbers .presenterNumberBtn:disabled,
-.presenterWhoPointBtn:disabled{
-  cursor:not-allowed;
+.presenterWhoCurrentBadge.active{
+  background:var(--primary);
 }
 
-.presenterWhoNumbers .presenterNumberBtn:disabled:not(.presenterOpened):not(.selectedPresenterTeam):not(.presenterPendingNumber),
-.presenterWhoPointBtn:disabled:not(.activeWhoPoint){
-  opacity:.48;
+.presenterWhoTimer{
+  font-size:1.75rem;
+}
+
+.presenterWhoTimer.timerDanger{
+  background:#7F0000;
+  animation:presenterWhoTimerPulse .75s ease-in-out infinite;
+}
+
+.presenterWhoTimer.timerFinished{
+  background:#7F0000;
+}
+
+@keyframes presenterWhoTimerPulse{
+  0%,100%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.08);
+  }
 }
 
 /* =========================
    4) POINTS
 ========================= */
 
-.presenterWhoPointsCard{
+.presenterWhoPointsGrid{
+  width:100%;
+  height:74px;
   min-width:0;
-  padding:8px;
+  min-height:0;
 
-  display:grid;
-  grid-template-columns:auto minmax(0,1fr);
-  align-items:center;
-  gap:8px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-surface);
-}
-
-.presenterWhoPointsLabel{
-  color:var(--presenter-primary);
-  font-size:.66rem;
-  white-space:nowrap;
-}
-
-.presenterWhoPoints{
-  min-width:0;
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:6px;
+  gap:8px;
+
+  padding:8px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:22px;
+
+  overflow:hidden;
 }
 
 .presenterWhoPointBtn{
-  min-height:46px;
-  font-size:.92rem;
-}
-
-/* =========================
-   5) TEAM + ERRORS
-========================= */
-
-.presenterWhoTeamsCard{
+  width:100%;
+  height:100%;
   min-width:0;
-  padding:8px;
+  min-height:0;
 
-  display:grid;
-  gap:7px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-surface);
-}
-
-.presenterWhoErrorsRow{
-  min-width:0;
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:7px;
-}
-
-.presenterWhoErrorBox{
-  min-width:0;
-  min-height:42px;
-  padding:5px 7px;
+  border:0;
+  border-radius:18px;
 
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:6px;
+  justify-content:center;
 
-  border:1px solid var(--presenter-line);
-  border-radius:11px;
-  background:var(--presenter-surface-soft);
+  cursor:pointer;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:1.75rem;
+  line-height:1;
+  font-weight:700;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
 }
 
-.presenterWhoErrorBox span{
-  min-width:0;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-
-  color:var(--presenter-muted);
-  font-size:.56rem;
+.presenterWhoPointBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.02);
 }
 
-.presenterWhoErrorBox strong{
-  color:var(--presenter-secondary);
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:.78rem;
-  font-weight:400;
+.presenterWhoPointBtn:active{
+  transform:scale(.97);
+}
+
+.presenterWhoPointBtn.activeWhoPoint,
+.presenterWhoPointBtn.selectedPresenterTeam{
+  background:var(--secondary);
+  color:#FFFFFF;
+}
+
+.presenterWhoPointBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
 }
 
 /* =========================
-   6) PREVIEW
+   5) NUMBERS GRID
+========================= */
+
+.presenterWhoGrid{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-rows:repeat(3,minmax(0,1fr));
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:24px;
+
+  overflow:hidden;
+}
+
+.presenterWhoGrid .presenterNumberBtn{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  border:0;
+  border-radius:20px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:clamp(1.65rem,2.45vw,3rem);
+  line-height:1;
+  font-weight:700;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
+}
+
+.presenterWhoGrid .presenterNumberBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.02);
+}
+
+.presenterWhoGrid .presenterNumberBtn:active{
+  transform:scale(.97);
+}
+
+.presenterWhoGrid .presenterNumberBtn.selectedPresenterTeam,
+.presenterWhoGrid .presenterNumberBtn.presenterPendingNumber{
+  background:var(--secondary);
+  color:#FFFFFF;
+}
+
+.presenterWhoGrid .presenterNumberBtn.presenterOpened,
+.presenterWhoGrid .presenterNumberBtn:disabled{
+  background:#E1E6EB;
+  color:#A0AAB4;
+
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+.presenterWhoGrid .presenterNumberBtn.presenterOpened{
+  color:transparent;
+}
+
+.presenterWhoGrid .presenterNumberBtn.presenterWhoLocked15{
+  background:#DCE2E8;
+  color:var(--muted);
+}
+
+/* =========================
+   6) PREVIEW CARD
 ========================= */
 
 .presenterWhoPreviewCard{
-  min-width:0;
-  min-height:0;
-  padding:9px;
-
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr) auto;
-  gap:7px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-lg);
-  background:var(--presenter-surface);
-  overflow:hidden;
-}
-
-.presenterWhoPreviewHead{
-  min-width:0;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-
-.presenterWhoCurrentNumber,
-.presenterWhoCurrentPoints{
-  min-height:30px;
-  padding:5px 8px;
-
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-
-  border-radius:999px;
-  background:var(--presenter-secondary-soft);
-  color:var(--presenter-secondary);
-
-  font-size:.62rem;
-  font-weight:400;
-}
-
-.presenterWhoMedia{
-  min-width:0;
-  min-height:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-surface-soft);
-  overflow:hidden;
-}
-
-.presenterWhoMedia img{
   width:100%;
   height:100%;
-  object-fit:contain;
-}
-
-.presenterWhoEmptyMedia{
-  color:var(--presenter-muted);
-  font-size:.7rem;
-  text-align:center;
-}
-
-.presenterWhoAnswer{
   min-width:0;
-  min-height:56px;
-  padding:8px;
+  min-height:0;
+
+  padding:12px;
+
+  display:grid;
+  grid-template-rows:40px minmax(0,.6fr) minmax(0,1fr);
+  gap:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
+
+  box-shadow:none;
+  overflow:hidden;
+}
+
+.presenterWhoMediaLabel{
+  width:100%;
+  min-width:0;
+  min-height:40px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  border:2px solid rgba(22,130,60,.28);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-green-soft);
-  color:var(--presenter-green);
-
-  font-size:.82rem;
-  line-height:1.4;
-  text-align:center;
-  font-weight:400;
-}
-
-/* =========================
-   7) COMPENSATION
-========================= */
-
-.presenterWhoCompensation,
-.presenterWhoCompensationCard,
-.presenterWhoCompensationBadge{
-  min-width:0;
-}
-
-.presenterWhoCompensationCard{
-  padding:8px;
-
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  align-items:center;
-  gap:8px;
-
-  border:2px solid rgba(254,127,45,.42);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-primary-soft);
-}
-
-.presenterWhoCompensationText{
-  min-width:0;
-  color:var(--presenter-primary-dark);
-  font-size:.66rem;
-  line-height:1.35;
-}
-
-.presenterWhoCompensationBadge{
-  min-height:32px;
-  padding:5px 10px;
-
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
+  padding:8px 12px;
 
   border-radius:999px;
-  background:var(--presenter-primary);
+
+  background:var(--secondary);
   color:#FFFFFF;
 
-  font-size:.62rem;
+  font-size:.82rem;
   line-height:1;
   font-weight:400;
-}
+  text-align:center;
 
-.presenterWhoCompensationCard.active,
-.presenterWhoCompensationActive{
-  border-color:var(--presenter-primary);
-  background:rgba(254,127,45,.18);
-}
-
-.presenterWhoCompensationCard.active .presenterWhoCompensationBadge,
-.presenterWhoCompensationActive .presenterWhoCompensationBadge{
-  background:var(--presenter-green);
-}
-
-.presenterWhoCompensationTeam{
-  min-width:0;
-  overflow:hidden;
   white-space:nowrap;
+  overflow:hidden;
   text-overflow:ellipsis;
 }
 
-/* =========================
-   8) ACTIONS
-========================= */
-
-.presenterWhoActions{
-  min-width:0;
-
-  display:grid;
-  grid-template-columns:repeat(6,minmax(0,1fr));
-  gap:6px;
+.presenterWhoMediaLabel:empty::before{
+  content:"من هو";
 }
 
-.presenterWhoActions .presenterBtn{
-  min-height:48px;
-}
-
-.presenterWhoActions .gray{
-  background:var(--presenter-surface);
-  border-color:var(--presenter-line-strong);
-  color:var(--presenter-secondary);
-}
-
-.presenterWhoActions .green{
-  background:var(--presenter-green);
-  border-color:var(--presenter-green);
-  color:#FFFFFF;
-}
-
-.presenterWhoActions .red{
-  background:var(--presenter-red);
-  border-color:var(--presenter-red);
-  color:#FFFFFF;
-}
-
-.presenterWhoActions .blue{
-  background:var(--presenter-blue);
-  border-color:var(--presenter-blue);
-  color:#FFFFFF;
-}
-
-.presenterWhoActions .orange,
-.presenterWhoCompensationBtn{
-  background:var(--presenter-primary);
-  border-color:var(--presenter-primary);
-  color:#FFFFFF;
-}
-
-/* =========================
-   9) LOADING
-========================= */
-
-.presenterWhoLoading{
-  grid-column:1 / -1;
-  min-height:120px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:var(--presenter-muted);
-  font-size:.72rem;
-  text-align:center;
-}
-
-/* =========================
-   10) READER MODE
-========================= */
-
-.readerWhoGrid{
+.presenterWhoAnswerText{
   width:100%;
+  height:100%;
   min-width:0;
+  min-height:0;
 
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
-}
-
-.readerWhoCard{
-  min-width:0;
-  min-height:180px;
-  padding:8px;
-
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr) auto;
-  gap:6px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-lg);
-  background:var(--presenter-surface);
-
-  cursor:pointer;
-  overflow:hidden;
-}
-
-.readerWhoNumber{
-  width:34px;
-  height:34px;
+  padding:14px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  border-radius:9px;
-  background:var(--presenter-secondary);
-  color:#FFFFFF;
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:22px;
 
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:.8rem;
+  color:var(--text);
+
+  font-size:clamp(1rem,1.35vw,1.25rem);
+  line-height:1.35;
   font-weight:400;
+  text-align:center;
+
+  overflow:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
 }
 
-.readerWhoMedia{
+.presenterWhoImageBox{
+  width:100%;
+  height:100%;
   min-width:0;
   min-height:0;
 
@@ -578,77 +423,276 @@
   align-items:center;
   justify-content:center;
 
-  border-radius:11px;
-  background:var(--presenter-surface-soft);
+  padding:8px;
+
+  background:#111827;
+  border-radius:22px;
+
   overflow:hidden;
 }
 
-.readerWhoMedia img{
+.presenterWhoImageBox.hidden{
+  display:none;
+}
+
+.presenterWhoImageBox img{
   width:100%;
   height:100%;
+
   object-fit:contain;
-}
+  display:block;
 
-.readerWhoAnswer{
-  min-width:0;
-  padding:6px;
-
-  border-radius:10px;
-  background:var(--presenter-green-soft);
-  color:var(--presenter-green);
-
-  font-size:.68rem;
-  line-height:1.3;
-  text-align:center;
-  font-weight:400;
-}
-
-.readerWhoCard.readerRead,
-.readerWhoCard.read{
-  border-color:rgba(22,130,60,.34);
-  background:var(--presenter-green-soft);
+  border-radius:16px;
 }
 
 /* =========================
-   11) GALAXY TAB A11 LANDSCAPE
+   7) ACTIONS
 ========================= */
 
-@media
-  (min-width:900px)
-  and (max-width:1400px)
-  and (orientation:landscape)
-  and (min-height:500px){
+.presenterWhoActions{
+  width:min(100%,860px);
+  height:76px;
+  min-height:76px;
+  margin:0 auto;
 
-  .presenterWhoLayout{
-    grid-template-columns:minmax(0,1.16fr) minmax(320px,.84fr);
-    gap:7px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:24px;
+
+  box-shadow:none;
+}
+
+.presenterWhoActions .presenterBtn{
+  width:100%;
+  height:52px;
+  min-height:52px;
+
+  border:0;
+  border-radius:16px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  color:#FFFFFF;
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:400;
+  text-align:center;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    opacity .15s ease;
+}
+
+.presenterWhoActions .presenterBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.presenterWhoActions .presenterBtn:active{
+  transform:scale(.97);
+}
+
+.presenterWhoDoubleBtn{
+  background:var(--btn-double);
+  color:#FFFFFF;
+}
+
+.presenterWhoDoubleBtn.presenterUsedDouble{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+}
+
+.presenterWhoCompensationBtn{
+  background:var(--btn-comp);
+  color:#FFFFFF;
+}
+
+.presenterWhoWrongBtn{
+  background:var(--btn-wrong);
+  color:#FFFFFF;
+}
+
+.presenterWhoCorrectBtn{
+  background:var(--btn-correct);
+  color:#FFFFFF;
+}
+
+.presenterWhoActions .presenterBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+/* =========================
+   8) READER
+========================= */
+
+#presenterReaderPanel .readerWhoList{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+
+#presenterReaderPanel .readerWhoList .readerMiniCard{
+  min-width:0;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:22px;
+
+  overflow:hidden;
+}
+
+#presenterReaderPanel .readerWhoList img{
+  width:100%;
+  max-height:150px;
+
+  object-fit:contain;
+
+  background:#111827;
+  display:block;
+}
+
+/* =========================
+   9) IPAD / TABLET LANDSCAPE
+========================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .presenterWhoScreen{
+    grid-template-rows:minmax(0,1fr) 70px;
+    gap:8px;
   }
 
-  .presenterWhoMain,
-  .presenterWhoSide{
-    gap:7px;
+  .presenterWhoMain{
+    grid-template-columns:minmax(0,1fr) 320px;
+    gap:8px;
   }
 
-  .presenterWhoNumbersCard,
-  .presenterWhoPreviewCard{
-    padding:8px;
+  .presenterWhoBoardCard{
+    padding:10px;
+
+    grid-template-rows:46px 64px minmax(0,1fr);
+    gap:8px;
+
+    border-radius:24px;
   }
 
-  .presenterWhoNumbers{
+  .presenterWhoInfoLine{
+    grid-template-columns:minmax(0,1fr) 96px;
+    gap:8px;
+  }
+
+  .presenterWhoCurrentBadge,
+  .presenterWhoTimer{
+    height:46px;
+    min-height:46px;
+
+    border-radius:16px;
+
+    font-size:.85rem;
+  }
+
+  .presenterWhoTimer{
+    font-size:1.45rem;
+  }
+
+  .presenterWhoPointsGrid{
+    height:64px;
+    padding:7px;
     gap:6px;
+
+    border-radius:20px;
   }
 
-  .presenterWhoNumbers .presenterNumberBtn{
-    font-size:1rem;
+  .presenterWhoPointBtn{
+    border-radius:15px;
+    font-size:1.35rem;
+  }
+
+  .presenterWhoGrid{
+    gap:8px;
+    padding:8px;
+    border-radius:22px;
+  }
+
+  .presenterWhoGrid .presenterNumberBtn{
+    border-radius:16px;
+    font-size:2rem;
+  }
+
+  .presenterWhoPreviewCard{
+    padding:10px;
+
+    grid-template-rows:36px minmax(0,.6fr) minmax(0,1fr);
+    gap:8px;
+
+    border-radius:24px;
+  }
+
+  .presenterWhoMediaLabel{
+    min-height:36px;
+    font-size:.72rem;
+  }
+
+  .presenterWhoAnswerText{
+    padding:12px;
+    border-radius:18px;
+
+    font-size:.92rem;
+    line-height:1.35;
+  }
+
+  .presenterWhoImageBox{
+    padding:7px;
+    border-radius:18px;
+  }
+
+  .presenterWhoImageBox img{
+    border-radius:13px;
+  }
+
+  .presenterWhoActions{
+    width:min(100%,760px);
+    height:70px;
+    min-height:70px;
+
+    padding:9px;
+    border-radius:22px;
   }
 
   .presenterWhoActions .presenterBtn{
-    min-height:45px;
+    height:48px;
+    min-height:48px;
+
+    border-radius:15px;
+
+    font-size:.9rem;
+  }
+
+  #presenterReaderPanel .readerWhoList{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
   }
 }
 
 /* =========================
-   12) IPHONE PRO MAX LANDSCAPE
+   10) IPHONE PRO MAX LANDSCAPE
 ========================= */
 
 @media
@@ -657,170 +701,154 @@
   and (orientation:landscape)
   and (max-height:500px){
 
-  .presenterWhoLayout{
-    grid-template-columns:minmax(0,1.16fr) minmax(270px,.84fr);
-    gap:5px;
+  .presenterWhoScreen{
+    grid-template-rows:minmax(0,1fr) 44px;
+    gap:6px;
   }
 
   .presenterWhoMain{
-    grid-template-rows:minmax(0,1fr) 42px;
+    grid-template-columns:minmax(0,1fr) 245px;
+    gap:6px;
+  }
+
+  .presenterWhoBoardCard{
+    padding:6px;
+
+    grid-template-rows:30px 42px minmax(0,1fr);
+    gap:5px;
+
+    border-radius:15px;
+  }
+
+  .presenterWhoInfoLine{
+    grid-template-columns:minmax(0,1fr) 58px;
     gap:5px;
   }
 
-  .presenterWhoSide{
-    grid-template-rows:42px 38px minmax(0,1fr) auto;
+  .presenterWhoCurrentBadge,
+  .presenterWhoTimer{
+    height:30px;
+    min-height:30px;
+
+    padding:4px 6px;
+
+    border-radius:10px;
+
+    font-size:.55rem;
+  }
+
+  .presenterWhoTimer{
+    font-size:.78rem;
+  }
+
+  .presenterWhoPointsGrid{
+    height:42px;
+    padding:5px;
     gap:5px;
-  }
 
-  .presenterWhoNumbersCard,
-  .presenterWhoPreviewCard{
-    padding:5px;
-    gap:4px;
-    border-radius:11px;
-  }
-
-  .presenterWhoNumbersHead{
-    min-height:18px;
-  }
-
-  .presenterWhoStatusText{
-    font-size:.5rem;
-  }
-
-  .presenterWhoNumbers{
-    gap:4px;
-  }
-
-  .presenterWhoNumbers .presenterNumberBtn{
-    padding:3px;
-    border-radius:8px;
-    font-size:.72rem;
-  }
-
-  .presenterWhoNumbers .presenterWhoLocked15::after{
-    inset-inline:2px;
-    bottom:2px;
-    min-height:12px;
-    font-size:.34rem;
-  }
-
-  .presenterWhoPointsCard,
-  .presenterWhoTeamsCard{
-    padding:5px;
-    gap:4px;
-    border-radius:9px;
-  }
-
-  .presenterWhoPointsLabel{
-    font-size:.48rem;
-  }
-
-  .presenterWhoPoints{
-    gap:4px;
+    border-radius:13px;
   }
 
   .presenterWhoPointBtn{
-    min-height:30px;
-    border-radius:7px;
-    font-size:.62rem;
+    border-radius:10px;
+    font-size:.9rem;
   }
 
-  .presenterWhoTeamsCard .presenterTeamBtn{
-    min-height:34px;
-    padding:4px;
-    font-size:.52rem;
-  }
-
-  .presenterWhoErrorsRow{
-    gap:4px;
-  }
-
-  .presenterWhoErrorBox{
-    min-height:28px;
-    padding:3px 4px;
-    border-radius:7px;
-  }
-
-  .presenterWhoErrorBox span{
-    font-size:.4rem;
-  }
-
-  .presenterWhoErrorBox strong{
-    font-size:.52rem;
-  }
-
-  .presenterWhoPreviewHead{
-    min-height:18px;
-  }
-
-  .presenterWhoCurrentNumber,
-  .presenterWhoCurrentPoints{
-    min-height:22px;
-    padding:3px 6px;
-    font-size:.46rem;
-  }
-
-  .presenterWhoMedia{
-    border-radius:8px;
-  }
-
-  .presenterWhoAnswer{
-    min-height:34px;
-    padding:4px;
-    border-radius:8px;
-    font-size:.54rem;
-  }
-
-  .presenterWhoCompensationCard{
-    padding:5px;
-    grid-template-columns:minmax(0,1fr) auto;
+  .presenterWhoGrid{
     gap:5px;
-    border-radius:9px;
+    padding:5px;
+    border-radius:14px;
   }
 
-  .presenterWhoCompensationText{
-    font-size:.46rem;
+  .presenterWhoGrid .presenterNumberBtn{
+    border-radius:10px;
+    font-size:.95rem;
   }
 
-  .presenterWhoCompensationBadge{
+  .presenterWhoPreviewCard{
+    padding:6px;
+
+    grid-template-rows:24px minmax(0,.6fr) minmax(0,1fr);
+    gap:5px;
+
+    border-radius:15px;
+  }
+
+  .presenterWhoMediaLabel{
     min-height:24px;
-    padding:3px 7px;
-    font-size:.46rem;
+
+    padding:4px 7px;
+
+    font-size:.55rem;
+  }
+
+  .presenterWhoAnswerText{
+    padding:7px;
+    border-radius:11px;
+
+    font-size:.6rem;
+    line-height:1.3;
+  }
+
+  .presenterWhoImageBox{
+    padding:5px;
+    border-radius:11px;
+  }
+
+  .presenterWhoImageBox img{
+    border-radius:8px;
   }
 
   .presenterWhoActions{
-    gap:4px;
+    width:min(100%,620px);
+    height:44px;
+    min-height:44px;
+
+    gap:6px;
+
+    padding:5px;
+
+    border-radius:15px;
   }
 
   .presenterWhoActions .presenterBtn{
-    min-height:42px;
-    padding:4px;
-    border-radius:8px;
-    font-size:.5rem;
+    height:30px;
+    min-height:30px;
+
+    border-radius:10px;
+
+    font-size:.58rem;
   }
 
-  .readerWhoGrid{
-    grid-template-columns:repeat(5,minmax(0,1fr));
-    gap:5px;
+  #presenterReaderPanel .readerWhoList{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:6px;
   }
 
-  .readerWhoCard{
-    min-height:110px;
-    padding:5px;
-    gap:4px;
-    border-radius:9px;
+  #presenterReaderPanel .readerWhoList img{
+    max-height:80px;
   }
+}
+.presenterWhoPointBtn{
+  background:var(--btn-nav) !important;
+  color:#FFFFFF !important;
+  border:2px solid var(--btn-nav) !important;
+}
 
-  .readerWhoNumber{
-    width:24px;
-    height:24px;
-    border-radius:6px;
-    font-size:.56rem;
-  }
+.presenterWhoPointBtn:hover{
+  filter:brightness(1.06);
+}
 
-  .readerWhoAnswer{
-    padding:4px;
-    border-radius:7px;
-    font-size:.46rem;
-  }
+.presenterWhoPointBtn.activeWhoPoint,
+.presenterWhoPointBtn.selectedPresenterTeam{
+  background:var(--primary) !important;
+  color:#FFFFFF !important;
+  border-color:var(--primary) !important;
+  box-shadow:0 0 0 3px rgba(254,127,45,.20) inset;
+}
+
+.presenterWhoPointBtn:disabled:not(.activeWhoPoint):not(.selectedPresenterTeam){
+  background:var(--btn-disabled) !important;
+  color:var(--btn-disabled-text) !important;
+  border-color:var(--btn-disabled) !important;
 }

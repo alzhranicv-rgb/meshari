@@ -32,10 +32,10 @@ const INTRO_ALL_GAME_SEGMENTS = [
   },
 
   {
-    key: "letterli",
-    title: "حرفلي",
-    sort: 3
-  },
+  key: "familyDidi",
+  title: "فاملي ديدي",
+  sort: 3
+},
 
   {
     key: "who",
@@ -888,7 +888,13 @@ function clearGameLocalState() {
 
   localStorage.removeItem("warmup_state_v1")
   localStorage.removeItem("top10_state_v1")
-  localStorage.removeItem("letterli_state_v1")
+  localStorage.removeItem(
+  "family_didi_state_v1"
+)
+
+localStorage.removeItem(
+  "family_didi_max_rounds"
+)
   localStorage.removeItem("who_state_v1")
   localStorage.removeItem("explain_state_v1")
 
@@ -948,7 +954,7 @@ function defaultIntroSegmentStatus() {
   return {
     warmup: createStatus(),
     top10: createStatus(),
-    letterli: createStatus(),
+    familyDidi: createStatus(),
     who: createStatus(),
     explain: createStatus(),
 
@@ -2106,8 +2112,8 @@ window.startGameFromIntro = async function () {
   top10:
     null,
 
-  letterli:
-    null,
+  familyDidi:
+  null,
 
   who:
     null,

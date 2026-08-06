@@ -651,6 +651,7 @@ function invalidateSupabaseWriteCache(
   "global_segment_visibility",
   "questions",
   "top10_questions",
+  "family_didi_questions",
   "auction_questions",
   "who_images",
   "explain_words",

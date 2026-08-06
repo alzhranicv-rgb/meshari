@@ -35,6 +35,8 @@ let presenterJoinMode =
   "control"
 
 let presenterReaderSegment = null
+let presenterLotteryPendingOpenInfo = null
+let presenterLotteryCompletedKeys = new Set()
 
 /* =========================
    2) CACHE SETTINGS
@@ -88,14 +90,14 @@ const PRESENTER_SEGMENTS = [
     displaySegment: "top10",
     needsLottery: true
   },
-  {
-    key: "letterli",
-    title: "حرفلي",
-    sort: 3,
-    moduleKey: "letterli",
-    displaySegment: "letterli",
-    needsLottery: false
-  },
+{
+  key: "familyDidi",
+  title: "فاملي ديدي",
+  sort: 3,
+  moduleKey: "familyDidi",
+  displaySegment: "familyDidi",
+  needsLottery: false
+},
   {
     key: "who",
     title: "من هو",
@@ -432,7 +434,7 @@ function getPresenterLoadingMarkup(
 }
 
 function showPresenterBootLoading(
-  text = "جاري تجهيز لوحة المقدم..."
+  text = "جاري تجهيز اللعبة..."
 ) {
   const overlay =
     document.getElementById("presenterBootLoading")
@@ -525,7 +527,7 @@ function getPresenterSegmentConfig(segment) {
 function getPresenterSegmentTitle(segment) {
   return (
     getPresenterSegmentConfig(segment)?.title ||
-    "لوحة المقدم"
+    "الحنكة"
   )
 }
 
@@ -856,6 +858,8 @@ function setPresenterJoinMode(mode) {
 function showPresenterJoin() {
   hideAllPresenterPages()
   document.getElementById("presenterJoin")?.classList.remove("hidden")
+
+  document.body.classList.remove("presenterHomeControlsMode")
   syncPresenterJoinModeUI()
   hidePresenterInsideModeSwitch()
 }
@@ -863,22 +867,33 @@ function showPresenterJoin() {
 function showPresenterHomePage() {
   hideAllPresenterPages()
   document.getElementById("presenterHome")?.classList.remove("hidden")
+
+  document.body.classList.add("presenterHomeControlsMode")
+  ensurePresenterInsideModeSwitch()
 }
 
 function showPresenterSegmentPage() {
   hideAllPresenterPages()
   document.getElementById("presenterSegmentPage")?.classList.remove("hidden")
+
+  document.body.classList.remove("presenterHomeControlsMode")
   hidePresenterInsideModeSwitch()
 }
 
 function showPresenterReaderHomePage() {
   hideAllPresenterPages()
   document.getElementById("presenterReaderHome")?.classList.remove("hidden")
+
+  document.body.classList.add("presenterHomeControlsMode")
+  ensurePresenterInsideModeSwitch()
 }
 
 function showPresenterReaderSegmentPage() {
   hideAllPresenterPages()
   document.getElementById("presenterReaderSegmentPage")?.classList.remove("hidden")
+
+  document.body.classList.remove("presenterHomeControlsMode")
+  hidePresenterInsideModeSwitch()
 }
 
 /* =========================
@@ -1390,15 +1405,30 @@ function buildPresenterSegmentsGridHtml() {
     const locked =
       isPresenterSegmentLocked(key)
 
+    const needsLottery =
+      item.needsLottery === true
+
     return `
       <button
         type="button"
-        class="segmentCard presenterSegmentCard presenterSegmentCardClean ${locked ? "presenterLockedSegment" : ""}"
+        class="segmentCard presenterSegmentCard presenterSegmentCardClean ${locked ? "presenterLockedSegment" : ""} ${needsLottery ? "presenterNeedsLottery" : ""}"
         data-segment="${key}"
         onclick="openPresenterSegmentCard('${key}')"
         ${locked ? "disabled" : ""}
       >
-        <span>${item.title}</span>
+        <span class="presenterSegmentCardTitle">
+          ${item.title}
+        </span>
+
+        ${
+          needsLottery
+            ? `
+              <span class="presenterLotteryBadge">
+                .
+              </span>
+            `
+            : ""
+        }
       </button>
     `
   }).join("")
@@ -1465,7 +1495,7 @@ function renderPresenterHome() {
   if (teamB) teamB.innerText = presenterTeamBName
   if (scoreA) scoreA.innerText = scores.A
   if (scoreB) scoreB.innerText = scores.B
-  if (title) title.innerText = "لوحة المقدم"
+  if (title) title.innerText = "الحنكة"
 
   const modelName =
     presenterLiveState?.currentModelName || ""
@@ -1674,10 +1704,10 @@ function getPresenterSegmentHandler(segment) {
       render: getPresenterModuleFunction("renderTop10"),
       refresh: getPresenterModuleFunction("refreshPresenterTop10FromState")
     },
-    letterli: {
-      render: getPresenterModuleFunction("renderPresenterLetterli"),
-      refresh: getPresenterModuleFunction("refreshPresenterLetterliFromState")
-    },
+    familyDidi: {
+  render: getPresenterModuleFunction("renderPresenterFamilyDidi"),
+  refresh: getPresenterModuleFunction("refreshPresenterFamilyDidiFromState")
+},
     who: {
       render: getPresenterModuleFunction("renderWho"),
       refresh: getPresenterModuleFunction("refreshPresenterWhoFromState")
@@ -1774,6 +1804,14 @@ function isPresenterPanelReadyForSegment(segment) {
     panelText.includes("جاري التحميل") ||
     panelText.includes("حدث خطأ في تحميل الفقرة")
 
+
+  if (
+    currentRendered === "lottery" &&
+    panel.dataset.lotterySegment === runtimeSegment
+  ) {
+    return true
+  }
+
   if (runtimeSegment === "final") {
     return (
       currentRendered === "final" &&
@@ -1805,6 +1843,10 @@ async function renderPresenterSegmentShell(segment) {
   }
 
   showPresenterSegmentPage()
+
+  updatePresenterTeamButtonsOnly(
+    presenterSelectedTeam
+  )
 
   const title =
     document.getElementById("presenterSegmentTitle")
@@ -2393,8 +2435,16 @@ async function syncPresenterOpenedSegment(openInfo) {
 }
 
 async function renderPresenterOpenedSegment(openInfo) {
-  await renderPresenterSegmentShell(openInfo.runtimeSegment)
-  await openPresenterSegmentFromSync(openInfo.runtimeSegment)
+  if (
+    openInfo?.needsLottery &&
+    !isPresenterLotteryCompleted(openInfo)
+  ) {
+    showPresenterSegmentPage()
+    renderPresenterLotteryGate(openInfo)
+    return
+  }
+
+  await renderPresenterSegmentAfterLottery(openInfo)
 }
 
 async function openPresenterSegmentCard(segment) {
@@ -2417,6 +2467,54 @@ async function openPresenterSegmentCard(segment) {
   if (isPresenterSegmentLocked(openInfo.key)) {
     showToast("هذه الفقرة منتهية")
     renderPresenterHome()
+    return
+  }
+
+    if (
+    openInfo.needsLottery &&
+    !isPresenterLotteryCompleted(openInfo)
+  ) {
+    presenterLotteryPendingOpenInfo = openInfo
+    presenterSelectedTeam = null
+
+    setPresenterLocalOpenState(openInfo)
+
+    markPresenterLocalSync(
+      openInfo.runtimeSegment,
+      openInfo.finalRound ? 1800 : 1400
+    )
+
+    showPresenterSegmentPage()
+    renderPresenterLotteryGate(openInfo)
+    updatePresenterTeamButtonsOnly(null)
+
+    const commandPromise =
+      sendCommand(
+        "openSegment",
+        {
+          ...getPresenterOpenCommandPayload(openInfo),
+          lotteryGate: true
+        }
+      )
+
+    const sessionPromise =
+      syncPresenterOpenedSegment(openInfo)
+        .catch(error => {
+          console.log(
+            "LOTTERY GATE SESSION SYNC CATCH:",
+            error
+          )
+          return false
+        })
+
+    const sent =
+      await commandPromise
+
+    if (!sent) {
+      showToast("تعذر فتح القرعة في العرض")
+    }
+
+    await sessionPromise
     return
   }
 
@@ -2690,6 +2788,433 @@ function getPresenterFinalTeamForRound(
   return getPresenterActiveTeamFromState()
 }
 
+function getPresenterLotteryKey(openInfo) {
+  return [
+    presenterSessionId || "local",
+    openInfo?.key || presenterSegment || "",
+    openInfo?.finalRound || ""
+  ].join("_")
+}
+
+function getPresenterLotteryStateKey(openInfo) {
+  const candidates = [
+    openInfo?.key,
+    openInfo?.sessionSegment,
+    openInfo?.displaySegment,
+    presenterSegment
+  ].filter(Boolean)
+
+  for (const item of candidates) {
+    const key = String(item)
+
+    if (
+      key === "final_round2" ||
+      key === "finalRound2"
+    ) {
+      return "finalRound2"
+    }
+
+    if (
+      key === "final_round4" ||
+      key === "finalRound4"
+    ) {
+      return "finalRound4"
+    }
+
+    if (
+      key === "warmup" ||
+      key === "top10" ||
+      key === "who" ||
+      key === "explain" ||
+      key === "archive"
+    ) {
+      return key
+    }
+  }
+
+  return openInfo?.key || presenterSegment || ""
+}
+
+function getPresenterSyncedLotteryTeam(openInfo) {
+  const state =
+    presenterLiveState?.segmentStartLottery ||
+    presenterLiveState?.segmentStartLotteryState ||
+    {}
+
+  const key =
+    getPresenterLotteryStateKey(openInfo)
+
+  const team =
+    state?.[key]?.team
+
+  return team === "A" || team === "B"
+    ? team
+    : ""
+}
+
+function isPresenterLotteryCompleted(openInfo) {
+  if (!openInfo?.needsLottery) return true
+
+  const syncedTeam =
+    getPresenterSyncedLotteryTeam(openInfo)
+
+  if (syncedTeam) return true
+
+  return presenterLotteryCompletedKeys.has(
+    getPresenterLotteryKey(openInfo)
+  )
+}
+
+function getPresenterLotteryTeamName(team) {
+  if (team === "A") {
+    return presenterTeamAName || "الفريق الأول"
+  }
+
+  if (team === "B") {
+    return presenterTeamBName || "الفريق الثاني"
+  }
+
+  return ""
+}
+
+function renderPresenterLotteryGate(openInfo) {
+  const panel =
+    document.getElementById("presenterPanel")
+
+  const title =
+    document.getElementById("presenterSegmentTitle")
+
+  if (!panel || !openInfo) return
+
+  presenterLotteryPendingOpenInfo = openInfo
+
+  if (title) {
+    title.innerText = openInfo.title || "القرعة"
+  }
+
+  panel.dataset.segment = "lottery"
+  panel.dataset.lotterySegment = openInfo.runtimeSegment || ""
+
+  if (openInfo.finalRound) {
+    panel.dataset.finalRound = String(openInfo.finalRound)
+  } else {
+    delete panel.dataset.finalRound
+  }
+
+  const selectedTeam =
+    presenterSelectedTeam
+
+  panel.innerHTML = `
+    <section
+      class="presenterLotteryGate"
+      aria-label="القرعة"
+    >
+
+      <div class="presenterLotteryCard">
+
+        <div class="presenterLotteryTitle">
+          <span>
+            القرعة
+          </span>
+
+          <strong>
+            ${openInfo.title || "الفقرة"}
+          </strong>
+        </div>
+
+        <div
+          id="presenterLotteryResult"
+          class="presenterLotteryResult ${selectedTeam ? "active" : ""}"
+        >
+          ${
+            selectedTeam
+              ? getPresenterLotteryTeamName(selectedTeam)
+              : "ابدأ القرعة"
+          }
+        </div>
+
+        <div class="presenterLotteryTeams">
+
+          <button
+            type="button"
+            id="presenterLotteryTeamA"
+            class="presenterLotteryTeamBtn ${selectedTeam === "A" ? "active" : ""}"
+            onclick="choosePresenterLotteryTeam('A')"
+          >
+            ${getPresenterLotteryTeamName("A")}
+          </button>
+
+          <button
+            type="button"
+            id="presenterLotteryTeamB"
+            class="presenterLotteryTeamBtn ${selectedTeam === "B" ? "active" : ""}"
+            onclick="choosePresenterLotteryTeam('B')"
+          >
+            ${getPresenterLotteryTeamName("B")}
+          </button>
+
+        </div>
+
+        <div class="presenterLotteryActions">
+
+          <button
+            type="button"
+            class="presenterBtn orange"
+            onclick="startPresenterLottery()"
+          >
+            بدء القرعة
+          </button>
+
+          <button
+            type="button"
+            id="presenterLotteryContinueBtn"
+            class="presenterBtn green"
+            onclick="continuePresenterLotterySegment()"
+            ${selectedTeam ? "" : "disabled"}
+          >
+            دخول الفقرة
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+  `
+
+  updatePresenterTeamButtonsOnly(
+    selectedTeam
+  )
+}
+
+function refreshPresenterLotteryGate() {
+  const result =
+    document.getElementById("presenterLotteryResult")
+
+  const teamA =
+    document.getElementById("presenterLotteryTeamA")
+
+  const teamB =
+    document.getElementById("presenterLotteryTeamB")
+
+  const continueBtn =
+    document.getElementById("presenterLotteryContinueBtn")
+
+  const team =
+    presenterSelectedTeam
+
+  if (result) {
+    result.classList.toggle("active", !!team)
+
+    result.innerText =
+      team
+        ? getPresenterLotteryTeamName(team)
+        : "ابدأ القرعة"
+  }
+
+  if (teamA) {
+    teamA.classList.toggle("active", team === "A")
+  }
+
+  if (teamB) {
+    teamB.classList.toggle("active", team === "B")
+  }
+
+  if (continueBtn) {
+    continueBtn.disabled = !team
+  }
+
+  updatePresenterTeamButtonsOnly(team)
+}
+
+async function choosePresenterLotteryTeam(team) {
+  if (team !== "A" && team !== "B") return
+
+  const openInfo =
+    presenterLotteryPendingOpenInfo
+
+  presenterSelectedTeam = team
+
+  updatePresenterTeamButtonsOnly(team)
+  refreshPresenterLotteryGate()
+
+  if (openInfo) {
+    await sendCommand("selectLotteryTeam", {
+      team,
+      teamName: getPresenterLotteryTeamName(team),
+      segment: openInfo.displaySegment,
+      segmentKey: openInfo.key,
+      activeSegment: openInfo.sessionSegment,
+      round: openInfo.finalRound || null
+    })
+  }
+
+  showToast(getPresenterLotteryTeamName(team))
+}
+
+async function startPresenterLottery() {
+  const openInfo =
+    presenterLotteryPendingOpenInfo ||
+    getPresenterOpenInfo(
+      getPresenterCurrentSegmentKey()
+    )
+
+  if (!openInfo?.needsLottery) {
+    showToast("هذه الفقرة بدون قرعة")
+    return
+  }
+
+  const team =
+    Math.random() < .5
+      ? "A"
+      : "B"
+
+  presenterSelectedTeam = team
+
+  updatePresenterTeamButtonsOnly(team)
+  refreshPresenterLotteryGate()
+
+  const teamName =
+    getPresenterLotteryTeamName(team)
+
+  await sendCommand("startLottery", {
+    team,
+    teamName,
+    segment: openInfo.displaySegment,
+    segmentKey: openInfo.key,
+    activeSegment: openInfo.sessionSegment,
+    round: openInfo.finalRound || null
+  })
+
+  showToast(`القرعة: ${teamName}`)
+}
+
+async function renderPresenterSegmentAfterLottery(openInfo) {
+  if (!openInfo) return
+
+  presenterLotteryCompletedKeys.add(
+    getPresenterLotteryKey(openInfo)
+  )
+
+  presenterLotteryPendingOpenInfo = null
+
+  await renderPresenterSegmentShell(openInfo.runtimeSegment)
+
+  const handler =
+    getPresenterSegmentHandler(openInfo.runtimeSegment)
+
+  const panel =
+    document.getElementById("presenterPanel")
+
+  if (!handler || typeof handler.render !== "function") {
+    if (panel) {
+      panel.innerHTML = `
+        <section class="presenterCard">
+          <div class="presenterLabel">
+            ملف الفقرة غير محمّل
+          </div>
+        </section>
+      `
+    }
+
+    return
+  }
+
+  const result = handler.render()
+
+  if (result && typeof result.then === "function") {
+    await result
+  }
+
+  if (panel) {
+    panel.dataset.segment = openInfo.runtimeSegment
+
+    if (openInfo.finalRound) {
+      panel.dataset.finalRound = String(openInfo.finalRound)
+    } else {
+      delete panel.dataset.finalRound
+    }
+  }
+
+  refreshPresenterCurrentSegmentFromState()
+}
+
+async function continuePresenterLotterySegment() {
+  const openInfo =
+    presenterLotteryPendingOpenInfo
+
+  if (!openInfo) return
+
+  if (
+    presenterSelectedTeam !== "A" &&
+    presenterSelectedTeam !== "B"
+  ) {
+    showToast("ابدأ القرعة أولاً")
+    return
+  }
+
+  const selectedTeam =
+    presenterSelectedTeam
+
+  presenterLotteryCompletedKeys.add(
+    getPresenterLotteryKey(openInfo)
+  )
+
+  presenterLotteryPendingOpenInfo = null
+
+  setPresenterLocalOpenState(openInfo)
+
+  presenterSelectedTeam = selectedTeam
+  setPresenterLocalActiveTeam(selectedTeam)
+  updatePresenterTeamButtonsOnly(selectedTeam)
+
+  markPresenterLocalSync(
+    openInfo.runtimeSegment,
+    openInfo.finalRound ? 1800 : 1400
+  )
+
+  const confirmPromise =
+    sendCommand("confirmLottery", {
+      team: selectedTeam,
+      teamName: getPresenterLotteryTeamName(selectedTeam),
+      segment: openInfo.displaySegment,
+      segmentKey: openInfo.key,
+      activeSegment: openInfo.sessionSegment,
+      round: openInfo.finalRound || null
+    })
+
+  const renderPromise =
+    renderPresenterSegmentAfterLottery(openInfo)
+      .catch(error => {
+        console.log(
+          "LOTTERY OPEN RENDER CATCH:",
+          error
+        )
+        showToast("تعذر دخول الفقرة")
+      })
+
+  await confirmPromise
+  await renderPromise
+
+  await sendCommand("selectTeam", {
+    team: selectedTeam,
+    segment: openInfo.runtimeSegment,
+    round: openInfo.finalRound || null
+  })
+
+  showToast("تم دخول الفقرة")
+}
+
+function isPresenterCurrentSegmentNeedsLottery() {
+  const key =
+    getPresenterCurrentSegmentKey()
+
+  const config =
+    getPresenterSegmentConfig(key)
+
+  return config?.needsLottery === true
+}
+
 function updatePresenterTeamButtonsOnly(team) {
   const cleanTeam =
     team === "A" || team === "B"
@@ -2702,11 +3227,31 @@ function updatePresenterTeamButtonsOnly(team) {
   const teamB =
     document.getElementById("teamB")
 
+  const teamAName =
+    document.getElementById("presenterSegmentTeamAName")
+
+  const teamBName =
+    document.getElementById("presenterSegmentTeamBName")
+
+  const lotteryBtn =
+    document.getElementById("presenterLotteryBtn")
+
+  if (teamAName) {
+    teamAName.innerText =
+      presenterTeamAName || "A"
+  }
+
+  if (teamBName) {
+    teamBName.innerText =
+      presenterTeamBName || "B"
+  }
+
   if (teamA) {
     teamA.classList.toggle(
       "selectedPresenterTeam",
       cleanTeam === "A"
     )
+
     teamA.classList.toggle(
       "activeTeam",
       cleanTeam === "A"
@@ -2718,9 +3263,23 @@ function updatePresenterTeamButtonsOnly(team) {
       "selectedPresenterTeam",
       cleanTeam === "B"
     )
+
     teamB.classList.toggle(
       "activeTeam",
       cleanTeam === "B"
+    )
+  }
+
+  if (lotteryBtn) {
+    const needsLottery =
+      typeof isPresenterCurrentSegmentNeedsLottery === "function" &&
+      isPresenterCurrentSegmentNeedsLottery()
+
+    lotteryBtn.disabled = !needsLottery
+
+    lotteryBtn.classList.toggle(
+      "presenterLotteryDisabled",
+      !needsLottery
     )
   }
 }
@@ -3414,41 +3973,105 @@ function showToast(text) {
 }
 
 function updateDisplayControlsEyeButton(isHidden) {
-  const btn =
-    document.getElementById("displayControlsEyeBtn")
+  const buttons = [
+    document.getElementById("displayControlsEyeBtn"),
+    document.getElementById("insideDisplayControlsEyeBtn")
+  ].filter(Boolean)
 
-  if (!btn) return
+  buttons.forEach(btn => {
+    btn.innerText =
+      isHidden
+        ? "إظهار التحكم"
+        : "إخفاء التحكم"
 
-  btn.innerText =
-    isHidden
-      ? "إظهار التحكم"
-      : "إخفاء التحكم"
+    btn.classList.toggle(
+      "showControlsMode",
+      isHidden
+    )
 
-  btn.classList.toggle(
-    "showControlsMode",
-    isHidden
-  )
+    btn.classList.toggle(
+      "hideControlsMode",
+      !isHidden
+    )
 
-  btn.classList.toggle(
-    "hideControlsMode",
-    !isHidden
-  )
-
-  btn.title =
-    isHidden
-      ? "إظهار أزرار التحكم"
-      : "إخفاء أزرار التحكم"
+    btn.title =
+      isHidden
+        ? "إظهار أزرار التحكم"
+        : "إخفاء أزرار التحكم"
+  })
 }
 
-function togglePresenterDisplayControls() {
+async function togglePresenterDisplayControls() {
   presenterDisplayControlsHidden =
     !presenterDisplayControlsHidden
+
+  localStorage.setItem(
+    "presenter_display_controls_hidden",
+    presenterDisplayControlsHidden ? "1" : "0"
+  )
 
   updateDisplayControlsEyeButton(
     presenterDisplayControlsHidden
   )
 
-  sendCommand("toggleDisplayControls")
+  const action =
+    presenterDisplayControlsHidden
+      ? "hideDisplayControls"
+      : "showDisplayControls"
+
+  const sent =
+    await sendCommand(action, {
+      hidden:presenterDisplayControlsHidden,
+      source:"presenterInsideButton"
+    })
+
+  if (!sent) {
+    presenterDisplayControlsHidden =
+      !presenterDisplayControlsHidden
+
+    localStorage.setItem(
+      "presenter_display_controls_hidden",
+      presenterDisplayControlsHidden ? "1" : "0"
+    )
+
+    updateDisplayControlsEyeButton(
+      presenterDisplayControlsHidden
+    )
+
+    showToast("تعذر إرسال أمر التحكم")
+    return
+  }
+
+  showToast(
+    presenterDisplayControlsHidden
+      ? "تم إخفاء التحكم"
+      : "تم إظهار التحكم"
+  )
+}
+
+async function presenterEndSegment() {
+  const currentSegment =
+    presenterSegment || localStorage.getItem("active_segment") || ""
+
+  const currentRound =
+    currentSegment === "final"
+      ? getPresenterFinalRound()
+      : null
+
+  const sent =
+    await sendCommand("endSegment", {
+      segment: currentSegment,
+      segmentKey: getPresenterCurrentSegmentKey(),
+      activeSegment: currentSegment,
+      round: currentRound,
+      source: "presenterEndButton"
+    })
+
+  if (!sent) {
+    showToast("تعذر إرسال أمر الإنهاء")
+    return
+  }
+
 }
 
 /* =========================
@@ -3885,44 +4508,36 @@ async function openPresenterReaderSegment(segment) {
   `
 
   try {
-    const externalReaders = {
-      warmup: "renderPresenterReaderWarmup",
-      top10: "renderPresenterReaderTop10",
-      who: "renderPresenterReaderWho",
-      explain: "renderPresenterReaderExplain",
-      finalRound1: "renderPresenterReaderFinalRound1",
-      finalRound2: "renderPresenterReaderFinalRound2",
-      finalRound3: "renderPresenterReaderFinalRound3",
-      finalRound4: "renderPresenterReaderFinalRound4"
-    }
+const externalReaders = {
+  warmup: "renderPresenterReaderWarmup",
+  top10: "renderPresenterReaderTop10",
+  familyDidi: "renderPresenterReaderFamilyDidi",
+  who: "renderPresenterReaderWho",
+  explain: "renderPresenterReaderExplain",
+  finalRound1: "renderPresenterReaderFinalRound1",
+  finalRound2: "renderPresenterReaderFinalRound2",
+  finalRound3: "renderPresenterReaderFinalRound3",
+  finalRound4: "renderPresenterReaderFinalRound4",
+  randomChallenge: "renderPresenterReaderRandomChallenge"
+}
 
-    if (segment === "letterli") {
-      panel.innerHTML =
-        readerEmpty(
-          "فقرة حرفلي تعتمد على ملف Excel وأسئلة ثابتة"
-        )
-    } else if (segment === "randomChallenge") {
-      panel.innerHTML =
-        readerEmpty(
-          "فقرة التحدي لا تحتوي على أسئلة من الأدمن"
-        )
-    } else if (segment === "archive") {
-      await renderPresenterReaderArchive()
-    } else {
-      const reader =
-        getPresenterModuleFunction(
-          externalReaders[segment]
-        )
+if (segment === "archive") {
+  await renderPresenterReaderArchive()
+} else {
+  const reader =
+    getPresenterModuleFunction(
+      externalReaders[segment]
+    )
 
-      if (!reader) {
-        panel.innerHTML =
-          readerEmpty(
-            "هذه الفقرة غير مدعومة في دليل الأسئلة"
-          )
-      } else {
-        await reader()
-      }
-    }
+  if (!reader) {
+    panel.innerHTML =
+      readerEmpty(
+        "هذه الفقرة غير مدعومة في دليل الأسئلة"
+      )
+  } else {
+    await reader()
+  }
+}
 
     savePresenterReaderCachedHtml(
       segment,
@@ -4171,6 +4786,9 @@ function ensurePresenterInsideModeSwitch() {
 
   if (box) {
     updatePresenterInsideModeSwitch()
+    updateDisplayControlsEyeButton(
+      presenterDisplayControlsHidden
+    )
     return
   }
 
@@ -4194,10 +4812,23 @@ function ensurePresenterInsideModeSwitch() {
     >
       دليل الأسئلة
     </button>
+
+    <button
+      type="button"
+      id="insideDisplayControlsEyeBtn"
+      class="presenterInsideDisplayControlsBtn"
+      onclick="togglePresenterDisplayControls()"
+    >
+      إخفاء التحكم
+    </button>
   `
 
   document.body.appendChild(box)
+
   updatePresenterInsideModeSwitch()
+  updateDisplayControlsEyeButton(
+    presenterDisplayControlsHidden
+  )
 }
 
 function updatePresenterInsideModeSwitch() {
@@ -4233,10 +4864,13 @@ async function switchPresenterInsideMode(mode) {
       : "control"
 
   presenterJoinMode = nextMode
+
   localStorage.setItem(
     "presenter_join_mode",
     presenterJoinMode
   )
+
+  updatePresenterInsideModeSwitch()
 
   const sessionId =
     localStorage.getItem("presenter_session_id")
@@ -4247,57 +4881,26 @@ async function switchPresenterInsideMode(mode) {
   }
 
   if (presenterJoinMode === "reader") {
-    presenterSegment = null
-    presenterSelectedTeam = null
     presenterReaderSegment = null
 
-    if (presenterChannel) {
-      db.removeChannel(presenterChannel)
-      presenterChannel = null
-    }
-
-    if (presenterSyncTimer) {
-      clearInterval(presenterSyncTimer)
-      presenterSyncTimer = null
-    }
-
+    showPresenterReaderHomePage()
     await renderPresenterReaderHome()
+
     ensurePresenterInsideModeSwitch()
+    updatePresenterInsideModeSwitch()
+
     showToast("تم التحويل إلى دليل الأسئلة")
     return
   }
 
   presenterReaderSegment = null
-  presenterSegment = null
 
-  showPresenterBootLoading(
-    "جاري التحويل إلى وضع التحكم..."
-  )
-
-  const result =
-    await loadPresenterSession(
-      sessionId,
-      { forceRefresh: true }
-    )
-
-  const data = result.data
-
-  if (
-    result.error ||
-    !data ||
-    data.status === "ended"
-  ) {
-    hidePresenterBootLoading()
-    renderPresenterEnded()
-    return
-  }
-
-  applyPresenterSessionData(data)
-  subscribeToGameSession(sessionId)
-
+  showPresenterHomePage()
   renderPresenterHome()
+
   ensurePresenterInsideModeSwitch()
-  hidePresenterBootLoading()
+  updatePresenterInsideModeSwitch()
+
   showToast("تم التحويل إلى وضع التحكم")
 }
 
@@ -4343,3 +4946,7 @@ window.openReaderMediaFromElement = openReaderMediaFromElement
 window.closeReaderMediaViewer = closeReaderMediaViewer
 window.switchPresenterInsideMode = switchPresenterInsideMode
 window.setPresenterJoinMode = setPresenterJoinMode
+window.startPresenterLottery = startPresenterLottery
+window.choosePresenterLotteryTeam = choosePresenterLotteryTeam
+window.continuePresenterLotterySegment = continuePresenterLotterySegment
+window.presenterEndSegment = presenterEndSegment

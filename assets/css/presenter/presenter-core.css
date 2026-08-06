@@ -1,942 +1,2807 @@
+/* =========================================================
+   PRESENTER CORE / المقدم
+   CLEAN FINAL
+   File: assets/css/presenter/presenter-core.css
+========================================================= */
 
 /* =========================
-   1) SHARED SURFACES
+   1) VARIABLES
 ========================= */
 
-.presenterCard{
-  min-width:0;
-  min-height:0;
-  padding:12px;
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-lg);
-  background:var(--presenter-surface);
-  box-shadow:var(--presenter-shadow-soft);
+.presenterApp{
+  --bg:#EAECF0;
+  --surface:#FFFFFF;
+  --soft:#F6F7F9;
+  --line:#D5DADF;
+
+  --primary:#FE7F2D;
+  --secondary:#233D4D;
+  --text:#151515;
+  --muted:#8793A0;
+
+  --btn-nav:#0A7C6E;
+  --btn-correct:#007F00;
+  --btn-wrong:#7F0000;
+  --btn-blue:#00007F;
+  --btn-dark:#00004C;
+  --btn-undo:#4C4C00;
+  --btn-change:#795000;
+
+  --btn-disabled:#D7DCE2;
+  --btn-disabled-text:#7B8792;
+
+  --radius-lg:28px;
+  --radius-md:22px;
+  --radius-sm:16px;
 }
 
-.presenterSoftCard{
-  min-width:0;
-  min-height:0;
-  padding:10px;
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-surface-soft);
+/* =========================
+   2) BASE
+========================= */
+
+.presenterApp,
+.presenterApp *{
+  box-sizing:border-box;
 }
 
-.presenterEyebrow{
-  display:block;
-  color:var(--presenter-primary);
-  font-size:.72rem;
-  line-height:1.2;
+.presenterApp{
+  width:100%;
+  min-height:var(--app-height,100dvh);
+
+  direction:rtl;
+
+  color:var(--text);
+  background:var(--bg);
+
+  font-family:"HanakaText",sans-serif;
+
+  overflow:hidden;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+
+.presenterApp button,
+.presenterApp input{
+  font-family:"HanakaText",sans-serif;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+
+.presenterApp button{
+  border:0;
+}
+
+.presenterApp h1,
+.presenterApp h2,
+.presenterApp h3,
+.presenterApp strong{
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
   font-weight:400;
 }
 
+.hidden{
+  display:none !important;
+}
+
 /* =========================
-   2) SHARED BUTTONS
+   3) PAGES
 ========================= */
 
-.presenterBtn,
-.presenterPrimaryBtn,
-.presenterSecondaryBtn,
-.presenterBackBtn,
-.presenterReaderLogoutBtn,
-.presenterModeBtn,
-.presenterTeamBtn,
-.presenterActionBtn{
-  min-width:0;
-  min-height:52px;
-  padding:9px 14px;
+.presenterPage{
+  width:100%;
+  min-height:var(--app-height,100dvh);
+}
 
-  display:inline-flex;
+.presenterLandscapeView{
+  width:100%;
+  height:var(--app-height,100dvh);
+  min-height:var(--app-height,100dvh);
+  max-height:var(--app-height,100dvh);
+
+  padding:
+    calc(10px + env(safe-area-inset-top,0px))
+    calc(14px + env(safe-area-inset-right,0px))
+    calc(10px + env(safe-area-inset-bottom,0px))
+    calc(14px + env(safe-area-inset-left,0px));
+
+  overflow:hidden;
+}
+
+.presenterLandscapeShell{
+  width:100%;
+  height:100%;
+  min-height:0;
+  max-height:100%;
+
+  display:grid;
+  gap:10px;
+
+  overflow:hidden;
+}
+
+.presenterHomeShell{
+  grid-template-rows:138px minmax(0,1fr);
+}
+
+.presenterSegmentShell{
+  grid-template-rows:84px minmax(0,1fr);
+}
+
+/* =========================
+   4) JOIN
+========================= */
+
+.presenterJoinPage{
+  width:100%;
+  min-height:var(--app-height,100dvh);
+
+  display:flex;
   align-items:center;
   justify-content:center;
-  gap:7px;
 
-  border:2px solid transparent;
-  border-radius:var(--presenter-radius-md);
+  padding:
+    calc(16px + env(safe-area-inset-top,0px))
+    calc(16px + env(safe-area-inset-right,0px))
+    calc(16px + env(safe-area-inset-bottom,0px))
+    calc(16px + env(safe-area-inset-left,0px));
 
-  font-weight:400;
-  line-height:1.2;
-  text-align:center;
-
-  cursor:pointer;
-
-  transition:
-    transform var(--presenter-transition),
-    border-color var(--presenter-transition),
-    background var(--presenter-transition),
-    opacity var(--presenter-transition);
+  background:var(--bg);
 }
-
-.presenterBtn:active,
-.presenterPrimaryBtn:active,
-.presenterSecondaryBtn:active,
-.presenterBackBtn:active,
-.presenterReaderLogoutBtn:active,
-.presenterModeBtn:active,
-.presenterTeamBtn:active,
-.presenterActionBtn:active{
-  transform:translateY(1px);
-}
-
-.presenterPrimaryBtn{
-  background:var(--presenter-primary);
-  border-color:var(--presenter-primary);
-  color:#FFFFFF;
-}
-
-.presenterPrimaryBtn:hover{
-  background:var(--presenter-primary-dark);
-  border-color:var(--presenter-primary-dark);
-}
-
-.presenterSecondaryBtn,
-.presenterBtn{
-  background:var(--presenter-surface);
-  border-color:var(--presenter-line-strong);
-  color:var(--presenter-secondary);
-}
-
-.presenterBackBtn,
-.presenterReaderLogoutBtn{
-  background:var(--presenter-secondary);
-  border-color:var(--presenter-secondary);
-  color:#FFFFFF;
-}
-
-.presenterActionBtn.presenterSuccess,
-.presenterBtn.presenterSuccess,
-.presenterCorrectBtn{
-  background:var(--presenter-green);
-  border-color:var(--presenter-green);
-  color:#FFFFFF;
-}
-
-.presenterActionBtn.presenterDanger,
-.presenterBtn.presenterDanger,
-.presenterWrongBtn{
-  background:var(--presenter-red);
-  border-color:var(--presenter-red);
-  color:#FFFFFF;
-}
-
-.presenterActionBtn.presenterInfo,
-.presenterBtn.presenterInfo{
-  background:var(--presenter-blue);
-  border-color:var(--presenter-blue);
-  color:#FFFFFF;
-}
-
-.presenterBtn:disabled,
-.presenterPrimaryBtn:disabled,
-.presenterSecondaryBtn:disabled,
-.presenterBackBtn:disabled,
-.presenterReaderLogoutBtn:disabled,
-.presenterModeBtn:disabled,
-.presenterTeamBtn:disabled,
-.presenterActionBtn:disabled{
-  opacity:.46;
-  cursor:not-allowed;
-  transform:none;
-}
-
-/* =========================
-   3) JOIN PAGE
-========================= */
 
 .presenterJoinShell{
-  max-width:920px;
+  width:min(100%,620px);
   display:grid;
-  grid-template-columns:minmax(0,.9fr) minmax(360px,1.1fr);
-  align-items:center;
-  gap:18px;
+  gap:14px;
 }
 
 .presenterJoinHeader{
-  min-width:0;
-  display:flex;
-  flex-direction:column;
+  width:100%;
+  display:grid;
   gap:8px;
+  text-align:center;
 }
 
-.presenterJoinHeader h1{
-  color:var(--presenter-secondary);
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(2rem,5vw,4rem);
+.presenterEyebrow{
+  color:var(--primary);
+  font-size:.9rem;
   line-height:1;
-}
-
-.presenterJoinHeader p{
-  max-width:420px;
-  color:var(--presenter-muted);
-  font-size:.94rem;
-  line-height:1.6;
-}
-
-.presenterJoinCard{
-  min-width:0;
-  padding:16px;
-
-  display:grid;
-  gap:13px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-xl);
-  background:var(--presenter-surface);
-  box-shadow:var(--presenter-shadow);
-}
-
-.presenterModeSwitch{
-  min-width:0;
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:9px;
-}
-
-.presenterModeBtn{
-  min-height:92px;
-  padding:10px;
-
-  flex-direction:column;
-
-  background:var(--presenter-surface-soft);
-  border-color:var(--presenter-line);
-  color:var(--presenter-secondary);
-}
-
-.presenterModeBtn strong,
-.presenterModeBtn small{
   font-weight:400;
 }
 
-.presenterModeBtn small{
-  color:var(--presenter-muted);
-  font-size:.7rem;
-  line-height:1.35;
+.presenterJoinHeader h1,
+.presenterHomeHeading h1,
+.presenterReaderHeader h1{
+  margin:0;
+  color:var(--secondary);
+  font-size:clamp(1.8rem,3vw,2.7rem);
+  line-height:1.05;
+  font-weight:400;
 }
 
-.presenterModeIcon{
-  font-size:1.35rem;
+.presenterJoinCard{
+  width:100%;
+  display:grid;
+  gap:14px;
+
+  padding:18px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:var(--radius-lg);
+
+  overflow:hidden;
+}
+
+.presenterModeSwitch{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterModeBtn{
+  width:100%;
+  min-height:64px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px;
+
+  border-radius:var(--radius-sm);
+
+  cursor:pointer;
+
+  background:var(--soft);
+  color:var(--secondary);
+  border:2px solid var(--line);
+
+  font-size:1rem;
   line-height:1;
+  font-weight:400;
+  text-align:center;
+
+  transition:
+    transform .15s ease,
+    border-color .15s ease,
+    background .15s ease,
+    color .15s ease;
 }
 
+.presenterModeBtn:hover{
+  transform:translateY(-1px);
+  border-color:var(--primary);
+}
+
+.presenterModeBtn.active,
 .presenterModeBtn.activePresenterMode{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
+  background:var(--secondary);
+  border-color:var(--secondary);
+  color:#fff;
 }
 
 .presenterJoinForm{
-  min-width:0;
+  width:100%;
   display:grid;
-  grid-template-columns:minmax(0,1fr) 120px;
-  gap:9px;
+  gap:10px;
 }
 
 .presenterJoinForm label{
-  grid-column:1 / -1;
-  color:var(--presenter-secondary);
-  font-size:.75rem;
+  color:var(--secondary);
+  font-size:1rem;
+  line-height:1;
+  font-weight:400;
+  text-align:center;
 }
 
 #joinCodeInput{
   width:100%;
-  height:56px;
-  min-width:0;
+  height:76px;
 
-  border:2px solid var(--presenter-line-strong);
-  border-radius:var(--presenter-radius-md);
-  background:#FFFFFF;
+  border:2px solid var(--line);
+  border-radius:20px;
+  outline:0;
 
-  color:var(--presenter-secondary);
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:1.45rem;
-  letter-spacing:.22em;
+  background:var(--soft);
+  color:var(--secondary);
+  caret-color:var(--primary);
+
+  font-size:2.8rem;
+  line-height:1;
+  font-weight:400;
   text-align:center;
+  letter-spacing:10px;
 }
 
 #joinCodeInput:focus{
-  border-color:var(--presenter-primary);
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(254,127,45,.14);
+}
+
+.presenterPrimaryBtn{
+  width:100%;
+  height:58px;
+
+  border-radius:var(--radius-sm);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  background:var(--btn-nav);
+  color:#fff;
+
+  font-size:1.05rem;
+  line-height:1;
+  font-weight:400;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease;
+}
+
+.presenterPrimaryBtn:hover:not(:disabled){
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.presenterPrimaryBtn:active:not(:disabled){
+  transform:scale(.97);
+}
+
+.presenterPrimaryBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
 }
 
 .presenterJoinStatus{
-  min-height:22px;
-  color:var(--presenter-muted);
-  font-size:.72rem;
-  line-height:1.45;
+  min-height:24px;
+  margin:0;
+
+  color:var(--muted);
+
+  font-size:.92rem;
+  line-height:1.25;
+  font-weight:400;
   text-align:center;
 }
 
 /* =========================
-   4) HOME
+   5) HOME HEADER
 ========================= */
 
-.presenterHomeShell{
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:10px;
-}
+.presenterMainHeader{
+  width:min(100%,1320px);
+  height:108px;
+  min-height:108px;
+  max-height:108px;
 
-.presenterHomeHeader{
-  min-width:0;
+  margin:30px auto 0;
+
+  display:grid;
+  grid-template-columns:minmax(360px,1fr) minmax(460px,.95fr);
+  align-items:center;
+  gap:10px;
+
   padding:10px;
 
-  display:grid;
-  grid-template-columns:minmax(180px,.65fr) minmax(0,1.35fr);
-  align-items:stretch;
-  gap:10px;
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:var(--radius-md);
 
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-xl);
-  background:var(--presenter-surface);
-  box-shadow:var(--presenter-shadow-soft);
+  overflow:hidden;
 }
 
 .presenterHomeHeading{
   min-width:0;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:5px;
-  padding-inline:7px;
+  height:84px;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(190px,.48fr);
+  align-items:center;
+  gap:10px;
+
+  padding:8px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:17px;
+
+  text-align:center;
+  overflow:hidden;
 }
 
-.presenterHomeHeading h1{
-  color:var(--presenter-secondary);
+.presenterHomeHeading .presenterEyebrow{
+  display:none !important;
+}
+
+.presenterHomeHeading h1,
+#presenterTitle{
+  min-width:0;
+  max-width:100%;
+  margin:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--secondary);
+
   font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:clamp(1.55rem,3vw,2.25rem);
+  font-size:clamp(2rem,3.2vw,3rem);
   line-height:1;
+  font-weight:400;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .presenterSubtitle{
   min-width:0;
+  height:62px;
+  margin:0;
+
   display:flex;
   align-items:center;
+  justify-content:center;
   gap:6px;
 
-  color:var(--presenter-muted);
-  font-size:.72rem;
+  padding:0 12px;
+
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+
+  color:var(--secondary);
+
+  font-size:1rem;
+  line-height:1.1;
+  font-weight:400;
+
+  white-space:nowrap;
+  overflow:hidden;
 }
 
 .presenterOnlineDot,
 .presenterOfflineDot{
-  flex:0 0 auto;
-  font-size:.7rem;
+  display:none !important;
 }
 
 .presenterModelName{
   min-width:0;
-  overflow:hidden;
+  max-width:100%;
+
+  display:block;
+
   white-space:nowrap;
+  overflow:hidden;
   text-overflow:ellipsis;
 }
 
 .presenterHomeScores{
   min-width:0;
+  height:84px;
+
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
+  gap:10px;
 }
 
 .presenterHomeTeam{
   min-width:0;
-  min-height:68px;
-  padding:8px;
 
   display:grid;
-  grid-template-columns:minmax(0,1fr) 58px;
+  grid-template-columns:minmax(0,1fr) 62px;
   align-items:center;
   gap:8px;
 
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-lg);
-  background:var(--presenter-surface-soft);
+  padding:7px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:19px;
+
+  overflow:hidden;
+}
+
+.presenterHomeTeamB{
+  grid-template-columns:62px minmax(0,1fr);
 }
 
 .presenterHomeTeam span{
   min-width:0;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
+  height:62px;
 
-  color:var(--presenter-secondary);
-  font-size:.86rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:4px 8px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:14px;
+
+  color:var(--text);
+
+  font-size:clamp(1.1rem,1.6vw,1.45rem);
+  line-height:1.12;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow:hidden;
+  overflow-wrap:anywhere;
 }
 
 .presenterHomeTeam strong{
-  width:58px;
-  height:52px;
+  width:62px;
+  height:62px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
   border-radius:14px;
-  background:var(--presenter-secondary);
-  color:#FFFFFF;
 
-  font-family:"MolhimCustom","HanakaText",sans-serif;
+  background:var(--secondary);
+  color:#fff;
+
   font-size:1.35rem;
+  line-height:1;
   font-weight:400;
 }
-
-.presenterHomeTeamA{
-  border-color:rgba(254,127,45,.45);
-}
-
-.presenterHomeTeamB{
-  border-color:rgba(35,61,77,.34);
-}
-
 /* =========================
-   5) SEGMENTS HOME GRID
+   6) HOME SEGMENTS
 ========================= */
 
 .presenterSegmentsSection{
-  min-width:0;
+  width:min(100%,1320px);
+  height:100%;
   min-height:0;
-  padding:10px;
 
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:8px;
+  margin:0 auto;
 
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-xl);
-  background:var(--presenter-surface);
-  box-shadow:var(--presenter-shadow-soft);
-
-  overflow:hidden;
-}
-
-.presenterSectionHead{
-  min-width:0;
   display:flex;
   align-items:center;
-  justify-content:space-between;
-}
+  justify-content:center;
 
-.presenterSectionHead span{
-  color:var(--presenter-primary);
-  font-size:.68rem;
-}
-
-.presenterSectionHead h2{
-  color:var(--presenter-secondary);
-  font-size:1rem;
+  overflow:hidden;
 }
 
 .presenterSegmentsGrid,
-.presenterReaderSegmentsGrid{
-  min-width:0;
+.presenterSegmentsCardsGrid{
+  width:100%;
+  height:100%;
   min-height:0;
+
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
-  grid-auto-rows:minmax(72px,1fr);
-  gap:8px;
-  overflow:auto;
-  overscroll-behavior:contain;
+  grid-auto-rows:minmax(92px,1fr);
+  gap:12px;
+
+  padding:12px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:var(--radius-lg);
+
+  overflow:hidden;
 }
 
 .segmentCard,
-.presenterReaderSegmentCard{
+.presenterSegmentCard,
+.presenterSegmentCardClean{
   position:relative;
+
   min-width:0;
-  min-height:72px;
-  padding:10px;
+  min-height:0;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-lg);
-  background:var(--presenter-surface-soft);
-  color:var(--presenter-secondary);
+  padding:12px;
 
-  font-size:1rem;
+  cursor:pointer;
+
+  background:var(--soft);
+  color:var(--secondary);
+
+  border:2px solid var(--line);
+  border-radius:22px;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(1.25rem,2vw,1.85rem);
+  line-height:1.18;
   font-weight:400;
   text-align:center;
 
-  cursor:pointer;
+  white-space:normal;
+  overflow-wrap:anywhere;
   overflow:hidden;
 
   transition:
-    transform var(--presenter-transition),
-    border-color var(--presenter-transition),
-    background var(--presenter-transition);
+    transform .15s ease,
+    border-color .15s ease,
+    background .15s ease,
+    color .15s ease,
+    box-shadow .15s ease;
 }
 
-.segmentCard:hover,
-.presenterReaderSegmentCard:hover{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
+.segmentCard:hover:not(:disabled),
+.presenterSegmentCard:hover:not(:disabled),
+.presenterSegmentCardClean:hover:not(:disabled){
+  transform:translateY(-2px);
+  border-color:var(--primary);
+  background:#FFF7ED;
+  box-shadow:0 10px 24px rgba(35,61,77,.10);
 }
 
-.segmentCard:active,
-.presenterReaderSegmentCard:active{
-  transform:translateY(1px);
+.segmentCard:active:not(:disabled),
+.presenterSegmentCard:active:not(:disabled),
+.presenterSegmentCardClean:active:not(:disabled){
+  transform:scale(.98);
 }
 
-.segmentCard span,
-.presenterReaderSegmentCard span,
-.segmentCard strong,
-.presenterReaderSegmentCard strong{
-  font-weight:400;
-}
-
-.segmentCard.presenterLockedSegment{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-.segmentCard.presenterLockedSegment::after{
-  content:"منتهية";
-  position:absolute;
-  inset-inline-end:7px;
-  inset-block-start:7px;
-  padding:3px 7px;
-
-  border-radius:999px;
-  background:var(--presenter-gray-soft);
-  color:var(--presenter-gray);
-
-  font-size:.58rem;
-  line-height:1;
-}
-
-/* =========================
-   6) RAFFLE BADGE
-========================= */
-
-.presenterRaffleBadge,
-.presenterDrawBadge,
-.presenterLotteryBadge{
-  position:absolute;
-  inset-inline-start:7px;
-  inset-block-start:7px;
-
-  min-height:24px;
-  padding:4px 8px;
-
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-
-  border:1px solid rgba(254,127,45,.45);
-  border-radius:999px;
-  background:var(--presenter-primary-soft);
-  color:var(--presenter-primary-dark);
-
-  font-size:.6rem;
-  line-height:1;
-  font-weight:400;
-}
-
-/* =========================
-   7) SEGMENT TOPBAR
-========================= */
-
-.presenterSegmentTopbar,
-.presenterReaderSegmentTopbar{
-  min-width:0;
-  min-height:60px;
-  padding:6px;
-
-  display:grid;
-  grid-template-columns:140px minmax(0,1fr) 140px;
-  align-items:center;
-  gap:8px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-lg);
-  background:var(--presenter-surface);
-  box-shadow:var(--presenter-shadow-soft);
-}
-
-.presenterSegmentTopbar h1,
-.presenterReaderSegmentTopbar h1{
-  min-width:0;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-
-  color:var(--presenter-secondary);
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.35rem;
-  line-height:1;
-  text-align:center;
-}
-
-.presenterBackBtn{
-  min-height:46px;
-  padding:7px 12px;
-  justify-self:start;
-}
-
-.presenterBackBtn span{
-  font-weight:400;
-}
-
-.presenterTopbarSpacer{
+.presenterSegmentCardTitle{
   width:100%;
-  height:1px;
-}
-
-/* =========================
-   8) READER HOME
-========================= */
-
-.presenterReaderShell{
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:10px;
-}
-
-.presenterReaderHeader{
   min-width:0;
-  padding:10px 12px;
+
+  display:block;
+
+  padding:0 8px;
+
+  color:inherit;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:inherit;
+  line-height:1.15;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+.presenterLockedSegment,
+.segmentCard:disabled,
+.presenterSegmentCard:disabled{
+  background:#E1E5E9;
+  color:var(--muted);
+  border-color:#D1D7DC;
+
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+
+.presenterEmptySegments{
+  grid-column:1 / -1;
 
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:12px;
+  justify-content:center;
 
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-xl);
-  background:var(--presenter-surface);
-  box-shadow:var(--presenter-shadow-soft);
-}
+  color:var(--muted);
 
-.presenterReaderHeader > div{
-  min-width:0;
-}
-
-.presenterReaderHeader h1{
-  color:var(--presenter-secondary);
-  font-family:"HanakaDisplay","HanakaText",sans-serif;
-  font-size:1.65rem;
-  line-height:1;
-}
-
-.presenterReaderHeader p{
-  margin-top:4px;
-  color:var(--presenter-muted);
-  font-size:.72rem;
-}
-
-.presenterReaderLogoutBtn{
-  min-width:92px;
-  min-height:46px;
-}
-
-.presenterReaderSegmentsGrid{
-  padding:10px;
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-xl);
-  background:var(--presenter-surface);
-  box-shadow:var(--presenter-shadow-soft);
+  font-size:1.2rem;
+  line-height:1.3;
+  font-weight:400;
 }
 
 /* =========================
-   9) COMMON TEAM SELECTION
+   7) LOTTERY BADGE
 ========================= */
 
-.presenterTeamsRow,
-.presenterTeamSelector{
+.presenterLotteryBadge{
+  position:absolute;
+  top:10px;
+  inset-inline-start:10px;
+
+  min-width:58px;
+  height:28px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0 10px;
+
+  border-radius:999px;
+
+  background:var(--primary);
+  color:#fff;
+
+  font-family:"HanakaText",sans-serif;
+  font-size:.72rem;
+  line-height:1;
+  font-weight:400;
+
+  pointer-events:none;
+}
+
+.presenterSegmentCard.presenterLockedSegment .presenterLotteryBadge,
+.segmentCard.presenterLockedSegment .presenterLotteryBadge{
+  background:#A0AAB4;
+  color:#fff;
+}
+
+/* =========================
+   8) SEGMENT HEADER
+========================= */
+
+.presenterSegmentHeader{
+  width:min(100%,1320px) !important;
+  height:84px !important;
+  min-height:84px !important;
+  max-height:84px !important;
+
+  margin:0 auto !important;
+
+  display:grid !important;
+  grid-template-columns:
+    100px
+    minmax(160px,1.2fr)
+    minmax(170px,.9fr)
+    minmax(160px,1.2fr)
+    100px !important;
+  align-items:center !important;
+  gap:10px !important;
+
+  padding:10px !important;
+
+  background:var(--surface) !important;
+  border:2px solid var(--line) !important;
+  border-radius:var(--radius-md) !important;
+
+  overflow:hidden !important;
+}
+
+.presenterSegmentHeader .presenterHeaderBtn,
+.presenterSegmentHeader .presenterBackBtn,
+.presenterSegmentHeader .presenterEndSegmentBtn{
+  width:100% !important;
+  height:52px !important;
+  min-height:52px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  padding:0 10px !important;
+
+  border:0 !important;
+  border-radius:var(--radius-sm) !important;
+
+  cursor:pointer !important;
+
+  color:#fff !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.86rem !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+  text-align:center !important;
+
+  white-space:nowrap !important;
+}
+
+.presenterSegmentHeader .presenterBackBtn{
+  background:var(--btn-nav) !important;
+}
+
+.presenterSegmentHeader .presenterEndSegmentBtn{
+  background:var(--btn-wrong) !important;
+}
+
+.presenterHeaderTeamBtn{
+  width:100% !important;
+  height:52px !important;
+  min-height:52px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  padding:4px 12px !important;
+
+  border:2px solid var(--line) !important;
+  border-radius:18px !important;
+
+  background:var(--soft) !important;
+  color:var(--secondary) !important;
+
+  cursor:pointer !important;
+  overflow:hidden !important;
+
+  transition:
+    transform .15s ease,
+    border-color .15s ease,
+    background .15s ease,
+    color .15s ease,
+    box-shadow .15s ease !important;
+}
+
+.presenterHeaderTeamBtn span{
+  width:100% !important;
+  min-width:0 !important;
+
+  display:-webkit-box !important;
+  -webkit-line-clamp:2 !important;
+  line-clamp:2 !important;
+  -webkit-box-orient:vertical !important;
+
+  overflow:hidden !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:1rem !important;
+  line-height:1.15 !important;
+  font-weight:400 !important;
+  text-align:center !important;
+
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+}
+
+.presenterHeaderTeamBtn:hover:not(:disabled){
+  transform:translateY(-1px) !important;
+  border-color:var(--primary) !important;
+}
+
+.presenterHeaderTeamBtn.selectedPresenterTeam,
+.presenterHeaderTeamBtn.activeTeam{
+  background:#FFF7ED !important;
+  border-color:var(--primary) !important;
+  color:var(--primary) !important;
+  box-shadow:0 0 0 4px rgba(254,127,45,.14) !important;
+}
+
+.presenterSegmentHeader #presenterSegmentTitle{
+  width:100% !important;
+  height:52px !important;
+  min-height:52px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  margin:0 !important;
+  padding:0 10px !important;
+
+  background:var(--secondary) !important;
+  color:#fff !important;
+
+  border-radius:18px !important;
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif !important;
+  font-size:1.18rem !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+  text-align:center !important;
+
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* =========================
+   9) READER HEADER
+========================= */
+
+.presenterReaderHome,
+.presenterReaderSegmentPage{
+  width:100%;
+  height:var(--app-height,100dvh);
+  min-height:var(--app-height,100dvh);
+  max-height:var(--app-height,100dvh);
+
+  padding:
+    calc(10px + env(safe-area-inset-top,0px))
+    calc(14px + env(safe-area-inset-right,0px))
+    calc(10px + env(safe-area-inset-bottom,0px))
+    calc(14px + env(safe-area-inset-left,0px));
+
+  overflow:hidden;
+  background:var(--bg);
+}
+
+.presenterReaderShell,
+.presenterReaderSegmentShell{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:grid;
+  gap:10px;
+
+  overflow:hidden;
+}
+
+.presenterReaderShell{
+  grid-template-rows:108px minmax(0,1fr);
+}
+
+.presenterReaderSegmentShell{
+  grid-template-rows:84px minmax(0,1fr);
+}
+
+.presenterReaderHeader{
+  width:min(100%,1320px);
+  height:108px;
+
+  margin:0 auto;
+
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 120px;
+  align-items:center;
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:var(--radius-md);
+
+  overflow:hidden;
+}
+
+.presenterReaderHeader > div{
+  height:84px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+
+  padding:8px 14px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:17px;
+
+  text-align:center;
+  overflow:hidden;
+}
+
+.presenterReaderHeader p{
+  margin:0;
+
+  color:var(--muted);
+
+  font-size:.86rem;
+  line-height:1.1;
+}
+
+.presenterReaderSegmentTopbar{
+  width:min(100%,1320px);
+  height:84px;
+  min-height:84px;
+  max-height:84px;
+
+  margin:0 auto;
+
+  display:grid;
+  grid-template-columns:120px minmax(0,1fr) 120px;
+  align-items:center;
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:var(--radius-md);
+
+  overflow:hidden;
+}
+
+.presenterReaderSegmentTopbar h1{
   min-width:0;
+  margin:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--secondary);
+
+  font-size:clamp(1.25rem,1.9vw,2rem);
+  line-height:1;
+  font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+.presenterReaderReloadBtn,
+.presenterReaderLogoutBtn{
+  width:100%;
+  height:52px;
+  min-height:52px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0 10px;
+
+  border-radius:var(--radius-sm);
+
+  cursor:pointer;
+
+  background:var(--btn-nav);
+  color:#fff;
+
+  font-size:.9rem;
+  line-height:1;
+  font-weight:400;
+  text-align:center;
+}
+
+/* =========================
+   10) PANEL
+========================= */
+
+.presenterPanel{
+  width:min(100%,1320px);
+  height:100%;
+  min-height:0;
+
+  margin:0 auto;
+
+  overflow:hidden;
+}
+
+.presenterCard{
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:var(--radius-lg);
+
+  overflow:hidden;
+}
+
+.presenterSegmentLoadingCard{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* =========================
+   11) GENERIC BUTTONS
+========================= */
+
+.presenterBtn{
+  min-width:0;
+  min-height:52px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+
+  padding:8px 12px;
+
+  border:0;
+  border-radius:var(--radius-sm);
+
+  cursor:pointer;
+
+  background:var(--secondary);
+  color:#fff;
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease,
+    color .15s ease,
+    opacity .15s ease;
+}
+
+.presenterBtn:hover:not(:disabled){
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.presenterBtn:active:not(:disabled){
+  transform:scale(.97);
+}
+
+.presenterBtn:disabled{
+  background:var(--btn-disabled) !important;
+  color:var(--btn-disabled-text) !important;
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+.presenterBtn.orange{ background:var(--primary); color:#fff; }
+.presenterBtn.green{ background:var(--btn-correct); color:#fff; }
+.presenterBtn.red{ background:var(--btn-wrong); color:#fff; }
+.presenterBtn.blue{ background:var(--btn-blue); color:#fff; }
+.presenterBtn.dark{ background:var(--btn-dark); color:#fff; }
+.presenterBtn.gray{ background:var(--secondary); color:#fff; }
+.presenterBtn.change{ background:var(--btn-change); color:#fff; }
+.presenterBtn.undo{ background:var(--btn-undo); color:#fff; }
+
+.presenterTeams{
+  width:100%;
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
   gap:8px;
 }
 
-.presenterTeamBtn{
-  min-height:54px;
-  background:var(--presenter-surface);
-  border-color:var(--presenter-line-strong);
-  color:var(--presenter-secondary);
+.presenterTeams .presenterBtn{
+  min-height:52px;
+  background:var(--secondary);
 }
 
-.presenterTeamBtn.presenterTeamActive,
-.presenterTeamBtn.active,
-.presenterTeamBtn.selected{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
-  color:var(--presenter-primary-dark);
-}
-
-.presenterTeamBtn strong,
-.presenterTeamBtn span{
-  min-width:0;
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-  font-weight:400;
+.presenterTeams .presenterBtn.selectedPresenterTeam,
+.presenterTeams .presenterBtn.activeTeam,
+.presenterBtn.selectedPresenterTeam,
+.presenterBtn.activeTeam{
+  background:var(--primary);
+  color:#fff;
+  box-shadow:0 0 0 4px rgba(254,127,45,.14);
 }
 
 /* =========================
-   10) COMMON CONTROL GRIDS
+   12) GENERIC NUMBERS
 ========================= */
 
-.presenterActions,
-.presenterActionsRow,
-.presenterControls,
-.presenterControlsRow,
-.presenterBottomActions{
-  min-width:0;
+.presenterGrid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
-  gap:7px;
+  gap:10px;
 }
 
-.presenterStatusBadge{
-  min-height:34px;
-  padding:6px 10px;
+.presenterNumberBtn{
+  width:100%;
+  min-width:0;
+  height:64px;
+  min-height:64px;
 
-  display:inline-flex;
+  display:flex;
   align-items:center;
   justify-content:center;
 
-  border:1px solid var(--presenter-line);
-  border-radius:999px;
-  background:var(--presenter-surface-soft);
-  color:var(--presenter-secondary);
+  border:0;
+  border-radius:18px;
 
-  font-size:.68rem;
+  cursor:pointer;
+
+  background:var(--primary);
+  color:#fff;
+
+  font-size:clamp(1.65rem,2.5vw,2.8rem);
+  line-height:1;
+  font-weight:700;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease,
+    color .15s ease;
+}
+
+.presenterNumberBtn:hover:not(:disabled):not(.presenterOpened){
+  transform:translateY(-1px);
+  filter:brightness(1.03);
+}
+
+.presenterNumberBtn:active:not(:disabled){
+  transform:scale(.97);
+}
+
+.presenterNumberBtn.selectedPresenterTeam,
+.presenterNumberBtn.active{
+  background:var(--secondary);
+  color:#fff;
+}
+
+.presenterNumberBtn.presenterOpened,
+.presenterNumberBtn:disabled{
+  background:#DCE2E8;
+  color:var(--muted);
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+.presenterNumberBtn.presenterPendingNumber{
+  background:var(--secondary);
+  color:#fff;
+}
+
+/* =========================
+   13) READER GRID + PANEL
+========================= */
+
+.presenterReaderSegmentsGrid{
+  width:min(100%,1320px);
+  height:100%;
+  min-height:0;
+
+  margin:0 auto;
+
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-auto-rows:minmax(92px,1fr);
+  gap:12px;
+
+  padding:12px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:var(--radius-lg);
+
+  overflow:hidden;
+}
+
+.presenterReaderSegmentCard{
+  min-width:0;
+  min-height:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+
+  padding:12px;
+
+  cursor:pointer;
+
+  background:var(--soft);
+  color:var(--secondary);
+
+  border:2px solid var(--line);
+  border-radius:22px;
+
+  text-align:center;
+
+  transition:
+    transform .15s ease,
+    border-color .15s ease,
+    background .15s ease;
+}
+
+.presenterReaderSegmentCard:hover{
+  transform:translateY(-2px);
+  border-color:var(--primary);
+  background:#FFF7ED;
+}
+
+.presenterReaderSegmentCard strong{
+  color:var(--secondary);
+  font-size:clamp(1.1rem,1.7vw,1.6rem);
+  line-height:1.15;
+  font-weight:400;
+}
+
+.presenterReaderSegmentCard span{
+  color:var(--muted);
+  font-size:.76rem;
   line-height:1.2;
   font-weight:400;
 }
 
-.presenterStatusBadge.presenterStatusSuccess{
-  border-color:rgba(22,130,60,.28);
-  background:var(--presenter-green-soft);
-  color:var(--presenter-green);
+.presenterReaderPanel{
+  width:min(100%,1320px);
+  height:100%;
+  min-height:0;
+
+  margin:0 auto;
+
+  padding:12px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:var(--radius-lg);
+
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
 }
 
-.presenterStatusBadge.presenterStatusDanger{
-  border-color:rgba(180,35,24,.26);
-  background:var(--presenter-red-soft);
-  color:var(--presenter-red);
+.readerRoundsStack{
+  width:100%;
+  display:grid;
+  gap:12px;
+}
+
+.readerRoundPage{
+  width:100%;
+  display:grid;
+  gap:10px;
+
+  padding:10px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:22px;
+}
+
+.readerRoundHead{
+  min-height:54px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+
+  padding:10px 14px;
+
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:16px;
+}
+
+.readerRoundHead h2{
+  margin:0;
+  color:var(--secondary);
+  font-size:1.15rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.readerRoundHead span{
+  color:var(--muted);
+  font-size:.82rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.readerSimpleGrid,
+.readerMediaList,
+.readerWordsOnly{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+
+.readerMiniCard{
+  min-width:0;
+  display:grid;
+  gap:8px;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:18px;
+
+  cursor:pointer;
+  overflow:hidden;
+
+  transition:
+    transform .15s ease,
+    border-color .15s ease,
+    background .15s ease;
+}
+
+.readerMiniCard:hover{
+  transform:translateY(-1px);
+  border-color:var(--primary);
+}
+
+.readerMiniCard.readerRead{
+  opacity:.58;
+  background:#E8EDF1;
+}
+
+.readerMiniTop{
+  min-height:42px;
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr);
+  gap:8px;
+}
+
+.readerMiniTop strong{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:12px;
+
+  background:var(--primary);
+  color:#fff;
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.readerMiniTop span{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:6px 10px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:12px;
+
+  color:var(--secondary);
+
+  font-size:.9rem;
+  line-height:1.2;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+.readerBlock,
+.readerPartItem{
+  display:grid;
+  gap:5px;
+}
+
+.readerBlock label,
+.readerPartItem span{
+  color:var(--muted);
+  font-size:.72rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.readerBlock p,
+.readerPartItem p{
+  margin:0;
+
+  padding:9px 10px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:12px;
+
+  color:var(--text);
+
+  font-size:.9rem;
+  line-height:1.35;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+.readerBlock.answer p{
+  background:#F0FDF4;
+  border-color:rgba(0,127,0,.18);
+  color:#064E3B;
+}
+
+.readerBlock.hint p{
+  background:#FFF7ED;
+  border-color:rgba(254,127,45,.22);
+  color:var(--secondary);
+}
+
+.readerPartsList{
+  display:grid;
+  gap:6px;
+}
+
+.readerWordOnly{
+  min-height:64px;
+
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr);
+  gap:8px;
+
+  padding:8px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:16px;
+
+  cursor:pointer;
+}
+
+.readerWordOnly strong{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:12px;
+
+  background:var(--primary);
+  color:#fff;
+
+  font-size:.95rem;
+  font-weight:400;
+}
+
+.readerWordOnly span{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--text);
+
+  font-size:1rem;
+  line-height:1.2;
+  font-weight:400;
+  text-align:center;
+}
+
+.readerWordOnly.readerRead{
+  opacity:.58;
+}
+
+.readerEmptyCard,
+.readerLoadingCard{
+  width:100%;
+  min-height:150px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  color:var(--muted);
+
+  background:var(--surface);
+  border:2px dashed var(--line);
+  border-radius:22px;
+
+  font-size:1.1rem;
+  line-height:1.3;
+  font-weight:400;
+  text-align:center;
 }
 
 /* =========================
-   11) RESPONSIVE - TABLET
+   14) READER MEDIA
 ========================= */
 
-@media
-  (min-width:900px)
-  and (max-width:1400px)
-  and (orientation:landscape){
+.readerMediaThumb{
+  width:100%;
+  height:150px;
 
-  .presenterHomeShell,
-  .presenterReaderShell{
-    grid-template-rows:80px minmax(0,1fr);
+  position:relative;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:14px;
+
+  overflow:hidden;
+}
+
+.readerMediaThumb img,
+.readerMediaThumb video{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  display:block;
+}
+
+.readerMediaHint{
+  position:absolute;
+  left:8px;
+  right:8px;
+  bottom:8px;
+
+  min-height:28px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:5px 8px;
+
+  border-radius:999px;
+
+  background:rgba(35,61,77,.86);
+  color:#fff;
+
+  font-size:.68rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.readerNoMedia{
+  color:var(--muted);
+  font-size:.9rem;
+  font-weight:400;
+}
+
+.readerMediaViewer{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+}
+
+.readerMediaViewer.hidden{
+  display:none;
+}
+
+.readerMediaViewerBackdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.78);
+}
+
+.readerMediaViewerBox{
+  position:relative;
+  z-index:2;
+
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.readerMediaViewerClose{
+  position:absolute;
+  top:14px;
+  inset-inline-end:14px;
+  z-index:3;
+
+  width:72px;
+  height:44px;
+
+  border-radius:14px;
+
+  background:#fff;
+  color:var(--secondary);
+
+  font-size:.9rem;
+  font-weight:400;
+
+  cursor:pointer;
+}
+
+.readerMediaViewerContent{
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.readerMediaViewerContent img,
+.readerMediaViewerContent video{
+  width:auto;
+  height:auto;
+
+  max-width:100%;
+  max-height:100%;
+
+  object-fit:contain;
+  object-position:center;
+
+  border-radius:22px;
+}
+
+/* =========================
+   15) ARCHIVE READER
+========================= */
+
+.readerArchiveInfo{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+
+.readerArchiveInfo div{
+  min-height:68px;
+
+  display:grid;
+  gap:5px;
+
+  padding:10px;
+
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+
+  text-align:center;
+}
+
+.readerArchiveInfo label{
+  color:var(--muted);
+  font-size:.72rem;
+  font-weight:400;
+}
+
+.readerArchiveInfo strong{
+  color:var(--secondary);
+  font-size:1rem;
+  line-height:1.2;
+  font-weight:400;
+}
+
+/* =========================
+   16) LOTTERY GATE
+========================= */
+
+.presenterLotteryGate{
+  width:100%;
+  height:100%;
+  min-height:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:12px;
+
+  background:var(--bg);
+  overflow:hidden;
+}
+
+.presenterLotteryCard{
+  width:min(100%,720px);
+  height:min(100%,460px);
+  min-height:0;
+
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto auto;
+  gap:14px;
+
+  padding:16px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
+
+  overflow:hidden;
+}
+
+.presenterLotteryTitle{
+  min-height:64px;
+
+  display:grid;
+  grid-template-columns:96px minmax(0,1fr);
+  gap:10px;
+
+  padding:8px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:18px;
+}
+
+.presenterLotteryTitle span,
+.presenterLotteryTitle strong{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:14px;
+  text-align:center;
+}
+
+.presenterLotteryTitle span{
+  background:var(--primary);
+  color:#fff;
+  font-size:1rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterLotteryTitle strong{
+  min-width:0;
+  color:var(--secondary);
+  font-size:1.35rem;
+  line-height:1.1;
+  font-weight:400;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  overflow:hidden;
+}
+
+.presenterLotteryResult{
+  min-height:130px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:14px;
+
+  background:var(--soft);
+  border:2px dashed var(--line);
+  border-radius:24px;
+
+  color:var(--muted);
+
+  font-family:"HanakaDisplay","HanakaText",sans-serif;
+  font-size:clamp(2rem,4vw,4rem);
+  line-height:1.1;
+  font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
+}
+
+.presenterLotteryResult.active{
+  background:#FFF7ED;
+  border-color:var(--primary);
+  color:var(--primary);
+}
+
+.presenterLotteryTeams,
+.presenterLotteryActions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.presenterLotteryTeamBtn{
+  min-height:64px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:10px;
+
+  border:2px solid var(--line);
+  border-radius:18px;
+
+  cursor:pointer;
+
+  background:var(--soft);
+  color:var(--text);
+
+  font-size:1.15rem;
+  line-height:1.15;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow:hidden;
+  overflow-wrap:anywhere;
+
+  transition:
+    transform .15s ease,
+    border-color .15s ease,
+    background .15s ease,
+    color .15s ease,
+    box-shadow .15s ease;
+}
+
+.presenterLotteryTeamBtn:hover{
+  transform:translateY(-1px);
+  border-color:var(--primary);
+}
+
+.presenterLotteryTeamBtn.active{
+  background:var(--surface);
+  border-color:var(--primary);
+  color:var(--primary);
+  box-shadow:0 0 0 4px rgba(254,127,45,.14);
+}
+
+.presenterLotteryActions .presenterBtn{
+  min-height:58px;
+}
+
+/* =========================
+   17) HOME MODE BOX
+========================= */
+
+.presenterInsideModeSwitch{
+  display:none !important;
+}
+
+body.presenterHomeControlsMode .presenterInsideModeSwitch{
+  position:fixed !important;
+  left:max(18px, env(safe-area-inset-left)) !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:max(18px, env(safe-area-inset-bottom)) !important;
+  z-index:99999 !important;
+
+  width:min(430px, calc(100vw - 36px)) !important;
+  height:auto !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:10px !important;
+
+  padding:12px !important;
+
+  background:var(--surface) !important;
+  border:2px solid var(--line) !important;
+  border-radius:22px !important;
+
+  box-shadow:0 14px 34px rgba(35,61,77,.16) !important;
+}
+
+body.presenterHomeControlsMode .presenterInsideModeSwitch.hidden{
+  display:none !important;
+}
+
+body.presenterHomeControlsMode .presenterInsideModeSwitch button{
+  width:100% !important;
+  min-width:0 !important;
+  height:54px !important;
+  min-height:54px !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  padding:0 12px !important;
+
+  border:2px solid var(--line) !important;
+  border-radius:16px !important;
+
+  cursor:pointer !important;
+
+  background:var(--soft) !important;
+  color:var(--secondary) !important;
+
+  font-family:"HanakaText",sans-serif !important;
+  font-size:.92rem !important;
+  line-height:1 !important;
+  font-weight:400 !important;
+
+  white-space:nowrap !important;
+}
+
+body.presenterHomeControlsMode .presenterInsideModeSwitch button.active{
+  background:var(--primary) !important;
+  border-color:var(--primary) !important;
+  color:#fff !important;
+}
+
+body.presenterHomeControlsMode .presenterInsideModeSwitch .presenterInsideDisplayControlsBtn{
+  background:var(--secondary) !important;
+  border-color:var(--secondary) !important;
+  color:#fff !important;
+}
+
+body.presenterHomeControlsMode .presenterInsideModeSwitch .presenterInsideDisplayControlsBtn.showControlsMode{
+  background:var(--btn-nav) !important;
+  border-color:var(--btn-nav) !important;
+  color:#fff !important;
+}
+
+body.presenterHomeControlsMode .presenterInsideModeSwitch .presenterInsideDisplayControlsBtn.hideControlsMode{
+  background:var(--secondary) !important;
+  border-color:var(--secondary) !important;
+  color:#fff !important;
+}
+
+/* =========================
+   18) LOADING + TOAST
+========================= */
+
+.presenterLoadingBox{
+  min-width:240px;
+  min-height:150px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+
+  padding:22px;
+
+  color:var(--secondary);
+  text-align:center;
+}
+
+.presenterLoadingSpinner,
+.presenterBackgroundSpinner{
+  width:36px;
+  height:36px;
+
+  border-radius:50%;
+
+  border:4px solid rgba(35,61,77,.18);
+  border-top-color:var(--primary);
+
+  animation:presenterSpin .8s linear infinite;
+}
+
+.presenterLoadingText{
+  color:var(--secondary);
+  font-size:1rem;
+  line-height:1.2;
+  font-weight:400;
+}
+
+.presenterBootLoading{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  background:var(--bg);
+}
+
+.presenterBootLoading.hidden{
+  display:none;
+}
+
+.presenterBootLoadingCard{
+  min-width:min(100%,360px);
+  min-height:170px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+
+  padding:24px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:var(--radius-lg);
+
+  color:var(--secondary);
+  text-align:center;
+}
+
+.presenterBootLoadingCard strong{
+  font-size:1rem;
+  line-height:1.2;
+  font-weight:400;
+}
+
+.presenterBackgroundLoading{
+  position:fixed;
+  right:16px;
+  bottom:16px;
+  z-index:2000;
+
+  min-height:42px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  padding:8px 14px;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:999px;
+
+  color:var(--secondary);
+
+  font-size:.82rem;
+  line-height:1;
+  font-weight:400;
+
+  box-shadow:0 12px 30px rgba(35,61,77,.12);
+}
+
+.presenterBackgroundSpinner{
+  width:22px;
+  height:22px;
+  border-width:3px;
+}
+
+@keyframes presenterSpin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+.presenterToast{
+  position:fixed;
+  left:50%;
+  bottom:22px;
+  z-index:9999;
+
+  transform:translate(-50%,14px);
+  opacity:0;
+
+  min-width:240px;
+  max-width:min(92vw,520px);
+  min-height:52px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  padding:10px 18px;
+
+  background:var(--secondary);
+  color:#fff;
+
+  border-radius:18px;
+
+  font-size:.95rem;
+  line-height:1.25;
+  font-weight:400;
+  text-align:center;
+
+  box-shadow:0 14px 34px rgba(15,23,42,.18);
+
+  pointer-events:none;
+
+  transition:
+    opacity .18s ease,
+    transform .18s ease;
+}
+
+.presenterToast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+.gameToastIcon{
+  width:26px;
+  height:26px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:50%;
+
+  background:rgba(255,255,255,.18);
+  color:#fff;
+
+  font-size:.9rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterToastSuccess{
+  background:var(--btn-correct);
+}
+
+.presenterToastError{
+  background:var(--btn-wrong);
+}
+/* =========================
+   19) TABLET LANDSCAPE
+========================= */
+
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .presenterLandscapeView,
+  .presenterReaderHome,
+  .presenterReaderSegmentPage{
+    padding:10px;
+  }
+
+  .presenterHomeShell{
+    grid-template-rows:96px minmax(0,1fr);
     gap:8px;
   }
 
-  .presenterHomeHeader{
-    grid-template-columns:220px minmax(0,1fr);
-    padding:7px;
+  .presenterSegmentShell{
+    grid-template-rows:76px minmax(0,1fr);
+    gap:8px;
+  }
+
+  .presenterMainHeader{
+    height:90px;
+    min-height:90px;
+    max-height:90px;
+
+    margin-top:6px;
+
+    grid-template-columns:minmax(260px,1fr) minmax(390px,.92fr);
+    gap:8px;
+
+    padding:8px;
+    border-radius:19px;
+  }
+
+  .presenterHomeHeading{
+    height:68px;
+
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(150px,.48fr);
+    align-items:center;
+    gap:7px;
+
+    padding:6px;
+    border-radius:14px;
+  }
+
+  .presenterHomeHeading .presenterEyebrow{
+    display:none !important;
+  }
+
+  .presenterHomeHeading h1,
+  #presenterTitle{
+    font-size:1.7rem;
+  }
+
+  .presenterSubtitle{
+    height:50px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0 10px;
+
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+
+    color:var(--secondary);
+
+    font-size:.86rem;
+  }
+
+  .presenterOnlineDot,
+  .presenterOfflineDot{
+    display:none !important;
+  }
+
+  .presenterHomeScores{
+    height:68px;
+    gap:8px;
   }
 
   .presenterHomeTeam{
-    min-height:62px;
+    grid-template-columns:minmax(0,1fr) 52px;
+    gap:6px;
+    padding:6px;
+    border-radius:16px;
   }
 
-  .presenterSegmentsSection,
-  .presenterReaderSegmentsGrid{
-    padding:8px;
+  .presenterHomeTeamB{
+    grid-template-columns:52px minmax(0,1fr);
+  }
+
+  .presenterHomeTeam span{
+    height:50px;
+    border-radius:12px;
+    font-size:1rem;
+  }
+
+  .presenterHomeTeam strong{
+    width:52px;
+    height:50px;
+    border-radius:12px;
+    font-size:1.12rem;
   }
 
   .presenterSegmentsGrid,
+  .presenterSegmentsCardsGrid,
   .presenterReaderSegmentsGrid{
     grid-template-columns:repeat(4,minmax(0,1fr));
-    grid-auto-rows:minmax(0,1fr);
-    gap:7px;
+    grid-auto-rows:minmax(78px,1fr);
+
+    gap:8px;
+    padding:10px;
+    border-radius:24px;
   }
 
   .segmentCard,
+  .presenterSegmentCard,
+  .presenterSegmentCardClean,
   .presenterReaderSegmentCard{
-    min-height:0;
-    height:100%;
+    border-radius:18px;
+    font-size:1.12rem;
   }
 
-  .presenterSegmentTopbar,
+  .presenterLotteryBadge{
+    top:8px;
+    inset-inline-start:8px;
+
+    min-width:50px;
+    height:24px;
+
+    padding:0 8px;
+
+    font-size:.62rem;
+  }
+
+  .presenterSegmentHeader{
+    height:76px !important;
+    min-height:76px !important;
+    max-height:76px !important;
+
+    grid-template-columns:
+      82px
+      minmax(118px,1.2fr)
+      minmax(128px,.9fr)
+      minmax(118px,1.2fr)
+      82px !important;
+    gap:8px !important;
+
+    padding:8px !important;
+    border-radius:19px !important;
+  }
+
+  .presenterSegmentHeader .presenterHeaderBtn,
+  .presenterSegmentHeader .presenterBackBtn,
+  .presenterSegmentHeader .presenterEndSegmentBtn,
+  .presenterHeaderTeamBtn,
+  .presenterSegmentHeader #presenterSegmentTitle{
+    height:50px !important;
+    min-height:50px !important;
+    border-radius:14px !important;
+  }
+
+  .presenterHeaderTeamBtn span{
+    font-size:.82rem !important;
+    line-height:1.12 !important;
+  }
+
+  .presenterSegmentHeader #presenterSegmentTitle{
+    font-size:.96rem !important;
+  }
+
+  .presenterSegmentHeader .presenterHeaderBtn,
+  .presenterSegmentHeader .presenterBackBtn,
+  .presenterSegmentHeader .presenterEndSegmentBtn{
+    font-size:.7rem !important;
+  }
+
+  .presenterReaderShell{
+    grid-template-rows:84px minmax(0,1fr);
+    gap:8px;
+  }
+
+  .presenterReaderHeader{
+    height:84px;
+    grid-template-columns:minmax(0,1fr) 92px;
+    gap:8px;
+    padding:8px;
+    border-radius:19px;
+  }
+
+  .presenterReaderHeader > div{
+    height:62px;
+    border-radius:14px;
+  }
+
+  .presenterReaderHeader h1{
+    font-size:1.25rem;
+  }
+
   .presenterReaderSegmentTopbar{
-    min-height:58px;
-    grid-template-columns:130px minmax(0,1fr) 130px;
+    height:84px;
+    min-height:84px;
+    max-height:84px;
+
+    grid-template-columns:92px minmax(0,1fr) 92px;
+    gap:8px;
+    padding:8px;
+    border-radius:19px;
+  }
+
+  .presenterReaderPanel{
+    padding:10px;
+    border-radius:24px;
+  }
+
+  .readerSimpleGrid,
+  .readerMediaList,
+  .readerWordsOnly{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+  }
+
+  .readerMiniCard{
+    padding:8px;
+    border-radius:16px;
+  }
+
+  .readerMediaThumb{
+    height:118px;
+  }
+
+  .readerBlock p,
+  .readerPartItem p{
+    font-size:.78rem;
+    line-height:1.28;
+  }
+
+  body.presenterHomeControlsMode .presenterInsideModeSwitch{
+    left:max(14px, env(safe-area-inset-left)) !important;
+    bottom:max(14px, env(safe-area-inset-bottom)) !important;
+
+    width:min(390px, calc(100vw - 28px)) !important;
+
+    gap:8px !important;
+    padding:10px !important;
+    border-radius:20px !important;
+  }
+
+  body.presenterHomeControlsMode .presenterInsideModeSwitch button{
+    height:48px !important;
+    min-height:48px !important;
+
+    border-radius:14px !important;
+    font-size:.78rem !important;
+  }
+
+  .presenterLotteryCard{
+    width:min(100%,640px);
+    height:min(100%,360px);
+
+    gap:10px;
+    padding:12px;
+    border-radius:22px;
+  }
+
+  .presenterLotteryTitle{
+    min-height:52px;
+    grid-template-columns:82px minmax(0,1fr);
+    gap:8px;
+    padding:7px;
+    border-radius:16px;
+  }
+
+  .presenterLotteryTitle span{
+    font-size:.8rem;
+  }
+
+  .presenterLotteryTitle strong{
+    font-size:1.05rem;
+  }
+
+  .presenterLotteryResult{
+    min-height:96px;
+    border-radius:20px;
+    font-size:2.4rem;
+  }
+
+  .presenterLotteryTeamBtn{
+    min-height:52px;
+    border-radius:15px;
+    font-size:.92rem;
+  }
+
+  .presenterLotteryActions .presenterBtn{
+    min-height:50px;
   }
 }
 
 /* =========================
-   12) RESPONSIVE - IPHONE PRO MAX LANDSCAPE
+   20) SMALL LANDSCAPE
 ========================= */
 
-@media
-  (min-width:740px)
-  and (max-width:960px)
-  and (orientation:landscape)
-  and (max-height:500px){
-
-  .presenterJoinShell{
-    max-width:900px;
-    grid-template-columns:minmax(0,.7fr) minmax(420px,1.3fr);
-    gap:10px;
-  }
-
-  .presenterJoinHeader{
-    gap:4px;
-  }
-
-  .presenterJoinHeader h1{
-    font-size:2rem;
-  }
-
-  .presenterJoinHeader p{
-    display:none;
-  }
-
-  .presenterJoinCard{
+@media (max-width:767px) and (orientation:landscape){
+  .presenterLandscapeView,
+  .presenterReaderHome,
+  .presenterReaderSegmentPage{
     padding:8px;
+  }
+
+  .presenterHomeShell{
+    grid-template-rows:82px minmax(0,1fr);
     gap:7px;
+  }
+
+  .presenterSegmentShell,
+  .presenterReaderSegmentShell{
+    grid-template-rows:64px minmax(0,1fr);
+    gap:7px;
+  }
+
+  .presenterMainHeader{
+    height:82px;
+    min-height:82px;
+    max-height:82px;
+
+    margin-top:0;
+
+    grid-template-columns:minmax(210px,1fr) minmax(280px,1fr);
+    gap:7px;
+
+    padding:7px;
     border-radius:17px;
   }
 
-  .presenterModeBtn{
-    min-height:66px;
-    padding:5px;
-  }
-
-  .presenterModeBtn small{
-    display:none;
-  }
-
-  .presenterJoinForm label{
-    display:none;
-  }
-
-  #joinCodeInput,
-  .presenterPrimaryBtn{
-    height:44px;
-    min-height:44px;
-  }
-
-  .presenterJoinStatus{
-    min-height:14px;
-    font-size:.61rem;
-  }
-
-  .presenterHomeShell,
-  .presenterReaderShell{
-    grid-template-rows:70px minmax(0,1fr);
-    gap:6px;
-  }
-
-  .presenterHomeHeader{
-    grid-template-columns:190px minmax(0,1fr);
-    padding:5px;
-    gap:6px;
-    border-radius:15px;
-  }
-
   .presenterHomeHeading{
-    padding-inline:4px;
-  }
+    height:62px;
 
-  .presenterHomeHeading h1{
-    font-size:1.35rem;
-  }
-
-  .presenterSubtitle{
-    display:none;
-  }
-
-  .presenterHomeScores{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(120px,.48fr);
+    align-items:center;
     gap:5px;
-  }
 
-  .presenterHomeTeam{
-    min-height:54px;
-    padding:4px;
-    grid-template-columns:minmax(0,1fr) 44px;
-    gap:4px;
-    border-radius:12px;
-  }
-
-  .presenterHomeTeam span{
-    font-size:.67rem;
-  }
-
-  .presenterHomeTeam strong{
-    width:44px;
-    height:42px;
-    border-radius:10px;
-    font-size:1rem;
-  }
-
-  .presenterSegmentsSection,
-  .presenterReaderSegmentsGrid{
-    padding:6px;
-    gap:4px;
-    border-radius:15px;
-  }
-
-  .presenterSectionHead{
-    display:none;
-  }
-
-  .presenterSegmentsGrid,
-  .presenterReaderSegmentsGrid{
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    grid-auto-rows:minmax(0,1fr);
-    gap:5px;
-  }
-
-  .segmentCard,
-  .presenterReaderSegmentCard{
-    min-height:0;
-    height:100%;
-    padding:6px;
-    border-radius:11px;
-    font-size:.78rem;
-  }
-
-  .presenterSegmentTopbar,
-  .presenterReaderSegmentTopbar{
-    min-height:46px;
-    grid-template-columns:96px minmax(0,1fr) 96px;
-    gap:5px;
-    padding:4px;
+    padding:5px;
     border-radius:13px;
   }
 
-  .presenterSegmentTopbar h1,
-  .presenterReaderSegmentTopbar h1{
-    font-size:1rem;
+  .presenterHomeHeading .presenterEyebrow{
+    display:none !important;
   }
 
-  .presenterBackBtn,
-  .presenterReaderLogoutBtn{
+  .presenterHomeHeading h1,
+  #presenterTitle{
+    font-size:1.38rem;
+  }
+
+  .presenterSubtitle{
+    height:46px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:0 8px;
+
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:11px;
+
+    color:var(--secondary);
+
+    font-size:.72rem;
+  }
+
+  .presenterOnlineDot,
+  .presenterOfflineDot{
+    display:none !important;
+  }
+
+  .presenterHomeScores{
+    height:62px;
+    gap:7px;
+  }
+
+  .presenterHomeTeam{
+    grid-template-columns:minmax(0,1fr) 46px;
+    gap:5px;
+    padding:5px;
+    border-radius:14px;
+  }
+
+  .presenterHomeTeamB{
+    grid-template-columns:46px minmax(0,1fr);
+  }
+
+  .presenterHomeTeam span{
+    height:46px;
+    font-size:.88rem;
+    border-radius:11px;
+  }
+
+  .presenterHomeTeam strong{
+    width:46px;
+    height:46px;
+    font-size:1rem;
+    border-radius:11px;
+  }
+
+  .presenterSegmentsGrid,
+  .presenterSegmentsCardsGrid,
+  .presenterReaderSegmentsGrid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    grid-auto-rows:minmax(62px,1fr);
+
+    gap:7px;
+    padding:8px;
+
+    border-radius:20px;
+  }
+
+  .segmentCard,
+  .presenterSegmentCard,
+  .presenterSegmentCardClean{
+    border-radius:15px;
+    font-size:.95rem;
+    line-height:1.12;
+  }
+
+  .presenterLotteryBadge{
+    top:6px;
+    inset-inline-start:6px;
+
+    min-width:44px;
+    height:22px;
+
+    padding:0 7px;
+
+    font-size:.56rem;
+  }
+
+  .presenterSegmentHeader{
+    height:64px !important;
+    min-height:64px !important;
+    max-height:64px !important;
+
+    grid-template-columns:
+      64px
+      minmax(86px,1.2fr)
+      minmax(90px,.9fr)
+      minmax(86px,1.2fr)
+      64px !important;
+    gap:6px !important;
+
+    padding:6px !important;
+    border-radius:16px !important;
+  }
+
+  .presenterSegmentHeader .presenterHeaderBtn,
+  .presenterSegmentHeader .presenterBackBtn,
+  .presenterSegmentHeader .presenterEndSegmentBtn,
+  .presenterHeaderTeamBtn,
+  .presenterSegmentHeader #presenterSegmentTitle{
+    height:42px !important;
+    min-height:42px !important;
+    border-radius:12px !important;
+  }
+
+  .presenterHeaderTeamBtn{
+    padding:3px 7px !important;
+  }
+
+  .presenterHeaderTeamBtn span{
+    font-size:.64rem !important;
+    line-height:1.1 !important;
+  }
+
+  .presenterSegmentHeader #presenterSegmentTitle{
+    font-size:.76rem !important;
+    padding:0 6px !important;
+  }
+
+  .presenterSegmentHeader .presenterHeaderBtn,
+  .presenterSegmentHeader .presenterBackBtn,
+  .presenterSegmentHeader .presenterEndSegmentBtn{
+    padding:0 5px !important;
+    font-size:.55rem !important;
+  }
+
+  .presenterReaderShell{
+    grid-template-rows:76px minmax(0,1fr);
+  }
+
+  .presenterReaderHeader{
+    height:76px;
+    grid-template-columns:minmax(0,1fr) 78px;
+    padding:7px;
+    border-radius:17px;
+  }
+
+  .presenterReaderHeader > div{
+    height:58px;
+    border-radius:13px;
+  }
+
+  .presenterReaderHeader h1{
+    font-size:1.05rem;
+  }
+
+  .presenterReaderSegmentTopbar{
+    height:64px;
+    min-height:64px;
+    max-height:64px;
+
+    grid-template-columns:78px minmax(0,1fr) 78px;
+    gap:7px;
+    padding:7px;
+    border-radius:17px;
+  }
+
+  .presenterReaderPanel{
+    padding:8px;
+    border-radius:20px;
+  }
+
+  .readerSimpleGrid,
+  .readerMediaList,
+  .readerWordsOnly{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+  }
+
+  .readerRoundHead{
+    min-height:46px;
+    padding:8px 10px;
+    border-radius:14px;
+  }
+
+  .readerRoundHead h2{
+    font-size:.95rem;
+  }
+
+  .readerRoundHead span{
+    font-size:.68rem;
+  }
+
+  .readerMiniTop{
     min-height:36px;
-    padding:5px 8px;
+    grid-template-columns:36px minmax(0,1fr);
+  }
+
+  .readerMiniTop span,
+  .readerBlock p,
+  .readerPartItem p{
+    font-size:.72rem;
+  }
+
+  .readerMediaThumb{
+    height:96px;
+  }
+
+  body.presenterHomeControlsMode .presenterInsideModeSwitch{
+    left:max(10px, env(safe-area-inset-left)) !important;
+    bottom:max(10px, env(safe-area-inset-bottom)) !important;
+
+    width:min(330px, calc(100vw - 20px)) !important;
+
+    gap:6px !important;
+    padding:8px !important;
+    border-radius:18px !important;
+  }
+
+  body.presenterHomeControlsMode .presenterInsideModeSwitch button{
+    height:40px !important;
+    min-height:40px !important;
+
+    padding:0 8px !important;
+
+    border-radius:12px !important;
+    font-size:.64rem !important;
+  }
+
+  .presenterLotteryCard{
+    width:min(100%,560px);
+    height:min(100%,300px);
+
+    gap:8px;
+    padding:10px;
+    border-radius:20px;
+  }
+
+  .presenterLotteryTitle{
+    min-height:44px;
+    grid-template-columns:68px minmax(0,1fr);
+    gap:7px;
+    padding:6px;
+    border-radius:14px;
+  }
+
+  .presenterLotteryTitle span{
     font-size:.66rem;
   }
 
-  .presenterBtn,
-  .presenterPrimaryBtn,
-  .presenterSecondaryBtn,
-  .presenterTeamBtn,
-  .presenterActionBtn{
-    min-height:42px;
-    padding:6px 8px;
-    border-radius:11px;
-    font-size:.67rem;
+  .presenterLotteryTitle strong{
+    font-size:.9rem;
   }
 
-  .presenterRaffleBadge,
-  .presenterDrawBadge,
-  .presenterLotteryBadge{
-    min-height:19px;
-    padding:3px 6px;
-    font-size:.5rem;
+  .presenterLotteryResult{
+    min-height:72px;
+    border-radius:17px;
+    font-size:1.8rem;
+  }
+
+  .presenterLotteryTeams,
+  .presenterLotteryActions{
+    gap:7px;
+  }
+
+  .presenterLotteryTeamBtn{
+    min-height:44px;
+    border-radius:13px;
+    font-size:.78rem;
+  }
+
+  .presenterLotteryActions .presenterBtn{
+    min-height:44px;
+  }
+}
+
+/* =========================
+   21) REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion:reduce){
+  .presenterApp *,
+  .presenterApp *::before,
+  .presenterApp *::after{
+    animation:none !important;
+    transition:none !important;
   }
 }

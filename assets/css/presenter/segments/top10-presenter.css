@@ -1,238 +1,264 @@
 /* =========================================================
-   PRESENTER SEGMENT: TOP 10
-   File: assets/css/presenter/segments/top10.css
-
-   المسؤوليات:
-   - تخطيط فقرة Top 10.
-   - الفرق ومعلومات الجولة.
-   - السؤال والأخطاء.
-   - قائمتي الإجابات.
-   - أزرار التحكم.
-   - وضع القراءة الخاص بـ Top 10.
-
-   لا يحتوي على:
-   - تنسيقات عامة للصفحة.
-   - تنسيقات بقية الفقرات.
-   - تنسيقات الأرشيف.
+   TOP 10 PRESENTER
+   MATCHING DISPLAY COLORS - CLEAN
 ========================================================= */
 
-/* =========================
-   1) SCREEN
-========================= */
+.presenterPanel[data-segment="top10"]{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+}
+
+.presenterTop10Screen,
+.presenterTop10Screen *{
+  box-sizing:border-box;
+}
 
 .presenterTop10Screen{
+  --bg:#EAECF0;
+  --surface:#FFFFFF;
+  --soft:#F6F7F9;
+  --line:#D5DADF;
+
+  --primary:#FE7F2D;
+  --secondary:#233D4D;
+  --text:#151515;
+  --muted:#8793A0;
+
+  --btn-nav:#0A7C6E;
+  --btn-correct:#007F00;
+  --btn-wrong:#7F0000;
+  --btn-double:#00007F;
+  --btn-switch:#00004C;
+  --btn-next:#4C4C00;
+  --btn-disabled:#D7DCE2;
+  --btn-disabled-text:#7B8792;
+
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  display:block;
+  direction:rtl;
+  overflow:hidden;
+
+  font-family:"HanakaText",sans-serif;
+  color:var(--text);
+}
+
+.presenterTop10Header,
+.presenterTop10TeamsBox,
+.presenterTop10RoundInfo,
+.presenterTop10StatusText,
+.presenterTop10QuestionCard{
+  display:none !important;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.presenterTop10Main{
   width:100%;
   height:100%;
   min-width:0;
   min-height:0;
 
   display:grid;
-  grid-template-rows:auto minmax(0,1fr) auto;
-  gap:8px;
+  grid-template-columns:minmax(0,1fr) minmax(330px,.54fr);
+  grid-template-areas:"answers control";
+  gap:12px;
 
+  direction:ltr;
+  overflow:hidden;
+}
+
+.presenterTop10ControlCard{
+  grid-area:control;
+
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+
+  padding:12px;
+
+  display:grid;
+  grid-template-rows:46px 46px minmax(0,1fr) auto;
+  gap:10px;
+
+  direction:rtl;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
+
+  box-shadow:none;
   overflow:hidden;
 }
 
 /* =========================
-   2) HEADER
+   CONTROL SIDE
 ========================= */
 
-.presenterTop10Header{
+.presenterTop10RoundLine{
+  width:100%;
   min-width:0;
+  min-height:0;
 
   display:grid;
-  grid-template-columns:minmax(0,1fr) 220px;
-  align-items:stretch;
-  gap:8px;
-}
-
-.presenterTop10TeamsBox{
-  min-width:0;
-}
-
-.presenterTop10TeamsBox .presenterTeamsRow,
-.presenterTop10TeamsBox .presenterTeamSelector{
-  height:100%;
-}
-
-.presenterTop10TeamsBox .presenterTeamBtn{
-  min-height:58px;
-}
-
-.presenterTop10RoundInfo{
-  min-width:0;
-  padding:7px 9px;
-
-  display:grid;
-  grid-template-columns:66px minmax(0,1fr);
+  grid-template-columns:minmax(0,1fr) 110px;
   align-items:center;
   gap:8px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-surface);
 }
 
 .presenterTop10RoundBadge{
-  width:66px;
-  min-height:48px;
+  width:100%;
+  height:46px;
+  min-height:46px;
 
-  display:flex;
-  flex-direction:column;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 42px;
   align-items:center;
-  justify-content:center;
+  gap:6px;
 
-  border-radius:12px;
-  background:var(--presenter-secondary);
+  padding:6px;
+
+  background:var(--secondary);
   color:#FFFFFF;
+
+  border-radius:16px;
+  overflow:hidden;
 }
 
 .presenterTop10RoundBadge span{
-  font-size:.57rem;
-  line-height:1;
-}
-
-.presenterTop10RoundBadge strong{
-  margin-top:3px;
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:1.15rem;
-  line-height:1;
-  font-weight:400;
-}
-
-.presenterTop10StatusText{
-  min-width:0;
-
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-
-  color:var(--presenter-muted);
-  font-size:.72rem;
-  line-height:1.35;
-  text-align:center;
-}
-
-/* =========================
-   3) CONTENT
-========================= */
-
-.presenterTop10Content{
-  min-width:0;
-  min-height:0;
-
-  display:grid;
-  grid-template-columns:minmax(300px,.78fr) minmax(0,1.22fr);
-  gap:8px;
-
-  overflow:hidden;
-}
-
-.presenterTop10QuestionCard,
-.presenterTop10AnswersCard{
-  min-width:0;
-  min-height:0;
-  height:100%;
-  overflow:hidden;
-}
-
-.presenterTop10QuestionCard{
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:8px;
-}
-
-.presenterTop10AnswersCard{
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr);
-  gap:8px;
-}
-
-/* =========================
-   4) QUESTION HEADER
-========================= */
-
-.presenterTop10QuestionHead{
   min-width:0;
 
   display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-
-.presenterTop10QuestionHead > div:first-child,
-.presenterTop10AnswersHead > div{
-  min-width:0;
-}
-
-.presenterTop10QuestionHint,
-.presenterTop10AnswersHint{
-  margin-top:3px;
-  color:var(--presenter-muted);
-  font-size:.63rem;
-  line-height:1.25;
-}
-
-.presenterTop10ErrorsMini{
-  flex:0 0 auto;
-
-  display:grid;
-  grid-template-columns:repeat(2,86px);
-  gap:6px;
-}
-
-.presenterTop10ErrorMiniBox{
-  min-width:0;
-  min-height:42px;
-  padding:5px 7px;
-
-  display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
 
-  border:1px solid var(--presenter-line);
-  border-radius:11px;
-  background:var(--presenter-surface-soft);
-}
-
-.presenterTop10ErrorMiniBox span{
-  max-width:100%;
-
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-
-  color:var(--presenter-muted);
-  font-size:.54rem;
-  line-height:1.1;
-}
-
-.presenterTop10ErrorMiniBox strong{
-  margin-top:3px;
-  color:var(--presenter-secondary);
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:.76rem;
+  font-size:.78rem;
   line-height:1;
   font-weight:400;
 }
 
-.presenterTop10ErrorMiniBox.teamA{
-  border-color:rgba(254,127,45,.38);
+.presenterTop10RoundBadge strong{
+  width:42px;
+  height:32px;
+  min-width:42px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:11px;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-size:1rem;
+  line-height:1;
+  font-weight:400;
 }
 
-.presenterTop10ErrorMiniBox.teamB{
-  border-color:rgba(35,61,77,.30);
+.presenterTop10Timer{
+  width:100%;
+  height:46px;
+  min-height:46px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:6px;
+
+  border-radius:16px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  font-size:1.35rem;
+  line-height:1;
+  font-weight:400;
 }
 
-/* =========================
-   5) QUESTION BODY
-========================= */
+.presenterTop10Timer.timerDanger{
+  background:#7F0000;
+  animation:presenterTop10TimerPulse .75s ease-in-out infinite;
+}
 
-.presenterTop10QuestionClear{
+.presenterTop10Timer.timerFinished{
+  background:#7F0000;
+}
+
+@keyframes presenterTop10TimerPulse{
+  0%{ transform:scale(1); }
+  50%{ transform:scale(1.06); }
+  100%{ transform:scale(1); }
+}
+
+.presenterTop10ErrorsLine{
+  width:100%;
   min-width:0;
-  min-height:0;
+
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+.presenterTop10ErrorMiniBox{
+  height:46px;
+  min-height:46px;
+
+  padding:6px;
+
+  display:grid;
+  grid-template-columns:38px minmax(0,1fr);
+  align-items:center;
+  gap:6px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:16px;
+
+  overflow:hidden;
+}
+
+.presenterTop10ErrorMiniBox span{
+  width:38px;
+  height:30px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:10px;
+
+  background:var(--secondary);
+  color:#FFFFFF;
+
+  font-size:.72rem;
+  line-height:1;
+  font-weight:400;
+}
+
+.presenterTop10ErrorMiniBox strong{
+  min-width:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:var(--btn-wrong);
+
+  font-size:.9rem;
+  line-height:1;
+  font-weight:400;
+  text-align:center;
 }
 
 .presenterTop10QuestionText{
@@ -240,44 +266,60 @@
   height:100%;
   min-width:0;
   min-height:0;
-  padding:14px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  overflow:auto;
-  overscroll-behavior:contain;
+  padding:14px 16px;
 
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-surface-soft);
-  color:var(--presenter-secondary);
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:22px;
 
-  font-size:clamp(1rem,2vw,1.45rem);
-  line-height:1.55;
-  text-align:center;
+  color:var(--text);
+
+  font-size:clamp(1rem,1.45vw,1.32rem);
+  line-height:1.35;
   font-weight:400;
+  text-align:center;
+
+  overflow:hidden;
 }
 
 /* =========================
-   6) ANSWERS
+   ANSWERS SIDE
 ========================= */
 
-.presenterTop10AnswersHead{
+.presenterTop10AnswersCard{
+  grid-area:answers;
+
+  width:100%;
+  height:100%;
   min-width:0;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  min-height:0;
+
+  padding:12px;
+
+  direction:rtl;
+
+  background:var(--surface);
+  border:2px solid var(--line);
+  border-radius:28px;
+
+  box-shadow:none;
+  overflow:hidden;
 }
 
 .presenterTop10AnswersCols{
+  width:100%;
+  height:100%;
   min-width:0;
   min-height:0;
 
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:7px;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
 
   overflow:hidden;
 }
@@ -288,412 +330,420 @@
 
   display:grid;
   grid-template-rows:repeat(5,minmax(0,1fr));
-  gap:6px;
+  gap:10px;
 }
 
-/* =========================
-   7) ANSWER BUTTON
-========================= */
-
 .presenterTop10AnswerBtn{
-  position:relative;
-
   width:100%;
+  height:100%;
   min-width:0;
   min-height:0;
-  padding:6px 8px;
+
+  border:0;
+  border-radius:20px;
 
   display:grid;
-  grid-template-columns:38px minmax(0,1fr);
-  grid-template-rows:minmax(0,1fr) auto;
+  grid-template-columns:58px minmax(0,1fr);
   align-items:center;
-  gap:2px 7px;
+  gap:10px;
 
-  border:2px solid var(--presenter-line);
-  border-radius:12px;
-  background:var(--presenter-surface-soft);
-  color:var(--presenter-secondary);
+  padding:8px 12px;
 
   cursor:pointer;
+
+  background:var(--primary);
+  color:#FFFFFF;
+
+  font-family:"HanakaText",sans-serif;
+
   overflow:hidden;
 
   transition:
-    transform var(--presenter-transition),
-    border-color var(--presenter-transition),
-    background var(--presenter-transition),
-    opacity var(--presenter-transition);
+    transform .15s ease,
+    filter .15s ease,
+    background .15s ease;
 }
 
 .presenterTop10AnswerBtn:hover{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
+  transform:translateY(-1px);
+  filter:brightness(1.02);
 }
 
 .presenterTop10AnswerBtn:active{
-  transform:translateY(1px);
+  transform:scale(.97);
+}
+
+.presenterTop10AnswerBtn.opened,
+.presenterTop10AnswerBtn.current{
+  background:var(--btn-nav);
+  color:#FFFFFF;
+}
+
+.presenterTop10AnswerBtn.pending{
+  background:var(--secondary);
+  color:#FFFFFF;
+}
+
+.presenterTop10AnswerBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+.presenterTop10AnswerBtn.opened:disabled,
+.presenterTop10AnswerBtn.current:disabled{
+  background:var(--btn-nav);
+  color:#FFFFFF;
 }
 
 .presenterTop10AnswerNo{
-  grid-row:1 / 3;
-
-  width:38px;
-  height:38px;
+  width:58px;
+  height:100%;
+  min-height:0;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  border-radius:10px;
-  background:var(--presenter-secondary);
+  border-radius:15px;
+
+  background:rgba(255,255,255,.22);
   color:#FFFFFF;
 
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:1rem;
+  font-size:clamp(1.45rem,2.2vw,2.3rem);
   line-height:1;
   font-weight:400;
+}
+
+.presenterTop10AnswerBtn:disabled .presenterTop10AnswerNo{
+  color:inherit;
 }
 
 .presenterTop10AnswerText{
   min-width:0;
 
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:inherit;
+
+  font-size:clamp(.98rem,1.35vw,1.24rem);
+  line-height:1.24;
+  font-weight:400;
+  text-align:center;
+
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+
   overflow:hidden;
   display:-webkit-box;
-  -webkit-box-orient:vertical;
   -webkit-line-clamp:2;
   line-clamp:2;
-
-  font-size:.78rem;
-  line-height:1.25;
-  text-align:right;
+  -webkit-box-orient:vertical;
 }
 
 .presenterTop10OpenedBy{
-  min-width:0;
-
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-
-  color:var(--presenter-muted);
-  font-size:.54rem;
-  line-height:1.1;
-  text-align:right;
-}
-
-.presenterTop10AnswerBtn.current{
-  border-color:var(--presenter-primary);
-  background:var(--presenter-primary-soft);
-}
-
-.presenterTop10AnswerBtn.current .presenterTop10AnswerNo{
-  background:var(--presenter-primary);
-}
-
-.presenterTop10AnswerBtn.pending{
-  border-color:var(--presenter-blue);
-  background:var(--presenter-blue-soft);
-}
-
-.presenterTop10AnswerBtn.opened{
-  border-color:rgba(22,130,60,.32);
-  background:var(--presenter-green-soft);
-}
-
-.presenterTop10AnswerBtn.opened .presenterTop10AnswerNo{
-  background:var(--presenter-green);
-}
-
-.presenterTop10AnswerBtn:disabled{
-  cursor:not-allowed;
-}
-
-.presenterTop10AnswerBtn:disabled:not(.opened):not(.current):not(.pending){
-  opacity:.5;
+  display:none;
 }
 
 .top10RevealFx{
-  animation:presenterTop10Reveal .35s ease;
+  animation:presenterTop10Reveal .45s ease both;
 }
 
 @keyframes presenterTop10Reveal{
   0%{
-    transform:scale(.97);
+    transform:scale(.96);
+    filter:brightness(1);
   }
 
-  55%{
-    transform:scale(1.02);
+  50%{
+    transform:scale(1.025);
+    filter:brightness(1.08);
   }
 
   100%{
     transform:scale(1);
+    filter:brightness(1);
   }
 }
 
 /* =========================
-   8) LOADING
+   ACTIONS
 ========================= */
 
-.presenterTop10Loading{
-  grid-column:1 / -1;
+.presenterTop10Actions{
+  width:100%;
+  height:auto;
+  min-height:0;
+  margin:0;
 
-  min-height:120px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+
+  padding:0;
+
+  background:transparent;
+  border:0;
+  border-radius:0;
+
+  box-shadow:none;
+}
+
+.presenterTop10Actions .presenterBtn{
+  width:100%;
+  height:52px;
+  min-height:52px;
+
+  border:0;
+  border-radius:16px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  color:var(--presenter-muted);
-  font-size:.75rem;
+  cursor:pointer;
+
+  color:#FFFFFF;
+
+  font-size:.82rem;
+  line-height:1.1;
+  font-weight:400;
+  text-align:center;
+
+  transition:
+    transform .15s ease,
+    filter .15s ease,
+    opacity .15s ease;
+}
+
+.presenterTop10Actions .presenterBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+}
+
+.presenterTop10Actions .presenterBtn:active{
+  transform:scale(.97);
+}
+
+.presenterTop10DoubleBtn{
+  background:var(--btn-double);
+  color:#FFFFFF;
+}
+
+.presenterTop10ShowAnswerBtn{
+  background:var(--btn-correct);
+  color:#FFFFFF;
+}
+
+.presenterTop10WrongBtn{
+  background:var(--btn-wrong);
+  color:#FFFFFF;
+}
+
+.presenterTop10UndoBtn{
+  background:var(--btn-nav);
+  color:#FFFFFF;
+}
+
+.presenterTop10SwitchBtn{
+  background:var(--btn-switch);
+  color:#FFFFFF;
+}
+
+.presenterTop10NextRoundBtn{
+  background:var(--btn-next);
+  color:#FFFFFF;
+}
+
+.presenterTop10Actions .presenterBtn:disabled{
+  background:var(--btn-disabled);
+  color:var(--btn-disabled-text);
+
+  opacity:1;
+  cursor:not-allowed;
+  transform:none;
+  filter:none;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.presenterTop10Loading{
+  width:100%;
+  height:100%;
+  min-height:120px;
+
+  grid-column:1 / -1;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:14px;
+
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:20px;
+
+  color:var(--muted);
+
+  font-size:.9rem;
+  line-height:1.4;
+  font-weight:400;
   text-align:center;
 }
 
 /* =========================
-   9) ACTIONS
+   READER
 ========================= */
 
-.presenterTop10Actions{
-  min-width:0;
-
-  display:grid;
-  grid-template-columns:repeat(6,minmax(0,1fr));
-  gap:7px;
-}
-
-.presenterTop10Actions .presenterBtn{
-  min-height:50px;
-}
-
-.presenterTop10Actions .gray{
-  background:var(--presenter-surface);
-  border-color:var(--presenter-line-strong);
-  color:var(--presenter-secondary);
-}
-
-.presenterTop10Actions .green{
-  background:var(--presenter-green);
-  border-color:var(--presenter-green);
-  color:#FFFFFF;
-}
-
-.presenterTop10Actions .red{
-  background:var(--presenter-red);
-  border-color:var(--presenter-red);
-  color:#FFFFFF;
-}
-
-.presenterTop10Actions .blue{
-  background:var(--presenter-blue);
-  border-color:var(--presenter-blue);
-  color:#FFFFFF;
-}
-
-/* =========================
-   10) READER MODE
-========================= */
-
-.readerTop10Stack{
-  width:100%;
-  min-width:0;
-
-  display:grid;
-  gap:10px;
-}
-
-.readerTop10Round{
-  min-width:0;
-  padding:10px;
-
-  display:grid;
-  gap:8px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-lg);
-  background:var(--presenter-surface);
-}
-
-.readerTop10RoundHead{
-  min-width:0;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.readerTop10RoundHead > div{
-  min-width:0;
-}
-
-.readerTop10RoundHead span{
-  color:var(--presenter-primary);
-  font-size:.6rem;
-  line-height:1;
-}
-
-.readerTop10RoundHead h2{
-  margin-top:3px;
-  color:var(--presenter-secondary);
-  font-size:1rem;
-  line-height:1.1;
-  font-weight:400;
-}
-
-.readerTop10RoundHead > strong{
-  flex:0 0 auto;
-  padding:5px 8px;
-
-  border-radius:999px;
-  background:var(--presenter-secondary-soft);
-  color:var(--presenter-secondary);
-
-  font-size:.62rem;
-  line-height:1;
-  font-weight:400;
-}
-
-.readerMainQuestion,
-.readerTop10Question{
-  min-width:0;
-  padding:10px;
-
-  border:2px solid var(--presenter-line);
-  border-radius:var(--presenter-radius-md);
-  background:var(--presenter-surface-soft);
-
-  cursor:pointer;
-}
-
-.readerTop10Question label,
-.readerTop10Answer label{
-  display:block;
-  color:var(--presenter-muted);
-  font-size:.56rem;
-  line-height:1;
-}
-
-.readerTop10Question p{
-  margin-top:5px;
-  color:var(--presenter-secondary);
-  font-size:.9rem;
-  line-height:1.45;
-  font-weight:400;
-}
-
-.readerTop10Answers{
-  min-width:0;
-
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:6px;
-}
-
-.readerTop10Answer{
-  min-width:0;
-  min-height:54px;
-  padding:6px;
-
-  display:grid;
-  grid-template-columns:34px minmax(0,1fr);
-  align-items:center;
-  gap:7px;
-
-  border:1px solid var(--presenter-line);
-  border-radius:11px;
-  background:var(--presenter-surface-soft);
-
-  cursor:pointer;
-}
-
-.readerTop10Answer > strong{
-  width:34px;
-  height:34px;
+#presenterReaderPanel .readerQuestionCard{
+  margin-bottom:10px;
+  padding:12px 14px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  border-radius:9px;
-  background:var(--presenter-secondary);
-  color:#FFFFFF;
+  background:var(--soft);
+  border:1px solid var(--line);
+  border-radius:18px;
 
-  font-family:"MolhimCustom","HanakaText",sans-serif;
-  font-size:.8rem;
-  line-height:1;
+  color:var(--text);
+
+  font-size:1rem;
+  line-height:1.45;
   font-weight:400;
-}
-
-.readerTop10Answer > div{
-  min-width:0;
-}
-
-.readerTop10Answer span{
-  display:block;
-  margin-top:3px;
-
-  color:var(--presenter-secondary);
-  font-size:.74rem;
-  line-height:1.3;
-  font-weight:400;
-}
-
-.readerTop10Question.read,
-.readerTop10Answer.read{
-  border-color:rgba(22,130,60,.32);
-  background:var(--presenter-green-soft);
+  text-align:center;
 }
 
 /* =========================
-   11) GALAXY TAB A11 LANDSCAPE
+   IPAD / TABLET LANDSCAPE
 ========================= */
 
-@media
-  (min-width:900px)
-  and (max-width:1400px)
-  and (orientation:landscape)
-  and (min-height:500px){
-
-  .presenterTop10Screen{
-    gap:7px;
+@media (min-width:768px) and (max-width:1180px) and (orientation:landscape){
+  .presenterTop10Main{
+    grid-template-columns:minmax(0,1fr) 320px;
+    gap:8px;
   }
 
-  .presenterTop10Header{
-    grid-template-columns:minmax(0,1fr) 205px;
-    gap:7px;
-  }
-
-  .presenterTop10TeamsBox .presenterTeamBtn{
-    min-height:54px;
-  }
-
-  .presenterTop10RoundInfo{
-    padding:6px 8px;
-  }
-
-  .presenterTop10Content{
-    grid-template-columns:minmax(280px,.76fr) minmax(0,1.24fr);
-    gap:7px;
-  }
-
-  .presenterTop10QuestionCard,
+  .presenterTop10ControlCard,
   .presenterTop10AnswersCard{
-    padding:9px;
+    padding:8px;
+    border-radius:22px;
+  }
+
+  .presenterTop10ControlCard{
+    grid-template-rows:38px 38px minmax(0,1fr) auto;
+    gap:7px;
+  }
+
+  .presenterTop10RoundLine{
+    grid-template-columns:minmax(0,1fr) 90px;
+    gap:6px;
+  }
+
+  .presenterTop10RoundBadge,
+  .presenterTop10Timer,
+  .presenterTop10ErrorMiniBox{
+    height:38px;
+    min-height:38px;
+    border-radius:14px;
+  }
+
+  .presenterTop10RoundBadge{
+    grid-template-columns:minmax(0,1fr) 34px;
+  }
+
+  .presenterTop10RoundBadge span{
+    font-size:.65rem;
+  }
+
+  .presenterTop10RoundBadge strong{
+    width:34px;
+    height:24px;
+    min-width:34px;
+    border-radius:9px;
+    font-size:.82rem;
+  }
+
+  .presenterTop10Timer{
+    font-size:1.04rem;
+  }
+
+  .presenterTop10ErrorMiniBox{
+    grid-template-columns:30px minmax(0,1fr);
+    gap:5px;
+  }
+
+  .presenterTop10ErrorMiniBox span{
+    width:30px;
+    height:24px;
+    border-radius:8px;
+    font-size:.62rem;
+  }
+
+  .presenterTop10ErrorMiniBox strong{
+    font-size:.74rem;
+  }
+
+  .presenterTop10QuestionText{
+    padding:10px 12px;
+    border-radius:18px;
+    font-size:.92rem;
+    line-height:1.28;
+  }
+
+  .presenterTop10AnswersCols{
+    gap:10px;
+  }
+
+  .presenterTop10AnswersCol{
+    gap:7px;
   }
 
   .presenterTop10AnswerBtn{
-    padding:5px 7px;
+    grid-template-columns:46px minmax(0,1fr);
+    gap:7px;
+    padding:6px 9px;
+    border-radius:15px;
+  }
+
+  .presenterTop10AnswerNo{
+    width:46px;
+    border-radius:11px;
+    font-size:1.5rem;
+  }
+
+  .presenterTop10AnswerText{
+    font-size:.88rem;
+    line-height:1.18;
   }
 
   .presenterTop10Actions{
+    grid-template-columns:repeat(3,minmax(0,1fr));
     gap:6px;
   }
 
   .presenterTop10Actions .presenterBtn{
-    min-height:46px;
+    height:42px;
+    min-height:42px;
+    border-radius:14px;
+    font-size:.64rem;
+    line-height:1.08;
   }
 }
 
 /* =========================
-   12) IPHONE PRO MAX LANDSCAPE
+   IPHONE PRO MAX LANDSCAPE
 ========================= */
 
 @media
@@ -702,180 +752,148 @@
   and (orientation:landscape)
   and (max-height:500px){
 
-  .presenterTop10Screen{
-    grid-template-rows:42px minmax(0,1fr) 42px;
+  .presenterTop10Main{
+    grid-template-columns:minmax(0,1fr) 270px;
+    gap:6px;
+  }
+
+  .presenterTop10ControlCard,
+  .presenterTop10AnswersCard{
+    padding:6px;
+    border-radius:16px;
+  }
+
+  .presenterTop10ControlCard{
+    grid-template-rows:28px 28px minmax(0,1fr) auto;
     gap:5px;
   }
 
-  .presenterTop10Header{
-    grid-template-columns:minmax(0,1fr) 170px;
-    gap:5px;
+  .presenterTop10RoundLine{
+    grid-template-columns:minmax(0,1fr) 62px;
+    gap:4px;
   }
 
-  .presenterTop10TeamsBox .presenterTeamBtn{
-    min-height:42px;
-  }
-
-  .presenterTop10RoundInfo{
-    padding:4px 5px;
-    grid-template-columns:48px minmax(0,1fr);
-    gap:5px;
+  .presenterTop10RoundBadge,
+  .presenterTop10Timer,
+  .presenterTop10ErrorMiniBox{
+    height:28px;
+    min-height:28px;
     border-radius:10px;
   }
 
   .presenterTop10RoundBadge{
-    width:48px;
-    min-height:34px;
-    border-radius:8px;
+    grid-template-columns:minmax(0,1fr) 24px;
+    padding:3px;
+    gap:3px;
   }
 
   .presenterTop10RoundBadge span{
-    font-size:.45rem;
+    font-size:.46rem;
   }
 
   .presenterTop10RoundBadge strong{
-    font-size:.8rem;
+    width:24px;
+    height:18px;
+    min-width:24px;
+    border-radius:6px;
+    font-size:.55rem;
   }
 
-  .presenterTop10StatusText{
-    font-size:.53rem;
+  .presenterTop10Timer{
+    font-size:.72rem;
   }
 
-  .presenterTop10Content{
-    grid-template-columns:minmax(220px,.72fr) minmax(0,1.28fr);
-    gap:5px;
-  }
-
-  .presenterTop10QuestionCard,
-  .presenterTop10AnswersCard{
-    padding:6px;
-    gap:5px;
-    border-radius:11px;
-  }
-
-  .presenterTop10QuestionHint,
-  .presenterTop10AnswersHint{
-    display:none;
-  }
-
-  .presenterTop10ErrorsMini{
-    grid-template-columns:repeat(2,64px);
+  .presenterTop10ErrorsLine{
     gap:4px;
   }
 
   .presenterTop10ErrorMiniBox{
-    min-height:32px;
-    padding:3px 5px;
-    border-radius:8px;
-  }
-
-  .presenterTop10ErrorMiniBox span{
-    font-size:.43rem;
-  }
-
-  .presenterTop10ErrorMiniBox strong{
-    font-size:.58rem;
-  }
-
-  .presenterTop10QuestionText{
-    padding:7px;
-    border-radius:9px;
-    font-size:.72rem;
-    line-height:1.35;
-  }
-
-  .presenterTop10AnswersCols{
-    gap:4px;
-  }
-
-  .presenterTop10AnswersCol{
+    grid-template-columns:20px minmax(0,1fr);
+    padding:3px;
     gap:3px;
   }
 
+  .presenterTop10ErrorMiniBox span{
+    width:20px;
+    height:18px;
+    border-radius:6px;
+    font-size:.46rem;
+  }
+
+  .presenterTop10ErrorMiniBox strong{
+    font-size:.5rem;
+  }
+
+  .presenterTop10QuestionText{
+    padding:6px 7px;
+    border-radius:11px;
+    font-size:.56rem;
+    line-height:1.22;
+  }
+
+  .presenterTop10AnswersCols{
+    gap:6px;
+  }
+
+  .presenterTop10AnswersCol{
+    gap:5px;
+  }
+
   .presenterTop10AnswerBtn{
-    padding:3px 5px;
-    grid-template-columns:28px minmax(0,1fr);
-    gap:1px 5px;
-    border-radius:8px;
+    grid-template-columns:30px minmax(0,1fr);
+    gap:5px;
+    padding:4px 5px;
+    border-radius:11px;
   }
 
   .presenterTop10AnswerNo{
-    width:28px;
-    height:28px;
-    border-radius:7px;
-    font-size:.68rem;
+    width:30px;
+    border-radius:8px;
+    font-size:.9rem;
   }
 
   .presenterTop10AnswerText{
     font-size:.55rem;
-    line-height:1.15;
-  }
-
-  .presenterTop10OpenedBy{
-    font-size:.42rem;
+    line-height:1.14;
   }
 
   .presenterTop10Actions{
-    grid-template-columns:repeat(6,minmax(0,1fr));
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:5px;
+  }
+
+  .presenterTop10Actions .presenterBtn{
+    height:30px;
+    min-height:30px;
+    border-radius:10px;
+    font-size:.48rem;
+    line-height:1.05;
+  }
+
+  #presenterReaderPanel .readerQuestionCard{
+    margin-bottom:6px;
+    padding:7px;
+    border-radius:12px;
+    font-size:.6rem;
+    line-height:1.3;
+  }
+}
+
+/* =========================
+   SMALL HEIGHT FALLBACK
+========================= */
+
+@media (max-height:420px){
+  .presenterTop10Main{
+    gap:5px;
+  }
+
+  .presenterTop10ControlCard{
     gap:4px;
   }
 
   .presenterTop10Actions .presenterBtn{
-    min-height:42px;
-    padding:4px 5px;
-    font-size:.55rem;
-    border-radius:9px;
-  }
-
-  .readerTop10Stack{
-    gap:6px;
-  }
-
-  .readerTop10Round{
-    padding:6px;
-    gap:5px;
-    border-radius:11px;
-  }
-
-  .readerTop10RoundHead h2{
-    font-size:.72rem;
-  }
-
-  .readerTop10RoundHead > strong{
-    font-size:.48rem;
-  }
-
-  .readerTop10Question{
-    padding:6px;
-    border-radius:8px;
-  }
-
-  .readerTop10Question p{
-    margin-top:3px;
-    font-size:.62rem;
-    line-height:1.3;
-  }
-
-  .readerTop10Answers{
-    gap:4px;
-  }
-
-  .readerTop10Answer{
-    min-height:40px;
-    padding:4px;
-    grid-template-columns:26px minmax(0,1fr);
-    gap:5px;
-    border-radius:8px;
-  }
-
-  .readerTop10Answer > strong{
-    width:26px;
-    height:26px;
-    border-radius:7px;
-    font-size:.6rem;
-  }
-
-  .readerTop10Answer span{
-    font-size:.52rem;
+    height:28px;
+    min-height:28px;
   }
 }
